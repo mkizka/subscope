@@ -1,2 +1,9 @@
 node_modules/
+dist/
+
+# turbo
 .turbo/
+
+# next
+.next/
+next-env.d.ts
