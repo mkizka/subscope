@@ -6,7 +6,7 @@
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
-      "inputs": ["**/*.{ts,tsx}"]
+      "inputs": ["**/eslint.config.mjs", "**/*.{ts,tsx}"]
     },
     "dev": {
       "persistent": true,
