@@ -8,12 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@mkizka/eslint-config':
-        specifier: 5.3.2
-        version: 5.3.2(@typescript-eslint/eslint-plugin@8.11.0(@typescript-eslint/parser@8.11.0(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(tailwindcss@3.4.14)(typescript@5.6.3)
-      eslint:
-        specifier: 9.13.0
-        version: 9.13.0(jiti@1.21.6)
       husky:
         specifier: 9.1.6
         version: 9.1.6
@@ -36,7 +30,23 @@ importers:
         specifier: 0.0.2
         version: 0.0.2
 
-  apps/common: {}
+  apps/common:
+    devDependencies:
+      '@mkizka/eslint-config':
+        specifier: 5.3.2
+        version: 5.3.2(@typescript-eslint/eslint-plugin@8.11.0(@typescript-eslint/parser@8.11.0(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(tailwindcss@3.4.14)(typescript@5.6.3)
+      '@tsconfig/node20':
+        specifier: 20.1.4
+        version: 20.1.4
+      '@tsconfig/strictest':
+        specifier: 2.0.5
+        version: 2.0.5
+      eslint:
+        specifier: 9.13.0
+        version: 9.13.0(jiti@1.21.6)
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
 
   apps/ingester:
     dependencies:
@@ -44,6 +54,9 @@ importers:
         specifier: 4.21.1
         version: 4.21.1
     devDependencies:
+      '@mkizka/eslint-config':
+        specifier: 5.3.2
+        version: 5.3.2(@typescript-eslint/eslint-plugin@8.11.0(@typescript-eslint/parser@8.11.0(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(tailwindcss@3.4.14)(typescript@5.6.3)
       '@tsconfig/node20':
         specifier: 20.1.4
         version: 20.1.4
@@ -53,6 +66,9 @@ importers:
       '@types/express':
         specifier: 5.0.0
         version: 5.0.0
+      eslint:
+        specifier: 9.13.0
+        version: 9.13.0(jiti@1.21.6)
       tsx:
         specifier: 4.19.2
         version: 4.19.2
@@ -64,7 +80,7 @@ importers:
     dependencies:
       next:
         specifier: 15.0.1
-        version: 15.0.1(@babel/core@7.26.0)(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021)
+        version: 15.0.1(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021)
       react:
         specifier: 19.0.0-rc-69d4b800-20241021
         version: 19.0.0-rc-69d4b800-20241021
@@ -72,6 +88,9 @@ importers:
         specifier: 19.0.0-rc-69d4b800-20241021
         version: 19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021)
     devDependencies:
+      '@mkizka/eslint-config':
+        specifier: 5.3.2
+        version: 5.3.2(@typescript-eslint/eslint-plugin@8.11.0(@typescript-eslint/parser@8.11.0(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.13.0(jiti@1.21.6))(tailwindcss@3.4.14)(typescript@5.6.3)
       '@types/node':
         specifier: 22.8.1
         version: 22.8.1
@@ -81,6 +100,9 @@ importers:
       '@types/react-dom':
         specifier: 18.3.1
         version: 18.3.1
+      eslint:
+        specifier: 9.13.0
+        version: 9.13.0(jiti@1.21.6)
       postcss:
         specifier: 8.4.47
         version: 8.4.47
@@ -4064,7 +4086,7 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  next@15.0.1(@babel/core@7.26.0)(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021):
+  next@15.0.1(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021):
     dependencies:
       '@next/env': 15.0.1
       '@swc/counter': 0.1.3
@@ -4074,7 +4096,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.0.0-rc-69d4b800-20241021
       react-dom: 19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021)
-      styled-jsx: 5.1.6(@babel/core@7.26.0)(react@19.0.0-rc-69d4b800-20241021)
+      styled-jsx: 5.1.6(react@19.0.0-rc-69d4b800-20241021)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.0.1
       '@next/swc-darwin-x64': 15.0.1
@@ -4559,12 +4581,10 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(@babel/core@7.26.0)(react@19.0.0-rc-69d4b800-20241021):
+  styled-jsx@5.1.6(react@19.0.0-rc-69d4b800-20241021):
     dependencies:
       client-only: 0.0.1
       react: 19.0.0-rc-69d4b800-20241021
-    optionalDependencies:
-      '@babel/core': 7.26.0
 
   sucrase@3.35.0:
     dependencies:

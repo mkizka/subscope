@@ -3,15 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development tsx watch ./src/server.ts"
+    "dev": "NODE_ENV=development tsx watch ./src/server.ts",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint"
   },
   "dependencies": {
     "express": "4.21.1"
   },
   "devDependencies": {
+    "@mkizka/eslint-config": "5.3.2",
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/strictest": "2.0.5",
     "@types/express": "5.0.0",
+    "eslint": "9.13.0",
     "tsx": "4.19.2",
     "typescript": "5.6.3"
   }
