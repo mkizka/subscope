@@ -3,7 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Murecho } from "next/font/google";
 
-import FlyonuiScript from "./_components/FlyonScript";
+import { FlyonuiScript } from "./_components/flyon-script";
 
 const murecho = Murecho({
   subsets: ["latin"],
