@@ -1,11 +1,10 @@
+import flyonui from "flyonui";
+// @ts-expect-error
+import flyonuiPlugin from "flyonui/plugin";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./app/**/*.{ts,tsx}", "./node_modules/flyonui/dist/js/*.js"],
   theme: {
     extend: {
       colors: {
@@ -14,6 +13,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [flyonui, flyonuiPlugin],
 };
 export default config;
