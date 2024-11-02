@@ -7,3 +7,9 @@ dist/
 # next
 .next/
 next-env.d.ts
+
+# atproto
+atproto/
+generated/
+apps/common/lexicons/app/bsky/
+apps/common/lexicons/com/atproto/
