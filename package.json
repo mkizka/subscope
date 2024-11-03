@@ -13,7 +13,7 @@
     "lint-staged": "15.2.10",
     "prettier": "3.3.3",
     "prettier-plugin-pkg": "0.18.1",
-    "react": "19.0.0-rc-69d4b800-20241021",
+    "react": "19.0.0-rc-02c0e824-20241028",
     "turbo": "2.2.3",
     "web": "0.0.2"
   },
