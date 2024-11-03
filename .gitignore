@@ -1,5 +1,6 @@
 node_modules/
 dist/
+generated/
 
 # turbo
 .turbo/
@@ -8,8 +9,9 @@ dist/
 .next/
 next-env.d.ts
 
-# atproto
-atproto/
-generated/
+# apps/dev-atproto
+apps/dev-atproto/atproto/
+
+# apps/common
 apps/common/lexicons/app/bsky/
 apps/common/lexicons/com/atproto/
