@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "chokidar lexicons/dev/**/*.json --command ./scripts/generate.sh --initial",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint"
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "migrate": "prisma db push --skip-generate"
+  },
+  "dependencies": {
+    "@prisma/client": "5.21.1"
   },
   "devDependencies": {
     "@atproto/lex-cli": "0.5.1",
@@ -13,6 +17,7 @@
     "@tsconfig/strictest": "2.0.5",
     "chokidar-cli": "3.0.0",
     "eslint": "9.14.0",
+    "prisma": "5.21.1",
     "typescript": "5.6.3"
   }
 }

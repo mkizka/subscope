@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p ./src/app/bsky/feed
-mkdir -p ./src/com/atproto
+mkdir -p ./lexicons/app/bsky/feed
+mkdir -p ./lexicons/com/atproto
 
 cp ../dev-atproto/atproto/lexicons/app/bsky/feed/post.json ./lexicons/app/bsky/feed/post.json
 cp -r ../dev-atproto/atproto/lexicons/com/atproto/repo ./lexicons/com/atproto
