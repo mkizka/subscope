@@ -1,0 +1,12 @@
+{
+  "name": "@dawn/client",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "chokidar ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial"
+  },
+  "devDependencies": {
+    "@atproto/lex-cli": "0.5.1",
+    "chokidar-cli": "3.0.0"
+  }
+}

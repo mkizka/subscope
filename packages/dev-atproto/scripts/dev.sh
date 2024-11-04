@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ ! -d ./atproto/node_modules ]; then
-  cd atproto
+ATPROTO_DIR=../../atproto
+
+cd $ATPROTO_DIR
+if [ ! -d node_modules ]; then
   make deps
   make build
-  cd ..
 fi
-
-cd atproto
 make run-dev-env

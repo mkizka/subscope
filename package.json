@@ -6,9 +6,11 @@
     "build": "turbo run build",
     "dev": "turbo run dev --ui tui",
     "lint": "turbo run lint",
+    "postinstall": "./scripts/postinstall.sh",
     "prepare": "husky"
   },
   "devDependencies": {
+    "giget": "1.2.3",
     "husky": "9.1.6",
     "lint-staged": "15.2.10",
     "prettier": "3.3.3",

@@ -10,9 +10,7 @@ generated/
 .next/
 next-env.d.ts
 
-# apps/dev-atproto
-apps/dev-atproto/atproto/
-
-# apps/common
-apps/common/lexicons/app/bsky/
-apps/common/lexicons/com/atproto/
+# atproto
+atproto/
+lexicons/app/bsky/
+lexicons/com/atproto/
