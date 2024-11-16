@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "docker compose up"
+    "dev": "wait-on tcp:2583 && docker compose up"
+  },
+  "devDependencies": {
+    "wait-on": "8.0.1"
   }
 }
