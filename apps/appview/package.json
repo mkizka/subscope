@@ -1,20 +1,32 @@
 {
   "name": "@dawn/appview",
   "version": "0.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development tsx watch ./src/server.ts",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint"
   },
   "dependencies": {
+    "@atproto/api": "0.13.14",
+    "@atproto/identity": "0.4.2",
+    "@dawn/common": "workspace:*",
+    "@dawn/db": "workspace:*",
     "@skyware/jetstream": "0.2.0",
-    "express": "4.21.1"
+    "express": "4.21.1",
+    "pino": "9.5.0",
+    "pino-http": "10.3.0",
+    "ws": "8.18.0",
+    "zod": "3.23.8",
+    "zod-validation-error": "3.4.0"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "5.3.4",
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/strictest": "2.0.5",
     "@types/express": "5.0.0",
+    "@types/node": "22.8.7",
+    "@types/ws": "8.5.13",
     "eslint": "9.14.0",
     "tsx": "4.19.2",
     "typescript": "5.6.3"
