@@ -8,16 +8,16 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint"
   },
   "dependencies": {
-    "@atproto/api": "0.13.18",
+    "@atproto/api": "0.13.22",
     "@atproto/identity": "0.4.3",
     "@dawn/common": "workspace:*",
     "@dawn/db": "workspace:*",
     "@skyware/jetstream": "0.2.1",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "pino": "9.5.0",
     "pino-http": "10.3.0",
     "ws": "8.18.0",
-    "zod": "3.23.8",
+    "zod": "3.24.1",
     "zod-validation-error": "3.4.0"
   },
   "devDependencies": {
@@ -25,9 +25,9 @@
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/strictest": "2.0.5",
     "@types/express": "5.0.0",
-    "@types/node": "22.10.1",
+    "@types/node": "22.10.2",
     "@types/ws": "8.5.13",
-    "eslint": "9.16.0",
+    "eslint": "9.17.0",
     "tsx": "4.19.2",
     "typescript": "5.7.2"
   }

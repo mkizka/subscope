@@ -9,24 +9,24 @@
     "start": "next start"
   },
   "dependencies": {
-    "@atproto/api": "0.13.18",
+    "@atproto/api": "0.13.22",
     "@t3-oss/env-nextjs": "0.11.1",
-    "flyonui": "1.1.0",
-    "next": "15.0.3",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
-    "zod": "3.23.8"
+    "flyonui": "1.2.0",
+    "next": "15.1.2",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "5.3.4",
-    "@types/node": "22.10.1",
-    "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
-    "eslint": "9.16.0",
-    "eslint-config-next": "15.0.3",
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "eslint": "9.17.0",
+    "eslint-config-next": "15.1.2",
     "eslint-config-next-flat": "0.1.2",
     "postcss": "8.4.49",
-    "tailwindcss": "3.4.15",
+    "tailwindcss": "3.4.17",
     "typescript": "5.7.2"
   }
 }
