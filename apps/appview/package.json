@@ -23,7 +23,6 @@
   "devDependencies": {
     "@mkizka/eslint-config": "5.3.4",
     "@tsconfig/node20": "20.1.4",
-    "@tsconfig/strictest": "2.0.5",
     "@types/express": "5.0.0",
     "@types/node": "22.10.2",
     "@types/ws": "8.5.13",

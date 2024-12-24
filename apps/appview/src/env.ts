@@ -2,7 +2,7 @@ import { z } from "zod";
 import { fromError } from "zod-validation-error";
 
 const match = <Prod, Default>({ prod, dev }: { prod: Prod; dev: Default }) => {
-  return process.env["NODE_ENV"] === "production" ? prod : dev;
+  return process.env.NODE_ENV === "production" ? prod : dev;
 };
 
 const schema = z.object({
