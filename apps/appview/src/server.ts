@@ -2,6 +2,7 @@ import express from "express";
 import { pinoHttp } from "pino-http";
 
 import { createLogger } from "./logger.js";
+import { userRouter } from "./presentation/controllers/user.js";
 import { jetstream } from "./subscription.js";
 
 const app = express();
@@ -11,9 +12,7 @@ app.use(pinoHttp());
 
 const logger = createLogger("server");
 
-app.get("/", (_, res) => {
-  res.send("Hello World!");
-});
+app.use(userRouter);
 
 jetstream.start();
 

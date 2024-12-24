@@ -1,7 +1,9 @@
-import type { User } from "../domain/user.js";
+import type { User } from "../domain/models/user.js";
 
 export class UserRepository {
   async save(user: User) {
-    // prisma.user.create( ... )
+    // eslint-disable-next-line no-console
+    console.log(`User ${user.did} saved`);
+    return Promise.resolve();
   }
 }

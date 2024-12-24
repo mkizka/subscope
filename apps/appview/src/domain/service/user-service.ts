@@ -1,4 +1,4 @@
-import type { User } from "../domain/user.js";
+import type { User } from "../models/user.js";
 
 export class UserService {
   constructor(private user: User) {}

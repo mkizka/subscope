@@ -16,6 +16,7 @@
     "express": "4.21.2",
     "pino": "9.5.0",
     "pino-http": "10.3.0",
+    "typed-inject": "5.0.0",
     "ws": "8.18.0",
     "zod": "3.24.1",
     "zod-validation-error": "3.4.0"
