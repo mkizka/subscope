@@ -1,10 +1,13 @@
 {
   "name": "@dawn/db",
   "version": "0.0.0",
+  "type": "module",
   "private": true,
-  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
   "scripts": {
-    "postinstall": "prisma generate"
+    "generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "6.1.0"

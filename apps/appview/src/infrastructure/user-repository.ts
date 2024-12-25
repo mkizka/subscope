@@ -1,9 +1,23 @@
+import { PrismaClient } from "@dawn/db";
+
+import type { IUserRepository } from "../application/create-user-use-case.js";
 import type { User } from "../domain/models/user.js";
 
-export class UserRepository {
+export class UserRepository implements IUserRepository {
+  prisma: PrismaClient;
+
+  constructor() {
+    this.prisma = new PrismaClient();
+  }
+
   async save(user: User) {
-    // eslint-disable-next-line no-console
-    console.log(`User ${user.did} saved`);
-    return Promise.resolve();
+    await this.prisma.user.create({
+      data: {
+        did: user.did,
+        avatar: user.avatar,
+        description: user.description,
+        handle: user.handle,
+      },
+    });
   }
 }

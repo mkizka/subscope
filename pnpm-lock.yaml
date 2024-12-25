@@ -93,6 +93,9 @@ importers:
       typescript:
         specifier: 5.7.2
         version: 5.7.2
+      wait-on:
+        specifier: 8.0.1
+        version: 8.0.1
 
   apps/web:
     dependencies:
