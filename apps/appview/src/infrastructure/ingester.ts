@@ -43,11 +43,12 @@ export class Ingester implements IIngester {
     // 何が変更されたかを示すものではなく、ID の現在の状態が何であるかを確実に示すものでもありません。
     // https://atproto.com/ja/specs/sync
     jetstream.on("identity", async (event) => {
-      logger.debug(event, "Jetstream identity event received");
-      await this.userRepository.createOrUpdate({
+      const dto = {
         did: event.identity.did,
         handle: event.identity.handle,
-      });
+      };
+      logger.debug(dto, "identity event received");
+      await this.userRepository.createOrUpdate(dto);
     });
 
     jetstream.onCreate("app.bsky.actor.profile", (event) => {
