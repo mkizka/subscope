@@ -7,6 +7,9 @@ const match = <Prod, Default>({ prod, dev }: { prod: Prod; dev: Default }) => {
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
+  LOG_LEVEL: z
+    .enum(["debug", "info", "warn", "error"])
+    .default(match({ prod: "info", dev: "debug" })),
   PLC_URL: z
     .string()
     .url()

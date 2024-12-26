@@ -11,9 +11,10 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
   jetstream:
-    image: ghcr.io/bluesky-social/jetstream:sha-011b545
+    image: ghcr.io/bluesky-social/jetstream:sha-ea96859
     restart: always
     network_mode: host
     environment:
       - JETSTREAM_WS_URL=ws://localhost:2583/xrpc/com.atproto.sync.subscribeRepos
       - JETSTREAM_WORKER_COUNT=1
+      - JETSTREAM_LIVENESS_TTL=10m
