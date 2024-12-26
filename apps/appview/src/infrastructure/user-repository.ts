@@ -1,22 +1,18 @@
+import type { Did } from "@atproto/api";
 import { PrismaClient } from "@dawn/db";
 
-import type { IUserRepository } from "../application/create-user-use-case.js";
-import type { User } from "../domain/models/user.js";
-
-export class UserRepository implements IUserRepository {
+export class UserRepository {
   prisma: PrismaClient;
 
   constructor() {
     this.prisma = new PrismaClient();
   }
 
-  async save(user: User) {
+  async create(createUserDto: { did: Did; handle?: string }) {
     await this.prisma.user.create({
       data: {
-        did: user.did,
-        avatar: user.avatar,
-        description: user.description,
-        handle: user.handle,
+        did: createUserDto.did,
+        handle: createUserDto.handle,
       },
     });
   }

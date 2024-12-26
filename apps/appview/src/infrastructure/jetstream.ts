@@ -1,16 +1,15 @@
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
-import type { ICreateUserUseCase } from "../application/create-user-use-case.js";
-import type { IIngester } from "../application/start-ingestion-use-case.js";
 import { env } from "../shared/env.js";
 import { createLogger } from "../shared/logger.js";
+import type { UserRepository } from "./user-repository.js";
 
-const logger = createLogger("jetstream-ingester");
+const logger = createLogger("JetstreamIngester");
 
-export class JetstreamIngester implements IIngester {
-  constructor(private createUserUseCase: ICreateUserUseCase) {}
-  static inject = ["createUserUseCase"] as const;
+export class JetstreamIngester {
+  constructor(private userRepository: UserRepository) {}
+  static inject = ["userRepository"] as const;
 
   start() {
     const jetstream = new Jetstream({
@@ -29,6 +28,22 @@ export class JetstreamIngester implements IIngester {
 
     jetstream.on("error", (error) => {
       logger.error(error, "Jetstream error occurred");
+    });
+
+    jetstream.on("commit", (commit) => {
+      logger.debug(commit, "Jetstream commit received");
+    });
+
+    jetstream.on("account", (account) => {
+      logger.debug(account, "Jetstream account event received");
+    });
+
+    jetstream.on("identity", async (event) => {
+      logger.debug(event, "Jetstream identity event received");
+      await this.userRepository.create({
+        did: event.identity.did,
+        handle: event.identity.handle,
+      });
     });
 
     jetstream.onCreate("app.bsky.actor.profile", (event) => {
