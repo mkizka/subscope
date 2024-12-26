@@ -1,9 +1,11 @@
-export class User {
-  did: string;
-  handle: string;
+import type { Did } from "@atproto/api";
 
-  constructor(options: { did: string; handle: string }) {
+export class User {
+  did: Did;
+  handle: string | null;
+
+  constructor(options: { did: Did; handle?: string }) {
     this.did = options.did;
-    this.handle = options.handle;
+    this.handle = options.handle ?? null;
   }
 }

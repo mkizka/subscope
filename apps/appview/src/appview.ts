@@ -1,4 +1,13 @@
-import { Server } from "./application/server.js";
-import { appInjector } from "./presentation/injector.js";
+import { createInjector } from "typed-inject";
 
-appInjector.injectClass(Server).start();
+import { UserService } from "./domain/service/user.js";
+import { JetstreamIngester } from "./infrastructure/jetstream.js";
+import { UserRepository } from "./infrastructure/repositories/user.js";
+import { Server } from "./presentation/server.js";
+
+createInjector()
+  .provideClass("userRepository", UserRepository)
+  .provideClass("userService", UserService)
+  .provideClass("ingester", JetstreamIngester)
+  .injectClass(Server)
+  .start();

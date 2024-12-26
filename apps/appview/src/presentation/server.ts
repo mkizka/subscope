@@ -1,14 +1,11 @@
 import express from "express";
 import { pinoHttp } from "pino-http";
 
+import type { IIngester } from "../domain/repositories/ingester.js";
 import { env } from "../shared/env.js";
 import { createLogger } from "../shared/logger.js";
 
 const logger = createLogger("Server");
-
-export interface IIngester {
-  start(): void;
-}
 
 export class Server {
   constructor(private readonly ingester: IIngester) {}
