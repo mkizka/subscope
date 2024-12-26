@@ -41,9 +41,9 @@ importers:
       '@dawn/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@dawn/db':
-        specifier: workspace:*
-        version: link:../../packages/db
+      '@prisma/client':
+        specifier: 6.1.0
+        version: 6.1.0(prisma@6.1.0)
       '@skyware/jetstream':
         specifier: 0.2.1
         version: 0.2.1(@atcute/client@2.0.3)
@@ -90,6 +90,9 @@ importers:
       pino-pretty:
         specifier: 13.0.0
         version: 13.0.0
+      prisma:
+        specifier: 6.1.0
+        version: 6.1.0
       tsx:
         specifier: 4.19.2
         version: 4.19.2
@@ -165,16 +168,6 @@ importers:
         version: 3.0.0
 
   packages/common: {}
-
-  packages/db:
-    dependencies:
-      '@prisma/client':
-        specifier: 6.1.0
-        version: 6.1.0(prisma@6.1.0)
-    devDependencies:
-      prisma:
-        specifier: 6.1.0
-        version: 6.1.0
 
   packages/dev-atproto: {}
 

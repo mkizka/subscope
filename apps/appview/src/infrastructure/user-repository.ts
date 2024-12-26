@@ -1,18 +1,14 @@
 import type { Did } from "@atproto/api";
-import { PrismaClient } from "@dawn/db";
+
+import { prisma } from "./prisma.js";
 
 export class UserRepository {
-  prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
-  async create(createUserDto: { did: Did; handle?: string }) {
-    await this.prisma.user.create({
-      data: {
+  async createOrUpdate(createUserDto: { did: Did; handle?: string }) {
+    await prisma.user.upsert({
+      create: createUserDto,
+      update: createUserDto,
+      where: {
         did: createUserDto.did,
-        handle: createUserDto.handle,
       },
     });
   }

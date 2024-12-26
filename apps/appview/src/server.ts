@@ -1,7 +1,7 @@
 import express from "express";
 import { pinoHttp } from "pino-http";
 
-import { JetstreamIngester } from "./infrastructure/jetstream.js";
+import { Ingester } from "./infrastructure/ingester.js";
 import { appInjector } from "./presentation/injector.js";
 import { createLogger } from "./shared/logger.js";
 
@@ -12,7 +12,7 @@ app.use(pinoHttp());
 
 const logger = createLogger("server");
 
-const ingester = appInjector.injectClass(JetstreamIngester);
+const ingester = appInjector.injectClass(Ingester);
 
 app.listen(PORT, () => {
   logger.info(`Appview server listening on port ${PORT}`);
