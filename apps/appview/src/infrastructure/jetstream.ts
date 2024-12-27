@@ -1,6 +1,7 @@
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
+import type { SyncProfileUseCase } from "../application/sync-profile.js";
 import type { SyncUserUseCase } from "../application/sync-user.js";
 import type { IIngester } from "../domain/repositories/ingester.js";
 import { env } from "../shared/env.js";
@@ -9,8 +10,11 @@ import { createLogger } from "../shared/logger.js";
 const logger = createLogger("JetstreamIngester");
 
 export class JetstreamIngester implements IIngester {
-  constructor(private syncUserUseCase: SyncUserUseCase) {}
-  static inject = ["syncUserUseCase"] as const;
+  constructor(
+    private syncUserUseCase: SyncUserUseCase,
+    private syncProfileUseCase: SyncProfileUseCase,
+  ) {}
+  static inject = ["syncUserUseCase", "syncProfileUseCase"] as const;
 
   start() {
     const jetstream = new Jetstream({
@@ -51,8 +55,15 @@ export class JetstreamIngester implements IIngester {
       await this.syncUserUseCase.execute(user);
     });
 
-    jetstream.onCreate("app.bsky.actor.profile", (event) => {
-      logger.info(event, "Profile created");
+    jetstream.onCreate("app.bsky.actor.profile", async (event) => {
+      const profile = {
+        did: event.did,
+        // avatar: event.commit.record.avatar,
+        description: event.commit.record.description,
+        displayName: event.commit.record.displayName,
+      };
+      logger.debug(event, "Profile created");
+      await this.syncProfileUseCase.execute(profile);
     });
 
     jetstream.onUpdate("app.bsky.actor.profile", (event) => {
