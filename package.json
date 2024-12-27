@@ -6,6 +6,7 @@
     "build": "turbo run build",
     "db:migrate": "turbo run db:migrate",
     "dev": "turbo run dev --ui tui",
+    "format": "prettier . --ignore-unknown --write && turbo run lint -- --fix",
     "lint": "turbo run lint",
     "postinstall": "./scripts/postinstall.sh",
     "prepare": "husky"

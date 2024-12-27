@@ -1,17 +1,16 @@
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
-import { User } from "../domain/models/user.js";
+import type { SyncUserUseCase } from "../application/sync-user.js";
 import type { IIngester } from "../domain/repositories/ingester.js";
-import type { UserService } from "../domain/service/user.js";
 import { env } from "../shared/env.js";
 import { createLogger } from "../shared/logger.js";
 
 const logger = createLogger("JetstreamIngester");
 
 export class JetstreamIngester implements IIngester {
-  constructor(private userService: UserService) {}
-  static inject = ["userService"] as const;
+  constructor(private syncUserUseCase: SyncUserUseCase) {}
+  static inject = ["syncUserUseCase"] as const;
 
   start() {
     const jetstream = new Jetstream({
@@ -44,12 +43,12 @@ export class JetstreamIngester implements IIngester {
     // 何が変更されたかを示すものではなく、ID の現在の状態が何であるかを確実に示すものでもありません。
     // https://atproto.com/ja/specs/sync
     jetstream.on("identity", async (event) => {
-      const user = new User({
+      const user = {
         did: event.identity.did,
         handle: event.identity.handle,
-      });
+      };
       logger.debug(user, "identity event received");
-      await this.userService.sync(user);
+      await this.syncUserUseCase.execute(user);
     });
 
     jetstream.onCreate("app.bsky.actor.profile", (event) => {
