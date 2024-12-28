@@ -12,5 +12,5 @@ next-env.d.ts
 
 # atproto
 atproto/
-lexicons/app/bsky/
-lexicons/com/atproto/
+lexicons/
+!lexicons/dev/mkizka/

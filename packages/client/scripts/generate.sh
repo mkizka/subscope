@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ATPROTO_DIR=../../atproto
+ATPROTO_DIR=../../atproto/lexicons
 LEXICONS_DIR=../../lexicons
 
-mkdir -p $LEXICONS_DIR/app/bsky/feed
-mkdir -p $LEXICONS_DIR/com/atproto
-
-cp $ATPROTO_DIR/lexicons/app/bsky/feed/post.json $LEXICONS_DIR/app/bsky/feed/post.json
-cp -r $ATPROTO_DIR/lexicons/com/atproto/repo $LEXICONS_DIR/com/atproto
+cp -r $ATPROTO_DIR/* $LEXICONS_DIR
 
 LEXICONS=$(find $LEXICONS_DIR -name '*.json' -type f)
 echo y | pnpm lex gen-api ./src/generated/api $LEXICONS
