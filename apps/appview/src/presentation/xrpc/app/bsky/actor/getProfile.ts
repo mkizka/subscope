@@ -1,3 +1,4 @@
+import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { AppBskyActorDefs, Server } from "@dawn/client";
 
 import type { IProfileRepository } from "../../../../../domain/repositories/profile.js";
@@ -11,10 +12,7 @@ export class GetProfile {
       handler: async ({ params }) => {
         const profile = await this.profileRepository.findOne(params.actor);
         if (!profile) {
-          return {
-            status: 404,
-            message: "Profile not found",
-          };
+          throw new InvalidRequestError("Profile not found");
         }
         return {
           encoding: "application/json",
