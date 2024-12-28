@@ -1,3 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient();
+import { createLogger } from "../shared/logger.js";
+
+export const prisma = new PrismaClient({
+  log: [
+    {
+      level: "query",
+      emit: "event",
+    },
+  ],
+});
+
+const logger = createLogger("prisma");
+
+prisma.$on("query", (e) => {
+  logger.debug({ params: e.params, duration: e.duration }, e.query);
+});

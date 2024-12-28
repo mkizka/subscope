@@ -4,12 +4,19 @@ import { prisma } from "../prisma.js";
 
 export class ProfileRepository implements IProfileRepository {
   async createOrUpdate(profile: Profile) {
+    const { did, ...data } = profile;
     await prisma.profile.upsert({
-      create: profile,
-      update: profile,
-      where: {
-        did: profile.did,
+      create: {
+        ...data,
+        user: {
+          connectOrCreate: {
+            where: { did },
+            create: { did },
+          },
+        },
       },
+      update: data,
+      where: { did },
     });
   }
 }
