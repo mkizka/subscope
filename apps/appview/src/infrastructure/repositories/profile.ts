@@ -3,8 +3,9 @@ import type { IProfileRepository } from "../../domain/repositories/profile.js";
 import { prisma } from "../prisma.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async findOne() {
+  async findOne(did: string) {
     const profile = await prisma.profile.findFirst({
+      where: { user: { did } },
       include: { user: true },
     });
     if (!profile) {

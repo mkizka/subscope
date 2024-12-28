@@ -2,9 +2,7 @@
   "name": "@dawn/client",
   "version": "0.0.0",
   "private": true,
-  "exports": {
-    ".": "./src/index.ts"
-  },
+  "main": "./src/index.ts",
   "scripts": {
     "build": "./scripts/generate.sh",
     "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial"
