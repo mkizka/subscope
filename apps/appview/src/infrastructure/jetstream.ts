@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
@@ -57,7 +58,7 @@ export class JetstreamIngester implements IIngester {
 
     jetstream.onCreate("app.bsky.actor.profile", async (event) => {
       const profile = {
-        did: event.did,
+        did: asDid(event.did),
         // avatar: event.commit.record.avatar,
         description: event.commit.record.description,
         displayName: event.commit.record.displayName,

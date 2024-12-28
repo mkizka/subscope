@@ -1,17 +1,34 @@
-import type { Profile } from "../../domain/models/profile.js";
+import { Profile } from "../../domain/models/profile.js";
 import type { IProfileRepository } from "../../domain/repositories/profile.js";
 import { prisma } from "../prisma.js";
 
 export class ProfileRepository implements IProfileRepository {
+  async findOne() {
+    const profile = await prisma.profile.findFirst({
+      include: { user: true },
+    });
+    if (!profile) {
+      return null;
+    }
+    return new Profile({
+      did: profile.user.did,
+      // @ts-expect-error
+      handle: profile.user.handle, // TODO: handleを必須にしたい
+      avatar: profile.avatar,
+      description: profile.description,
+      displayName: profile.displayName,
+    });
+  }
+
   async createOrUpdate(profile: Profile) {
-    const { did, ...data } = profile;
+    const { did, handle, ...data } = profile;
     await prisma.profile.upsert({
       create: {
         ...data,
         user: {
           connectOrCreate: {
             where: { did },
-            create: { did },
+            create: { did, handle },
           },
         },
       },

@@ -2,9 +2,17 @@
   "name": "@dawn/client",
   "version": "0.0.0",
   "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "./scripts/generate.sh",
     "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial"
+  },
+  "dependencies": {
+    "@atproto/lexicon": "0.4.4",
+    "@atproto/xrpc": "0.6.5",
+    "@atproto/xrpc-server": "0.7.4"
   },
   "devDependencies": {
     "@atproto/lex-cli": "0.5.4",

@@ -1,4 +1,4 @@
-import type { Did } from "@atproto/api";
+import type { Did } from "@atproto/did";
 
 import { Profile } from "../domain/models/profile.js";
 import type { IProfileRepository } from "../domain/repositories/profile.js";
@@ -13,7 +13,10 @@ export class SyncProfileUseCase {
     description?: string;
     displayName?: string;
   }) {
-    const user = new Profile(dto);
+    const user = new Profile({
+      ...dto,
+      handle: "invalid.handle", // TODO: 実装
+    });
     await this.profileRepository.createOrUpdate(user);
   }
 }
