@@ -10,7 +10,7 @@
     "dev:prisma": "BROWSER=none prisma studio",
     "dev:server": "wait-on tcp:6008 && NODE_ENV=development tsx watch ./src/appview.ts | pino-pretty",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "start": "NODE_ENV=production tsx ./src/appview.ts"
+    "start": "pnpm -s db:migrate && NODE_ENV=production tsx ./src/appview.ts"
   },
   "dependencies": {
     "@atproto/api": "0.13.22",
