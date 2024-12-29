@@ -10,7 +10,9 @@ export class GetProfile {
   handle(server: Server) {
     server.app.bsky.actor.getProfile({
       handler: async ({ params }) => {
-        const profile = await this.profileRepository.findOne(params.actor);
+        const profile = await this.profileRepository.findOne({
+          did: params.actor,
+        });
         if (!profile) {
           throw new InvalidRequestError("Profile not found");
         }

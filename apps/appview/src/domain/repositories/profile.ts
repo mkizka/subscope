@@ -1,6 +1,15 @@
 import type { Profile } from "../models/profile.js";
+import type { ProfileDetailed } from "../models/profile-detailed.js";
+import type { TransactionContext } from "./transaction-manager.js";
 
 export interface IProfileRepository {
-  findOne(did: string): Promise<Profile | null>;
-  createOrUpdate(profile: Profile): Promise<void>;
+  findOne(params: {
+    ctx?: TransactionContext;
+    did: string;
+  }): Promise<ProfileDetailed | null>;
+
+  createOrUpdate(params: {
+    ctx?: TransactionContext;
+    profile: Profile;
+  }): Promise<void>;
 }

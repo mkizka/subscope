@@ -1,11 +1,12 @@
 import type { Did } from "@atproto/api";
+import { asDid } from "@atproto/did";
 
 export class User {
-  did: Did;
-  handle: string | null;
+  readonly did: Did;
+  readonly handle: string;
 
-  constructor(options: { did: Did; handle?: string }) {
-    this.did = options.did;
-    this.handle = options.handle ?? null;
+  constructor(params: { did: string; handle: string }) {
+    this.did = asDid(params.did);
+    this.handle = params.handle;
   }
 }

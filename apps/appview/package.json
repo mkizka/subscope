@@ -6,7 +6,7 @@
   "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma db push",
-    "dev": "run-p dev:*",
+    "dev": "run-p -s dev:*",
     "dev:prisma": "BROWSER=none prisma studio",
     "dev:server": "wait-on tcp:6008 && NODE_ENV=development tsx watch ./src/appview.ts | pino-pretty",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint"

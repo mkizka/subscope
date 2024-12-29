@@ -1,5 +1,14 @@
 import type { User } from "../models/user.js";
+import type { TransactionContext } from "./transaction-manager.js";
 
 export interface IUserRepository {
-  createOrUpdate(user: User): Promise<void>;
+  findOne(params: {
+    ctx?: TransactionContext;
+    did: string;
+  }): Promise<User | null>;
+
+  createOrUpdate(params: {
+    ctx?: TransactionContext;
+    user: User;
+  }): Promise<void>;
 }
