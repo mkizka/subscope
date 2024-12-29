@@ -3,13 +3,13 @@ import type { ProfileDetailed } from "../models/profile-detailed.js";
 import type { TransactionContext } from "./transaction-manager.js";
 
 export interface IProfileRepository {
-  findOne(params: {
+  findOne: (params: {
     ctx?: TransactionContext;
     did: string;
-  }): Promise<ProfileDetailed | null>;
+  }) => Promise<ProfileDetailed | null>;
 
-  createOrUpdate(params: {
+  createOrUpdate: (params: {
     ctx?: TransactionContext;
     profile: Profile;
-  }): Promise<void>;
+  }) => Promise<void>;
 }

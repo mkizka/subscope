@@ -2,9 +2,16 @@ import type { Profile } from "../../domain/models/profile.js";
 import { ProfileDetailed } from "../../domain/models/profile-detailed.js";
 import type { IProfileRepository } from "../../domain/repositories/profile.js";
 import type { TransactionContext } from "../../domain/repositories/transaction-manager.js";
+import { defaultTransactionContext } from "./transaction-manager.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async findOne({ ctx, did }: { ctx: TransactionContext; did: string }) {
+  async findOne({
+    ctx = defaultTransactionContext,
+    did,
+  }: {
+    ctx?: TransactionContext;
+    did: string;
+  }) {
     const profile = await ctx.prisma.profile.findFirst({
       where: { user: { did } },
       include: { user: true },
@@ -22,10 +29,10 @@ export class ProfileRepository implements IProfileRepository {
   }
 
   async createOrUpdate({
-    ctx,
+    ctx = defaultTransactionContext,
     profile,
   }: {
-    ctx: TransactionContext;
+    ctx?: TransactionContext;
     profile: Profile;
   }) {
     const { did, ...data } = profile;

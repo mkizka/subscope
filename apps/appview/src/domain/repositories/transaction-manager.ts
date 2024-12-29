@@ -5,5 +5,7 @@ export type TransactionContext = {
 };
 
 export interface ITransactionManager {
-  transaction<T>(fn: (context: TransactionContext) => Promise<T>): Promise<T>;
+  transaction: <T>(
+    fn: (context: TransactionContext) => Promise<T>,
+  ) => Promise<T>;
 }

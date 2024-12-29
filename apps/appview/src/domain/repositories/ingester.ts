@@ -1,3 +1,3 @@
 export interface IIngester {
-  start(): void;
+  start: () => void;
 }

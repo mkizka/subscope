@@ -1,6 +1,7 @@
 import { DidResolver as Resolver, MemoryCache } from "@atproto/identity";
 
 import type { IDidResolver } from "../../domain/repositories/did-resolver.js";
+import { env } from "../../shared/env.js";
 
 export class DidResolver implements IDidResolver {
   readonly resolver: Resolver;
@@ -8,6 +9,7 @@ export class DidResolver implements IDidResolver {
   constructor() {
     this.resolver = new Resolver({
       didCache: new MemoryCache(),
+      plcUrl: env.PLC_URL,
     });
   }
 

@@ -1,5 +1,5 @@
 export interface IDidResolver {
-  resolve(did: string): Promise<{
+  resolve: (did: string) => Promise<{
     handle: string;
   }>;
 }
