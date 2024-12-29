@@ -3,7 +3,10 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build", "db:generate"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "src/generated/**"]
+    },
+    "start": {
+      "cache": true
     },
     "lint": {
       "dependsOn": ["db:generate"]
