@@ -4,11 +4,8 @@ import { Profile } from "../domain/models/profile.js";
 import { User } from "../domain/models/user.js";
 import type { IDidResolver } from "../domain/repositories/did-resolver.js";
 import type { IProfileRepository } from "../domain/repositories/profile.js";
-import type { ITransactionManager } from "../domain/repositories/transaction-manager.js";
+import type { ITransactionManager } from "../domain/repositories/transaction.js";
 import type { IUserRepository } from "../domain/repositories/user.js";
-import { createLogger } from "../shared/logger.js";
-
-const logger = createLogger("SyncProfileUseCase");
 
 export class SyncProfileUseCase {
   constructor(

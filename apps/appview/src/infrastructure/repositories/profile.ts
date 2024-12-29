@@ -1,8 +1,8 @@
 import type { Profile } from "../../domain/models/profile.js";
 import { ProfileDetailed } from "../../domain/models/profile-detailed.js";
 import type { IProfileRepository } from "../../domain/repositories/profile.js";
-import type { TransactionContext } from "../../domain/repositories/transaction-manager.js";
-import { defaultTransactionContext } from "./transaction-manager.js";
+import type { TransactionContext } from "../../domain/repositories/transaction.js";
+import { defaultTransactionContext } from "./transaction.js";
 
 export class ProfileRepository implements IProfileRepository {
   async findOne({

@@ -5,7 +5,7 @@ import { SyncUserUseCase } from "./application/sync-user.js";
 import { JetstreamIngester } from "./infrastructure/jetstream.js";
 import { DidResolver } from "./infrastructure/repositories/did-resolver.js";
 import { ProfileRepository } from "./infrastructure/repositories/profile.js";
-import { TransactionManager } from "./infrastructure/repositories/transaction-manager.js";
+import { TransactionManager } from "./infrastructure/repositories/transaction.js";
 import { UserRepository } from "./infrastructure/repositories/user.js";
 import { AppviewServer } from "./presentation/server.js";
 import { GetProfile } from "./presentation/xrpc/app/bsky/actor/getProfile.js";
