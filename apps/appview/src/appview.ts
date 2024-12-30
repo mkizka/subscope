@@ -7,9 +7,9 @@ import { DidResolver } from "./infrastructure/repositories/did-resolver.js";
 import { ProfileRepository } from "./infrastructure/repositories/profile.js";
 import { TransactionManager } from "./infrastructure/repositories/transaction.js";
 import { UserRepository } from "./infrastructure/repositories/user.js";
+import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
+import { XRPCRoutes } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
-import { GetProfile } from "./presentation/xrpc/app/bsky/actor/getProfile.js";
-import { XRPCRoutes } from "./presentation/xrpc/route.js";
 
 createInjector()
   // infrastructure

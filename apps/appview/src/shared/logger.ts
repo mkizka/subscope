@@ -11,6 +11,9 @@ const logger = pino({
   },
   useOnlyCustomLevels: true,
   level: env.LOG_LEVEL,
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
 });
 
 export const createLogger = (name: string) => logger.child({ name });
