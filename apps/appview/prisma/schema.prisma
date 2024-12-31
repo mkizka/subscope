@@ -23,11 +23,22 @@ model User {
 
 model Profile {
   did         String   @id
-  avatar      String?
+  avatar      Blob?
+  avatarCid   String?  @unique
   description String?
   displayName String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [did], references: [did], onDelete: Cascade)
+}
+
+model Blob {
+  cid       String   @id
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile? @relation(fields: [cid], references: [avatarCid])
 }

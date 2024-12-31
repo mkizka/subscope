@@ -14,7 +14,7 @@ export class ProfileRepository implements IProfileRepository {
   }) {
     const profile = await ctx.prisma.profile.findFirst({
       where: { user: { did } },
-      include: { user: true },
+      include: { user: true, avatar: true },
     });
     if (!profile) {
       return null;
@@ -22,7 +22,11 @@ export class ProfileRepository implements IProfileRepository {
     return new ProfileDetailed({
       did: profile.user.did,
       handle: profile.user.handle,
-      avatar: profile.avatar,
+      avatar: profile.avatar && {
+        cid: profile.avatar.cid,
+        mimeType: profile.avatar.mimeType,
+        size: profile.avatar.size,
+      },
       description: profile.description,
       displayName: profile.displayName,
     });
@@ -35,14 +39,38 @@ export class ProfileRepository implements IProfileRepository {
     ctx?: TransactionContext;
     profile: Profile;
   }) {
-    const { did, ...data } = profile;
     await ctx.prisma.profile.upsert({
       create: {
-        did,
-        ...data,
+        did: profile.did,
+        avatarCid: profile.avatarCid,
+        description: profile.description,
+        displayName: profile.displayName,
       },
-      update: data,
-      where: { did },
+      update: {
+        avatarCid: profile.avatarCid,
+        description: profile.description,
+        displayName: profile.displayName,
+      },
+      where: {
+        did: profile.did,
+      },
+    });
+    if (!profile.avatar) {
+      return;
+    }
+    await ctx.prisma.blob.upsert({
+      create: {
+        cid: profile.avatar.cid,
+        mimeType: profile.avatar.mimeType,
+        size: profile.avatar.size,
+      },
+      update: {
+        mimeType: profile.avatar.mimeType,
+        size: profile.avatar.size,
+      },
+      where: {
+        cid: profile.avatar.cid,
+      },
     });
   }
 }

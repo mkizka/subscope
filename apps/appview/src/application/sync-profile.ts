@@ -23,7 +23,11 @@ export class SyncProfileUseCase {
 
   async execute(dto: {
     did: Did;
-    avatar?: string;
+    avatar?: {
+      cid: string;
+      mimeType: string;
+      size: number;
+    };
     description?: string;
     displayName?: string;
   }) {

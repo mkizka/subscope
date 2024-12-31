@@ -1,15 +1,21 @@
 import { asDid, type Did } from "@atproto/did";
 
+type Avatar = {
+  readonly cid: string;
+  readonly mimeType: string;
+  readonly size: number;
+};
+
 export type ProfileParams = {
   did: string;
-  avatar?: string | null;
+  avatar?: Avatar | null;
   description?: string | null;
   displayName?: string | null;
 };
 
 export class Profile {
   readonly did: Did;
-  readonly avatar: string | null;
+  readonly avatar: Avatar | null;
   readonly description: string | null;
   readonly displayName: string | null;
 
@@ -18,5 +24,24 @@ export class Profile {
     this.avatar = params.avatar ?? null;
     this.description = params.description ?? null;
     this.displayName = params.displayName ?? null;
+  }
+
+  get avatarCid(): string | null {
+    if (!this.avatar) {
+      return null;
+    }
+    return this.avatar.cid;
+  }
+
+  get avatarUrl(): string | null {
+    if (!this.avatar) {
+      return null;
+    }
+    const [type, subtype] = this.avatar.mimeType.split("/");
+    if (type !== "image" || !subtype) {
+      return null;
+    }
+    // TODO: 自作実装に置き換える
+    return `https://cdn.bsky.app/img/avatar/plain/${this.did}/${this.avatar.cid}@${subtype}`;
   }
 }
