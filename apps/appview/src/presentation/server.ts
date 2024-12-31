@@ -1,7 +1,7 @@
 import express from "express";
 import { pinoHttp } from "pino-http";
 
-import type { IIngester } from "../domain/repositories/ingester.js";
+import type { IIngester } from "../domain/interfaces/ingester.js";
 import { env } from "../shared/env.js";
 import { createLogger } from "../shared/logger.js";
 import { wellKnownRouter } from "./routes/well-known.js";

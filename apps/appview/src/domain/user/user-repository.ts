@@ -1,5 +1,5 @@
-import type { User } from "../models/user.js";
-import type { TransactionContext } from "./transaction.js";
+import type { TransactionContext } from "../interfaces/transaction.js";
+import type { User } from "./user.js";
 
 export interface IUserRepository {
   findOne: (params: {

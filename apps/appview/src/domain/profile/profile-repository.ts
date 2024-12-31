@@ -1,5 +1,5 @@
-import type { Profile } from "../models/profile.js";
-import type { TransactionContext } from "./transaction.js";
+import type { TransactionContext } from "../interfaces/transaction.js";
+import type { Profile } from "./profile.js";
 
 export interface IProfileRepository {
   findOne: (params: {

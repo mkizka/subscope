@@ -1,11 +1,11 @@
 import type { Did } from "@atproto/did";
 
-import { Profile } from "../domain/models/profile.js";
-import { User } from "../domain/models/user.js";
-import type { IDidResolver } from "../domain/repositories/did-resolver.js";
-import type { IProfileRepository } from "../domain/repositories/profile.js";
-import type { ITransactionManager } from "../domain/repositories/transaction.js";
-import type { IUserRepository } from "../domain/repositories/user.js";
+import type { IDidResolver } from "../domain/interfaces/did-resolver.js";
+import type { ITransactionManager } from "../domain/interfaces/transaction.js";
+import { Profile } from "../domain/profile/profile.js";
+import type { IProfileRepository } from "../domain/profile/profile-repository.js";
+import { User } from "../domain/user/user.js";
+import type { IUserRepository } from "../domain/user/user-repository.js";
 
 export class SyncProfileUseCase {
   constructor(

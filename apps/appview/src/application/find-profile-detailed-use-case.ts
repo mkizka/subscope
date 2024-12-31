@@ -1,7 +1,7 @@
 import type { AppBskyActorDefs } from "@dawn/client";
 
-import type { IProfileRepository } from "../domain/repositories/profile.js";
-import type { IUserRepository } from "../domain/repositories/user.js";
+import type { IProfileRepository } from "../domain/profile/profile-repository.js";
+import type { IUserRepository } from "../domain/user/user-repository.js";
 
 export class FindProfileDetailedUseCase {
   constructor(

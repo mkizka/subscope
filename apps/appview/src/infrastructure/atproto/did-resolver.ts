@@ -1,6 +1,6 @@
 import { DidResolver as Resolver, MemoryCache } from "@atproto/identity";
 
-import type { IDidResolver } from "../../domain/repositories/did-resolver.js";
+import type { IDidResolver } from "../../domain/interfaces/did-resolver.js";
 import { env } from "../../shared/env.js";
 
 export class DidResolver implements IDidResolver {
