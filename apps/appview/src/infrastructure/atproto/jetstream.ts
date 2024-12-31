@@ -3,11 +3,11 @@ import type { CommitCreateEvent, CommitUpdateEvent } from "@skyware/jetstream";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
-import type { SyncProfileUseCase } from "../application/sync-profile.js";
-import type { SyncUserUseCase } from "../application/sync-user.js";
-import type { IIngester } from "../domain/repositories/ingester.js";
-import { env } from "../shared/env.js";
-import { createLogger } from "../shared/logger.js";
+import type { SyncProfileUseCase } from "../../application/sync-profile.js";
+import type { SyncUserUseCase } from "../../application/sync-user.js";
+import type { IIngester } from "../../domain/repositories/ingester.js";
+import { env } from "../../shared/env.js";
+import { createLogger } from "../../shared/logger.js";
 
 const logger = createLogger("JetstreamIngester");
 
