@@ -25,9 +25,9 @@ export class Profile {
 
   constructor(params: ProfileParams) {
     this.did = asDid(params.did);
-    this.avatar = params.avatar ?? null;
-    this.description = params.description ?? null;
-    this.displayName = params.displayName ?? null;
+    this.avatar = params.avatar;
+    this.description = params.description;
+    this.displayName = params.displayName;
     this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
     this.indexedAt = params.indexedAt ? new Date(params.indexedAt) : null;
   }
