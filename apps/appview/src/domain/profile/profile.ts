@@ -8,9 +8,11 @@ type Avatar = {
 
 export type ProfileParams = {
   did: string;
-  avatar?: Avatar | null;
-  description?: string | null;
-  displayName?: string | null;
+  avatar: Avatar | null;
+  description: string | null;
+  displayName: string | null;
+  createdAt: string | Date | null;
+  indexedAt?: string | Date | null; // DBが作るデータなのでオプショナル
 };
 
 export class Profile {
@@ -18,12 +20,16 @@ export class Profile {
   readonly avatar: Avatar | null;
   readonly description: string | null;
   readonly displayName: string | null;
+  readonly createdAt: Date | null;
+  readonly indexedAt: Date | null;
 
   constructor(params: ProfileParams) {
     this.did = asDid(params.did);
     this.avatar = params.avatar ?? null;
     this.description = params.description ?? null;
     this.displayName = params.displayName ?? null;
+    this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
+    this.indexedAt = params.indexedAt ? new Date(params.indexedAt) : null;
   }
 
   getAvatarUrl(): string | null {

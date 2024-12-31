@@ -1,7 +1,7 @@
 import type { TransactionContext } from "../../domain/interfaces/transaction.js";
 import { User } from "../../domain/user/user.js";
 import type { IUserRepository } from "../../domain/user/user-repository.js";
-import { defaultTransactionContext } from "./transaction-manager.js";
+import { defaultTransactionContext } from "./transaction.js";
 
 export class UserRepository implements IUserRepository {
   async findOne({

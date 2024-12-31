@@ -1,7 +1,7 @@
 import type { TransactionContext } from "../../domain/interfaces/transaction.js";
 import { Profile } from "../../domain/profile/profile.js";
 import type { IProfileRepository } from "../../domain/profile/profile-repository.js";
-import { defaultTransactionContext } from "./transaction-manager.js";
+import { defaultTransactionContext } from "./transaction.js";
 
 export class ProfileRepository implements IProfileRepository {
   async findOne({
@@ -27,6 +27,8 @@ export class ProfileRepository implements IProfileRepository {
       },
       description: profile.description,
       displayName: profile.displayName,
+      createdAt: profile.createdAt,
+      indexedAt: profile.indexedAt,
     });
   }
 
@@ -59,11 +61,13 @@ export class ProfileRepository implements IProfileRepository {
         avatarCid: profile.avatar?.cid,
         description: profile.description,
         displayName: profile.displayName,
+        createdAt: profile.createdAt,
       },
       update: {
         avatarCid: profile.avatar?.cid,
         description: profile.description,
         displayName: profile.displayName,
+        createdAt: profile.createdAt,
       },
       where: {
         did: profile.did,

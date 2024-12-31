@@ -21,7 +21,20 @@ export class FindProfileDetailedUseCase {
     return {
       did: profile.did,
       handle: user.handle,
+      displayName: profile.displayName ?? undefined,
+      description: profile.description ?? undefined,
       avatar: profile.getAvatarUrl() ?? undefined,
+      // banner?: string
+      // followersCount?: number
+      // followsCount?: number
+      // postsCount?: number
+      // associated?: ProfileAssociated
+      // joinedViaStarterPack?: AppBskyGraphDefs.StarterPackViewBasic
+      indexedAt: profile.indexedAt?.toISOString(),
+      createdAt: profile.createdAt?.toISOString(),
+      // viewer?: ViewerState
+      // labels?: ComAtprotoLabelDefs.Label[]
+      // pinnedPost?: ComAtprotoRepoStrongRef.Main
     } satisfies AppBskyActorDefs.ProfileViewDetailed;
   }
 }

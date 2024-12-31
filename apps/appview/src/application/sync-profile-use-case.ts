@@ -23,13 +23,14 @@ export class SyncProfileUseCase {
 
   async execute(dto: {
     did: Did;
-    avatar?: {
+    avatar: {
       cid: string;
       mimeType: string;
       size: number;
-    };
-    description?: string;
-    displayName?: string;
+    } | null;
+    description: string | null;
+    displayName: string | null;
+    createdAt: string | null;
   }) {
     await this.transactionManager.transaction(async (ctx) => {
       const user = await this.userRepository.findOne({ ctx, did: dto.did });
