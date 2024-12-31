@@ -65,7 +65,7 @@ export class JetstreamIngester implements IIngester {
       | CommitCreateEvent<"app.bsky.actor.profile">
       | CommitUpdateEvent<"app.bsky.actor.profile">,
   ) {
-    logger.info(event, "app.bsky.actor.profile event received");
+    logger.info({ did: event.did }, "app.bsky.actor.profile event received");
     await this.syncProfileUseCase.execute({
       did: asDid(event.did),
       avatar: event.commit.record.avatar && {
