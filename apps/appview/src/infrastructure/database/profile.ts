@@ -1,5 +1,4 @@
-import type { Profile } from "../../domain/models/profile.js";
-import { ProfileDetailed } from "../../domain/models/profile-detailed.js";
+import { Profile } from "../../domain/models/profile.js";
 import type { IProfileRepository } from "../../domain/repositories/profile.js";
 import type { TransactionContext } from "../../domain/repositories/transaction.js";
 import { defaultTransactionContext } from "./transaction.js";
@@ -19,9 +18,8 @@ export class ProfileRepository implements IProfileRepository {
     if (!profile) {
       return null;
     }
-    return new ProfileDetailed({
+    return new Profile({
       did: profile.user.did,
-      handle: profile.user.handle,
       avatar: profile.avatar && {
         cid: profile.avatar.cid,
         mimeType: profile.avatar.mimeType,
@@ -58,12 +56,12 @@ export class ProfileRepository implements IProfileRepository {
     await ctx.prisma.profile.upsert({
       create: {
         did: profile.did,
-        avatarCid: profile.avatarCid,
+        avatarCid: profile.avatar?.cid,
         description: profile.description,
         displayName: profile.displayName,
       },
       update: {
-        avatarCid: profile.avatarCid,
+        avatarCid: profile.avatar?.cid,
         description: profile.description,
         displayName: profile.displayName,
       },

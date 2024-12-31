@@ -1,5 +1,6 @@
 import { createInjector } from "typed-inject";
 
+import { FindProfileDetailedUseCase } from "./application/find-profile-detailed.js";
 import { SyncProfileUseCase } from "./application/sync-profile.js";
 import { SyncUserUseCase } from "./application/sync-user.js";
 import { DidResolver } from "./infrastructure/atproto/did-resolver.js";
@@ -21,6 +22,7 @@ createInjector()
   .provideClass("syncUserUseCase", SyncUserUseCase)
   .provideClass("syncProfileUseCase", SyncProfileUseCase)
   .provideClass("ingester", JetstreamIngester)
+  .provideClass("findProfileDetailedUseCase", FindProfileDetailedUseCase)
   .provideClass("getProfile", GetProfile)
   // presentation
   .provideClass("xrpcRoutes", XRPCRoutes)

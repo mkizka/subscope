@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "build": "./scripts/generate.sh",
     "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial"
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@atproto/lex-cli": "0.5.4",
+    "@types/express": "5.0.0",
     "chokidar-cli": "3.0.0"
   }
 }

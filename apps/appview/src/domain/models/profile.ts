@@ -26,14 +26,7 @@ export class Profile {
     this.displayName = params.displayName ?? null;
   }
 
-  get avatarCid(): string | null {
-    if (!this.avatar) {
-      return null;
-    }
-    return this.avatar.cid;
-  }
-
-  get avatarUrl(): string | null {
+  getAvatarUrl(): string | null {
     if (!this.avatar) {
       return null;
     }
