@@ -39,6 +39,22 @@ export class ProfileRepository implements IProfileRepository {
     ctx?: TransactionContext;
     profile: Profile;
   }) {
+    if (profile.avatar) {
+      await ctx.prisma.blob.upsert({
+        create: {
+          cid: profile.avatar.cid,
+          mimeType: profile.avatar.mimeType,
+          size: profile.avatar.size,
+        },
+        update: {
+          mimeType: profile.avatar.mimeType,
+          size: profile.avatar.size,
+        },
+        where: {
+          cid: profile.avatar.cid,
+        },
+      });
+    }
     await ctx.prisma.profile.upsert({
       create: {
         did: profile.did,
@@ -53,23 +69,6 @@ export class ProfileRepository implements IProfileRepository {
       },
       where: {
         did: profile.did,
-      },
-    });
-    if (!profile.avatar) {
-      return;
-    }
-    await ctx.prisma.blob.upsert({
-      create: {
-        cid: profile.avatar.cid,
-        mimeType: profile.avatar.mimeType,
-        size: profile.avatar.size,
-      },
-      update: {
-        mimeType: profile.avatar.mimeType,
-        size: profile.avatar.size,
-      },
-      where: {
-        cid: profile.avatar.cid,
       },
     });
   }
