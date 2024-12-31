@@ -1,5 +1,5 @@
 import { InvalidRequestError } from "@atproto/xrpc-server";
-import type { AppBskyActorDefs, Server } from "@dawn/client";
+import type { Server } from "@dawn/client";
 
 import type { IProfileRepository } from "../../../../../domain/repositories/profile.js";
 
@@ -18,10 +18,7 @@ export class GetProfile {
         }
         return {
           encoding: "application/json",
-          body: {
-            did: profile.did,
-            handle: profile.handle,
-          } satisfies AppBskyActorDefs.ProfileViewDetailed,
+          body: profile.toRecord(),
         };
       },
     });
