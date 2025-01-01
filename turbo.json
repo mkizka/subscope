@@ -6,9 +6,6 @@
       "outputs": [".next/**", "!.next/cache/**", "src/generated/**"]
     },
     "typecheck": {},
-    "start": {
-      "cache": true
-    },
     "lint": {
       "dependsOn": ["db:generate"]
     },
@@ -17,9 +14,6 @@
       "cache": false
     },
     "db:generate": {
-      "cache": false
-    },
-    "db:migrate": {
       "cache": false
     }
   }

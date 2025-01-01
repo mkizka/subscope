@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wait-on tcp:6008 && NODE_ENV=development tsx watch ./src/ingester.ts | pino-pretty",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "start": "NODE_ENV=production tsx ./src/appview.ts",
+    "start": "NODE_ENV=production tsx ./src/ingester.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
