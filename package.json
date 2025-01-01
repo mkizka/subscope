@@ -12,7 +12,7 @@
     "postinstall": "./scripts/postinstall.sh",
     "prepare": "husky",
     "start:appview": "pnpm db:migrate && cd apps/appview && pnpm -s start",
-    "start:ingester": "echo $DATABASE_URL"
+    "start:ingester": "pnpm db:migrate && cd apps/ingester && pnpm -s start"
   },
   "devDependencies": {
     "giget": "1.2.3",
