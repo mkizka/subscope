@@ -23,9 +23,6 @@ importers:
       prettier-plugin-pkg:
         specifier: 0.18.1
         version: 0.18.1(prettier@3.4.2)
-      react:
-        specifier: 19.0.0
-        version: 19.0.0
       turbo:
         specifier: 2.3.3
         version: 2.3.3
@@ -56,9 +53,6 @@ importers:
       express:
         specifier: 4.21.2
         version: 4.21.2
-      pino:
-        specifier: 9.5.0
-        version: 9.5.0
       pino-http:
         specifier: 10.3.0
         version: 10.3.0
@@ -114,15 +108,15 @@ importers:
       '@atproto/identity':
         specifier: 0.4.3
         version: 0.4.3
+      '@dawn/common':
+        specifier: workspace:*
+        version: link:../../packages/common
       '@dawn/db':
         specifier: workspace:*
         version: link:../../packages/db
       '@skyware/jetstream':
         specifier: 0.2.1
         version: 0.2.1(@atcute/client@2.0.3)
-      pino:
-        specifier: 9.5.0
-        version: 9.5.0
       typed-inject:
         specifier: 5.0.0
         version: 5.0.0
@@ -177,7 +171,11 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
 
-  packages/common: {}
+  packages/common:
+    dependencies:
+      pino:
+        specifier: 9.5.0
+        version: 9.5.0
 
   packages/db:
     dependencies:
@@ -2270,10 +2268,6 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
-
-  react@19.0.0:
-    resolution: {integrity: sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==}
-    engines: {node: '>=0.10.0'}
 
   read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
@@ -5079,8 +5073,6 @@ snapshots:
       unpipe: 1.0.0
 
   react-is@16.13.1: {}
-
-  react@19.0.0: {}
 
   read-cache@1.0.0:
     dependencies:

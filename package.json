@@ -11,8 +11,9 @@
     "lint": "turbo run lint",
     "postinstall": "./scripts/postinstall.sh",
     "prepare": "husky",
-    "start:appview": "pnpm db:migrate && cd apps/appview && pnpm -s start",
-    "start:ingester": "pnpm db:migrate && cd apps/ingester && pnpm -s start"
+    "start:appview": "pnpm -s db:migrate && pnpm --filter @dawn/appview start",
+    "start:ingester": "pnpm -s db:migrate && pnpm --filter @dawn/ingester start",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "giget": "1.2.3",
@@ -20,7 +21,6 @@
     "lint-staged": "15.2.11",
     "prettier": "3.4.2",
     "prettier-plugin-pkg": "0.18.1",
-    "react": "19.0.0",
     "turbo": "2.3.3"
   },
   "lint-staged": {
