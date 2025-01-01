@@ -1,4 +1,4 @@
-import type { TransactionContext } from "../interfaces/transaction.js";
+import type { TransactionContext } from "../../application/interfaces/transaction.js";
 import type { User } from "./user.js";
 
 export interface IUserRepository {

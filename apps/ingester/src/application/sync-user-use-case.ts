@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/api";
 
-import type { IDidResolver } from "../domain/interfaces/did-resolver.js";
 import { User } from "../domain/user/user.js";
 import type { IUserRepository } from "../domain/user/user-repository.js";
+import type { IDidResolver } from "./interfaces/did-resolver.js";
 
 export class SyncUserUseCase {
   constructor(

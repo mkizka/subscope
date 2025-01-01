@@ -1,4 +1,4 @@
-import type { TransactionContext } from "../../domain/interfaces/transaction.js";
+import type { TransactionContext } from "../../application/interfaces/transaction.js";
 import { Profile } from "../../domain/profile/profile.js";
 import type { IProfileRepository } from "../../domain/profile/profile-repository.js";
 import { defaultTransactionContext } from "./transaction.js";
