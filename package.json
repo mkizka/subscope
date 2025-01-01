@@ -11,7 +11,8 @@
     "lint": "turbo run lint",
     "postinstall": "./scripts/postinstall.sh",
     "prepare": "husky",
-    "start": "pnpm db:migrate && cd apps/appview && pnpm -s start"
+    "start:appview": "pnpm db:migrate && cd apps/appview && pnpm -s start",
+    "start:ingester": "pnpm db:migrate && cd apps/ingester && pnpm -s start"
   },
   "devDependencies": {
     "giget": "1.2.3",
