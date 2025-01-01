@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@dawn/db";
 
 export type TransactionContext = {
   prisma: Prisma.TransactionClient;
