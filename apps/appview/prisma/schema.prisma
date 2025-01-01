@@ -38,7 +38,7 @@ model Blob {
   cid       String   @id
   mimeType  String
   size      Int
-  createdAt DateTime @default(now())
+  indexedAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   profile Profile[]
