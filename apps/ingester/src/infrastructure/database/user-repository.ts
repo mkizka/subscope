@@ -1,6 +1,7 @@
-import type { TransactionContext } from "../../application/interfaces/transaction.js";
-import { User } from "../../domain/user/user.js";
-import type { IUserRepository } from "../../domain/user/user-repository.js";
+import type { TransactionContext } from "@dawn/common/domain";
+import { User } from "@dawn/common/domain";
+
+import type { IUserRepository } from "../../application/interfaces/user-repository.js";
 import { defaultTransactionContext } from "./transaction.js";
 
 export class UserRepository implements IUserRepository {

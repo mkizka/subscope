@@ -1,11 +1,10 @@
 import type { Did } from "@atproto/did";
+import type { ITransactionManager } from "@dawn/common/domain";
+import { Profile, User } from "@dawn/common/domain";
 
-import { Profile } from "../domain/profile/profile.js";
-import type { IProfileRepository } from "../domain/profile/profile-repository.js";
-import { User } from "../domain/user/user.js";
-import type { IUserRepository } from "../domain/user/user-repository.js";
 import type { IDidResolver } from "./interfaces/did-resolver.js";
-import type { ITransactionManager } from "./interfaces/transaction.js";
+import type { IProfileRepository } from "./interfaces/profile-repository.js";
+import type { IUserRepository } from "./interfaces/user-repository.js";
 
 export class SyncProfileUseCase {
   constructor(

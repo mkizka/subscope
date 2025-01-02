@@ -1,8 +1,8 @@
 import { createInjector } from "typed-inject";
 
 import { FindProfileDetailedUseCase } from "./application/find-profile-detailed-use-case.js";
-import { ProfileRepository } from "./infrastructure/database/profile-repository.js";
-import { UserRepository } from "./infrastructure/database/user-repository.js";
+import { ProfileRepository } from "./infrastructure/profile-repository.js";
+import { UserRepository } from "./infrastructure/user-repository.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { XRPCRoutes } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";

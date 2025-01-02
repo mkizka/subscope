@@ -1,5 +1,6 @@
-import { User } from "../../domain/user/user.js";
-import type { IUserRepository } from "../../domain/user/user-repository.js";
+import { User } from "@dawn/common/domain";
+
+import type { IUserRepository } from "../application/interfaces/user-repository.js";
 import { prisma } from "./prisma.js";
 
 export class UserRepository implements IUserRepository {

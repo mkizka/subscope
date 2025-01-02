@@ -1,4 +1,4 @@
-import { createRootLogger } from "@dawn/common";
+import { createRootLogger } from "@dawn/common/utils";
 
 import { env } from "./env.js";
 

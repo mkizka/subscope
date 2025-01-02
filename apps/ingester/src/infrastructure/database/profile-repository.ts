@@ -1,6 +1,7 @@
-import type { TransactionContext } from "../../application/interfaces/transaction.js";
-import { Profile } from "../../domain/profile/profile.js";
-import type { IProfileRepository } from "../../domain/profile/profile-repository.js";
+import type { TransactionContext } from "@dawn/common/domain";
+import { Profile } from "@dawn/common/domain";
+
+import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
 import { defaultTransactionContext } from "./transaction.js";
 
 export class ProfileRepository implements IProfileRepository {

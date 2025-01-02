@@ -1,5 +1,4 @@
-import type { TransactionContext } from "../../application/interfaces/transaction.js";
-import type { Profile } from "./profile.js";
+import type { Profile, TransactionContext } from "@dawn/common/domain";
 
 export interface IProfileRepository {
   findOne: (params: {

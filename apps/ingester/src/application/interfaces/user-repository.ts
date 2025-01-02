@@ -1,5 +1,4 @@
-import type { TransactionContext } from "../../application/interfaces/transaction.js";
-import type { User } from "./user.js";
+import type { TransactionContext, User } from "@dawn/common/domain";
 
 export interface IUserRepository {
   findOne: (params: {

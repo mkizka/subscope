@@ -173,6 +173,12 @@ importers:
 
   packages/common:
     dependencies:
+      '@atproto/did':
+        specifier: 0.1.3
+        version: 0.1.3
+      '@dawn/db':
+        specifier: workspace:*
+        version: link:../db
       pino:
         specifier: 9.5.0
         version: 9.5.0

@@ -1,5 +1,4 @@
-import type { Did } from "@atproto/api";
-import { asDid } from "@atproto/did";
+import { type Did, asDid } from "@atproto/did";
 
 export class User {
   readonly did: Did;

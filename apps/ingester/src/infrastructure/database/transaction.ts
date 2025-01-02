@@ -1,7 +1,8 @@
 import type {
   ITransactionManager,
   TransactionContext,
-} from "../../application/interfaces/transaction.js";
+} from "@dawn/common/domain";
+
 import { prisma } from "./prisma.js";
 
 export const defaultTransactionContext: TransactionContext = {
