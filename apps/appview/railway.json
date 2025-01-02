@@ -1,6 +1,8 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "deploy": {
-    "startCommand": "pnpm start:appview"
+    "startCommand": "pnpm start:appview",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 5
   }
 }

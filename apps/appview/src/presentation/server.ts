@@ -3,6 +3,7 @@ import { pinoHttp } from "pino-http";
 
 import { env } from "../shared/env.js";
 import { createLogger } from "../shared/logger.js";
+import { healthRouter } from "./routes/health.js";
 import { wellKnownRouter } from "./routes/well-known.js";
 import type { XRPCRoutes } from "./routes/xrpc.js";
 
@@ -29,6 +30,7 @@ export class AppviewServer {
       }),
     );
     this.app.use(this.xrpcRoutes.create());
+    this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
   }
   static inject = ["xrpcRoutes"] as const;

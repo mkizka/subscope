@@ -15,24 +15,6 @@ const schema = z.object({
     process.env.NODE_ENV === "production"
       ? z.string()
       : z.string().default("appview.localhost"),
-  PLC_URL: z
-    .string()
-    .url()
-    .default(
-      match({
-        prod: "https://plc.directory",
-        dev: "http://localhost:2582",
-      }),
-    ),
-  JETSTREAM_URL: z
-    .string()
-    .url()
-    .default(
-      match({
-        prod: "wss://jetstream1.us-west.bsky.network/subscribe",
-        dev: "ws://localhost:6008/subscribe",
-      }),
-    ),
 });
 
 export const env = (() => {
