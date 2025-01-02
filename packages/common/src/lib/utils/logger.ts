@@ -10,6 +10,8 @@ export const createRootLogger = ({ level }: { level: string }) => {
     },
     useOnlyCustomLevels: true,
     level,
+    // disable pid and hostname in logs
+    base: null,
     formatters: {
       level: (label) => ({ level: label }),
     },
