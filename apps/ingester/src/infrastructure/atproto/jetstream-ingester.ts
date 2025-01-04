@@ -47,7 +47,7 @@ export class JetstreamIngester {
     // 何が変更されたかを示すものではなく、ID の現在の状態が何であるかを確実に示すものでもありません。
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
-      logger.info({ did: event.identity.did }, "identity event received");
+      logger.debug({ did: event.identity.did }, "identity event received");
       await this.syncUserUseCase.execute({
         did: event.identity.did,
         handle: event.identity.handle,
@@ -69,7 +69,7 @@ export class JetstreamIngester {
       | CommitCreateEvent<"app.bsky.actor.profile">
       | CommitUpdateEvent<"app.bsky.actor.profile">,
   ) {
-    logger.info({ did: event.did }, "app.bsky.actor.profile event received");
+    logger.debug({ did: event.did }, "app.bsky.actor.profile event received");
     await this.syncProfileUseCase.execute({
       did: asDid(event.did),
       avatar: event.commit.record.avatar
