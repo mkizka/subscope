@@ -14,5 +14,5 @@ export const prisma = new PrismaClient({
 const logger = createLogger("prisma");
 
 prisma.$on("query", (e) => {
-  logger.info({ query: e.query, params: e.params }, e.query);
+  logger.debug(e.query);
 });
