@@ -12,10 +12,8 @@ export class UserRepository implements IUserRepository {
     ctx?: TransactionContext;
     did: string;
   }) {
-    const user = await ctx.prisma.user.findFirst({
-      where: {
-        did,
-      },
+    const user = await ctx.prisma.user.findUnique({
+      where: { did },
     });
     if (!user) {
       return null;
@@ -30,11 +28,17 @@ export class UserRepository implements IUserRepository {
     ctx?: TransactionContext;
     user: User;
   }) {
-    const { did, ...rest } = user;
     await ctx.prisma.user.upsert({
-      create: user,
-      update: rest,
-      where: { did },
+      create: {
+        did: user.did,
+        handle: user.handle,
+      },
+      update: {
+        handle: user.handle,
+      },
+      where: {
+        did: user.did,
+      },
     });
   }
 }
