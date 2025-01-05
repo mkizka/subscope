@@ -12,15 +12,9 @@
     "dev": "BROWSER=none prisma studio"
   },
   "dependencies": {
-    "@libsql/client": "0.14.0",
-    "@prisma/adapter-libsql": "6.1.0",
-    "@prisma/client": "6.1.0",
-    "zod": "3.24.1",
-    "zod-validation-error": "3.4.0"
+    "@prisma/client": "6.1.0"
   },
   "devDependencies": {
-    "@tsconfig/node-lts": "22.0.1",
-    "@types/node": "22.10.2",
     "prisma": "6.1.0"
   }
 }

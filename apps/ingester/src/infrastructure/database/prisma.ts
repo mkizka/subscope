@@ -1,6 +1,8 @@
-import { createPrisma } from "@dawn/db";
+import { PrismaClient } from "@dawn/db";
 
-export const prisma = createPrisma({
+import { createLogger } from "../../shared/logger.js";
+
+export const prisma = new PrismaClient({
   log: [
     {
       level: "query",
@@ -9,8 +11,8 @@ export const prisma = createPrisma({
   ],
 });
 
-// const logger = createLogger("prisma");
-//
-// prisma.$on("query", (e) => {
-//   logger.debug(e.query);
-// });
+const logger = createLogger("prisma");
+
+prisma.$on("query", (e) => {
+  logger.debug(e.query);
+});
