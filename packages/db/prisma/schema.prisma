@@ -24,7 +24,7 @@ model User {
 model Profile {
   did         String    @id
   avatarCid   String?
-  description String?
+  description String?   @db.Text
   displayName String?
   createdAt   DateTime?
   indexedAt   DateTime  @default(now())
