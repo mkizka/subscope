@@ -30,12 +30,11 @@ export class UserRepository implements IUserRepository {
     ctx?: TransactionContext;
     user: User;
   }) {
+    const { did, ...rest } = user;
     await ctx.prisma.user.upsert({
       create: user,
-      update: user,
-      where: {
-        did: user.did,
-      },
+      update: rest,
+      where: { did },
     });
   }
 }

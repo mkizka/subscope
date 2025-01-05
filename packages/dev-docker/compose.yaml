@@ -3,13 +3,13 @@ volumes:
 
 services:
   db:
-    image: postgres:16-alpine
+    image: mysql:9
     ports:
-      - 5432:5432
+      - 3306:3306
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/mysql
     environment:
-      - POSTGRES_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
   jetstream:
     image: ghcr.io/bluesky-social/jetstream:sha-ea96859
     restart: always
