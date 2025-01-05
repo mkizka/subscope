@@ -14,3 +14,6 @@ next-env.d.ts
 /atproto/
 /lexicons/
 !/lexicons/dev/mkizka/
+
+# prisma
+dev.db

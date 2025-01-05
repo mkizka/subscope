@@ -1,9 +1,7 @@
 import type { TransactionContext } from "@dawn/common/domain";
-import { PrismaClient } from "@dawn/db";
+import { createPrisma } from "@dawn/db";
 
-import { createLogger } from "../shared/logger.js";
-
-export const prisma = new PrismaClient({
+export const prisma = createPrisma({
   log: [
     {
       level: "query",
@@ -12,11 +10,11 @@ export const prisma = new PrismaClient({
   ],
 });
 
-const logger = createLogger("prisma");
+// const logger = createLogger("prisma");
 
-prisma.$on("query", (e) => {
-  logger.debug(e.query);
-});
+// prisma.$on("query", (e) => {
+//   logger.debug(e.query);
+// });
 
 export const defaultTransactionContext = {
   prisma,
