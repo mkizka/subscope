@@ -15,6 +15,10 @@ const schema = z.object({
     process.env.NODE_ENV === "production"
       ? z.string()
       : z.string().default("appview.localhost"),
+  DATABASE_URL: match({
+    prod: z.string().url(),
+    dev: z.string().url().default("mysql://root:password@localhost:3306/db"),
+  }),
 });
 
 export const env = (() => {

@@ -28,6 +28,10 @@ const schema = z.object({
         dev: "ws://localhost:6008/subscribe",
       }),
     ),
+  DATABASE_URL: match({
+    prod: z.string().url(),
+    dev: z.string().url().default("mysql://root:password@localhost:3306/db"),
+  }),
 });
 
 export const env = (() => {

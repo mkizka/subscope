@@ -1,7 +1,7 @@
-import type { Prisma } from "@dawn/db";
+import type { DatabaseClient, TransactionClient } from "@dawn/db";
 
 export type TransactionContext = {
-  prisma: Prisma.TransactionClient;
+  db: DatabaseClient | TransactionClient;
 };
 
 export interface ITransactionManager {

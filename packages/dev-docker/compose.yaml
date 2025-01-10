@@ -9,6 +9,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     environment:
+      - MYSQL_DATABASE=db
       - MYSQL_ROOT_PASSWORD=password
   jetstream:
     image: ghcr.io/bluesky-social/jetstream:sha-ea96859

@@ -16,6 +16,7 @@
     "@dawn/common": "workspace:*",
     "@dawn/db": "workspace:*",
     "@skyware/jetstream": "0.2.1",
+    "drizzle-orm": "0.38.3",
     "typed-inject": "5.0.0",
     "ws": "8.18.0",
     "zod": "3.24.1",
