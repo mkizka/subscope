@@ -3,7 +3,7 @@
 ## app.bsky.actor
 
 - [x] app/bsky/actor/getProfile.json
-- [ ] app/bsky/actor/getProfiles.json
+- [x] app/bsky/actor/getProfiles.json
 - [ ] app/bsky/actor/searchActors.json
 
 優先度低い
