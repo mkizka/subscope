@@ -4,7 +4,6 @@ import {
   text,
   int,
   timestamp,
-  primaryKey,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 

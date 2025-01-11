@@ -1,26 +1,17 @@
 import type { AppBskyActorDefs } from "@dawn/client";
 
 import type { IProfileRepository } from "./interfaces/profile-repository.js";
-import type { IUserRepository } from "./interfaces/user-repository.js";
 
-export class FindProfileDetailedUseCase {
-  constructor(
-    private readonly profileRepository: IProfileRepository,
-    private readonly userRepository: IUserRepository,
-  ) {}
-  static inject = ["profileRepository", "userRepository"] as const;
+export class FindProfilesDetailedUseCase {
+  constructor(private readonly profileRepository: IProfileRepository) {}
+  static inject = ["profileRepository"] as const;
 
-  async execute(did: string) {
-    const [profile, user] = await Promise.all([
-      this.profileRepository.findOne({ did }),
-      this.userRepository.findOne({ did }),
-    ]);
-    if (!profile || !user) {
-      return null;
-    }
-    return {
+  async execute(dids: string[]) {
+    const profiles = await this.profileRepository.findManyDetailed({ dids });
+
+    return profiles.map((profile) => ({
       did: profile.did,
-      handle: user.handle,
+      handle: profile.handle,
       displayName: profile.displayName ?? undefined,
       description: profile.description ?? undefined,
       avatar: profile.getAvatarUrl() ?? undefined,
@@ -35,6 +26,6 @@ export class FindProfileDetailedUseCase {
       // viewer?: ViewerState
       // labels?: ComAtprotoLabelDefs.Label[]
       // pinnedPost?: ComAtprotoRepoStrongRef.Main
-    } satisfies AppBskyActorDefs.ProfileViewDetailed;
+    })) satisfies AppBskyActorDefs.ProfileViewDetailed[];
   }
 }

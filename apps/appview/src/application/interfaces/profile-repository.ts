@@ -1,5 +1,5 @@
-import type { Profile } from "@dawn/common/domain";
+import type { ProfileDetailed } from "@dawn/common/domain";
 
 export interface IProfileRepository {
-  findOne: (params: { did: string }) => Promise<Profile | null>;
+  findManyDetailed: (params: { dids: string[] }) => Promise<ProfileDetailed[]>;
 }

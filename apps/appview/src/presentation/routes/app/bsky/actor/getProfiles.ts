@@ -1,4 +1,3 @@
-import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { Server } from "@dawn/client";
 
 import type { FindProfilesDetailedUseCase } from "../../../../../application/find-profiles-detailed-use-case.js";
@@ -10,17 +9,14 @@ export class GetProfile {
   static inject = ["findProfilesDetailedUseCase"] as const;
 
   handle(server: Server) {
-    server.app.bsky.actor.getProfile({
+    server.app.bsky.actor.getProfiles({
       handler: async ({ params }) => {
-        const [profile] = await this.findProfilesDetailedUseCase.execute([
-          params.actor,
-        ]);
-        if (!profile) {
-          throw new InvalidRequestError("Profile not found");
-        }
+        const profiles = await this.findProfilesDetailedUseCase.execute(
+          params.actors,
+        );
         return {
           encoding: "application/json",
-          body: profile,
+          body: { profiles },
         };
       },
     });
