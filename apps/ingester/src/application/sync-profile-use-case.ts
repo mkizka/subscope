@@ -34,8 +34,8 @@ export class SyncProfileUseCase {
     await this.transactionManager.transaction(async (ctx) => {
       const user = await this.userRepository.findOne({ ctx, did: dto.did });
       if (!user) {
-        const { handle } = await this.didResolver.resolve(dto.did);
-        const newUser = new User({ did: dto.did, handle });
+        const data = await this.didResolver.resolve(dto.did);
+        const newUser = new User({ did: dto.did, handle: data?.handle });
         await this.userRepository.createOrUpdate({ ctx, user: newUser });
       }
       const profile = new Profile(dto);

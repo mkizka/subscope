@@ -182,6 +182,9 @@ importers:
       '@atproto/did':
         specifier: 0.1.3
         version: 0.1.3
+      '@dawn/client':
+        specifier: workspace:*
+        version: link:../client
       '@dawn/db':
         specifier: workspace:*
         version: link:../db

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@atproto/did": "0.1.3",
+    "@dawn/client": "workspace:*",
     "@dawn/db": "workspace:*",
     "pino": "9.5.0"
   },

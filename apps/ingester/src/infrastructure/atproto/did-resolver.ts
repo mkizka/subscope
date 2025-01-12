@@ -2,6 +2,9 @@ import { DidResolver as Resolver, MemoryCache } from "@atproto/identity";
 
 import type { IDidResolver } from "../../application/interfaces/did-resolver.js";
 import { env } from "../../shared/env.js";
+import { createLogger } from "../../shared/logger.js";
+
+const logger = createLogger("DidResolver");
 
 export class DidResolver implements IDidResolver {
   readonly resolver: Resolver;
@@ -14,7 +17,12 @@ export class DidResolver implements IDidResolver {
   }
 
   async resolve(did: string) {
-    const data = await this.resolver.resolveAtprotoData(did);
-    return { handle: data.handle };
+    try {
+      const data = await this.resolver.resolveAtprotoData(did);
+      return { handle: data.handle };
+    } catch (error) {
+      logger.warn(error, `Failed to resolve DID: ${did}`);
+      return null;
+    }
   }
 }

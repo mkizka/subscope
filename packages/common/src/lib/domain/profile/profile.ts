@@ -1,4 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
+import { AppBskyActorDefs } from "@dawn/client";
 
 type Avatar = {
   readonly cid: string;
@@ -42,5 +43,16 @@ export class Profile {
     }
     // TODO: 自作実装に置き換える
     return `https://cdn.bsky.app/img/avatar/plain/${this.did}/${this.avatar.cid}@${subtype}`;
+  }
+
+  toJSON() {
+    return {
+      did: this.did,
+      avatar: this.getAvatarUrl() ?? undefined,
+      description: this.description ?? undefined,
+      displayName: this.displayName ?? undefined,
+      createdAt: this.createdAt?.toISOString(),
+      indexedAt: this.indexedAt?.toISOString(),
+    };
   }
 }

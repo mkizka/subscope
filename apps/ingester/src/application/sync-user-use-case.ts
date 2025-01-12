@@ -15,7 +15,7 @@ export class SyncUserUseCase {
     let handle = dto.handle;
     if (!handle) {
       const data = await this.didResolver.resolve(dto.did);
-      handle = data.handle;
+      handle = data?.handle;
     }
     const user = new User({ did: dto.did, handle });
     await this.userRepository.createOrUpdate({ user });

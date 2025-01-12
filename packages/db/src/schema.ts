@@ -9,7 +9,7 @@ import { relations } from "drizzle-orm";
 
 export const users = mysqlTable("users", {
   did: varchar("did", { length: 256 }).primaryKey(),
-  handle: varchar("handle", { length: 256 }).notNull(),
+  handle: varchar("handle", { length: 256 }),
   indexedAt: timestamp("indexedAt").defaultNow(),
   updatedAt: timestamp("updatedAt").onUpdateNow(),
 });
