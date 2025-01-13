@@ -16,9 +16,10 @@ export class RedisDidCache implements DidCache {
 
   constructor() {
     this.cache = new Keyv({
-      store: new KeyvRedis<CacheVal>(env.REDIS_URL, {
-        namespace: "did-cache",
-      }),
+      namespace: "did-cache",
+      // https://github.com/jaredwray/keyv/issues/1255
+      useKeyPrefix: false,
+      store: new KeyvRedis<CacheVal>(env.REDIS_URL),
     });
   }
 
