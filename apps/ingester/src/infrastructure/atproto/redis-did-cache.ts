@@ -16,6 +16,7 @@ export class RedisDidCache implements DidCache {
 
   constructor() {
     this.cache = new Keyv({
+      namespace: "did-cache",
       serialize: JSON.stringify,
       deserialize: JSON.parse,
       store: new KeyvRedis<CacheVal>(env.REDIS_URL),
@@ -32,8 +33,8 @@ export class RedisDidCache implements DidCache {
     return {
       ...val,
       did,
-      stale: true,
-      expired: true,
+      stale: false,
+      expired: false, // expiring is handled by redis
     };
   }
 
