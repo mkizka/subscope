@@ -11,6 +11,10 @@ services:
     environment:
       - MYSQL_DATABASE=db
       - MYSQL_ROOT_PASSWORD=password
+  redis:
+    image: redis:7
+    ports:
+      - 6379:6379
   jetstream:
     image: ghcr.io/bluesky-social/jetstream:sha-ea96859
     restart: always

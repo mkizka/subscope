@@ -1,8 +1,9 @@
-import { DidResolver as BaseDidResolver, MemoryCache } from "@atproto/identity";
+import { DidResolver as BaseDidResolver } from "@atproto/identity";
 
 import type { IDidResolver } from "../../application/interfaces/did-resolver.js";
 import { env } from "../../shared/env.js";
 import { createLogger } from "../../shared/logger.js";
+import { RedisDidCache } from "./redis-did-cache.js";
 
 const logger = createLogger("DidResolver");
 
@@ -35,7 +36,7 @@ export class DidResolver implements IDidResolver {
 
   constructor() {
     this.resolver = new Resolver({
-      didCache: new MemoryCache(),
+      didCache: new RedisDidCache(),
       plcUrl: env.PLC_URL,
     });
   }
