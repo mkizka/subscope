@@ -1,4 +1,6 @@
+import type { Did } from "@atproto/did";
 import { ProfileDetailed } from "@dawn/common/domain";
+import type { Handle } from "@dawn/common/utils";
 import { schema } from "@dawn/db";
 import { eq, inArray, or } from "drizzle-orm";
 
@@ -6,7 +8,7 @@ import type { IProfileRepository } from "../application/interfaces/profile-repos
 import { db } from "./db.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async findManyDetailed({ handleOrDids }: { handleOrDids: string[] }) {
+  async findManyDetailed(handleOrDids: (Handle | Did)[]) {
     const rows = await db
       .select()
       .from(schema.profiles)
