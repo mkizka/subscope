@@ -4,8 +4,10 @@ export class FindProfilesDetailedUseCase {
   constructor(private readonly profileRepository: IProfileRepository) {}
   static inject = ["profileRepository"] as const;
 
-  async execute(dids: string[]) {
-    const profiles = await this.profileRepository.findManyDetailed({ dids });
+  async execute(handleOrDids: string[]) {
+    const profiles = await this.profileRepository.findManyDetailed({
+      handleOrDids,
+    });
     return profiles.map((profile) => profile.toJSON());
   }
 }

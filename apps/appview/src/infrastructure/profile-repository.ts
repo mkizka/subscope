@@ -1,12 +1,17 @@
 import { ProfileDetailed } from "@dawn/common/domain";
+import { schema } from "@dawn/db";
+import { inArray, or } from "drizzle-orm";
 
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 import { db } from "./db.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async findManyDetailed({ dids }: { dids: string[] }) {
+  async findManyDetailed({ handleOrDids }: { handleOrDids: string[] }) {
     const profiles = await db.query.profiles.findMany({
-      where: (profiles, { inArray }) => inArray(profiles.did, dids),
+      where: or(
+        inArray(schema.profiles.did, handleOrDids),
+        inArray(schema.users.handle, handleOrDids),
+      ),
       with: {
         user: true,
         avatar: true,
