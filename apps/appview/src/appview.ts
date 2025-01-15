@@ -3,6 +3,7 @@ import { createInjector } from "typed-inject";
 import { FindProfilesDetailedUseCase } from "./application/find-profiles-detailed-use-case.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
+import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { XRPCRoutes } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
 
@@ -12,6 +13,7 @@ createInjector()
   // application
   .provideClass("findProfilesDetailedUseCase", FindProfilesDetailedUseCase)
   .provideClass("getProfile", GetProfile)
+  .provideClass("getProfiles", GetProfiles)
   // presentation
   .provideClass("xrpcRoutes", XRPCRoutes)
   .injectClass(AppviewServer)

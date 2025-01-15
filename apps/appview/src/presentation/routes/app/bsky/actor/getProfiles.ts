@@ -4,7 +4,7 @@ import { isHandle } from "@dawn/common/utils";
 
 import type { FindProfilesDetailedUseCase } from "../../../../../application/find-profiles-detailed-use-case.js";
 
-export class GetProfile {
+export class GetProfiles {
   constructor(
     private findProfilesDetailedUseCase: FindProfilesDetailedUseCase,
   ) {}
