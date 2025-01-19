@@ -3,14 +3,13 @@ import type { Profile } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 
 import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
-import { defaultTransactionContext } from "./transaction.js";
 
 export class ProfileRepository implements IProfileRepository {
   async createOrUpdate({
-    ctx = defaultTransactionContext,
+    ctx,
     profile,
   }: {
-    ctx?: TransactionContext;
+    ctx: TransactionContext;
     profile: Profile;
   }) {
     if (profile.avatar) {
