@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import type { ILoggerManager, Logger } from "@dawn/common/domain";
 import type { CommitCreateEvent, CommitUpdateEvent } from "@skyware/jetstream";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
@@ -6,17 +7,17 @@ import WebSocket from "ws";
 import type { SyncProfileUseCase } from "../../application/sync-profile-use-case.js";
 import type { SyncUserUseCase } from "../../application/sync-user-use-case.js";
 import { env } from "../../shared/env.js";
-import { createLogger } from "../../shared/logger.js";
-
-const logger = createLogger("JetstreamIngester");
 
 export class JetstreamIngester {
   private readonly jetstream: Jetstream;
+  private readonly logger: Logger;
 
   constructor(
     private syncUserUseCase: SyncUserUseCase,
     private syncProfileUseCase: SyncProfileUseCase,
+    loggerManager: ILoggerManager,
   ) {
+    this.logger = loggerManager.createLogger("JetstreamIngester");
     this.jetstream = new Jetstream({
       ws: WebSocket,
       cursor: env.NODE_ENV === "development" ? -1 : undefined,
@@ -25,15 +26,17 @@ export class JetstreamIngester {
     });
 
     this.jetstream.on("open", () => {
-      logger.info(`jetstream subscription started to ${env.JETSTREAM_URL}`);
+      this.logger.info(
+        `jetstream subscription started to ${env.JETSTREAM_URL}`,
+      );
     });
 
     this.jetstream.on("close", () => {
-      logger.info(`jetstream subscription closed`);
+      this.logger.info(`jetstream subscription closed`);
     });
 
     this.jetstream.on("error", (error) => {
-      logger.error(error, "jetstream error occurred");
+      this.logger.error(error, "jetstream error occurred");
     });
 
     // イベントを発行するサービスでアカウント ホスティング ステータスが変更された可能性があること、および新しいステータスが何であるかを示します。
@@ -47,7 +50,7 @@ export class JetstreamIngester {
     // 何が変更されたかを示すものではなく、ID の現在の状態が何であるかを確実に示すものでもありません。
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
-      logger.debug({ did: event.identity.did }, "identity event received");
+      this.logger.debug({ did: event.identity.did }, "identity event received");
       await this.syncUserUseCase.execute({
         did: event.identity.did,
         handle: event.identity.handle,
@@ -62,14 +65,21 @@ export class JetstreamIngester {
       await this.handleProfileChanged(event);
     });
   }
-  static inject = ["syncUserUseCase", "syncProfileUseCase"] as const;
+  static inject = [
+    "syncUserUseCase",
+    "syncProfileUseCase",
+    "loggerManager",
+  ] as const;
 
   private async handleProfileChanged(
     event:
       | CommitCreateEvent<"app.bsky.actor.profile">
       | CommitUpdateEvent<"app.bsky.actor.profile">,
   ) {
-    logger.debug({ did: event.did }, "app.bsky.actor.profile event received");
+    this.logger.debug(
+      { did: event.did },
+      "app.bsky.actor.profile event received",
+    );
     await this.syncProfileUseCase.execute({
       did: asDid(event.did),
       avatar: event.commit.record.avatar
