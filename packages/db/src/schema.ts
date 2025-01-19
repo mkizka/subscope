@@ -4,15 +4,24 @@ import {
   text,
   int,
   timestamp,
+  index,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
-export const users = mysqlTable("users", {
-  did: varchar("did", { length: 256 }).primaryKey(),
-  handle: varchar("handle", { length: 256 }),
-  indexedAt: timestamp("indexedAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").onUpdateNow(),
-});
+export const users = mysqlTable(
+  "users",
+  {
+    did: varchar("did", { length: 256 }).primaryKey(),
+    handle: varchar("handle", { length: 256 }),
+    indexedAt: timestamp("indexedAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").onUpdateNow(),
+  },
+  (table) => {
+    return {
+      handleIdx: index("handle_idx").on(table.handle),
+    };
+  },
+);
 
 export const profiles = mysqlTable("profiles", {
   did: varchar("did", { length: 256 }).primaryKey(),
