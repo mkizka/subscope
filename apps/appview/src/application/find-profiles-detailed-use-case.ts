@@ -8,9 +8,8 @@ export class FindProfilesDetailedUseCase {
   static inject = ["profileRepository"] as const;
 
   async execute(handleOrDids: (Handle | Did)[]) {
-    const profiles = await this.profileRepository.findManyDetailed({
-      handleOrDids,
-    });
+    const profiles =
+      await this.profileRepository.findManyDetailed(handleOrDids);
     return profiles.map((profile) => profile.toJSON());
   }
 }
