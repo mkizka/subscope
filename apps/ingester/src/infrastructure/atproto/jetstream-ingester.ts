@@ -4,8 +4,8 @@ import type { CommitCreateEvent, CommitUpdateEvent } from "@skyware/jetstream";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
+import type { SyncActorUseCase } from "../../application/sync-actor-use-case.js";
 import type { SyncProfileUseCase } from "../../application/sync-profile-use-case.js";
-import type { SyncUserUseCase } from "../../application/sync-user-use-case.js";
 import { env } from "../../shared/env.js";
 
 export class JetstreamIngester {
@@ -13,7 +13,7 @@ export class JetstreamIngester {
   private readonly logger: Logger;
 
   constructor(
-    private syncUserUseCase: SyncUserUseCase,
+    private syncActorUseCase: SyncActorUseCase,
     private syncProfileUseCase: SyncProfileUseCase,
     loggerManager: ILoggerManager,
   ) {
@@ -51,7 +51,7 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
       this.logger.debug({ did: event.identity.did }, "identity event received");
-      await this.syncUserUseCase.execute({
+      await this.syncActorUseCase.execute({
         did: event.identity.did,
         handle: event.identity.handle,
       });
@@ -66,7 +66,7 @@ export class JetstreamIngester {
     });
   }
   static inject = [
-    "syncUserUseCase",
+    "syncActorUseCase",
     "syncProfileUseCase",
     "loggerManager",
   ] as const;

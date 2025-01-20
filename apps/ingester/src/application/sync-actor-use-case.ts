@@ -1,17 +1,17 @@
 import type { Did } from "@atproto/api";
 import type { DatabaseClient } from "@dawn/common/domain";
-import { User } from "@dawn/common/domain";
+import { Actor } from "@dawn/common/domain";
 
+import type { IActorRepository } from "./interfaces/actor-repository.js";
 import type { IDidResolver } from "./interfaces/did-resolver.js";
-import type { IUserRepository } from "./interfaces/user-repository.js";
 
-export class SyncUserUseCase {
+export class SyncActorUseCase {
   constructor(
-    private readonly userRepository: IUserRepository,
+    private readonly actorRepository: IActorRepository,
     private readonly didResolver: IDidResolver,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = ["userRepository", "didResolver", "db"] as const;
+  static inject = ["actorRepository", "didResolver", "db"] as const;
 
   async execute(dto: { did: Did; handle?: string }) {
     let handle = dto.handle;
@@ -19,7 +19,7 @@ export class SyncUserUseCase {
       const data = await this.didResolver.resolve(dto.did);
       handle = data?.handle;
     }
-    const user = new User({ did: dto.did, handle });
-    await this.userRepository.createOrUpdate({ ctx: { db: this.db }, user });
+    const actor = new Actor({ did: dto.did, handle });
+    await this.actorRepository.createOrUpdate({ ctx: { db: this.db }, actor });
   }
 }

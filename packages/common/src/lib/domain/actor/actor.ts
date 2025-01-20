@@ -1,7 +1,7 @@
 import { type Did, asDid } from "@atproto/did";
 import { asHandle, Handle } from "../../utils/handle.js";
 
-export class User {
+export class Actor {
   readonly did: Did;
   readonly handle: Handle | null; // handle can fail to resolve
 

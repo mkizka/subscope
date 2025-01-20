@@ -12,15 +12,15 @@ export class HandlesToDidsRepository implements IHandlesToDidsRepository {
   static inject = ["db"] as const;
 
   async findDidsByHandle(handles: Handle[]) {
-    const users = await this.db
+    const actors = await this.db
       .select({
-        did: schema.users.did,
-        handle: schema.users.handle,
+        did: schema.actors.did,
+        handle: schema.actors.handle,
       })
-      .from(schema.users)
-      .where(inArray(schema.users.handle, handles));
-    return users.reduce<Record<Handle, Did>>((acc, user) => {
-      acc[asHandle(user.handle)] = asDid(user.did);
+      .from(schema.actors)
+      .where(inArray(schema.actors.handle, handles));
+    return actors.reduce<Record<Handle, Did>>((acc, actor) => {
+      acc[asHandle(actor.handle)] = asDid(actor.did);
       return acc;
     }, {});
   }
