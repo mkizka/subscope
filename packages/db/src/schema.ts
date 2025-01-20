@@ -32,10 +32,8 @@ export const profiles = mysqlTable("profiles", {
 });
 
 export const posts = mysqlTable("posts", {
-  actorDid: varchar("actorDid", { length: 256 })
-    .primaryKey()
-    .references(() => profiles.did),
   rkey: varchar("rkey", { length: 256 }).primaryKey(),
+  actorDid: varchar("actorDid", { length: 256 }).references(() => users.did),
   text: text("text"),
   langs: varchar("langs", { length: 3 }),
   createdAt: timestamp("createdAt"),
