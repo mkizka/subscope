@@ -13,40 +13,40 @@ export const actors = mysqlTable(
   {
     did: varchar("did", { length: 256 }).primaryKey(),
     handle: varchar("handle", { length: 256 }),
-    indexedAt: timestamp("indexedAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").onUpdateNow(),
+    indexedAt: timestamp("indexed_at").defaultNow(),
+    updatedAt: timestamp("updated_at").onUpdateNow(),
   },
   (table) => [index("handle_idx").on(table.handle)],
 );
 
 export const profiles = mysqlTable("profiles", {
-  actorDid: varchar("actorDid", { length: 256 })
+  actorDid: varchar("actor_did", { length: 256 })
     .primaryKey()
     .references(() => actors.did),
-  avatarCid: varchar("avatarCid", { length: 256 }),
+  avatarCid: varchar("avatar_cid", { length: 256 }),
   description: text("description"),
-  displayName: varchar("displayName", { length: 256 }),
-  createdAt: timestamp("createdAt"),
-  indexedAt: timestamp("indexedAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").onUpdateNow(),
+  displayName: varchar("display_name", { length: 256 }),
+  createdAt: timestamp("created_at"),
+  indexedAt: timestamp("indexed_at").defaultNow(),
+  updatedAt: timestamp("updated_at").onUpdateNow(),
 });
 
 export const posts = mysqlTable("posts", {
   rkey: varchar("rkey", { length: 256 }).primaryKey(),
-  actorDid: varchar("actorDid", { length: 256 }).references(() => actors.did),
+  actorDid: varchar("actor_did", { length: 256 }).references(() => actors.did),
   text: text("text"),
   langs: varchar("langs", { length: 3 }),
-  createdAt: timestamp("createdAt"),
-  indexedAt: timestamp("indexedAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").onUpdateNow(),
+  createdAt: timestamp("created_at"),
+  indexedAt: timestamp("indexed_at").defaultNow(),
+  updatedAt: timestamp("updated_at").onUpdateNow(),
 });
 
 export const blobs = mysqlTable("blobs", {
   cid: varchar("cid", { length: 256 }).primaryKey(),
-  mimeType: varchar("mimeType", { length: 256 }).notNull(),
+  mimeType: varchar("mime_type", { length: 256 }).notNull(),
   size: int("size").notNull(),
-  indexedAt: timestamp("indexedAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").onUpdateNow(),
+  indexedAt: timestamp("indexed_at").defaultNow(),
+  updatedAt: timestamp("updated_at").onUpdateNow(),
 });
 
 export const actorsRelations = relations(actors, ({ one, many }) => ({
