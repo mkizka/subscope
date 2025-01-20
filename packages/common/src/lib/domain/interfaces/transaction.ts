@@ -1,7 +1,10 @@
-import type { DatabaseClient, TransactionClient } from "@dawn/db";
+import { schema } from "@dawn/db";
+import { MySql2Database } from "drizzle-orm/mysql2";
+
+export type DatabaseClient = MySql2Database<typeof schema>;
 
 export type TransactionContext = {
-  db: DatabaseClient | TransactionClient;
+  db: DatabaseClient;
 };
 
 export interface ITransactionManager {

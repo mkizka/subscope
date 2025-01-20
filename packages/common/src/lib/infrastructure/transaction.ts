@@ -1,8 +1,8 @@
 import type {
+  DatabaseClient,
   ITransactionManager,
   TransactionContext,
 } from "@dawn/common/domain";
-import { DatabaseClient } from "@dawn/db";
 
 export class TransactionManager implements ITransactionManager {
   constructor(private readonly db: DatabaseClient) {}

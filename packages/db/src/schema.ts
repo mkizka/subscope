@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
+// TODO: actorsにかえる
 export const users = mysqlTable(
   "users",
   {
@@ -16,18 +17,27 @@ export const users = mysqlTable(
     indexedAt: timestamp("indexedAt").defaultNow(),
     updatedAt: timestamp("updatedAt").onUpdateNow(),
   },
-  (table) => {
-    return {
-      handleIdx: index("handle_idx").on(table.handle),
-    };
-  },
+  (table) => [index("handle_idx").on(table.handle)],
 );
 
 export const profiles = mysqlTable("profiles", {
+  // TODO: actorDidにかえる
   did: varchar("did", { length: 256 }).primaryKey(),
   avatarCid: varchar("avatarCid", { length: 256 }),
   description: text("description"),
   displayName: varchar("displayName", { length: 256 }),
+  createdAt: timestamp("createdAt"),
+  indexedAt: timestamp("indexedAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").onUpdateNow(),
+});
+
+export const posts = mysqlTable("posts", {
+  actorDid: varchar("actorDid", { length: 256 })
+    .primaryKey()
+    .references(() => profiles.did),
+  rkey: varchar("rkey", { length: 256 }).primaryKey(),
+  text: text("text"),
+  langs: varchar("langs", { length: 3 }),
   createdAt: timestamp("createdAt"),
   indexedAt: timestamp("indexedAt").defaultNow(),
   updatedAt: timestamp("updatedAt").onUpdateNow(),
@@ -41,9 +51,17 @@ export const blobs = mysqlTable("blobs", {
   updatedAt: timestamp("updatedAt").onUpdateNow(),
 });
 
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [users.did],
+    references: [profiles.did],
+  }),
+  posts: many(posts),
+}));
+
+export const postsRelations = relations(posts, ({ one }) => ({
+  actor: one(profiles, {
+    fields: [posts.actorDid],
     references: [profiles.did],
   }),
 }));

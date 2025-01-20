@@ -1,9 +1,6 @@
 import type { Did } from "@atproto/did";
+import type { DatabaseClient } from "@dawn/common/domain";
 import { ProfileDetailed } from "@dawn/common/domain";
-import type { Handle } from "@dawn/common/utils";
-import type { DatabaseClient } from "@dawn/db";
-import { schema } from "@dawn/db";
-import { eq, inArray, or } from "drizzle-orm";
 
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 
@@ -11,32 +8,28 @@ export class ProfileRepository implements IProfileRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findManyDetailed(handleOrDids: (Handle | Did)[]) {
-    const rows = await this.db
-      .select()
-      .from(schema.profiles)
-      .innerJoin(schema.users, eq(schema.profiles.did, schema.users.did))
-      .leftJoin(schema.blobs, eq(schema.profiles.avatarCid, schema.blobs.cid))
-      .where(
-        or(
-          inArray(schema.profiles.did, handleOrDids),
-          inArray(schema.users.handle, handleOrDids),
-        ),
-      );
-    return rows.map(
-      (row) =>
+  async findManyDetailed(dids: Did[]) {
+    const profiles = await this.db.query.profiles.findMany({
+      where: (profiles, { inArray }) => inArray(profiles.did, dids),
+      with: {
+        user: true,
+        avatar: true,
+      },
+    });
+    return profiles.map(
+      (profile) =>
         new ProfileDetailed({
-          did: row.profiles.did,
-          handle: row.users.handle,
-          avatar: row.blobs && {
-            cid: row.blobs.cid,
-            mimeType: row.blobs.mimeType,
-            size: row.blobs.size,
+          did: profile.did,
+          handle: profile.user.handle,
+          avatar: profile.avatar && {
+            cid: profile.avatar.cid,
+            mimeType: profile.avatar.mimeType,
+            size: profile.avatar.size,
           },
-          description: row.profiles.description,
-          displayName: row.profiles.displayName,
-          createdAt: row.profiles.createdAt,
-          indexedAt: row.profiles.indexedAt,
+          description: profile.description,
+          displayName: profile.displayName,
+          createdAt: profile.createdAt,
+          indexedAt: profile.indexedAt,
         }),
     );
   }

@@ -2,6 +2,7 @@ import { databaseFactory, LoggerManager } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
 import { FindProfilesDetailedUseCase } from "./application/find-profiles-detailed-use-case.js";
+import { HandlesToDidsRepository } from "./infrastructure/handles-to-dids-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
@@ -15,6 +16,7 @@ createInjector()
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("db", databaseFactory)
   .provideClass("profileRepository", ProfileRepository)
+  .provideClass("handlesToDidsRepository", HandlesToDidsRepository)
   // application
   .provideClass("findProfilesDetailedUseCase", FindProfilesDetailedUseCase)
   .provideClass("getProfile", GetProfile)
