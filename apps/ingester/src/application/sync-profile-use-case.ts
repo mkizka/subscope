@@ -1,23 +1,23 @@
 import type { Did } from "@atproto/did";
 import type { ITransactionManager } from "@dawn/common/domain";
-import { Actor, Profile } from "@dawn/common/domain";
+import { Profile } from "@dawn/common/domain";
 
+import type { ActorService } from "../domain/actor-service.js";
 import type { IActorRepository } from "./interfaces/actor-repository.js";
-import type { IDidResolver } from "./interfaces/did-resolver.js";
 import type { IProfileRepository } from "./interfaces/profile-repository.js";
 
 export class SyncProfileUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
+    private readonly actorService: ActorService,
     private readonly actorRepository: IActorRepository,
     private readonly profileRepository: IProfileRepository,
-    private readonly didResolver: IDidResolver,
   ) {}
   static inject = [
     "transactionManager",
+    "actorService",
     "actorRepository",
     "profileRepository",
-    "didResolver",
   ] as const;
 
   async execute(dto: {
@@ -32,10 +32,9 @@ export class SyncProfileUseCase {
     createdAt: string | null;
   }) {
     await this.transactionManager.transaction(async (ctx) => {
-      const actor = await this.actorRepository.findOne({ ctx, did: dto.did });
-      if (!actor) {
-        const data = await this.didResolver.resolve(dto.did);
-        const newActor = new Actor({ did: dto.did, handle: data?.handle });
+      const exists = await this.actorRepository.exists({ ctx, did: dto.did });
+      if (!exists) {
+        const newActor = await this.actorService.resolveActor(dto.did);
         await this.actorRepository.createOrUpdate({ ctx, actor: newActor });
       }
       const profile = new Profile(dto);

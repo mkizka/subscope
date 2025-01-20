@@ -7,6 +7,7 @@ import { createInjector } from "typed-inject";
 
 import { SyncActorUseCase } from "./application/sync-actor-use-case.js";
 import { SyncProfileUseCase } from "./application/sync-profile-use-case.js";
+import { ActorService } from "./domain/actor-service.js";
 import { DidResolver } from "./infrastructure/atproto/did-resolver.js";
 import { JetstreamIngester } from "./infrastructure/atproto/jetstream-ingester.js";
 import { ActorRepository } from "./infrastructure/database/actor-repository.js";
@@ -22,6 +23,8 @@ createInjector()
   .provideClass("actorRepository", ActorRepository)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("didResolver", DidResolver)
+  // domain
+  .provideClass("actorService", ActorService)
   // application
   .provideClass("syncActorUseCase", SyncActorUseCase)
   .provideClass("syncProfileUseCase", SyncProfileUseCase)

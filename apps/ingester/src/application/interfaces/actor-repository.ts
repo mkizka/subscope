@@ -1,10 +1,10 @@
 import type { Actor, TransactionContext } from "@dawn/common/domain";
 
 export interface IActorRepository {
-  findOne: (params: {
+  exists: (params: {
     ctx: TransactionContext;
     did: string;
-  }) => Promise<Actor | null>;
+  }) => Promise<boolean>;
 
   createOrUpdate: (params: {
     ctx: TransactionContext;
