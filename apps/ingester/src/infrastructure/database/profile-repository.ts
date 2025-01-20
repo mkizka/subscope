@@ -30,7 +30,7 @@ export class ProfileRepository implements IProfileRepository {
     await ctx.db
       .insert(schema.profiles)
       .values({
-        did: profile.did,
+        actorDid: profile.did,
         avatarCid: profile.avatar?.cid,
         description: profile.description,
         displayName: profile.displayName,

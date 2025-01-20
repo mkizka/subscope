@@ -10,7 +10,7 @@ export class ProfileRepository implements IProfileRepository {
 
   async findManyDetailed(dids: Did[]) {
     const profiles = await this.db.query.profiles.findMany({
-      where: (profiles, { inArray }) => inArray(profiles.did, dids),
+      where: (profiles, { inArray }) => inArray(profiles.actorDid, dids),
       with: {
         user: true,
         avatar: true,
@@ -19,7 +19,7 @@ export class ProfileRepository implements IProfileRepository {
     return profiles.map(
       (profile) =>
         new ProfileDetailed({
-          did: profile.did,
+          did: profile.actorDid,
           handle: profile.user.handle,
           avatar: profile.avatar && {
             cid: profile.avatar.cid,

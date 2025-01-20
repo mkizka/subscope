@@ -8,7 +8,6 @@ import {
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
-// TODO: actorsにかえる
 export const actors = mysqlTable(
   "actors",
   {
@@ -21,8 +20,9 @@ export const actors = mysqlTable(
 );
 
 export const profiles = mysqlTable("profiles", {
-  // TODO: actorDidにかえる
-  did: varchar("did", { length: 256 }).primaryKey(),
+  actorDid: varchar("actorDid", { length: 256 })
+    .primaryKey()
+    .references(() => actors.did),
   avatarCid: varchar("avatarCid", { length: 256 }),
   description: text("description"),
   displayName: varchar("displayName", { length: 256 }),
@@ -49,24 +49,24 @@ export const blobs = mysqlTable("blobs", {
   updatedAt: timestamp("updatedAt").onUpdateNow(),
 });
 
-export const usersRelations = relations(actors, ({ one, many }) => ({
+export const actorsRelations = relations(actors, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [actors.did],
-    references: [profiles.did],
+    references: [profiles.actorDid],
   }),
   posts: many(posts),
 }));
 
 export const postsRelations = relations(posts, ({ one }) => ({
-  actor: one(profiles, {
+  actor: one(actors, {
     fields: [posts.actorDid],
-    references: [profiles.did],
+    references: [actors.did],
   }),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
   user: one(actors, {
-    fields: [profiles.did],
+    fields: [profiles.actorDid],
     references: [actors.did],
   }),
   avatar: one(blobs, {
