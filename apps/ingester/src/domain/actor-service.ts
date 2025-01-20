@@ -6,6 +6,7 @@ export class ActorService {
   constructor(private readonly didResolver: IDidResolver) {}
   static inject = ["didResolver"] as const;
 
+  // TODO: DBを確認する
   async resolveActor(did: string) {
     const data = await this.didResolver.resolve(did);
     return new Actor({ did, handle: data?.handle });
