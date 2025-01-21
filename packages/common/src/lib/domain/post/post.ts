@@ -4,7 +4,7 @@ type PostParams = {
   rkey: string;
   actorDid: Did;
   text: string;
-  langs: string[];
+  langs: string[] | null;
   createdAt: Date;
 };
 
@@ -12,7 +12,7 @@ export class Post {
   readonly rkey: string;
   readonly actorDid: Did;
   readonly text: string;
-  readonly langs: string[];
+  readonly langs: string[] | null;
   readonly createdAt: Date;
 
   constructor(params: PostParams) {

@@ -5,6 +5,7 @@ import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
 import type { SyncActorUseCase } from "../../application/sync-actor-use-case.js";
+import type { SyncPostUseCase } from "../../application/sync-post-use-case.js";
 import type { SyncProfileUseCase } from "../../application/sync-profile-use-case.js";
 import { env } from "../../shared/env.js";
 
@@ -13,16 +14,17 @@ export class JetstreamIngester {
   private readonly logger: Logger;
 
   constructor(
+    loggerManager: ILoggerManager,
     private syncActorUseCase: SyncActorUseCase,
     private syncProfileUseCase: SyncProfileUseCase,
-    loggerManager: ILoggerManager,
+    private syncPostUseCase: SyncPostUseCase,
   ) {
     this.logger = loggerManager.createLogger("JetstreamIngester");
     this.jetstream = new Jetstream({
       ws: WebSocket,
       cursor: env.NODE_ENV === "development" ? -1 : undefined,
       endpoint: env.JETSTREAM_URL,
-      wantedCollections: ["app.bsky.actor.profile"],
+      wantedCollections: ["app.bsky.actor.profile", "app.bsky.feed.post"],
     });
 
     this.jetstream.on("open", () => {
@@ -64,11 +66,20 @@ export class JetstreamIngester {
     this.jetstream.onUpdate("app.bsky.actor.profile", async (event) => {
       await this.handleProfileChanged(event);
     });
+
+    this.jetstream.onCreate("app.bsky.feed.post", async (event) => {
+      await this.handlePostChanged(event);
+    });
+
+    this.jetstream.onUpdate("app.bsky.feed.post", async (event) => {
+      await this.handlePostChanged(event);
+    });
   }
   static inject = [
+    "loggerManager",
     "syncActorUseCase",
     "syncProfileUseCase",
-    "loggerManager",
+    "syncPostUseCase",
   ] as const;
 
   private async handleProfileChanged(
@@ -92,6 +103,21 @@ export class JetstreamIngester {
       description: event.commit.record.description ?? null,
       displayName: event.commit.record.displayName ?? null,
       createdAt: event.commit.record.createdAt ?? null,
+    });
+  }
+
+  private async handlePostChanged(
+    event:
+      | CommitCreateEvent<"app.bsky.feed.post">
+      | CommitUpdateEvent<"app.bsky.feed.post">,
+  ) {
+    this.logger.debug({ did: event.did }, "app.bsky.actor.post event received");
+    await this.syncPostUseCase.execute({
+      rkey: event.commit.rkey,
+      actorDid: asDid(event.did),
+      text: event.commit.record.text,
+      langs: event.commit.record.langs ?? [],
+      createdAt: new Date(event.commit.record.createdAt),
     });
   }
 

@@ -5,6 +5,7 @@ import {
   int,
   timestamp,
   index,
+  json,
 } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
@@ -35,7 +36,7 @@ export const posts = mysqlTable("posts", {
   rkey: varchar("rkey", { length: 256 }).primaryKey(),
   actorDid: varchar("actor_did", { length: 256 }).references(() => actors.did),
   text: text("text"),
-  langs: varchar("langs", { length: 3 }),
+  langs: json("langs").$type<string[]>(),
   createdAt: timestamp("created_at"),
   indexedAt: timestamp("indexed_at").defaultNow(),
   updatedAt: timestamp("updated_at").onUpdateNow(),

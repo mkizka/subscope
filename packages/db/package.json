@@ -7,7 +7,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "db:migrate": "drizzle-kit push"
+    "db:migrate": "drizzle-kit push",
+    "dev": "drizzle-kit studio"
   },
   "dependencies": {
     "drizzle-orm": "0.38.3"
