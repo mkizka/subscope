@@ -24,7 +24,11 @@ export class JetstreamIngester {
       ws: WebSocket,
       cursor: env.NODE_ENV === "development" ? -1 : undefined,
       endpoint: env.JETSTREAM_URL,
-      wantedCollections: ["app.bsky.actor.profile", "app.bsky.feed.post"],
+      wantedCollections: [
+        "app.bsky.actor.profile",
+        // TODO: 戻す
+        // "app.bsky.feed.post"
+      ],
     });
 
     this.jetstream.on("open", () => {
@@ -67,13 +71,14 @@ export class JetstreamIngester {
       await this.handleProfileChanged(event);
     });
 
-    this.jetstream.onCreate("app.bsky.feed.post", async (event) => {
-      await this.handlePostChanged(event);
-    });
+    // TODO: 戻す
+    // this.jetstream.onCreate("app.bsky.feed.post", async (event) => {
+    //   await this.handlePostChanged(event);
+    // });
 
-    this.jetstream.onUpdate("app.bsky.feed.post", async (event) => {
-      await this.handlePostChanged(event);
-    });
+    // this.jetstream.onUpdate("app.bsky.feed.post", async (event) => {
+    //   await this.handlePostChanged(event);
+    // });
   }
   static inject = [
     "loggerManager",

@@ -18,10 +18,13 @@ export class DidResolver implements IDidResolver {
   }
   static inject = ["loggerManager"] as const;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async resolve(did: string) {
     try {
-      const data = await this.resolver.resolveAtprotoData(did);
-      return { handle: data.handle };
+      // const data = await this.resolver.resolveAtprotoData(did);
+      // return { handle: data.handle };
+      // TODO: 元に戻す
+      throw new Error("Not implemented");
     } catch (error) {
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
       return null;
