@@ -26,7 +26,7 @@ export class DidResolver implements IDidResolver {
       // TODO: 元に戻す
       throw new Error("Not implemented");
     } catch (error) {
-      this.logger.warn(error, `Failed to resolve DID: ${did}`);
+      // this.logger.warn(error, `Failed to resolve DID: ${did}`);
       return null;
     }
   }
