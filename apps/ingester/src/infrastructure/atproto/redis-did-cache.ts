@@ -10,7 +10,7 @@ type CacheVal = {
   updatedAt: number;
 };
 
-const TTL = 24 * 60 * 60 * 1000;
+const TTL = 30 * 24 * 60 * 60 * 1000;
 
 export class RedisDidCache implements DidCache {
   private readonly cache: Keyv<CacheVal>;
