@@ -1,4 +1,3 @@
-# copied from: https://github.com/zuchka/railway-prometheus
 FROM prom/prometheus:v3.1.0
 
 # copy the Prometheus configuration file
