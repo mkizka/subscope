@@ -23,14 +23,17 @@ export class DidResolver implements IDidResolver {
   }
   static inject = ["loggerManager", "didCache", "metric"] as const;
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async resolve(did: string) {
     try {
       this.metric.increment({
         name: "did_resolve_total",
         help: "Total number of did resolves",
       });
-      const data = await this.resolver.resolveAtprotoData(did);
-      return { handle: data.handle };
+      return null;
+      // TODO: 元に戻す
+      // const data = await this.resolver.resolveAtprotoData(did);
+      // return { handle: data.handle };
     } catch (error) {
       this.metric.increment({
         name: "did_resolve_error_total",
