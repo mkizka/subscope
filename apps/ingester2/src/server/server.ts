@@ -6,6 +6,7 @@ import { env } from "../shared/env.js";
 import type { JetstreamIngester } from "./jetstream.js";
 import { dashboardRouter } from "./routes/dashboard.js";
 import { healthRouter } from "./routes/health.js";
+import { metricsRouter } from "./routes/metrics.js";
 
 const noop = () => {};
 
@@ -34,6 +35,7 @@ export class IngesterServer {
       }),
     );
     this.app.use(healthRouter);
+    this.app.use(metricsRouter);
     this.app.use(dashboardRouter);
   }
   static inject = ["loggerManager", "ingester"] as const;
