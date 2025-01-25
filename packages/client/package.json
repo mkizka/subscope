@@ -9,12 +9,12 @@
     "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial"
   },
   "dependencies": {
-    "@atproto/lexicon": "0.4.4",
-    "@atproto/xrpc": "0.6.5",
-    "@atproto/xrpc-server": "0.7.4"
+    "@atproto/lexicon": "0.4.5",
+    "@atproto/xrpc": "0.6.6",
+    "@atproto/xrpc-server": "0.7.8"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.5.4",
+    "@atproto/lex-cli": "0.5.6",
     "@types/express": "5.0.0",
     "chokidar-cli": "3.0.0"
   }
