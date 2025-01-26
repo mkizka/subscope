@@ -20,10 +20,12 @@ export class IngesterServer {
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
-    // this.app.use(promBundle({ includeMethod: true }));
     this.app.use(
       pinoHttp({
         logger: this.logger,
+        autoLogging: {
+          ignore: (req) => req.path === "/metrics",
+        },
         customSuccessMessage: (req, res, responseTime) => {
           return `${req.method} ${res.statusCode} ${req.url} ${responseTime}ms`;
         },
