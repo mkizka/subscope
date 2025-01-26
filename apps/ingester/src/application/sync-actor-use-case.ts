@@ -1,4 +1,4 @@
-import type { Did } from "@atproto/api";
+import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { Actor } from "@dawn/common/domain";
 

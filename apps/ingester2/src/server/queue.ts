@@ -1,8 +1,16 @@
 import { Queue } from "bullmq";
 
+import { env } from "../shared/env.js";
+
+const queueOptions = {
+  connection: {
+    url: env.REDIS_URL,
+  },
+};
+
 export const queues = {
-  syncProfile: new Queue("syncProfile"),
-  syncIdentity: new Queue("syncIdentity"),
+  identity: new Queue("identity", queueOptions),
+  "app.bsky.actor.profile": new Queue("app.bsky.actor.profile", queueOptions),
 };
 
 export class QueueService {

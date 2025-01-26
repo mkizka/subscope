@@ -3,9 +3,9 @@ import express from "express";
 import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";
 
-import type { JetstreamIngester } from "../infrastructure/atproto/jetstream-ingester.js";
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
+import type { SyncWorker } from "./worker.js";
 
 const noop = () => {};
 
@@ -15,7 +15,7 @@ export class IngesterServer {
 
   constructor(
     loggerManager: ILoggerManager,
-    private readonly ingester: JetstreamIngester,
+    private readonly syncWorker: SyncWorker,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
@@ -35,12 +35,12 @@ export class IngesterServer {
     );
     this.app.use(healthRouter);
   }
-  static inject = ["loggerManager", "ingester"] as const;
+  static inject = ["loggerManager", "syncWorker"] as const;
 
   start() {
-    this.app.listen(env.PORT, () => {
+    this.app.listen(env.PORT, async () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
-      this.ingester.start();
+      await this.syncWorker.start();
     });
   }
 }

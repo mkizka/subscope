@@ -47,7 +47,7 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
       this.logger.debug({ did: event.identity.did }, "identity event received");
-      await this.queueService.addTask("syncIdentity", event);
+      await this.queueService.addTask("identity", event);
     });
 
     this.jetstream.on("app.bsky.actor.profile", async (event) => {
@@ -55,7 +55,7 @@ export class JetstreamIngester {
         { did: event.did },
         "app.bsky.actor.profile event received",
       );
-      await this.queueService.addTask("syncProfile", event);
+      await this.queueService.addTask("app.bsky.actor.profile", event);
     });
   }
   static inject = ["loggerManager", "queueService"] as const;

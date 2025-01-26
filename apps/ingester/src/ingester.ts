@@ -10,13 +10,13 @@ import { SyncPostUseCase } from "./application/sync-post-use-case.js";
 import { SyncProfileUseCase } from "./application/sync-profile-use-case.js";
 import { ActorService } from "./domain/actor-service.js";
 import { DidResolver } from "./infrastructure/atproto/did-resolver.js";
-import { JetstreamIngester } from "./infrastructure/atproto/jetstream-ingester.js";
 import { RedisDidCache } from "./infrastructure/atproto/redis-did-cache.js";
 import { ActorRepository } from "./infrastructure/database/actor-repository.js";
 import { PostRepository } from "./infrastructure/database/post-repository.js";
 import { ProfileRepository } from "./infrastructure/database/profile-repository.js";
 import { Metric } from "./infrastructure/system/metric.js";
 import { IngesterServer } from "./presentation/server.js";
+import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
 
 createInjector()
@@ -37,7 +37,7 @@ createInjector()
   .provideClass("syncActorUseCase", SyncActorUseCase)
   .provideClass("syncProfileUseCase", SyncProfileUseCase)
   .provideClass("syncPostUseCase", SyncPostUseCase)
-  .provideClass("ingester", JetstreamIngester)
+  .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(IngesterServer)
   .start();
