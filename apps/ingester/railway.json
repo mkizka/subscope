@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "watchPatterns": [
-      "/apps/ingester2/**/*",
+      "/apps/ingester/**/*",
       "/lexicons/**/*",
       "/packages/client/**/*",
       "/packages/common/**/*",
@@ -10,6 +10,6 @@
     ]
   },
   "deploy": {
-    "startCommand": "pnpm --filter @dawn/ingester2 start"
+    "startCommand": "pnpm --filter @dawn/ingester start"
   }
 }
