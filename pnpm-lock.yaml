@@ -102,6 +102,73 @@ importers:
 
   apps/ingester:
     dependencies:
+      '@bull-board/api':
+        specifier: 6.7.1
+        version: 6.7.1(@bull-board/ui@6.7.1)
+      '@bull-board/express':
+        specifier: 6.7.1
+        version: 6.7.1
+      '@dawn/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@skyware/jetstream':
+        specifier: 0.2.2
+        version: 0.2.2(@atcute/client@2.0.3)
+      bullmq:
+        specifier: 5.37.0
+        version: 5.37.0
+      express:
+        specifier: 4.21.2
+        version: 4.21.2
+      pino-http:
+        specifier: 10.4.0
+        version: 10.4.0
+      typed-inject:
+        specifier: 5.0.0
+        version: 5.0.0
+      ws:
+        specifier: 8.18.0
+        version: 8.18.0
+      zod:
+        specifier: 3.24.1
+        version: 3.24.1
+      zod-validation-error:
+        specifier: 3.4.0
+        version: 3.4.0(zod@3.24.1)
+    devDependencies:
+      '@mkizka/eslint-config':
+        specifier: 5.3.4
+        version: 5.3.4(@typescript-eslint/eslint-plugin@8.21.0(@typescript-eslint/parser@8.21.0(eslint@9.19.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.19.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.19.0(jiti@1.21.7))(tailwindcss@3.4.17)(typescript@5.7.3)
+      '@tsconfig/node-lts':
+        specifier: 22.0.1
+        version: 22.0.1
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      '@types/node':
+        specifier: 22.10.10
+        version: 22.10.10
+      '@types/ws':
+        specifier: 8.5.14
+        version: 8.5.14
+      eslint:
+        specifier: 9.19.0
+        version: 9.19.0(jiti@1.21.7)
+      pino-pretty:
+        specifier: 13.0.0
+        version: 13.0.0
+      tsx:
+        specifier: 4.19.2
+        version: 4.19.2
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      wait-on:
+        specifier: 8.0.2
+        version: 8.0.2
+
+  apps/worker:
+    dependencies:
       '@atproto/api':
         specifier: 0.13.31
         version: 0.13.31
@@ -166,73 +233,6 @@ importers:
       '@types/ws':
         specifier: 8.5.14
         version: 8.5.14
-      pino-pretty:
-        specifier: 13.0.0
-        version: 13.0.0
-      tsx:
-        specifier: 4.19.2
-        version: 4.19.2
-      typescript:
-        specifier: 5.7.3
-        version: 5.7.3
-      wait-on:
-        specifier: 8.0.2
-        version: 8.0.2
-
-  apps/ingester2:
-    dependencies:
-      '@bull-board/api':
-        specifier: 6.7.1
-        version: 6.7.1(@bull-board/ui@6.7.1)
-      '@bull-board/express':
-        specifier: 6.7.1
-        version: 6.7.1
-      '@dawn/common':
-        specifier: workspace:*
-        version: link:../../packages/common
-      '@skyware/jetstream':
-        specifier: 0.2.2
-        version: 0.2.2(@atcute/client@2.0.3)
-      bullmq:
-        specifier: 5.37.0
-        version: 5.37.0
-      express:
-        specifier: 4.21.2
-        version: 4.21.2
-      pino-http:
-        specifier: 10.4.0
-        version: 10.4.0
-      typed-inject:
-        specifier: 5.0.0
-        version: 5.0.0
-      ws:
-        specifier: 8.18.0
-        version: 8.18.0
-      zod:
-        specifier: 3.24.1
-        version: 3.24.1
-      zod-validation-error:
-        specifier: 3.4.0
-        version: 3.4.0(zod@3.24.1)
-    devDependencies:
-      '@mkizka/eslint-config':
-        specifier: 5.3.4
-        version: 5.3.4(@typescript-eslint/eslint-plugin@8.21.0(@typescript-eslint/parser@8.21.0(eslint@9.19.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.19.0(jiti@1.21.7))(typescript@5.7.3))(eslint@9.19.0(jiti@1.21.7))(tailwindcss@3.4.17)(typescript@5.7.3)
-      '@tsconfig/node-lts':
-        specifier: 22.0.1
-        version: 22.0.1
-      '@types/express':
-        specifier: 5.0.0
-        version: 5.0.0
-      '@types/node':
-        specifier: 22.10.10
-        version: 22.10.10
-      '@types/ws':
-        specifier: 8.5.14
-        version: 8.5.14
-      eslint:
-        specifier: 9.19.0
-        version: 9.19.0(jiti@1.21.7)
       pino-pretty:
         specifier: 13.0.0
         version: 13.0.0
