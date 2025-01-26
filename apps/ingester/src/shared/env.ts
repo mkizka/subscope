@@ -10,7 +10,7 @@ const schema = z.object({
   LOG_LEVEL: z
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
-  PORT: z.coerce.number().default(3003),
+  PORT: z.coerce.number().default(3002),
   JETSTREAM_URL: z
     .string()
     .url()
