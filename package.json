@@ -12,6 +12,7 @@
     "prepare": "husky",
     "start:appview": "pnpm -s db:migrate && pnpm --filter @dawn/appview start",
     "start:ingester": "pnpm -s db:migrate && pnpm --filter @dawn/ingester start",
+    "start:worker": "pnpm -s db:migrate && pnpm --filter @dawn/worker start",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {

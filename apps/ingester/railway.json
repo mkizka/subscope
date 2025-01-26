@@ -10,6 +10,8 @@
     ]
   },
   "deploy": {
-    "startCommand": "pnpm --filter @dawn/ingester start"
+    "startCommand": "pnpm start:ingester",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 60
   }
 }

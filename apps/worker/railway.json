@@ -10,6 +10,8 @@
     ]
   },
   "deploy": {
-    "startCommand": "pnpm --filter @dawn/worker start"
+    "startCommand": "pnpm start:worker",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 60
   }
 }
