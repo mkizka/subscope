@@ -16,10 +16,6 @@ import { env } from "../shared/env.js";
 
 const workerOptions = {
   autorun: false,
-  limiter: {
-    max: 1,
-    duration: 1000,
-  },
   connection: {
     url: env.REDIS_URL,
   },
