@@ -6,7 +6,8 @@
       "/lexicons/**/*",
       "/packages/client/**/*",
       "/packages/common/**/*",
-      "/packages/db/**/*"
+      "/packages/db/**/*",
+      "pnpm-lock.yaml"
     ]
   },
   "deploy": {
