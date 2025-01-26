@@ -15,7 +15,7 @@ import { ActorRepository } from "./infrastructure/database/actor-repository.js";
 import { PostRepository } from "./infrastructure/database/post-repository.js";
 import { ProfileRepository } from "./infrastructure/database/profile-repository.js";
 import { Metric } from "./infrastructure/system/metric.js";
-import { IngesterServer } from "./presentation/server.js";
+import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
 
@@ -39,5 +39,5 @@ createInjector()
   .provideClass("syncPostUseCase", SyncPostUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
-  .injectClass(IngesterServer)
+  .injectClass(WorkerServer)
   .start();

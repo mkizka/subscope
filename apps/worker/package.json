@@ -1,12 +1,12 @@
 {
-  "name": "@dawn/ingester",
+  "name": "@dawn/worker",
   "version": "0.0.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "wait-on tcp:6008 && NODE_ENV=development tsx watch ./src/ingester.ts | pino-pretty",
+    "dev": "wait-on tcp:6008 && NODE_ENV=development tsx watch ./src/worker.ts | pino-pretty",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "start": "NODE_ENV=production tsx ./src/ingester.ts",
+    "start": "NODE_ENV=production tsx ./src/worker.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

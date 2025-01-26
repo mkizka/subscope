@@ -9,7 +9,7 @@ import type { SyncWorker } from "./worker.js";
 
 const noop = () => {};
 
-export class IngesterServer {
+export class WorkerServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
 
@@ -17,7 +17,7 @@ export class IngesterServer {
     loggerManager: ILoggerManager,
     private readonly syncWorker: SyncWorker,
   ) {
-    this.logger = loggerManager.createLogger("IngesterServer");
+    this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(
@@ -39,7 +39,7 @@ export class IngesterServer {
 
   start() {
     this.app.listen(env.PORT, async () => {
-      this.logger.info(`Ingester server listening on port ${env.PORT}`);
+      this.logger.info(`Worker server listening on port ${env.PORT}`);
       await this.syncWorker.start();
     });
   }
