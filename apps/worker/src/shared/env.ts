@@ -20,15 +20,6 @@ const schema = z.object({
         dev: "http://localhost:2582",
       }),
     ),
-  JETSTREAM_URL: z
-    .string()
-    .url()
-    .default(
-      match({
-        prod: "wss://jetstream1.us-west.bsky.network/subscribe",
-        dev: "ws://localhost:6008/subscribe",
-      }),
-    ),
   DATABASE_URL: match({
     prod: z.string().url(),
     dev: z.string().url().default("mysql://root:password@localhost:3306/db"),
