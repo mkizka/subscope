@@ -18,7 +18,7 @@ export class QueueService {
   async addTask(name: keyof typeof queues, data: unknown) {
     await queues[name].add(name, data, {
       removeOnComplete: {
-        age: 24 * 60 * 60,
+        age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
       },
       removeOnFail: {
         age: 24 * 60 * 60,
