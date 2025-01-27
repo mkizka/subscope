@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import { type ITransactionManager, Post } from "@dawn/common/domain";
+import { Actor, type ITransactionManager, Post } from "@dawn/common/domain";
 
 import type { ActorService } from "../domain/actor-service.js";
 import type { IActorRepository } from "./interfaces/actor-repository.js";
@@ -32,8 +32,10 @@ export class SyncPostUseCase {
         did: dto.actorDid,
       });
       if (!exists) {
-        const newActor = await this.actorService.resolveActor(dto.actorDid);
-        await this.actorRepository.createOrUpdate({ ctx, actor: newActor });
+        await this.actorRepository.createOrUpdate({
+          ctx,
+          actor: new Actor({ did: dto.actorDid }), // postの作成速度が速すぎるので、DIDだけで作成する
+        });
       }
       const post = new Post(dto);
       await this.postRepository.createOrUpdate({ ctx, post });

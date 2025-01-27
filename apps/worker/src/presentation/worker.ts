@@ -16,7 +16,7 @@ import type { SyncPostUseCase } from "../application/sync-post-use-case.js";
 import type { SyncProfileUseCase } from "../application/sync-profile-use-case.js";
 import { env } from "../shared/env.js";
 
-const workerOptions = {
+const baseWorkerOptions = {
   autorun: false,
   connection: {
     url: env.REDIS_URL,
@@ -28,6 +28,7 @@ const createSyncRecordWorker = <RecordType extends string, DTO>({
   factory,
   upsert,
   delete: delete_,
+  workerOptions,
 }: {
   collection: RecordType;
   factory: (
@@ -35,6 +36,7 @@ const createSyncRecordWorker = <RecordType extends string, DTO>({
   ) => DTO;
   upsert: (dto: DTO) => Promise<void>;
   delete: (uri: AtUri) => Promise<void>;
+  workerOptions?: Partial<WorkerOptions>;
 }) => {
   return new Worker<CommitEvent<RecordType>>(
     name,
@@ -58,7 +60,10 @@ const createSyncRecordWorker = <RecordType extends string, DTO>({
           break;
       }
     },
-    workerOptions,
+    {
+      ...baseWorkerOptions,
+      ...workerOptions,
+    },
   );
 };
 
@@ -79,13 +84,16 @@ export class SyncWorker {
             handle: job.data.identity.handle,
           });
         },
-        workerOptions,
+        baseWorkerOptions,
       ),
       createSyncRecordWorker({
         collection: "app.bsky.actor.profile",
         factory: upsertProfileDtoFactory,
         upsert: (dto) => syncProfileUseCase.execute(dto),
         delete: async (uri) => {}, // TODO: 削除処理を書く
+        workerOptions: {
+          concurrency: 16,
+        },
       }),
       createSyncRecordWorker({
         collection: "app.bsky.feed.post",
