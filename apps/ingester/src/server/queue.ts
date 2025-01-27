@@ -16,7 +16,12 @@ export const queues = {
 export class QueueService {
   async addTask(name: keyof typeof queues, data: unknown) {
     await queues[name].add(name, data, {
-      removeOnComplete: true,
+      removeOnComplete: {
+        age: 24 * 60 * 60,
+      },
+      removeOnFail: {
+        age: 24 * 60 * 60,
+      },
     });
   }
 }
