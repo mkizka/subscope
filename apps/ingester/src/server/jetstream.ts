@@ -18,7 +18,7 @@ export class JetstreamIngester {
       ws: WebSocket,
       cursor: env.NODE_ENV === "development" ? -1 : undefined,
       endpoint: env.JETSTREAM_URL,
-      wantedCollections: ["app.bsky.actor.profile"],
+      wantedCollections: ["app.bsky.actor.profile", "app.bsky.feed.post"],
     });
 
     this.jetstream.on("open", () => {
@@ -56,6 +56,14 @@ export class JetstreamIngester {
         "app.bsky.actor.profile event received",
       );
       await this.queueService.addTask("app.bsky.actor.profile", event);
+    });
+
+    this.jetstream.on("app.bsky.feed.post", async (event) => {
+      this.logger.debug(
+        { did: event.did },
+        "app.bsky.feed.post event received",
+      );
+      await this.queueService.addTask("app.bsky.feed.post", event);
     });
   }
   static inject = ["loggerManager", "queueService"] as const;

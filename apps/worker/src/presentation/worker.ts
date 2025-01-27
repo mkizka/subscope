@@ -9,8 +9,10 @@ import type {
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
+import { upsertPostDtoFactory } from "../application/post/upsert-profile-dto.js";
 import { upsertProfileDtoFactory } from "../application/profile/upsert-profile-dto.js";
 import type { SyncActorUseCase } from "../application/sync-actor-use-case.js";
+import type { SyncPostUseCase } from "../application/sync-post-use-case.js";
 import type { SyncProfileUseCase } from "../application/sync-profile-use-case.js";
 import { env } from "../shared/env.js";
 
@@ -21,15 +23,17 @@ const workerOptions = {
   },
 } satisfies WorkerOptions;
 
-const createSyncRecordWorker = <RecordType extends string>({
+const createSyncRecordWorker = <RecordType extends string, DTO>({
   collection: name,
+  factory,
   upsert,
   delete: delete_,
 }: {
   collection: RecordType;
-  upsert: (
+  factory: (
     event: CommitCreateEvent<RecordType> | CommitUpdateEvent<RecordType>,
-  ) => Promise<void>;
+  ) => DTO;
+  upsert: (dto: DTO) => Promise<void>;
   delete: (uri: AtUri) => Promise<void>;
 }) => {
   return new Worker<CommitEvent<RecordType>>(
@@ -42,9 +46,11 @@ const createSyncRecordWorker = <RecordType extends string>({
         case "create":
         case "update":
           await upsert(
-            job.data as
-              | CommitCreateEvent<RecordType>
-              | CommitUpdateEvent<RecordType>,
+            factory(
+              job.data as
+                | CommitCreateEvent<RecordType>
+                | CommitUpdateEvent<RecordType>,
+            ),
           );
           break;
         case "delete":
@@ -62,6 +68,7 @@ export class SyncWorker {
   constructor(
     syncActorUseCase: SyncActorUseCase,
     syncProfileUseCase: SyncProfileUseCase,
+    syncPostUseCase: SyncPostUseCase,
   ) {
     this.workers = [
       new Worker<IdentityEvent>(
@@ -76,13 +83,23 @@ export class SyncWorker {
       ),
       createSyncRecordWorker({
         collection: "app.bsky.actor.profile",
-        upsert: (event) =>
-          syncProfileUseCase.execute(upsertProfileDtoFactory(event)),
+        factory: upsertProfileDtoFactory,
+        upsert: (dto) => syncProfileUseCase.execute(dto),
         delete: async (uri) => {}, // TODO: 削除処理を書く
+      }),
+      createSyncRecordWorker({
+        collection: "app.bsky.feed.post",
+        factory: upsertPostDtoFactory,
+        upsert: (dto) => syncPostUseCase.execute(dto),
+        delete: async () => {}, // TODO: 削除処理を書く
       }),
     ];
   }
-  static inject = ["syncActorUseCase", "syncProfileUseCase"] as const;
+  static inject = [
+    "syncActorUseCase",
+    "syncProfileUseCase",
+    "syncPostUseCase",
+  ] as const;
 
   async start() {
     await Promise.all(this.workers.map((worker) => worker.run()));

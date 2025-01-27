@@ -11,6 +11,7 @@ const queueOptions = {
 export const queues = {
   identity: new Queue("identity", queueOptions),
   "app.bsky.actor.profile": new Queue("app.bsky.actor.profile", queueOptions),
+  "app.bsky.feed.post": new Queue("app.bsky.feed.post", queueOptions),
 };
 
 export class QueueService {
