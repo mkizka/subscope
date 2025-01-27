@@ -91,15 +91,15 @@ export class SyncWorker {
         factory: upsertProfileDtoFactory,
         upsert: (dto) => syncProfileUseCase.execute(dto),
         delete: async (uri) => {}, // TODO: 削除処理を書く
-        workerOptions: {
-          concurrency: 16,
-        },
       }),
       createSyncRecordWorker({
         collection: "app.bsky.feed.post",
         factory: upsertPostDtoFactory,
         upsert: (dto) => syncPostUseCase.execute(dto),
         delete: async () => {}, // TODO: 削除処理を書く
+        workerOptions: {
+          concurrency: 16,
+        },
       }),
     ];
   }
