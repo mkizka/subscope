@@ -1,4 +1,5 @@
 import { AtUri } from "@atproto/api";
+import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
 import type {
   CommitCreateEvent,
@@ -10,6 +11,7 @@ import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
 import type { UpsertIdentityUseCase } from "../application/actor/upsert-identity-use-case.js";
+import type { ResolveDidUseCase } from "../application/did/resolve-did-use-case.js";
 import { upsertPostDtoFactory } from "../application/post/upsert-post-dto.js";
 import type { UpsertPostUseCase } from "../application/post/upsert-post-use-case.js";
 import { upsertProfileDtoFactory } from "../application/profile/upsert-profile-dto.js";
@@ -75,8 +77,10 @@ export class SyncWorker {
     upsertIdentityUseCase: UpsertIdentityUseCase,
     upsertProfileUseCase: UpsertProfileUseCase,
     upsertPostUseCase: UpsertPostUseCase,
+    resolveDidUseCase: ResolveDidUseCase,
   ) {
     this.workers = [
+      // atproto record events
       new Worker<IdentityEvent>(
         "identity",
         async (job) => {
@@ -102,12 +106,25 @@ export class SyncWorker {
           concurrency: 16,
         },
       }),
+      // others
+      new Worker<Did>(
+        "resolveDid",
+        (job) => resolveDidUseCase.execute(job.data),
+        {
+          ...baseWorkerOptions,
+          limiter: {
+            max: 5, // plc.directoryの負荷を抑えるために10rpsに制限
+            duration: 1000,
+          },
+        },
+      ),
     ];
   }
   static inject = [
     "upsertIdentityUseCase",
     "upsertProfileUseCase",
     "upsertPostUseCase",
+    "resolveDidUseCase",
   ] as const;
 
   async start() {

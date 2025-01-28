@@ -1,6 +1,7 @@
 import { Queue } from "bullmq";
 
-import { env } from "../shared/env.js";
+import type { IQueueService } from "../../application/interfaces/queue.js";
+import { env } from "../../shared/env.js";
 
 const queueOptions = {
   connection: {
@@ -8,16 +9,14 @@ const queueOptions = {
   },
 };
 
-export const queues = {
-  identity: new Queue("identity", queueOptions),
+export const queues: Record<string, Queue> = {
   resolveDid: new Queue("resolveDid", queueOptions),
-  "app.bsky.actor.profile": new Queue("app.bsky.actor.profile", queueOptions),
-  "app.bsky.feed.post": new Queue("app.bsky.feed.post", queueOptions),
 };
 
-export class QueueService {
-  async addTask(name: keyof typeof queues, data: unknown) {
-    await queues[name].add(name, data, {
+export class QueueService implements IQueueService {
+  async addTask(name: string, data: unknown) {
+    // TODO: queueを@dawn/commonにまとめる
+    await queues[name]?.add(name, data, {
       removeOnComplete: {
         age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
       },
