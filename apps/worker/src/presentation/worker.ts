@@ -9,11 +9,11 @@ import type {
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
-import { upsertPostDtoFactory } from "../application/post/upsert-profile-dto.js";
+import type { UpsertIdentityUseCase } from "../application/actor/upsert-identity-use-case.js";
+import { upsertPostDtoFactory } from "../application/post/upsert-post-dto.js";
+import type { UpsertPostUseCase } from "../application/post/upsert-post-use-case.js";
 import { upsertProfileDtoFactory } from "../application/profile/upsert-profile-dto.js";
-import type { SyncActorUseCase } from "../application/sync-actor-use-case.js";
-import type { SyncPostUseCase } from "../application/sync-post-use-case.js";
-import type { SyncProfileUseCase } from "../application/sync-profile-use-case.js";
+import type { UpsertProfileUseCase } from "../application/profile/upsert-profile-use-case.js";
 import { env } from "../shared/env.js";
 
 const baseWorkerOptions = {
@@ -24,7 +24,7 @@ const baseWorkerOptions = {
 } satisfies WorkerOptions;
 
 const createSyncRecordWorker = <RecordType extends string, DTO>({
-  collection: name,
+  collection,
   factory,
   upsert,
   delete: delete_,
@@ -39,11 +39,8 @@ const createSyncRecordWorker = <RecordType extends string, DTO>({
   workerOptions?: Partial<WorkerOptions>;
 }) => {
   return new Worker<CommitEvent<RecordType>>(
-    name,
+    collection,
     async (job) => {
-      const uri = new AtUri(
-        `at://${job.data.did}/${job.data.commit.collection}/${job.data.commit.rkey}`,
-      );
       switch (job.data.commit.operation) {
         case "create":
         case "update":
@@ -56,7 +53,11 @@ const createSyncRecordWorker = <RecordType extends string, DTO>({
           );
           break;
         case "delete":
-          await delete_(uri);
+          await delete_(
+            new AtUri(
+              `at://${job.data.did}/${job.data.commit.collection}/${job.data.commit.rkey}`,
+            ),
+          );
           break;
       }
     },
@@ -71,15 +72,15 @@ export class SyncWorker {
   private readonly workers: Worker[];
 
   constructor(
-    syncActorUseCase: SyncActorUseCase,
-    syncProfileUseCase: SyncProfileUseCase,
-    syncPostUseCase: SyncPostUseCase,
+    upsertIdentityUseCase: UpsertIdentityUseCase,
+    upsertProfileUseCase: UpsertProfileUseCase,
+    upsertPostUseCase: UpsertPostUseCase,
   ) {
     this.workers = [
       new Worker<IdentityEvent>(
         "identity",
         async (job) => {
-          await syncActorUseCase.execute({
+          await upsertIdentityUseCase.execute({
             did: asDid(job.data.identity.did),
             handle: job.data.identity.handle,
           });
@@ -89,13 +90,13 @@ export class SyncWorker {
       createSyncRecordWorker({
         collection: "app.bsky.actor.profile",
         factory: upsertProfileDtoFactory,
-        upsert: (dto) => syncProfileUseCase.execute(dto),
+        upsert: (dto) => upsertProfileUseCase.execute(dto),
         delete: async (uri) => {}, // TODO: 削除処理を書く
       }),
       createSyncRecordWorker({
         collection: "app.bsky.feed.post",
         factory: upsertPostDtoFactory,
-        upsert: (dto) => syncPostUseCase.execute(dto),
+        upsert: (dto) => upsertPostUseCase.execute(dto),
         delete: async () => {}, // TODO: 削除処理を書く
         workerOptions: {
           concurrency: 16,
@@ -104,9 +105,9 @@ export class SyncWorker {
     ];
   }
   static inject = [
-    "syncActorUseCase",
-    "syncProfileUseCase",
-    "syncPostUseCase",
+    "upsertIdentityUseCase",
+    "upsertProfileUseCase",
+    "upsertPostUseCase",
   ] as const;
 
   async start() {

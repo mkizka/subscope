@@ -5,9 +5,9 @@ import {
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { SyncActorUseCase } from "./application/sync-actor-use-case.js";
-import { SyncPostUseCase } from "./application/sync-post-use-case.js";
-import { SyncProfileUseCase } from "./application/sync-profile-use-case.js";
+import { UpsertIdentityUseCase } from "./application/actor/upsert-identity-use-case.js";
+import { UpsertPostUseCase } from "./application/post/upsert-post-use-case.js";
+import { UpsertProfileUseCase } from "./application/profile/upsert-profile-use-case.js";
 import { ActorService } from "./domain/actor-service.js";
 import { DidResolver } from "./infrastructure/atproto/did-resolver.js";
 import { RedisDidCache } from "./infrastructure/atproto/redis-did-cache.js";
@@ -34,9 +34,9 @@ createInjector()
   // domain
   .provideClass("actorService", ActorService)
   // application
-  .provideClass("syncActorUseCase", SyncActorUseCase)
-  .provideClass("syncProfileUseCase", SyncProfileUseCase)
-  .provideClass("syncPostUseCase", SyncPostUseCase)
+  .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
+  .provideClass("upsertProfileUseCase", UpsertProfileUseCase)
+  .provideClass("upsertPostUseCase", UpsertPostUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(WorkerServer)

@@ -15,4 +15,4 @@ export const upsertPostDtoFactory = (
   };
 };
 
-export type UpsertProfileDto = ReturnType<typeof upsertPostDtoFactory>;
+export type UpsertPostDto = ReturnType<typeof upsertPostDtoFactory>;

@@ -1,12 +1,12 @@
-import type { Did } from "@atproto/did";
 import type { ITransactionManager } from "@dawn/common/domain";
 import { Profile } from "@dawn/common/domain";
 
-import type { ActorService } from "../domain/actor-service.js";
-import type { IActorRepository } from "./interfaces/actor-repository.js";
-import type { IProfileRepository } from "./interfaces/profile-repository.js";
+import type { ActorService } from "../../domain/actor-service.js";
+import type { IActorRepository } from "../interfaces/actor-repository.js";
+import type { IProfileRepository } from "../interfaces/profile-repository.js";
+import type { UpsertProfileDto } from "./upsert-profile-dto.js";
 
-export class SyncProfileUseCase {
+export class UpsertProfileUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly actorService: ActorService,
@@ -20,17 +20,7 @@ export class SyncProfileUseCase {
     "profileRepository",
   ] as const;
 
-  async execute(dto: {
-    did: Did;
-    avatar: {
-      cid: string;
-      mimeType: string;
-      size: number;
-    } | null;
-    description: string | null;
-    displayName: string | null;
-    createdAt: string | null;
-  }) {
+  async execute(dto: UpsertProfileDto) {
     await this.transactionManager.transaction(async (ctx) => {
       const exists = await this.actorRepository.exists({ ctx, did: dto.did });
       if (!exists) {

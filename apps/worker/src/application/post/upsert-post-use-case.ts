@@ -1,31 +1,22 @@
-import type { Did } from "@atproto/did";
 import { Actor, type ITransactionManager, Post } from "@dawn/common/domain";
 
-import type { ActorService } from "../domain/actor-service.js";
-import type { IActorRepository } from "./interfaces/actor-repository.js";
-import type { IPostRepository } from "./interfaces/post-repository.js";
+import type { IActorRepository } from "../interfaces/actor-repository.js";
+import type { IPostRepository } from "../interfaces/post-repository.js";
+import type { UpsertPostDto } from "./upsert-post-dto.js";
 
-export class SyncPostUseCase {
+export class UpsertPostUseCase {
   constructor(
     private readonly postRepository: IPostRepository,
-    private readonly actorService: ActorService,
     private readonly actorRepository: IActorRepository,
     private readonly transactionManager: ITransactionManager,
   ) {}
   static inject = [
     "postRepository",
-    "actorService",
     "actorRepository",
     "transactionManager",
   ] as const;
 
-  async execute(dto: {
-    rkey: string;
-    actorDid: Did;
-    text: string;
-    langs: string[];
-    createdAt: Date;
-  }) {
+  async execute(dto: UpsertPostDto) {
     await this.transactionManager.transaction(async (ctx) => {
       const exists = await this.actorRepository.exists({
         ctx,
