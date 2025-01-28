@@ -9,7 +9,6 @@ import { UpsertIdentityUseCase } from "./application/actor/upsert-identity-use-c
 import { ResolveDidUseCase } from "./application/did/resolve-did-use-case.js";
 import { UpsertPostUseCase } from "./application/post/upsert-post-use-case.js";
 import { UpsertProfileUseCase } from "./application/profile/upsert-profile-use-case.js";
-import { ActorService } from "./domain/actor-service.js";
 import { DidResolver } from "./infrastructure/atproto/did-resolver.js";
 import { RedisDidCache } from "./infrastructure/atproto/redis-did-cache.js";
 import { ActorRepository } from "./infrastructure/database/actor-repository.js";
@@ -34,8 +33,6 @@ createInjector()
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
   .provideClass("queue", QueueService)
-  // domain
-  .provideClass("actorService", ActorService)
   // application
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("upsertProfileUseCase", UpsertProfileUseCase)

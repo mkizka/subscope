@@ -1,22 +1,25 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient } from "@dawn/common/domain";
+import { Actor, type DatabaseClient } from "@dawn/common/domain";
 
-import type { ActorService } from "../../domain/actor-service.js";
 import type { IActorRepository } from "../interfaces/actor-repository.js";
+import type { IDidResolver } from "../interfaces/did-resolver.js";
 
 export class ResolveDidUseCase {
   constructor(
-    private readonly actorService: ActorService,
+    private readonly didResolver: IDidResolver,
     private readonly actorRepository: IActorRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = ["actorService", "actorRepository", "db"] as const;
+  static inject = ["didResolver", "actorRepository", "db"] as const;
 
   async execute(did: Did) {
-    const resolvedActor = await this.actorService.resolveActor(did);
+    const data = await this.didResolver.resolve(did);
+    if (!data?.handle) {
+      throw new Error(`Failed to resolve DID: ${did}`);
+    }
     await this.actorRepository.createOrUpdate({
       ctx: { db: this.db },
-      actor: resolvedActor,
+      actor: new Actor({ did, handle: data.handle }),
     });
   }
 }
