@@ -1,4 +1,4 @@
-import type { ILoggerManager, Logger } from "@dawn/common/domain";
+import type { ILoggerManager } from "@dawn/common/domain";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
@@ -6,8 +6,8 @@ import { env } from "../shared/env.js";
 import type { QueueService } from "./queue.js";
 
 export class JetstreamIngester {
-  private readonly jetstream: Jetstream;
-  private readonly logger: Logger;
+  private readonly jetstream;
+  private readonly logger;
 
   constructor(
     loggerManager: ILoggerManager,
@@ -50,24 +50,16 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
       this.logger.debug({ did: event.identity.did }, "identity event received");
-      await this.queueService.addTask("identity", event);
+      await this.queueService.addTask(event.kind, event);
     });
 
-    this.jetstream.on("app.bsky.actor.profile", async (event) => {
+    this.jetstream.on("commit", async (event) => {
       this.logger.debug(
         { did: event.did },
-        "app.bsky.actor.profile event received",
+        `${event.commit.collection} event received`,
       );
-      await this.queueService.addTask("app.bsky.actor.profile", event);
+      await this.queueService.addTask(event.commit.collection, event);
     });
-
-    // this.jetstream.on("app.bsky.feed.post", async (event) => {
-    //   this.logger.debug(
-    //     { did: event.did },
-    //     "app.bsky.feed.post event received",
-    //   );
-    //   await this.queueService.addTask("app.bsky.feed.post", event);
-    // });
   }
   static inject = ["loggerManager", "queueService"] as const;
 
