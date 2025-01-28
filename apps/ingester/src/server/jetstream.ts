@@ -18,7 +18,10 @@ export class JetstreamIngester {
       ws: WebSocket,
       cursor: env.NODE_ENV === "development" ? -1 : undefined,
       endpoint: env.JETSTREAM_URL,
-      wantedCollections: ["app.bsky.actor.profile", "app.bsky.feed.post"],
+      wantedCollections: [
+        "app.bsky.actor.profile",
+        //  "app.bsky.feed.post"
+      ],
     });
 
     this.jetstream.on("open", () => {
