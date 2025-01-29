@@ -1,4 +1,4 @@
-import { Queue } from "bullmq";
+import type { Queue } from "bullmq";
 
 import type { IQueueService } from "../../application/interfaces/queue.js";
 import { env } from "../../shared/env.js";
@@ -10,7 +10,7 @@ const queueOptions = {
 };
 
 export const queues: Record<string, Queue> = {
-  resolveDid: new Queue("resolveDid", queueOptions),
+  // resolveDid: new Queue("resolveDid", queueOptions),
 };
 
 export class QueueService implements IQueueService {
