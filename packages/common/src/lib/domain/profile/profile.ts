@@ -1,5 +1,4 @@
 import { asDid, type Did } from "@atproto/did";
-import { AppBskyActorDefs } from "@dawn/client";
 
 type Avatar = {
   readonly cid: string;

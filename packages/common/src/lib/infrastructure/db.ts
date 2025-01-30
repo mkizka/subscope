@@ -1,8 +1,9 @@
-import { IConfig } from "../domain/interfaces/config.js";
-import { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
-import { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
 import { schema } from "@dawn/db";
+import type { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
 import { drizzle } from "drizzle-orm/mysql2";
+
+import type { IConfig } from "../domain/interfaces/config.js";
+import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 
 export const databaseFactory = (
   config: IConfig,

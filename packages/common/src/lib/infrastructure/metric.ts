@@ -1,5 +1,9 @@
-import { IMetricReporter, MetricKey } from "../domain/interfaces/metric.js";
 import client from "prom-client";
+
+import type {
+  IMetricReporter,
+  MetricKey,
+} from "../domain/interfaces/metric.js";
 
 const metrics = {
   did_cache_hit_total: new client.Counter({

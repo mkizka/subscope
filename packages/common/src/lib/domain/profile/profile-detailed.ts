@@ -1,5 +1,7 @@
-import { Profile, ProfileParams } from "./profile.js";
-import { AppBskyActorDefs } from "@dawn/client";
+import type { AppBskyActorDefs } from "@dawn/client";
+
+import type { ProfileParams } from "./profile.js";
+import { Profile } from "./profile.js";
 
 export type ProfileDetailedParams = ProfileParams & {
   handle: string | null;

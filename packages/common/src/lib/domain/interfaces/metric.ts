@@ -5,6 +5,6 @@ export type MetricKey =
   | "did_resolve_error_total";
 
 export interface IMetricReporter {
-  resetAll(): void;
-  increment(key: MetricKey): void;
+  resetAll: () => void;
+  increment: (key: MetricKey) => void;
 }

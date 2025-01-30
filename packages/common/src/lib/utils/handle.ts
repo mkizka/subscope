@@ -2,7 +2,7 @@ export type Handle = `${string}.${string}`;
 
 export function assertHandle(input: unknown): asserts input is Handle {
   if (typeof input !== "string") {
-    throw new Error(`Expected handle to be a string, but got ${input}`);
+    throw new Error(`Expected handle to be a string, but got ${String(input)}`);
   }
   if (!input.includes(".")) {
     throw new Error(`Expected handle to contain a ".", but got ${input}`);

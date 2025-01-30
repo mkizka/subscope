@@ -1,4 +1,4 @@
-import pino from "pino";
+import type pino from "pino";
 
 export type Logger = pino.Logger<"error" | "warn" | "info" | "debug">;
 

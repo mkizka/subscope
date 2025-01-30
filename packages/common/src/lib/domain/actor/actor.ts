@@ -1,5 +1,7 @@
-import { type Did, asDid } from "@atproto/did";
-import { asHandle, Handle } from "../../utils/handle.js";
+import { asDid, type Did } from "@atproto/did";
+
+import type { Handle } from "../../utils/handle.js";
+import { asHandle } from "../../utils/handle.js";
 
 export class Actor {
   readonly did: Did;

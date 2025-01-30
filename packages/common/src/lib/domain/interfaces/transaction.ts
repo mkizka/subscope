@@ -1,5 +1,5 @@
-import { schema } from "@dawn/db";
-import { MySql2Database } from "drizzle-orm/mysql2";
+import type { schema } from "@dawn/db";
+import type { MySql2Database } from "drizzle-orm/mysql2";
 
 export type DatabaseClient = MySql2Database<typeof schema>;
 
