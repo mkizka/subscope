@@ -1,8 +1,8 @@
 import type { CacheResult, DidCache, DidDocument } from "@atproto/identity";
+import type { IMetricReporter } from "@dawn/common/domain";
 import KeyvRedis from "@keyv/redis";
 import Keyv from "keyv";
 
-import type { IMetric } from "../../application/interfaces/metric.js";
 import { env } from "../../shared/env.js";
 
 type CacheVal = {
@@ -15,7 +15,7 @@ const TTL = 30 * 24 * 60 * 60 * 1000;
 export class RedisDidCache implements DidCache {
   private readonly cache: Keyv<CacheVal>;
 
-  constructor(private readonly metric: IMetric) {
+  constructor(private readonly metricReporter: IMetricReporter) {
     this.cache = new Keyv({
       namespace: "did-cache",
       // https://github.com/jaredwray/keyv/issues/1255
@@ -23,7 +23,7 @@ export class RedisDidCache implements DidCache {
       store: new KeyvRedis<CacheVal>(env.REDIS_URL),
     });
   }
-  static inject = ["metric"] as const;
+  static inject = ["metricReporter"] as const;
 
   async cacheDid(did: string, doc: DidDocument): Promise<void> {
     await this.cache.set(did, { doc, updatedAt: Date.now() }, TTL);
@@ -32,16 +32,10 @@ export class RedisDidCache implements DidCache {
   async checkCache(did: string): Promise<CacheResult | null> {
     const val = await this.cache.get(did);
     if (!val) {
-      this.metric.increment({
-        name: "did_cache_miss_total",
-        help: "Total number of did resolver cache misses",
-      });
+      this.metricReporter.increment("did_cache_miss_total");
       return null;
     }
-    this.metric.increment({
-      name: "did_cache_hit_total",
-      help: "Total number of did resolver cache hits",
-    });
+    this.metricReporter.increment("did_cache_hit_total");
     return {
       ...val,
       did,

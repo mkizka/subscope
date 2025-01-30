@@ -1,4 +1,8 @@
-import type { ILoggerManager, Logger } from "@dawn/common/domain";
+import type {
+  ILoggerManager,
+  IMetricReporter,
+  Logger,
+} from "@dawn/common/domain";
 import express from "express";
 import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";
@@ -16,6 +20,7 @@ export class WorkerServer {
   constructor(
     loggerManager: ILoggerManager,
     private readonly syncWorker: SyncWorker,
+    private readonly metricReporter: IMetricReporter,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
@@ -35,9 +40,10 @@ export class WorkerServer {
     );
     this.app.use(healthRouter);
   }
-  static inject = ["loggerManager", "syncWorker"] as const;
+  static inject = ["loggerManager", "syncWorker", "metricReporter"] as const;
 
   start() {
+    this.metricReporter.resetAll();
     this.app.listen(env.PORT, async () => {
       this.logger.info(`Worker server listening on port ${env.PORT}`);
       await this.syncWorker.start();

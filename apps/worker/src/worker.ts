@@ -1,6 +1,7 @@
 import {
   databaseFactory,
   LoggerManager,
+  MetricReporter,
   TransactionManager,
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
@@ -14,7 +15,6 @@ import { RedisDidCache } from "./infrastructure/atproto/redis-did-cache.js";
 import { ActorRepository } from "./infrastructure/database/actor-repository.js";
 import { PostRepository } from "./infrastructure/database/post-repository.js";
 import { ProfileRepository } from "./infrastructure/database/profile-repository.js";
-import { Metric } from "./infrastructure/system/metric.js";
 import { QueueService } from "./infrastructure/system/queue.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
@@ -26,7 +26,7 @@ createInjector()
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("db", databaseFactory)
   .provideClass("transactionManager", TransactionManager)
-  .provideClass("metric", Metric)
+  .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
   .provideClass("actorRepository", ActorRepository)

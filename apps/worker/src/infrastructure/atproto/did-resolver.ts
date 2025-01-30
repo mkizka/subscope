@@ -1,9 +1,12 @@
 import type { DidCache } from "@atproto/identity";
 import { DidResolver as Resolver } from "@atproto/identity";
-import type { ILoggerManager, Logger } from "@dawn/common/domain";
+import type {
+  ILoggerManager,
+  IMetricReporter,
+  Logger,
+} from "@dawn/common/domain";
 
 import type { IDidResolver } from "../../application/interfaces/did-resolver.js";
-import type { IMetric } from "../../application/interfaces/metric.js";
 import { env } from "../../shared/env.js";
 
 export class DidResolver implements IDidResolver {
@@ -13,7 +16,7 @@ export class DidResolver implements IDidResolver {
   constructor(
     loggerManager: ILoggerManager,
     didCache: DidCache,
-    private readonly metric: IMetric,
+    private readonly metricReporter: IMetricReporter,
   ) {
     this.resolver = new Resolver({
       didCache,
@@ -21,21 +24,15 @@ export class DidResolver implements IDidResolver {
     });
     this.logger = loggerManager.createLogger("DidResolver");
   }
-  static inject = ["loggerManager", "didCache", "metric"] as const;
+  static inject = ["loggerManager", "didCache", "metricReporter"] as const;
 
   async resolve(did: string) {
     try {
-      this.metric.increment({
-        name: "did_resolve_total",
-        help: "Total number of did resolves",
-      });
+      this.metricReporter.increment("did_resolve_total");
       const data = await this.resolver.resolveAtprotoData(did);
       return { handle: data.handle };
     } catch (error) {
-      this.metric.increment({
-        name: "did_resolve_error_total",
-        help: "Total number of did resolve errors",
-      });
+      this.metricReporter.increment("did_resolve_error_total");
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
       return null;
     }
