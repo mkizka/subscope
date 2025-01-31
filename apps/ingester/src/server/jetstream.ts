@@ -1,9 +1,8 @@
-import type { ILoggerManager } from "@dawn/common/domain";
+import type { IJobQueue, ILoggerManager } from "@dawn/common/domain";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
 import { env } from "../shared/env.js";
-import type { QueueService } from "./queue.js";
 
 export class JetstreamIngester {
   private readonly jetstream;
@@ -11,7 +10,7 @@ export class JetstreamIngester {
 
   constructor(
     loggerManager: ILoggerManager,
-    private readonly queueService: QueueService,
+    private readonly jobQueue: IJobQueue,
   ) {
     this.logger = loggerManager.createLogger("JetstreamIngester");
     this.jetstream = new Jetstream({
@@ -50,7 +49,7 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
       this.logger.debug({ did: event.identity.did }, "identity event received");
-      await this.queueService.addTask(event.kind, event);
+      await this.jobQueue.add(event.kind, event);
     });
 
     this.jetstream.on("commit", async (event) => {
@@ -58,10 +57,10 @@ export class JetstreamIngester {
         { did: event.did },
         `${event.commit.collection} event received`,
       );
-      await this.queueService.addTask(event.commit.collection, event);
+      await this.jobQueue.add(event.commit.collection, event);
     });
   }
-  static inject = ["loggerManager", "queueService"] as const;
+  static inject = ["loggerManager", "jobQueue"] as const;
 
   start() {
     this.jetstream.start();

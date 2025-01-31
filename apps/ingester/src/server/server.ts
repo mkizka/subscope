@@ -1,12 +1,11 @@
 import type { ILoggerManager, Logger } from "@dawn/common/domain";
+import type { Router } from "express";
 import express from "express";
 import { pinoHttp } from "pino-http";
 
 import { env } from "../shared/env.js";
 import type { JetstreamIngester } from "./jetstream.js";
-import { dashboardRouter } from "./routes/dashboard.js";
 import { healthRouter } from "./routes/health.js";
-import { metricsRouter } from "./routes/metrics.js";
 
 const noop = () => {};
 
@@ -16,6 +15,8 @@ export class IngesterServer {
 
   constructor(
     loggerManager: ILoggerManager,
+    metricsRouter: Router,
+    dashboardRouter: Router,
     private readonly ingester: JetstreamIngester,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
@@ -40,7 +41,12 @@ export class IngesterServer {
     this.app.use(metricsRouter);
     this.app.use(dashboardRouter);
   }
-  static inject = ["loggerManager", "ingester"] as const;
+  static inject = [
+    "loggerManager",
+    "dashboardRouter",
+    "metricsRouter",
+    "ingester",
+  ] as const;
 
   start() {
     this.app.listen(env.PORT, () => {

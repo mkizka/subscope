@@ -1,5 +1,6 @@
 import {
   databaseFactory,
+  JobQueue,
   LoggerManager,
   MetricReporter,
   TransactionManager,
@@ -15,7 +16,6 @@ import { RedisDidCache } from "./infrastructure/atproto/redis-did-cache.js";
 import { ActorRepository } from "./infrastructure/database/actor-repository.js";
 import { PostRepository } from "./infrastructure/database/post-repository.js";
 import { ProfileRepository } from "./infrastructure/database/profile-repository.js";
-import { QueueService } from "./infrastructure/system/queue.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
@@ -32,7 +32,8 @@ createInjector()
   .provideClass("actorRepository", ActorRepository)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
-  .provideClass("queue", QueueService)
+  .provideValue("redisUrl", env.REDIS_URL)
+  .provideClass("jobQueue", JobQueue)
   // application
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("upsertProfileUseCase", UpsertProfileUseCase)

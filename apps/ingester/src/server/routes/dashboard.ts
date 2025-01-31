@@ -1,21 +1,20 @@
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js";
 import { ExpressAdapter } from "@bull-board/express";
+import type { IJobQueue } from "@dawn/common/domain";
 import { Router } from "express";
 
-import { queues } from "../queue.js";
+export const dashboardRouterFactory = (jobQueue: IJobQueue) => {
+  const dashboardRouter = Router();
 
-const dashboardRouter = Router();
+  const serverAdapter = new ExpressAdapter();
+  serverAdapter.setBasePath("/dashboard");
 
-const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath("/dashboard");
-
-createBullBoard({
-  queues: Object.values(queues).map((queue) => new BullMQAdapter(queue)),
-  serverAdapter,
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-dashboardRouter.use("/dashboard", serverAdapter.getRouter());
-
-export { dashboardRouter };
+  createBullBoard({
+    queues: jobQueue.getQueues().map((queue) => new BullMQAdapter(queue)),
+    serverAdapter,
+  });
+  dashboardRouter.use("/dashboard", serverAdapter.getRouter() as Router);
+  return dashboardRouter;
+};
+dashboardRouterFactory.inject = ["jobQueue"] as const;

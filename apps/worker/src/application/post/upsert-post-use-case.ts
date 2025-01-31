@@ -1,8 +1,8 @@
+import type { IJobQueue } from "@dawn/common/domain";
 import { Actor, type ITransactionManager, Post } from "@dawn/common/domain";
 
 import type { IActorRepository } from "../interfaces/actor-repository.js";
 import type { IPostRepository } from "../interfaces/post-repository.js";
-import type { IQueueService } from "../interfaces/queue.js";
 import type { UpsertPostDto } from "./upsert-post-dto.js";
 
 export class UpsertPostUseCase {
@@ -10,13 +10,13 @@ export class UpsertPostUseCase {
     private readonly postRepository: IPostRepository,
     private readonly actorRepository: IActorRepository,
     private readonly transactionManager: ITransactionManager,
-    private readonly queue: IQueueService,
+    private readonly jobQueue: IJobQueue,
   ) {}
   static inject = [
     "postRepository",
     "actorRepository",
     "transactionManager",
-    "queue",
+    "jobQueue",
   ] as const;
 
   async execute(dto: UpsertPostDto) {
@@ -28,7 +28,7 @@ export class UpsertPostUseCase {
       if (!exists) {
         const actor = new Actor({ did: dto.actorDid });
         await Promise.all([
-          this.queue.addTask("resolveDid", dto.actorDid),
+          this.jobQueue.add("resolveDid", dto.actorDid),
           this.actorRepository.createOrUpdate({ ctx, actor }),
         ]);
       }

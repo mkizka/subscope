@@ -14,7 +14,6 @@
     "@bull-board/express": "6.7.1",
     "@dawn/common": "workspace:*",
     "@skyware/jetstream": "0.2.2",
-    "bullmq": "5.37.0",
     "express": "4.21.2",
     "pino-http": "10.4.0",
     "typed-inject": "5.0.0",

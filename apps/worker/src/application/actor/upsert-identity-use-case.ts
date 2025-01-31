@@ -1,17 +1,20 @@
-import type { ITransactionManager } from "@dawn/common/domain";
+import type { IJobQueue, ITransactionManager } from "@dawn/common/domain";
 import { Actor } from "@dawn/common/domain";
 
 import type { IActorRepository } from "../interfaces/actor-repository.js";
-import type { IQueueService } from "../interfaces/queue.js";
 import type { UpsertIdentityDto } from "./upsert-identity-dto.js";
 
 export class UpsertIdentityUseCase {
   constructor(
     private readonly actorRepository: IActorRepository,
     private readonly transactionManager: ITransactionManager,
-    private readonly queue: IQueueService,
+    private readonly jobQueue: IJobQueue,
   ) {}
-  static inject = ["actorRepository", "transactionManager", "queue"] as const;
+  static inject = [
+    "actorRepository",
+    "transactionManager",
+    "jobQueue",
+  ] as const;
 
   async execute(dto: UpsertIdentityDto) {
     await this.transactionManager.transaction(async (ctx) => {
@@ -20,7 +23,7 @@ export class UpsertIdentityUseCase {
         did: dto.did,
       });
       if (!exists && !dto.handle) {
-        await this.queue.addTask("resolveDid", dto.did);
+        await this.jobQueue.add("resolveDid", dto.did);
       }
       await this.actorRepository.createOrUpdate({
         ctx,
