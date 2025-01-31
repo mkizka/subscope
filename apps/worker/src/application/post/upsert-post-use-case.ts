@@ -28,7 +28,9 @@ export class UpsertPostUseCase {
       if (!exists) {
         const actor = new Actor({ did: dto.actorDid });
         await Promise.all([
-          this.jobQueue.add("resolveDid", dto.actorDid),
+          // ポストの数が多すぎてジョブが詰まってしまうため解決策を思いつくまで無効化
+          // TODO: did解決出来ていない投稿者への対策を考える
+          // this.jobQueue.add("resolveDid", dto.actorDid),
           this.actorRepository.createOrUpdate({ ctx, actor }),
         ]);
       }
