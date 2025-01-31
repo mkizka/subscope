@@ -3,7 +3,7 @@ import type { IMetricReporter } from "@dawn/common/domain";
 import KeyvRedis from "@keyv/redis";
 import Keyv from "keyv";
 
-import { env } from "../../shared/env.js";
+import { env } from "../shared/env.js";
 
 type CacheVal = {
   doc: DidDocument;

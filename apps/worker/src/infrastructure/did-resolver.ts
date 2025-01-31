@@ -6,8 +6,8 @@ import type {
   Logger,
 } from "@dawn/common/domain";
 
-import type { IDidResolver } from "../../application/interfaces/did-resolver.js";
-import { env } from "../../shared/env.js";
+import type { IDidResolver } from "../application/interfaces/did-resolver.js";
+import { env } from "../shared/env.js";
 
 export class DidResolver implements IDidResolver {
   private readonly resolver: Resolver;

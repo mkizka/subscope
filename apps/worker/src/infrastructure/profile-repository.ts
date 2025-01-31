@@ -2,7 +2,7 @@ import type { TransactionContext } from "@dawn/common/domain";
 import type { Profile } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 
-import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
+import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 
 export class ProfileRepository implements IProfileRepository {
   async createOrUpdate({

@@ -3,7 +3,7 @@ import type { Actor } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
-import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
+import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
   async exists({ ctx, did }: { ctx: TransactionContext; did: string }) {

@@ -11,11 +11,11 @@ import { UpsertIdentityUseCase } from "./application/actor/upsert-identity-use-c
 import { ResolveDidUseCase } from "./application/did/resolve-did-use-case.js";
 import { UpsertPostUseCase } from "./application/post/upsert-post-use-case.js";
 import { UpsertProfileUseCase } from "./application/profile/upsert-profile-use-case.js";
-import { DidResolver } from "./infrastructure/atproto/did-resolver.js";
-import { RedisDidCache } from "./infrastructure/atproto/redis-did-cache.js";
-import { ActorRepository } from "./infrastructure/database/actor-repository.js";
-import { PostRepository } from "./infrastructure/database/post-repository.js";
-import { ProfileRepository } from "./infrastructure/database/profile-repository.js";
+import { ActorRepository } from "./infrastructure/actor-repository.js";
+import { DidResolver } from "./infrastructure/did-resolver.js";
+import { PostRepository } from "./infrastructure/post-repository.js";
+import { ProfileRepository } from "./infrastructure/profile-repository.js";
+import { RedisDidCache } from "./infrastructure/redis-did-cache.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
