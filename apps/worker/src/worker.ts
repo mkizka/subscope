@@ -21,8 +21,12 @@ import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
 
 createInjector()
+  // envs
+  .provideValue("databaseUrl", env.DATABASE_URL)
+  .provideValue("redisUrl", env.REDIS_URL)
+  .provideValue("logLevel", env.LOG_LEVEL)
+  .provideValue("redisUrl", env.REDIS_URL)
   // infrastructure
-  .provideValue("config", env)
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("db", databaseFactory)
   .provideClass("transactionManager", TransactionManager)
@@ -32,7 +36,6 @@ createInjector()
   .provideClass("actorRepository", ActorRepository)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
-  .provideValue("redisUrl", env.REDIS_URL)
   .provideClass("jobQueue", JobQueue)
   // application
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)

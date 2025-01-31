@@ -2,11 +2,10 @@ import { schema } from "@dawn/db";
 import type { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
 import { drizzle } from "drizzle-orm/mysql2";
 
-import type { IConfig } from "../domain/interfaces/config.js";
 import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 
 export const databaseFactory = (
-  config: IConfig,
+  databaseUrl: string,
   loggerManager: ILoggerManager,
 ) => {
   class DrizzleLogger implements BaseDrizzleLogger {
@@ -21,10 +20,10 @@ export const databaseFactory = (
     }
   }
   return drizzle({
-    connection: config.DATABASE_URL,
+    connection: databaseUrl,
     schema,
     mode: "default",
     logger: new DrizzleLogger(),
   });
 };
-databaseFactory.inject = ["config", "loggerManager"] as const;
+databaseFactory.inject = ["databaseUrl", "loggerManager"] as const;

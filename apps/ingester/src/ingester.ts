@@ -8,10 +8,13 @@ import { IngesterServer } from "./server/server.js";
 import { env } from "./shared/env.js";
 
 createInjector()
-  .provideValue("config", { ...env, DATABASE_URL: "" }) // TODO: logger用の設定を分ける
-  .provideClass("loggerManager", LoggerManager)
+  // envs
+  .provideValue("logLevel", env.LOG_LEVEL)
   .provideValue("redisUrl", env.REDIS_URL)
+  // infrastructure
+  .provideClass("loggerManager", LoggerManager)
   .provideClass("jobQueue", JobQueue)
+  // server
   .provideFactory("dashboardRouter", dashboardRouterFactory)
   .provideFactory("metricsRouter", metricsRouterFactory)
   .provideClass("ingester", JetstreamIngester)

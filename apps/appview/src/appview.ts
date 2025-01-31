@@ -11,8 +11,10 @@ import { AppviewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
 createInjector()
+  // envs
+  .provideValue("logLevel", env.LOG_LEVEL)
+  .provideValue("databaseUrl", env.DATABASE_URL)
   // infrastructure
-  .provideValue("config", env)
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("db", databaseFactory)
   .provideClass("profileRepository", ProfileRepository)

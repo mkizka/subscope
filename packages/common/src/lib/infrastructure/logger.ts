@@ -1,12 +1,11 @@
 import { pino } from "pino";
 
-import type { IConfig } from "../domain/interfaces/config.js";
-import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
+import type { ILoggerManager, LogLevel } from "../domain/interfaces/logger.js";
 
 export class LoggerManager implements ILoggerManager {
-  private readonly rootLogger: Logger;
+  private readonly rootLogger;
 
-  constructor(private readonly config: IConfig) {
+  constructor(logLevel: LogLevel) {
     this.rootLogger = pino({
       customLevels: {
         error: 50,
@@ -15,7 +14,7 @@ export class LoggerManager implements ILoggerManager {
         debug: 20,
       },
       useOnlyCustomLevels: true,
-      level: this.config.LOG_LEVEL,
+      level: logLevel,
       // disable pid and hostname in logs
       base: null,
       formatters: {
@@ -23,7 +22,7 @@ export class LoggerManager implements ILoggerManager {
       },
     });
   }
-  static inject = ["config"] as const;
+  static inject = ["logLevel"] as const;
 
   createLogger(name: string) {
     return this.rootLogger.child({ name });
