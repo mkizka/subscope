@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import type { CommitCreateEvent, CommitUpdateEvent } from "@skyware/jetstream";
 
 export const upsertPostDtoFactory = (
@@ -12,6 +13,15 @@ export const upsertPostDtoFactory = (
     text: event.commit.record.text,
     langs: event.commit.record.langs ?? [],
     createdAt: new Date(event.commit.record.createdAt),
+    // for record
+    record: {
+      uri: new AtUri(
+        `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`,
+      ),
+      cid: event.commit.cid,
+      actorDid: asDid(event.did),
+      json: event.commit.record,
+    },
   };
 };
 

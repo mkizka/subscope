@@ -3,24 +3,31 @@ import { Actor, type ITransactionManager, Post } from "@dawn/common/domain";
 
 import type { IActorRepository } from "../interfaces/actor-repository.js";
 import type { IPostRepository } from "../interfaces/post-repository.js";
+import type { IRecordRepository } from "../interfaces/record-repository.js";
 import type { UpsertPostDto } from "./upsert-post-dto.js";
 
 export class UpsertPostUseCase {
   constructor(
-    private readonly postRepository: IPostRepository,
-    private readonly actorRepository: IActorRepository,
     private readonly transactionManager: ITransactionManager,
     private readonly jobQueue: IJobQueue,
+    private readonly postRepository: IPostRepository,
+    private readonly actorRepository: IActorRepository,
+    private readonly recordRepository: IRecordRepository,
   ) {}
   static inject = [
-    "postRepository",
-    "actorRepository",
     "transactionManager",
     "jobQueue",
+    "postRepository",
+    "actorRepository",
+    "recordRepository",
   ] as const;
 
   async execute(dto: UpsertPostDto) {
     await this.transactionManager.transaction(async (ctx) => {
+      await this.recordRepository.createOrUpdate({
+        ctx,
+        record: dto.record,
+      });
       const exists = await this.actorRepository.exists({
         ctx,
         did: dto.actorDid,

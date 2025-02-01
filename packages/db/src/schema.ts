@@ -20,6 +20,14 @@ export const actors = mysqlTable(
   (table) => [index("handle_idx").on(table.handle)],
 );
 
+export const record = mysqlTable("record", {
+  uri: varchar("uri", { length: 256 }).primaryKey(),
+  cid: varchar("cid", { length: 256 }),
+  actorDid: varchar("did", { length: 256 }).references(() => actors.did),
+  json: json("json"),
+  indexedAt: timestamp("indexed_at").defaultNow(),
+});
+
 export const profiles = mysqlTable("profiles", {
   actorDid: varchar("actor_did", { length: 256 })
     .primaryKey()
