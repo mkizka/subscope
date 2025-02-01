@@ -103,11 +103,11 @@ importers:
   apps/ingester:
     dependencies:
       '@bull-board/api':
-        specifier: 6.7.1
-        version: 6.7.1(@bull-board/ui@6.7.1)
+        specifier: 6.7.4
+        version: 6.7.4(@bull-board/ui@6.7.4)
       '@bull-board/express':
-        specifier: 6.7.1
-        version: 6.7.1
+        specifier: 6.7.4
+        version: 6.7.4
       '@dawn/common':
         specifier: workspace:*
         version: link:../../packages/common
@@ -185,8 +185,8 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       bullmq:
-        specifier: 5.37.0
-        version: 5.37.0
+        specifier: 5.39.1
+        version: 5.39.1
       drizzle-orm:
         specifier: 0.38.4
         version: 0.38.4(@opentelemetry/api@1.9.0)(@prisma/client@6.1.0(prisma@6.1.0))(@types/pg@8.6.1)(mysql2@3.12.0)(prisma@6.1.0)
@@ -453,16 +453,16 @@ packages:
     resolution: {integrity: sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg==}
     engines: {node: '>=6.9.0'}
 
-  '@bull-board/api@6.7.1':
-    resolution: {integrity: sha512-Gv+0jo0QYBjNE0DatcUSavMLfGAOuhsLVPxJHR3QjN7Rp0s1VM/O2ExNTezDip1Q67G8fq8Tp9ZfleJZb1KP2Q==}
+  '@bull-board/api@6.7.4':
+    resolution: {integrity: sha512-WjW+3ihZwqxgHjhwRefxlSNHQyMm8EtLVyAyOhVI+6jYd6gKQhK79HsCC5Q2qoazJ78H6ize3GmXN1hm2QTcQA==}
     peerDependencies:
-      '@bull-board/ui': 6.7.1
+      '@bull-board/ui': 6.7.4
 
-  '@bull-board/express@6.7.1':
-    resolution: {integrity: sha512-PQ3nMDbafnJPk+O/CPFi+MftBYDomi9jSJkuAMxAIMDGN+nhiVVYkyflUt7ToeV9YppB+GJnunpoGbAN6HZfeg==}
+  '@bull-board/express@6.7.4':
+    resolution: {integrity: sha512-hvYN4u8CFrZJkSq15wvj5OQXHBoKGYj9NAc1sqdE0mIvxc5YprtR3gfo4ST4TCHWVwwi/paK42Q7jJR+04ixwQ==}
 
-  '@bull-board/ui@6.7.1':
-    resolution: {integrity: sha512-Bf2S81enM+KSz7ltOmWBE/Z69NtKPmYhUFbPEXooFGXs63yrR/17vzdSlraJb9jC6kMLzJhp0y61rXLdCqPTBw==}
+  '@bull-board/ui@6.7.4':
+    resolution: {integrity: sha512-9eHG+24lVwuYlvVnG1yEYUnqlGJPb3ffisKVGwgZvh6ROu1LuqXxyelWaKl6IOFYhAYrc34cZ4TC8GhWY3/Pgw==}
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     resolution: {integrity: sha512-P7swiOAdF7aSi0H+tHtHtr6zrpF3aAq/W9FXx5HektRvLTM2O89xCyXF3pk7pLc7QpaY7AoaE8UowVf9QBdh3w==}
@@ -1424,9 +1424,6 @@ packages:
 
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
-
-  bullmq@5.37.0:
-    resolution: {integrity: sha512-h/wf979+9uROyYpB8oTE44Py6JERCluCSd+ZFpCZlPsYh+wxAkqrfHsHHHKBgsNJp9odWLIY4SG+280EXzXiCQ==}
 
   bullmq@5.39.1:
     resolution: {integrity: sha512-z6ovgX3mMly0L9F3dStCuiMQOk3bqiwqgr83mbjRlX5yGRcStwP9kZsrO0a5VrjPuU0oUgwmWXv37jcSbGaERQ==}
@@ -3800,23 +3797,23 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@bull-board/api@6.7.1(@bull-board/ui@6.7.1)':
+  '@bull-board/api@6.7.4(@bull-board/ui@6.7.4)':
     dependencies:
-      '@bull-board/ui': 6.7.1
+      '@bull-board/ui': 6.7.4
       redis-info: 3.1.0
 
-  '@bull-board/express@6.7.1':
+  '@bull-board/express@6.7.4':
     dependencies:
-      '@bull-board/api': 6.7.1(@bull-board/ui@6.7.1)
-      '@bull-board/ui': 6.7.1
+      '@bull-board/api': 6.7.4(@bull-board/ui@6.7.4)
+      '@bull-board/ui': 6.7.4
       ejs: 3.1.10
       express: 4.21.2
     transitivePeerDependencies:
       - supports-color
 
-  '@bull-board/ui@6.7.1':
+  '@bull-board/ui@6.7.4':
     dependencies:
-      '@bull-board/api': 6.7.1(@bull-board/ui@6.7.1)
+      '@bull-board/api': 6.7.4(@bull-board/ui@6.7.4)
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     optional: true
@@ -4664,18 +4661,6 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
-
-  bullmq@5.37.0:
-    dependencies:
-      cron-parser: 4.9.0
-      ioredis: 5.4.2
-      msgpackr: 1.11.2
-      node-abort-controller: 3.1.1
-      semver: 7.6.3
-      tslib: 2.8.1
-      uuid: 9.0.1
-    transitivePeerDependencies:
-      - supports-color
 
   bullmq@5.39.1:
     dependencies:
