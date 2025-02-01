@@ -113,7 +113,7 @@ export class SyncWorker {
         {
           ...baseWorkerOptions,
           limiter: {
-            max: 5, // plc.directoryの負荷を抑えるために10rpsに制限
+            max: 5, // plc.directoryの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
