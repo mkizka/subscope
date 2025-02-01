@@ -29,9 +29,6 @@ importers:
 
   apps/appview:
     dependencies:
-      '@atproto/api':
-        specifier: 0.13.31
-        version: 0.13.31
       '@atproto/did':
         specifier: 0.1.3
         version: 0.1.3
@@ -166,15 +163,15 @@ importers:
 
   apps/worker:
     dependencies:
-      '@atproto/api':
-        specifier: 0.13.31
-        version: 0.13.31
       '@atproto/did':
         specifier: 0.1.3
         version: 0.1.3
       '@atproto/identity':
         specifier: 0.4.5
         version: 0.4.5
+      '@atproto/syntax':
+        specifier: 0.3.1
+        version: 0.3.1
       '@dawn/common':
         specifier: workspace:*
         version: link:../../packages/common
@@ -358,9 +355,6 @@ packages:
 
   '@atcute/client@2.0.3':
     resolution: {integrity: sha512-j9GryA5l+4F0BTQWa6/1XmsuSPSq+bqNCY3mrHUGD592hMqUZxgpYDLgRWL+719V287AW/56AwvFYlbjlENp7A==}
-
-  '@atproto/api@0.13.31':
-    resolution: {integrity: sha512-i2cUQuwe+3j8rgPJj4YWRjSQeJunGqJ3IzesnvbODjjZh3IS9jB80BZ/pTe/AvNg6JCBbqeWJjWDVKeFHaiZAw==}
 
   '@atproto/common-web@0.3.2':
     resolution: {integrity: sha512-Vx0JtL1/CssJbFAb0UOdvTrkbUautsDfHNOXNTcX2vyPIxH9xOameSqLLunM1hZnOQbJwyjmQCt6TV+bhnanDg==}
@@ -1376,9 +1370,6 @@ packages:
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
-
-  await-lock@2.2.2:
-    resolution: {integrity: sha512-aDczADvlvTGajTDjcjpJMqRkOF6Qdz3YbPZm/PyW6tKPkx2hlYBzxMhEywM/tU72HrVZjgl5VCdRuMlA7pZ8Gw==}
 
   aws-ssl-profiles@1.1.2:
     resolution: {integrity: sha512-NZKeq9AfyQvEeNlN0zSYAaWrmBffJh3IELMZfRpJVWgrpEbtEpnjvzqBPf+mxoI287JohRDoa+/nsfqqiZmF6g==}
@@ -3366,10 +3357,6 @@ packages:
   tinycolor2@1.6.0:
     resolution: {integrity: sha512-XPaBkWQJdsf3pLKJV9p4qN/S+fm2Oj8AIPo1BTUhg5oxkvm9+SVEGFdhyOz7tTdUTfvxMiAs4sp6/eZO2Ew+pw==}
 
-  tlds@1.255.0:
-    resolution: {integrity: sha512-tcwMRIioTcF/FcxLev8MJWxCp+GUALRhFEqbDoZrnowmKSGqPrl5pqS+Sut2m8BgJ6S4FExCSSpGffZ0Tks6Aw==}
-    hasBin: true
-
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -3635,17 +3622,6 @@ snapshots:
       '@atcute/client': 2.0.3
 
   '@atcute/client@2.0.3': {}
-
-  '@atproto/api@0.13.31':
-    dependencies:
-      '@atproto/common-web': 0.3.2
-      '@atproto/lexicon': 0.4.5
-      '@atproto/syntax': 0.3.1
-      '@atproto/xrpc': 0.6.6
-      await-lock: 2.2.2
-      multiformats: 9.9.0
-      tlds: 1.255.0
-      zod: 3.24.1
 
   '@atproto/common-web@0.3.2':
     dependencies:
@@ -4613,8 +4589,6 @@ snapshots:
   available-typed-arrays@1.0.7:
     dependencies:
       possible-typed-array-names: 1.0.0
-
-  await-lock@2.2.2: {}
 
   aws-ssl-profiles@1.1.2: {}
 
@@ -6834,8 +6808,6 @@ snapshots:
       real-require: 0.2.0
 
   tinycolor2@1.6.0: {}
-
-  tlds@1.255.0: {}
 
   to-regex-range@5.0.1:
     dependencies:

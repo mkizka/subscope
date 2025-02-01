@@ -10,9 +10,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/api": "0.13.31",
     "@atproto/did": "0.1.3",
     "@atproto/identity": "0.4.5",
+    "@atproto/syntax": "0.3.1",
     "@dawn/common": "workspace:*",
     "@dawn/db": "workspace:*",
     "@keyv/redis": "4.2.0",

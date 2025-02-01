@@ -1,6 +1,6 @@
-import { AtUri } from "@atproto/api";
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import type {
   CommitCreateEvent,
   CommitEvent,
