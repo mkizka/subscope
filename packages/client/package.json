@@ -6,7 +6,8 @@
   "types": "./src/index.ts",
   "scripts": {
     "build": "./scripts/generate.sh",
-    "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial"
+    "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@atproto/lexicon": "0.4.5",
@@ -15,7 +16,9 @@
   },
   "devDependencies": {
     "@atproto/lex-cli": "0.5.6",
+    "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.0",
-    "chokidar-cli": "3.0.0"
+    "chokidar-cli": "3.0.0",
+    "typescript": "5.7.3"
   }
 }
