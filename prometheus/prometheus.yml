@@ -11,3 +11,8 @@ scrape_configs:
     static_configs:
       - targets:
           - dawn-worker-iw5dqt:3003
+
+  - job_name: node-exporter
+    static_configs:
+      - targets:
+          - dawn-node-exporter-rpi2y1:9100
