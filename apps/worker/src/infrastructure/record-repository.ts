@@ -1,19 +1,30 @@
-import type { Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@dawn/common/domain";
+import { schema } from "@dawn/db";
 
 import type { IRecordRepository } from "../application/interfaces/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
-  async createOrUpdate(params: {
+  async createOrUpdate({
+    ctx,
+    record,
+  }: {
     ctx: TransactionContext;
-    record: {
-      uri: AtUri;
-      cid: string;
-      actorDid: Did;
-      json: unknown;
-    };
+    record: Record;
   }) {
-    // TODO: Implement
+    await ctx.db
+      .insert(schema.record)
+      .values({
+        uri: record.uri.toString(),
+        cid: record.cid,
+        actorDid: record.actorDid,
+        json: record.json,
+      })
+      .onDuplicateKeyUpdate({
+        set: {
+          cid: record.cid,
+          actorDid: record.actorDid,
+          json: record.json,
+        },
+      });
   }
 }
