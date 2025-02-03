@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
 type RecordParams = {
@@ -18,6 +19,6 @@ export class Record {
   }
 
   get actorDid() {
-    return this.uri.hostname;
+    return asDid(this.uri.hostname);
   }
 }

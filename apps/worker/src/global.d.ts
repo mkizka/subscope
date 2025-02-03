@@ -1,3 +1,5 @@
 declare module "multiformats/cid" {
-  export type CID = unknown;
+  export type CID = {
+    $link: string;
+  };
 }
