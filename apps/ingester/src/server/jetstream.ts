@@ -54,7 +54,7 @@ export class JetstreamIngester {
         { did: event.did },
         `${event.commit.collection} event received`,
       );
-      await this.jobQueue.add(event.commit.collection, event);
+      await this.jobQueue.add(event.kind, event);
     });
   }
   static inject = ["loggerManager", "jobQueue"] as const;

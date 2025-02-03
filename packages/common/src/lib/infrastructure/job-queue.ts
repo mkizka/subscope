@@ -29,11 +29,7 @@ export class JobQueue implements IJobQueue {
     this.queues = {
       resolveDid: new Queue("resolveDid", queueOptions),
       identity: new Queue("identity", queueOptions),
-      "app.bsky.actor.profile": new Queue(
-        "app.bsky.actor.profile",
-        queueOptions,
-      ),
-      "app.bsky.feed.post": new Queue("app.bsky.feed.post", queueOptions), //
+      commit: new Queue("commit", queueOptions),
     };
   }
   static inject = ["redisUrl"] as const;

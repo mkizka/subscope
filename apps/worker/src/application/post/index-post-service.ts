@@ -1,6 +1,6 @@
 import type { AtUri } from "@atproto/syntax";
 import type { AppBskyFeedPost } from "@dawn/client";
-import { lexicons } from "@dawn/client";
+import client from "@dawn/client";
 import type { Record, TransactionContext } from "@dawn/common/domain";
 import { Actor, Post } from "@dawn/common/domain";
 
@@ -15,7 +15,7 @@ export class IndexPostService {
   static inject = ["postRepository", "actorRepository"] as const;
 
   private assertRecord(json: unknown): asserts json is AppBskyFeedPost.Record {
-    lexicons.assertValidRecord("app.bsky.feed.post", json);
+    client.lexicons.assertValidRecord("app.bsky.feed.post", json);
   }
 
   private createPost(record: Record) {

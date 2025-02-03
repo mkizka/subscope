@@ -5,8 +5,7 @@ import type { Queue } from "bullmq";
 export type JobData = {
   resolveDid: Did;
   identity: IdentityEvent;
-  "app.bsky.actor.profile": CommitEvent<string>;
-  "app.bsky.feed.post": CommitEvent<string>;
+  commit: CommitEvent<string>;
 };
 
 export type QueueName = keyof JobData;

@@ -1,6 +1,6 @@
 import type { AtUri } from "@atproto/syntax";
 import type { AppBskyActorProfile } from "@dawn/client";
-import { lexicons } from "@dawn/client";
+import client from "@dawn/client";
 import type {
   IJobQueue,
   Record,
@@ -22,7 +22,7 @@ export class IndexProfileService {
   private assertRecord(
     json: unknown,
   ): asserts json is AppBskyActorProfile.Record {
-    lexicons.assertValidRecord("app.bsky.actor.profile", json);
+    client.lexicons.assertValidRecord("app.bsky.actor.profile", json);
   }
 
   private createProfile(record: Record) {
