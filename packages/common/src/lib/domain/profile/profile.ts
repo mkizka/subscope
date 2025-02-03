@@ -16,7 +16,7 @@ export type ProfileParams = {
 };
 
 export class Profile {
-  readonly did: Did;
+  readonly did: Did; // TODO: actorDidに変える
   readonly avatar: Avatar | null;
   readonly description: string | null;
   readonly displayName: string | null;
