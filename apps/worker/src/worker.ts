@@ -9,8 +9,9 @@ import { createInjector } from "typed-inject";
 
 import { UpsertIdentityUseCase } from "./application/actor/upsert-identity-use-case.js";
 import { ResolveDidUseCase } from "./application/did/resolve-did-use-case.js";
-import { UpsertPostUseCase } from "./application/post/upsert-post-use-case.js";
-import { UpsertProfileUseCase } from "./application/profile/upsert-profile-use-case.js";
+import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
+import { IndexPostService } from "./application/post/index-post-service.js";
+import { IndexProfileService } from "./application/profile/index-profile-service.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { DidResolver } from "./infrastructure/did-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
@@ -41,8 +42,9 @@ createInjector()
   .provideClass("recordRepository", RecordRepository)
   // application
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
-  .provideClass("upsertProfileUseCase", UpsertProfileUseCase)
-  .provideClass("upsertPostUseCase", UpsertPostUseCase)
+  .provideClass("indexProfileService", IndexProfileService)
+  .provideClass("indexPostService", IndexPostService)
+  .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
