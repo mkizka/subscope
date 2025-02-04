@@ -1,5 +1,6 @@
 import { type ITransactionManager, Record } from "@dawn/common/domain";
 
+import type { IndexActorService } from "./actor/index-actor-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import type { IRecordRepository } from "./interfaces/record-repository.js";
 import type { IndexPostService } from "./post/index-post-service.js";
@@ -11,6 +12,7 @@ export class IndexCommitUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly recordRepository: IRecordRepository,
+    private readonly indexActorService: IndexActorService,
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
   ) {
@@ -22,24 +24,32 @@ export class IndexCommitUseCase {
   static inject = [
     "transactionManager",
     "recordRepository",
+    "indexActorService",
     "indexPostService",
     "indexProfileService",
   ] as const;
 
   async execute(command: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      const service = this.services[command.collection];
-      if (command.operation === "delete") {
-        await this.recordRepository.delete({ ctx, uri: command.uri });
-        await service.delete({ ctx, uri: command.uri });
-      } else {
-        const record = new Record({
-          uri: command.uri,
-          cid: command.cid,
-          json: command.record,
-        });
-        await this.recordRepository.createOrUpdate({ ctx, record });
-        await service.upsert({ ctx, record });
+      await this.indexActorService.upsert({ ctx, did: command.did });
+      const indexService = this.services[command.collection];
+      switch (command.operation) {
+        case "create":
+        case "update": {
+          const record = new Record({
+            uri: command.uri,
+            cid: command.cid,
+            json: command.record,
+          });
+          await indexService.upsert({ ctx, record });
+          await this.recordRepository.createOrUpdate({ ctx, record });
+          break;
+        }
+        case "delete": {
+          await indexService.delete({ ctx, uri: command.uri });
+          await this.recordRepository.delete({ ctx, uri: command.uri });
+          break;
+        }
       }
     });
   }

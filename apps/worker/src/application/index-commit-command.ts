@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { CommitEvent } from "@skyware/jetstream";
 
@@ -8,6 +9,7 @@ export const indexCommitCommandFactory = (
     uri: new AtUri(
       `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`,
     ),
+    did: asDid(event.did),
     collection: event.commit.collection,
   };
   if (event.commit.operation === "delete") {

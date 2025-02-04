@@ -7,6 +7,7 @@ import {
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { IndexActorService } from "./application/actor/index-actor-service.js";
 import { UpsertIdentityUseCase } from "./application/actor/upsert-identity-use-case.js";
 import { ResolveDidUseCase } from "./application/did/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
@@ -44,6 +45,7 @@ createInjector()
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
+  .provideClass("indexActorService", IndexActorService)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("syncWorker", SyncWorker)

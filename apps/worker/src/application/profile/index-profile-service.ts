@@ -1,33 +1,28 @@
+import { jsonToLex } from "@atproto/lexicon";
 import type { AtUri } from "@atproto/syntax";
 import type { AppBskyActorProfile } from "@dawn/client";
 import client from "@dawn/client";
-import type {
-  IJobQueue,
-  Record,
-  TransactionContext,
-} from "@dawn/common/domain";
-import { Actor, Profile } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@dawn/common/domain";
+import { Profile } from "@dawn/common/domain";
 
-import type { IActorRepository } from "../interfaces/actor-repository.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 
 export class IndexProfileService {
-  constructor(
-    private readonly actorRepository: IActorRepository,
-    private readonly profileRepository: IProfileRepository,
-    private readonly jobQueue: IJobQueue,
-  ) {}
-  static inject = ["actorRepository", "profileRepository", "jobQueue"] as const;
+  constructor(private readonly profileRepository: IProfileRepository) {}
+  static inject = ["profileRepository"] as const;
 
   private assertRecord(
     json: unknown,
   ): asserts json is AppBskyActorProfile.Record {
-    client.lexicons.assertValidRecord("app.bsky.actor.profile", json);
+    client.lexicons.assertValidRecord(
+      "app.bsky.actor.profile",
+      jsonToLex(json),
+    );
   }
 
-  private createProfile(record: Record) {
+  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     this.assertRecord(record.json);
-    return new Profile({
+    const profile = new Profile({
       did: record.actorDid,
       avatar: record.json.avatar
         ? {
@@ -40,21 +35,6 @@ export class IndexProfileService {
       displayName: record.json.displayName ?? null,
       createdAt: record.json.createdAt ? new Date(record.json.createdAt) : null,
     });
-  }
-
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
-    const profile = this.createProfile(record);
-    const exists = await this.actorRepository.exists({
-      ctx,
-      did: profile.did,
-    });
-    if (!exists) {
-      const actor = new Actor({ did: profile.did });
-      await Promise.all([
-        this.jobQueue.add("resolveDid", profile.did),
-        this.actorRepository.createOrUpdate({ ctx, actor }),
-      ]);
-    }
     await this.profileRepository.createOrUpdate({ ctx, profile });
   }
 

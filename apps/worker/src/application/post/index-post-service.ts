@@ -1,49 +1,29 @@
+import { jsonToLex } from "@atproto/lexicon";
 import type { AtUri } from "@atproto/syntax";
 import type { AppBskyFeedPost } from "@dawn/client";
 import client from "@dawn/client";
 import type { Record, TransactionContext } from "@dawn/common/domain";
-import { Actor, Post } from "@dawn/common/domain";
+import { Post } from "@dawn/common/domain";
 
-import type { IActorRepository } from "../interfaces/actor-repository.js";
 import type { IPostRepository } from "../interfaces/post-repository.js";
 
 export class IndexPostService {
-  constructor(
-    private readonly postRepository: IPostRepository,
-    private readonly actorRepository: IActorRepository,
-  ) {}
-  static inject = ["postRepository", "actorRepository"] as const;
+  constructor(private readonly postRepository: IPostRepository) {}
+  static inject = ["postRepository"] as const;
 
   private assertRecord(json: unknown): asserts json is AppBskyFeedPost.Record {
-    client.lexicons.assertValidRecord("app.bsky.feed.post", json);
+    client.lexicons.assertValidRecord("app.bsky.feed.post", jsonToLex(json));
   }
 
-  private createPost(record: Record) {
+  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     this.assertRecord(record.json);
-    return new Post({
+    const post = new Post({
       rkey: record.uri.rkey,
       actorDid: record.actorDid,
       text: record.json.text,
       langs: record.json.langs ?? [],
       createdAt: new Date(record.json.createdAt),
     });
-  }
-
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
-    const post = this.createPost(record);
-    const exists = await this.actorRepository.exists({
-      ctx,
-      did: post.actorDid,
-    });
-    if (!exists) {
-      const actor = new Actor({ did: post.actorDid });
-      await Promise.all([
-        // ポストの数が多すぎてジョブが詰まってしまうため解決策を思いつくまで無効化
-        // TODO: did解決出来ていない投稿者への対策を考える
-        // this.jobQueue.add("resolveDid", dto.actorDid),
-        this.actorRepository.createOrUpdate({ ctx, actor }),
-      ]);
-    }
     await this.postRepository.createOrUpdate({ ctx, post });
   }
 
