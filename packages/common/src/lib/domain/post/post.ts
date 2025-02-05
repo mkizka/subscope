@@ -1,10 +1,10 @@
-import type { Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
+import { asDid, type Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 
 type PostParams = {
-  uri: AtUri;
+  uri: AtUri | string;
   cid: string;
-  actorDid: Did;
+  actorDid: string;
   text: string;
   langs: string[] | null;
   createdAt: Date;
@@ -19,9 +19,9 @@ export class Post {
   readonly createdAt: Date;
 
   constructor(params: PostParams) {
-    this.uri = params.uri;
+    this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = params.actorDid;
+    this.actorDid = asDid(params.actorDid);
     this.text = params.text;
     this.langs = params.langs;
     this.createdAt = params.createdAt;
