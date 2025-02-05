@@ -1,4 +1,5 @@
-import { asDid, type Did } from "@atproto/did";
+import { type Did } from "@atproto/did";
+import type { AtUri } from "@atproto/syntax";
 
 type Avatar = {
   readonly cid: string;
@@ -7,16 +8,20 @@ type Avatar = {
 };
 
 export type ProfileParams = {
-  did: string;
+  uri: AtUri;
+  cid: string;
+  actorDid: Did;
   avatar: Avatar | null;
   description: string | null;
   displayName: string | null;
-  createdAt: string | Date | null;
-  indexedAt?: string | Date | null; // DBが作るデータなのでオプショナル
+  createdAt: Date | null;
+  indexedAt?: Date | null; // DBが作るデータなのでオプショナル
 };
 
 export class Profile {
-  readonly did: Did; // TODO: actorDidに変える
+  readonly uri: AtUri;
+  readonly cid: string;
+  readonly actorDid: Did;
   readonly avatar: Avatar | null;
   readonly description: string | null;
   readonly displayName: string | null;
@@ -24,12 +29,14 @@ export class Profile {
   readonly indexedAt: Date | null;
 
   constructor(params: ProfileParams) {
-    this.did = asDid(params.did);
+    this.uri = params.uri;
+    this.cid = params.cid;
+    this.actorDid = params.actorDid;
     this.avatar = params.avatar;
     this.description = params.description;
     this.displayName = params.displayName;
-    this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
-    this.indexedAt = params.indexedAt ? new Date(params.indexedAt) : null;
+    this.createdAt = params.createdAt;
+    this.indexedAt = params.indexedAt ?? null;
   }
 
   getAvatarUrl(): string | null {
@@ -41,12 +48,12 @@ export class Profile {
       return null;
     }
     // TODO: 自作実装に置き換える
-    return `https://cdn.bsky.app/img/avatar/plain/${this.did}/${this.avatar.cid}@${subtype}`;
+    return `https://cdn.bsky.app/img/avatar/plain/${this.actorDid}/${this.avatar.cid}@${subtype}`;
   }
 
   toJSON() {
     return {
-      did: this.did,
+      did: this.actorDid,
       avatar: this.getAvatarUrl() ?? undefined,
       description: this.description ?? undefined,
       displayName: this.displayName ?? undefined,

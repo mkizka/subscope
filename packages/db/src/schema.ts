@@ -32,8 +32,12 @@ export const record = mysqlTable("record", {
 });
 
 export const profiles = mysqlTable("profiles", {
-  actorDid: varchar({ length: 256 })
+  uri: varchar({ length: 256 })
     .primaryKey()
+    .references(() => record.uri),
+  cid: varchar({ length: 256 }).notNull(),
+  actorDid: varchar({ length: 256 })
+    .notNull()
     .references(() => actors.did),
   avatarCid: varchar({ length: 256 }),
   description: text(),

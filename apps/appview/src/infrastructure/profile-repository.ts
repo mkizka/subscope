@@ -1,4 +1,5 @@
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { ProfileDetailed } from "@dawn/common/domain";
 
@@ -19,7 +20,9 @@ export class ProfileRepository implements IProfileRepository {
     return profiles.map(
       (profile) =>
         new ProfileDetailed({
-          did: profile.actorDid,
+          uri: new AtUri(profile.uri),
+          cid: profile.cid,
+          actorDid: asDid(profile.actorDid),
           handle: profile.user.handle,
           avatar: profile.avatar && {
             cid: profile.avatar.cid,

@@ -23,7 +23,9 @@ export class IndexProfileService {
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     this.assertRecord(record.json);
     const profile = new Profile({
-      did: record.actorDid,
+      uri: record.uri,
+      cid: record.cid,
+      actorDid: record.actorDid,
       avatar: record.json.avatar
         ? {
             cid: record.json.avatar.ref.$link,
