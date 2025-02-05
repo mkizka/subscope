@@ -27,7 +27,7 @@ export class IndexActorService {
     const actor = new Actor({ did, handle });
     await this.actorRepository.createOrUpdate({ ctx, actor });
     if (!handle) {
-      await this.jobQueue.add("resolveDid", did);
+      // await this.jobQueue.add("resolveDid", did);
     }
   }
 }
