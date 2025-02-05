@@ -46,7 +46,7 @@ export class IndexCommitUseCase {
           break;
         }
         case "delete": {
-          await indexService.delete({ ctx, uri: command.uri });
+          // Related data is also deleted by cascade
           await this.recordRepository.delete({ ctx, uri: command.uri });
           break;
         }

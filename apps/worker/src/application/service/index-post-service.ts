@@ -27,8 +27,4 @@ export class IndexPostService {
     });
     await this.postRepository.upsert({ ctx, post });
   }
-
-  async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
-    // TODO: 削除処理
-  }
 }

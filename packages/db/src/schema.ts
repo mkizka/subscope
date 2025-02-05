@@ -34,7 +34,7 @@ export const record = mysqlTable("record", {
 export const profiles = mysqlTable("profiles", {
   uri: varchar({ length: 256 })
     .primaryKey()
-    .references(() => record.uri),
+    .references(() => record.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
@@ -50,7 +50,7 @@ export const profiles = mysqlTable("profiles", {
 export const posts = mysqlTable("posts", {
   uri: varchar({ length: 256 })
     .primaryKey()
-    .references(() => record.uri),
+    .references(() => record.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()

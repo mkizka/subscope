@@ -39,8 +39,4 @@ export class IndexProfileService {
     });
     await this.profileRepository.upsert({ ctx, profile });
   }
-
-  async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
-    // TODO: 削除処理
-  }
 }
