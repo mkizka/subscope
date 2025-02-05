@@ -18,7 +18,7 @@ export class IndexPostService {
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     this.assertRecord(record.json);
     const post = new Post({
-      rkey: record.uri.rkey,
+      uri: record.uri,
       actorDid: record.actorDid,
       text: record.json.text,
       langs: record.json.langs ?? [],

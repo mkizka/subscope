@@ -42,7 +42,8 @@ export const profiles = mysqlTable("profiles", {
 });
 
 export const posts = mysqlTable("posts", {
-  rkey: varchar("rkey", { length: 256 }).primaryKey(),
+  uri: varchar("uri", { length: 256 }).primaryKey(),
+  cid: varchar("cid", { length: 256 }),
   actorDid: varchar("actor_did", { length: 256 }).references(() => actors.did),
   text: text("text"),
   langs: json("langs").$type<string[]>(),

@@ -8,7 +8,7 @@ export class PostRepository implements IPostRepository {
     await ctx.db
       .insert(schema.posts)
       .values({
-        rkey: post.rkey,
+        uri: post.uri.toString(),
         actorDid: post.actorDid,
         text: post.text,
         langs: post.langs,
