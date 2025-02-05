@@ -7,11 +7,11 @@ import {
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { IndexActorService } from "./application/actor/index-actor-service.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
-import { IndexPostService } from "./application/post/index-post-service.js";
-import { IndexProfileService } from "./application/profile/index-profile-service.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
+import { IndexActorService } from "./application/service/index-actor-service.js";
+import { IndexPostService } from "./application/service/index-post-service.js";
+import { IndexProfileService } from "./application/service/index-profile-service.js";
 import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { DidResolver } from "./infrastructure/did-resolver.js";

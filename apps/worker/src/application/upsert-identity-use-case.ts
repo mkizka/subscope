@@ -1,6 +1,6 @@
 import type { ITransactionManager } from "@dawn/common/domain";
 
-import type { IndexActorService } from "./actor/index-actor-service.js";
+import type { IndexActorService } from "./service/index-actor-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 export class UpsertIdentityUseCase {

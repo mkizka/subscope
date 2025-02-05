@@ -1,10 +1,10 @@
 import { type ITransactionManager, Record } from "@dawn/common/domain";
 
-import type { IndexActorService } from "./actor/index-actor-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import type { IRecordRepository } from "./interfaces/record-repository.js";
-import type { IndexPostService } from "./post/index-post-service.js";
-import type { IndexProfileService } from "./profile/index-profile-service.js";
+import type { IndexActorService } from "./service/index-actor-service.js";
+import type { IndexPostService } from "./service/index-post-service.js";
+import type { IndexProfileService } from "./service/index-profile-service.js";
 
 export class IndexCommitUseCase {
   private readonly services;
