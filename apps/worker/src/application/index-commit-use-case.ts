@@ -41,8 +41,8 @@ export class IndexCommitUseCase {
             cid: command.cid,
             json: command.record,
           });
-          await indexService.upsert({ ctx, record });
           await this.recordRepository.upsert({ ctx, record });
+          await indexService.upsert({ ctx, record });
           break;
         }
         case "delete": {
