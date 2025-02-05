@@ -13,51 +13,51 @@ import { relations } from "drizzle-orm";
 export const actors = mysqlTable(
   "actors",
   {
-    did: varchar("did", { length: 256 }).primaryKey(),
-    handle: varchar("handle", { length: 256 }),
-    indexedAt: timestamp("indexed_at").defaultNow(),
-    updatedAt: timestamp("updated_at").onUpdateNow(),
+    did: varchar({ length: 256 }).primaryKey(),
+    handle: varchar({ length: 256 }),
+    indexedAt: timestamp().defaultNow(),
+    updatedAt: timestamp().onUpdateNow(),
   },
   (table) => [index("handle_idx").on(table.handle)],
 );
 
 export const record = mysqlTable("record", {
-  uri: varchar("uri", { length: 256 }).primaryKey(),
-  cid: varchar("cid", { length: 256 }),
-  actorDid: varchar("did", { length: 256 }).references(() => actors.did),
-  json: json("json"),
-  indexedAt: timestamp("indexed_at").defaultNow(),
+  uri: varchar({ length: 256 }).primaryKey(),
+  cid: varchar({ length: 256 }),
+  actorDid: varchar({ length: 256 }).references(() => actors.did),
+  json: json(),
+  indexedAt: timestamp().defaultNow(),
 });
 
 export const profiles = mysqlTable("profiles", {
-  actorDid: varchar("actor_did", { length: 256 })
+  actorDid: varchar({ length: 256 })
     .primaryKey()
     .references(() => actors.did),
-  avatarCid: varchar("avatar_cid", { length: 256 }),
-  description: text("description"),
-  displayName: varchar("display_name", { length: 256 }),
-  createdAt: timestamp("created_at"),
-  indexedAt: timestamp("indexed_at").defaultNow(),
-  updatedAt: timestamp("updated_at").onUpdateNow(),
+  avatarCid: varchar({ length: 256 }),
+  description: text(),
+  displayName: varchar({ length: 256 }),
+  createdAt: timestamp(),
+  indexedAt: timestamp().defaultNow(),
+  updatedAt: timestamp().onUpdateNow(),
 });
 
 export const posts = mysqlTable("posts", {
-  uri: varchar("uri", { length: 256 }).primaryKey(),
-  cid: varchar("cid", { length: 256 }),
-  actorDid: varchar("actor_did", { length: 256 }).references(() => actors.did),
-  text: text("text"),
-  langs: json("langs").$type<string[]>(),
-  createdAt: timestamp("created_at"),
-  indexedAt: timestamp("indexed_at").defaultNow(),
-  updatedAt: timestamp("updated_at").onUpdateNow(),
+  uri: varchar({ length: 256 }).primaryKey(),
+  cid: varchar({ length: 256 }),
+  actorDid: varchar({ length: 256 }).references(() => actors.did),
+  text: text(),
+  langs: json().$type<string[]>(),
+  createdAt: timestamp(),
+  indexedAt: timestamp().defaultNow(),
+  updatedAt: timestamp().onUpdateNow(),
 });
 
 export const blobs = mysqlTable("blobs", {
-  cid: varchar("cid", { length: 256 }).primaryKey(),
-  mimeType: varchar("mime_type", { length: 256 }).notNull(),
-  size: int("size").notNull(),
-  indexedAt: timestamp("indexed_at").defaultNow(),
-  updatedAt: timestamp("updated_at").onUpdateNow(),
+  cid: varchar({ length: 256 }).primaryKey(),
+  mimeType: varchar({ length: 256 }).notNull(),
+  size: int().notNull(),
+  indexedAt: timestamp().defaultNow(),
+  updatedAt: timestamp().onUpdateNow(),
 });
 
 export const actorsRelations = relations(actors, ({ one, many }) => ({

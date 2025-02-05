@@ -23,6 +23,7 @@ export const databaseFactory = (
     connection: databaseUrl,
     schema,
     mode: "default",
+    casing: "snake_case",
     logger: new DrizzleLogger(),
   });
 };
