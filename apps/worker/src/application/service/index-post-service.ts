@@ -19,6 +19,7 @@ export class IndexPostService {
     this.assertRecord(record.json);
     const post = new Post({
       uri: record.uri,
+      cid: record.cid,
       actorDid: record.actorDid,
       text: record.json.text,
       langs: record.json.langs ?? [],

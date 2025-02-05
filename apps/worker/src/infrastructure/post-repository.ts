@@ -9,6 +9,7 @@ export class PostRepository implements IPostRepository {
       .insert(schema.posts)
       .values({
         uri: post.uri.toString(),
+        cid: post.cid,
         actorDid: post.actorDid,
         text: post.text,
         langs: post.langs,

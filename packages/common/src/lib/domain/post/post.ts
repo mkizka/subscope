@@ -3,6 +3,7 @@ import type { AtUri } from "@atproto/syntax";
 
 type PostParams = {
   uri: AtUri;
+  cid: string;
   actorDid: Did;
   text: string;
   langs: string[] | null;
@@ -11,6 +12,7 @@ type PostParams = {
 
 export class Post {
   readonly uri: AtUri;
+  readonly cid: string;
   readonly actorDid: Did;
   readonly text: string;
   readonly langs: string[] | null;
@@ -18,6 +20,7 @@ export class Post {
 
   constructor(params: PostParams) {
     this.uri = params.uri;
+    this.cid = params.cid;
     this.actorDid = params.actorDid;
     this.text = params.text;
     this.langs = params.langs;

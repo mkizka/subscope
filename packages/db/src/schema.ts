@@ -45,6 +45,7 @@ export const profiles = mysqlTable("profiles", {
 
 export const posts = mysqlTable("posts", {
   uri: varchar({ length: 256 }).primaryKey(),
+  cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
     .references(() => actors.did),
