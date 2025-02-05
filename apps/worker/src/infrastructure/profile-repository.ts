@@ -5,7 +5,7 @@ import { schema } from "@dawn/db";
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async createOrUpdate({
+  async upsert({
     ctx,
     profile,
   }: {

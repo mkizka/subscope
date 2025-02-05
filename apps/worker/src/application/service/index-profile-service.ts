@@ -35,7 +35,7 @@ export class IndexProfileService {
       displayName: record.json.displayName ?? null,
       createdAt: record.json.createdAt ? new Date(record.json.createdAt) : null,
     });
-    await this.profileRepository.createOrUpdate({ ctx, profile });
+    await this.profileRepository.upsert({ ctx, profile });
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {

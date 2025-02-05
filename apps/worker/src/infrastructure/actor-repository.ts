@@ -15,13 +15,7 @@ export class ActorRepository implements IActorRepository {
     return rows.length > 0;
   }
 
-  async createOrUpdate({
-    ctx,
-    actor,
-  }: {
-    ctx: TransactionContext;
-    actor: Actor;
-  }) {
+  async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     await ctx.db
       .insert(schema.actors)
       .values({

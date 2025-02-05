@@ -6,13 +6,7 @@ import { eq } from "drizzle-orm";
 import type { IRecordRepository } from "../application/interfaces/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
-  async createOrUpdate({
-    ctx,
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }) {
+  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     await ctx.db
       .insert(schema.record)
       .values({

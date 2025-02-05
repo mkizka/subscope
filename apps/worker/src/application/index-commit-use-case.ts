@@ -42,7 +42,7 @@ export class IndexCommitUseCase {
             json: command.record,
           });
           await indexService.upsert({ ctx, record });
-          await this.recordRepository.createOrUpdate({ ctx, record });
+          await this.recordRepository.upsert({ ctx, record });
           break;
         }
         case "delete": {

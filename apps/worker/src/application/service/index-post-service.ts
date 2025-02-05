@@ -24,7 +24,7 @@ export class IndexPostService {
       langs: record.json.langs ?? [],
       createdAt: new Date(record.json.createdAt),
     });
-    await this.postRepository.createOrUpdate({ ctx, post });
+    await this.postRepository.upsert({ ctx, post });
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {

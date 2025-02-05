@@ -6,8 +6,5 @@ export interface IActorRepository {
     did: string;
   }) => Promise<boolean>;
 
-  createOrUpdate: (params: {
-    ctx: TransactionContext;
-    actor: Actor;
-  }) => Promise<void>;
+  upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
 }

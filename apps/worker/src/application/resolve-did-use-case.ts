@@ -17,7 +17,7 @@ export class ResolveDidUseCase {
     if (!data?.handle) {
       throw new Error(`Failed to resolve DID: ${did}`);
     }
-    await this.actorRepository.createOrUpdate({
+    await this.actorRepository.upsert({
       ctx: { db: this.db },
       actor: new Actor({ did, handle: data.handle }),
     });

@@ -4,7 +4,7 @@ import { schema } from "@dawn/db";
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
 export class PostRepository implements IPostRepository {
-  async createOrUpdate({ ctx, post }: { ctx: TransactionContext; post: Post }) {
+  async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {
     await ctx.db
       .insert(schema.posts)
       .values({
