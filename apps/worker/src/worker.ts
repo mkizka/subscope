@@ -8,11 +8,11 @@ import {
 import { createInjector } from "typed-inject";
 
 import { IndexActorService } from "./application/actor/index-actor-service.js";
-import { UpsertIdentityUseCase } from "./application/actor/upsert-identity-use-case.js";
-import { ResolveDidUseCase } from "./application/did/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { IndexPostService } from "./application/post/index-post-service.js";
 import { IndexProfileService } from "./application/profile/index-profile-service.js";
+import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
+import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { DidResolver } from "./infrastructure/did-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
@@ -41,11 +41,12 @@ createInjector()
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
   .provideClass("recordRepository", RecordRepository)
-  // application
-  .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
+  // application(service)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)
+  // application(use-case)
+  .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("syncWorker", SyncWorker)

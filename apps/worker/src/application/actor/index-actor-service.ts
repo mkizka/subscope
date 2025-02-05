@@ -4,6 +4,7 @@ import {
   type IJobQueue,
   type TransactionContext,
 } from "@dawn/common/domain";
+import type { Handle } from "@dawn/common/utils";
 
 import type { IActorRepository } from "../interfaces/actor-repository.js";
 
@@ -14,9 +15,19 @@ export class IndexActorService {
   ) {}
   static inject = ["actorRepository", "jobQueue"] as const;
 
-  async upsert({ ctx, did }: { ctx: TransactionContext; did: Did }) {
-    const actor = new Actor({ did });
+  async upsert({
+    ctx,
+    did,
+    handle,
+  }: {
+    ctx: TransactionContext;
+    did: Did;
+    handle?: Handle;
+  }) {
+    const actor = new Actor({ did, handle });
     await this.actorRepository.createOrUpdate({ ctx, actor });
-    // await this.jobQueue.add("resolveDid", did);
+    if (!handle) {
+      await this.jobQueue.add("resolveDid", did);
+    }
   }
 }

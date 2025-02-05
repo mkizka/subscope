@@ -1,13 +1,13 @@
 import type { Did } from "@atproto/did";
-import { asDid } from "@atproto/did";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
-import type { UpsertIdentityUseCase } from "../application/actor/upsert-identity-use-case.js";
-import type { ResolveDidUseCase } from "../application/did/resolve-did-use-case.js";
 import { indexCommitCommandFactory } from "../application/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/index-commit-use-case.js";
+import type { ResolveDidUseCase } from "../application/resolve-did-use-case.js";
+import { upsertIdentityCommandFactory } from "../application/upsert-identity-command.js";
+import type { UpsertIdentityUseCase } from "../application/upsert-identity-use-case.js";
 import { env } from "../shared/env.js";
 
 const baseWorkerOptions = {
@@ -28,11 +28,10 @@ export class SyncWorker {
     this.workers = [
       new Worker<IdentityEvent>(
         "identity",
-        (job) =>
-          upsertIdentityUseCase.execute({
-            did: asDid(job.data.identity.did),
-            handle: job.data.identity.handle,
-          }),
+        async (job) => {
+          const command = upsertIdentityCommandFactory(job.data);
+          await upsertIdentityUseCase.execute(command);
+        },
         baseWorkerOptions,
       ),
       new Worker<CommitEvent<"app.bsky.feed.post" | "app.bsky.actor.profile">>(
