@@ -23,9 +23,11 @@ export const actors = mysqlTable(
 
 export const record = mysqlTable("record", {
   uri: varchar({ length: 256 }).primaryKey(),
-  cid: varchar({ length: 256 }),
-  actorDid: varchar({ length: 256 }).references(() => actors.did),
-  json: json(),
+  cid: varchar({ length: 256 }).notNull(),
+  actorDid: varchar({ length: 256 })
+    .notNull()
+    .references(() => actors.did),
+  json: json().notNull(),
   indexedAt: timestamp().defaultNow(),
 });
 
@@ -43,11 +45,12 @@ export const profiles = mysqlTable("profiles", {
 
 export const posts = mysqlTable("posts", {
   uri: varchar({ length: 256 }).primaryKey(),
-  cid: varchar({ length: 256 }),
-  actorDid: varchar({ length: 256 }).references(() => actors.did),
-  text: text(),
+  actorDid: varchar({ length: 256 })
+    .notNull()
+    .references(() => actors.did),
+  text: text().notNull(),
   langs: json().$type<string[]>(),
-  createdAt: timestamp(),
+  createdAt: timestamp().notNull(),
   indexedAt: timestamp().defaultNow(),
   updatedAt: timestamp().onUpdateNow(),
 });
