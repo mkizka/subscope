@@ -35,9 +35,6 @@ importers:
       '@atproto/identity':
         specifier: 0.4.5
         version: 0.4.5
-      '@atproto/syntax':
-        specifier: 0.3.1
-        version: 0.3.1
       '@atproto/xrpc-server':
         specifier: 0.7.8
         version: 0.7.8

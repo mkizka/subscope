@@ -1,5 +1,5 @@
-import { type Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
+import { asDid, type Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 
 type Avatar = {
   readonly cid: string;
@@ -8,14 +8,14 @@ type Avatar = {
 };
 
 export type ProfileParams = {
-  uri: AtUri;
+  uri: AtUri | string;
   cid: string;
-  actorDid: Did;
-  avatar: Avatar | null;
-  description: string | null;
-  displayName: string | null;
-  createdAt: Date | null;
-  indexedAt?: Date | null; // DBが作るデータなのでオプショナル
+  actorDid: string;
+  avatar?: Avatar | null;
+  description?: string | null;
+  displayName?: string | null;
+  createdAt?: Date | string | null;
+  indexedAt?: Date | string | null;
 };
 
 export class Profile {
@@ -29,14 +29,14 @@ export class Profile {
   readonly indexedAt: Date | null;
 
   constructor(params: ProfileParams) {
-    this.uri = params.uri;
+    this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = params.actorDid;
-    this.avatar = params.avatar;
-    this.description = params.description;
-    this.displayName = params.displayName;
-    this.createdAt = params.createdAt;
-    this.indexedAt = params.indexedAt ?? null;
+    this.actorDid = asDid(params.actorDid);
+    this.avatar = params.avatar ?? null;
+    this.description = params.description ?? null;
+    this.displayName = params.displayName ?? null;
+    this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
+    this.indexedAt = params.indexedAt ? new Date(params.indexedAt) : null;
   }
 
   getAvatarUrl(): string | null {
