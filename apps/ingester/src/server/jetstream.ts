@@ -46,7 +46,11 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
       this.logger.debug({ did: event.identity.did }, "identity event received");
-      await this.jobQueue.add(event.kind, event);
+      await this.jobQueue.add({
+        queueName: event.kind,
+        jobName: `at://${event.identity.handle ?? event.did}`,
+        data: event,
+      });
     });
 
     this.jetstream.on("commit", async (event) => {
@@ -54,7 +58,11 @@ export class JetstreamIngester {
         { did: event.did },
         `${event.commit.collection} event received`,
       );
-      await this.jobQueue.add(event.kind, event);
+      await this.jobQueue.add({
+        queueName: event.kind,
+        jobName: `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`,
+        data: event,
+      });
     });
   }
   static inject = ["loggerManager", "jobQueue"] as const;

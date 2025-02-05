@@ -34,8 +34,16 @@ export class JobQueue implements IJobQueue {
   }
   static inject = ["redisUrl"] as const;
 
-  async add<T extends QueueName>(queueName: T, data: JobData[T]) {
-    await this.queues[queueName].add(queueName, data);
+  async add<T extends QueueName>({
+    queueName,
+    jobName,
+    data,
+  }: {
+    queueName: T;
+    jobName: string;
+    data: JobData[T];
+  }) {
+    await this.queues[queueName].add(jobName, data);
   }
 
   getQueues() {
