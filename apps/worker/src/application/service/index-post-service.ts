@@ -1,5 +1,4 @@
 import { jsonToLex } from "@atproto/lexicon";
-import type { AtUri } from "@atproto/syntax";
 import type { AppBskyFeedPost } from "@dawn/client";
 import client from "@dawn/client";
 import type { Record, TransactionContext } from "@dawn/common/domain";
