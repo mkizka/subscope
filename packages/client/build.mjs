@@ -7,6 +7,7 @@ await build({
   entryPoints: ["src/index.ts"],
   bundle: true,
   outdir: "dist",
+  outExtension: { ".js": ".mjs" },
   platform: "node",
   format: "esm",
   sourcemap: true,
