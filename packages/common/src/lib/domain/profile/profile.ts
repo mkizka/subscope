@@ -1,6 +1,9 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
+import { parseRecord } from "../../utils/record.js";
+import type { Record } from "../record.js";
+
 type Avatar = {
   readonly cid: string;
   readonly mimeType: string;
@@ -37,6 +40,26 @@ export class Profile {
     this.displayName = params.displayName ?? null;
     this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
     this.indexedAt = params.indexedAt ? new Date(params.indexedAt) : null;
+  }
+
+  static from(record: Record) {
+    const parsed = parseRecord("app.bsky.actor.profile", record.json);
+    return new Profile({
+      uri: record.uri,
+      cid: record.cid,
+      actorDid: record.actorDid,
+      avatar: parsed.avatar
+        ? {
+            cid: parsed.avatar.ref.toString(),
+            mimeType: parsed.avatar.mimeType,
+            size: parsed.avatar.size,
+          }
+        : null,
+      description: parsed.description ?? null,
+      displayName: parsed.displayName ?? null,
+      createdAt: parsed.createdAt,
+      indexedAt: null,
+    });
   }
 
   getAvatarUrl(): string | null {
