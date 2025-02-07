@@ -1,9 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
-import { jsonToLex } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
-import type { AppBskyFeedPost } from "@dawn/client";
-import client from "@dawn/client";
 
+import { parseRecord } from "../../utils/record.js";
 import type { Record } from "../record.js";
 type PostParams = {
   uri: AtUri | string;
@@ -13,10 +11,6 @@ type PostParams = {
   langs: string[] | null;
   createdAt: Date;
 };
-
-function assertRecord(json: unknown): asserts json is AppBskyFeedPost.Record {
-  client.lexicons.assertValidRecord("app.bsky.feed.post", jsonToLex(json));
-}
 
 export class Post {
   readonly uri: AtUri;
@@ -36,14 +30,14 @@ export class Post {
   }
 
   static from(record: Record) {
-    assertRecord(record.json);
+    const parsed = parseRecord("app.bsky.feed.post", record.json);
     return new Post({
       uri: record.uri,
       cid: record.cid,
       actorDid: record.actorDid,
-      text: record.json.text,
-      langs: record.json.langs ?? [],
-      createdAt: new Date(record.json.createdAt),
+      text: parsed.text,
+      langs: parsed.langs ?? [],
+      createdAt: new Date(parsed.createdAt),
     });
   }
 }
