@@ -1,6 +1,6 @@
 import { jsonToLex } from "@atproto/lexicon";
 import type { AppBskyActorProfile, AppBskyFeedPost } from "@dawn/client";
-import client from "@dawn/client";
+import { lexicons } from "@dawn/client";
 
 type RecordMap = {
   "app.bsky.actor.profile": AppBskyActorProfile.Record;
@@ -12,6 +12,6 @@ export const parseRecord = <T extends keyof RecordMap>(
   json: unknown,
 ) => {
   const value = jsonToLex(json);
-  client.lexicons.assertValidRecord(lexUri, value);
+  lexicons.assertValidRecord(lexUri, value);
   return value as RecordMap[T];
 };

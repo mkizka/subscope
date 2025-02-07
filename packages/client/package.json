@@ -2,23 +2,31 @@
   "name": "@dawn/client",
   "version": "0.0.0",
   "private": true,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  },
   "scripts": {
-    "build": "./scripts/generate.sh",
-    "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command ./scripts/generate.sh --initial",
+    "build": "pnpm generate && run-p -s build:*",
+    "build:ts": "node build.mjs",
+    "build:type": "tsc --project tsconfig.build.json",
+    "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command \"pnpm build\" --initial",
+    "generate": "./scripts/generate.sh",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@atproto/lexicon": "0.4.5",
     "@atproto/xrpc": "0.6.6",
-    "@atproto/xrpc-server": "0.7.8"
+    "@atproto/xrpc-server": "0.7.8",
+    "multiformats": "13.3.1"
   },
   "devDependencies": {
     "@atproto/lex-cli": "0.5.6",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.0",
     "chokidar-cli": "3.0.0",
+    "esbuild": "0.24.2",
+    "npm-run-all2": "7.0.2",
     "typescript": "5.7.3"
   }
 }
