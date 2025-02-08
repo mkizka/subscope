@@ -48,17 +48,14 @@ export class Profile {
       uri: record.uri,
       cid: record.cid,
       actorDid: record.actorDid,
-      avatar: parsed.avatar
-        ? {
-            cid: parsed.avatar.ref.toString(),
-            mimeType: parsed.avatar.mimeType,
-            size: parsed.avatar.size,
-          }
-        : null,
-      description: parsed.description ?? null,
-      displayName: parsed.displayName ?? null,
+      avatar: parsed.avatar && {
+        cid: parsed.avatar.ref.toString(),
+        mimeType: parsed.avatar.mimeType,
+        size: parsed.avatar.size,
+      },
+      description: parsed.description,
+      displayName: parsed.displayName,
       createdAt: parsed.createdAt,
-      indexedAt: null,
     });
   }
 
