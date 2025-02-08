@@ -1,5 +1,7 @@
 import type { AppBskyActorDefs } from "@dawn/client";
 
+import type { Handle } from "../../utils/handle.js";
+import { asHandle } from "../../utils/handle.js";
 import type { ProfileParams } from "./profile.js";
 import { Profile } from "./profile.js";
 
@@ -8,11 +10,11 @@ export type ProfileDetailedParams = ProfileParams & {
 };
 
 export class ProfileDetailed extends Profile {
-  readonly handle: string | null;
+  readonly handle: Handle | null;
 
   constructor(params: ProfileDetailedParams) {
     super(params);
-    this.handle = params.handle;
+    this.handle = params.handle ? asHandle(params.handle) : null;
   }
 
   toJSON() {
