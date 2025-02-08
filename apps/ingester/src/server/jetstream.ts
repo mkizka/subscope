@@ -43,7 +43,7 @@ export class JetstreamIngester {
     // たとえば、アカウントの作成、削除、または一時停止の結果である可能性があります。イベントは、変更された内容ではなく、現在のホスティング ステータスを説明します。
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("account", (event) => {
-      this.metricReporter.increment("ingester_events_commit_total");
+      this.metricReporter.increment("ingester_events_account_total");
       // TODO: アカウントステータスの変動を実装
     });
 
