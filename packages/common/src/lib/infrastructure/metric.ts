@@ -42,9 +42,6 @@ const metrics = {
 };
 
 export class MetricReporter implements IMetricReporter {
-  resetAll(): void {
-    Object.values(metrics).forEach((metric) => metric.inc(0));
-  }
   increment(key: MetricKey, labels?: LabelsValue): void {
     if (labels) {
       metrics[key].inc(labels);

@@ -43,7 +43,6 @@ export class WorkerServer {
   static inject = ["loggerManager", "syncWorker", "metricReporter"] as const;
 
   start() {
-    this.metricReporter.resetAll();
     this.app.listen(env.PORT, async () => {
       this.logger.info(`Worker server listening on port ${env.PORT}`);
       await this.syncWorker.start();

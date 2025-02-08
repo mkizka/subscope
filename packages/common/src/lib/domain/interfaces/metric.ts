@@ -10,7 +10,6 @@ export type MetricKey =
 export type LabelsValue = Record<string, string | number>;
 
 export interface IMetricReporter {
-  resetAll: () => void;
   increment: (key: MetricKey, labels?: LabelsValue) => void;
   getMetrics: () => Promise<string>;
 }

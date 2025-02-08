@@ -55,7 +55,6 @@ export class IngesterServer {
   ] as const;
 
   start() {
-    this.metricReporter.resetAll();
     this.app.listen(env.PORT, () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
       this.ingester.start();
