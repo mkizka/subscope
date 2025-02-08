@@ -1,4 +1,8 @@
-import type { IJobQueue, ILoggerManager } from "@dawn/common/domain";
+import type {
+  IJobQueue,
+  ILoggerManager,
+  IMetricReporter,
+} from "@dawn/common/domain";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
@@ -11,6 +15,7 @@ export class JetstreamIngester {
   constructor(
     loggerManager: ILoggerManager,
     private readonly jobQueue: IJobQueue,
+    private readonly metricReporter: IMetricReporter,
   ) {
     this.logger = loggerManager.createLogger("JetstreamIngester");
     this.jetstream = new Jetstream({
@@ -37,7 +42,8 @@ export class JetstreamIngester {
     // イベントを発行するサービスでアカウント ホスティング ステータスが変更された可能性があること、および新しいステータスが何であるかを示します。
     // たとえば、アカウントの作成、削除、または一時停止の結果である可能性があります。イベントは、変更された内容ではなく、現在のホスティング ステータスを説明します。
     // https://atproto.com/ja/specs/sync
-    this.jetstream.on("account", async (event) => {
+    this.jetstream.on("account", (event) => {
+      this.metricReporter.increment("ingester_events_commit_total");
       // TODO: アカウントステータスの変動を実装
     });
 
@@ -46,6 +52,9 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("identity", async (event) => {
       this.logger.debug({ did: event.identity.did }, "identity event received");
+      this.metricReporter.increment("ingester_events_identity_total", {
+        change_handle: event.identity.handle ? "true" : "false",
+      });
       await this.jobQueue.add({
         queueName: event.kind,
         jobName: `at://${event.identity.handle ?? event.did}`,
@@ -58,6 +67,9 @@ export class JetstreamIngester {
         { did: event.did },
         `${event.commit.collection} event received`,
       );
+      this.metricReporter.increment("ingester_events_commit_total", {
+        collection: event.commit.collection,
+      });
       await this.jobQueue.add({
         queueName: event.kind,
         jobName: `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`,
@@ -65,7 +77,7 @@ export class JetstreamIngester {
       });
     });
   }
-  static inject = ["loggerManager", "jobQueue"] as const;
+  static inject = ["loggerManager", "jobQueue", "metricReporter"] as const;
 
   start() {
     this.jetstream.start();

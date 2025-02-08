@@ -1,4 +1,8 @@
-import { JobQueue, LoggerManager } from "@dawn/common/infrastructure";
+import {
+  JobQueue,
+  LoggerManager,
+  MetricReporter,
+} from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
 import { JetstreamIngester } from "./server/jetstream.js";
@@ -14,6 +18,7 @@ createInjector()
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideClass("jobQueue", JobQueue)
+  .provideClass("metricReporter", MetricReporter)
   // server
   .provideFactory("dashboardRouter", dashboardRouterFactory)
   .provideFactory("metricsRouter", metricsRouterFactory)

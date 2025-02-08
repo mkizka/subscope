@@ -1,4 +1,8 @@
-import type { ILoggerManager, Logger } from "@dawn/common/domain";
+import type {
+  ILoggerManager,
+  IMetricReporter,
+  Logger,
+} from "@dawn/common/domain";
 import type { Router } from "express";
 import express from "express";
 import { pinoHttp } from "pino-http";
@@ -18,6 +22,7 @@ export class IngesterServer {
     metricsRouter: Router,
     dashboardRouter: Router,
     private readonly ingester: JetstreamIngester,
+    private readonly metricReporter: IMetricReporter,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
@@ -46,9 +51,11 @@ export class IngesterServer {
     "dashboardRouter",
     "metricsRouter",
     "ingester",
+    "metricReporter",
   ] as const;
 
   start() {
+    this.metricReporter.resetAll();
     this.app.listen(env.PORT, () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
       this.ingester.start();
