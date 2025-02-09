@@ -1,13 +1,19 @@
 import { type ITransactionManager, Record } from "@dawn/common/domain";
+import type { SupportedCollection } from "@dawn/common/utils";
 
 import type { IndexCommitCommand } from "./index-commit-command.js";
+import type { IIndexColectionService } from "./interfaces/index-collection-service.js";
 import type { IRecordRepository } from "./interfaces/record-repository.js";
 import type { IndexActorService } from "./service/index-actor-service.js";
 import type { IndexPostService } from "./service/index-post-service.js";
 import type { IndexProfileService } from "./service/index-profile-service.js";
 
+type IndexCollectionServiceMap = {
+  [key in SupportedCollection]: IIndexColectionService;
+};
+
 export class IndexCommitUseCase {
-  private readonly services;
+  private readonly services: IndexCollectionServiceMap;
 
   constructor(
     private readonly transactionManager: ITransactionManager,

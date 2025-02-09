@@ -1,9 +1,10 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
+import type { SupportedCollection } from "@dawn/common/utils";
 import type { CommitEvent } from "@skyware/jetstream";
 
 export const indexCommitCommandFactory = (
-  event: CommitEvent<"app.bsky.feed.post" | "app.bsky.actor.profile">,
+  event: CommitEvent<SupportedCollection>,
 ) => {
   const base = {
     uri: new AtUri(

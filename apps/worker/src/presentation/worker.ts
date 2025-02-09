@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import type { SupportedCollection } from "@dawn/common/utils";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
@@ -34,7 +35,7 @@ export class SyncWorker {
         },
         baseWorkerOptions,
       ),
-      new Worker<CommitEvent<"app.bsky.feed.post" | "app.bsky.actor.profile">>(
+      new Worker<CommitEvent<SupportedCollection>>(
         "commit",
         async (job) => {
           const command = indexCommitCommandFactory(job.data);

@@ -1,9 +1,10 @@
 import type { Record, TransactionContext } from "@dawn/common/domain";
 import { Profile } from "@dawn/common/domain";
 
+import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 
-export class IndexProfileService {
+export class IndexProfileService implements IIndexColectionService {
   constructor(private readonly profileRepository: IProfileRepository) {}
   static inject = ["profileRepository"] as const;
 
