@@ -1,21 +1,24 @@
 import { asDid } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atproto/syntax";
 
 type RecordParams = {
-  uri: AtUri;
+  uri: AtUri | string;
   cid: string;
   json: unknown;
+  indexedAt?: Date | null;
 };
 
 export class Record {
   readonly uri: AtUri;
   readonly cid: string;
   readonly json: unknown;
+  readonly indexedAt: Date | null;
 
   constructor(params: RecordParams) {
-    this.uri = params.uri;
+    this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.json = params.json;
+    this.indexedAt = params.indexedAt ?? null;
   }
 
   get actorDid() {
