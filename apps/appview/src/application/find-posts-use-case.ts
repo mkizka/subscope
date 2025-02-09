@@ -1,6 +1,7 @@
 import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { AppBskyFeedDefs } from "@dawn/client";
+import type { ILoggerManager } from "@dawn/common/domain";
 import { required } from "@dawn/common/utils";
 
 import type { IRecordRepository } from "./interfaces/record-repository.js";
@@ -14,16 +15,26 @@ const asObject = (obj: unknown) => {
 };
 
 export class FindPostsUseCase {
+  private readonly logger;
   constructor(
     private readonly recordRepository: IRecordRepository,
     private readonly profileViewService: ProfileViewService,
-  ) {}
-  static inject = ["recordRepository", "profileViewService"] as const;
+    loggerManager: ILoggerManager,
+  ) {
+    this.logger = loggerManager.createLogger("FindPostsUseCase");
+  }
+  static inject = [
+    "recordRepository",
+    "profileViewService",
+    "loggerManager",
+  ] as const;
 
   async execute(uris: AtUri[]): Promise<AppBskyFeedDefs.PostView[]> {
     const records = await this.recordRepository.findMany(uris);
+    this.logger.info(records, "Found records");
     const dids = records.map((record) => asDid(record.uri.host));
     const profiles = await this.profileViewService.findProfileViewBasic(dids);
+    this.logger.info(profiles, "Found profiles");
     return records.map((record) => {
       const author = profiles.find(
         (profile) => profile.did === record.uri.host,
