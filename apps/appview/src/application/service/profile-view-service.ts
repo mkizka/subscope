@@ -1,0 +1,70 @@
+import type { Did } from "@atproto/did";
+import type { AppBskyActorDefs } from "@dawn/client";
+import type { ProfileDetailed } from "@dawn/common/domain";
+import { type Handle, isHandle } from "@dawn/common/utils";
+
+import type { IHandlesToDidsRepository } from "../interfaces/handles-to-dids-repository.js";
+import type { IProfileRepository } from "../interfaces/profile-repository.js";
+
+type HandleOrDid = Handle | Did;
+
+export class ProfileViewService {
+  constructor(
+    private readonly profileRepository: IProfileRepository,
+    private readonly handlesToDidsRepository: IHandlesToDidsRepository,
+  ) {}
+  static inject = ["profileRepository", "handlesToDidsRepository"] as const;
+
+  private async findProfile(handleOrDids: HandleOrDid[]) {
+    const handles = handleOrDids.filter((handleOrDid) => isHandle(handleOrDid));
+    const didsByHandle =
+      await this.handlesToDidsRepository.findDidsByHandle(handles);
+    const dids = handleOrDids
+      .map((handleOrDid) =>
+        isHandle(handleOrDid) ? didsByHandle[handleOrDid] : handleOrDid,
+      )
+      .filter((did) => !!did);
+    return await this.profileRepository.findManyDetailed(dids);
+  }
+
+  private createProfileViewBasic(
+    profile: ProfileDetailed,
+  ): AppBskyActorDefs.ProfileViewBasic {
+    return {
+      did: profile.actorDid,
+      handle: profile.handle?.toString() ?? "handle.invalid",
+      displayName: profile.displayName ?? undefined,
+      avatar: profile.getAvatarUrl() ?? undefined,
+      // associated?: ProfileAssociated
+      // viewer?: ViewerState
+      // labels?: ComAtprotoLabelDefs.Label[]
+      createdAt: profile.createdAt?.toISOString(),
+    };
+  }
+
+  private createProfileViewDetailed(
+    profile: ProfileDetailed,
+  ): AppBskyActorDefs.ProfileViewDetailed {
+    return {
+      ...this.createProfileViewBasic(profile),
+      // description?: string
+      // banner?: string
+      // followersCount?: number
+      // followsCount?: number
+      // postsCount?: number
+      // joinedViaStarterPack?: AppBskyGraphDefs.StarterPackViewBasic
+      indexedAt: profile.indexedAt?.toISOString(),
+      // pinnedPost?: ComAtprotoRepoStrongRef.Main
+    };
+  }
+
+  async findProfileViewBasic(handleOrDids: HandleOrDid[]) {
+    const profiles = await this.findProfile(handleOrDids);
+    return profiles.map((profile) => this.createProfileViewBasic(profile));
+  }
+
+  async findProfileViewDetailed(handleOrDids: HandleOrDid[]) {
+    const profiles = await this.findProfile(handleOrDids);
+    return profiles.map((profile) => this.createProfileViewDetailed(profile));
+  }
+}
