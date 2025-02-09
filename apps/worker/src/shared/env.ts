@@ -22,7 +22,7 @@ const schema = z.object({
     ),
   DATABASE_URL: match({
     prod: z.string().url(),
-    dev: z.string().url().default("mysql://root:password@localhost:3306/db"),
+    dev: z.string().url().default("mysql://root:password@localhost:3306/dev"),
   }),
   REDIS_URL: match({
     prod: z.string().url(),
