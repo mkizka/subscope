@@ -21,7 +21,7 @@ export const actors = mysqlTable(
   (table) => [index("handle_idx").on(table.handle)],
 );
 
-export const record = mysqlTable("record", {
+export const records = mysqlTable("records", {
   uri: varchar({ length: 256 }).primaryKey(),
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
@@ -34,7 +34,7 @@ export const record = mysqlTable("record", {
 export const profiles = mysqlTable("profiles", {
   uri: varchar({ length: 256 })
     .primaryKey()
-    .references(() => record.uri, { onDelete: "cascade" }),
+    .references(() => records.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
@@ -50,7 +50,7 @@ export const profiles = mysqlTable("profiles", {
 export const posts = mysqlTable("posts", {
   uri: varchar({ length: 256 })
     .primaryKey()
-    .references(() => record.uri, { onDelete: "cascade" }),
+    .references(() => records.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()

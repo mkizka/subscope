@@ -8,7 +8,7 @@ import type { IRecordRepository } from "../application/interfaces/record-reposit
 export class RecordRepository implements IRecordRepository {
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     await ctx.db
-      .insert(schema.record)
+      .insert(schema.records)
       .values({
         uri: record.uri.toString(),
         cid: record.cid,
@@ -26,7 +26,7 @@ export class RecordRepository implements IRecordRepository {
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
     await ctx.db
-      .delete(schema.record)
-      .where(eq(schema.record.uri, uri.toString()));
+      .delete(schema.records)
+      .where(eq(schema.records.uri, uri.toString()));
   }
 }

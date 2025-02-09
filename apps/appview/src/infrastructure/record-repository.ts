@@ -14,8 +14,8 @@ export class RecordRepository implements IRecordRepository {
     const stringUris = uris.map((uri) => uri.toString());
     const records = await this.db
       .select()
-      .from(schema.record)
-      .where(inArray(schema.record.uri, stringUris));
+      .from(schema.records)
+      .where(inArray(schema.records.uri, stringUris));
     return records.map(
       (record) =>
         new Record({
