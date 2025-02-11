@@ -1,7 +1,7 @@
 import { databaseFactory, LoggerManager } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { FindPostsUseCase } from "./application/find-posts-use-case.js";
+import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { FindProfilesDetailedUseCase } from "./application/find-profiles-detailed-use-case.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
 import { HandlesToDidsRepository } from "./infrastructure/handles-to-dids-repository.js";
@@ -27,7 +27,7 @@ createInjector()
   // application
   .provideClass("profileViewService", ProfileViewService)
   .provideClass("findProfilesDetailedUseCase", FindProfilesDetailedUseCase)
-  .provideClass("findPostsUseCase", FindPostsUseCase)
+  .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
   .provideClass("getPosts", GetPosts)

@@ -1,16 +1,16 @@
 import { AtUri } from "@atproto/syntax";
 import type { Server } from "@dawn/client";
 
-import type { FindPostsUseCase } from "../../../../../application/find-posts-use-case.js";
+import type { GetPostsUseCase } from "../../../../../application/get-posts-use-case.js";
 
 export class GetPosts {
-  constructor(private readonly findPostsUseCase: FindPostsUseCase) {}
-  static inject = ["findPostsUseCase"] as const;
+  constructor(private readonly getPostsUseCase: GetPostsUseCase) {}
+  static inject = ["getPostsUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.feed.getPosts({
       handler: async ({ params }) => {
-        const posts = await this.findPostsUseCase.execute(
+        const posts = await this.getPostsUseCase.execute(
           params.uris.map((uri) => new AtUri(uri)),
         );
         return {

@@ -14,14 +14,14 @@ const asObject = (obj: unknown) => {
   return obj;
 };
 
-export class FindPostsUseCase {
+export class GetPostsUseCase {
   private readonly logger;
   constructor(
     private readonly recordRepository: IRecordRepository,
     private readonly profileViewService: ProfileViewService,
     loggerManager: ILoggerManager,
   ) {
-    this.logger = loggerManager.createLogger("FindPostsUseCase");
+    this.logger = loggerManager.createLogger("getPostsUseCase");
   }
   static inject = [
     "recordRepository",
