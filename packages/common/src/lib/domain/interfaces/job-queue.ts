@@ -6,6 +6,7 @@ export type JobData = {
   resolveDid: Did;
   identity: IdentityEvent;
   commit: CommitEvent<string>;
+  temp__cleanupDatabase: undefined;
 };
 
 export type QueueName = keyof JobData;

@@ -30,7 +30,16 @@ export class JobQueue implements IJobQueue {
       resolveDid: new Queue("resolveDid", queueOptions),
       identity: new Queue("identity", queueOptions),
       commit: new Queue("commit", queueOptions),
+      temp__cleanupDatabase: new Queue("temp__cleanupDatabase", queueOptions),
     };
+    this.queues.temp__cleanupDatabase
+      .upsertJobScheduler(
+        "temp",
+        { pattern: "0 0 * * *" },
+        { name: "cleanupDatabase" },
+      )
+      // eslint-disable-next-line no-console
+      .catch(console.error);
   }
   static inject = ["redisUrl"] as const;
 

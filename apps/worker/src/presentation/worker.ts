@@ -7,6 +7,7 @@ import { Worker } from "bullmq";
 import { indexCommitCommandFactory } from "../application/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/index-commit-use-case.js";
 import type { ResolveDidUseCase } from "../application/resolve-did-use-case.js";
+import type { Temp__CleanupDatabaseUseCase } from "../application/temp__cleanup-database-usecase.js";
 import { upsertIdentityCommandFactory } from "../application/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/upsert-identity-use-case.js";
 import { env } from "../shared/env.js";
@@ -25,6 +26,7 @@ export class SyncWorker {
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
     resolveDidUseCase: ResolveDidUseCase,
+    temp__cleanupDatabaseUseCase: Temp__CleanupDatabaseUseCase,
   ) {
     this.workers = [
       new Worker<IdentityEvent>(
@@ -57,12 +59,21 @@ export class SyncWorker {
           },
         },
       ),
+      // 開発用
+      new Worker(
+        "temp__cleanupDatabase",
+        async () => {
+          await temp__cleanupDatabaseUseCase.execute();
+        },
+        baseWorkerOptions,
+      ),
     ];
   }
   static inject = [
     "upsertIdentityUseCase",
     "indexCommitUseCase",
     "resolveDidUseCase",
+    "temp__cleanupDatabaseUseCase",
   ] as const;
 
   async start() {

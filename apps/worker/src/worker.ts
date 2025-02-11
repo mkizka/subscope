@@ -12,6 +12,7 @@ import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
 import { IndexPostService } from "./application/service/index-post-service.js";
 import { IndexProfileService } from "./application/service/index-profile-service.js";
+import { Temp__CleanupDatabaseUseCase } from "./application/temp__cleanup-database-usecase.js";
 import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { DidResolver } from "./infrastructure/did-resolver.js";
@@ -49,6 +50,7 @@ createInjector()
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
+  .provideClass("temp__cleanupDatabaseUseCase", Temp__CleanupDatabaseUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(WorkerServer)
