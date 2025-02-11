@@ -3,6 +3,7 @@ import { createInjector } from "typed-inject";
 
 import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
+import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
 import { HandlesToDidsRepository } from "./infrastructure/handles-to-dids-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
@@ -26,6 +27,7 @@ createInjector()
   .provideClass("recordRepository", RecordRepository)
   // application
   .provideClass("profileViewService", ProfileViewService)
+  .provideClass("postViewService", PostViewService)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getProfile", GetProfile)
