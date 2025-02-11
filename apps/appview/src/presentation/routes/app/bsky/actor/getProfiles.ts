@@ -2,13 +2,11 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@dawn/client";
 import { isHandle } from "@dawn/common/utils";
 
-import type { FindProfilesDetailedUseCase } from "../../../../../application/find-profiles-detailed-use-case.js";
+import type { GetProfilesUseCase } from "../../../../../application/get-profiles-use-case.js";
 
 export class GetProfiles {
-  constructor(
-    private findProfilesDetailedUseCase: FindProfilesDetailedUseCase,
-  ) {}
-  static inject = ["findProfilesDetailedUseCase"] as const;
+  constructor(private getProfilesUseCase: GetProfilesUseCase) {}
+  static inject = ["getProfilesUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.actor.getProfiles({
@@ -16,8 +14,7 @@ export class GetProfiles {
         const handleOrDids = params.actors.filter(
           (actor) => isDid(actor) || isHandle(actor),
         );
-        const profiles =
-          await this.findProfilesDetailedUseCase.execute(handleOrDids);
+        const profiles = await this.getProfilesUseCase.execute(handleOrDids);
         return {
           encoding: "application/json",
           body: { profiles },

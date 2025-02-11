@@ -3,13 +3,11 @@ import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { Server } from "@dawn/client";
 import { isHandle } from "@dawn/common/utils";
 
-import type { FindProfilesDetailedUseCase } from "../../../../../application/find-profiles-detailed-use-case.js";
+import type { GetProfilesUseCase } from "../../../../../application/get-profiles-use-case.js";
 
 export class GetProfile {
-  constructor(
-    private findProfilesDetailedUseCase: FindProfilesDetailedUseCase,
-  ) {}
-  static inject = ["findProfilesDetailedUseCase"] as const;
+  constructor(private getProfilesUseCase: GetProfilesUseCase) {}
+  static inject = ["getProfilesUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.actor.getProfile({
@@ -17,9 +15,7 @@ export class GetProfile {
         if (!isDid(params.actor) && !isHandle(params.actor)) {
           throw new InvalidRequestError("Invalid actor");
         }
-        const [profile] = await this.findProfilesDetailedUseCase.execute([
-          params.actor,
-        ]);
+        const [profile] = await this.getProfilesUseCase.execute([params.actor]);
         if (!profile) {
           throw new InvalidRequestError("Profile not found");
         }

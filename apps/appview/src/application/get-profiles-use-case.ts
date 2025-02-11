@@ -3,7 +3,7 @@ import { type Handle } from "@dawn/common/utils";
 
 import type { ProfileViewService } from "./service/profile-view-service.js";
 
-export class FindProfilesDetailedUseCase {
+export class GetProfilesUseCase {
   constructor(private readonly profileViewService: ProfileViewService) {}
   static inject = ["profileViewService"] as const;
 
