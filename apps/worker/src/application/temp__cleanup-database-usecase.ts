@@ -1,15 +1,16 @@
-import type { DatabaseClient } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import type { ITransactionManager } from "@dawn/common/domain";
 
 export class Temp__CleanupDatabaseUseCase {
-  constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
+  constructor(private readonly transactionManager: ITransactionManager) {}
+  static inject = ["transactionManager"] as const;
 
   async execute() {
-    await this.db.delete(schema.blobs);
-    await this.db.delete(schema.profiles);
-    await this.db.delete(schema.posts);
-    await this.db.delete(schema.records);
-    await this.db.delete(schema.actors);
+    await this.transactionManager.transaction(async (ctx) => {
+      await ctx.db.execute("TRUNCATE TABLE blobs;");
+      await ctx.db.execute("TRUNCATE TABLE posts;");
+      await ctx.db.execute("TRUNCATE TABLE profiles;");
+      await ctx.db.execute("TRUNCATE TABLE records;");
+      await ctx.db.execute("TRUNCATE TABLE actors;");
+    });
   }
 }
