@@ -1,4 +1,5 @@
 export * from "./lib/domain/actor/actor.js";
+export * from "./lib/domain/interfaces/did-resolver.js";
 export * from "./lib/domain/interfaces/job-queue.js";
 export * from "./lib/domain/interfaces/logger.js";
 export * from "./lib/domain/interfaces/metric.js";

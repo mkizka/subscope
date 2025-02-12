@@ -1,5 +1,6 @@
 import {
   databaseFactory,
+  DidResolver,
   JobQueue,
   LoggerManager,
   MetricReporter,
@@ -15,7 +16,7 @@ import { IndexProfileService } from "./application/service/index-profile-service
 import { Temp__CleanupDatabaseUseCase } from "./application/temp__cleanup-database-usecase.js";
 import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
-import { DidResolver } from "./infrastructure/did-resolver.js";
+
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
@@ -30,6 +31,7 @@ createInjector()
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("logLevel", env.LOG_LEVEL)
   .provideValue("redisUrl", env.REDIS_URL)
+  .provideValue("plcUrl", env.PLC_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("db", databaseFactory)
