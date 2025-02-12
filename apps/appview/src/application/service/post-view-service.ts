@@ -24,14 +24,17 @@ export class PostViewService {
     const records = await this.recordRepository.findMany(uris);
     const dids = records.map((record) => asDid(record.uri.host));
     const profiles = await this.profileViewService.findProfileViewBasic(dids);
-    return records.map((record) => {
+    const posts = records.map((record) => {
       const author = profiles.find(
         (profile) => profile.did === record.uri.host,
       );
+      if (!author) {
+        return null;
+      }
       return {
         uri: record.uri.toString(),
         cid: record.cid,
-        author: required(author),
+        author,
         record: asObject(record.json),
         // replyCount?: number
         // repostCount?: number
@@ -43,5 +46,6 @@ export class PostViewService {
         // threadgate?: ThreadgateView
       };
     });
+    return posts.filter((post) => post !== null);
   }
 }
