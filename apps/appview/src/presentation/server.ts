@@ -1,5 +1,6 @@
 import type { ILoggerManager, Logger } from "@dawn/common/domain";
 import express from "express";
+import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";
 
 import { env } from "../shared/env.js";
@@ -19,6 +20,7 @@ export class AppviewServer {
   ) {
     this.logger = loggerManager.createLogger("AppviewServer");
     this.app = express();
+    this.app.use(promBundle({ includeMethod: true }));
     this.app.use(
       pinoHttp({
         logger: this.logger,
