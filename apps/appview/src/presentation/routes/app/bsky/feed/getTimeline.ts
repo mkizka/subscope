@@ -1,14 +1,21 @@
 import type { Server } from "@dawn/client";
 
 import type { GetTimelineUseCase } from "../../../../../application/get-timeline-use-case.js";
+import type { AuthVerifierService } from "../../../../../application/service/auth-verifier-service.js";
 
 export class GetTimeline {
-  constructor(private readonly getTimelineUseCase: GetTimelineUseCase) {}
-  static inject = ["getTimelineUseCase"] as const;
+  constructor(
+    private readonly authVerifierService: AuthVerifierService,
+    private readonly getTimelineUseCase: GetTimelineUseCase,
+  ) {}
+  static inject = ["authVerifierService", "getTimelineUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.feed.getTimeline({
-      handler: async () => {
+      auth: (ctx) => this.authVerifierService.loginRequired(ctx.req),
+      handler: async ({ auth }) => {
+        // eslint-disable-next-line no-console
+        console.log("auth", auth);
         const timeline = await this.getTimelineUseCase.execute();
         return {
           encoding: "application/json",

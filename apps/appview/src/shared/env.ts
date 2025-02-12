@@ -19,6 +19,19 @@ const schema = z.object({
     prod: z.string().url(),
     dev: z.string().url().default("mysql://root:password@localhost:3306/dev"),
   }),
+  PLC_URL: z
+    .string()
+    .url()
+    .default(
+      match({
+        prod: "https://plc.directory",
+        dev: "http://localhost:2582",
+      }),
+    ),
+  REDIS_URL: match({
+    prod: z.string().url(),
+    dev: z.string().url().default("redis://localhost:6379"),
+  }),
 });
 
 export const env = (() => {
