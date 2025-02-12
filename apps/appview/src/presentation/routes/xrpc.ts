@@ -6,12 +6,16 @@ import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 
 export class XRPCRoutes {
+  private readonly handlers;
+
   constructor(
-    private readonly getProfile: GetProfile,
-    private readonly getProfiles: GetProfiles,
-    private readonly getPosts: GetPosts,
-    private readonly getTimeline: GetTimeline,
-  ) {}
+    getProfile: GetProfile,
+    getProfiles: GetProfiles,
+    getPosts: GetPosts,
+    getTimeline: GetTimeline,
+  ) {
+    this.handlers = [getProfile, getProfiles, getPosts, getTimeline];
+  }
   static inject = [
     "getProfile",
     "getProfiles",
@@ -21,10 +25,9 @@ export class XRPCRoutes {
 
   create() {
     const server = createServer();
-    this.getProfile.handle(server);
-    this.getProfiles.handle(server);
-    this.getPosts.handle(server);
-    this.getTimeline.handle(server);
+    for (const handler of this.handlers) {
+      handler.handle(server);
+    }
     return server.xrpc.routes;
   }
 }
