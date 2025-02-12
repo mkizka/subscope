@@ -35,7 +35,7 @@ export class JobQueue implements IJobQueue {
     this.queues.temp__cleanupDatabase
       .upsertJobScheduler(
         "temp",
-        { pattern: "0 0 * * *" },
+        { pattern: "0 15 * * *" }, // 日本時間0時
         { name: "cleanupDatabase" },
       )
       // eslint-disable-next-line no-console
