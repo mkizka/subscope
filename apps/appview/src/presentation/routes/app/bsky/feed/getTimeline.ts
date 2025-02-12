@@ -4,7 +4,7 @@ import type { GetTimelineUseCase } from "../../../../../application/get-timeline
 
 export class GetTimeline {
   constructor(private readonly getTimelineUseCase: GetTimelineUseCase) {}
-  static inject = ["findTimelineUseCase"] as const;
+  static inject = ["getTimelineUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.feed.getTimeline({

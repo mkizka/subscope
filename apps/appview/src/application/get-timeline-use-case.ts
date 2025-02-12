@@ -9,7 +9,7 @@ export class GetTimelineUseCase {
     private readonly db: DatabaseClient,
     private readonly postViewService: PostViewService,
   ) {}
-  static inject = ["db"] as const;
+  static inject = ["db", "postViewService"] as const;
 
   async execute(): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const samplePosts = await this.db.query.posts.findMany({
