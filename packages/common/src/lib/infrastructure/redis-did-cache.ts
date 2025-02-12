@@ -3,8 +3,6 @@ import type { IMetricReporter } from "@dawn/common/domain";
 import KeyvRedis from "@keyv/redis";
 import Keyv from "keyv";
 
-import { env } from "../shared/env.js";
-
 type CacheVal = {
   doc: DidDocument;
   updatedAt: number;
@@ -15,15 +13,18 @@ const TTL = 30 * 24 * 60 * 60 * 1000;
 export class RedisDidCache implements DidCache {
   private readonly cache: Keyv<CacheVal>;
 
-  constructor(private readonly metricReporter: IMetricReporter) {
+  constructor(
+    redisUrl: string,
+    private readonly metricReporter: IMetricReporter,
+  ) {
     this.cache = new Keyv({
       namespace: "did-cache",
       // https://github.com/jaredwray/keyv/issues/1255
       useKeyPrefix: false,
-      store: new KeyvRedis<CacheVal>(env.REDIS_URL),
+      store: new KeyvRedis<CacheVal>(redisUrl),
     });
   }
-  static inject = ["metricReporter"] as const;
+  static inject = ["redisUrl", "metricReporter"] as const;
 
   async cacheDid(did: string, doc: DidDocument): Promise<void> {
     await this.cache.set(did, { doc, updatedAt: Date.now() }, TTL);
