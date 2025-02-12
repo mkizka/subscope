@@ -21,7 +21,7 @@ import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
-import { XRPCRoutes } from "./presentation/routes/xrpc.js";
+import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
@@ -53,6 +53,6 @@ createInjector()
   .provideClass("getProfiles", GetProfiles)
   .provideClass("getPosts", GetPosts)
   .provideClass("getTimeline", GetTimeline)
-  .provideClass("xrpcRoutes", XRPCRoutes)
+  .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();

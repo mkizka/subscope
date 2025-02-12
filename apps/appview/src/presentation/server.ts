@@ -6,7 +6,7 @@ import { pinoHttp } from "pino-http";
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
 import { wellKnownRouter } from "./routes/well-known.js";
-import type { XRPCRoutes } from "./routes/xrpc.js";
+import type { XRPCRouter } from "./routes/xrpc.js";
 
 const noop = () => {};
 
@@ -15,7 +15,7 @@ export class AppviewServer {
   private readonly logger: Logger;
 
   constructor(
-    private readonly xrpcRoutes: XRPCRoutes,
+    private readonly xrpcRouter: XRPCRouter,
     loggerManager: ILoggerManager,
   ) {
     this.logger = loggerManager.createLogger("AppviewServer");
@@ -34,11 +34,11 @@ export class AppviewServer {
         customErrorObject: env.NODE_ENV === "development" ? noop : undefined,
       }),
     );
-    this.app.use(this.xrpcRoutes.create());
+    this.app.use(this.xrpcRouter.create());
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
   }
-  static inject = ["xrpcRoutes", "loggerManager"] as const;
+  static inject = ["xrpcRouter", "loggerManager"] as const;
 
   start() {
     this.app.listen(env.PORT, () => {

@@ -5,7 +5,7 @@ import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 
-export class XRPCRoutes {
+export class XRPCRouter {
   private readonly handlers;
 
   constructor(
@@ -28,6 +28,6 @@ export class XRPCRoutes {
     for (const handler of this.handlers) {
       handler.handle(server);
     }
-    return server.xrpc.routes;
+    return server.xrpc.router;
   }
 }
