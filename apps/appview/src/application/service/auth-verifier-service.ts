@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 
-import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
+import { parseReqNsid, ResponseType } from "@atproto/xrpc-server";
 
 import type { ITokenVerifier } from "../interfaces/token-verifier.js";
 
@@ -21,23 +21,38 @@ export class AuthVerifierService {
     const authorization =
       request.headers.authorization ?? request.headers.Authorization;
     if (typeof authorization !== "string") {
-      throw new AuthRequiredError("Bad authorization header");
+      return {
+        status: ResponseType.AuthRequired,
+        message: "Bad authorization header",
+      };
     }
     const splitted = authorization.split(" ");
     if (splitted.length !== 2) {
-      throw new AuthRequiredError("Bad authorization header");
+      return {
+        status: ResponseType.AuthRequired,
+        message: "Bad authorization header",
+      };
     }
     const [type, token] = splitted;
     if (!type || type.toLowerCase() !== "bearer") {
-      throw new AuthRequiredError("Bad authorization type");
+      return {
+        status: ResponseType.AuthRequired,
+        message: "Bad authorization type",
+      };
     }
     if (!token) {
-      throw new AuthRequiredError("No token provided");
+      return {
+        status: ResponseType.AuthRequired,
+        message: "No token provided",
+      };
     }
     const nsid = parseReqNsid({ url: request.path } as IncomingMessage);
     const credentials = await this.tokenVerifier.verify({ token, nsid });
     if (!credentials) {
-      throw new AuthRequiredError("Invalid token");
+      return {
+        status: ResponseType.AuthRequired,
+        message: "Invalid token",
+      };
     }
     return {
       credentials,
