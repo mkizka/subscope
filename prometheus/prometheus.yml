@@ -2,6 +2,11 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
+  - job_name: appview
+    static_configs:
+      - targets:
+          - dawn-appview-ubm0d9:3001
+
   - job_name: ingester
     static_configs:
       - targets:
