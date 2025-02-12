@@ -1,7 +1,16 @@
 diff --git a/dist/server.js b/dist/server.js
-index b4389a30a357c902f6d38e7e503ee473d668fea2..b07eb2658632e3ffb82149d037167f1504560c6f 100644
+index b4389a30a357c902f6d38e7e503ee473d668fea2..59351c1b333c5018e9b9099e7b1ccbacaa0fd69b 100644
 --- a/dist/server.js
 +++ b/dist/server.js
+@@ -101,7 +101,7 @@ class Server {
+             this.addLexicons(lexicons);
+         }
+         this.router.use(this.routes);
+-        this.router.use('/xrpc/:methodId', this.catchall.bind(this));
++        // this.router.use('/xrpc/:methodId', this.catchall.bind(this));
+         this.router.use(createErrorMiddleware(opts));
+         this.router.once('mount', (app) => {
+             this.enableStreamingOnListen(app);
 @@ -188,6 +188,7 @@ class Server {
          this.routes[verb](`/xrpc/${nsid}`, ...middleware, this.createHandler(nsid, def, config));
      }
@@ -10,7 +19,15 @@ index b4389a30a357c902f6d38e7e503ee473d668fea2..b07eb2658632e3ffb82149d037167f15
          if (this.globalRateLimiters) {
              try {
                  const rlRes = await (0, rate_limiter_1.consumeMany)({
-@@ -465,6 +466,7 @@ function createLocalsMiddleware(nsid) {
+@@ -235,6 +236,7 @@ class Server {
+         const consumeRateLimit = (reqCtx) => (0, rate_limiter_1.consumeMany)(reqCtx, rls.map((rl) => (ctx) => rl.consume(ctx)));
+         const resetRateLimit = (reqCtx) => (0, rate_limiter_1.resetMany)(reqCtx, rls.map((rl) => (ctx) => rl.reset(ctx)));
+         return async function (req, res, next) {
++            console.log('called createHandler')
+             try {
+                 // validate request
+                 let params = (0, util_1.decodeQueryParams)(def, req.query);
+@@ -465,6 +467,7 @@ function createLocalsMiddleware(nsid) {
  }
  function createAuthMiddleware(verifier) {
      return async function (req, res, next) {
@@ -18,7 +35,7 @@ index b4389a30a357c902f6d38e7e503ee473d668fea2..b07eb2658632e3ffb82149d037167f15
          try {
              const result = await verifier({ req, res });
              if ((0, types_1.isHandlerError)(result)) {
-@@ -475,12 +477,14 @@ function createAuthMiddleware(verifier) {
+@@ -475,12 +478,14 @@ function createAuthMiddleware(verifier) {
              next();
          }
          catch (err) {
@@ -33,7 +50,7 @@ index b4389a30a357c902f6d38e7e503ee473d668fea2..b07eb2658632e3ffb82149d037167f15
          const locals = req[kRequestLocals];
          const methodSuffix = locals ? ` method ${locals.nsid}` : '';
          const xrpcError = errorParser(err);
-@@ -497,8 +501,10 @@ function createErrorMiddleware({ errorParser = (err) => types_1.XRPCError.fromEr
+@@ -497,8 +502,10 @@ function createErrorMiddleware({ errorParser = (err) => types_1.XRPCError.fromEr
              }, `error in xrpc${methodSuffix}`);
          }
          if (res.headersSent) {
