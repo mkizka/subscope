@@ -1,0 +1,46 @@
+diff --git a/dist/server.js b/dist/server.js
+index b4389a30a357c902f6d38e7e503ee473d668fea2..b07eb2658632e3ffb82149d037167f1504560c6f 100644
+--- a/dist/server.js
++++ b/dist/server.js
+@@ -188,6 +188,7 @@ class Server {
+         this.routes[verb](`/xrpc/${nsid}`, ...middleware, this.createHandler(nsid, def, config));
+     }
+     async catchall(req, res, next) {
++        console.log('called catchall')
+         if (this.globalRateLimiters) {
+             try {
+                 const rlRes = await (0, rate_limiter_1.consumeMany)({
+@@ -465,6 +466,7 @@ function createLocalsMiddleware(nsid) {
+ }
+ function createAuthMiddleware(verifier) {
+     return async function (req, res, next) {
++        console.log('called createAuthMiddleware')
+         try {
+             const result = await verifier({ req, res });
+             if ((0, types_1.isHandlerError)(result)) {
+@@ -475,12 +477,14 @@ function createAuthMiddleware(verifier) {
+             next();
+         }
+         catch (err) {
++            console.log('called createAuthMiddleware catch')
+             next(err);
+         }
+     };
+ }
+ function createErrorMiddleware({ errorParser = (err) => types_1.XRPCError.fromError(err), }) {
+     return (err, req, res, next) => {
++        console.log('called createErrorMiddleware')
+         const locals = req[kRequestLocals];
+         const methodSuffix = locals ? ` method ${locals.nsid}` : '';
+         const xrpcError = errorParser(err);
+@@ -497,8 +501,10 @@ function createErrorMiddleware({ errorParser = (err) => types_1.XRPCError.fromEr
+             }, `error in xrpc${methodSuffix}`);
+         }
+         if (res.headersSent) {
++            console.log('called createErrorMiddleware res.headersSent')
+             return next(err);
+         }
++        console.log('called createErrorMiddleware res.status')
+         return res.status(xrpcError.type).json(xrpcError.payload);
+     };
+ }

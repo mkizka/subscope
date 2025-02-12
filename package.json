@@ -31,6 +31,11 @@
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"
   },
+  "pnpm": {
+    "patchedDependencies": {
+      "@atproto/xrpc-server": "patches/@atproto__xrpc-server.patch"
+    }
+  },
   "prettier": {
     "plugins": [
       "prettier-plugin-pkg"
