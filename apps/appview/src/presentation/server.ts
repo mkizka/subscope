@@ -37,6 +37,13 @@ export class AppviewServer {
     this.app.use(this.xrpcRoutes.create());
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
+    // @ts-expect-error
+    this.app.use((err, req, res, next) => {
+      // eslint-disable-next-line no-console
+      console.log("err catched", err);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      res.status(500).send("Internal server error!!!");
+    });
   }
   static inject = ["xrpcRoutes", "loggerManager"] as const;
 
