@@ -24,15 +24,12 @@ export class IndexActorService {
     did: Did;
     handle?: Handle;
   }) {
-    const exists = await this.actorRepository.existsWithLock({ ctx, did });
-    if (!exists) {
-      await this.actorRepository.create({
-        ctx,
-        actor: new Actor({ did, handle }),
-      });
-      if (!handle) {
-        // await this.jobQueue.add("resolveDid", did);
-      }
+    await this.actorRepository.create({
+      ctx,
+      actor: new Actor({ did, handle }),
+    });
+    if (!handle) {
+      // await this.jobQueue.add("resolveDid", did);
     }
   }
 

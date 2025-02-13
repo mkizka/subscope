@@ -6,15 +6,6 @@ import { eq } from "drizzle-orm";
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
-  async existsWithLock({ ctx, did }: { ctx: TransactionContext; did: string }) {
-    const rows = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did))
-      .for("update", { skipLocked: true });
-    return rows.length > 0;
-  }
-
   async create({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     await ctx.db
       .insert(schema.actors)
