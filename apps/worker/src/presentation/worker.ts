@@ -40,7 +40,10 @@ export class SyncWorker {
       new Worker<CommitEvent<SupportedCollection>>(
         "commit",
         async (job) => {
-          const command = indexCommitCommandFactory(job.data);
+          const command = indexCommitCommandFactory({
+            event: job.data,
+            log: job.log,
+          });
           await indexCommitUseCase.execute(command);
         },
         {

@@ -37,15 +37,15 @@ export class IndexCommitUseCase {
 
   async execute(command: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      await this.indexActorService.upsert({ ctx, did: command.did });
-      const indexService = this.services[command.collection];
-      switch (command.operation) {
+      await this.indexActorService.upsert({ ctx, did: command.commit.did });
+      const indexService = this.services[command.commit.collection];
+      switch (command.commit.operation) {
         case "create":
         case "update": {
           const record = new Record({
-            uri: command.uri,
-            cid: command.cid,
-            json: command.record,
+            uri: command.commit.uri,
+            cid: command.commit.cid,
+            json: command.commit.record,
           });
           await this.recordRepository.upsert({ ctx, record });
           await indexService.upsert({ ctx, record });
@@ -53,7 +53,7 @@ export class IndexCommitUseCase {
         }
         case "delete": {
           // Related data is also deleted by cascade
-          await this.recordRepository.delete({ ctx, uri: command.uri });
+          await this.recordRepository.delete({ ctx, uri: command.commit.uri });
           break;
         }
       }
