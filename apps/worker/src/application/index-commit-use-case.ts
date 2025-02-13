@@ -37,7 +37,10 @@ export class IndexCommitUseCase {
 
   async execute(command: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      await this.indexActorService.upsert({ ctx, did: command.commit.did });
+      await this.indexActorService.createIfNotExists({
+        ctx,
+        did: command.commit.did,
+      });
       const indexService = this.services[command.commit.collection];
       switch (command.commit.operation) {
         case "create":
