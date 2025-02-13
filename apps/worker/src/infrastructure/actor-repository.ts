@@ -11,7 +11,7 @@ export class ActorRepository implements IActorRepository {
       .select()
       .from(schema.actors)
       .where(eq(schema.actors.did, did))
-      .for("update");
+      .for("update", { skipLocked: true });
     return rows.length > 0;
   }
 
