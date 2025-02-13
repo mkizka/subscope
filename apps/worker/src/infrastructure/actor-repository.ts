@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
-  async exists({ ctx, did }: { ctx: TransactionContext; did: string }) {
+  async existsWithLock({ ctx, did }: { ctx: TransactionContext; did: string }) {
     const rows = await ctx.db
       .select()
       .from(schema.actors)

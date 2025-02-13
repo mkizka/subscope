@@ -1,7 +1,7 @@
 import type { Actor, TransactionContext } from "@dawn/common/domain";
 
 export interface IActorRepository {
-  exists: (params: {
+  existsWithLock: (params: {
     ctx: TransactionContext;
     did: string;
   }) => Promise<boolean>;

@@ -24,7 +24,7 @@ export class IndexActorService {
     did: Did;
     handle?: Handle;
   }) {
-    const exists = await this.actorRepository.exists({ ctx, did });
+    const exists = await this.actorRepository.existsWithLock({ ctx, did });
     if (!exists) {
       await this.actorRepository.create({
         ctx,
