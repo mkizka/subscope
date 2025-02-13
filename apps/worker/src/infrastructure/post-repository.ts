@@ -15,7 +15,8 @@ export class PostRepository implements IPostRepository {
         langs: post.langs,
         createdAt: post.createdAt,
       })
-      .onDuplicateKeyUpdate({
+      .onConflictDoUpdate({
+        target: schema.posts.uri,
         set: {
           text: post.text,
           langs: post.langs,

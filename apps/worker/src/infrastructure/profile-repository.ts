@@ -20,7 +20,8 @@ export class ProfileRepository implements IProfileRepository {
           mimeType: profile.avatar.mimeType,
           size: profile.avatar.size,
         })
-        .onDuplicateKeyUpdate({
+        .onConflictDoUpdate({
+          target: schema.blobs.cid,
           set: {
             mimeType: profile.avatar.mimeType,
             size: profile.avatar.size,
@@ -38,7 +39,8 @@ export class ProfileRepository implements IProfileRepository {
         displayName: profile.displayName,
         createdAt: profile.createdAt,
       })
-      .onDuplicateKeyUpdate({
+      .onConflictDoUpdate({
+        target: schema.profiles.uri,
         set: {
           avatarCid: profile.avatar?.cid,
           description: profile.description,

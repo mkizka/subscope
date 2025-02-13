@@ -1,6 +1,6 @@
 import { schema } from "@dawn/db";
 import type { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle } from "drizzle-orm/node-postgres";
 
 import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 
@@ -22,7 +22,6 @@ export const databaseFactory = (
   return drizzle({
     connection: databaseUrl,
     schema,
-    mode: "default",
     casing: "snake_case",
     logger: new DrizzleLogger(),
   });

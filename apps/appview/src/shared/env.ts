@@ -17,7 +17,10 @@ const schema = z.object({
       : z.string().default("appview.localhost"),
   DATABASE_URL: match({
     prod: z.string().url(),
-    dev: z.string().url().default("mysql://root:password@localhost:3306/dev"),
+    dev: z
+      .string()
+      .url()
+      .default("postgresql://postgres:password@localhost:5432/postgres"),
   }),
   PLC_URL: z
     .string()

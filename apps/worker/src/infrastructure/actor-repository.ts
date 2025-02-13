@@ -16,10 +16,13 @@ export class ActorRepository implements IActorRepository {
   }
 
   async create({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
-    await ctx.db.insert(schema.actors).values({
-      did: actor.did,
-      handle: actor.handle,
-    });
+    await ctx.db
+      .insert(schema.actors)
+      .values({
+        did: actor.did,
+        handle: actor.handle,
+      })
+      .onConflictDoNothing();
   }
 
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
@@ -29,11 +32,9 @@ export class ActorRepository implements IActorRepository {
         did: actor.did,
         handle: actor.handle,
       })
-      .onDuplicateKeyUpdate({
-        set: {
-          // handleがない時は既存の値を保持する
-          handle: actor.handle ?? undefined,
-        },
+      .onConflictDoUpdate({
+        target: schema.actors.did,
+        set: { handle: actor.handle },
       });
   }
 }

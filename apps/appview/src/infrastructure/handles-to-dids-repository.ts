@@ -3,7 +3,7 @@ import { asDid } from "@atproto/did";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { asHandle, type Handle } from "@dawn/common/utils";
 import { schema } from "@dawn/db";
-import { inArray } from "drizzle-orm/mysql-core/expressions";
+import { inArray } from "drizzle-orm";
 
 import type { IHandlesToDidsRepository } from "../application/interfaces/handles-to-dids-repository.js";
 

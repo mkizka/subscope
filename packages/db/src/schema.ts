@@ -1,37 +1,36 @@
-// 参考： https://github.com/bluesky-social/atproto/tree/main/packages/bsky/src/data-plane/server/db/tables
 import {
-  mysqlTable,
+  pgTable,
   varchar,
   text,
-  int,
+  integer,
   timestamp,
   index,
-  json,
-} from "drizzle-orm/mysql-core";
+  jsonb,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const actors = mysqlTable(
+export const actors = pgTable(
   "actors",
   {
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
     indexedAt: timestamp().defaultNow(),
-    updatedAt: timestamp().onUpdateNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
   },
   (table) => [index("handle_idx").on(table.handle)],
 );
 
-export const records = mysqlTable("records", {
+export const records = pgTable("records", {
   uri: varchar({ length: 256 }).primaryKey(),
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
     .references(() => actors.did),
-  json: json().notNull(),
+  json: jsonb().notNull(),
   indexedAt: timestamp().defaultNow(),
 });
 
-export const profiles = mysqlTable("profiles", {
+export const profiles = pgTable("profiles", {
   uri: varchar({ length: 256 })
     .primaryKey()
     .references(() => records.uri, { onDelete: "cascade" }),
@@ -44,10 +43,10 @@ export const profiles = mysqlTable("profiles", {
   displayName: varchar({ length: 256 }),
   createdAt: timestamp(),
   indexedAt: timestamp().defaultNow(),
-  updatedAt: timestamp().onUpdateNow(),
+  updatedAt: timestamp().$onUpdate(() => new Date()),
 });
 
-export const posts = mysqlTable("posts", {
+export const posts = pgTable("posts", {
   uri: varchar({ length: 256 })
     .primaryKey()
     .references(() => records.uri, { onDelete: "cascade" }),
@@ -56,18 +55,18 @@ export const posts = mysqlTable("posts", {
     .notNull()
     .references(() => actors.did),
   text: text().notNull(),
-  langs: json().$type<string[]>(),
+  langs: jsonb().$type<string[]>(),
   createdAt: timestamp().notNull(),
   indexedAt: timestamp().defaultNow(),
-  updatedAt: timestamp().onUpdateNow(),
+  updatedAt: timestamp().$onUpdate(() => new Date()),
 });
 
-export const blobs = mysqlTable("blobs", {
+export const blobs = pgTable("blobs", {
   cid: varchar({ length: 256 }).primaryKey(),
   mimeType: varchar({ length: 256 }).notNull(),
-  size: int().notNull(),
+  size: integer().notNull(),
   indexedAt: timestamp().defaultNow(),
-  updatedAt: timestamp().onUpdateNow(),
+  updatedAt: timestamp().$onUpdate(() => new Date()),
 });
 
 export const actorsRelations = relations(actors, ({ one, many }) => ({

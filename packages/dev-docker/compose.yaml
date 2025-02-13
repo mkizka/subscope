@@ -3,14 +3,13 @@ volumes:
 
 services:
   db:
-    image: mysql:9
+    image: postgres:16-alpine
     ports:
-      - 3306:3306
+      - 5432:5432
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
     environment:
-      - MYSQL_DATABASE=dev
-      - MYSQL_ROOT_PASSWORD=password
+      - POSTGRES_PASSWORD=password
   redis:
     image: redis:7
     ports:

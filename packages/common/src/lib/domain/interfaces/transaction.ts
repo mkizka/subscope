@@ -1,7 +1,7 @@
 import type { schema } from "@dawn/db";
-import type { MySql2Database } from "drizzle-orm/mysql2";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
-export type DatabaseClient = MySql2Database<typeof schema>;
+export type DatabaseClient = NodePgDatabase<typeof schema>;
 
 export type TransactionContext = {
   db: DatabaseClient;

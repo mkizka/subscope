@@ -15,7 +15,8 @@ export class RecordRepository implements IRecordRepository {
         actorDid: record.actorDid,
         json: record.json,
       })
-      .onDuplicateKeyUpdate({
+      .onConflictDoUpdate({
+        target: schema.records.uri,
         set: {
           cid: record.cid,
           actorDid: record.actorDid,
