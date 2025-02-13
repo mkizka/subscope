@@ -24,14 +24,15 @@ export class IndexActorService {
     did: Did;
     handle?: Handle;
   }) {
-    try {
+    const exists = await this.actorRepository.exists({ ctx, did });
+    if (!exists) {
       await this.actorRepository.create({
         ctx,
         actor: new Actor({ did, handle }),
       });
-    } catch {}
-    if (!handle) {
-      // await this.jobQueue.add("resolveDid", did);
+      if (!handle) {
+        // await this.jobQueue.add("resolveDid", did);
+      }
     }
   }
 
