@@ -24,7 +24,8 @@ export class ActorRepository implements IActorRepository {
       })
       .onDuplicateKeyUpdate({
         set: {
-          handle: actor.handle,
+          // handleがない時は既存の値を保持する
+          handle: actor.handle ?? undefined,
         },
       });
   }
