@@ -23,6 +23,7 @@
     "bullmq": "5.40.2",
     "drizzle-orm": "0.39.2",
     "keyv": "5.2.3",
+    "multiformats": "13.3.1",
     "pino": "9.6.0",
     "prom-client": "15.1.3"
   },
