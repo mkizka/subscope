@@ -4,5 +4,5 @@ export interface IDidResolver {
     signingKey: string;
     handle: string;
     pds: string;
-  } | null>;
+  }>;
 }

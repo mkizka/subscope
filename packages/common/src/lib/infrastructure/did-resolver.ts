@@ -32,7 +32,7 @@ export class DidResolver implements IDidResolver {
     } catch (error) {
       this.metricReporter.increment("did_resolve_error_total");
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
-      return null;
+      throw error;
     }
   }
 }
