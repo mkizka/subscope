@@ -11,6 +11,7 @@ import { createInjector } from "typed-inject";
 
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
+import { FetchProfileService } from "./application/service/fetch-profile-service.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
 import { IndexPostService } from "./application/service/index-post-service.js";
 import { IndexProfileService } from "./application/service/index-profile-service.js";
@@ -18,6 +19,7 @@ import { Temp__CleanupDatabaseUseCase } from "./application/temp__cleanup-databa
 import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
+import { ProfileFetcher } from "./infrastructure/profile-fetcher.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { WorkerServer } from "./presentation/server.js";
@@ -39,6 +41,7 @@ createInjector()
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
   .provideClass("jobQueue", JobQueue)
+  .provideClass("profileFetcher", ProfileFetcher)
   .provideClass("actorRepository", ActorRepository)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
@@ -47,6 +50,7 @@ createInjector()
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)
+  .provideClass("fetchProfileService", FetchProfileService)
   // application(use-case)
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
