@@ -42,7 +42,7 @@ export class SyncWorker {
         async (job) => {
           const command = indexCommitCommandFactory({
             event: job.data,
-            log: job.log,
+            log: (message: string) => job.log(message),
           });
           await indexCommitUseCase.execute(command);
         },

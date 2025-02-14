@@ -1,7 +1,6 @@
 import type { TransactionContext } from "@dawn/common/domain";
 import type { Actor } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
-import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 
