@@ -4,7 +4,6 @@ import type { SupportedCollection } from "@dawn/common/utils";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import type { IIndexColectionService } from "./interfaces/index-collection-service.js";
 import type { IRecordRepository } from "./interfaces/record-repository.js";
-import type { FetchProfileService } from "./service/fetch-profile-service.js";
 import type { IndexActorService } from "./service/index-actor-service.js";
 import type { IndexPostService } from "./service/index-post-service.js";
 import type { IndexProfileService } from "./service/index-profile-service.js";
@@ -20,7 +19,6 @@ export class IndexCommitUseCase {
     private readonly transactionManager: ITransactionManager,
     private readonly recordRepository: IRecordRepository,
     private readonly indexActorService: IndexActorService,
-    private readonly fetchProfileService: FetchProfileService,
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
   ) {
@@ -33,26 +31,16 @@ export class IndexCommitUseCase {
     "transactionManager",
     "recordRepository",
     "indexActorService",
-    "fetchProfileService",
     "indexPostService",
     "indexProfileService",
   ] as const;
 
   async execute(command: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      // 1. アクターがなければ作成
       await this.indexActorService.createIfNotExists({
         ctx,
         did: command.commit.did,
       });
-
-      // 2. プロフィールがなければ作成
-      await this.fetchProfileService.fetchAndCreateIfNotExists({
-        ctx,
-        did: command.commit.did,
-      });
-
-      // 3. コレクションごとにインデックス
       const indexService = this.services[command.commit.collection];
       switch (command.commit.operation) {
         case "create":

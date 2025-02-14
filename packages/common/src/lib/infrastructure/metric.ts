@@ -37,14 +37,6 @@ const metrics = {
     labelNames: ["collection"],
     help: "Total number of commit events processed by the ingester",
   }),
-  fetch_profile_total: new client.Counter({
-    name: "fetch_profile_total",
-    help: "Total number of profile fetches from PDS",
-  }),
-  fetch_profile_error_total: new client.Counter({
-    name: "fetch_profile_error_total",
-    help: "Total number of profile fetch errors from PDS",
-  }),
 } satisfies {
   [key in MetricKey]: client.Counter;
 };
