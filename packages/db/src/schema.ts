@@ -1,3 +1,4 @@
+// 参考： https://github.com/bluesky-social/atproto/tree/main/packages/bsky/src/data-plane/server/db/tables
 import {
   pgTable,
   varchar,
