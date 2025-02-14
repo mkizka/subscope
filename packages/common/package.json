@@ -32,7 +32,8 @@
     "@skyware/jetstream": "0.2.2",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.0",
-    "eslint": "9.20.0"
+    "eslint": "9.20.0",
+    "typescript": "5.7.3"
   },
   "sideEffects": false
 }
