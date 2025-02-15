@@ -6,7 +6,9 @@
       "outputs": ["dist/**", "src/generated/**"]
     },
     "start": {},
-    "typecheck": {},
+    "typecheck": {
+      "dependsOn": ["build"]
+    },
     "lint": {},
     "dev": {
       "cache": false
