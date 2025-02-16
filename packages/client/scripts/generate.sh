@@ -9,5 +9,6 @@ cp -r $ATPROTO_DIR/com $LEXICONS_DIR
 
 LEXICONS=$(find $LEXICONS_DIR -name '*.json' -type f)
 echo 'Starting client code generation...'
-echo y | pnpm lex gen-api ./src/generated/api $LEXICONS
-echo y | pnpm lex gen-server ./src/generated/server $LEXICONS
+yes | pnpm lex gen-api ./src/generated/api $LEXICONS &
+yes | pnpm lex gen-server ./src/generated/server $LEXICONS &
+wait
