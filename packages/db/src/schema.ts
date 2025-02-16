@@ -47,20 +47,25 @@ export const profiles = pgTable("profiles", {
   updatedAt: timestamp().$onUpdate(() => new Date()),
 });
 
-export const posts = pgTable("posts", {
-  uri: varchar({ length: 256 })
-    .primaryKey()
-    .references(() => records.uri, { onDelete: "cascade" }),
-  cid: varchar({ length: 256 }).notNull(),
-  actorDid: varchar({ length: 256 })
-    .notNull()
-    .references(() => actors.did),
-  text: text().notNull(),
-  langs: jsonb().$type<string[]>(),
-  createdAt: timestamp().notNull(),
-  indexedAt: timestamp().defaultNow(),
-  updatedAt: timestamp().$onUpdate(() => new Date()),
-});
+export const posts = pgTable(
+  "posts",
+  {
+    uri: varchar({ length: 256 })
+      .primaryKey()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did),
+    text: text().notNull(),
+    langs: jsonb().$type<string[]>(),
+    createdAt: timestamp().notNull(),
+    indexedAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
+  },
+  // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
+  (table) => [index("indexed_at_idx").on(table.indexedAt)],
+);
 
 export const blobs = pgTable("blobs", {
   cid: varchar({ length: 256 }).primaryKey(),

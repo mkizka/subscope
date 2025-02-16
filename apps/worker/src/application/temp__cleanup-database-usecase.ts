@@ -14,7 +14,7 @@ export class Temp__CleanupDatabaseUseCase {
         count: count(),
       })
       .from(schema.posts)
-      .where(lt(schema.posts.createdAt, ONE_HOUR_AGO));
+      .where(lt(schema.posts.indexedAt, ONE_HOUR_AGO));
 
     jobLogger.log(`Found ${postCountsToDelete!.count} posts to delete`);
     const range = Math.ceil(postCountsToDelete!.count / 100);
@@ -22,7 +22,7 @@ export class Temp__CleanupDatabaseUseCase {
       const posts = await this.db
         .select({ uri: schema.posts.uri })
         .from(schema.posts)
-        .where(lt(schema.posts.createdAt, ONE_HOUR_AGO))
+        .where(lt(schema.posts.indexedAt, ONE_HOUR_AGO))
         .limit(100);
       jobLogger.log(`Deleting ${posts.length} posts (${i + 1}/${range})`);
       const uris = posts.map((post) => post.uri);
