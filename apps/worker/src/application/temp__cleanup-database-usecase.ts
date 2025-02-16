@@ -1,4 +1,6 @@
 import type { ITransactionManager } from "@dawn/common/domain";
+import { schema } from "@dawn/db";
+import { inArray } from "drizzle-orm";
 
 export class Temp__CleanupDatabaseUseCase {
   constructor(private readonly transactionManager: ITransactionManager) {}
@@ -6,13 +8,13 @@ export class Temp__CleanupDatabaseUseCase {
 
   async execute() {
     await this.transactionManager.transaction(async (ctx) => {
-      await ctx.db.execute("SET FOREIGN_KEY_CHECKS = 0;");
-      await ctx.db.execute("TRUNCATE TABLE blobs;");
-      await ctx.db.execute("TRUNCATE TABLE posts;");
-      await ctx.db.execute("TRUNCATE TABLE profiles;");
-      await ctx.db.execute("TRUNCATE TABLE records;");
-      await ctx.db.execute("TRUNCATE TABLE actors;");
-      await ctx.db.execute("SET FOREIGN_KEY_CHECKS = 1;");
+      const posts = await ctx.db
+        .select({ uri: schema.posts.uri })
+        .from(schema.posts);
+      const uris = posts.map((post) => post.uri);
+      await ctx.db
+        .delete(schema.records)
+        .where(inArray(schema.posts.uri, uris));
     });
   }
 }
