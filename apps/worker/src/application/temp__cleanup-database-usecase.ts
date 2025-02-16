@@ -2,33 +2,50 @@ import type { DatabaseClient } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { count, inArray, lt } from "drizzle-orm";
 
+const DELETE_BATCH_SIZE = 1000;
+
+const CLEANUP_THRESHOLD_DURATION = 1000 * 60 * 60 * 24;
+
 export class Temp__CleanupDatabaseUseCase {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async execute(jobLogger: { log: (message: string) => void }) {
-    jobLogger.log("Starting cleanup database");
-    const ONE_HOUR_AGO = new Date(Date.now() - 1000 * 60 * 60);
-    const [postCountsToDelete] = await this.db
+  private async getPostsCountToDelete(date: Date) {
+    const [result] = await this.db
       .select({
         count: count(),
       })
       .from(schema.posts)
-      .where(lt(schema.posts.indexedAt, ONE_HOUR_AGO));
+      .where(lt(schema.posts.indexedAt, date));
+    return result!.count;
+  }
 
-    jobLogger.log(`Found ${postCountsToDelete!.count} posts to delete`);
-    const range = Math.ceil(postCountsToDelete!.count / 100);
+  private async getPostUrisToDelete(date: Date) {
+    const posts = await this.db
+      .select({ uri: schema.posts.uri })
+      .from(schema.posts)
+      .where(lt(schema.posts.indexedAt, date))
+      .limit(DELETE_BATCH_SIZE);
+    return posts.map((post) => post.uri);
+  }
+
+  private async deletePosts(uris: string[]) {
+    await this.db
+      .delete(schema.records)
+      .where(inArray(schema.records.uri, uris));
+  }
+
+  async execute(jobLogger: { log: (message: string) => void }) {
+    jobLogger.log("Starting cleanup database");
+    const oneDayAgo = new Date(Date.now() - CLEANUP_THRESHOLD_DURATION);
+    const count = await this.getPostsCountToDelete(oneDayAgo);
+    jobLogger.log(`Found ${count} posts to delete`);
+
+    const range = Math.ceil(count / DELETE_BATCH_SIZE);
     for (const i of Array(range).keys()) {
-      const posts = await this.db
-        .select({ uri: schema.posts.uri })
-        .from(schema.posts)
-        .where(lt(schema.posts.indexedAt, ONE_HOUR_AGO))
-        .limit(100);
-      jobLogger.log(`Deleting ${posts.length} posts (${i + 1}/${range})`);
-      const uris = posts.map((post) => post.uri);
-      await this.db
-        .delete(schema.records)
-        .where(inArray(schema.records.uri, uris));
+      const uris = await this.getPostUrisToDelete(oneDayAgo);
+      jobLogger.log(`Deleting ${uris.length} posts (${i + 1}/${range})`);
+      await this.deletePosts(uris);
     }
   }
 }
