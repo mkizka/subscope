@@ -65,8 +65,9 @@ export class SyncWorker {
       // 開発用
       new Worker(
         "temp__cleanupDatabase",
-        async () => {
-          await temp__cleanupDatabaseUseCase.execute();
+        async (job) => {
+          const jobLogger = { log: (message: string) => job.log(message) };
+          await temp__cleanupDatabaseUseCase.execute(jobLogger);
         },
         baseWorkerOptions,
       ),
