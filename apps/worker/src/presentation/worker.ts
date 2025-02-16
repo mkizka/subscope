@@ -69,7 +69,10 @@ export class SyncWorker {
           const jobLogger = { log: (message: string) => job.log(message) };
           await temp__cleanupDatabaseUseCase.execute(jobLogger);
         },
-        baseWorkerOptions,
+        {
+          ...baseWorkerOptions,
+          stalledInterval: 5 * 60 * 1000,
+        },
       ),
     ];
   }
