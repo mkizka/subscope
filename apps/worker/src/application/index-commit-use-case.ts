@@ -12,6 +12,11 @@ type IndexCollectionServiceMap = {
   [key in SupportedCollection]: IIndexColectionService;
 };
 
+const isValidRecord = (record: Record) => {
+  // Postgresには`\u0000`を含む文字列を保存できないため
+  return !JSON.stringify(record.json).includes("\u0000");
+};
+
 export class IndexCommitUseCase {
   private readonly services: IndexCollectionServiceMap;
 
@@ -36,6 +41,7 @@ export class IndexCommitUseCase {
   ] as const;
 
   async execute(command: IndexCommitCommand) {
+    await command.jobLogger.log(command.commit.uri.toString());
     await this.transactionManager.transaction(async (ctx) => {
       await this.indexActorService.createIfNotExists({
         ctx,
@@ -50,6 +56,10 @@ export class IndexCommitUseCase {
             cid: command.commit.cid,
             json: command.commit.record,
           });
+          if (!isValidRecord(record)) {
+            await command.jobLogger.log("Invalid record: null character found");
+            break;
+          }
           await this.recordRepository.upsert({ ctx, record });
           await indexService.upsert({ ctx, record });
           break;
