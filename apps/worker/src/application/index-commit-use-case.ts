@@ -14,7 +14,7 @@ type IndexCollectionServiceMap = {
 
 const isValidRecord = (record: Record) => {
   // Postgresには`\u0000`を含む文字列を保存できないため
-  return !JSON.stringify(record.json).includes("\u0000");
+  return !JSON.stringify(record.json).includes("\\u0000");
 };
 
 export class IndexCommitUseCase {
