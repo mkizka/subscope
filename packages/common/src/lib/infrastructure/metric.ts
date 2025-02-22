@@ -1,6 +1,7 @@
 import client from "prom-client";
 
 import type {
+  ConnectionStates,
   CounterKey,
   GaugeKey,
   IMetricReporter,
@@ -47,8 +48,20 @@ const gauges = {
     name: "ingester_events_time_delay",
     help: "Time delay of events processed by the ingester",
   }),
+  ingester_websocket_connection_state: new client.Gauge({
+    name: "ingester_websocket_connection_state",
+    help: "State of the websocket connection",
+  }),
 } satisfies {
   [key in GaugeKey]: client.Gauge;
+};
+
+const connectionStates = {
+  open: 1,
+  close: 2,
+  error: 3,
+} satisfies {
+  [key in ConnectionStates]: number;
 };
 
 export class MetricReporter implements IMetricReporter {
@@ -59,12 +72,8 @@ export class MetricReporter implements IMetricReporter {
       counters[key].inc();
     }
   }
-  setGauge(key: GaugeKey, value: number, labels?: LabelsValue) {
-    if (labels) {
-      gauges[key].set(labels, value);
-    } else {
-      gauges[key].set(value);
-    }
+  setConnectionStateGauge(state: ConnectionStates) {
+    gauges.ingester_websocket_connection_state.set(connectionStates[state]);
   }
   setTimeDelayGauge(timeUs: number) {
     const dalay = Date.now() * 1000 - timeUs;

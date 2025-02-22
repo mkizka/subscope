@@ -7,13 +7,17 @@ export type CounterKey =
   | "ingester_events_identity_total"
   | "ingester_events_commit_total";
 
-export type GaugeKey = "ingester_events_time_delay";
+export type GaugeKey =
+  | "ingester_events_time_delay"
+  | "ingester_websocket_connection_state";
 
 export type LabelsValue = Record<string, string | number>;
 
+export type ConnectionStates = "open" | "close" | "error";
+
 export interface IMetricReporter {
   increment: (key: CounterKey, labels?: LabelsValue) => void;
-  setGauge: (key: GaugeKey, value: number, labels?: LabelsValue) => void;
+  setConnectionStateGauge: (state: ConnectionStates) => void;
   setTimeDelayGauge: (timeUs: number) => void;
   getMetrics: () => Promise<string>;
 }

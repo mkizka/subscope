@@ -33,14 +33,17 @@ export class JetstreamIngester {
       this.logger.info(
         `jetstream subscription started to ${env.JETSTREAM_URL}`,
       );
+      this.metricReporter.setConnectionStateGauge("open");
     });
 
     this.jetstream.on("close", () => {
       this.logger.info(`jetstream subscription closed`);
+      this.metricReporter.setConnectionStateGauge("close");
     });
 
     this.jetstream.on("error", (error) => {
       this.logger.error(error, "jetstream error occurred");
+      this.metricReporter.setConnectionStateGauge("error");
     });
 
     // イベントを発行するサービスでアカウント ホスティング ステータスが変更された可能性があること、および新しいステータスが何であるかを示します。
