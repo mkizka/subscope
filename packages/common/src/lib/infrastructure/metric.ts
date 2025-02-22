@@ -76,7 +76,7 @@ export class MetricReporter implements IMetricReporter {
     gauges.ingester_websocket_connection_state.set(connectionStates[state]);
   }
   setTimeDelayGauge(timeUs: number) {
-    const dalay = Date.now() * 1000 - timeUs;
+    const dalay = Date.now() - Math.round(timeUs / 1000);
     gauges.ingester_events_time_delay.set(dalay);
   }
   getMetrics() {
