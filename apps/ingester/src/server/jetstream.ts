@@ -48,6 +48,7 @@ export class JetstreamIngester {
     // https://atproto.com/ja/specs/sync
     this.jetstream.on("account", (event) => {
       this.metricReporter.increment("ingester_events_account_total");
+      this.metricReporter.setTimeDelayGauge(event.time_us);
       // TODO: アカウントステータスの変動を実装
     });
 
@@ -59,6 +60,7 @@ export class JetstreamIngester {
       this.metricReporter.increment("ingester_events_identity_total", {
         change_handle: event.identity.handle ? "true" : "false",
       });
+      this.metricReporter.setTimeDelayGauge(event.time_us);
       await this.jobQueue.add({
         queueName: event.kind,
         jobName: `at://${event.identity.handle ?? event.did}`,
@@ -74,6 +76,7 @@ export class JetstreamIngester {
       this.metricReporter.increment("ingester_events_commit_total", {
         collection: event.commit.collection,
       });
+      this.metricReporter.setTimeDelayGauge(event.time_us);
       await this.jobQueue.add({
         queueName: event.kind,
         jobName: `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`,

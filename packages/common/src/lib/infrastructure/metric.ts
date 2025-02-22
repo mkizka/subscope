@@ -1,12 +1,13 @@
 import client from "prom-client";
 
 import type {
+  CounterKey,
+  GaugeKey,
   IMetricReporter,
   LabelsValue,
-  MetricKey,
 } from "../domain/interfaces/metric.js";
 
-const metrics = {
+const counters = {
   did_cache_hit_total: new client.Counter({
     name: "did_cache_hit_total",
     help: "Total number of did resolver cache hits",
@@ -38,16 +39,36 @@ const metrics = {
     help: "Total number of commit events processed by the ingester",
   }),
 } satisfies {
-  [key in MetricKey]: client.Counter;
+  [key in CounterKey]: client.Counter;
+};
+
+const gauges = {
+  ingester_events_time_delay: new client.Gauge({
+    name: "ingester_events_time_delay",
+    help: "Time delay of events processed by the ingester",
+  }),
+} satisfies {
+  [key in GaugeKey]: client.Gauge;
 };
 
 export class MetricReporter implements IMetricReporter {
-  increment(key: MetricKey, labels?: LabelsValue): void {
+  increment(key: CounterKey, labels?: LabelsValue): void {
     if (labels) {
-      metrics[key].inc(labels);
+      counters[key].inc(labels);
     } else {
-      metrics[key].inc();
+      counters[key].inc();
     }
+  }
+  setGauge(key: GaugeKey, value: number, labels?: LabelsValue) {
+    if (labels) {
+      gauges[key].set(labels, value);
+    } else {
+      gauges[key].set(value);
+    }
+  }
+  setTimeDelayGauge(timeUs: number) {
+    const dalay = Date.now() * 1000 - timeUs;
+    gauges.ingester_events_time_delay.set(dalay);
   }
   getMetrics() {
     return client.register.metrics();
