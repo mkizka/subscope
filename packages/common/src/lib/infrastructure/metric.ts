@@ -58,8 +58,8 @@ const gauges = {
 
 const connectionStates = {
   open: 1,
-  close: 2,
-  error: 3,
+  error: 2,
+  close: 3,
 } satisfies {
   [key in ConnectionStates]: number;
 };
