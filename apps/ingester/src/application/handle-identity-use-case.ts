@@ -1,0 +1,34 @@
+import type {
+  IJobQueue,
+  ILoggerManager,
+  IMetricReporter,
+} from "@dawn/common/domain";
+import type { IdentityEvent } from "@skyware/jetstream";
+
+export class HandleIdentityUseCase {
+  private readonly logger;
+  constructor(
+    loggerManager: ILoggerManager,
+    private readonly metricReporter: IMetricReporter,
+    private readonly jobQueue: IJobQueue,
+  ) {
+    this.logger = loggerManager.createLogger("ProcessEventService");
+  }
+  static inject = ["loggerManager", "metricReporter", "jobQueue"] as const;
+
+  // 指定された ID (DID ドキュメントまたはハンドル) に変更があった可能性があること、およびオプションで現在のハンドルが何であるかを示します。
+  // 何が変更されたかを示すものではなく、ID の現在の状態が何であるかを確実に示すものでもありません。
+  // https://atproto.com/ja/specs/sync
+  async execute(event: IdentityEvent) {
+    this.logger.debug({ did: event.identity.did }, "identity event received");
+    this.metricReporter.increment("ingester_events_identity_total", {
+      change_handle: event.identity.handle ? "true" : "false",
+    });
+    this.metricReporter.setTimeDelayGauge(event.time_us);
+    await this.jobQueue.add({
+      queueName: event.kind,
+      jobName: `at://${event.identity.handle ?? event.did}`,
+      data: event,
+    });
+  }
+}

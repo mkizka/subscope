@@ -1,8 +1,4 @@
-import type {
-  ILoggerManager,
-  IMetricReporter,
-  Logger,
-} from "@dawn/common/domain";
+import type { ILoggerManager, Logger } from "@dawn/common/domain";
 import type { Router } from "express";
 import express from "express";
 import { pinoHttp } from "pino-http";
@@ -22,7 +18,6 @@ export class IngesterServer {
     metricsRouter: Router,
     dashboardRouter: Router,
     private readonly ingester: JetstreamIngester,
-    private readonly metricReporter: IMetricReporter,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
