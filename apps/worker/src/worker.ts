@@ -9,6 +9,7 @@ import {
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { BackfillUseCase } from "./application/backfill-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
@@ -20,6 +21,7 @@ import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
+import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
@@ -43,6 +45,7 @@ createInjector()
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
   .provideClass("recordRepository", RecordRepository)
+  .provideClass("repoFetcher", RepoFetcher)
   // application(service)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
@@ -52,6 +55,7 @@ createInjector()
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("temp__cleanupDatabaseUseCase", Temp__CleanupDatabaseUseCase)
+  .provideClass("backfillUseCase", BackfillUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(WorkerServer)

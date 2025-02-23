@@ -4,9 +4,9 @@ import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
+import type { BackfillUseCase } from "../application/backfill-use-case.js";
 import { indexCommitCommandFactory } from "../application/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/index-commit-use-case.js";
-import type { ResolveDidUseCase } from "../application/resolve-did-use-case.js";
 import type { Temp__CleanupDatabaseUseCase } from "../application/temp__cleanup-database-usecase.js";
 import { upsertIdentityCommandFactory } from "../application/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/upsert-identity-use-case.js";
@@ -25,7 +25,7 @@ export class SyncWorker {
   constructor(
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
-    resolveDidUseCase: ResolveDidUseCase,
+    backfillUseCase: BackfillUseCase,
     temp__cleanupDatabaseUseCase: Temp__CleanupDatabaseUseCase,
   ) {
     this.workers = [
@@ -52,8 +52,10 @@ export class SyncWorker {
         },
       ),
       new Worker<Did>(
-        "resolveDid",
-        (job) => resolveDidUseCase.execute(job.data),
+        "backfill",
+        async (job) => {
+          await backfillUseCase.execute(job.data);
+        },
         {
           ...baseWorkerOptions,
           limiter: {
@@ -79,7 +81,7 @@ export class SyncWorker {
   static inject = [
     "upsertIdentityUseCase",
     "indexCommitUseCase",
-    "resolveDidUseCase",
+    "backfillUseCase",
     "temp__cleanupDatabaseUseCase",
   ] as const;
 
