@@ -12,7 +12,7 @@ export class HandleIdentityUseCase {
     private readonly metricReporter: IMetricReporter,
     private readonly jobQueue: IJobQueue,
   ) {
-    this.logger = loggerManager.createLogger("ProcessEventService");
+    this.logger = loggerManager.createLogger("HandleIdentityUseCase");
   }
   static inject = ["loggerManager", "metricReporter", "jobQueue"] as const;
 
