@@ -1,4 +1,4 @@
-import type { AppBskyFeedGetTimeline } from "@dawn/client";
+import type { AppBskyFeedDefs, AppBskyFeedGetTimeline } from "@dawn/client";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { required } from "@dawn/common/utils";
 
@@ -30,19 +30,24 @@ export class GetTimelineUseCase {
     );
     const replyPostViews = await this.postViewService.findPostView(replyUris);
     const feed = samplePosts.map((feedPost) => {
-      const post = required(
-        postViews.find((post) => post.uri === feedPost.uri.toString()),
-      );
       const replyRoot = replyPostViews.find(
         (reply) => reply.uri === feedPost.replyRoot?.uri.toString(),
       );
       const replyParent = replyPostViews.find(
         (reply) => reply.uri === feedPost.replyParent?.uri.toString(),
       );
-      if (replyRoot && replyParent) {
-        return { post, reply: { root: replyRoot, parent: replyParent } };
-      }
-      return { post };
+      return {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: required(
+          postViews.find((post) => post.uri === feedPost.uri.toString()),
+        ),
+        reply: replyRoot &&
+          replyParent && {
+            $type: "app.bsky.feed.defs#replyRef",
+            root: replyRoot,
+            parent: replyParent,
+          },
+      } satisfies AppBskyFeedDefs.FeedViewPost;
     });
     return {
       cursor: undefined, // TODO: 実装

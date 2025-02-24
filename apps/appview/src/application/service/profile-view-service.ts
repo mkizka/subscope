@@ -31,6 +31,7 @@ export class ProfileViewService {
     profile: ProfileDetailed,
   ): AppBskyActorDefs.ProfileViewBasic {
     return {
+      $type: "app.bsky.actor.defs#profileViewBasic",
       did: profile.actorDid,
       handle: profile.handle?.toString() ?? "handle.invalid",
       displayName: profile.displayName ?? undefined,
@@ -47,6 +48,7 @@ export class ProfileViewService {
   ): AppBskyActorDefs.ProfileViewDetailed {
     return {
       ...this.createProfileViewBasic(profile),
+      $type: "app.bsky.actor.defs#profileViewDetailed",
       // description?: string
       // banner?: string
       // followersCount?: number

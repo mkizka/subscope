@@ -10,7 +10,7 @@ const asObject = (obj: unknown) => {
   if (typeof obj !== "object" || obj === null) {
     throw new Error("Expected object");
   }
-  return obj;
+  return obj as { [_ in string]: unknown };
 };
 
 export class PostViewService {
@@ -20,7 +20,7 @@ export class PostViewService {
   ) {}
   static inject = ["recordRepository", "profileViewService"] as const;
 
-  async findPostView(uris: AtUri[]): Promise<AppBskyFeedDefs.PostView[]> {
+  async findPostView(uris: AtUri[]) {
     const records = await this.recordRepository.findMany(uris);
     const dids = records.map((record) => asDid(record.uri.host));
     const profiles = await this.profileViewService.findProfileViewBasic(dids);
@@ -29,6 +29,7 @@ export class PostViewService {
         (profile) => profile.did === record.uri.host,
       );
       return {
+        $type: "app.bsky.feed.defs#postView",
         uri: record.uri.toString(),
         cid: record.cid,
         author: profile ?? {
@@ -44,7 +45,7 @@ export class PostViewService {
         // viewer?: ViewerState
         // labels?: ComAtprotoLabelDefs.Label[]
         // threadgate?: ThreadgateView
-      };
+      } satisfies AppBskyFeedDefs.PostView;
     });
   }
 }
