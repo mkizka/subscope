@@ -9,6 +9,15 @@ type StrongRef = Readonly<{
   cid: string;
 }>;
 
+const getStrongRef = (ref: { uri: string; cid: string } | undefined) => {
+  return (
+    ref && {
+      uri: new AtUri(ref.uri),
+      cid: ref.cid,
+    }
+  );
+};
+
 type PostParams = {
   uri: AtUri | string;
   cid: string;
@@ -48,14 +57,8 @@ export class Post {
       cid: record.cid,
       actorDid: record.actorDid,
       text: parsed.text,
-      replyRoot: parsed.reply?.root && {
-        uri: new AtUri(parsed.reply.root.uri),
-        cid: parsed.reply.root.cid,
-      },
-      replyParent: parsed.reply?.parent && {
-        uri: new AtUri(parsed.reply.parent.uri),
-        cid: parsed.reply.parent.cid,
-      },
+      replyRoot: getStrongRef(parsed.reply?.root),
+      replyParent: getStrongRef(parsed.reply?.parent),
       langs: parsed.langs ?? [],
       createdAt: new Date(parsed.createdAt),
     });
