@@ -3,11 +3,19 @@ import { AtUri } from "@atproto/syntax";
 
 import { parseRecord } from "../../utils/record.js";
 import type { Record } from "../record.js";
+
+type StrongRef = Readonly<{
+  uri: AtUri;
+  cid: string;
+}>;
+
 type PostParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;
   text: string;
+  replyRoot?: StrongRef | null;
+  replyParent?: StrongRef | null;
   langs: string[] | null;
   createdAt: Date;
 };
@@ -17,6 +25,8 @@ export class Post {
   readonly cid: string;
   readonly actorDid: Did;
   readonly text: string;
+  readonly replyRoot?: StrongRef | null;
+  readonly replyParent?: StrongRef | null;
   readonly langs: string[] | null;
   readonly createdAt: Date;
 
@@ -25,6 +35,8 @@ export class Post {
     this.cid = params.cid;
     this.actorDid = asDid(params.actorDid);
     this.text = params.text;
+    this.replyRoot = params.replyRoot ?? null;
+    this.replyParent = params.replyParent ?? null;
     this.langs = params.langs;
     this.createdAt = params.createdAt;
   }
@@ -36,6 +48,14 @@ export class Post {
       cid: record.cid,
       actorDid: record.actorDid,
       text: parsed.text,
+      replyRoot: parsed.reply?.root && {
+        uri: new AtUri(parsed.reply.root.uri),
+        cid: parsed.reply.root.cid,
+      },
+      replyParent: parsed.reply?.parent && {
+        uri: new AtUri(parsed.reply.parent.uri),
+        cid: parsed.reply.parent.cid,
+      },
       langs: parsed.langs ?? [],
       createdAt: new Date(parsed.createdAt),
     });

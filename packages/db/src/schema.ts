@@ -58,6 +58,10 @@ export const posts = pgTable(
       .notNull()
       .references(() => actors.did),
     text: text().notNull(),
+    replyRootUri: varchar({ length: 256 }),
+    replyRootCid: varchar({ length: 256 }),
+    replyParentUri: varchar({ length: 256 }),
+    replyParentCid: varchar({ length: 256 }),
     langs: jsonb().$type<string[]>(),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().defaultNow(),
