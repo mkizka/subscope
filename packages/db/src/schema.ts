@@ -67,8 +67,11 @@ export const posts = pgTable(
     indexedAt: timestamp().defaultNow(),
     updatedAt: timestamp().$onUpdate(() => new Date()),
   },
-  // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
-  (table) => [index("indexed_at_idx").on(table.indexedAt)],
+  (table) => [
+    index("created_at_idx").on(table.createdAt),
+    // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
+    index("indexed_at_idx").on(table.indexedAt),
+  ],
 );
 
 export const blobs = pgTable("blobs", {
