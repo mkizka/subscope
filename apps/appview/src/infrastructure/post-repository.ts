@@ -2,7 +2,7 @@ import { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { Post } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
-import { desc } from "drizzle-orm";
+import { and, desc, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
@@ -20,10 +20,16 @@ export class PostRepository implements IPostRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findMany(params: { limit: number }) {
+  async findMany(params: { limit: number; cursor?: string }) {
+    const filters = [];
+    if (params.cursor) {
+      const cursor = new Date(params.cursor);
+      filters.push(lt(schema.posts.sortAt, cursor));
+    }
     const posts = await this.db
       .select()
       .from(schema.posts)
+      .where(and(...filters))
       .orderBy(desc(schema.posts.sortAt))
       .limit(params.limit);
     return posts.map(

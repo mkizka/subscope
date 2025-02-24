@@ -19,6 +19,7 @@ export class GetTimelineUseCase {
     const samplePosts = await this.postRepository.findMany({
       // TODO: サーバー側の型を利用するように修正(limitは必須になっている)
       limit: params.limit!,
+      cursor: params.cursor,
     });
     const postViews = await this.postViewService.findPostView(
       samplePosts.map((post) => post.uri),
@@ -50,7 +51,7 @@ export class GetTimelineUseCase {
       } satisfies AppBskyFeedDefs.FeedViewPost;
     });
     return {
-      cursor: undefined, // TODO: 実装
+      cursor: samplePosts.at(-1)?.sortAt?.toISOString(),
       feed,
     };
   }
