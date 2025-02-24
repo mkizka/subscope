@@ -25,8 +25,8 @@ export class Post {
   readonly cid: string;
   readonly actorDid: Did;
   readonly text: string;
-  readonly replyRoot?: StrongRef | null;
-  readonly replyParent?: StrongRef | null;
+  readonly replyRoot: StrongRef | null;
+  readonly replyParent: StrongRef | null;
   readonly langs: string[] | null;
   readonly createdAt: Date;
 
