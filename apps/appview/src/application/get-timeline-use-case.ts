@@ -11,9 +11,11 @@ export class GetTimelineUseCase {
   ) {}
   static inject = ["db", "postViewService"] as const;
 
-  async execute(): Promise<AppBskyFeedGetTimeline.OutputSchema> {
+  async execute(
+    params: AppBskyFeedGetTimeline.QueryParams,
+  ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const samplePosts = await this.db.query.posts.findMany({
-      limit: 25,
+      limit: params.limit,
     });
     const posts = await this.postViewService.findPostView(
       samplePosts.map((post) => new AtUri(post.uri)),

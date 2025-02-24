@@ -13,10 +13,10 @@ export class GetTimeline {
   handle(server: Server) {
     server.app.bsky.feed.getTimeline({
       auth: (ctx) => this.authVerifierService.loginRequired(ctx.req),
-      handler: async ({ auth }) => {
+      handler: async ({ params, auth }) => {
         // eslint-disable-next-line no-console
         console.log("auth", auth);
-        const timeline = await this.getTimelineUseCase.execute();
+        const timeline = await this.getTimelineUseCase.execute(params);
         return {
           encoding: "application/json",
           body: timeline,
