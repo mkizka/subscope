@@ -14,6 +14,7 @@ import { AuthVerifierService } from "./application/service/auth-verifier-service
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
 import { HandlesToDidsRepository } from "./infrastructure/handles-to-dids-repository.js";
+import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
@@ -37,6 +38,7 @@ createInjector()
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("handlesToDidsRepository", HandlesToDidsRepository)
   .provideClass("recordRepository", RecordRepository)
+  .provideClass("postRepository", PostRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
