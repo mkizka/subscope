@@ -37,6 +37,7 @@ export class PostRepository implements IPostRepository {
           replyParent: getStrongRef(post.replyParentUri, post.replyParentCid),
           langs: post.langs,
           createdAt: post.createdAt,
+          sortAt: post.sortAt,
         }),
     );
   }

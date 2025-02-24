@@ -27,6 +27,7 @@ type PostParams = {
   replyParent?: StrongRef | null;
   langs: string[] | null;
   createdAt: Date;
+  sortAt?: Date | null;
 };
 
 export class Post {
@@ -38,6 +39,7 @@ export class Post {
   readonly replyParent: StrongRef | null;
   readonly langs: string[] | null;
   readonly createdAt: Date;
+  readonly sortAt: Date | null;
 
   constructor(params: PostParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -48,6 +50,7 @@ export class Post {
     this.replyParent = params.replyParent ?? null;
     this.langs = params.langs;
     this.createdAt = params.createdAt;
+    this.sortAt = params.sortAt ?? null;
   }
 
   static from(record: Record) {
