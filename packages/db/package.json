@@ -11,12 +11,12 @@
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "drizzle-orm": "0.39.2",
+    "drizzle-orm": "0.39.3",
     "pg": "8.13.3"
   },
   "devDependencies": {
     "@tsconfig/node-lts": "22.0.1",
-    "@types/node": "22.13.1",
+    "@types/node": "22.13.5",
     "@types/pg": "8.11.11",
     "dotenv": "16.4.7",
     "drizzle-kit": "0.30.4"
