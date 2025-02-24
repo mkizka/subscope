@@ -28,7 +28,7 @@
     "prom-client": "15.1.3"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "5.3.4",
+    "@mkizka/eslint-config": "5.4.0",
     "@skyware/jetstream": "0.2.2",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.0",
