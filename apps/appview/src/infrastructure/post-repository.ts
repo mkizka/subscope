@@ -24,7 +24,7 @@ export class PostRepository implements IPostRepository {
     const posts = await this.db
       .select()
       .from(schema.posts)
-      .orderBy(desc(schema.posts.createdAt))
+      .orderBy(desc(schema.posts.sortAt))
       .limit(params.limit);
     return posts.map(
       (post) =>

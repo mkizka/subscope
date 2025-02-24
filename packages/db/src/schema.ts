@@ -8,7 +8,7 @@ import {
   index,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const actors = pgTable(
   "actors",
@@ -66,9 +66,12 @@ export const posts = pgTable(
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().defaultNow(),
     updatedAt: timestamp().$onUpdate(() => new Date()),
+    sortAt: timestamp()
+      .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
+      .notNull(),
   },
   (table) => [
-    index("created_at_idx").on(table.createdAt),
+    index("sort_at_idx").on(table.sortAt),
     // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
     index("indexed_at_idx").on(table.indexedAt),
   ],
