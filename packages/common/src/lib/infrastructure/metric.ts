@@ -60,6 +60,7 @@ const connectionStates = {
   open: 1,
   error: 2,
   close: 3,
+  reconnecting: 4,
 } satisfies {
   [key in ConnectionStates]: number;
 };

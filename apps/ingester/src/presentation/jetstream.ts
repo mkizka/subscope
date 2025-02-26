@@ -49,14 +49,17 @@ export class JetstreamIngester {
 
     this.jetstream.on("account", async (event) => {
       await this.handleAccountUseCase.execute(event);
+      this.jetstream.cursor = event.time_us;
     });
 
     this.jetstream.on("identity", async (event) => {
       await this.handleIdentityUseCase.execute(event);
+      this.jetstream.cursor = event.time_us;
     });
 
     this.jetstream.on("commit", async (event) => {
       await this.handleCommitUseCase.execute(event);
+      this.jetstream.cursor = event.time_us;
     });
   }
   static inject = [
@@ -69,5 +72,17 @@ export class JetstreamIngester {
 
   start() {
     this.jetstream.start();
+    let lastCursor = 0;
+    setInterval(() => {
+      if (this.jetstream.cursor !== 0 && this.jetstream.cursor === lastCursor) {
+        this.logger.error(
+          "Jetstream cursor not updated, restarting connection",
+        );
+        this.metricReporter.setConnectionStateGauge("reconnecting");
+        this.jetstream.close();
+        this.jetstream.start();
+      }
+      lastCursor = this.jetstream.cursor ?? 0;
+    }, 5000);
   }
 }
