@@ -11,6 +11,8 @@ export type JobData = {
 
 export type QueueName = keyof JobData;
 
+export type JobState = "inProgress" | "completed" | "failed";
+
 export interface IJobQueue {
   getQueues: () => Queue[];
   add: <T extends QueueName>(params: {
@@ -18,4 +20,8 @@ export interface IJobQueue {
     jobName: string;
     data: JobData[T];
   }) => Promise<void>;
+  getJobState: (params: {
+    queueName: QueueName;
+    jobId: string;
+  }) => Promise<JobState>;
 }

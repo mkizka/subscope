@@ -4,13 +4,12 @@ import { Queue } from "bullmq";
 import type {
   IJobQueue,
   JobData,
+  JobState,
   QueueName,
 } from "../domain/interfaces/job-queue.js";
 
 export class JobQueue implements IJobQueue {
-  private readonly queues: {
-    [key in QueueName]: Queue;
-  };
+  private readonly queues;
 
   constructor(redisUrl: string) {
     const queueOptions = {
@@ -57,5 +56,19 @@ export class JobQueue implements IJobQueue {
 
   getQueues() {
     return Object.values(this.queues);
+  }
+
+  async getJobState({
+    queueName,
+    jobId,
+  }: {
+    queueName: QueueName;
+    jobId: string;
+  }): Promise<JobState> {
+    const state = await this.queues[queueName].getJobState(jobId);
+    if (state === "completed" || state === "failed") {
+      return state;
+    }
+    return "inProgress";
   }
 }
