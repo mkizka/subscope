@@ -40,7 +40,7 @@ export class JetstreamIngester {
     this.jetstream.on("open", () => {
       this.logger.info(
         { cursor: this.jetstream.cursor },
-        `Jetstream subscription started to ${env.JETSTREAM_URL}`,
+        `Jetstream subscription started at ${env.JETSTREAM_URL}`,
       );
       this.metricReporter.setConnectionStateGauge("open");
     });
@@ -79,11 +79,21 @@ export class JetstreamIngester {
   ] as const;
 
   private shouldReconnect() {
+    this.logger.debug(
+      {
+        cursor: this.jetstream.cursor,
+        lastCursor: this.lastCursor,
+      },
+      "Checking if should reconnect",
+    );
     return this.jetstream.cursor === this.lastCursor;
   }
 
   private reconnect() {
-    this.logger.info("Cursor did not change, start reconnecting");
+    this.logger.info(
+      { reconnectDelay: this.reconnectDelay },
+      `The cursor did not change, so attempting to reconnect`,
+    );
     this.jetstream.close();
     this.start();
   }
