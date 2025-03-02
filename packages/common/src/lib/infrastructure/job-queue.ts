@@ -9,7 +9,9 @@ import type {
 } from "../domain/interfaces/job-queue.js";
 
 export class JobQueue implements IJobQueue {
-  private readonly queues;
+  private readonly queues: {
+    [key in QueueName]: Queue;
+  };
 
   constructor(redisUrl: string) {
     const queueOptions = {
@@ -29,6 +31,7 @@ export class JobQueue implements IJobQueue {
       resolveDid: new Queue("resolveDid", queueOptions),
       identity: new Queue("identity", queueOptions),
       commit: new Queue("commit", queueOptions),
+      backfill: new Queue("backfill", queueOptions),
       temp__cleanupDatabase: new Queue("temp__cleanupDatabase", queueOptions),
     };
     this.queues.temp__cleanupDatabase

@@ -1,12 +1,14 @@
 import {
   databaseFactory,
   DidResolver,
+  JobQueue,
   LoggerManager,
   MetricReporter,
   RedisDidCache,
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { GetJobStatusUseCase } from "./application/get-job-status-use-case.js";
 import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
@@ -22,6 +24,7 @@ import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
+import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -43,6 +46,7 @@ createInjector()
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
   .provideClass("tokenVerifier", TokenVerifier)
+  .provideClass("jobQueue", JobQueue)
   // application
   .provideClass("profileViewService", ProfileViewService)
   .provideClass("postViewService", PostViewService)
@@ -50,11 +54,13 @@ createInjector()
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
+  .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
   .provideClass("getPosts", GetPosts)
   .provideClass("getTimeline", GetTimeline)
+  .provideClass("getJobStatus", GetJobStatus)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();

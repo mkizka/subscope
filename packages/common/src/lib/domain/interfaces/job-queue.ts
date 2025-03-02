@@ -6,6 +6,7 @@ export type JobData = {
   resolveDid: Did;
   identity: IdentityEvent;
   commit: CommitEvent<string>;
+  backfill: Did;
   temp__cleanupDatabase: undefined;
 };
 
