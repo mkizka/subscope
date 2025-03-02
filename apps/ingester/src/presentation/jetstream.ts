@@ -8,9 +8,16 @@ import type { HandleCommitUseCase } from "../application/handle-commit-use-case.
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
 import { env } from "../shared/env.js";
 
+const CONNECTION_CHECK_INTERVAL = 2000;
+const INITIAL_RECONNECT_DELAY = 2000;
+const MAX_RECONNECT_DELAY = 30000;
+
 export class JetstreamIngester {
   private readonly jetstream;
   private readonly logger;
+
+  private lastCursor: number | null = null;
+  private reconnectDelay = INITIAL_RECONNECT_DELAY;
 
   constructor(
     loggerManager: ILoggerManager,
@@ -32,18 +39,19 @@ export class JetstreamIngester {
 
     this.jetstream.on("open", () => {
       this.logger.info(
-        `jetstream subscription started to ${env.JETSTREAM_URL}`,
+        { cursor: this.jetstream.cursor },
+        `Jetstream subscription started to ${env.JETSTREAM_URL}`,
       );
       this.metricReporter.setConnectionStateGauge("open");
     });
 
     this.jetstream.on("close", () => {
-      this.logger.info(`jetstream subscription closed`);
+      this.logger.info(`Jetstream subscription closed`);
       this.metricReporter.setConnectionStateGauge("close");
     });
 
     this.jetstream.on("error", (error) => {
-      this.logger.error(error, "jetstream error occurred");
+      this.logger.error(error, "Jetstream error occurred");
       this.metricReporter.setConnectionStateGauge("error");
     });
 
@@ -70,19 +78,45 @@ export class JetstreamIngester {
     "handleCommitUseCase",
   ] as const;
 
+  private shouldReconnect() {
+    return this.jetstream.cursor === this.lastCursor;
+  }
+
+  private reconnect() {
+    this.logger.info("Cursor did not change, start reconnecting");
+    this.jetstream.close();
+    this.start();
+  }
+
+  private startConnectionMonitoring() {
+    const intervalId = setInterval(() => {
+      if (this.shouldReconnect()) {
+        clearInterval(intervalId);
+        this.reconnect();
+      }
+    }, CONNECTION_CHECK_INTERVAL);
+  }
+
+  private nextReconnectDelay() {
+    return Math.min(this.reconnectDelay * 2, MAX_RECONNECT_DELAY);
+  }
+
+  /**
+   * Starts the Jetstream connection and performs an initial health check.
+   * - After starting, it checks if the cursor has changed.
+   * - If the cursor remains the same, it assumes a connection failure and attempts a reconnect with an exponential backoff delay.
+   * - If the cursor updates normally, it resets the reconnect delay and starts periodic connection monitoring.
+   */
   start() {
     this.jetstream.start();
-    let lastCursor = 0;
-    setInterval(() => {
-      if (this.jetstream.cursor !== 0 && this.jetstream.cursor === lastCursor) {
-        this.logger.error(
-          "Jetstream cursor not updated, restarting connection",
-        );
-        this.metricReporter.setConnectionStateGauge("reconnecting");
-        this.jetstream.close();
-        this.jetstream.start();
+    setTimeout(() => {
+      if (this.shouldReconnect()) {
+        this.reconnectDelay = this.nextReconnectDelay();
+        this.reconnect();
+      } else {
+        this.reconnectDelay = INITIAL_RECONNECT_DELAY;
+        this.startConnectionMonitoring();
       }
-      lastCursor = this.jetstream.cursor ?? 0;
-    }, 5000);
+    }, this.reconnectDelay);
   }
 }
