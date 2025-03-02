@@ -1,5 +1,5 @@
 import type { ILoggerManager, IMetricReporter } from "@dawn/common/domain";
-import type { SupportedCollection } from "@dawn/common/utils";
+import { required, type SupportedCollection } from "@dawn/common/utils";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
@@ -16,7 +16,7 @@ export class JetstreamIngester {
   private readonly jetstream;
   private readonly logger;
 
-  private lastCursor: number | null = null;
+  private lastCursor: number = 0;
   private reconnectDelay = INITIAL_RECONNECT_DELAY;
 
   constructor(
@@ -89,11 +89,14 @@ export class JetstreamIngester {
   }
 
   private startConnectionMonitoring() {
+    this.logger.info("Starting connection monitoring");
+    this.lastCursor = required(this.jetstream.cursor);
     const intervalId = setInterval(() => {
       if (this.shouldReconnect()) {
         clearInterval(intervalId);
         this.reconnect();
       }
+      this.lastCursor = required(this.jetstream.cursor);
     }, CONNECTION_CHECK_INTERVAL);
   }
 
