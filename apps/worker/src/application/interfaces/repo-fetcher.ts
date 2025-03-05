@@ -1,5 +1,6 @@
+import type { Did } from "@atproto/did";
 import type { Record } from "@dawn/common/domain";
 
 export interface IRepoFetcher {
-  fetch: (pds: string) => Promise<Record[]>;
+  fetch: (did: Did) => Promise<Record[]>;
 }

@@ -178,6 +178,9 @@ importers:
       '@atproto/lexicon':
         specifier: 0.4.7
         version: 0.4.7
+      '@atproto/repo':
+        specifier: 0.7.0
+        version: 0.7.0
       '@atproto/syntax':
         specifier: 0.3.3
         version: 0.3.3
@@ -426,6 +429,10 @@ packages:
 
   '@atproto/lexicon@0.4.7':
     resolution: {integrity: sha512-/x6h3tAiDNzSi4eXtC8ke65B7UzsagtlGRHmUD95698x5lBRpDnpizj0fZWTZVYed5qnOmz/ZEue+v3wDmO61g==}
+
+  '@atproto/repo@0.7.0':
+    resolution: {integrity: sha512-n0xyMsKuCxRyP7wROg1wX8vUEnt+H0umIyFUlMTz6jb8XPYk88p5XTcTmLV3dNNu0f71JPd2Jzt6/EGub9zxMg==}
+    engines: {node: '>=18.7.0'}
 
   '@atproto/syntax@0.3.3':
     resolution: {integrity: sha512-F1LZweesNYdBbZBXVa72N/cSvchG8Q1tG4/209ZXbIuM3FwQtkgn+zgmmV4P4ORmhOeXPBNXvMBpcqiwx/gEQQ==}
@@ -1057,6 +1064,9 @@ packages:
 
   '@ioredis/commands@1.2.0':
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
+
+  '@ipld/car@3.2.4':
+    resolution: {integrity: sha512-rezKd+jk8AsTGOoJKqzfjLJ3WVft7NZNH95f0pfPbicROvzTyvHCNy567HzSUd6gRXZ9im29z5ZEv9Hw49jSYw==}
 
   '@ipld/dag-cbor@7.0.3':
     resolution: {integrity: sha512-1VVh2huHsuohdXC1bGJNE8WR72slZ9XE2T3wbBBq31dm7ZBatmKLLxrB+XAqafxfRFjv08RZmj/W/ZqaM13AuA==}
@@ -3631,6 +3641,9 @@ packages:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
 
+  varint@6.0.0:
+    resolution: {integrity: sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg==}
+
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
@@ -3807,6 +3820,18 @@ snapshots:
       '@atproto/syntax': 0.3.3
       iso-datestring-validator: 2.2.2
       multiformats: 9.9.0
+      zod: 3.24.2
+
+  '@atproto/repo@0.7.0':
+    dependencies:
+      '@atproto/common': 0.4.8
+      '@atproto/common-web': 0.4.0
+      '@atproto/crypto': 0.4.4
+      '@atproto/lexicon': 0.4.7
+      '@ipld/car': 3.2.4
+      '@ipld/dag-cbor': 7.0.3
+      multiformats: 9.9.0
+      uint8arrays: 3.0.0
       zod: 3.24.2
 
   '@atproto/syntax@0.3.3': {}
@@ -4284,6 +4309,12 @@ snapshots:
   '@humanwhocodes/retry@0.4.2': {}
 
   '@ioredis/commands@1.2.0': {}
+
+  '@ipld/car@3.2.4':
+    dependencies:
+      '@ipld/dag-cbor': 7.0.3
+      multiformats: 9.9.0
+      varint: 6.0.0
 
   '@ipld/dag-cbor@7.0.3':
     dependencies:
@@ -7161,6 +7192,8 @@ snapshots:
   utils-merge@1.0.1: {}
 
   uuid@9.0.1: {}
+
+  varint@6.0.0: {}
 
   vary@1.1.2: {}
 
