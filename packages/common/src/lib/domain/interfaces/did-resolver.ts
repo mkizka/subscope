@@ -1,8 +1,11 @@
+import type { Did } from "@atproto/did";
+
+import type { Handle } from "../../utils/handle.js";
+
 export interface IDidResolver {
-  resolve: (did: string) => Promise<{
-    did: string;
+  resolve: (did: Did) => Promise<{
     signingKey: string;
-    handle: string;
-    pds: string;
+    handle: Handle;
+    pds: URL;
   }>;
 }

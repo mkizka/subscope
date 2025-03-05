@@ -12,7 +12,7 @@ export class RepoFetcher implements IRepoFetcher {
   constructor(private readonly didResolver: IDidResolver) {}
   static inject = ["didResolver"] as const;
 
-  private async fetchRepo(did: Did, pds: string) {
+  private async fetchRepo(did: Did, pds: URL) {
     const client = new AtpBaseClient(pds);
     const response = await client.com.atproto.sync.getRepo({ did });
     if (!response.success) {

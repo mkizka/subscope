@@ -4,6 +4,7 @@ import { DidResolver as Resolver } from "@atproto/identity";
 import type { IDidResolver } from "../domain/interfaces/did-resolver.js";
 import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 import type { IMetricReporter } from "../domain/interfaces/metric.js";
+import { asHandle } from "../utils/handle.js";
 
 export class DidResolver implements IDidResolver {
   private readonly resolver: Resolver;
@@ -28,7 +29,12 @@ export class DidResolver implements IDidResolver {
   async resolve(did: string) {
     try {
       this.metricReporter.increment("did_resolve_total");
-      return await this.resolver.resolveAtprotoData(did);
+      const data = await this.resolver.resolveAtprotoData(did);
+      return {
+        signingKey: data.signingKey,
+        handle: asHandle(data.handle),
+        pds: new URL(data.pds),
+      };
     } catch (error) {
       this.metricReporter.increment("did_resolve_error_total");
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
