@@ -11,7 +11,7 @@ export class TokenVerifier implements ITokenVerifier {
 
   async verify(params: { token: string; nsid: string }) {
     const getSigninKey = async (did: string) => {
-      const { signingKey } = await this.didResolver.resolve(did);
+      const { signingKey } = await this.didResolver.resolve(asDid(did));
       return signingKey;
     };
     const payload = await verifyJwt(
