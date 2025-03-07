@@ -4,9 +4,10 @@
   "type": "module",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./dist/index.js"
   },
   "scripts": {
+    "build": "node build.js",
     "db:migrate": "drizzle-kit push",
     "studio": "drizzle-kit studio"
   },
@@ -19,6 +20,7 @@
     "@types/node": "22.13.5",
     "@types/pg": "8.11.11",
     "dotenv": "16.4.7",
-    "drizzle-kit": "0.30.4"
+    "drizzle-kit": "0.30.4",
+    "esbuild": "0.25.0"
   }
 }
