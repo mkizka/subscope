@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ATPROTO_DIR=../../atproto
+ATPROTO_DIR=../client/atproto
 
 cd $ATPROTO_DIR
 if [ ! -d node_modules ]; then

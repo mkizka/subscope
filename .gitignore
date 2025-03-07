@@ -11,6 +11,6 @@ generated/
 next-env.d.ts
 
 # atproto
-/atproto/
+/packages/client/atproto/
 /lexicons/app/bsky/
 /lexicons/com/atproto/
