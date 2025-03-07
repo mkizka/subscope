@@ -346,6 +346,9 @@ importers:
       '@types/express':
         specifier: 5.0.0
         version: 5.0.0
+      esbuild:
+        specifier: 0.25.0
+        version: 0.25.0
       eslint:
         specifier: 9.21.0
         version: 9.21.0(jiti@1.21.7)
@@ -377,6 +380,9 @@ importers:
       drizzle-kit:
         specifier: 0.30.4
         version: 0.30.4
+      esbuild:
+        specifier: 0.25.0
+        version: 0.25.0
 
   packages/dev-atproto: {}
 
