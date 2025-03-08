@@ -1,8 +1,7 @@
 import type { CacheResult, DidCache, DidDocument } from "@atproto/identity";
+import type { IMetricReporter } from "@dawn/common/domain";
 import KeyvRedis from "@keyv/redis";
 import Keyv from "keyv";
-
-import type { IMetricReporter } from "../domain/interfaces/metric.js";
 
 type CacheVal = {
   doc: DidDocument;

@@ -4,21 +4,11 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./utils": {
-      "import": "./dist/utils.js",
-      "types": "./dist/utils.d.ts"
-    },
-    "./domain": {
-      "import": "./dist/domain.js",
-      "types": "./dist/domain.d.ts"
-    },
-    "./infrastructure": {
-      "import": "./dist/infrastructure.js",
-      "types": "./dist/infrastructure.d.ts"
-    }
+    "./utils": "./src/utils.js",
+    "./domain": "./src/domain.js",
+    "./infrastructure": "./src/infrastructure.js"
   },
   "scripts": {
-    "build": "bunchee --sourcemap",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "typecheck": "tsc --noEmit"
   },
@@ -42,7 +32,6 @@
     "@skyware/jetstream": "0.2.2",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.0",
-    "bunchee": "6.4.0",
     "eslint": "9.21.0",
     "typescript": "5.7.3"
   },
