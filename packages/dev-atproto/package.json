@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "./scripts/dev.sh",
-    "postinstall": "pnpm giget gh:bluesky-social/atproto#22a96d6 node_modules/.cache/atproto --force --preferOffline"
+    "postinstall": "giget gh:bluesky-social/atproto#22a96d6 /tmp/dawn-atproto-22a96d6 --force --preferOffline"
   },
   "devDependencies": {
     "giget": "1.2.5"
