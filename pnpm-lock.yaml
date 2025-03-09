@@ -378,7 +378,11 @@ importers:
         specifier: 0.30.4
         version: 0.30.4
 
-  packages/dev-atproto: {}
+  packages/dev-atproto:
+    devDependencies:
+      giget:
+        specifier: 1.2.5
+        version: 1.2.5
 
   packages/dev-docker:
     devDependencies:

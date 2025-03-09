@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ATPROTO_DIR=./atproto/lexicons
+ATPROTO_DIR=./node_modules/.cache/lexicons
 LEXICONS_DIR=../../lexicons
 
 cp -r $ATPROTO_DIR/app $LEXICONS_DIR

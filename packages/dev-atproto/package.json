@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "./scripts/dev.sh"
+    "dev": "./scripts/dev.sh",
+    "postinstall": "pnpm giget gh:bluesky-social/atproto#22a96d6 node_modules/.cache/atproto --force --preferOffline"
+  },
+  "devDependencies": {
+    "giget": "1.2.5"
   }
 }
