@@ -43,7 +43,7 @@ export class Profile {
   }
 
   static from(record: Record) {
-    const parsed = parseRecord("app.bsky.actor.profile", record.json);
+    const parsed = parseRecord("app.bsky.actor.profile", record);
     return new Profile({
       uri: record.uri,
       cid: record.cid,

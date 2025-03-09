@@ -32,10 +32,10 @@ export class RepoFetcher implements IRepoFetcher {
     return creates.map((create) => {
       const cbor = required(commit.newBlocks.get(create.cid));
       const record = cborToLexRecord(cbor);
-      return new Record({
+      return Record.fromLex({
         uri: AtUri.make(did, create.collection, create.rkey),
         cid: create.cid.toString(),
-        json: record,
+        lex: record,
       });
     });
   }

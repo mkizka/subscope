@@ -13,14 +13,14 @@ export class RecordRepository implements IRecordRepository {
         uri: record.uri.toString(),
         cid: record.cid,
         actorDid: record.actorDid,
-        json: record.json,
+        json: record.getJson(),
       })
       .onConflictDoUpdate({
         target: schema.records.uri,
         set: {
           cid: record.cid,
           actorDid: record.actorDid,
-          json: record.json,
+          json: record.getJson(),
         },
       });
   }

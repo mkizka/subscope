@@ -1,6 +1,6 @@
-import { jsonToLex } from "@atproto/lexicon";
 import { lexicons } from "@dawn/client";
 
+import type { Record } from "../domain/record.js";
 import type {
   SupportedCollection,
   SupportedCollectionMap,
@@ -8,9 +8,9 @@ import type {
 
 export const parseRecord = <T extends SupportedCollection>(
   lexUri: T,
-  json: unknown,
+  record: Record,
 ) => {
-  const value = jsonToLex(json);
-  lexicons.assertValidRecord(lexUri, value);
-  return value as SupportedCollectionMap[T];
+  const lex = record.getLex();
+  lexicons.assertValidRecord(lexUri, lex);
+  return lex as SupportedCollectionMap[T];
 };

@@ -1,24 +1,56 @@
 import { asDid } from "@atproto/did";
+import { jsonToLex, lexToJson } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 
-type RecordParams = {
+type BaseRecordParams = {
   uri: AtUri | string;
   cid: string;
-  json: unknown;
   indexedAt?: Date | null;
 };
 
-export class Record {
-  readonly uri: AtUri;
-  readonly cid: string;
-  readonly json: unknown;
-  readonly indexedAt: Date | null;
+type LexRecordParams = BaseRecordParams & {
+  lex: unknown;
+};
 
-  constructor(params: RecordParams) {
+type JsonRecordParams = BaseRecordParams & {
+  json: unknown;
+};
+
+export class Record {
+  readonly uri;
+  readonly cid;
+  private json;
+  private lex;
+  readonly indexedAt;
+
+  private constructor(params: LexRecordParams & JsonRecordParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.json = params.json;
+    this.lex = params.lex;
     this.indexedAt = params.indexedAt ?? null;
+  }
+
+  static fromLex(params: LexRecordParams) {
+    return new Record({
+      ...params,
+      json: lexToJson(params.lex),
+    });
+  }
+
+  static fromJson(params: JsonRecordParams) {
+    return new Record({
+      ...params,
+      lex: jsonToLex(params.json),
+    });
+  }
+
+  getLex() {
+    return this.lex;
+  }
+
+  getJson() {
+    return this.json;
   }
 
   get actorDid() {

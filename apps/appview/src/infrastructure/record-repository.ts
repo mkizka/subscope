@@ -16,14 +16,13 @@ export class RecordRepository implements IRecordRepository {
       .select()
       .from(schema.records)
       .where(inArray(schema.records.uri, stringUris));
-    return records.map(
-      (record) =>
-        new Record({
-          uri: record.uri,
-          cid: record.cid,
-          json: record.json,
-          indexedAt: record.indexedAt,
-        }),
+    return records.map((record) =>
+      Record.fromJson({
+        uri: record.uri,
+        cid: record.cid,
+        json: record.json,
+        indexedAt: record.indexedAt,
+      }),
     );
   }
 }

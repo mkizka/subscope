@@ -54,7 +54,7 @@ export class Post {
   }
 
   static from(record: Record) {
-    const parsed = parseRecord("app.bsky.feed.post", record.json);
+    const parsed = parseRecord("app.bsky.feed.post", record);
     return new Post({
       uri: record.uri,
       cid: record.cid,
