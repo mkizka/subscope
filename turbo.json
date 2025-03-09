@@ -7,10 +7,13 @@
     },
     "start": {},
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": ["^typecheck", "build"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint", "build"]
+    },
+    "all": {
+      "dependsOn": ["typecheck", "lint"]
     },
     "dev": {
       "cache": false

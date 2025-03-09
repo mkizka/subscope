@@ -6,6 +6,7 @@
     "node": "22"
   },
   "scripts": {
+    "all": "turbo run all",
     "build": "turbo run build",
     "db:migrate": "pnpm --filter @dawn/db db:migrate",
     "dev": "turbo run dev --ui tui",
