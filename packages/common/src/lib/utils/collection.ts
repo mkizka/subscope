@@ -6,3 +6,14 @@ export type SupportedCollectionMap = {
 };
 
 export type SupportedCollection = keyof SupportedCollectionMap;
+
+const supportedCollections = [
+  "app.bsky.actor.profile",
+  "app.bsky.feed.post",
+] as const satisfies SupportedCollection[];
+
+export const isSupportedCollection = (
+  collection: string,
+): collection is SupportedCollection => {
+  return supportedCollections.includes(collection as SupportedCollection);
+};

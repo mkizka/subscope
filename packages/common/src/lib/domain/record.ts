@@ -2,6 +2,8 @@ import { asDid } from "@atproto/did";
 import { jsonToLex, lexToJson } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 
+import { isSupportedCollection } from "../utils/collection.js";
+
 type BaseRecordParams = {
   uri: AtUri | string;
   cid: string;
@@ -55,5 +57,12 @@ export class Record {
 
   get actorDid() {
     return asDid(this.uri.hostname);
+  }
+
+  getCollection() {
+    if (!isSupportedCollection(this.uri.collection)) {
+      throw new Error(`Unsupported collection: ${this.uri.collection}`);
+    }
+    return this.uri.collection;
   }
 }
