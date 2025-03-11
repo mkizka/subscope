@@ -11,6 +11,7 @@ import type { Temp__CleanupDatabaseUseCase } from "../application/temp__cleanup-
 import { upsertIdentityCommandFactory } from "../application/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/upsert-identity-use-case.js";
 import { env } from "../shared/env.js";
+import { createJobLogger } from "../shared/job.js";
 
 const baseWorkerOptions = {
   autorun: false,
@@ -42,7 +43,7 @@ export class SyncWorker {
         async (job) => {
           const command = indexCommitCommandFactory({
             event: job.data,
-            log: (message: string) => job.log(message),
+            jobLogger: createJobLogger(job),
           });
           await indexCommitUseCase.execute(command);
         },
@@ -68,7 +69,7 @@ export class SyncWorker {
       new Worker(
         "temp__cleanupDatabase",
         async (job) => {
-          const jobLogger = { log: (message: string) => job.log(message) };
+          const jobLogger = createJobLogger(job);
           await temp__cleanupDatabaseUseCase.execute(jobLogger);
         },
         {

@@ -3,12 +3,14 @@ import { AtUri } from "@atproto/syntax";
 import type { SupportedCollection } from "@dawn/common/utils";
 import type { CommitEvent } from "@skyware/jetstream";
 
+import type { JobLogger } from "../shared/job.js";
+
 export const indexCommitCommandFactory = ({
   event,
-  log,
+  jobLogger,
 }: {
   event: CommitEvent<SupportedCollection>;
-  log: (message: string) => Promise<unknown>;
+  jobLogger: JobLogger;
 }) => {
   const base = {
     uri: new AtUri(
@@ -17,7 +19,6 @@ export const indexCommitCommandFactory = ({
     did: asDid(event.did),
     collection: event.commit.collection,
   };
-  const jobLogger = { log };
   if (event.commit.operation === "delete") {
     return {
       commit: {
