@@ -1,4 +1,4 @@
-import { type ITransactionManager, Record } from "@dawn/common/domain";
+import { type ITransactionManager } from "@dawn/common/domain";
 
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import type { IndexCommitService } from "./service/index-commit-service.js";
@@ -16,12 +16,11 @@ export class IndexCommitUseCase {
       switch (commit.operation) {
         case "create":
         case "update": {
-          const record = Record.fromJson({
-            uri: commit.uri,
-            cid: commit.cid,
-            json: commit.record,
+          await this.indexCommitService.upsert({
+            ctx,
+            record: commit.record,
+            jobLogger,
           });
-          await this.indexCommitService.upsert({ ctx, record, jobLogger });
           break;
         }
         case "delete": {
