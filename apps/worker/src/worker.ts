@@ -13,6 +13,7 @@ import { BackfillUseCase } from "./application/backfill-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
+import { IndexCommitService } from "./application/service/index-commit-service.js";
 import { IndexPostService } from "./application/service/index-post-service.js";
 import { IndexProfileService } from "./application/service/index-profile-service.js";
 import { Temp__CleanupDatabaseUseCase } from "./application/temp__cleanup-database-usecase.js";
@@ -50,6 +51,7 @@ createInjector()
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)
+  .provideClass("indexCommitService", IndexCommitService)
   // application(use-case)
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)

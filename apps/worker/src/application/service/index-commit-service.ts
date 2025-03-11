@@ -34,7 +34,6 @@ export class IndexCommitService {
     };
   }
   static inject = [
-    "transactionManager",
     "recordRepository",
     "indexActorService",
     "indexPostService",
