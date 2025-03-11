@@ -7,6 +7,6 @@
     "postinstall": "giget gh:bluesky-social/atproto#22a96d6 /tmp/dawn-atproto-22a96d6 --force --preferOffline"
   },
   "devDependencies": {
-    "giget": "1.2.5"
+    "giget": "2.0.0"
   }
 }

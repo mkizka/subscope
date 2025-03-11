@@ -21,12 +21,12 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "giget": "1.2.5",
+    "giget": "2.0.0",
     "husky": "9.1.7",
     "lint-staged": "15.4.3",
-    "prettier": "3.5.2",
+    "prettier": "3.5.3",
     "prettier-plugin-pkg": "0.18.1",
-    "turbo": "2.4.2"
+    "turbo": "2.4.4"
   },
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"
