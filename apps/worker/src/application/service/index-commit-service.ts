@@ -1,7 +1,10 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@dawn/common/domain";
 import type { Record } from "@dawn/common/domain";
-import { type SupportedCollection } from "@dawn/common/utils";
+import {
+  isSupportedCollection,
+  type SupportedCollection,
+} from "@dawn/common/utils";
 
 import type { JobLogger } from "../../shared/job.js";
 import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
@@ -46,6 +49,9 @@ export class IndexCommitService {
     record: Record;
     jobLogger: JobLogger;
   }) {
+    if (!isSupportedCollection(record.collection)) {
+      throw new Error(`Unsupported collection: ${record.collection}`);
+    }
     if (!isValidRecord(record)) {
       await jobLogger.log("Invalid record: null character found");
       return;

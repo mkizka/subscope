@@ -12,7 +12,7 @@ const SUPPORTED_COLLECTION = [
   "app.bsky.feed.post",
 ] as const satisfies SupportedCollection[];
 
-const isSupportedCollection = (
+export const isSupportedCollection = (
   collection: string,
 ): collection is SupportedCollection => {
   return SUPPORTED_COLLECTION.includes(collection as SupportedCollection);
