@@ -7,7 +7,6 @@ import type {
   SupportedCollection,
   SupportedCollectionMap,
 } from "../utils/collection.js";
-import { asSupportedCollection } from "../utils/collection.js";
 
 type BaseRecordParams = {
   uri: AtUri | string;
@@ -25,8 +24,6 @@ type JsonRecordParams = BaseRecordParams & {
 
 export class Record {
   readonly uri;
-  readonly actorDid;
-  readonly collection;
   readonly cid;
   readonly json;
   private readonly lex;
@@ -34,8 +31,6 @@ export class Record {
 
   private constructor(params: LexRecordParams & JsonRecordParams) {
     this.uri = new AtUri(params.uri.toString());
-    this.actorDid = asDid(this.uri.hostname);
-    this.collection = asSupportedCollection(this.uri.collection);
     this.cid = params.cid;
     this.json = params.json;
     this.lex = params.lex;
@@ -54,6 +49,14 @@ export class Record {
       ...params,
       lex: jsonToLex(params.json),
     });
+  }
+
+  get actorDid() {
+    return asDid(this.uri.host);
+  }
+
+  get collection() {
+    return this.uri.collection;
   }
 
   validate<T extends SupportedCollection>(collection: T) {
