@@ -7,13 +7,20 @@ export type SupportedCollectionMap = {
 
 export type SupportedCollection = keyof SupportedCollectionMap;
 
-const supportedCollections = [
+const SUPPORTED_COLLECTION = [
   "app.bsky.actor.profile",
   "app.bsky.feed.post",
 ] as const satisfies SupportedCollection[];
 
-export const isSupportedCollection = (
+const isSupportedCollection = (
   collection: string,
 ): collection is SupportedCollection => {
-  return supportedCollections.includes(collection as SupportedCollection);
+  return SUPPORTED_COLLECTION.includes(collection as SupportedCollection);
+};
+
+export const asSupportedCollection = (collection: string) => {
+  if (!isSupportedCollection(collection)) {
+    throw new Error(`Unsupported collection: ${collection}`);
+  }
+  return collection;
 };

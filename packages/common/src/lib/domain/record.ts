@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import { jsonToLex, lexToJson } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 
-import { isSupportedCollection } from "../utils/collection.js";
+import { asSupportedCollection } from "../utils/collection.js";
 
 type BaseRecordParams = {
   uri: AtUri | string;
@@ -20,13 +20,17 @@ type JsonRecordParams = BaseRecordParams & {
 
 export class Record {
   readonly uri;
+  readonly actorDid;
+  readonly collection;
   readonly cid;
-  private json;
-  private lex;
+  readonly json;
+  readonly lex;
   readonly indexedAt;
 
   private constructor(params: LexRecordParams & JsonRecordParams) {
     this.uri = new AtUri(params.uri.toString());
+    this.actorDid = asDid(this.uri.hostname);
+    this.collection = asSupportedCollection(this.uri.collection);
     this.cid = params.cid;
     this.json = params.json;
     this.lex = params.lex;
@@ -45,24 +49,5 @@ export class Record {
       ...params,
       lex: jsonToLex(params.json),
     });
-  }
-
-  getLex() {
-    return this.lex;
-  }
-
-  getJson() {
-    return this.json;
-  }
-
-  get actorDid() {
-    return asDid(this.uri.hostname);
-  }
-
-  getCollection() {
-    if (!isSupportedCollection(this.uri.collection)) {
-      throw new Error(`Unsupported collection: ${this.uri.collection}`);
-    }
-    return this.uri.collection;
   }
 }

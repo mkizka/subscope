@@ -9,7 +9,7 @@ import type { IndexCommitService } from "./service/index-commit-service.js";
 const BACKFILL_SUPPORTED_COLLECTIONS = ["app.bsky.actor.profile"];
 
 const isBackfillSupported = (record: Record) => {
-  return BACKFILL_SUPPORTED_COLLECTIONS.includes(record.getCollection());
+  return BACKFILL_SUPPORTED_COLLECTIONS.includes(record.collection);
 };
 
 export class BackfillUseCase {

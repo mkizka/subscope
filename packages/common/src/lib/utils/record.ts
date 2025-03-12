@@ -10,7 +10,6 @@ export const parseRecord = <T extends SupportedCollection>(
   lexUri: T,
   record: Record,
 ) => {
-  const lex = record.getLex();
-  lexicons.assertValidRecord(lexUri, lex);
-  return lex as SupportedCollectionMap[T];
+  lexicons.assertValidRecord(lexUri, record.lex);
+  return record.lex as SupportedCollectionMap[T];
 };

@@ -36,7 +36,7 @@ export class PostViewService {
           did: record.uri.host,
           handle: "handle.invalid",
         },
-        record: asObject(record.getJson()),
+        record: asObject(record.json),
         // replyCount?: number
         // repostCount?: number
         // likeCount?: number

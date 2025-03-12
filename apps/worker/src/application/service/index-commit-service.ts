@@ -15,7 +15,7 @@ type IndexCollectionServiceMap = {
 
 const isValidRecord = (record: Record) => {
   // Postgresには`\u0000`を含む文字列を保存できないため
-  return !JSON.stringify(record.getJson()).includes("\\u0000");
+  return !JSON.stringify(record.json).includes("\\u0000");
 };
 
 export class IndexCommitService {
@@ -51,7 +51,7 @@ export class IndexCommitService {
       return;
     }
     await this.recordRepository.upsert({ ctx, record });
-    await this.services[record.getCollection()].upsert({ ctx, record });
+    await this.services[record.collection].upsert({ ctx, record });
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
