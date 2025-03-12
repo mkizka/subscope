@@ -1,7 +1,12 @@
 import { asDid } from "@atproto/did";
 import { jsonToLex, lexToJson } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
+import { lexicons } from "@dawn/client";
 
+import type {
+  SupportedCollection,
+  SupportedCollectionMap,
+} from "../utils/collection.js";
 import { asSupportedCollection } from "../utils/collection.js";
 
 type BaseRecordParams = {
@@ -24,7 +29,7 @@ export class Record {
   readonly collection;
   readonly cid;
   readonly json;
-  readonly lex;
+  private readonly lex;
   readonly indexedAt;
 
   private constructor(params: LexRecordParams & JsonRecordParams) {
@@ -49,5 +54,10 @@ export class Record {
       ...params,
       lex: jsonToLex(params.json),
     });
+  }
+
+  validate<T extends SupportedCollection>(collection: T) {
+    lexicons.assertValidRecord(collection, this.lex);
+    return this.lex as SupportedCollectionMap[T];
   }
 }

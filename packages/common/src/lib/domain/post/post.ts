@@ -1,7 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import { parseRecord } from "../../utils/record.js";
 import type { Record } from "../record.js";
 
 type StrongRef = Readonly<{
@@ -54,7 +53,7 @@ export class Post {
   }
 
   static from(record: Record) {
-    const parsed = parseRecord("app.bsky.feed.post", record);
+    const parsed = record.validate("app.bsky.feed.post");
     return new Post({
       uri: record.uri,
       cid: record.cid,

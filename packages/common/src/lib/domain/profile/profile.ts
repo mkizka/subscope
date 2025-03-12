@@ -1,7 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import { parseRecord } from "../../utils/record.js";
 import type { Record } from "../record.js";
 
 type Avatar = {
@@ -43,7 +42,7 @@ export class Profile {
   }
 
   static from(record: Record) {
-    const parsed = parseRecord("app.bsky.actor.profile", record);
+    const parsed = record.validate("app.bsky.actor.profile");
     return new Profile({
       uri: record.uri,
       cid: record.cid,
