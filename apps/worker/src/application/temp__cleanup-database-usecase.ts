@@ -2,6 +2,8 @@ import type { DatabaseClient } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { count, inArray, lt } from "drizzle-orm";
 
+import type { JobLogger } from "../shared/job.js";
+
 const DELETE_BATCH_SIZE = 1000;
 
 const CLEANUP_THRESHOLD_DURATION = 1000 * 60 * 60 * 24;
@@ -35,16 +37,16 @@ export class Temp__CleanupDatabaseUseCase {
       .where(inArray(schema.records.uri, uris));
   }
 
-  async execute(jobLogger: { log: (message: string) => void }) {
-    jobLogger.log("Starting cleanup database");
+  async execute(jobLogger: JobLogger) {
+    await jobLogger.log("Starting cleanup database");
     const oneDayAgo = new Date(Date.now() - CLEANUP_THRESHOLD_DURATION);
     const count = await this.getPostsCountToDelete(oneDayAgo);
-    jobLogger.log(`Found ${count} posts to delete`);
+    await jobLogger.log(`Found ${count} posts to delete`);
 
     const range = Math.ceil(count / DELETE_BATCH_SIZE);
     for (const i of Array(range).keys()) {
       const uris = await this.getPostUrisToDelete(oneDayAgo);
-      jobLogger.log(`Deleting ${uris.length} posts (${i + 1}/${range})`);
+      await jobLogger.log(`Deleting ${uris.length} posts (${i + 1}/${range})`);
       await this.deletePosts(uris);
     }
   }

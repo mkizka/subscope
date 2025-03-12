@@ -55,7 +55,10 @@ export class SyncWorker {
       new Worker<Did>(
         "backfill",
         async (job) => {
-          await backfillUseCase.execute(job.data);
+          await backfillUseCase.execute({
+            did: job.data,
+            jobLogger: createJobLogger(job),
+          });
         },
         {
           ...baseWorkerOptions,
