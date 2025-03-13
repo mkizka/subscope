@@ -7,7 +7,7 @@ export type SupportedCollectionMap = {
 
 export type SupportedCollection = keyof SupportedCollectionMap;
 
-const SUPPORTED_COLLECTION = [
+export const SUPPORTED_COLLECTIONS = [
   "app.bsky.actor.profile",
   "app.bsky.feed.post",
 ] as const satisfies SupportedCollection[];
@@ -15,5 +15,5 @@ const SUPPORTED_COLLECTION = [
 export const isSupportedCollection = (
   collection: string,
 ): collection is SupportedCollection => {
-  return SUPPORTED_COLLECTION.includes(collection as SupportedCollection);
+  return SUPPORTED_COLLECTIONS.includes(collection as SupportedCollection);
 };

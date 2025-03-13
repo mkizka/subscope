@@ -1,5 +1,5 @@
 import type { ILoggerManager, IMetricReporter } from "@dawn/common/domain";
-import { required, type SupportedCollection } from "@dawn/common/utils";
+import { required, SUPPORTED_COLLECTIONS } from "@dawn/common/utils";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
@@ -31,10 +31,7 @@ export class JetstreamIngester {
       ws: WebSocket,
       cursor: env.NODE_ENV === "development" ? -1 : undefined,
       endpoint: env.JETSTREAM_URL,
-      wantedCollections: [
-        "app.bsky.actor.profile",
-        "app.bsky.feed.post",
-      ] satisfies SupportedCollection[],
+      wantedCollections: SUPPORTED_COLLECTIONS,
     });
 
     this.jetstream.on("open", () => {
