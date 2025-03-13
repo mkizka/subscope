@@ -17,10 +17,3 @@ export const isSupportedCollection = (
 ): collection is SupportedCollection => {
   return SUPPORTED_COLLECTION.includes(collection as SupportedCollection);
 };
-
-export const asSupportedCollection = (collection: string) => {
-  if (!isSupportedCollection(collection)) {
-    throw new Error(`Unsupported collection: ${collection}`);
-  }
-  return collection;
-};
