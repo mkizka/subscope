@@ -31,6 +31,26 @@ export const records = pgTable("records", {
   indexedAt: timestamp().defaultNow(),
 });
 
+export const follows = pgTable(
+  "follows",
+  {
+    uri: varchar({ length: 256 })
+      .primaryKey()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did),
+    subjectDid: varchar({ length: 256 }).notNull(),
+    createdAt: timestamp().notNull(),
+    indexedAt: timestamp().defaultNow(),
+    sortAt: timestamp()
+      .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
+      .notNull(),
+  },
+  (table) => [index("sort_at_idx").on(table.sortAt)],
+);
+
 export const profiles = pgTable("profiles", {
   uri: varchar({ length: 256 })
     .primaryKey()
