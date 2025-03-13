@@ -9,6 +9,7 @@ import {
 import type { JobLogger } from "../../shared/job.js";
 import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
+import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
 
@@ -28,16 +29,19 @@ export class IndexCommitService {
     private readonly recordRepository: IRecordRepository,
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
+    indexFollowService: IndexFollowService,
   ) {
     this.services = {
       "app.bsky.feed.post": indexPostService,
       "app.bsky.actor.profile": indexProfileService,
+      "app.bsky.graph.follow": indexFollowService,
     };
   }
   static inject = [
     "recordRepository",
     "indexPostService",
     "indexProfileService",
+    "indexFollowService",
   ] as const;
 
   async upsert({

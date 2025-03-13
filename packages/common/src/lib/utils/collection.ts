@@ -1,8 +1,13 @@
-import type { AppBskyActorProfile, AppBskyFeedPost } from "@dawn/client";
+import type {
+  AppBskyActorProfile,
+  AppBskyFeedPost,
+  AppBskyGraphFollow,
+} from "@dawn/client";
 
 export type SupportedCollectionMap = {
   "app.bsky.actor.profile": AppBskyActorProfile.Record;
   "app.bsky.feed.post": AppBskyFeedPost.Record;
+  "app.bsky.graph.follow": AppBskyGraphFollow.Record;
 };
 
 export type SupportedCollection = keyof SupportedCollectionMap;
@@ -10,6 +15,7 @@ export type SupportedCollection = keyof SupportedCollectionMap;
 export const SUPPORTED_COLLECTIONS = [
   "app.bsky.actor.profile",
   "app.bsky.feed.post",
+  "app.bsky.graph.follow",
 ] as const satisfies SupportedCollection[];
 
 export const isSupportedCollection = (
