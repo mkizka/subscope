@@ -48,7 +48,7 @@ export const follows = pgTable(
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),
   },
-  (table) => [index("sort_at_idx").on(table.sortAt)],
+  (table) => [index("follows_sort_at_idx").on(table.sortAt)],
 );
 
 export const profiles = pgTable("profiles", {
@@ -91,9 +91,9 @@ export const posts = pgTable(
       .notNull(),
   },
   (table) => [
-    index("sort_at_idx").on(table.sortAt),
+    index("posts_sort_at_idx").on(table.sortAt),
     // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
-    index("indexed_at_idx").on(table.indexedAt),
+    index("posts_indexed_at_idx").on(table.indexedAt),
   ],
 );
 
