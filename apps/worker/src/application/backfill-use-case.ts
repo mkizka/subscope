@@ -1,15 +1,21 @@
 import type { Did } from "@atproto/did";
 import type { ITransactionManager, Record } from "@dawn/common/domain";
+import type { SupportedCollection } from "@dawn/common/utils";
 
 import type { JobLogger } from "../shared/job.js";
 import type { IRepoFetcher } from "./interfaces/repo-fetcher.js";
 import type { IndexActorService } from "./service/index-actor-service.js";
 import type { IndexCommitService } from "./service/index-commit-service.js";
 
-const BACKFILL_SUPPORTED_COLLECTIONS = ["app.bsky.actor.profile"];
+const BACKFILL_COLLECTIONS: SupportedCollection[] = [
+  "app.bsky.actor.profile",
+  "app.bsky.graph.follow",
+];
 
 const isBackfillSupported = (record: Record) => {
-  return BACKFILL_SUPPORTED_COLLECTIONS.includes(record.collection);
+  return BACKFILL_COLLECTIONS.includes(
+    record.collection as SupportedCollection,
+  );
 };
 
 export class BackfillUseCase {
