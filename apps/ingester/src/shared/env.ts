@@ -20,6 +20,7 @@ const schema = z.object({
         dev: "ws://localhost:6008/subscribe",
       }),
     ),
+  DISABLE_INGESTER: z.coerce.boolean().default(false),
   REDIS_URL: match({
     prod: z.string().url(),
     dev: z.string().url().default("redis://localhost:6379"),

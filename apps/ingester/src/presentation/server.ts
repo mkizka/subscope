@@ -52,7 +52,9 @@ export class IngesterServer {
   start() {
     this.app.listen(env.PORT, () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
-      this.ingester.start();
+      if (!env.DISABLE_INGESTER) {
+        this.ingester.start();
+      }
     });
   }
 }
