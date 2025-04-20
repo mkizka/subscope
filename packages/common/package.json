@@ -14,26 +14,26 @@
   },
   "dependencies": {
     "@atproto/did": "0.1.5",
-    "@atproto/identity": "0.4.6",
-    "@atproto/lexicon": "0.4.8",
-    "@atproto/syntax": "0.3.4",
+    "@atproto/identity": "0.4.7",
+    "@atproto/lexicon": "0.4.10",
+    "@atproto/syntax": "0.4.0",
     "@dawn/client": "workspace:*",
     "@dawn/db": "workspace:*",
-    "@keyv/redis": "4.3.1",
-    "bullmq": "5.41.9",
-    "drizzle-orm": "0.40.0",
-    "keyv": "5.3.1",
+    "@keyv/redis": "4.3.4",
+    "bullmq": "5.49.1",
+    "drizzle-orm": "0.42.0",
+    "keyv": "5.3.3",
     "multiformats": "13.3.2",
     "pino": "9.6.0",
     "prom-client": "15.1.3"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "5.4.0",
+    "@mkizka/eslint-config": "6.0.1",
     "@skyware/jetstream": "0.2.2",
     "@tsconfig/node-lts": "22.0.1",
-    "@types/express": "5.0.0",
-    "eslint": "9.22.0",
-    "typescript": "5.8.2"
+    "@types/express": "5.0.1",
+    "eslint": "9.25.0",
+    "typescript": "5.8.3"
   },
   "sideEffects": false
 }
