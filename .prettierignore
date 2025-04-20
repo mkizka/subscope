@@ -1,2 +1,4 @@
 .next/
+.husky/
 pnpm-lock.yaml
+Dockerfile
