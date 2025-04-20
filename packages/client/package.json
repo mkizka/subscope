@@ -12,7 +12,6 @@
     "build:type": "tsc --project tsconfig.build.json",
     "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command \"pnpm build\" --initial",
     "generate": "./scripts/generate.sh",
-    "postinstall": "giget gh:bluesky-social/atproto/lexicons#22a96d6 ../../lexicons --force --preferOffline",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
