@@ -15,18 +15,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/lexicon": "0.4.10",
-    "@atproto/xrpc": "0.6.12",
-    "@atproto/xrpc-server": "0.7.15",
-    "multiformats": "13.3.2"
+    "@atproto/lexicon": "0.4.11",
+    "@atproto/xrpc": "0.7.0",
+    "@atproto/xrpc-server": "0.7.18",
+    "multiformats": "13.3.3"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.8.0",
+    "@atproto/lex-cli": "0.8.1",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.1",
     "chokidar-cli": "3.0.0",
-    "esbuild": "0.25.2",
-    "npm-run-all2": "7.0.2",
+    "esbuild": "0.25.4",
+    "npm-run-all2": "8.0.1",
     "typescript": "5.8.3"
   }
 }
