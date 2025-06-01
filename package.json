@@ -9,7 +9,7 @@
     "all": "turbo run all",
     "build": "turbo run build",
     "db:migrate": "pnpm --filter @dawn/db db:migrate",
-    "dev": "./scripts/dev.sh",
+    "dev": "turbo run dev --ui tui",
     "format": "prettier . --ignore-unknown --write && turbo run lint -- --fix",
     "lint": "pnpm prettier . --check && turbo run lint",
     "prepare": "husky",
@@ -22,13 +22,11 @@
   },
   "devDependencies": {
     "husky": "9.1.7",
-    "kill-port": "2.0.1",
     "lint-staged": "15.5.2",
     "prettier": "3.5.3",
     "prettier-plugin-pkg": "0.19.1",
     "prettier-plugin-sh": "0.17.4",
-    "turbo": "2.5.3",
-    "wait-on": "8.0.3"
+    "turbo": "2.5.3"
   },
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"

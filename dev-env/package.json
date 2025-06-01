@@ -8,9 +8,12 @@
     "postinstall": "./scripts/postinstall.sh",
     "reset-dev-env": "./scripts/reset-dev-env.sh",
     "run-dev-env": "./scripts/run-dev-env.sh",
-    "setup-dev-env": "./scripts/setup-dev-env.sh"
+    "setup-dev-env": "./scripts/setup-dev-env.sh",
+    "start-docker": "./scripts/start-docker.sh"
   },
   "devDependencies": {
-    "giget": "2.0.0"
+    "giget": "2.0.0",
+    "kill-port": "2.0.1",
+    "wait-on": "8.0.3"
   }
 }

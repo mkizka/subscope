@@ -15,8 +15,27 @@
     "all": {
       "dependsOn": ["typecheck", "lint"]
     },
+    "reset-dev-env": {
+      "cache": false
+    },
+    "setup-dev-env": {
+      "dependsOn": ["reset-dev-env"],
+      "cache": false
+    },
+    "run-dev-env": {
+      "dependsOn": ["setup-dev-env"],
+      "cache": false
+    },
+    "start-docker": {
+      "dependsOn": ["run-dev-env"],
+      "cache": false
+    },
+    "db:migrate": {
+      "dependsOn": ["start-docker"],
+      "cache": false
+    },
     "dev": {
-      "dependsOn": ["build"],
+      "dependsOn": ["build", "db:migrate"],
       "cache": false
     }
   }
