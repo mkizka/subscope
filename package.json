@@ -12,7 +12,6 @@
     "dev": "./scripts/dev.sh",
     "format": "prettier . --ignore-unknown --write && turbo run lint -- --fix",
     "lint": "pnpm prettier . --check && turbo run lint",
-    "postinstall": "./scripts/postinstall.sh",
     "prepare": "husky",
     "start": "turbo run start",
     "start:appview": "pnpm -s db:migrate && pnpm --filter @dawn/appview start",
@@ -22,7 +21,6 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "giget": "2.0.0",
     "husky": "9.1.7",
     "kill-port": "2.0.1",
     "lint-staged": "15.5.2",
