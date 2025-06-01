@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AppBskyActorDefs } from "@dawn/client/api";
+import type { AppBskyActorDefs } from "@dawn/client/server";
 import type { ProfileDetailed } from "@dawn/common/domain";
 import { type Handle, isHandle } from "@dawn/common/utils";
 

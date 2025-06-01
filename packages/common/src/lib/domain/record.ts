@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import { jsonToLex, lexToJson } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
-import { lexicons } from "@dawn/client/api";
+import { lexicons } from "@dawn/client/server";
 
 import type {
   SupportedCollection,

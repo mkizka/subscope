@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { DevMkizkaTestSyncGetJobStatus } from "@dawn/client/api";
+import type { DevMkizkaTestSyncGetJobStatus } from "@dawn/client/server";
 import type { IJobQueue } from "@dawn/common/domain";
 
 export class GetJobStatusUseCase {

@@ -1,4 +1,7 @@
-import type { AppBskyFeedDefs, AppBskyFeedGetTimeline } from "@dawn/client/api";
+import type {
+  AppBskyFeedDefs,
+  AppBskyFeedGetTimeline,
+} from "@dawn/client/server";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { required } from "@dawn/common/utils";
 
@@ -18,7 +21,7 @@ export class GetTimelineUseCase {
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const samplePosts = await this.postRepository.findMany({
       // TODO: サーバー側の型を利用するように修正(limitは必須になっている)
-      limit: params.limit!,
+      limit: params.limit,
       cursor: params.cursor,
     });
     const postViews = await this.postViewService.findPostView(

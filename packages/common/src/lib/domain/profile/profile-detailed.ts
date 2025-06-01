@@ -1,4 +1,4 @@
-import type { AppBskyActorDefs } from "@dawn/client/api";
+import type { AppBskyActorDefs } from "@dawn/client/server";
 
 import type { Handle } from "../../utils/handle.js";
 import { asHandle } from "../../utils/handle.js";

@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
-import type { AppBskyFeedDefs } from "@dawn/client/api";
+import type { AppBskyFeedDefs } from "@dawn/client/server";
 import { required } from "@dawn/common/utils";
 
 import type { IRecordRepository } from "../interfaces/record-repository.js";
