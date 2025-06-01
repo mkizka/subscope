@@ -9,3 +9,4 @@ export * from "./lib/domain/post/post.js";
 export * from "./lib/domain/profile/profile.js";
 export * from "./lib/domain/profile/profile-detailed.js";
 export * from "./lib/domain/record.js";
+export * from "./lib/domain/subscription.js";

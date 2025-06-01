@@ -1,0 +1,17 @@
+import type { Record, TransactionContext } from "@dawn/common/domain";
+import { Subscription } from "@dawn/common/domain";
+
+import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
+import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";
+
+export class IndexSubscriptionService implements IIndexColectionService {
+  constructor(
+    private readonly subscriptionRepository: ISubscriptionRepository,
+  ) {}
+  static inject = ["subscriptionRepository"] as const;
+
+  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+    const subscription = Subscription.from(record);
+    await this.subscriptionRepository.upsert({ ctx, subscription });
+  }
+}

@@ -12,6 +12,7 @@ import type { IRecordRepository } from "../interfaces/record-repository.js";
 import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
+import type { IndexSubscriptionService } from "./index-subscription-service.js";
 
 type IndexCollectionServiceMap = {
   [key in SupportedCollection]: IIndexColectionService;
@@ -30,11 +31,13 @@ export class IndexCommitService {
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
+    indexSubscriptionService: IndexSubscriptionService,
   ) {
     this.services = {
       "app.bsky.feed.post": indexPostService,
       "app.bsky.actor.profile": indexProfileService,
       "app.bsky.graph.follow": indexFollowService,
+      "dev.mkizka.test.subscription": indexSubscriptionService,
     };
   }
   static inject = [
@@ -42,6 +45,7 @@ export class IndexCommitService {
     "indexPostService",
     "indexProfileService",
     "indexFollowService",
+    "indexSubscriptionService",
   ] as const;
 
   async upsert({

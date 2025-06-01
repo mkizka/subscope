@@ -17,6 +17,7 @@ import { IndexCommitService } from "./application/service/index-commit-service.j
 import { IndexFollowService } from "./application/service/index-follow-service.js";
 import { IndexPostService } from "./application/service/index-post-service.js";
 import { IndexProfileService } from "./application/service/index-profile-service.js";
+import { IndexSubscriptionService } from "./application/service/index-subscription-service.js";
 import { Temp__CleanupDatabaseUseCase } from "./application/temp__cleanup-database-usecase.js";
 import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
@@ -25,6 +26,7 @@ import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
+import { SubscriptionRepository } from "./infrastructure/subscription-repository.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
@@ -50,11 +52,13 @@ createInjector()
   .provideClass("postRepository", PostRepository)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("followRepository", FollowRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
   // application(service)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("indexFollowService", IndexFollowService)
+  .provideClass("indexSubscriptionService", IndexSubscriptionService)
   .provideClass("indexCommitService", IndexCommitService)
   // application(use-case)
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
