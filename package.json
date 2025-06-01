@@ -17,7 +17,6 @@
     "start:appview": "pnpm -s db:migrate && pnpm --filter @dawn/appview start",
     "start:ingester": "pnpm --filter @dawn/ingester start",
     "start:worker": "pnpm -s db:migrate && pnpm --filter @dawn/worker start",
-    "studio": "pnpm --filter @dawn/db studio",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
