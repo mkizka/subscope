@@ -11,6 +11,7 @@ Dawnは3つのメインアプリケーションでBluesky AppViewを実装する
 - **worker**: BullMQを使用してレコードをデータベースにインデックスするバックグラウンドジョブプロセッサー
 
 ## プロジェクトのコンセプト
+
 システムは選択的データ保存アプローチに従い、「サブスクライバー」（サブスクリプションレコードを作成したユーザー）とそのフォローグラフのレコードのみを保存してデータベースサイズを最小化します。
 
 詳しい仕様は @docs/spec.md を参照してください。
@@ -18,41 +19,47 @@ Dawnは3つのメインアプリケーションでBluesky AppViewを実装する
 ## 開発コマンド
 
 ### 初期セットアップ
+
 ```bash
 pnpm install
-pnpm dev  # atprotoサーバー、コンテナ、全アプリを含む完全な開発環境を実行
+pnpm dev # atprotoサーバー、コンテナ、全アプリを含む完全な開発環境を実行
 ```
 
 ### データベース操作
+
 ```bash
-pnpm db:migrate     # データベースマイグレーションを実行
-pnpm studio         # データベース確認用にDrizzle Studioを開く
+pnpm db:migrate # データベースマイグレーションを実行
+pnpm studio     # データベース確認用にDrizzle Studioを開く
 ```
 
 ### 開発
+
 ```bash
-pnpm dev            # TUI付きで開発モードで全サービスを開始
-pnpm typecheck      # 全パッケージの型チェック
-pnpm lint           # 全コードのlintとフォーマットチェック
-pnpm format         # コードフォーマットとlint問題の自動修正
+pnpm dev       # TUI付きで開発モードで全サービスを開始
+pnpm typecheck # 全パッケージの型チェック
+pnpm lint      # 全コードのlintとフォーマットチェック
+pnpm format    # コードフォーマットとlint問題の自動修正
 ```
 
 ### 個別アプリ開発
+
 ```bash
-pnpm start:appview   # マイグレーション付きでappviewのみ開始
-pnpm start:ingester  # ingesterのみ開始
-pnpm start:worker    # マイグレーション付きでworkerのみ開始
+pnpm start:appview  # マイグレーション付きでappviewのみ開始
+pnpm start:ingester # ingesterのみ開始
+pnpm start:worker   # マイグレーション付きでworkerのみ開始
 ```
 
 ### 本番環境
+
 ```bash
-pnpm build          # 全パッケージをビルド
-pnpm start          # 本番モードで全アプリを開始
+pnpm build # 全パッケージをビルド
+pnpm start # 本番モードで全アプリを開始
 ```
 
 ## パッケージ依存関係
 
 モノレポは共有パッケージでワークスペースを使用：
+
 - `@dawn/db` - Drizzle ORMデータベース層
 - `@dawn/common` - 共有ユーティリティとBullMQジョブ定義
 - `@dawn/client` - AT Protocolクライアントラッパー
@@ -60,12 +67,14 @@ pnpm start          # 本番モードで全アプリを開始
 ## 開発環境
 
 devスクリプトは自動的に：
+
 1. atproto参照実装をダウンロードしてビルド
 2. Docker Compose経由でPostgreSQL、Redis、Jetstreamコンテナを開始
 3. データベースマイグレーションを実行
 4. ホットリロード付きで3つのアプリを全て開始
 
 システムの要件：
+
 - Node.js 22
 - pnpm 10.10.0+
 - ローカル開発依存関係用のDocker
@@ -73,6 +82,7 @@ devスクリプトは自動的に：
 ## コードアーキテクチャ
 
 各アプリはクリーンアーキテクチャパターンに従う：
+
 - `application/` - ユースケースとビジネスロジック
 - `infrastructure/` - 外部サービス実装
 - `presentation/` - HTTPルートとWebSocketハンドラー
