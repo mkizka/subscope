@@ -10,7 +10,7 @@
     "build": "pnpm generate && run-p -s build:*",
     "build:ts": "node build.mjs",
     "build:type": "tsc --project tsconfig.build.json",
-    "dev": "chokidar ./scripts/generate.sh ../../lexicons/dev/**/*.json --command \"pnpm build\" --initial",
+    "dev": "chokidar ./scripts/generate.sh ./lexicons/dev/**/*.json --command \"pnpm build\" --initial",
     "generate": "./scripts/generate.sh",
     "typecheck": "tsc --noEmit"
   },
