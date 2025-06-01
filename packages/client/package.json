@@ -24,15 +24,15 @@
     "@atproto/lexicon": "0.4.11",
     "@atproto/xrpc": "0.7.0",
     "@atproto/xrpc-server": "0.7.18",
-    "multiformats": "13.3.3"
+    "multiformats": "13.3.6"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.8.1",
+    "@atproto/lex-cli": "0.8.2",
     "@tsconfig/node-lts": "22.0.1",
-    "@types/express": "5.0.1",
+    "@types/express": "5.0.2",
     "chokidar-cli": "3.0.0",
-    "esbuild": "0.25.4",
-    "npm-run-all2": "8.0.1",
+    "esbuild": "0.25.5",
+    "npm-run-all2": "8.0.4",
     "typescript": "5.8.3"
   },
   "sideEffects": false
