@@ -1,66 +1,35 @@
 import type { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
-import {
-  connectionPoolFactory,
-  databaseFactory,
-  LoggerManager,
-} from "@dawn/common/infrastructure";
 import { schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
-import { execa } from "execa";
-import type { StartedTestContainer } from "testcontainers";
-import { GenericContainer } from "testcontainers";
-import { createInjector } from "typed-inject";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { PostRepository } from "../../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+} from "../../shared/test-utils.js";
 import { IndexPostService } from "./index-post-service.js";
 
-let postgresContainer: StartedTestContainer;
+let testSetup: Awaited<ReturnType<typeof setupTestDatabase>>;
 let indexPostService: IndexPostService;
-let connectionPool: ReturnType<typeof connectionPoolFactory>;
 let ctx: TransactionContext;
 
 beforeAll(async () => {
-  postgresContainer = await new GenericContainer("postgres:16-alpine")
-    .withEnvironment({ POSTGRES_PASSWORD: "password" })
-    .withExposedPorts(5432)
-    .start();
+  testSetup = await setupTestDatabase();
 
-  const databaseUrl = new URL(
-    `postgresql://${postgresContainer.getHost()}:${postgresContainer.getMappedPort(5432)}`,
-  );
-  databaseUrl.username = "postgres";
-  databaseUrl.password = "password";
-  databaseUrl.pathname = "postgres";
-  await execa({
-    cwd: "../..",
-    stdout: "inherit",
-    stderr: "inherit",
-    env: {
-      DATABASE_URL: databaseUrl.toString(),
-    },
-  })`pnpm db:migrate`;
-
-  const injector = createInjector()
-    .provideValue("logLevel", "debug" as const)
-    .provideValue("databaseUrl", databaseUrl.toString())
-    .provideClass("loggerManager", LoggerManager)
-    .provideFactory("connectionPoolFactory", connectionPoolFactory)
-    .provideFactory("db", databaseFactory)
+  const injector = testSetup.injector
     .provideClass("postRepository", PostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("indexPostService", IndexPostService);
 
   indexPostService = injector.resolve("indexPostService");
-  connectionPool = injector.resolve("connectionPoolFactory");
-  ctx = { db: injector.resolve("db") };
+  ctx = { db: testSetup.db };
 });
 
 afterAll(async () => {
-  await connectionPool.end();
-  await postgresContainer.stop();
+  await teardownTestDatabase(testSetup);
 });
 
 describe("IndexPostService", () => {
@@ -98,7 +67,7 @@ describe("IndexPostService", () => {
         text: "test post",
         createdAt: new Date().toISOString(),
       };
-      
+
       await ctx.db.insert(schema.records).values({
         uri: "at://did:plc:123/app.bsky.feed.post/123",
         cid: "abc123",
