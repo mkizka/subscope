@@ -1,5 +1,6 @@
 import type { Subscription, TransactionContext } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
+import { and, eq, exists } from "drizzle-orm";
 
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 
@@ -27,5 +28,43 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         target: schema.subscriptions.uri,
         set: data,
       });
+  }
+
+  async isSubscriber(
+    ctx: TransactionContext,
+    actorDid: string,
+  ): Promise<boolean> {
+    const result = await ctx.db
+      .select({ actorDid: schema.subscriptions.actorDid })
+      .from(schema.subscriptions)
+      .where(eq(schema.subscriptions.actorDid, actorDid))
+      .limit(1);
+
+    return result.length > 0;
+  }
+
+  async hasSubscriberFollower(
+    ctx: TransactionContext,
+    actorDid: string,
+  ): Promise<boolean> {
+    const result = await ctx.db
+      .select({ actorDid: schema.follows.actorDid })
+      .from(schema.follows)
+      .where(
+        and(
+          eq(schema.follows.subjectDid, actorDid), // actorDidがフォロイーであるフォロー関係
+          exists(
+            ctx.db
+              .select()
+              .from(schema.subscriptions)
+              .where(
+                eq(schema.subscriptions.actorDid, schema.follows.actorDid),
+              ),
+          ),
+        ),
+      )
+      .limit(1);
+
+    return result.length > 0;
   }
 }

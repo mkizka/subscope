@@ -1,5 +1,6 @@
 import type { Post, TransactionContext } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
+import { inArray } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
@@ -12,6 +13,10 @@ export class PostRepository implements IPostRepository {
         cid: post.cid,
         actorDid: post.actorDid,
         text: post.text,
+        replyRootUri: post.replyRoot?.uri.toString(),
+        replyRootCid: post.replyRoot?.cid,
+        replyParentUri: post.replyParent?.uri.toString(),
+        replyParentCid: post.replyParent?.cid,
         langs: post.langs,
         createdAt: post.createdAt,
       })
@@ -19,9 +24,27 @@ export class PostRepository implements IPostRepository {
         target: schema.posts.uri,
         set: {
           text: post.text,
+          replyRootUri: post.replyRoot?.uri.toString(),
+          replyRootCid: post.replyRoot?.cid,
+          replyParentUri: post.replyParent?.uri.toString(),
+          replyParentCid: post.replyParent?.cid,
           langs: post.langs,
           createdAt: post.createdAt,
         },
       });
+  }
+
+  async existsAny(ctx: TransactionContext, uris: string[]): Promise<boolean> {
+    if (uris.length === 0) {
+      return false;
+    }
+
+    const result = await ctx.db
+      .select({ uri: schema.posts.uri })
+      .from(schema.posts)
+      .where(inArray(schema.posts.uri, uris))
+      .limit(1);
+
+    return result.length > 0;
   }
 }
