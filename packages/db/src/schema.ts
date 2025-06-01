@@ -105,6 +105,19 @@ export const blobs = pgTable("blobs", {
   updatedAt: timestamp().$onUpdate(() => new Date()),
 });
 
+export const subscriptions = pgTable("subscriptions", {
+  uri: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => records.uri, { onDelete: "cascade" }),
+  cid: varchar({ length: 256 }).notNull(),
+  actorDid: varchar({ length: 256 })
+    .notNull()
+    .references(() => actors.did),
+  appviewDid: varchar({ length: 256 }).notNull(),
+  createdAt: timestamp().notNull(),
+  indexedAt: timestamp().defaultNow(),
+});
+
 export const actorsRelations = relations(actors, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [actors.did],
