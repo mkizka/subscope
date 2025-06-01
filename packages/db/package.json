@@ -20,5 +20,6 @@
     "@types/pg": "8.15.1",
     "dotenv": "16.5.0",
     "drizzle-kit": "0.31.1"
-  }
+  },
+  "sideEffects": false
 }
