@@ -1,6 +1,6 @@
-import type { TransactionContext  } from "@dawn/common/domain";
+import type { TransactionContext } from "@dawn/common/domain";
 import { Post, Record } from "@dawn/common/domain";
-import { beforeEach, describe, expect, it, type Mock,vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import type { IPostRepository } from "../interfaces/post-repository.js";
 import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";

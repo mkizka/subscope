@@ -1,11 +1,19 @@
 import { schema } from "@dawn/db";
 import type { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 
 import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 
+export const connectionPoolFactory = (databaseUrl: string) => {
+  return new Pool({
+    connectionString: databaseUrl,
+  });
+};
+connectionPoolFactory.inject = ["databaseUrl"] as const;
+
 export const databaseFactory = (
-  databaseUrl: string,
+  connectionPool: ReturnType<typeof connectionPoolFactory>,
   loggerManager: ILoggerManager,
 ) => {
   class DrizzleLogger implements BaseDrizzleLogger {
@@ -19,11 +27,12 @@ export const databaseFactory = (
       this.logger.debug(query);
     }
   }
+
   return drizzle({
-    connection: databaseUrl,
+    client: connectionPool,
     schema,
     casing: "snake_case",
     logger: new DrizzleLogger(),
   });
 };
-databaseFactory.inject = ["databaseUrl", "loggerManager"] as const;
+databaseFactory.inject = ["connectionPoolFactory", "loggerManager"] as const;

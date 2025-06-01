@@ -1,4 +1,5 @@
 import {
+  connectionPoolFactory,
   databaseFactory,
   DidResolver,
   JobQueue,
@@ -40,6 +41,7 @@ createInjector()
   .provideValue("plcUrl", env.PLC_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
+  .provideFactory("connectionPoolFactory", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("transactionManager", TransactionManager)
   .provideClass("metricReporter", MetricReporter)

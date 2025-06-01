@@ -358,6 +358,9 @@ importers:
       '@keyv/redis':
         specifier: 4.4.0
         version: 4.4.0(keyv@5.3.3)
+      '@types/pg':
+        specifier: 8.15.2
+        version: 8.15.2
       bullmq:
         specifier: 5.53.1
         version: 5.53.1
@@ -370,6 +373,9 @@ importers:
       multiformats:
         specifier: 13.3.6
         version: 13.3.6
+      pg:
+        specifier: 8.16.0
+        version: 8.16.0
       pino:
         specifier: 9.7.0
         version: 9.7.0

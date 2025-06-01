@@ -1,4 +1,5 @@
 import {
+  connectionPoolFactory,
   databaseFactory,
   DidResolver,
   JobQueue,
@@ -37,6 +38,7 @@ createInjector()
   .provideValue("redisUrl", env.REDIS_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
+  .provideFactory("connectionPoolFactory", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("handlesToDidsRepository", HandlesToDidsRepository)
