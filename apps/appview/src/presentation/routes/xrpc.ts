@@ -1,4 +1,4 @@
-import { createServer } from "@dawn/client";
+import { createServer } from "@dawn/client/server";
 
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";

@@ -3,8 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "import": "./dist/index.mjs",
-    "types": "./dist/index.d.ts"
+    "./api": {
+      "import": "./dist/api.mjs",
+      "types": "./dist/api.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.mjs",
+      "types": "./dist/server.d.ts"
+    }
   },
   "scripts": {
     "build": "pnpm generate && run-p -s build:*",

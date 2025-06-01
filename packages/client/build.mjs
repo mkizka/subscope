@@ -4,7 +4,7 @@ import fs from "fs";
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 
 await build({
-  entryPoints: ["src/index.ts"],
+  entryPoints: ["src/api.ts", "src/server.ts"],
   bundle: true,
   outdir: "dist",
   outExtension: { ".js": ".mjs" },

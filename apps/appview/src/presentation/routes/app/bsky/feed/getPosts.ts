@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import type { Server } from "@dawn/client";
+import type { Server } from "@dawn/client/server";
 
 import type { GetPostsUseCase } from "../../../../../application/get-posts-use-case.js";
 

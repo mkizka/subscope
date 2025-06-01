@@ -1,4 +1,4 @@
-import type { AppBskyFeedDefs, AppBskyFeedGetTimeline } from "@dawn/client";
+import type { AppBskyFeedDefs, AppBskyFeedGetTimeline } from "@dawn/client/api";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { required } from "@dawn/common/utils";
 

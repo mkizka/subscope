@@ -1,4 +1,4 @@
-import type { Server } from "@dawn/client";
+import type { Server } from "@dawn/client/server";
 
 import type { GetJobStatusUseCase } from "../../../../../application/get-job-status-use-case.js";
 import type { AuthVerifierService } from "../../../../../application/service/auth-verifier-service.js";

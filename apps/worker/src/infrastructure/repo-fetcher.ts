@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import { cborToLexRecord, verifyRepoCar } from "@atproto/repo";
 import { AtUri } from "@atproto/syntax";
-import { AtpBaseClient } from "@dawn/client";
+import { AtpBaseClient } from "@dawn/client/api";
 import type { IDidResolver } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { required } from "@dawn/common/utils";
