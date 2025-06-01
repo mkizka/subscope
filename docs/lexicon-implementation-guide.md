@@ -21,7 +21,7 @@ AT Protocolにおける新しいレコードタイプを追加する際の標準
 
 ### Lexicon定義例
 
-**ファイル:** `/lexicons/{namespace}/{collection}.json`
+**ファイル:** `/packages/client/lexicons/{namespace}/{collection}.json`
 
 ```json
 {
@@ -222,7 +222,7 @@ constructor(
 
 ### 事前準備
 
-- [ ] Lexicon定義ファイル作成 (`/lexicons/{namespace}/{collection}.json`)
+- [ ] Lexicon定義ファイル作成 (`/packages/client/lexicons/{namespace}/{collection}.json`)
 - [ ] データベーステーブル定義追加 (`/packages/db/src/schema.ts`)
 
 ### 実装ファイル

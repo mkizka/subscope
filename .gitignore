@@ -10,8 +10,3 @@ generated/
 # next
 .next/
 next-env.d.ts
-
-# atproto
-/packages/client/atproto/
-/lexicons/*
-!/lexicons/dev/
