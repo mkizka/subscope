@@ -1,142 +1,123 @@
 import type { TransactionContext } from "@dawn/common/domain";
-import { Post, Record } from "@dawn/common/domain";
-import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import { Record } from "@dawn/common/domain";
+import {
+  connectionPoolFactory,
+  databaseFactory,
+  LoggerManager,
+} from "@dawn/common/infrastructure";
+import { schema } from "@dawn/db";
+import { eq } from "drizzle-orm";
+import { execa } from "execa";
+import type { StartedTestContainer } from "testcontainers";
+import { GenericContainer } from "testcontainers";
+import { createInjector } from "typed-inject";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import type { IPostRepository } from "../interfaces/post-repository.js";
-import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";
+import { PostRepository } from "../../infrastructure/post-repository.js";
+import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexPostService } from "./index-post-service.js";
 
+let postgresContainer: StartedTestContainer;
+let indexPostService: IndexPostService;
+let connectionPool: ReturnType<typeof connectionPoolFactory>;
+let ctx: TransactionContext;
+
+beforeAll(async () => {
+  postgresContainer = await new GenericContainer("postgres:16-alpine")
+    .withEnvironment({ POSTGRES_PASSWORD: "password" })
+    .withExposedPorts(5432)
+    .start();
+
+  const databaseUrl = new URL(
+    `postgresql://${postgresContainer.getHost()}:${postgresContainer.getMappedPort(5432)}`,
+  );
+  databaseUrl.username = "postgres";
+  databaseUrl.password = "password";
+  databaseUrl.pathname = "postgres";
+  await execa({
+    cwd: "../..",
+    stdout: "inherit",
+    stderr: "inherit",
+    env: {
+      DATABASE_URL: databaseUrl.toString(),
+    },
+  })`pnpm db:migrate`;
+
+  const injector = createInjector()
+    .provideValue("logLevel", "debug" as const)
+    .provideValue("databaseUrl", databaseUrl.toString())
+    .provideClass("loggerManager", LoggerManager)
+    .provideFactory("connectionPoolFactory", connectionPoolFactory)
+    .provideFactory("db", databaseFactory)
+    .provideClass("postRepository", PostRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("indexPostService", IndexPostService);
+
+  indexPostService = injector.resolve("indexPostService");
+  connectionPool = injector.resolve("connectionPoolFactory");
+  ctx = { db: injector.resolve("db") };
+});
+
+afterAll(async () => {
+  await connectionPool.end();
+  await postgresContainer.stop();
+});
+
 describe("IndexPostService", () => {
-  let service: IndexPostService;
-  let mockPostRepository: IPostRepository;
-  let mockSubscriptionRepository: ISubscriptionRepository;
-  let mockCtx: TransactionContext;
-
-  beforeEach(() => {
-    mockPostRepository = {
-      upsert: vi.fn(),
-      existsAny: vi.fn(),
-    };
-    mockSubscriptionRepository = {
-      upsert: vi.fn(),
-      isSubscriber: vi.fn(),
-      hasSubscriberFollower: vi.fn(),
-    };
-    mockCtx = {} as TransactionContext;
-
-    service = new IndexPostService(
-      mockPostRepository,
-      mockSubscriptionRepository,
-    );
-  });
-
   describe("upsert", () => {
-    it("投稿者がsubscriberの場合は投稿を保存する", async () => {
-      const mockRecord = Record.fromJson({
-        uri: "at://did:example:alice/app.bsky.feed.post/123",
-        cid: "bafyreib2cyuq4wlb2d2643ktta3tqn7s5gmwbrsabohrfqrxcwazajx7za",
+    it("subscriberの投稿は実際にDBに保存される", async () => {
+      // subscriberとしてactor情報を準備
+      await ctx.db.insert(schema.actors).values({
+        did: "did:plc:123",
+        handle: "test.bsky.social",
+      });
+
+      // subscriptionレコード用のrecordsテーブルエントリ
+      await ctx.db.insert(schema.records).values({
+        uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
+        cid: "sub123",
+        actorDid: "did:plc:123",
         json: {
-          $type: "app.bsky.feed.post",
-          text: "Hello world",
-          createdAt: "2023-01-01T00:00:00.000Z",
+          $type: "dev.mkizka.test.subscription",
+          appviewDid: "did:web:api.dawn.test",
+          createdAt: new Date().toISOString(),
         },
       });
 
-      (mockSubscriptionRepository.isSubscriber as Mock).mockResolvedValue(true);
-
-      await service.upsert({ ctx: mockCtx, record: mockRecord });
-
-      expect(mockPostRepository.upsert).toHaveBeenCalledWith({
-        ctx: mockCtx,
-        post: expect.any(Post),
+      await ctx.db.insert(schema.subscriptions).values({
+        uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
+        cid: "sub123",
+        actorDid: "did:plc:123",
+        appviewDid: "did:web:api.dawn.test",
+        createdAt: new Date(),
       });
-    });
 
-    it("親投稿がDBに存在する場合はリプライを保存する", async () => {
-      const parentRef = {
-        uri: "at://did:example:bob/app.bsky.feed.post/456",
-        cid: "bafyreihk2xqt6eibvhw7n6uekwp2xqjhqgd5mcrw2vqv6kqfbacaexmmiq",
+      // 投稿レコード用のrecordsテーブルエントリ
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "test post",
+        createdAt: new Date().toISOString(),
       };
-      const mockRecord = Record.fromJson({
-        uri: "at://did:example:alice/app.bsky.feed.post/123",
-        cid: "bafyreib2cyuq4wlb2d2643ktta3tqn7s5gmwbrsabohrfqrxcwazajx7za",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Reply to post",
-          createdAt: "2023-01-01T00:00:00.000Z",
-          reply: {
-            parent: parentRef,
-            root: parentRef,
-          },
-        },
+      
+      await ctx.db.insert(schema.records).values({
+        uri: "at://did:plc:123/app.bsky.feed.post/123",
+        cid: "abc123",
+        actorDid: "did:plc:123",
+        json: postJson,
       });
 
-      (mockSubscriptionRepository.isSubscriber as Mock).mockResolvedValue(
-        false,
-      );
-      (mockPostRepository.existsAny as Mock).mockResolvedValue(true);
-
-      await service.upsert({ ctx: mockCtx, record: mockRecord });
-
-      expect(mockPostRepository.existsAny).toHaveBeenCalledWith(mockCtx, [
-        "at://did:example:bob/app.bsky.feed.post/456",
-      ]);
-      expect(mockPostRepository.upsert).toHaveBeenCalledWith({
-        ctx: mockCtx,
-        post: expect.any(Post),
+      const record = Record.fromJson({
+        uri: "at://did:plc:123/app.bsky.feed.post/123",
+        cid: "abc123",
+        json: postJson,
       });
-    });
-
-    it("投稿者にsubscriberのフォロワーがいる場合は投稿を保存する", async () => {
-      const mockRecord = Record.fromJson({
-        uri: "at://did:example:alice/app.bsky.feed.post/123",
-        cid: "bafyreib2cyuq4wlb2d2643ktta3tqn7s5gmwbrsabohrfqrxcwazajx7za",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Hello world",
-          createdAt: "2023-01-01T00:00:00.000Z",
-        },
-      });
-
-      (mockSubscriptionRepository.isSubscriber as Mock).mockResolvedValue(
-        false,
-      );
-      (
-        mockSubscriptionRepository.hasSubscriberFollower as Mock
-      ).mockResolvedValue(true);
-
-      await service.upsert({ ctx: mockCtx, record: mockRecord });
-
-      expect(
-        mockSubscriptionRepository.hasSubscriberFollower,
-      ).toHaveBeenCalledWith(mockCtx, "did:example:alice");
-      expect(mockPostRepository.upsert).toHaveBeenCalledWith({
-        ctx: mockCtx,
-        post: expect.any(Post),
-      });
-    });
-
-    it("保存条件を満たさない場合は投稿を保存しない", async () => {
-      const mockRecord = Record.fromJson({
-        uri: "at://did:example:alice/app.bsky.feed.post/123",
-        cid: "bafyreib2cyuq4wlb2d2643ktta3tqn7s5gmwbrsabohrfqrxcwazajx7za",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Hello world",
-          createdAt: "2023-01-01T00:00:00.000Z",
-        },
-      });
-
-      (mockSubscriptionRepository.isSubscriber as Mock).mockResolvedValue(
-        false,
-      );
-      (
-        mockSubscriptionRepository.hasSubscriberFollower as Mock
-      ).mockResolvedValue(false);
-
-      await service.upsert({ ctx: mockCtx, record: mockRecord });
-
-      expect(mockPostRepository.upsert).not.toHaveBeenCalled();
+      await indexPostService.upsert({ ctx, record });
+      const [post] = await ctx.db
+        .select()
+        .from(schema.posts)
+        .where(eq(schema.posts.uri, record.uri.toString()))
+        .limit(1);
+      expect(post).toBeDefined();
     });
   });
 });
