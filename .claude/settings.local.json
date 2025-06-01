@@ -6,6 +6,6 @@
       "Bash(pnpm format:*)",
       "Bash(pnpm test:*)"
     ],
-    "deny": []
+    "deny": ["Bash(pnpm lint:*)"]
   }
 }
