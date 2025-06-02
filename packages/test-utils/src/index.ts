@@ -4,6 +4,7 @@ import {
   databaseFactory,
   LoggerManager,
 } from "@dawn/common/infrastructure";
+import { required } from "@dawn/common/utils";
 import { execa } from "execa";
 import type { StartedTestContainer } from "testcontainers";
 import { GenericContainer } from "testcontainers";
@@ -15,7 +16,7 @@ const createTestInjector = (databaseUrl: string) => {
     .provideValue("logLevel", "error" as const)
     .provideValue("databaseUrl", databaseUrl)
     .provideClass("loggerManager", LoggerManager)
-    .provideFactory("connectionPoolFactory", connectionPoolFactory)
+    .provideFactory("connectionPool", connectionPoolFactory)
     .provideFactory("db", databaseFactory);
 };
 
@@ -59,26 +60,19 @@ export function setupTestDatabase() {
       postgresContainer,
       databaseUrl,
       injector,
-      connectionPool: injector.resolve("connectionPoolFactory"),
+      connectionPool: injector.resolve("connectionPool"),
       db: injector.resolve("db"),
     };
   });
 
   afterAll(async () => {
-    if (!testSetup) throw new Error("Test database not initialized.");
-    await testSetup.connectionPool.end();
-    await testSetup.postgresContainer.stop();
+    const { connectionPool, postgresContainer } = required(testSetup);
+    await connectionPool.end();
+    await postgresContainer.stop();
     testSetup = null;
   });
 
   return {
-    getSetup: () => {
-      if (!testSetup) {
-        throw new Error(
-          "Test database not initialized. Call setupTestDatabase() first.",
-        );
-      }
-      return testSetup;
-    },
+    getSetup: () => required(testSetup),
   };
 }

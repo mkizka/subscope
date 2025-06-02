@@ -35,4 +35,4 @@ export const databaseFactory = (
     logger: new DrizzleLogger(),
   });
 };
-databaseFactory.inject = ["connectionPoolFactory", "loggerManager"] as const;
+databaseFactory.inject = ["connectionPool", "loggerManager"] as const;
