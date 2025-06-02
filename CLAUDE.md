@@ -105,7 +105,7 @@ devスクリプトは自動的に：
 
 ## コードのコメントについて
 
-コメントはWhyやWhy notを表すもののみ記載してください。以下に例を示しますが、必要に応じて形式は変更してください
+コメントはWhyやWhy notを表すもののみ記載してください。コードが何をしているかが明らかな場合は、コメントを書かないでください。以下に例を示しますが、必要に応じて形式は変更してください。
 
 悪いコメントの例：
 
@@ -114,6 +114,15 @@ devスクリプトは自動的に：
 await ctx.db.insert(schema.xxx).values({
   ...
 });
+
+// actorが存在しない場合は作成
+await this.indexActorService.createIfNotExists({
+  ctx,
+  did: record.actorDid,
+});
+
+// ユーザーを取得
+const user = await userRepository.findById(userId);
 ```
 
 良いコメントの例：
@@ -123,4 +132,19 @@ await ctx.db.insert(schema.xxx).values({
 await ctx.db.insert(schema.xxx).values({
   ...
 });
+
+// Postgresには`\u0000`を含む文字列を保存できないため
+if (!isValidRecord(record)) {
+  return;
+}
+
+// レート制限を回避するため1秒待機
+await sleep(1000);
 ```
+
+コメントを書くべき場合：
+
+- 特殊な制約や理由がある場合（例：データベースの制限、外部APIの仕様）
+- 一見不要に見える処理の理由を説明する場合
+- パフォーマンスやセキュリティ上の理由で特定の実装を選んだ場合
+- TODOやFIXMEなどの将来の改善点を記録する場合
