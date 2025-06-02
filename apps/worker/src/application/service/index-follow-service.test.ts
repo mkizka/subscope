@@ -1,24 +1,32 @@
+import type { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { setupTestDatabase } from "@dawn/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { FollowRepository } from "../../infrastructure/follow-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexFollowService } from "./index-follow-service.js";
 
+let indexFollowService: IndexFollowService;
+let ctx: TransactionContext;
+
 const { getSetup } = setupTestDatabase();
+
+beforeAll(() => {
+  const testSetup = getSetup();
+  indexFollowService = testSetup.testInjector
+    .provideClass("followRepository", FollowRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .injectClass(IndexFollowService);
+  ctx = testSetup.ctx;
+});
 
 describe("IndexFollowService", () => {
   describe("upsert", () => {
     it("フォロワーがsubscriberの場合、フォローレコードが保存される", async () => {
       // Arrange
-      const { testInjector, ctx } = getSetup();
-      const indexFollowService = testInjector
-        .provideClass("followRepository", FollowRepository)
-        .provideClass("subscriptionRepository", SubscriptionRepository)
-        .injectClass(IndexFollowService);
       // フォロワー（subscriber）とフォロイーのactor情報を準備
       await ctx.db.insert(schema.actors).values([
         {
@@ -80,14 +88,8 @@ describe("IndexFollowService", () => {
       expect(follows[0]?.subjectDid).toBe("did:plc:followee");
     });
 
-
     it("フォロイーがsubscriberの場合、フォローレコードが保存される", async () => {
       // Arrange
-      const { testInjector, ctx } = getSetup();
-      const indexFollowService = testInjector
-        .provideClass("followRepository", FollowRepository)
-        .provideClass("subscriptionRepository", SubscriptionRepository)
-        .injectClass(IndexFollowService);
       // フォロワーとフォロイー（subscriber）のactor情報を準備
       await ctx.db.insert(schema.actors).values([
         {
@@ -149,14 +151,8 @@ describe("IndexFollowService", () => {
       expect(follows[0]?.subjectDid).toBe("did:plc:followee2");
     });
 
-
     it("フォロワーもフォロイーもsubscriberでない場合、フォローレコードは保存されない", async () => {
       // Arrange
-      const { testInjector, ctx } = getSetup();
-      const indexFollowService = testInjector
-        .provideClass("followRepository", FollowRepository)
-        .provideClass("subscriptionRepository", SubscriptionRepository)
-        .injectClass(IndexFollowService);
       // フォロワーとフォロイーのactor情報を準備（どちらもsubscriberではない）
       await ctx.db.insert(schema.actors).values([
         {
