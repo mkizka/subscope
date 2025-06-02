@@ -6,8 +6,11 @@
       "Bash(pnpm format:*)",
       "Bash(pnpm test:*)",
       "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)"
     ],
     "deny": ["Bash(pnpm lint:*)"]
   }
