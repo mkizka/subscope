@@ -5,7 +5,8 @@ import type {
   TransactionContext,
 } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { mock, type MockProxy } from "vitest-mock-extended";
 
 import type { JobLogger } from "../shared/job.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
@@ -14,30 +15,20 @@ import type { IndexCommitService } from "./service/index-commit-service.js";
 
 describe("IndexCommitUseCase", () => {
   let indexCommitUseCase: IndexCommitUseCase;
-  let mockTransactionManager: ITransactionManager;
-  let mockIndexCommitService: IndexCommitService;
-  let mockJobLogger: JobLogger;
+  let mockTransactionManager: MockProxy<ITransactionManager>;
+  let mockIndexCommitService: MockProxy<IndexCommitService>;
+  let mockJobLogger: MockProxy<JobLogger>;
 
   beforeEach(() => {
-    mockTransactionManager = {
-      transaction: vi
-        .fn()
-        .mockImplementation(
-          async (fn: (ctx: TransactionContext) => Promise<void>) => {
-            await fn({} as TransactionContext);
-          },
-        ),
-    };
+    mockTransactionManager = mock<ITransactionManager>();
+    mockTransactionManager.transaction.mockImplementation(
+      async (fn: (ctx: TransactionContext) => Promise<unknown>) => {
+        await fn({} as TransactionContext);
+      },
+    );
 
-    mockIndexCommitService = {
-      shouldSave: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    } as unknown as IndexCommitService;
-
-    mockJobLogger = {
-      log: vi.fn(),
-    } as unknown as JobLogger;
+    mockIndexCommitService = mock<IndexCommitService>();
+    mockJobLogger = mock<JobLogger>();
 
     indexCommitUseCase = new IndexCommitUseCase(
       mockTransactionManager,
@@ -61,19 +52,17 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
-      const shouldSaveMock = vi.mocked(mockIndexCommitService.shouldSave);
-      shouldSaveMock.mockResolvedValue(true);
+      mockIndexCommitService.shouldSave.mockResolvedValue(true);
 
       // act
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(shouldSaveMock).toHaveBeenCalledWith({
+      expect(mockIndexCommitService.shouldSave).toHaveBeenCalledWith({
         ctx: {},
         record: commit.record,
       });
-      const upsertMock = vi.mocked(mockIndexCommitService.upsert);
-      expect(upsertMock).toHaveBeenCalledWith({
+      expect(mockIndexCommitService.upsert).toHaveBeenCalledWith({
         ctx: {},
         record: commit.record,
         jobLogger: mockJobLogger,
@@ -95,23 +84,20 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
-      const shouldSaveMock = vi.mocked(mockIndexCommitService.shouldSave);
-      shouldSaveMock.mockResolvedValue(false);
+      mockIndexCommitService.shouldSave.mockResolvedValue(false);
 
       // act
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(shouldSaveMock).toHaveBeenCalledWith({
+      expect(mockIndexCommitService.shouldSave).toHaveBeenCalledWith({
         ctx: {},
         record: commit.record,
       });
-      const logMock = vi.mocked(mockJobLogger.log);
-      expect(logMock).toHaveBeenCalledWith(
+      expect(mockJobLogger.log).toHaveBeenCalledWith(
         "Record does not match storage rules, skipping",
       );
-      const upsertMock = vi.mocked(mockIndexCommitService.upsert);
-      expect(upsertMock).not.toHaveBeenCalled();
+      expect(mockIndexCommitService.upsert).not.toHaveBeenCalled();
     });
   });
 
@@ -129,15 +115,12 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      const deleteMock = vi.mocked(mockIndexCommitService.delete);
-      expect(deleteMock).toHaveBeenCalledWith({
+      expect(mockIndexCommitService.delete).toHaveBeenCalledWith({
         ctx: {},
         uri,
       });
-      const shouldSaveMock = vi.mocked(mockIndexCommitService.shouldSave);
-      expect(shouldSaveMock).not.toHaveBeenCalled();
-      const upsertMock = vi.mocked(mockIndexCommitService.upsert);
-      expect(upsertMock).not.toHaveBeenCalled();
+      expect(mockIndexCommitService.shouldSave).not.toHaveBeenCalled();
+      expect(mockIndexCommitService.upsert).not.toHaveBeenCalled();
     });
   });
 });
