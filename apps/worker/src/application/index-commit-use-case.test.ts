@@ -10,14 +10,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { JobLogger } from "../shared/job.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import { IndexCommitUseCase } from "./index-commit-use-case.js";
-import type { IndexActorService } from "./service/index-actor-service.js";
 import type { IndexCommitService } from "./service/index-commit-service.js";
 
 describe("IndexCommitUseCase", () => {
   let indexCommitUseCase: IndexCommitUseCase;
   let mockTransactionManager: ITransactionManager;
   let mockIndexCommitService: IndexCommitService;
-  let mockIndexActorService: IndexActorService;
   let mockJobLogger: JobLogger;
 
   beforeEach(() => {
@@ -37,10 +35,6 @@ describe("IndexCommitUseCase", () => {
       delete: vi.fn(),
     } as unknown as IndexCommitService;
 
-    mockIndexActorService = {
-      createIfNotExists: vi.fn(),
-    } as unknown as IndexActorService;
-
     mockJobLogger = {
       log: vi.fn(),
     } as unknown as JobLogger;
@@ -48,7 +42,6 @@ describe("IndexCommitUseCase", () => {
     indexCommitUseCase = new IndexCommitUseCase(
       mockTransactionManager,
       mockIndexCommitService,
-      mockIndexActorService,
     );
   });
 
@@ -78,13 +71,6 @@ describe("IndexCommitUseCase", () => {
       expect(shouldSaveMock).toHaveBeenCalledWith({
         ctx: {},
         record: commit.record,
-      });
-      const createIfNotExistsMock = vi.mocked(
-        mockIndexActorService.createIfNotExists,
-      );
-      expect(createIfNotExistsMock).toHaveBeenCalledWith({
-        ctx: {},
-        did: commit.record.actorDid,
       });
       const upsertMock = vi.mocked(mockIndexCommitService.upsert);
       expect(upsertMock).toHaveBeenCalledWith({
@@ -124,10 +110,6 @@ describe("IndexCommitUseCase", () => {
       expect(logMock).toHaveBeenCalledWith(
         "Record does not match storage rules, skipping",
       );
-      const createIfNotExistsMock = vi.mocked(
-        mockIndexActorService.createIfNotExists,
-      );
-      expect(createIfNotExistsMock).not.toHaveBeenCalled();
       const upsertMock = vi.mocked(mockIndexCommitService.upsert);
       expect(upsertMock).not.toHaveBeenCalled();
     });
@@ -154,10 +136,6 @@ describe("IndexCommitUseCase", () => {
       });
       const shouldSaveMock = vi.mocked(mockIndexCommitService.shouldSave);
       expect(shouldSaveMock).not.toHaveBeenCalled();
-      const createIfNotExistsMock = vi.mocked(
-        mockIndexActorService.createIfNotExists,
-      );
-      expect(createIfNotExistsMock).not.toHaveBeenCalled();
       const upsertMock = vi.mocked(mockIndexCommitService.upsert);
       expect(upsertMock).not.toHaveBeenCalled();
     });

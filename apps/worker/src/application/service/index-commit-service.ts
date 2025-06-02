@@ -9,6 +9,7 @@ import {
 import type { JobLogger } from "../../shared/job.js";
 import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
+import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
@@ -28,6 +29,7 @@ export class IndexCommitService {
 
   constructor(
     private readonly recordRepository: IRecordRepository,
+    private readonly indexActorService: IndexActorService,
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
@@ -42,6 +44,7 @@ export class IndexCommitService {
   }
   static inject = [
     "recordRepository",
+    "indexActorService",
     "indexPostService",
     "indexProfileService",
     "indexFollowService",
@@ -80,6 +83,10 @@ export class IndexCommitService {
       await jobLogger.log("Invalid record: null character found");
       return;
     }
+    await this.indexActorService.createIfNotExists({
+      ctx,
+      did: record.actorDid,
+    });
     await this.recordRepository.upsert({ ctx, record });
     await this.services[record.collection].upsert({ ctx, record });
   }
