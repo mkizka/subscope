@@ -14,19 +14,17 @@ export class IndexFollowService implements IIndexColectionService {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const follow = Follow.from(record);
-
-    const shouldSave = await this.shouldSaveFollow(ctx, follow);
-    if (!shouldSave) {
-      return;
-    }
-
     await this.followRepository.upsert({ ctx, follow });
   }
 
-  private async shouldSaveFollow(
-    ctx: TransactionContext,
-    follow: Follow,
-  ): Promise<boolean> {
+  async shouldSave({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }): Promise<boolean> {
+    const follow = Follow.from(record);
     // フォローまたはフォロイーがsubscribersなら保存
     return this.subscriptionRepository.hasAnySubscriber(ctx, [
       follow.actorDid,

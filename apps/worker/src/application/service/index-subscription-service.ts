@@ -14,4 +14,9 @@ export class IndexSubscriptionService implements IIndexColectionService {
     const subscription = Subscription.from(record);
     await this.subscriptionRepository.upsert({ ctx, subscription });
   }
+
+  shouldSave(_: { ctx: TransactionContext; record: Record }): Promise<boolean> {
+    // subscriptionレコードは常に保存する
+    return Promise.resolve(true);
+  }
 }

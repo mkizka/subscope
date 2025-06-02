@@ -14,19 +14,17 @@ export class IndexPostService implements IIndexColectionService {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const post = Post.from(record);
-
-    const shouldSave = await this.shouldSavePost(ctx, post);
-    if (!shouldSave) {
-      return;
-    }
-
     await this.postRepository.upsert({ ctx, post });
   }
 
-  private async shouldSavePost(
-    ctx: TransactionContext,
-    post: Post,
-  ): Promise<boolean> {
+  async shouldSave({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }): Promise<boolean> {
+    const post = Post.from(record);
     // subscribers本人の投稿は保存
     if (await this.subscriptionRepository.isSubscriber(ctx, post.actorDid)) {
       return true;

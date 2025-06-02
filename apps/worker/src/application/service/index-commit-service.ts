@@ -48,6 +48,22 @@ export class IndexCommitService {
     "indexSubscriptionService",
   ] as const;
 
+  async shouldSave({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }): Promise<boolean> {
+    if (!isSupportedCollection(record.collection)) {
+      return false;
+    }
+    if (!isValidRecord(record)) {
+      return false;
+    }
+    return await this.services[record.collection].shouldSave({ ctx, record });
+  }
+
   async upsert({
     ctx,
     record,

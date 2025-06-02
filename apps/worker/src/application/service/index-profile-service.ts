@@ -14,19 +14,17 @@ export class IndexProfileService implements IIndexColectionService {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const profile = Profile.from(record);
-
-    const shouldSave = await this.shouldSaveProfile(ctx, profile);
-    if (!shouldSave) {
-      return;
-    }
-
     await this.profileRepository.upsert({ ctx, profile });
   }
 
-  private async shouldSaveProfile(
-    ctx: TransactionContext,
-    profile: Profile,
-  ): Promise<boolean> {
+  async shouldSave({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }): Promise<boolean> {
+    const profile = Profile.from(record);
     // subscribers本人なら保存
     return this.subscriptionRepository.isSubscriber(ctx, profile.actorDid);
   }

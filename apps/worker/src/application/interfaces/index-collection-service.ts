@@ -8,4 +8,11 @@ export interface IIndexColectionService {
     ctx: TransactionContext;
     record: Record;
   }) => Promise<void>;
+  shouldSave: ({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }) => Promise<boolean>;
 }
