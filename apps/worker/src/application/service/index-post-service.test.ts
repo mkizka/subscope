@@ -1,4 +1,3 @@
-import type { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { setupTestDatabase } from "@dawn/test-utils";
@@ -14,14 +13,13 @@ const { getSetup } = setupTestDatabase();
 describe("IndexPostService", () => {
   describe("upsert", () => {
     it("subscriberの投稿は実際にDBに保存される", async () => {
-      const testSetup = getSetup();
-      const injector = testSetup.injector
+      const { testInjector, ctx } = getSetup();
+      const injector = testInjector
         .provideClass("postRepository", PostRepository)
         .provideClass("subscriptionRepository", SubscriptionRepository)
         .provideClass("indexPostService", IndexPostService);
 
       const indexPostService = injector.resolve("indexPostService");
-      const ctx: TransactionContext = { db: testSetup.db };
 
       // subscriberとしてactor情報を準備
       await ctx.db.insert(schema.actors).values({

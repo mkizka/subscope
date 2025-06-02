@@ -1,13 +1,13 @@
-import type { DatabaseClient } from "@dawn/common/domain";
+import type { TransactionContext } from "@dawn/common/domain";
 import {
   connectionPoolFactory,
   databaseFactory,
   LoggerManager,
 } from "@dawn/common/infrastructure";
 import { required } from "@dawn/common/utils";
+import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
+import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { execa } from "execa";
-import type { StartedTestContainer } from "testcontainers";
-import { GenericContainer } from "testcontainers";
 import { createInjector } from "typed-inject";
 import { afterAll, beforeAll } from "vitest";
 
@@ -21,31 +21,21 @@ const createTestInjector = (databaseUrl: string) => {
 };
 
 interface TestDatabaseSetup {
-  postgresContainer: StartedTestContainer;
-  databaseUrl: string;
-  injector: ReturnType<typeof createTestInjector>;
-  connectionPool: ReturnType<typeof connectionPoolFactory>;
-  db: DatabaseClient;
+  testInjector: ReturnType<typeof createTestInjector>;
+  ctx: TransactionContext;
 }
 
 export function setupTestDatabase() {
-  let testSetup: TestDatabaseSetup | null = null;
+  let testSetup: TestDatabaseSetup;
+  let postgresContainer: StartedPostgreSqlContainer;
+  let connectionPool: ReturnType<typeof connectionPoolFactory>;
 
   beforeAll(async () => {
-    const postgresContainer = await new GenericContainer("postgres:16-alpine")
-      .withEnvironment({ POSTGRES_PASSWORD: "password" })
-      .withExposedPorts(5432)
-      .start();
+    postgresContainer = await new PostgreSqlContainer(
+      "postgres:16-alpine",
+    ).start();
 
-    const databaseUrl = (() => {
-      const url = new URL(
-        `postgresql://${postgresContainer.getHost()}:${postgresContainer.getMappedPort(5432)}`,
-      );
-      url.username = "postgres";
-      url.password = "password";
-      url.pathname = "postgres";
-      return url.toString();
-    })();
+    const databaseUrl = postgresContainer.getConnectionUri();
 
     await execa({
       cwd: "../..",
@@ -54,22 +44,18 @@ export function setupTestDatabase() {
       },
     })`pnpm db:migrate`;
 
-    const injector = createTestInjector(databaseUrl);
+    const testInjector = createTestInjector(databaseUrl);
+    connectionPool = testInjector.resolve("connectionPool");
 
     testSetup = {
-      postgresContainer,
-      databaseUrl,
-      injector,
-      connectionPool: injector.resolve("connectionPool"),
-      db: injector.resolve("db"),
+      testInjector,
+      ctx: { db: testInjector.resolve("db") },
     };
   });
 
   afterAll(async () => {
-    const { connectionPool, postgresContainer } = required(testSetup);
     await connectionPool.end();
     await postgresContainer.stop();
-    testSetup = null;
   });
 
   return {

@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@dawn/common": "workspace:*",
+    "@testcontainers/postgresql": "10.28.0",
     "execa": "9.6.0",
-    "testcontainers": "10.28.0",
     "typed-inject": "4.0.0",
     "vitest": "2.1.8"
   },
