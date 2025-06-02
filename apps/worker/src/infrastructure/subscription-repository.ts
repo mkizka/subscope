@@ -1,6 +1,6 @@
 import type { Subscription, TransactionContext } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
-import { and, eq, exists } from "drizzle-orm";
+import { and, eq, exists, inArray } from "drizzle-orm";
 
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 
@@ -38,6 +38,23 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       .select({ actorDid: schema.subscriptions.actorDid })
       .from(schema.subscriptions)
       .where(eq(schema.subscriptions.actorDid, actorDid))
+      .limit(1);
+
+    return result.length > 0;
+  }
+
+  async hasAnySubscriber(
+    ctx: TransactionContext,
+    actorDids: string[],
+  ): Promise<boolean> {
+    if (actorDids.length === 0) {
+      return false;
+    }
+
+    const result = await ctx.db
+      .select({ actorDid: schema.subscriptions.actorDid })
+      .from(schema.subscriptions)
+      .where(inArray(schema.subscriptions.actorDid, actorDids))
       .limit(1);
 
     return result.length > 0;
