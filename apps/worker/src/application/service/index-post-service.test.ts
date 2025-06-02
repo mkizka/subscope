@@ -1,12 +1,12 @@
 import type { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
+import { setupTestDatabase } from "@dawn/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { PostRepository } from "../../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
-import { setupTestDatabase } from "../../shared/test-utils.js";
 import { IndexPostService } from "./index-post-service.js";
 
 const { getSetup } = setupTestDatabase();

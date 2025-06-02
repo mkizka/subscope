@@ -1,0 +1,27 @@
+{
+  "name": "@dawn/test-utils",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dawn/common": "workspace:*",
+    "execa": "9.6.0",
+    "testcontainers": "10.28.0",
+    "typed-inject": "4.0.0",
+    "vitest": "2.1.8"
+  },
+  "devDependencies": {
+    "@mkizka/eslint-config": "6.0.2",
+    "@tsconfig/node-lts": "22.0.1",
+    "eslint": "9.28.0",
+    "typescript": "5.8.3"
+  },
+  "sideEffects": false
+}
