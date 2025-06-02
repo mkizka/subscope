@@ -19,4 +19,4 @@
 - post(リプライ) ... subscribers本人、またはリプライ先またはツリー先の投稿がDB上にあれば保存
 - like ... いいねしたユーザー、またはいいねされた投稿のフォロワーが1人以上subscribersなら保存
 - follow ... フォローまたはフォロイーがsubscribersなら保存
-- profile ... DB上にアクターがあれば保存
+- profile ... subscribers本人なら保存
