@@ -2,39 +2,27 @@ import type { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { PostRepository } from "../../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
-import {
-  setupTestDatabase,
-  teardownTestDatabase,
-} from "../../shared/test-utils.js";
+import { setupTestDatabase } from "../../shared/test-utils.js";
 import { IndexPostService } from "./index-post-service.js";
 
-let testSetup: Awaited<ReturnType<typeof setupTestDatabase>>;
-let indexPostService: IndexPostService;
-let ctx: TransactionContext;
-
-beforeAll(async () => {
-  testSetup = await setupTestDatabase();
-
-  const injector = testSetup.injector
-    .provideClass("postRepository", PostRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("indexPostService", IndexPostService);
-
-  indexPostService = injector.resolve("indexPostService");
-  ctx = { db: testSetup.db };
-});
-
-afterAll(async () => {
-  await teardownTestDatabase(testSetup);
-});
+const { getSetup } = setupTestDatabase();
 
 describe("IndexPostService", () => {
   describe("upsert", () => {
     it("subscriberの投稿は実際にDBに保存される", async () => {
+      const testSetup = getSetup();
+      const injector = testSetup.injector
+        .provideClass("postRepository", PostRepository)
+        .provideClass("subscriptionRepository", SubscriptionRepository)
+        .provideClass("indexPostService", IndexPostService);
+
+      const indexPostService = injector.resolve("indexPostService");
+      const ctx: TransactionContext = { db: testSetup.db };
+
       // subscriberとしてactor情報を準備
       await ctx.db.insert(schema.actors).values({
         did: "did:plc:123",
