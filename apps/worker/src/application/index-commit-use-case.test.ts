@@ -37,7 +37,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("create/updateオペレーション", () => {
-    it("保存ルールを満たすレコードの場合、actorとrecordを保存する", async () => {
+    it("upsertメソッドを呼び出す", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const record = Record.fromJson({
@@ -52,52 +52,15 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
-      mockIndexCommitService.shouldSave.mockResolvedValue(true);
-
       // act
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(mockIndexCommitService.shouldSave).toHaveBeenCalledWith({
-        ctx: {},
-        record: commit.record,
-      });
       expect(mockIndexCommitService.upsert).toHaveBeenCalledWith({
         ctx: {},
         record: commit.record,
         jobLogger: mockJobLogger,
       });
-    });
-
-    it("保存ルールを満たさないレコードの場合、何も保存しない", async () => {
-      // arrange
-      const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
-      const record = Record.fromJson({
-        uri,
-        cid: "cid123",
-        json: { text: "Hello world", createdAt: new Date().toISOString() },
-      });
-      const commit = {
-        operation: "create" as const,
-        uri,
-        record,
-      };
-      const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
-
-      mockIndexCommitService.shouldSave.mockResolvedValue(false);
-
-      // act
-      await indexCommitUseCase.execute(command);
-
-      // assert
-      expect(mockIndexCommitService.shouldSave).toHaveBeenCalledWith({
-        ctx: {},
-        record: commit.record,
-      });
-      expect(mockJobLogger.log).toHaveBeenCalledWith(
-        "Record does not match storage rules, skipping",
-      );
-      expect(mockIndexCommitService.upsert).not.toHaveBeenCalled();
     });
   });
 
@@ -119,7 +82,6 @@ describe("IndexCommitUseCase", () => {
         ctx: {},
         uri,
       });
-      expect(mockIndexCommitService.shouldSave).not.toHaveBeenCalled();
       expect(mockIndexCommitService.upsert).not.toHaveBeenCalled();
     });
   });

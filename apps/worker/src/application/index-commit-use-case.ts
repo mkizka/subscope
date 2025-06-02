@@ -16,16 +16,6 @@ export class IndexCommitUseCase {
       switch (commit.operation) {
         case "create":
         case "update": {
-          const shouldSave = await this.indexCommitService.shouldSave({
-            ctx,
-            record: commit.record,
-          });
-          if (!shouldSave) {
-            await jobLogger.log(
-              "Record does not match storage rules, skipping",
-            );
-            return;
-          }
           await this.indexCommitService.upsert({
             ctx,
             record: commit.record,

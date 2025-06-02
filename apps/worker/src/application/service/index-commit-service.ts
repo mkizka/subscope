@@ -51,22 +51,6 @@ export class IndexCommitService {
     "indexSubscriptionService",
   ] as const;
 
-  async shouldSave({
-    ctx,
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }): Promise<boolean> {
-    if (!isSupportedCollection(record.collection)) {
-      return false;
-    }
-    if (!isValidRecord(record)) {
-      return false;
-    }
-    return await this.services[record.collection].shouldSave({ ctx, record });
-  }
-
   async upsert({
     ctx,
     record,
@@ -75,12 +59,20 @@ export class IndexCommitService {
     ctx: TransactionContext;
     record: Record;
     jobLogger: JobLogger;
-  }) {
+  }): Promise<void> {
     if (!isSupportedCollection(record.collection)) {
       throw new Error(`Unsupported collection: ${record.collection}`);
     }
     if (!isValidRecord(record)) {
       await jobLogger.log("Invalid record: null character found");
+      return;
+    }
+    const shouldSave = await this.services[record.collection].shouldSave({
+      ctx,
+      record,
+    });
+    if (!shouldSave) {
+      await jobLogger.log("Record does not match storage rules, skipping");
       return;
     }
     await this.indexActorService.createIfNotExists({
