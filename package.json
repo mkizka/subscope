@@ -13,6 +13,7 @@
     "format": "prettier . --ignore-unknown --write && turbo run lint -- --fix",
     "lint": "pnpm prettier . --check && turbo run lint",
     "prepare": "husky",
+    "studio": "pnpm --filter @dawn/db dev",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
