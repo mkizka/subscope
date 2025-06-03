@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { fromError } from "zod-validation-error";
 
 const match = <Prod, Default>({ prod, dev }: { prod: Prod; dev: Default }) => {
@@ -16,24 +16,20 @@ const schema = z.object({
       ? z.string()
       : z.string().default("appview.localhost"),
   DATABASE_URL: match({
-    prod: z.string().url(),
+    prod: z.url(),
     dev: z
-      .string()
       .url()
       .default("postgresql://postgres:password@localhost:5432/postgres"),
   }),
-  PLC_URL: z
-    .string()
-    .url()
-    .default(
-      match({
-        prod: "https://plc.directory",
-        dev: "http://localhost:2582",
-      }),
-    ),
+  PLC_URL: z.url().default(
+    match({
+      prod: "https://plc.directory",
+      dev: "http://localhost:2582",
+    }),
+  ),
   REDIS_URL: match({
-    prod: z.string().url(),
-    dev: z.string().url().default("redis://localhost:6379"),
+    prod: z.url(),
+    dev: z.url().default("redis://localhost:6379"),
   }),
 });
 

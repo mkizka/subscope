@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { fromError } from "zod-validation-error";
 
 const match = <Prod, Default>({ prod, dev }: { prod: Prod; dev: Default }) => {
@@ -11,19 +11,16 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3002),
-  JETSTREAM_URL: z
-    .string()
-    .url()
-    .default(
-      match({
-        prod: "wss://jetstream1.us-west.bsky.network/subscribe",
-        dev: "ws://localhost:6008/subscribe",
-      }),
-    ),
-  DISABLE_INGESTER: z.coerce.boolean().default(false),
+  JETSTREAM_URL: z.url().default(
+    match({
+      prod: "wss://jetstream1.us-west.bsky.network/subscribe",
+      dev: "ws://localhost:6008/subscribe",
+    }),
+  ),
+  DISABLE_INGESTER: z.stringbool().default(false),
   REDIS_URL: match({
-    prod: z.string().url(),
-    dev: z.string().url().default("redis://localhost:6379"),
+    prod: z.url(),
+    dev: z.url().default("redis://localhost:6379"),
   }),
 });
 
