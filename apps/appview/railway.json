@@ -1,9 +1,9 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
+    "buildCommand": "pnpm build --filter @dawn/appview",
     "watchPatterns": [
       "/apps/appview/**/*",
-      "/lexicons/**/*",
       "/packages/client/**/*",
       "/packages/common/**/*",
       "/packages/db/**/*",
