@@ -13,10 +13,6 @@
     "format": "prettier . --ignore-unknown --write && turbo run lint -- --fix",
     "lint": "pnpm prettier . --check && turbo run lint",
     "prepare": "husky",
-    "start": "turbo run start",
-    "start:appview": "pnpm -s db:migrate && pnpm --filter @dawn/appview start",
-    "start:ingester": "pnpm --filter @dawn/ingester start",
-    "start:worker": "pnpm -s db:migrate && pnpm --filter @dawn/worker start",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
