@@ -37,7 +37,7 @@ describe("IndexFollowService", () => {
           handle: "followee.bsky.social",
         },
       ]);
-      
+
       const followJson = {
         $type: "app.bsky.graph.follow",
         subject: "did:plc:followee",
@@ -68,8 +68,6 @@ describe("IndexFollowService", () => {
       expect(follows[0]?.actorDid).toBe("did:plc:follower");
       expect(follows[0]?.subjectDid).toBe("did:plc:followee");
     });
-
-
   });
 
   describe("shouldSave", () => {
@@ -85,7 +83,7 @@ describe("IndexFollowService", () => {
           handle: "shouldsave-followee1.bsky.social",
         },
       ]);
-      
+
       // フォロワーをsubscriberとして登録
       await ctx.db.insert(schema.records).values({
         uri: "at://did:plc:shouldsave-follower1/dev.mkizka.test.subscription/123",
@@ -104,7 +102,7 @@ describe("IndexFollowService", () => {
         appviewDid: "did:web:api.dawn.test",
         createdAt: new Date(),
       });
-      
+
       const followJson = {
         $type: "app.bsky.graph.follow",
         subject: "did:plc:shouldsave-followee1",
@@ -123,7 +121,6 @@ describe("IndexFollowService", () => {
       expect(result).toBe(true);
     });
 
-
     it("フォロイーがsubscriberの場合、trueを返す", async () => {
       // Arrange
       await ctx.db.insert(schema.actors).values([
@@ -136,7 +133,7 @@ describe("IndexFollowService", () => {
           handle: "shouldsave-followee2.bsky.social",
         },
       ]);
-      
+
       // フォロイーをsubscriberとして登録
       await ctx.db.insert(schema.records).values({
         uri: "at://did:plc:shouldsave-followee2/dev.mkizka.test.subscription/456",
@@ -155,7 +152,7 @@ describe("IndexFollowService", () => {
         appviewDid: "did:web:api.dawn.test",
         createdAt: new Date(),
       });
-      
+
       const followJson = {
         $type: "app.bsky.graph.follow",
         subject: "did:plc:shouldsave-followee2",
@@ -174,7 +171,6 @@ describe("IndexFollowService", () => {
       expect(result).toBe(true);
     });
 
-
     it("フォロワーもフォロイーもsubscriberでない場合、falseを返す", async () => {
       // Arrange
       await ctx.db.insert(schema.actors).values([
@@ -187,7 +183,7 @@ describe("IndexFollowService", () => {
           handle: "shouldsave-followee3.bsky.social",
         },
       ]);
-      
+
       const followJson = {
         $type: "app.bsky.graph.follow",
         subject: "did:plc:shouldsave-followee3",

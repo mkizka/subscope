@@ -9,6 +9,7 @@ import type { IndexCommitService } from "./service/index-commit-service.js";
 const BACKFILL_COLLECTIONS: SupportedCollection[] = [
   "app.bsky.actor.profile",
   "app.bsky.graph.follow",
+  "app.bsky.feed.post",
 ];
 
 const isBackfillSupported = (record: Record) => {
@@ -26,7 +27,6 @@ export class BackfillUseCase {
   static inject = [
     "repoFetcher",
     "transactionManager",
-    "indexActorService",
     "indexCommitService",
   ] as const;
 

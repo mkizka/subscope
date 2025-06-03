@@ -9,6 +9,7 @@
   - did:web:api.bsky.app#bsky_appview のような
 - Appviewがsubscriptionレコードを監視してsubscribersテーブルに保存
   - subscribersになったユーザーのPDSからフォローレコードを全取得
+    - バックフィル仕様に記載
   - 取得処理は時間がかかるのでbullmqジョブにする
   - ジョブの実行状況を見られるqueryも用意する
 - 後述の条件でフォロイーの投稿が保存されるようになる
@@ -20,3 +21,15 @@
 - like ... いいねしたユーザー、またはいいねされた投稿のフォロワーが1人以上subscribersなら保存
 - follow ... フォローまたはフォロイーがsubscribersなら保存
 - profile ... subscribers本人なら保存
+
+## バックフィル仕様
+
+- subscribersになったユーザーのPDSからレコード一覧を取得
+- レコード一覧の中から以下のレコードを一括保存
+  - follow
+  - post
+  - profile
+  - repost(未実装)
+  - like(未実装)
+- バックフィルの状況はdev.mkizka.test.getJobStatusで確認出来る
+  - クライアントは定期的にポーリングする
