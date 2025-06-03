@@ -18,6 +18,7 @@ Dawnは3つのメインアプリケーションでBluesky AppViewを実装する
 
 - **システム仕様**: @docs/spec.md を参照
 - **Lexicon実装**: 新しいレコードタイプを追加する場合は @docs/lexicon-implementation-guide.md を参照
+- **Identity Event処理**: Identity Eventの処理仕様については @docs/identity-event-handling.md を参照
 - **実装状況**: API実装の進捗については @docs/tasks.md を参照
 
 ## 開発コマンド
