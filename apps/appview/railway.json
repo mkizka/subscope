@@ -11,7 +11,8 @@
     ]
   },
   "deploy": {
-    "startCommand": "pnpm start:appview",
+    "preDeployCommand": "pnpm db:migrate",
+    "startCommand": "pnpm --filter @dawn/appview start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60
   }

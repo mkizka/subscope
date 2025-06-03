@@ -11,7 +11,8 @@
     ]
   },
   "deploy": {
-    "startCommand": "pnpm start:worker",
+    "preDeployCommand": "pnpm db:migrate",
+    "startCommand": "pnpm --filter @dawn/worker start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60
   }
