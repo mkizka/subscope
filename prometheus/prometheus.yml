@@ -2,22 +2,17 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: appview
+  - job_name: "appview"
     static_configs:
       - targets:
-          - dawn-appview-ubm0d9:3001
+          - "appview.railway.internal:8080"
 
   - job_name: ingester
     static_configs:
       - targets:
-          - dawn-ingester-3jsk35:3002
+          - ingester.railway.internal:8080
 
   - job_name: worker
     static_configs:
       - targets:
-          - dawn-worker-iw5dqt:3003
-
-  - job_name: node-exporter
-    static_configs:
-      - targets:
-          - dawn-node-exporter-mg6kyb:9100
+          - worker.railway.internal:8080
