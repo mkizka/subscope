@@ -7,7 +7,7 @@ import {
 } from "@dawn/common/utils";
 
 import type { JobLogger } from "../../shared/job.js";
-import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
+import type { IIndexCollectionService } from "../interfaces/index-collection-service.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
@@ -16,7 +16,7 @@ import type { IndexProfileService } from "./index-profile-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
 
 type IndexCollectionServiceMap = {
-  [key in SupportedCollection]: IIndexColectionService;
+  [key in SupportedCollection]: IIndexCollectionService;
 };
 
 const isValidRecord = (record: Record) => {

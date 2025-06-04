@@ -1,6 +1,6 @@
 import type { Record, TransactionContext } from "@dawn/common/domain";
 
-export interface IIndexColectionService {
+export interface IIndexCollectionService {
   upsert: ({
     ctx,
     record,
