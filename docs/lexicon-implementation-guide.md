@@ -126,7 +126,7 @@ export class {RecordType} {
 **ファイル:** `/apps/worker/src/application/interfaces/{record-type}-repository.ts`
 
 ```typescript
-import { TransactionContext } from "@dawn/db";
+import { TransactionContext } from "@dawn/common/domain";
 import { {RecordType} } from "@dawn/common/domain";
 
 export interface I{RecordType}Repository {
@@ -139,7 +139,8 @@ export interface I{RecordType}Repository {
 **ファイル:** `/apps/worker/src/infrastructure/{record-type}-repository.ts`
 
 ```typescript
-import { TransactionContext, schema } from "@dawn/db";
+import { schema } from "@dawn/db";
+import { TransactionContext } from "@dawn/common/domain";
 import { {RecordType} } from "@dawn/common/domain";
 import { I{RecordType}Repository } from "../application/interfaces/{record-type}-repository.js";
 
@@ -173,7 +174,7 @@ export class {RecordType}Repository implements I{RecordType}Repository {
 **ファイル:** `/apps/worker/src/application/service/index-{record-type}-service.ts`
 
 ```typescript
-import { TransactionContext } from "@dawn/db";
+import { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/client";
 import { {RecordType} } from "@dawn/common/domain";
 import { I{RecordType}Repository } from "../interfaces/{record-type}-repository.js";
