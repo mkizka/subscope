@@ -2,10 +2,10 @@ import type { Record, TransactionContext } from "@dawn/common/domain";
 import type { IJobQueue } from "@dawn/common/domain";
 import { Subscription } from "@dawn/common/domain";
 
-import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
+import type { IIndexCollectionService } from "../interfaces/index-collection-service.js";
 import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";
 
-export class IndexSubscriptionService implements IIndexColectionService {
+export class IndexSubscriptionService implements IIndexCollectionService {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly jobQueue: IJobQueue,

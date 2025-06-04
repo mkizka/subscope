@@ -2,10 +2,10 @@ import type { Record, TransactionContext } from "@dawn/common/domain";
 import { Follow } from "@dawn/common/domain";
 
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
-import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
+import type { IIndexCollectionService } from "../interfaces/index-collection-service.js";
 import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";
 
-export class IndexFollowService implements IIndexColectionService {
+export class IndexFollowService implements IIndexCollectionService {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,

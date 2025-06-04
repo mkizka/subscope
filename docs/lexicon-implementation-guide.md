@@ -178,9 +178,9 @@ import { TransactionContext } from "@dawn/common/domain";
 import { Record } from "@dawn/client";
 import { {RecordType} } from "@dawn/common/domain";
 import { I{RecordType}Repository } from "../interfaces/{record-type}-repository.js";
-import { IIndexColectionService } from "../interfaces/index-collection-service.js";
+import { IIndexCollectionService } from "../interfaces/index-collection-service.js";
 
-export class Index{RecordType}Service implements IIndexColectionService {
+export class Index{RecordType}Service implements IIndexCollectionService {
   constructor(private {recordType}Repository: I{RecordType}Repository) {}
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }): Promise<void> {

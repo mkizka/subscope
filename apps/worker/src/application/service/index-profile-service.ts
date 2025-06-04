@@ -1,11 +1,11 @@
 import type { Record, TransactionContext } from "@dawn/common/domain";
 import { Profile } from "@dawn/common/domain";
 
-import type { IIndexColectionService } from "../interfaces/index-collection-service.js";
+import type { IIndexCollectionService } from "../interfaces/index-collection-service.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";
 
-export class IndexProfileService implements IIndexColectionService {
+export class IndexProfileService implements IIndexCollectionService {
   constructor(
     private readonly profileRepository: IProfileRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
