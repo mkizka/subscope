@@ -15,7 +15,7 @@ export class IndexActorService {
   ) {}
   static inject = ["actorRepository", "jobQueue"] as const;
 
-  async createIfNotExists({
+  async upsert({
     ctx,
     did,
     handle,
@@ -24,25 +24,34 @@ export class IndexActorService {
     did: Did;
     handle?: Handle;
   }) {
-    await this.actorRepository.create({
-      ctx,
-      actor: new Actor({ did, handle }),
-    });
+    const existingActor = await this.actorRepository.findByDid({ ctx, did });
+    const actor = new Actor({ did, handle });
+    if (existingActor) {
+      // インデックスされた時点からhandleが変更されていれば更新
+      if (handle && existingActor.handle !== handle) {
+        await this.actorRepository.upsert({ ctx, actor });
+        return;
+      }
+      // インデックス済みのactorがhandleを持っていなければ解決を予約
+      if (!existingActor.handle) {
+        await this.scheduleResolveDid(did);
+        return;
+      }
+      // ハンドルを変更も新規解決もする必要がなければ何もしない
+      return;
+    }
+    // インデックスされていない場合は新規登録
+    await this.actorRepository.upsert({ ctx, actor });
     if (!handle) {
-      // await this.jobQueue.add("resolveDid", did);
+      await this.scheduleResolveDid(did);
     }
   }
 
-  async upsert({
-    ctx,
-    did,
-    handle,
-  }: {
-    ctx: TransactionContext;
-    did: Did;
-    handle: Handle;
-  }) {
-    const actor = new Actor({ did, handle });
-    await this.actorRepository.upsert({ ctx, actor });
+  private async scheduleResolveDid(did: Did) {
+    await this.jobQueue.add({
+      queueName: "resolveDid",
+      jobName: `at://${did}`,
+      data: did,
+    });
   }
 }

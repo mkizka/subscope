@@ -75,7 +75,7 @@ export class IndexCommitService {
       await jobLogger.log("Record does not match storage rules, skipping");
       return;
     }
-    await this.indexActorService.createIfNotExists({
+    await this.indexActorService.upsert({
       ctx,
       did: record.actorDid,
     });
