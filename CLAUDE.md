@@ -150,3 +150,4 @@ await sleep(1000);
 - テストケースにはarrange-act-assertパターンに基づいたコメントを書いてください
 - arrange-act-assertのまとまりごとに1行空行を書いて、テストケースごとに空行が2行になるようにしてください
 - テストでモックを使いたいときは出来るだけvite-mock-extendedを使う
+- string型のdid文字列を扱うときはasDid関数でチェックする
