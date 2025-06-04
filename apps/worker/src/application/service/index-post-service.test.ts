@@ -80,4 +80,126 @@ describe("IndexPostService", () => {
       expect(post).toBeDefined();
     });
   });
+
+  describe("shouldSave", () => {
+    it("投稿者がsubscriberの場合、trueを返す", async () => {
+      // Arrange
+      await ctx.db.insert(schema.actors).values({
+        did: "did:plc:shouldsave-author1",
+        handle: "shouldsave-author1.bsky.social",
+      });
+      await ctx.db.insert(schema.records).values({
+        uri: "at://did:plc:shouldsave-author1/dev.mkizka.test.subscription/123",
+        cid: "sub123",
+        actorDid: "did:plc:shouldsave-author1",
+        json: {
+          $type: "dev.mkizka.test.subscription",
+          appviewDid: "did:web:api.dawn.test",
+          createdAt: new Date().toISOString(),
+        },
+      });
+      await ctx.db.insert(schema.subscriptions).values({
+        uri: "at://did:plc:shouldsave-author1/dev.mkizka.test.subscription/123",
+        cid: "sub123",
+        actorDid: "did:plc:shouldsave-author1",
+        appviewDid: "did:web:api.dawn.test",
+        createdAt: new Date(),
+      });
+      const record = Record.fromJson({
+        uri: "at://did:plc:shouldsave-author1/app.bsky.feed.post/123",
+        cid: "post123",
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "hello",
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // Act
+      const result = await indexPostService.shouldSave({ ctx, record });
+
+      // Assert
+      expect(result).toBe(true);
+    });
+
+    it("リプライ先の投稿が存在する場合、trueを返す", async () => {
+      // Arrange
+      await ctx.db.insert(schema.actors).values([
+        {
+          did: "did:plc:reply-author",
+          handle: "reply-author.bsky.social",
+        },
+        {
+          did: "did:plc:reply-parent",
+          handle: "reply-parent.bsky.social",
+        },
+      ]);
+      const parentPostJson = {
+        $type: "app.bsky.feed.post",
+        text: "parent",
+        createdAt: new Date().toISOString(),
+      };
+      await ctx.db.insert(schema.records).values({
+        uri: "at://did:plc:reply-parent/app.bsky.feed.post/1",
+        cid: "parentcid",
+        actorDid: "did:plc:reply-parent",
+        json: parentPostJson,
+      });
+      await ctx.db.insert(schema.posts).values({
+        uri: "at://did:plc:reply-parent/app.bsky.feed.post/1",
+        cid: "parentcid",
+        actorDid: "did:plc:reply-parent",
+        text: "parent",
+        createdAt: new Date(),
+      });
+      const record = Record.fromJson({
+        uri: "at://did:plc:reply-author/app.bsky.feed.post/1",
+        cid: "replycid",
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "reply",
+          reply: {
+            parent: {
+              uri: "at://did:plc:reply-parent/app.bsky.feed.post/1",
+              cid: "parentcid",
+            },
+            root: {
+              uri: "at://did:plc:reply-parent/app.bsky.feed.post/1",
+              cid: "parentcid",
+            },
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // Act
+      const result = await indexPostService.shouldSave({ ctx, record });
+
+      // Assert
+      expect(result).toBe(true);
+    });
+
+    it("条件を満たさない場合、falseを返す", async () => {
+      // Arrange
+      await ctx.db.insert(schema.actors).values({
+        did: "did:plc:nosave-author",
+        handle: "nosave-author.bsky.social",
+      });
+      const record = Record.fromJson({
+        uri: "at://did:plc:nosave-author/app.bsky.feed.post/1",
+        cid: "nosavecid",
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "nosave",
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // Act
+      const result = await indexPostService.shouldSave({ ctx, record });
+
+      // Assert
+      expect(result).toBe(false);
+    });
+  });
 });
