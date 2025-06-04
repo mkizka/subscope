@@ -54,6 +54,10 @@ export class JobQueue implements IJobQueue {
     jobName: string;
     data: JobData[T];
   }) {
+    // TODO: 元に戻す
+    if (queueName === "resolveDid") {
+      return;
+    }
     await this.queues[queueName].add(jobName, data);
   }
 
