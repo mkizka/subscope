@@ -7,6 +7,7 @@ import { Worker } from "bullmq";
 import type { BackfillUseCase } from "../application/backfill-use-case.js";
 import { indexCommitCommandFactory } from "../application/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/index-commit-use-case.js";
+import type { ResolveDidUseCase } from "../application/resolve-did-use-case.js";
 import type { Temp__CleanupDatabaseUseCase } from "../application/temp__cleanup-database-usecase.js";
 import { upsertIdentityCommandFactory } from "../application/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/upsert-identity-use-case.js";
@@ -27,6 +28,7 @@ export class SyncWorker {
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
     backfillUseCase: BackfillUseCase,
+    resolveDidUseCase: ResolveDidUseCase,
     temp__cleanupDatabaseUseCase: Temp__CleanupDatabaseUseCase,
   ) {
     this.workers = [
@@ -60,6 +62,13 @@ export class SyncWorker {
             jobLogger: createJobLogger(job),
           });
         },
+        baseWorkerOptions,
+      ),
+      new Worker<Did>(
+        "resolveDid",
+        async (job) => {
+          await resolveDidUseCase.execute(job.data);
+        },
         {
           ...baseWorkerOptions,
           limiter: {
@@ -86,6 +95,7 @@ export class SyncWorker {
     "upsertIdentityUseCase",
     "indexCommitUseCase",
     "backfillUseCase",
+    "resolveDidUseCase",
     "temp__cleanupDatabaseUseCase",
   ] as const;
 
