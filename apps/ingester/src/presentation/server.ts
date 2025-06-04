@@ -43,10 +43,9 @@ export class IngesterServer {
   }
   static inject = [
     "loggerManager",
-    "dashboardRouter",
     "metricsRouter",
+    "dashboardRouter",
     "ingester",
-    "metricReporter",
   ] as const;
 
   start() {
