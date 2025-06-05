@@ -3,6 +3,7 @@ import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@dawn/common/domain";
 import type { Actor, BackfillStatus } from "@dawn/common/domain";
 import { Actor as ActorDomain } from "@dawn/common/domain";
+import type { Handle } from "@dawn/common/utils";
 import { schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
@@ -61,6 +62,23 @@ export class ActorRepository implements IActorRepository {
       .set({
         backfillStatus: status,
         backfillVersion: CURRENT_BACKFILL_VERSION,
+      })
+      .where(eq(schema.actors.did, did));
+  }
+
+  async updateHandle({
+    ctx,
+    did,
+    handle,
+  }: {
+    ctx: TransactionContext;
+    did: Did;
+    handle: Handle;
+  }) {
+    await ctx.db
+      .update(schema.actors)
+      .set({
+        handle,
       })
       .where(eq(schema.actors.did, did));
   }

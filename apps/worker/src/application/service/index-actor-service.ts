@@ -45,13 +45,7 @@ export class IndexActorService {
     if (existingActor) {
       // インデックスされた時点からhandleが変更されていれば更新
       if (handle && existingActor.handle !== handle) {
-        const actor = new Actor({
-          did: existingActor.did,
-          handle,
-          backfillStatus: existingActor.backfillStatus,
-          backfillVersion: existingActor.backfillVersion,
-        });
-        await this.actorRepository.upsert({ ctx, actor });
+        await this.actorRepository.updateHandle({ ctx, did, handle });
         return;
       }
       // インデックス済みのactorがhandleを持っていなければ解決を予約
