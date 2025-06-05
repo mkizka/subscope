@@ -7,21 +7,20 @@ import type { IRecordRepository } from "../application/interfaces/record-reposit
 
 export class RecordRepository implements IRecordRepository {
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+    const data = {
+      cid: record.cid,
+      actorDid: record.actorDid,
+      json: record.json,
+    };
     await ctx.db
       .insert(schema.records)
       .values({
         uri: record.uri.toString(),
-        cid: record.cid,
-        actorDid: record.actorDid,
-        json: record.json,
+        ...data,
       })
       .onConflictDoUpdate({
         target: schema.records.uri,
-        set: {
-          cid: record.cid,
-          actorDid: record.actorDid,
-          json: record.json,
-        },
+        set: data,
       });
   }
 

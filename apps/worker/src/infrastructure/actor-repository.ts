@@ -13,21 +13,20 @@ const CURRENT_BACKFILL_VERSION = 1;
 
 export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
+    const data = {
+      handle: actor.handle,
+      backfillStatus: actor.backfillStatus,
+      backfillVersion: actor.backfillVersion,
+    };
     await ctx.db
       .insert(schema.actors)
       .values({
         did: actor.did,
-        handle: actor.handle,
-        backfillStatus: actor.backfillStatus,
-        backfillVersion: actor.backfillVersion,
+        ...data,
       })
       .onConflictDoUpdate({
         target: schema.actors.did,
-        set: {
-          handle: actor.handle,
-          backfillStatus: actor.backfillStatus,
-          backfillVersion: actor.backfillVersion,
-        },
+        set: data,
       });
   }
 

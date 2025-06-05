@@ -6,31 +6,26 @@ import type { IPostRepository } from "../application/interfaces/post-repository.
 
 export class PostRepository implements IPostRepository {
   async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {
+    const data = {
+      cid: post.cid,
+      actorDid: post.actorDid,
+      text: post.text,
+      replyRootUri: post.replyRoot?.uri.toString(),
+      replyRootCid: post.replyRoot?.cid,
+      replyParentUri: post.replyParent?.uri.toString(),
+      replyParentCid: post.replyParent?.cid,
+      langs: post.langs,
+      createdAt: post.createdAt,
+    };
     await ctx.db
       .insert(schema.posts)
       .values({
         uri: post.uri.toString(),
-        cid: post.cid,
-        actorDid: post.actorDid,
-        text: post.text,
-        replyRootUri: post.replyRoot?.uri.toString(),
-        replyRootCid: post.replyRoot?.cid,
-        replyParentUri: post.replyParent?.uri.toString(),
-        replyParentCid: post.replyParent?.cid,
-        langs: post.langs,
-        createdAt: post.createdAt,
+        ...data,
       })
       .onConflictDoUpdate({
         target: schema.posts.uri,
-        set: {
-          text: post.text,
-          replyRootUri: post.replyRoot?.uri.toString(),
-          replyRootCid: post.replyRoot?.cid,
-          replyParentUri: post.replyParent?.uri.toString(),
-          replyParentCid: post.replyParent?.cid,
-          langs: post.langs,
-          createdAt: post.createdAt,
-        },
+        set: data,
       });
   }
 
