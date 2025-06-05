@@ -9,7 +9,10 @@ import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import { ActorService } from "./actor-service.js";
+import { BackfillService } from "./backfill-service.js";
 import { IndexActorService } from "./index-actor-service.js";
+import { ResolveDidService } from "./resolve-did-service.js";
 
 const mockJobQueue = mock<IJobQueue>();
 const { getSetup } = setupTestDatabase();
@@ -21,8 +24,11 @@ beforeAll(() => {
   const testSetup = getSetup();
   indexActorService = testSetup.testInjector
     .provideClass("actorRepository", ActorRepository)
-    .provideValue("jobQueue", mockJobQueue)
     .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideValue("jobQueue", mockJobQueue)
+    .provideClass("actorService", ActorService)
+    .provideClass("resolveDidService", ResolveDidService)
+    .provideClass("backfillService", BackfillService)
     .injectClass(IndexActorService);
   ctx = testSetup.ctx;
 });
@@ -165,6 +171,14 @@ describe("IndexActorService", () => {
         queueName: "resolveDid",
         jobName: `at://${newDid}`,
         data: newDid,
+      });
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "backfill",
+        jobName: `at://${newDid}`,
+        data: {
+          did: newDid,
+          targetCollections: ["app.bsky.actor.profile"],
+        },
       });
     });
 

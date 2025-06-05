@@ -149,5 +149,5 @@ await sleep(1000);
 - 私が指示するまでコミットしないでください
 - テストケースにはarrange-act-assertパターンに基づいたコメントを書いてください
 - arrange-act-assertのまとまりごとに1行空行を書いて、テストケースごとに空行が2行になるようにしてください
-- テストでモックを使いたいときは出来るだけvite-mock-extendedを使う
 - string型のdid文字列を扱うときはasDid関数でチェックする
+- テストを書くときはモックは原則禁止。JobQueueクラスのみモックを使用して良いが、vite-mock-extendedを使用する必要がある

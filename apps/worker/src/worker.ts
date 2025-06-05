@@ -13,12 +13,15 @@ import { createInjector } from "typed-inject";
 import { BackfillUseCase } from "./application/backfill-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
+import { ActorService } from "./application/service/actor-service.js";
+import { BackfillService } from "./application/service/backfill-service.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
 import { IndexCommitService } from "./application/service/index-commit-service.js";
 import { IndexFollowService } from "./application/service/index-follow-service.js";
 import { IndexPostService } from "./application/service/index-post-service.js";
 import { IndexProfileService } from "./application/service/index-profile-service.js";
 import { IndexSubscriptionService } from "./application/service/index-subscription-service.js";
+import { ResolveDidService } from "./application/service/resolve-did-service.js";
 import { Temp__CleanupDatabaseUseCase } from "./application/temp__cleanup-database-usecase.js";
 import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
@@ -56,6 +59,9 @@ createInjector()
   .provideClass("followRepository", FollowRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
   // application(service)
+  .provideClass("actorService", ActorService)
+  .provideClass("resolveDidService", ResolveDidService)
+  .provideClass("backfillService", BackfillService)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)

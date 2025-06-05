@@ -7,21 +7,28 @@ import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../infrastructure/actor-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
+import { ActorService } from "./service/actor-service.js";
+import { BackfillService } from "./service/backfill-service.js";
 import { IndexActorService } from "./service/index-actor-service.js";
+import { ResolveDidService } from "./service/resolve-did-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 
 let upsertIdentityUseCase: UpsertIdentityUseCase;
 let ctx: TransactionContext;
 
+const mockJobQueue = mock<IJobQueue>();
 const { getSetup } = setupTestDatabase();
 
 beforeAll(() => {
   const testSetup = getSetup();
   upsertIdentityUseCase = testSetup.testInjector
-    .provideValue("jobQueue", mock<IJobQueue>())
     .provideClass("actorRepository", ActorRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("actorService", ActorService)
+    .provideValue("jobQueue", mockJobQueue)
+    .provideClass("resolveDidService", ResolveDidService)
+    .provideClass("backfillService", BackfillService)
     .provideClass("indexActorService", IndexActorService)
     .injectClass(UpsertIdentityUseCase);
   ctx = testSetup.ctx;
