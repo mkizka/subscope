@@ -10,11 +10,19 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
+export const backfillStatus = ["dirty", "in-process", "synchronized"] as const;
+
+export type BackfillStatus = (typeof backfillStatus)[number];
+
 export const actors = pgTable(
   "actors",
   {
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
+    backfillStatus: varchar({ length: 20, enum: backfillStatus })
+      .notNull()
+      .default("dirty"),
+    backfillVersion: integer(),
     indexedAt: timestamp().defaultNow(),
     updatedAt: timestamp().$onUpdate(() => new Date()),
   },

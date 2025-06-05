@@ -1,12 +1,14 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@dawn/common/domain";
-import type { Actor } from "@dawn/common/domain";
+import type { Actor, BackfillStatus } from "@dawn/common/domain";
 import { Actor as ActorDomain } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
+
+const CURRENT_BACKFILL_VERSION = 1;
 
 export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
@@ -15,10 +17,16 @@ export class ActorRepository implements IActorRepository {
       .values({
         did: actor.did,
         handle: actor.handle,
+        backfillStatus: actor.backfillStatus,
+        backfillVersion: actor.backfillVersion,
       })
       .onConflictDoUpdate({
         target: schema.actors.did,
-        set: { handle: actor.handle },
+        set: {
+          handle: actor.handle,
+          backfillStatus: actor.backfillStatus,
+          backfillVersion: actor.backfillVersion,
+        },
       });
   }
 
@@ -34,6 +42,26 @@ export class ActorRepository implements IActorRepository {
     return new ActorDomain({
       did: asDid(row.did),
       handle: row.handle || undefined,
+      backfillStatus: row.backfillStatus,
+      backfillVersion: row.backfillVersion,
     });
+  }
+
+  async updateBackfillStatus({
+    ctx,
+    did,
+    status,
+  }: {
+    ctx: TransactionContext;
+    did: Did;
+    status: BackfillStatus;
+  }) {
+    await ctx.db
+      .update(schema.actors)
+      .set({
+        backfillStatus: status,
+        backfillVersion: CURRENT_BACKFILL_VERSION,
+      })
+      .where(eq(schema.actors.did, did));
   }
 }

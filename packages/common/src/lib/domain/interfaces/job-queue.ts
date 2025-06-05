@@ -6,7 +6,7 @@ import type { SupportedCollection } from "../../utils/collection.js";
 
 export type BackfillJobData = {
   did: Did;
-  targetCollections?: SupportedCollection[];
+  targetCollections: SupportedCollection[];
 };
 
 export type JobData = {

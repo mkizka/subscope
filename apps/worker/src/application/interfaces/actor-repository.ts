@@ -1,5 +1,6 @@
 import type { Did } from "@atproto/did";
 import type { Actor, TransactionContext } from "@dawn/common/domain";
+import type { BackfillStatus } from "@dawn/common/domain";
 
 export interface IActorRepository {
   upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
@@ -8,4 +9,10 @@ export interface IActorRepository {
     ctx: TransactionContext;
     did: Did;
   }) => Promise<Actor | null>;
+
+  updateBackfillStatus: (params: {
+    ctx: TransactionContext;
+    did: Did;
+    status: BackfillStatus;
+  }) => Promise<void>;
 }

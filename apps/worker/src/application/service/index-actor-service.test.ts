@@ -8,6 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
+import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
 
 const mockJobQueue = mock<IJobQueue>();
@@ -21,13 +22,14 @@ beforeAll(() => {
   indexActorService = testSetup.testInjector
     .provideClass("actorRepository", ActorRepository)
     .provideValue("jobQueue", mockJobQueue)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
     .injectClass(IndexActorService);
   ctx = testSetup.ctx;
 });
 
 describe("IndexActorService", () => {
   describe("upsert", () => {
-    it("handle指定あり、既存actorなしの場合は、actorを作成してresolvDidジョブは追加しない", async () => {
+    it("handle指定あり、既存actorなしの場合は、actorを作成してbackfillジョブを追加する", async () => {
       // arrange
       const testDid = asDid("did:plc:new-with-handle");
       const testHandle = asHandle("new-with-handle.bsky.social");
@@ -48,7 +50,14 @@ describe("IndexActorService", () => {
       expect(actors[0]?.did).toBe(testDid);
       expect(actors[0]?.handle).toBe(testHandle);
 
-      expect(mockJobQueue.add).not.toHaveBeenCalled();
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "backfill",
+        jobName: `at://${testDid}`,
+        data: {
+          did: testDid,
+          targetCollections: ["app.bsky.actor.profile"],
+        },
+      });
     });
 
     it("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
