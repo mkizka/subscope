@@ -89,8 +89,14 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(newHandle);
-
-      expect(mockJobQueue.add).not.toHaveBeenCalled();
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "backfill",
+        jobName: `at://${existingDid}`,
+        data: {
+          did: existingDid,
+          targetCollections: ["app.bsky.actor.profile"],
+        },
+      });
     });
 
     it("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
@@ -116,8 +122,14 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(existingHandle);
-
-      expect(mockJobQueue.add).not.toHaveBeenCalled();
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "backfill",
+        jobName: `at://${existingDid}`,
+        data: {
+          did: existingDid,
+          targetCollections: ["app.bsky.actor.profile"],
+        },
+      });
     });
 
     it("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
@@ -144,8 +156,14 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(newHandle);
-
-      expect(mockJobQueue.add).not.toHaveBeenCalled();
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "backfill",
+        jobName: `at://${existingDid}`,
+        data: {
+          did: existingDid,
+          targetCollections: ["app.bsky.actor.profile"],
+        },
+      });
     });
 
     it("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
@@ -233,8 +251,14 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(existingHandle);
-
-      expect(mockJobQueue.add).not.toHaveBeenCalled();
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "backfill",
+        jobName: `at://${existingDid}`,
+        data: {
+          did: existingDid,
+          targetCollections: ["app.bsky.actor.profile"],
+        },
+      });
     });
   });
 });
