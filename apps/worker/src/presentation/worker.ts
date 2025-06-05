@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import type { BackfillJobData } from "@dawn/common/domain";
 import type { SupportedCollection } from "@dawn/common/utils";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
@@ -54,11 +55,12 @@ export class SyncWorker {
           concurrency: 16,
         },
       ),
-      new Worker<Did>(
+      new Worker<BackfillJobData>(
         "backfill",
         async (job) => {
           await backfillUseCase.execute({
-            did: job.data,
+            did: job.data.did,
+            targetCollections: job.data.targetCollections,
             jobLogger: createJobLogger(job),
           });
         },

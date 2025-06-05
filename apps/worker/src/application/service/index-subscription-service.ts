@@ -18,7 +18,7 @@ export class IndexSubscriptionService implements IIndexCollectionService {
     await this.jobQueue.add({
       queueName: "backfill",
       jobName: `backfill-${record.actorDid}`,
-      data: record.actorDid,
+      data: { did: record.actorDid },
     });
   }
 

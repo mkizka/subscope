@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { ITransactionManager, Record } from "@dawn/common/domain";
+import type { ITransactionManager } from "@dawn/common/domain";
 import type { SupportedCollection } from "@dawn/common/utils";
 
 import type { JobLogger } from "../shared/job.js";
@@ -11,12 +11,6 @@ const BACKFILL_COLLECTIONS: SupportedCollection[] = [
   "app.bsky.graph.follow",
   "app.bsky.feed.post",
 ];
-
-const isBackfillSupported = (record: Record) => {
-  return BACKFILL_COLLECTIONS.includes(
-    record.collection as SupportedCollection,
-  );
-};
 
 export class BackfillUseCase {
   constructor(
@@ -30,11 +24,21 @@ export class BackfillUseCase {
     "indexCommitService",
   ] as const;
 
-  async execute({ did, jobLogger }: { did: Did; jobLogger: JobLogger }) {
+  async execute({
+    did,
+    jobLogger,
+    targetCollections = BACKFILL_COLLECTIONS,
+  }: {
+    did: Did;
+    jobLogger: JobLogger;
+    targetCollections?: SupportedCollection[];
+  }) {
     const repoRecords = await this.repoFetcher.fetch(did);
-    const backfillSupportedRecords = repoRecords.filter(isBackfillSupported);
+    const filteredRecords = repoRecords.filter((record) =>
+      targetCollections.includes(record.collection as SupportedCollection),
+    );
     await this.transactionManager.transaction(async (ctx) => {
-      for (const record of backfillSupportedRecords) {
+      for (const record of filteredRecords) {
         await this.indexCommitService.upsert({ ctx, record, jobLogger });
       }
     });
