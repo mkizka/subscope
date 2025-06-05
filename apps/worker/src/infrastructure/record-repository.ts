@@ -1,6 +1,6 @@
 import type { AtUri } from "@atproto/syntax";
 import type { Record, TransactionContext } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import { type RecordInsert, schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
 import type { IRecordRepository } from "../application/interfaces/record-repository.js";
@@ -11,7 +11,7 @@ export class RecordRepository implements IRecordRepository {
       cid: record.cid,
       actorDid: record.actorDid,
       json: record.json,
-    };
+    } satisfies RecordInsert;
     await ctx.db
       .insert(schema.records)
       .values({

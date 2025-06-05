@@ -1,6 +1,6 @@
 import type { TransactionContext } from "@dawn/common/domain";
 import type { Profile } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import { type BlobInsert, type ProfileInsert, schema } from "@dawn/db";
 
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 
@@ -16,7 +16,7 @@ export class ProfileRepository implements IProfileRepository {
       const blobData = {
         mimeType: profile.avatar.mimeType,
         size: profile.avatar.size,
-      };
+      } satisfies BlobInsert;
       await ctx.db
         .insert(schema.blobs)
         .values({
@@ -35,7 +35,7 @@ export class ProfileRepository implements IProfileRepository {
       description: profile.description,
       displayName: profile.displayName,
       createdAt: profile.createdAt,
-    };
+    } satisfies ProfileInsert;
     await ctx.db
       .insert(schema.profiles)
       .values({

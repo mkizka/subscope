@@ -1,5 +1,5 @@
 import type { Post, TransactionContext } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import { type PostInsert, schema } from "@dawn/db";
 import { inArray } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
@@ -16,7 +16,7 @@ export class PostRepository implements IPostRepository {
       replyParentCid: post.replyParent?.cid,
       langs: post.langs,
       createdAt: post.createdAt,
-    };
+    } satisfies PostInsert;
     await ctx.db
       .insert(schema.posts)
       .values({

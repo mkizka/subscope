@@ -4,7 +4,7 @@ import type { TransactionContext } from "@dawn/common/domain";
 import type { Actor, BackfillStatus } from "@dawn/common/domain";
 import { Actor as ActorDomain } from "@dawn/common/domain";
 import type { Handle } from "@dawn/common/utils";
-import { schema } from "@dawn/db";
+import { type ActorInsert, schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
@@ -17,7 +17,7 @@ export class ActorRepository implements IActorRepository {
       handle: actor.handle,
       backfillStatus: actor.backfillStatus,
       backfillVersion: actor.backfillVersion,
-    };
+    } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
       .values({
