@@ -23,34 +23,32 @@ export class ActorService {
     handle?: Handle;
   }): Promise<ActorUpsertResult> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
-
     if (existingActor) {
-      // インデックスされた時点からhandleが変更されていれば更新
+      const shouldBackfill = existingActor.backfillStatus === "dirty";
+      // インデックスされたactorのhandleと異なるhandleが指定された場合は更新
       if (handle && existingActor.handle !== handle) {
         await this.actorRepository.updateHandle({ ctx, did, handle });
         return {
           shouldResolveDid: false,
-          shouldBackfill: false,
+          shouldBackfill,
         };
       }
-      // インデックス済みのactorがhandleを持っていなければ解決を予約
+      // インデックスされたactorがhandleを持っていなければ解決
       if (!existingActor.handle) {
         return {
           shouldResolveDid: true,
-          shouldBackfill: false,
+          shouldBackfill,
         };
       }
-      // ハンドルを変更も新規解決もする必要がなければ何もしない
+      // それ以外は何もしない
       return {
         shouldResolveDid: false,
-        shouldBackfill: false,
+        shouldBackfill,
       };
     }
-
     // インデックスされていない場合は新規登録
     const actor = new Actor({ did, handle });
     await this.actorRepository.upsert({ ctx, actor });
-
     return {
       shouldResolveDid: !handle,
       shouldBackfill: actor.backfillStatus === "dirty",
