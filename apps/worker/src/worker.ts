@@ -13,7 +13,6 @@ import { createInjector } from "typed-inject";
 import { BackfillUseCase } from "./application/backfill-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
-import { ActorService } from "./application/service/actor-service.js";
 import { BackfillService } from "./application/service/backfill-service.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
 import { IndexCommitService } from "./application/service/index-commit-service.js";
@@ -59,7 +58,6 @@ createInjector()
   .provideClass("followRepository", FollowRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
   // application(service)
-  .provideClass("actorService", ActorService)
   .provideClass("resolveDidService", ResolveDidService)
   .provideClass("backfillService", BackfillService)
   .provideClass("indexProfileService", IndexProfileService)

@@ -9,7 +9,6 @@ import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
-import { ActorService } from "./actor-service.js";
 import { BackfillService } from "./backfill-service.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { ResolveDidService } from "./resolve-did-service.js";
@@ -26,7 +25,6 @@ beforeAll(() => {
     .provideClass("actorRepository", ActorRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
-    .provideClass("actorService", ActorService)
     .provideClass("resolveDidService", ResolveDidService)
     .provideClass("backfillService", BackfillService)
     .injectClass(IndexActorService);
