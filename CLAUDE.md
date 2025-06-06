@@ -142,6 +142,21 @@ await sleep(1000);
 - パフォーマンスやセキュリティ上の理由で特定の実装を選んだ場合
 - TODOやFIXMEなどの将来の改善点を記録する場合
 
+## サポートコレクション
+
+Dawnがインデックス可能なレコードタイプは `packages/common/src/lib/utils/collection.ts` の `SUPPORTED_COLLECTIONS` で定義されています。現在対応しているのは：
+
+- `app.bsky.actor.profile` - プロフィール情報
+- `app.bsky.feed.post` - 投稿（リプライ、引用投稿を含む）
+- `app.bsky.graph.follow` - フォロー関係
+- `dev.mkizka.test.subscription` - Dawnへのサブスクリプション
+
+新しいレコードタイプを追加する場合は：
+
+1. このリストに追加
+2. `SupportedCollectionMap` の型定義を更新
+3. [Lexicon実装ガイド](docs/lexicon-implementation-guide.md)に従って実装
+
 ## メモリ
 
 - ファイルの編集後は最後に必ずリポジトリルートに移動してpnpm typecheckとpnpm formatを実行し、型エラーかlintエラーが残っていないことを確認してください
