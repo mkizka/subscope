@@ -13,9 +13,10 @@
       "Bash(git diff:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
+      "Bash(rg:*)",
       "Bash(cat:*)",
       "Bash(ls:*)"
     ],
-    "deny": ["Bash(pnpm lint:*)"]
+    "deny": ["Bash(npm:*)", "Bash(yarn:*)"]
   }
 }
