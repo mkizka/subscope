@@ -20,6 +20,7 @@ Dawnは3つのメインアプリケーションでBluesky AppViewを実装する
 - **Lexicon実装**: 新しいレコードタイプを追加する場合は @docs/lexicon-implementation-guide.md を参照
 - **Identity Event処理**: Identity Eventの処理仕様については @docs/identity-event-handling.md を参照
 - **実装状況**: API実装の進捗については @docs/tasks.md を参照
+- **AT Protocolコードベース**: @docs/atproto-repomix-output.xml を参照
 
 ## 開発コマンド
 
@@ -143,7 +144,7 @@ await sleep(1000);
 
 ## メモリ
 
-- ファイルの編集後は最後に必ずpnpm typecheckとpnpm formatを実行し、型エラーかlintエラーが残っていないことを確認してください
+- ファイルの編集後は最後に必ずリポジトリルートに移動してpnpm typecheckとpnpm formatを実行し、型エラーかlintエラーが残っていないことを確認してください
 - テストケース名は日本語で書いてください
 - 重要でないnull/undefinedチェックは@dawn/commonパッケージのrequired関数を使ってください
 - 私が指示するまでコミットしないでください
