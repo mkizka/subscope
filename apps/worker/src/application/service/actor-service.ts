@@ -6,7 +6,6 @@ import type { IActorRepository } from "../interfaces/actor-repository.js";
 
 export interface ActorUpsertResult {
   shouldResolveDid: boolean;
-  shouldBackfill: boolean;
 }
 
 export class ActorService {
@@ -24,26 +23,22 @@ export class ActorService {
   }): Promise<ActorUpsertResult> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
     if (existingActor) {
-      const shouldBackfill = existingActor.backfillStatus === "dirty";
       // インデックスされたactorのhandleと異なるhandleが指定された場合は更新
       if (handle && existingActor.handle !== handle) {
         await this.actorRepository.updateHandle({ ctx, did, handle });
         return {
           shouldResolveDid: false,
-          shouldBackfill,
         };
       }
       // インデックスされたactorがhandleを持っていなければ解決
       if (!existingActor.handle) {
         return {
           shouldResolveDid: true,
-          shouldBackfill,
         };
       }
       // それ以外は何もしない
       return {
         shouldResolveDid: false,
-        shouldBackfill,
       };
     }
     // インデックスされていない場合は新規登録
@@ -51,7 +46,6 @@ export class ActorService {
     await this.actorRepository.upsert({ ctx, actor });
     return {
       shouldResolveDid: !handle,
-      shouldBackfill: actor.backfillStatus === "dirty",
     };
   }
 }

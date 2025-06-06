@@ -4,7 +4,7 @@ import { asHandle } from "@dawn/common/utils";
 import { schema } from "@dawn/db";
 import { setupTestDatabase } from "@dawn/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
@@ -34,8 +34,12 @@ beforeAll(() => {
 });
 
 describe("IndexActorService", () => {
+  beforeEach(() => {
+    mockJobQueue.add.mockClear();
+  });
+
   describe("upsert", () => {
-    it("handle指定あり、既存actorなしの場合は、actorを作成してbackfillジョブを追加する", async () => {
+    it("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
       // arrange
       const testDid = asDid("did:plc:new-with-handle");
       const testHandle = asHandle("new-with-handle.bsky.social");
@@ -56,14 +60,39 @@ describe("IndexActorService", () => {
       expect(actors[0]?.did).toBe(testDid);
       expect(actors[0]?.handle).toBe(testHandle);
 
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "backfill",
-        jobName: `at://${testDid}`,
-        data: {
-          did: testDid,
-          targetCollections: ["app.bsky.actor.profile"],
-        },
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
+    });
+
+    it("handle指定あり、既存actorなしの場合は、backfillジョブを追加しない", async () => {
+      // arrange
+      const testDid = asDid("did:plc:new-no-backfill");
+      const testHandle = asHandle("new-no-backfill.bsky.social");
+
+      // act
+      await indexActorService.upsert({
+        ctx,
+        did: testDid,
+        handle: testHandle,
       });
+
+      // assert
+      const actors = await ctx.db
+        .select()
+        .from(schema.actors)
+        .where(eq(schema.actors.did, testDid));
+      expect(actors).toHaveLength(1);
+      expect(actors[0]?.did).toBe(testDid);
+      expect(actors[0]?.handle).toBe(testHandle);
+
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
     });
 
     it("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
@@ -89,14 +118,11 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(newHandle);
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "backfill",
-        jobName: `at://${existingDid}`,
-        data: {
-          did: existingDid,
-          targetCollections: ["app.bsky.actor.profile"],
-        },
-      });
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
     });
 
     it("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
@@ -122,14 +148,11 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(existingHandle);
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "backfill",
-        jobName: `at://${existingDid}`,
-        data: {
-          did: existingDid,
-          targetCollections: ["app.bsky.actor.profile"],
-        },
-      });
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
     });
 
     it("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
@@ -156,14 +179,11 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(newHandle);
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "backfill",
-        jobName: `at://${existingDid}`,
-        data: {
-          did: existingDid,
-          targetCollections: ["app.bsky.actor.profile"],
-        },
-      });
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
     });
 
     it("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
@@ -190,14 +210,11 @@ describe("IndexActorService", () => {
         jobName: `at://${newDid}`,
         data: newDid,
       });
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "backfill",
-        jobName: `at://${newDid}`,
-        data: {
-          did: newDid,
-          targetCollections: ["app.bsky.actor.profile"],
-        },
-      });
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
     });
 
     it("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
@@ -251,14 +268,11 @@ describe("IndexActorService", () => {
         .where(eq(schema.actors.did, existingDid));
       expect(actors).toHaveLength(1);
       expect(actors[0]?.handle).toBe(existingHandle);
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "backfill",
-        jobName: `at://${existingDid}`,
-        data: {
-          did: existingDid,
-          targetCollections: ["app.bsky.actor.profile"],
-        },
-      });
+      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          queueName: "backfill",
+        }),
+      );
     });
   });
 });

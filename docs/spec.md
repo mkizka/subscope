@@ -34,21 +34,20 @@
 1. 保存ルールをチェックし、該当しなければ何もしない
 2. didに基づいてactorをDBに保存
 3. identityイベントなどhandleがすぐ分からなければresolveDidをジョブキューに追加
-4. actorがdirtyであればbackfillをジョブキューに追加
-5. recordをDBに保存
-6. コレクションごとのデータをDBに保存
+4. recordをDBに保存
+5. コレクションごとのデータをDBに保存
 
 ## 2. バックフィル
+
+subscriptionレコードをインデックスする際に、actorがdirtyであればバックフィルする
 
 ### バックフィルの処理手順(バージョン1)
 
 1. actorのステータスをin-processに
 2. subscribersになったユーザーのPDSからレコード一覧を取得
-3. レコード一覧の中から以下のレコードを一括保存(※)
+3. レコード一覧の中から以下のレコードを一括保存
 4. バックフィルの状況はdev.mkizka.test.getJobStatusで確認出来る。クライアントは定期的にポーリングする
 5. actorのステータスをsynchronizedにする
-
-(※)subscriberの場合はサポートしている全コレクション、それ以外はapp.bsky.actor.profileのみ保存する。
 
 ## バックフィルステータスの定義
 
