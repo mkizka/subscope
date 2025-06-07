@@ -2,18 +2,11 @@ import type { Did } from "@atproto/did";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { Queue } from "bullmq";
 
-import type { SupportedCollection } from "../../utils/collection.js";
-
-export type BackfillJobData = {
-  did: Did;
-  targetCollections: SupportedCollection[];
-};
-
 export type JobData = {
   resolveDid: Did;
   identity: IdentityEvent;
   commit: CommitEvent<string>;
-  backfill: BackfillJobData;
+  backfill: Did;
   temp__cleanupDatabase: undefined;
 };
 

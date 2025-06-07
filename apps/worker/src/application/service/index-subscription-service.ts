@@ -28,7 +28,7 @@ export class IndexSubscriptionService implements IIndexCollectionService {
       did: asDid(record.actorDid),
     });
     if (actor?.backfillStatus === "dirty") {
-      await this.backfillService.schedule({ ctx, did: actor.did });
+      await this.backfillService.schedule(actor.did);
     }
   }
 

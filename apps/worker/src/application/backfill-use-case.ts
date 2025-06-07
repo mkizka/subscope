@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import type { DatabaseClient, ITransactionManager } from "@dawn/common/domain";
-import type { SupportedCollection } from "@dawn/common/utils";
+import { isSupportedCollection } from "@dawn/common/utils";
 
 import type { JobLogger } from "../shared/job.js";
 import type { IActorRepository } from "./interfaces/actor-repository.js";
@@ -23,15 +23,7 @@ export class BackfillUseCase {
     "db",
   ] as const;
 
-  async execute({
-    did,
-    targetCollections,
-    jobLogger,
-  }: {
-    did: Did;
-    targetCollections: SupportedCollection[];
-    jobLogger: JobLogger;
-  }) {
+  async execute({ did, jobLogger }: { did: Did; jobLogger: JobLogger }) {
     await this.actorRepository.updateBackfillStatus({
       ctx: { db: this.db },
       did,
@@ -40,7 +32,7 @@ export class BackfillUseCase {
 
     const repoRecords = await this.repoFetcher.fetch(did, jobLogger);
     const filteredRecords = repoRecords.filter((record) =>
-      targetCollections.includes(record.collection as SupportedCollection),
+      isSupportedCollection(record.collection),
     );
 
     await this.transactionManager.transaction(async (ctx) => {
