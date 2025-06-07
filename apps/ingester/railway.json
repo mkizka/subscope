@@ -13,6 +13,12 @@
   "deploy": {
     "startCommand": "pnpm --filter @dawn/ingester start",
     "healthcheckPath": "/health",
-    "healthcheckTimeout": 60
+    "healthcheckTimeout": 60,
+    "limitOverride": {
+      "containers": {
+        "cpu": 1,
+        "memoryBytes": 1073741824
+      }
+    }
   }
 }
