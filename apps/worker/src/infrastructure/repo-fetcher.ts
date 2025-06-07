@@ -5,6 +5,7 @@ import { AtpBaseClient } from "@dawn/client/api";
 import type { IDidResolver } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { isSupportedCollection } from "@dawn/common/utils";
+import { setImmediate } from "timers/promises";
 import { z } from "zod";
 
 import type { IRepoFetcher } from "../application/interfaces/repo-fetcher.js";
@@ -141,6 +142,20 @@ export class RepoFetcher implements IRepoFetcher {
           { blockCid: String(block.cid), duration: blockDuration },
           "Slow block processing detected",
         );
+      }
+
+      // 100ブロックごとにイベントループに制御を戻し、進捗をログ出力
+      if (blockCount % 100 === 0) {
+        await jobLogger.info(
+          {
+            did,
+            mstNodeCount,
+            recordCount,
+            supportedRecordCount: records.length,
+          },
+          `Block processing progress (${blockCount} blocks processed)`,
+        );
+        await setImmediate();
       }
     }
     const blockProcessingTime = Date.now() - blockProcessingStart;
