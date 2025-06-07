@@ -13,6 +13,8 @@ scrape_configs:
           - ingester.railway.internal:8080
 
   - job_name: worker
-    static_configs:
-      - targets:
-          - worker.railway.internal:8080
+    dns_sd_configs:
+      - names:
+          - worker.railway.internal
+        type: AAAA
+        port: 8080
