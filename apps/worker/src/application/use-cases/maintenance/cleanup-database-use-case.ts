@@ -2,7 +2,7 @@ import type { DatabaseClient } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 import { count, inArray, lt } from "drizzle-orm";
 
-import type { JobLogger } from "../shared/job.js";
+import type { JobLogger } from "../../../shared/job.js";
 
 const DELETE_BATCH_SIZE = 1000;
 

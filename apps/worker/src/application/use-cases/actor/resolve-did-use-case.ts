@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { IDidResolver } from "@dawn/common/domain";
 import { Actor, type DatabaseClient } from "@dawn/common/domain";
 
-import type { IActorRepository } from "./interfaces/actor-repository.js";
+import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 
 export class ResolveDidUseCase {
   constructor(

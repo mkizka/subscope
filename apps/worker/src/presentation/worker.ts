@@ -4,15 +4,15 @@ import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
-import type { BackfillUseCase } from "../application/backfill-use-case.js";
-import { fetchProfileCommandFactory } from "../application/fetch-profile-command.js";
-import type { FetchProfileUseCase } from "../application/fetch-profile-use-case.js";
-import { indexCommitCommandFactory } from "../application/index-commit-command.js";
-import type { IndexCommitUseCase } from "../application/index-commit-use-case.js";
-import type { ResolveDidUseCase } from "../application/resolve-did-use-case.js";
-import type { Temp__CleanupDatabaseUseCase } from "../application/temp__cleanup-database-usecase.js";
-import { upsertIdentityCommandFactory } from "../application/upsert-identity-command.js";
-import type { UpsertIdentityUseCase } from "../application/upsert-identity-use-case.js";
+import type { BackfillUseCase } from "../application/use-cases/actor/backfill-use-case.js";
+import type { ResolveDidUseCase } from "../application/use-cases/actor/resolve-did-use-case.js";
+import { upsertIdentityCommandFactory } from "../application/use-cases/actor/upsert-identity-command.js";
+import type { UpsertIdentityUseCase } from "../application/use-cases/actor/upsert-identity-use-case.js";
+import type { Temp__CleanupDatabaseUseCase } from "../application/use-cases/maintenance/cleanup-database-use-case.js";
+import { fetchProfileCommandFactory } from "../application/use-cases/profile/fetch-profile-command.js";
+import type { FetchProfileUseCase } from "../application/use-cases/profile/fetch-profile-use-case.js";
+import { indexCommitCommandFactory } from "../application/use-cases/record/index-commit-command.js";
+import type { IndexCommitUseCase } from "../application/use-cases/record/index-commit-use-case.js";
 import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 

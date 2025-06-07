@@ -1,10 +1,10 @@
 import type { DatabaseClient } from "@dawn/common/domain";
 import { Profile } from "@dawn/common/domain";
 
+import type { IProfileRecordFetcher } from "../../interfaces/external/profile-record-fetcher.js";
+import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
+import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
 import type { FetchProfileCommand } from "./fetch-profile-command.js";
-import type { IProfileRecordFetcher } from "./interfaces/profile-record-fetcher.js";
-import type { IProfileRepository } from "./interfaces/profile-repository.js";
-import type { IRecordRepository } from "./interfaces/record-repository.js";
 
 export class FetchProfileUseCase {
   constructor(

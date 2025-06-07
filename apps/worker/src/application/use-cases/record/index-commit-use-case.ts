@@ -1,7 +1,7 @@
 import { type ITransactionManager } from "@dawn/common/domain";
 
+import type { IndexCommitService } from "../../services/record/index-commit-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
-import type { IndexCommitService } from "./service/index-commit-service.js";
 
 export class IndexCommitUseCase {
   constructor(

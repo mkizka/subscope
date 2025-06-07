@@ -3,7 +3,7 @@ import type { Record, TransactionContext } from "@dawn/common/domain";
 import { type RecordInsert, schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
-import type { IRecordRepository } from "../application/interfaces/record-repository.js";
+import type { IRecordRepository } from "../application/interfaces/repositories/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {

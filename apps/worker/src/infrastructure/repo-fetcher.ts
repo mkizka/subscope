@@ -6,7 +6,7 @@ import type { IDidResolver } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 import { required } from "@dawn/common/utils";
 
-import type { IRepoFetcher } from "../application/interfaces/repo-fetcher.js";
+import type { IRepoFetcher } from "../application/interfaces/external/repo-fetcher.js";
 import type { JobLogger } from "../shared/job.js";
 
 export class RepoFetcher implements IRepoFetcher {
@@ -68,7 +68,7 @@ export class RepoFetcher implements IRepoFetcher {
             const record = cborToLexRecord(cbor);
             return Record.fromLex({
               uri: AtUri.make(did, create.collection, create.rkey),
-              cid: create.cid.toString(),
+              cid: String(create.cid),
               lex: record,
             });
           }),

@@ -1,7 +1,7 @@
 import type { Follow, TransactionContext } from "@dawn/common/domain";
 import { schema } from "@dawn/db";
 
-import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
+import type { IFollowRepository } from "../application/interfaces/repositories/follow-repository.js";
 
 export class FollowRepository implements IFollowRepository {
   async upsert({ ctx, follow }: { ctx: TransactionContext; follow: Follow }) {

@@ -2,9 +2,9 @@ import type { Did } from "@atproto/did";
 import { Actor, type TransactionContext } from "@dawn/common/domain";
 import type { Handle } from "@dawn/common/utils";
 
-import type { IActorRepository } from "../interfaces/actor-repository.js";
-import type { IProfileRepository } from "../interfaces/profile-repository.js";
-import type { FetchProfileService } from "./fetch-profile-service.js";
+import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
+import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
+import type { FetchProfileService } from "../profile/fetch-profile-service.js";
 import type { ResolveDidService } from "./resolve-did-service.js";
 
 export class IndexActorService {

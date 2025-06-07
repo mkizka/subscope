@@ -5,8 +5,8 @@ import { setupTestDatabase } from "@dawn/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { PostRepository } from "../../infrastructure/post-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import { PostRepository } from "../../../infrastructure/post-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { IndexPostService } from "./index-post-service.js";
 
 let indexPostService: IndexPostService;

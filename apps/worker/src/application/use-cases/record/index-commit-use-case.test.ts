@@ -8,10 +8,10 @@ import { Record } from "@dawn/common/domain";
 import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import type { JobLogger } from "../shared/job.js";
+import type { JobLogger } from "../../../shared/job.js";
+import type { IndexCommitService } from "../../services/record/index-commit-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import { IndexCommitUseCase } from "./index-commit-use-case.js";
-import type { IndexCommitService } from "./service/index-commit-service.js";
 
 const mockIndexCommitService = mock<IndexCommitService>();
 const mockJobLogger = mock<JobLogger>();

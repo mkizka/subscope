@@ -7,11 +7,11 @@ import { eq } from "drizzle-orm";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../infrastructure/actor-repository.js";
-import { ProfileRepository } from "../../infrastructure/profile-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
-import { BackfillService } from "./backfill-service.js";
-import { FetchProfileService } from "./fetch-profile-service.js";
+import { ActorRepository } from "../../../infrastructure/actor-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { BackfillService } from "../backfill/backfill-service.js";
+import { FetchProfileService } from "../profile/fetch-profile-service.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { ResolveDidService } from "./resolve-did-service.js";
 

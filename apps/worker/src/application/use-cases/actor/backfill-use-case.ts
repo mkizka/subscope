@@ -2,10 +2,10 @@ import type { Did } from "@atproto/did";
 import type { DatabaseClient, ITransactionManager } from "@dawn/common/domain";
 import { isSupportedCollection } from "@dawn/common/utils";
 
-import type { JobLogger } from "../shared/job.js";
-import type { IActorRepository } from "./interfaces/actor-repository.js";
-import type { IRepoFetcher } from "./interfaces/repo-fetcher.js";
-import type { IndexCommitService } from "./service/index-commit-service.js";
+import type { JobLogger } from "../../../shared/job.js";
+import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
+import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
+import type { IndexCommitService } from "../../services/record/index-commit-service.js";
 
 export class BackfillUseCase {
   constructor(

@@ -2,7 +2,7 @@ import type { Post, TransactionContext } from "@dawn/common/domain";
 import { type PostInsert, schema } from "@dawn/db";
 import { inArray } from "drizzle-orm";
 
-import type { IPostRepository } from "../application/interfaces/post-repository.js";
+import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
 
 export class PostRepository implements IPostRepository {
   async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {

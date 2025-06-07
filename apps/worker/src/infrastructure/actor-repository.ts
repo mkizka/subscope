@@ -7,7 +7,7 @@ import type { Handle } from "@dawn/common/utils";
 import { type ActorInsert, schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
-import type { IActorRepository } from "../application/interfaces/actor-repository.js";
+import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 
 const CURRENT_BACKFILL_VERSION = 1;
 

@@ -2,10 +2,10 @@ import { asDid } from "@atproto/did";
 import type { Record, TransactionContext } from "@dawn/common/domain";
 import { Subscription } from "@dawn/common/domain";
 
-import type { IActorRepository } from "../interfaces/actor-repository.js";
-import type { IIndexCollectionService } from "../interfaces/index-collection-service.js";
-import type { ISubscriptionRepository } from "../interfaces/subscription-repository.js";
-import type { BackfillService } from "./backfill-service.js";
+import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
+import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
+import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { BackfillService } from "../backfill/backfill-service.js";
 
 export class IndexSubscriptionService implements IIndexCollectionService {
   constructor(

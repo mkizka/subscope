@@ -1,7 +1,7 @@
 import type { DatabaseClient, TransactionContext } from "@dawn/common/domain";
 
-import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
-import type { IndexActorService } from "./service/index-actor-service.js";
+import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
+import type { IndexActorService } from "../../services/actor/index-actor-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 export class UpsertIdentityUseCase {

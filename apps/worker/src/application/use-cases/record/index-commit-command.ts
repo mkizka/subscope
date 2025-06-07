@@ -3,7 +3,7 @@ import { Record } from "@dawn/common/domain";
 import type { SupportedCollection } from "@dawn/common/utils";
 import type { CommitEvent } from "@skyware/jetstream";
 
-import type { JobLogger } from "../shared/job.js";
+import type { JobLogger } from "../../../shared/job.js";
 
 export const indexCommitCommandFactory = ({
   event,

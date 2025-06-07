@@ -5,8 +5,8 @@ import { setupTestDatabase } from "@dawn/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { FollowRepository } from "../../infrastructure/follow-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { IndexFollowService } from "./index-follow-service.js";
 
 let indexFollowService: IndexFollowService;

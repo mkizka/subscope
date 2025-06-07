@@ -4,7 +4,7 @@ import { AtpBaseClient } from "@dawn/client/api";
 import type { IDidResolver } from "@dawn/common/domain";
 import { Record } from "@dawn/common/domain";
 
-import type { IProfileRecordFetcher } from "../application/interfaces/profile-record-fetcher.js";
+import type { IProfileRecordFetcher } from "../application/interfaces/external/profile-record-fetcher.js";
 
 export class ProfileRecordFetcher implements IProfileRecordFetcher {
   static inject = ["didResolver"] as const;

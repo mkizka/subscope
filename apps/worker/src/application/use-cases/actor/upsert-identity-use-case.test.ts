@@ -5,13 +5,13 @@ import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../infrastructure/actor-repository.js";
-import { ProfileRepository } from "../infrastructure/profile-repository.js";
-import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
-import { BackfillService } from "./service/backfill-service.js";
-import { FetchProfileService } from "./service/fetch-profile-service.js";
-import { IndexActorService } from "./service/index-actor-service.js";
-import { ResolveDidService } from "./service/resolve-did-service.js";
+import { ActorRepository } from "../../../infrastructure/actor-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { IndexActorService } from "../../services/actor/index-actor-service.js";
+import { ResolveDidService } from "../../services/actor/resolve-did-service.js";
+import { BackfillService } from "../../services/backfill/backfill-service.js";
+import { FetchProfileService } from "../../services/profile/fetch-profile-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 

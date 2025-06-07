@@ -4,7 +4,7 @@ import type { Profile } from "@dawn/common/domain";
 import { type BlobInsert, type ProfileInsert, schema } from "@dawn/db";
 import { eq } from "drizzle-orm";
 
-import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
+import type { IProfileRepository } from "../application/interfaces/repositories/profile-repository.js";
 
 export class ProfileRepository implements IProfileRepository {
   async upsert({
