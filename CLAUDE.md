@@ -167,3 +167,4 @@ Dawnがインデックス可能なレコードタイプは `packages/common/src/
 - arrange-act-assertのまとまりごとに1行空行を書いて、テストケースごとに空行が2行になるようにしてください
 - string型のdid文字列を扱うときはasDid関数でチェックする
 - テストを書くときはモックは原則禁止。JobQueueクラスのみモックを使用して良いが、vite-mock-extendedを使用する必要がある
+- DBマイグレーションファイルの作成は不要
