@@ -9,7 +9,6 @@ import type { ResolveDidUseCase } from "../application/use-cases/actor/resolve-d
 import { upsertIdentityCommandFactory } from "../application/use-cases/actor/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/actor/upsert-identity-use-case.js";
 import type { Temp__CleanupDatabaseUseCase } from "../application/use-cases/maintenance/cleanup-database-use-case.js";
-import { fetchProfileCommandFactory } from "../application/use-cases/profile/fetch-profile-command.js";
 import type { FetchProfileUseCase } from "../application/use-cases/profile/fetch-profile-use-case.js";
 import { indexCommitCommandFactory } from "../application/use-cases/record/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/record/index-commit-use-case.js";
@@ -83,8 +82,10 @@ export class SyncWorker {
       new Worker<Did>(
         "fetchProfile",
         async (job) => {
-          const command = fetchProfileCommandFactory(job);
-          await fetchProfileUseCase.execute(command);
+          await fetchProfileUseCase.execute({
+            did: job.data,
+            jobLogger: createJobLogger(job),
+          });
         },
         {
           ...baseWorkerOptions,

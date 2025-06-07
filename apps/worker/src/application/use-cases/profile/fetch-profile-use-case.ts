@@ -1,10 +1,11 @@
+import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@dawn/common/domain";
 import { Profile } from "@dawn/common/domain";
 
+import type { JobLogger } from "../../../shared/job.js";
 import type { IProfileRecordFetcher } from "../../interfaces/external/profile-record-fetcher.js";
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
 import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
-import type { FetchProfileCommand } from "./fetch-profile-command.js";
 
 export class FetchProfileUseCase {
   constructor(
@@ -20,7 +21,13 @@ export class FetchProfileUseCase {
     "db",
   ] as const;
 
-  async execute({ did, jobLogger }: FetchProfileCommand): Promise<void> {
+  async execute({
+    did,
+    jobLogger,
+  }: {
+    did: Did;
+    jobLogger: JobLogger;
+  }): Promise<void> {
     const record = await this.profileRecordFetcher.fetch(did);
     if (!record) {
       await jobLogger.log(`Profile not found for DID: ${did}`);
