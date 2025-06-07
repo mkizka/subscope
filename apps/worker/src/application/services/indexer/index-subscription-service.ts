@@ -2,6 +2,7 @@ import { asDid } from "@atproto/did";
 import type { Record, TransactionContext } from "@dawn/common/domain";
 import { Subscription } from "@dawn/common/domain";
 
+import { env } from "../../../shared/env.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
@@ -27,7 +28,12 @@ export class IndexSubscriptionService implements IIndexCollectionService {
       ctx,
       did: asDid(record.actorDid),
     });
-    if (actor?.backfillStatus === "dirty") {
+
+    // バックフィル条件：actorのステータスがdirtyかつappviewDidがこのサービスのDIDと一致
+    if (
+      actor?.backfillStatus === "dirty" &&
+      subscription.appviewDid === env.APPVIEW_DID
+    ) {
       await this.backfillService.schedule(actor.did);
     }
   }

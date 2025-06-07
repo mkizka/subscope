@@ -11,6 +11,9 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3003),
+  APPVIEW_DID: z
+    .string()
+    .default("did:web:appview.localhost"),
   PLC_URL: z.url().default(
     match({
       prod: "https://plc.directory",
