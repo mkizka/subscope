@@ -38,7 +38,7 @@ export class BackfillUseCase {
       status: "in-process",
     });
 
-    const repoRecords = await this.repoFetcher.fetch(did);
+    const repoRecords = await this.repoFetcher.fetch(did, jobLogger);
     const filteredRecords = repoRecords.filter((record) =>
       targetCollections.includes(record.collection as SupportedCollection),
     );
