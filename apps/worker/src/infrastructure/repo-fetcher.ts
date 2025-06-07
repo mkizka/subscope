@@ -16,16 +16,15 @@ export class RepoFetcher implements IRepoFetcher {
   private async measureAndLog<T>(
     jobLogger: JobLogger,
     taskName: string,
-    data: { [key: string]: unknown },
     task: () => Promise<T>,
   ): Promise<T> {
-    await jobLogger.info(data, `${taskName}を開始`);
+    await jobLogger.log(`${taskName}を開始`);
     const startTime = Date.now();
 
     const result = await task();
 
     const duration = Date.now() - startTime;
-    await jobLogger.info({ ...data, duration }, `${taskName}完了`);
+    await jobLogger.log(`${taskName}完了 (${duration}ms)`);
 
     return result;
   }
@@ -33,71 +32,50 @@ export class RepoFetcher implements IRepoFetcher {
   private async fetchRepo(did: Did, pds: URL, jobLogger: JobLogger) {
     const client = new AtpBaseClient(pds);
 
-    return this.measureAndLog(
-      jobLogger,
-      "リポジトリの取得",
-      { did },
-      async () => {
-        const response = await client.com.atproto.sync.getRepo({ did });
-        if (!response.success) {
-          throw new Error("Failed to fetch repo");
-        }
-        return response.data;
-      },
-    );
+    return this.measureAndLog(jobLogger, "リポジトリの取得", async () => {
+      const response = await client.com.atproto.sync.getRepo({ did });
+      if (!response.success) {
+        throw new Error("Failed to fetch repo");
+      }
+      return response.data;
+    });
   }
 
   private async fetchRepoAndVerify(did: Did, jobLogger: JobLogger) {
     const { pds, signingKey } = await this.measureAndLog(
       jobLogger,
       "DID解決",
-      { did },
       () => this.didResolver.resolve(did),
     );
 
     const repoCar = await this.fetchRepo(did, pds, jobLogger);
 
-    const result = await this.measureAndLog(
-      jobLogger,
-      "リポジトリ検証",
-      { did },
-      () => verifyRepoCar(repoCar, did, signingKey),
+    const result = await this.measureAndLog(jobLogger, "リポジトリ検証", () =>
+      verifyRepoCar(repoCar, did, signingKey),
     );
 
     return result;
   }
 
   async fetch(did: Did, jobLogger: JobLogger) {
-    return this.measureAndLog(
-      jobLogger,
-      "レコード取得処理",
-      { did },
-      async () => {
-        const { creates, commit } = await this.fetchRepoAndVerify(
-          did,
-          jobLogger,
-        );
+    return this.measureAndLog(jobLogger, "レコード取得処理", async () => {
+      const { creates, commit } = await this.fetchRepoAndVerify(did, jobLogger);
 
-        const records = await this.measureAndLog(
-          jobLogger,
-          "レコード変換",
-          { recordCount: creates.length },
-          () =>
-            Promise.resolve(
-              creates.map((create) => {
-                const cbor = required(commit.newBlocks.get(create.cid));
-                const record = cborToLexRecord(cbor);
-                return Record.fromLex({
-                  uri: AtUri.make(did, create.collection, create.rkey),
-                  cid: create.cid.toString(),
-                  lex: record,
-                });
-              }),
-            ),
-        );
+      const records = await this.measureAndLog(jobLogger, "レコード変換", () =>
+        Promise.resolve(
+          creates.map((create) => {
+            const cbor = required(commit.newBlocks.get(create.cid));
+            const record = cborToLexRecord(cbor);
+            return Record.fromLex({
+              uri: AtUri.make(did, create.collection, create.rkey),
+              cid: create.cid.toString(),
+              lex: record,
+            });
+          }),
+        ),
+      );
 
-        return records;
-      },
-    );
+      return records;
+    });
   }
 }
