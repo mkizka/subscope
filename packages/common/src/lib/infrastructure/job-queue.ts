@@ -29,6 +29,7 @@ export class JobQueue implements IJobQueue {
     } satisfies QueueOptions;
     this.queues = {
       resolveDid: new Queue("resolveDid", queueOptions),
+      fetchProfile: new Queue("fetchProfile", queueOptions),
       identity: new Queue("identity", queueOptions),
       commit: new Queue("commit", queueOptions),
       backfill: new Queue("backfill", queueOptions),

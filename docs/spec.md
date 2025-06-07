@@ -34,8 +34,9 @@
 1. 保存ルールをチェックし、該当しなければ何もしない
 2. didに基づいてactorをDBに保存
 3. identityイベントなどhandleがすぐ分からなければresolveDidをジョブキューに追加
-4. recordをDBに保存
-5. コレクションごとのデータをDBに保存
+4. actorのapp.bsky.actor.profileがDBになければfetchProfileをジョブキューに追加
+5. recordをDBに保存
+6. コレクションごとのデータをDBに保存
 
 ## 2. バックフィル
 

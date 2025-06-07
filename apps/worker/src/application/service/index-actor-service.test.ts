@@ -8,8 +8,10 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
+import { ProfileRepository } from "../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { BackfillService } from "./backfill-service.js";
+import { FetchProfileService } from "./fetch-profile-service.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { ResolveDidService } from "./resolve-did-service.js";
 
@@ -23,10 +25,12 @@ beforeAll(() => {
   const testSetup = getSetup();
   indexActorService = testSetup.testInjector
     .provideClass("actorRepository", ActorRepository)
+    .provideClass("profileRepository", ProfileRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("resolveDidService", ResolveDidService)
     .provideClass("backfillService", BackfillService)
+    .provideClass("fetchProfileService", FetchProfileService)
     .injectClass(IndexActorService);
   ctx = testSetup.ctx;
 });
@@ -63,6 +67,11 @@ describe("IndexActorService", () => {
           queueName: "backfill",
         }),
       );
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "fetchProfile",
+        jobName: `at://${testDid}/app.bsky.actor.profile/self`,
+        data: testDid,
+      });
     });
 
     it("handle指定あり、既存actorなしの場合は、backfillジョブを追加しない", async () => {

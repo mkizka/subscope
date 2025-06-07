@@ -11,9 +11,11 @@ import {
 import { createInjector } from "typed-inject";
 
 import { BackfillUseCase } from "./application/backfill-use-case.js";
+import { FetchProfileUseCase } from "./application/fetch-profile-use-case.js";
 import { IndexCommitUseCase } from "./application/index-commit-use-case.js";
 import { ResolveDidUseCase } from "./application/resolve-did-use-case.js";
 import { BackfillService } from "./application/service/backfill-service.js";
+import { FetchProfileService } from "./application/service/fetch-profile-service.js";
 import { IndexActorService } from "./application/service/index-actor-service.js";
 import { IndexCommitService } from "./application/service/index-commit-service.js";
 import { IndexFollowService } from "./application/service/index-follow-service.js";
@@ -60,6 +62,7 @@ createInjector()
   // application(service)
   .provideClass("resolveDidService", ResolveDidService)
   .provideClass("backfillService", BackfillService)
+  .provideClass("fetchProfileService", FetchProfileService)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)
@@ -70,6 +73,7 @@ createInjector()
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
+  .provideClass("fetchProfileUseCase", FetchProfileUseCase)
   .provideClass("temp__cleanupDatabaseUseCase", Temp__CleanupDatabaseUseCase)
   .provideClass("backfillUseCase", BackfillUseCase)
   .provideClass("syncWorker", SyncWorker)

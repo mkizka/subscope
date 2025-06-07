@@ -4,6 +4,7 @@ import type { Queue } from "bullmq";
 
 export type JobData = {
   resolveDid: Did;
+  fetchProfile: Did;
   identity: IdentityEvent;
   commit: CommitEvent<string>;
   backfill: Did;

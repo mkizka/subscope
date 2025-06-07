@@ -3,14 +3,23 @@ import { Actor, type TransactionContext } from "@dawn/common/domain";
 import type { Handle } from "@dawn/common/utils";
 
 import type { IActorRepository } from "../interfaces/actor-repository.js";
+import type { IProfileRepository } from "../interfaces/profile-repository.js";
+import type { FetchProfileService } from "./fetch-profile-service.js";
 import type { ResolveDidService } from "./resolve-did-service.js";
 
 export class IndexActorService {
   constructor(
     private readonly actorRepository: IActorRepository,
+    private readonly profileRepository: IProfileRepository,
+    private readonly fetchProfileService: FetchProfileService,
     private readonly resolveDidService: ResolveDidService,
   ) {}
-  static inject = ["actorRepository", "resolveDidService"] as const;
+  static inject = [
+    "actorRepository",
+    "profileRepository",
+    "fetchProfileService",
+    "resolveDidService",
+  ] as const;
 
   async upsert({
     ctx,
@@ -26,21 +35,29 @@ export class IndexActorService {
       // インデックスされたactorのhandleと異なるhandleが指定された場合は更新
       if (handle && existingActor.handle !== handle) {
         await this.actorRepository.updateHandle({ ctx, did, handle });
-        return;
       }
       // インデックスされたactorがhandleを持っていなければresolveする
       if (!existingActor.handle) {
         await this.resolveDidService.schedule(did);
       }
-      return;
-    }
-    // インデックスされていない場合は新規登録
-    const actor = new Actor({ did, handle });
-    await this.actorRepository.upsert({ ctx, actor });
+    } else {
+      // インデックスされていない場合は新規登録
+      const actor = new Actor({ did, handle });
+      await this.actorRepository.upsert({ ctx, actor });
 
-    // handleが無い場合はresolveする
-    if (!handle) {
-      await this.resolveDidService.schedule(did);
+      // handleが無い場合はresolveする
+      if (!handle) {
+        await this.resolveDidService.schedule(did);
+      }
+    }
+
+    // profileが存在しない場合はfetchProfileジョブを追加
+    const profileExists = await this.profileRepository.exists({
+      ctx,
+      actorDid: did,
+    });
+    if (!profileExists) {
+      await this.fetchProfileService.schedule(did);
     }
   }
 }

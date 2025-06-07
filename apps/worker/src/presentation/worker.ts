@@ -5,6 +5,8 @@ import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
 import type { BackfillUseCase } from "../application/backfill-use-case.js";
+import { fetchProfileCommandFactory } from "../application/fetch-profile-command.js";
+import type { FetchProfileUseCase } from "../application/fetch-profile-use-case.js";
 import { indexCommitCommandFactory } from "../application/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/index-commit-use-case.js";
 import type { ResolveDidUseCase } from "../application/resolve-did-use-case.js";
@@ -29,6 +31,7 @@ export class SyncWorker {
     indexCommitUseCase: IndexCommitUseCase,
     backfillUseCase: BackfillUseCase,
     resolveDidUseCase: ResolveDidUseCase,
+    fetchProfileUseCase: FetchProfileUseCase,
     temp__cleanupDatabaseUseCase: Temp__CleanupDatabaseUseCase,
   ) {
     this.workers = [
@@ -77,6 +80,20 @@ export class SyncWorker {
           },
         },
       ),
+      new Worker<Did>(
+        "fetchProfile",
+        async (job) => {
+          const command = fetchProfileCommandFactory(job);
+          await fetchProfileUseCase.execute(command);
+        },
+        {
+          ...baseWorkerOptions,
+          limiter: {
+            max: 10, // PDSの負荷を抑えるためにrpsを制限
+            duration: 1000,
+          },
+        },
+      ),
       // 開発用
       new Worker(
         "temp__cleanupDatabase",
@@ -96,6 +113,7 @@ export class SyncWorker {
     "indexCommitUseCase",
     "backfillUseCase",
     "resolveDidUseCase",
+    "fetchProfileUseCase",
     "temp__cleanupDatabaseUseCase",
   ] as const;
 
