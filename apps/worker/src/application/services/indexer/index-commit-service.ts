@@ -9,10 +9,10 @@ import {
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
-import type { IndexActorService } from "../actor/index-actor-service.js";
-import type { IndexProfileService } from "../profile/index-profile-service.js";
+import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexPostService } from "./index-post-service.js";
+import type { IndexProfileService } from "./index-profile-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
 
 type IndexCollectionServiceMap = {

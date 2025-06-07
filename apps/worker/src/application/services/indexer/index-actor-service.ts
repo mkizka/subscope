@@ -4,8 +4,8 @@ import type { Handle } from "@dawn/common/utils";
 
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
-import type { FetchProfileService } from "../profile/fetch-profile-service.js";
-import type { ResolveDidService } from "./resolve-did-service.js";
+import type { FetchProfileService } from "../scheduler/fetch-profile-service.js";
+import type { ResolveDidService } from "../scheduler/resolve-did-service.js";
 
 export class IndexActorService {
   constructor(

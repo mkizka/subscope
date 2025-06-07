@@ -4,14 +4,14 @@ import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
-import type { BackfillUseCase } from "../application/use-cases/actor/backfill-use-case.js";
-import type { ResolveDidUseCase } from "../application/use-cases/actor/resolve-did-use-case.js";
-import { upsertIdentityCommandFactory } from "../application/use-cases/actor/upsert-identity-command.js";
-import type { UpsertIdentityUseCase } from "../application/use-cases/actor/upsert-identity-use-case.js";
-import type { Temp__CleanupDatabaseUseCase } from "../application/use-cases/maintenance/cleanup-database-use-case.js";
-import type { FetchProfileUseCase } from "../application/use-cases/profile/fetch-profile-use-case.js";
-import { indexCommitCommandFactory } from "../application/use-cases/record/index-commit-command.js";
-import type { IndexCommitUseCase } from "../application/use-cases/record/index-commit-use-case.js";
+import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
+import type { Temp__CleanupDatabaseUseCase } from "../application/use-cases/async/cleanup-database-use-case.js";
+import type { FetchProfileUseCase } from "../application/use-cases/async/fetch-profile-use-case.js";
+import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
+import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
+import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
+import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
+import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 

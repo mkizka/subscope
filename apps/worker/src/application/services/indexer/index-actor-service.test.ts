@@ -10,10 +10,10 @@ import { mock } from "vitest-mock-extended";
 import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { BackfillService } from "../backfill/backfill-service.js";
-import { FetchProfileService } from "../profile/fetch-profile-service.js";
+import { BackfillService } from "../scheduler/backfill-service.js";
+import { FetchProfileService } from "../scheduler/fetch-profile-service.js";
+import { ResolveDidService } from "../scheduler/resolve-did-service.js";
 import { IndexActorService } from "./index-actor-service.js";
-import { ResolveDidService } from "./resolve-did-service.js";
 
 const mockJobQueue = mock<IJobQueue>();
 const { getSetup } = setupTestDatabase();
