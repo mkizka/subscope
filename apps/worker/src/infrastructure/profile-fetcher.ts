@@ -31,10 +31,10 @@ export class ProfileFetcher implements IProfileFetcher {
       return null;
     }
 
-    const record = Record.fromJson({
+    const record = Record.fromLex({
       uri: new AtUri(response.data.uri),
       cid,
-      json: response.data.value,
+      lex: response.data.value,
     });
     return Profile.from(record);
   }
