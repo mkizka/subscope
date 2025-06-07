@@ -28,7 +28,7 @@ import { UpsertIdentityUseCase } from "./application/upsert-identity-use-case.js
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
-import { ProfileFetcher } from "./infrastructure/profile-fetcher.js";
+import { ProfileRecordFetcher } from "./infrastructure/profile-record-fetcher.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
@@ -54,7 +54,7 @@ createInjector()
   .provideClass("didResolver", DidResolver)
   .provideClass("jobQueue", JobQueue)
   .provideClass("repoFetcher", RepoFetcher)
-  .provideClass("profileFetcher", ProfileFetcher)
+  .provideClass("profileRecordFetcher", ProfileRecordFetcher)
   .provideClass("actorRepository", ActorRepository)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)

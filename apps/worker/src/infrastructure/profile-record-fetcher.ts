@@ -2,16 +2,16 @@ import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import { AtpBaseClient } from "@dawn/client/api";
 import type { IDidResolver } from "@dawn/common/domain";
-import { Profile, Record } from "@dawn/common/domain";
+import { Record } from "@dawn/common/domain";
 
-import type { IProfileFetcher } from "../application/interfaces/profile-fetcher.js";
+import type { IProfileRecordFetcher } from "../application/interfaces/profile-record-fetcher.js";
 
-export class ProfileFetcher implements IProfileFetcher {
+export class ProfileRecordFetcher implements IProfileRecordFetcher {
   static inject = ["didResolver"] as const;
 
   constructor(private readonly didResolver: IDidResolver) {}
 
-  async fetch(did: Did): Promise<Profile | null> {
+  async fetch(did: Did): Promise<Record | null> {
     // DIDからPDSを解決
     const { pds } = await this.didResolver.resolve(did);
     const client = new AtpBaseClient(pds);
@@ -36,6 +36,6 @@ export class ProfileFetcher implements IProfileFetcher {
       cid,
       lex: response.data.value,
     });
-    return Profile.from(record);
+    return record;
   }
 }
