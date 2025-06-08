@@ -1,0 +1,17 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "pnpm build --filter @dawn/blob-proxy",
+    "watchPatterns": [
+      "/apps/blob-proxy/**/*",
+      "/packages/client/**/*",
+      "/packages/common/**/*",
+      "pnpm-lock.yaml"
+    ]
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter @dawn/blob-proxy start",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 60
+  }
+}
