@@ -135,6 +135,16 @@ export const postEmbedImages = pgTable("post_embed_images", {
   alt: text().notNull(),
 });
 
+export const postEmbedExternals = pgTable("post_embed_externals", {
+  postUri: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => posts.uri, { onDelete: "cascade" }),
+  uri: text().notNull(),
+  title: text().notNull(),
+  description: text().notNull(),
+  thumbCid: varchar({ length: 256 }),
+});
+
 export const actorsRelations = relations(actors, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [actors.did],

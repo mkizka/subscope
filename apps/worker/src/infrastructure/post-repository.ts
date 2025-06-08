@@ -1,5 +1,6 @@
 import type {
   Post,
+  PostEmbedExternal,
   PostEmbedImage,
   TransactionContext,
 } from "@dawn/common/domain";
@@ -10,6 +11,7 @@ import type { IPostRepository } from "../application/interfaces/repositories/pos
 
 export class PostRepository implements IPostRepository {
   async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {
+    const postUri = post.uri.toString();
     const data = {
       cid: post.cid,
       actorDid: post.actorDid,
@@ -24,7 +26,7 @@ export class PostRepository implements IPostRepository {
     await ctx.db
       .insert(schema.posts)
       .values({
-        uri: post.uri.toString(),
+        uri: postUri,
         ...data,
       })
       .onConflictDoUpdate({
@@ -32,9 +34,12 @@ export class PostRepository implements IPostRepository {
         set: data,
       });
 
-    // 画像埋め込みがある場合は関連テーブルに保存
     if (post.embed) {
-      await this.upsertEmbedImages(ctx, post.uri.toString(), post.embed);
+      if (Array.isArray(post.embed)) {
+        await this.upsertEmbedImages(ctx, postUri, post.embed);
+      } else {
+        await this.upsertEmbedExternal(ctx, postUri, post.embed);
+      }
     }
   }
 
@@ -58,6 +63,31 @@ export class PostRepository implements IPostRepository {
         })),
       );
     }
+  }
+
+  private async upsertEmbedExternal(
+    ctx: TransactionContext,
+    postUri: string,
+    embedExternal: PostEmbedExternal,
+  ) {
+    await ctx.db
+      .insert(schema.postEmbedExternals)
+      .values({
+        postUri,
+        uri: embedExternal.uri,
+        title: embedExternal.title,
+        description: embedExternal.description,
+        thumbCid: embedExternal.thumbCid,
+      })
+      .onConflictDoUpdate({
+        target: schema.postEmbedExternals.postUri,
+        set: {
+          uri: embedExternal.uri,
+          title: embedExternal.title,
+          description: embedExternal.description,
+          thumbCid: embedExternal.thumbCid,
+        },
+      });
   }
 
   async existsAny(ctx: TransactionContext, uris: string[]): Promise<boolean> {

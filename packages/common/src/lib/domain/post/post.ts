@@ -2,6 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record.js";
+import { PostEmbedExternal } from "./embed-external.js";
 import { PostEmbedImage } from "./embed-images.js";
 
 type StrongRef = Readonly<{
@@ -26,7 +27,7 @@ type PostParams = {
   replyRoot?: StrongRef | null;
   replyParent?: StrongRef | null;
   langs: string[] | null;
-  embed: PostEmbedImage[] | null;
+  embed: PostEmbedExternal | PostEmbedImage[] | null;
   createdAt: Date;
   sortAt?: Date | null;
 };
@@ -39,7 +40,7 @@ export class Post {
   readonly replyRoot: StrongRef | null;
   readonly replyParent: StrongRef | null;
   readonly langs: string[] | null;
-  readonly embed: PostEmbedImage[] | null;
+  readonly embed: PostEmbedExternal | PostEmbedImage[] | null;
   readonly createdAt: Date;
   readonly sortAt: Date | null;
 
@@ -69,7 +70,12 @@ export class Post {
       ) {
         return PostEmbedImage.from(parsed.embed.images);
       }
-      // TODO: 他のタイプも実装
+      if (
+        parsed.embed.$type === "app.bsky.embed.external" &&
+        "external" in parsed.embed
+      ) {
+        return PostEmbedExternal.from(parsed.embed.external);
+      }
       return null;
     })();
 
