@@ -16,9 +16,49 @@ const getStrongRef = (uri: string | null, cid: string | null) => {
   };
 };
 
+type SelectPostEmbedImage = typeof schema.postEmbedImages.$inferSelect;
+
+type SelectPost = typeof schema.posts.$inferSelect & {
+  embedImages: SelectPostEmbedImage[];
+};
+
 export class PostRepository implements IPostRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
+
+  private convertToPostEmbedImage(image: SelectPostEmbedImage) {
+    const aspectRatio =
+      image.aspectRatioWidth && image.aspectRatioHeight
+        ? {
+            width: image.aspectRatioWidth,
+            height: image.aspectRatioHeight,
+          }
+        : undefined;
+    return new PostEmbedImage({
+      cid: image.cid,
+      position: image.position,
+      alt: image.alt,
+      aspectRatio,
+    });
+  }
+
+  private convertToPost(post: SelectPost) {
+    const images = post.embedImages.map((image) =>
+      this.convertToPostEmbedImage(image),
+    );
+    return new Post({
+      uri: post.uri,
+      cid: post.cid,
+      actorDid: post.actorDid,
+      text: post.text,
+      replyRoot: getStrongRef(post.replyRootUri, post.replyRootCid),
+      replyParent: getStrongRef(post.replyParentUri, post.replyParentCid),
+      langs: post.langs,
+      embed: images.length > 0 ? images : null,
+      createdAt: post.createdAt,
+      sortAt: post.sortAt,
+    });
+  }
 
   async findByUris(uris: AtUri[]) {
     const postsWithImages = await this.db.query.posts.findMany({
@@ -32,35 +72,7 @@ export class PostRepository implements IPostRepository {
         },
       },
     });
-
-    return postsWithImages.map((post) => {
-      const images = post.embedImages.map(
-        (image) =>
-          new PostEmbedImage(
-            image.cid,
-            image.position,
-            image.alt,
-            image.aspectRatioWidth && image.aspectRatioHeight
-              ? {
-                  width: image.aspectRatioWidth,
-                  height: image.aspectRatioHeight,
-                }
-              : undefined,
-          ),
-      );
-      return new Post({
-        uri: post.uri,
-        cid: post.cid,
-        actorDid: post.actorDid,
-        text: post.text,
-        replyRoot: getStrongRef(post.replyRootUri, post.replyRootCid),
-        replyParent: getStrongRef(post.replyParentUri, post.replyParentCid),
-        langs: post.langs,
-        embed: images.length > 0 ? images : null,
-        createdAt: post.createdAt,
-        sortAt: post.sortAt,
-      });
-    });
+    return postsWithImages.map((post) => this.convertToPost(post));
   }
 
   async findMany(params: { limit: number; cursor?: string }) {
@@ -80,34 +92,6 @@ export class PostRepository implements IPostRepository {
         },
       },
     });
-
-    return postsWithImages.map((post) => {
-      const images = post.embedImages.map(
-        (image) =>
-          new PostEmbedImage(
-            image.cid,
-            image.position,
-            image.alt,
-            image.aspectRatioWidth && image.aspectRatioHeight
-              ? {
-                  width: image.aspectRatioWidth,
-                  height: image.aspectRatioHeight,
-                }
-              : undefined,
-          ),
-      );
-      return new Post({
-        uri: post.uri,
-        cid: post.cid,
-        actorDid: post.actorDid,
-        text: post.text,
-        replyRoot: getStrongRef(post.replyRootUri, post.replyRootCid),
-        replyParent: getStrongRef(post.replyParentUri, post.replyParentCid),
-        langs: post.langs,
-        embed: images.length > 0 ? images : null,
-        createdAt: post.createdAt,
-        sortAt: post.sortAt,
-      });
-    });
+    return postsWithImages.map((post) => this.convertToPost(post));
   }
 }
