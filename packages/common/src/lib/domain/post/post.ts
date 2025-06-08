@@ -2,6 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record.js";
+import { PostEmbedImage } from "./embed-images.js";
 
 type StrongRef = Readonly<{
   uri: AtUri;
@@ -25,6 +26,7 @@ type PostParams = {
   replyRoot?: StrongRef | null;
   replyParent?: StrongRef | null;
   langs: string[] | null;
+  embed: PostEmbedImage[] | null;
   createdAt: Date;
   sortAt?: Date | null;
 };
@@ -37,6 +39,7 @@ export class Post {
   readonly replyRoot: StrongRef | null;
   readonly replyParent: StrongRef | null;
   readonly langs: string[] | null;
+  readonly embed: PostEmbedImage[] | null;
   readonly createdAt: Date;
   readonly sortAt: Date | null;
 
@@ -48,12 +51,28 @@ export class Post {
     this.replyRoot = params.replyRoot ?? null;
     this.replyParent = params.replyParent ?? null;
     this.langs = params.langs;
+    this.embed = params.embed;
     this.createdAt = params.createdAt;
     this.sortAt = params.sortAt ?? null;
   }
 
   static from(record: Record) {
     const parsed = record.validate("app.bsky.feed.post");
+
+    const embed = (() => {
+      if (!parsed.embed) {
+        return null;
+      }
+      if (
+        parsed.embed.$type === "app.bsky.embed.images" &&
+        "images" in parsed.embed
+      ) {
+        return PostEmbedImage.from(parsed.embed.images);
+      }
+      // TODO: 他のタイプも実装
+      return null;
+    })();
+
     return new Post({
       uri: record.uri,
       cid: record.cid,
@@ -62,6 +81,7 @@ export class Post {
       replyRoot: getStrongRef(parsed.reply?.root),
       replyParent: getStrongRef(parsed.reply?.parent),
       langs: parsed.langs ?? [],
+      embed,
       createdAt: new Date(parsed.createdAt),
     });
   }

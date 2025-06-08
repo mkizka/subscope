@@ -42,6 +42,7 @@ export class PostRepository implements IPostRepository {
           replyRoot: getStrongRef(post.replyRootUri, post.replyRootCid),
           replyParent: getStrongRef(post.replyParentUri, post.replyParentCid),
           langs: post.langs,
+          embed: null, // TODO: post_imagesテーブルから取得
           createdAt: post.createdAt,
           sortAt: post.sortAt,
         }),

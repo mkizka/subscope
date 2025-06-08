@@ -312,5 +312,107 @@ describe("IndexPostService", () => {
       // Assert
       expect(result).toBe(false);
     });
+
+    it("画像を含む投稿が正しく保存される", async () => {
+      // Arrange
+      await ctx.db.insert(schema.actors).values({
+        did: "did:plc:imageuser",
+        handle: "imageuser.bsky.social",
+      });
+      await ctx.db.insert(schema.records).values({
+        uri: "at://did:plc:imageuser/dev.mkizka.test.subscription/sub",
+        cid: "sub123",
+        actorDid: "did:plc:imageuser",
+        json: {
+          $type: "dev.mkizka.test.subscription",
+          appviewDid: "did:web:api.dawn.test",
+          createdAt: new Date().toISOString(),
+        },
+      });
+      await ctx.db.insert(schema.subscriptions).values({
+        uri: "at://did:plc:imageuser/dev.mkizka.test.subscription/sub",
+        cid: "sub123",
+        actorDid: "did:plc:imageuser",
+        appviewDid: "did:web:api.dawn.test",
+        createdAt: new Date(),
+      });
+
+      const postWithImagesJson = {
+        $type: "app.bsky.feed.post",
+        text: "Check out these images!",
+        embed: {
+          $type: "app.bsky.embed.images",
+          images: [
+            {
+              alt: "First image",
+              image: {
+                $type: "blob",
+                ref: {
+                  $link:
+                    "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+                },
+                mimeType: "image/jpeg",
+                size: 123456,
+              },
+            },
+            {
+              alt: "Second image",
+              image: {
+                $type: "blob",
+                ref: {
+                  $link:
+                    "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+                },
+                mimeType: "image/png",
+                size: 234567,
+              },
+            },
+          ],
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:imageuser/app.bsky.feed.post/img123",
+        cid: "bafyreigimage123",
+        json: postWithImagesJson,
+      });
+
+      // recordsテーブルにも挿入（外部キー制約のため）
+      await ctx.db.insert(schema.records).values({
+        uri: record.uri.toString(),
+        cid: record.cid,
+        actorDid: record.actorDid,
+        json: postWithImagesJson,
+      });
+
+      // Act
+      await indexPostService.upsert({ ctx, record });
+
+      // Assert
+      const savedPost = await ctx.db
+        .select()
+        .from(schema.posts)
+        .where(eq(schema.posts.uri, record.uri.toString()));
+      expect(savedPost).toHaveLength(1);
+      expect(savedPost[0]?.text).toBe("Check out these images!");
+
+      const savedImages = await ctx.db
+        .select()
+        .from(schema.postEmbedImages)
+        .where(eq(schema.postEmbedImages.postUri, record.uri.toString()));
+      expect(savedImages).toHaveLength(2);
+      expect(savedImages[0]).toMatchObject({
+        postUri: record.uri.toString(),
+        cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+        position: 0,
+        alt: "First image",
+      });
+      expect(savedImages[1]).toMatchObject({
+        postUri: record.uri.toString(),
+        cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+        position: 1,
+        alt: "Second image",
+      });
+    });
   });
 });

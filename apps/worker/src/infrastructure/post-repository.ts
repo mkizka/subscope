@@ -1,6 +1,10 @@
-import type { Post, TransactionContext } from "@dawn/common/domain";
+import type {
+  Post,
+  PostEmbedImage,
+  TransactionContext,
+} from "@dawn/common/domain";
 import { type PostInsert, schema } from "@dawn/db";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
 
@@ -27,6 +31,33 @@ export class PostRepository implements IPostRepository {
         target: schema.posts.uri,
         set: data,
       });
+
+    // 画像埋め込みがある場合は関連テーブルに保存
+    if (post.embed) {
+      await this.upsertEmbedImages(ctx, post.uri.toString(), post.embed);
+    }
+  }
+
+  private async upsertEmbedImages(
+    ctx: TransactionContext,
+    postUri: string,
+    embedImages: PostEmbedImage[],
+  ) {
+    // 添付画像には一意なIDがないので、既存の画像を削除してから新しい画像を挿入
+    await ctx.db
+      .delete(schema.postEmbedImages)
+      .where(eq(schema.postEmbedImages.postUri, postUri));
+
+    if (embedImages.length > 0) {
+      await ctx.db.insert(schema.postEmbedImages).values(
+        embedImages.map((image, index) => ({
+          postUri,
+          cid: image.cid,
+          position: index,
+          alt: image.alt,
+        })),
+      );
+    }
   }
 
   async existsAny(ctx: TransactionContext, uris: string[]): Promise<boolean> {

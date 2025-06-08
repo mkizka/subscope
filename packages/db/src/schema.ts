@@ -126,6 +126,15 @@ export const subscriptions = pgTable("subscriptions", {
   indexedAt: timestamp().defaultNow(),
 });
 
+export const postEmbedImages = pgTable("post_embed_images", {
+  postUri: varchar({ length: 256 })
+    .notNull()
+    .references(() => posts.uri, { onDelete: "cascade" }),
+  cid: varchar({ length: 256 }).notNull(),
+  position: integer().notNull(),
+  alt: text().notNull(),
+});
+
 export const actorsRelations = relations(actors, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [actors.did],

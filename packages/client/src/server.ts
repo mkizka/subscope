@@ -6,6 +6,7 @@ export * as AppBskyFeedDefs from "./generated/server/types/app/bsky/feed/defs";
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline";
 export * as AppBskyActorDefs from "./generated/api/types/app/bsky/actor/defs";
 export * as AppBskyActorProfile from "./generated/api/types/app/bsky/actor/profile";
+export * as AppBskyEmbedImages from "./generated/server/types/app/bsky/embed/images";
 export * as AppBskyFeedPost from "./generated/api/types/app/bsky/feed/post";
 export * as AppBskyGraphFollow from "./generated/api/types/app/bsky/graph/follow";
 export * as DevMkizkaTestSubscription from "./generated/api/types/dev/mkizka/test/subscription";
