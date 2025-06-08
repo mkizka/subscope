@@ -78,6 +78,9 @@ importers:
         specifier: 3.4.1
         version: 3.4.1(zod@3.25.46)
     devDependencies:
+      '@dawn/test-utils':
+        specifier: workspace:*
+        version: link:../../packages/test-utils
       '@mkizka/eslint-config':
         specifier: 6.0.2
         version: 6.0.2(@typescript-eslint/eslint-plugin@8.33.0(@typescript-eslint/parser@8.33.0(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
@@ -105,6 +108,12 @@ importers:
       typescript:
         specifier: 5.8.3
         version: 5.8.3
+      vitest:
+        specifier: 3.1.4
+        version: 3.1.4(@types/node@22.15.29)(@vitest/ui@3.1.4)(jiti@1.21.7)(tsx@4.19.4)(yaml@2.8.0)
+      vitest-mock-extended:
+        specifier: 3.1.0
+        version: 3.1.0(typescript@5.8.3)(vitest@3.1.4)
 
   apps/ingester:
     dependencies:

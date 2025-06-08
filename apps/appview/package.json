@@ -7,6 +7,7 @@
     "dev": "NODE_ENV=development tsx watch ./src/appview.ts | pino-pretty",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "start": "NODE_ENV=production tsx ./src/appview.ts",
+    "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "zod-validation-error": "3.4.1"
   },
   "devDependencies": {
+    "@dawn/test-utils": "workspace:*",
     "@mkizka/eslint-config": "6.0.2",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.2",
@@ -34,6 +36,8 @@
     "eslint": "9.28.0",
     "pino-pretty": "13.0.0",
     "tsx": "4.19.4",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "3.1.4",
+    "vitest-mock-extended": "3.1.0"
   }
 }
