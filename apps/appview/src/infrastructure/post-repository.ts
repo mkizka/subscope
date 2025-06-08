@@ -35,7 +35,18 @@ export class PostRepository implements IPostRepository {
 
     return postsWithImages.map((post) => {
       const images = post.embedImages.map(
-        (image) => new PostEmbedImage(image.cid, image.position, image.alt),
+        (image) =>
+          new PostEmbedImage(
+            image.cid,
+            image.position,
+            image.alt,
+            image.aspectRatioWidth && image.aspectRatioHeight
+              ? {
+                  width: image.aspectRatioWidth,
+                  height: image.aspectRatioHeight,
+                }
+              : undefined,
+          ),
       );
       return new Post({
         uri: post.uri,
@@ -72,7 +83,18 @@ export class PostRepository implements IPostRepository {
 
     return postsWithImages.map((post) => {
       const images = post.embedImages.map(
-        (image) => new PostEmbedImage(image.cid, image.position, image.alt),
+        (image) =>
+          new PostEmbedImage(
+            image.cid,
+            image.position,
+            image.alt,
+            image.aspectRatioWidth && image.aspectRatioHeight
+              ? {
+                  width: image.aspectRatioWidth,
+                  height: image.aspectRatioHeight,
+                }
+              : undefined,
+          ),
       );
       return new Post({
         uri: post.uri,

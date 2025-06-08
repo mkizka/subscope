@@ -133,6 +133,8 @@ export const postEmbedImages = pgTable("post_embed_images", {
   cid: varchar({ length: 256 }).notNull(),
   position: integer().notNull(),
   alt: text().notNull(),
+  aspectRatioWidth: integer(),
+  aspectRatioHeight: integer(),
 });
 
 export const postEmbedExternals = pgTable("post_embed_externals", {

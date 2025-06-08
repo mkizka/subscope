@@ -5,6 +5,7 @@ export class PostEmbedImage {
     readonly cid: string,
     readonly position: number,
     readonly alt: string,
+    readonly aspectRatio?: { width: number; height: number },
   ) {}
 
   toJSON(actorDid: string) {
@@ -12,6 +13,7 @@ export class PostEmbedImage {
       alt: this.alt,
       thumb: `https://cdn.bsky.app/img/feed_thumbnail/plain/${actorDid}/${this.cid}@jpeg`,
       fullsize: `https://cdn.bsky.app/img/feed_fullsize/plain/${actorDid}/${this.cid}@jpeg`,
+      aspectRatio: this.aspectRatio,
     } satisfies AppBskyEmbedImages.ViewImage;
   }
 
@@ -21,6 +23,7 @@ export class PostEmbedImage {
         image.image.toJSON().ref.$link,
         index,
         image.alt,
+        image.aspectRatio,
       );
     });
   }

@@ -60,6 +60,8 @@ export class PostRepository implements IPostRepository {
           cid: image.cid,
           position: index,
           alt: image.alt,
+          aspectRatioWidth: image.aspectRatio?.width,
+          aspectRatioHeight: image.aspectRatio?.height,
         })),
       );
     }
