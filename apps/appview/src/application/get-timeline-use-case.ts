@@ -20,7 +20,6 @@ export class GetTimelineUseCase {
     params: AppBskyFeedGetTimeline.QueryParams,
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const samplePosts = await this.postRepository.findMany({
-      // TODO: サーバー側の型を利用するように修正(limitは必須になっている)
       limit: params.limit,
       cursor: params.cursor,
     });
