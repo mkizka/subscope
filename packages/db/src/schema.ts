@@ -153,11 +153,12 @@ export const actorsRelations = relations(actors, ({ one, many }) => ({
   posts: many(posts),
 }));
 
-export const postsRelations = relations(posts, ({ one }) => ({
+export const postsRelations = relations(posts, ({ one, many }) => ({
   actor: one(actors, {
     fields: [posts.actorDid],
     references: [actors.did],
   }),
+  embedImages: many(postEmbedImages),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
@@ -170,6 +171,16 @@ export const profilesRelations = relations(profiles, ({ one }) => ({
     references: [blobs.cid],
   }),
 }));
+
+export const postEmbedImagesRelations = relations(
+  postEmbedImages,
+  ({ one }) => ({
+    post: one(posts, {
+      fields: [postEmbedImages.postUri],
+      references: [posts.uri],
+    }),
+  }),
+);
 
 export const blobsRelations = relations(blobs, ({ many }) => ({
   profiles: many(profiles),
