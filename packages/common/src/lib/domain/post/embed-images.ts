@@ -25,15 +25,6 @@ export class PostEmbedImage {
     this.aspectRatio = params.aspectRatio;
   }
 
-  toJSON(actorDid: string) {
-    return {
-      alt: this.alt,
-      thumb: `https://cdn.bsky.app/img/feed_thumbnail/plain/${actorDid}/${this.cid}@jpeg`,
-      fullsize: `https://cdn.bsky.app/img/feed_fullsize/plain/${actorDid}/${this.cid}@jpeg`,
-      aspectRatio: this.aspectRatio,
-    } satisfies AppBskyEmbedImages.ViewImage;
-  }
-
   static from(images: AppBskyEmbedImages.Image[]) {
     return images.map((image, index) => {
       return new PostEmbedImage({

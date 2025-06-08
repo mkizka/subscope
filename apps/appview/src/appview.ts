@@ -14,6 +14,7 @@ import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
 import { AuthVerifierService } from "./application/service/auth-verifier-service.js";
+import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
 import { HandlesToDidsRepository } from "./infrastructure/handles-to-dids-repository.js";
@@ -51,6 +52,7 @@ createInjector()
   .provideClass("jobQueue", JobQueue)
   // application
   .provideClass("profileViewService", ProfileViewService)
+  .provideClass("embedViewService", EmbedViewService)
   .provideClass("postViewService", PostViewService)
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)

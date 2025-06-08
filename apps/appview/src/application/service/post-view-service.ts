@@ -1,9 +1,10 @@
 import type { AtUri } from "@atproto/syntax";
-import type { AppBskyEmbedImages, AppBskyFeedDefs } from "@dawn/client/server";
+import type { AppBskyFeedDefs } from "@dawn/client/server";
 import { required } from "@dawn/common/utils";
 
 import type { IPostRepository } from "../interfaces/post-repository.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
+import type { EmbedViewService } from "./embed-view-service.js";
 import type { ProfileViewService } from "./profile-view-service.js";
 
 const asObject = (obj: unknown) => {
@@ -17,11 +18,13 @@ export class PostViewService {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly recordRepository: IRecordRepository,
+    private readonly embedViewService: EmbedViewService,
     private readonly profileViewService: ProfileViewService,
   ) {}
   static inject = [
     "postRepository",
     "recordRepository",
+    "embedViewService",
     "profileViewService",
   ] as const;
 
@@ -36,14 +39,7 @@ export class PostViewService {
         (r) => r.uri.toString() === post.uri.toString(),
       );
       const profile = profiles.find((profile) => profile.did === post.actorDid);
-
-      const embed = Array.isArray(post.embed)
-        ? ({
-            $type: "app.bsky.embed.images#view",
-            images: post.embed.map((image) => image.toJSON(post.actorDid)),
-          } satisfies AppBskyEmbedImages.View)
-        : undefined;
-
+      const embed = this.embedViewService.toView(post.embed, post.actorDid);
       return {
         $type: "app.bsky.feed.defs#postView",
         uri: post.uri.toString(),
