@@ -6,7 +6,6 @@
       "/apps/ingester/**/*",
       "/packages/client/**/*",
       "/packages/common/**/*",
-      "/packages/db/**/*",
       "pnpm-lock.yaml"
     ]
   },

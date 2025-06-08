@@ -12,6 +12,12 @@
   "deploy": {
     "startCommand": "pnpm --filter @dawn/blob-proxy start",
     "healthcheckPath": "/health",
-    "healthcheckTimeout": 60
+    "healthcheckTimeout": 60,
+    "limitOverride": {
+      "containers": {
+        "cpu": 1,
+        "memoryBytes": 1000000000
+      }
+    }
   }
 }
