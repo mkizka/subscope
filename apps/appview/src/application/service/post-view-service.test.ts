@@ -232,8 +232,8 @@ describe("PostViewService", () => {
         images: [
           {
             alt: "Test image",
-            thumb: `http://localhost:3004/blob/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe`,
-            fullsize: `http://localhost:3004/blob/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe`,
+            thumb: `http://localhost:3004/images/feed_thumbnail/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+            fullsize: `http://localhost:3004/images/feed_fullsize/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
           },
         ],
       });
@@ -327,7 +327,7 @@ describe("PostViewService", () => {
           uri: "https://example.com",
           title: "Example Site",
           description: "An example website",
-          thumb: `http://localhost:3004/blob/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe`,
+          thumb: `http://localhost:3004/images/feed_thumbnail/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
         },
       });
     });
