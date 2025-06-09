@@ -11,7 +11,7 @@ export class BlobProxyServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
 
-  constructor(loggerManager: ILoggerManager, blobRouter: express.Router) {
+  constructor(loggerManager: ILoggerManager, imagesRouter: express.Router) {
     this.logger = loggerManager.createLogger("BlobProxyServer");
     this.app = express();
     this.app.use(
@@ -28,9 +28,9 @@ export class BlobProxyServer {
       }),
     );
     this.app.use("/health", healthRouter);
-    this.app.use("/blob", blobRouter);
+    this.app.use("/images", imagesRouter);
   }
-  static inject = ["loggerManager", "blobRouter"] as const;
+  static inject = ["loggerManager", "imagesRouter"] as const;
 
   start() {
     this.app.listen(env.PORT, () => {

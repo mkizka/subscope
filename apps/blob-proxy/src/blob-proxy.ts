@@ -6,11 +6,12 @@ import {
 } from "@dawn/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { BlobProxyService } from "./application/blob-proxy-service.js";
+import { ImageTransformService } from "./application/image-transform-service.js";
 import { ResolvePdsService } from "./application/resolve-pds-service.js";
+import { ImageTransformationService } from "./domain/services/image-transformation-service.js";
 import { BlobCacheRepository } from "./infrastructure/blob-cache-repository.js";
 import { BlobFetcher } from "./infrastructure/blob-fetcher.js";
-import { blobRouterFactory } from "./presentation/routes/blob.js";
+import { imagesRouterFactory } from "./presentation/routes/images.js";
 import { BlobProxyServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
@@ -26,10 +27,12 @@ createInjector()
   .provideClass("didResolver", DidResolver)
   .provideClass("blobCacheRepository", BlobCacheRepository)
   .provideClass("blobFetcher", BlobFetcher)
+  // domain
+  .provideClass("imageTransformationService", ImageTransformationService)
   // application
   .provideClass("resolvePdsService", ResolvePdsService)
-  .provideClass("blobProxyService", BlobProxyService)
+  .provideClass("imageTransformService", ImageTransformService)
   // presentation
-  .provideFactory("blobRouter", blobRouterFactory)
+  .provideFactory("imagesRouter", imagesRouterFactory)
   .injectClass(BlobProxyServer)
   .start();
