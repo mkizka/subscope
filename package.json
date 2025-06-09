@@ -14,7 +14,7 @@
     "lint": "turbo run lint && pnpm prettier . --check",
     "prepare": "husky",
     "studio": "pnpm --filter @dawn/db dev",
-    "test": "turbo run test",
+    "test": "vitest",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
@@ -25,6 +25,7 @@
     "prettier-plugin-pkg": "0.19.1",
     "prettier-plugin-sh": "0.17.4",
     "turbo": "2.5.4",
+    "vitest": "^3.2.2",
     "wait-on": "8.0.3"
   },
   "lint-staged": {

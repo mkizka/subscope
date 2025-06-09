@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import type { TransactionContext } from "@dawn/common/domain";
 import {
   connectionPoolFactory,
@@ -34,11 +36,10 @@ export function setupTestDatabase() {
     postgresContainer = await new PostgreSqlContainer(
       "postgres:16-alpine",
     ).start();
-
     const databaseUrl = postgresContainer.getConnectionUri();
 
     await execa({
-      cwd: "../..",
+      cwd: path.resolve(import.meta.dirname, "../../../"),
       env: {
         DATABASE_URL: databaseUrl,
       },

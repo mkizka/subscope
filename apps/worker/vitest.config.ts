@@ -1,7 +1,8 @@
-import { defineConfig } from "vitest/config";
+import { defineProject } from "vitest/config";
 
-export default defineConfig({
+export default defineProject({
   test: {
+    name: "worker",
     // testcontainersの起動を待つ
     hookTimeout: 60000,
     clearMocks: true,
