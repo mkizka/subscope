@@ -18,3 +18,8 @@ scrape_configs:
           - worker.railway.internal
         type: AAAA
         port: 8080
+
+  - job_name: blob-proxy
+    static_configs:
+      - targets:
+          - blob-proxy.railway.internal:8080

@@ -5,7 +5,9 @@ export type CounterKey =
   | "did_resolve_error_total"
   | "ingester_events_account_total"
   | "ingester_events_identity_total"
-  | "ingester_events_commit_total";
+  | "ingester_events_commit_total"
+  | "blob_proxy_cache_hit_total"
+  | "blob_proxy_cache_miss_total";
 
 export type GaugeKey =
   | "ingester_events_time_delay"

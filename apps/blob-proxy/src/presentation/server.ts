@@ -1,5 +1,6 @@
 import type { ILoggerManager, Logger } from "@dawn/common/domain";
 import express from "express";
+import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";
 
 import { env } from "../shared/env.js";
@@ -14,6 +15,7 @@ export class BlobProxyServer {
   constructor(loggerManager: ILoggerManager, imagesRouter: express.Router) {
     this.logger = loggerManager.createLogger("BlobProxyServer");
     this.app = express();
+    this.app.use(promBundle({ includeMethod: true }));
     this.app.use(
       pinoHttp({
         logger: this.logger,

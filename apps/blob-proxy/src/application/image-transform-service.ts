@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import type { IMetricReporter } from "@dawn/common/domain";
 
 import type { BlobData } from "../domain/blob-data.js";
 import { ImagePreset } from "../domain/image-preset.js";
@@ -14,20 +15,24 @@ export class ImageTransformService {
     private blobFetcher: IBlobFetcher,
     private imageTransformationService: ImageTransformationService,
     private blobCacheRepository: IBlobCacheRepository,
+    private metricReporter: IMetricReporter,
   ) {}
   static inject = [
     "resolvePdsService",
     "blobFetcher",
     "imageTransformationService",
     "blobCacheRepository",
+    "metricReporter",
   ] as const;
 
   async getTransformedImage(request: ImageTransformRequest): Promise<BlobData> {
     const cacheKey = request.getCacheKey();
     const cached = await this.blobCacheRepository.get(cacheKey);
     if (cached) {
+      this.metricReporter.increment("blob_proxy_cache_hit_total");
       return cached;
     }
+    this.metricReporter.increment("blob_proxy_cache_miss_total");
 
     const preset = ImagePreset.fromType(request.presetType);
     const originalBlob = await this.fetchOriginalBlob(request.did, request.cid);
@@ -37,7 +42,6 @@ export class ImageTransformService {
     );
 
     await this.blobCacheRepository.set(cacheKey, transformedBlob);
-
     return transformedBlob;
   }
 

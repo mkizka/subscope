@@ -39,6 +39,14 @@ const counters = {
     labelNames: ["collection"],
     help: "Total number of commit events processed by the ingester",
   }),
+  blob_proxy_cache_hit_total: new client.Counter({
+    name: "blob_proxy_cache_hit_total",
+    help: "Total number of blob cache hits",
+  }),
+  blob_proxy_cache_miss_total: new client.Counter({
+    name: "blob_proxy_cache_miss_total",
+    help: "Total number of blob cache misses",
+  }),
 } satisfies {
   [key in CounterKey]: client.Counter;
 };
