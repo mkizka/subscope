@@ -36,7 +36,7 @@ export class ProfileViewService {
       did: profile.actorDid,
       handle: profile.handle?.toString() ?? "handle.invalid",
       displayName: profile.displayName ?? undefined,
-      avatar: this.getAvatarUrl(profile),
+      avatar: this.getAvatarThumbnailUrl(profile),
       // associated?: ProfileAssociated
       // viewer?: ViewerState
       // labels?: ComAtprotoLabelDefs.Label[]
@@ -71,10 +71,10 @@ export class ProfileViewService {
     return profiles.map((profile) => this.createProfileViewDetailed(profile));
   }
 
-  private getAvatarUrl(profile: ProfileDetailed) {
+  private getAvatarThumbnailUrl(profile: ProfileDetailed) {
     if (!profile.avatar) {
       return undefined;
     }
-    return `${env.BLOB_PROXY_URL}/blob/${profile.actorDid}/${profile.avatar.cid}`;
+    return `${env.BLOB_PROXY_URL}/images/avatar_thumbnail/${profile.actorDid}/${profile.avatar.cid}.jpg`;
   }
 }

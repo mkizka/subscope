@@ -29,7 +29,7 @@ export class EmbedViewService {
         title: embed.title,
         description: embed.description,
         thumb: embed.thumbCid
-          ? `${env.BLOB_PROXY_URL}/blob/${actorDid}/${embed.thumbCid}`
+          ? `${env.BLOB_PROXY_URL}/images/feed_thumbnail/${actorDid}/${embed.thumbCid}.jpg`
           : undefined,
       },
     };
@@ -43,8 +43,8 @@ export class EmbedViewService {
       $type: "app.bsky.embed.images#view" as const,
       images: images.map((image) => ({
         alt: image.alt,
-        thumb: `${env.BLOB_PROXY_URL}/blob/${actorDid}/${image.cid}`,
-        fullsize: `${env.BLOB_PROXY_URL}/blob/${actorDid}/${image.cid}`,
+        thumb: `${env.BLOB_PROXY_URL}/images/feed_thumbnail/${actorDid}/${image.cid}.jpg`,
+        fullsize: `${env.BLOB_PROXY_URL}/images/feed_fullsize/${actorDid}/${image.cid}.jpg`,
         aspectRatio: image.aspectRatio,
       })),
     };
