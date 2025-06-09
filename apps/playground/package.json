@@ -10,15 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@atproto/api": "0.15.12",
+    "@atproto/api": "0.15.14",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "6.0.2",
     "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.5",
-    "@vitejs/plugin-react-swc": "^3.10.0",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react-swc": "^3.10.1",
     "eslint": "^9.28.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"

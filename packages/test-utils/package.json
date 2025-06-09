@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@dawn/common": "workspace:*",
-    "@testcontainers/postgresql": "10.28.0",
+    "@testcontainers/postgresql": "11.0.2",
     "execa": "9.6.0",
-    "typed-inject": "4.0.0",
-    "vitest": "3.2.2"
+    "typed-inject": "5.0.0",
+    "vitest": "3.2.3"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "6.0.2",
