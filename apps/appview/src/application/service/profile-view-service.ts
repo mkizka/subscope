@@ -75,6 +75,6 @@ export class ProfileViewService {
     if (!profile.avatar) {
       return undefined;
     }
-    return `${env.BLOB_CDN_URL}/blob/${profile.actorDid}/${profile.avatar.cid}`;
+    return `${env.BLOB_PROXY_URL}/blob/${profile.actorDid}/${profile.avatar.cid}`;
   }
 }
