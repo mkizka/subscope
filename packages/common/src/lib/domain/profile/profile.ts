@@ -57,27 +57,4 @@ export class Profile {
       createdAt: parsed.createdAt,
     });
   }
-
-  getAvatarUrl(): string | null {
-    if (!this.avatar) {
-      return null;
-    }
-    const [type, subtype] = this.avatar.mimeType.split("/");
-    if (type !== "image" || !subtype) {
-      return null;
-    }
-    // TODO: 自作実装に置き換える
-    return `https://cdn.bsky.app/img/avatar/plain/${this.actorDid}/${this.avatar.cid}@${subtype}`;
-  }
-
-  toJSON() {
-    return {
-      did: this.actorDid,
-      avatar: this.getAvatarUrl() ?? undefined,
-      description: this.description ?? undefined,
-      displayName: this.displayName ?? undefined,
-      createdAt: this.createdAt?.toISOString(),
-      indexedAt: this.indexedAt?.toISOString(),
-    };
-  }
 }

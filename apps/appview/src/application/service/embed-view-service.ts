@@ -5,6 +5,8 @@ import type {
 } from "@dawn/client/server";
 import type { PostEmbedExternal, PostEmbedImage } from "@dawn/common/domain";
 
+import { env } from "../../shared/env.js";
+
 export class EmbedViewService {
   toView(embed: PostEmbedExternal | PostEmbedImage[] | null, actorDid: string) {
     if (Array.isArray(embed)) {
@@ -27,7 +29,7 @@ export class EmbedViewService {
         title: embed.title,
         description: embed.description,
         thumb: embed.thumbCid
-          ? `https://cdn.bsky.app/img/feed_thumbnail/plain/${actorDid}/${embed.thumbCid}@jpeg`
+          ? `${env.BLOB_CDN_URL}/blob/${actorDid}/${embed.thumbCid}`
           : undefined,
       },
     };
@@ -41,8 +43,8 @@ export class EmbedViewService {
       $type: "app.bsky.embed.images#view" as const,
       images: images.map((image) => ({
         alt: image.alt,
-        thumb: `https://cdn.bsky.app/img/feed_thumbnail/plain/${actorDid}/${image.cid}@jpeg`,
-        fullsize: `https://cdn.bsky.app/img/feed_fullsize/plain/${actorDid}/${image.cid}@jpeg`,
+        thumb: `${env.BLOB_CDN_URL}/blob/${actorDid}/${image.cid}`,
+        fullsize: `${env.BLOB_CDN_URL}/blob/${actorDid}/${image.cid}`,
         aspectRatio: image.aspectRatio,
       })),
     };

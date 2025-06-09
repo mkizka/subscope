@@ -3,6 +3,7 @@ import type { AppBskyActorDefs } from "@dawn/client/server";
 import type { ProfileDetailed } from "@dawn/common/domain";
 import { type Handle, isHandle } from "@dawn/common/utils";
 
+import { env } from "../../shared/env.js";
 import type { IHandlesToDidsRepository } from "../interfaces/handles-to-dids-repository.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 
@@ -35,7 +36,7 @@ export class ProfileViewService {
       did: profile.actorDid,
       handle: profile.handle?.toString() ?? "handle.invalid",
       displayName: profile.displayName ?? undefined,
-      avatar: profile.getAvatarUrl() ?? undefined,
+      avatar: this.getAvatarUrl(profile),
       // associated?: ProfileAssociated
       // viewer?: ViewerState
       // labels?: ComAtprotoLabelDefs.Label[]
@@ -68,5 +69,12 @@ export class ProfileViewService {
   async findProfileViewDetailed(handleOrDids: HandleOrDid[]) {
     const profiles = await this.findProfile(handleOrDids);
     return profiles.map((profile) => this.createProfileViewDetailed(profile));
+  }
+
+  private getAvatarUrl(profile: ProfileDetailed) {
+    if (!profile.avatar) {
+      return undefined;
+    }
+    return `${env.BLOB_CDN_URL}/blob/${profile.actorDid}/${profile.avatar.cid}`;
   }
 }

@@ -31,6 +31,10 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("redis://localhost:6379"),
   }),
+  BLOB_CDN_URL: match({
+    prod: z.url(),
+    dev: z.url().default("http://localhost:3004"),
+  }),
 });
 
 export const env = (() => {
