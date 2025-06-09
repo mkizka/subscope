@@ -37,6 +37,10 @@ export function imagesRouterFactory(
         res.status(400).json({ error: error.message });
         return;
       }
+      logger.error(
+        { params: req.params, error },
+        "Unexpected error occurred while processing image transform request",
+      );
       throw error;
     }
   });
