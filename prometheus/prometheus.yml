@@ -2,10 +2,10 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: "appview"
+  - job_name: appview
     static_configs:
       - targets:
-          - "appview.railway.internal:8080"
+          - appview.railway.internal:8080
 
   - job_name: ingester
     static_configs:
