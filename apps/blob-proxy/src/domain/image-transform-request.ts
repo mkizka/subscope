@@ -1,4 +1,4 @@
-import { asDid, type Did } from "@atproto/did";
+import { type Did, isDid } from "@atproto/did";
 
 import { ImagePreset } from "./image-preset.js";
 
@@ -7,13 +7,39 @@ export class ImageTransformRequest {
   readonly cid: string;
   readonly preset: ImagePreset;
 
-  constructor(params: { did: string; cid: string; type: string }) {
-    this.did = asDid(params.did);
+  private constructor(params: { did: Did; cid: string; preset: ImagePreset }) {
+    this.did = params.did;
     this.cid = params.cid;
-    this.preset = new ImagePreset(params.type);
+    this.preset = params.preset;
+  }
+
+  static fromParams(params: {
+    did: string;
+    cid: string;
+    type: string;
+  }): ImageTransformRequest {
+    this.assertDid(params.did);
+    return new ImageTransformRequest({
+      did: params.did,
+      cid: params.cid,
+      preset: ImagePreset.fromType(params.type),
+    });
+  }
+
+  static assertDid(did: string): asserts did is Did {
+    if (!isDid(did)) {
+      throw new InvalidDidError(did);
+    }
   }
 
   getCacheKey(): string {
     return `${this.preset.type}/${this.did}/${this.cid}/`;
+  }
+}
+
+export class InvalidDidError extends Error {
+  constructor(did: string) {
+    super(`${did} is not a valid DID`);
+    this.name = "InvalidDidError";
   }
 }

@@ -12,9 +12,12 @@ export class FetchBlobService {
     private blobFetcher: IBlobFetcher,
   ) {}
 
-  async fetchBlob(did: Did, cid: string): Promise<ImageBlob> {
-    const resolved = await this.didResolver.resolve(did);
-    const pdsUrl = resolved.pds.toString();
-    return await this.blobFetcher.fetchBlob(pdsUrl, did, cid);
+  async fetchBlob(params: { did: Did; cid: string }): Promise<ImageBlob> {
+    const { pds } = await this.didResolver.resolve(params.did);
+    return await this.blobFetcher.fetchBlob({
+      pds,
+      did: params.did,
+      cid: params.cid,
+    });
   }
 }

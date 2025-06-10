@@ -10,7 +10,7 @@ export function imagesRouterFactory(
   const router = expressRouter();
 
   router.get("/:type/:did/:cid.jpg", async (req, res) => {
-    const request = new ImageTransformRequest(req.params);
+    const request = ImageTransformRequest.fromParams(req.params);
     const result = await imageTransformService.getTransformedImage(request);
     res
       .type(result.contentType)

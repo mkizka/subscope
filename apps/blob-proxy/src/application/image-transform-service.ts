@@ -31,14 +31,14 @@ export class ImageTransformService {
     }
     this.metricReporter.increment("blob_proxy_cache_miss_total");
 
-    const originalBlob = await this.fetchBlobService.fetchBlob(
-      request.did,
-      request.cid,
-    );
-    const transformedBlob = await this.imageBlobService.transform(
-      originalBlob,
-      request.preset,
-    );
+    const originalBlob = await this.fetchBlobService.fetchBlob({
+      did: request.did,
+      cid: request.cid,
+    });
+    const transformedBlob = await this.imageBlobService.transform({
+      blob: originalBlob,
+      preset: request.preset,
+    });
 
     await this.blobCacheRepository.set(cacheKey, transformedBlob);
     return transformedBlob;

@@ -4,13 +4,16 @@ import { ImageBlob } from "../image-blob.js";
 import type { ImagePreset } from "../image-preset.js";
 
 export class ImageBlobService {
-  async transform(
-    originalBlob: ImageBlob,
-    preset: ImagePreset,
-  ): Promise<ImageBlob> {
+  async transform({
+    blob,
+    preset,
+  }: {
+    blob: ImageBlob;
+    preset: ImagePreset;
+  }): Promise<ImageBlob> {
     const presetConfig = preset.getValue();
 
-    const transformedData = await sharp(originalBlob.data)
+    const transformedData = await sharp(blob.data)
       .resize(presetConfig.width, presetConfig.height, {
         fit: presetConfig.fit,
       })

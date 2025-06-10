@@ -11,12 +11,7 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3004),
-  PLC_URL: z.url().default(
-    match({
-      prod: "https://plc.directory",
-      dev: "http://localhost:2582",
-    }),
-  ),
+  PLC_URL: z.url().default("https://plc.directory"),
   REDIS_URL: match({
     prod: z.string(),
     dev: z.string().default("redis://localhost:6379"),

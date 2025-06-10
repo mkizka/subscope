@@ -34,16 +34,16 @@ const IMAGE_PRESETS = {
   [key: string]: ImagePresetConfig;
 };
 
-export type ImagePresetType = keyof typeof IMAGE_PRESETS;
+type ImagePresetType = keyof typeof IMAGE_PRESETS;
 
 export class ImagePreset {
-  readonly type: ImagePresetType;
+  private constructor(readonly type: ImagePresetType) {}
 
-  constructor(type: string) {
+  static fromType(type: string): ImagePreset {
     if (!ImagePreset.isValidType(type)) {
       throw new InvalidImagePresetTypeError(type);
     }
-    this.type = type;
+    return new ImagePreset(type);
   }
 
   static isValidType(type: string): type is ImagePresetType {
@@ -57,7 +57,7 @@ export class ImagePreset {
 
 export class InvalidImagePresetTypeError extends Error {
   constructor(type: string) {
-    super(`Invalid image preset type: ${type}`);
+    super(`${type} is not a valid image preset type`);
     this.name = "InvalidImagePresetTypeError";
   }
 }

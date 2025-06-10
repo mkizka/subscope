@@ -5,13 +5,17 @@ import type { IBlobFetcher } from "../application/interfaces/blob-fetcher.js";
 import { ImageBlob } from "../domain/image-blob.js";
 
 export class BlobFetcher implements IBlobFetcher {
-  async fetchBlob(pdsUrl: string, did: Did, cid: string): Promise<ImageBlob> {
+  async fetchBlob(params: {
+    pds: URL;
+    did: Did;
+    cid: string;
+  }): Promise<ImageBlob> {
     const client = new AtpBaseClient({
-      service: pdsUrl,
+      service: params.pds.toString(),
     });
     const response = await client.com.atproto.sync.getBlob({
-      did,
-      cid,
+      did: params.did,
+      cid: params.cid,
     });
     return new ImageBlob({
       data: response.data,
