@@ -1,12 +1,12 @@
 import path from "node:path";
 
-import type { TransactionContext } from "@dawn/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 import {
   connectionPoolFactory,
   databaseFactory,
   LoggerManager,
-} from "@dawn/common/infrastructure";
-import { required } from "@dawn/common/utils";
+} from "@repo/common/infrastructure";
+import { required } from "@repo/common/utils";
 import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { execa } from "execa";

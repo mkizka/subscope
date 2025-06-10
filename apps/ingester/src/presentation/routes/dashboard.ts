@@ -1,7 +1,7 @@
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter.js";
 import { ExpressAdapter } from "@bull-board/express";
-import type { IJobQueue } from "@dawn/common/domain";
+import type { IJobQueue } from "@repo/common/domain";
 import { Router } from "express";
 
 export const dashboardRouterFactory = (jobQueue: IJobQueue) => {

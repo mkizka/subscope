@@ -1,6 +1,6 @@
 import { type Did } from "@atproto/did";
-import type { DatabaseClient } from "@dawn/common/domain";
-import { ProfileDetailed } from "@dawn/common/domain";
+import type { DatabaseClient } from "@repo/common/domain";
+import { ProfileDetailed } from "@repo/common/domain";
 
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 

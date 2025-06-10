@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { IJobQueue } from "@dawn/common/domain";
+import type { IJobQueue } from "@repo/common/domain";
 
 export class FetchProfileService {
   constructor(private readonly jobQueue: IJobQueue) {}

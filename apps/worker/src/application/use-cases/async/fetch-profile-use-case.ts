@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient } from "@dawn/common/domain";
-import { Profile } from "@dawn/common/domain";
+import type { DatabaseClient } from "@repo/common/domain";
+import { Profile } from "@repo/common/domain";
 
 import type { JobLogger } from "../../../shared/job.js";
 import type { IProfileRecordFetcher } from "../../interfaces/external/profile-record-fetcher.js";

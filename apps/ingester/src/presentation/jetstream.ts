@@ -1,5 +1,5 @@
-import type { ILoggerManager, IMetricReporter } from "@dawn/common/domain";
-import { required, SUPPORTED_COLLECTIONS } from "@dawn/common/utils";
+import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
+import { required, SUPPORTED_COLLECTIONS } from "@repo/common/utils";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 

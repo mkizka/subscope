@@ -1,4 +1,4 @@
-import type { DatabaseClient, TransactionContext } from "@dawn/common/domain";
+import type { DatabaseClient, TransactionContext } from "@repo/common/domain";
 
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IndexActorService } from "../../services/indexer/index-actor-service.js";

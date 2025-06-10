@@ -7,7 +7,7 @@ import {
   MetricReporter,
   RedisDidCache,
   TransactionManager,
-} from "@dawn/common/infrastructure";
+} from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";

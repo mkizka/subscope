@@ -2,7 +2,7 @@ import {
   JobQueue,
   LoggerManager,
   MetricReporter,
-} from "@dawn/common/infrastructure";
+} from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
 import { HandleAccountUseCase } from "./application/handle-account-use-case.js";

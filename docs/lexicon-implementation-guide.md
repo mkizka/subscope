@@ -4,7 +4,9 @@
 
 ## 概要
 
-AT Protocolにおける新しいレコードタイプを追加する際の標準的な実装パターンです。Dawnアーキテクチャでは、レコードがJetstreamから流れてきてデータベースにインデックスされるまでの一連の流れを実装する必要があります。
+AT Protocolにおける新しいレコードタイプを追加する際の標準的な実装パターンです。
+
+このプロジェクトでは、レコードがJetstreamから流れてきてデータベースにインデックスされるまでの一連の流れを実装する必要があります。
 
 ## テンプレート変数
 
@@ -95,7 +97,7 @@ export const SUPPORTED_COLLECTIONS = [
 **ファイル:** `/packages/common/src/lib/domain/{record_type}.ts`
 
 ```typescript
-import { Record } from "@dawn/client";
+import { Record } from "@repo/client";
 
 export class {RecordType} {
   constructor(
@@ -126,8 +128,8 @@ export class {RecordType} {
 **ファイル:** `/apps/worker/src/application/interfaces/{record-type}-repository.ts`
 
 ```typescript
-import { TransactionContext } from "@dawn/common/domain";
-import { {RecordType} } from "@dawn/common/domain";
+import { TransactionContext } from "@repo/common/domain";
+import { {RecordType} } from "@repo/common/domain";
 
 export interface I{RecordType}Repository {
   upsert: (ctx: TransactionContext, {recordInstance}: {RecordType}) => Promise<void>;
@@ -139,9 +141,9 @@ export interface I{RecordType}Repository {
 **ファイル:** `/apps/worker/src/infrastructure/{record-type}-repository.ts`
 
 ```typescript
-import { schema } from "@dawn/db";
-import { TransactionContext } from "@dawn/common/domain";
-import { {RecordType} } from "@dawn/common/domain";
+import { schema } from "@repo/db";
+import { TransactionContext } from "@repo/common/domain";
+import { {RecordType} } from "@repo/common/domain";
 import { I{RecordType}Repository } from "../application/interfaces/{record-type}-repository.js";
 
 export class {RecordType}Repository implements I{RecordType}Repository {
@@ -174,9 +176,9 @@ export class {RecordType}Repository implements I{RecordType}Repository {
 **ファイル:** `/apps/worker/src/application/service/index-{record-type}-service.ts`
 
 ```typescript
-import { TransactionContext } from "@dawn/common/domain";
-import { Record } from "@dawn/client";
-import { {RecordType} } from "@dawn/common/domain";
+import { TransactionContext } from "@repo/common/domain";
+import { Record } from "@repo/client";
+import { {RecordType} } from "@repo/common/domain";
 import { I{RecordType}Repository } from "../interfaces/{record-type}-repository.js";
 import { IIndexCollectionService } from "../interfaces/index-collection-service.js";
 

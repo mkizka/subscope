@@ -3,8 +3,8 @@ import type {
   PostEmbedExternal,
   PostEmbedImage,
   TransactionContext,
-} from "@dawn/common/domain";
-import { type PostInsert, schema } from "@dawn/db";
+} from "@repo/common/domain";
+import { type PostInsert, schema } from "@repo/db";
 import { eq, inArray } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";

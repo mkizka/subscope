@@ -50,13 +50,13 @@ importers:
       '@atproto/xrpc-server':
         specifier: 0.7.19
         version: 0.7.19
-      '@dawn/client':
+      '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@dawn/common':
+      '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@dawn/db':
+      '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
       drizzle-orm:
@@ -81,7 +81,7 @@ importers:
         specifier: 3.4.1
         version: 3.4.1(zod@3.25.56)
     devDependencies:
-      '@dawn/test-utils':
+      '@repo/test-utils':
         specifier: workspace:*
         version: link:../../packages/test-utils
       '@mkizka/eslint-config':
@@ -123,10 +123,10 @@ importers:
       '@atproto/identity':
         specifier: 0.4.8
         version: 0.4.8
-      '@dawn/client':
+      '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@dawn/common':
+      '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
       express:
@@ -190,7 +190,7 @@ importers:
       '@bull-board/express':
         specifier: 6.10.0
         version: 6.10.0
-      '@dawn/common':
+      '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
       '@skyware/jetstream':
@@ -294,13 +294,13 @@ importers:
       '@atproto/syntax':
         specifier: 0.4.0
         version: 0.4.0
-      '@dawn/client':
+      '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@dawn/common':
+      '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
-      '@dawn/db':
+      '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
       bullmq:
@@ -334,7 +334,7 @@ importers:
         specifier: 3.4.1
         version: 3.4.1(zod@3.25.56)
     devDependencies:
-      '@dawn/test-utils':
+      '@repo/test-utils':
         specifier: workspace:*
         version: link:../../packages/test-utils
       '@mkizka/eslint-config':
@@ -431,10 +431,10 @@ importers:
       '@atproto/syntax':
         specifier: 0.4.0
         version: 0.4.0
-      '@dawn/client':
+      '@repo/client':
         specifier: workspace:*
         version: link:../client
-      '@dawn/db':
+      '@repo/db':
         specifier: workspace:*
         version: link:../db
       '@keyv/redis':
@@ -511,7 +511,7 @@ importers:
 
   packages/test-utils:
     dependencies:
-      '@dawn/common':
+      '@repo/common':
         specifier: workspace:*
         version: link:../common
       '@testcontainers/postgresql':

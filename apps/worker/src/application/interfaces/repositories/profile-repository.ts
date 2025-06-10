@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { Profile, TransactionContext } from "@dawn/common/domain";
+import type { Profile, TransactionContext } from "@repo/common/domain";
 
 export interface IProfileRepository {
   upsert: (params: {

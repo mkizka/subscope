@@ -1,4 +1,4 @@
-import type { Record, TransactionContext } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@repo/common/domain";
 
 export interface IIndexCollectionService {
   upsert: ({

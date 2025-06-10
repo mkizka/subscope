@@ -1,5 +1,5 @@
-import type { Record, TransactionContext } from "@dawn/common/domain";
-import { Profile } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@repo/common/domain";
+import { Profile } from "@repo/common/domain";
 
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";

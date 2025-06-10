@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { DevMkizkaTestSyncGetJobStatus } from "@dawn/client/server";
-import type { IJobQueue } from "@dawn/common/domain";
+import type { DevMkizkaTestSyncGetJobStatus } from "@repo/client/server";
+import type { IJobQueue } from "@repo/common/domain";
 
 export class GetJobStatusUseCase {
   constructor(private readonly jobQueue: IJobQueue) {}

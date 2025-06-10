@@ -2,7 +2,7 @@ import type {
   DatabaseClient,
   ITransactionManager,
   TransactionContext,
-} from "@dawn/common/domain";
+} from "@repo/common/domain";
 
 export class TransactionManager implements ITransactionManager {
   constructor(private readonly db: DatabaseClient) {}

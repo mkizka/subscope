@@ -1,5 +1,5 @@
-import type { DatabaseClient } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import type { DatabaseClient } from "@repo/common/domain";
+import { schema } from "@repo/db";
 import { count, inArray, lt } from "drizzle-orm";
 
 import type { JobLogger } from "../../../shared/job.js";

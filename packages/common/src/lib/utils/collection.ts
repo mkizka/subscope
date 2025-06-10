@@ -3,7 +3,7 @@ import type {
   AppBskyFeedPost,
   AppBskyGraphFollow,
   DevMkizkaTestSubscription,
-} from "@dawn/client/server";
+} from "@repo/client/server";
 
 export type SupportedCollectionMap = {
   "app.bsky.actor.profile": AppBskyActorProfile.Record;

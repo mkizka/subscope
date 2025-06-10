@@ -1,10 +1,10 @@
 import type { Did } from "@atproto/did";
 import { cborToLexRecord, verifyRepoCar } from "@atproto/repo";
 import { AtUri } from "@atproto/syntax";
-import { AtpBaseClient } from "@dawn/client/api";
-import type { IDidResolver } from "@dawn/common/domain";
-import { Record } from "@dawn/common/domain";
-import { required } from "@dawn/common/utils";
+import { AtpBaseClient } from "@repo/client/api";
+import type { IDidResolver } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
+import { required } from "@repo/common/utils";
 
 import type { IRepoFetcher } from "../application/interfaces/external/repo-fetcher.js";
 import type { JobLogger } from "../shared/job.js";

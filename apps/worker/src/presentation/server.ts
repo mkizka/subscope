@@ -2,7 +2,7 @@ import type {
   ILoggerManager,
   IMetricReporter,
   Logger,
-} from "@dawn/common/domain";
+} from "@repo/common/domain";
 import express from "express";
 import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";

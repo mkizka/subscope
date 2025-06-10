@@ -1,8 +1,8 @@
 import { asDid } from "@atproto/did";
-import type { IJobQueue, TransactionContext } from "@dawn/common/domain";
-import { asHandle } from "@dawn/common/utils";
-import { schema } from "@dawn/db";
-import { setupTestDatabase } from "@dawn/test-utils";
+import type { IJobQueue, TransactionContext } from "@repo/common/domain";
+import { asHandle } from "@repo/common/utils";
+import { schema } from "@repo/db";
+import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";

@@ -1,5 +1,5 @@
 {
-  "name": "@dawn/ingester",
+  "name": "@repo/ingester",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -12,7 +12,7 @@
   "dependencies": {
     "@bull-board/api": "6.10.0",
     "@bull-board/express": "6.10.0",
-    "@dawn/common": "workspace:*",
+    "@repo/common": "workspace:*",
     "@skyware/jetstream": "0.2.2",
     "express": "5.1.0",
     "pino-http": "10.5.0",

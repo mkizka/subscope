@@ -1,7 +1,7 @@
-import type { TransactionContext } from "@dawn/common/domain";
-import { Record } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
-import { setupTestDatabase } from "@dawn/test-utils";
+import type { TransactionContext } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
+import { schema } from "@repo/db";
+import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -91,7 +91,7 @@ describe("IndexFollowService", () => {
         actorDid: "did:plc:shouldsave-follower1",
         json: {
           $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.dawn.test",
+          appviewDid: "did:web:appview.test",
           createdAt: new Date().toISOString(),
         },
       });
@@ -99,7 +99,7 @@ describe("IndexFollowService", () => {
         uri: "at://did:plc:shouldsave-follower1/dev.mkizka.test.subscription/123",
         cid: "sub123",
         actorDid: "did:plc:shouldsave-follower1",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date(),
       });
 
@@ -141,7 +141,7 @@ describe("IndexFollowService", () => {
         actorDid: "did:plc:shouldsave-followee2",
         json: {
           $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.dawn.test",
+          appviewDid: "did:web:appview.test",
           createdAt: new Date().toISOString(),
         },
       });
@@ -149,7 +149,7 @@ describe("IndexFollowService", () => {
         uri: "at://did:plc:shouldsave-followee2/dev.mkizka.test.subscription/456",
         cid: "sub456",
         actorDid: "did:plc:shouldsave-followee2",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date(),
       });
 

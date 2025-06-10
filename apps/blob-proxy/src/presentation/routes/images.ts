@@ -1,4 +1,4 @@
-import type { ILoggerManager } from "@dawn/common/domain";
+import type { ILoggerManager } from "@repo/common/domain";
 import type { Router } from "express";
 import { Router as expressRouter } from "express";
 

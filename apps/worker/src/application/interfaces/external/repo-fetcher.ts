@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { Record } from "@dawn/common/domain";
+import type { Record } from "@repo/common/domain";
 
 import type { JobLogger } from "../../../shared/job.js";
 

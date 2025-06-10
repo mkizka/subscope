@@ -1,5 +1,5 @@
-import type { Subscription, TransactionContext } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import type { Subscription, TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 import { and, eq, exists, inArray } from "drizzle-orm";
 
 import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";

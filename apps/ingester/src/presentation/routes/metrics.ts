@@ -1,4 +1,4 @@
-import type { IJobQueue, IMetricReporter } from "@dawn/common/domain";
+import type { IJobQueue, IMetricReporter } from "@repo/common/domain";
 import { Router } from "express";
 
 export const metricsRouterFactory = (

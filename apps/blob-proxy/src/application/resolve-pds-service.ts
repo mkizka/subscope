@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { IDidResolver } from "@dawn/common/domain";
+import type { IDidResolver } from "@repo/common/domain";
 
 export class ResolvePdsService {
   static inject = ["didResolver"] as const;

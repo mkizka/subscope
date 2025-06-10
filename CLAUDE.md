@@ -10,19 +10,19 @@
 
 ### 概要
 
-Dawnは3つのアプリケーションでBluesky AppViewを実装するmonorepoになっています。
+3つのアプリケーションでBluesky AppViewを実装するmonorepoになっています。
 
 appsディレクトリ(アプリケーション)
 
-- `@dawn/appview` - XRPCエンドポイント経由でタイムラインやプロフィールなどを提供するAT ProtocolのAppViewサーバー
-- `@dawn/ingester` - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送るWebSocketクライアント
-- `@dawn/worker` - BullMQを使用してレコードをデータベースにインデックスするバックグラウンドジョブプロセッサー
+- `@repo/appview` - XRPCエンドポイント経由でタイムラインやプロフィールなどを提供するAT ProtocolのAppViewサーバー
+- `@repo/ingester` - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送るWebSocketクライアント
+- `@repo/worker` - BullMQを使用してレコードをデータベースにインデックスするバックグラウンドジョブプロセッサー
 
 packagesディレクトリ(共通パッケージ)
 
-- `@dawn/db` - Drizzle ORMデータベース層
-- `@dawn/common` - 共有ユーティリティとBullMQジョブ定義
-- `@dawn/client` - AT Protocolクライアントラッパー
+- `@repo/db` - Drizzle ORMデータベース層
+- `@repo/common` - 共有ユーティリティとBullMQジョブ定義
+- `@repo/client` - AT Protocolクライアントラッパー
 
 ### 実装パターン
 
@@ -126,7 +126,7 @@ await sleep(1000);
 
 - ファイルの編集後は最後に必ずリポジトリルートに移動してpnpm typecheckとpnpm formatを実行し、型エラーかlintエラーが残っていないことを確認してください
 - テストケース名は日本語で書いてください
-- 重要でないnull/undefinedチェックは@dawn/commonパッケージのrequired関数を使ってください
+- 重要でないnull/undefinedチェックは@repo/commonパッケージのrequired関数を使ってください
 - 私が指示するまでコミットしないでください
 - テストケースにはarrange-act-assertパターンに基づいたコメントを書いてください
 - arrange-act-assertのまとまりごとに1行空行を書いて、テストケースごとに空行が2行になるようにしてください

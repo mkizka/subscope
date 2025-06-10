@@ -1,9 +1,9 @@
 import type {
   AppBskyFeedDefs,
   AppBskyFeedGetTimeline,
-} from "@dawn/client/server";
-import type { DatabaseClient } from "@dawn/common/domain";
-import { required } from "@dawn/common/utils";
+} from "@repo/client/server";
+import type { DatabaseClient } from "@repo/common/domain";
+import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "./interfaces/post-repository.js";
 import type { PostViewService } from "./service/post-view-service.js";

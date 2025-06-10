@@ -1,4 +1,4 @@
-import type { Follow, TransactionContext } from "@dawn/common/domain";
+import type { Follow, TransactionContext } from "@repo/common/domain";
 
 export interface IFollowRepository {
   upsert: (params: {

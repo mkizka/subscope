@@ -1,7 +1,7 @@
 import { AtUri } from "@atproto/syntax";
-import type { DatabaseClient } from "@dawn/common/domain";
-import { Post, PostEmbedExternal, PostEmbedImage } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import type { DatabaseClient } from "@repo/common/domain";
+import { Post, PostEmbedExternal, PostEmbedImage } from "@repo/common/domain";
+import { schema } from "@repo/db";
 import { and, inArray, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";

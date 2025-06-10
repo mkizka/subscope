@@ -1,7 +1,7 @@
-import type { TransactionContext } from "@dawn/common/domain";
-import { Record } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
-import { setupTestDatabase } from "@dawn/test-utils";
+import type { TransactionContext } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
+import { schema } from "@repo/db";
+import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -39,7 +39,7 @@ describe("IndexPostService", () => {
         actorDid: "did:plc:123",
         json: {
           $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.dawn.test",
+          appviewDid: "did:web:appview.test",
           createdAt: new Date().toISOString(),
         },
       });
@@ -47,7 +47,7 @@ describe("IndexPostService", () => {
         uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
         cid: "sub123",
         actorDid: "did:plc:123",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date(),
       });
       // 投稿レコード用のrecordsテーブルエントリ
@@ -94,7 +94,7 @@ describe("IndexPostService", () => {
         actorDid: "did:plc:subscriber",
         json: {
           $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.dawn.test",
+          appviewDid: "did:web:appview.test",
           createdAt: new Date().toISOString(),
         },
       });
@@ -102,7 +102,7 @@ describe("IndexPostService", () => {
         uri: "at://did:plc:subscriber/dev.mkizka.test.subscription/123",
         cid: "sub123",
         actorDid: "did:plc:subscriber",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date(),
       });
 
@@ -137,7 +137,7 @@ describe("IndexPostService", () => {
         actorDid: "did:plc:subscriber2",
         json: {
           $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.dawn.test",
+          appviewDid: "did:web:appview.test",
           createdAt: new Date().toISOString(),
         },
       });
@@ -145,7 +145,7 @@ describe("IndexPostService", () => {
         uri: "at://did:plc:subscriber2/dev.mkizka.test.subscription/456",
         cid: "bafyreib2rxk3rybk3aobmv5cjuql3bm2twh4jvxuiqn2kwedfr7o4vck6e",
         actorDid: "did:plc:subscriber2",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date(),
       });
 
@@ -325,7 +325,7 @@ describe("IndexPostService", () => {
         actorDid: "did:plc:imageuser",
         json: {
           $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.dawn.test",
+          appviewDid: "did:web:appview.test",
           createdAt: new Date().toISOString(),
         },
       });
@@ -333,7 +333,7 @@ describe("IndexPostService", () => {
         uri: "at://did:plc:imageuser/dev.mkizka.test.subscription/sub",
         cid: "sub123",
         actorDid: "did:plc:imageuser",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date(),
       });
 

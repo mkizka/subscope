@@ -1,6 +1,6 @@
-import type { IJobQueue, TransactionContext } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
-import { setupTestDatabase } from "@dawn/test-utils";
+import type { IJobQueue, TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
+import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -75,7 +75,7 @@ describe("UpsertIdentityUseCase", () => {
       actorDid: command.did,
       json: {
         $type: "dev.mkizka.test.subscription",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date().toISOString(),
       },
     });
@@ -83,7 +83,7 @@ describe("UpsertIdentityUseCase", () => {
       uri: "at://did:plc:identity-subscriber/dev.mkizka.test.subscription/123",
       cid: "sub123",
       actorDid: command.did,
-      appviewDid: "did:web:api.dawn.test",
+      appviewDid: "did:web:appview.test",
       createdAt: new Date(),
     });
 
@@ -119,7 +119,7 @@ describe("UpsertIdentityUseCase", () => {
       actorDid: subscriberDid,
       json: {
         $type: "dev.mkizka.test.subscription",
-        appviewDid: "did:web:api.dawn.test",
+        appviewDid: "did:web:appview.test",
         createdAt: new Date().toISOString(),
       },
     });
@@ -127,7 +127,7 @@ describe("UpsertIdentityUseCase", () => {
       uri: `at://${subscriberDid}/dev.mkizka.test.subscription/456`,
       cid: "sub456",
       actorDid: subscriberDid,
-      appviewDid: "did:web:api.dawn.test",
+      appviewDid: "did:web:appview.test",
       createdAt: new Date(),
     });
 

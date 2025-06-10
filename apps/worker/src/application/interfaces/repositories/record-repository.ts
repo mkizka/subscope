@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Record, TransactionContext } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@repo/common/domain";
 
 export interface IRecordRepository {
   upsert: (params: {

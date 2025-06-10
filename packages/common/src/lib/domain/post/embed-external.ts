@@ -1,4 +1,4 @@
-import type { AppBskyEmbedExternal } from "@dawn/client/server";
+import type { AppBskyEmbedExternal } from "@repo/client/server";
 
 export class PostEmbedExternal {
   constructor(

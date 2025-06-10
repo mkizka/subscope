@@ -2,8 +2,8 @@ import type {
   IJobQueue,
   ILoggerManager,
   IMetricReporter,
-} from "@dawn/common/domain";
-import type { SupportedCollection } from "@dawn/common/utils";
+} from "@repo/common/domain";
+import type { SupportedCollection } from "@repo/common/utils";
 import type { CommitEvent } from "@skyware/jetstream";
 
 export class HandleCommitUseCase {

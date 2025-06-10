@@ -1,5 +1,5 @@
 {
-  "name": "@dawn/common",
+  "name": "@repo/common",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -17,9 +17,9 @@
     "@atproto/identity": "0.4.8",
     "@atproto/lexicon": "0.4.11",
     "@atproto/syntax": "0.4.0",
-    "@dawn/client": "workspace:*",
-    "@dawn/db": "workspace:*",
     "@keyv/redis": "4.4.0",
+    "@repo/client": "workspace:*",
+    "@repo/db": "workspace:*",
     "bullmq": "5.53.2",
     "drizzle-orm": "0.44.2",
     "keyv": "5.3.3",

@@ -1,10 +1,10 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
-import type { TransactionContext } from "@dawn/common/domain";
-import type { Actor, BackfillStatus } from "@dawn/common/domain";
-import { Actor as ActorDomain } from "@dawn/common/domain";
-import type { Handle } from "@dawn/common/utils";
-import { type ActorInsert, schema } from "@dawn/db";
+import type { TransactionContext } from "@repo/common/domain";
+import type { Actor, BackfillStatus } from "@repo/common/domain";
+import { Actor as ActorDomain } from "@repo/common/domain";
+import type { Handle } from "@repo/common/utils";
+import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";

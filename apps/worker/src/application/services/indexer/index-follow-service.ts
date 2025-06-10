@@ -1,5 +1,5 @@
-import type { Record, TransactionContext } from "@dawn/common/domain";
-import { Follow } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@repo/common/domain";
+import { Follow } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";

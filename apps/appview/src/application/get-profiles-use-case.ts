@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import { type Handle } from "@dawn/common/utils";
+import { type Handle } from "@repo/common/utils";
 
 import type { ProfileViewService } from "./service/profile-view-service.js";
 

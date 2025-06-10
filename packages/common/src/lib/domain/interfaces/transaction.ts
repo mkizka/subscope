@@ -1,4 +1,4 @@
-import type { schema } from "@dawn/db";
+import type { schema } from "@repo/db";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 export type DatabaseClient = NodePgDatabase<typeof schema>;

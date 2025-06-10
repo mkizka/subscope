@@ -1,4 +1,4 @@
-import { schema } from "@dawn/db";
+import { schema } from "@repo/db";
 import type { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";

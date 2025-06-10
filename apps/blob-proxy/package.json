@@ -1,5 +1,5 @@
 {
-  "name": "@dawn/blob-proxy",
+  "name": "@repo/blob-proxy",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@atproto/identity": "0.4.8",
-    "@dawn/client": "workspace:*",
-    "@dawn/common": "workspace:*",
+    "@repo/client": "workspace:*",
+    "@repo/common": "workspace:*",
     "express": "5.1.0",
     "express-prom-bundle": "8.0.0",
     "lru-cache": "^11.1.0",

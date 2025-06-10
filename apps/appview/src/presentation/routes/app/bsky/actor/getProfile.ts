@@ -1,7 +1,7 @@
 import { isDid } from "@atproto/did";
 import { InvalidRequestError } from "@atproto/xrpc-server";
-import type { Server } from "@dawn/client/server";
-import { isHandle } from "@dawn/common/utils";
+import type { Server } from "@repo/client/server";
+import { isHandle } from "@repo/common/utils";
 
 import type { GetProfilesUseCase } from "../../../../../application/get-profiles-use-case.js";
 

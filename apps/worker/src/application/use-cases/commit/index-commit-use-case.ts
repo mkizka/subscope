@@ -1,4 +1,4 @@
-import { type ITransactionManager } from "@dawn/common/domain";
+import { type ITransactionManager } from "@repo/common/domain";
 
 import type { IndexCommitService } from "../../services/indexer/index-commit-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";

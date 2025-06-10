@@ -9,15 +9,15 @@ cleanup() {
 
 main() {
   # 1. atprotoリポジトリのdockerボリュームを削除して初期値に戻す
-  pnpm --filter @dawn/dev-env reset-dev-env
+  pnpm --filter @repo/dev-env reset-dev-env
 
   # 2. atprotoリポジトリをダウンロードしてビルド
-  pnpm --filter @dawn/dev-env setup-dev-env
+  pnpm --filter @repo/dev-env setup-dev-env
 
   # 3. atprotoリポジトリでmake run-dev-envを実行
   DEV_ENV_LOG=dev-env/run-dev-env.log
   rm -f $DEV_ENV_LOG
-  pnpm --filter @dawn/dev-env run-dev-env > $DEV_ENV_LOG 2>&1 &
+  pnpm --filter @repo/dev-env run-dev-env > $DEV_ENV_LOG 2>&1 &
   pnpm wait-on http://localhost:2583/xrpc/_health
 
   # 4. このリポジトリのdocker composeを起動

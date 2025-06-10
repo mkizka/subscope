@@ -1,4 +1,4 @@
-import type { ILoggerManager, Logger } from "@dawn/common/domain";
+import type { ILoggerManager, Logger } from "@repo/common/domain";
 import express from "express";
 import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";

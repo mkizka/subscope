@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
-import type { DatabaseClient } from "@dawn/common/domain";
-import { asHandle, type Handle } from "@dawn/common/utils";
-import { schema } from "@dawn/db";
+import type { DatabaseClient } from "@repo/common/domain";
+import { asHandle, type Handle } from "@repo/common/utils";
+import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
 
 import type { IHandlesToDidsRepository } from "../application/interfaces/handles-to-dids-repository.js";

@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { AppBskyActorDefs } from "@dawn/client/server";
-import type { ProfileDetailed } from "@dawn/common/domain";
-import { type Handle, isHandle } from "@dawn/common/utils";
+import type { AppBskyActorDefs } from "@repo/client/server";
+import type { ProfileDetailed } from "@repo/common/domain";
+import { type Handle, isHandle } from "@repo/common/utils";
 
 import { env } from "../../shared/env.js";
 import type { IHandlesToDidsRepository } from "../interfaces/handles-to-dids-repository.js";

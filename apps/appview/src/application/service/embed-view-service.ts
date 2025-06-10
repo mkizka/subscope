@@ -2,8 +2,8 @@ import type {
   $Typed,
   AppBskyEmbedExternal,
   AppBskyEmbedImages,
-} from "@dawn/client/server";
-import type { PostEmbedExternal, PostEmbedImage } from "@dawn/common/domain";
+} from "@repo/client/server";
+import type { PostEmbedExternal, PostEmbedImage } from "@repo/common/domain";
 
 import { env } from "../../shared/env.js";
 

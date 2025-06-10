@@ -3,8 +3,8 @@ import { AtUri } from "@atproto/syntax";
 import type {
   ITransactionManager,
   TransactionContext,
-} from "@dawn/common/domain";
-import { Record } from "@dawn/common/domain";
+} from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
 import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 

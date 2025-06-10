@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
-import type { DatabaseClient } from "@dawn/common/domain";
-import { Record } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import type { DatabaseClient } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
+import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
 
 import type { IRecordRepository } from "../application/interfaces/record-repository.js";

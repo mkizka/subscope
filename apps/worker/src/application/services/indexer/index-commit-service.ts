@@ -1,10 +1,10 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@dawn/common/domain";
-import type { Record } from "@dawn/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+import type { Record } from "@repo/common/domain";
 import {
   isSupportedCollection,
   type SupportedCollection,
-} from "@dawn/common/utils";
+} from "@repo/common/utils";
 
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";

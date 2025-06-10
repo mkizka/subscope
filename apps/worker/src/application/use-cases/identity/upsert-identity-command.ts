@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import { asHandle } from "@dawn/common/utils";
+import { asHandle } from "@repo/common/utils";
 import type { IdentityEvent } from "@skyware/jetstream";
 
 export const upsertIdentityCommandFactory = (event: IdentityEvent) => {

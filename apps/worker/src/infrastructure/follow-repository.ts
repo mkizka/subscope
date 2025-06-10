@@ -1,5 +1,5 @@
-import type { Follow, TransactionContext } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
+import type { Follow, TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
 import type { IFollowRepository } from "../application/interfaces/repositories/follow-repository.js";
 

@@ -1,4 +1,4 @@
-import type { Subscription, TransactionContext } from "@dawn/common/domain";
+import type { Subscription, TransactionContext } from "@repo/common/domain";
 
 export interface ISubscriptionRepository {
   upsert: (params: {

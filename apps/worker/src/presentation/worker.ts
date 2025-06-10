@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { SupportedCollection } from "@dawn/common/utils";
+import type { SupportedCollection } from "@repo/common/utils";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";

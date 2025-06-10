@@ -1,7 +1,7 @@
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@dawn/common/domain";
-import { schema } from "@dawn/db";
-import { setupTestDatabase } from "@dawn/test-utils";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
+import { setupTestDatabase } from "@repo/test-utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { HandlesToDidsRepository } from "../../infrastructure/handles-to-dids-repository.js";

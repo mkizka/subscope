@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient, ITransactionManager } from "@dawn/common/domain";
-import { isSupportedCollection } from "@dawn/common/utils";
+import type { DatabaseClient, ITransactionManager } from "@repo/common/domain";
+import { isSupportedCollection } from "@repo/common/utils";
 
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";

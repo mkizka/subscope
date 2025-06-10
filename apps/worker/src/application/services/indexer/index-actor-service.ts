@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
-import { Actor, type TransactionContext } from "@dawn/common/domain";
-import type { Handle } from "@dawn/common/utils";
+import { Actor, type TransactionContext } from "@repo/common/domain";
+import type { Handle } from "@repo/common/utils";
 
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";

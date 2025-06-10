@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import { AtpBaseClient } from "@dawn/client/api";
+import { AtpBaseClient } from "@repo/client/api";
 
 import type { IBlobFetcher } from "../application/interfaces/blob-fetcher.js";
 import { BlobData } from "../domain/blob-data.js";

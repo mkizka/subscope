@@ -1,5 +1,5 @@
 {
-  "name": "@dawn/client",
+  "name": "@repo/client",
   "version": "0.0.0",
   "private": true,
   "exports": {

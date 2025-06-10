@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { TransactionContext } from "@dawn/common/domain";
-import type { Profile } from "@dawn/common/domain";
-import { type BlobInsert, type ProfileInsert, schema } from "@dawn/db";
+import type { TransactionContext } from "@repo/common/domain";
+import type { Profile } from "@repo/common/domain";
+import { type BlobInsert, type ProfileInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IProfileRepository } from "../application/interfaces/repositories/profile-repository.js";

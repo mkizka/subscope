@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import { AtpBaseClient } from "@dawn/client/api";
-import type { IDidResolver } from "@dawn/common/domain";
-import { Record } from "@dawn/common/domain";
+import { AtpBaseClient } from "@repo/client/api";
+import type { IDidResolver } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
 
 import type { IProfileRecordFetcher } from "../application/interfaces/external/profile-record-fetcher.js";
 

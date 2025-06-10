@@ -25,7 +25,7 @@ export function App() {
 
   return (
     <div>
-      <h1>Dawn Playground</h1>
+      <h1>Playground</h1>
       <button onClick={createSubscriptionRecord}>
         Create Subscription Record
       </button>

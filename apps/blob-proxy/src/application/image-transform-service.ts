@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { IMetricReporter } from "@dawn/common/domain";
+import type { IMetricReporter } from "@repo/common/domain";
 
 import type { BlobData } from "../domain/blob-data.js";
 import { ImagePreset } from "../domain/image-preset.js";

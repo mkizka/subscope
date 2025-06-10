@@ -1,5 +1,5 @@
 {
-  "name": "@dawn/worker",
+  "name": "@repo/worker",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -16,9 +16,9 @@
     "@atproto/lexicon": "0.4.11",
     "@atproto/repo": "0.8.1",
     "@atproto/syntax": "0.4.0",
-    "@dawn/client": "workspace:*",
-    "@dawn/common": "workspace:*",
-    "@dawn/db": "workspace:*",
+    "@repo/client": "workspace:*",
+    "@repo/common": "workspace:*",
+    "@repo/db": "workspace:*",
     "bullmq": "5.53.2",
     "drizzle-orm": "0.44.2",
     "express": "5.1.0",
@@ -31,8 +31,8 @@
     "zod-validation-error": "3.4.1"
   },
   "devDependencies": {
-    "@dawn/test-utils": "workspace:*",
     "@mkizka/eslint-config": "6.0.2",
+    "@repo/test-utils": "workspace:*",
     "@skyware/jetstream": "0.2.2",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.3",

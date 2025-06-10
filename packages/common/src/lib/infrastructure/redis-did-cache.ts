@@ -1,6 +1,6 @@
 import type { CacheResult, DidCache, DidDocument } from "@atproto/identity";
-import type { IMetricReporter } from "@dawn/common/domain";
 import KeyvRedis from "@keyv/redis";
+import type { IMetricReporter } from "@repo/common/domain";
 import Keyv from "keyv";
 
 type CacheVal = {

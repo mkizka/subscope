@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Record } from "@dawn/common/domain";
+import type { Record } from "@repo/common/domain";
 
 export interface IRecordRepository {
   findMany: (uris: AtUri[]) => Promise<Record[]>;

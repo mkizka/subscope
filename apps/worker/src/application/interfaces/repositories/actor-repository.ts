@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { Actor, TransactionContext } from "@dawn/common/domain";
-import type { BackfillStatus } from "@dawn/common/domain";
-import type { Handle } from "@dawn/common/utils";
+import type { Actor, TransactionContext } from "@repo/common/domain";
+import type { BackfillStatus } from "@repo/common/domain";
+import type { Handle } from "@repo/common/utils";
 
 export interface IActorRepository {
   upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;

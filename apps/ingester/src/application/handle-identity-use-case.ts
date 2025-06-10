@@ -2,7 +2,7 @@ import type {
   IJobQueue,
   ILoggerManager,
   IMetricReporter,
-} from "@dawn/common/domain";
+} from "@repo/common/domain";
 import type { IdentityEvent } from "@skyware/jetstream";
 
 export class HandleIdentityUseCase {

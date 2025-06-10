@@ -1,4 +1,4 @@
-import type { AppBskyEmbedImages } from "@dawn/client/server";
+import type { AppBskyEmbedImages } from "@repo/client/server";
 
 type AspectRatio = {
   width: number;

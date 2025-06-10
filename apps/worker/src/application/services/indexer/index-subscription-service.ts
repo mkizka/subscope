@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
-import type { Record, TransactionContext } from "@dawn/common/domain";
-import { Subscription } from "@dawn/common/domain";
+import type { Record, TransactionContext } from "@repo/common/domain";
+import { Subscription } from "@repo/common/domain";
 
 import { env } from "../../../shared/env.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
