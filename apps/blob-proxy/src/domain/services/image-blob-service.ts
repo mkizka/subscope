@@ -14,7 +14,9 @@ export class ImageBlobService {
     const presetConfig = preset.getValue();
 
     const transformedData = await sharp(blob.data)
-      .resize(presetConfig.width, presetConfig.height, {
+      .resize({
+        width: presetConfig.width,
+        height: presetConfig.height,
         fit: presetConfig.fit,
       })
       .jpeg({ quality: 90 })
