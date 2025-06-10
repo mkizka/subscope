@@ -8,7 +8,7 @@ import { createInjector } from "typed-inject";
 
 import { FetchBlobService } from "./application/fetch-blob-service.js";
 import { ImageTransformService } from "./application/image-transform-service.js";
-import { ImageTransformationService } from "./domain/services/image-transformation-service.js";
+import { ImageBlobService } from "./domain/services/image-blob-service.js";
 import { BlobCacheRepository } from "./infrastructure/blob-cache-repository.js";
 import { BlobFetcher } from "./infrastructure/blob-fetcher.js";
 import { imagesRouterFactory } from "./presentation/routes/images.js";
@@ -28,7 +28,7 @@ createInjector()
   .provideClass("blobCacheRepository", BlobCacheRepository)
   .provideClass("blobFetcher", BlobFetcher)
   // domain
-  .provideClass("imageTransformationService", ImageTransformationService)
+  .provideClass("imageBlobService", ImageBlobService)
   // application
   .provideClass("fetchBlobService", FetchBlobService)
   .provideClass("imageTransformService", ImageTransformService)

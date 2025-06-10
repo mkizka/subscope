@@ -3,20 +3,17 @@ import sharp from "sharp";
 import { ImageBlob } from "../image-blob.js";
 import type { ImagePreset } from "../image-preset.js";
 
-export class ImageTransformationService {
+export class ImageBlobService {
   async transform(
     originalBlob: ImageBlob,
     preset: ImagePreset,
   ): Promise<ImageBlob> {
-    const sharpInstance = sharp(originalBlob.data).resize(
-      preset.width,
-      preset.height,
-      {
-        fit: preset.fit,
-      },
-    );
+    const presetConfig = preset.getValue();
 
-    const transformedData = await sharpInstance
+    const transformedData = await sharp(originalBlob.data)
+      .resize(presetConfig.width, presetConfig.height, {
+        fit: presetConfig.fit,
+      })
       .jpeg({ quality: 90 })
       .toBuffer();
 

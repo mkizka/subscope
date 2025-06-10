@@ -1,41 +1,63 @@
+type ImagePresetConfig = {
+  fit: "cover" | "inside";
+  width: number;
+  height: number;
+};
+
+const IMAGE_PRESETS = {
+  avatar: {
+    fit: "cover",
+    width: 1000,
+    height: 1000,
+  },
+  avatar_thumbnail: {
+    fit: "cover",
+    width: 128,
+    height: 128,
+  },
+  banner: {
+    fit: "cover",
+    width: 3000,
+    height: 1000,
+  },
+  feed_thumbnail: {
+    fit: "inside",
+    width: 2000,
+    height: 2000,
+  },
+  feed_fullsize: {
+    fit: "inside",
+    width: 1000,
+    height: 1000,
+  },
+} as const satisfies {
+  [key: string]: ImagePresetConfig;
+};
+
 export type ImagePresetType = keyof typeof IMAGE_PRESETS;
 
 export class ImagePreset {
-  private constructor(
-    public readonly fit: "cover" | "inside",
-    public readonly width: number,
-    public readonly height: number,
-  ) {}
+  readonly type: ImagePresetType;
 
-  static avatar(): ImagePreset {
-    return new ImagePreset("cover", 1000, 1000);
+  constructor(type: string) {
+    if (!ImagePreset.isValidType(type)) {
+      throw new InvalidImagePresetTypeError(type);
+    }
+    this.type = type;
   }
 
-  static avatarThumbnail(): ImagePreset {
-    return new ImagePreset("cover", 128, 128);
+  static isValidType(type: string): type is ImagePresetType {
+    return type in IMAGE_PRESETS;
   }
 
-  static banner(): ImagePreset {
-    return new ImagePreset("cover", 3000, 1000);
-  }
-
-  static feedThumbnail(): ImagePreset {
-    return new ImagePreset("inside", 2000, 2000);
-  }
-
-  static feedFullsize(): ImagePreset {
-    return new ImagePreset("inside", 1000, 1000);
-  }
-
-  static fromType(type: ImagePresetType): ImagePreset {
-    return IMAGE_PRESETS[type]();
+  getValue(): ImagePresetConfig {
+    return IMAGE_PRESETS[this.type];
   }
 }
 
-export const IMAGE_PRESETS = {
-  avatar: () => ImagePreset.avatar(),
-  avatar_thumbnail: () => ImagePreset.avatarThumbnail(),
-  banner: () => ImagePreset.banner(),
-  feed_thumbnail: () => ImagePreset.feedThumbnail(),
-  feed_fullsize: () => ImagePreset.feedFullsize(),
-} as const;
+export class InvalidImagePresetTypeError extends Error {
+  constructor(type: string) {
+    super(`Invalid image preset type: ${type}`);
+    this.name = "InvalidImagePresetTypeError";
+  }
+}
