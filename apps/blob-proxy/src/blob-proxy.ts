@@ -6,8 +6,8 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { FetchBlobService } from "./application/fetch-blob-service.js";
 import { ImageTransformService } from "./application/image-transform-service.js";
-import { ResolvePdsService } from "./application/resolve-pds-service.js";
 import { ImageTransformationService } from "./domain/services/image-transformation-service.js";
 import { BlobCacheRepository } from "./infrastructure/blob-cache-repository.js";
 import { BlobFetcher } from "./infrastructure/blob-fetcher.js";
@@ -30,7 +30,7 @@ createInjector()
   // domain
   .provideClass("imageTransformationService", ImageTransformationService)
   // application
-  .provideClass("resolvePdsService", ResolvePdsService)
+  .provideClass("fetchBlobService", FetchBlobService)
   .provideClass("imageTransformService", ImageTransformService)
   // presentation
   .provideFactory("imagesRouter", imagesRouterFactory)
