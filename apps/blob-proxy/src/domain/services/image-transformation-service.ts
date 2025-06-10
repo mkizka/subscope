@@ -1,13 +1,13 @@
 import sharp from "sharp";
 
-import { BlobData } from "../blob-data.js";
+import { ImageBlob } from "../blob-data.js";
 import type { ImagePreset } from "../image-preset.js";
 
 export class ImageTransformationService {
   async transform(
-    originalBlob: BlobData,
+    originalBlob: ImageBlob,
     preset: ImagePreset,
-  ): Promise<BlobData> {
+  ): Promise<ImageBlob> {
     const sharpInstance = sharp(originalBlob.data).resize(
       preset.width,
       preset.height,
@@ -20,6 +20,6 @@ export class ImageTransformationService {
       .jpeg({ quality: 90 })
       .toBuffer();
 
-    return BlobData.createJpeg(transformedData);
+    return ImageBlob.jpeg(transformedData);
   }
 }

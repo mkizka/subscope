@@ -1,28 +1,13 @@
-export class BlobData {
-  constructor(
-    public readonly data: Uint8Array,
-    public readonly contentType: string,
-  ) {
-    this.validate();
+export class ImageBlob {
+  readonly data: Uint8Array;
+  readonly contentType: string;
+
+  constructor(params: { data: Uint8Array; contentType: string }) {
+    this.data = params.data;
+    this.contentType = params.contentType;
   }
 
-  private validate(): void {
-    if (this.data.length === 0) {
-      throw new InvalidBlobDataError("Blob data cannot be empty");
-    }
-    if (!this.contentType) {
-      throw new InvalidBlobDataError("Content type is required");
-    }
-  }
-
-  static createJpeg(data: Uint8Array): BlobData {
-    return new BlobData(data, "image/jpeg");
-  }
-}
-
-export class InvalidBlobDataError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "InvalidBlobDataError";
+  static jpeg(data: Uint8Array): ImageBlob {
+    return new ImageBlob({ data, contentType: "image/jpeg" });
   }
 }

@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { IMetricReporter } from "@repo/common/domain";
 
-import type { BlobData } from "../domain/blob-data.js";
+import type { ImageBlob } from "../domain/blob-data.js";
 import { ImagePreset } from "../domain/image-preset.js";
 import type { ImageTransformRequest } from "../domain/image-transform-request.js";
 import type { ImageTransformationService } from "../domain/services/image-transformation-service.js";
@@ -25,7 +25,9 @@ export class ImageTransformService {
     "metricReporter",
   ] as const;
 
-  async getTransformedImage(request: ImageTransformRequest): Promise<BlobData> {
+  async getTransformedImage(
+    request: ImageTransformRequest,
+  ): Promise<ImageBlob> {
     const cacheKey = request.getCacheKey();
     const cached = await this.blobCacheRepository.get(cacheKey);
     if (cached) {
@@ -45,7 +47,7 @@ export class ImageTransformService {
     return transformedBlob;
   }
 
-  private async fetchOriginalBlob(did: Did, cid: string): Promise<BlobData> {
+  private async fetchOriginalBlob(did: Did, cid: string): Promise<ImageBlob> {
     const pdsUrl = await this.resolvePdsService.resolve(did);
     return await this.blobFetcher.fetchBlob(pdsUrl, did, cid);
   }

@@ -1,10 +1,10 @@
 import { LRUCache } from "lru-cache";
 
 import type { IBlobCacheRepository } from "../application/interfaces/blob-cache-repository.js";
-import type { BlobData } from "../domain/blob-data.js";
+import type { ImageBlob } from "../domain/blob-data.js";
 
 export class BlobCacheRepository implements IBlobCacheRepository {
-  private cache: LRUCache<string, BlobData>;
+  private cache: LRUCache<string, ImageBlob>;
 
   constructor() {
     this.cache = new LRUCache({
@@ -13,11 +13,11 @@ export class BlobCacheRepository implements IBlobCacheRepository {
     });
   }
 
-  get(key: string): Promise<BlobData | undefined> {
+  get(key: string): Promise<ImageBlob | undefined> {
     return Promise.resolve(this.cache.get(key));
   }
 
-  set(key: string, value: BlobData): Promise<void> {
+  set(key: string, value: ImageBlob): Promise<void> {
     this.cache.set(key, value);
     return Promise.resolve();
   }
