@@ -1,7 +1,7 @@
 import { LRUCache } from "lru-cache";
 
 import type { IBlobCacheRepository } from "../application/interfaces/blob-cache-repository.js";
-import type { ImageBlob } from "../domain/blob-data.js";
+import type { ImageBlob } from "../domain/image-blob.js";
 
 export class BlobCacheRepository implements IBlobCacheRepository {
   private cache: LRUCache<string, ImageBlob>;

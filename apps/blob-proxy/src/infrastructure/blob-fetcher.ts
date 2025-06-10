@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import { AtpBaseClient } from "@repo/client/api";
 
 import type { IBlobFetcher } from "../application/interfaces/blob-fetcher.js";
-import { ImageBlob } from "../domain/blob-data.js";
+import { ImageBlob } from "../domain/image-blob.js";
 
 export class BlobFetcher implements IBlobFetcher {
   async fetchBlob(pdsUrl: string, did: Did, cid: string): Promise<ImageBlob> {

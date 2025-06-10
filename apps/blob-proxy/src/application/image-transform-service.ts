@@ -1,6 +1,6 @@
 import type { IMetricReporter } from "@repo/common/domain";
 
-import type { ImageBlob } from "../domain/blob-data.js";
+import type { ImageBlob } from "../domain/image-blob.js";
 import { ImagePreset } from "../domain/image-preset.js";
 import type { ImageTransformRequest } from "../domain/image-transform-request.js";
 import type { ImageTransformationService } from "../domain/services/image-transformation-service.js";

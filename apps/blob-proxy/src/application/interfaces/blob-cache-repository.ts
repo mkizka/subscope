@@ -1,4 +1,4 @@
-import type { ImageBlob } from "../../domain/blob-data.js";
+import type { ImageBlob } from "../../domain/image-blob.js";
 
 export interface IBlobCacheRepository {
   get: (key: string) => Promise<ImageBlob | undefined>;

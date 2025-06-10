@@ -1,6 +1,6 @@
 import sharp from "sharp";
 
-import { ImageBlob } from "../blob-data.js";
+import { ImageBlob } from "../image-blob.js";
 import type { ImagePreset } from "../image-preset.js";
 
 export class ImageTransformationService {
