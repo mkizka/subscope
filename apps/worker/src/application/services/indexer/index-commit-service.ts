@@ -14,6 +14,7 @@ import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexLikeService } from "./index-like-service.js";
 import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
+import type { IndexRepostService } from "./index-repost-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
 
 type IndexCollectionServiceMap = {
@@ -35,10 +36,12 @@ export class IndexCommitService {
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
     indexLikeService: IndexLikeService,
+    indexRepostService: IndexRepostService,
     indexSubscriptionService: IndexSubscriptionService,
   ) {
     this.services = {
       "app.bsky.feed.post": indexPostService,
+      "app.bsky.feed.repost": indexRepostService,
       "app.bsky.actor.profile": indexProfileService,
       "app.bsky.graph.follow": indexFollowService,
       "app.bsky.feed.like": indexLikeService,
@@ -52,6 +55,7 @@ export class IndexCommitService {
     "indexProfileService",
     "indexFollowService",
     "indexLikeService",
+    "indexRepostService",
     "indexSubscriptionService",
   ] as const;
 
