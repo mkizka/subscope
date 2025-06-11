@@ -9,11 +9,7 @@ export class SearchActors {
   handle(server: Server) {
     server.app.bsky.actor.searchActors({
       handler: async ({ params }) => {
-        const result = await this.searchActorsUseCase.execute({
-          q: params.q,
-          limit: params.limit,
-          cursor: params.cursor,
-        });
+        const result = await this.searchActorsUseCase.execute(params);
         return {
           encoding: "application/json",
           body: result,
