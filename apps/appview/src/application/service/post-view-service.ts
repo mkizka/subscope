@@ -28,6 +28,7 @@ export class PostViewService {
     "profileViewService",
   ] as const;
 
+  // TODO: 引数をPostの配列にして二重に呼び出さないようにする
   async findPostView(uris: AtUri[]) {
     const posts = await this.postRepository.findByUris(uris);
     const records = await this.recordRepository.findMany(uris);
