@@ -136,9 +136,7 @@ export const reposts = pgTable(
     actorDid: varchar({ length: 256 })
       .notNull()
       .references(() => actors.did),
-    subjectUri: varchar({ length: 256 })
-      .notNull()
-      .references(() => posts.uri),
+    subjectUri: varchar({ length: 256 }).notNull(),
     subjectCid: varchar({ length: 256 }).notNull(),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().defaultNow(),

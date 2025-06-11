@@ -31,7 +31,6 @@ import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRecordFetcher } from "./infrastructure/profile-record-fetcher.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
-import { RecordFetcher } from "./infrastructure/record-fetcher.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
 import { RepostRepository } from "./infrastructure/repost-repository.js";
@@ -57,7 +56,6 @@ createInjector()
   .provideClass("didResolver", DidResolver)
   .provideClass("jobQueue", JobQueue)
   .provideClass("repoFetcher", RepoFetcher)
-  .provideClass("recordFetcher", RecordFetcher)
   .provideClass("profileRecordFetcher", ProfileRecordFetcher)
   .provideClass("actorRepository", ActorRepository)
   .provideClass("profileRepository", ProfileRepository)
