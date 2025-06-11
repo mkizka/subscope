@@ -62,13 +62,18 @@ export class ProfileRepository implements IProfileRepository {
     });
 
     // displayNameまたはhandleにマッチするprofileをフィルタリング
-    const filteredProfiles = profiles.filter(profile => 
-      (profile.displayName && profile.displayName.toLowerCase().includes(query.toLowerCase())) ||
-      (profile.user.handle && profile.user.handle.toLowerCase().includes(query.toLowerCase()))
+    const filteredProfiles = profiles.filter(
+      (profile) =>
+        (profile.displayName &&
+          profile.displayName.toLowerCase().includes(query.toLowerCase())) ||
+        (profile.user.handle &&
+          profile.user.handle.toLowerCase().includes(query.toLowerCase())),
     );
 
     const hasMore = filteredProfiles.length > limit;
-    const resultsToReturn = hasMore ? filteredProfiles.slice(0, limit) : filteredProfiles;
+    const resultsToReturn = hasMore
+      ? filteredProfiles.slice(0, limit)
+      : filteredProfiles;
     const lastProfile =
       resultsToReturn.length > 0
         ? resultsToReturn[resultsToReturn.length - 1]

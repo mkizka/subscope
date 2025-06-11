@@ -8,11 +8,7 @@ export class SearchActorsUseCase {
   ) {}
   static inject = ["profileRepository", "profileViewService"] as const;
 
-  async execute(params: {
-    q?: string;
-    limit?: number;
-    cursor?: string;
-  }) {
+  async execute(params: { q?: string; limit: number; cursor?: string }) {
     const query = params.q;
     if (!query) {
       return {
@@ -21,7 +17,7 @@ export class SearchActorsUseCase {
       };
     }
 
-    const limit = params.limit || 25;
+    const limit = params.limit;
     const searchResult = await this.profileRepository.search(
       query,
       limit,
