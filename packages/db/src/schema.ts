@@ -126,6 +126,30 @@ export const subscriptions = pgTable("subscriptions", {
   indexedAt: timestamp().defaultNow(),
 });
 
+export const reposts = pgTable(
+  "reposts",
+  {
+    uri: varchar({ length: 256 })
+      .primaryKey()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did),
+    subjectUri: varchar({ length: 256 }).notNull(),
+    subjectCid: varchar({ length: 256 }).notNull(),
+    createdAt: timestamp().notNull(),
+    indexedAt: timestamp().defaultNow(),
+    sortAt: timestamp()
+      .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
+      .notNull(),
+  },
+  (table) => [
+    index("reposts_sort_at_idx").on(table.sortAt),
+    index("reposts_subject_uri_idx").on(table.subjectUri),
+  ],
+);
+
 export const postEmbedImages = pgTable("post_embed_images", {
   postUri: varchar({ length: 256 })
     .notNull()

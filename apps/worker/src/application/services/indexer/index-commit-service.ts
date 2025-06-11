@@ -13,6 +13,7 @@ import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
+import type { IndexRepostService } from "./index-repost-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
 
 type IndexCollectionServiceMap = {
@@ -33,10 +34,12 @@ export class IndexCommitService {
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
+    indexRepostService: IndexRepostService,
     indexSubscriptionService: IndexSubscriptionService,
   ) {
     this.services = {
       "app.bsky.feed.post": indexPostService,
+      "app.bsky.feed.repost": indexRepostService,
       "app.bsky.actor.profile": indexProfileService,
       "app.bsky.graph.follow": indexFollowService,
       "dev.mkizka.test.subscription": indexSubscriptionService,
@@ -48,6 +51,7 @@ export class IndexCommitService {
     "indexPostService",
     "indexProfileService",
     "indexFollowService",
+    "indexRepostService",
     "indexSubscriptionService",
   ] as const;
 
