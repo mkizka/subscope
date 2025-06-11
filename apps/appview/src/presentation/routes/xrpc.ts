@@ -3,7 +3,6 @@ import { createServer } from "@repo/client/server";
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
-import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { GetJobStatus } from "./dev/mkizka/test/getJobStatus.js";
 
@@ -14,7 +13,6 @@ export class XRPCRouter {
     getProfile: GetProfile,
     getProfiles: GetProfiles,
     getPosts: GetPosts,
-    getPostThread: GetPostThread,
     getTimeline: GetTimeline,
     getJobStatus: GetJobStatus,
   ) {
@@ -22,7 +20,6 @@ export class XRPCRouter {
       getProfile,
       getProfiles,
       getPosts,
-      getPostThread,
       getTimeline,
       getJobStatus,
     ];
@@ -31,7 +28,6 @@ export class XRPCRouter {
     "getProfile",
     "getProfiles",
     "getPosts",
-    "getPostThread",
     "getTimeline",
     "getJobStatus",
   ] as const;

@@ -4,7 +4,4 @@ import type { Post } from "@repo/common/domain";
 export interface IPostRepository {
   findMany: (params: { limit: number; cursor?: string }) => Promise<Post[]>;
   findByUris: (uris: AtUri[]) => Promise<Post[]>;
-  findByUri: (uri: AtUri) => Promise<Post | null>;
-  findReplies: (uri: AtUri, depth: number) => Promise<Post[]>;
-  findParents: (uri: AtUri, parentHeight: number) => Promise<Post[]>;
 }

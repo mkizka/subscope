@@ -2,7 +2,7 @@ import { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
 import { Post, PostEmbedExternal, PostEmbedImage } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, eq, inArray, lt, or } from "drizzle-orm";
+import { and, inArray, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
@@ -109,77 +109,5 @@ export class PostRepository implements IPostRepository {
       },
     });
     return postsWithEmbeds.map((post) => this.convertToPost(post));
-  }
-
-  async findByUri(uri: AtUri) {
-    const post = await this.db.query.posts.findFirst({
-      where: eq(schema.posts.uri, uri.toString()),
-      with: {
-        embedImages: {
-          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
-        },
-        embedExternal: true,
-      },
-    });
-    return post ? this.convertToPost(post) : null;
-  }
-
-  async findReplies(uri: AtUri, depth: number) {
-    if (depth <= 0) return [];
-
-    const postsWithEmbeds = await this.db.query.posts.findMany({
-      where: or(
-        eq(schema.posts.replyParentUri, uri.toString()),
-        eq(schema.posts.replyRootUri, uri.toString()),
-      ),
-      with: {
-        embedImages: {
-          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
-        },
-        embedExternal: true,
-      },
-    });
-    return postsWithEmbeds.map((post) => this.convertToPost(post));
-  }
-
-  private async findPostWithEmbeds(uri: string) {
-    return await this.db.query.posts.findFirst({
-      where: eq(schema.posts.uri, uri),
-      with: {
-        embedImages: {
-          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
-        },
-        embedExternal: true,
-      },
-    });
-  }
-
-  async findParents(uri: AtUri, parentHeight: number): Promise<Post[]> {
-    if (parentHeight <= 0) return [];
-
-    const findParentRecursive = async (
-      currentUri: string,
-      remainingHeight: number,
-    ): Promise<Post[]> => {
-      if (remainingHeight <= 0) return [];
-
-      const post = await this.findPostWithEmbeds(currentUri);
-
-      if (!post || !post.replyParentUri) return [];
-
-      const parentPost = await this.findPostWithEmbeds(post.replyParentUri);
-
-      if (!parentPost) return [];
-
-      const convertedParent = this.convertToPost(parentPost);
-      const ancestorParents = await findParentRecursive(
-        post.replyParentUri,
-        remainingHeight - 1,
-      );
-
-      return [...ancestorParents, convertedParent];
-    };
-
-    return await findParentRecursive(uri.toString(), parentHeight);
   }
 }
