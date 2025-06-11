@@ -15,7 +15,7 @@ export class RecordFetcher implements IRecordFetcher {
     try {
       // URIからDIDを抽出
       const did = asDid(uri.hostname);
-
+      
       // DIDからPDSを解決
       const { pds } = await this.didResolver.resolve(did);
       const client = new AtpBaseClient(pds);

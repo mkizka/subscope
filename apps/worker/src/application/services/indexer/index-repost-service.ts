@@ -21,7 +21,7 @@ export class IndexRepostService implements IIndexCollectionService {
   ) {}
   static inject = [
     "repostRepository",
-    "subscriptionRepository",
+    "subscriptionRepository", 
     "recordFetcher",
     "recordRepository",
     "indexActorService",
@@ -30,20 +30,17 @@ export class IndexRepostService implements IIndexCollectionService {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const repost = Repost.from(record);
-
+    
     // subjectのpostを先にインデックス
     await this.indexSubjectPost(ctx, repost);
-
+    
     await this.repostRepository.upsert({ ctx, repost });
   }
 
-  private async indexSubjectPost(
-    ctx: TransactionContext,
-    repost: Repost,
-  ): Promise<void> {
+  private async indexSubjectPost(ctx: TransactionContext, repost: Repost): Promise<void> {
     try {
       const subjectUri = new AtUri(repost.subjectUri);
-
+      
       // subjectのpostレコードを取得
       const subjectRecord = await this.recordFetcher.fetch(subjectUri);
       if (!subjectRecord || subjectRecord.collection !== "app.bsky.feed.post") {
