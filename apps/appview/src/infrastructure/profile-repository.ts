@@ -1,8 +1,6 @@
 import { type Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { ProfileDetailed } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { and, eq, gt, ilike, or } from "drizzle-orm";
 
 import type {
   IProfileRepository,
@@ -47,44 +45,30 @@ export class ProfileRepository implements IProfileRepository {
     cursor?: string,
   ): Promise<SearchResult> {
     const searchTerm = `%${query}%`;
-    const cursorCondition = cursor
-      ? gt(schema.profiles.indexedAt, new Date(cursor))
-      : undefined;
 
-    const whereConditions = [
-      or(
-        ilike(schema.profiles.displayName, searchTerm),
-        ilike(schema.actors.handle, searchTerm),
-      ),
-    ];
+    const profiles = await this.db.query.profiles.findMany({
+      where: (profiles, { and, gt }) => {
+        const conditions = [];
+        if (cursor) {
+          conditions.push(gt(profiles.indexedAt, new Date(cursor)));
+        }
+        return conditions.length > 0 ? and(...conditions) : undefined;
+      },
+      with: {
+        user: true,
+        avatar: true,
+      },
+      orderBy: (profiles, { asc }) => asc(profiles.indexedAt),
+    });
 
-    if (cursorCondition) {
-      whereConditions.push(cursorCondition);
-    }
+    // displayNameまたはhandleにマッチするprofileをフィルタリング
+    const filteredProfiles = profiles.filter(profile => 
+      (profile.displayName && profile.displayName.toLowerCase().includes(query.toLowerCase())) ||
+      (profile.user.handle && profile.user.handle.toLowerCase().includes(query.toLowerCase()))
+    );
 
-    const profiles = await this.db
-      .select({
-        uri: schema.profiles.uri,
-        cid: schema.profiles.cid,
-        actorDid: schema.profiles.actorDid,
-        displayName: schema.profiles.displayName,
-        description: schema.profiles.description,
-        createdAt: schema.profiles.createdAt,
-        indexedAt: schema.profiles.indexedAt,
-        handle: schema.actors.handle,
-        avatarCid: schema.blobs.cid,
-        avatarMimeType: schema.blobs.mimeType,
-        avatarSize: schema.blobs.size,
-      })
-      .from(schema.profiles)
-      .innerJoin(schema.actors, eq(schema.profiles.actorDid, schema.actors.did))
-      .leftJoin(schema.blobs, eq(schema.profiles.avatarCid, schema.blobs.cid))
-      .where(and(...whereConditions))
-      .orderBy(schema.profiles.indexedAt)
-      .limit(limit + 1);
-
-    const hasMore = profiles.length > limit;
-    const resultsToReturn = hasMore ? profiles.slice(0, limit) : profiles;
+    const hasMore = filteredProfiles.length > limit;
+    const resultsToReturn = hasMore ? filteredProfiles.slice(0, limit) : filteredProfiles;
     const lastProfile =
       resultsToReturn.length > 0
         ? resultsToReturn[resultsToReturn.length - 1]
@@ -100,12 +84,12 @@ export class ProfileRepository implements IProfileRepository {
           uri: profile.uri,
           cid: profile.cid,
           actorDid: profile.actorDid,
-          handle: profile.handle,
-          avatar: profile.avatarCid
+          handle: profile.user.handle,
+          avatar: profile.avatar
             ? {
-                cid: profile.avatarCid,
-                mimeType: profile.avatarMimeType!,
-                size: profile.avatarSize!,
+                cid: profile.avatar.cid,
+                mimeType: profile.avatar.mimeType,
+                size: profile.avatar.size,
               }
             : undefined,
           description: profile.description,
