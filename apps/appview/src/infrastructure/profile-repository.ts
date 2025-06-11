@@ -55,7 +55,6 @@ export class ProfileRepository implements IProfileRepository {
       or(
         ilike(schema.profiles.displayName, searchTerm),
         ilike(schema.actors.handle, searchTerm),
-        ilike(schema.profiles.description, searchTerm),
       ),
     ];
 
