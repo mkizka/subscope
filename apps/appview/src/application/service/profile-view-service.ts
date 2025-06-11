@@ -44,6 +44,24 @@ export class ProfileViewService {
     };
   }
 
+  private createProfileView(
+    profile: ProfileDetailed,
+  ): AppBskyActorDefs.ProfileView {
+    return {
+      $type: "app.bsky.actor.defs#profileView",
+      did: profile.actorDid,
+      handle: profile.handle?.toString() ?? "handle.invalid",
+      displayName: profile.displayName ?? undefined,
+      description: profile.description ?? undefined,
+      avatar: this.getAvatarThumbnailUrl(profile),
+      // associated?: ProfileAssociated
+      // viewer?: ViewerState
+      // labels?: ComAtprotoLabelDefs.Label[]
+      createdAt: profile.createdAt?.toISOString(),
+      indexedAt: profile.indexedAt?.toISOString(),
+    };
+  }
+
   private createProfileViewDetailed(
     profile: ProfileDetailed,
   ): AppBskyActorDefs.ProfileViewDetailed {
@@ -69,6 +87,10 @@ export class ProfileViewService {
   async findProfileViewDetailed(handleOrDids: HandleOrDid[]) {
     const profiles = await this.findProfile(handleOrDids);
     return profiles.map((profile) => this.createProfileViewDetailed(profile));
+  }
+
+  convertToProfileViews(profiles: ProfileDetailed[]) {
+    return profiles.map((profile) => this.createProfileView(profile));
   }
 
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {

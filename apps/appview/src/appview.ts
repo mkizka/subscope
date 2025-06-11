@@ -13,6 +13,7 @@ import { GetJobStatusUseCase } from "./application/get-job-status-use-case.js";
 import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
+import { SearchActorsUseCase } from "./application/search-actors-use-case.js";
 import { AuthVerifierService } from "./application/service/auth-verifier-service.js";
 import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
@@ -24,6 +25,7 @@ import { RecordRepository } from "./infrastructure/record-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
+import { SearchActors } from "./presentation/routes/app/bsky/actor/searchActors.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
 import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
@@ -59,9 +61,11 @@ createInjector()
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
+  .provideClass("searchActorsUseCase", SearchActorsUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
+  .provideClass("searchActors", SearchActors)
   .provideClass("getPosts", GetPosts)
   .provideClass("getTimeline", GetTimeline)
   .provideClass("getJobStatus", GetJobStatus)
