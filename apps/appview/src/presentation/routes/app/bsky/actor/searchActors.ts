@@ -11,7 +11,7 @@ export class SearchActors {
       handler: async ({ params }) => {
         const result = await this.searchActorsUseCase.execute({
           q: params.q,
-          limit: params.limit || 25,
+          limit: params.limit,
           cursor: params.cursor,
         });
         return {
