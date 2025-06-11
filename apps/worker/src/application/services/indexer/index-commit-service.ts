@@ -11,6 +11,7 @@ import type { IRecordRepository } from "../../interfaces/repositories/record-rep
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
+import type { IndexLikeService } from "./index-like-service.js";
 import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
 import type { IndexRepostService } from "./index-repost-service.js";
@@ -34,6 +35,7 @@ export class IndexCommitService {
     indexPostService: IndexPostService,
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
+    indexLikeService: IndexLikeService,
     indexRepostService: IndexRepostService,
     indexSubscriptionService: IndexSubscriptionService,
   ) {
@@ -42,6 +44,7 @@ export class IndexCommitService {
       "app.bsky.feed.repost": indexRepostService,
       "app.bsky.actor.profile": indexProfileService,
       "app.bsky.graph.follow": indexFollowService,
+      "app.bsky.feed.like": indexLikeService,
       "dev.mkizka.test.subscription": indexSubscriptionService,
     };
   }
@@ -51,6 +54,7 @@ export class IndexCommitService {
     "indexPostService",
     "indexProfileService",
     "indexFollowService",
+    "indexLikeService",
     "indexRepostService",
     "indexSubscriptionService",
   ] as const;
