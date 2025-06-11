@@ -13,6 +13,7 @@ import { createInjector } from "typed-inject";
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
 import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
 import { IndexFollowService } from "./application/services/indexer/index-follow-service.js";
+import { IndexLikeService } from "./application/services/indexer/index-like-service.js";
 import { IndexPostService } from "./application/services/indexer/index-post-service.js";
 import { IndexProfileService } from "./application/services/indexer/index-profile-service.js";
 import { IndexSubscriptionService } from "./application/services/indexer/index-subscription-service.js";
@@ -27,6 +28,7 @@ import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
+import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRecordFetcher } from "./infrastructure/profile-record-fetcher.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
@@ -60,6 +62,7 @@ createInjector()
   .provideClass("postRepository", PostRepository)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("followRepository", FollowRepository)
+  .provideClass("likeRepository", LikeRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
   // application(service)
   .provideClass("resolveDidService", ResolveDidService)
@@ -69,6 +72,7 @@ createInjector()
   .provideClass("indexPostService", IndexPostService)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("indexFollowService", IndexFollowService)
+  .provideClass("indexLikeService", IndexLikeService)
   .provideClass("indexSubscriptionService", IndexSubscriptionService)
   .provideClass("indexCommitService", IndexCommitService)
   // application(use-case)
