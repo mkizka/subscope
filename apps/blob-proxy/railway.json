@@ -10,6 +10,7 @@
     ]
   },
   "deploy": {
+    "preDeployCommand": "pnpm db:migrate",
     "startCommand": "pnpm --filter @repo/blob-proxy start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
