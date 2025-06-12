@@ -81,12 +81,12 @@ importers:
         specifier: 3.4.1
         version: 3.4.1(zod@3.25.56)
     devDependencies:
-      '@repo/test-utils':
-        specifier: workspace:*
-        version: link:../../packages/test-utils
       '@mkizka/eslint-config':
         specifier: 6.0.2
         version: 6.0.2(@typescript-eslint/eslint-plugin@8.33.1(@typescript-eslint/parser@8.33.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
+      '@repo/test-utils':
+        specifier: workspace:*
+        version: link:../../packages/test-utils
       '@tsconfig/node-lts':
         specifier: 22.0.1
         version: 22.0.1
@@ -129,6 +129,12 @@ importers:
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      drizzle-orm:
+        specifier: 0.44.2
+        version: 0.44.2(@opentelemetry/api@1.9.0)(@prisma/client@6.1.0(prisma@6.1.0))(@types/pg@8.15.4)(gel@2.0.1)(mysql2@3.12.0)(pg@8.16.0)(postgres@3.4.7)(prisma@6.1.0)
       express:
         specifier: 5.1.0
         version: 5.1.0
@@ -138,6 +144,9 @@ importers:
       lru-cache:
         specifier: ^11.1.0
         version: 11.1.0
+      pg:
+        specifier: 8.16.0
+        version: 8.16.0
       pino-http:
         specifier: 10.5.0
         version: 10.5.0
@@ -334,12 +343,12 @@ importers:
         specifier: 3.4.1
         version: 3.4.1(zod@3.25.56)
     devDependencies:
-      '@repo/test-utils':
-        specifier: workspace:*
-        version: link:../../packages/test-utils
       '@mkizka/eslint-config':
         specifier: 6.0.2
         version: 6.0.2(@typescript-eslint/eslint-plugin@8.33.1(@typescript-eslint/parser@8.33.1(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.28.0(jiti@1.21.7))(typescript@5.8.3)
+      '@repo/test-utils':
+        specifier: workspace:*
+        version: link:../../packages/test-utils
       '@skyware/jetstream':
         specifier: 0.2.2
         version: 0.2.2(@atcute/client@2.0.3)
@@ -431,15 +440,15 @@ importers:
       '@atproto/syntax':
         specifier: 0.4.0
         version: 0.4.0
+      '@keyv/redis':
+        specifier: 4.4.0
+        version: 4.4.0(keyv@5.3.3)
       '@repo/client':
         specifier: workspace:*
         version: link:../client
       '@repo/db':
         specifier: workspace:*
         version: link:../db
-      '@keyv/redis':
-        specifier: 4.4.0
-        version: 4.4.0(keyv@5.3.3)
       bullmq:
         specifier: 5.53.2
         version: 5.53.2

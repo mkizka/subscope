@@ -16,6 +16,16 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default("redis://localhost:6379"),
   }),
+  DATABASE_URL: match({
+    prod: z.string(),
+    dev: z
+      .url()
+      .default("postgresql://postgres:password@localhost:5432/postgres"),
+  }),
+  BLOB_CACHE_DIR: match({
+    prod: z.string(),
+    dev: z.string().default("./cache"),
+  }),
 });
 
 export const env = (() => {

@@ -33,7 +33,7 @@ export class ImageTransformRequest {
   }
 
   getCacheKey(): string {
-    return `${this.preset.type}/${this.did}/${this.cid}/`;
+    return `${this.preset.type}/${this.did}/${this.cid}`;
   }
 }
 

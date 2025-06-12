@@ -243,6 +243,15 @@ export const postEmbedExternalsRelations = relations(
   }),
 );
 
+export const imageBlobCache = pgTable(
+  "image_blob_cache",
+  {
+    cacheKey: varchar({ length: 512 }).primaryKey(),
+    createdAt: timestamp().notNull().defaultNow(),
+  },
+  (table) => [index("image_blob_cache_created_at_idx").on(table.createdAt)],
+);
+
 export const blobsRelations = relations(blobs, ({ many }) => ({
   profiles: many(profiles),
 }));

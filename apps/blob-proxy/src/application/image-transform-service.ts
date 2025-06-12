@@ -4,27 +4,26 @@ import type { ImageBlob } from "../domain/image-blob.js";
 import type { ImageTransformRequest } from "../domain/image-transform-request.js";
 import type { ImageBlobService } from "../domain/services/image-blob-service.js";
 import type { FetchBlobService } from "./fetch-blob-service.js";
-import type { IBlobCacheRepository } from "./interfaces/blob-cache-repository.js";
+import type { ImageCacheService } from "./image-cache-service.js";
 
 export class ImageTransformService {
   constructor(
     private fetchBlobService: FetchBlobService,
     private imageBlobService: ImageBlobService,
-    private blobCacheRepository: IBlobCacheRepository,
+    private imageCacheService: ImageCacheService,
     private metricReporter: IMetricReporter,
   ) {}
   static inject = [
     "fetchBlobService",
     "imageBlobService",
-    "blobCacheRepository",
+    "imageCacheService",
     "metricReporter",
   ] as const;
 
   async getTransformedImage(
     request: ImageTransformRequest,
   ): Promise<ImageBlob> {
-    const cacheKey = request.getCacheKey();
-    const cached = await this.blobCacheRepository.get(cacheKey);
+    const cached = await this.imageCacheService.get(request);
     if (cached) {
       this.metricReporter.increment("blob_proxy_cache_hit_total");
       return cached;
@@ -40,7 +39,7 @@ export class ImageTransformService {
       preset: request.preset,
     });
 
-    await this.blobCacheRepository.set(cacheKey, transformedBlob);
+    await this.imageCacheService.set(request, transformedBlob);
     return transformedBlob;
   }
 }
