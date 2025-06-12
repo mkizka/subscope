@@ -1,6 +1,6 @@
 import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 
 import type { ICacheMetadataRepository } from "../application/interfaces/cache-metadata-repository.js";
 import { CacheMetadata } from "../domain/cache-metadata.js";
@@ -38,5 +38,14 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
     await this.db
       .delete(schema.imageBlobCache)
       .where(eq(schema.imageBlobCache.cacheKey, key));
+  }
+
+  async findExpiredEntries(expirationDate: Date): Promise<CacheMetadata[]> {
+    const rows = await this.db
+      .select()
+      .from(schema.imageBlobCache)
+      .where(lt(schema.imageBlobCache.createdAt, expirationDate));
+
+    return rows.map((row) => new CacheMetadata(row));
   }
 }

@@ -8,6 +8,8 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { CacheCleanupService } from "./application/cache-cleanup-service.js";
+import { CacheScheduler } from "./application/cache-scheduler.js";
 import { FetchBlobService } from "./application/fetch-blob-service.js";
 import { ImageCacheService } from "./application/image-cache-service.js";
 import { ImageTransformService } from "./application/image-transform-service.js";
@@ -41,6 +43,8 @@ createInjector()
   .provideClass("fetchBlobService", FetchBlobService)
   .provideClass("imageCacheService", ImageCacheService)
   .provideClass("imageTransformService", ImageTransformService)
+  .provideClass("cacheCleanupService", CacheCleanupService)
+  .provideClass("cacheScheduler", CacheScheduler)
   // presentation
   .provideFactory("imagesRouter", imagesRouterFactory)
   .injectClass(BlobProxyServer)

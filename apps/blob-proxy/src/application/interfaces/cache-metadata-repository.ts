@@ -4,4 +4,5 @@ export interface ICacheMetadataRepository {
   get: (key: string) => Promise<CacheMetadata | null>;
   save: (key: string) => Promise<void>;
   delete: (key: string) => Promise<void>;
+  findExpiredEntries: (expirationDate: Date) => Promise<CacheMetadata[]>;
 }
