@@ -17,8 +17,6 @@
     "drizzle-orm": "0.44.2",
     "express": "5.1.0",
     "express-prom-bundle": "8.0.0",
-    "lru-cache": "^11.1.0",
-    "pg": "8.16.0",
     "pino-http": "10.5.0",
     "sharp": "0.34.2",
     "typed-inject": "5.0.0",
