@@ -11,10 +11,10 @@ import type { IRecordRepository } from "../../interfaces/repositories/record-rep
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
-import type { IndexLikeService } from "./index-like-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
 import type { IndexRepostService } from "./index-repost-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
+import type { LikeIndexer } from "./like-indexer.js";
 import type { PostIndexer } from "./post-indexer.js";
 
 type IndexCollectionServiceMap = {
@@ -35,7 +35,7 @@ export class IndexCommitService {
     postIndexer: PostIndexer,
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
-    indexLikeService: IndexLikeService,
+    likeIndexer: LikeIndexer,
     indexRepostService: IndexRepostService,
     indexSubscriptionService: IndexSubscriptionService,
   ) {
@@ -44,7 +44,7 @@ export class IndexCommitService {
       "app.bsky.feed.repost": indexRepostService,
       "app.bsky.actor.profile": indexProfileService,
       "app.bsky.graph.follow": indexFollowService,
-      "app.bsky.feed.like": indexLikeService,
+      "app.bsky.feed.like": likeIndexer,
       "dev.mkizka.test.subscription": indexSubscriptionService,
     };
   }
@@ -54,7 +54,7 @@ export class IndexCommitService {
     "postIndexer",
     "indexProfileService",
     "indexFollowService",
-    "indexLikeService",
+    "likeIndexer",
     "indexRepostService",
     "indexSubscriptionService",
   ] as const;
