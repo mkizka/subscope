@@ -12,10 +12,10 @@ import type { IIndexCollectionService } from "../../interfaces/services/index-co
 import type { IndexActorService } from "./index-actor-service.js";
 import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexLikeService } from "./index-like-service.js";
-import type { IndexPostService } from "./index-post-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
 import type { IndexRepostService } from "./index-repost-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
+import type { PostIndexer } from "./post-indexer.js";
 
 type IndexCollectionServiceMap = {
   [key in SupportedCollection]: IIndexCollectionService;
@@ -32,7 +32,7 @@ export class IndexCommitService {
   constructor(
     private readonly recordRepository: IRecordRepository,
     private readonly indexActorService: IndexActorService,
-    indexPostService: IndexPostService,
+    postIndexer: PostIndexer,
     indexProfileService: IndexProfileService,
     indexFollowService: IndexFollowService,
     indexLikeService: IndexLikeService,
@@ -40,7 +40,7 @@ export class IndexCommitService {
     indexSubscriptionService: IndexSubscriptionService,
   ) {
     this.services = {
-      "app.bsky.feed.post": indexPostService,
+      "app.bsky.feed.post": postIndexer,
       "app.bsky.feed.repost": indexRepostService,
       "app.bsky.actor.profile": indexProfileService,
       "app.bsky.graph.follow": indexFollowService,
@@ -51,7 +51,7 @@ export class IndexCommitService {
   static inject = [
     "recordRepository",
     "indexActorService",
-    "indexPostService",
+    "postIndexer",
     "indexProfileService",
     "indexFollowService",
     "indexLikeService",

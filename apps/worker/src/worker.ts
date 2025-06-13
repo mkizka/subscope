@@ -10,14 +10,15 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { PostIndexingPolicy } from "./application/domain/post-indexing-policy.js";
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
 import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
 import { IndexFollowService } from "./application/services/indexer/index-follow-service.js";
 import { IndexLikeService } from "./application/services/indexer/index-like-service.js";
-import { IndexPostService } from "./application/services/indexer/index-post-service.js";
 import { IndexProfileService } from "./application/services/indexer/index-profile-service.js";
 import { IndexRepostService } from "./application/services/indexer/index-repost-service.js";
 import { IndexSubscriptionService } from "./application/services/indexer/index-subscription-service.js";
+import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { BackfillService } from "./application/services/scheduler/backfill-service.js";
 import { FetchProfileService } from "./application/services/scheduler/fetch-profile-service.js";
 import { ResolveDidService } from "./application/services/scheduler/resolve-did-service.js";
@@ -71,8 +72,9 @@ createInjector()
   .provideClass("resolveDidService", ResolveDidService)
   .provideClass("backfillService", BackfillService)
   .provideClass("fetchProfileService", FetchProfileService)
+  .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("indexProfileService", IndexProfileService)
-  .provideClass("indexPostService", IndexPostService)
+  .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("indexFollowService", IndexFollowService)
   .provideClass("indexLikeService", IndexLikeService)

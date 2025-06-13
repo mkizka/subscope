@@ -1,87 +1,29 @@
 import type { TransactionContext } from "@repo/common/domain";
-import { Record } from "@repo/common/domain";
+import { Post, Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { PostRepository } from "../../../infrastructure/post-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { IndexPostService } from "./index-post-service.js";
+import { PostRepository } from "../../infrastructure/post-repository.js";
+import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import { PostIndexingPolicy } from "./post-indexing-policy.js";
 
-let indexPostService: IndexPostService;
+let postIndexingPolicy: PostIndexingPolicy;
 let ctx: TransactionContext;
 
 const { getSetup } = setupTestDatabase();
 
 beforeAll(() => {
   const testSetup = getSetup();
-  indexPostService = testSetup.testInjector
+  postIndexingPolicy = testSetup.testInjector
     .provideClass("postRepository", PostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .injectClass(IndexPostService);
+    .injectClass(PostIndexingPolicy);
   ctx = testSetup.ctx;
 });
 
-describe("IndexPostService", () => {
-  describe("upsert", () => {
-    it("subscriberの投稿は実際にDBに保存される", async () => {
-      // Arrange
-      // subscriberとしてactor情報を準備
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:123",
-        handle: "test.bsky.social",
-      });
-      // subscriptionレコード用のrecordsテーブルエントリ
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:123",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:123",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
-      // 投稿レコード用のrecordsテーブルエントリ
-      const postJson = {
-        $type: "app.bsky.feed.post",
-        text: "test post",
-        createdAt: new Date().toISOString(),
-      };
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:123/app.bsky.feed.post/123",
-        cid: "abc123",
-        actorDid: "did:plc:123",
-        json: postJson,
-      });
-      const record = Record.fromJson({
-        uri: "at://did:plc:123/app.bsky.feed.post/123",
-        cid: "abc123",
-        json: postJson,
-      });
-
-      // Act
-      await indexPostService.upsert({ ctx, record });
-
-      // Assert
-      const [post] = await ctx.db
-        .select()
-        .from(schema.posts)
-        .where(eq(schema.posts.uri, record.uri.toString()))
-        .limit(1);
-      expect(post).toBeDefined();
-    });
-  });
-
-  describe("shouldSave", () => {
+describe("PostIndexingPolicy", () => {
+  describe("shouldIndex", () => {
     it("subscriberの投稿は保存すべき", async () => {
       // Arrange
       await ctx.db.insert(schema.actors).values({
@@ -118,7 +60,10 @@ describe("IndexPostService", () => {
       });
 
       // Act
-      const result = await indexPostService.shouldSave({ ctx, record });
+      const result = await postIndexingPolicy.shouldIndex(
+        ctx,
+        Post.from(record),
+      );
 
       // Assert
       expect(result).toBe(true);
@@ -186,7 +131,10 @@ describe("IndexPostService", () => {
       });
 
       // Act
-      const result = await indexPostService.shouldSave({ ctx, record });
+      const result = await postIndexingPolicy.shouldIndex(
+        ctx,
+        Post.from(record),
+      );
 
       // Assert
       expect(result).toBe(true);
@@ -247,7 +195,10 @@ describe("IndexPostService", () => {
       });
 
       // Act
-      const result = await indexPostService.shouldSave({ ctx, record });
+      const result = await postIndexingPolicy.shouldIndex(
+        ctx,
+        Post.from(record),
+      );
 
       // Assert
       expect(result).toBe(true);
@@ -272,7 +223,10 @@ describe("IndexPostService", () => {
       });
 
       // Act
-      const result = await indexPostService.shouldSave({ ctx, record });
+      const result = await postIndexingPolicy.shouldIndex(
+        ctx,
+        Post.from(record),
+      );
 
       // Assert
       expect(result).toBe(false);
@@ -307,112 +261,13 @@ describe("IndexPostService", () => {
       });
 
       // Act
-      const result = await indexPostService.shouldSave({ ctx, record });
+      const result = await postIndexingPolicy.shouldIndex(
+        ctx,
+        Post.from(record),
+      );
 
       // Assert
       expect(result).toBe(false);
-    });
-
-    it("画像を含む投稿が正しく保存される", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:imageuser",
-        handle: "imageuser.bsky.social",
-      });
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:imageuser/dev.mkizka.test.subscription/sub",
-        cid: "sub123",
-        actorDid: "did:plc:imageuser",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:imageuser/dev.mkizka.test.subscription/sub",
-        cid: "sub123",
-        actorDid: "did:plc:imageuser",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
-
-      const postWithImagesJson = {
-        $type: "app.bsky.feed.post",
-        text: "Check out these images!",
-        embed: {
-          $type: "app.bsky.embed.images",
-          images: [
-            {
-              alt: "First image",
-              image: {
-                $type: "blob",
-                ref: {
-                  $link:
-                    "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
-                },
-                mimeType: "image/jpeg",
-                size: 123456,
-              },
-            },
-            {
-              alt: "Second image",
-              image: {
-                $type: "blob",
-                ref: {
-                  $link:
-                    "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
-                },
-                mimeType: "image/png",
-                size: 234567,
-              },
-            },
-          ],
-        },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: "at://did:plc:imageuser/app.bsky.feed.post/img123",
-        cid: "bafyreigimage123",
-        json: postWithImagesJson,
-      });
-
-      // recordsテーブルにも挿入（外部キー制約のため）
-      await ctx.db.insert(schema.records).values({
-        uri: record.uri.toString(),
-        cid: record.cid,
-        actorDid: record.actorDid,
-        json: postWithImagesJson,
-      });
-
-      // Act
-      await indexPostService.upsert({ ctx, record });
-
-      // Assert
-      const savedPost = await ctx.db
-        .select()
-        .from(schema.posts)
-        .where(eq(schema.posts.uri, record.uri.toString()));
-      expect(savedPost).toHaveLength(1);
-      expect(savedPost[0]?.text).toBe("Check out these images!");
-
-      const savedImages = await ctx.db
-        .select()
-        .from(schema.postEmbedImages)
-        .where(eq(schema.postEmbedImages.postUri, record.uri.toString()));
-      expect(savedImages).toHaveLength(2);
-      expect(savedImages[0]).toMatchObject({
-        postUri: record.uri.toString(),
-        cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
-        position: 0,
-        alt: "First image",
-      });
-      expect(savedImages[1]).toMatchObject({
-        postUri: record.uri.toString(),
-        cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
-        position: 1,
-        alt: "Second image",
-      });
     });
   });
 });

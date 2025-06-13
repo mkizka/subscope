@@ -57,6 +57,21 @@ export class Post {
     this.sortAt = params.sortAt ?? null;
   }
 
+  isReply(): boolean {
+    return this.replyParent !== null || this.replyRoot !== null;
+  }
+
+  getReplyTargetUris(): string[] {
+    const uris = new Set<string>();
+    if (this.replyParent) {
+      uris.add(this.replyParent.uri.toString());
+    }
+    if (this.replyRoot) {
+      uris.add(this.replyRoot.uri.toString());
+    }
+    return Array.from(uris);
+  }
+
   static from(record: Record) {
     const parsed = record.validate("app.bsky.feed.post");
 
