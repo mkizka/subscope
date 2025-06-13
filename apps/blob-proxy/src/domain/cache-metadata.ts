@@ -1,3 +1,7 @@
+import path from "path";
+
+import { env } from "../shared/env.js";
+
 export class CacheMetadata {
   readonly cacheKey: string;
   readonly createdAt: Date;
@@ -8,6 +12,6 @@ export class CacheMetadata {
   }
 
   getPath(): string {
-    return `${this.cacheKey}.jpg`;
+    return path.join(env.BLOB_CACHE_DIR, `${this.cacheKey}.jpg`);
   }
 }
