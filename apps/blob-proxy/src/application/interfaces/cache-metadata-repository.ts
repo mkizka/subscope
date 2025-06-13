@@ -2,7 +2,7 @@ import type { CacheMetadata } from "../../domain/cache-metadata.js";
 
 export interface ICacheMetadataRepository {
   get: (key: string) => Promise<CacheMetadata | null>;
-  save: (key: string) => Promise<void>;
+  save: (key: string) => Promise<CacheMetadata>;
   delete: (key: string) => Promise<void>;
   findExpiredEntries: (expirationDate: Date) => Promise<CacheMetadata[]>;
 }

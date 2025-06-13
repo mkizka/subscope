@@ -29,7 +29,7 @@ export class CacheCleanupService {
     let deletedCount = 0;
     for (const entry of expiredEntries) {
       try {
-        await this.imageStorage.remove(entry.cacheKey);
+        await this.imageStorage.remove(entry.getPath());
         await this.cacheMetadataRepository.delete(entry.cacheKey);
         deletedCount++;
       } catch (error) {

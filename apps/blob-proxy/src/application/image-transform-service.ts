@@ -23,7 +23,8 @@ export class ImageTransformService {
   async getTransformedImage(
     request: ImageTransformRequest,
   ): Promise<ImageBlob> {
-    const cached = await this.imageCacheService.get(request);
+    const cacheKey = request.getCacheKey();
+    const cached = await this.imageCacheService.get(cacheKey);
     if (cached) {
       this.metricReporter.increment("blob_proxy_cache_hit_total");
       return cached;
@@ -39,7 +40,7 @@ export class ImageTransformService {
       preset: request.preset,
     });
 
-    await this.imageCacheService.set(request, transformedBlob);
+    await this.imageCacheService.set(cacheKey, transformedBlob);
     return transformedBlob;
   }
 }

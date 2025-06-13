@@ -6,4 +6,8 @@ export class CacheMetadata {
     this.cacheKey = params.cacheKey;
     this.createdAt = params.createdAt;
   }
+
+  getPath(): string {
+    return `${this.cacheKey}.jpg`;
+  }
 }

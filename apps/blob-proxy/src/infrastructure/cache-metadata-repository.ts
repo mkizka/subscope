@@ -1,4 +1,5 @@
 import type { DatabaseClient } from "@repo/common/domain";
+import { required } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { eq, lt } from "drizzle-orm";
 
@@ -19,7 +20,7 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
     return row ? new CacheMetadata(row) : null;
   }
 
-  async save(key: string): Promise<void> {
+  async save(key: string): Promise<CacheMetadata> {
     await this.db
       .insert(schema.imageBlobCache)
       .values({
@@ -32,6 +33,7 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
           createdAt: new Date(),
         },
       });
+    return required(await this.get(key));
   }
 
   async delete(key: string): Promise<void> {
