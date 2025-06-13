@@ -13,14 +13,15 @@ import { createInjector } from "typed-inject";
 import { FollowIndexingPolicy } from "./application/domain/follow-indexing-policy.js";
 import { LikeIndexingPolicy } from "./application/domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "./application/domain/post-indexing-policy.js";
+import { RepostIndexingPolicy } from "./application/domain/repost-indexing-policy.js";
 import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
 import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
 import { IndexProfileService } from "./application/services/indexer/index-profile-service.js";
-import { IndexRepostService } from "./application/services/indexer/index-repost-service.js";
 import { IndexSubscriptionService } from "./application/services/indexer/index-subscription-service.js";
 import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
+import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
 import { BackfillService } from "./application/services/scheduler/backfill-service.js";
 import { FetchProfileService } from "./application/services/scheduler/fetch-profile-service.js";
 import { ResolveDidService } from "./application/services/scheduler/resolve-did-service.js";
@@ -77,12 +78,13 @@ createInjector()
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
+  .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("followIndexer", FollowIndexer)
   .provideClass("likeIndexer", LikeIndexer)
-  .provideClass("indexRepostService", IndexRepostService)
+  .provideClass("repostIndexer", RepostIndexer)
   .provideClass("indexSubscriptionService", IndexSubscriptionService)
   .provideClass("indexCommitService", IndexCommitService)
   // application(use-case)

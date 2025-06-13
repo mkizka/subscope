@@ -1,16 +1,16 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Repost } from "@repo/common/domain";
 
+import type { RepostIndexingPolicy } from "../../domain/repost-indexing-policy.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 
-export class IndexRepostService implements IIndexCollectionService {
+export class RepostIndexer implements IIndexCollectionService {
   constructor(
     private readonly repostRepository: IRepostRepository,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly repostIndexingPolicy: RepostIndexingPolicy,
   ) {}
-  static inject = ["repostRepository", "subscriptionRepository"] as const;
+  static inject = ["repostRepository", "repostIndexingPolicy"] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const repost = Repost.from(record);
@@ -25,15 +25,6 @@ export class IndexRepostService implements IIndexCollectionService {
     record: Record;
   }): Promise<boolean> {
     const repost = Repost.from(record);
-    // subscribers本人のrepostは保存
-    if (await this.subscriptionRepository.isSubscriber(ctx, repost.actorDid)) {
-      return true;
-    }
-
-    // repost者のフォロワーが1人以上subscribersなら保存
-    return await this.subscriptionRepository.hasSubscriberFollower(
-      ctx,
-      repost.actorDid,
-    );
+    return await this.repostIndexingPolicy.shouldIndex(ctx, repost);
   }
 }
