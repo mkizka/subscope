@@ -9,8 +9,8 @@ import {
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { FollowIndexer } from "./follow-indexer.js";
 import type { IndexActorService } from "./index-actor-service.js";
-import type { IndexFollowService } from "./index-follow-service.js";
 import type { IndexProfileService } from "./index-profile-service.js";
 import type { IndexRepostService } from "./index-repost-service.js";
 import type { IndexSubscriptionService } from "./index-subscription-service.js";
@@ -34,7 +34,7 @@ export class IndexCommitService {
     private readonly indexActorService: IndexActorService,
     postIndexer: PostIndexer,
     indexProfileService: IndexProfileService,
-    indexFollowService: IndexFollowService,
+    followIndexer: FollowIndexer,
     likeIndexer: LikeIndexer,
     indexRepostService: IndexRepostService,
     indexSubscriptionService: IndexSubscriptionService,
@@ -43,7 +43,7 @@ export class IndexCommitService {
       "app.bsky.feed.post": postIndexer,
       "app.bsky.feed.repost": indexRepostService,
       "app.bsky.actor.profile": indexProfileService,
-      "app.bsky.graph.follow": indexFollowService,
+      "app.bsky.graph.follow": followIndexer,
       "app.bsky.feed.like": likeIndexer,
       "dev.mkizka.test.subscription": indexSubscriptionService,
     };
@@ -53,7 +53,7 @@ export class IndexCommitService {
     "indexActorService",
     "postIndexer",
     "indexProfileService",
-    "indexFollowService",
+    "followIndexer",
     "likeIndexer",
     "indexRepostService",
     "indexSubscriptionService",

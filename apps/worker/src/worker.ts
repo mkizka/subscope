@@ -10,11 +10,12 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { FollowIndexingPolicy } from "./application/domain/follow-indexing-policy.js";
 import { LikeIndexingPolicy } from "./application/domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "./application/domain/post-indexing-policy.js";
+import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
 import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
-import { IndexFollowService } from "./application/services/indexer/index-follow-service.js";
 import { IndexProfileService } from "./application/services/indexer/index-profile-service.js";
 import { IndexRepostService } from "./application/services/indexer/index-repost-service.js";
 import { IndexSubscriptionService } from "./application/services/indexer/index-subscription-service.js";
@@ -75,10 +76,11 @@ createInjector()
   .provideClass("fetchProfileService", FetchProfileService)
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
+  .provideClass("followIndexingPolicy", FollowIndexingPolicy)
   .provideClass("indexProfileService", IndexProfileService)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)
-  .provideClass("indexFollowService", IndexFollowService)
+  .provideClass("followIndexer", FollowIndexer)
   .provideClass("likeIndexer", LikeIndexer)
   .provideClass("indexRepostService", IndexRepostService)
   .provideClass("indexSubscriptionService", IndexSubscriptionService)

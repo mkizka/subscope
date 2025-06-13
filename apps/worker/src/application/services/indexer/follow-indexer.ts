@@ -1,16 +1,16 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
+import type { FollowIndexingPolicy } from "../../domain/follow-indexing-policy.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 
-export class IndexFollowService implements IIndexCollectionService {
+export class FollowIndexer implements IIndexCollectionService {
   constructor(
     private readonly followRepository: IFollowRepository,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly followIndexingPolicy: FollowIndexingPolicy,
   ) {}
-  static inject = ["followRepository", "subscriptionRepository"] as const;
+  static inject = ["followRepository", "followIndexingPolicy"] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const follow = Follow.from(record);
@@ -25,10 +25,6 @@ export class IndexFollowService implements IIndexCollectionService {
     record: Record;
   }): Promise<boolean> {
     const follow = Follow.from(record);
-    // フォローまたはフォロイーがsubscribersなら保存
-    return this.subscriptionRepository.hasAnySubscriber(ctx, [
-      follow.actorDid,
-      follow.subjectDid,
-    ]);
+    return await this.followIndexingPolicy.shouldIndex(ctx, follow);
   }
 }
