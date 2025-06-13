@@ -14,10 +14,16 @@ export class FetchBlobService {
 
   async fetchBlob(params: { did: Did; cid: string }): Promise<ImageBlob> {
     const { pds } = await this.didResolver.resolve(params.did);
-    return await this.blobFetcher.fetchBlob({
+    const blob = await this.blobFetcher.fetchBlob({
       pds,
       did: params.did,
       cid: params.cid,
     });
+
+    if (!blob) {
+      throw new Error("Blob not found");
+    }
+
+    return blob;
   }
 }

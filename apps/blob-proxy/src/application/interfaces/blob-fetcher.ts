@@ -7,5 +7,5 @@ export interface IBlobFetcher {
     pds: URL;
     did: Did;
     cid: string;
-  }) => Promise<ImageBlob>;
+  }) => Promise<ImageBlob | null>;
 }

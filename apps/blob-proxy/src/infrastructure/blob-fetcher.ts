@@ -9,14 +9,19 @@ export class BlobFetcher implements IBlobFetcher {
     pds: URL;
     did: Did;
     cid: string;
-  }): Promise<ImageBlob> {
+  }): Promise<ImageBlob | null> {
     const client = new AtpBaseClient({
       service: params.pds.toString(),
     });
-    const response = await client.com.atproto.sync.getBlob({
-      did: params.did,
-      cid: params.cid,
-    });
+    let response;
+    try {
+      response = await client.com.atproto.sync.getBlob({
+        did: params.did,
+        cid: params.cid,
+      });
+    } catch {
+      return null;
+    }
     return new ImageBlob({
       data: response.data,
       contentType:
