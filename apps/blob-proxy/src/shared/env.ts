@@ -32,10 +32,10 @@ const schema = z.object({
     dev: z.string().default("* * * * *"),
   }),
   CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
-  CACHE_RETENTION_TIME: z
-    .string()
-    .default("1d")
-    .transform((val) => ms(val as StringValue)),
+  CACHE_RETENTION_TIME: match({
+    prod: z.string().default("1d"),
+    dev: z.string().default("1m"),
+  }).transform((val) => ms(val as StringValue)),
 });
 
 export const env = (() => {
