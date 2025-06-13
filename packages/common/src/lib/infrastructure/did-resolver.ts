@@ -1,7 +1,10 @@
 import type { DidCache } from "@atproto/identity";
 import { DidResolver as Resolver } from "@atproto/identity";
 
-import type { IDidResolver } from "../domain/interfaces/did-resolver.js";
+import {
+  DidResolutionError,
+  type IDidResolver,
+} from "../domain/interfaces/did-resolver.js";
 import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 import type { IMetricReporter } from "../domain/interfaces/metric.js";
 import { asHandle } from "../utils/handle.js";
@@ -38,7 +41,7 @@ export class DidResolver implements IDidResolver {
     } catch (error) {
       this.metricReporter.increment("did_resolve_error_total");
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
-      throw error;
+      throw new DidResolutionError(did);
     }
   }
 }

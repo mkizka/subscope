@@ -1,3 +1,4 @@
+import { DidResolutionError } from "@repo/common/domain";
 import type { Router } from "express";
 import { Router as expressRouter } from "express";
 
@@ -19,7 +20,10 @@ export function imagesRouterFactory(
         .header("Cache-Control", "public, max-age=86400")
         .send(result.data);
     } catch (e) {
-      if (e instanceof BlobFetchFailedError) {
+      if (
+        e instanceof BlobFetchFailedError ||
+        e instanceof DidResolutionError
+      ) {
         res.status(404).send(e.message);
         return;
       }

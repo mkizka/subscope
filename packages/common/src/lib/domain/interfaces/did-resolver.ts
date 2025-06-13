@@ -9,3 +9,10 @@ export interface IDidResolver {
     pds: URL;
   }>;
 }
+
+export class DidResolutionError extends Error {
+  constructor(did: string) {
+    super(`Failed to resolve DID: ${did} `);
+    this.name = "DidResolutionError";
+  }
+}
