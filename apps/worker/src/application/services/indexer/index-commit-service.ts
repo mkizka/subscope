@@ -11,11 +11,11 @@ import type { IRecordRepository } from "../../interfaces/repositories/record-rep
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 import type { FollowIndexer } from "./follow-indexer.js";
 import type { IndexActorService } from "./index-actor-service.js";
-import type { IndexSubscriptionService } from "./index-subscription-service.js";
 import type { LikeIndexer } from "./like-indexer.js";
 import type { PostIndexer } from "./post-indexer.js";
 import type { ProfileIndexer } from "./profile-indexer.js";
 import type { RepostIndexer } from "./repost-indexer.js";
+import type { SubscriptionIndexer } from "./subscription-indexer.js";
 
 type IndexCollectionServiceMap = {
   [key in SupportedCollection]: IIndexCollectionService;
@@ -37,7 +37,7 @@ export class IndexCommitService {
     followIndexer: FollowIndexer,
     likeIndexer: LikeIndexer,
     repostIndexer: RepostIndexer,
-    indexSubscriptionService: IndexSubscriptionService,
+    subscriptionIndexer: SubscriptionIndexer,
   ) {
     this.services = {
       "app.bsky.feed.post": postIndexer,
@@ -45,7 +45,7 @@ export class IndexCommitService {
       "app.bsky.actor.profile": profileIndexer,
       "app.bsky.graph.follow": followIndexer,
       "app.bsky.feed.like": likeIndexer,
-      "dev.mkizka.test.subscription": indexSubscriptionService,
+      "dev.mkizka.test.subscription": subscriptionIndexer,
     };
   }
   static inject = [
@@ -56,7 +56,7 @@ export class IndexCommitService {
     "followIndexer",
     "likeIndexer",
     "repostIndexer",
-    "indexSubscriptionService",
+    "subscriptionIndexer",
   ] as const;
 
   async upsert({

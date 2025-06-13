@@ -3,21 +3,24 @@ import type { Record, TransactionContext } from "@repo/common/domain";
 import { Subscription } from "@repo/common/domain";
 
 import { env } from "../../../shared/env.js";
+import type { SubscriptionIndexingPolicy } from "../../domain/subscription-indexing-policy.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 import type { BackfillService } from "../scheduler/backfill-service.js";
 
-export class IndexSubscriptionService implements IIndexCollectionService {
+export class SubscriptionIndexer implements IIndexCollectionService {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly actorRepository: IActorRepository,
     private readonly backfillService: BackfillService,
+    private readonly subscriptionIndexingPolicy: SubscriptionIndexingPolicy,
   ) {}
   static inject = [
     "subscriptionRepository",
     "actorRepository",
     "backfillService",
+    "subscriptionIndexingPolicy",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -38,8 +41,14 @@ export class IndexSubscriptionService implements IIndexCollectionService {
     }
   }
 
-  shouldSave(_: { ctx: TransactionContext; record: Record }): Promise<boolean> {
-    // subscriptionレコードは常に保存する
-    return Promise.resolve(true);
+  async shouldSave({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }): Promise<boolean> {
+    const subscription = Subscription.from(record);
+    return await this.subscriptionIndexingPolicy.shouldIndex(ctx, subscription);
   }
 }

@@ -15,14 +15,15 @@ import { LikeIndexingPolicy } from "./application/domain/like-indexing-policy.js
 import { PostIndexingPolicy } from "./application/domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "./application/domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "./application/domain/repost-indexing-policy.js";
+import { SubscriptionIndexingPolicy } from "./application/domain/subscription-indexing-policy.js";
 import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
 import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
-import { IndexSubscriptionService } from "./application/services/indexer/index-subscription-service.js";
 import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
+import { SubscriptionIndexer } from "./application/services/indexer/subscription-indexer.js";
 import { BackfillService } from "./application/services/scheduler/backfill-service.js";
 import { FetchProfileService } from "./application/services/scheduler/fetch-profile-service.js";
 import { ResolveDidService } from "./application/services/scheduler/resolve-did-service.js";
@@ -81,13 +82,14 @@ createInjector()
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
   .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
   .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
+  .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
   .provideClass("profileIndexer", ProfileIndexer)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("followIndexer", FollowIndexer)
   .provideClass("likeIndexer", LikeIndexer)
   .provideClass("repostIndexer", RepostIndexer)
-  .provideClass("indexSubscriptionService", IndexSubscriptionService)
+  .provideClass("subscriptionIndexer", SubscriptionIndexer)
   .provideClass("indexCommitService", IndexCommitService)
   // application(use-case)
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
