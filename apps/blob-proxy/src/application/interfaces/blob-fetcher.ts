@@ -7,5 +7,12 @@ export interface IBlobFetcher {
     pds: URL;
     did: Did;
     cid: string;
-  }) => Promise<ImageBlob | null>;
+  }) => Promise<ImageBlob>;
+}
+
+export class BlobFetchFailedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BlobFetchFailedError";
+  }
 }

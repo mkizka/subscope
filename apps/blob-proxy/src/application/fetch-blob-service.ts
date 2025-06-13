@@ -19,11 +19,6 @@ export class FetchBlobService {
       did: params.did,
       cid: params.cid,
     });
-
-    if (!blob) {
-      throw new Error("Blob not found");
-    }
-
     return blob;
   }
 }

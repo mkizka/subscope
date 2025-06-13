@@ -123,6 +123,9 @@ importers:
       '@atproto/identity':
         specifier: 0.4.8
         version: 0.4.8
+      '@atproto/xrpc':
+        specifier: 0.7.0
+        version: 0.7.0
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
