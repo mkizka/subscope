@@ -63,7 +63,10 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // Act
-      const result = await likeIndexingPolicy.shouldIndex(ctx, Like.from(record));
+      const result = await likeIndexingPolicy.shouldIndex(
+        ctx,
+        Like.from(record),
+      );
 
       // Assert
       expect(result).toBe(true);
@@ -116,7 +119,10 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // Act
-      const result = await likeIndexingPolicy.shouldIndex(ctx, Like.from(record));
+      const result = await likeIndexingPolicy.shouldIndex(
+        ctx,
+        Like.from(record),
+      );
 
       // Assert
       expect(result).toBe(true);
@@ -144,7 +150,10 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // Act
-      const result = await likeIndexingPolicy.shouldIndex(ctx, Like.from(record));
+      const result = await likeIndexingPolicy.shouldIndex(
+        ctx,
+        Like.from(record),
+      );
 
       // Assert
       expect(result).toBe(false);
