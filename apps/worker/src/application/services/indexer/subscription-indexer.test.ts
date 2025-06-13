@@ -3,7 +3,8 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
@@ -16,16 +17,12 @@ let ctx: TransactionContext;
 
 const { getSetup } = setupTestDatabase();
 
-const mockBackfillService = {
-  schedule: vi.fn(),
-} as unknown as BackfillService;
-
 beforeAll(() => {
   const testSetup = getSetup();
   subscriptionIndexer = testSetup.testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("actorRepository", ActorRepository)
-    .provideValue("backfillService", mockBackfillService)
+    .provideValue("backfillService", mockDeep<BackfillService>())
     .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
     .injectClass(SubscriptionIndexer);
   ctx = testSetup.ctx;
