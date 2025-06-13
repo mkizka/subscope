@@ -11,8 +11,8 @@ export interface IBlobFetcher {
 }
 
 export class BlobFetchFailedError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(errorName: string) {
+    super(`Failed to fetch blob: ${errorName}`);
     this.name = "BlobFetchFailedError";
   }
 }

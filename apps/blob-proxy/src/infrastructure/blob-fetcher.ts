@@ -25,7 +25,7 @@ export class BlobFetcher implements IBlobFetcher {
       });
     } catch (e) {
       if (e instanceof XRPCError) {
-        throw new BlobFetchFailedError(`Failed to fetch blob: ${e.error}`);
+        throw new BlobFetchFailedError(e.error);
       }
       throw e;
     }
