@@ -169,30 +169,65 @@ export class {RecordType}Repository implements I{RecordType}Repository {
 }
 ```
 
-### 3. Service層
+### 3. ドメインサービス層（DDDパターン）
 
-#### 3.1 IndexService
+#### 3.1 インデックスポリシー（ドメインサービス）
 
-**ファイル:** `/apps/worker/src/application/service/index-{record-type}-service.ts`
+**ファイル:** `/apps/worker/src/application/domain/{record-type}-indexing-policy.ts`
+
+```typescript
+import { Record } from "@repo/client";
+import { TransactionContext } from "@repo/common/domain";
+
+export class {RecordType}IndexingPolicy {
+  static readonly inject = [] as const;
+
+  async shouldIndex(ctx: TransactionContext, record: Record): Promise<boolean> {
+    // レコードタイプ固有の保存条件判定ロジック
+    // 例：subscriberかどうか、フォローグラフに含まれるかなど
+    return true; // 実際の実装では条件に応じてboolean値を返す
+  }
+}
+```
+
+### 4. アプリケーションサービス層
+
+#### 4.1 インデクサー（アプリケーションサービス）
+
+**ファイル:** `/apps/worker/src/application/services/indexer/{record-type}-indexer.ts`
 
 ```typescript
 import { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/client";
 import { {RecordType} } from "@repo/common/domain";
-import { I{RecordType}Repository } from "../interfaces/{record-type}-repository.js";
-import { IIndexCollectionService } from "../interfaces/index-collection-service.js";
+import { I{RecordType}Repository } from "../../interfaces/{record-type}-repository.js";
+import { {RecordType}IndexingPolicy } from "../../domain/{record-type}-indexing-policy.js";
+import { IIndexCollectionService } from "../../interfaces/index-collection-service.js";
 
-export class Index{RecordType}Service implements IIndexCollectionService {
-  constructor(private {recordType}Repository: I{RecordType}Repository) {}
+export class {RecordType}Indexer implements IIndexCollectionService {
+
+  constructor(
+    private {recordType}Repository: I{RecordType}Repository,
+    private {recordType}IndexingPolicy: {RecordType}IndexingPolicy,
+  ) {}
+  static readonly inject = [
+    "{recordType}Repository",
+    "{recordType}IndexingPolicy",
+  ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }): Promise<void> {
+    const shouldIndex = await this.{recordType}IndexingPolicy.shouldIndex(ctx, record);
+    if (!shouldIndex) {
+      return;
+    }
+
     const {recordInstance} = {RecordType}.from(record);
     await this.{recordType}Repository.upsert(ctx, {recordInstance});
   }
 }
 ```
 
-#### 3.2 IndexCommitService更新
+#### 4.2 IndexCommitService更新
 
 **ファイル:** `/apps/worker/src/application/service/index-commit-service.ts`
 
@@ -200,25 +235,36 @@ export class Index{RecordType}Service implements IIndexCollectionService {
 // コンストラクターに追加
 constructor(
   // 既存のパラメーター...
-  private index{RecordType}Service: Index{RecordType}Service,
+  private {recordType}Indexer: {RecordType}Indexer,
 ) {
   this.services = {
-    "app.bsky.feed.post": indexPostService,
-    "app.bsky.actor.profile": indexProfileService,
-    "app.bsky.graph.follow": indexFollowService,
-    "{namespace}.{collection}": index{RecordType}Service, // 追加
+    "app.bsky.feed.post": postIndexer,
+    "app.bsky.actor.profile": profileIndexer,
+    "app.bsky.graph.follow": followIndexer,
+    "{namespace}.{collection}": {recordType}Indexer, // 追加
   };
 }
 ```
 
-### 4. 依存性注入更新
+### 5. 依存性注入更新
 
-#### 4.1 Worker DIコンテナ更新
+#### 5.1 Worker DIコンテナ更新
 
 **ファイル:** `/apps/worker/src/worker.ts`
 
 ```typescript
-// {RecordType}RepositoryとIndex{RecordType}Serviceの注入設定を追加
+import { {RecordType}Repository } from "./infrastructure/{record-type}-repository.js";
+import { {RecordType}IndexingPolicy } from "./application/domain/{record-type}-indexing-policy.js";
+import { {RecordType}Indexer } from "./application/services/indexer/{record-type}-indexer.js";
+
+// DIコンテナ設定
+const container = createContainer()
+  // Repository
+  .register("{recordType}Repository", asClass({RecordType}Repository))
+  // Domain Service
+  .register("{recordType}IndexingPolicy", asClass({RecordType}IndexingPolicy))
+  // Application Service
+  .register("{recordType}Indexer", asClass({RecordType}Indexer));
 ```
 
 ## 実装チェックリスト
@@ -233,7 +279,8 @@ constructor(
 - [ ] ドメインモデル (`/packages/common/src/lib/domain/{record-type}.ts`)
 - [ ] Repositoryインターフェース (`/apps/worker/src/application/interfaces/{record-type}-repository.ts`)
 - [ ] Repository実装 (`/apps/worker/src/infrastructure/{record-type}-repository.ts`)
-- [ ] Indexサービス (`/apps/worker/src/application/service/index-{record-type}-service.ts`)
+- [ ] ドメインサービス (`/apps/worker/src/application/domain/{record-type}-indexing-policy.ts`)
+- [ ] アプリケーションサービス (`/apps/worker/src/application/services/indexer/{record-type}-indexer.ts`)
 
 ### 統合作業
 
@@ -252,9 +299,10 @@ constructor(
 1. **事前準備**: Lexicon定義とデータベーステーブル作成
 2. **基盤準備**: SUPPORTED_COLLECTIONSとドメインモデル
 3. **Repository層**: インターフェースと実装
-4. **Service層**: インデックスサービス作成
-5. **統合**: DIコンテナでの配線
-6. **テスト**: Jetstreamからの実際のレコード処理確認
+4. **ドメインサービス層**: インデックスポリシー（ビジネスルール）作成
+5. **アプリケーションサービス層**: インデクサー（実行フロー）作成
+6. **統合**: DIコンテナでの配線
+7. **テスト**: Jetstreamからの実際のレコード処理確認
 
 ## アーキテクチャガイドライン
 
@@ -274,8 +322,14 @@ constructor(
 ## データフロー
 
 ```
-Jetstream WebSocket → Ingester → BullMQ Queue → Worker → IndexCommitService → Index{RecordType}Service → {RecordType}Repository → Database
+Jetstream WebSocket → Ingester → BullMQ Queue → Worker → IndexCommitService → {RecordType}Indexer → {RecordType}IndexingPolicy → {RecordType}Repository → Database
 ```
+
+### DDDパターンによる責任分離
+
+1. **{RecordType}Indexer**: レコード処理の実行フローを制御
+2. **{RecordType}IndexingPolicy**: ビジネスルール（保存条件）を判定
+3. **{RecordType}Repository**: データベースアクセスを実行
 
 ## サンプル実装：Subscriptionレコード
 
@@ -284,8 +338,10 @@ Jetstream WebSocket → Ingester → BullMQ Queue → Worker → IndexCommitServ
 ### 具体的なファイル名
 
 - ドメインモデル: `subscription.ts`
-- Repository: `subscription-repository.ts`
-- Service: `index-subscription-service.ts`
+- Repositoryインターフェース: `subscription-repository.ts`
+- Repository実装: `subscription-repository.ts`
+- ドメインサービス: `subscription-indexing-policy.ts`
+- アプリケーションサービス: `subscription-indexer.ts`
 - テーブル名: `subscriptions`
 - Collection ID: `dev.mkizka.test.subscription`
 
