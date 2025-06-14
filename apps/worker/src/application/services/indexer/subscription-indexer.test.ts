@@ -6,9 +6,9 @@ import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
+import { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
 import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { SubscriptionIndexingPolicy } from "../../domain/subscription-indexing-policy.js";
 import type { BackfillService } from "../scheduler/backfill-service.js";
 import { SubscriptionIndexer } from "./subscription-indexer.js";
 

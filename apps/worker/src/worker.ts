@@ -10,12 +10,6 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { FollowIndexingPolicy } from "./application/domain/follow-indexing-policy.js";
-import { LikeIndexingPolicy } from "./application/domain/like-indexing-policy.js";
-import { PostIndexingPolicy } from "./application/domain/post-indexing-policy.js";
-import { ProfileIndexingPolicy } from "./application/domain/profile-indexing-policy.js";
-import { RepostIndexingPolicy } from "./application/domain/repost-indexing-policy.js";
-import { SubscriptionIndexingPolicy } from "./application/domain/subscription-indexing-policy.js";
 import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
 import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
 import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
@@ -33,6 +27,12 @@ import { FetchProfileUseCase } from "./application/use-cases/async/fetch-profile
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
+import { FollowIndexingPolicy } from "./domain/follow-indexing-policy.js";
+import { LikeIndexingPolicy } from "./domain/like-indexing-policy.js";
+import { PostIndexingPolicy } from "./domain/post-indexing-policy.js";
+import { ProfileIndexingPolicy } from "./domain/profile-indexing-policy.js";
+import { RepostIndexingPolicy } from "./domain/repost-indexing-policy.js";
+import { SubscriptionIndexingPolicy } from "./domain/subscription-indexing-policy.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";

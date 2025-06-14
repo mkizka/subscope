@@ -5,9 +5,9 @@ import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { PostIndexingPolicy } from "../../domain/post-indexing-policy.js";
 import { PostIndexer } from "./post-indexer.js";
 
 let postIndexer: PostIndexer;

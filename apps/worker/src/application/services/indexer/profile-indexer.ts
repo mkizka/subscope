@@ -1,7 +1,7 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Profile } from "@repo/common/domain";
 
-import type { ProfileIndexingPolicy } from "../../domain/profile-indexing-policy.js";
+import type { ProfileIndexingPolicy } from "../../../domain/profile-indexing-policy.js";
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 

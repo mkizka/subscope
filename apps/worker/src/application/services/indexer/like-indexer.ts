@@ -1,7 +1,7 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Like } from "@repo/common/domain";
 
-import type { LikeIndexingPolicy } from "../../domain/like-indexing-policy.js";
+import type { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 

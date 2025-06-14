@@ -1,7 +1,7 @@
 import type { Like, TransactionContext } from "@repo/common/domain";
 
-import type { IPostRepository } from "../interfaces/repositories/post-repository.js";
-import type { ISubscriptionRepository } from "../interfaces/repositories/subscription-repository.js";
+import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
+import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
 
 export class LikeIndexingPolicy {
   constructor(

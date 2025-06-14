@@ -2,8 +2,8 @@ import { asDid } from "@atproto/did";
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Subscription } from "@repo/common/domain";
 
+import type { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
 import { env } from "../../../shared/env.js";
-import type { SubscriptionIndexingPolicy } from "../../domain/subscription-indexing-policy.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
@@ -32,6 +32,7 @@ export class SubscriptionIndexer implements IIndexCollectionService {
       did: asDid(record.actorDid),
     });
 
+    // TODO: アプリケーションサービスに移動
     // バックフィル条件：actorのステータスがdirtyかつappviewDidがこのサービスのDIDと一致
     if (
       actor?.backfillStatus === "dirty" &&

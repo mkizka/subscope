@@ -5,9 +5,9 @@ import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { FollowIndexingPolicy } from "../../domain/follow-indexing-policy.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
 let followIndexer: FollowIndexer;

@@ -1,7 +1,7 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Post } from "@repo/common/domain";
 
-import type { PostIndexingPolicy } from "../../domain/post-indexing-policy.js";
+import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
 

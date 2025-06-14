@@ -4,7 +4,7 @@ import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
 
 let repostIndexingPolicy: RepostIndexingPolicy;

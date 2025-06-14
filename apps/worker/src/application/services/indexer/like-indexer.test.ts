@@ -5,10 +5,10 @@ import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { LikeIndexingPolicy } from "../../domain/like-indexing-policy.js";
 import { LikeIndexer } from "./like-indexer.js";
 
 let likeIndexer: LikeIndexer;

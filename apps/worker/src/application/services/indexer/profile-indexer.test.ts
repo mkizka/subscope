@@ -5,9 +5,9 @@ import { setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { ProfileIndexingPolicy } from "../../../domain/profile-indexing-policy.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { ProfileIndexingPolicy } from "../../domain/profile-indexing-policy.js";
 import { ProfileIndexer } from "./profile-indexer.js";
 
 let profileIndexer: ProfileIndexer;

@@ -4,8 +4,8 @@ import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { PostRepository } from "../../infrastructure/post-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
+import { PostRepository } from "../infrastructure/post-repository.js";
+import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
 
 let likeIndexingPolicy: LikeIndexingPolicy;
