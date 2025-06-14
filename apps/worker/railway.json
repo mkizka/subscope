@@ -15,6 +15,7 @@
     "startCommand": "pnpm --filter @repo/worker start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
+    "drainingSeconds": 60,
     "limitOverride": {
       "containers": {
         "cpu": 1,
