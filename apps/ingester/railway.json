@@ -10,7 +10,7 @@
     ]
   },
   "deploy": {
-    "startCommand": "pnpm --filter @repo/ingester start",
+    "startCommand": "cd apps/ingester && NODE_ENV=production node --import tsx ./src/ingester.ts",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "limitOverride": {

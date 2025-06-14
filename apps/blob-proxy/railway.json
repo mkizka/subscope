@@ -11,7 +11,7 @@
   },
   "deploy": {
     "preDeployCommand": "pnpm db:migrate",
-    "startCommand": "pnpm --filter @repo/blob-proxy start",
+    "startCommand": "cd apps/blob-proxy && NODE_ENV=production node --import tsx ./src/blob-proxy.ts",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "limitOverride": {
