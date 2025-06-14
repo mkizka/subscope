@@ -1,14 +1,15 @@
 import type { TransactionContext } from "@repo/common/domain";
 import type { Subscription } from "@repo/common/domain";
 
+import { env } from "../shared/env.js";
+
 export class SubscriptionIndexingPolicy {
   static inject = [] as const;
 
-  async shouldIndex(
+  shouldIndex(
     _ctx: TransactionContext,
-    _subscription: Subscription,
+    subscription: Subscription,
   ): Promise<boolean> {
-    // subscriptionレコードは常に保存する
-    return Promise.resolve(true);
+    return Promise.resolve(subscription.appviewDid === env.APPVIEW_DID);
   }
 }
