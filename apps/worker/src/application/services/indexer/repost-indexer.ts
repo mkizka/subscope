@@ -3,9 +3,9 @@ import { Repost } from "@repo/common/domain";
 
 import type { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
-import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
-export class RepostIndexer implements IIndexCollectionService {
+export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
     private readonly repostIndexingPolicy: RepostIndexingPolicy,
@@ -17,7 +17,7 @@ export class RepostIndexer implements IIndexCollectionService {
     await this.repostRepository.upsert({ ctx, repost });
   }
 
-  async shouldSave({
+  async shouldIndex({
     ctx,
     record,
   }: {

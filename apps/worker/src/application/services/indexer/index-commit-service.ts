@@ -8,7 +8,7 @@ import {
 
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
-import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { FollowIndexer } from "./follow-indexer.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { LikeIndexer } from "./like-indexer.js";
@@ -17,8 +17,8 @@ import type { ProfileIndexer } from "./profile-indexer.js";
 import type { RepostIndexer } from "./repost-indexer.js";
 import type { SubscriptionIndexer } from "./subscription-indexer.js";
 
-type IndexCollectionServiceMap = {
-  [key in SupportedCollection]: IIndexCollectionService;
+type CollectionIndexerMap = {
+  [key in SupportedCollection]: ICollectionIndexer;
 };
 
 const isValidRecord = (record: Record) => {
@@ -27,7 +27,7 @@ const isValidRecord = (record: Record) => {
 };
 
 export class IndexCommitService {
-  private readonly services: IndexCollectionServiceMap;
+  private readonly indexers: CollectionIndexerMap;
 
   constructor(
     private readonly recordRepository: IRecordRepository,
@@ -39,7 +39,7 @@ export class IndexCommitService {
     repostIndexer: RepostIndexer,
     subscriptionIndexer: SubscriptionIndexer,
   ) {
-    this.services = {
+    this.indexers = {
       "app.bsky.feed.post": postIndexer,
       "app.bsky.feed.repost": repostIndexer,
       "app.bsky.actor.profile": profileIndexer,
@@ -75,7 +75,7 @@ export class IndexCommitService {
       await jobLogger.log("Invalid record: null character found");
       return;
     }
-    const shouldSave = await this.services[record.collection].shouldSave({
+    const shouldSave = await this.indexers[record.collection].shouldIndex({
       ctx,
       record,
     });
@@ -88,7 +88,7 @@ export class IndexCommitService {
       did: record.actorDid,
     });
     await this.recordRepository.upsert({ ctx, record });
-    await this.services[record.collection].upsert({ ctx, record });
+    await this.indexers[record.collection].upsert({ ctx, record });
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {

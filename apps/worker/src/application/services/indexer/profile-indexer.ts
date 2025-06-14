@@ -3,9 +3,9 @@ import { Profile } from "@repo/common/domain";
 
 import type { ProfileIndexingPolicy } from "../../../domain/profile-indexing-policy.js";
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
-import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
-export class ProfileIndexer implements IIndexCollectionService {
+export class ProfileIndexer implements ICollectionIndexer {
   constructor(
     private readonly profileRepository: IProfileRepository,
     private readonly profileIndexingPolicy: ProfileIndexingPolicy,
@@ -17,7 +17,7 @@ export class ProfileIndexer implements IIndexCollectionService {
     await this.profileRepository.upsert({ ctx, profile });
   }
 
-  async shouldSave({
+  async shouldIndex({
     ctx,
     record,
   }: {

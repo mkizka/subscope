@@ -5,10 +5,10 @@ import { Subscription } from "@repo/common/domain";
 import type { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
-import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { BackfillService } from "../scheduler/backfill-service.js";
 
-export class SubscriptionIndexer implements IIndexCollectionService {
+export class SubscriptionIndexer implements ICollectionIndexer {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly actorRepository: IActorRepository,
@@ -36,7 +36,7 @@ export class SubscriptionIndexer implements IIndexCollectionService {
     }
   }
 
-  async shouldSave({
+  async shouldIndex({
     ctx,
     record,
   }: {

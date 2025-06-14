@@ -3,9 +3,9 @@ import { Follow } from "@repo/common/domain";
 
 import type { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
-export class FollowIndexer implements IIndexCollectionService {
+export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly followIndexingPolicy: FollowIndexingPolicy,
@@ -17,7 +17,7 @@ export class FollowIndexer implements IIndexCollectionService {
     await this.followRepository.upsert({ ctx, follow });
   }
 
-  async shouldSave({
+  async shouldIndex({
     ctx,
     record,
   }: {

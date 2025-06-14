@@ -1,6 +1,6 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 
-export interface IIndexCollectionService {
+export interface ICollectionIndexer {
   upsert: ({
     ctx,
     record,
@@ -8,7 +8,7 @@ export interface IIndexCollectionService {
     ctx: TransactionContext;
     record: Record;
   }) => Promise<void>;
-  shouldSave: ({
+  shouldIndex: ({
     ctx,
     record,
   }: {

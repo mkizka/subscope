@@ -3,9 +3,9 @@ import { Like } from "@repo/common/domain";
 
 import type { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
-import type { IIndexCollectionService } from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
-export class LikeIndexer implements IIndexCollectionService {
+export class LikeIndexer implements ICollectionIndexer {
   constructor(
     private readonly likeRepository: ILikeRepository,
     private readonly likeIndexingPolicy: LikeIndexingPolicy,
@@ -17,7 +17,7 @@ export class LikeIndexer implements IIndexCollectionService {
     await this.likeRepository.upsert({ ctx, like });
   }
 
-  async shouldSave({
+  async shouldIndex({
     ctx,
     record,
   }: {
