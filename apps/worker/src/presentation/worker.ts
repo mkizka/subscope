@@ -121,4 +121,8 @@ export class SyncWorker {
   async start() {
     await Promise.all(this.workers.map((worker) => worker.run()));
   }
+
+  async stop() {
+    await Promise.all(this.workers.map((worker) => worker.close()));
+  }
 }

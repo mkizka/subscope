@@ -1,8 +1,6 @@
-import type {
-  ILoggerManager,
-  IMetricReporter,
-  Logger,
-} from "@repo/common/domain";
+import type { Server } from "node:http";
+
+import type { ILoggerManager, Logger } from "@repo/common/domain";
 import express from "express";
 import promBundle from "express-prom-bundle";
 import { pinoHttp } from "pino-http";
@@ -16,11 +14,11 @@ const noop = () => {};
 export class WorkerServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
+  private server?: Server;
 
   constructor(
     loggerManager: ILoggerManager,
     private readonly syncWorker: SyncWorker,
-    private readonly metricReporter: IMetricReporter,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
@@ -40,12 +38,44 @@ export class WorkerServer {
     );
     this.app.use(healthRouter);
   }
-  static inject = ["loggerManager", "syncWorker", "metricReporter"] as const;
+  static inject = ["loggerManager", "syncWorker"] as const;
 
   start() {
-    this.app.listen(env.PORT, async () => {
+    this.server = this.app.listen(env.PORT, async () => {
       this.logger.info(`Worker server listening on port ${env.PORT}`);
       await this.syncWorker.start();
+    });
+
+    process.on("SIGTERM", () => this.shutdown());
+    process.on("SIGINT", () => this.shutdown());
+  }
+
+  private async shutdown() {
+    this.logger.info("Shutting down worker server...");
+    await Promise.all([this.stopWorkers(), this.stopServer()]);
+    this.logger.info("Worker server shutdown complete");
+    process.exit(0);
+  }
+
+  private async stopWorkers() {
+    try {
+      await this.syncWorker.stop();
+      this.logger.info("Workers stopped successfully");
+    } catch (error) {
+      this.logger.error("Error stopping workers", { error });
+    }
+  }
+
+  private async stopServer() {
+    await new Promise<void>((resolve) => {
+      if (this.server) {
+        this.server.close(() => {
+          this.logger.info("HTTP server closed");
+          resolve();
+        });
+      } else {
+        resolve();
+      }
     });
   }
 }
