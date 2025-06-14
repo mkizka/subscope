@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import type { Server } from "@repo/client/server";
 
 import type { GetPostThreadUseCase } from "../../../../../application/get-post-thread-use-case.js";
@@ -9,7 +10,11 @@ export class GetPostThread {
   handle(server: Server) {
     server.app.bsky.feed.getPostThread({
       handler: async ({ params }) => {
-        const result = await this.getPostThreadUseCase.execute(params);
+        const result = await this.getPostThreadUseCase.execute({
+          uri: new AtUri(params.uri),
+          depth: params.depth,
+          parentHeight: params.parentHeight,
+        });
         return {
           encoding: "application/json",
           body: result,

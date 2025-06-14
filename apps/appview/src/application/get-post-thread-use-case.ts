@@ -1,4 +1,4 @@
-import { AtUri } from "@atproto/syntax";
+import type { AtUri } from "@atproto/syntax";
 import type {
   $Typed,
   AppBskyFeedDefs,
@@ -8,31 +8,44 @@ import type { Post } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "./interfaces/post-repository.js";
+import {
+  type AtUriService,
+  AtUriServiceError,
+} from "./service/at-uri-service.js";
 import type { PostViewService } from "./service/post-view-service.js";
 
 export class GetPostThreadUseCase {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly postViewService: PostViewService,
+    private readonly atUriService: AtUriService,
   ) {}
-  static inject = ["postRepository", "postViewService"] as const;
+  static inject = [
+    "postRepository",
+    "postViewService",
+    "atUriService",
+  ] as const;
 
   async execute(params: {
-    uri: string;
+    uri: AtUri;
     depth: number;
     parentHeight: number;
   }): Promise<AppBskyFeedGetPostThread.OutputSchema> {
-    const targetUri = new AtUri(params.uri);
-    const targetPost = await this.postRepository.findByUri(targetUri);
+    // at://example.com/app.bsky.feed.post/12345 の形式でリクエストが来る場合があるので解決する
+    let targetUri;
+    try {
+      targetUri = await this.atUriService.resolveHostname(params.uri);
+    } catch (error) {
+      // DB上のデータでハンドル解決出来ない場合は投稿も存在しないはずなのでnotFoundPostで返す
+      if (error instanceof AtUriServiceError) {
+        return { thread: this.notFoundPost(params.uri) };
+      }
+      throw error;
+    }
 
+    const targetPost = await this.postRepository.findByUri(targetUri);
     if (!targetPost) {
-      return {
-        thread: {
-          $type: "app.bsky.feed.defs#notFoundPost",
-          uri: params.uri,
-          notFound: true,
-        },
-      };
+      return { thread: this.notFoundPost(targetUri) };
     }
 
     const parentThread = await this.collectParentPosts(
@@ -51,6 +64,14 @@ export class GetPostThreadUseCase {
         parent: parentThread,
         replies: childThreads,
       },
+    };
+  }
+
+  private notFoundPost(uri: AtUri): $Typed<AppBskyFeedDefs.NotFoundPost> {
+    return {
+      $type: "app.bsky.feed.defs#notFoundPost" as const,
+      uri: uri.toString(),
+      notFound: true,
     };
   }
 

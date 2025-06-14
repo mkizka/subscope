@@ -14,6 +14,7 @@ import { GetPostThreadUseCase } from "./application/get-post-thread-use-case.js"
 import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
+import { AtUriService } from "./application/service/at-uri-service.js";
 import { AuthVerifierService } from "./application/service/auth-verifier-service.js";
 import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
@@ -57,6 +58,7 @@ createInjector()
   .provideClass("embedViewService", EmbedViewService)
   .provideClass("postViewService", PostViewService)
   .provideClass("authVerifierService", AuthVerifierService)
+  .provideClass("atUriService", AtUriService)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getPostThreadUseCase", GetPostThreadUseCase)

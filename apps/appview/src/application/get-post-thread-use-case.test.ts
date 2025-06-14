@@ -9,6 +9,7 @@ import { PostRepository } from "../infrastructure/post-repository.js";
 import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { RecordRepository } from "../infrastructure/record-repository.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
+import { AtUriService } from "./service/at-uri-service.js";
 import { EmbedViewService } from "./service/embed-view-service.js";
 import { PostViewService } from "./service/post-view-service.js";
 import { ProfileViewService } from "./service/profile-view-service.js";
@@ -28,6 +29,7 @@ beforeAll(() => {
     .provideClass("embedViewService", EmbedViewService)
     .provideClass("profileViewService", ProfileViewService)
     .provideClass("postViewService", PostViewService)
+    .provideClass("atUriService", AtUriService)
     .injectClass(GetPostThreadUseCase);
   ctx = testSetup.ctx;
 });
@@ -36,7 +38,7 @@ describe("GetPostThreadUseCase", () => {
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: "at://did:plc:notexist/app.bsky.feed.post/notexist",
+      uri: new AtUri("at://did:plc:notexist/app.bsky.feed.post/notexist"),
       depth: 6,
       parentHeight: 80,
     });
@@ -107,7 +109,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: postUri.toString(),
+      uri: postUri,
       depth: 6,
       parentHeight: 80,
     });
@@ -293,7 +295,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: targetUri.toString(),
+      uri: targetUri,
       depth: 6,
       parentHeight: 10,
     });
@@ -499,7 +501,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: rootUri.toString(),
+      uri: rootUri,
       depth: 6,
       parentHeight: 80,
     });
@@ -761,7 +763,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act - depth=2で実行（Level 3は取得されないはず）
     const result = await getPostThreadUseCase.execute({
-      uri: rootUri.toString(),
+      uri: rootUri,
       depth: 2,
       parentHeight: 80,
     });
@@ -1024,7 +1026,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act - parentHeight=2で実行（Level 0は取得されないはず）
     const result = await getPostThreadUseCase.execute({
-      uri: targetUri.toString(),
+      uri: targetUri,
       depth: 6,
       parentHeight: 2,
     });
@@ -1058,6 +1060,114 @@ describe("GetPostThreadUseCase", () => {
         },
       },
       replies: [],
+    });
+  });
+
+  test("handleが含まれるURIの場合、DIDに変換してから投稿を取得する", async () => {
+    // arrange
+    const postUri = AtUri.make(
+      "did:plc:handleuser",
+      "app.bsky.feed.post",
+      "handlepost123",
+    );
+    const actorDid = "did:plc:handleuser";
+    const postRecord = {
+      $type: "app.bsky.feed.post",
+      text: "Post with handle URI",
+      createdAt: "2024-01-01T00:00:00.000Z",
+    };
+
+    await ctx.db.insert(schema.actors).values({
+      did: actorDid,
+      handle: "handleuser.bsky.social",
+    });
+
+    await ctx.db.insert(schema.records).values({
+      uri: postUri.toString(),
+      cid: "bafyreihandlepost",
+      actorDid,
+      json: postRecord,
+      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+
+    await ctx.db.insert(schema.posts).values({
+      uri: postUri.toString(),
+      cid: "bafyreihandlepost",
+      actorDid,
+      text: "Post with handle URI",
+      createdAt: new Date(postRecord.createdAt),
+    });
+
+    const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
+    await ctx.db.insert(schema.records).values({
+      uri: profileUri,
+      cid: "bafyreihandleprofile",
+      actorDid,
+      json: {
+        $type: "app.bsky.actor.profile",
+        displayName: "Handle User",
+        createdAt: "2024-01-01T00:00:00.000Z",
+      },
+      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+
+    await ctx.db.insert(schema.profiles).values({
+      uri: profileUri,
+      cid: "bafyreihandleprofile",
+      actorDid,
+      displayName: "Handle User",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+
+    // handleを使ったAtUriを作成
+    const handleUri = new AtUri(
+      "at://handleuser.bsky.social/app.bsky.feed.post/handlepost123",
+    );
+
+    // act
+    const result = await getPostThreadUseCase.execute({
+      uri: handleUri,
+      depth: 6,
+      parentHeight: 80,
+    });
+
+    // assert
+    expect(result.thread).toMatchObject({
+      $type: "app.bsky.feed.defs#threadViewPost",
+      post: {
+        uri: postUri.toString(),
+        author: {
+          did: actorDid,
+          handle: "handleuser.bsky.social",
+          displayName: "Handle User",
+        },
+        record: {
+          text: "Post with handle URI",
+        },
+      },
+      parent: undefined,
+      replies: [],
+    });
+  });
+
+  test("handleが解決できない場合、notFoundPostを返す", async () => {
+    // arrange
+    const handleUri = new AtUri(
+      "at://notfound.handle/app.bsky.feed.post/notfound123",
+    );
+
+    // act
+    const result = await getPostThreadUseCase.execute({
+      uri: handleUri,
+      depth: 6,
+      parentHeight: 80,
+    });
+
+    // assert
+    expect(result.thread).toEqual({
+      $type: "app.bsky.feed.defs#notFoundPost",
+      uri: "at://notfound.handle/app.bsky.feed.post/notfound123",
+      notFound: true,
     });
   });
 });
