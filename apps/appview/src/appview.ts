@@ -10,6 +10,7 @@ import {
 import { createInjector } from "typed-inject";
 
 import { GetJobStatusUseCase } from "./application/get-job-status-use-case.js";
+import { GetPostThreadUseCase } from "./application/get-post-thread-use-case.js";
 import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
@@ -25,6 +26,7 @@ import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
+import { GetPostThread } from "./presentation/routes/app/bsky/feed/getPostThread.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
 import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
@@ -57,12 +59,14 @@ createInjector()
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
+  .provideClass("getPostThreadUseCase", GetPostThreadUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
   .provideClass("getPosts", GetPosts)
+  .provideClass("getPostThread", GetPostThread)
   .provideClass("getTimeline", GetTimeline)
   .provideClass("getJobStatus", GetJobStatus)
   .provideClass("xrpcRouter", XRPCRouter)

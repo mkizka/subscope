@@ -14,5 +14,6 @@ export * as AppBskyFeedRepost from "./generated/api/types/app/bsky/feed/repost";
 export * as AppBskyGraphFollow from "./generated/api/types/app/bsky/graph/follow";
 export * as DevMkizkaTestSubscription from "./generated/api/types/dev/mkizka/test/subscription";
 export * as DevMkizkaTestSyncGetJobStatus from "./generated/api/types/dev/mkizka/test/sync/getJobStatus";
+export * as AppBskyFeedGetPostThread from "./generated/api/types/app/bsky/feed/getPostThread";
 
 export { $Typed } from "./generated/server/util";

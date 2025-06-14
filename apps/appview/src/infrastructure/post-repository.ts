@@ -2,7 +2,7 @@ import { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
 import { Post, PostEmbedExternal, PostEmbedImage } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, inArray, lt } from "drizzle-orm";
+import { and, eq, inArray, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
@@ -108,6 +108,39 @@ export class PostRepository implements IPostRepository {
         embedExternal: true,
       },
     });
+    return postsWithEmbeds.map((post) => this.convertToPost(post));
+  }
+
+  async findByUri(uri: AtUri): Promise<Post | null> {
+    const postWithEmbeds = await this.db.query.posts.findFirst({
+      where: eq(schema.posts.uri, uri.toString()),
+      with: {
+        embedImages: {
+          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
+        },
+        embedExternal: true,
+      },
+    });
+
+    if (!postWithEmbeds) {
+      return null;
+    }
+
+    return this.convertToPost(postWithEmbeds);
+  }
+
+  async findReplies(uri: AtUri): Promise<Post[]> {
+    const postsWithEmbeds = await this.db.query.posts.findMany({
+      where: eq(schema.posts.replyParentUri, uri.toString()),
+      orderBy: (posts, { asc }) => [asc(posts.createdAt)],
+      with: {
+        embedImages: {
+          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
+        },
+        embedExternal: true,
+      },
+    });
+
     return postsWithEmbeds.map((post) => this.convertToPost(post));
   }
 }
