@@ -40,22 +40,26 @@ export class ReplyRefService {
       string,
       $Typed<AppBskyFeedDefs.PostView> | $Typed<AppBskyFeedDefs.NotFoundPost>
     >();
-    replyAtUris.forEach((uri, index) => {
-      const postView = replyPostViews[index];
-      if (postView) {
-        postViewMap.set(uri.toString(), postView);
-      } else {
+    
+    // 取得できたPostViewをマップに追加
+    for (const postView of replyPostViews) {
+      postViewMap.set(postView.uri, postView);
+    }
+    
+    // 存在しなかったURIにはNotFoundPostを設定
+    for (const uri of replyAtUris) {
+      if (!postViewMap.has(uri.toString())) {
         postViewMap.set(uri.toString(), {
           $type: "app.bsky.feed.defs#notFoundPost",
           uri: uri.toString(),
           notFound: true,
         });
       }
-    });
+    }
 
     // 各リプライ投稿のReplyRefを作成
     const replyRefMap = new Map<string, $Typed<AppBskyFeedDefs.ReplyRef>>();
-    replyPosts.forEach((post) => {
+    for (const post of replyPosts) {
       const rootView = postViewMap.get(post.replyRoot.uri.toString());
       const parentView = postViewMap.get(post.replyParent.uri.toString());
 
@@ -66,7 +70,7 @@ export class ReplyRefService {
           parent: parentView,
         });
       }
-    });
+    }
 
     return replyRefMap;
   }
