@@ -143,17 +143,19 @@ describe("ReplyRefService", () => {
     const result = await replyRefService.createReplyRefs(posts);
 
     // assert
-    expect(result.size).toBe(1);
-    expect(result.has(replyUri.toString())).toBe(true);
-
-    const replyRef = result.get(replyUri.toString());
-    expect(replyRef).toMatchObject({
+    expect(result.get(replyUri.toString())).toMatchObject({
       $type: "app.bsky.feed.defs#replyRef",
       root: {
         uri: rootUri.toString(),
+        record: {
+          text: "Root post",
+        },
       },
       parent: {
         uri: parentUri.toString(),
+        record: {
+          text: "Parent post",
+        },
       },
     });
   });
@@ -255,9 +257,36 @@ describe("ReplyRefService", () => {
     const result = await replyRefService.createReplyRefs(posts);
 
     // assert
-    expect(result.size).toBe(2);
-    expect(result.has(reply1Uri.toString())).toBe(true);
-    expect(result.has(reply2Uri.toString())).toBe(true);
+    expect(result.get(reply1Uri.toString())).toMatchObject({
+      $type: "app.bsky.feed.defs#replyRef",
+      root: {
+        uri: rootUri.toString(),
+        record: {
+          text: "Root post 2",
+        },
+      },
+      parent: {
+        uri: parentUri.toString(),
+        record: {
+          text: "Parent post 2",
+        },
+      },
+    });
+    expect(result.get(reply2Uri.toString())).toMatchObject({
+      $type: "app.bsky.feed.defs#replyRef",
+      root: {
+        uri: rootUri.toString(),
+        record: {
+          text: "Root post 2",
+        },
+      },
+      parent: {
+        uri: rootUri.toString(),
+        record: {
+          text: "Root post 2",
+        },
+      },
+    });
   });
 
   test("PostViewが見つからない場合、NotFoundPostを含むreply情報を返す", async () => {
@@ -288,10 +317,7 @@ describe("ReplyRefService", () => {
     const result = await replyRefService.createReplyRefs(posts);
 
     // assert
-    expect(result.size).toBe(1);
-
-    const replyRef = result.get(replyUri.toString());
-    expect(replyRef).toMatchObject({
+    expect(result.get(replyUri.toString())).toMatchObject({
       $type: "app.bsky.feed.defs#replyRef",
       root: {
         $type: "app.bsky.feed.defs#notFoundPost",
@@ -403,8 +429,21 @@ describe("ReplyRefService", () => {
     const result = await replyRefService.createReplyRefs(posts);
 
     // assert
-    expect(result.size).toBe(1);
-    expect(result.has(replyUri.toString())).toBe(true);
-    expect(result.has(normalUri.toString())).toBe(false);
+    expect(result.get(replyUri.toString())).toMatchObject({
+      $type: "app.bsky.feed.defs#replyRef",
+      root: {
+        uri: rootUri.toString(),
+        record: {
+          text: "Root post 3",
+        },
+      },
+      parent: {
+        uri: parentUri.toString(),
+        record: {
+          text: "Parent post 3",
+        },
+      },
+    });
+    expect(result.get(normalUri.toString())).toBeUndefined();
   });
 });
