@@ -19,10 +19,12 @@ import { AuthVerifierService } from "./application/service/auth-verifier-service
 import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
+import { TimelineService } from "./application/service/timeline-service.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
+import { TimelineRepository } from "./infrastructure/timeline-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
@@ -48,6 +50,7 @@ createInjector()
   .provideClass("handleResolver", HandleResolver)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("postRepository", PostRepository)
+  .provideClass("timelineRepository", TimelineRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
@@ -57,6 +60,7 @@ createInjector()
   .provideClass("profileViewService", ProfileViewService)
   .provideClass("embedViewService", EmbedViewService)
   .provideClass("postViewService", PostViewService)
+  .provideClass("timelineService", TimelineService)
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("atUriService", AtUriService)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)

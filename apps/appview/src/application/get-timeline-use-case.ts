@@ -1,64 +1,44 @@
-import type {
-  AppBskyFeedDefs,
-  AppBskyFeedGetTimeline,
-} from "@repo/client/server";
-import type { DatabaseClient } from "@repo/common/domain";
-import { required } from "@repo/common/utils";
+import { AtUri } from "@atproto/syntax";
+import type { AppBskyFeedGetTimeline } from "@repo/client/server";
 
-import type { IPostRepository } from "./interfaces/post-repository.js";
+import { TimelineQuery } from "./domain/timeline-query.js";
 import type { PostViewService } from "./service/post-view-service.js";
+import type { TimelineService } from "./service/timeline-service.js";
 
 export class GetTimelineUseCase {
   constructor(
-    private readonly db: DatabaseClient,
-    private readonly postRepository: IPostRepository,
+    private readonly timelineService: TimelineService,
     private readonly postViewService: PostViewService,
   ) {}
-  static inject = ["db", "postRepository", "postViewService"] as const;
+  static inject = ["timelineService", "postViewService"] as const;
 
-  // TODO: 全体的に修正
-  //  - フォロイーの投稿に限定
-  //  - リポストも含める
-  //  - リプライ数、リポスト数、いいね数などのメタデータを含める
   async execute(
     params: AppBskyFeedGetTimeline.QueryParams,
+    authDid: string,
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
-    const samplePosts = await this.postRepository.findMany({
-      limit: params.limit,
+    const query = TimelineQuery.fromCursor({
+      authDid,
       cursor: params.cursor,
+      limit: params.limit,
     });
+
+    const paginationResult = await this.timelineService.findPostsWithPagination(query);
+
     const postViews = await this.postViewService.findPostView(
-      samplePosts.map((post) => post.uri),
+      paginationResult.items.map((post) => new AtUri(post.uri)),
     );
-    const replyUris = samplePosts.flatMap((post) =>
-      [post.replyRoot?.uri, post.replyParent?.uri].filter(
-        (uri) => uri !== undefined,
-      ),
-    );
-    const replyPostViews = await this.postViewService.findPostView(replyUris);
-    const feed = samplePosts.map((feedPost) => {
-      const replyRoot = replyPostViews.find(
-        (reply) => reply.uri === feedPost.replyRoot?.uri.toString(),
-      );
-      const replyParent = replyPostViews.find(
-        (reply) => reply.uri === feedPost.replyParent?.uri.toString(),
-      );
-      return {
-        $type: "app.bsky.feed.defs#feedViewPost",
-        post: required(
-          postViews.find((post) => post.uri === feedPost.uri.toString()),
-        ),
-        reply: replyRoot &&
-          replyParent && {
-            $type: "app.bsky.feed.defs#replyRef",
-            root: replyRoot,
-            parent: replyParent,
-          },
-      } satisfies AppBskyFeedDefs.FeedViewPost;
-    });
-    return {
-      cursor: samplePosts.at(-1)?.sortAt?.toISOString(),
+
+    const feed = postViews.map((postView) => ({
+      $type: "app.bsky.feed.defs#feedViewPost" as const,
+      post: postView,
+    }));
+
+    const result: AppBskyFeedGetTimeline.OutputSchema = {
       feed,
     };
+    if (paginationResult.cursor) {
+      result.cursor = paginationResult.cursor;
+    }
+    return result;
   }
 }

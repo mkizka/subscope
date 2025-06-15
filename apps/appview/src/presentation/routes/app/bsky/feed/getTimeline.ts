@@ -14,8 +14,10 @@ export class GetTimeline {
     server.app.bsky.feed.getTimeline({
       auth: (ctx) => this.authVerifierService.loginRequired(ctx.req),
       handler: async ({ params, auth }) => {
-        // TODO: authを使ってユーザーのフォローしている投稿だけを返す
-        const timeline = await this.getTimelineUseCase.execute(params);
+        const timeline = await this.getTimelineUseCase.execute(
+          params,
+          auth.credentials.did,
+        );
         return {
           encoding: "application/json",
           body: timeline,
