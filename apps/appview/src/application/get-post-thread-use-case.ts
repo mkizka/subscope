@@ -5,7 +5,6 @@ import type {
   AppBskyFeedGetPostThread,
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
-import type { LoggerManager } from "@repo/common/infrastructure";
 import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "./interfaces/post-repository.js";
@@ -16,21 +15,15 @@ import {
 import type { PostViewService } from "./service/post-view-service.js";
 
 export class GetPostThreadUseCase {
-  private readonly logger;
-
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly postViewService: PostViewService,
     private readonly atUriService: AtUriService,
-    private readonly loggerManager: LoggerManager,
-  ) {
-    this.logger = this.loggerManager.createLogger("GetPostThreadUseCase");
-  }
+  ) {}
   static inject = [
     "postRepository",
     "postViewService",
     "atUriService",
-    "loggerManager",
   ] as const;
 
   async execute(params: {
@@ -38,12 +31,8 @@ export class GetPostThreadUseCase {
     depth: number;
     parentHeight: number;
   }): Promise<AppBskyFeedGetPostThread.OutputSchema> {
-    const startTime = Date.now();
-    const performanceLog: Record<string, number> = {};
-
     // at://example.com/app.bsky.feed.post/12345 の形式でリクエストが来る場合があるので解決する
     let targetUri;
-    const resolveStart = Date.now();
     try {
       targetUri = await this.atUriService.resolveHostname(params.uri);
     } catch (error) {
@@ -53,42 +42,21 @@ export class GetPostThreadUseCase {
       }
       throw error;
     }
-    performanceLog.resolveHostname = Date.now() - resolveStart;
 
-    const findPostStart = Date.now();
     const targetPost = await this.postRepository.findByUri(targetUri);
-    performanceLog.findTargetPost = Date.now() - findPostStart;
-
     if (!targetPost) {
       return { thread: this.notFoundPost(targetUri) };
     }
 
-    const parentStart = Date.now();
     const parentThread = await this.collectParentPosts(
       targetPost.uri,
       params.parentHeight,
     );
-    performanceLog.collectParentPosts = Date.now() - parentStart;
-
-    const childStart = Date.now();
     const childThreads = await this.collectChildPosts(
       targetPost.uri,
       params.depth,
     );
-    performanceLog.collectChildPosts = Date.now() - childStart;
-
-    const buildStart = Date.now();
     const targetPostThread = await this.buildThreadViewPost(targetPost);
-    performanceLog.buildTargetPost = Date.now() - buildStart;
-
-    performanceLog.total = Date.now() - startTime;
-
-    this.logger.info("performance", {
-      uri: params.uri.toString(),
-      depth: params.depth,
-      parentHeight: params.parentHeight,
-      ...performanceLog,
-    });
 
     return {
       thread: {
