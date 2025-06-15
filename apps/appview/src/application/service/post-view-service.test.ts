@@ -6,6 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../infrastructure/record-repository.js";
 import { EmbedViewService } from "./embed-view-service.js";
@@ -23,6 +24,7 @@ beforeAll(() => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
     .provideClass("embedViewService", EmbedViewService)
     .provideClass("profileViewService", ProfileViewService)
@@ -100,6 +102,10 @@ describe("PostViewService", () => {
           displayName: "Test User",
         },
         record: postRecord,
+        replyCount: 0,
+        repostCount: 0,
+        likeCount: 0,
+        quoteCount: 0,
         indexedAt: "2024-01-01T00:00:00.000Z",
       });
     });

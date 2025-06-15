@@ -22,6 +22,7 @@ import { ProfileViewService } from "./application/service/profile-view-service.j
 import { TimelineService } from "./application/service/timeline-service.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
+import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { TimelineRepository } from "./infrastructure/timeline-repository.js";
@@ -50,6 +51,7 @@ createInjector()
   .provideClass("handleResolver", HandleResolver)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("postRepository", PostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("timelineRepository", TimelineRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)

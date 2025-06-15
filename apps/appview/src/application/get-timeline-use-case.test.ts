@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, test } from "vitest";
 
 import { HandleResolver } from "../infrastructure/handle-resolver.js";
 import { PostRepository } from "../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { RecordRepository } from "../infrastructure/record-repository.js";
 import { TimelineRepository } from "../infrastructure/timeline-repository.js";
@@ -26,6 +27,7 @@ beforeAll(() => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
     .provideClass("timelineRepository", TimelineRepository)
     .provideClass("embedViewService", EmbedViewService)
