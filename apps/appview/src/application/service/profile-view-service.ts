@@ -4,7 +4,7 @@ import type { ProfileDetailed } from "@repo/common/domain";
 import { type Handle, isHandle } from "@repo/common/utils";
 
 import { env } from "../../shared/env.js";
-import type { IHandlesToDidsRepository } from "../interfaces/handles-to-dids-repository.js";
+import type { IHandleResolver } from "../interfaces/handle-resolver.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 
 type HandleOrDid = Handle | Did;
@@ -12,14 +12,13 @@ type HandleOrDid = Handle | Did;
 export class ProfileViewService {
   constructor(
     private readonly profileRepository: IProfileRepository,
-    private readonly handlesToDidsRepository: IHandlesToDidsRepository,
+    private readonly handleResolver: IHandleResolver,
   ) {}
-  static inject = ["profileRepository", "handlesToDidsRepository"] as const;
+  static inject = ["profileRepository", "handleResolver"] as const;
 
   private async findProfile(handleOrDids: HandleOrDid[]) {
     const handles = handleOrDids.filter((handleOrDid) => isHandle(handleOrDid));
-    const didsByHandle =
-      await this.handlesToDidsRepository.findDidsByHandle(handles);
+    const didsByHandle = await this.handleResolver.resolveMany(handles);
     const dids = handleOrDids
       .map((handleOrDid) =>
         isHandle(handleOrDid) ? didsByHandle[handleOrDid] : handleOrDid,

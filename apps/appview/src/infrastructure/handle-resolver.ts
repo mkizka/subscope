@@ -5,13 +5,13 @@ import { asHandle, type Handle } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
 
-import type { IHandlesToDidsRepository } from "../application/interfaces/handles-to-dids-repository.js";
+import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 
-export class HandlesToDidsRepository implements IHandlesToDidsRepository {
+export class HandleResolver implements IHandleResolver {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findDidsByHandle(handles: Handle[]) {
+  async resolveMany(handles: Handle[]) {
     const actors = await this.db
       .select({
         did: schema.actors.did,

@@ -2,13 +2,11 @@ import { isDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import { asHandle, isHandle } from "@repo/common/utils";
 
-import type { IHandlesToDidsRepository } from "../interfaces/handles-to-dids-repository.js";
+import type { IHandleResolver } from "../interfaces/handle-resolver.js";
 
 export class AtUriService {
-  constructor(
-    private readonly handlesToDidsRepository: IHandlesToDidsRepository,
-  ) {}
-  static inject = ["handlesToDidsRepository"] as const;
+  constructor(private readonly handleResolver: IHandleResolver) {}
+  static inject = ["handleResolver"] as const;
 
   async resolveHostname(uri: AtUri): Promise<AtUri> {
     if (isDid(uri.hostname)) {
@@ -20,9 +18,7 @@ export class AtUriService {
     }
 
     const handle = asHandle(uri.hostname);
-    const handleToDids = await this.handlesToDidsRepository.findDidsByHandle([
-      handle,
-    ]);
+    const handleToDids = await this.handleResolver.resolveMany([handle]);
     const did = handleToDids[handle];
 
     if (!did) {

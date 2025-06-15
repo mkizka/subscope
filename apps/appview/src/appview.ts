@@ -19,7 +19,7 @@ import { AuthVerifierService } from "./application/service/auth-verifier-service
 import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
-import { HandlesToDidsRepository } from "./infrastructure/handles-to-dids-repository.js";
+import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
@@ -45,7 +45,7 @@ createInjector()
   .provideFactory("connectionPool", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("profileRepository", ProfileRepository)
-  .provideClass("handlesToDidsRepository", HandlesToDidsRepository)
+  .provideClass("handleResolver", HandleResolver)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("postRepository", PostRepository)
   .provideClass("metricReporter", MetricReporter)

@@ -4,7 +4,7 @@ import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
-import { HandlesToDidsRepository } from "../../infrastructure/handles-to-dids-repository.js";
+import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import {
   AtUriService,
   HandleResolutionError,
@@ -19,7 +19,7 @@ const { getSetup } = setupTestDatabase();
 beforeAll(() => {
   const testSetup = getSetup();
   atUriService = testSetup.testInjector
-    .provideClass("handlesToDidsRepository", HandlesToDidsRepository)
+    .provideClass("handleResolver", HandleResolver)
     .injectClass(AtUriService);
   ctx = testSetup.ctx;
 });

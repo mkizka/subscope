@@ -4,7 +4,7 @@ import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
-import { HandlesToDidsRepository } from "../infrastructure/handles-to-dids-repository.js";
+import { HandleResolver } from "../infrastructure/handle-resolver.js";
 import { PostRepository } from "../infrastructure/post-repository.js";
 import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { RecordRepository } from "../infrastructure/record-repository.js";
@@ -23,7 +23,7 @@ beforeAll(() => {
   const testSetup = getSetup();
   getPostThreadUseCase = testSetup.testInjector
     .provideClass("profileRepository", ProfileRepository)
-    .provideClass("handlesToDidsRepository", HandlesToDidsRepository)
+    .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)
     .provideClass("recordRepository", RecordRepository)
     .provideClass("embedViewService", EmbedViewService)
