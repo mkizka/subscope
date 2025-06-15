@@ -409,4 +409,133 @@ describe("GetTimelineUseCase", () => {
       ],
     });
   });
+
+  test("複数の投稿がある場合、sortAt（indexedAtとcreatedAtの早い方）の降順でソートされて返す", async () => {
+    // arrange
+    const authDid = "did:plc:sort-user";
+    const followeeDid = "did:plc:sort-followee";
+
+    await ctx.db.insert(schema.actors).values([
+      { did: authDid, handle: "sortuser.bsky.social" },
+      { did: followeeDid, handle: "sortfollowee.bsky.social" },
+    ]);
+
+    // フォロー関係を作成
+    const followUri = "at://did:plc:sort-user/app.bsky.graph.follow/test";
+    await ctx.db.insert(schema.records).values({
+      uri: followUri,
+      cid: "follow-cid",
+      actorDid: authDid,
+      json: { subject: followeeDid },
+    });
+    await ctx.db.insert(schema.follows).values({
+      uri: followUri,
+      cid: "follow-cid",
+      actorDid: authDid,
+      subjectDid: followeeDid,
+      createdAt: new Date(),
+    });
+
+    // 異なる時間の投稿を作成（sortAtの順序を確認するため）
+    const posts = [
+      {
+        uri: "at://did:plc:sort-followee/app.bsky.feed.post/early",
+        cid: "early-cid",
+        actorDid: followeeDid,
+        text: "Early post",
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T01:30:00.000Z"), // sortAt = 2024-01-01T01:00:00.000Z (createdAtが早い)
+      },
+      {
+        uri: "at://did:plc:sort-followee/app.bsky.feed.post/latest",
+        cid: "latest-cid",
+        actorDid: followeeDid,
+        text: "Latest post",
+        createdAt: new Date("2024-01-01T03:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T02:30:00.000Z"), // sortAt = 2024-01-01T02:30:00.000Z (indexedAtが早い)
+      },
+      {
+        uri: "at://did:plc:sort-followee/app.bsky.feed.post/middle",
+        cid: "middle-cid",
+        actorDid: followeeDid,
+        text: "Middle post",
+        createdAt: new Date("2024-01-01T02:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T02:00:00.000Z"), // sortAt = 2024-01-01T02:00:00.000Z
+      },
+    ];
+
+    await ctx.db.insert(schema.records).values(
+      posts.map((post) => ({
+        uri: post.uri,
+        cid: post.cid,
+        actorDid: post.actorDid,
+        json: { text: post.text },
+        indexedAt: post.indexedAt,
+      })),
+    );
+    await ctx.db.insert(schema.posts).values(
+      posts.map((post) => ({
+        uri: post.uri,
+        cid: post.cid,
+        actorDid: post.actorDid,
+        text: post.text,
+        createdAt: post.createdAt,
+        indexedAt: post.indexedAt,
+      })),
+    );
+
+    // プロフィールを作成
+    const profileUri = `at://${followeeDid}/app.bsky.actor.profile/self`;
+    await ctx.db.insert(schema.records).values({
+      uri: profileUri,
+      cid: "profile-cid",
+      actorDid: followeeDid,
+      json: {
+        $type: "app.bsky.actor.profile",
+        displayName: "Sort Followee",
+        createdAt: "2024-01-01T00:00:00.000Z",
+      },
+    });
+    await ctx.db.insert(schema.profiles).values({
+      uri: profileUri,
+      cid: "profile-cid",
+      actorDid: followeeDid,
+      displayName: "Sort Followee",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+
+    // act
+    const result = await getTimelineUseCase.execute({ limit: 50 }, authDid);
+
+    // assert
+    // sortAtの降順：Latest(02:30) > Middle(02:00) > Early(01:00)
+    expect(result).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            record: {
+              text: "Latest post",
+            },
+          },
+        },
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            record: {
+              text: "Middle post",
+            },
+          },
+        },
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            record: {
+              text: "Early post",
+            },
+          },
+        },
+      ],
+    });
+  });
 });
