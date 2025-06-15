@@ -32,6 +32,7 @@ export class PostViewService {
     "embedViewService",
   ] as const;
 
+  // TODO: 引数をPost[]にした方がいい？
   async findPostView(
     uris: AtUri[],
   ): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
