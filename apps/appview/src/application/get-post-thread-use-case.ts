@@ -83,12 +83,15 @@ export class GetPostThreadUseCase {
 
     performanceLog.total = Date.now() - startTime;
 
-    this.logger.info("performance", {
-      uri: params.uri.toString(),
-      depth: params.depth,
-      parentHeight: params.parentHeight,
-      ...performanceLog,
-    });
+    this.logger.info(
+      {
+        uri: params.uri.toString(),
+        depth: params.depth,
+        parentHeight: params.parentHeight,
+        ...performanceLog,
+      },
+      "performance",
+    );
 
     return {
       thread: {
