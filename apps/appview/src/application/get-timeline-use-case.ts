@@ -16,6 +16,10 @@ export class GetTimelineUseCase {
   ) {}
   static inject = ["db", "postRepository", "postViewService"] as const;
 
+  // TODO: 全体的に修正
+  //  - フォロイーの投稿に限定
+  //  - リポストも含める
+  //  - リプライ数、リポスト数、いいね数などのメタデータを含める
   async execute(
     params: AppBskyFeedGetTimeline.QueryParams,
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {

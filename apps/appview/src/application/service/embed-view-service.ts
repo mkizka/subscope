@@ -7,6 +7,7 @@ import type { PostEmbedExternal, PostEmbedImage } from "@repo/common/domain";
 
 import { env } from "../../shared/env.js";
 
+// TODO: 投稿の埋め込みに対応
 export class EmbedViewService {
   toView(embed: PostEmbedExternal | PostEmbedImage[] | null, actorDid: string) {
     if (Array.isArray(embed)) {
