@@ -106,7 +106,7 @@ export class GetPostThreadUseCase {
     //    }
     //  }
     //
-    return parentThreads.reduce<
+    return parentThreads.reduceRight<
       $Typed<AppBskyFeedDefs.ThreadViewPost> | undefined
     >(
       (parentChain, currentParent) => ({

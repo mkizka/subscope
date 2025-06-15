@@ -257,15 +257,15 @@ describe("GetTimelineUseCase", () => {
       },
     ];
 
-    for (const post of posts) {
-      await ctx.db.insert(schema.records).values({
+    await ctx.db.insert(schema.records).values(
+      posts.map((post) => ({
         uri: post.uri,
         cid: post.cid,
         actorDid: post.actorDid,
         json: { text: post.text },
-      });
-      await ctx.db.insert(schema.posts).values(post);
-    }
+      })),
+    );
+    await ctx.db.insert(schema.posts).values(posts);
 
     // プロフィールを作成
     const profileUri = `at://${followeeDid}/app.bsky.actor.profile/self`;

@@ -63,6 +63,7 @@ describe("PostViewService", () => {
         actorDid,
         text: "Hello World",
         createdAt: new Date(postRecord.createdAt),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
 
       const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
@@ -139,6 +140,27 @@ describe("PostViewService", () => {
         actorDid,
         text: "Test post",
         createdAt: new Date(postRecord.createdAt),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+
+      // プロファイルを作成（ただし最小限のデータ）
+      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
+      await ctx.db.insert(schema.records).values({
+        uri: profileUri,
+        cid: "bafyreiprofile456",
+        actorDid,
+        json: {
+          $type: "app.bsky.actor.profile",
+          createdAt: "2024-01-01T00:00:00.000Z",
+        },
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+
+      await ctx.db.insert(schema.profiles).values({
+        uri: profileUri,
+        cid: "bafyreiprofile456",
+        actorDid,
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
 
       // Act
@@ -148,7 +170,7 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]?.author).toMatchObject({
         did: actorDid,
-        handle: "handle.invalid",
+        handle: "noProfile.bsky.social",
       });
     });
 
@@ -390,6 +412,7 @@ describe("PostViewService", () => {
           actorDid: actorDid1,
           text: "First post",
           createdAt: new Date("2024-01-01T00:00:00.000Z"),
+          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
         },
         {
           uri: postUri2.toString(),
@@ -397,6 +420,53 @@ describe("PostViewService", () => {
           actorDid: actorDid2,
           text: "Second post",
           createdAt: new Date("2024-01-01T01:00:00.000Z"),
+          indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+        },
+      ]);
+
+      // 投稿者のプロフィールを作成
+      const profile1Uri = `at://${actorDid1}/app.bsky.actor.profile/self`;
+      const profile2Uri = `at://${actorDid2}/app.bsky.actor.profile/self`;
+
+      await ctx.db.insert(schema.records).values([
+        {
+          uri: profile1Uri,
+          cid: "bafyreiprofile1",
+          actorDid: actorDid1,
+          json: {
+            $type: "app.bsky.actor.profile",
+            displayName: "User 1",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          },
+          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+        {
+          uri: profile2Uri,
+          cid: "bafyreiprofile2",
+          actorDid: actorDid2,
+          json: {
+            $type: "app.bsky.actor.profile",
+            displayName: "User 2",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          },
+          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+      ]);
+
+      await ctx.db.insert(schema.profiles).values([
+        {
+          uri: profile1Uri,
+          cid: "bafyreiprofile1",
+          actorDid: actorDid1,
+          displayName: "User 1",
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+        {
+          uri: profile2Uri,
+          cid: "bafyreiprofile2",
+          actorDid: actorDid2,
+          displayName: "User 2",
+          createdAt: new Date("2024-01-01T00:00:00.000Z"),
         },
       ]);
 
@@ -447,6 +517,29 @@ describe("PostViewService", () => {
         cid: "bafyreiexists",
         actorDid,
         text: "Existing post",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+
+      // プロフィールを作成
+      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
+      await ctx.db.insert(schema.records).values({
+        uri: profileUri,
+        cid: "bafyreiprofile",
+        actorDid,
+        json: {
+          $type: "app.bsky.actor.profile",
+          displayName: "Existing User",
+          createdAt: "2024-01-01T00:00:00.000Z",
+        },
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+
+      await ctx.db.insert(schema.profiles).values({
+        uri: profileUri,
+        cid: "bafyreiprofile",
+        actorDid,
+        displayName: "Existing User",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
 

@@ -50,26 +50,29 @@ export class PostViewService {
       this.postStatsRepository.findStats(postUris),
     ]);
 
+    const postMap = new Map(posts.map((post) => [post.uri.toString(), post]));
     const authorMap = new Map(authors.map((author) => [author.did, author]));
     const recordMap = new Map(
       records.map((record) => [record.uri.toString(), record]),
     );
 
-    const postViews = posts.map((post) => {
-      const author = authorMap.get(post.actorDid);
-      const record = recordMap.get(post.uri.toString());
-      const stats = statsMap.get(post.uri.toString());
+    return uris
+      .map((uri) => {
+        const post = postMap.get(uri.toString());
+        if (!post) return null;
 
-      if (!author || !record || !stats) {
-        throw new Error(
-          `Missing author, record, or stats for post: ${post.uri.toString()}`,
-        );
-      }
+        const author = authorMap.get(post.actorDid);
+        const record = recordMap.get(post.uri.toString());
+        const stats = statsMap.get(post.uri.toString());
+        if (!author || !record || !stats) {
+          throw new Error(
+            `Missing author, record, or stats for post: ${post.uri.toString()}`,
+          );
+        }
 
-      return this.createPostView(post, record, author, stats);
-    });
-
-    return postViews;
+        return this.createPostView(post, record, author, stats);
+      })
+      .filter((postView) => postView !== null);
   }
 
   private isRecordObject(value: unknown): value is { [x: string]: unknown } {
