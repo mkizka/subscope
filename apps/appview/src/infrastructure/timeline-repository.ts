@@ -1,6 +1,6 @@
 import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, exists, lt, sql } from "drizzle-orm";
+import { and, desc, eq, exists, lt } from "drizzle-orm";
 
 import type {
   ITimelineRepository,
@@ -25,7 +25,7 @@ export class TimelineRepository implements ITimelineRepository {
       filters.push(lt(schema.posts.sortAt, before));
     }
 
-    const posts = await this.db
+    const unionQuery = this.db
       .select({
         uri: schema.posts.uri,
         sortAt: schema.posts.sortAt,
@@ -56,7 +56,12 @@ export class TimelineRepository implements ITimelineRepository {
           .from(schema.posts)
           .where(and(...filters, eq(schema.posts.actorDid, authDid))),
       )
-      .orderBy(desc(sql`"sort_at"`))
+      .as("timeline_posts");
+
+    const posts = await this.db
+      .select()
+      .from(unionQuery)
+      .orderBy(desc(unionQuery.sortAt))
       .limit(limit);
 
     return posts;
