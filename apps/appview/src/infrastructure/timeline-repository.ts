@@ -57,7 +57,7 @@ export class TimelineRepository implements ITimelineRepository {
           .where(and(...filters, eq(schema.posts.actorDid, authDid))),
       )
       .orderBy(desc(sql`"sort_at"`))
-      .limit(limit + 1);
+      .limit(limit);
 
     return posts;
   }
