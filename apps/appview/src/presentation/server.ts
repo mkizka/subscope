@@ -20,7 +20,7 @@ export class AppviewServer {
   ) {
     this.logger = loggerManager.createLogger("AppviewServer");
     this.app = express();
-    this.app.use(promBundle({ includeMethod: true }));
+    this.app.use(promBundle({ includeMethod: true, includePath: true }));
     this.app.use(
       pinoHttp({
         logger: this.logger,
