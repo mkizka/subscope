@@ -40,7 +40,7 @@ beforeAll(() => {
 });
 
 describe("GetTimelineUseCase", () => {
-  test("フォローしているユーザーがいない場合は空のタイムラインを返す", async () => {
+  test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
     // arrange
     const authDid = "did:plc:nofollows";
 
@@ -58,7 +58,7 @@ describe("GetTimelineUseCase", () => {
     });
   });
 
-  test("フォローしているユーザーの投稿を返す", async () => {
+  test("フォローしているユーザーが投稿している場合、そのユーザーの投稿を返す", async () => {
     // arrange
     const authDid = "did:plc:user-1";
     const followeeDid = "did:plc:followee-1";
@@ -139,7 +139,7 @@ describe("GetTimelineUseCase", () => {
     });
   });
 
-  test("自分の投稿も含める", async () => {
+  test("自分の投稿がある場合、自分の投稿も含める", async () => {
     // arrange
     const authDid = "did:plc:self-user";
 
@@ -206,7 +206,7 @@ describe("GetTimelineUseCase", () => {
     });
   });
 
-  test("カーソルベースのページネーションが動作する", async () => {
+  test("カーソルを指定した場合、ページネーションが動作する", async () => {
     // arrange
     const authDid = "did:plc:pagination-user";
     const followeeDid = "did:plc:pagination-followee";
@@ -335,7 +335,7 @@ describe("GetTimelineUseCase", () => {
     expect(secondPage.cursor).toBeUndefined();
   });
 
-  test("限界値のlimitパラメータが正しく動作する", async () => {
+  test("limitパラメータが0または1の場合、指定した件数の投稿を返す", async () => {
     // arrange
     const authDid = "did:plc:limit-user";
 
