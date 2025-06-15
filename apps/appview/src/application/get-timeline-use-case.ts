@@ -22,7 +22,8 @@ export class GetTimelineUseCase {
       limit: params.limit,
     });
 
-    const paginationResult = await this.timelineService.findPostsWithPagination(query);
+    const paginationResult =
+      await this.timelineService.findPostsWithPagination(query);
 
     const postViews = await this.postViewService.findPostView(
       paginationResult.items.map((post) => new AtUri(post.uri)),
