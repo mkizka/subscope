@@ -14,6 +14,7 @@ import { AtUriService } from "./service/at-uri-service.js";
 import { EmbedViewService } from "./service/embed-view-service.js";
 import { PostViewService } from "./service/post-view-service.js";
 import { ProfileViewService } from "./service/profile-view-service.js";
+import { ReplyRefService } from "./service/reply-ref-service.js";
 import { TimelineService } from "./service/timeline-service.js";
 
 let getTimelineUseCase: GetTimelineUseCase;
@@ -33,6 +34,7 @@ beforeAll(() => {
     .provideClass("embedViewService", EmbedViewService)
     .provideClass("profileViewService", ProfileViewService)
     .provideClass("postViewService", PostViewService)
+    .provideClass("replyRefService", ReplyRefService)
     .provideClass("timelineService", TimelineService)
     .provideClass("atUriService", AtUriService)
     .injectClass(GetTimelineUseCase);
@@ -532,6 +534,191 @@ describe("GetTimelineUseCase", () => {
           post: {
             record: {
               text: "Early post",
+            },
+          },
+        },
+      ],
+    });
+  });
+
+  test("リプライがある場合、reply情報を含むfeedViewPostを返す", async () => {
+    // arrange
+    const authDid = "did:plc:reply-user";
+    const rootAuthorDid = "did:plc:root-author";
+    const parentAuthorDid = "did:plc:parent-author";
+    const replyAuthorDid = "did:plc:reply-author";
+
+    await ctx.db.insert(schema.actors).values([
+      { did: authDid, handle: "replyuser.bsky.social" },
+      { did: rootAuthorDid, handle: "rootauthor.bsky.social" },
+      { did: parentAuthorDid, handle: "parentauthor.bsky.social" },
+      { did: replyAuthorDid, handle: "replyauthor.bsky.social" },
+    ]);
+
+    // フォロー関係を作成（authがreplyAuthorをフォロー）
+    const followUri = "at://did:plc:reply-user/app.bsky.graph.follow/test";
+    await ctx.db.insert(schema.records).values({
+      uri: followUri,
+      cid: "follow-cid",
+      actorDid: authDid,
+      json: { subject: replyAuthorDid },
+    });
+    await ctx.db.insert(schema.follows).values({
+      uri: followUri,
+      cid: "follow-cid",
+      actorDid: authDid,
+      subjectDid: replyAuthorDid,
+      createdAt: new Date(),
+    });
+
+    // 根投稿を作成
+    const rootPost = {
+      uri: "at://did:plc:root-author/app.bsky.feed.post/root123",
+      cid: "root-post-cid",
+      actorDid: rootAuthorDid,
+      text: "Root post",
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+    };
+    await ctx.db.insert(schema.records).values({
+      uri: rootPost.uri,
+      cid: rootPost.cid,
+      actorDid: rootPost.actorDid,
+      json: { text: rootPost.text },
+    });
+    await ctx.db.insert(schema.posts).values(rootPost);
+
+    // 中間投稿（根投稿へのリプライ）を作成
+    const parentPost = {
+      uri: "at://did:plc:parent-author/app.bsky.feed.post/parent123",
+      cid: "parent-post-cid",
+      actorDid: parentAuthorDid,
+      text: "Parent reply to root",
+      replyRootUri: rootPost.uri,
+      replyRootCid: rootPost.cid,
+      replyParentUri: rootPost.uri,
+      replyParentCid: rootPost.cid,
+      createdAt: new Date("2024-01-01T02:00:00.000Z"),
+    };
+    await ctx.db.insert(schema.records).values({
+      uri: parentPost.uri,
+      cid: parentPost.cid,
+      actorDid: parentPost.actorDid,
+      json: {
+        text: parentPost.text,
+        reply: {
+          root: { uri: rootPost.uri, cid: rootPost.cid },
+          parent: { uri: rootPost.uri, cid: rootPost.cid },
+        },
+      },
+    });
+    await ctx.db.insert(schema.posts).values(parentPost);
+
+    // 最終リプライ投稿（中間投稿へのリプライ）を作成
+    const replyPost = {
+      uri: "at://did:plc:reply-author/app.bsky.feed.post/reply123",
+      cid: "reply-post-cid",
+      actorDid: replyAuthorDid,
+      text: "Reply to parent post",
+      replyRootUri: rootPost.uri,
+      replyRootCid: rootPost.cid,
+      replyParentUri: parentPost.uri,
+      replyParentCid: parentPost.cid,
+      createdAt: new Date("2024-01-01T03:00:00.000Z"),
+    };
+    await ctx.db.insert(schema.records).values({
+      uri: replyPost.uri,
+      cid: replyPost.cid,
+      actorDid: replyPost.actorDid,
+      json: {
+        text: replyPost.text,
+        reply: {
+          root: { uri: rootPost.uri, cid: rootPost.cid },
+          parent: { uri: parentPost.uri, cid: parentPost.cid },
+        },
+      },
+    });
+    await ctx.db.insert(schema.posts).values(replyPost);
+
+    // プロフィールを作成
+    const profiles = [
+      {
+        uri: `at://${rootAuthorDid}/app.bsky.actor.profile/self`,
+        cid: "root-profile-cid",
+        actorDid: rootAuthorDid,
+        displayName: "Root Author",
+      },
+      {
+        uri: `at://${parentAuthorDid}/app.bsky.actor.profile/self`,
+        cid: "parent-profile-cid",
+        actorDid: parentAuthorDid,
+        displayName: "Parent Author",
+      },
+      {
+        uri: `at://${replyAuthorDid}/app.bsky.actor.profile/self`,
+        cid: "reply-profile-cid",
+        actorDid: replyAuthorDid,
+        displayName: "Reply Author",
+      },
+    ];
+
+    await ctx.db.insert(schema.records).values(
+      profiles.map((profile) => ({
+        uri: profile.uri,
+        cid: profile.cid,
+        actorDid: profile.actorDid,
+        json: {
+          $type: "app.bsky.actor.profile",
+          displayName: profile.displayName,
+          createdAt: "2024-01-01T00:00:00.000Z",
+        },
+      })),
+    );
+    await ctx.db.insert(schema.profiles).values(
+      profiles.map((profile) => ({
+        uri: profile.uri,
+        cid: profile.cid,
+        actorDid: profile.actorDid,
+        displayName: profile.displayName,
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      })),
+    );
+
+    // act
+    const result = await getTimelineUseCase.execute({ limit: 50 }, authDid);
+
+    // assert
+    expect(result).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            uri: replyPost.uri,
+            author: {
+              displayName: "Reply Author",
+            },
+            record: {
+              text: "Reply to parent post",
+            },
+          },
+          reply: {
+            $type: "app.bsky.feed.defs#replyRef",
+            root: {
+              uri: rootPost.uri,
+              author: {
+                displayName: "Root Author",
+              },
+              record: {
+                text: "Root post",
+              },
+            },
+            parent: {
+              uri: parentPost.uri,
+              author: {
+                displayName: "Parent Author",
+              },
+              record: {
+                text: "Parent reply to root",
+              },
             },
           },
         },

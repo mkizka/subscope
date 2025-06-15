@@ -19,6 +19,7 @@ import { AuthVerifierService } from "./application/service/auth-verifier-service
 import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
+import { ReplyRefService } from "./application/service/reply-ref-service.js";
 import { TimelineService } from "./application/service/timeline-service.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
@@ -62,6 +63,7 @@ createInjector()
   .provideClass("profileViewService", ProfileViewService)
   .provideClass("embedViewService", EmbedViewService)
   .provideClass("postViewService", PostViewService)
+  .provideClass("replyRefService", ReplyRefService)
   .provideClass("timelineService", TimelineService)
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("atUriService", AtUriService)
