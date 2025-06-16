@@ -8,7 +8,7 @@
   },
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "_prettier": "prettier . --ignore-path ../../.gitignore --no-color --cache",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --no-color --cache --log-level warn",
     "db:migrate": "drizzle-kit push",
     "dev": "drizzle-kit studio",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",

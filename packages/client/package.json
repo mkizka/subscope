@@ -14,7 +14,7 @@
   },
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "_prettier": "prettier . --ignore-path ../../.gitignore --cache",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "pnpm generate && run-p -s build:*",
     "build:ts": "node build.mjs",
     "build:type": "tsc --project tsconfig.build.json",

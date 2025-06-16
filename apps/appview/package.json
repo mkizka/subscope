@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "_prettier": "prettier . --ignore-path ../../.gitignore --cache",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "dev": "NODE_ENV=development tsx watch ./src/appview.ts | pino-pretty",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",

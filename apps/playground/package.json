@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
-    "_prettier": "prettier . --ignore-path ../../.gitignore --cache",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "tsc -b && vite build",
     "dev": "vite",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
