@@ -8,7 +8,7 @@ import { mock } from "vitest-mock-extended";
 import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { IndexActorService } from "../../services/indexer/index-actor-service.js";
+import { IndexActorService } from "../../services/index-actor-service.js";
 import { BackfillService } from "../../services/scheduler/backfill-service.js";
 import { FetchProfileService } from "../../services/scheduler/fetch-profile-service.js";
 import { ResolveDidService } from "../../services/scheduler/resolve-did-service.js";

@@ -5,7 +5,7 @@ import { isSupportedCollection } from "@repo/common/utils";
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
-import type { IndexCommitService } from "../../services/indexer/index-commit-service.js";
+import type { IndexCommitService } from "../../services/index-commit-service.js";
 
 export class BackfillUseCase {
   constructor(

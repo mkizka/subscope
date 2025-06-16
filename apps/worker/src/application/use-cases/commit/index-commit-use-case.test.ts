@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import type { JobLogger } from "../../../shared/job.js";
-import type { IndexCommitService } from "../../services/indexer/index-commit-service.js";
+import type { IndexCommitService } from "../../services/index-commit-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import { IndexCommitUseCase } from "./index-commit-use-case.js";
 

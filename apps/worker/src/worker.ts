@@ -10,9 +10,9 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { IndexActorService } from "./application/services/index-actor-service.js";
+import { IndexCommitService } from "./application/services/index-commit-service.js";
 import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
-import { IndexActorService } from "./application/services/indexer/index-actor-service.js";
-import { IndexCommitService } from "./application/services/indexer/index-commit-service.js";
 import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";

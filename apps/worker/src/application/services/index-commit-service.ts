@@ -6,16 +6,16 @@ import {
   type SupportedCollection,
 } from "@repo/common/utils";
 
-import type { JobLogger } from "../../../shared/job.js";
-import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { FollowIndexer } from "./follow-indexer.js";
+import type { JobLogger } from "../../shared/job.js";
+import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
+import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
-import type { LikeIndexer } from "./like-indexer.js";
-import type { PostIndexer } from "./post-indexer.js";
-import type { ProfileIndexer } from "./profile-indexer.js";
-import type { RepostIndexer } from "./repost-indexer.js";
-import type { SubscriptionIndexer } from "./subscription-indexer.js";
+import type { FollowIndexer } from "./indexer/follow-indexer.js";
+import type { LikeIndexer } from "./indexer/like-indexer.js";
+import type { PostIndexer } from "./indexer/post-indexer.js";
+import type { ProfileIndexer } from "./indexer/profile-indexer.js";
+import type { RepostIndexer } from "./indexer/repost-indexer.js";
+import type { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
 
 type CollectionIndexerMap = {
   [key in SupportedCollection]: ICollectionIndexer;

@@ -2,10 +2,10 @@ import type { Did } from "@atproto/did";
 import { Actor, type TransactionContext } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 
-import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
-import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
-import type { FetchProfileService } from "../scheduler/fetch-profile-service.js";
-import type { ResolveDidService } from "../scheduler/resolve-did-service.js";
+import type { IActorRepository } from "../interfaces/repositories/actor-repository.js";
+import type { IProfileRepository } from "../interfaces/repositories/profile-repository.js";
+import type { FetchProfileService } from "./scheduler/fetch-profile-service.js";
+import type { ResolveDidService } from "./scheduler/resolve-did-service.js";
 
 export class IndexActorService {
   constructor(

@@ -7,13 +7,13 @@ import { eq } from "drizzle-orm";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/actor-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { BackfillService } from "../scheduler/backfill-service.js";
-import { FetchProfileService } from "../scheduler/fetch-profile-service.js";
-import { ResolveDidService } from "../scheduler/resolve-did-service.js";
+import { ActorRepository } from "../../infrastructure/actor-repository.js";
+import { ProfileRepository } from "../../infrastructure/profile-repository.js";
+import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
+import { BackfillService } from "./scheduler/backfill-service.js";
+import { FetchProfileService } from "./scheduler/fetch-profile-service.js";
+import { ResolveDidService } from "./scheduler/resolve-did-service.js";
 
 const mockJobQueue = mock<IJobQueue>();
 const { getSetup } = setupTestDatabase();
