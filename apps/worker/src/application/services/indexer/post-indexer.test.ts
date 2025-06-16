@@ -84,4 +84,132 @@ describe("PostIndexer", () => {
       expect(post).toBeDefined();
     });
   });
+
+  describe("updateStats", () => {
+    it("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
+      // Arrange
+      const parentPostUri = "at://did:plc:parent/app.bsky.feed.post/parent";
+
+      // actorとrecordsテーブルを準備
+      await ctx.db.insert(schema.actors).values([
+        { did: "did:plc:parent", handle: "parent.bsky.social" },
+        { did: "did:plc:replier1", handle: "replier1.bsky.social" },
+        { did: "did:plc:replier2", handle: "replier2.bsky.social" },
+      ]);
+      await ctx.db.insert(schema.records).values([
+        {
+          uri: parentPostUri,
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          actorDid: "did:plc:parent",
+          json: { $type: "app.bsky.feed.post" },
+        },
+        {
+          uri: "at://did:plc:replier1/app.bsky.feed.post/reply1",
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          actorDid: "did:plc:replier1",
+          json: { $type: "app.bsky.feed.post" },
+        },
+        {
+          uri: "at://did:plc:replier2/app.bsky.feed.post/reply2",
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          actorDid: "did:plc:replier2",
+          json: { $type: "app.bsky.feed.post" },
+        },
+      ]);
+      await ctx.db.insert(schema.posts).values([
+        {
+          uri: parentPostUri,
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          actorDid: "did:plc:parent",
+          text: "Parent post",
+          createdAt: new Date(),
+        },
+        {
+          uri: "at://did:plc:replier1/app.bsky.feed.post/reply1",
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          actorDid: "did:plc:replier1",
+          text: "Reply 1",
+          replyParentUri: parentPostUri,
+          createdAt: new Date(),
+        },
+        {
+          uri: "at://did:plc:replier2/app.bsky.feed.post/reply2",
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          actorDid: "did:plc:replier2",
+          text: "Reply 2",
+          replyParentUri: parentPostUri,
+          createdAt: new Date(),
+        },
+      ]);
+
+      const replyJson = {
+        $type: "app.bsky.feed.post",
+        text: "New reply",
+        reply: {
+          root: {
+            uri: parentPostUri,
+            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          },
+          parent: {
+            uri: parentPostUri,
+            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          },
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:replier3/app.bsky.feed.post/newreply",
+        cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        json: replyJson,
+      });
+
+      // Act
+      await postIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const [stats] = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, parentPostUri))
+        .limit(1);
+
+      expect(stats).toMatchObject({
+        postUri: parentPostUri,
+        likeCount: 0,
+        repostCount: 0,
+        replyCount: 2,
+      });
+    });
+
+    it("通常の投稿（リプライでない）の場合は統計更新されない", async () => {
+      // Arrange
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "Regular post without reply",
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:regular/app.bsky.feed.post/regular",
+        cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        json: postJson,
+      });
+
+      // Act
+      await postIndexer.updateStats({ ctx, record });
+
+      // Assert
+      // post_statsテーブルに新しいエントリが作成されていないことを確認
+      const stats = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(
+          eq(
+            schema.postStats.postUri,
+            "at://did:plc:regular/app.bsky.feed.post/regular",
+          ),
+        );
+
+      expect(stats).toHaveLength(0);
+    });
+  });
 });

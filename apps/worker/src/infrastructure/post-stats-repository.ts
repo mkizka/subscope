@@ -23,6 +23,8 @@ export class PostStatsRepository implements IPostStatsRepository {
       .values({
         postUri,
         likeCount,
+        repostCount: 0,
+        replyCount: 0,
       })
       .onConflictDoUpdate({
         target: schema.postStats.postUri,
@@ -49,12 +51,43 @@ export class PostStatsRepository implements IPostStatsRepository {
       .insert(schema.postStats)
       .values({
         postUri,
+        likeCount: 0,
         repostCount,
+        replyCount: 0,
       })
       .onConflictDoUpdate({
         target: schema.postStats.postUri,
         set: {
           repostCount,
+        },
+      });
+  }
+
+  async upsertReplyCount({
+    ctx,
+    postUri,
+  }: {
+    ctx: TransactionContext;
+    postUri: string;
+  }) {
+    const [result] = await ctx.db
+      .select({ count: count() })
+      .from(schema.posts)
+      .where(eq(schema.posts.replyParentUri, postUri));
+
+    const replyCount = result?.count ?? 0;
+    await ctx.db
+      .insert(schema.postStats)
+      .values({
+        postUri,
+        likeCount: 0,
+        repostCount: 0,
+        replyCount,
+      })
+      .onConflictDoUpdate({
+        target: schema.postStats.postUri,
+        set: {
+          replyCount,
         },
       });
   }

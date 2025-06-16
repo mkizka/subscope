@@ -10,4 +10,9 @@ export interface IPostStatsRepository {
     ctx: TransactionContext;
     postUri: string;
   }) => Promise<void>;
+
+  upsertReplyCount: (params: {
+    ctx: TransactionContext;
+    postUri: string;
+  }) => Promise<void>;
 }

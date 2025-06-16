@@ -168,6 +168,7 @@ describe("RepostIndexer", () => {
         postUri,
         likeCount: 0,
         repostCount: 2,
+        replyCount: 0,
       });
     });
 
@@ -241,6 +242,7 @@ describe("RepostIndexer", () => {
         postUri,
         likeCount: 0,
         repostCount: 1,
+        replyCount: 0,
       });
     });
   });
