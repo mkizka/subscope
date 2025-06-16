@@ -6,7 +6,7 @@
     "node": "22"
   },
   "scripts": {
-    "all": "turbo run all && pnpm test --run",
+    "all": "turbo run typecheck format && pnpm test --run",
     "build": "turbo run build",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "./scripts/dev.sh",

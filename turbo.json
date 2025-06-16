@@ -14,9 +14,6 @@
     "format": {
       "dependsOn": ["build"]
     },
-    "all": {
-      "dependsOn": ["typecheck", "lint"]
-    },
     "dev": {
       "dependsOn": ["build"],
       "cache": false
