@@ -8,7 +8,7 @@ export class RepostRepository implements IRepostRepository {
     const data = {
       cid: repost.cid,
       actorDid: repost.actorDid,
-      subjectUri: repost.subjectUri,
+      subjectUri: repost.subjectUri.toString(),
       subjectCid: repost.subjectCid,
       createdAt: repost.createdAt,
     };

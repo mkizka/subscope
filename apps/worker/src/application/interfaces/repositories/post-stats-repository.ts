@@ -1,18 +1,19 @@
+import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
 export interface IPostStatsRepository {
   upsertLikeCount: (params: {
     ctx: TransactionContext;
-    postUri: string;
+    uri: AtUri;
   }) => Promise<void>;
 
   upsertRepostCount: (params: {
     ctx: TransactionContext;
-    postUri: string;
+    uri: AtUri;
   }) => Promise<void>;
 
   upsertReplyCount: (params: {
     ctx: TransactionContext;
-    postUri: string;
+    uri: AtUri;
   }) => Promise<void>;
 }

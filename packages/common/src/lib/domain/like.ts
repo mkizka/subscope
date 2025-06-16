@@ -7,7 +7,7 @@ type LikeParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;
-  subjectUri: string;
+  subjectUri: AtUri | string;
   subjectCid: string;
   createdAt: Date;
 };
@@ -24,7 +24,7 @@ export class Like {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.actorDid = asDid(params.actorDid);
-    this.subjectUri = new AtUri(params.subjectUri);
+    this.subjectUri = new AtUri(params.subjectUri.toString());
     this.subjectCid = params.subjectCid;
     this.createdAt = params.createdAt;
   }

@@ -44,7 +44,7 @@ export class RepostIndexer implements ICollectionIndexer {
     const repost = Repost.from(record);
     await this.postStatsRepository.upsertRepostCount({
       ctx,
-      postUri: repost.subjectUri.toString(),
+      uri: repost.subjectUri,
     });
   }
 }

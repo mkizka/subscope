@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { count, eq } from "drizzle-orm";
@@ -5,13 +6,8 @@ import { count, eq } from "drizzle-orm";
 import type { IPostStatsRepository } from "../application/interfaces/repositories/post-stats-repository.js";
 
 export class PostStatsRepository implements IPostStatsRepository {
-  async upsertLikeCount({
-    ctx,
-    postUri,
-  }: {
-    ctx: TransactionContext;
-    postUri: string;
-  }) {
+  async upsertLikeCount({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
+    const postUri = uri.toString();
     const [result] = await ctx.db
       .select({ count: count() })
       .from(schema.likes)
@@ -36,11 +32,12 @@ export class PostStatsRepository implements IPostStatsRepository {
 
   async upsertRepostCount({
     ctx,
-    postUri,
+    uri,
   }: {
     ctx: TransactionContext;
-    postUri: string;
+    uri: AtUri;
   }) {
+    const postUri = uri.toString();
     const [result] = await ctx.db
       .select({ count: count() })
       .from(schema.reposts)
@@ -65,11 +62,12 @@ export class PostStatsRepository implements IPostStatsRepository {
 
   async upsertReplyCount({
     ctx,
-    postUri,
+    uri,
   }: {
     ctx: TransactionContext;
-    postUri: string;
+    uri: AtUri;
   }) {
+    const postUri = uri.toString();
     const [result] = await ctx.db
       .select({ count: count() })
       .from(schema.posts)

@@ -7,7 +7,7 @@ type RepostParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;
-  subjectUri: string;
+  subjectUri: AtUri | string;
   subjectCid: string;
   createdAt: Date;
 };
@@ -16,7 +16,7 @@ export class Repost {
   readonly uri: AtUri;
   readonly cid: string;
   readonly actorDid: Did;
-  readonly subjectUri: string;
+  readonly subjectUri: AtUri;
   readonly subjectCid: string;
   readonly createdAt: Date;
 
@@ -24,7 +24,7 @@ export class Repost {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.actorDid = asDid(params.actorDid);
-    this.subjectUri = params.subjectUri;
+    this.subjectUri = new AtUri(params.subjectUri.toString());
     this.subjectCid = params.subjectCid;
     this.createdAt = params.createdAt;
   }

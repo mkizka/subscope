@@ -46,7 +46,7 @@ export class PostIndexer implements ICollectionIndexer {
     if (post.replyParent) {
       await this.postStatsRepository.upsertReplyCount({
         ctx,
-        postUri: post.replyParent.uri.toString(),
+        uri: post.replyParent.uri,
       });
     }
   }

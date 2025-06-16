@@ -44,7 +44,7 @@ export class LikeIndexer implements ICollectionIndexer {
     const like = Like.from(record);
     await this.postStatsRepository.upsertLikeCount({
       ctx,
-      postUri: like.subjectUri.toString(),
+      uri: like.subjectUri,
     });
   }
 }
