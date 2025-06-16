@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
+import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { RepostIndexer } from "./repost-indexer.js";
@@ -19,6 +20,7 @@ beforeAll(() => {
   const testSetup = getSetup();
   repostIndexer = testSetup.testInjector
     .provideClass("repostRepository", RepostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
     .injectClass(RepostIndexer);
@@ -74,6 +76,172 @@ describe("RepostIndexer", () => {
       expect(reposts[0]?.subjectUri).toBe(
         "at://did:plc:author/app.bsky.feed.post/123",
       );
+    });
+  });
+
+  describe("updateStats", () => {
+    it("リポスト追加時にpost_statsのリポスト数が正しく更新される", async () => {
+      // Arrange
+      const postUri = "at://did:plc:author3/app.bsky.feed.post/123";
+
+      // actorとrecordsテーブルを準備
+      await ctx.db.insert(schema.actors).values([
+        { did: "did:plc:author3", handle: "author3.bsky.social" },
+        { did: "did:plc:user7", handle: "user7.bsky.social" },
+        { did: "did:plc:user8", handle: "user8.bsky.social" },
+      ]);
+      await ctx.db.insert(schema.records).values([
+        {
+          uri: postUri,
+          cid: "post123",
+          actorDid: "did:plc:author3",
+          json: { $type: "app.bsky.feed.post" },
+        },
+        {
+          uri: "at://did:plc:user7/app.bsky.feed.repost/1",
+          cid: "repost1",
+          actorDid: "did:plc:user7",
+          json: { $type: "app.bsky.feed.repost" },
+        },
+        {
+          uri: "at://did:plc:user8/app.bsky.feed.repost/2",
+          cid: "repost2",
+          actorDid: "did:plc:user8",
+          json: { $type: "app.bsky.feed.repost" },
+        },
+      ]);
+      await ctx.db.insert(schema.posts).values({
+        uri: postUri,
+        cid: "post123",
+        actorDid: "did:plc:author3",
+        text: "Test post for repost",
+        createdAt: new Date(),
+      });
+
+      // 既存のリポストを2つ追加
+      await ctx.db.insert(schema.reposts).values([
+        {
+          uri: "at://did:plc:user7/app.bsky.feed.repost/1",
+          cid: "repost1",
+          actorDid: "did:plc:user7",
+          subjectUri: postUri,
+          subjectCid:
+            "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+          createdAt: new Date(),
+        },
+        {
+          uri: "at://did:plc:user8/app.bsky.feed.repost/2",
+          cid: "repost2",
+          actorDid: "did:plc:user8",
+          subjectUri: postUri,
+          subjectCid:
+            "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+          createdAt: new Date(),
+        },
+      ]);
+
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: postUri,
+          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:user9/app.bsky.feed.repost/3",
+        cid: "repost3",
+        json: repostJson,
+      });
+
+      // Act
+      await repostIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const [stats] = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, postUri))
+        .limit(1);
+
+      expect(stats).toMatchObject({
+        postUri,
+        likeCount: 0,
+        repostCount: 2,
+      });
+    });
+
+    it("リポストが削除された場合にpost_statsのリポスト数が正しく更新される", async () => {
+      // Arrange
+      const postUri = "at://did:plc:author4/app.bsky.feed.post/456";
+
+      // actorとrecordsテーブルを準備
+      await ctx.db.insert(schema.actors).values([
+        { did: "did:plc:author4", handle: "author4.bsky.social" },
+        { did: "did:plc:user10", handle: "user10.bsky.social" },
+      ]);
+      await ctx.db.insert(schema.records).values([
+        {
+          uri: postUri,
+          cid: "post456",
+          actorDid: "did:plc:author4",
+          json: { $type: "app.bsky.feed.post" },
+        },
+        {
+          uri: "at://did:plc:user10/app.bsky.feed.repost/remaining",
+          cid: "remaining",
+          actorDid: "did:plc:user10",
+          json: { $type: "app.bsky.feed.repost" },
+        },
+      ]);
+      await ctx.db.insert(schema.posts).values({
+        uri: postUri,
+        cid: "post456",
+        actorDid: "did:plc:author4",
+        text: "Test post for repost 2",
+        createdAt: new Date(),
+      });
+
+      // 既存のリポストを1つ追加
+      await ctx.db.insert(schema.reposts).values({
+        uri: "at://did:plc:user10/app.bsky.feed.repost/remaining",
+        cid: "remaining",
+        actorDid: "did:plc:user10",
+        subjectUri: postUri,
+        subjectCid:
+          "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        createdAt: new Date(),
+      });
+
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: postUri,
+          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:user11/app.bsky.feed.repost/deleted",
+        cid: "deleted",
+        json: repostJson,
+      });
+
+      // Act
+      await repostIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const [stats] = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, postUri))
+        .limit(1);
+
+      expect(stats).toMatchObject({
+        postUri,
+        likeCount: 0,
+        repostCount: 1,
+      });
     });
   });
 });

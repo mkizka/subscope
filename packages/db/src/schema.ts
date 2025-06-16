@@ -105,6 +105,14 @@ export const posts = pgTable(
   ],
 );
 
+export const postStats = pgTable("post_stats", {
+  postUri: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => posts.uri, { onDelete: "cascade" }),
+  likeCount: integer().notNull().default(0),
+  repostCount: integer().notNull().default(0),
+});
+
 export const blobs = pgTable("blobs", {
   cid: varchar({ length: 256 }).primaryKey(),
   mimeType: varchar({ length: 256 }).notNull(),
@@ -210,6 +218,10 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     fields: [posts.uri],
     references: [postEmbedExternals.postUri],
   }),
+  stats: one(postStats, {
+    fields: [posts.uri],
+    references: [postStats.postUri],
+  }),
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
@@ -251,6 +263,13 @@ export const imageBlobCache = pgTable(
   },
   (table) => [index("image_blob_cache_created_at_idx").on(table.createdAt)],
 );
+
+export const postStatsRelations = relations(postStats, ({ one }) => ({
+  post: one(posts, {
+    fields: [postStats.postUri],
+    references: [posts.uri],
+  }),
+}));
 
 export const blobsRelations = relations(blobs, ({ many }) => ({
   profiles: many(profiles),

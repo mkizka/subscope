@@ -1,11 +1,36 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
 import { type RecordInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IRecordRepository } from "../application/interfaces/repositories/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
+  async findByUri({
+    ctx,
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Record | null> {
+    const [row] = await ctx.db
+      .select()
+      .from(schema.records)
+      .where(eq(schema.records.uri, uri.toString()))
+      .limit(1);
+
+    if (!row) {
+      return null;
+    }
+
+    return Record.fromJson({
+      uri,
+      cid: row.cid,
+      json: row.json,
+    });
+  }
+
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const data = {
       cid: record.cid,

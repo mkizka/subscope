@@ -75,23 +75,37 @@ export class IndexCommitService {
       await jobLogger.log("Invalid record: null character found");
       return;
     }
-    const shouldSave = await this.indexers[record.collection].shouldIndex({
+
+    const indexer = this.indexers[record.collection];
+    const shouldIndex = await indexer.shouldIndex({
       ctx,
       record,
     });
-    if (!shouldSave) {
+    if (!shouldIndex) {
       await jobLogger.log("Record does not match storage rules, skipping");
       return;
     }
-    await this.indexActorService.upsert({
-      ctx,
-      did: record.actorDid,
-    });
+
+    await this.indexActorService.upsert({ ctx, did: record.actorDid });
     await this.recordRepository.upsert({ ctx, record });
-    await this.indexers[record.collection].upsert({ ctx, record });
+
+    await indexer.upsert({ ctx, record });
+    if (indexer.updateStats) {
+      await indexer.updateStats({ ctx, record });
+    }
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
+    const existingRecord = await this.recordRepository.findByUri({ ctx, uri });
+
+    if (existingRecord && isSupportedCollection(existingRecord.collection)) {
+      const indexer = this.indexers[existingRecord.collection];
+      await indexer.updateStats?.({
+        ctx,
+        record: existingRecord,
+      });
+    }
+
     await this.recordRepository.delete({ ctx, uri });
   }
 }

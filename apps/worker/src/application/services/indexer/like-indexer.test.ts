@@ -8,6 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { LikeIndexer } from "./like-indexer.js";
 
@@ -21,6 +22,7 @@ beforeAll(() => {
   likeIndexer = testSetup.testInjector
     .provideClass("likeRepository", LikeRepository)
     .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
     .injectClass(LikeIndexer);
@@ -86,6 +88,172 @@ describe("LikeIndexer", () => {
         .where(eq(schema.likes.uri, record.uri.toString()))
         .limit(1);
       expect(like).toBeDefined();
+    });
+  });
+
+  describe("updateStats", () => {
+    it("いいね追加時にpost_statsのいいね数が正しく更新される", async () => {
+      // Arrange
+      const postUri = "at://did:plc:author/app.bsky.feed.post/123";
+
+      // actorとrecordsテーブルを準備
+      await ctx.db.insert(schema.actors).values([
+        { did: "did:plc:author", handle: "author.bsky.social" },
+        { did: "did:plc:user3", handle: "user3.bsky.social" },
+        { did: "did:plc:user4", handle: "user4.bsky.social" },
+      ]);
+      await ctx.db.insert(schema.records).values([
+        {
+          uri: postUri,
+          cid: "post123",
+          actorDid: "did:plc:author",
+          json: { $type: "app.bsky.feed.post" },
+        },
+        {
+          uri: "at://did:plc:user3/app.bsky.feed.like/1",
+          cid: "like1",
+          actorDid: "did:plc:user3",
+          json: { $type: "app.bsky.feed.like" },
+        },
+        {
+          uri: "at://did:plc:user4/app.bsky.feed.like/2",
+          cid: "like2",
+          actorDid: "did:plc:user4",
+          json: { $type: "app.bsky.feed.like" },
+        },
+      ]);
+      await ctx.db.insert(schema.posts).values({
+        uri: postUri,
+        cid: "post123",
+        actorDid: "did:plc:author",
+        text: "Test post",
+        createdAt: new Date(),
+      });
+
+      // 既存のいいねを2つ追加
+      await ctx.db.insert(schema.likes).values([
+        {
+          uri: "at://did:plc:user3/app.bsky.feed.like/1",
+          cid: "like1",
+          actorDid: "did:plc:user3",
+          subjectUri: postUri,
+          subjectCid:
+            "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          createdAt: new Date(),
+        },
+        {
+          uri: "at://did:plc:user4/app.bsky.feed.like/2",
+          cid: "like2",
+          actorDid: "did:plc:user4",
+          subjectUri: postUri,
+          subjectCid:
+            "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          createdAt: new Date(),
+        },
+      ]);
+
+      const likeJson = {
+        $type: "app.bsky.feed.like",
+        subject: {
+          uri: postUri,
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:user5/app.bsky.feed.like/3",
+        cid: "like3",
+        json: likeJson,
+      });
+
+      // Act
+      await likeIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const [stats] = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, postUri))
+        .limit(1);
+
+      expect(stats).toMatchObject({
+        postUri,
+        likeCount: 2,
+        repostCount: 0,
+      });
+    });
+
+    it("いいねが削除された場合にpost_statsのいいね数が正しく更新される", async () => {
+      // Arrange
+      const postUri = "at://did:plc:author2/app.bsky.feed.post/456";
+
+      // actorとrecordsテーブルを準備
+      await ctx.db.insert(schema.actors).values([
+        { did: "did:plc:author2", handle: "author2.bsky.social" },
+        { did: "did:plc:user5", handle: "user5.bsky.social" },
+      ]);
+      await ctx.db.insert(schema.records).values([
+        {
+          uri: postUri,
+          cid: "post456",
+          actorDid: "did:plc:author2",
+          json: { $type: "app.bsky.feed.post" },
+        },
+        {
+          uri: "at://did:plc:user5/app.bsky.feed.like/remaining",
+          cid: "remaining",
+          actorDid: "did:plc:user5",
+          json: { $type: "app.bsky.feed.like" },
+        },
+      ]);
+      await ctx.db.insert(schema.posts).values({
+        uri: postUri,
+        cid: "post456",
+        actorDid: "did:plc:author2",
+        text: "Test post 2",
+        createdAt: new Date(),
+      });
+
+      // 既存のいいねを1つ追加
+      await ctx.db.insert(schema.likes).values({
+        uri: "at://did:plc:user5/app.bsky.feed.like/remaining",
+        cid: "remaining",
+        actorDid: "did:plc:user5",
+        subjectUri: postUri,
+        subjectCid:
+          "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        createdAt: new Date(),
+      });
+
+      const likeJson = {
+        $type: "app.bsky.feed.like",
+        subject: {
+          uri: postUri,
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:user6/app.bsky.feed.like/deleted",
+        cid: "deleted",
+        json: likeJson,
+      });
+
+      // Act
+      await likeIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const [stats] = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, postUri))
+        .limit(1);
+
+      expect(stats).toMatchObject({
+        postUri,
+        likeCount: 1,
+        repostCount: 0,
+      });
     });
   });
 });

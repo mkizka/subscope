@@ -37,6 +37,7 @@ import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
+import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
 import { ProfileRecordFetcher } from "./infrastructure/profile-record-fetcher.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
@@ -71,6 +72,7 @@ createInjector()
   .provideClass("recordRepository", RecordRepository)
   .provideClass("followRepository", FollowRepository)
   .provideClass("likeRepository", LikeRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
   // application(service)

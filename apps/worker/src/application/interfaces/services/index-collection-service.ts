@@ -15,4 +15,11 @@ export interface ICollectionIndexer {
     ctx: TransactionContext;
     record: Record;
   }) => Promise<boolean>;
+  updateStats?: ({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }) => Promise<void>;
 }

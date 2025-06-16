@@ -7,6 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { PostIndexer } from "./post-indexer.js";
 
@@ -19,6 +20,7 @@ beforeAll(() => {
   const testSetup = getSetup();
   postIndexer = testSetup.testInjector
     .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .injectClass(PostIndexer);
