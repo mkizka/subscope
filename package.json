@@ -10,8 +10,8 @@
     "build": "turbo run build",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "./scripts/dev.sh",
-    "format": "turbo run lint -- --fix && prettier . --ignore-unknown --write",
-    "lint": "turbo run lint && pnpm prettier . --check",
+    "format": "turbo run format",
+    "lint": "turbo run lint",
     "prepare": "husky",
     "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
@@ -27,9 +27,6 @@
     "turbo": "2.5.4",
     "vitest": "^3.2.3",
     "wait-on": "8.0.3"
-  },
-  "lint-staged": {
-    "*": "prettier --ignore-unknown --write"
   },
   "prettier": {
     "plugins": [

@@ -4,8 +4,11 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache",
     "dev": "NODE_ENV=development tsx watch ./src/blob-proxy.ts | pino-pretty",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
+    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "start": "NODE_ENV=production tsx ./src/blob-proxy.ts",
     "typecheck": "tsc --noEmit"
   },

@@ -7,7 +7,10 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache",
+    "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
+    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

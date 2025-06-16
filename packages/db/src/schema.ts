@@ -1,14 +1,14 @@
 // 参考： https://github.com/bluesky-social/atproto/tree/main/packages/bsky/src/data-plane/server/db/tables
-import {
-  pgTable,
-  varchar,
-  text,
-  integer,
-  timestamp,
-  index,
-  jsonb,
-} from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
+import {
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const backfillStatus = ["dirty", "in-process", "synchronized"] as const;
 

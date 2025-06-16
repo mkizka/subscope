@@ -40,12 +40,12 @@ export class ReplyRefService {
       string,
       $Typed<AppBskyFeedDefs.PostView> | $Typed<AppBskyFeedDefs.NotFoundPost>
     >();
-    
+
     // 取得できたPostViewをマップに追加
     for (const postView of replyPostViews) {
       postViewMap.set(postView.uri, postView);
     }
-    
+
     // 存在しなかったURIにはNotFoundPostを設定
     for (const uri of replyAtUris) {
       if (!postViewMap.has(uri.toString())) {

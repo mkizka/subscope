@@ -7,19 +7,25 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --no-color --cache",
     "db:migrate": "drizzle-kit push",
-    "dev": "drizzle-kit studio"
+    "dev": "drizzle-kit studio",
+    "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
+    "lint": "pnpm -s _eslint && pnpm -s _prettier --check"
   },
   "dependencies": {
     "drizzle-orm": "0.44.2",
     "pg": "8.16.0"
   },
   "devDependencies": {
+    "@mkizka/eslint-config": "6.0.2",
     "@tsconfig/node-lts": "22.0.1",
     "@types/node": "22.15.30",
     "@types/pg": "8.15.4",
     "dotenv": "16.5.0",
-    "drizzle-kit": "0.31.1"
+    "drizzle-kit": "0.31.1",
+    "eslint": "9.19.0"
   },
   "sideEffects": false
 }

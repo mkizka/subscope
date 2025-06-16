@@ -1,1 +1,4 @@
-{ "*.ts": "pnpm lint --fix" }
+{
+  "*.ts": "pnpm lint --fix",
+  "*": "prettier --ignore-unknown --write"
+}
