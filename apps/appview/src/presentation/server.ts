@@ -20,7 +20,6 @@ export class AppviewServer {
   ) {
     this.logger = loggerManager.createLogger("AppviewServer");
     this.app = express();
-    this.app.use(promBundle({ includeMethod: true, includePath: true }));
     this.app.use(
       pinoHttp({
         logger: this.logger,
@@ -34,6 +33,7 @@ export class AppviewServer {
         customErrorObject: env.NODE_ENV === "development" ? noop : undefined,
       }),
     );
+    this.app.use(promBundle({ includeMethod: true, includePath: true }));
     this.app.use(this.xrpcRouter.create());
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
