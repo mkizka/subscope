@@ -504,6 +504,9 @@ importers:
       eslint:
         specifier: 9.28.0
         version: 9.28.0(jiti@1.21.7)
+      pino-http:
+        specifier: 10.5.0
+        version: 10.5.0
       typescript:
         specifier: 5.8.3
         version: 5.8.3

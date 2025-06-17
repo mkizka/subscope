@@ -1,15 +1,13 @@
 import type { Server } from "node:http";
 
 import type { ILoggerManager, Logger } from "@repo/common/domain";
+import { loggingMiddleware } from "@repo/common/infrastructure";
 import express from "express";
 import promBundle from "express-prom-bundle";
-import { pinoHttp } from "pino-http";
 
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
 import type { SyncWorker } from "./worker.js";
-
-const noop = () => {};
 
 export class WorkerServer {
   private readonly app: express.Express;
@@ -22,20 +20,8 @@ export class WorkerServer {
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
+    this.app.use(loggingMiddleware(this.logger));
     this.app.use(promBundle({ includeMethod: true }));
-    this.app.use(
-      pinoHttp({
-        logger: this.logger,
-        customSuccessMessage: (req, res, responseTime) => {
-          return `${req.method} ${res.statusCode} ${req.url} ${responseTime}ms`;
-        },
-        customErrorMessage: (req, res) => {
-          return `${req.method} ${res.statusCode} ${req.url}`;
-        },
-        customSuccessObject: env.NODE_ENV === "development" ? noop : undefined,
-        customErrorObject: env.NODE_ENV === "development" ? noop : undefined,
-      }),
-    );
     this.app.use(healthRouter);
   }
   static inject = ["loggerManager", "syncWorker"] as const;

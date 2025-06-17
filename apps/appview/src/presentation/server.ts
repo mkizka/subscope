@@ -1,14 +1,12 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
+import { loggingMiddleware } from "@repo/common/infrastructure";
 import express from "express";
 import promBundle from "express-prom-bundle";
-import { pinoHttp } from "pino-http";
 
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
 import { wellKnownRouter } from "./routes/well-known.js";
 import type { XRPCRouter } from "./routes/xrpc.js";
-
-const noop = () => {};
 
 export class AppviewServer {
   private readonly app: express.Express;
@@ -20,19 +18,7 @@ export class AppviewServer {
   ) {
     this.logger = loggerManager.createLogger("AppviewServer");
     this.app = express();
-    this.app.use(
-      pinoHttp({
-        logger: this.logger,
-        customSuccessMessage: (req, res, responseTime) => {
-          return `${req.method} ${res.statusCode} ${req.url} ${responseTime}ms`;
-        },
-        customErrorMessage: (req, res) => {
-          return `${req.method} ${res.statusCode} ${req.url}`;
-        },
-        customSuccessObject: env.NODE_ENV === "development" ? noop : undefined,
-        customErrorObject: env.NODE_ENV === "development" ? noop : undefined,
-      }),
-    );
+    this.app.use(loggingMiddleware(this.logger));
     this.app.use(promBundle({ includeMethod: true, includePath: true }));
     this.app.use(this.xrpcRouter.create());
     this.app.use(healthRouter);
