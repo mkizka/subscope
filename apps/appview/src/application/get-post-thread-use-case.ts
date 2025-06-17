@@ -49,13 +49,10 @@ export class GetPostThreadUseCase {
     }
 
     const parentThread = await this.collectParentPosts(
-      targetPost.uri,
+      targetPost,
       params.parentHeight,
     );
-    const childThreads = await this.collectChildPosts(
-      targetPost.uri,
-      params.depth,
-    );
+    const childThreads = await this.collectChildPosts(targetPost, params.depth);
     const targetPostThread = await this.buildThreadViewPost(targetPost);
 
     return {
@@ -76,7 +73,7 @@ export class GetPostThreadUseCase {
   }
 
   private async collectParentPosts(
-    uri: AtUri,
+    post: Post,
     maxDepth: number,
   ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost> | undefined> {
     if (maxDepth <= 0) {
@@ -84,7 +81,7 @@ export class GetPostThreadUseCase {
     }
 
     // 再帰的に親投稿を取得する。投稿は[直接の親, さらに親 ... ルート投稿]の順
-    const parentPosts = await this.findParentPosts(uri, maxDepth);
+    const parentPosts = await this.findParentPosts(post, maxDepth);
     if (parentPosts.length === 0) {
       return undefined;
     }
@@ -117,15 +114,13 @@ export class GetPostThreadUseCase {
     );
   }
 
-  private async findParentPosts(uri: AtUri, maxDepth: number): Promise<Post[]> {
-    const currentPost = await this.postRepository.findByUri(uri);
-
-    if (!currentPost?.replyParent || maxDepth <= 0) {
+  private async findParentPosts(post: Post, maxDepth: number): Promise<Post[]> {
+    if (!post.replyParent || maxDepth <= 0) {
       return [];
     }
 
     const parentPost = await this.postRepository.findByUri(
-      currentPost.replyParent.uri,
+      post.replyParent.uri,
     );
 
     if (!parentPost) {
@@ -133,21 +128,21 @@ export class GetPostThreadUseCase {
     }
 
     const moreParentPosts = await this.findParentPosts(
-      parentPost.uri,
+      parentPost,
       maxDepth - 1,
     );
     return [parentPost, ...moreParentPosts];
   }
 
   private async collectChildPosts(
-    uri: AtUri,
+    post: Post,
     maxDepth: number,
   ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost>[]> {
     if (maxDepth <= 0) {
       return [];
     }
 
-    const directReplies = await this.postRepository.findReplies(uri);
+    const directReplies = await this.postRepository.findReplies(post.uri);
 
     return Promise.all(
       directReplies.map((reply) =>
@@ -172,7 +167,7 @@ export class GetPostThreadUseCase {
     //    }
     //  ]
     //
-    const childReplies = await this.collectChildPosts(reply.uri, maxDepth);
+    const childReplies = await this.collectChildPosts(reply, maxDepth);
 
     return {
       ...threadViewPost,
