@@ -8,6 +8,8 @@ import { healthRouter } from "./routes/health.js";
 import { wellKnownRouter } from "./routes/well-known.js";
 import type { XRPCRouter } from "./routes/xrpc.js";
 
+const MONITORING_PATHS = ["/xrpc", "/health", "/.well-known"];
+
 export class AppviewServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
@@ -19,7 +21,18 @@ export class AppviewServer {
     this.logger = loggerManager.createLogger("AppviewServer");
     this.app = express();
     this.app.use(loggingMiddleware(this.logger));
-    this.app.use(promBundle({ includeMethod: true, includePath: true }));
+    this.app.use(
+      promBundle({
+        includeMethod: true,
+        includePath: true,
+        normalizePath: (req) => {
+          if (MONITORING_PATHS.some((path) => req.path.startsWith(path))) {
+            return req.path;
+          }
+          return "/others";
+        },
+      }),
+    );
     this.app.use(this.xrpcRouter.create());
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
