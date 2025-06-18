@@ -7,6 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
+import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { RepostIndexer } from "./repost-indexer.js";
@@ -23,6 +24,7 @@ beforeAll(() => {
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
+    .provideClass("feedItemRepository", FeedItemRepository)
     .injectClass(RepostIndexer);
   ctx = testSetup.ctx;
 });
@@ -76,6 +78,18 @@ describe("RepostIndexer", () => {
       expect(reposts[0]?.subjectUri).toBe(
         "at://did:plc:author/app.bsky.feed.post/123",
       );
+
+      const [feedItem] = await ctx.db
+        .select()
+        .from(schema.feedItems)
+        .where(eq(schema.feedItems.uri, record.uri.toString()))
+        .limit(1);
+      expect(feedItem).toMatchObject({
+        uri: record.uri.toString(),
+        type: "repost",
+        actorDid: "did:plc:reposter",
+        subjectUri: "at://did:plc:author/app.bsky.feed.post/123",
+      });
     });
   });
 

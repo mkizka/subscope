@@ -42,6 +42,7 @@ import { ProfileRecordFetcher } from "./infrastructure/profile-record-fetcher.js
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
+import { FeedItemRepository } from "./infrastructure/repositories/feed-item-repository.js";
 import { RepostRepository } from "./infrastructure/repost-repository.js";
 import { SubscriptionRepository } from "./infrastructure/subscription-repository.js";
 import { WorkerServer } from "./presentation/server.js";
@@ -75,6 +76,7 @@ createInjector()
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
   .provideClass("resolveDidService", ResolveDidService)
   .provideClass("backfillService", BackfillService)

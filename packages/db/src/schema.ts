@@ -180,6 +180,29 @@ export const reposts = pgTable(
   ],
 );
 
+export const feedType = ["post", "repost"] as const;
+
+export const feedItems = pgTable(
+  "feed_items",
+  {
+    uri: varchar({ length: 256 })
+      .primaryKey()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    type: varchar({ length: 20, enum: feedType }).notNull(),
+    subjectUri: varchar({ length: 256 }),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did),
+    sortAt: timestamp().notNull(),
+    indexedAt: timestamp().defaultNow(),
+  },
+  (table) => [
+    index("feed_items_sort_at_idx").on(table.sortAt),
+    index("feed_items_actor_did_idx").on(table.actorDid),
+  ],
+);
+
 export const postEmbedImages = pgTable("post_embed_images", {
   postUri: varchar({ length: 256 })
     .notNull()
