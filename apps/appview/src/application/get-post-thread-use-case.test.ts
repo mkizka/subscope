@@ -2,7 +2,7 @@ import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { setupTestDatabase } from "@repo/test-utils";
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import { HandleResolver } from "../infrastructure/handle-resolver.js";
 import { PostRepository } from "../infrastructure/post-repository.js";
@@ -19,6 +19,10 @@ let getPostThreadUseCase: GetPostThreadUseCase;
 let ctx: TransactionContext;
 
 const { getSetup } = setupTestDatabase();
+
+const spyFindByUri = vi.spyOn(PostRepository.prototype, "findByUri");
+const spyFindPostView = vi.spyOn(PostViewService.prototype, "findPostView");
+const spyFindReplies = vi.spyOn(PostRepository.prototype, "findReplies");
 
 beforeAll(() => {
   const testSetup = getSetup();
@@ -51,6 +55,10 @@ describe("GetPostThreadUseCase", () => {
       uri: "at://did:plc:notexist/app.bsky.feed.post/notexist",
       notFound: true,
     });
+    // ターゲット投稿の取得1回のみ
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    expect(spyFindReplies).toHaveBeenCalledTimes(0);
+    expect(spyFindPostView).toHaveBeenCalledTimes(0);
   });
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
@@ -128,6 +136,10 @@ describe("GetPostThreadUseCase", () => {
       parent: undefined,
       replies: [],
     });
+    // ターゲット投稿とリプライ取得1回ずつ
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
+    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
@@ -330,6 +342,11 @@ describe("GetPostThreadUseCase", () => {
         },
       },
     });
+    // ターゲット投稿1回、親2回取得
+    expect(spyFindByUri).toHaveBeenCalledTimes(3);
+    // ターゲット投稿のリプライを検索
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
+    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
@@ -541,6 +558,11 @@ describe("GetPostThreadUseCase", () => {
         },
       ],
     });
+    // ターゲット投稿の取得1回のみ
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // ターゲット投稿のリプライ、リプライのリプライ、リプライのリプライのリプライ(これは結果無し)で3回
+    expect(spyFindReplies).toHaveBeenCalledTimes(3);
+    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("depthより大きい深さのリプライは取得しない", async () => {
@@ -804,6 +826,11 @@ describe("GetPostThreadUseCase", () => {
         },
       ],
     });
+    // ターゲット投稿の取得で1回
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // depth=2の制限により、ルート投稿と深さ1の投稿のリプライのみ取得（計2回）
+    expect(spyFindReplies).toHaveBeenCalledTimes(2);
+    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
@@ -1063,6 +1090,11 @@ describe("GetPostThreadUseCase", () => {
       },
       replies: [],
     });
+    // ターゲット投稿で1回、親投稿チェーンで2回
+    expect(spyFindByUri).toHaveBeenCalledTimes(3);
+    // ターゲット投稿のリプライ取得1回のみ
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
+    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("handleが含まれるURIの場合、DIDに変換してから投稿を取得する", async () => {
@@ -1150,6 +1182,11 @@ describe("GetPostThreadUseCase", () => {
       parent: undefined,
       replies: [],
     });
+    // ターゲット投稿の取得で1回
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // ターゲット投稿のリプライ取得1回のみ
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
+    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("handleが解決できない場合、notFoundPostを返す", async () => {
@@ -1171,5 +1208,9 @@ describe("GetPostThreadUseCase", () => {
       uri: "at://notfound.handle/app.bsky.feed.post/notfound123",
       notFound: true,
     });
+    // handle解決に失敗で以下はすべて実行されない
+    expect(spyFindByUri).toHaveBeenCalledTimes(0);
+    expect(spyFindReplies).toHaveBeenCalledTimes(0);
+    expect(spyFindPostView).toHaveBeenCalledTimes(0);
   });
 });

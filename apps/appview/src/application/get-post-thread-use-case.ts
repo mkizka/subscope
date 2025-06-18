@@ -1,11 +1,10 @@
-import type { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atproto/syntax";
 import type {
   $Typed,
   AppBskyFeedDefs,
   AppBskyFeedGetPostThread,
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
-import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "./interfaces/post-repository.js";
 import {
@@ -13,6 +12,10 @@ import {
   AtUriServiceError,
 } from "./service/at-uri-service.js";
 import type { PostViewService } from "./service/post-view-service.js";
+
+type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
+type PostView = $Typed<AppBskyFeedDefs.PostView>;
+type NotFoundPost = $Typed<AppBskyFeedDefs.NotFoundPost>;
 
 export class GetPostThreadUseCase {
   constructor(
@@ -31,173 +34,258 @@ export class GetPostThreadUseCase {
     depth: number;
     parentHeight: number;
   }): Promise<AppBskyFeedGetPostThread.OutputSchema> {
-    // at://example.com/app.bsky.feed.post/12345 の形式でリクエストが来る場合があるので解決する
-    let targetUri;
+    // 1. URIを解決（ハンドル形式の場合はDIDに変換）
+    const resolvedUri = await this.resolveUri(params.uri);
+    if (!resolvedUri) {
+      return { thread: this.notFoundPost(params.uri) };
+    }
+
+    // 2. ターゲット投稿を取得
+    const targetPost = await this.postRepository.findByUri(resolvedUri);
+    if (!targetPost) {
+      return { thread: this.notFoundPost(resolvedUri) };
+    }
+
+    // 3. スレッド全体の構造を収集
+    const threadData = await this.collectThreadData({
+      targetPost,
+      parentHeight: params.parentHeight,
+      replyDepth: params.depth,
+    });
+
+    // 4. すべての投稿のPostViewを一括取得
+    const postViewMap = await this.hydratePostViewMap(threadData.allPostUris);
+
+    // 5. ターゲット投稿のPostViewを確認
+    const targetPostView = postViewMap.get(targetPost.uri.toString());
+    if (!targetPostView) {
+      return { thread: this.notFoundPost(resolvedUri) };
+    }
+
+    // 6. スレッド構造を構築して返す
+    return {
+      thread: this.buildThreadStructure({
+        targetPost,
+        targetPostView,
+        parentPosts: threadData.parentPosts,
+        replyDepth: params.depth,
+        postViewMap,
+        replyTree: threadData.replyTree,
+      }),
+    };
+  }
+
+  private async resolveUri(uri: AtUri): Promise<AtUri | null> {
     try {
-      targetUri = await this.atUriService.resolveHostname(params.uri);
+      return await this.atUriService.resolveHostname(uri);
     } catch (error) {
-      // DB上のデータでハンドル解決出来ない場合は投稿も存在しないはずなのでnotFoundPostで返す
       if (error instanceof AtUriServiceError) {
-        return { thread: this.notFoundPost(params.uri) };
+        return null;
       }
       throw error;
     }
-
-    const targetPost = await this.postRepository.findByUri(targetUri);
-    if (!targetPost) {
-      return { thread: this.notFoundPost(targetUri) };
-    }
-
-    const parentThread = await this.collectParentPosts(
-      targetPost,
-      params.parentHeight,
-    );
-    const childThreads = await this.collectChildPosts(targetPost, params.depth);
-    const targetPostThread = await this.buildThreadViewPost(targetPost);
-
-    return {
-      thread: {
-        ...targetPostThread,
-        parent: parentThread,
-        replies: childThreads,
-      },
-    };
   }
 
-  private notFoundPost(uri: AtUri): $Typed<AppBskyFeedDefs.NotFoundPost> {
-    return {
-      $type: "app.bsky.feed.defs#notFoundPost" as const,
+  private notFoundPost(uri: AtUri): NotFoundPost {
+    const result: NotFoundPost = {
+      $type: "app.bsky.feed.defs#notFoundPost",
       uri: uri.toString(),
       notFound: true,
     };
+    return result;
   }
 
-  private async collectParentPosts(
-    post: Post,
-    maxDepth: number,
-  ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost> | undefined> {
-    if (maxDepth <= 0) {
-      return undefined;
-    }
+  private async collectThreadData(params: {
+    targetPost: Post;
+    parentHeight: number;
+    replyDepth: number;
+  }): Promise<{
+    parentPosts: Post[];
+    allPostUris: Set<string>;
+    replyTree: Map<string, Post[]>;
+  }> {
+    const { targetPost, parentHeight, replyDepth } = params;
 
-    // 再帰的に親投稿を取得する。投稿は[直接の親, さらに親 ... ルート投稿]の順
-    const parentPosts = await this.findParentPosts(post, maxDepth);
-    if (parentPosts.length === 0) {
-      return undefined;
-    }
+    const parentPosts = await this.collectParentChain(targetPost, parentHeight);
+    const replyTree = await this.collectReplyTree(targetPost, replyDepth);
 
-    const parentThreads = await this.buildThreadViewPosts(parentPosts);
+    const allPostUris = this.aggregateAllUris({
+      targetPost,
+      parentPosts,
+      replyTree,
+    });
 
-    // parentThreadsが配列 [A, B, C] のとき、以下のような構造を作成する
-    //
-    //  {
-    //    "$type": "app.bsky.feed.defs#threadViewPost",
-    //    "post": { A },
-    //    "parent": {
-    //      "$type": "app.bsky.feed.defs#threadViewPost",
-    //      "post": { B },
-    //      "parent": {
-    //        "$type": "app.bsky.feed.defs#threadViewPost",
-    //        "post": { C },
-    //      },
-    //    }
-    //  }
-    //
-    return parentThreads.reduceRight<
-      $Typed<AppBskyFeedDefs.ThreadViewPost> | undefined
-    >(
-      (parentChain, currentParent) => ({
-        ...currentParent,
-        parent: parentChain,
-      }),
-      undefined,
+    return { parentPosts, allPostUris, replyTree };
+  }
+
+  private async hydratePostViewMap(
+    uris: Set<string>,
+  ): Promise<Map<string, PostView>> {
+    const uriArray = Array.from(uris).map((uri) => new AtUri(uri));
+    const postViews = await this.postViewService.findPostView(uriArray);
+    return new Map(postViews.map((view) => [view.uri, view]));
+  }
+
+  private buildThreadStructure({
+    targetPost,
+    targetPostView,
+    parentPosts,
+    replyDepth,
+    postViewMap,
+    replyTree,
+  }: {
+    targetPost: Post;
+    targetPostView: PostView;
+    parentPosts: Post[];
+    replyDepth: number;
+    postViewMap: Map<string, PostView>;
+    replyTree: Map<string, Post[]>;
+  }): ThreadViewPost {
+    const parentThread = this.buildParentThread(parentPosts, postViewMap);
+    const replyThreads = this.buildReplyThreads(
+      targetPost,
+      replyDepth,
+      postViewMap,
+      replyTree,
     );
+
+    return {
+      $type: "app.bsky.feed.defs#threadViewPost",
+      post: targetPostView,
+      parent: parentThread,
+      replies: replyThreads,
+    };
   }
 
-  private async findParentPosts(post: Post, maxDepth: number): Promise<Post[]> {
-    if (!post.replyParent || maxDepth <= 0) {
+  private async collectParentChain(
+    post: Post,
+    remainingHeight: number,
+  ): Promise<Post[]> {
+    if (!post.replyParent || remainingHeight <= 0) {
       return [];
     }
 
     const parentPost = await this.postRepository.findByUri(
       post.replyParent.uri,
     );
-
     if (!parentPost) {
       return [];
     }
 
-    const moreParentPosts = await this.findParentPosts(
+    const ancestorPosts = await this.collectParentChain(
       parentPost,
-      maxDepth - 1,
+      remainingHeight - 1,
     );
-    return [parentPost, ...moreParentPosts];
+
+    return [parentPost, ...ancestorPosts];
   }
 
-  private async collectChildPosts(
+  // 各リプライについてリプライのuriをキーとし、リプライへのリプライの配列を値とするMapを返す
+  // buildReplyThreadsでリプライスレッドを再構築する際に使用する
+  private async collectReplyTree(
     post: Post,
-    maxDepth: number,
-  ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost>[]> {
-    if (maxDepth <= 0) {
-      return [];
+    remainingDepth: number,
+    structure: Map<string, Post[]> = new Map(),
+  ): Promise<Map<string, Post[]>> {
+    if (remainingDepth <= 0) {
+      return structure;
     }
 
     const directReplies = await this.postRepository.findReplies(post.uri);
+    structure.set(post.uri.toString(), directReplies);
 
-    return Promise.all(
+    await Promise.all(
       directReplies.map((reply) =>
-        this.buildChildPostChain(reply, maxDepth - 1),
+        this.collectReplyTree(reply, remainingDepth - 1, structure),
       ),
+    );
+
+    return structure;
+  }
+
+  private aggregateAllUris({
+    targetPost,
+    parentPosts,
+    replyTree,
+  }: {
+    targetPost: Post;
+    parentPosts: Post[];
+    replyTree: Map<string, Post[]>;
+  }): Set<string> {
+    const uris = new Set<string>();
+    uris.add(targetPost.uri.toString());
+
+    for (const post of parentPosts) {
+      uris.add(post.uri.toString());
+    }
+
+    for (const replies of replyTree.values()) {
+      replies.forEach((reply) => uris.add(reply.uri.toString()));
+    }
+    return uris;
+  }
+
+  private buildParentThread(
+    parentPosts: Post[],
+    postViewMap: Map<string, PostView>,
+  ): ThreadViewPost | undefined {
+    if (parentPosts.length === 0) {
+      return undefined;
+    }
+
+    const threadViews = parentPosts
+      .map((post) => {
+        const postView = postViewMap.get(post.uri.toString());
+        if (!postView) return null;
+
+        return {
+          $type: "app.bsky.feed.defs#threadViewPost" as const,
+          post: postView,
+        };
+      })
+      .filter((view) => view !== null);
+
+    // threadViewsは[親、親の親、親の親の親...]の順
+    // 一番上の親から逆方向に組み上げていく(最初のchildThreadはundefined)のでreduceRightを使用
+    return threadViews.reduceRight<ThreadViewPost | undefined>(
+      (childThread, currentThread) => ({
+        ...currentThread,
+        parent: childThread,
+      }),
+      undefined,
     );
   }
 
-  private async buildChildPostChain(
-    reply: Post,
-    maxDepth: number,
-  ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost>> {
-    const threadViewPost = await this.buildThreadViewPost(reply);
-
-    // ここで再帰的に子投稿を収集しているので、childRepliesは以下のようになる
-    //
-    //  [
-    //    {
-    //      "$type": "app.bsky.feed.defs#threadViewPost",
-    //      "post": reply,
-    //      "replies": [ ...replyの子投稿の配列 ]
-    //    }
-    //  ]
-    //
-    const childReplies = await this.collectChildPosts(reply, maxDepth);
-
-    return {
-      ...threadViewPost,
-      replies: childReplies,
-    };
-  }
-
-  private async buildThreadViewPosts(
-    posts: Post[],
-  ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost>[]> {
-    if (posts.length === 0) {
+  private buildReplyThreads(
+    post: Post,
+    remainingDepth: number,
+    postViewMap: Map<string, PostView>,
+    replyTree: Map<string, Post[]>,
+  ): ThreadViewPost[] {
+    if (remainingDepth <= 0) {
       return [];
     }
 
-    const postViews = await this.postViewService.findPostView(
-      posts.map((post) => post.uri),
-    );
+    const directReplies = replyTree.get(post.uri.toString()) ?? [];
 
-    return postViews.map((postView) => {
-      return {
-        $type: "app.bsky.feed.defs#threadViewPost" as const,
-        post: postView,
-      };
-    });
-  }
+    return directReplies
+      .map((reply) => {
+        const postView = postViewMap.get(reply.uri.toString());
+        if (!postView) return null;
 
-  private async buildThreadViewPost(
-    post: Post,
-  ): Promise<$Typed<AppBskyFeedDefs.ThreadViewPost>> {
-    const result = await this.buildThreadViewPosts([post]);
-    return required(result[0]);
+        const nestedReplies = this.buildReplyThreads(
+          reply,
+          remainingDepth - 1,
+          postViewMap,
+          replyTree,
+        );
+
+        return {
+          $type: "app.bsky.feed.defs#threadViewPost" as const,
+          post: postView,
+          replies: nestedReplies,
+        };
+      })
+      .filter((thread) => thread !== null);
   }
 }
