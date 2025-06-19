@@ -10,9 +10,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const backfillStatus = ["dirty", "in-process", "synchronized"] as const;
-
-export type BackfillStatus = (typeof backfillStatus)[number];
+const backfillStatus = ["dirty", "in-process", "synchronized"] as const;
 
 export const actors = pgTable(
   "actors",
@@ -92,6 +90,7 @@ export const posts = pgTable(
     replyParentCid: varchar({ length: 256 }),
     langs: jsonb().$type<string[]>(),
     createdAt: timestamp().notNull(),
+    // TODO: defaultNowではなくnotNullにする
     indexedAt: timestamp().defaultNow(),
     updatedAt: timestamp().$onUpdate(() => new Date()),
     sortAt: timestamp()
@@ -180,7 +179,7 @@ export const reposts = pgTable(
   ],
 );
 
-export const feedType = ["post", "repost"] as const;
+const feedType = ["post", "repost"] as const;
 
 export const feedItems = pgTable(
   "feed_items",
