@@ -51,6 +51,7 @@ export const recordFactory = (db: Database, collection: string) =>
           indexedAt: () => faker.date.recent(),
         },
         vars: {
+          actorDid: () => null as string | null,
           actor: () => actorFactory(db).create(),
         },
       },
@@ -58,8 +59,12 @@ export const recordFactory = (db: Database, collection: string) =>
     )
     .props({
       uri: async ({ vars }) =>
-        fakeAtUri({ did: (await vars.actor).did, collection }),
-      actorDid: async ({ vars }) => (await vars.actor).did,
+        fakeAtUri({
+          did: (await vars.actorDid) ?? (await vars.actor).did,
+          collection,
+        }),
+      actorDid: async ({ vars }) =>
+        (await vars.actorDid) ?? (await vars.actor).did,
     });
 
 export const postFactory = (db: Database) =>
@@ -88,6 +93,23 @@ export const postFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
+    })
+    .traits({
+      withProfile: {
+        after: async (post) => {
+          const profileRecord = await recordFactory(
+            db,
+            "app.bsky.actor.profile",
+          )
+            .vars({ actorDid: () => post.actorDid })
+            .create();
+          await profileFactory(db)
+            .vars({
+              record: () => profileRecord,
+            })
+            .create();
+        },
+      },
     });
 
 export const postStatsFactory = (db: Database) =>
