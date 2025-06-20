@@ -7,9 +7,9 @@ export const create = async <T extends TableConfig>(
   db: DatabaseClient,
   table: PgTable<T>,
   props: PgTable<T>["$inferInsert"],
-): Promise<PgTable<T>["$inferSelect"]> => {
+) => {
   const models = await db.insert(table).values(props).returning();
-  if (!Array.isArray(models)) {
+  if (!Array.isArray(models) || models[0] === undefined) {
     throw Error("Failed to insert.");
   }
   return models[0];
