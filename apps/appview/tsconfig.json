@@ -3,7 +3,9 @@
   "compilerOptions": {
     "outDir": "dist",
     "sourceMap": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "moduleResolution": "bundler",
+    "module": "esnext"
   },
   "include": ["**/*.ts"]
 }
