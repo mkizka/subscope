@@ -1,15 +1,22 @@
 import { AtUri } from "@atproto/syntax";
 import { faker } from "@faker-js/faker";
 import { defineFactory } from "@praha/drizzle-factory";
-import { schema } from "@repo/db";
+import { schema as dbShema } from "@repo/db";
+
+const schema = {
+  actors: dbShema.actors,
+  records: dbShema.records,
+  posts: dbShema.posts,
+  postStats: dbShema.postStats,
+};
 
 export const actorFactory = defineFactory({
-  schema: { actors: schema.actors },
+  schema,
   table: "actors",
   resolver: ({ sequence }) => ({
     did: `did:plc:example${sequence}`,
     handle: `example${sequence}.test`,
-    backfillStatus: "dirty",
+    backfillStatus: "dirty" as const,
     backfillVersion: 1,
     indexedAt: faker.date.recent(),
     updatedAt: faker.date.recent(),
@@ -18,7 +25,7 @@ export const actorFactory = defineFactory({
 
 export const recordFactory = (collection: string) =>
   defineFactory({
-    schema: { records: schema.records },
+    schema,
     table: "records",
     resolver: ({ sequence, use }) => {
       const actor = use(actorFactory).create();
@@ -38,7 +45,7 @@ export const recordFactory = (collection: string) =>
   });
 
 export const postFactory = defineFactory({
-  schema: { posts: schema.posts },
+  schema,
   table: "posts",
   resolver: ({ sequence, use }) => {
     const record = use(recordFactory("app.bsky.feed.post")).create();
@@ -47,14 +54,21 @@ export const postFactory = defineFactory({
       cid: `bafyreicidpostexample${sequence}`,
       actorDid: async () => (await record).actorDid,
       text: faker.lorem.sentence(),
+      replyRootUri: null,
+      replyRootCid: null,
+      replyParentUri: null,
+      replyParentCid: null,
+      langs: [],
       createdAt: faker.date.recent(),
+      indexedAt: faker.date.recent(),
+      updatedAt: faker.date.recent(),
     };
   },
 });
 
 export const postStatsFactory = defineFactory({
-  schema: { post_stats: schema.postStats },
-  table: "post_stats",
+  schema,
+  table: "postStats",
   resolver: ({ use }) => {
     return {
       postUri: () =>
