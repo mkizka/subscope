@@ -81,14 +81,13 @@ export const postFactory = (db: Database) =>
         },
         vars: {
           record: () => recordFactory(db, "app.bsky.feed.post").create(),
-          actor: () => actorFactory(db).create(),
         },
       },
       (props) => create(db, schema.posts, props),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
-      actorDid: async ({ vars }) => (await vars.actor).did,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
 
 export const postStatsFactory = (db: Database) =>
@@ -128,12 +127,11 @@ export const profileFactory = (db: Database) =>
         },
         vars: {
           record: () => recordFactory(db, "app.bsky.actor.profile").create(),
-          actor: () => actorFactory(db).create(),
         },
       },
       (props) => create(db, schema.profiles, props),
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
-      actorDid: async ({ vars }) => (await vars.actor).did,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
