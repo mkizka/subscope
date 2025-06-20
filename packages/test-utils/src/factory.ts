@@ -8,25 +8,27 @@ import { create } from "./create.js";
 
 type Database = NodePgDatabase<typeof schema>;
 
-const randomDid = () => () => `did:plc:${faker.string.alphanumeric(16)}`;
+const fakeDid = () =>
+  `did:plc:${faker.string.alphanumeric({ length: 24, casing: "lower" })}`;
 
-const randomHandle = () => () => faker.internet.domainName();
+const fakeHandle = () => faker.internet.domainName();
 
-const randomAtUri = (collection: string) => () =>
+const fakeAtUri = ({ did, collection }: { did?: string; collection: string }) =>
   AtUri.make(
-    randomDid()(),
+    did ?? fakeDid(),
     collection,
-    faker.string.alphanumeric(16),
+    faker.string.alphanumeric({ length: 13, casing: "lower" }),
   ).toString();
 
-const randomCid = () => () => `bafyre${faker.string.alphanumeric(46)}`;
+const fakeCid = () =>
+  `bafyre${faker.string.alphanumeric({ length: 46, casing: "lower" })}`;
 
 export const actorFactory = (db: Database) =>
   factory.define(
     {
       props: {
-        did: randomDid(),
-        handle: randomHandle(),
+        did: () => fakeDid(),
+        handle: () => fakeHandle(),
         backfillStatus: () => "dirty" as const,
         backfillVersion: () => null,
         indexedAt: () => faker.date.recent(),
@@ -42,7 +44,7 @@ export const recordFactory = (db: Database, collection: string) =>
     .define(
       {
         props: {
-          uri: randomAtUri(collection),
+          uri: later<string>(),
           cid: () => `bafyre${faker.string.alphanumeric(46)}`,
           actorDid: later<string>(),
           json: () => ({ $type: collection }),
@@ -55,6 +57,8 @@ export const recordFactory = (db: Database, collection: string) =>
       (props) => create(db, schema.records, props),
     )
     .props({
+      uri: async ({ vars }) =>
+        fakeAtUri({ did: (await vars.actor).did, collection }),
       actorDid: async ({ vars }) => (await vars.actor).did,
     });
 
@@ -64,13 +68,13 @@ export const postFactory = (db: Database) =>
       {
         props: {
           uri: later<string>(),
-          cid: randomCid(),
+          cid: () => fakeCid(),
           actorDid: later<string>(),
           text: () => faker.lorem.sentence(),
-          replyRootUri: () => null,
-          replyRootCid: () => null,
-          replyParentUri: () => null,
-          replyParentCid: () => null,
+          replyRootUri: () => fakeAtUri({ collection: "app.bsky.feed.post" }),
+          replyRootCid: () => fakeCid(),
+          replyParentUri: () => fakeAtUri({ collection: "app.bsky.feed.post" }),
+          replyParentCid: () => fakeCid(),
           langs: () => [],
           createdAt: () => faker.date.recent(),
           indexedAt: () => faker.date.recent(),
@@ -105,4 +109,31 @@ export const postStatsFactory = (db: Database) =>
     )
     .props({
       postUri: async ({ vars }) => (await vars.post).uri,
+    });
+
+export const profileFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          uri: later<string>(),
+          cid: () => fakeCid(),
+          actorDid: later<string>(),
+          avatarCid: () => fakeCid(),
+          description: () => faker.lorem.sentence(),
+          displayName: () => faker.person.fullName(),
+          createdAt: () => faker.date.recent(),
+          indexedAt: () => faker.date.recent(),
+          updatedAt: () => faker.date.recent(),
+        },
+        vars: {
+          record: () => recordFactory(db, "app.bsky.actor.profile").create(),
+          actor: () => actorFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.profiles, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.record).uri,
+      actorDid: async ({ vars }) => (await vars.actor).did,
     });
