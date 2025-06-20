@@ -1,7 +1,11 @@
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  postFactory,
+  profileFactory,
+  setupTestDatabase,
+} from "@repo/test-utils";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import { HandleResolver } from "../infrastructure/handle-resolver.js";
@@ -63,63 +67,14 @@ describe("GetPostThreadUseCase", () => {
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
     // arrange
-    const postUri = AtUri.make(
-      "did:plc:single",
-      "app.bsky.feed.post",
-      "single123",
-    );
-    const actorDid = "did:plc:single";
-    const postRecord = {
-      $type: "app.bsky.feed.post",
-      text: "Single post",
-      createdAt: "2024-01-01T00:00:00.000Z",
-    };
-
-    await ctx.db.insert(schema.actors).values({
-      did: actorDid,
-      handle: "single.bsky.social",
-    });
-
-    await ctx.db.insert(schema.records).values({
-      uri: postUri.toString(),
-      cid: "bafyreisingle",
-      actorDid,
-      json: postRecord,
-      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-    });
-
-    await ctx.db.insert(schema.posts).values({
-      uri: postUri.toString(),
-      cid: "bafyreisingle",
-      actorDid,
-      text: "Single post",
-      createdAt: new Date(postRecord.createdAt),
-    });
-
-    const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
-    await ctx.db.insert(schema.records).values({
-      uri: profileUri,
-      cid: "bafyreiprofile",
-      actorDid,
-      json: {
-        $type: "app.bsky.actor.profile",
-        displayName: "Single User",
-        createdAt: "2024-01-01T00:00:00.000Z",
-      },
-      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-    });
-
-    await ctx.db.insert(schema.profiles).values({
-      uri: profileUri,
-      cid: "bafyreiprofile",
-      actorDid,
-      displayName: "Single User",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-    });
+    const post = await postFactory(ctx.db).create();
+    const profile = await profileFactory(ctx.db)
+      .props({ actorDid: () => post.actorDid })
+      .create();
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: postUri,
+      uri: new AtUri(post.uri),
       depth: 6,
       parentHeight: 80,
     });
@@ -128,9 +83,9 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: postUri.toString(),
+        uri: post.uri,
         author: {
-          displayName: "Single User",
+          displayName: profile.displayName,
         },
       },
       parent: undefined,
@@ -144,172 +99,42 @@ describe("GetPostThreadUseCase", () => {
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
     // arrange
-    const rootUri = AtUri.make("did:plc:root", "app.bsky.feed.post", "root123");
-    const parentUri = AtUri.make(
-      "did:plc:parent",
-      "app.bsky.feed.post",
-      "parent123",
-    );
-    const targetUri = AtUri.make(
-      "did:plc:target",
-      "app.bsky.feed.post",
-      "target123",
-    );
-
-    const rootActorDid = "did:plc:root";
-    const parentActorDid = "did:plc:parent";
-    const targetActorDid = "did:plc:target";
-
-    // actorsを作成
-    await ctx.db.insert(schema.actors).values([
-      { did: rootActorDid, handle: "root.bsky.social" },
-      { did: parentActorDid, handle: "parent.bsky.social" },
-      { did: targetActorDid, handle: "target.bsky.social" },
-    ]);
-
-    // recordsを作成
-    await ctx.db.insert(schema.records).values([
-      {
-        uri: rootUri.toString(),
-        cid: "bafyreiroot",
-        actorDid: rootActorDid,
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Root post",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        uri: parentUri.toString(),
-        cid: "bafyreiparent",
-        actorDid: parentActorDid,
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Parent post",
-          reply: {
-            root: { uri: rootUri.toString(), cid: "bafyreiroot" },
-            parent: { uri: rootUri.toString(), cid: "bafyreiroot" },
-          },
-          createdAt: "2024-01-01T01:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T01:00:00.000Z"),
-      },
-      {
-        uri: targetUri.toString(),
-        cid: "bafyreitarget",
-        actorDid: targetActorDid,
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Target post",
-          reply: {
-            root: { uri: rootUri.toString(), cid: "bafyreiroot" },
-            parent: { uri: parentUri.toString(), cid: "bafyreiparent" },
-          },
-          createdAt: "2024-01-01T02:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T02:00:00.000Z"),
-      },
-    ]);
-
-    // profile recordsを作成
-    await ctx.db.insert(schema.records).values([
-      {
-        uri: `at://${rootActorDid}/app.bsky.actor.profile/self`,
-        cid: "bafyreiprofileroot",
-        actorDid: rootActorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Root User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        uri: `at://${parentActorDid}/app.bsky.actor.profile/self`,
-        cid: "bafyreiprofileparent",
-        actorDid: parentActorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Parent User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        uri: `at://${targetActorDid}/app.bsky.actor.profile/self`,
-        cid: "bafyreiprofiletarget",
-        actorDid: targetActorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Target User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-    ]);
-
-    // postsを作成
-    await ctx.db.insert(schema.posts).values([
-      {
-        uri: rootUri.toString(),
-        cid: "bafyreiroot",
-        actorDid: rootActorDid,
-        text: "Root post",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        uri: parentUri.toString(),
-        cid: "bafyreiparent",
-        actorDid: parentActorDid,
-        text: "Parent post",
-        replyRootUri: rootUri.toString(),
-        replyRootCid: "bafyreiroot",
-        replyParentUri: rootUri.toString(),
-        replyParentCid: "bafyreiroot",
-        createdAt: new Date("2024-01-01T01:00:00.000Z"),
-      },
-      {
-        uri: targetUri.toString(),
-        cid: "bafyreitarget",
-        actorDid: targetActorDid,
-        text: "Target post",
-        replyRootUri: rootUri.toString(),
-        replyRootCid: "bafyreiroot",
-        replyParentUri: parentUri.toString(),
-        replyParentCid: "bafyreiparent",
-        createdAt: new Date("2024-01-01T02:00:00.000Z"),
-      },
-    ]);
-
-    // profilesを作成
-    await ctx.db.insert(schema.profiles).values([
-      {
-        uri: `at://${rootActorDid}/app.bsky.actor.profile/self`,
-        cid: "bafyreiprofileroot",
-        actorDid: rootActorDid,
-        displayName: "Root User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        uri: `at://${parentActorDid}/app.bsky.actor.profile/self`,
-        cid: "bafyreiprofileparent",
-        actorDid: parentActorDid,
-        displayName: "Parent User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        uri: `at://${targetActorDid}/app.bsky.actor.profile/self`,
-        cid: "bafyreiprofiletarget",
-        actorDid: targetActorDid,
-        displayName: "Target User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-    ]);
+    const rootPost = await postFactory(ctx.db).create();
+    const rootProfile = await profileFactory(ctx.db)
+      .props({
+        actorDid: () => rootPost.actorDid,
+      })
+      .create();
+    const parentPost = await postFactory(ctx.db)
+      .props({
+        replyRootUri: () => rootPost.uri,
+        replyRootCid: () => rootPost.cid,
+        replyParentUri: () => rootPost.uri,
+        replyParentCid: () => rootPost.cid,
+      })
+      .create();
+    const parentProfile = await profileFactory(ctx.db)
+      .props({
+        actorDid: () => parentPost.actorDid,
+      })
+      .create();
+    const targetPost = await postFactory(ctx.db)
+      .props({
+        replyRootUri: () => rootPost.uri,
+        replyRootCid: () => rootPost.cid,
+        replyParentUri: () => parentPost.uri,
+        replyParentCid: () => parentPost.cid,
+      })
+      .create();
+    const targetProfile = await profileFactory(ctx.db)
+      .props({
+        actorDid: () => targetPost.actorDid,
+      })
+      .create();
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: targetUri,
+      uri: new AtUri(targetPost.uri),
       depth: 6,
       parentHeight: 10,
     });
@@ -318,25 +143,25 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: targetUri.toString(),
+        uri: targetPost.uri,
         author: {
-          displayName: "Target User",
+          displayName: targetProfile.displayName,
         },
       },
       parent: {
         $type: "app.bsky.feed.defs#threadViewPost",
         post: {
-          uri: parentUri.toString(),
+          uri: parentPost.uri,
           author: {
-            displayName: "Parent User",
+            displayName: parentProfile.displayName,
           },
         },
         parent: {
           $type: "app.bsky.feed.defs#threadViewPost",
           post: {
-            uri: rootUri.toString(),
+            uri: rootPost.uri,
             author: {
-              displayName: "Root User",
+              displayName: rootProfile.displayName,
             },
           },
         },
