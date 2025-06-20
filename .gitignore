@@ -9,3 +9,6 @@ generated/
 
 # claude
 .claude/settings.local.json
+
+# repomix
+*.xml
