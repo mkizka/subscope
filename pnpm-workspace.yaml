@@ -2,3 +2,5 @@ packages:
   - apps/*
   - packages/*
   - dev-env
+patchedDependencies:
+  '@factory-js/factory': patches/@factory-js__factory.patch

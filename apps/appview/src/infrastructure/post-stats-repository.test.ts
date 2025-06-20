@@ -60,7 +60,9 @@ describe("PostStatsRepository", () => {
 
     it("複数の投稿が指定された場合、それぞれの統計を含むMapを返す", async () => {
       // arrange
-      const [postStats1, postStats2] = await postStatsFactory(ctx.db).create(2);
+      const [postStats1, postStats2] = await postStatsFactory(
+        ctx.db,
+      ).createList(2);
 
       // act
       const result = await postStatsRepository.findStats([

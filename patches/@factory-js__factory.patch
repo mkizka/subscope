@@ -1,0 +1,36 @@
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index 48ad540004e100f97189e65b927961d24d702063..2d9808c77cc584e65a410e42467aaaac895886e4 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,5 +1,19 @@
+ type Promisable<T> = T | PromiseLike<T>;
+ 
++// Tuple generation utility types
++type TupleOf<T, N extends number, R extends unknown[] = []> = R['length'] extends N ? R : TupleOf<T, N, [...R, T]>;
++type ToTupleOrArray<T, N extends number> = N extends 1 ? [T] 
++  : N extends 2 ? [T, T]
++  : N extends 3 ? [T, T, T]
++  : N extends 4 ? [T, T, T, T]
++  : N extends 5 ? [T, T, T, T, T]
++  : N extends 6 ? [T, T, T, T, T, T]
++  : N extends 7 ? [T, T, T, T, T, T, T]
++  : N extends 8 ? [T, T, T, T, T, T, T, T]
++  : N extends 9 ? [T, T, T, T, T, T, T, T, T]
++  : N extends 10 ? [T, T, T, T, T, T, T, T, T, T]
++  : T[];
++
+ type Key = string | number | symbol;
+ 
+ type UnknownRecord = Record<Key, unknown>;
+@@ -58,9 +72,9 @@ declare class Factory<P extends UnknownRecord, O, V extends UnknownRecord, T ext
+     use(pick: (traits: T) => Trait<P, V, O>): Factory<P, O, V, T>;
+     after(after: After<O, V>): Factory<P, O, V, T>;
+     build(): Promise<P>;
+-    buildList(count: number): Promise<P[]>;
++    buildList<N extends number>(count: N): Promise<ToTupleOrArray<P, N>>;
+     create(): Promise<O>;
+-    createList(count: number): Promise<O[]>;
++    createList<N extends number>(count: N): Promise<ToTupleOrArray<O, N>>;
+     get def(): {
+         props: InitProps<P>;
+         vars: InitVars<V>;

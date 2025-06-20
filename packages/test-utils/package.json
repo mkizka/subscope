@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@atproto/syntax": "0.4.0",
+    "@factory-js/factory": "0.4.0",
     "@faker-js/faker": "9.8.0",
-    "@praha/drizzle-factory": "1.1.2",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
     "@testcontainers/postgresql": "11.0.2",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@mkizka/eslint-config": "6.0.2",
     "@tsconfig/node-lts": "22.0.1",
+    "drizzle-orm": "0.44.2",
     "eslint": "9.28.0",
     "typescript": "5.8.3"
   },
