@@ -95,7 +95,7 @@ export const postFactory = (db: Database) =>
       actorDid: async ({ vars }) => (await vars.record).actorDid,
     })
     .traits({
-      withProfile: {
+      withProfile: (params: { displayName: string }) => ({
         after: async (post) => {
           const profileRecord = await recordFactory(
             db,
@@ -104,12 +104,11 @@ export const postFactory = (db: Database) =>
             .vars({ actorDid: () => post.actorDid })
             .create();
           await profileFactory(db)
-            .vars({
-              record: () => profileRecord,
-            })
+            .vars({ record: () => profileRecord })
+            .props({ displayName: () => params.displayName })
             .create();
         },
-      },
+      }),
     });
 
 export const postStatsFactory = (db: Database) =>
