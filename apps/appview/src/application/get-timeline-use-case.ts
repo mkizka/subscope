@@ -5,7 +5,7 @@ import type {
   AppBskyFeedGetTimeline,
 } from "@repo/client/server";
 
-import { TimelineQuery } from "./domain/timeline-query.js";
+import { TimelineQuery } from "../domain/models/timeline-query.js";
 import type { IPostRepository } from "./interfaces/post-repository.js";
 import type { PostViewService } from "./service/post-view-service.js";
 import type { ReplyRefService } from "./service/reply-ref-service.js";

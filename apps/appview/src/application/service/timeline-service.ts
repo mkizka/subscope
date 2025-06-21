@@ -1,5 +1,5 @@
-import { PaginationResult } from "../domain/pagination-result.js";
-import type { TimelineQuery } from "../domain/timeline-query.js";
+import { PaginationResult } from "../../domain/models/pagination-result.js";
+import type { TimelineQuery } from "../../domain/models/timeline-query.js";
 import type { ITimelineRepository } from "../interfaces/timeline-repository.js";
 
 export class TimelineService {
