@@ -156,3 +156,28 @@ export const profileFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.record).uri,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
+
+export const followFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          uri: later<string>(),
+          cid: () => fakeCid(),
+          actorDid: later<string>(),
+          subjectDid: later<string>(),
+          createdAt: () => faker.date.recent(),
+          indexedAt: () => faker.date.recent(),
+        },
+        vars: {
+          record: () => recordFactory(db, "app.bsky.graph.follow").create(),
+          followee: () => actorFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.follows, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.record).uri,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      subjectDid: async ({ vars }) => (await vars.followee).did,
+    });
