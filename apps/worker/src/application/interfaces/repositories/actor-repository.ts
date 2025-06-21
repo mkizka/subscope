@@ -4,6 +4,11 @@ import type { BackfillStatus } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 
 export interface IActorRepository {
+  createIfNotExists: (params: {
+    ctx: TransactionContext;
+    did: Did;
+  }) => Promise<void>;
+
   upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
 
   findByDid: (params: {
