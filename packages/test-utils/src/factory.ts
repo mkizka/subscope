@@ -21,7 +21,7 @@ const fakeAtUri = ({ did, collection }: { did?: string; collection: string }) =>
   ).toString();
 
 const fakeCid = () =>
-  `bafyre${faker.string.alphanumeric({ length: 46, casing: "lower" })}`;
+  "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e";
 
 export const actorFactory = (db: Database) =>
   factory
@@ -61,7 +61,7 @@ export const recordFactory = (db: Database, collection: string) =>
       {
         props: {
           uri: later<string>(),
-          cid: () => `bafyre${faker.string.alphanumeric(46)}`,
+          cid: () => fakeCid(),
           actorDid: later<string>(),
           json: () => ({ $type: collection }),
           indexedAt: () => faker.date.recent(),
@@ -89,7 +89,7 @@ export const postFactory = (db: Database) =>
       {
         props: {
           uri: later<string>(),
-          cid: () => fakeCid(),
+          cid: later<string>(),
           actorDid: later<string>(),
           text: () => faker.lorem.sentence(),
           replyRootUri: () => null as string | null,
@@ -108,6 +108,7 @@ export const postFactory = (db: Database) =>
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
 
@@ -154,6 +155,7 @@ export const profileFactory = (db: Database) =>
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
 
@@ -178,6 +180,7 @@ export const followFactory = (db: Database) =>
     )
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
       subjectDid: async ({ vars }) => (await vars.followee).did,
     });
