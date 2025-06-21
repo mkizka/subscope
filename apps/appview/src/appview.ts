@@ -16,6 +16,7 @@ import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
 import { AuthVerifierService } from "./application/service/auth-verifier-service.js";
 import { EmbedViewService } from "./application/service/embed-view-service.js";
+import { HandleService } from "./application/service/handle-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
 import { ReplyRefService } from "./application/service/reply-ref-service.js";
@@ -72,6 +73,7 @@ createInjector()
   .provideClass("getPostThreadUseCase", GetPostThreadUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
+  .provideClass("handleService", HandleService)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)

@@ -3,13 +3,30 @@ import { asDid } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { asHandle, type Handle, required } from "@repo/common/utils";
 import { schema } from "@repo/db";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
-import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
+import {
+  HandleResolutionError,
+  type IHandleResolver,
+} from "../application/interfaces/handle-resolver.js";
 
 export class HandleResolver implements IHandleResolver {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
+
+  async resolve(handle: Handle): Promise<Did> {
+    const [actor] = await this.db
+      .select({
+        did: schema.actors.did,
+      })
+      .from(schema.actors)
+      .where(eq(schema.actors.handle, handle))
+      .limit(1);
+    if (!actor) {
+      throw new HandleResolutionError(handle);
+    }
+    return asDid(required(actor.did));
+  }
 
   async resolveMany(handles: Handle[]) {
     const actors = await this.db

@@ -1,29 +1,15 @@
 import type { Did } from "@atproto/did";
 import type { AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
-import { type Handle, isHandle } from "@repo/common/utils";
 
 import { env } from "../../shared/env.js";
-import type { IHandleResolver } from "../interfaces/handle-resolver.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 
-type HandleOrDid = Handle | Did;
-
 export class ProfileViewService {
-  constructor(
-    private readonly profileRepository: IProfileRepository,
-    private readonly handleResolver: IHandleResolver,
-  ) {}
-  static inject = ["profileRepository", "handleResolver"] as const;
+  constructor(private readonly profileRepository: IProfileRepository) {}
+  static inject = ["profileRepository"] as const;
 
-  private async findProfile(handleOrDids: HandleOrDid[]) {
-    const handles = handleOrDids.filter((handleOrDid) => isHandle(handleOrDid));
-    const didsByHandle = await this.handleResolver.resolveMany(handles);
-    const dids = handleOrDids
-      .map((handleOrDid) =>
-        isHandle(handleOrDid) ? didsByHandle[handleOrDid] : handleOrDid,
-      )
-      .filter((did) => !!did);
+  private async findProfile(dids: Did[]) {
     return await this.profileRepository.findManyDetailed(dids);
   }
 
@@ -60,13 +46,13 @@ export class ProfileViewService {
     };
   }
 
-  async findProfileViewBasic(handleOrDids: HandleOrDid[]) {
-    const profiles = await this.findProfile(handleOrDids);
+  async findProfileViewBasic(dids: Did[]) {
+    const profiles = await this.findProfile(dids);
     return profiles.map((profile) => this.createProfileViewBasic(profile));
   }
 
-  async findProfileViewDetailed(handleOrDids: HandleOrDid[]) {
-    const profiles = await this.findProfile(handleOrDids);
+  async findProfileViewDetailed(dids: Did[]) {
+    const profiles = await this.findProfile(dids);
     return profiles.map((profile) => this.createProfileViewDetailed(profile));
   }
 

@@ -18,13 +18,8 @@ export class AtUriService {
       throw new InvalidHostnameError(uri);
     }
 
-    const didMap = await this.handleResolver.resolveMany([uri.hostname]);
-    const did = didMap[uri.hostname];
-
-    if (!did) {
-      throw new HandleResolutionError(uri.hostname);
-    }
-    return ResolvedAtUri.make(did, uri.collection, uri.rkey);
+    const handle = await this.handleResolver.resolve(uri.hostname);
+    return ResolvedAtUri.make(handle, uri.collection, uri.rkey);
   }
 }
 
@@ -34,12 +29,5 @@ export class InvalidHostnameError extends AtUriServiceError {
   constructor(uri: AtUri) {
     super(`Invalid hostname in URI: ${uri.toString()}`);
     this.name = "InvalidHostnameError";
-  }
-}
-
-export class HandleResolutionError extends AtUriServiceError {
-  constructor(handle: string) {
-    super(`Failed to resolve handle: ${handle}`);
-    this.name = "HandleResolutionError";
   }
 }
