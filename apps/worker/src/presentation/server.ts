@@ -1,7 +1,7 @@
 import type { Server } from "node:http";
 
 import type { ILoggerManager, Logger } from "@repo/common/domain";
-import { loggingMiddleware } from "@repo/common/infrastructure";
+import { loggingMiddleware } from "@repo/common/utils";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
