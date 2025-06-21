@@ -32,3 +32,12 @@ export const isSupportedCollection = (
 ): collection is SupportedCollection => {
   return SUPPORTED_COLLECTIONS.includes(collection as SupportedCollection);
 };
+
+export const asSupportedCollection = (
+  collection: string,
+): SupportedCollection => {
+  if (isSupportedCollection(collection)) {
+    return collection;
+  }
+  throw new Error(`Unsupported collection: ${collection}`);
+};

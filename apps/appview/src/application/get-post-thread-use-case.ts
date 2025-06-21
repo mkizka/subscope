@@ -6,11 +6,9 @@ import type {
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
 
+import type { ResolvedAtUri } from "../domain/models/at-uri.js";
+import { type AtUriService } from "../domain/service/at-uri-service.js";
 import type { IPostRepository } from "./interfaces/post-repository.js";
-import {
-  type AtUriService,
-  AtUriServiceError,
-} from "./service/at-uri-service.js";
 import type { PostViewService } from "./service/post-view-service.js";
 
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
@@ -30,39 +28,35 @@ export class GetPostThreadUseCase {
   ] as const;
 
   async execute(params: {
-    uri: AtUri;
+    uri: ResolvedAtUri;
     depth: number;
     parentHeight: number;
   }): Promise<AppBskyFeedGetPostThread.OutputSchema> {
-    // 1. URIを解決（ハンドル形式の場合はDIDに変換）
-    const resolvedUri = await this.resolveUri(params.uri);
-    if (!resolvedUri) {
-      return { thread: this.notFoundPost(params.uri) };
-    }
-
-    // 2. ターゲット投稿を取得
-    const targetPost = await this.postRepository.findByUri(resolvedUri);
+    // 1. ターゲット投稿を取得
+    const targetPost = await this.postRepository.findByUri(
+      params.uri.getValue(),
+    );
     if (!targetPost) {
-      return { thread: this.notFoundPost(resolvedUri) };
+      return { thread: this.notFoundPost(params.uri.getValue()) };
     }
 
-    // 3. スレッド全体の構造を収集
+    // 2. スレッド全体の構造を収集
     const threadData = await this.collectThreadData({
       targetPost,
       parentHeight: params.parentHeight,
       replyDepth: params.depth,
     });
 
-    // 4. すべての投稿のPostViewを一括取得
+    // 3. すべての投稿のPostViewを一括取得
     const postViewMap = await this.hydratePostViewMap(threadData.allPostUris);
 
-    // 5. ターゲット投稿のPostViewを確認
+    // 4. ターゲット投稿のPostViewを確認
     const targetPostView = postViewMap.get(targetPost.uri.toString());
     if (!targetPostView) {
-      return { thread: this.notFoundPost(resolvedUri) };
+      return { thread: this.notFoundPost(targetPost.uri) };
     }
 
-    // 6. スレッド構造を構築して返す
+    // 5. スレッド構造を構築して返す
     return {
       thread: this.buildThreadStructure({
         targetPost,
@@ -73,17 +67,6 @@ export class GetPostThreadUseCase {
         replyTree: threadData.replyTree,
       }),
     };
-  }
-
-  private async resolveUri(uri: AtUri): Promise<AtUri | null> {
-    try {
-      return await this.atUriService.resolveHostname(uri);
-    } catch (error) {
-      if (error instanceof AtUriServiceError) {
-        return null;
-      }
-      throw error;
-    }
   }
 
   private notFoundPost(uri: AtUri): NotFoundPost {

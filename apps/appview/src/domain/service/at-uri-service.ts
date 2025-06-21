@@ -1,30 +1,30 @@
 import { isDid } from "@atproto/did";
-import { AtUri } from "@atproto/syntax";
-import { asHandle, isHandle } from "@repo/common/utils";
+import type { AtUri } from "@atproto/syntax";
+import { isHandle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../interfaces/handle-resolver.js";
+import type { IHandleResolver } from "../../application/interfaces/handle-resolver.js";
+import { ResolvedAtUri } from "../models/at-uri.js";
 
 export class AtUriService {
   constructor(private readonly handleResolver: IHandleResolver) {}
   static inject = ["handleResolver"] as const;
 
-  async resolveHostname(uri: AtUri): Promise<AtUri> {
+  async resolveHostname(uri: AtUri): Promise<ResolvedAtUri> {
     if (isDid(uri.hostname)) {
-      return uri;
+      return new ResolvedAtUri(uri);
     }
 
     if (!isHandle(uri.hostname)) {
       throw new InvalidHostnameError(uri);
     }
 
-    const handle = asHandle(uri.hostname);
-    const handleToDids = await this.handleResolver.resolveMany([handle]);
-    const did = handleToDids[handle];
+    const didMap = await this.handleResolver.resolveMany([uri.hostname]);
+    const did = didMap[uri.hostname];
 
     if (!did) {
-      throw new HandleResolutionError(handle);
+      throw new HandleResolutionError(uri.hostname);
     }
-    return AtUri.make(did, uri.collection, uri.rkey);
+    return ResolvedAtUri.make(did, uri.collection, uri.rkey);
   }
 }
 

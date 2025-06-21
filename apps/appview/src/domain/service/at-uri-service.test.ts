@@ -35,7 +35,6 @@ describe("AtUriService", () => {
       const result = await atUriService.resolveHostname(uri);
 
       // assert
-      expect(result).toBe(uri);
       expect(result.toString()).toBe(
         "at://did:plc:example123/app.bsky.feed.post/abc123",
       );

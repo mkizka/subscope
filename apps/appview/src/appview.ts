@@ -14,13 +14,13 @@ import { GetPostThreadUseCase } from "./application/get-post-thread-use-case.js"
 import { GetPostsUseCase } from "./application/get-posts-use-case.js";
 import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
 import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
-import { AtUriService } from "./application/service/at-uri-service.js";
 import { AuthVerifierService } from "./application/service/auth-verifier-service.js";
 import { EmbedViewService } from "./application/service/embed-view-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
 import { ProfileViewService } from "./application/service/profile-view-service.js";
 import { ReplyRefService } from "./application/service/reply-ref-service.js";
 import { TimelineService } from "./application/service/timeline-service.js";
+import { AtUriService } from "./domain/service/at-uri-service.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";

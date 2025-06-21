@@ -1,4 +1,3 @@
-import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 import {
   actorFactory,
@@ -8,13 +7,14 @@ import {
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
+import { ResolvedAtUri } from "../domain/models/at-uri.js";
+import { AtUriService } from "../domain/service/at-uri-service.js";
 import { HandleResolver } from "../infrastructure/handle-resolver.js";
 import { PostRepository } from "../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { RecordRepository } from "../infrastructure/record-repository.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
-import { AtUriService } from "./service/at-uri-service.js";
 import { EmbedViewService } from "./service/embed-view-service.js";
 import { PostViewService } from "./service/post-view-service.js";
 import { ProfileViewService } from "./service/profile-view-service.js";
@@ -48,7 +48,9 @@ describe("GetPostThreadUseCase", () => {
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: new AtUri("at://did:plc:notexist/app.bsky.feed.post/notexist"),
+      uri: new ResolvedAtUri(
+        "at://did:plc:notexist/app.bsky.feed.post/notexist",
+      ),
       depth: 6,
       parentHeight: 80,
     });
@@ -79,7 +81,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: new AtUri(post.uri),
+      uri: new ResolvedAtUri(post.uri),
       depth: 6,
       parentHeight: 80,
     });
@@ -148,7 +150,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: new AtUri(targetPost.uri),
+      uri: new ResolvedAtUri(targetPost.uri),
       depth: 6,
       parentHeight: 10,
     });
@@ -234,7 +236,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act
     const result = await getPostThreadUseCase.execute({
-      uri: new AtUri(rootPost.uri),
+      uri: new ResolvedAtUri(rootPost.uri),
       depth: 6,
       parentHeight: 80,
     });
@@ -342,7 +344,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act - depth=2で実行（Level 3は取得されないはず）
     const result = await getPostThreadUseCase.execute({
-      uri: new AtUri(rootPost.uri),
+      uri: new ResolvedAtUri(rootPost.uri),
       depth: 2,
       parentHeight: 80,
     });
@@ -450,7 +452,7 @@ describe("GetPostThreadUseCase", () => {
 
     // act - parentHeight=2で実行（Level 0は取得されないはず）
     const result = await getPostThreadUseCase.execute({
-      uri: new AtUri(targetPost.uri),
+      uri: new ResolvedAtUri(targetPost.uri),
       depth: 6,
       parentHeight: 2,
     });
@@ -490,74 +492,5 @@ describe("GetPostThreadUseCase", () => {
     // ターゲット投稿のリプライ取得1回のみ
     expect(spyFindReplies).toHaveBeenCalledTimes(1);
     expect(spyFindPostView).toHaveBeenCalledTimes(1);
-  });
-
-  test("handleが含まれるURIの場合、DIDに変換してから投稿を取得する", async () => {
-    // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Handle User" }))
-      .create();
-    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => actor })
-      .create();
-    await postFactory(ctx.db)
-      .vars({ record: () => record })
-      .create();
-    const originalUri = new AtUri(record.uri);
-    const handleUri = AtUri.make(
-      actor.handle!, // DIDをhandleに差し替えておく
-      originalUri.collection,
-      originalUri.rkey,
-    );
-
-    // act
-    const result = await getPostThreadUseCase.execute({
-      uri: handleUri,
-      depth: 6,
-      parentHeight: 80,
-    });
-
-    // assert
-    expect(result.thread).toMatchObject({
-      $type: "app.bsky.feed.defs#threadViewPost",
-      post: {
-        uri: record.uri,
-        author: {
-          displayName: "Handle User",
-        },
-      },
-      parent: undefined,
-      replies: [],
-    });
-    // ターゲット投稿の取得で1回
-    expect(spyFindByUri).toHaveBeenCalledTimes(1);
-    // ターゲット投稿のリプライ取得1回のみ
-    expect(spyFindReplies).toHaveBeenCalledTimes(1);
-    expect(spyFindPostView).toHaveBeenCalledTimes(1);
-  });
-
-  test("handleが解決できない場合、notFoundPostを返す", async () => {
-    // arrange
-    const handleUri = new AtUri(
-      "at://notfound.handle/app.bsky.feed.post/notfound123",
-    );
-
-    // act
-    const result = await getPostThreadUseCase.execute({
-      uri: handleUri,
-      depth: 6,
-      parentHeight: 80,
-    });
-
-    // assert
-    expect(result.thread).toEqual({
-      $type: "app.bsky.feed.defs#notFoundPost",
-      uri: "at://notfound.handle/app.bsky.feed.post/notfound123",
-      notFound: true,
-    });
-    // handle解決に失敗で以下はすべて実行されない
-    expect(spyFindByUri).toHaveBeenCalledTimes(0);
-    expect(spyFindReplies).toHaveBeenCalledTimes(0);
-    expect(spyFindPostView).toHaveBeenCalledTimes(0);
   });
 });

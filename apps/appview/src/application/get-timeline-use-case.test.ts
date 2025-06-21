@@ -8,6 +8,7 @@ import {
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
+import { AtUriService } from "../domain/service/at-uri-service.js";
 import { HandleResolver } from "../infrastructure/handle-resolver.js";
 import { PostRepository } from "../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../infrastructure/post-stats-repository.js";
@@ -15,7 +16,6 @@ import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { RecordRepository } from "../infrastructure/record-repository.js";
 import { TimelineRepository } from "../infrastructure/timeline-repository.js";
 import { GetTimelineUseCase } from "./get-timeline-use-case.js";
-import { AtUriService } from "./service/at-uri-service.js";
 import { EmbedViewService } from "./service/embed-view-service.js";
 import { PostViewService } from "./service/post-view-service.js";
 import { ProfileViewService } from "./service/profile-view-service.js";
