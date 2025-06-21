@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
+import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { RepostRepository } from "../../../infrastructure/repost-repository.js";
@@ -25,6 +26,7 @@ beforeAll(() => {
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
+    .provideClass("postRepository", PostRepository)
     .injectClass(RepostIndexer);
   ctx = testSetup.ctx;
 });
@@ -258,6 +260,37 @@ describe("RepostIndexer", () => {
         repostCount: 1,
         replyCount: 0,
       });
+    });
+
+    it("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
+      // Arrange
+      const nonExistentPostUri =
+        "at://did:plc:nonexistent/app.bsky.feed.post/888";
+
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: nonExistentPostUri,
+          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:reposter/app.bsky.feed.repost/orphan",
+        cid: "orphanrepost",
+        json: repostJson,
+      });
+
+      // Act
+      await repostIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const stats = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, nonExistentPostUri));
+
+      expect(stats).toHaveLength(0);
     });
   });
 });

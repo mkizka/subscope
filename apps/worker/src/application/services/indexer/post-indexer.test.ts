@@ -225,5 +225,43 @@ describe("PostIndexer", () => {
 
       expect(stats).toHaveLength(0);
     });
+
+    it("親投稿が存在しない場合はpost_statsを更新しない", async () => {
+      // Arrange
+      const nonExistentParentUri =
+        "at://did:plc:nonexistent/app.bsky.feed.post/parent";
+
+      const replyJson = {
+        $type: "app.bsky.feed.post",
+        text: "Reply to non-existent post",
+        reply: {
+          root: {
+            uri: nonExistentParentUri,
+            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          },
+          parent: {
+            uri: nonExistentParentUri,
+            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+          },
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:replier/app.bsky.feed.post/orphanreply",
+        cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        json: replyJson,
+      });
+
+      // Act
+      await postIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const stats = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, nonExistentParentUri));
+
+      expect(stats).toHaveLength(0);
+    });
   });
 });

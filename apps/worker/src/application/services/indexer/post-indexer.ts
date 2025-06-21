@@ -50,10 +50,17 @@ export class PostIndexer implements ICollectionIndexer {
     const post = Post.from(record);
 
     if (post.replyParent) {
-      await this.postStatsRepository.upsertReplyCount({
+      // 親投稿が存在する場合のみstatsを更新
+      const parentExists = await this.postRepository.exists(
         ctx,
-        uri: post.replyParent.uri,
-      });
+        post.replyParent.uri.toString(),
+      );
+      if (parentExists) {
+        await this.postStatsRepository.upsertReplyCount({
+          ctx,
+          uri: post.replyParent.uri,
+        });
+      }
     }
   }
 }

@@ -257,5 +257,36 @@ describe("LikeIndexer", () => {
         replyCount: 0,
       });
     });
+
+    it("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
+      // Arrange
+      const nonExistentPostUri =
+        "at://did:plc:nonexistent/app.bsky.feed.post/999";
+
+      const likeJson = {
+        $type: "app.bsky.feed.like",
+        subject: {
+          uri: nonExistentPostUri,
+          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: "at://did:plc:liker/app.bsky.feed.like/orphan",
+        cid: "orphanlike",
+        json: likeJson,
+      });
+
+      // Act
+      await likeIndexer.updateStats({ ctx, record });
+
+      // Assert
+      const stats = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, nonExistentPostUri));
+
+      expect(stats).toHaveLength(0);
+    });
   });
 });
