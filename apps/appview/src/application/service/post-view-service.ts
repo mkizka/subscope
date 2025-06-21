@@ -4,7 +4,7 @@ import type {
   AppBskyActorDefs,
   AppBskyFeedDefs,
 } from "@repo/client/server";
-import type { Post, Record } from "@repo/common/domain";
+import type { ILoggerManager, Logger, Post, Record } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "../interfaces/post-repository.js";
@@ -17,19 +17,25 @@ import type { EmbedViewService } from "./embed-view-service.js";
 import type { ProfileViewService } from "./profile-view-service.js";
 
 export class PostViewService {
+  private readonly logger: Logger;
+
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly recordRepository: IRecordRepository,
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly profileViewService: ProfileViewService,
     private readonly embedViewService: EmbedViewService,
-  ) {}
+    loggerManager: ILoggerManager,
+  ) {
+    this.logger = loggerManager.createLogger("PostViewService");
+  }
   static inject = [
     "postRepository",
     "recordRepository",
     "postStatsRepository",
     "profileViewService",
     "embedViewService",
+    "loggerManager",
   ] as const;
 
   // TODO: 引数をPost[]にした方がいい？
@@ -66,9 +72,11 @@ export class PostViewService {
         const record = recordMap.get(post.uri.toString());
         const stats = statsMap.get(post.uri.toString());
         if (!author || !record || !stats) {
-          throw new Error(
-            `Missing author, record, or stats for post: ${post.uri.toString()}`,
+          this.logger.warn(
+            { author, record, stats },
+            `Missing data for post ${post.uri.toString()}`,
           );
+          return null;
         }
 
         return this.createPostView(post, record, author, stats);
