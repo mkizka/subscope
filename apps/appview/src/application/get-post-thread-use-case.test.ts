@@ -67,8 +67,14 @@ describe("GetPostThreadUseCase", () => {
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
     // arrange
-    const post = await postFactory(ctx.db)
+    const actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Single User" }))
+      .create();
+    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .create();
+    const post = await postFactory(ctx.db)
+      .vars({ record: () => record })
       .create();
 
     // act
@@ -98,11 +104,24 @@ describe("GetPostThreadUseCase", () => {
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
     // arrange
-    const rootPost = await postFactory(ctx.db)
+    const rootActor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Root User" }))
       .create();
-    const parentPost = await postFactory(ctx.db)
+    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => rootActor })
+      .create();
+    const rootPost = await postFactory(ctx.db)
+      .vars({ record: () => rootRecord })
+      .create();
+
+    const parentActor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Parent User" }))
+      .create();
+    const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => parentActor })
+      .create();
+    const parentPost = await postFactory(ctx.db)
+      .vars({ record: () => parentRecord })
       .props({
         replyRootUri: () => rootPost.uri,
         replyRootCid: () => rootPost.cid,
@@ -110,8 +129,15 @@ describe("GetPostThreadUseCase", () => {
         replyParentCid: () => rootPost.cid,
       })
       .create();
-    const targetPost = await postFactory(ctx.db)
+
+    const targetActor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Target User" }))
+      .create();
+    const targetRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => targetActor })
+      .create();
+    const targetPost = await postFactory(ctx.db)
+      .vars({ record: () => targetRecord })
       .props({
         replyRootUri: () => rootPost.uri,
         replyRootCid: () => rootPost.cid,
@@ -164,26 +190,46 @@ describe("GetPostThreadUseCase", () => {
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
     // arrange
-    const rootPost = await postFactory(ctx.db)
+    const rootActor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Root User" }))
       .create();
+    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => rootActor })
+      .create();
+    const rootPost = await postFactory(ctx.db)
+      .vars({ record: () => rootRecord })
+      .create();
+
+    const replyActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Reply User" }))
+      .create();
+    const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => replyActor })
+      .create();
     const replyPost = await postFactory(ctx.db)
+      .vars({ record: () => replyRecord })
       .props({
         replyRootUri: () => rootPost.uri,
         replyRootCid: () => rootPost.cid,
         replyParentUri: () => rootPost.uri,
         replyParentCid: () => rootPost.cid,
       })
-      .use((t) => t.withProfile({ displayName: "Reply User" }))
+      .create();
+
+    const grandchildActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Grandchild User" }))
+      .create();
+    const grandchildRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => grandchildActor })
       .create();
     const grandchildPost = await postFactory(ctx.db)
+      .vars({ record: () => grandchildRecord })
       .props({
         replyRootUri: () => rootPost.uri,
         replyRootCid: () => rootPost.cid,
         replyParentUri: () => replyPost.uri,
         replyParentCid: () => replyPost.cid,
       })
-      .use((t) => t.withProfile({ displayName: "Grandchild User" }))
       .create();
 
     // act
@@ -235,11 +281,24 @@ describe("GetPostThreadUseCase", () => {
 
   test("depthより大きい深さのリプライは取得しない", async () => {
     // arrange
-    const rootPost = await postFactory(ctx.db)
+    const rootActor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Root User" }))
       .create();
-    const level1Post = await postFactory(ctx.db)
+    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => rootActor })
+      .create();
+    const rootPost = await postFactory(ctx.db)
+      .vars({ record: () => rootRecord })
+      .create();
+
+    const level1Actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Level 1 User" }))
+      .create();
+    const level1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => level1Actor })
+      .create();
+    const level1Post = await postFactory(ctx.db)
+      .vars({ record: () => level1Record })
       .props({
         replyRootUri: () => rootPost.uri,
         replyRootCid: () => rootPost.cid,
@@ -247,8 +306,15 @@ describe("GetPostThreadUseCase", () => {
         replyParentCid: () => rootPost.cid,
       })
       .create();
-    const level2Post = await postFactory(ctx.db)
+
+    const level2Actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Level 2 User" }))
+      .create();
+    const level2Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => level2Actor })
+      .create();
+    const level2Post = await postFactory(ctx.db)
+      .vars({ record: () => level2Record })
       .props({
         replyRootUri: () => rootPost.uri,
         replyRootCid: () => rootPost.cid,
@@ -256,8 +322,15 @@ describe("GetPostThreadUseCase", () => {
         replyParentCid: () => level1Post.cid,
       })
       .create();
-    await postFactory(ctx.db)
+
+    const level3Actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Level 3 User" }))
+      .create();
+    const level3Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => level3Actor })
+      .create();
+    await postFactory(ctx.db)
+      .vars({ record: () => level3Record })
       .props({
         text: () => "Level 3 reply (should not appear)",
         replyRootUri: () => rootPost.uri,
@@ -317,11 +390,24 @@ describe("GetPostThreadUseCase", () => {
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
     // arrange
-    const level0Post = await postFactory(ctx.db)
+    const level0Actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Level 0 User" }))
       .create();
-    const level1Post = await postFactory(ctx.db)
+    const level0Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => level0Actor })
+      .create();
+    const level0Post = await postFactory(ctx.db)
+      .vars({ record: () => level0Record })
+      .create();
+
+    const level1Actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Level 1 User" }))
+      .create();
+    const level1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => level1Actor })
+      .create();
+    const level1Post = await postFactory(ctx.db)
+      .vars({ record: () => level1Record })
       .props({
         replyRootUri: () => level0Post.uri,
         replyRootCid: () => level0Post.cid,
@@ -329,8 +415,15 @@ describe("GetPostThreadUseCase", () => {
         replyParentCid: () => level0Post.cid,
       })
       .create();
-    const level2Post = await postFactory(ctx.db)
+
+    const level2Actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Level 2 User" }))
+      .create();
+    const level2Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => level2Actor })
+      .create();
+    const level2Post = await postFactory(ctx.db)
+      .vars({ record: () => level2Record })
       .props({
         replyRootUri: () => level0Post.uri,
         replyRootCid: () => level0Post.cid,
@@ -338,8 +431,15 @@ describe("GetPostThreadUseCase", () => {
         replyParentCid: () => level1Post.cid,
       })
       .create();
-    const targetPost = await postFactory(ctx.db)
+
+    const targetActor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Target User" }))
+      .create();
+    const targetRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => targetActor })
+      .create();
+    const targetPost = await postFactory(ctx.db)
+      .vars({ record: () => targetRecord })
       .props({
         replyRootUri: () => level0Post.uri,
         replyRootCid: () => level0Post.cid,
@@ -394,12 +494,13 @@ describe("GetPostThreadUseCase", () => {
 
   test("handleが含まれるURIの場合、DIDに変換してから投稿を取得する", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Handle User" }))
+      .create();
     const record = await recordFactory(ctx.db, "app.bsky.feed.post")
       .vars({ actor: () => actor })
       .create();
     await postFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Handle User" }))
       .vars({ record: () => record })
       .create();
     const originalUri = new AtUri(record.uri);

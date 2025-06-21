@@ -62,8 +62,12 @@ describe("GetTimelineUseCase", () => {
 
   test("フォローしているユーザーが投稿している場合、そのユーザーの投稿を返す", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db).create();
-    const followeeActor = await actorFactory(ctx.db).create();
+    const authActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Auth User" }))
+      .create();
+    const followeeActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Followee User" }))
+      .create();
 
     await followFactory(ctx.db)
       .vars({
@@ -82,7 +86,6 @@ describe("GetTimelineUseCase", () => {
             .vars({ actor: () => followeeActor })
             .create(),
       })
-      .use((t) => t.withProfile({ displayName: "Followee User" }))
       .create();
 
     // act
@@ -109,7 +112,9 @@ describe("GetTimelineUseCase", () => {
 
   test("自分の投稿がある場合、自分の投稿も含める", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db).create();
+    const authActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Self User" }))
+      .create();
 
     const selfPost = await postFactory(ctx.db)
       .vars({
@@ -125,7 +130,6 @@ describe("GetTimelineUseCase", () => {
             .create(),
       })
       .props({ text: () => "My own post" })
-      .use((t) => t.withProfile({ displayName: "Self User" }))
       .create();
 
     // act
@@ -156,7 +160,9 @@ describe("GetTimelineUseCase", () => {
   test("カーソルを指定した場合、ページネーションが動作する", async () => {
     // arrange
     const authActor = await actorFactory(ctx.db).create();
-    const followeeActor = await actorFactory(ctx.db).create();
+    const followeeActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Pagination Followee" }))
+      .create();
 
     await followFactory(ctx.db)
       .vars({
@@ -183,7 +189,6 @@ describe("GetTimelineUseCase", () => {
         text: () => "First post",
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
       })
-      .use((t) => t.withProfile({ displayName: "Pagination Followee" }))
       .create();
 
     await postFactory(ctx.db)
@@ -274,7 +279,9 @@ describe("GetTimelineUseCase", () => {
 
   test("limitパラメータが0または1の場合、指定した件数の投稿を返す", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db).create();
+    const authActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Limit User" }))
+      .create();
 
     const post = await postFactory(ctx.db)
       .vars({
@@ -290,7 +297,6 @@ describe("GetTimelineUseCase", () => {
             .create(),
       })
       .props({ text: () => "Limit test post" })
-      .use((t) => t.withProfile({ displayName: "Limit User" }))
       .create();
 
     // act - limit=0
@@ -326,7 +332,9 @@ describe("GetTimelineUseCase", () => {
   test("複数の投稿がある場合、sortAt（indexedAtとcreatedAtの早い方）の降順でソートされて返す", async () => {
     // arrange
     const authActor = await actorFactory(ctx.db).create();
-    const followeeActor = await actorFactory(ctx.db).create();
+    const followeeActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Sort Followee" }))
+      .create();
 
     await followFactory(ctx.db)
       .vars({
@@ -353,7 +361,6 @@ describe("GetTimelineUseCase", () => {
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
         indexedAt: () => new Date("2024-01-01T01:30:00.000Z"),
       })
-      .use((t) => t.withProfile({ displayName: "Sort Followee" }))
       .create();
 
     const latestRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -429,9 +436,15 @@ describe("GetTimelineUseCase", () => {
   test("リプライがある場合、reply情報を含むfeedViewPostを返す", async () => {
     // arrange
     const authActor = await actorFactory(ctx.db).create();
-    const rootAuthor = await actorFactory(ctx.db).create();
-    const parentAuthor = await actorFactory(ctx.db).create();
-    const replyAuthor = await actorFactory(ctx.db).create();
+    const rootAuthor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Root Author" }))
+      .create();
+    const parentAuthor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Parent Author" }))
+      .create();
+    const replyAuthor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Reply Author" }))
+      .create();
 
     await followFactory(ctx.db)
       .vars({
@@ -455,7 +468,6 @@ describe("GetTimelineUseCase", () => {
         text: () => "Root post",
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
       })
-      .use((t) => t.withProfile({ displayName: "Root Author" }))
       .create();
 
     // 中間投稿（根投稿へのリプライ）を作成
@@ -472,7 +484,6 @@ describe("GetTimelineUseCase", () => {
         replyParentCid: () => rootPost.cid,
         createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
       })
-      .use((t) => t.withProfile({ displayName: "Parent Author" }))
       .create();
 
     // 最終リプライ投稿（中間投稿へのリプライ）を作成
@@ -489,7 +500,6 @@ describe("GetTimelineUseCase", () => {
         replyParentCid: () => parentPost.cid,
         createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
       })
-      .use((t) => t.withProfile({ displayName: "Reply Author" }))
       .create();
 
     // act

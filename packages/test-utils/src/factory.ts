@@ -24,20 +24,36 @@ const fakeCid = () =>
   `bafyre${faker.string.alphanumeric({ length: 46, casing: "lower" })}`;
 
 export const actorFactory = (db: Database) =>
-  factory.define(
-    {
-      props: {
-        did: () => fakeDid(),
-        handle: () => fakeHandle(),
-        backfillStatus: () => "dirty" as const,
-        backfillVersion: () => null,
-        indexedAt: () => faker.date.recent(),
-        updatedAt: () => faker.date.recent(),
+  factory
+    .define(
+      {
+        props: {
+          did: () => fakeDid(),
+          handle: () => fakeHandle(),
+          backfillStatus: () => "dirty" as const,
+          backfillVersion: () => null,
+          indexedAt: () => faker.date.recent(),
+          updatedAt: () => faker.date.recent(),
+        },
+        vars: {},
       },
-      vars: {},
-    },
-    (props) => create(db, schema.actors, props),
-  );
+      (props) => create(db, schema.actors, props),
+    )
+    .traits({
+      withProfile: (params: { displayName?: string }) => ({
+        after: async (actor) => {
+          const record = await recordFactory(db, "app.bsky.actor.profile")
+            .vars({ actor: () => actor })
+            .create();
+          await profileFactory(db)
+            .vars({ record: () => record })
+            .props({
+              displayName: () => params.displayName ?? faker.person.fullName(),
+            })
+            .create();
+        },
+      }),
+    });
 
 export const recordFactory = (db: Database, collection: string) =>
   factory
@@ -93,22 +109,6 @@ export const postFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
-    })
-    .traits({
-      withProfile: (params: { displayName: string }) => ({
-        after: async (post) => {
-          const profileRecord = await recordFactory(
-            db,
-            "app.bsky.actor.profile",
-          )
-            .vars({ actorDid: () => post.actorDid })
-            .create();
-          await profileFactory(db)
-            .vars({ record: () => profileRecord })
-            .props({ displayName: () => params.displayName })
-            .create();
-        },
-      }),
     });
 
 export const postStatsFactory = (db: Database) =>
