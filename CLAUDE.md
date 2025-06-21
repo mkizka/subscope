@@ -41,11 +41,20 @@ packagesディレクトリ(共通パッケージ)
 
 ### 仕様書・資料など
 
-- **システム仕様**: @docs/spec.md を参照
-- **Lexicon実装**: 新しいレコードタイプを追加する場合は @docs/lexicon-implementation-guide.md を参照
-- **Identity Event処理**: Identity Eventの処理仕様については @docs/identity-event-handling.md を参照
-- **実装状況**: API実装の進捗については @docs/tasks.md を参照
-- **AT Protocolコードベース**: docs/repomix/atproto-repomix-output.xml を参照
+- システム仕様
+  - @docs/spec.md を参照
+- XRPC実装状況
+  - @docs/tasks.md
+- Lexiconのインデックス実装追加ガイド
+  - @docs/guide/lexicon-implementation.md
+- Identity Event処理
+  - @docs/guide/identity-event-handling.md
+- テストケースの書き方
+  - @docs/guide/testing.md を参照
+- `@atproto`各種ライブラリやAT Protocol仕様について知りたい時の資料
+  - docs/repomix/atproto-repomix-output.xml
+- `factory-js/factory`ライブラリについて知りたい時の資料
+  - docs/repomix/factoryjs-repomix-output.xml
 
 ## 開発コマンド
 
@@ -138,7 +147,7 @@ await sleep(1000);
 - 重要でないnull/undefinedチェックは@repo/commonパッケージのrequired関数を使ってください
 - 私が指示するまでコミットしないでください
 - テストケースにはarrange-act-assertパターンに基づいたコメントを書いてください
-- arrange-act-assertのまとまりごとに1行空行を書いて、テストケースごとに空行が2行になるようにしてください
+- arrange-act-assertのまとまりごとに1行空行を書いてください
 - asの使用は避けてください
 - テストを書くときはモックは原則禁止。JobQueueクラスのような外部システムと接続するクラスのみvite-mock-extendedを使用してモックする
 - DBマイグレーションファイルの作成は不要です
