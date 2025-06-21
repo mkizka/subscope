@@ -2,6 +2,7 @@ import type { Record, TransactionContext } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
 import type { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
+import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
@@ -9,8 +10,13 @@ export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly followIndexingPolicy: FollowIndexingPolicy,
+    private readonly actorStatsRepository: IActorStatsRepository,
   ) {}
-  static inject = ["followRepository", "followIndexingPolicy"] as const;
+  static inject = [
+    "followRepository",
+    "followIndexingPolicy",
+    "actorStatsRepository",
+  ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const follow = Follow.from(record);
@@ -26,5 +32,25 @@ export class FollowIndexer implements ICollectionIndexer {
   }): Promise<boolean> {
     const follow = Follow.from(record);
     return await this.followIndexingPolicy.shouldIndex(ctx, follow);
+  }
+
+  async updateStats({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }): Promise<void> {
+    const follow = Follow.from(record);
+
+    await this.actorStatsRepository.upsertFollowsCount({
+      ctx,
+      actorDid: follow.actorDid,
+    });
+
+    await this.actorStatsRepository.upsertFollowersCount({
+      ctx,
+      actorDid: follow.subjectDid,
+    });
   }
 }

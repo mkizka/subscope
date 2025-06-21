@@ -2,6 +2,7 @@ import type { Record, TransactionContext } from "@repo/common/domain";
 import { FeedItem, Post } from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
+import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
@@ -13,12 +14,14 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postIndexingPolicy: PostIndexingPolicy,
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly feedItemRepository: IFeedItemRepository,
+    private readonly actorStatsRepository: IActorStatsRepository,
   ) {}
   static inject = [
     "postRepository",
     "postIndexingPolicy",
     "postStatsRepository",
     "feedItemRepository",
+    "actorStatsRepository",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -49,8 +52,12 @@ export class PostIndexer implements ICollectionIndexer {
   }): Promise<void> {
     const post = Post.from(record);
 
+    await this.actorStatsRepository.upsertPostsCount({
+      ctx,
+      actorDid: post.actorDid,
+    });
+
     if (post.replyParent) {
-      // 親投稿が存在する場合のみstatsを更新
       const parentExists = await this.postRepository.exists(
         ctx,
         post.replyParent.uri.toString(),

@@ -34,6 +34,7 @@ import { ProfileIndexingPolicy } from "./domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "./domain/repost-indexing-policy.js";
 import { SubscriptionIndexingPolicy } from "./domain/subscription-indexing-policy.js";
 import { ActorRepository } from "./infrastructure/actor-repository.js";
+import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
@@ -68,6 +69,7 @@ createInjector()
   .provideClass("repoFetcher", RepoFetcher)
   .provideClass("profileRecordFetcher", ProfileRecordFetcher)
   .provideClass("actorRepository", ActorRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("postRepository", PostRepository)
   .provideClass("recordRepository", RecordRepository)

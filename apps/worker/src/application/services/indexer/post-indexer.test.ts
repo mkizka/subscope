@@ -1,11 +1,17 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  postFactory,
+  recordFactory,
+  setupTestDatabase,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
@@ -25,6 +31,7 @@ beforeAll(() => {
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
     .injectClass(PostIndexer);
   ctx = testSetup.ctx;
 });
@@ -101,135 +108,155 @@ describe("PostIndexer", () => {
 
   describe("updateStats", () => {
     it("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
-      // Arrange
-      const parentPostUri = "at://did:plc:parent/app.bsky.feed.post/parent";
+      // arrange
+      // 親投稿を作成
+      const parentActor = await actorFactory(ctx.db).create();
+      const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => parentActor })
+        .create();
+      const parentPost = await postFactory(ctx.db)
+        .vars({ record: () => parentRecord })
+        .props({
+          text: () => "Parent post",
+        })
+        .create();
 
-      // actorとrecordsテーブルを準備
-      await ctx.db.insert(schema.actors).values([
-        { did: "did:plc:parent", handle: "parent.bsky.social" },
-        { did: "did:plc:replier1", handle: "replier1.bsky.social" },
-        { did: "did:plc:replier2", handle: "replier2.bsky.social" },
-      ]);
-      await ctx.db.insert(schema.records).values([
-        {
-          uri: parentPostUri,
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          actorDid: "did:plc:parent",
-          json: { $type: "app.bsky.feed.post" },
-        },
-        {
-          uri: "at://did:plc:replier1/app.bsky.feed.post/reply1",
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          actorDid: "did:plc:replier1",
-          json: { $type: "app.bsky.feed.post" },
-        },
-        {
-          uri: "at://did:plc:replier2/app.bsky.feed.post/reply2",
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          actorDid: "did:plc:replier2",
-          json: { $type: "app.bsky.feed.post" },
-        },
-      ]);
-      await ctx.db.insert(schema.posts).values([
-        {
-          uri: parentPostUri,
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          actorDid: "did:plc:parent",
-          text: "Parent post",
-          createdAt: new Date(),
-        },
-        {
-          uri: "at://did:plc:replier1/app.bsky.feed.post/reply1",
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          actorDid: "did:plc:replier1",
-          text: "Reply 1",
-          replyParentUri: parentPostUri,
-          createdAt: new Date(),
-        },
-        {
-          uri: "at://did:plc:replier2/app.bsky.feed.post/reply2",
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          actorDid: "did:plc:replier2",
-          text: "Reply 2",
-          replyParentUri: parentPostUri,
-          createdAt: new Date(),
-        },
-      ]);
+      // 既存のリプライを2つ作成
+      const replier1 = await actorFactory(ctx.db).create();
+      const reply1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => replier1 })
+        .create();
+      await postFactory(ctx.db)
+        .vars({ record: () => reply1Record })
+        .props({
+          text: () => "Reply 1",
+          replyParentUri: () => parentPost.uri,
+          replyParentCid: () => parentPost.cid,
+        })
+        .create();
+
+      const replier2 = await actorFactory(ctx.db).create();
+      const reply2Record = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => replier2 })
+        .create();
+      await postFactory(ctx.db)
+        .vars({ record: () => reply2Record })
+        .props({
+          text: () => "Reply 2",
+          replyParentUri: () => parentPost.uri,
+          replyParentCid: () => parentPost.cid,
+        })
+        .create();
+
+      // 新しいリプライを作成するアクター
+      const replier3 = await actorFactory(ctx.db).create();
 
       const replyJson = {
         $type: "app.bsky.feed.post",
         text: "New reply",
         reply: {
           root: {
-            uri: parentPostUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            uri: parentPost.uri,
+            cid: parentPost.cid,
           },
           parent: {
-            uri: parentPostUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            uri: parentPost.uri,
+            cid: parentPost.cid,
           },
         },
         createdAt: new Date().toISOString(),
       };
+
+      // 新しいリプライのrecordを作成
+      const newReplyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => replier3 })
+        .props({ json: () => replyJson })
+        .create();
       const record = Record.fromJson({
-        uri: "at://did:plc:replier3/app.bsky.feed.post/newreply",
-        cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        uri: newReplyRecord.uri,
+        cid: newReplyRecord.cid,
         json: replyJson,
       });
 
-      // Act
+      // act
+      await postIndexer.upsert({ ctx, record });
       await postIndexer.updateStats({ ctx, record });
 
-      // Assert
+      // assert
+      // 親投稿のpost_statsが更新される
       const [stats] = await ctx.db
         .select()
         .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, parentPostUri))
+        .where(eq(schema.postStats.postUri, parentPost.uri))
         .limit(1);
 
       expect(stats).toMatchObject({
-        postUri: parentPostUri,
+        postUri: parentPost.uri,
         likeCount: 0,
         repostCount: 0,
-        replyCount: 2,
+        replyCount: 3, // 既存の2リプライ + 新しい1リプライ
+      });
+
+      // 投稿者のactor_statsも更新される
+      const [actorStats] = await ctx.db
+        .select()
+        .from(schema.actorStats)
+        .where(eq(schema.actorStats.actorDid, replier3.did));
+
+      expect(actorStats).toMatchObject({
+        actorDid: replier3.did,
+        postsCount: 1, // replier3の投稿は1件のみ
+        followsCount: 0,
+        followersCount: 0,
       });
     });
 
-    it("通常の投稿（リプライでない）の場合は統計更新されない", async () => {
-      // Arrange
+    it("投稿時にactor_statsの投稿数が更新される", async () => {
+      // arrange
+      const regularActor = await actorFactory(ctx.db).create();
+
       const postJson = {
         $type: "app.bsky.feed.post",
         text: "Regular post without reply",
         createdAt: new Date().toISOString(),
       };
+      const regularRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => regularActor })
+        .props({ json: () => postJson })
+        .create();
       const record = Record.fromJson({
-        uri: "at://did:plc:regular/app.bsky.feed.post/regular",
-        cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        uri: regularRecord.uri,
+        cid: regularRecord.cid,
         json: postJson,
       });
 
-      // Act
+      // act
+      await postIndexer.upsert({ ctx, record });
       await postIndexer.updateStats({ ctx, record });
 
-      // Assert
-      // post_statsテーブルに新しいエントリが作成されていないことを確認
-      const stats = await ctx.db
+      // assert
+      // actor_statsテーブルに投稿数が更新されていることを確認
+      const [actorStats] = await ctx.db
         .select()
-        .from(schema.postStats)
-        .where(
-          eq(
-            schema.postStats.postUri,
-            "at://did:plc:regular/app.bsky.feed.post/regular",
-          ),
-        );
+        .from(schema.actorStats)
+        .where(eq(schema.actorStats.actorDid, regularActor.did));
 
-      expect(stats).toHaveLength(0);
+      expect(actorStats).toMatchObject({
+        actorDid: regularActor.did,
+        postsCount: 1,
+        followsCount: 0,
+        followersCount: 0,
+      });
     });
 
     it("親投稿が存在しない場合はpost_statsを更新しない", async () => {
-      // Arrange
+      // arrange
+      const replierActor = await actorFactory(ctx.db).create();
+
       const nonExistentParentUri =
         "at://did:plc:nonexistent/app.bsky.feed.post/parent";
+      const nonExistentParentCid =
+        "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e";
 
       const replyJson = {
         $type: "app.bsky.feed.post",
@@ -237,31 +264,52 @@ describe("PostIndexer", () => {
         reply: {
           root: {
             uri: nonExistentParentUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: nonExistentParentCid,
           },
           parent: {
             uri: nonExistentParentUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: nonExistentParentCid,
           },
         },
         createdAt: new Date().toISOString(),
       };
+
+      // recordを作成
+      const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => replierActor })
+        .props({ json: () => replyJson })
+        .create();
       const record = Record.fromJson({
-        uri: "at://did:plc:replier/app.bsky.feed.post/orphanreply",
-        cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+        uri: replyRecord.uri,
+        cid: replyRecord.cid,
         json: replyJson,
       });
 
-      // Act
+      // act
+      await postIndexer.upsert({ ctx, record });
       await postIndexer.updateStats({ ctx, record });
 
-      // Assert
+      // assert
+      // 親投稿のpost_statsは更新されない
       const stats = await ctx.db
         .select()
         .from(schema.postStats)
         .where(eq(schema.postStats.postUri, nonExistentParentUri));
 
       expect(stats).toHaveLength(0);
+
+      // ただし、投稿者のactor_statsは更新される
+      const [actorStats] = await ctx.db
+        .select()
+        .from(schema.actorStats)
+        .where(eq(schema.actorStats.actorDid, replierActor.did));
+
+      expect(actorStats).toMatchObject({
+        actorDid: replierActor.did,
+        postsCount: 1,
+        followsCount: 0,
+        followersCount: 0,
+      });
     });
   });
 });
