@@ -17,7 +17,7 @@
 
 - [ ] app/bsky/feed/getActorLikes.json
 - [ ] app/bsky/feed/getLikes.json
-- [ ] app/bsky/feed/getPostThread.json
+- [x] app/bsky/feed/getPostThread.json
 - [x] app/bsky/feed/getPosts.json
   - ブロックなどは未反映
 - [x] app/bsky/feed/getTimeline.json
