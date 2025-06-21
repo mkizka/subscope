@@ -18,9 +18,9 @@ export class FetchProfileUseCase {
   ) {}
   static inject = [
     "profileRecordFetcher",
+    "actorRepository",
     "recordRepository",
     "profileRepository",
-    "actorRepository",
     "transactionManager",
   ] as const;
 
