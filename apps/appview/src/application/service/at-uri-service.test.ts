@@ -1,7 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import { actorFactory, setupTestDatabase } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
 import { HandleResolver } from "../../infrastructure/handle-resolver.js";
@@ -44,11 +43,12 @@ describe("AtUriService", () => {
 
     test("handleが含まれるURIの場合、DIDに変換して返す", async () => {
       // arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:resolved123",
-        handle: "example.com",
-      });
-
+      await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:resolved123",
+          handle: () => "example.com",
+        })
+        .create();
       const uri = new AtUri("at://example.com/app.bsky.feed.post/xyz789");
 
       // act
@@ -58,9 +58,6 @@ describe("AtUriService", () => {
       expect(result.toString()).toBe(
         "at://did:plc:resolved123/app.bsky.feed.post/xyz789",
       );
-      expect(result.hostname).toBe("did:plc:resolved123");
-      expect(result.collection).toBe("app.bsky.feed.post");
-      expect(result.rkey).toBe("xyz789");
     });
 
     test("無効なhostnameの場合、InvalidHostnameErrorをスローする", async () => {
