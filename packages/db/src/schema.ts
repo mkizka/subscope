@@ -113,6 +113,18 @@ export const postStats = pgTable("post_stats", {
   replyCount: integer().notNull().default(0),
 });
 
+export const actorStats = pgTable("actor_stats", {
+  actorDid: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => actors.did, { onDelete: "cascade" }),
+  followsCount: integer().notNull().default(0),
+  followersCount: integer().notNull().default(0),
+  postsCount: integer().notNull().default(0),
+  updatedAt: timestamp()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 export const blobs = pgTable("blobs", {
   cid: varchar({ length: 256 }).primaryKey(),
   mimeType: varchar({ length: 256 }).notNull(),
@@ -229,6 +241,10 @@ export const actorsRelations = relations(actors, ({ one, many }) => ({
     references: [profiles.actorDid],
   }),
   posts: many(posts),
+  stats: one(actorStats, {
+    fields: [actors.did],
+    references: [actorStats.actorDid],
+  }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -291,6 +307,13 @@ export const postStatsRelations = relations(postStats, ({ one }) => ({
   post: one(posts, {
     fields: [postStats.postUri],
     references: [posts.uri],
+  }),
+}));
+
+export const actorStatsRelations = relations(actorStats, ({ one }) => ({
+  actor: one(actors, {
+    fields: [actorStats.actorDid],
+    references: [actors.did],
   }),
 }));
 
