@@ -92,6 +92,16 @@ export class PostRepository implements IPostRepository {
       });
   }
 
+  async exists(ctx: TransactionContext, uri: string): Promise<boolean> {
+    const result = await ctx.db
+      .select({ uri: schema.posts.uri })
+      .from(schema.posts)
+      .where(eq(schema.posts.uri, uri))
+      .limit(1);
+
+    return result.length > 0;
+  }
+
   async existsAny(ctx: TransactionContext, uris: string[]): Promise<boolean> {
     if (uris.length === 0) {
       return false;
