@@ -5,7 +5,6 @@ import type {
   AppBskyFeedGetTimeline,
 } from "@repo/client/server";
 
-import { PaginationQuery } from "../domain/models/pagination-query.js";
 import type { IPostRepository } from "./interfaces/post-repository.js";
 import type { PostViewService } from "./service/post-view-service.js";
 import type { ReplyRefService } from "./service/reply-ref-service.js";
@@ -29,16 +28,15 @@ export class GetTimelineUseCase {
     params: AppBskyFeedGetTimeline.QueryParams,
     authDid: string,
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
-    const query = PaginationQuery.create(
-      { authDid },
+    const cursor = params.cursor ? new Date(params.cursor) : undefined;
+
+    const paginationResult = await this.timelineService.findPostsWithPagination(
       {
-        cursor: params.cursor,
+        authDid,
+        cursor,
         limit: params.limit,
       },
     );
-
-    const paginationResult =
-      await this.timelineService.findPostsWithPagination(query);
 
     const postUris = paginationResult.items.map((item) => new AtUri(item.uri));
     const posts = await this.postRepository.findByUris(postUris);

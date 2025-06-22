@@ -1,19 +1,30 @@
-import type { PaginationQuery } from "../../domain/models/pagination-query.js";
-import { PaginationResult } from "../../domain/models/pagination-result.js";
 import type { ITimelineRepository } from "../interfaces/timeline-repository.js";
+import { createCursorPaginator, type Page } from "../utils/pagination.js";
 
 export class TimelineService {
   constructor(private readonly timelineRepository: ITimelineRepository) {}
   static inject = ["timelineRepository"] as const;
 
-  async findPostsWithPagination(
-    query: PaginationQuery<{ authDid: string }>,
-  ): Promise<PaginationResult<{ uri: string; sortAt: Date }>> {
+  async findPostsWithPagination({
+    authDid,
+    cursor,
+    limit,
+  }: {
+    authDid: string;
+    cursor?: Date;
+    limit: number;
+  }): Promise<Page<{ uri: string; sortAt: Date }>> {
+    const paginator = createCursorPaginator(
+      limit,
+      (post: { uri: string; sortAt: Date }) => post.sortAt.toISOString(),
+    );
+
     const posts = await this.timelineRepository.findPosts({
-      authDid: query.params.authDid,
-      cursor: query.cursor,
-      limit: query.queryLimit,
+      authDid,
+      cursor,
+      limit: paginator.queryLimit,
     });
-    return PaginationResult.create(posts, query.limit, (post) => post.sortAt);
+
+    return paginator.extractPage(posts);
   }
 }
