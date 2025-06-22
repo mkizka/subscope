@@ -184,3 +184,38 @@ export const followFactory = (db: Database) =>
       actorDid: async ({ vars }) => (await vars.record).actorDid,
       subjectDid: async ({ vars }) => (await vars.followee).did,
     });
+
+export const blobFactory = (db: Database) =>
+  factory.define(
+    {
+      props: {
+        cid: () => randomCid(),
+        mimeType: () => "image/jpeg",
+        size: () => faker.number.int({ min: 1000, max: 100000 }),
+        indexedAt: () => faker.date.recent(),
+        updatedAt: () => faker.date.recent(),
+      },
+      vars: {},
+    },
+    (props) => create(db, schema.blobs, props),
+  );
+
+export const actorStatsFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          actorDid: later<string>(),
+          followsCount: () => 0,
+          followersCount: () => 0,
+          postsCount: () => 0,
+        },
+        vars: {
+          actor: () => actorFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.actorStats, props),
+    )
+    .props({
+      actorDid: async ({ vars }) => (await vars.actor).did,
+    });
