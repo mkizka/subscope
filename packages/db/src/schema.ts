@@ -47,7 +47,9 @@ export const follows = pgTable(
     actorDid: varchar({ length: 256 })
       .notNull()
       .references(() => actors.did),
-    subjectDid: varchar({ length: 256 }).notNull(),
+    subjectDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().defaultNow(),
     sortAt: timestamp()

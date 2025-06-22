@@ -1,5 +1,6 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
+import type { JobQueue } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
 import {
   actorFactory,
@@ -8,11 +9,18 @@ import {
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
+import { mock } from "vitest-mock-extended";
 
 import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
+import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { IndexActorService } from "../index-actor-service.js";
+import { BackfillService } from "../scheduler/backfill-service.js";
+import { FetchProfileService } from "../scheduler/fetch-profile-service.js";
+import { ResolveDidService } from "../scheduler/resolve-did-service.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
 let followIndexer: FollowIndexer;
@@ -27,6 +35,13 @@ beforeAll(() => {
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("followIndexingPolicy", FollowIndexingPolicy)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("actorRepository", ActorRepository)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideValue("jobQueue", mock<JobQueue>())
+    .provideClass("resolveDidService", ResolveDidService)
+    .provideClass("backfillService", BackfillService)
+    .provideClass("fetchProfileService", FetchProfileService)
+    .provideClass("indexActorService", IndexActorService)
     .injectClass(FollowIndexer);
   ctx = testSetup.ctx;
 });
@@ -67,6 +82,63 @@ describe("FollowIndexer", () => {
         cid: record.cid.toString(),
         actorDid: follower.did,
         subjectDid: followee.did,
+      });
+    });
+
+    it("フォロイーのactorが存在しない場合、自動的に作成される", async () => {
+      // arrange
+      const follower = await actorFactory(ctx.db).create();
+      const followeeDid = "did:plc:nonexistent-followee";
+
+      const followJson = {
+        $type: "app.bsky.graph.follow",
+        subject: followeeDid,
+        createdAt: new Date().toISOString(),
+      };
+      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => follower })
+        .props({ json: () => followJson })
+        .create();
+      const record = Record.fromJson({
+        uri: followRecord.uri,
+        cid: followRecord.cid,
+        json: followJson,
+      });
+
+      // フォロイーのactorが存在しないことを確認
+      const followeeBeforeUpsert = await ctx.db
+        .select()
+        .from(schema.actors)
+        .where(eq(schema.actors.did, followeeDid))
+        .limit(1);
+      expect(followeeBeforeUpsert).toHaveLength(0);
+
+      // act
+      await followIndexer.upsert({ ctx, record });
+
+      // assert
+      // フォロイーのactorが作成されたことを確認
+      const [followeeAfterUpsert] = await ctx.db
+        .select()
+        .from(schema.actors)
+        .where(eq(schema.actors.did, followeeDid))
+        .limit(1);
+      expect(followeeAfterUpsert).toMatchObject({
+        did: followeeDid,
+        handle: null,
+      });
+
+      // フォローレコードも正しく保存されたことを確認
+      const [follow] = await ctx.db
+        .select()
+        .from(schema.follows)
+        .where(eq(schema.follows.uri, record.uri.toString()))
+        .limit(1);
+      expect(follow).toMatchObject({
+        uri: record.uri.toString(),
+        cid: record.cid.toString(),
+        actorDid: follower.did,
+        subjectDid: followeeDid,
       });
     });
   });

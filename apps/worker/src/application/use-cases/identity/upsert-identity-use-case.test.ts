@@ -131,6 +131,12 @@ describe("UpsertIdentityUseCase", () => {
       createdAt: new Date(),
     });
 
+    // followedDidのactorを先に作成（外部キー制約のため）
+    await ctx.db.insert(schema.actors).values({
+      did: followedDid,
+      handle: null,
+    });
+
     // subscriberがfollowedDidをフォロー
     await ctx.db.insert(schema.records).values({
       uri: `at://${subscriberDid}/app.bsky.graph.follow/789`,

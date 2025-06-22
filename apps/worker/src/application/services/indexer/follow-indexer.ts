@@ -5,21 +5,25 @@ import type { FollowIndexingPolicy } from "../../../domain/follow-indexing-polic
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { IndexActorService } from "../index-actor-service.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly followIndexingPolicy: FollowIndexingPolicy,
     private readonly actorStatsRepository: IActorStatsRepository,
+    private readonly indexActorService: IndexActorService,
   ) {}
   static inject = [
     "followRepository",
     "followIndexingPolicy",
     "actorStatsRepository",
+    "indexActorService",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const follow = Follow.from(record);
+    await this.indexActorService.upsert({ ctx, did: follow.subjectDid });
     await this.followRepository.upsert({ ctx, follow });
   }
 
