@@ -3,4 +3,4 @@ packages:
   - packages/*
   - dev-env
 patchedDependencies:
-  '@factory-js/factory': patches/@factory-js__factory.patch
+  "@factory-js/factory": patches/@factory-js__factory.patch

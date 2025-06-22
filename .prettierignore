@@ -1,2 +1,4 @@
 .husky/
+apps/
+packages/
 pnpm-lock.yaml

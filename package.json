@@ -10,13 +10,13 @@
     "build": "turbo run build",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "./scripts/dev.sh",
-    "format": "turbo run format",
-    "lint": "turbo run lint",
+    "format": "turbo run format && prettier . --write",
+    "get-docs": "./scripts/get-docs.sh",
+    "lint": "turbo run lint && pnpm prettier . --check",
     "prepare": "husky",
     "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
-    "typecheck": "turbo run typecheck",
-    "get-docs": "./scripts/get-docs.sh"
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "husky": "9.1.7",
@@ -29,6 +29,9 @@
     "turbo": "2.5.4",
     "vitest": "^3.2.3",
     "wait-on": "8.0.3"
+  },
+  "lint-staged": {
+    "*": "prettier --ignore-unknown --write"
   },
   "prettier": {
     "plugins": [
