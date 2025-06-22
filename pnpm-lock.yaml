@@ -560,6 +560,9 @@ importers:
       execa:
         specifier: 9.6.0
         version: 9.6.0
+      multiformats:
+        specifier: 13.3.6
+        version: 13.3.6
       typed-inject:
         specifier: 5.0.0
         version: 5.0.0

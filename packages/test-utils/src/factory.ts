@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker";
 import { schema } from "@repo/db";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
+import { randomCid } from "./cid.js";
 import { create } from "./create.js";
 
 type Database = NodePgDatabase<typeof schema>;
@@ -19,9 +20,6 @@ const fakeAtUri = ({ did, collection }: { did?: string; collection: string }) =>
     collection,
     faker.string.alphanumeric({ length: 13, casing: "lower" }),
   ).toString();
-
-const fakeCid = () =>
-  "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e";
 
 export const actorFactory = (db: Database) =>
   factory
@@ -61,7 +59,7 @@ export const recordFactory = (db: Database, collection: string) =>
       {
         props: {
           uri: later<string>(),
-          cid: () => fakeCid(),
+          cid: () => randomCid(),
           actorDid: later<string>(),
           json: () => ({ $type: collection }),
           indexedAt: () => faker.date.recent(),
@@ -138,9 +136,9 @@ export const profileFactory = (db: Database) =>
       {
         props: {
           uri: later<string>(),
-          cid: () => fakeCid(),
+          cid:   later<string>(),
           actorDid: later<string>(),
-          avatarCid: () => fakeCid(),
+          avatarCid: later<string | null>(),
           description: () => faker.lorem.sentence(),
           displayName: () => faker.person.fullName(),
           createdAt: () => faker.date.recent(),
@@ -149,6 +147,7 @@ export const profileFactory = (db: Database) =>
         },
         vars: {
           record: () => recordFactory(db, "app.bsky.actor.profile").create(),
+          avatar: () => blobFactory(db).create(),
         },
       },
       (props) => create(db, schema.profiles, props),
@@ -157,6 +156,7 @@ export const profileFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
+      avatarCid: async ({ vars }) => (await vars.avatar).cid,
     });
 
 export const followFactory = (db: Database) =>
@@ -165,7 +165,7 @@ export const followFactory = (db: Database) =>
       {
         props: {
           uri: later<string>(),
-          cid: () => fakeCid(),
+          cid: later<string>(),
           actorDid: later<string>(),
           subjectDid: later<string>(),
           createdAt: () => faker.date.recent(),
