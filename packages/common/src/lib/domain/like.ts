@@ -10,6 +10,7 @@ type LikeParams = {
   subjectUri: AtUri | string;
   subjectCid: string;
   createdAt: Date;
+  sortAt?: Date;
 };
 
 export class Like {
@@ -19,6 +20,7 @@ export class Like {
   readonly subjectUri: AtUri;
   readonly subjectCid: string;
   readonly createdAt: Date;
+  readonly sortAt: Date;
 
   constructor(params: LikeParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -27,6 +29,7 @@ export class Like {
     this.subjectUri = new AtUri(params.subjectUri.toString());
     this.subjectCid = params.subjectCid;
     this.createdAt = params.createdAt;
+    this.sortAt = params.sortAt ?? params.createdAt;
   }
 
   static from(record: Record) {

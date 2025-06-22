@@ -69,6 +69,16 @@ export class ProfileViewService {
     });
   }
 
+  async findProfileView(dids: Did[]): Promise<AppBskyActorDefs.ProfileView[]> {
+    const profiles = await this.findProfile(dids);
+    return profiles.map((profile) => ({
+      ...this.createProfileViewBasic(profile),
+      $type: "app.bsky.actor.defs#profileView" as const,
+      description: profile.description ?? undefined,
+      indexedAt: profile.indexedAt?.toISOString(),
+    }));
+  }
+
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {
     if (!profile.avatar) {
       return undefined;

@@ -186,6 +186,34 @@ export const followFactory = (db: Database) =>
       subjectDid: async ({ vars }) => (await vars.followee).did,
     });
 
+export const likeFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          uri: later<string>(),
+          cid: later<string>(),
+          actorDid: later<string>(),
+          subjectUri: later<string>(),
+          subjectCid: later<string>(),
+          createdAt: () => faker.date.recent(),
+          indexedAt: () => faker.date.recent(),
+        },
+        vars: {
+          record: () => recordFactory(db, "app.bsky.feed.like").create(),
+          subject: () => postFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.likes, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      subjectUri: async ({ vars }) => (await vars.subject).uri,
+      subjectCid: async ({ vars }) => (await vars.subject).cid,
+    });
+
 export const blobFactory = (db: Database) =>
   factory.define(
     {

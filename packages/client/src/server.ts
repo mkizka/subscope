@@ -12,5 +12,6 @@ export { lexicons } from "./generated/server/lexicons";
 export * as AppBskyEmbedExternal from "./generated/server/types/app/bsky/embed/external";
 export * as AppBskyEmbedImages from "./generated/server/types/app/bsky/embed/images";
 export * as AppBskyFeedDefs from "./generated/server/types/app/bsky/feed/defs";
+export * as AppBskyFeedGetLikes from "./generated/server/types/app/bsky/feed/getLikes";
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline";
 export { $Typed } from "./generated/server/util";
