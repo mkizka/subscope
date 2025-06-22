@@ -1,5 +1,6 @@
 import { asDid } from "@atproto/did";
 import { jsonToLex, lexToJson } from "@atproto/lexicon";
+import { ValidationError } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "@repo/client/server";
 
@@ -60,7 +61,21 @@ export class Record {
   }
 
   validate<T extends SupportedCollection>(collection: T) {
-    lexicons.assertValidRecord(collection, this.lex);
-    return this.lex as SupportedCollectionMap[T];
+    try {
+      lexicons.assertValidRecord(collection, this.lex);
+      return this.lex as SupportedCollectionMap[T];
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        throw new RecordValidationError(error.message, this.uri);
+      }
+      throw error;
+    }
+  }
+}
+
+export class RecordValidationError extends Error {
+  constructor(message: string, uri: AtUri) {
+    super(`Record validation error: ${message} for URI: ${uri.toString()}`);
+    this.name = "RecordValidationError";
   }
 }

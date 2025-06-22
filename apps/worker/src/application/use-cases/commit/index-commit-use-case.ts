@@ -1,4 +1,7 @@
-import { type ITransactionManager } from "@repo/common/domain";
+import {
+  type ITransactionManager,
+  RecordValidationError,
+} from "@repo/common/domain";
 
 import type { IndexCommitService } from "../../services/index-commit-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
@@ -10,8 +13,23 @@ export class IndexCommitUseCase {
   ) {}
   static inject = ["transactionManager", "indexCommitService"] as const;
 
-  async execute({ commit, jobLogger }: IndexCommitCommand) {
-    await jobLogger.log(commit.uri.toString());
+  async execute(command: IndexCommitCommand) {
+    await command.jobLogger.log(
+      `Starting indexing for commit: ${command.commit.uri.toString()}`,
+    );
+    try {
+      await this.doIndexCommit(command);
+      await command.jobLogger.log("Indexing completed successfully.");
+    } catch (error) {
+      if (error instanceof RecordValidationError) {
+        await command.jobLogger.log(error.message);
+        return;
+      }
+      throw error;
+    }
+  }
+
+  async doIndexCommit({ commit, jobLogger }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
       switch (commit.operation) {
         case "create":
