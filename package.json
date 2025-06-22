@@ -6,13 +6,14 @@
     "node": "22"
   },
   "scripts": {
+    "_prettier": "prettier --ignore-path .prettier --ignore-path .gitignore",
     "all": "turbo run typecheck format && pnpm test --run",
     "build": "turbo run build",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "./scripts/dev.sh",
-    "format": "turbo run format && prettier . --write",
+    "format": "turbo run format && pnpm -s _prettier . --write",
     "get-docs": "./scripts/get-docs.sh",
-    "lint": "turbo run lint && pnpm prettier . --check",
+    "lint": "turbo run lint && pnpm -s _prettier . --check",
     "prepare": "husky",
     "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
