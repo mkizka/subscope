@@ -136,7 +136,7 @@ export const profileFactory = (db: Database) =>
       {
         props: {
           uri: later<string>(),
-          cid:   later<string>(),
+          cid: later<string>(),
           actorDid: later<string>(),
           avatarCid: later<string | null>(),
           description: () => faker.lorem.sentence(),

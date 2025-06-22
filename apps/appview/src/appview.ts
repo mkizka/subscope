@@ -22,6 +22,7 @@ import { ProfileViewService } from "./application/service/profile-view-service.j
 import { ReplyRefService } from "./application/service/reply-ref-service.js";
 import { TimelineService } from "./application/service/timeline-service.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
+import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
@@ -50,6 +51,7 @@ createInjector()
   .provideFactory("connectionPool", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
   .provideClass("handleResolver", HandleResolver)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("postRepository", PostRepository)

@@ -9,6 +9,7 @@ import {
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
+import { ActorStatsRepository } from "../../infrastructure/actor-stats-repository.js";
 import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../infrastructure/post-stats-repository.js";
@@ -27,6 +28,7 @@ beforeAll(() => {
   const testSetup = getSetup();
   postViewService = testSetup.testInjector
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)

@@ -3,11 +3,15 @@ import type { AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 
 import { env } from "../../shared/env.js";
+import type { IActorStatsRepository } from "../interfaces/actor-stats-repository.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 
 export class ProfileViewService {
-  constructor(private readonly profileRepository: IProfileRepository) {}
-  static inject = ["profileRepository"] as const;
+  constructor(
+    private readonly profileRepository: IProfileRepository,
+    private readonly actorStatsRepository: IActorStatsRepository,
+  ) {}
+  static inject = ["profileRepository", "actorStatsRepository"] as const;
 
   private async findProfile(dids: Did[]) {
     return await this.profileRepository.findManyDetailed(dids);
@@ -31,15 +35,20 @@ export class ProfileViewService {
 
   private createProfileViewDetailed(
     profile: ProfileDetailed,
+    stats?: {
+      followsCount: number;
+      followersCount: number;
+      postsCount: number;
+    },
   ): AppBskyActorDefs.ProfileViewDetailed {
     return {
       ...this.createProfileViewBasic(profile),
       $type: "app.bsky.actor.defs#profileViewDetailed",
       // description?: string
       // banner?: string
-      // followersCount?: number
-      // followsCount?: number
-      // postsCount?: number
+      followersCount: stats?.followersCount,
+      followsCount: stats?.followsCount,
+      postsCount: stats?.postsCount,
       // joinedViaStarterPack?: AppBskyGraphDefs.StarterPackViewBasic
       indexedAt: profile.indexedAt?.toISOString(),
       // pinnedPost?: ComAtprotoRepoStrongRef.Main
@@ -53,7 +62,11 @@ export class ProfileViewService {
 
   async findProfileViewDetailed(dids: Did[]) {
     const profiles = await this.findProfile(dids);
-    return profiles.map((profile) => this.createProfileViewDetailed(profile));
+    const statsMap = await this.actorStatsRepository.findStats(dids);
+    return profiles.map((profile) => {
+      const stats = statsMap.get(profile.actorDid);
+      return this.createProfileViewDetailed(profile, stats);
+    });
   }
 
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {
