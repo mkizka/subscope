@@ -1,8 +1,13 @@
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import {
+  actorFactory,
+  postFactory,
+  recordFactory,
+  setupTestDatabase,
+} from "@repo/test-utils";
+import { beforeAll, describe, expect, test } from "vitest";
 
 import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../infrastructure/post-repository.js";
@@ -34,75 +39,54 @@ beforeAll(() => {
 
 describe("PostViewService", () => {
   describe("findPostView", () => {
-    it("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {
-      // Arrange
-      const postUri = AtUri.make("did:plc:123", "app.bsky.feed.post", "abc123");
-      const actorDid = "did:plc:123";
-      const postRecord = {
-        $type: "app.bsky.feed.post",
-        text: "Hello World",
-        createdAt: "2024-01-01T00:00:00.000Z",
-      };
+    test("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Test User" }))
+        .props({ handle: () => "test.bsky.social" })
+        .create();
+      const record = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          cid: () => "bafyreiabc123",
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Hello World",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => record })
+        .props({
+          text: () => "Hello World",
+          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+      const postUri = new AtUri(post.uri);
 
-      await ctx.db.insert(schema.actors).values({
-        did: actorDid,
-        handle: "test.bsky.social",
-      });
-
-      await ctx.db.insert(schema.records).values({
-        uri: postUri.toString(),
-        cid: "bafyreiabc123",
-        actorDid,
-        json: postRecord,
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.posts).values({
-        uri: postUri.toString(),
-        cid: "bafyreiabc123",
-        actorDid,
-        text: "Hello World",
-        createdAt: new Date(postRecord.createdAt),
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
-      await ctx.db.insert(schema.records).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Test User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.profiles).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        displayName: "Test User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      // Act
+      // act
       const result = await postViewService.findPostView([postUri]);
 
-      // Assert
+      // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: postUri.toString(),
+        uri: post.uri,
         cid: "bafyreiabc123",
         author: {
           $type: "app.bsky.actor.defs#profileViewBasic",
-          did: actorDid,
+          did: actor.did,
           handle: "test.bsky.social",
           displayName: "Test User",
         },
-        record: postRecord,
+        record: {
+          $type: "app.bsky.feed.post",
+          text: "Hello World",
+          createdAt: "2024-01-01T00:00:00.000Z",
+        },
         replyCount: 0,
         repostCount: 0,
         likeCount: 0,
@@ -111,447 +95,269 @@ describe("PostViewService", () => {
       });
     });
 
-    it("プロフィールが存在しない場合はデフォルト値を使用する", async () => {
-      // Arrange
-      const postUri = AtUri.make("did:plc:456", "app.bsky.feed.post", "def456");
-      const actorDid = "did:plc:456";
-      const postRecord = {
-        $type: "app.bsky.feed.post",
-        text: "Test post",
-        createdAt: "2024-01-01T00:00:00.000Z",
-      };
-
-      await ctx.db.insert(schema.actors).values({
-        did: actorDid,
-        handle: "noProfile.bsky.social",
-      });
-
-      await ctx.db.insert(schema.records).values({
-        uri: postUri.toString(),
-        cid: "bafyreidef456",
-        actorDid,
-        json: postRecord,
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.posts).values({
-        uri: postUri.toString(),
-        cid: "bafyreidef456",
-        actorDid,
-        text: "Test post",
-        createdAt: new Date(postRecord.createdAt),
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      // プロファイルを作成（ただし最小限のデータ）
-      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
-      await ctx.db.insert(schema.records).values({
-        uri: profileUri,
-        cid: "bafyreiprofile456",
-        actorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
+    test("プロフィールの表示名がnullの場合、表示名なしでプロフィールビューを返す", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .props({ handle: () => "noProfile.bsky.social" })
+        .create();
+      const profileRecord = await recordFactory(
+        ctx.db,
+        "app.bsky.actor.profile",
+      )
+        .vars({ actor: () => actor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.actor.profile",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+        })
+        .create();
       await ctx.db.insert(schema.profiles).values({
-        uri: profileUri,
-        cid: "bafyreiprofile456",
-        actorDid,
+        uri: profileRecord.uri,
+        cid: profileRecord.cid,
+        actorDid: profileRecord.actorDid,
+        displayName: null,
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Test post",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+        })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => postRecord })
+        .create();
+      const postUri = new AtUri(post.uri);
 
-      // Act
+      // act
       const result = await postViewService.findPostView([postUri]);
 
-      // Assert
+      // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.author).toMatchObject({
-        did: actorDid,
-        handle: "noProfile.bsky.social",
+      expect(result[0]).toMatchObject({
+        author: {
+          did: actor.did,
+          handle: "noProfile.bsky.social",
+          displayName: undefined,
+        },
       });
     });
 
-    it("画像埋め込みを含む投稿の場合、画像ビューを含む投稿ビューを取得できる", async () => {
-      // Arrange
-      const postUri = AtUri.make("did:plc:789", "app.bsky.feed.post", "img789");
-      const actorDid = "did:plc:789";
-      const postRecord = {
-        $type: "app.bsky.feed.post",
-        text: "Post with images",
-        embed: {
-          $type: "app.bsky.embed.images",
-          images: [
-            {
-              alt: "Test image",
-              image: {
-                $type: "blob",
-                ref: {
-                  $link:
-                    "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+    test("画像埋め込みを含む投稿の場合、画像ビューを含む投稿ビューを取得できる", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Image User" }))
+        .props({ handle: () => "imageuser.bsky.social" })
+        .create();
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Post with images",
+            embed: {
+              $type: "app.bsky.embed.images",
+              images: [
+                {
+                  alt: "Test image",
+                  image: {
+                    $type: "blob",
+                    ref: {
+                      $link:
+                        "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+                    },
+                    mimeType: "image/jpeg",
+                    size: 123456,
+                  },
                 },
-                mimeType: "image/jpeg",
-                size: 123456,
-              },
+              ],
             },
-          ],
-        },
-        createdAt: "2024-01-01T00:00:00.000Z",
-      };
-
-      await ctx.db.insert(schema.actors).values({
-        did: actorDid,
-        handle: "imageuser.bsky.social",
-      });
-
-      await ctx.db.insert(schema.records).values({
-        uri: postUri.toString(),
-        cid: "bafyreiimg789",
-        actorDid,
-        json: postRecord,
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.posts).values({
-        uri: postUri.toString(),
-        cid: "bafyreiimg789",
-        actorDid,
-        text: "Post with images",
-        createdAt: new Date(postRecord.createdAt),
-      });
-
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+        })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => postRecord })
+        .create();
       await ctx.db.insert(schema.postEmbedImages).values({
-        postUri: postUri.toString(),
+        postUri: post.uri,
         cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
         position: 0,
         alt: "Test image",
       });
+      const postUri = new AtUri(post.uri);
 
-      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
-      await ctx.db.insert(schema.records).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Image User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.profiles).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        displayName: "Image User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      // Act
+      // act
       const result = await postViewService.findPostView([postUri]);
 
-      // Assert
+      // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.embed).toMatchObject({
-        $type: "app.bsky.embed.images#view",
-        images: [
-          {
-            alt: "Test image",
-            thumb: `http://localhost:3004/images/feed_thumbnail/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
-            fullsize: `http://localhost:3004/images/feed_fullsize/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
-          },
-        ],
+      expect(result[0]).toMatchObject({
+        embed: {
+          $type: "app.bsky.embed.images#view",
+          images: [
+            {
+              alt: "Test image",
+              thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+              fullsize: `http://localhost:3004/images/feed_fullsize/${actor.did}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+            },
+          ],
+        },
       });
     });
 
-    it("外部リンク埋め込みを含む投稿の場合、外部リンクビューを含む投稿ビューを取得できる", async () => {
-      // Arrange
-      const postUri = AtUri.make("did:plc:ext", "app.bsky.feed.post", "ext123");
-      const actorDid = "did:plc:ext";
-      const postRecord = {
-        $type: "app.bsky.feed.post",
-        text: "Post with external link",
-        embed: {
-          $type: "app.bsky.embed.external",
-          external: {
-            uri: "https://example.com",
-            title: "Example Site",
-            description: "An example website",
-            thumb: {
-              $type: "blob",
-              ref: {
-                $link:
-                  "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+    test("外部リンク埋め込みを含む投稿の場合、外部リンクビューを含む投稿ビューを取得できる", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Link User" }))
+        .props({ handle: () => "linkuser.bsky.social" })
+        .create();
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Post with external link",
+            embed: {
+              $type: "app.bsky.embed.external",
+              external: {
+                uri: "https://example.com",
+                title: "Example Site",
+                description: "An example website",
+                thumb: {
+                  $type: "blob",
+                  ref: {
+                    $link:
+                      "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+                  },
+                  mimeType: "image/jpeg",
+                  size: 50000,
+                },
               },
-              mimeType: "image/jpeg",
-              size: 50000,
             },
-          },
-        },
-        createdAt: "2024-01-01T00:00:00.000Z",
-      };
-
-      await ctx.db.insert(schema.actors).values({
-        did: actorDid,
-        handle: "linkuser.bsky.social",
-      });
-
-      await ctx.db.insert(schema.records).values({
-        uri: postUri.toString(),
-        cid: "bafyreiext123",
-        actorDid,
-        json: postRecord,
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.posts).values({
-        uri: postUri.toString(),
-        cid: "bafyreiext123",
-        actorDid,
-        text: "Post with external link",
-        createdAt: new Date(postRecord.createdAt),
-      });
-
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+        })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => postRecord })
+        .create();
       await ctx.db.insert(schema.postEmbedExternals).values({
-        postUri: postUri.toString(),
+        postUri: post.uri,
         uri: "https://example.com",
         title: "Example Site",
         description: "An example website",
         thumbCid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
       });
+      const postUri = new AtUri(post.uri);
 
-      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
-      await ctx.db.insert(schema.records).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Link User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.profiles).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        displayName: "Link User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      // Act
+      // act
       const result = await postViewService.findPostView([postUri]);
 
-      // Assert
+      // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.embed).toMatchObject({
-        $type: "app.bsky.embed.external#view",
-        external: {
-          uri: "https://example.com",
-          title: "Example Site",
-          description: "An example website",
-          thumb: `http://localhost:3004/images/feed_thumbnail/${actorDid}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+      expect(result[0]).toMatchObject({
+        embed: {
+          $type: "app.bsky.embed.external#view",
+          external: {
+            uri: "https://example.com",
+            title: "Example Site",
+            description: "An example website",
+            thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+          },
         },
       });
     });
 
-    it("複数のURIを指定した場合、対応する複数の投稿ビューを取得できる", async () => {
-      // Arrange
-      const postUri1 = AtUri.make(
-        "did:plc:multi1",
-        "app.bsky.feed.post",
-        "post1",
-      );
-      const postUri2 = AtUri.make(
-        "did:plc:multi2",
-        "app.bsky.feed.post",
-        "post2",
-      );
-      const actorDid1 = "did:plc:multi1";
-      const actorDid2 = "did:plc:multi2";
-
-      await ctx.db.insert(schema.actors).values([
-        { did: actorDid1, handle: "user1.bsky.social" },
-        { did: actorDid2, handle: "user2.bsky.social" },
-      ]);
-
-      await ctx.db.insert(schema.records).values([
-        {
-          uri: postUri1.toString(),
-          cid: "bafyreipost1",
-          actorDid: actorDid1,
-          json: {
+    test("複数のURIを指定した場合、対応する複数の投稿ビューを取得できる", async () => {
+      // arrange
+      const actor1 = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "User 1" }))
+        .props({ handle: () => "user1.bsky.social" })
+        .create();
+      const actor2 = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "User 2" }))
+        .props({ handle: () => "user2.bsky.social" })
+        .create();
+      const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor1 })
+        .props({
+          json: () => ({
             $type: "app.bsky.feed.post",
             text: "First post",
             createdAt: "2024-01-01T00:00:00.000Z",
-          },
-          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-        },
-        {
-          uri: postUri2.toString(),
-          cid: "bafyreipost2",
-          actorDid: actorDid2,
-          json: {
+          }),
+        })
+        .create();
+      const record2 = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor2 })
+        .props({
+          json: () => ({
             $type: "app.bsky.feed.post",
             text: "Second post",
             createdAt: "2024-01-01T01:00:00.000Z",
-          },
-          indexedAt: new Date("2024-01-01T01:00:00.000Z"),
-        },
-      ]);
+          }),
+        })
+        .create();
+      const post1 = await postFactory(ctx.db)
+        .vars({ record: () => record1 })
+        .create();
+      const post2 = await postFactory(ctx.db)
+        .vars({ record: () => record2 })
+        .create();
+      const postUri1 = new AtUri(post1.uri);
+      const postUri2 = new AtUri(post2.uri);
 
-      await ctx.db.insert(schema.posts).values([
-        {
-          uri: postUri1.toString(),
-          cid: "bafyreipost1",
-          actorDid: actorDid1,
-          text: "First post",
-          createdAt: new Date("2024-01-01T00:00:00.000Z"),
-          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-        },
-        {
-          uri: postUri2.toString(),
-          cid: "bafyreipost2",
-          actorDid: actorDid2,
-          text: "Second post",
-          createdAt: new Date("2024-01-01T01:00:00.000Z"),
-          indexedAt: new Date("2024-01-01T01:00:00.000Z"),
-        },
-      ]);
-
-      // 投稿者のプロフィールを作成
-      const profile1Uri = `at://${actorDid1}/app.bsky.actor.profile/self`;
-      const profile2Uri = `at://${actorDid2}/app.bsky.actor.profile/self`;
-
-      await ctx.db.insert(schema.records).values([
-        {
-          uri: profile1Uri,
-          cid: "bafyreiprofile1",
-          actorDid: actorDid1,
-          json: {
-            $type: "app.bsky.actor.profile",
-            displayName: "User 1",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          },
-          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-        },
-        {
-          uri: profile2Uri,
-          cid: "bafyreiprofile2",
-          actorDid: actorDid2,
-          json: {
-            $type: "app.bsky.actor.profile",
-            displayName: "User 2",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          },
-          indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-        },
-      ]);
-
-      await ctx.db.insert(schema.profiles).values([
-        {
-          uri: profile1Uri,
-          cid: "bafyreiprofile1",
-          actorDid: actorDid1,
-          displayName: "User 1",
-          createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        },
-        {
-          uri: profile2Uri,
-          cid: "bafyreiprofile2",
-          actorDid: actorDid2,
-          displayName: "User 2",
-          createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        },
-      ]);
-
-      // Act
+      // act
       const result = await postViewService.findPostView([postUri1, postUri2]);
 
-      // Assert
+      // assert
       expect(result).toHaveLength(2);
-      expect(result.map((post) => post.uri)).toEqual([
-        postUri1.toString(),
-        postUri2.toString(),
-      ]);
+      expect(result.map((post) => post.uri)).toEqual([post1.uri, post2.uri]);
     });
 
-    it("存在しない投稿URIが含まれている場合、そのURIは結果に含まれない", async () => {
-      // Arrange
-      const existingUri = AtUri.make(
-        "did:plc:exists",
-        "app.bsky.feed.post",
-        "exists",
-      );
+    test("存在しない投稿URIが含まれている場合、そのURIは結果に含まれない", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Existing User" }))
+        .props({ handle: () => "exists.bsky.social" })
+        .create();
+      const record = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Existing post",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+        })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => record })
+        .create();
+      const existingUri = new AtUri(post.uri);
       const nonExistentUri = AtUri.make(
         "did:plc:ghost",
         "app.bsky.feed.post",
         "ghost",
       );
-      const actorDid = "did:plc:exists";
 
-      await ctx.db.insert(schema.actors).values({
-        did: actorDid,
-        handle: "exists.bsky.social",
-      });
-
-      await ctx.db.insert(schema.records).values({
-        uri: existingUri.toString(),
-        cid: "bafyreiexists",
-        actorDid,
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Existing post",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.posts).values({
-        uri: existingUri.toString(),
-        cid: "bafyreiexists",
-        actorDid,
-        text: "Existing post",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      // プロフィールを作成
-      const profileUri = `at://${actorDid}/app.bsky.actor.profile/self`;
-      await ctx.db.insert(schema.records).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Existing User",
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      await ctx.db.insert(schema.profiles).values({
-        uri: profileUri,
-        cid: "bafyreiprofile",
-        actorDid,
-        displayName: "Existing User",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
-
-      // Act
+      // act
       const result = await postViewService.findPostView([
         existingUri,
         nonExistentUri,
       ]);
 
-      // Assert
+      // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(existingUri.toString());
+      expect(result[0]).toMatchObject({
+        uri: post.uri,
+      });
     });
   });
 });
