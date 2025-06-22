@@ -26,7 +26,7 @@
     "vitest": "3.2.3"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "6.0.2",
+    "@mkizka/eslint-config": "7.0.1",
     "@tsconfig/node-lts": "22.0.1",
     "drizzle-orm": "0.44.2",
     "eslint": "9.28.0",

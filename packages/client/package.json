@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@atproto/lex-cli": "0.8.2",
-    "@mkizka/eslint-config": "6.0.2",
+    "@mkizka/eslint-config": "7.0.1",
     "@tsconfig/node-lts": "22.0.1",
     "@types/express": "5.0.3",
     "chokidar-cli": "3.0.0",
