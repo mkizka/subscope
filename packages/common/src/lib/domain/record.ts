@@ -63,6 +63,7 @@ export class Record {
   validate<T extends SupportedCollection>(collection: T) {
     try {
       lexicons.assertValidRecord(collection, this.lex);
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       return this.lex as SupportedCollectionMap[T];
     } catch (error) {
       if (error instanceof ValidationError) {

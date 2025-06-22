@@ -30,6 +30,7 @@ export const SUPPORTED_COLLECTIONS = [
 export const isSupportedCollection = (
   collection: string,
 ): collection is SupportedCollection => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return SUPPORTED_COLLECTIONS.includes(collection as SupportedCollection);
 };
 

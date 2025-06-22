@@ -35,7 +35,10 @@ const schema = z.object({
   CACHE_RETENTION_TIME: match({
     prod: z.string().default("1d"),
     dev: z.string().default("1m"),
-  }).transform((val) => ms(val as StringValue)),
+  }).transform((val) =>
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    ms(val as StringValue),
+  ),
 });
 
 export const env = (() => {

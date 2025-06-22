@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { AtUri } from "@atproto/syntax";
 import { factory, later } from "@factory-js/factory";
 import { faker } from "@faker-js/faker";

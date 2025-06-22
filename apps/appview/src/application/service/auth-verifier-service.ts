@@ -34,6 +34,7 @@ export class AuthVerifierService {
     if (!token) {
       throw new AuthRequiredError("No token provided");
     }
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const nsid = parseReqNsid({ url: request.path } as IncomingMessage);
     const credentials = await this.tokenVerifier.verify({ token, nsid });
     if (!credentials) {
