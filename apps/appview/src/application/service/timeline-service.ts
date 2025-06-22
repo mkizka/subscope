@@ -1,4 +1,7 @@
-import type { ITimelineRepository } from "../interfaces/timeline-repository.js";
+import type {
+  ITimelineRepository,
+  TimelinePost,
+} from "../interfaces/timeline-repository.js";
 import { createCursorPaginator, type Page } from "../utils/pagination.js";
 
 export class TimelineService {
@@ -13,16 +16,16 @@ export class TimelineService {
     authDid: string;
     cursor?: Date;
     limit: number;
-  }): Promise<Page<{ uri: string; sortAt: Date }>> {
-    const paginator = createCursorPaginator(
+  }): Promise<Page<TimelinePost>> {
+    const paginator = createCursorPaginator<TimelinePost>({
       limit,
-      (post: { uri: string; sortAt: Date }) => post.sortAt.toISOString(),
-    );
+      getCursor: (post) => post.sortAt.toISOString(),
+    });
 
     const posts = await this.timelineRepository.findPosts({
       authDid,
-      cursor,
       limit: paginator.queryLimit,
+      cursor,
     });
 
     return paginator.extractPage(posts);

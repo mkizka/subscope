@@ -16,9 +16,10 @@ export class LikeService {
     cursor?: Date;
     limit: number;
   }): Promise<Page<Like>> {
-    const paginator = createCursorPaginator(limit, (like: Like) =>
-      like.sortAt.toISOString(),
-    );
+    const paginator = createCursorPaginator<Like>({
+      limit,
+      getCursor: (like) => like.sortAt.toISOString(),
+    });
 
     const likes = await this.likeRepository.findMany({
       subjectUri,

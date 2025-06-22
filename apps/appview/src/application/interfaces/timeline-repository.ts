@@ -6,7 +6,7 @@ export interface TimelinePost {
 export interface ITimelineRepository {
   findPosts: (params: {
     authDid: string;
-    cursor?: Date;
     limit: number;
+    cursor?: Date;
   }) => Promise<TimelinePost[]>;
 }

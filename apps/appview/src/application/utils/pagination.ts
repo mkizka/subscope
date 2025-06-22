@@ -8,10 +8,13 @@ export interface Page<T> {
   cursor?: string;
 }
 
-export function createCursorPaginator<T>(
-  limit: number,
-  getCursor: (item: T) => string,
-): Paginator<T> {
+export function createCursorPaginator<T>({
+  limit,
+  getCursor,
+}: {
+  limit: number;
+  getCursor: (item: T) => string;
+}): Paginator<T> {
   return {
     queryLimit: limit + 1,
     extractPage: (items: T[]): Page<T> => {
