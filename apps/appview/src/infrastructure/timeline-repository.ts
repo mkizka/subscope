@@ -13,16 +13,16 @@ export class TimelineRepository implements ITimelineRepository {
 
   async findPosts({
     authDid,
-    before,
+    cursor,
     limit,
   }: {
     authDid: string;
-    before?: Date;
+    cursor?: Date;
     limit: number;
   }): Promise<TimelinePost[]> {
     const filters = [];
-    if (before) {
-      filters.push(lt(schema.posts.sortAt, before));
+    if (cursor) {
+      filters.push(lt(schema.posts.sortAt, cursor));
     }
 
     const posts = await this.db

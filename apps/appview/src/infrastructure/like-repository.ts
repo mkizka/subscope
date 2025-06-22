@@ -9,15 +9,18 @@ export class LikeRepository implements ILikeRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findMany(params: {
+  async findMany({
+    subjectUri,
+    limit,
+    cursor,
+  }: {
     subjectUri: string;
     limit: number;
-    cursor?: string;
+    cursor?: Date;
   }): Promise<Like[]> {
-    const filters = [eq(schema.likes.subjectUri, params.subjectUri)];
+    const filters = [eq(schema.likes.subjectUri, subjectUri)];
 
-    if (params.cursor) {
-      const cursor = new Date(params.cursor);
+    if (cursor) {
       filters.push(lt(schema.likes.sortAt, cursor));
     }
 
@@ -26,7 +29,7 @@ export class LikeRepository implements ILikeRepository {
       .from(schema.likes)
       .where(and(...filters))
       .orderBy(desc(schema.likes.sortAt))
-      .limit(params.limit);
+      .limit(limit);
 
     return likes.map(
       (like) =>

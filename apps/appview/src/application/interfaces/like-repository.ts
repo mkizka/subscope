@@ -4,6 +4,6 @@ export interface ILikeRepository {
   findMany: (params: {
     subjectUri: string;
     limit: number;
-    cursor?: string;
+    cursor?: Date;
   }) => Promise<Like[]>;
 }

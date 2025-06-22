@@ -1,6 +1,6 @@
 import type { Like } from "@repo/common/domain";
 
-import type { LikeQuery } from "../../domain/models/like-query.js";
+import type { PaginationQuery } from "../../domain/models/pagination-query.js";
 import { PaginationResult } from "../../domain/models/pagination-result.js";
 import type { ILikeRepository } from "../interfaces/like-repository.js";
 
@@ -9,12 +9,12 @@ export class LikeService {
   static inject = ["likeRepository"] as const;
 
   async findLikesWithPagination(
-    query: LikeQuery,
+    query: PaginationQuery<{ subjectUri: string }>,
   ): Promise<PaginationResult<Like>> {
     const likes = await this.likeRepository.findMany({
-      subjectUri: query.subjectUri,
+      subjectUri: query.params.subjectUri,
       limit: query.queryLimit,
-      cursor: query.before?.toISOString(),
+      cursor: query.cursor,
     });
 
     return PaginationResult.create(likes, query.limit, (like) => like.sortAt);

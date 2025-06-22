@@ -1,6 +1,6 @@
 import type { AppBskyFeedGetLikes } from "@repo/client/server";
 
-import { LikeQuery } from "../domain/models/like-query.js";
+import { PaginationQuery } from "../domain/models/pagination-query.js";
 import type { LikeService } from "./service/like-service.js";
 import type { ProfileViewService } from "./service/profile-view-service.js";
 
@@ -14,11 +14,13 @@ export class GetLikesUseCase {
   async execute(
     params: AppBskyFeedGetLikes.QueryParams,
   ): Promise<AppBskyFeedGetLikes.OutputSchema> {
-    const query = LikeQuery.fromCursor({
-      subjectUri: params.uri,
-      cursor: params.cursor,
-      limit: params.limit,
-    });
+    const query = PaginationQuery.create(
+      { subjectUri: params.uri },
+      {
+        cursor: params.cursor,
+        limit: params.limit,
+      },
+    );
 
     const paginationResult =
       await this.likeService.findLikesWithPagination(query);
