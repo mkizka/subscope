@@ -22,6 +22,7 @@
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "generate": "./scripts/generate.sh",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
+    "postinstall": "./scripts/postinstall.sh",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "chokidar-cli": "3.0.0",
     "esbuild": "0.25.5",
     "eslint": "9.19.0",
+    "giget": "2.0.0",
     "npm-run-all2": "8.0.4",
     "typescript": "5.8.3"
   },

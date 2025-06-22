@@ -3,7 +3,7 @@ set -euo pipefail
 
 ATPROTO_SHA=$(< .atproto-sha)
 DOWNLOAD_DIR="./node_modules/.cache/lexicons"
-LEXICONS_DIR="../packages/client/lexicons"
+LEXICONS_DIR="./lexicons"
 
 paths=(
   # app.bsky

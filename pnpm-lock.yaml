@@ -388,11 +388,7 @@ importers:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.8.3)(vitest@3.2.3(@types/node@22.15.30)(jiti@1.21.7)(tsx@4.19.4)(yaml@2.8.0))
 
-  dev-env:
-    devDependencies:
-      giget:
-        specifier: 2.0.0
-        version: 2.0.0
+  dev-env: {}
 
   packages/client:
     dependencies:
@@ -430,6 +426,9 @@ importers:
       eslint:
         specifier: 9.19.0
         version: 9.19.0(jiti@1.21.7)
+      giget:
+        specifier: 2.0.0
+        version: 2.0.0
       npm-run-all2:
         specifier: 8.0.4
         version: 8.0.4

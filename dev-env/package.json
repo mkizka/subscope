@@ -5,12 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "tail -f run-dev-env.log",
-    "postinstall": "./scripts/postinstall.sh",
     "reset-dev-env": "./scripts/reset-dev-env.sh",
     "run-dev-env": "./scripts/run-dev-env.sh",
     "setup-dev-env": "./scripts/setup-dev-env.sh"
-  },
-  "devDependencies": {
-    "giget": "2.0.0"
   }
 }

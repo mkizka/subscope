@@ -14,14 +14,14 @@ AT ProtocolのXRPCエンドポイントを追加する場合、Lexicon定義か�
 
 新しいLexiconファイルをクライアントパッケージにコピーするため、postinstall.shに追加します。
 
-**ファイル:** `/dev-env/scripts/postinstall.sh`
+**ファイル:** `/packages/client/scripts/postinstall.sh`
 
 ```bash
 # 例：app.bsky.graph.getFollowsを追加する場合
 paths=(
   # ... 既存のパス
   "app/bsky/graph/follow.json"
-  "app/bsky/graph/getFollows.json"  # 新しく追加
+  "app/bsky/graph/getFollows.json" # 新しく追加
   # ...
 )
 ```
@@ -50,7 +50,7 @@ pnpm build --force
 ```typescript
 export interface I{Entity}Repository {
   // 既存のメソッド...
-  
+
   find{Entities}: (params: {
     db: DatabaseClient;
     actorDid: Did;
@@ -70,7 +70,7 @@ async find{Entities}(params: {
   cursor?: string;
 }): Promise<{Entity}[]> {
   const filters = [eq(schema.{table}.actorDid, params.actorDid.toString())];
-  
+
   if (params.cursor) {
     const cursor = new Date(params.cursor);
     filters.push(lt(schema.{table}.sortAt, cursor));
@@ -113,7 +113,7 @@ export class {EndpointName}UseCase {
   async execute(params: {EndpointName}Params) {
     // DIDまたはハンドルの解決
     let actorDid: ReturnType<typeof asDid>;
-    
+
     if (params.actor.startsWith("did:")) {
       actorDid = asDid(params.actor);
     } else {
@@ -205,13 +205,13 @@ import { {EndpointName} } from "./presentation/routes/app/bsky/{category}/{endpo
 
 createInjector()
   // ... 既存の登録
-  
+
   // application
   .provideClass("{endpointName}UseCase", {EndpointName}UseCase)
-  
+
   // presentation
   .provideClass("{endpointName}", {EndpointName})
-  
+
   // ... 残りの設定
 ```
 
@@ -274,7 +274,7 @@ describe("{EndpointName}UseCase", () => {
     const actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Test User" }))
       .create();
-    
+
     // act
     const result = await {endpointName}UseCase.execute({
       db: ctx.db,

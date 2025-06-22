@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ATPROTO_SHA=$(< .atproto-sha)
+ATPROTO_SHA=$(< ../packages/client/.atproto-sha)
 ATPROTO_DIR="$HOME/.cache/atproto/$ATPROTO_SHA"
 
 if [ -d "$ATPROTO_DIR" ]; then
