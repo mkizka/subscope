@@ -1,12 +1,9 @@
-export interface TimelinePost {
-  uri: string;
-  sortAt: Date;
-}
+import type { FeedItem } from "@repo/common/domain";
 
 export interface ITimelineRepository {
-  findPosts: (params: {
+  findFeedItems: (params: {
     authDid: string;
     limit: number;
     cursor?: Date;
-  }) => Promise<TimelinePost[]>;
+  }) => Promise<FeedItem[]>;
 }

@@ -3,7 +3,10 @@ import {
   actorFactory,
   followFactory,
   postFactory,
+  postFeedItemFactory,
   recordFactory,
+  repostFactory,
+  repostFeedItemFactory,
   setupTestDatabase,
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
@@ -90,6 +93,11 @@ describe("GetTimelineUseCase", () => {
       })
       .create();
 
+    // feed_itemsテーブルに投稿を追加
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post })
+      .create();
+
     // act
     const result = await getTimelineUseCase.execute(
       { limit: 50 },
@@ -132,6 +140,11 @@ describe("GetTimelineUseCase", () => {
             .create(),
       })
       .props({ text: () => "My own post" })
+      .create();
+
+    // feed_itemsテーブルに投稿を追加
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => selfPost })
       .create();
 
     // act
@@ -177,7 +190,7 @@ describe("GetTimelineUseCase", () => {
       .create();
 
     // 複数の投稿を時系列で作成
-    await postFactory(ctx.db)
+    const firstPost = await postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
@@ -193,7 +206,11 @@ describe("GetTimelineUseCase", () => {
       })
       .create();
 
-    await postFactory(ctx.db)
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => firstPost })
+      .create();
+
+    const secondPost = await postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
@@ -212,7 +229,11 @@ describe("GetTimelineUseCase", () => {
       })
       .create();
 
-    await postFactory(ctx.db)
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => secondPost })
+      .create();
+
+    const thirdPost = await postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
@@ -226,6 +247,10 @@ describe("GetTimelineUseCase", () => {
         text: () => "Third post",
         createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
       })
+      .create();
+
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => thirdPost })
       .create();
 
     // act - 最初のページ（limit=2）
@@ -301,6 +326,11 @@ describe("GetTimelineUseCase", () => {
       .props({ text: () => "Limit test post" })
       .create();
 
+    // feed_itemsテーブルに投稿を追加
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post })
+      .create();
+
     // act - limit=0
     const zeroLimitResult = await getTimelineUseCase.execute(
       { limit: 0 },
@@ -356,13 +386,17 @@ describe("GetTimelineUseCase", () => {
         indexedAt: () => new Date("2024-01-01T01:30:00.000Z"),
       })
       .create();
-    await postFactory(ctx.db)
+    const earlyPost = await postFactory(ctx.db)
       .vars({ record: () => earlyRecord })
       .props({
         text: () => "Early post",
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
         indexedAt: () => new Date("2024-01-01T01:30:00.000Z"),
       })
+      .create();
+
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => earlyPost })
       .create();
 
     const latestRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -372,13 +406,17 @@ describe("GetTimelineUseCase", () => {
         indexedAt: () => new Date("2024-01-01T02:30:00.000Z"),
       })
       .create();
-    await postFactory(ctx.db)
+    const latestPost = await postFactory(ctx.db)
       .vars({ record: () => latestRecord })
       .props({
         text: () => "Latest post",
         createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
         indexedAt: () => new Date("2024-01-01T02:30:00.000Z"),
       })
+      .create();
+
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => latestPost })
       .create();
 
     const middleRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -388,13 +426,17 @@ describe("GetTimelineUseCase", () => {
         indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
       })
       .create();
-    await postFactory(ctx.db)
+    const middlePost = await postFactory(ctx.db)
       .vars({ record: () => middleRecord })
       .props({
         text: () => "Middle post",
         createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
         indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
       })
+      .create();
+
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => middlePost })
       .create();
 
     // act
@@ -429,6 +471,100 @@ describe("GetTimelineUseCase", () => {
             record: {
               text: "Early post",
             },
+          },
+        },
+      ],
+    });
+  });
+
+  test("フォローしているユーザーがリポストしている場合、ReasonRepostを含むfeedViewPostを返す", async () => {
+    // arrange
+    const authActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Auth User" }))
+      .create();
+    const originalAuthor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Original Author" }))
+      .create();
+    const reposter = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Reposter" }))
+      .create();
+
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ actor: () => authActor })
+            .create(),
+        followee: () => reposter,
+      })
+      .create();
+
+    // 元の投稿を作成
+    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => originalAuthor })
+      .props({
+        json: () => ({ $type: "app.bsky.feed.post", text: "Original post" }),
+      })
+      .create();
+    const originalPost = await postFactory(ctx.db)
+      .vars({ record: () => originalRecord })
+      .props({
+        text: () => "Original post",
+        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+      })
+      .create();
+
+    // リポストを作成
+    const repost = await repostFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.repost")
+            .vars({ actor: () => reposter })
+            .create(),
+        subject: () => originalPost,
+      })
+      .props({
+        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+      })
+      .create();
+
+    // feed_itemsテーブルに投稿を追加
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => originalPost })
+      .create();
+
+    // feed_itemsテーブルにリポストを追加
+    await repostFeedItemFactory(ctx.db)
+      .vars({ repost: () => repost })
+      .create();
+
+    // act
+    const result = await getTimelineUseCase.execute(
+      { limit: 50 },
+      authActor.did,
+    );
+
+    // assert
+    expect(result).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            uri: originalPost.uri,
+            author: {
+              displayName: "Original Author",
+            },
+            record: {
+              text: "Original post",
+            },
+          },
+          reason: {
+            $type: "app.bsky.feed.defs#reasonRepost",
+            by: {
+              did: reposter.did,
+              displayName: "Reposter",
+            },
+            indexedAt: expect.any(String),
           },
         },
       ],
@@ -472,6 +608,10 @@ describe("GetTimelineUseCase", () => {
       })
       .create();
 
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => rootPost })
+      .create();
+
     // 中間投稿（根投稿へのリプライ）を作成
     const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
       .vars({ actor: () => parentAuthor })
@@ -488,6 +628,10 @@ describe("GetTimelineUseCase", () => {
       })
       .create();
 
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => parentPost })
+      .create();
+
     // 最終リプライ投稿（中間投稿へのリプライ）を作成
     const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
       .vars({ actor: () => replyAuthor })
@@ -502,6 +646,10 @@ describe("GetTimelineUseCase", () => {
         replyParentCid: () => parentPost.cid,
         createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
       })
+      .create();
+
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => replyPost })
       .create();
 
     // act

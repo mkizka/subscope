@@ -1,3 +1,5 @@
+import type { Did } from "@atproto/did";
+
 import type { Post } from "./post/post.js";
 import type { Repost } from "./repost.js";
 
@@ -8,7 +10,7 @@ type FeedItemParams = {
   cid: string;
   type: FeedType;
   subjectUri: string | null;
-  actorDid: string;
+  actorDid: Did;
   sortAt: Date;
 };
 
@@ -17,7 +19,7 @@ export class FeedItem {
   readonly cid: string;
   readonly type: FeedType;
   readonly subjectUri: string | null;
-  readonly actorDid: string;
+  readonly actorDid: Did;
   readonly sortAt: Date;
 
   constructor(params: FeedItemParams) {
@@ -35,7 +37,7 @@ export class FeedItem {
       cid: post.cid,
       type: "post",
       subjectUri: null,
-      actorDid: post.actorDid.toString(),
+      actorDid: post.actorDid,
       sortAt: post.createdAt, // TODO: sortAtに修正
     });
   }
@@ -46,7 +48,7 @@ export class FeedItem {
       cid: repost.cid,
       type: "repost",
       subjectUri: repost.subjectUri.toString(),
-      actorDid: repost.actorDid.toString(),
+      actorDid: repost.actorDid,
       sortAt: repost.createdAt, // TODO: sortAtに修正
     });
   }
