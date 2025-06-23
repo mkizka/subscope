@@ -36,7 +36,7 @@ export class FeedItem {
       type: "post",
       subjectUri: null,
       actorDid: post.actorDid.toString(),
-      sortAt: post.createdAt,
+      sortAt: post.createdAt, // TODO: sortAtに修正
     });
   }
 
@@ -47,7 +47,7 @@ export class FeedItem {
       type: "repost",
       subjectUri: repost.subjectUri.toString(),
       actorDid: repost.actorDid.toString(),
-      sortAt: repost.createdAt,
+      sortAt: repost.createdAt, // TODO: sortAtに修正
     });
   }
 }
