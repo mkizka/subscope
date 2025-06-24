@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AppBskyActorDefs } from "@repo/client/server";
+import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 
 import { env } from "../../shared/env.js";
@@ -19,7 +19,7 @@ export class ProfileViewService {
 
   private createProfileViewBasic(
     profile: ProfileDetailed,
-  ): AppBskyActorDefs.ProfileViewBasic {
+  ): $Typed<AppBskyActorDefs.ProfileViewBasic> {
     return {
       $type: "app.bsky.actor.defs#profileViewBasic",
       did: profile.actorDid,
@@ -40,7 +40,7 @@ export class ProfileViewService {
       followersCount: number;
       postsCount: number;
     },
-  ): AppBskyActorDefs.ProfileViewDetailed {
+  ): $Typed<AppBskyActorDefs.ProfileViewDetailed> {
     return {
       ...this.createProfileViewBasic(profile),
       $type: "app.bsky.actor.defs#profileViewDetailed",
@@ -69,7 +69,9 @@ export class ProfileViewService {
     });
   }
 
-  async findProfileView(dids: Did[]): Promise<AppBskyActorDefs.ProfileView[]> {
+  async findProfileView(
+    dids: Did[],
+  ): Promise<$Typed<AppBskyActorDefs.ProfileView>[]> {
     const profiles = await this.findProfile(dids);
     return profiles.map((profile) => ({
       ...this.createProfileViewBasic(profile),
