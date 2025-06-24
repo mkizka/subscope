@@ -1,6 +1,11 @@
 import { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
-import { Post, PostEmbedExternal, PostEmbedImage } from "@repo/common/domain";
+import {
+  Post,
+  PostEmbedExternal,
+  PostEmbedImage,
+  PostEmbedRecord,
+} from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, eq, inArray, lt } from "drizzle-orm";
 
@@ -20,9 +25,12 @@ type SelectPostEmbedImage = typeof schema.postEmbedImages.$inferSelect;
 
 type SelectPostEmbedExternal = typeof schema.postEmbedExternals.$inferSelect;
 
+type SelectPostEmbedRecord = typeof schema.postEmbedRecords.$inferSelect;
+
 type SelectPost = typeof schema.posts.$inferSelect & {
   embedImages: SelectPostEmbedImage[];
   embedExternal: SelectPostEmbedExternal | null;
+  embedRecord: SelectPostEmbedRecord | null;
 };
 
 export class PostRepository implements IPostRepository {
@@ -55,6 +63,9 @@ export class PostRepository implements IPostRepository {
           }),
       );
     }
+    if (post.embedRecord) {
+      return new PostEmbedRecord(post.embedRecord.uri, post.embedRecord.cid);
+    }
     return null;
   }
 
@@ -86,6 +97,7 @@ export class PostRepository implements IPostRepository {
           orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
         },
         embedExternal: true,
+        embedRecord: true,
       },
     });
     return postsWithEmbeds.map((post) => this.convertToPost(post));
@@ -107,6 +119,7 @@ export class PostRepository implements IPostRepository {
           orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
         },
         embedExternal: true,
+        embedRecord: true,
       },
     });
     return postsWithEmbeds.map((post) => this.convertToPost(post));
@@ -120,6 +133,7 @@ export class PostRepository implements IPostRepository {
           orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
         },
         embedExternal: true,
+        embedRecord: true,
       },
     });
 
@@ -139,6 +153,7 @@ export class PostRepository implements IPostRepository {
           orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
         },
         embedExternal: true,
+        embedRecord: true,
       },
     });
 

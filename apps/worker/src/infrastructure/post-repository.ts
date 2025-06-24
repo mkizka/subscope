@@ -1,8 +1,9 @@
-import type {
-  Post,
+import {
+  type Post,
   PostEmbedExternal,
-  PostEmbedImage,
-  TransactionContext,
+  type PostEmbedImage,
+  PostEmbedRecord,
+  type TransactionContext,
 } from "@repo/common/domain";
 import { type PostInsert, schema } from "@repo/db";
 import { eq, inArray } from "drizzle-orm";
@@ -37,8 +38,10 @@ export class PostRepository implements IPostRepository {
     if (post.embed) {
       if (Array.isArray(post.embed)) {
         await this.upsertEmbedImages(ctx, postUri, post.embed);
-      } else {
+      } else if (post.embed instanceof PostEmbedExternal) {
         await this.upsertEmbedExternal(ctx, postUri, post.embed);
+      } else if (post.embed instanceof PostEmbedRecord) {
+        await this.upsertEmbedRecord(ctx, postUri, post.embed);
       }
     }
   }
@@ -88,6 +91,27 @@ export class PostRepository implements IPostRepository {
           title: embedExternal.title,
           description: embedExternal.description,
           thumbCid: embedExternal.thumbCid,
+        },
+      });
+  }
+
+  private async upsertEmbedRecord(
+    ctx: TransactionContext,
+    postUri: string,
+    embedRecord: PostEmbedRecord,
+  ) {
+    await ctx.db
+      .insert(schema.postEmbedRecords)
+      .values({
+        postUri,
+        uri: embedRecord.uri.toString(),
+        cid: embedRecord.cid,
+      })
+      .onConflictDoUpdate({
+        target: schema.postEmbedRecords.postUri,
+        set: {
+          uri: embedRecord.uri.toString(),
+          cid: embedRecord.cid,
         },
       });
   }

@@ -4,6 +4,7 @@ import { AtUri } from "@atproto/syntax";
 import type { Record } from "../record.js";
 import { PostEmbedExternal } from "./embed-external.js";
 import { PostEmbedImage } from "./embed-images.js";
+import { PostEmbedRecord } from "./embed-record.js";
 
 type StrongRef = Readonly<{
   uri: AtUri;
@@ -27,7 +28,7 @@ type PostParams = {
   replyRoot?: StrongRef | null;
   replyParent?: StrongRef | null;
   langs: string[] | null;
-  embed: PostEmbedExternal | PostEmbedImage[] | null;
+  embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null;
   createdAt: Date;
   sortAt?: Date | null;
   indexedAt?: Date | null;
@@ -41,7 +42,7 @@ export class Post {
   readonly replyRoot: StrongRef | null;
   readonly replyParent: StrongRef | null;
   readonly langs: string[] | null;
-  readonly embed: PostEmbedExternal | PostEmbedImage[] | null;
+  readonly embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null;
   readonly createdAt: Date;
   readonly sortAt: Date | null;
   readonly indexedAt: Date | null;
@@ -93,6 +94,12 @@ export class Post {
         "external" in parsed.embed
       ) {
         return PostEmbedExternal.from(parsed.embed.external);
+      }
+      if (
+        parsed.embed.$type === "app.bsky.embed.record" &&
+        "record" in parsed.embed
+      ) {
+        return PostEmbedRecord.from(parsed.embed);
       }
       return null;
     })();

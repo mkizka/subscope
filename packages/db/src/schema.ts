@@ -237,6 +237,14 @@ export const postEmbedExternals = pgTable("post_embed_externals", {
   thumbCid: varchar({ length: 256 }),
 });
 
+export const postEmbedRecords = pgTable("post_embed_records", {
+  postUri: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => posts.uri, { onDelete: "cascade" }),
+  uri: varchar({ length: 256 }).notNull(),
+  cid: varchar({ length: 256 }).notNull(),
+});
+
 export const actorsRelations = relations(actors, ({ one, many }) => ({
   profile: one(profiles, {
     fields: [actors.did],
@@ -258,6 +266,10 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   embedExternal: one(postEmbedExternals, {
     fields: [posts.uri],
     references: [postEmbedExternals.postUri],
+  }),
+  embedRecord: one(postEmbedRecords, {
+    fields: [posts.uri],
+    references: [postEmbedRecords.postUri],
   }),
   stats: one(postStats, {
     fields: [posts.uri],
@@ -291,6 +303,16 @@ export const postEmbedExternalsRelations = relations(
   ({ one }) => ({
     post: one(posts, {
       fields: [postEmbedExternals.postUri],
+      references: [posts.uri],
+    }),
+  }),
+);
+
+export const postEmbedRecordsRelations = relations(
+  postEmbedRecords,
+  ({ one }) => ({
+    post: one(posts, {
+      fields: [postEmbedRecords.postUri],
       references: [posts.uri],
     }),
   }),
