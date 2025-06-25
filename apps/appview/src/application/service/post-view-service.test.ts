@@ -50,7 +50,6 @@ describe("PostViewService", () => {
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => actor })
         .props({
-          cid: () => "bafyreiabc123",
           json: () => ({
             $type: "app.bsky.feed.post",
             text: "Hello World",
@@ -77,7 +76,7 @@ describe("PostViewService", () => {
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
         uri: post.uri,
-        cid: "bafyreiabc123",
+        cid: record.cid,
         author: {
           $type: "app.bsky.actor.defs#profileViewBasic",
           did: actor.did,
@@ -156,6 +155,8 @@ describe("PostViewService", () => {
         .use((t) => t.withProfile({ displayName: "Image User" }))
         .props({ handle: () => "imageuser.bsky.social" })
         .create();
+      const imageCid =
+        "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => actor })
         .props({
@@ -170,8 +171,7 @@ describe("PostViewService", () => {
                   image: {
                     $type: "blob",
                     ref: {
-                      $link:
-                        "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+                      $link: imageCid,
                     },
                     mimeType: "image/jpeg",
                     size: 123456,
@@ -188,7 +188,7 @@ describe("PostViewService", () => {
         .create();
       await ctx.db.insert(schema.postEmbedImages).values({
         postUri: post.uri,
-        cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+        cid: imageCid,
         position: 0,
         alt: "Test image",
       });
@@ -205,8 +205,8 @@ describe("PostViewService", () => {
           images: [
             {
               alt: "Test image",
-              thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
-              fullsize: `http://localhost:3004/images/feed_fullsize/${actor.did}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+              thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/${imageCid}.jpg`,
+              fullsize: `http://localhost:3004/images/feed_fullsize/${actor.did}/${imageCid}.jpg`,
             },
           ],
         },
@@ -219,6 +219,8 @@ describe("PostViewService", () => {
         .use((t) => t.withProfile({ displayName: "Link User" }))
         .props({ handle: () => "linkuser.bsky.social" })
         .create();
+      const thumbCid =
+        "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => actor })
         .props({
@@ -234,8 +236,7 @@ describe("PostViewService", () => {
                 thumb: {
                   $type: "blob",
                   ref: {
-                    $link:
-                      "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+                    $link: thumbCid,
                   },
                   mimeType: "image/jpeg",
                   size: 50000,
@@ -254,7 +255,7 @@ describe("PostViewService", () => {
         uri: "https://example.com",
         title: "Example Site",
         description: "An example website",
-        thumbCid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
+        thumbCid,
       });
       const postUri = new AtUri(post.uri);
 
@@ -270,7 +271,7 @@ describe("PostViewService", () => {
             uri: "https://example.com",
             title: "Example Site",
             description: "An example website",
-            thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe.jpg`,
+            thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/${thumbCid}.jpg`,
           },
         },
       });
@@ -359,6 +360,184 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         uri: post.uri,
+      });
+    });
+
+    test("投稿の埋め込み(app.bsky.embed.record)を含む投稿の場合、埋め込み投稿ビューを含む投稿ビューを取得できる", async () => {
+      // arrange
+      const embeddedAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Embedded Author" }))
+        .props({ handle: () => "embedded.bsky.social" })
+        .create();
+      const embeddedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => embeddedAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "This is the embedded post",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+      const embeddedPost = await postFactory(ctx.db)
+        .vars({ record: () => embeddedRecord })
+        .props({
+          text: () => "This is the embedded post",
+          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+
+      const quotingAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
+        .props({ handle: () => "quoting.bsky.social" })
+        .create();
+      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotingAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Check out this post!",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: embeddedPost.uri,
+                cid: embeddedPost.cid,
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      const quotingPost = await postFactory(ctx.db)
+        .vars({ record: () => quotingRecord })
+        .props({
+          text: () => "Check out this post!",
+          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      await ctx.db.insert(schema.postEmbedRecords).values({
+        postUri: quotingPost.uri,
+        uri: embeddedPost.uri,
+        cid: embeddedPost.cid,
+      });
+      const quotingPostUri = new AtUri(quotingPost.uri);
+
+      // act
+      const result = await postViewService.findPostView([quotingPostUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        $type: "app.bsky.feed.defs#postView",
+        uri: quotingPost.uri,
+        cid: quotingRecord.cid,
+        author: {
+          $type: "app.bsky.actor.defs#profileViewBasic",
+          did: quotingAuthor.did,
+          handle: "quoting.bsky.social",
+          displayName: "Quoting Author",
+        },
+        record: {
+          $type: "app.bsky.feed.post",
+          text: "Check out this post!",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: embeddedPost.uri,
+              cid: embeddedPost.cid,
+            },
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        embed: {
+          $type: "app.bsky.embed.record#view",
+          record: {
+            $type: "app.bsky.embed.record#viewRecord",
+            uri: embeddedPost.uri,
+            cid: embeddedRecord.cid,
+            author: {
+              $type: "app.bsky.actor.defs#profileViewBasic",
+              did: embeddedAuthor.did,
+              handle: "embedded.bsky.social",
+              displayName: "Embedded Author",
+            },
+            value: {
+              $type: "app.bsky.feed.post",
+              text: "This is the embedded post",
+              createdAt: "2024-01-01T00:00:00.000Z",
+            },
+            indexedAt: "2024-01-01T00:00:00.000Z",
+            replyCount: 0,
+            repostCount: 0,
+            likeCount: 0,
+            quoteCount: 0,
+            embeds: undefined,
+          },
+        },
+        replyCount: 0,
+        repostCount: 0,
+        likeCount: 0,
+        quoteCount: 0,
+        indexedAt: "2024-01-01T01:00:00.000Z",
+      });
+    });
+
+    test("投稿の埋め込み(app.bsky.embed.record)の埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
+      // arrange
+      const quotingAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
+        .props({ handle: () => "quoting.bsky.social" })
+        .create();
+      const notFoundUri = AtUri.make(
+        "did:plc:notfound",
+        "app.bsky.feed.post",
+        "notfound123",
+      ).toString();
+      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotingAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting a deleted post",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: notFoundUri,
+                cid: "bafyreighost123456789",
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+        })
+        .create();
+      const quotingPost = await postFactory(ctx.db)
+        .vars({ record: () => quotingRecord })
+        .create();
+      await ctx.db.insert(schema.postEmbedRecords).values({
+        postUri: quotingPost.uri,
+        uri: notFoundUri,
+        cid: "bafyreighost123456789",
+      });
+      const quotingPostUri = new AtUri(quotingPost.uri);
+
+      // act
+      const result = await postViewService.findPostView([quotingPostUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        embed: {
+          $type: "app.bsky.embed.record#view",
+          record: {
+            $type: "app.bsky.embed.record#viewNotFound",
+            uri: notFoundUri,
+            notFound: true,
+          },
+        },
       });
     });
   });

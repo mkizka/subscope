@@ -3,6 +3,7 @@ import type {
   AppBskyEmbedExternal,
   AppBskyEmbedImages,
   AppBskyEmbedRecord,
+  AppBskyFeedDefs,
 } from "@repo/client/server";
 import {
   PostEmbedExternal,
@@ -16,6 +17,7 @@ export class EmbedViewService {
   toView(
     embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null,
     actorDid: string,
+    embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
   ) {
     if (Array.isArray(embed)) {
       return this.toImagesView(embed, actorDid);
@@ -24,7 +26,7 @@ export class EmbedViewService {
       return this.toExternalView(embed, actorDid);
     }
     if (embed instanceof PostEmbedRecord) {
-      return this.toRecordView(embed);
+      return this.toRecordView(embed, embedPostViewMap);
     }
     return undefined;
   }
@@ -63,9 +65,30 @@ export class EmbedViewService {
 
   private toRecordView(
     embed: PostEmbedRecord,
+    embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
   ): $Typed<AppBskyEmbedRecord.View> {
-    // 現在の実装では、ViewNotFoundを返す
-    // 将来的には埋め込まれた投稿の情報を取得して返す
+    const postView = embedPostViewMap?.get(embed.uri.toString());
+
+    if (postView) {
+      return {
+        $type: "app.bsky.embed.record#view" as const,
+        record: {
+          $type: "app.bsky.embed.record#viewRecord" as const,
+          uri: postView.uri,
+          cid: postView.cid,
+          author: postView.author,
+          value: postView.record,
+          indexedAt: postView.indexedAt,
+          replyCount: postView.replyCount,
+          repostCount: postView.repostCount,
+          likeCount: postView.likeCount,
+          quoteCount: postView.quoteCount,
+          embeds: postView.embed ? [postView.embed] : undefined,
+        },
+      };
+    }
+
+    // 見つからない場合は従来通りviewNotFoundを返す
     return {
       $type: "app.bsky.embed.record#view" as const,
       record: {
