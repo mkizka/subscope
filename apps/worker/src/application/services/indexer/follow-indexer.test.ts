@@ -19,7 +19,7 @@ import { ProfileRepository } from "../../../infrastructure/profile-repository.js
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "../index-actor-service.js";
 import { BackfillService } from "../scheduler/backfill-service.js";
-import { FetchProfileService } from "../scheduler/fetch-profile-service.js";
+import { FetchRecordService } from "../scheduler/fetch-record-service.js";
 import { ResolveDidService } from "../scheduler/resolve-did-service.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
@@ -40,7 +40,7 @@ beforeAll(() => {
     .provideValue("jobQueue", mock<JobQueue>())
     .provideClass("resolveDidService", ResolveDidService)
     .provideClass("backfillService", BackfillService)
-    .provideClass("fetchProfileService", FetchProfileService)
+    .provideClass("fetchRecordService", FetchRecordService)
     .provideClass("indexActorService", IndexActorService)
     .injectClass(FollowIndexer);
   ctx = testSetup.ctx;

@@ -1,23 +1,24 @@
 import type { Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import { Actor, type TransactionContext } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 
 import type { IActorRepository } from "../interfaces/repositories/actor-repository.js";
 import type { IProfileRepository } from "../interfaces/repositories/profile-repository.js";
-import type { FetchProfileService } from "./scheduler/fetch-profile-service.js";
+import type { FetchRecordService } from "./scheduler/fetch-record-service.js";
 import type { ResolveDidService } from "./scheduler/resolve-did-service.js";
 
 export class IndexActorService {
   constructor(
     private readonly actorRepository: IActorRepository,
     private readonly profileRepository: IProfileRepository,
-    private readonly fetchProfileService: FetchProfileService,
+    private readonly fetchRecordService: FetchRecordService,
     private readonly resolveDidService: ResolveDidService,
   ) {}
   static inject = [
     "actorRepository",
     "profileRepository",
-    "fetchProfileService",
+    "fetchRecordService",
     "resolveDidService",
   ] as const;
 
@@ -51,13 +52,14 @@ export class IndexActorService {
       }
     }
 
-    // profileが存在しない場合はfetchProfileジョブを追加
+    // profileが存在しない場合はfetchRecordジョブを追加
     const profileExists = await this.profileRepository.exists({
       ctx,
       actorDid: did,
     });
     if (!profileExists) {
-      await this.fetchProfileService.schedule(did);
+      const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
+      await this.fetchRecordService.schedule(profileUri);
     }
   }
 }

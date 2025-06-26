@@ -12,7 +12,7 @@ import { ProfileRepository } from "../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { BackfillService } from "./scheduler/backfill-service.js";
-import { FetchProfileService } from "./scheduler/fetch-profile-service.js";
+import { FetchRecordService } from "./scheduler/fetch-record-service.js";
 import { ResolveDidService } from "./scheduler/resolve-did-service.js";
 
 const mockJobQueue = mock<IJobQueue>();
@@ -30,7 +30,7 @@ beforeAll(() => {
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("resolveDidService", ResolveDidService)
     .provideClass("backfillService", BackfillService)
-    .provideClass("fetchProfileService", FetchProfileService)
+    .provideClass("fetchRecordService", FetchRecordService)
     .injectClass(IndexActorService);
   ctx = testSetup.ctx;
 });
@@ -68,9 +68,9 @@ describe("IndexActorService", () => {
         }),
       );
       expect(mockJobQueue.add).toHaveBeenCalledWith({
-        queueName: "fetchProfile",
+        queueName: "fetchRecord",
         jobName: `at://${testDid}/app.bsky.actor.profile/self`,
-        data: testDid,
+        data: `at://${testDid}/app.bsky.actor.profile/self`,
       });
     });
 

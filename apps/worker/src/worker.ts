@@ -19,11 +19,11 @@ import { ProfileIndexer } from "./application/services/indexer/profile-indexer.j
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
 import { SubscriptionIndexer } from "./application/services/indexer/subscription-indexer.js";
 import { BackfillService } from "./application/services/scheduler/backfill-service.js";
-import { FetchProfileService } from "./application/services/scheduler/fetch-profile-service.js";
+import { FetchRecordService } from "./application/services/scheduler/fetch-record-service.js";
 import { ResolveDidService } from "./application/services/scheduler/resolve-did-service.js";
 import { BackfillUseCase } from "./application/use-cases/async/backfill-use-case.js";
 import { Temp__CleanupDatabaseUseCase } from "./application/use-cases/async/cleanup-database-use-case.js";
-import { FetchProfileUseCase } from "./application/use-cases/async/fetch-profile-use-case.js";
+import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
@@ -39,8 +39,8 @@ import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
-import { ProfileRecordFetcher } from "./infrastructure/profile-record-fetcher.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
+import { RecordFetcher } from "./infrastructure/record-fetcher.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
 import { FeedItemRepository } from "./infrastructure/repositories/feed-item-repository.js";
@@ -67,7 +67,7 @@ createInjector()
   .provideClass("didResolver", DidResolver)
   .provideClass("jobQueue", JobQueue)
   .provideClass("repoFetcher", RepoFetcher)
-  .provideClass("profileRecordFetcher", ProfileRecordFetcher)
+  .provideClass("recordFetcher", RecordFetcher)
   .provideClass("actorRepository", ActorRepository)
   .provideClass("actorStatsRepository", ActorStatsRepository)
   .provideClass("profileRepository", ProfileRepository)
@@ -82,7 +82,7 @@ createInjector()
   // application(service)
   .provideClass("resolveDidService", ResolveDidService)
   .provideClass("backfillService", BackfillService)
-  .provideClass("fetchProfileService", FetchProfileService)
+  .provideClass("fetchRecordService", FetchRecordService)
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
@@ -101,7 +101,7 @@ createInjector()
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
-  .provideClass("fetchProfileUseCase", FetchProfileUseCase)
+  .provideClass("fetchRecordUseCase", FetchRecordUseCase)
   .provideClass("temp__cleanupDatabaseUseCase", Temp__CleanupDatabaseUseCase)
   .provideClass("backfillUseCase", BackfillUseCase)
   .provideClass("syncWorker", SyncWorker)

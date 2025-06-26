@@ -10,7 +10,7 @@ import { ProfileRepository } from "../../../infrastructure/profile-repository.js
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "../../services/index-actor-service.js";
 import { BackfillService } from "../../services/scheduler/backfill-service.js";
-import { FetchProfileService } from "../../services/scheduler/fetch-profile-service.js";
+import { FetchRecordService } from "../../services/scheduler/fetch-record-service.js";
 import { ResolveDidService } from "../../services/scheduler/resolve-did-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
@@ -30,7 +30,7 @@ beforeAll(() => {
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("resolveDidService", ResolveDidService)
     .provideClass("backfillService", BackfillService)
-    .provideClass("fetchProfileService", FetchProfileService)
+    .provideClass("fetchRecordService", FetchRecordService)
     .provideClass("indexActorService", IndexActorService)
     .injectClass(UpsertIdentityUseCase);
   ctx = testSetup.ctx;

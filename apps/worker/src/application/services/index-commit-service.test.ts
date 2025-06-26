@@ -12,7 +12,7 @@ import { mockDeep } from "vitest-mock-extended";
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
 import { ProfileRepository } from "../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../infrastructure/record-repository.js";
-import { FetchProfileService } from "../services/scheduler/fetch-profile-service.js";
+import { FetchRecordService } from "../services/scheduler/fetch-record-service.js";
 import { ResolveDidService } from "../services/scheduler/resolve-did-service.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { IndexCommitService } from "./index-commit-service.js";
@@ -47,7 +47,7 @@ beforeAll(() => {
     .provideClass("recordRepository", RecordRepository)
     .provideClass("actorRepository", ActorRepository)
     .provideClass("profileRepository", ProfileRepository)
-    .provideClass("fetchProfileService", FetchProfileService)
+    .provideClass("fetchRecordService", FetchRecordService)
     .provideClass("resolveDidService", ResolveDidService)
     .provideClass("indexActorService", IndexActorService)
     .provideValue("postIndexer", postIndexer)

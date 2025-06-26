@@ -1,26 +1,27 @@
-import type { Did } from "@atproto/did";
-import { AtUri } from "@atproto/syntax";
+import { asDid } from "@atproto/did";
+import type { AtUri } from "@atproto/syntax";
 import { AtpBaseClient } from "@repo/client/api";
 import type { IDidResolver } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 
-import type { IProfileRecordFetcher } from "../application/interfaces/external/profile-record-fetcher.js";
+import type { IRecordFetcher } from "../application/interfaces/external/record-fetcher.js";
 
-export class ProfileRecordFetcher implements IProfileRecordFetcher {
+export class RecordFetcher implements IRecordFetcher {
   static inject = ["didResolver"] as const;
 
   constructor(private readonly didResolver: IDidResolver) {}
 
-  async fetch(did: Did): Promise<Record | null> {
-    // DIDからPDSを解決
+  async fetch(uri: AtUri): Promise<Record | null> {
+    // AT-URIからDIDを取得してPDSを解決
+    const did = asDid(uri.hostname);
     const { pds } = await this.didResolver.resolve(did);
     const client = new AtpBaseClient(pds);
 
-    // プロファイルレコードを取得
+    // レコードを取得
     const response = await client.com.atproto.repo.getRecord({
       repo: did,
-      collection: "app.bsky.actor.profile",
-      rkey: "self",
+      collection: uri.collection,
+      rkey: uri.rkey,
     });
     if (!response.success) {
       return null;
@@ -32,7 +33,7 @@ export class ProfileRecordFetcher implements IProfileRecordFetcher {
     }
 
     const record = Record.fromLex({
-      uri: new AtUri(response.data.uri),
+      uri,
       cid,
       lex: response.data.value,
     });

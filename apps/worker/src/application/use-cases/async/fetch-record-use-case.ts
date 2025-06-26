@@ -1,32 +1,33 @@
-import type { Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import type { ITransactionManager } from "@repo/common/domain";
 
 import type { JobLogger } from "../../../shared/job.js";
-import type { IProfileRecordFetcher } from "../../interfaces/external/profile-record-fetcher.js";
+import type { IRecordFetcher } from "../../interfaces/external/record-fetcher.js";
 import type { IndexCommitService } from "../../services/index-commit-service.js";
 
-export class FetchProfileUseCase {
+export class FetchRecordUseCase {
   constructor(
-    private readonly profileRecordFetcher: IProfileRecordFetcher,
+    private readonly recordFetcher: IRecordFetcher,
     private readonly transactionManager: ITransactionManager,
     private readonly indexCommitService: IndexCommitService,
   ) {}
   static inject = [
-    "profileRecordFetcher",
+    "recordFetcher",
     "transactionManager",
     "indexCommitService",
   ] as const;
 
   async execute({
-    did,
+    uri,
     jobLogger,
   }: {
-    did: Did;
+    uri: string;
     jobLogger: JobLogger;
   }): Promise<void> {
-    const record = await this.profileRecordFetcher.fetch(did);
+    const atUri = new AtUri(uri);
+    const record = await this.recordFetcher.fetch(atUri);
     if (!record) {
-      await jobLogger.log(`Profile not found for DID: ${did}`);
+      await jobLogger.log(`Record not found for URI: ${uri}`);
       return;
     }
     await this.transactionManager.transaction(async (ctx) => {
@@ -34,7 +35,7 @@ export class FetchProfileUseCase {
         ctx,
         record,
         jobLogger,
-        // サブスクライバーでない、いいねしたアカウントのプロフィールなどルール外のProfileもインデックスする
+        // サブスクライバーでない、いいねしたアカウントのプロフィールなどルール外のレコードもインデックスする
         force: true,
       });
     });
