@@ -63,10 +63,12 @@ export class IndexCommitService {
     ctx,
     record,
     jobLogger,
+    force = false,
   }: {
     ctx: TransactionContext;
     record: Record;
     jobLogger: JobLogger;
+    force?: boolean;
   }): Promise<void> {
     if (!isSupportedCollection(record.collection)) {
       throw new Error(`Unsupported collection: ${record.collection}`);
@@ -81,7 +83,7 @@ export class IndexCommitService {
       ctx,
       record,
     });
-    if (!shouldIndex) {
+    if (!shouldIndex && !force) {
       await jobLogger.log("Record does not match storage rules, skipping");
       return;
     }

@@ -34,6 +34,8 @@ export class FetchProfileUseCase {
         ctx,
         record,
         jobLogger,
+        // サブスクライバーでない、いいねしたアカウントのプロフィールなどルール外のProfileもインデックスする
+        force: true,
       });
     });
   }
