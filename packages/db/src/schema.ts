@@ -241,6 +241,7 @@ export const postEmbedRecords = pgTable("post_embed_records", {
   postUri: varchar({ length: 256 })
     .primaryKey()
     .references(() => posts.uri, { onDelete: "cascade" }),
+  // 埋め込まれたレコード(投稿)はすでに削除されたものである可能性が一応あるので外部制約は設定しない
   uri: varchar({ length: 256 }).notNull(),
   cid: varchar({ length: 256 }).notNull(),
 });
