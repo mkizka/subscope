@@ -3,18 +3,18 @@ import type { ITransactionManager } from "@repo/common/domain";
 
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRecordFetcher } from "../../interfaces/external/record-fetcher.js";
-import type { IndexCommitService } from "../../services/index-commit-service.js";
+import type { IndexRecordService } from "../../services/index-record-service.js";
 
 export class FetchRecordUseCase {
   constructor(
     private readonly recordFetcher: IRecordFetcher,
     private readonly transactionManager: ITransactionManager,
-    private readonly indexCommitService: IndexCommitService,
+    private readonly indexRecordService: IndexRecordService,
   ) {}
   static inject = [
     "recordFetcher",
     "transactionManager",
-    "indexCommitService",
+    "indexRecordService",
   ] as const;
 
   async execute({
@@ -31,7 +31,7 @@ export class FetchRecordUseCase {
       return;
     }
     await this.transactionManager.transaction(async (ctx) => {
-      await this.indexCommitService.upsert({
+      await this.indexRecordService.upsert({
         ctx,
         record,
         jobLogger,

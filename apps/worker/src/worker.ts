@@ -11,7 +11,7 @@ import {
 import { createInjector } from "typed-inject";
 
 import { IndexActorService } from "./application/services/index-actor-service.js";
-import { IndexCommitService } from "./application/services/index-commit-service.js";
+import { IndexRecordService } from "./application/services/index-record-service.js";
 import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
 import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
@@ -96,7 +96,7 @@ createInjector()
   .provideClass("likeIndexer", LikeIndexer)
   .provideClass("repostIndexer", RepostIndexer)
   .provideClass("subscriptionIndexer", SubscriptionIndexer)
-  .provideClass("indexCommitService", IndexCommitService)
+  .provideClass("indexRecordService", IndexRecordService)
   // application(use-case)
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
   .provideClass("indexCommitUseCase", IndexCommitUseCase)

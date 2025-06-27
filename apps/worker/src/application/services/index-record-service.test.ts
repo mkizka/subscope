@@ -15,7 +15,7 @@ import { RecordRepository } from "../../infrastructure/record-repository.js";
 import { FetchRecordService } from "../services/scheduler/fetch-record-service.js";
 import { ResolveDidService } from "../services/scheduler/resolve-did-service.js";
 import { IndexActorService } from "./index-actor-service.js";
-import { IndexCommitService } from "./index-commit-service.js";
+import { IndexRecordService } from "./index-record-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { LikeIndexer } from "./indexer/like-indexer.js";
 import type { PostIndexer } from "./indexer/post-indexer.js";
@@ -23,7 +23,7 @@ import type { ProfileIndexer } from "./indexer/profile-indexer.js";
 import type { RepostIndexer } from "./indexer/repost-indexer.js";
 import type { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
 
-let indexCommitService: IndexCommitService;
+let indexRecordService: IndexRecordService;
 let ctx: TransactionContext;
 
 // 各種indexerをモック
@@ -41,8 +41,8 @@ beforeAll(() => {
   const testSetup = getSetup();
   ctx = testSetup.ctx;
 
-  // IndexCommitServiceを作成
-  indexCommitService = testSetup.testInjector
+  // IndexRecordServiceを作成
+  indexRecordService = testSetup.testInjector
     .provideValue("jobQueue", mockDeep<IJobQueue>())
     .provideClass("recordRepository", RecordRepository)
     .provideClass("actorRepository", ActorRepository)
@@ -56,10 +56,10 @@ beforeAll(() => {
     .provideValue("likeIndexer", likeIndexer)
     .provideValue("repostIndexer", repostIndexer)
     .provideValue("subscriptionIndexer", subscriptionIndexer)
-    .injectClass(IndexCommitService);
+    .injectClass(IndexRecordService);
 });
 
-describe("IndexCommitService", () => {
+describe("IndexRecordService", () => {
   describe("upsert", () => {
     it("サポートされていないコレクションの場合、エラーを投げる", async () => {
       // Arrange
@@ -74,7 +74,7 @@ describe("IndexCommitService", () => {
 
       // Act & Assert
       await expect(
-        indexCommitService.upsert({ ctx, record, jobLogger }),
+        indexRecordService.upsert({ ctx, record, jobLogger }),
       ).rejects.toThrow("Unsupported collection: unsupported.collection");
     });
 
@@ -90,7 +90,7 @@ describe("IndexCommitService", () => {
       });
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ describe("IndexCommitService", () => {
       postIndexer.shouldIndex.mockResolvedValue(false);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -135,7 +135,7 @@ describe("IndexCommitService", () => {
       postIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(postIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -179,7 +179,7 @@ describe("IndexCommitService", () => {
       profileIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(profileIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -206,7 +206,7 @@ describe("IndexCommitService", () => {
       followIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(followIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -236,7 +236,7 @@ describe("IndexCommitService", () => {
       likeIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(likeIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -266,7 +266,7 @@ describe("IndexCommitService", () => {
       repostIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(repostIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -293,7 +293,7 @@ describe("IndexCommitService", () => {
       subscriptionIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexCommitService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger });
 
       // Assert
       expect(subscriptionIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -326,7 +326,7 @@ describe("IndexCommitService", () => {
       });
 
       // Act
-      await indexCommitService.delete({ ctx, uri: AtUri.make(uri) });
+      await indexRecordService.delete({ ctx, uri: AtUri.make(uri) });
 
       // Assert
       const records = await ctx.db

@@ -26,7 +26,7 @@ const isValidRecord = (record: Record) => {
   return !JSON.stringify(record.json).includes("\\u0000");
 };
 
-export class IndexCommitService {
+export class IndexRecordService {
   private readonly indexers: CollectionIndexerMap;
 
   constructor(
@@ -92,9 +92,7 @@ export class IndexCommitService {
     await this.recordRepository.upsert({ ctx, record });
 
     await indexer.upsert({ ctx, record });
-    if (indexer.updateStats) {
-      await indexer.updateStats({ ctx, record });
-    }
+    await indexer.updateStats?.({ ctx, record });
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {

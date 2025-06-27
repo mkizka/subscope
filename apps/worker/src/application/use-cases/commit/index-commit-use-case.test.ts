@@ -10,11 +10,11 @@ import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import type { JobLogger } from "../../../shared/job.js";
-import type { IndexCommitService } from "../../services/index-commit-service.js";
+import type { IndexRecordService } from "../../services/index-record-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import { IndexCommitUseCase } from "./index-commit-use-case.js";
 
-const mockIndexCommitService = mock<IndexCommitService>();
+const mockIndexRecordService = mock<IndexRecordService>();
 const mockJobLogger = mock<JobLogger>();
 const mockTransactionManager = mock<ITransactionManager>();
 const mockTransactionContext = mock<TransactionContext>();
@@ -24,7 +24,7 @@ mockTransactionManager.transaction.mockImplementation(async (fn) => {
 
 const indexCommitUseCase = createInjector()
   .provideValue("transactionManager", mockTransactionManager)
-  .provideValue("indexCommitService", mockIndexCommitService)
+  .provideValue("indexRecordService", mockIndexRecordService)
   .injectClass(IndexCommitUseCase);
 
 describe("IndexCommitUseCase", () => {
@@ -51,7 +51,7 @@ describe("IndexCommitUseCase", () => {
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         `Starting indexing for commit: ${uri.toString()}`,
       );
-      expect(mockIndexCommitService.upsert).toHaveBeenCalledWith({
+      expect(mockIndexRecordService.upsert).toHaveBeenCalledWith({
         ctx: mockTransactionContext,
         record: commit.record,
         jobLogger: mockJobLogger,
@@ -79,11 +79,11 @@ describe("IndexCommitUseCase", () => {
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         `Starting indexing for commit: ${uri.toString()}`,
       );
-      expect(mockIndexCommitService.delete).toHaveBeenCalledWith({
+      expect(mockIndexRecordService.delete).toHaveBeenCalledWith({
         ctx: mockTransactionContext,
         uri,
       });
-      expect(mockIndexCommitService.upsert).not.toHaveBeenCalled();
+      expect(mockIndexRecordService.upsert).not.toHaveBeenCalled();
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         "Indexing completed successfully.",
       );
@@ -107,7 +107,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
-      mockIndexCommitService.upsert.mockRejectedValueOnce(
+      mockIndexRecordService.upsert.mockRejectedValueOnce(
         new RecordValidationError(validationErrorMessage, uri),
       );
 
@@ -142,7 +142,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
       const genericError = new Error("Database connection error");
-      mockIndexCommitService.upsert.mockRejectedValueOnce(genericError);
+      mockIndexRecordService.upsert.mockRejectedValueOnce(genericError);
 
       // act & assert
       await expect(indexCommitUseCase.execute(command)).rejects.toThrow(

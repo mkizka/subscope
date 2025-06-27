@@ -3,15 +3,15 @@ import {
   RecordValidationError,
 } from "@repo/common/domain";
 
-import type { IndexCommitService } from "../../services/index-commit-service.js";
+import type { IndexRecordService } from "../../services/index-record-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 export class IndexCommitUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly indexCommitService: IndexCommitService,
+    private readonly indexRecordService: IndexRecordService,
   ) {}
-  static inject = ["transactionManager", "indexCommitService"] as const;
+  static inject = ["transactionManager", "indexRecordService"] as const;
 
   async execute(command: IndexCommitCommand) {
     await command.jobLogger.log(
@@ -34,7 +34,7 @@ export class IndexCommitUseCase {
       switch (commit.operation) {
         case "create":
         case "update": {
-          await this.indexCommitService.upsert({
+          await this.indexRecordService.upsert({
             ctx,
             record: commit.record,
             jobLogger,
@@ -43,7 +43,7 @@ export class IndexCommitUseCase {
         }
         case "delete": {
           // Related data is also deleted by cascade
-          await this.indexCommitService.delete({ ctx, uri: commit.uri });
+          await this.indexRecordService.delete({ ctx, uri: commit.uri });
           break;
         }
       }
