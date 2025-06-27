@@ -6,19 +6,19 @@ import type { SubscriptionIndexingPolicy } from "../../../domain/subscription-in
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { BackfillService } from "../scheduler/backfill-service.js";
+import type { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 
 export class SubscriptionIndexer implements ICollectionIndexer {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly actorRepository: IActorRepository,
-    private readonly backfillService: BackfillService,
+    private readonly backfillScheduler: BackfillScheduler,
     private readonly subscriptionIndexingPolicy: SubscriptionIndexingPolicy,
   ) {}
   static inject = [
     "subscriptionRepository",
     "actorRepository",
-    "backfillService",
+    "backfillScheduler",
     "subscriptionIndexingPolicy",
   ] as const;
 
@@ -32,7 +32,7 @@ export class SubscriptionIndexer implements ICollectionIndexer {
     });
 
     if (actor?.backfillStatus === "dirty") {
-      await this.backfillService.schedule(actor.did);
+      await this.backfillScheduler.schedule(actor.did);
     }
   }
 

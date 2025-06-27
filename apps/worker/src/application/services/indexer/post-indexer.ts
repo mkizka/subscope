@@ -7,7 +7,7 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { FetchRecordService } from "../scheduler/fetch-record-service.js";
+import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class PostIndexer implements ICollectionIndexer {
   constructor(
@@ -16,7 +16,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly actorStatsRepository: IActorStatsRepository,
-    private readonly fetchRecordService: FetchRecordService,
+    private readonly fetchRecordScheduler: FetchRecordScheduler,
   ) {}
   static inject = [
     "postRepository",
@@ -24,7 +24,7 @@ export class PostIndexer implements ICollectionIndexer {
     "postStatsRepository",
     "feedItemRepository",
     "actorStatsRepository",
-    "fetchRecordService",
+    "fetchRecordScheduler",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -35,7 +35,7 @@ export class PostIndexer implements ICollectionIndexer {
     await this.feedItemRepository.upsertPost({ ctx, feedItem });
 
     if (post.embed instanceof PostEmbedRecord) {
-      await this.fetchRecordService.schedule(post.embed.uri);
+      await this.fetchRecordScheduler.schedule(post.embed.uri);
     }
   }
 

@@ -17,7 +17,7 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import { FetchRecordService } from "../scheduler/fetch-record-service.js";
+import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
 let postIndexer: PostIndexer;
@@ -37,7 +37,7 @@ beforeAll(() => {
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideValue("jobQueue", mockJobQueue)
-    .provideClass("fetchRecordService", FetchRecordService)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .injectClass(PostIndexer);
   ctx = testSetup.ctx;
 });

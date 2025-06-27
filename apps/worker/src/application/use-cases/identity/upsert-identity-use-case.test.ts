@@ -9,9 +9,9 @@ import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "../../services/index-actor-service.js";
-import { BackfillService } from "../../services/scheduler/backfill-service.js";
-import { FetchRecordService } from "../../services/scheduler/fetch-record-service.js";
-import { ResolveDidService } from "../../services/scheduler/resolve-did-service.js";
+import { BackfillScheduler } from "../../services/scheduler/backfill-scheduler.js";
+import { FetchRecordScheduler } from "../../services/scheduler/fetch-record-scheduler.js";
+import { ResolveDidScheduler } from "../../services/scheduler/resolve-did-scheduler.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 
@@ -28,9 +28,9 @@ beforeAll(() => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
-    .provideClass("resolveDidService", ResolveDidService)
-    .provideClass("backfillService", BackfillService)
-    .provideClass("fetchRecordService", FetchRecordService)
+    .provideClass("resolveDidScheduler", ResolveDidScheduler)
+    .provideClass("backfillScheduler", BackfillScheduler)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .provideClass("indexActorService", IndexActorService)
     .injectClass(UpsertIdentityUseCase);
   ctx = testSetup.ctx;

@@ -9,7 +9,7 @@ import { mockDeep } from "vitest-mock-extended";
 import { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
 import { ActorRepository } from "../../../infrastructure/actor-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import type { BackfillService } from "../scheduler/backfill-service.js";
+import type { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 import { SubscriptionIndexer } from "./subscription-indexer.js";
 
 let subscriptionIndexer: SubscriptionIndexer;
@@ -22,7 +22,7 @@ beforeAll(() => {
   subscriptionIndexer = testSetup.testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("actorRepository", ActorRepository)
-    .provideValue("backfillService", mockDeep<BackfillService>())
+    .provideValue("backfillScheduler", mockDeep<BackfillScheduler>())
     .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
     .injectClass(SubscriptionIndexer);
   ctx = testSetup.ctx;

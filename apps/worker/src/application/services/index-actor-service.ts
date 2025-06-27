@@ -5,21 +5,21 @@ import type { Handle } from "@repo/common/utils";
 
 import type { IActorRepository } from "../interfaces/repositories/actor-repository.js";
 import type { IProfileRepository } from "../interfaces/repositories/profile-repository.js";
-import type { FetchRecordService } from "./scheduler/fetch-record-service.js";
-import type { ResolveDidService } from "./scheduler/resolve-did-service.js";
+import type { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
+import type { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 export class IndexActorService {
   constructor(
     private readonly actorRepository: IActorRepository,
     private readonly profileRepository: IProfileRepository,
-    private readonly fetchRecordService: FetchRecordService,
-    private readonly resolveDidService: ResolveDidService,
+    private readonly fetchRecordScheduler: FetchRecordScheduler,
+    private readonly resolveDidScheduler: ResolveDidScheduler,
   ) {}
   static inject = [
     "actorRepository",
     "profileRepository",
-    "fetchRecordService",
-    "resolveDidService",
+    "fetchRecordScheduler",
+    "resolveDidScheduler",
   ] as const;
 
   async upsert({
@@ -39,7 +39,7 @@ export class IndexActorService {
       }
       // インデックスされたactorがhandleを持っていなければresolveする
       if (!existingActor.handle) {
-        await this.resolveDidService.schedule(did);
+        await this.resolveDidScheduler.schedule(did);
       }
     } else {
       // インデックスされていない場合は新規登録
@@ -48,7 +48,7 @@ export class IndexActorService {
 
       // handleが無い場合はresolveする
       if (!handle) {
-        await this.resolveDidService.schedule(did);
+        await this.resolveDidScheduler.schedule(did);
       }
     }
 
@@ -59,7 +59,7 @@ export class IndexActorService {
     });
     if (!profileExists) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-      await this.fetchRecordService.schedule(profileUri);
+      await this.fetchRecordScheduler.schedule(profileUri);
     }
   }
 }

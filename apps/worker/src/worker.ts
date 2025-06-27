@@ -18,9 +18,9 @@ import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
 import { SubscriptionIndexer } from "./application/services/indexer/subscription-indexer.js";
-import { BackfillService } from "./application/services/scheduler/backfill-service.js";
-import { FetchRecordService } from "./application/services/scheduler/fetch-record-service.js";
-import { ResolveDidService } from "./application/services/scheduler/resolve-did-service.js";
+import { BackfillScheduler } from "./application/services/scheduler/backfill-scheduler.js";
+import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
+import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { BackfillUseCase } from "./application/use-cases/async/backfill-use-case.js";
 import { Temp__CleanupDatabaseUseCase } from "./application/use-cases/async/cleanup-database-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
@@ -80,9 +80,9 @@ createInjector()
   .provideClass("subscriptionRepository", SubscriptionRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
-  .provideClass("resolveDidService", ResolveDidService)
-  .provideClass("backfillService", BackfillService)
-  .provideClass("fetchRecordService", FetchRecordService)
+  .provideClass("resolveDidScheduler", ResolveDidScheduler)
+  .provideClass("backfillScheduler", BackfillScheduler)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)

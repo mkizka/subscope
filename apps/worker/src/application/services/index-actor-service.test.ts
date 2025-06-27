@@ -11,9 +11,9 @@ import { ActorRepository } from "../../infrastructure/actor-repository.js";
 import { ProfileRepository } from "../../infrastructure/profile-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
-import { BackfillService } from "./scheduler/backfill-service.js";
-import { FetchRecordService } from "./scheduler/fetch-record-service.js";
-import { ResolveDidService } from "./scheduler/resolve-did-service.js";
+import { BackfillScheduler } from "./scheduler/backfill-scheduler.js";
+import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
+import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 const mockJobQueue = mock<IJobQueue>();
 const { getSetup } = setupTestDatabase();
@@ -28,9 +28,9 @@ beforeAll(() => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
-    .provideClass("resolveDidService", ResolveDidService)
-    .provideClass("backfillService", BackfillService)
-    .provideClass("fetchRecordService", FetchRecordService)
+    .provideClass("resolveDidScheduler", ResolveDidScheduler)
+    .provideClass("backfillScheduler", BackfillScheduler)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .injectClass(IndexActorService);
   ctx = testSetup.ctx;
 });

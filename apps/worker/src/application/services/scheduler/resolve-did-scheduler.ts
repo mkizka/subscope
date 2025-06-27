@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { IJobQueue } from "@repo/common/domain";
 
-export class ResolveDidService {
+export class ResolveDidScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
   static inject = ["jobQueue"] as const;
 

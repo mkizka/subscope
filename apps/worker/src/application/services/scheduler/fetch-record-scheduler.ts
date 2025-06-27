@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { IJobQueue } from "@repo/common/domain";
 
-export class FetchRecordService {
+export class FetchRecordScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
   static inject = ["jobQueue"] as const;
 
