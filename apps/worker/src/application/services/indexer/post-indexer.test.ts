@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { IJobQueue, TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
@@ -9,6 +9,7 @@ import {
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
+import { mock } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
@@ -16,15 +17,18 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { FetchRecordService } from "../scheduler/fetch-record-service.js";
 import { PostIndexer } from "./post-indexer.js";
 
 let postIndexer: PostIndexer;
 let ctx: TransactionContext;
+let mockJobQueue: IJobQueue;
 
 const { getSetup } = setupTestDatabase();
 
 beforeAll(() => {
   const testSetup = getSetup();
+  mockJobQueue = mock<IJobQueue>();
   postIndexer = testSetup.testInjector
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
@@ -32,6 +36,8 @@ beforeAll(() => {
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideValue("jobQueue", mockJobQueue)
+    .provideClass("fetchRecordService", FetchRecordService)
     .injectClass(PostIndexer);
   ctx = testSetup.ctx;
 });
@@ -103,6 +109,68 @@ describe("PostIndexer", () => {
         actorDid: "did:plc:123",
         subjectUri: null,
       });
+    });
+
+    it("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "test post with embed",
+        embed: {
+          $type: "app.bsky.embed.record",
+          record: {
+            uri: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
+            cid: "embedcid123",
+          },
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const recordData = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({ json: () => postJson })
+        .create();
+      const record = Record.fromJson({
+        uri: recordData.uri,
+        cid: recordData.cid,
+        json: postJson,
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record });
+
+      // assert
+      expect(mockJobQueue.add).toHaveBeenCalledTimes(1);
+      expect(mockJobQueue.add).toHaveBeenCalledWith({
+        queueName: "fetchRecord",
+        jobName: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
+        data: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
+      });
+    });
+
+    it("embedがない場合、fetchRecordジョブは追加されない", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "test post without embed",
+        createdAt: new Date().toISOString(),
+      };
+      const recordData = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({ json: () => postJson })
+        .create();
+      const record = Record.fromJson({
+        uri: recordData.uri,
+        cid: recordData.cid,
+        json: postJson,
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record });
+
+      // assert
+      expect(mockJobQueue.add).not.toHaveBeenCalled();
     });
   });
 

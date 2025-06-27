@@ -20,6 +20,7 @@
 
 - post, repost
   - subscribers本人、または投稿者のフォロワーが1人以上subscribersなら保存
+  - embedがある場合はfetchRecordにそのレコードを取得するジョブを追加
 - post(リプライ)
   - subscribers本人、またはリプライ先またはツリー先の投稿がDB上にあれば保存
 - like

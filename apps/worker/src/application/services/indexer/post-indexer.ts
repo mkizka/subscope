@@ -1,5 +1,5 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
-import { FeedItem, Post } from "@repo/common/domain";
+import { FeedItem, Post, PostEmbedRecord } from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
@@ -7,6 +7,7 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { FetchRecordService } from "../scheduler/fetch-record-service.js";
 
 export class PostIndexer implements ICollectionIndexer {
   constructor(
@@ -15,6 +16,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly actorStatsRepository: IActorStatsRepository,
+    private readonly fetchRecordService: FetchRecordService,
   ) {}
   static inject = [
     "postRepository",
@@ -22,6 +24,7 @@ export class PostIndexer implements ICollectionIndexer {
     "postStatsRepository",
     "feedItemRepository",
     "actorStatsRepository",
+    "fetchRecordService",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -30,6 +33,10 @@ export class PostIndexer implements ICollectionIndexer {
 
     const feedItem = FeedItem.fromPost(post);
     await this.feedItemRepository.upsertPost({ ctx, feedItem });
+
+    if (post.embed instanceof PostEmbedRecord) {
+      await this.fetchRecordService.schedule(post.embed.uri);
+    }
   }
 
   async shouldIndex({
