@@ -20,6 +20,7 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "3.2.3",
     "husky": "9.1.7",
     "kill-port": "2.0.1",
     "lint-staged": "16.1.0",

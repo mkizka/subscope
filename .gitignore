@@ -12,3 +12,6 @@ generated/
 
 # repomix
 *.xml
+
+# vitest
+coverage/
