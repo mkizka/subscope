@@ -34,7 +34,7 @@
 ### レコード保存時の処理
 
 1. 保存ルールをチェックし、該当しなければ何もしない
-2. didに基づいてactorをDBに保存
+2. didに基づいてactorをDBに保存(このときprofileが無ければfetchRecordにジョブ追加)
 3. identityイベントなどhandleがすぐ分からなければresolveDidをジョブキューに追加
 4. actorのapp.bsky.actor.profileがDBになければfetchProfileをジョブキューに追加
 5. recordをDBに保存
