@@ -4,8 +4,10 @@ import { schema } from "@repo/db";
 import {
   actorFactory,
   postFactory,
+  randomCid,
   recordFactory,
   setupTestDatabase,
+  subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -45,52 +47,44 @@ beforeAll(() => {
 describe("PostIndexer", () => {
   describe("upsert", () => {
     it("subscriberの投稿は実際にDBに保存される", async () => {
-      // Arrange
-      // subscriberとしてactor情報を準備
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:123",
-        handle: "test.bsky.social",
-      });
-      // subscriptionレコード用のrecordsテーブルエントリ
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:123",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:123/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:123",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
-      // 投稿レコード用のrecordsテーブルエントリ
+      // arrange
+      const subscriber = await actorFactory(ctx.db).create();
+      const subscriptionRecord = await recordFactory(
+        ctx.db,
+        "dev.mkizka.test.subscription",
+      )
+        .vars({ actor: () => subscriber })
+        .props({
+          json: () => ({
+            $type: "dev.mkizka.test.subscription",
+            appviewDid: "did:web:appview.test",
+            createdAt: new Date().toISOString(),
+          }),
+        })
+        .create();
+      await subscriptionFactory(ctx.db)
+        .vars({ record: () => subscriptionRecord })
+        .create();
+
       const postJson = {
         $type: "app.bsky.feed.post",
         text: "test post",
         createdAt: new Date().toISOString(),
       };
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:123/app.bsky.feed.post/123",
-        cid: "abc123",
-        actorDid: "did:plc:123",
-        json: postJson,
-      });
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => subscriber })
+        .props({ json: () => postJson })
+        .create();
       const record = Record.fromJson({
-        uri: "at://did:plc:123/app.bsky.feed.post/123",
-        cid: "abc123",
+        uri: postRecord.uri,
+        cid: postRecord.cid,
         json: postJson,
       });
 
-      // Act
+      // act
       await postIndexer.upsert({ ctx, record });
 
-      // Assert
+      // assert
       const [post] = await ctx.db
         .select()
         .from(schema.posts)
@@ -106,7 +100,7 @@ describe("PostIndexer", () => {
       expect(feedItem).toMatchObject({
         uri: record.uri.toString(),
         type: "post",
-        actorDid: "did:plc:123",
+        actorDid: subscriber.did,
         subjectUri: null,
       });
     });
@@ -114,6 +108,7 @@ describe("PostIndexer", () => {
     it("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
+      const embedCid = await randomCid();
       const postJson = {
         $type: "app.bsky.feed.post",
         text: "test post with embed",
@@ -121,7 +116,7 @@ describe("PostIndexer", () => {
           $type: "app.bsky.embed.record",
           record: {
             uri: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
-            cid: "embedcid123",
+            cid: embedCid,
           },
         },
         createdAt: new Date().toISOString(),
@@ -177,7 +172,6 @@ describe("PostIndexer", () => {
   describe("updateStats", () => {
     it("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
       // arrange
-      // 親投稿を作成
       const parentActor = await actorFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => parentActor })
@@ -189,7 +183,6 @@ describe("PostIndexer", () => {
         })
         .create();
 
-      // 既存のリプライを2つ作成
       const replier1 = await actorFactory(ctx.db).create();
       const reply1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => replier1 })
@@ -216,9 +209,7 @@ describe("PostIndexer", () => {
         })
         .create();
 
-      // 新しいリプライを作成するアクター
       const replier3 = await actorFactory(ctx.db).create();
-
       const replyJson = {
         $type: "app.bsky.feed.post",
         text: "New reply",
@@ -234,8 +225,6 @@ describe("PostIndexer", () => {
         },
         createdAt: new Date().toISOString(),
       };
-
-      // 新しいリプライのrecordを作成
       const newReplyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => replier3 })
         .props({ json: () => replyJson })
@@ -251,7 +240,6 @@ describe("PostIndexer", () => {
       await postIndexer.updateStats({ ctx, record });
 
       // assert
-      // 親投稿のpost_statsが更新される
       const [stats] = await ctx.db
         .select()
         .from(schema.postStats)
@@ -262,10 +250,9 @@ describe("PostIndexer", () => {
         postUri: parentPost.uri,
         likeCount: 0,
         repostCount: 0,
-        replyCount: 3, // 既存の2リプライ + 新しい1リプライ
+        replyCount: 3,
       });
 
-      // 投稿者のactor_statsも更新される
       const [actorStats] = await ctx.db
         .select()
         .from(schema.actorStats)
@@ -273,7 +260,7 @@ describe("PostIndexer", () => {
 
       expect(actorStats).toMatchObject({
         actorDid: replier3.did,
-        postsCount: 1, // replier3の投稿は1件のみ
+        postsCount: 1,
         followsCount: 0,
         followersCount: 0,
       });
@@ -282,7 +269,6 @@ describe("PostIndexer", () => {
     it("投稿時にactor_statsの投稿数が更新される", async () => {
       // arrange
       const regularActor = await actorFactory(ctx.db).create();
-
       const postJson = {
         $type: "app.bsky.feed.post",
         text: "Regular post without reply",
@@ -303,7 +289,6 @@ describe("PostIndexer", () => {
       await postIndexer.updateStats({ ctx, record });
 
       // assert
-      // actor_statsテーブルに投稿数が更新されていることを確認
       const [actorStats] = await ctx.db
         .select()
         .from(schema.actorStats)
@@ -320,12 +305,10 @@ describe("PostIndexer", () => {
     it("親投稿が存在しない場合はpost_statsを更新しない", async () => {
       // arrange
       const replierActor = await actorFactory(ctx.db).create();
-
       const nonExistentParentUri =
         "at://did:plc:nonexistent/app.bsky.feed.post/parent";
       const nonExistentParentCid =
         "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e";
-
       const replyJson = {
         $type: "app.bsky.feed.post",
         text: "Reply to non-existent post",
@@ -341,8 +324,6 @@ describe("PostIndexer", () => {
         },
         createdAt: new Date().toISOString(),
       };
-
-      // recordを作成
       const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => replierActor })
         .props({ json: () => replyJson })
@@ -358,20 +339,16 @@ describe("PostIndexer", () => {
       await postIndexer.updateStats({ ctx, record });
 
       // assert
-      // 親投稿のpost_statsは更新されない
       const stats = await ctx.db
         .select()
         .from(schema.postStats)
         .where(eq(schema.postStats.postUri, nonExistentParentUri));
-
       expect(stats).toHaveLength(0);
 
-      // ただし、投稿者のactor_statsは更新される
       const [actorStats] = await ctx.db
         .select()
         .from(schema.actorStats)
         .where(eq(schema.actorStats.actorDid, replierActor.did));
-
       expect(actorStats).toMatchObject({
         actorDid: replierActor.did,
         postsCount: 1,

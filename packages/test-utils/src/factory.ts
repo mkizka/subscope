@@ -330,3 +330,28 @@ export const repostFeedItemFactory = (db: Database) =>
       subjectUri: async ({ vars }) => (await vars.repost).subjectUri,
       sortAt: async ({ vars }) => (await vars.repost).createdAt,
     });
+
+export const subscriptionFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          uri: later<string>(),
+          cid: later<string>(),
+          actorDid: later<string>(),
+          appviewDid: () => "did:web:appview.test",
+          createdAt: () => faker.date.recent(),
+          indexedAt: () => faker.date.recent(),
+        },
+        vars: {
+          record: () =>
+            recordFactory(db, "dev.mkizka.test.subscription").create(),
+        },
+      },
+      (props) => create(db, schema.subscriptions, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
+    });
