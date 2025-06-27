@@ -7,6 +7,7 @@ import type { IPostRepository } from "../../interfaces/repositories/post-reposit
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
@@ -15,6 +16,7 @@ export class RepostIndexer implements ICollectionIndexer {
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postRepository: IPostRepository,
+    private readonly fetchRecordScheduler: FetchRecordScheduler,
   ) {}
   static inject = [
     "repostRepository",
@@ -22,6 +24,7 @@ export class RepostIndexer implements ICollectionIndexer {
     "postStatsRepository",
     "feedItemRepository",
     "postRepository",
+    "fetchRecordScheduler",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -30,6 +33,8 @@ export class RepostIndexer implements ICollectionIndexer {
 
     const feedItem = FeedItem.fromRepost(repost);
     await this.feedItemRepository.upsertRepost({ ctx, feedItem });
+
+    await this.fetchRecordScheduler.schedule(repost.subjectUri);
   }
 
   async shouldIndex({
