@@ -325,4 +325,86 @@ describe("GetAuthorFeedUseCase", () => {
       ],
     });
   });
+
+  test("cursorパラメータでページネーションが動作する", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Test User" }))
+      .create();
+
+    // 3つの投稿を異なる時刻で作成
+    const posts = [];
+    for (let i = 0; i < 3; i++) {
+      const createdAt = new Date(Date.now() - i * 1000 * 60); // 1分ずつ古くする
+      const record = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: `Post ${i + 1}`,
+            createdAt: createdAt.toISOString(),
+          }),
+        })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => record })
+        .props({
+          text: () => `Post ${i + 1}`,
+          createdAt: () => createdAt,
+        })
+        .create();
+      await postFeedItemFactory(ctx.db)
+        .vars({ post: () => post })
+        .props({
+          sortAt: () => createdAt,
+        })
+        .create();
+      posts.push(post);
+    }
+
+    // act - 最初のページ（limit=2）
+    const firstPage = await getAuthorFeedUseCase.execute({
+      actorDid: asDid(actor.did),
+      limit: 2,
+      filter: "posts_and_author_threads",
+      includePins: false,
+    });
+
+    // assert - 最初のページ
+    expect(firstPage.feed).toHaveLength(2);
+    expect(firstPage.cursor).toBeDefined();
+    expect(firstPage.feed[0]).toMatchObject({
+      post: {
+        record: {
+          text: "Post 1", // 最新
+        },
+      },
+    });
+    expect(firstPage.feed[1]).toMatchObject({
+      post: {
+        record: {
+          text: "Post 2",
+        },
+      },
+    });
+
+    // act - 2ページ目（cursorを使用）
+    const secondPage = await getAuthorFeedUseCase.execute({
+      actorDid: asDid(actor.did),
+      limit: 2,
+      cursor: new Date(firstPage.cursor!),
+      filter: "posts_and_author_threads",
+      includePins: false,
+    });
+
+    // assert - 2ページ目
+    expect(secondPage.feed).toHaveLength(1);
+    expect(secondPage.feed[0]).toMatchObject({
+      post: {
+        record: {
+          text: "Post 3", // 最古
+        },
+      },
+    });
+  });
 });
