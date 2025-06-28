@@ -9,12 +9,12 @@ import {
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../infrastructure/actor-stats-repository.js";
-import { HandleResolver } from "../../infrastructure/handle-resolver.js";
-import { PostRepository } from "../../infrastructure/post-repository.js";
-import { PostStatsRepository } from "../../infrastructure/post-stats-repository.js";
-import { ProfileRepository } from "../../infrastructure/profile-repository.js";
-import { RecordRepository } from "../../infrastructure/record-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
+import { PostRepository } from "../../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { RecordRepository } from "../../../infrastructure/record-repository.js";
 import { EmbedViewService } from "./embed-view-service.js";
 import { PostViewService } from "./post-view-service.js";
 import { ProfileViewService } from "./profile-view-service.js";

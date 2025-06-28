@@ -9,8 +9,8 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../infrastructure/actor-stats-repository.js";
-import { ProfileRepository } from "../../infrastructure/profile-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
 describe("ProfileViewService", () => {

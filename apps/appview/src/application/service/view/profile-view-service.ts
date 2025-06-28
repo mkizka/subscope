@@ -2,9 +2,9 @@ import type { Did } from "@atproto/did";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import { env } from "../../shared/env.js";
-import type { IActorStatsRepository } from "../interfaces/actor-stats-repository.js";
-import type { IProfileRepository } from "../interfaces/profile-repository.js";
+import { env } from "../../../shared/env.js";
+import type { IActorStatsRepository } from "../../interfaces/actor-stats-repository.js";
+import type { IProfileRepository } from "../../interfaces/profile-repository.js";
 
 export class ProfileViewService {
   constructor(

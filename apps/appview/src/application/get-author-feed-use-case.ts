@@ -1,8 +1,8 @@
 import { type Did } from "@atproto/did";
 import type { AppBskyFeedGetAuthorFeed } from "@repo/client/server";
 
-import type { AuthorFeedService } from "./service/author-feed-service.js";
-import type { FeedProcessor } from "./service/feed-processor.js";
+import type { AuthorFeedService } from "./service/feed/author-feed-service.js";
+import type { FeedProcessor } from "./service/feed/feed-processor.js";
 
 export class GetAuthorFeedUseCase {
   constructor(

@@ -7,11 +7,11 @@ import type {
 } from "@repo/client/server";
 import type { FeedItem } from "@repo/common/domain";
 
-import type { IPostRepository } from "../interfaces/post-repository.js";
-import type { Page } from "../utils/pagination.js";
-import type { PostViewService } from "./post-view-service.js";
-import type { ProfileViewService } from "./profile-view-service.js";
-import type { ReplyRefService } from "./reply-ref-service.js";
+import type { IPostRepository } from "../../interfaces/post-repository.js";
+import type { Page } from "../../utils/pagination.js";
+import type { PostViewService } from "../view/post-view-service.js";
+import type { ProfileViewService } from "../view/profile-view-service.js";
+import type { ReplyRefService } from "../view/reply-ref-service.js";
 
 export class FeedProcessor {
   constructor(

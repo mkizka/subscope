@@ -12,8 +12,8 @@ import { ActorStatsRepository } from "../infrastructure/actor-stats-repository.j
 import { LikeRepository } from "../infrastructure/like-repository.js";
 import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { GetLikesUseCase } from "./get-likes-use-case.js";
-import { LikeService } from "./service/like-service.js";
-import { ProfileViewService } from "./service/profile-view-service.js";
+import { LikeService } from "./service/view/like-service.js";
+import { ProfileViewService } from "./service/view/profile-view-service.js";
 
 let getLikesUseCase: GetLikesUseCase;
 let ctx: TransactionContext;

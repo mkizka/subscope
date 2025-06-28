@@ -11,7 +11,7 @@ import {
   PostEmbedRecord,
 } from "@repo/common/domain";
 
-import { env } from "../../shared/env.js";
+import { env } from "../../../shared/env.js";
 
 export class EmbedViewService {
   toView(

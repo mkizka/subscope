@@ -9,7 +9,7 @@ import type { Post } from "@repo/common/domain";
 import type { ResolvedAtUri } from "../domain/models/at-uri.js";
 import { type AtUriService } from "../domain/service/at-uri-service.js";
 import type { IPostRepository } from "./interfaces/post-repository.js";
-import type { PostViewService } from "./service/post-view-service.js";
+import type { PostViewService } from "./service/view/post-view-service.js";
 
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;

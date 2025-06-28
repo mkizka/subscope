@@ -16,9 +16,9 @@ import { PostStatsRepository } from "../infrastructure/post-stats-repository.js"
 import { ProfileRepository } from "../infrastructure/profile-repository.js";
 import { RecordRepository } from "../infrastructure/record-repository.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
-import { EmbedViewService } from "./service/embed-view-service.js";
-import { PostViewService } from "./service/post-view-service.js";
-import { ProfileViewService } from "./service/profile-view-service.js";
+import { EmbedViewService } from "./service/view/embed-view-service.js";
+import { PostViewService } from "./service/view/post-view-service.js";
+import { ProfileViewService } from "./service/view/profile-view-service.js";
 
 let getPostThreadUseCase: GetPostThreadUseCase;
 let ctx: TransactionContext;

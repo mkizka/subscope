@@ -3,7 +3,7 @@ import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
 import type { GetAuthorFeedUseCase } from "../../../../../application/get-author-feed-use-case.js";
-import type { HandleService } from "../../../../../application/service/handle-service.js";
+import type { HandleService } from "../../../../../application/service/request/handle-service.js";
 
 export class GetAuthorFeed {
   constructor(

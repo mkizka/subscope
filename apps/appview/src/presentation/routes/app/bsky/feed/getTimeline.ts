@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 
 import type { GetTimelineUseCase } from "../../../../../application/get-timeline-use-case.js";
-import type { AuthVerifierService } from "../../../../../application/service/auth-verifier-service.js";
+import type { AuthVerifierService } from "../../../../../application/service/request/auth-verifier-service.js";
 
 export class GetTimeline {
   constructor(

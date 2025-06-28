@@ -4,8 +4,8 @@ import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { GetTimelineUseCase } from "./get-timeline-use-case.js";
-import type { FeedProcessor } from "./service/feed-processor.js";
-import type { TimelineService } from "./service/timeline-service.js";
+import type { FeedProcessor } from "./service/feed/feed-processor.js";
+import type { TimelineService } from "./service/feed/timeline-service.js";
 import type { Page } from "./utils/pagination.js";
 
 const mockTimelineService = mock<TimelineService>();

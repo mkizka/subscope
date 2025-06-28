@@ -5,8 +5,8 @@ import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
-import type { AuthorFeedService } from "./service/author-feed-service.js";
-import type { FeedProcessor } from "./service/feed-processor.js";
+import type { AuthorFeedService } from "./service/feed/author-feed-service.js";
+import type { FeedProcessor } from "./service/feed/feed-processor.js";
 import type { Page } from "./utils/pagination.js";
 
 const mockAuthorFeedService = mock<AuthorFeedService>();

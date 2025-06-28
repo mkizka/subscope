@@ -9,12 +9,12 @@ import type { ILoggerManager, Logger, Post, Record } from "@repo/common/domain";
 import { PostEmbedRecord } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
-import type { IPostRepository } from "../interfaces/post-repository.js";
+import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type {
   IPostStatsRepository,
   PostStats,
-} from "../interfaces/post-stats-repository.js";
-import type { IRecordRepository } from "../interfaces/record-repository.js";
+} from "../../interfaces/post-stats-repository.js";
+import type { IRecordRepository } from "../../interfaces/record-repository.js";
 import type { EmbedViewService } from "./embed-view-service.js";
 import type { ProfileViewService } from "./profile-view-service.js";
 
