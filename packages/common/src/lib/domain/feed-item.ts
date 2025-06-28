@@ -49,7 +49,7 @@ export class FeedItem {
       type: "repost",
       subjectUri: repost.subjectUri.toString(),
       actorDid: repost.actorDid,
-      sortAt: repost.createdAt, // TODO: sortAtに修正
+      sortAt: repost.sortAt,
     });
   }
 }

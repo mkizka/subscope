@@ -10,6 +10,7 @@ type RepostParams = {
   subjectUri: AtUri | string;
   subjectCid: string;
   createdAt: Date;
+  sortAt?: Date;
 };
 
 export class Repost {
@@ -19,6 +20,7 @@ export class Repost {
   readonly subjectUri: AtUri;
   readonly subjectCid: string;
   readonly createdAt: Date;
+  readonly sortAt: Date;
 
   constructor(params: RepostParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -27,6 +29,7 @@ export class Repost {
     this.subjectUri = new AtUri(params.subjectUri.toString());
     this.subjectCid = params.subjectCid;
     this.createdAt = params.createdAt;
+    this.sortAt = params.sortAt || params.createdAt;
   }
 
   static from(record: Record) {

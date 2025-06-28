@@ -22,6 +22,7 @@
   - ブロックなどは未反映
 - [x] app/bsky/feed/getTimeline.json
 - [ ] app/bsky/feed/searchPosts.json
+- [x] app/bsky/feed/getAuthorFeed.json
 
 優先度低い
 
@@ -47,7 +48,6 @@
 
 - [ ] app/bsky/feed/describeFeedGenerator.json
 - [ ] app/bsky/feed/getActorFeeds.json
-- [ ] app/bsky/feed/getAuthorFeed.json
 - [ ] app/bsky/feed/getFeed.json
 - [ ] app/bsky/feed/getFeedGenerator.json
 - [ ] app/bsky/feed/getFeedGenerators.json

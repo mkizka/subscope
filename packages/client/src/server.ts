@@ -13,6 +13,7 @@ export * as AppBskyEmbedExternal from "./generated/server/types/app/bsky/embed/e
 export * as AppBskyEmbedImages from "./generated/server/types/app/bsky/embed/images";
 export * as AppBskyEmbedRecord from "./generated/server/types/app/bsky/embed/record";
 export * as AppBskyFeedDefs from "./generated/server/types/app/bsky/feed/defs";
+export * as AppBskyFeedGetAuthorFeed from "./generated/server/types/app/bsky/feed/getAuthorFeed";
 export * as AppBskyFeedGetLikes from "./generated/server/types/app/bsky/feed/getLikes";
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline";
 export { $Typed } from "./generated/server/util";

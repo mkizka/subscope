@@ -2,6 +2,7 @@ import { createServer } from "@repo/client/server";
 
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
+import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
 import type { GetLikes } from "./app/bsky/feed/getLikes.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
@@ -14,6 +15,7 @@ export class XRPCRouter {
   constructor(
     getProfile: GetProfile,
     getProfiles: GetProfiles,
+    getAuthorFeed: GetAuthorFeed,
     getLikes: GetLikes,
     getPosts: GetPosts,
     getPostThread: GetPostThread,
@@ -23,6 +25,7 @@ export class XRPCRouter {
     this.handlers = [
       getProfile,
       getProfiles,
+      getAuthorFeed,
       getLikes,
       getPosts,
       getPostThread,
@@ -33,6 +36,7 @@ export class XRPCRouter {
   static inject = [
     "getProfile",
     "getProfiles",
+    "getAuthorFeed",
     "getLikes",
     "getPosts",
     "getPostThread",
