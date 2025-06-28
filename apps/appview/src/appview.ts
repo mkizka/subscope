@@ -19,6 +19,7 @@ import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
 import { AuthVerifierService } from "./application/service/auth-verifier-service.js";
 import { AuthorFeedService } from "./application/service/author-feed-service.js";
 import { EmbedViewService } from "./application/service/embed-view-service.js";
+import { FeedProcessor } from "./application/service/feed-processor.js";
 import { HandleService } from "./application/service/handle-service.js";
 import { LikeService } from "./application/service/like-service.js";
 import { PostViewService } from "./application/service/post-view-service.js";
@@ -83,6 +84,7 @@ createInjector()
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("atUriService", AtUriService)
   .provideClass("handleService", HandleService)
+  .provideClass("feedProcessor", FeedProcessor)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getPostThreadUseCase", GetPostThreadUseCase)

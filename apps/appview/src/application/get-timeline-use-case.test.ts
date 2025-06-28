@@ -1,691 +1,200 @@
-import type { TransactionContext } from "@repo/common/domain";
-import {
-  actorFactory,
-  followFactory,
-  postFactory,
-  postFeedItemFactory,
-  recordFactory,
-  repostFactory,
-  repostFeedItemFactory,
-  setupTestDatabase,
-} from "@repo/test-utils";
-import { beforeAll, describe, expect, test } from "vitest";
+/* eslint-disable @typescript-eslint/unbound-method */
+import type { FeedItem } from "@repo/common/domain";
+import { describe, expect, test } from "vitest";
+import { mock } from "vitest-mock-extended";
 
-import { AtUriService } from "../domain/service/at-uri-service.js";
-import { ActorStatsRepository } from "../infrastructure/actor-stats-repository.js";
-import { HandleResolver } from "../infrastructure/handle-resolver.js";
-import { PostRepository } from "../infrastructure/post-repository.js";
-import { PostStatsRepository } from "../infrastructure/post-stats-repository.js";
-import { ProfileRepository } from "../infrastructure/profile-repository.js";
-import { RecordRepository } from "../infrastructure/record-repository.js";
-import { TimelineRepository } from "../infrastructure/timeline-repository.js";
 import { GetTimelineUseCase } from "./get-timeline-use-case.js";
-import { EmbedViewService } from "./service/embed-view-service.js";
-import { PostViewService } from "./service/post-view-service.js";
-import { ProfileViewService } from "./service/profile-view-service.js";
-import { ReplyRefService } from "./service/reply-ref-service.js";
-import { TimelineService } from "./service/timeline-service.js";
+import type { FeedProcessor } from "./service/feed-processor.js";
+import type { TimelineService } from "./service/timeline-service.js";
+import type { Page } from "./utils/pagination.js";
 
-let getTimelineUseCase: GetTimelineUseCase;
-let ctx: TransactionContext;
-
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  getTimelineUseCase = testSetup.testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("timelineRepository", TimelineRepository)
-    .provideClass("embedViewService", EmbedViewService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("postViewService", PostViewService)
-    .provideClass("replyRefService", ReplyRefService)
-    .provideClass("timelineService", TimelineService)
-    .provideClass("atUriService", AtUriService)
-    .injectClass(GetTimelineUseCase);
-  ctx = testSetup.ctx;
-});
+const mockTimelineService = mock<TimelineService>();
+const mockFeedProcessor = mock<FeedProcessor>();
+const getTimelineUseCase = new GetTimelineUseCase(
+  mockTimelineService,
+  mockFeedProcessor,
+);
 
 describe("GetTimelineUseCase", () => {
-  test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
+  test("パラメータが渡された場合、TimelineServiceに正しいパラメータを渡して呼び出す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const authDid = "did:plc:testuser";
+    const params = { limit: 50 };
+    const expectedCursor = undefined;
 
-    // act
-    const result = await getTimelineUseCase.execute({ limit: 50 }, actor.did);
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [],
+      cursor: undefined,
+    };
 
-    // assert
-    expect(result).toMatchObject({
+    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
+    );
+    mockFeedProcessor.processFeedItems.mockResolvedValue({
       feed: [],
+      cursor: undefined,
     });
-  });
-
-  test("フォローしているユーザーが投稿している場合、そのユーザーの投稿を返す", async () => {
-    // arrange
-    const authActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Auth User" }))
-      .create();
-    const followeeActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Followee User" }))
-      .create();
-
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => authActor })
-            .create(),
-        followee: () => followeeActor,
-      })
-      .create();
-
-    const post = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => followeeActor })
-            .create(),
-      })
-      .create();
-
-    // feed_itemsテーブルに投稿を追加
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => post })
-      .create();
 
     // act
-    const result = await getTimelineUseCase.execute(
-      { limit: 50 },
-      authActor.did,
-    );
+    await getTimelineUseCase.execute(params, authDid);
 
     // assert
-    expect(result).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: post.uri,
-            author: {
-              displayName: "Followee User",
-            },
-          },
-        },
-      ],
+    expect(
+      mockTimelineService.findFeedItemsWithPagination,
+    ).toHaveBeenCalledWith({
+      authDid,
+      cursor: expectedCursor,
+      limit: params.limit,
     });
   });
 
-  test("自分の投稿がある場合、自分の投稿も含める", async () => {
+  test("カーソルが指定された場合、Date型に変換してTimelineServiceに渡す", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Self User" }))
-      .create();
+    const authDid = "did:plc:testuser";
+    const cursorString = "2024-01-01T00:00:00.000Z";
+    const params = { limit: 50, cursor: cursorString };
+    const expectedCursor = new Date(cursorString);
 
-    const selfPost = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => authActor })
-            .props({
-              json: () => ({
-                $type: "app.bsky.feed.post",
-                text: "My own post",
-              }),
-            })
-            .create(),
-      })
-      .props({ text: () => "My own post" })
-      .create();
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [],
+      cursor: undefined,
+    };
 
-    // feed_itemsテーブルに投稿を追加
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => selfPost })
-      .create();
-
-    // act
-    const result = await getTimelineUseCase.execute(
-      { limit: 50 },
-      authActor.did,
+    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
     );
-
-    // assert
-    expect(result).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: selfPost.uri,
-            author: {
-              displayName: "Self User",
-            },
-            record: {
-              text: "My own post",
-            },
-          },
-        },
-      ],
-    });
-  });
-
-  test("カーソルを指定した場合、ページネーションが動作する", async () => {
-    // arrange
-    const authActor = await actorFactory(ctx.db).create();
-    const followeeActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Pagination Followee" }))
-      .create();
-
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => authActor })
-            .create(),
-        followee: () => followeeActor,
-      })
-      .create();
-
-    // 複数の投稿を時系列で作成
-    const firstPost = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => followeeActor })
-            .props({
-              json: () => ({ $type: "app.bsky.feed.post", text: "First post" }),
-            })
-            .create(),
-      })
-      .props({
-        text: () => "First post",
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => firstPost })
-      .create();
-
-    const secondPost = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => followeeActor })
-            .props({
-              json: () => ({
-                $type: "app.bsky.feed.post",
-                text: "Second post",
-              }),
-            })
-            .create(),
-      })
-      .props({
-        text: () => "Second post",
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => secondPost })
-      .create();
-
-    const thirdPost = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => followeeActor })
-            .props({
-              json: () => ({ $type: "app.bsky.feed.post", text: "Third post" }),
-            })
-            .create(),
-      })
-      .props({
-        text: () => "Third post",
-        createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => thirdPost })
-      .create();
-
-    // act - 最初のページ（limit=2）
-    const firstPage = await getTimelineUseCase.execute(
-      { limit: 2 },
-      authActor.did,
-    );
-
-    // assert - 最新の2件が返される
-    expect(firstPage).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            record: {
-              text: "Third post",
-            },
-          },
-        },
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            record: {
-              text: "Second post",
-            },
-          },
-        },
-      ],
-      cursor: expect.any(String),
-    });
-
-    // act - 次のページ
-    const secondPage = await getTimelineUseCase.execute(
-      { limit: 2, cursor: firstPage.cursor },
-      authActor.did,
-    );
-
-    // assert - 残りの1件が返される
-    expect(secondPage).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            record: {
-              text: "First post",
-            },
-          },
-        },
-      ],
-    });
-    expect(secondPage.cursor).toBeUndefined();
-  });
-
-  test("limitパラメータが0または1の場合、指定した件数の投稿を返す", async () => {
-    // arrange
-    const authActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Limit User" }))
-      .create();
-
-    const post = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => authActor })
-            .props({
-              json: () => ({
-                $type: "app.bsky.feed.post",
-                text: "Limit test post",
-              }),
-            })
-            .create(),
-      })
-      .props({ text: () => "Limit test post" })
-      .create();
-
-    // feed_itemsテーブルに投稿を追加
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => post })
-      .create();
-
-    // act - limit=0
-    const zeroLimitResult = await getTimelineUseCase.execute(
-      { limit: 0 },
-      authActor.did,
-    );
-
-    // assert
-    expect(zeroLimitResult).toMatchObject({
+    mockFeedProcessor.processFeedItems.mockResolvedValue({
       feed: [],
+      cursor: undefined,
     });
 
-    // act - limit=1
-    const oneLimitResult = await getTimelineUseCase.execute(
-      { limit: 1 },
-      authActor.did,
-    );
+    // act
+    await getTimelineUseCase.execute(params, authDid);
 
     // assert
-    expect(oneLimitResult).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: post.uri,
-          },
-        },
-      ],
+    expect(
+      mockTimelineService.findFeedItemsWithPagination,
+    ).toHaveBeenCalledWith({
+      authDid,
+      cursor: expectedCursor,
+      limit: params.limit,
     });
   });
 
-  test("複数の投稿がある場合、sortAt（indexedAtとcreatedAtの早い方）の降順でソートされて返す", async () => {
+  test("TimelineServiceから結果を取得した場合、FeedProcessorに結果を渡す", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db).create();
-    const followeeActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Sort Followee" }))
-      .create();
+    const authDid = "did:plc:testuser";
+    const params = { limit: 50 };
 
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => authActor })
-            .create(),
-        followee: () => followeeActor,
-      })
-      .create();
-
-    // 異なる時間の投稿を作成（sortAtの順序を確認するため）
-    const earlyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => followeeActor })
-      .props({
-        json: () => ({ $type: "app.bsky.feed.post", text: "Early post" }),
-        indexedAt: () => new Date("2024-01-01T01:30:00.000Z"),
-      })
-      .create();
-    const earlyPost = await postFactory(ctx.db)
-      .vars({ record: () => earlyRecord })
-      .props({
-        text: () => "Early post",
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T01:30:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => earlyPost })
-      .create();
-
-    const latestRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => followeeActor })
-      .props({
-        json: () => ({ $type: "app.bsky.feed.post", text: "Latest post" }),
-        indexedAt: () => new Date("2024-01-01T02:30:00.000Z"),
-      })
-      .create();
-    const latestPost = await postFactory(ctx.db)
-      .vars({ record: () => latestRecord })
-      .props({
-        text: () => "Latest post",
-        createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T02:30:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => latestPost })
-      .create();
-
-    const middleRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => followeeActor })
-      .props({
-        json: () => ({ $type: "app.bsky.feed.post", text: "Middle post" }),
-        indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
-    const middlePost = await postFactory(ctx.db)
-      .vars({ record: () => middleRecord })
-      .props({
-        text: () => "Middle post",
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => middlePost })
-      .create();
-
-    // act
-    const result = await getTimelineUseCase.execute(
-      { limit: 50 },
-      authActor.did,
-    );
-
-    // assert
-    // sortAtの降順：Latest(02:30) > Middle(02:00) > Early(01:00)
-    expect(result).toMatchObject({
-      feed: [
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [
         {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            record: {
-              text: "Latest post",
-            },
-          },
+          type: "post",
+          uri: "at://example.com/post/1",
+          actorDid: "did:plc:author1",
+          cid: "cid1",
+          sortAt: new Date(),
+          subjectUri: null,
         },
         {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            record: {
-              text: "Middle post",
-            },
-          },
-        },
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            record: {
-              text: "Early post",
-            },
-          },
+          type: "repost",
+          uri: "at://example.com/repost/1",
+          actorDid: "did:plc:reposter",
+          cid: "cid2",
+          sortAt: new Date(),
+          subjectUri: "at://example.com/post/2",
         },
       ],
+      cursor: "2024-01-01T00:00:00.000Z",
+    };
+
+    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
+    );
+    mockFeedProcessor.processFeedItems.mockResolvedValue({
+      feed: [],
+      cursor: "2024-01-01T00:00:00.000Z",
     });
+
+    // act
+    await getTimelineUseCase.execute(params, authDid);
+
+    // assert
+    expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
+      mockPaginationResult,
+    );
   });
 
-  test("フォローしているユーザーがリポストしている場合、ReasonRepostを含むfeedViewPostを返す", async () => {
+  test("FeedProcessorから結果を取得した場合、その結果をそのまま返す", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Auth User" }))
-      .create();
-    const originalAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Original Author" }))
-      .create();
-    const reposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reposter" }))
-      .create();
+    const authDid = "did:plc:testuser";
+    const params = { limit: 50 };
 
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => authActor })
-            .create(),
-        followee: () => reposter,
-      })
-      .create();
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [],
+      cursor: undefined,
+    };
 
-    // 元の投稿を作成
-    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => originalAuthor })
-      .props({
-        json: () => ({ $type: "app.bsky.feed.post", text: "Original post" }),
-      })
-      .create();
-    const originalPost = await postFactory(ctx.db)
-      .vars({ record: () => originalRecord })
-      .props({
-        text: () => "Original post",
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
-
-    // リポストを作成
-    const repost = await repostFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.repost")
-            .vars({ actor: () => reposter })
-            .create(),
-        subject: () => originalPost,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
-
-    // feed_itemsテーブルに投稿を追加
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => originalPost })
-      .create();
-
-    // feed_itemsテーブルにリポストを追加
-    await repostFeedItemFactory(ctx.db)
-      .vars({ repost: () => repost })
-      .create();
-
-    // act
-    const result = await getTimelineUseCase.execute(
-      { limit: 50 },
-      authActor.did,
-    );
-
-    // assert
-    expect(result).toMatchObject({
+    const expectedResult = {
       feed: [
         {
-          $type: "app.bsky.feed.defs#feedViewPost",
+          $type: "app.bsky.feed.defs#feedViewPost" as const,
           post: {
-            uri: originalPost.uri,
-            author: {
-              displayName: "Original Author",
-            },
-            record: {
-              text: "Original post",
-            },
-          },
-          reason: {
-            $type: "app.bsky.feed.defs#reasonRepost",
-            by: {
-              did: reposter.did,
-              displayName: "Reposter",
-            },
-            indexedAt: expect.any(String),
+            uri: "at://example.com/post/1",
+            cid: "cid123",
+            author: { did: "did:plc:author1", handle: "author.test" },
+            record: { $type: "app.bsky.feed.post", text: "Test post" },
+            indexedAt: "2024-01-01T00:00:00.000Z",
           },
         },
       ],
-    });
+      cursor: "2024-01-01T00:00:00.000Z",
+    };
+
+    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
+    );
+    mockFeedProcessor.processFeedItems.mockResolvedValue(expectedResult);
+
+    // act
+    const result = await getTimelineUseCase.execute(params, authDid);
+
+    // assert
+    expect(result).toEqual(expectedResult);
   });
 
-  test("リプライがある場合、reply情報を含むfeedViewPostを返す", async () => {
+  test("limit=0の場合も正しく処理される", async () => {
     // arrange
-    const authActor = await actorFactory(ctx.db).create();
-    const rootAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Root Author" }))
-      .create();
-    const parentAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Parent Author" }))
-      .create();
-    const replyAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reply Author" }))
-      .create();
+    const authDid = "did:plc:testuser";
+    const params = { limit: 0 };
 
-    await followFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => authActor })
-            .create(),
-        followee: () => replyAuthor,
-      })
-      .create();
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [],
+      cursor: undefined,
+    };
 
-    // 根投稿を作成
-    const rootPost = await postFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => rootAuthor })
-            .create(),
-      })
-      .props({
-        text: () => "Root post",
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => rootPost })
-      .create();
-
-    // 中間投稿（根投稿へのリプライ）を作成
-    const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => parentAuthor })
-      .create();
-    const parentPost = await postFactory(ctx.db)
-      .vars({ record: () => parentRecord })
-      .props({
-        text: () => "Parent reply to root",
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => rootPost.uri,
-        replyParentCid: () => rootPost.cid,
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => parentPost })
-      .create();
-
-    // 最終リプライ投稿（中間投稿へのリプライ）を作成
-    const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => replyAuthor })
-      .create();
-    const replyPost = await postFactory(ctx.db)
-      .vars({ record: () => replyRecord })
-      .props({
-        text: () => "Reply to parent post",
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => parentPost.uri,
-        replyParentCid: () => parentPost.cid,
-        createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
-      })
-      .create();
-
-    await postFeedItemFactory(ctx.db)
-      .vars({ post: () => replyPost })
-      .create();
+    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
+    );
+    mockFeedProcessor.processFeedItems.mockResolvedValue({
+      feed: [],
+      cursor: undefined,
+    });
 
     // act
-    const result = await getTimelineUseCase.execute(
-      { limit: 50 },
-      authActor.did,
-    );
+    const result = await getTimelineUseCase.execute(params, authDid);
 
     // assert
-    expect(result).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: replyPost.uri,
-            author: {
-              displayName: "Reply Author",
-            },
-          },
-          reply: {
-            $type: "app.bsky.feed.defs#replyRef",
-            root: {
-              uri: rootPost.uri,
-              author: {
-                displayName: "Root Author",
-              },
-            },
-            parent: {
-              uri: parentPost.uri,
-              author: {
-                displayName: "Parent Author",
-              },
-            },
-          },
-        },
-      ],
+    expect(
+      mockTimelineService.findFeedItemsWithPagination,
+    ).toHaveBeenCalledWith({
+      authDid,
+      cursor: undefined,
+      limit: 0,
+    });
+    expect(result).toEqual({
+      feed: [],
+      cursor: undefined,
     });
   });
 });
