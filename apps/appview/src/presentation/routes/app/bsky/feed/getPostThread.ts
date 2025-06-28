@@ -1,7 +1,7 @@
 import { AtUri } from "@atproto/syntax";
 import type { Server } from "@repo/client/server";
 
-import type { GetPostThreadUseCase } from "../../../../../application/get-post-thread-use-case.js";
+import type { GetPostThreadUseCase } from "../../../../../application/use-cases/feed/get-post-thread-use-case.js";
 import type { AtUriService } from "../../../../../domain/service/at-uri-service.js";
 
 export class GetPostThread {

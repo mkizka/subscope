@@ -1,7 +1,7 @@
 import type { AppBskyFeedGetLikes } from "@repo/client/server";
 
-import type { LikeService } from "./service/view/like-service.js";
-import type { ProfileViewService } from "./service/view/profile-view-service.js";
+import type { LikeService } from "../../service/view/like-service.js";
+import type { ProfileViewService } from "../../service/view/profile-view-service.js";
 
 export class GetLikesUseCase {
   constructor(

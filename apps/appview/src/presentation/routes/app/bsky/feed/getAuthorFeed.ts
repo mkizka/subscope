@@ -2,8 +2,8 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { GetAuthorFeedUseCase } from "../../../../../application/get-author-feed-use-case.js";
 import type { HandleService } from "../../../../../application/service/request/handle-service.js";
+import type { GetAuthorFeedUseCase } from "../../../../../application/use-cases/feed/get-author-feed-use-case.js";
 
 export class GetAuthorFeed {
   constructor(

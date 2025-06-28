@@ -1,7 +1,7 @@
 import type { AppBskyFeedGetTimeline } from "@repo/client/server";
 
-import type { FeedProcessor } from "./service/feed/feed-processor.js";
-import type { TimelineService } from "./service/feed/timeline-service.js";
+import type { FeedProcessor } from "../../service/feed/feed-processor.js";
+import type { TimelineService } from "../../service/feed/timeline-service.js";
 
 export class GetTimelineUseCase {
   constructor(

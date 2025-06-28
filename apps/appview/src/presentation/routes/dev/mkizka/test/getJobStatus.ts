@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 
-import type { GetJobStatusUseCase } from "../../../../../application/get-job-status-use-case.js";
 import type { AuthVerifierService } from "../../../../../application/service/request/auth-verifier-service.js";
+import type { GetJobStatusUseCase } from "../../../../../application/use-cases/job/get-job-status-use-case.js";
 
 export class GetJobStatus {
   constructor(

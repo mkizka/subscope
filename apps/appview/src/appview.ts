@@ -9,13 +9,6 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { GetAuthorFeedUseCase } from "./application/get-author-feed-use-case.js";
-import { GetJobStatusUseCase } from "./application/get-job-status-use-case.js";
-import { GetLikesUseCase } from "./application/get-likes-use-case.js";
-import { GetPostThreadUseCase } from "./application/get-post-thread-use-case.js";
-import { GetPostsUseCase } from "./application/get-posts-use-case.js";
-import { GetProfilesUseCase } from "./application/get-profiles-use-case.js";
-import { GetTimelineUseCase } from "./application/get-timeline-use-case.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
@@ -26,6 +19,13 @@ import { LikeService } from "./application/service/view/like-service.js";
 import { PostViewService } from "./application/service/view/post-view-service.js";
 import { ProfileViewService } from "./application/service/view/profile-view-service.js";
 import { ReplyRefService } from "./application/service/view/reply-ref-service.js";
+import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
+import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
+import { GetLikesUseCase } from "./application/use-cases/feed/get-likes-use-case.js";
+import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thread-use-case.js";
+import { GetPostsUseCase } from "./application/use-cases/feed/get-posts-use-case.js";
+import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-use-case.js";
+import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { AuthorFeedRepository } from "./infrastructure/author-feed-repository.js";

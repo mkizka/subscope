@@ -7,18 +7,18 @@ import {
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test, vi } from "vitest";
 
-import { ResolvedAtUri } from "../domain/models/at-uri.js";
-import { AtUriService } from "../domain/service/at-uri-service.js";
-import { ActorStatsRepository } from "../infrastructure/actor-stats-repository.js";
-import { HandleResolver } from "../infrastructure/handle-resolver.js";
-import { PostRepository } from "../infrastructure/post-repository.js";
-import { PostStatsRepository } from "../infrastructure/post-stats-repository.js";
-import { ProfileRepository } from "../infrastructure/profile-repository.js";
-import { RecordRepository } from "../infrastructure/record-repository.js";
+import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
+import { AtUriService } from "../../../domain/service/at-uri-service.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
+import { PostRepository } from "../../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { EmbedViewService } from "../../service/view/embed-view-service.js";
+import { PostViewService } from "../../service/view/post-view-service.js";
+import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
-import { EmbedViewService } from "./service/view/embed-view-service.js";
-import { PostViewService } from "./service/view/post-view-service.js";
-import { ProfileViewService } from "./service/view/profile-view-service.js";
 
 let getPostThreadUseCase: GetPostThreadUseCase;
 let ctx: TransactionContext;

@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 import type { DatabaseClient } from "@repo/common/domain";
 
-import type { GetLikesUseCase } from "../../../../../application/get-likes-use-case.js";
+import type { GetLikesUseCase } from "../../../../../application/use-cases/feed/get-likes-use-case.js";
 
 export class GetLikes {
   constructor(

@@ -8,12 +8,12 @@ import {
 } from "@repo/test-utils";
 import { beforeAll, describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../infrastructure/actor-stats-repository.js";
-import { LikeRepository } from "../infrastructure/like-repository.js";
-import { ProfileRepository } from "../infrastructure/profile-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { LikeRepository } from "../../../infrastructure/like-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { LikeService } from "../../service/view/like-service.js";
+import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetLikesUseCase } from "./get-likes-use-case.js";
-import { LikeService } from "./service/view/like-service.js";
-import { ProfileViewService } from "./service/view/profile-view-service.js";
 
 let getLikesUseCase: GetLikesUseCase;
 let ctx: TransactionContext;

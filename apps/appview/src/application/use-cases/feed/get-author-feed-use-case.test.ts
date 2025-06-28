@@ -4,10 +4,10 @@ import type { FeedItem } from "@repo/common/domain";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
+import type { AuthorFeedService } from "../../service/feed/author-feed-service.js";
+import type { FeedProcessor } from "../../service/feed/feed-processor.js";
+import type { Page } from "../../utils/pagination.js";
 import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
-import type { AuthorFeedService } from "./service/feed/author-feed-service.js";
-import type { FeedProcessor } from "./service/feed/feed-processor.js";
-import type { Page } from "./utils/pagination.js";
 
 const mockAuthorFeedService = mock<AuthorFeedService>();
 const mockFeedProcessor = mock<FeedProcessor>();

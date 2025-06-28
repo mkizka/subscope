@@ -3,10 +3,10 @@ import type { FeedItem } from "@repo/common/domain";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
+import type { FeedProcessor } from "../../service/feed/feed-processor.js";
+import type { TimelineService } from "../../service/feed/timeline-service.js";
+import type { Page } from "../../utils/pagination.js";
 import { GetTimelineUseCase } from "./get-timeline-use-case.js";
-import type { FeedProcessor } from "./service/feed/feed-processor.js";
-import type { TimelineService } from "./service/feed/timeline-service.js";
-import type { Page } from "./utils/pagination.js";
 
 const mockTimelineService = mock<TimelineService>();
 const mockFeedProcessor = mock<FeedProcessor>();

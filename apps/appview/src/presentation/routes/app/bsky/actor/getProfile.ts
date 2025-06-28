@@ -3,8 +3,8 @@ import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { GetProfilesUseCase } from "../../../../../application/get-profiles-use-case.js";
 import type { HandleService } from "../../../../../application/service/request/handle-service.js";
+import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";
 
 export class GetProfile {
   constructor(
