@@ -28,5 +28,10 @@ export const setup = async () => {
 };
 
 export const teardown = async () => {
-  await postgresContainer?.stop();
+  // コンテナを起動しなかったvitestワーカーではpostgresContainerがundefinedになる
+  // その場合は何もしない
+  if (!postgresContainer) {
+    return;
+  }
+  await postgresContainer.stop();
 };
