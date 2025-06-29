@@ -346,6 +346,7 @@ export const subscriptionFactory = (db: Database) =>
         vars: {
           record: () =>
             recordFactory(db, "dev.mkizka.test.subscription").create(),
+          actor: () => actorFactory(db).create(),
         },
       },
       (props) => create(db, schema.subscriptions, props),

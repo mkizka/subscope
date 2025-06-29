@@ -1,15 +1,15 @@
-import type { IJobQueue, TransactionContext } from "@repo/common/domain";
+import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
+  getTestSetup,
   postFactory,
   recordFactory,
   repostFactory,
-  setupTestDatabase,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
@@ -21,34 +21,25 @@ import { SubscriptionRepository } from "../../../infrastructure/subscription-rep
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { RepostIndexer } from "./repost-indexer.js";
 
-let repostIndexer: RepostIndexer;
-let ctx: TransactionContext;
-let mockJobQueue: IJobQueue;
+const mockJobQueue = mock<IJobQueue>();
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  mockJobQueue = mock<IJobQueue>();
-  repostIndexer = testSetup.testInjector
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
-    .provideClass("feedItemRepository", FeedItemRepository)
-    .provideClass("postRepository", PostRepository)
-    .provideValue("jobQueue", mockJobQueue)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .injectClass(RepostIndexer);
-  ctx = testSetup.ctx;
-});
+const repostIndexer = testInjector
+  .provideClass("repostRepository", RepostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
+  .provideClass("feedItemRepository", FeedItemRepository)
+  .provideClass("postRepository", PostRepository)
+  .provideValue("jobQueue", mockJobQueue)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .injectClass(RepostIndexer);
 
 describe("RepostIndexer", () => {
   describe("upsert", () => {
     it("リポストレコードを正しく保存する", async () => {
       // arrange
-      const reposter = await actorFactory(ctx.db).create();
-      const author = await actorFactory(ctx.db).create();
+      const [reposter, author] = await actorFactory(ctx.db).createList(2);
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
 
       const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")

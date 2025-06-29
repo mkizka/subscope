@@ -1,14 +1,9 @@
-import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import type { JobQueue } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
-import {
-  actorFactory,
-  recordFactory,
-  setupTestDatabase,
-} from "@repo/test-utils";
+import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
@@ -23,35 +18,27 @@ import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../scheduler/resolve-did-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
-let followIndexer: FollowIndexer;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  followIndexer = testSetup.testInjector
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("followIndexingPolicy", FollowIndexingPolicy)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideValue("jobQueue", mock<JobQueue>())
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("backfillScheduler", BackfillScheduler)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .provideClass("indexActorService", IndexActorService)
-    .injectClass(FollowIndexer);
-  ctx = testSetup.ctx;
-});
+const followIndexer = testInjector
+  .provideClass("followRepository", FollowRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("followIndexingPolicy", FollowIndexingPolicy)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideClass("actorRepository", ActorRepository)
+  .provideClass("profileRepository", ProfileRepository)
+  .provideValue("jobQueue", mock<JobQueue>())
+  .provideClass("resolveDidScheduler", ResolveDidScheduler)
+  .provideClass("backfillScheduler", BackfillScheduler)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("indexActorService", IndexActorService)
+  .injectClass(FollowIndexer);
 
 describe("FollowIndexer", () => {
   describe("upsert", () => {
     it("フォローレコードを正しく保存する", async () => {
       // arrange
-      const follower = await actorFactory(ctx.db).create();
-      const followee = await actorFactory(ctx.db).create();
+      const [follower, followee] = await actorFactory(ctx.db).createList(2);
 
       const followJson = {
         $type: "app.bsky.graph.follow",
@@ -146,8 +133,7 @@ describe("FollowIndexer", () => {
   describe("updateStats", () => {
     it("フォロー作成時にfollowsCountとfollowersCountが更新される", async () => {
       // arrange
-      const follower = await actorFactory(ctx.db).create();
-      const followee = await actorFactory(ctx.db).create();
+      const [follower, followee] = await actorFactory(ctx.db).createList(2);
 
       const followJson = {
         $type: "app.bsky.graph.follow",

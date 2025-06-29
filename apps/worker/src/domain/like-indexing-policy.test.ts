@@ -1,42 +1,35 @@
-import type { TransactionContext } from "@repo/common/domain";
 import { Like, Record } from "@repo/common/domain";
 import {
   actorFactory,
+  getTestSetup,
   postFactory,
   recordFactory,
-  setupTestDatabase,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { PostRepository } from "../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
 
-let likeIndexingPolicy: LikeIndexingPolicy;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  likeIndexingPolicy = testSetup.testInjector
-    .provideClass("postRepository", PostRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .injectClass(LikeIndexingPolicy);
-  ctx = testSetup.ctx;
-});
+const likeIndexingPolicy = testInjector
+  .provideClass("postRepository", PostRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .injectClass(LikeIndexingPolicy);
 
 describe("LikeIndexingPolicy", () => {
   describe("shouldIndex", () => {
     it("subscriberのいいねは保存すべき", async () => {
       // arrange
-      const subscriber = await actorFactory(ctx.db).create();
+      const subscriberActor = await actorFactory(ctx.db).create();
+
       const subscriptionRecord = await recordFactory(
         ctx.db,
         "dev.mkizka.test.subscription",
       )
-        .vars({ actor: () => subscriber })
+        .vars({ actor: () => subscriberActor })
         .create();
       await subscriptionFactory(ctx.db)
         .vars({ record: () => subscriptionRecord })
@@ -50,9 +43,13 @@ describe("LikeIndexingPolicy", () => {
         },
         createdAt: new Date().toISOString(),
       };
+      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
+        .vars({ actor: () => subscriberActor })
+        .props({ json: () => likeJson })
+        .create();
       const record = Record.fromJson({
-        uri: `at://${subscriber.did}/app.bsky.feed.like/123`,
-        cid: "abc123",
+        uri: likeRecord.uri,
+        cid: likeRecord.cid,
         json: likeJson,
       });
 
@@ -68,8 +65,17 @@ describe("LikeIndexingPolicy", () => {
 
     it("DBに存在する投稿へのいいねは保存すべき", async () => {
       // arrange
-      const liker = await actorFactory(ctx.db).create();
-      const post = await postFactory(ctx.db).create();
+      // いいねするactor（subscriberではない）
+      const likerActor = await actorFactory(ctx.db).create();
+
+      // いいねされる投稿のactorと投稿
+      const posterActor = await actorFactory(ctx.db).create();
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => posterActor })
+        .create();
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => postRecord })
+        .create();
 
       const likeJson = {
         $type: "app.bsky.feed.like",
@@ -79,9 +85,13 @@ describe("LikeIndexingPolicy", () => {
         },
         createdAt: new Date().toISOString(),
       };
+      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
+        .vars({ actor: () => likerActor })
+        .props({ json: () => likeJson })
+        .create();
       const record = Record.fromJson({
-        uri: `at://${liker.did}/app.bsky.feed.like/123`,
-        cid: "like123",
+        uri: likeRecord.uri,
+        cid: likeRecord.cid,
         json: likeJson,
       });
 
@@ -107,9 +117,13 @@ describe("LikeIndexingPolicy", () => {
         },
         createdAt: new Date().toISOString(),
       };
+      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
+        .vars({ actor: () => unrelatedActor })
+        .props({ json: () => likeJson })
+        .create();
       const record = Record.fromJson({
-        uri: `at://${unrelatedActor.did}/app.bsky.feed.like/123`,
-        cid: "like123",
+        uri: likeRecord.uri,
+        cid: likeRecord.cid,
         json: likeJson,
       });
 

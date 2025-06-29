@@ -1,13 +1,12 @@
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
 import { Post } from "@repo/common/domain";
 import {
   actorFactory,
+  getTestSetup,
   postFactory,
   recordFactory,
-  setupTestDatabase,
 } from "@repo/test-utils";
-import { beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
@@ -20,26 +19,19 @@ import { PostViewService } from "./post-view-service.js";
 import { ProfileViewService } from "./profile-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
-let replyRefService: ReplyRefService;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  replyRefService = testSetup.testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("postViewService", PostViewService)
-    .injectClass(ReplyRefService);
-  ctx = testSetup.ctx;
-});
+const replyRefService = testInjector
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideClass("handleResolver", HandleResolver)
+  .provideClass("postRepository", PostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
+  .provideClass("recordRepository", RecordRepository)
+  .provideClass("embedViewService", EmbedViewService)
+  .provideClass("profileViewService", ProfileViewService)
+  .provideClass("postViewService", PostViewService)
+  .injectClass(ReplyRefService);
 
 describe("ReplyRefService", () => {
   test("リプライがない投稿のみの場合、空のMapを返す", async () => {

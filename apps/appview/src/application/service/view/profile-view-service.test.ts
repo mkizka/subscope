@@ -3,9 +3,9 @@ import {
   actorFactory,
   actorStatsFactory,
   blobFactory,
+  getTestSetup,
   profileFactory,
   recordFactory,
-  setupTestDatabase,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -13,23 +13,18 @@ import { ActorStatsRepository } from "../../../infrastructure/actor-stats-reposi
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
+const { testInjector, ctx } = getTestSetup();
+
+const profileViewService = testInjector
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideClass("profileViewService", ProfileViewService)
+  .resolve("profileViewService");
+
 describe("ProfileViewService", () => {
-  const { getSetup } = setupTestDatabase();
-
-  const getProfileViewService = () => {
-    const { testInjector } = getSetup();
-    const container = testInjector
-      .provideClass("profileRepository", ProfileRepository)
-      .provideClass("actorStatsRepository", ActorStatsRepository)
-      .provideClass("profileViewService", ProfileViewService);
-
-    return container.resolve("profileViewService");
-  };
-
   describe("findProfileViewBasic", () => {
     test("プロフィールが存在する場合、ProfileViewBasicを返す", async () => {
       // arrange
-      const { ctx } = getSetup();
       const actor = await actorFactory(ctx.db).create();
       const avatar = await blobFactory(ctx.db).create();
       await profileFactory(ctx.db)
@@ -46,7 +41,6 @@ describe("ProfileViewService", () => {
         .create();
 
       // act
-      const profileViewService = getProfileViewService();
       const results = await profileViewService.findProfileViewBasic([
         asDid(actor.did),
       ]);
@@ -68,7 +62,6 @@ describe("ProfileViewService", () => {
       const nonExistentDid = "did:plc:nonexistent";
 
       // act
-      const profileViewService = getProfileViewService();
       const results = await profileViewService.findProfileViewBasic([
         nonExistentDid,
       ]);
@@ -81,7 +74,6 @@ describe("ProfileViewService", () => {
   describe("findProfileViewDetailed", () => {
     test("プロフィールと統計情報が存在する場合、統計情報を含むProfileViewDetailedを返す", async () => {
       // arrange
-      const { ctx } = getSetup();
       const actor = await actorFactory(ctx.db).create();
       const avatar = await blobFactory(ctx.db).create();
       await profileFactory(ctx.db)
@@ -106,7 +98,6 @@ describe("ProfileViewService", () => {
         .create();
 
       // act
-      const profileViewService = getProfileViewService();
       const results = await profileViewService.findProfileViewDetailed([
         asDid(actor.did),
       ]);
@@ -129,7 +120,6 @@ describe("ProfileViewService", () => {
 
     test("プロフィールは存在するが統計情報が存在しない場合、統計情報を0として返す", async () => {
       // arrange
-      const { ctx } = getSetup();
       const actor = await actorFactory(ctx.db).create();
       await profileFactory(ctx.db)
         .vars({
@@ -144,7 +134,6 @@ describe("ProfileViewService", () => {
         .create();
 
       // act
-      const profileViewService = getProfileViewService();
       const results = await profileViewService.findProfileViewDetailed([
         asDid(actor.did),
       ]);
@@ -166,7 +155,6 @@ describe("ProfileViewService", () => {
 
     test("複数のプロフィールに対して正しい統計情報を関連付ける", async () => {
       // arrange
-      const { ctx } = getSetup();
       const actor1 = await actorFactory(ctx.db).create();
       await profileFactory(ctx.db)
         .vars({
@@ -206,7 +194,6 @@ describe("ProfileViewService", () => {
         .create();
 
       // act
-      const profileViewService = getProfileViewService();
       const results = await profileViewService.findProfileViewDetailed([
         asDid(actor1.did),
         asDid(actor2.did),
@@ -237,7 +224,6 @@ describe("ProfileViewService", () => {
       const nonExistentDid = "did:plc:nonexistent";
 
       // act
-      const profileViewService = getProfileViewService();
       const results = await profileViewService.findProfileViewDetailed([
         nonExistentDid,
       ]);

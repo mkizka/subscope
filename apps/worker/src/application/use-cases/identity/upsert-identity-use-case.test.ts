@@ -1,14 +1,14 @@
-import type { IJobQueue, TransactionContext } from "@repo/common/domain";
+import type { IJobQueue } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
   followFactory,
+  getTestSetup,
   recordFactory,
-  setupTestDatabase,
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../../infrastructure/actor-repository.js";
@@ -21,26 +21,19 @@ import { ResolveDidScheduler } from "../../services/scheduler/resolve-did-schedu
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 
-let upsertIdentityUseCase: UpsertIdentityUseCase;
-let ctx: TransactionContext;
-
 const mockJobQueue = mock<IJobQueue>();
-const { getSetup } = setupTestDatabase();
+const { testInjector, ctx } = getTestSetup();
 
-beforeAll(() => {
-  const testSetup = getSetup();
-  upsertIdentityUseCase = testSetup.testInjector
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideValue("jobQueue", mockJobQueue)
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("backfillScheduler", BackfillScheduler)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .provideClass("indexActorService", IndexActorService)
-    .injectClass(UpsertIdentityUseCase);
-  ctx = testSetup.ctx;
-});
+const upsertIdentityUseCase = testInjector
+  .provideClass("actorRepository", ActorRepository)
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideValue("jobQueue", mockJobQueue)
+  .provideClass("resolveDidScheduler", ResolveDidScheduler)
+  .provideClass("backfillScheduler", BackfillScheduler)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("indexActorService", IndexActorService)
+  .injectClass(UpsertIdentityUseCase);
 
 describe("UpsertIdentityUseCase", () => {
   it("ハンドルがない場合は何もしない", async () => {

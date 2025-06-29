@@ -1,16 +1,11 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
 import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import {
-  actorFactory,
-  recordFactory,
-  setupTestDatabase,
-} from "@repo/test-utils";
+import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
@@ -27,9 +22,6 @@ import type { ProfileIndexer } from "./indexer/profile-indexer.js";
 import type { RepostIndexer } from "./indexer/repost-indexer.js";
 import type { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
 
-let indexRecordService: IndexRecordService;
-let ctx: TransactionContext;
-
 // 各種indexerをモック
 const postIndexer = mockDeep<PostIndexer>();
 const profileIndexer = mockDeep<ProfileIndexer>();
@@ -39,29 +31,23 @@ const repostIndexer = mockDeep<RepostIndexer>();
 const subscriptionIndexer = mockDeep<SubscriptionIndexer>();
 const jobLogger = { log: vi.fn() };
 
-const { getSetup } = setupTestDatabase();
+const { testInjector, ctx } = getTestSetup();
 
-beforeAll(() => {
-  const testSetup = getSetup();
-  ctx = testSetup.ctx;
-
-  // IndexRecordServiceを作成
-  indexRecordService = testSetup.testInjector
-    .provideValue("jobQueue", mockDeep<IJobQueue>())
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("indexActorService", IndexActorService)
-    .provideValue("postIndexer", postIndexer)
-    .provideValue("profileIndexer", profileIndexer)
-    .provideValue("followIndexer", followIndexer)
-    .provideValue("likeIndexer", likeIndexer)
-    .provideValue("repostIndexer", repostIndexer)
-    .provideValue("subscriptionIndexer", subscriptionIndexer)
-    .injectClass(IndexRecordService);
-});
+const indexRecordService = testInjector
+  .provideValue("jobQueue", mockDeep<IJobQueue>())
+  .provideClass("recordRepository", RecordRepository)
+  .provideClass("actorRepository", ActorRepository)
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("resolveDidScheduler", ResolveDidScheduler)
+  .provideClass("indexActorService", IndexActorService)
+  .provideValue("postIndexer", postIndexer)
+  .provideValue("profileIndexer", profileIndexer)
+  .provideValue("followIndexer", followIndexer)
+  .provideValue("likeIndexer", likeIndexer)
+  .provideValue("repostIndexer", repostIndexer)
+  .provideValue("subscriptionIndexer", subscriptionIndexer)
+  .injectClass(IndexRecordService);
 
 describe("IndexRecordService", () => {
   describe("upsert", () => {

@@ -1,46 +1,29 @@
-import type { TransactionContext } from "@repo/common/domain";
 import { Record, Repost } from "@repo/common/domain";
 import {
   actorFactory,
   followFactory,
+  getTestSetup,
   recordFactory,
-  setupTestDatabase,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
 
-let repostIndexingPolicy: RepostIndexingPolicy;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  repostIndexingPolicy = testSetup.testInjector
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .injectClass(RepostIndexingPolicy);
-  ctx = testSetup.ctx;
-});
+const repostIndexingPolicy = testInjector
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .injectClass(RepostIndexingPolicy);
 
 describe("RepostIndexingPolicy", () => {
   describe("shouldIndex", () => {
     it("repost者がsubscriberの場合は保存すべき", async () => {
       // arrange
-      const reposterActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:reposter",
-          handle: () => "reposter.bsky.social",
-        })
-        .create();
-      const authorActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:author",
-          handle: () => "author.bsky.social",
-        })
-        .create();
+      const [reposterActor, authorActor] = await actorFactory(
+        ctx.db,
+      ).createList(2);
 
       // repost者をsubscriberとして登録
       const subscriptionRecord = await recordFactory(
@@ -49,7 +32,8 @@ describe("RepostIndexingPolicy", () => {
       )
         .vars({ actor: () => reposterActor })
         .props({
-          uri: () => "at://did:plc:reposter/dev.mkizka.test.subscription/123",
+          uri: () =>
+            `at://${reposterActor.did}/dev.mkizka.test.subscription/123`,
           cid: () => "sub123",
         })
         .create();
@@ -63,13 +47,13 @@ describe("RepostIndexingPolicy", () => {
       const repostJson = {
         $type: "app.bsky.feed.repost",
         subject: {
-          uri: "at://did:plc:author/app.bsky.feed.post/456",
+          uri: `at://${authorActor.did}/app.bsky.feed.post/456`,
           cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
         },
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:reposter/app.bsky.feed.repost/123",
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/123`,
         cid: "repost123",
         json: repostJson,
       });
@@ -86,24 +70,9 @@ describe("RepostIndexingPolicy", () => {
 
     it("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
       // arrange
-      const reposterActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:reposter2",
-          handle: () => "reposter2.bsky.social",
-        })
-        .create();
-      const followerActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:follower",
-          handle: () => "follower.bsky.social",
-        })
-        .create();
-      const authorActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:author2",
-          handle: () => "author2.bsky.social",
-        })
-        .create();
+      const [reposterActor, followerActor, authorActor] = await actorFactory(
+        ctx.db,
+      ).createList(3);
 
       // フォロワーをsubscriberとして登録
       const subscriptionRecord = await recordFactory(
@@ -112,7 +81,8 @@ describe("RepostIndexingPolicy", () => {
       )
         .vars({ actor: () => followerActor })
         .props({
-          uri: () => "at://did:plc:follower/dev.mkizka.test.subscription/789",
+          uri: () =>
+            `at://${followerActor.did}/dev.mkizka.test.subscription/789`,
           cid: () => "sub789",
         })
         .create();
@@ -127,7 +97,7 @@ describe("RepostIndexingPolicy", () => {
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => followerActor })
         .props({
-          uri: () => "at://did:plc:follower/app.bsky.graph.follow/987",
+          uri: () => `at://${followerActor.did}/app.bsky.graph.follow/987`,
           cid: () => "follow987",
         })
         .create();
@@ -138,13 +108,13 @@ describe("RepostIndexingPolicy", () => {
       const repostJson = {
         $type: "app.bsky.feed.repost",
         subject: {
-          uri: "at://did:plc:author2/app.bsky.feed.post/654",
+          uri: `at://${authorActor.did}/app.bsky.feed.post/654`,
           cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
         },
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:reposter2/app.bsky.feed.repost/321",
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/321`,
         cid: "repost321",
         json: repostJson,
       });
@@ -161,29 +131,20 @@ describe("RepostIndexingPolicy", () => {
 
     it("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
       // arrange
-      const reposterActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:unrelated-reposter",
-          handle: () => "unrelated-reposter.bsky.social",
-        })
-        .create();
-      const authorActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:unrelated-author",
-          handle: () => "unrelated-author.bsky.social",
-        })
-        .create();
+      const [reposterActor, authorActor] = await actorFactory(
+        ctx.db,
+      ).createList(2);
 
       const repostJson = {
         $type: "app.bsky.feed.repost",
         subject: {
-          uri: "at://did:plc:unrelated-author/app.bsky.feed.post/999",
+          uri: `at://${authorActor.did}/app.bsky.feed.post/999`,
           cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
         },
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:unrelated-reposter/app.bsky.feed.repost/888",
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/888`,
         cid: "repost888",
         json: repostJson,
       });

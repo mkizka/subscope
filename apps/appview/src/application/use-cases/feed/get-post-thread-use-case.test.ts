@@ -1,11 +1,10 @@
-import type { TransactionContext } from "@repo/common/domain";
 import {
   actorFactory,
+  getTestSetup,
   postFactory,
   recordFactory,
-  setupTestDatabase,
 } from "@repo/test-utils";
-import { beforeAll, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { AtUriService } from "../../../domain/service/at-uri-service.js";
@@ -20,31 +19,24 @@ import { PostViewService } from "../../service/view/post-view-service.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
 
-let getPostThreadUseCase: GetPostThreadUseCase;
-let ctx: TransactionContext;
-
-const { getSetup } = setupTestDatabase();
+const { testInjector, ctx } = getTestSetup();
 
 const spyFindByUri = vi.spyOn(PostRepository.prototype, "findByUri");
 const spyFindPostView = vi.spyOn(PostViewService.prototype, "findPostView");
 const spyFindReplies = vi.spyOn(PostRepository.prototype, "findReplies");
 
-beforeAll(() => {
-  const testSetup = getSetup();
-  getPostThreadUseCase = testSetup.testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("postViewService", PostViewService)
-    .provideClass("atUriService", AtUriService)
-    .injectClass(GetPostThreadUseCase);
-  ctx = testSetup.ctx;
-});
+const getPostThreadUseCase = testInjector
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideClass("handleResolver", HandleResolver)
+  .provideClass("postRepository", PostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
+  .provideClass("recordRepository", RecordRepository)
+  .provideClass("embedViewService", EmbedViewService)
+  .provideClass("profileViewService", ProfileViewService)
+  .provideClass("postViewService", PostViewService)
+  .provideClass("atUriService", AtUriService)
+  .injectClass(GetPostThreadUseCase);
 
 describe("GetPostThreadUseCase", () => {
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {

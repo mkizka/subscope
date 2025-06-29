@@ -1,43 +1,30 @@
-import type { TransactionContext } from "@repo/common/domain";
 import { Post, Record } from "@repo/common/domain";
 import {
   actorFactory,
   followFactory,
+  getTestSetup,
   postFactory,
   recordFactory,
-  setupTestDatabase,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { PostRepository } from "../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
 
-let postIndexingPolicy: PostIndexingPolicy;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  postIndexingPolicy = testSetup.testInjector
-    .provideClass("postRepository", PostRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .injectClass(PostIndexingPolicy);
-  ctx = testSetup.ctx;
-});
+const postIndexingPolicy = testInjector
+  .provideClass("postRepository", PostRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .injectClass(PostIndexingPolicy);
 
 describe("PostIndexingPolicy", () => {
   describe("shouldIndex", () => {
     it("subscriberの投稿は保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:subscriber",
-          handle: () => "subscriber.bsky.social",
-        })
-        .create();
+      const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
         .vars({
           record: () =>
@@ -53,7 +40,7 @@ describe("PostIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:subscriber/app.bsky.feed.post/123",
+        uri: `at://${subscriberActor.did}/app.bsky.feed.post/123`,
         cid: "abc123",
         json: postJson,
       });
@@ -70,12 +57,7 @@ describe("PostIndexingPolicy", () => {
 
     it("subscriberにフォローされているユーザーの投稿は保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:subscriber2",
-          handle: () => "subscriber2.bsky.social",
-        })
-        .create();
+      const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
         .vars({
           record: () =>
@@ -85,12 +67,7 @@ describe("PostIndexingPolicy", () => {
         })
         .create();
 
-      const followedActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:followed",
-          handle: () => "followed.bsky.social",
-        })
-        .create();
+      const followedActor = await actorFactory(ctx.db).create();
 
       await followFactory(ctx.db)
         .vars({
@@ -108,7 +85,7 @@ describe("PostIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:followed/app.bsky.feed.post/123",
+        uri: `at://${followedActor.did}/app.bsky.feed.post/123`,
         cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
         json: postJson,
       });
@@ -125,12 +102,7 @@ describe("PostIndexingPolicy", () => {
 
     it("DBに存在する投稿への返信は保存すべき", async () => {
       // arrange
-      const originalPosterActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:originalPoster",
-          handle: () => "original.bsky.social",
-        })
-        .create();
+      const originalPosterActor = await actorFactory(ctx.db).create();
       const originalPost = await postFactory(ctx.db)
         .vars({
           record: () =>
@@ -143,12 +115,7 @@ describe("PostIndexingPolicy", () => {
         })
         .create();
 
-      const replierActor = await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:replier",
-          handle: () => "replier.bsky.social",
-        })
-        .create();
+      const replierActor = await actorFactory(ctx.db).create();
 
       const replyJson = {
         $type: "app.bsky.feed.post",
@@ -166,7 +133,7 @@ describe("PostIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:replier/app.bsky.feed.post/reply123",
+        uri: `at://${replierActor.did}/app.bsky.feed.post/reply123`,
         cid: "bafyreihj7fbbzsqgahvoa4f5qhevzxvbcfi6mjlvvinjlfl3uvp5nzl5eu",
         json: replyJson,
       });
@@ -183,12 +150,7 @@ describe("PostIndexingPolicy", () => {
 
     it("subscriberでもフォロワーでもないユーザーの投稿は保存すべきでない", async () => {
       // arrange
-      await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:unrelated",
-          handle: () => "unrelated.bsky.social",
-        })
-        .create();
+      const unrelatedActor = await actorFactory(ctx.db).create();
 
       const postJson = {
         $type: "app.bsky.feed.post",
@@ -196,7 +158,7 @@ describe("PostIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:unrelated/app.bsky.feed.post/123",
+        uri: `at://${unrelatedActor.did}/app.bsky.feed.post/123`,
         cid: "abc123",
         json: postJson,
       });
@@ -213,12 +175,7 @@ describe("PostIndexingPolicy", () => {
 
     it("DBに存在しない投稿への返信は保存すべきでない", async () => {
       // arrange
-      await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:replier2",
-          handle: () => "replier2.bsky.social",
-        })
-        .create();
+      const replierActor = await actorFactory(ctx.db).create();
 
       const replyJson = {
         $type: "app.bsky.feed.post",
@@ -236,7 +193,7 @@ describe("PostIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:replier2/app.bsky.feed.post/reply456",
+        uri: `at://${replierActor.did}/app.bsky.feed.post/reply456`,
         cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
         json: replyJson,
       });

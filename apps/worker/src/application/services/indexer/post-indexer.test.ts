@@ -1,16 +1,16 @@
-import type { IJobQueue, TransactionContext } from "@repo/common/domain";
+import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
+  getTestSetup,
   postFactory,
   randomCid,
   recordFactory,
-  setupTestDatabase,
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
@@ -22,27 +22,19 @@ import { SubscriptionRepository } from "../../../infrastructure/subscription-rep
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
-let postIndexer: PostIndexer;
-let ctx: TransactionContext;
-let mockJobQueue: IJobQueue;
+const mockJobQueue = mock<IJobQueue>();
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  mockJobQueue = mock<IJobQueue>();
-  postIndexer = testSetup.testInjector
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("postIndexingPolicy", PostIndexingPolicy)
-    .provideClass("feedItemRepository", FeedItemRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideValue("jobQueue", mockJobQueue)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .injectClass(PostIndexer);
-  ctx = testSetup.ctx;
-});
+const postIndexer = testInjector
+  .provideClass("postRepository", PostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("postIndexingPolicy", PostIndexingPolicy)
+  .provideClass("feedItemRepository", FeedItemRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideValue("jobQueue", mockJobQueue)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .injectClass(PostIndexer);
 
 describe("PostIndexer", () => {
   describe("upsert", () => {

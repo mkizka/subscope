@@ -1,19 +1,17 @@
 import { asDid } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
+  getTestSetup,
   postFactory,
   postFeedItemFactory,
   recordFactory,
   repostFactory,
   repostFeedItemFactory,
-  setupTestDatabase,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { AtUriService } from "../../../domain/service/at-uri-service.js";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
@@ -26,28 +24,20 @@ import { ProfileViewService } from "../view/profile-view-service.js";
 import { ReplyRefService } from "../view/reply-ref-service.js";
 import { FeedProcessor } from "./feed-processor.js";
 
-let feedProcessor: FeedProcessor;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  feedProcessor = testSetup.testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("postViewService", PostViewService)
-    .provideClass("replyRefService", ReplyRefService)
-    .provideClass("atUriService", AtUriService)
-    .injectClass(FeedProcessor);
-  ctx = testSetup.ctx;
-});
+const feedProcessor = testInjector
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideClass("handleResolver", HandleResolver)
+  .provideClass("postRepository", PostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
+  .provideClass("recordRepository", RecordRepository)
+  .provideClass("embedViewService", EmbedViewService)
+  .provideClass("profileViewService", ProfileViewService)
+  .provideClass("postViewService", PostViewService)
+  .provideClass("replyRefService", ReplyRefService)
+  .injectClass(FeedProcessor);
 
 describe("FeedProcessor", () => {
   test("投稿のみの場合、FeedViewPostのリストを返す", async () => {

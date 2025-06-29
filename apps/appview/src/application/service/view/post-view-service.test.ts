@@ -1,16 +1,15 @@
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
 import {
   actorFactory,
+  getTestSetup,
   postEmbedExternalFactory,
   postEmbedImageFactory,
   postEmbedRecordFactory,
   postFactory,
   profileFactory,
   recordFactory,
-  setupTestDatabase,
 } from "@repo/test-utils";
-import { beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
@@ -22,25 +21,18 @@ import { EmbedViewService } from "./embed-view-service.js";
 import { PostViewService } from "./post-view-service.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
-let postViewService: PostViewService;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  postViewService = testSetup.testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
-    .provideClass("profileViewService", ProfileViewService)
-    .injectClass(PostViewService);
-  ctx = testSetup.ctx;
-});
+const postViewService = testInjector
+  .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorStatsRepository", ActorStatsRepository)
+  .provideClass("handleResolver", HandleResolver)
+  .provideClass("postRepository", PostRepository)
+  .provideClass("postStatsRepository", PostStatsRepository)
+  .provideClass("recordRepository", RecordRepository)
+  .provideClass("embedViewService", EmbedViewService)
+  .provideClass("profileViewService", ProfileViewService)
+  .injectClass(PostViewService);
 
 describe("PostViewService", () => {
   describe("findPostView", () => {

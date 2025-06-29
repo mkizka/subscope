@@ -1,23 +1,15 @@
-import type { TransactionContext } from "@repo/common/domain";
 import { Record, Subscription } from "@repo/common/domain";
-import { setupTestDatabase } from "@repo/test-utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import { getTestSetup } from "@repo/test-utils";
+import { describe, expect, it } from "vitest";
 
 import { env } from "../shared/env.js";
 import { SubscriptionIndexingPolicy } from "./subscription-indexing-policy.js";
 
-let subscriptionIndexingPolicy: SubscriptionIndexingPolicy;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  subscriptionIndexingPolicy = testSetup.testInjector.injectClass(
-    SubscriptionIndexingPolicy,
-  );
-  ctx = testSetup.ctx;
-});
+const subscriptionIndexingPolicy = testInjector.injectClass(
+  SubscriptionIndexingPolicy,
+);
 
 describe("SubscriptionIndexingPolicy", () => {
   describe("shouldIndex", () => {

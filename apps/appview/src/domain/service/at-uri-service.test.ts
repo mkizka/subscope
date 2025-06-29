@@ -1,24 +1,16 @@
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
-import { actorFactory, setupTestDatabase } from "@repo/test-utils";
-import { beforeAll, describe, expect, test } from "vitest";
+import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
 import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import { AtUriService, InvalidHostnameError } from "./at-uri-service.js";
 
-let atUriService: AtUriService;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  atUriService = testSetup.testInjector
-    .provideClass("handleResolver", HandleResolver)
-    .injectClass(AtUriService);
-  ctx = testSetup.ctx;
-});
+const atUriService = testInjector
+  .provideClass("handleResolver", HandleResolver)
+  .injectClass(AtUriService);
 
 describe("AtUriService", () => {
   describe("resolveHostname", () => {

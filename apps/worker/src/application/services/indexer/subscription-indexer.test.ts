@@ -1,13 +1,8 @@
-import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import {
-  actorFactory,
-  recordFactory,
-  setupTestDatabase,
-} from "@repo/test-utils";
+import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
 import { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
@@ -17,23 +12,15 @@ import { env } from "../../../shared/env.js";
 import type { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 import { SubscriptionIndexer } from "./subscription-indexer.js";
 
-let subscriptionIndexer: SubscriptionIndexer;
-let ctx: TransactionContext;
-let mockBackfillScheduler: ReturnType<typeof mockDeep<BackfillScheduler>>;
+const mockBackfillScheduler = mockDeep<BackfillScheduler>();
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  mockBackfillScheduler = mockDeep<BackfillScheduler>();
-  subscriptionIndexer = testSetup.testInjector
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("actorRepository", ActorRepository)
-    .provideValue("backfillScheduler", mockBackfillScheduler)
-    .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
-    .injectClass(SubscriptionIndexer);
-  ctx = testSetup.ctx;
-});
+const subscriptionIndexer = testInjector
+  .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("actorRepository", ActorRepository)
+  .provideValue("backfillScheduler", mockBackfillScheduler)
+  .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
+  .injectClass(SubscriptionIndexer);
 
 describe("SubscriptionIndexer", () => {
   describe("upsert", () => {

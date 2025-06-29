@@ -1,19 +1,11 @@
-import type { TransactionContext } from "@repo/common/domain";
-import { postStatsFactory, setupTestDatabase } from "@repo/test-utils";
-import { beforeAll, describe, expect, it } from "vitest";
+import { getTestSetup, postStatsFactory } from "@repo/test-utils";
+import { describe, expect, it } from "vitest";
 
 import { PostStatsRepository } from "./post-stats-repository.js";
 
-let postStatsRepository: PostStatsRepository;
-let ctx: TransactionContext;
+const { testInjector, ctx } = getTestSetup();
 
-const { getSetup } = setupTestDatabase();
-
-beforeAll(() => {
-  const testSetup = getSetup();
-  postStatsRepository = testSetup.testInjector.injectClass(PostStatsRepository);
-  ctx = testSetup.ctx;
-});
+const postStatsRepository = testInjector.injectClass(PostStatsRepository);
 
 describe("PostStatsRepository", () => {
   describe("findStats", () => {
