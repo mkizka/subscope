@@ -4,9 +4,11 @@ import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { execa } from "execa";
 
-let postgresContainer: StartedPostgreSqlContainer;
+let postgresContainer: StartedPostgreSqlContainer | undefined;
 
 export const setup = async () => {
+  // 各パッケージがこのsetupを呼び出すのでコンテナ起動済みの場合は何もしない
+  // ルートではなくパッケージからsetupを呼び出しているのはパッケージルートからでもテストを実行できるようにするため
   if (process.env.TEST_DATABASE_URL) {
     return;
   }
@@ -26,5 +28,5 @@ export const setup = async () => {
 };
 
 export const teardown = async () => {
-  await postgresContainer.stop();
+  await postgresContainer?.stop();
 };
