@@ -28,7 +28,7 @@ export const actorFactory = (db: Database) =>
       {
         props: {
           did: () => fakeDid(),
-          handle: () => fakeHandle(),
+          handle: () => fakeHandle() as string | null,
           backfillStatus: () =>
             "dirty" as "dirty" | "in-process" | "synchronized",
           backfillVersion: () => null,
@@ -142,7 +142,7 @@ export const profileFactory = (db: Database) =>
           actorDid: later<string>(),
           avatarCid: later<string | null>(),
           description: () => faker.lorem.sentence(),
-          displayName: () => faker.person.fullName(),
+          displayName: () => faker.person.fullName() as string | null,
           createdAt: () => faker.date.recent(),
           indexedAt: () => faker.date.recent(),
           updatedAt: () => faker.date.recent(),
@@ -354,4 +354,69 @@ export const subscriptionFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
+    });
+
+export const postEmbedImageFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          postUri: later<string>(),
+          cid: () => randomCid(),
+          position: () => faker.number.int({ min: 0, max: 3 }),
+          alt: () => faker.lorem.sentence(),
+          aspectRatioWidth: () => faker.number.int({ min: 100, max: 2000 }),
+          aspectRatioHeight: () => faker.number.int({ min: 100, max: 2000 }),
+        },
+        vars: {
+          post: () => postFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.postEmbedImages, props),
+    )
+    .props({
+      postUri: async ({ vars }) => (await vars.post).uri,
+    });
+
+export const postEmbedExternalFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          postUri: later<string>(),
+          uri: () => faker.internet.url(),
+          title: () => faker.lorem.sentence(),
+          description: () => faker.lorem.paragraph(),
+          thumbCid: () => randomCid(),
+        },
+        vars: {
+          post: () => postFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.postEmbedExternals, props),
+    )
+    .props({
+      postUri: async ({ vars }) => (await vars.post).uri,
+    });
+
+export const postEmbedRecordFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          postUri: later<string>(),
+          uri: later<string>(),
+          cid: later<string>(),
+        },
+        vars: {
+          post: () => postFactory(db).create(),
+          embeddedPost: () => postFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.postEmbedRecords, props),
+    )
+    .props({
+      postUri: async ({ vars }) => (await vars.post).uri,
+      uri: async ({ vars }) => (await vars.embeddedPost).uri,
+      cid: async ({ vars }) => (await vars.embeddedPost).cid,
     });

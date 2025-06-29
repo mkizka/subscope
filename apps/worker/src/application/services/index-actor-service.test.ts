@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import type { IJobQueue, TransactionContext } from "@repo/common/domain";
 import { asHandle } from "@repo/common/utils";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import { actorFactory, setupTestDatabase } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -106,10 +106,12 @@ describe("IndexActorService", () => {
       // arrange
       const existingDid = asDid("did:plc:no-handle-to-handle");
       const newHandle = asHandle("new-handle.bsky.social");
-      await ctx.db.insert(schema.actors).values({
-        did: existingDid,
-        handle: null,
-      });
+      await actorFactory(ctx.db)
+        .props({
+          did: () => existingDid,
+          handle: () => null,
+        })
+        .create();
 
       // act
       await indexActorService.upsert({
@@ -136,10 +138,12 @@ describe("IndexActorService", () => {
       // arrange
       const existingDid = asDid("did:plc:same-handle");
       const existingHandle = asHandle("same-handle.bsky.social");
-      await ctx.db.insert(schema.actors).values({
-        did: existingDid,
-        handle: existingHandle,
-      });
+      await actorFactory(ctx.db)
+        .props({
+          did: () => existingDid,
+          handle: () => existingHandle,
+        })
+        .create();
 
       // act
       await indexActorService.upsert({
@@ -167,10 +171,12 @@ describe("IndexActorService", () => {
       const existingDid = asDid("did:plc:changed-handle");
       const oldHandle = asHandle("old-handle.bsky.social");
       const newHandle = asHandle("new-handle.bsky.social");
-      await ctx.db.insert(schema.actors).values({
-        did: existingDid,
-        handle: oldHandle,
-      });
+      await actorFactory(ctx.db)
+        .props({
+          did: () => existingDid,
+          handle: () => oldHandle,
+        })
+        .create();
 
       // act
       await indexActorService.upsert({
@@ -227,10 +233,12 @@ describe("IndexActorService", () => {
     it("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
-      await ctx.db.insert(schema.actors).values({
-        did: existingDidNoHandle,
-        handle: null,
-      });
+      await actorFactory(ctx.db)
+        .props({
+          did: () => existingDidNoHandle,
+          handle: () => null,
+        })
+        .create();
 
       // act
       await indexActorService.upsert({
@@ -257,10 +265,12 @@ describe("IndexActorService", () => {
       // arrange
       const existingDid = asDid("did:plc:existing-with-handle");
       const existingHandle = asHandle("existing-with-handle.bsky.social");
-      await ctx.db.insert(schema.actors).values({
-        did: existingDid,
-        handle: existingHandle,
-      });
+      await actorFactory(ctx.db)
+        .props({
+          did: () => existingDid,
+          handle: () => existingHandle,
+        })
+        .create();
 
       // act
       await indexActorService.upsert({

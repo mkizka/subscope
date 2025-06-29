@@ -1,7 +1,11 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  recordFactory,
+  setupTestDatabase,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -29,10 +33,12 @@ describe("ProfileIndexer", () => {
   describe("upsert", () => {
     it("プロフィールレコードを正しく保存する", async () => {
       // Arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:user",
-        handle: "user.bsky.social",
-      });
+      const actor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:user",
+          handle: () => "user.bsky.social",
+        })
+        .create();
 
       const profileJson = {
         $type: "app.bsky.actor.profile",
@@ -40,12 +46,14 @@ describe("ProfileIndexer", () => {
         description: "Test description",
         createdAt: new Date().toISOString(),
       };
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:user/app.bsky.actor.profile/self",
-        cid: "profile123",
-        actorDid: "did:plc:user",
-        json: profileJson,
-      });
+      await recordFactory(ctx.db, "app.bsky.actor.profile")
+        .vars({ actor: () => actor })
+        .props({
+          uri: () => "at://did:plc:user/app.bsky.actor.profile/self",
+          cid: () => "profile123",
+          json: () => profileJson,
+        })
+        .create();
       const record = Record.fromJson({
         uri: "at://did:plc:user/app.bsky.actor.profile/self",
         cid: "profile123",

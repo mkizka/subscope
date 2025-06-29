@@ -4,7 +4,11 @@ import type { TransactionContext } from "@repo/common/domain";
 import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  recordFactory,
+  setupTestDatabase,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
@@ -311,19 +315,23 @@ describe("IndexRecordService", () => {
     it("レコードを正しく削除する", async () => {
       // Arrange
       const uri = "at://did:plc:deleteuser/app.bsky.feed.post/delete-test";
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:deleteuser",
-        handle: "deleteuser.bsky.social",
-      });
-      await ctx.db.insert(schema.records).values({
-        uri,
-        cid: "cid123",
-        actorDid: "did:plc:deleteuser",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Hello World",
-        },
-      });
+      const actor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:deleteuser",
+          handle: () => "deleteuser.bsky.social",
+        })
+        .create();
+      await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({
+          uri: () => uri,
+          cid: () => "cid123",
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Hello World",
+          }),
+        })
+        .create();
 
       // Act
       await indexRecordService.delete({ ctx, uri: AtUri.make(uri) });

@@ -1,6 +1,12 @@
 import type { IJobQueue, TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  followFactory,
+  recordFactory,
+  setupTestDatabase,
+  subscriptionFactory,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -63,29 +69,28 @@ describe("UpsertIdentityUseCase", () => {
     };
 
     // actorを先に作成
-    await ctx.db.insert(schema.actors).values({
-      did: command.did,
-      handle: "old-handle.bsky.social",
-    });
+    const actor = await actorFactory(ctx.db)
+      .props({
+        did: () => command.did,
+        handle: () => "old-handle.bsky.social",
+      })
+      .create();
 
     // subscriberとして登録
-    await ctx.db.insert(schema.records).values({
-      uri: "at://did:plc:identity-subscriber/dev.mkizka.test.subscription/123",
-      cid: "sub123",
-      actorDid: command.did,
-      json: {
-        $type: "dev.mkizka.test.subscription",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date().toISOString(),
-      },
-    });
-    await ctx.db.insert(schema.subscriptions).values({
-      uri: "at://did:plc:identity-subscriber/dev.mkizka.test.subscription/123",
-      cid: "sub123",
-      actorDid: command.did,
-      appviewDid: "did:web:appview.test",
-      createdAt: new Date(),
-    });
+    const record = await recordFactory(ctx.db, "dev.mkizka.test.subscription")
+      .vars({ actorDid: () => actor.did })
+      .props({
+        json: () => ({
+          $type: "dev.mkizka.test.subscription",
+          appviewDid: "did:web:appview.test",
+          createdAt: new Date().toISOString(),
+        }),
+      })
+      .create();
+
+    await subscriptionFactory(ctx.db)
+      .vars({ record: () => record })
+      .create();
 
     // act
     await upsertIdentityUseCase.execute(command);
@@ -109,52 +114,56 @@ describe("UpsertIdentityUseCase", () => {
     };
 
     // subscriberを作成
-    await ctx.db.insert(schema.actors).values({
-      did: subscriberDid,
-      handle: "identity-follower-subscriber.bsky.social",
-    });
-    await ctx.db.insert(schema.records).values({
-      uri: `at://${subscriberDid}/dev.mkizka.test.subscription/456`,
-      cid: "sub456",
-      actorDid: subscriberDid,
-      json: {
-        $type: "dev.mkizka.test.subscription",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date().toISOString(),
-      },
-    });
-    await ctx.db.insert(schema.subscriptions).values({
-      uri: `at://${subscriberDid}/dev.mkizka.test.subscription/456`,
-      cid: "sub456",
-      actorDid: subscriberDid,
-      appviewDid: "did:web:appview.test",
-      createdAt: new Date(),
-    });
+    const subscriberActor = await actorFactory(ctx.db)
+      .props({
+        did: () => subscriberDid,
+        handle: () => "identity-follower-subscriber.bsky.social",
+      })
+      .create();
+
+    const subscriberRecord = await recordFactory(
+      ctx.db,
+      "dev.mkizka.test.subscription",
+    )
+      .vars({ actorDid: () => subscriberActor.did })
+      .props({
+        json: () => ({
+          $type: "dev.mkizka.test.subscription",
+          appviewDid: "did:web:appview.test",
+          createdAt: new Date().toISOString(),
+        }),
+      })
+      .create();
+
+    await subscriptionFactory(ctx.db)
+      .vars({ record: () => subscriberRecord })
+      .create();
 
     // followedDidのactorを先に作成（外部キー制約のため）
-    await ctx.db.insert(schema.actors).values({
-      did: followedDid,
-      handle: null,
-    });
+    const followedActor = await actorFactory(ctx.db)
+      .props({
+        did: () => followedDid,
+      })
+      .create();
 
     // subscriberがfollowedDidをフォロー
-    await ctx.db.insert(schema.records).values({
-      uri: `at://${subscriberDid}/app.bsky.graph.follow/789`,
-      cid: "follow789",
-      actorDid: subscriberDid,
-      json: {
-        $type: "app.bsky.graph.follow",
-        subject: followedDid,
-        createdAt: new Date().toISOString(),
-      },
-    });
-    await ctx.db.insert(schema.follows).values({
-      uri: `at://${subscriberDid}/app.bsky.graph.follow/789`,
-      cid: "follow789",
-      actorDid: subscriberDid,
-      subjectDid: followedDid,
-      createdAt: new Date(),
-    });
+    const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
+      .vars({ actorDid: () => subscriberActor.did })
+      .props({
+        json: () => ({
+          $type: "app.bsky.graph.follow",
+          subject: followedDid,
+          createdAt: new Date().toISOString(),
+        }),
+      })
+      .create();
+
+    await followFactory(ctx.db)
+      .vars({
+        record: () => followRecord,
+        followee: () => followedActor,
+      })
+      .create();
 
     // act
     await upsertIdentityUseCase.execute(command);

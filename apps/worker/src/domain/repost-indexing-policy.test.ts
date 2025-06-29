@@ -1,7 +1,12 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { Record, Repost } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  followFactory,
+  recordFactory,
+  setupTestDatabase,
+  subscriptionFactory,
+} from "@repo/test-utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
@@ -23,36 +28,37 @@ beforeAll(() => {
 describe("RepostIndexingPolicy", () => {
   describe("shouldIndex", () => {
     it("repost者がsubscriberの場合は保存すべき", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values([
-        {
-          did: "did:plc:reposter",
-          handle: "reposter.bsky.social",
-        },
-        {
-          did: "did:plc:author",
-          handle: "author.bsky.social",
-        },
-      ]);
+      // arrange
+      const reposterActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:reposter",
+          handle: () => "reposter.bsky.social",
+        })
+        .create();
+      const authorActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:author",
+          handle: () => "author.bsky.social",
+        })
+        .create();
 
       // repost者をsubscriberとして登録
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:reposter/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:reposter",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:reposter/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:reposter",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
+      const subscriptionRecord = await recordFactory(
+        ctx.db,
+        "dev.mkizka.test.subscription",
+      )
+        .vars({ actor: () => reposterActor })
+        .props({
+          uri: () => "at://did:plc:reposter/dev.mkizka.test.subscription/123",
+          cid: () => "sub123",
+        })
+        .create();
+      await subscriptionFactory(ctx.db)
+        .vars({ record: () => subscriptionRecord })
+        .props({
+          appviewDid: () => "did:web:appview.test",
+        })
+        .create();
 
       const repostJson = {
         $type: "app.bsky.feed.repost",
@@ -68,70 +74,66 @@ describe("RepostIndexingPolicy", () => {
         json: repostJson,
       });
 
-      // Act
+      // act
       const result = await repostIndexingPolicy.shouldIndex(
         ctx,
         Repost.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(true);
     });
 
     it("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values([
-        {
-          did: "did:plc:reposter2",
-          handle: "reposter2.bsky.social",
-        },
-        {
-          did: "did:plc:follower",
-          handle: "follower.bsky.social",
-        },
-        {
-          did: "did:plc:author2",
-          handle: "author2.bsky.social",
-        },
-      ]);
+      // arrange
+      const reposterActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:reposter2",
+          handle: () => "reposter2.bsky.social",
+        })
+        .create();
+      const followerActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:follower",
+          handle: () => "follower.bsky.social",
+        })
+        .create();
+      const authorActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:author2",
+          handle: () => "author2.bsky.social",
+        })
+        .create();
 
       // フォロワーをsubscriberとして登録
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:follower/dev.mkizka.test.subscription/789",
-        cid: "sub789",
-        actorDid: "did:plc:follower",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:follower/dev.mkizka.test.subscription/789",
-        cid: "sub789",
-        actorDid: "did:plc:follower",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
+      const subscriptionRecord = await recordFactory(
+        ctx.db,
+        "dev.mkizka.test.subscription",
+      )
+        .vars({ actor: () => followerActor })
+        .props({
+          uri: () => "at://did:plc:follower/dev.mkizka.test.subscription/789",
+          cid: () => "sub789",
+        })
+        .create();
+      await subscriptionFactory(ctx.db)
+        .vars({ record: () => subscriptionRecord })
+        .props({
+          appviewDid: () => "did:web:appview.test",
+        })
+        .create();
 
       // フォローレコード作成
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:follower/app.bsky.graph.follow/987",
-        cid: "follow987",
-        actorDid: "did:plc:follower",
-        json: {
-          $type: "app.bsky.graph.follow",
-          subject: "did:plc:reposter2",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.follows).values({
-        uri: "at://did:plc:follower/app.bsky.graph.follow/987",
-        cid: "follow987",
-        actorDid: "did:plc:follower",
-        subjectDid: "did:plc:reposter2",
-        createdAt: new Date(),
-      });
+      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => followerActor })
+        .props({
+          uri: () => "at://did:plc:follower/app.bsky.graph.follow/987",
+          cid: () => "follow987",
+        })
+        .create();
+      await followFactory(ctx.db)
+        .vars({ record: () => followRecord, followee: () => reposterActor })
+        .create();
 
       const repostJson = {
         $type: "app.bsky.feed.repost",
@@ -147,28 +149,30 @@ describe("RepostIndexingPolicy", () => {
         json: repostJson,
       });
 
-      // Act
+      // act
       const result = await repostIndexingPolicy.shouldIndex(
         ctx,
         Repost.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(true);
     });
 
     it("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values([
-        {
-          did: "did:plc:unrelated-reposter",
-          handle: "unrelated-reposter.bsky.social",
-        },
-        {
-          did: "did:plc:unrelated-author",
-          handle: "unrelated-author.bsky.social",
-        },
-      ]);
+      // arrange
+      const reposterActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:unrelated-reposter",
+          handle: () => "unrelated-reposter.bsky.social",
+        })
+        .create();
+      const authorActor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:unrelated-author",
+          handle: () => "unrelated-author.bsky.social",
+        })
+        .create();
 
       const repostJson = {
         $type: "app.bsky.feed.repost",
@@ -184,13 +188,13 @@ describe("RepostIndexingPolicy", () => {
         json: repostJson,
       });
 
-      // Act
+      // act
       const result = await repostIndexingPolicy.shouldIndex(
         ctx,
         Repost.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(false);
     });
   });

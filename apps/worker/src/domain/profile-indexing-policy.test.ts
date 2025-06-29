@@ -1,7 +1,11 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { Profile, Record } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  recordFactory,
+  setupTestDatabase,
+  subscriptionFactory,
+} from "@repo/test-utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
@@ -23,30 +27,32 @@ beforeAll(() => {
 describe("ProfileIndexingPolicy", () => {
   describe("shouldIndex", () => {
     it("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:subscriber",
-        handle: "subscriber.bsky.social",
-      });
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:subscriber",
+          handle: () => "subscriber.bsky.social",
+        })
+        .create();
 
-      // subscriberとして登録
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:subscriber/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:subscriber",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:subscriber/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:subscriber",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
+      const subscriptionRecord = await recordFactory(
+        ctx.db,
+        "dev.mkizka.test.subscription",
+      )
+        .vars({ actor: () => actor })
+        .props({
+          uri: () => "at://did:plc:subscriber/dev.mkizka.test.subscription/123",
+          cid: () => "sub123",
+          json: () => ({
+            $type: "dev.mkizka.test.subscription",
+            appviewDid: "did:web:appview.test",
+            createdAt: new Date().toISOString(),
+          }),
+        })
+        .create();
+      await subscriptionFactory(ctx.db)
+        .vars({ record: () => subscriptionRecord })
+        .create();
 
       const profileJson = {
         $type: "app.bsky.actor.profile",
@@ -60,22 +66,24 @@ describe("ProfileIndexingPolicy", () => {
         json: profileJson,
       });
 
-      // Act
+      // act
       const result = await profileIndexingPolicy.shouldIndex(
         ctx,
         Profile.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(true);
     });
 
     it("プロフィール作成者がsubscriberでない場合は保存すべきでない", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:unrelated",
-        handle: "unrelated.bsky.social",
-      });
+      // arrange
+      await actorFactory(ctx.db)
+        .props({
+          did: () => "did:plc:unrelated",
+          handle: () => "unrelated.bsky.social",
+        })
+        .create();
 
       const profileJson = {
         $type: "app.bsky.actor.profile",
@@ -89,13 +97,13 @@ describe("ProfileIndexingPolicy", () => {
         json: profileJson,
       });
 
-      // Act
+      // act
       const result = await profileIndexingPolicy.shouldIndex(
         ctx,
         Profile.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(false);
     });
   });

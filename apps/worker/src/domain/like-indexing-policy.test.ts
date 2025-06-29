@@ -1,7 +1,12 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { Like, Record } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { setupTestDatabase } from "@repo/test-utils";
+import {
+  actorFactory,
+  postFactory,
+  recordFactory,
+  setupTestDatabase,
+  subscriptionFactory,
+} from "@repo/test-utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { PostRepository } from "../infrastructure/post-repository.js";
@@ -25,28 +30,17 @@ beforeAll(() => {
 describe("LikeIndexingPolicy", () => {
   describe("shouldIndex", () => {
     it("subscriberのいいねは保存すべき", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:subscriber",
-        handle: "subscriber.bsky.social",
-      });
-      await ctx.db.insert(schema.records).values({
-        uri: "at://did:plc:subscriber/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:subscriber",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.subscriptions).values({
-        uri: "at://did:plc:subscriber/dev.mkizka.test.subscription/123",
-        cid: "sub123",
-        actorDid: "did:plc:subscriber",
-        appviewDid: "did:web:appview.test",
-        createdAt: new Date(),
-      });
+      // arrange
+      const subscriber = await actorFactory(ctx.db).create();
+      const subscriptionRecord = await recordFactory(
+        ctx.db,
+        "dev.mkizka.test.subscription",
+      )
+        .vars({ actor: () => subscriber })
+        .create();
+      await subscriptionFactory(ctx.db)
+        .vars({ record: () => subscriptionRecord })
+        .create();
 
       const likeJson = {
         $type: "app.bsky.feed.like",
@@ -57,83 +51,53 @@ describe("LikeIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:subscriber/app.bsky.feed.like/123",
+        uri: `at://${subscriber.did}/app.bsky.feed.like/123`,
         cid: "abc123",
         json: likeJson,
       });
 
-      // Act
+      // act
       const result = await likeIndexingPolicy.shouldIndex(
         ctx,
         Like.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(true);
     });
 
     it("DBに存在する投稿へのいいねは保存すべき", async () => {
-      // Arrange
-      // いいねするactor（subscriberではない）
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:liker",
-        handle: "liker.bsky.social",
-      });
-
-      // いいねされる投稿のactor
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:poster",
-        handle: "poster.bsky.social",
-      });
-      const postUri = "at://did:plc:poster/app.bsky.feed.post/original";
-      await ctx.db.insert(schema.records).values({
-        uri: postUri,
-        cid: "bafyreihml5hpzt7wajfixoystmq6vttmtigdsupjrvajqkauyiuozp3r7m",
-        actorDid: "did:plc:poster",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "original post",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await ctx.db.insert(schema.posts).values({
-        uri: postUri,
-        cid: "bafyreihml5hpzt7wajfixoystmq6vttmtigdsupjrvajqkauyiuozp3r7m",
-        actorDid: "did:plc:poster",
-        text: "original post",
-        createdAt: new Date(),
-      });
+      // arrange
+      const liker = await actorFactory(ctx.db).create();
+      const post = await postFactory(ctx.db).create();
 
       const likeJson = {
         $type: "app.bsky.feed.like",
         subject: {
-          uri: postUri,
-          cid: "bafyreihml5hpzt7wajfixoystmq6vttmtigdsupjrvajqkauyiuozp3r7m",
+          uri: post.uri,
+          cid: post.cid,
         },
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:liker/app.bsky.feed.like/123",
+        uri: `at://${liker.did}/app.bsky.feed.like/123`,
         cid: "like123",
         json: likeJson,
       });
 
-      // Act
+      // act
       const result = await likeIndexingPolicy.shouldIndex(
         ctx,
         Like.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(true);
     });
 
     it("subscriberでもなく、DBに存在しない投稿へのいいねは保存すべきでない", async () => {
-      // Arrange
-      await ctx.db.insert(schema.actors).values({
-        did: "did:plc:unrelated",
-        handle: "unrelated.bsky.social",
-      });
+      // arrange
+      const unrelatedActor = await actorFactory(ctx.db).create();
 
       const likeJson = {
         $type: "app.bsky.feed.like",
@@ -144,18 +108,18 @@ describe("LikeIndexingPolicy", () => {
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:unrelated/app.bsky.feed.like/123",
+        uri: `at://${unrelatedActor.did}/app.bsky.feed.like/123`,
         cid: "like123",
         json: likeJson,
       });
 
-      // Act
+      // act
       const result = await likeIndexingPolicy.shouldIndex(
         ctx,
         Like.from(record),
       );
 
-      // Assert
+      // assert
       expect(result).toBe(false);
     });
   });

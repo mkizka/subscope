@@ -1,9 +1,12 @@
 import { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
-import { schema } from "@repo/db";
 import {
   actorFactory,
+  postEmbedExternalFactory,
+  postEmbedImageFactory,
+  postEmbedRecordFactory,
   postFactory,
+  profileFactory,
   recordFactory,
   setupTestDatabase,
 } from "@repo/test-utils";
@@ -113,13 +116,13 @@ describe("PostViewService", () => {
           }),
         })
         .create();
-      await ctx.db.insert(schema.profiles).values({
-        uri: profileRecord.uri,
-        cid: profileRecord.cid,
-        actorDid: profileRecord.actorDid,
-        displayName: null,
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      });
+      await profileFactory(ctx.db)
+        .vars({ record: () => profileRecord })
+        .props({
+          displayName: () => null,
+          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .vars({ actor: () => actor })
         .props({
@@ -186,12 +189,14 @@ describe("PostViewService", () => {
       const post = await postFactory(ctx.db)
         .vars({ record: () => postRecord })
         .create();
-      await ctx.db.insert(schema.postEmbedImages).values({
-        postUri: post.uri,
-        cid: imageCid,
-        position: 0,
-        alt: "Test image",
-      });
+      await postEmbedImageFactory(ctx.db)
+        .vars({ post: () => post })
+        .props({
+          cid: () => imageCid,
+          position: () => 0,
+          alt: () => "Test image",
+        })
+        .create();
       const postUri = new AtUri(post.uri);
 
       // act
@@ -250,13 +255,15 @@ describe("PostViewService", () => {
       const post = await postFactory(ctx.db)
         .vars({ record: () => postRecord })
         .create();
-      await ctx.db.insert(schema.postEmbedExternals).values({
-        postUri: post.uri,
-        uri: "https://example.com",
-        title: "Example Site",
-        description: "An example website",
-        thumbCid,
-      });
+      await postEmbedExternalFactory(ctx.db)
+        .vars({ post: () => post })
+        .props({
+          uri: () => "https://example.com",
+          title: () => "Example Site",
+          description: () => "An example website",
+          thumbCid: () => thumbCid,
+        })
+        .create();
       const postUri = new AtUri(post.uri);
 
       // act
@@ -419,11 +426,12 @@ describe("PostViewService", () => {
           indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
         })
         .create();
-      await ctx.db.insert(schema.postEmbedRecords).values({
-        postUri: quotingPost.uri,
-        uri: embeddedPost.uri,
-        cid: embeddedPost.cid,
-      });
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => quotingPost,
+          embeddedPost: () => embeddedPost,
+        })
+        .create();
       const quotingPostUri = new AtUri(quotingPost.uri);
 
       // act
@@ -517,11 +525,13 @@ describe("PostViewService", () => {
       const quotingPost = await postFactory(ctx.db)
         .vars({ record: () => quotingRecord })
         .create();
-      await ctx.db.insert(schema.postEmbedRecords).values({
-        postUri: quotingPost.uri,
-        uri: notFoundUri,
-        cid: "bafyreighost123456789",
-      });
+      await postEmbedRecordFactory(ctx.db)
+        .vars({ post: () => quotingPost })
+        .props({
+          uri: () => notFoundUri,
+          cid: () => "bafyreighost123456789",
+        })
+        .create();
       const quotingPostUri = new AtUri(quotingPost.uri);
 
       // act
