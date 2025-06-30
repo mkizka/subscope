@@ -21,38 +21,39 @@ AT Protocolにおける新しいレコードタイプを追加する際の標準
 - `{tableName}`: テーブル名（例：`subscriptions`）
 - `{customField}`: レコード固有のフィールド名（例：`appviewDid`）
 
-### Lexicon定義例
+## Lexicon定義ファイルの取得
 
-**ファイル:** `/packages/client/lexicons/{namespace}/{collection}.json`
+**重要**: Lexicon定義ファイルは手動で作成せず、AT Protocol公式リポジトリから取得する必要があります。
 
-```json
-{
-  "lexicon": 1,
-  "id": "{namespace}.{collection}",
-  "defs": {
-    "main": {
-      "type": "record",
-      "description": "{Record type description}",
-      "key": "tid",
-      "record": {
-        "type": "object",
-        "required": ["{required_field_1}", "createdAt"],
-        "properties": {
-          "{field_name}": {
-            "type": "string",
-            "format": "{format}",
-            "description": "{Field description}"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "datetime",
-            "description": "Client-declared timestamp when this record was created."
-          }
-        }
-      }
-    }
-  }
-}
+### postinstall.shの更新
+
+**ファイル:** `/packages/client/scripts/postinstall.sh`
+
+新しいレコードタイプを追加する際は、pathsに対象のlexiconファイルパスを追加してください：
+
+```bash
+paths=(
+  "app/bsky/actor/defs.json"
+  "app/bsky/actor/getProfile.json"
+  # ...既存のパス...
+  "app/bsky/feed/generator.json" # 新しく追加
+  # ...その他のパス...
+)
+```
+
+### Lexicon定義の取得手順
+
+1. `/packages/client/scripts/postinstall.sh`のpaths配列に該当するlexiconファイルパスを追加
+2. `pnpm install`を実行してAT Protocol公式リポジトリからlexicon定義を取得
+3. `pnpm build`を実行してTypeScript型定義を生成
+
+### 生成されるファイル例
+
+取得したlexicon定義から以下のファイルが自動生成されます：
+
+```
+/packages/client/src/generated/api/types/{namespace}/{collection}.ts
+/packages/client/dist/generated/api/types/{namespace}/{collection}.d.ts
 ```
 
 ### データベース定義例
@@ -271,7 +272,7 @@ const container = createContainer()
 
 ### 事前準備
 
-- [ ] Lexicon定義ファイル作成 (`/packages/client/lexicons/{namespace}/{collection}.json`)
+- [ ] Lexicon定義ファイルの取得（`/packages/client/scripts/postinstall.sh`を更新）
 - [ ] データベーステーブル定義追加 (`/packages/db/src/schema.ts`)
 
 ### 実装ファイル
@@ -296,7 +297,7 @@ const container = createContainer()
 
 ## 実装の流れ
 
-1. **事前準備**: Lexicon定義とデータベーステーブル作成
+1. **事前準備**: Lexicon定義の取得とデータベーステーブル作成
 2. **基盤準備**: SUPPORTED_COLLECTIONSとドメインモデル
 3. **Repository層**: インターフェースと実装
 4. **ドメインサービス層**: インデックスポリシー（ビジネスルール）作成
