@@ -1,1 +1,1 @@
-export { setup, teardown } from "@repo/test-utils";
+export { setup, teardown } from "@repo/test-utils/global-setup";

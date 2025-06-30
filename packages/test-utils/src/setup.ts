@@ -3,13 +3,13 @@ import {
   databaseFactory,
   LoggerManager,
 } from "@repo/common/infrastructure";
-import { required } from "@repo/common/utils";
 import { createInjector } from "typed-inject";
+import { inject } from "vitest";
 
 export const getTestSetup = () => {
   const testInjector = createInjector()
     .provideValue("logLevel", "error" as const)
-    .provideValue("databaseUrl", required(process.env.TEST_DATABASE_URL))
+    .provideValue("databaseUrl", inject("databaseUrl"))
     .provideClass("loggerManager", LoggerManager)
     .provideFactory("connectionPool", connectionPoolFactory)
     .provideFactory("db", databaseFactory);

@@ -3,15 +3,11 @@ import path from "node:path";
 import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { execa } from "execa";
+import type { TestProject } from "vitest/node";
 
-let postgresContainer: StartedPostgreSqlContainer | undefined;
+let postgresContainer: StartedPostgreSqlContainer;
 
-export const setup = async () => {
-  // 各パッケージがこのsetupを呼び出すのでコンテナ起動済みの場合は何もしない
-  // ルートではなくパッケージからsetupを呼び出しているのはパッケージルートからでもテストを実行できるようにするため
-  if (process.env.TEST_DATABASE_URL) {
-    return;
-  }
+const startPostgres = async (project: TestProject) => {
   postgresContainer = await new PostgreSqlContainer(
     "postgres:16-alpine",
   ).start();
@@ -24,14 +20,17 @@ export const setup = async () => {
     },
   })`pnpm db:migrate`;
 
-  process.env.TEST_DATABASE_URL = databaseUrl;
+  project.provide("databaseUrl", databaseUrl);
+};
+
+export const setup = async (project: TestProject) => {
+  project.onTestsRerun(async () => {
+    await teardown();
+    await startPostgres(project);
+  });
+  await startPostgres(project);
 };
 
 export const teardown = async () => {
-  // コンテナを起動しなかったvitestワーカーではpostgresContainerがundefinedになる
-  // その場合は何もしない
-  if (!postgresContainer) {
-    return;
-  }
   await postgresContainer.stop();
 };

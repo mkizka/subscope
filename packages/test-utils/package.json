@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./global-setup": "./src/global-setup.ts"
   },
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
