@@ -34,7 +34,11 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = FeedItem.fromPost(post);
     await this.feedItemRepository.upsertPost({ ctx, feedItem });
 
-    if (post.embed instanceof PostEmbedRecord) {
+    if (
+      post.embed instanceof PostEmbedRecord &&
+      // TODO: 他のレコードもサポートする
+      post.embed.uri.collection === "app.bsky.feed.post"
+    ) {
       await this.fetchRecordScheduler.schedule(post.embed.uri);
     }
   }
