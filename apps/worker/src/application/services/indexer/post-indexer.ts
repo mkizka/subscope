@@ -1,5 +1,5 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
-import { FeedItem, Post, PostEmbedRecord } from "@repo/common/domain";
+import { FeedItem, Post } from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
@@ -34,12 +34,9 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = FeedItem.fromPost(post);
     await this.feedItemRepository.upsertPost({ ctx, feedItem });
 
-    if (
-      post.embed instanceof PostEmbedRecord &&
-      // TODO: 他のレコードもサポートする
-      post.embed.uri.collection === "app.bsky.feed.post"
-    ) {
-      await this.fetchRecordScheduler.schedule(post.embed.uri);
+    const embedUri = post.getFetchableEmbedUri();
+    if (embedUri) {
+      await this.fetchRecordScheduler.schedule(embedUri);
     }
   }
 

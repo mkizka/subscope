@@ -65,6 +65,22 @@ export class Post {
     return this.replyParent !== null || this.replyRoot !== null;
   }
 
+  /**
+   * embedのURIがインデックス可能なコレクションの場合そのURIを返す。
+   * アプリケーション層でPostのインデックス時にこのURIのレコードもインデックスする。
+   */
+  getFetchableEmbedUri(): AtUri | null {
+    if (
+      this.embed instanceof PostEmbedRecord &&
+      ["app.bsky.feed.post", "app.bsky.feed.generator"].includes(
+        this.embed.uri.collection,
+      )
+    ) {
+      return this.embed.uri;
+    }
+    return null;
+  }
+
   getReplyTargetUris(): string[] {
     const uris = new Set<string>();
     if (this.replyParent) {
