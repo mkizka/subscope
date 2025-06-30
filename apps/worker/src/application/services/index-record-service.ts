@@ -11,6 +11,7 @@ import type { IRecordRepository } from "../interfaces/repositories/record-reposi
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
+import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
 import type { LikeIndexer } from "./indexer/like-indexer.js";
 import type { PostIndexer } from "./indexer/post-indexer.js";
 import type { ProfileIndexer } from "./indexer/profile-indexer.js";
@@ -35,12 +36,14 @@ export class IndexRecordService {
     postIndexer: PostIndexer,
     profileIndexer: ProfileIndexer,
     followIndexer: FollowIndexer,
+    generatorIndexer: GeneratorIndexer,
     likeIndexer: LikeIndexer,
     repostIndexer: RepostIndexer,
     subscriptionIndexer: SubscriptionIndexer,
   ) {
     this.indexers = {
       "app.bsky.feed.post": postIndexer,
+      "app.bsky.feed.generator": generatorIndexer,
       "app.bsky.feed.repost": repostIndexer,
       "app.bsky.actor.profile": profileIndexer,
       "app.bsky.graph.follow": followIndexer,
@@ -54,6 +57,7 @@ export class IndexRecordService {
     "postIndexer",
     "profileIndexer",
     "followIndexer",
+    "generatorIndexer",
     "likeIndexer",
     "repostIndexer",
     "subscriptionIndexer",

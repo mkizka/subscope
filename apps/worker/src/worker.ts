@@ -13,6 +13,7 @@ import { createInjector } from "typed-inject";
 import { IndexActorService } from "./application/services/index-actor-service.js";
 import { IndexRecordService } from "./application/services/index-record-service.js";
 import { FollowIndexer } from "./application/services/indexer/follow-indexer.js";
+import { GeneratorIndexer } from "./application/services/indexer/generator-indexer.js";
 import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
@@ -28,6 +29,7 @@ import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
 import { FollowIndexingPolicy } from "./domain/follow-indexing-policy.js";
+import { GeneratorIndexingPolicy } from "./domain/generator-indexing-policy.js";
 import { LikeIndexingPolicy } from "./domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "./domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "./domain/profile-indexing-policy.js";
@@ -36,6 +38,7 @@ import { SubscriptionIndexingPolicy } from "./domain/subscription-indexing-polic
 import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
+import { GeneratorRepository } from "./infrastructure/generator-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
@@ -74,6 +77,7 @@ createInjector()
   .provideClass("postRepository", PostRepository)
   .provideClass("recordRepository", RecordRepository)
   .provideClass("followRepository", FollowRepository)
+  .provideClass("generatorRepository", GeneratorRepository)
   .provideClass("likeRepository", LikeRepository)
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("repostRepository", RepostRepository)
@@ -86,6 +90,7 @@ createInjector()
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
+  .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
   .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
   .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
   .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
@@ -93,6 +98,7 @@ createInjector()
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("followIndexer", FollowIndexer)
+  .provideClass("generatorIndexer", GeneratorIndexer)
   .provideClass("likeIndexer", LikeIndexer)
   .provideClass("repostIndexer", RepostIndexer)
   .provideClass("subscriptionIndexer", SubscriptionIndexer)

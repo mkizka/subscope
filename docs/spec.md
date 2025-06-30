@@ -30,6 +30,8 @@
   - フォローまたはフォロイーがsubscribersなら保存
 - app.bsky.actor.profile
   - subscribers本人なら保存
+- app.bsky.feed.generator
+  - subscriber本人なら保存
 - dev.mkizka.test.subscription
   - appviewDidが環境変数APPVIEW_DIDと一致なら保存
 

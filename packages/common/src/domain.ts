@@ -1,6 +1,7 @@
 export * from "./lib/domain/actor/actor.js";
 export * from "./lib/domain/feed-item.js";
 export * from "./lib/domain/follow.js";
+export * from "./lib/domain/generator.js";
 export * from "./lib/domain/interfaces/did-resolver.js";
 export * from "./lib/domain/interfaces/job-queue.js";
 export * from "./lib/domain/interfaces/logger.js";

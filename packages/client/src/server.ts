@@ -1,5 +1,6 @@
 export * as AppBskyActorDefs from "./generated/api/types/app/bsky/actor/defs";
 export * as AppBskyActorProfile from "./generated/api/types/app/bsky/actor/profile";
+export * as AppBskyFeedGenerator from "./generated/api/types/app/bsky/feed/generator";
 export * as AppBskyFeedGetPostThread from "./generated/api/types/app/bsky/feed/getPostThread";
 export * as AppBskyFeedLike from "./generated/api/types/app/bsky/feed/like";
 export * as AppBskyFeedPost from "./generated/api/types/app/bsky/feed/post";

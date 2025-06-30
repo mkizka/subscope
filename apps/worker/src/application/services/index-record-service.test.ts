@@ -16,6 +16,7 @@ import { ResolveDidScheduler } from "../services/scheduler/resolve-did-scheduler
 import { IndexActorService } from "./index-actor-service.js";
 import { IndexRecordService } from "./index-record-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
+import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
 import type { LikeIndexer } from "./indexer/like-indexer.js";
 import type { PostIndexer } from "./indexer/post-indexer.js";
 import type { ProfileIndexer } from "./indexer/profile-indexer.js";
@@ -26,6 +27,7 @@ import type { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
 const postIndexer = mockDeep<PostIndexer>();
 const profileIndexer = mockDeep<ProfileIndexer>();
 const followIndexer = mockDeep<FollowIndexer>();
+const generatorIndexer = mockDeep<GeneratorIndexer>();
 const likeIndexer = mockDeep<LikeIndexer>();
 const repostIndexer = mockDeep<RepostIndexer>();
 const subscriptionIndexer = mockDeep<SubscriptionIndexer>();
@@ -44,6 +46,7 @@ const indexRecordService = testInjector
   .provideValue("postIndexer", postIndexer)
   .provideValue("profileIndexer", profileIndexer)
   .provideValue("followIndexer", followIndexer)
+  .provideValue("generatorIndexer", generatorIndexer)
   .provideValue("likeIndexer", likeIndexer)
   .provideValue("repostIndexer", repostIndexer)
   .provideValue("subscriptionIndexer", subscriptionIndexer)

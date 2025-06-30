@@ -421,3 +421,30 @@ export const postEmbedRecordFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.embeddedPost).uri,
       cid: async ({ vars }) => (await vars.embeddedPost).cid,
     });
+
+export const generatorFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          uri: later<string>(),
+          cid: later<string>(),
+          actorDid: later<string>(),
+          did: () => fakeDid(),
+          displayName: () => faker.company.name(),
+          description: () => faker.lorem.sentence() as string | null,
+          avatarCid: () => null as string | null,
+          createdAt: () => faker.date.recent(),
+          indexedAt: () => faker.date.recent(),
+        },
+        vars: {
+          record: () => recordFactory(db, "app.bsky.feed.generator").create(),
+        },
+      },
+      (props) => create(db, schema.generators, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
+    });
