@@ -6,6 +6,12 @@ import {
 import { createInjector } from "typed-inject";
 import { inject } from "vitest";
 
+declare module "vitest" {
+  interface ProvidedContext {
+    databaseUrl: string;
+  }
+}
+
 export const getTestSetup = () => {
   const testInjector = createInjector()
     .provideValue("logLevel", "error" as const)
