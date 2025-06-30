@@ -18,18 +18,19 @@
 
 ### レコードの保存ルール
 
-- post, repost
+- app.bsky.feed.post
+- app.bsky.feed.repost
   - subscribers本人、または投稿者のフォロワーが1人以上subscribersなら保存
   - embedがある場合はfetchRecordにそのレコードを取得するジョブを追加
-- post(リプライ)
+- app.bsky.feed.post(リプライ)
   - subscribers本人、またはリプライ先またはツリー先の投稿がDB上にあれば保存
-- like
+- app.bsky.feed.like
   - いいねしたユーザー、またはいいねされた投稿のフォロワーが1人以上subscribersなら保存
-- follow
+- app.bsky.graph.follow
   - フォローまたはフォロイーがsubscribersなら保存
-- profile
+- app.bsky.actor.profile
   - subscribers本人なら保存
-- subscription
+- dev.mkizka.test.subscription
   - appviewDidが環境変数APPVIEW_DIDと一致なら保存
 
 ### レコード保存時の処理
