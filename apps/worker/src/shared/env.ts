@@ -15,6 +15,10 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default("did:web:appview.localhost"),
   }),
+  INDEX_LEVEL: z
+    .enum(["1", "2"])
+    .transform((val) => parseInt(val))
+    .default(1),
   PLC_URL: z.url().default(
     match({
       prod: "https://plc.directory",

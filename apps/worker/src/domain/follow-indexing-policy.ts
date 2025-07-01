@@ -9,7 +9,6 @@ export class FollowIndexingPolicy {
   static inject = ["subscriptionRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, follow: Follow): Promise<boolean> {
-    // フォローまたはフォロイーがsubscribersなら保存
     return this.subscriptionRepository.hasAnySubscriber(ctx, [
       follow.actorDid,
       follow.subjectDid,

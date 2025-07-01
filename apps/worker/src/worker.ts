@@ -60,6 +60,7 @@ createInjector()
   .provideValue("logLevel", env.LOG_LEVEL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("plcUrl", env.PLC_URL)
+  .provideValue("indexLevel", env.INDEX_LEVEL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)

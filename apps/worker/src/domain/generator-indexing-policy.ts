@@ -13,7 +13,6 @@ export class GeneratorIndexingPolicy {
     ctx: TransactionContext,
     generator: Generator,
   ): Promise<boolean> {
-    // subscribers本人の場合のみ保存
     return await this.subscriptionRepository.isSubscriber(
       ctx,
       generator.actorDid,

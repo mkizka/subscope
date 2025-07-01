@@ -1,3 +1,4 @@
+import { asDid, type Did } from "@atproto/did";
 import {
   type Post,
   PostEmbedExternal,
@@ -138,5 +139,19 @@ export class PostRepository implements IPostRepository {
       .limit(1);
 
     return result.length > 0;
+  }
+
+  async findActorDidByUri(
+    ctx: TransactionContext,
+    uri: string,
+  ): Promise<Did | null> {
+    const result = await ctx.db
+      .select({ actorDid: schema.posts.actorDid })
+      .from(schema.posts)
+      .where(eq(schema.posts.uri, uri))
+      .limit(1);
+
+    const actorDid = result[0]?.actorDid;
+    return actorDid ? asDid(actorDid) : null;
   }
 }

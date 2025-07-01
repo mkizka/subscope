@@ -7,18 +7,38 @@ export class LikeIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly postRepository: IPostRepository,
+    private readonly indexLevel: number,
   ) {}
-  static inject = ["subscriptionRepository", "postRepository"] as const;
+  static inject = [
+    "subscriptionRepository",
+    "postRepository",
+    "indexLevel",
+  ] as const;
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
-    // いいねしたユーザーがsubscriberなら保存
     const isLikerSubscriber =
       await this.subscriptionRepository.hasAnySubscriber(ctx, [like.actorDid]);
     if (isLikerSubscriber) {
       return true;
     }
 
-    // いいねされた投稿がDBに存在すれば保存（投稿の保存ルールを通った投稿のみDBにあるため）
-    return this.postRepository.existsAny(ctx, [like.subjectUri.toString()]);
+    // いいねしたポストの作成者がsubscribersなら保存
+    const targetActorDid = await this.postRepository.findActorDidByUri(
+      ctx,
+      like.subjectUri.toString(),
+    );
+    if (targetActorDid) {
+      const isTargetActorSubscriber =
+        await this.subscriptionRepository.isSubscriber(ctx, targetActorDid);
+      if (isTargetActorSubscriber) {
+        return true;
+      }
+    }
+
+    if (this.indexLevel === 2) {
+      return this.postRepository.exists(ctx, like.subjectUri.toString());
+    }
+
+    return false;
   }
 }

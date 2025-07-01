@@ -28,9 +28,10 @@ const repostIndexer = testInjector
   .provideClass("repostRepository", RepostRepository)
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("postRepository", PostRepository)
+  .provideValue("indexLevel", 1)
   .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
   .provideClass("feedItemRepository", FeedItemRepository)
-  .provideClass("postRepository", PostRepository)
   .provideValue("jobQueue", mockJobQueue)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .injectClass(RepostIndexer);

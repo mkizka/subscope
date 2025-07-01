@@ -7,11 +7,15 @@ export class PostIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly postRepository: IPostRepository,
+    private readonly indexLevel: number,
   ) {}
-  static inject = ["subscriptionRepository", "postRepository"] as const;
+  static inject = [
+    "subscriptionRepository",
+    "postRepository",
+    "indexLevel",
+  ] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
-    // subscribers本人の投稿は保存
     const isActorSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       post.actorDid,
@@ -20,24 +24,41 @@ export class PostIndexingPolicy {
       return true;
     }
 
-    // リプライの場合：リプライ先またはリプライルートの投稿がDB上にあれば保存
     if (post.isReply()) {
+      // リプライしたポストの作成者がsubscribersなら保存
       const replyTargetUris = post.getReplyTargetUris();
-      if (replyTargetUris.length > 0) {
-        const replyTargetExists = await this.postRepository.existsAny(
+      for (const targetUri of replyTargetUris) {
+        const targetActorDid = await this.postRepository.findActorDidByUri(
           ctx,
-          replyTargetUris,
+          targetUri,
         );
-        if (replyTargetExists) {
-          return true;
+        if (targetActorDid) {
+          const isTargetActorSubscriber =
+            await this.subscriptionRepository.isSubscriber(ctx, targetActorDid);
+          if (isTargetActorSubscriber) {
+            return true;
+          }
         }
       }
+
+      if (this.indexLevel === 2) {
+        if (replyTargetUris.length > 0) {
+          const replyTargetExists = await this.postRepository.existsAny(
+            ctx,
+            replyTargetUris,
+          );
+          if (replyTargetExists) {
+            return true;
+          }
+        }
+      }
+    } else {
+      return await this.subscriptionRepository.hasSubscriberFollower(
+        ctx,
+        post.actorDid,
+      );
     }
 
-    // 通常投稿：投稿者のフォロワーが1人以上subscribersなら保存
-    return await this.subscriptionRepository.hasSubscriberFollower(
-      ctx,
-      post.actorDid,
-    );
+    return false;
   }
 }

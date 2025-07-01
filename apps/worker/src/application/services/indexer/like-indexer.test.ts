@@ -25,6 +25,7 @@ const likeIndexer = testInjector
   .provideClass("postRepository", PostRepository)
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideValue("indexLevel", 1)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .injectClass(LikeIndexer);
 

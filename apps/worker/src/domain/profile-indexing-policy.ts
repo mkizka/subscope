@@ -13,7 +13,6 @@ export class ProfileIndexingPolicy {
     ctx: TransactionContext,
     profile: Profile,
   ): Promise<boolean> {
-    // subscribers本人なら保存
     return this.subscriptionRepository.isSubscriber(ctx, profile.actorDid);
   }
 }

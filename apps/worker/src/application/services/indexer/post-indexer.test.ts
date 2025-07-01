@@ -29,6 +29,7 @@ const postIndexer = testInjector
   .provideClass("postRepository", PostRepository)
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideValue("indexLevel", 1)
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("feedItemRepository", FeedItemRepository)
   .provideClass("actorStatsRepository", ActorStatsRepository)
