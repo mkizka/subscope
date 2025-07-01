@@ -16,6 +16,22 @@ export class PostIndexingPolicy {
   ] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
+    const level1Result = await this.shouldIndexLevel1(ctx, post);
+    if (level1Result) {
+      return true;
+    }
+
+    if (this.indexLevel === 2) {
+      return await this.shouldIndexLevel2(ctx, post);
+    }
+
+    return false;
+  }
+
+  private async shouldIndexLevel1(
+    ctx: TransactionContext,
+    post: Post,
+  ): Promise<boolean> {
     const isActorSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       post.actorDid,
@@ -25,7 +41,6 @@ export class PostIndexingPolicy {
     }
 
     if (post.isReply()) {
-      // リプライしたポストの作成者がsubscribersなら保存
       const replyTargetUris = post.getReplyTargetUris();
       for (const targetUri of replyTargetUris) {
         const targetActorDid = await this.postRepository.findActorDidByUri(
@@ -40,25 +55,23 @@ export class PostIndexingPolicy {
           }
         }
       }
-
-      if (this.indexLevel === 2) {
-        if (replyTargetUris.length > 0) {
-          const replyTargetExists = await this.postRepository.existsAny(
-            ctx,
-            replyTargetUris,
-          );
-          if (replyTargetExists) {
-            return true;
-          }
-        }
-      }
-    } else {
-      return await this.subscriptionRepository.hasSubscriberFollower(
-        ctx,
-        post.actorDid,
-      );
+      return false;
     }
 
-    return false;
+    return this.subscriptionRepository.hasSubscriberFollower(
+      ctx,
+      post.actorDid,
+    );
+  }
+
+  private async shouldIndexLevel2(
+    ctx: TransactionContext,
+    post: Post,
+  ): Promise<boolean> {
+    const replyTargetUris = post.getReplyTargetUris();
+    if (replyTargetUris.length === 0) {
+      return false;
+    }
+    return this.postRepository.existsAny(ctx, replyTargetUris);
   }
 }

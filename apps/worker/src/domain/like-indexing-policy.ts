@@ -16,29 +16,48 @@ export class LikeIndexingPolicy {
   ] as const;
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
-    const isLikerSubscriber =
-      await this.subscriptionRepository.hasAnySubscriber(ctx, [like.actorDid]);
-    if (isLikerSubscriber) {
+    const level1Result = await this.shouldIndexLevel1(ctx, like);
+    if (level1Result) {
       return true;
     }
 
-    // いいねしたポストの作成者がsubscribersなら保存
+    if (this.indexLevel === 2) {
+      return await this.shouldIndexLevel2(ctx, like);
+    }
+
+    return false;
+  }
+
+  private async shouldIndexLevel1(
+    ctx: TransactionContext,
+    like: Like,
+  ): Promise<boolean> {
+    const isSubscriber = await this.subscriptionRepository.hasAnySubscriber(
+      ctx,
+      [like.actorDid],
+    );
+    if (isSubscriber) {
+      return true;
+    }
+
     const targetActorDid = await this.postRepository.findActorDidByUri(
       ctx,
       like.subjectUri.toString(),
     );
     if (targetActorDid) {
-      const isTargetActorSubscriber =
-        await this.subscriptionRepository.isSubscriber(ctx, targetActorDid);
-      if (isTargetActorSubscriber) {
-        return true;
-      }
-    }
-
-    if (this.indexLevel === 2) {
-      return this.postRepository.exists(ctx, like.subjectUri.toString());
+      return await this.subscriptionRepository.isSubscriber(
+        ctx,
+        targetActorDid,
+      );
     }
 
     return false;
+  }
+
+  private async shouldIndexLevel2(
+    ctx: TransactionContext,
+    like: Like,
+  ): Promise<boolean> {
+    return this.postRepository.exists(ctx, like.subjectUri.toString());
   }
 }
