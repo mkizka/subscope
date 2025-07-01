@@ -14,17 +14,17 @@ import { LikeService } from "../../service/view/like-service.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetLikesUseCase } from "./get-likes-use-case.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const getLikesUseCase = testInjector
-  .provideClass("likeRepository", LikeRepository)
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("likeService", LikeService)
-  .provideClass("profileViewService", ProfileViewService)
-  .injectClass(GetLikesUseCase);
-
 describe("GetLikesUseCase", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const getLikesUseCase = testInjector
+    .provideClass("likeRepository", LikeRepository)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("likeService", LikeService)
+    .provideClass("profileViewService", ProfileViewService)
+    .injectClass(GetLikesUseCase);
+
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
     // arrange
     const targetActor = await actorFactory(ctx.db)

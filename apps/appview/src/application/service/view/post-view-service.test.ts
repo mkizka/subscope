@@ -21,20 +21,20 @@ import { EmbedViewService } from "./embed-view-service.js";
 import { PostViewService } from "./post-view-service.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const postViewService = testInjector
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("handleResolver", HandleResolver)
-  .provideClass("postRepository", PostRepository)
-  .provideClass("postStatsRepository", PostStatsRepository)
-  .provideClass("recordRepository", RecordRepository)
-  .provideClass("embedViewService", EmbedViewService)
-  .provideClass("profileViewService", ProfileViewService)
-  .injectClass(PostViewService);
-
 describe("PostViewService", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const postViewService = testInjector
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("handleResolver", HandleResolver)
+    .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("recordRepository", RecordRepository)
+    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("profileViewService", ProfileViewService)
+    .injectClass(PostViewService);
+
   describe("findPostView", () => {
     test("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {
       // arrange

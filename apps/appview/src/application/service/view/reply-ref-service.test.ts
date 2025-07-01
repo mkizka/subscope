@@ -19,21 +19,21 @@ import { PostViewService } from "./post-view-service.js";
 import { ProfileViewService } from "./profile-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const replyRefService = testInjector
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("handleResolver", HandleResolver)
-  .provideClass("postRepository", PostRepository)
-  .provideClass("postStatsRepository", PostStatsRepository)
-  .provideClass("recordRepository", RecordRepository)
-  .provideClass("embedViewService", EmbedViewService)
-  .provideClass("profileViewService", ProfileViewService)
-  .provideClass("postViewService", PostViewService)
-  .injectClass(ReplyRefService);
-
 describe("ReplyRefService", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const replyRefService = testInjector
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("handleResolver", HandleResolver)
+    .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("recordRepository", RecordRepository)
+    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("profileViewService", ProfileViewService)
+    .provideClass("postViewService", PostViewService)
+    .injectClass(ReplyRefService);
+
   test("リプライがない投稿のみの場合、空のMapを返す", async () => {
     // arrange
     const posts = [

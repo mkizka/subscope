@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 
 import { PostStatsRepository } from "./post-stats-repository.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const postStatsRepository = testInjector.injectClass(PostStatsRepository);
-
 describe("PostStatsRepository", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const postStatsRepository = testInjector.injectClass(PostStatsRepository);
+
   describe("findStats", () => {
     it("空の配列が指定された場合、空のMapを返す", async () => {
       // act

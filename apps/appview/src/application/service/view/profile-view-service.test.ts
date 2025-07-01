@@ -13,15 +13,15 @@ import { ActorStatsRepository } from "../../../infrastructure/actor-stats-reposi
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const profileViewService = testInjector
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("profileViewService", ProfileViewService)
-  .resolve("profileViewService");
-
 describe("ProfileViewService", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const profileViewService = testInjector
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("profileViewService", ProfileViewService)
+    .resolve("profileViewService");
+
   describe("findProfileViewBasic", () => {
     test("プロフィールが存在する場合、ProfileViewBasicを返す", async () => {
       // arrange

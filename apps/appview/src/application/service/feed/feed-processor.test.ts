@@ -24,22 +24,22 @@ import { ProfileViewService } from "../view/profile-view-service.js";
 import { ReplyRefService } from "../view/reply-ref-service.js";
 import { FeedProcessor } from "./feed-processor.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const feedProcessor = testInjector
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("handleResolver", HandleResolver)
-  .provideClass("postRepository", PostRepository)
-  .provideClass("postStatsRepository", PostStatsRepository)
-  .provideClass("recordRepository", RecordRepository)
-  .provideClass("embedViewService", EmbedViewService)
-  .provideClass("profileViewService", ProfileViewService)
-  .provideClass("postViewService", PostViewService)
-  .provideClass("replyRefService", ReplyRefService)
-  .injectClass(FeedProcessor);
-
 describe("FeedProcessor", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const feedProcessor = testInjector
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("handleResolver", HandleResolver)
+    .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("recordRepository", RecordRepository)
+    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("profileViewService", ProfileViewService)
+    .provideClass("postViewService", PostViewService)
+    .provideClass("replyRefService", ReplyRefService)
+    .injectClass(FeedProcessor);
+
   test("投稿のみの場合、FeedViewPostのリストを返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)

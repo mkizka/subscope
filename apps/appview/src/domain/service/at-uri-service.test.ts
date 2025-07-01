@@ -6,13 +6,13 @@ import { HandleResolutionError } from "../../application/interfaces/handle-resol
 import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import { AtUriService, InvalidHostnameError } from "./at-uri-service.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const atUriService = testInjector
-  .provideClass("handleResolver", HandleResolver)
-  .injectClass(AtUriService);
-
 describe("AtUriService", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const atUriService = testInjector
+    .provideClass("handleResolver", HandleResolver)
+    .injectClass(AtUriService);
+
   describe("resolveHostname", () => {
     test("DIDが含まれるURIの場合、そのまま返す", async () => {
       // arrange
