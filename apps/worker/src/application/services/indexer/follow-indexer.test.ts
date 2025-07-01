@@ -18,23 +18,23 @@ import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../scheduler/resolve-did-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const followIndexer = testInjector
-  .provideClass("followRepository", FollowRepository)
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideClass("followIndexingPolicy", FollowIndexingPolicy)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("actorRepository", ActorRepository)
-  .provideClass("profileRepository", ProfileRepository)
-  .provideValue("jobQueue", mock<JobQueue>())
-  .provideClass("resolveDidScheduler", ResolveDidScheduler)
-  .provideClass("backfillScheduler", BackfillScheduler)
-  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-  .provideClass("indexActorService", IndexActorService)
-  .injectClass(FollowIndexer);
-
 describe("FollowIndexer", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const followIndexer = testInjector
+    .provideClass("followRepository", FollowRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("followIndexingPolicy", FollowIndexingPolicy)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("actorRepository", ActorRepository)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideValue("jobQueue", mock<JobQueue>())
+    .provideClass("resolveDidScheduler", ResolveDidScheduler)
+    .provideClass("backfillScheduler", BackfillScheduler)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+    .provideClass("indexActorService", IndexActorService)
+    .injectClass(FollowIndexer);
+
   describe("upsert", () => {
     it("フォローレコードを正しく保存する", async () => {
       // arrange

@@ -9,15 +9,15 @@ import { ProfileRepository } from "../../../infrastructure/profile-repository.js
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { ProfileIndexer } from "./profile-indexer.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const profileIndexer = testInjector
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
-  .injectClass(ProfileIndexer);
-
 describe("ProfileIndexer", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const profileIndexer = testInjector
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
+    .injectClass(ProfileIndexer);
+
   describe("upsert", () => {
     it("プロフィールレコードを正しく保存する", async () => {
       // arrange

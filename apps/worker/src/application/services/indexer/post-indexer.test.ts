@@ -22,22 +22,22 @@ import { SubscriptionRepository } from "../../../infrastructure/subscription-rep
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
-const mockJobQueue = mock<IJobQueue>();
-const { testInjector, ctx } = getTestSetup();
-
-const postIndexer = testInjector
-  .provideClass("postRepository", PostRepository)
-  .provideClass("postStatsRepository", PostStatsRepository)
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideValue("indexLevel", 1)
-  .provideClass("postIndexingPolicy", PostIndexingPolicy)
-  .provideClass("feedItemRepository", FeedItemRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideValue("jobQueue", mockJobQueue)
-  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-  .injectClass(PostIndexer);
-
 describe("PostIndexer", () => {
+  const mockJobQueue = mock<IJobQueue>();
+  const { testInjector, ctx } = getTestSetup();
+
+  const postIndexer = testInjector
+    .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideValue("indexLevel", 1)
+    .provideClass("postIndexingPolicy", PostIndexingPolicy)
+    .provideClass("feedItemRepository", FeedItemRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideValue("jobQueue", mockJobQueue)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+    .injectClass(PostIndexer);
+
   describe("upsert", () => {
     it("subscriberの投稿は実際にDBに保存される", async () => {
       // arrange

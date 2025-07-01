@@ -12,17 +12,17 @@ import { env } from "../../../shared/env.js";
 import type { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 import { SubscriptionIndexer } from "./subscription-indexer.js";
 
-const mockBackfillScheduler = mockDeep<BackfillScheduler>();
-const { testInjector, ctx } = getTestSetup();
-
-const subscriptionIndexer = testInjector
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideClass("actorRepository", ActorRepository)
-  .provideValue("backfillScheduler", mockBackfillScheduler)
-  .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
-  .injectClass(SubscriptionIndexer);
-
 describe("SubscriptionIndexer", () => {
+  const mockBackfillScheduler = mockDeep<BackfillScheduler>();
+  const { testInjector, ctx } = getTestSetup();
+
+  const subscriptionIndexer = testInjector
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("actorRepository", ActorRepository)
+    .provideValue("backfillScheduler", mockBackfillScheduler)
+    .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
+    .injectClass(SubscriptionIndexer);
+
   describe("upsert", () => {
     it("サブスクリプションレコードをupsertする場合、subscriptionsテーブルに保存する", async () => {
       // arrange

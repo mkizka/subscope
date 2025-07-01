@@ -11,13 +11,13 @@ import { describe, expect, it } from "vitest";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { GeneratorIndexingPolicy } from "./generator-indexing-policy.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const generatorIndexingPolicy = testInjector
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .injectClass(GeneratorIndexingPolicy);
-
 describe("GeneratorIndexingPolicy", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const generatorIndexingPolicy = testInjector
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .injectClass(GeneratorIndexingPolicy);
+
   describe("shouldIndex", () => {
     it("subscriberが作成したgeneratorは保存すべき", async () => {
       // arrange

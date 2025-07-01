@@ -10,13 +10,13 @@ import { describe, expect, it } from "vitest";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { FollowIndexingPolicy } from "./follow-indexing-policy.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const followIndexingPolicy = testInjector
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .injectClass(FollowIndexingPolicy);
-
 describe("FollowIndexingPolicy", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const followIndexingPolicy = testInjector
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .injectClass(FollowIndexingPolicy);
+
   describe("shouldIndex", () => {
     it("フォロワーがsubscriberの場合は保存すべき", async () => {
       // arrange

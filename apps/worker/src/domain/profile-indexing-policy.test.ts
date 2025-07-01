@@ -10,13 +10,13 @@ import { describe, expect, it } from "vitest";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const profileIndexingPolicy = testInjector
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .injectClass(ProfileIndexingPolicy);
-
 describe("ProfileIndexingPolicy", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const profileIndexingPolicy = testInjector
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .injectClass(ProfileIndexingPolicy);
+
   describe("shouldIndex", () => {
     it("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
       // arrange

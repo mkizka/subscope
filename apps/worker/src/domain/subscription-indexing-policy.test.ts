@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 import { env } from "../shared/env.js";
 import { SubscriptionIndexingPolicy } from "./subscription-indexing-policy.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const subscriptionIndexingPolicy = testInjector.injectClass(
-  SubscriptionIndexingPolicy,
-);
-
 describe("SubscriptionIndexingPolicy", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const subscriptionIndexingPolicy = testInjector.injectClass(
+    SubscriptionIndexingPolicy,
+  );
+
   describe("shouldIndex", () => {
     it("appviewDidが環境変数のAPPVIEW_DIDと一致する場合はtrueを返すべき", async () => {
       // Arrange

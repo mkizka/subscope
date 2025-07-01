@@ -33,26 +33,26 @@ const repostIndexer = mockDeep<RepostIndexer>();
 const subscriptionIndexer = mockDeep<SubscriptionIndexer>();
 const jobLogger = { log: vi.fn() };
 
-const { testInjector, ctx } = getTestSetup();
-
-const indexRecordService = testInjector
-  .provideValue("jobQueue", mockDeep<IJobQueue>())
-  .provideClass("recordRepository", RecordRepository)
-  .provideClass("actorRepository", ActorRepository)
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-  .provideClass("resolveDidScheduler", ResolveDidScheduler)
-  .provideClass("indexActorService", IndexActorService)
-  .provideValue("postIndexer", postIndexer)
-  .provideValue("profileIndexer", profileIndexer)
-  .provideValue("followIndexer", followIndexer)
-  .provideValue("generatorIndexer", generatorIndexer)
-  .provideValue("likeIndexer", likeIndexer)
-  .provideValue("repostIndexer", repostIndexer)
-  .provideValue("subscriptionIndexer", subscriptionIndexer)
-  .injectClass(IndexRecordService);
-
 describe("IndexRecordService", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const indexRecordService = testInjector
+    .provideValue("jobQueue", mockDeep<IJobQueue>())
+    .provideClass("recordRepository", RecordRepository)
+    .provideClass("actorRepository", ActorRepository)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+    .provideClass("resolveDidScheduler", ResolveDidScheduler)
+    .provideClass("indexActorService", IndexActorService)
+    .provideValue("postIndexer", postIndexer)
+    .provideValue("profileIndexer", profileIndexer)
+    .provideValue("followIndexer", followIndexer)
+    .provideValue("generatorIndexer", generatorIndexer)
+    .provideValue("likeIndexer", likeIndexer)
+    .provideValue("repostIndexer", repostIndexer)
+    .provideValue("subscriptionIndexer", subscriptionIndexer)
+    .injectClass(IndexRecordService);
+
   describe("upsert", () => {
     it("サポートされていないコレクションの場合、エラーを投げる", async () => {
       // Arrange

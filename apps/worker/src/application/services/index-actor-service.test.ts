@@ -4,7 +4,7 @@ import { asHandle } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { actorFactory, getTestSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
@@ -15,23 +15,19 @@ import { BackfillScheduler } from "./scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
-const mockJobQueue = mock<IJobQueue>();
-const { testInjector, ctx } = getTestSetup();
-
-const indexActorService = testInjector
-  .provideClass("actorRepository", ActorRepository)
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideValue("jobQueue", mockJobQueue)
-  .provideClass("resolveDidScheduler", ResolveDidScheduler)
-  .provideClass("backfillScheduler", BackfillScheduler)
-  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-  .injectClass(IndexActorService);
-
 describe("IndexActorService", () => {
-  beforeEach(() => {
-    mockJobQueue.add.mockClear();
-  });
+  const mockJobQueue = mock<IJobQueue>();
+  const { testInjector, ctx } = getTestSetup();
+
+  const indexActorService = testInjector
+    .provideClass("actorRepository", ActorRepository)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideValue("jobQueue", mockJobQueue)
+    .provideClass("resolveDidScheduler", ResolveDidScheduler)
+    .provideClass("backfillScheduler", BackfillScheduler)
+    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+    .injectClass(IndexActorService);
 
   describe("upsert", () => {
     it("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {

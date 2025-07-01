@@ -18,18 +18,18 @@ import { PostStatsRepository } from "../../../infrastructure/post-stats-reposito
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { LikeIndexer } from "./like-indexer.js";
 
-const { testInjector, ctx } = getTestSetup();
-
-const likeIndexer = testInjector
-  .provideClass("likeRepository", LikeRepository)
-  .provideClass("postRepository", PostRepository)
-  .provideClass("postStatsRepository", PostStatsRepository)
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideValue("indexLevel", 1)
-  .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
-  .injectClass(LikeIndexer);
-
 describe("LikeIndexer", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const likeIndexer = testInjector
+    .provideClass("likeRepository", LikeRepository)
+    .provideClass("postRepository", PostRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideValue("indexLevel", 1)
+    .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
+    .injectClass(LikeIndexer);
+
   describe("upsert", () => {
     it("subscriberのいいねは実際にDBに保存される", async () => {
       // arrange
