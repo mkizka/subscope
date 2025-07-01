@@ -14,26 +14,27 @@
     - バックフィル仕様に記載
   - 取得処理は時間がかかるのでbullmqジョブにする
   - ジョブの実行状況を見られるqueryも用意する
-- 後述の条件でフォロイーの投稿が保存されるようになる
+- 後述の条件で限られたsubscribersに関係があるレコードのみを保存する
 
 ### レコードの保存ルール
 
-- app.bsky.feed.post
-- app.bsky.feed.repost
-  - subscribers本人、または投稿者のフォロワーが1人以上subscribersなら保存
-  - embedがある場合はfetchRecordにそのレコードを取得するジョブを追加
-- app.bsky.feed.post(リプライ)
-  - subscribers本人、またはリプライ先またはツリー先の投稿がDB上にあれば保存
-- app.bsky.feed.like
-  - いいねしたユーザー、またはいいねされた投稿のフォロワーが1人以上subscribersなら保存
-- app.bsky.graph.follow
-  - フォローまたはフォロイーがsubscribersなら保存
-- app.bsky.actor.profile
-  - subscribers本人なら保存
-- app.bsky.feed.generator
-  - subscriber本人なら保存
-- dev.mkizka.test.subscription
-  - appviewDidが環境変数APPVIEW_DIDと一致なら保存
+レコードは条件に基づいてsubscribersに関係があるレコードのみ保存する。ただしINDEX_LEVEL環境変数によって保存範囲を調整できる。
+
+| NSID                             | INDEX_LEVEL=1                                                                                 | INDEX_LEVEL=2（追加分）    |
+| -------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------- |
+| app.bsky.feed.post               | subscribersの投稿<br>subscribersのフォロイーの投稿                                            | なし                       |
+| app.bsky.feed.post<br>(リプライ) | subscribersのリプライ<br>subscribersへのリプライ                                              | 保存された投稿へのリプライ |
+| app.bsky.feed.repost             | subscribersのリポスト<br>subscribersのフォロイーのリポスト<br>subscribersのポストへのリポスト | 保存された投稿へのリポスト |
+| app.bsky.feed.like               | subscribersのいいね<br>subscribersのポストへのいいね                                          | 保存された投稿へのいいね   |
+| app.bsky.graph.follow            | フォローまたはフォロイーがsubscribers                                                         | なし                       |
+| app.bsky.actor.profile           | subscribersのプロフール                                                                       | なし                       |
+| app.bsky.feed.generator          | subscribersのフィード                                                                         | なし                       |
+| dev.mkizka.test.subscription     | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                       |
+
+さらに、以下はPDSにリクエストを送って追加で保存する
+
+- app.bsky.feed.postがembedしているレコード
+- 保存条件に一致したレコードを作成したアカウントのapp.bsky.actor.profile
 
 ### レコード保存時の処理
 
