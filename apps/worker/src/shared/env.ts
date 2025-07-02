@@ -18,7 +18,7 @@ const schema = z.object({
   INDEX_LEVEL: z
     .enum(["1", "2"])
     .transform((val) => parseInt(val))
-    .default(1),
+    .default(2),
   PLC_URL: z.url().default(
     match({
       prod: "https://plc.directory",
