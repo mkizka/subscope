@@ -272,7 +272,7 @@ describe("GetActorLikesUseCase", () => {
     const secondPage = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
-      cursor: firstPage.cursor,
+      cursor: firstPage.cursor ? new Date(firstPage.cursor) : undefined,
     });
 
     // assert - 残りの1件が返される

@@ -29,7 +29,7 @@ export class GetActorLikes {
         const result = await this.getActorLikesUseCase.execute({
           actorDid,
           limit: params.limit,
-          cursor: params.cursor,
+          cursor: params.cursor ? new Date(params.cursor) : undefined,
         });
 
         return {

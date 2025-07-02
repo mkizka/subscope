@@ -16,21 +16,15 @@ export class GetActorLikesUseCase {
   async execute(params: {
     actorDid: Did;
     limit: number;
-    cursor?: string;
+    cursor?: Date;
   }): Promise<AppBskyFeedGetActorLikes.OutputSchema> {
     const paginationResult =
       await this.actorLikesService.findLikesWithPagination({
         actorDid: params.actorDid,
-        cursor: params.cursor ? new Date(params.cursor) : undefined,
+        cursor: params.cursor,
         limit: params.limit,
       });
 
-    const feedResult =
-      await this.feedProcessor.processFeedItems(paginationResult);
-
-    return {
-      feed: feedResult.feed,
-      cursor: feedResult.cursor,
-    };
+    return await this.feedProcessor.processFeedItems(paginationResult);
   }
 }
