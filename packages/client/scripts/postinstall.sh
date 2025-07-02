@@ -24,6 +24,7 @@ paths=(
   "app/bsky/feed/getLikes.json"
   "app/bsky/feed/getPostThread.json"
   "app/bsky/feed/getPosts.json"
+  "app/bsky/feed/getRepostedBy.json"
   "app/bsky/feed/getTimeline.json"
   "app/bsky/feed/like.json"
   "app/bsky/feed/post.json"

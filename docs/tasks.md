@@ -17,6 +17,7 @@
 
 - [x] app/bsky/feed/getActorLikes.json
 - [x] app/bsky/feed/getLikes.json
+- [x] app/bsky/feed/getRepostedBy.json
 - [x] app/bsky/feed/getPostThread.json
 - [x] app/bsky/feed/getPosts.json
   - ブロックなどは未反映
@@ -28,7 +29,6 @@
 
 - [ ] app/bsky/feed/getListFeed.json
 - [ ] app/bsky/feed/getQuotes.json
-- [ ] app/bsky/feed/getRepostedBy.json
 - [ ] app/bsky/feed/getSuggestedFeeds.json
 - [ ] app/bsky/feed/sendInteractions.json
 

@@ -20,12 +20,14 @@ import { LikeService } from "./application/service/view/like-service.js";
 import { PostViewService } from "./application/service/view/post-view-service.js";
 import { ProfileViewService } from "./application/service/view/profile-view-service.js";
 import { ReplyRefService } from "./application/service/view/reply-ref-service.js";
+import { RepostService } from "./application/service/view/repost-service.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
 import { GetActorLikesUseCase } from "./application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
 import { GetLikesUseCase } from "./application/use-cases/feed/get-likes-use-case.js";
 import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thread-use-case.js";
 import { GetPostsUseCase } from "./application/use-cases/feed/get-posts-use-case.js";
+import { GetRepostedByUseCase } from "./application/use-cases/feed/get-reposted-by-use-case.js";
 import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-use-case.js";
 import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
@@ -37,6 +39,7 @@ import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
 import { RecordRepository } from "./infrastructure/record-repository.js";
+import { RepostRepository } from "./infrastructure/repost-repository.js";
 import { TimelineRepository } from "./infrastructure/timeline-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
@@ -46,6 +49,7 @@ import { GetAuthorFeed } from "./presentation/routes/app/bsky/feed/getAuthorFeed
 import { GetLikes } from "./presentation/routes/app/bsky/feed/getLikes.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetPostThread } from "./presentation/routes/app/bsky/feed/getPostThread.js";
+import { GetRepostedBy } from "./presentation/routes/app/bsky/feed/getRepostedBy.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
 import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
@@ -71,6 +75,7 @@ createInjector()
   .provideClass("timelineRepository", TimelineRepository)
   .provideClass("authorFeedRepository", AuthorFeedRepository)
   .provideClass("likeRepository", LikeRepository)
+  .provideClass("repostRepository", RepostRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
@@ -85,6 +90,7 @@ createInjector()
   .provideClass("authorFeedService", AuthorFeedService)
   .provideClass("actorLikesService", ActorLikesService)
   .provideClass("likeService", LikeService)
+  .provideClass("repostService", RepostService)
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("atUriService", AtUriService)
   .provideClass("handleService", HandleService)
@@ -97,6 +103,7 @@ createInjector()
   .provideClass("getAuthorFeedUseCase", GetAuthorFeedUseCase)
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
   .provideClass("getLikesUseCase", GetLikesUseCase)
+  .provideClass("getRepostedByUseCase", GetRepostedByUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
@@ -107,6 +114,7 @@ createInjector()
   .provideClass("getAuthorFeed", GetAuthorFeed)
   .provideClass("getJobStatus", GetJobStatus)
   .provideClass("getLikes", GetLikes)
+  .provideClass("getRepostedBy", GetRepostedBy)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();
