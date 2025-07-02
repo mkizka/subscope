@@ -41,6 +41,19 @@ pnpm build
 pnpm build --force
 ```
 
+#### 1.3 クライアントパッケージの型エクスポート設定（必要に応じて）
+
+新しいレコードタイプやレスポンスタイプを他のパッケージで使用する場合は、packages/client/src/server.tsでエクスポートする必要があります。
+
+**ファイル:** `/packages/client/src/server.ts`
+
+```typescript
+// 例：app.bsky.graph.getFollowsのレスポンスタイプをエクスポートする場合
+export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows";
+```
+
+**注意**: これは型定義のエクスポートのみです。XRPCエンドポイント自体は自動生成される`/packages/client/src/generated/server/index.ts`で処理されるため、手動での追加は不要です。
+
 ### 2. AppView実装（Queryエンドポイントの場合）
 
 #### 2.1 Repositoryの拡張（必要に応じて）
