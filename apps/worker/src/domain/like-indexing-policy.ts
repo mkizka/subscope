@@ -32,9 +32,9 @@ export class LikeIndexingPolicy {
     ctx: TransactionContext,
     like: Like,
   ): Promise<boolean> {
-    const isSubscriber = await this.subscriptionRepository.hasAnySubscriber(
+    const isSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
-      [like.actorDid],
+      like.actorDid,
     );
     if (isSubscriber) {
       return true;
