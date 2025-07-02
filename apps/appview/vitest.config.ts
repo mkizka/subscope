@@ -4,8 +4,7 @@ export default defineProject({
   test: {
     name: "appview",
     globalSetup: "./vitest.global-setup.ts",
-    // testcontainersの起動を待つ
-    hookTimeout: 60000,
+    testTimeout: 10000,
     clearMocks: true,
   },
 });
