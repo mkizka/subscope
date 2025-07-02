@@ -19,6 +19,7 @@ paths=(
   "app/bsky/embed/video.json"
   "app/bsky/feed/defs.json"
   "app/bsky/feed/generator.json"
+  "app/bsky/feed/getActorLikes.json"
   "app/bsky/feed/getAuthorFeed.json"
   "app/bsky/feed/getLikes.json"
   "app/bsky/feed/getPostThread.json"

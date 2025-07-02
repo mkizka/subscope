@@ -9,6 +9,7 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
@@ -20,6 +21,7 @@ import { PostViewService } from "./application/service/view/post-view-service.js
 import { ProfileViewService } from "./application/service/view/profile-view-service.js";
 import { ReplyRefService } from "./application/service/view/reply-ref-service.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
+import { GetActorLikesUseCase } from "./application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
 import { GetLikesUseCase } from "./application/use-cases/feed/get-likes-use-case.js";
 import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thread-use-case.js";
@@ -39,6 +41,7 @@ import { TimelineRepository } from "./infrastructure/timeline-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
+import { GetActorLikes } from "./presentation/routes/app/bsky/feed/getActorLikes.js";
 import { GetAuthorFeed } from "./presentation/routes/app/bsky/feed/getAuthorFeed.js";
 import { GetLikes } from "./presentation/routes/app/bsky/feed/getLikes.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
@@ -80,6 +83,7 @@ createInjector()
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("timelineService", TimelineService)
   .provideClass("authorFeedService", AuthorFeedService)
+  .provideClass("actorLikesService", ActorLikesService)
   .provideClass("likeService", LikeService)
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("atUriService", AtUriService)
@@ -89,6 +93,7 @@ createInjector()
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getPostThreadUseCase", GetPostThreadUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
+  .provideClass("getActorLikesUseCase", GetActorLikesUseCase)
   .provideClass("getAuthorFeedUseCase", GetAuthorFeedUseCase)
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
   .provideClass("getLikesUseCase", GetLikesUseCase)
@@ -98,6 +103,7 @@ createInjector()
   .provideClass("getPosts", GetPosts)
   .provideClass("getPostThread", GetPostThread)
   .provideClass("getTimeline", GetTimeline)
+  .provideClass("getActorLikes", GetActorLikes)
   .provideClass("getAuthorFeed", GetAuthorFeed)
   .provideClass("getJobStatus", GetJobStatus)
   .provideClass("getLikes", GetLikes)
