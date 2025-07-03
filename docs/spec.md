@@ -31,9 +31,10 @@
 | app.bsky.feed.generator          | subscribersのフィード                                                                         | なし                       |
 | dev.mkizka.test.subscription     | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                       |
 
-さらに、以下はPDSにリクエストを送って追加で保存する
+さらに、以下はPDSにリクエストを送って追加で保存する。再帰処理になる場合の連鎖は2回まで。
 
 - app.bsky.feed.postがembedしているレコード
+- app.bsky.feed.repostがリポストしたレコード
 - 保存条件に一致したレコードを作成したアカウントのapp.bsky.actor.profile
 
 ### レコード保存時の処理
