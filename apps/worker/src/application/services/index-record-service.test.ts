@@ -1,61 +1,90 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { AtUri } from "@atproto/syntax";
 import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
-import { describe, expect, it, vi } from "vitest";
+import {
+  actorFactory,
+  getTestSetup,
+  postFactory,
+  recordFactory,
+  subscriptionFactory,
+} from "@repo/test-utils";
+import { describe, expect, test, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
+import { FollowIndexingPolicy } from "../../domain/follow-indexing-policy.js";
+import { GeneratorIndexingPolicy } from "../../domain/generator-indexing-policy.js";
+import { LikeIndexingPolicy } from "../../domain/like-indexing-policy.js";
+import { PostIndexingPolicy } from "../../domain/post-indexing-policy.js";
+import { ProfileIndexingPolicy } from "../../domain/profile-indexing-policy.js";
+import { RepostIndexingPolicy } from "../../domain/repost-indexing-policy.js";
+import { SubscriptionIndexingPolicy } from "../../domain/subscription-indexing-policy.js";
 import { ActorRepository } from "../../infrastructure/actor-repository.js";
+import { ActorStatsRepository } from "../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../infrastructure/follow-repository.js";
+import { GeneratorRepository } from "../../infrastructure/generator-repository.js";
+import { LikeRepository } from "../../infrastructure/like-repository.js";
+import { PostRepository } from "../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../infrastructure/record-repository.js";
-import { FetchRecordScheduler } from "../services/scheduler/fetch-record-scheduler.js";
-import { ResolveDidScheduler } from "../services/scheduler/resolve-did-scheduler.js";
+import { FeedItemRepository } from "../../infrastructure/repositories/feed-item-repository.js";
+import { RepostRepository } from "../../infrastructure/repost-repository.js";
+import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { IndexRecordService } from "./index-record-service.js";
-import type { FollowIndexer } from "./indexer/follow-indexer.js";
-import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
-import type { LikeIndexer } from "./indexer/like-indexer.js";
-import type { PostIndexer } from "./indexer/post-indexer.js";
-import type { ProfileIndexer } from "./indexer/profile-indexer.js";
-import type { RepostIndexer } from "./indexer/repost-indexer.js";
-import type { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
-
-// 各種indexerをモック
-const postIndexer = mockDeep<PostIndexer>();
-const profileIndexer = mockDeep<ProfileIndexer>();
-const followIndexer = mockDeep<FollowIndexer>();
-const generatorIndexer = mockDeep<GeneratorIndexer>();
-const likeIndexer = mockDeep<LikeIndexer>();
-const repostIndexer = mockDeep<RepostIndexer>();
-const subscriptionIndexer = mockDeep<SubscriptionIndexer>();
-const jobLogger = { log: vi.fn() };
+import { FollowIndexer } from "./indexer/follow-indexer.js";
+import { GeneratorIndexer } from "./indexer/generator-indexer.js";
+import { LikeIndexer } from "./indexer/like-indexer.js";
+import { PostIndexer } from "./indexer/post-indexer.js";
+import { ProfileIndexer } from "./indexer/profile-indexer.js";
+import { RepostIndexer } from "./indexer/repost-indexer.js";
+import { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
+import { BackfillScheduler } from "./scheduler/backfill-scheduler.js";
+import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
+import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 describe("IndexRecordService", () => {
   const { testInjector, ctx } = getTestSetup();
+  const jobLogger = { log: vi.fn() };
 
   const indexRecordService = testInjector
     .provideValue("jobQueue", mockDeep<IJobQueue>())
-    .provideClass("recordRepository", RecordRepository)
+    .provideValue("indexLevel", 1)
     .provideClass("actorRepository", ActorRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("postRepository", PostRepository)
+    .provideClass("recordRepository", RecordRepository)
+    .provideClass("followRepository", FollowRepository)
+    .provideClass("generatorRepository", GeneratorRepository)
+    .provideClass("likeRepository", LikeRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("repostRepository", RepostRepository)
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+    .provideClass("postIndexingPolicy", PostIndexingPolicy)
+    .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
+    .provideClass("followIndexingPolicy", FollowIndexingPolicy)
+    .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
+    .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
+    .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
+    .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
+    .provideClass("backfillScheduler", BackfillScheduler)
     .provideClass("resolveDidScheduler", ResolveDidScheduler)
+    .provideClass("profileIndexer", ProfileIndexer)
+    .provideClass("postIndexer", PostIndexer)
     .provideClass("indexActorService", IndexActorService)
-    .provideValue("postIndexer", postIndexer)
-    .provideValue("profileIndexer", profileIndexer)
-    .provideValue("followIndexer", followIndexer)
-    .provideValue("generatorIndexer", generatorIndexer)
-    .provideValue("likeIndexer", likeIndexer)
-    .provideValue("repostIndexer", repostIndexer)
-    .provideValue("subscriptionIndexer", subscriptionIndexer)
+    .provideClass("followIndexer", FollowIndexer)
+    .provideClass("generatorIndexer", GeneratorIndexer)
+    .provideClass("likeIndexer", LikeIndexer)
+    .provideClass("repostIndexer", RepostIndexer)
+    .provideClass("subscriptionIndexer", SubscriptionIndexer)
     .injectClass(IndexRecordService);
 
   describe("upsert", () => {
-    it("サポートされていないコレクションの場合、エラーを投げる", async () => {
-      // Arrange
+    test("サポートされていないコレクションの場合、エラーを投げる", async () => {
+      // arrange
       const record = Record.fromJson({
         uri: "at://did:plc:user/unsupported.collection/123",
         cid: "cid123",
@@ -65,14 +94,14 @@ describe("IndexRecordService", () => {
         },
       });
 
-      // Act & Assert
+      // act & assert
       await expect(
         indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 }),
       ).rejects.toThrow("Unsupported collection: unsupported.collection");
     });
 
-    it("無効なレコード（null文字を含む）の場合、ログを記録して処理を終了する", async () => {
-      // Arrange
+    test("無効なレコード（null文字を含む）の場合、ログを記録して処理を終了する", async () => {
+      // arrange
       const record = Record.fromJson({
         uri: "at://did:plc:user/app.bsky.feed.post/123",
         cid: "cid123",
@@ -82,256 +111,145 @@ describe("IndexRecordService", () => {
         },
       });
 
-      // Act
+      // act
       await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
-      // Assert
+      // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
         "Invalid record: null character found",
       );
-      expect(postIndexer.shouldIndex).not.toHaveBeenCalled();
     });
 
-    it("保存条件を満たさない場合、ログを記録して処理を終了する", async () => {
-      // Arrange
+    test("保存条件を満たさない場合、ログを記録して処理を終了する", async () => {
+      // arrange
       const record = Record.fromJson({
         uri: "at://did:plc:user/app.bsky.feed.post/123",
         cid: "cid123",
         json: {
           $type: "app.bsky.feed.post",
           text: "Hello World",
+          createdAt: new Date().toISOString(),
         },
       });
-      postIndexer.shouldIndex.mockResolvedValue(false);
 
-      // Act
+      // act
       await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
-      // Assert
+      // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
         "Record does not match storage rules, skipping",
       );
-      expect(postIndexer.upsert).not.toHaveBeenCalled();
     });
 
-    it("投稿レコードの保存条件を満たす場合、正しく保存する", async () => {
-      // Arrange
-      const record = Record.fromJson({
-        uri: "at://did:plc:user/app.bsky.feed.post/123",
-        cid: "cid123",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Hello World",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      postIndexer.shouldIndex.mockResolvedValue(true);
+    test("subscriberのフォローレコードの場合、正しく保存する", async () => {
+      // arrange
+      const followingActor = await actorFactory(ctx.db).create();
+      const followerActor = await actorFactory(ctx.db).create();
 
-      // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
+      const subscriptionRecord = await recordFactory(
+        ctx.db,
+        "dev.mkizka.test.subscription",
+      )
+        .vars({
+          actor: () => followingActor,
+        })
+        .create();
+      await subscriptionFactory(ctx.db)
+        .vars({
+          record: () => subscriptionRecord,
+        })
+        .create();
 
-      // Assert
-      expect(postIndexer.shouldIndex).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-      expect(postIndexer.upsert).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-
-      // recordsテーブルに保存されていることを確認
-      const records = await ctx.db
-        .select()
-        .from(schema.records)
-        .where(eq(schema.records.uri, record.uri.toString()))
-        .limit(1);
-      expect(records.length).toBe(1);
-      expect(records[0]?.actorDid).toBe("did:plc:user");
-
-      // actorsテーブルに保存されていることを確認
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, "did:plc:user"))
-        .limit(1);
-      expect(actors.length).toBe(1);
-      expect(actors[0]?.did).toBe("did:plc:user");
-    });
-
-    it("プロフィールレコードの保存条件を満たす場合、正しく保存する", async () => {
-      // Arrange
-      const record = Record.fromJson({
-        uri: "at://did:plc:user/app.bsky.actor.profile/self",
-        cid: "cid123",
-        json: {
-          $type: "app.bsky.actor.profile",
-          displayName: "Test User",
-        },
-      });
-      profileIndexer.shouldIndex.mockResolvedValue(true);
-
-      // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
-
-      // Assert
-      expect(profileIndexer.shouldIndex).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-      expect(profileIndexer.upsert).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-    });
-
-    it("フォローレコードの保存条件を満たす場合、正しく保存する", async () => {
-      // Arrange
-      const record = Record.fromJson({
-        uri: "at://did:plc:user/app.bsky.graph.follow/123",
-        cid: "cid123",
+      const followRecord = Record.fromJson({
+        uri: `at://${followerActor.did}/app.bsky.graph.follow/456`,
+        cid: "follow-cid",
         json: {
           $type: "app.bsky.graph.follow",
-          subject: "did:plc:target",
+          subject: followingActor.did,
           createdAt: new Date().toISOString(),
         },
       });
-      followIndexer.shouldIndex.mockResolvedValue(true);
 
-      // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
-
-      // Assert
-      expect(followIndexer.shouldIndex).toHaveBeenCalledWith({
+      // act
+      await indexRecordService.upsert({
         ctx,
-        record,
+        record: followRecord,
+        jobLogger,
+        depth: 0,
       });
-      expect(followIndexer.upsert).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-    });
 
-    it("いいねレコードの保存条件を満たす場合、正しく保存する", async () => {
-      // Arrange
-      const record = Record.fromJson({
-        uri: "at://did:plc:user/app.bsky.feed.like/123",
-        cid: "cid123",
-        json: {
-          $type: "app.bsky.feed.like",
-          subject: {
-            uri: "at://did:plc:target/app.bsky.feed.post/123",
-            cid: "postcid123",
-          },
-          createdAt: new Date().toISOString(),
-        },
+      // assert
+      expect(jobLogger.log).not.toHaveBeenCalledWith(
+        "Record does not match storage rules, skipping",
+      );
+      const savedRecord = await ctx.db.query.records.findFirst({
+        where: (records, { eq }) =>
+          eq(records.uri, followRecord.uri.toString()),
       });
-      likeIndexer.shouldIndex.mockResolvedValue(true);
-
-      // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
-
-      // Assert
-      expect(likeIndexer.shouldIndex).toHaveBeenCalledWith({
-        ctx,
-        record,
+      expect(savedRecord).toMatchObject({
+        uri: followRecord.uri.toString(),
+        cid: followRecord.cid,
+        actorDid: followerActor.did,
       });
-      expect(likeIndexer.upsert).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-    });
 
-    it("リポストレコードの保存条件を満たす場合、正しく保存する", async () => {
-      // Arrange
-      const record = Record.fromJson({
-        uri: "at://did:plc:user/app.bsky.feed.repost/123",
-        cid: "cid123",
-        json: {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: "at://did:plc:target/app.bsky.feed.post/123",
-            cid: "postcid123",
-          },
-          createdAt: new Date().toISOString(),
-        },
+      const savedFollow = await ctx.db.query.follows.findFirst({
+        where: (follows, { eq }) =>
+          eq(follows.uri, followRecord.uri.toString()),
       });
-      repostIndexer.shouldIndex.mockResolvedValue(true);
-
-      // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
-
-      // Assert
-      expect(repostIndexer.shouldIndex).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-      expect(repostIndexer.upsert).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-    });
-
-    it("サブスクリプションレコードの保存条件を満たす場合、正しく保存する", async () => {
-      // Arrange
-      const record = Record.fromJson({
-        uri: "at://did:plc:user/dev.mkizka.test.subscription/123",
-        cid: "cid123",
-        json: {
-          $type: "dev.mkizka.test.subscription",
-          appviewDid: "did:web:api.bsky.app#bsky_appview",
-          createdAt: new Date().toISOString(),
-        },
-      });
-      subscriptionIndexer.shouldIndex.mockResolvedValue(true);
-
-      // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
-
-      // Assert
-      expect(subscriptionIndexer.shouldIndex).toHaveBeenCalledWith({
-        ctx,
-        record,
-      });
-      expect(subscriptionIndexer.upsert).toHaveBeenCalledWith({
-        ctx,
-        record,
+      expect(savedFollow).toMatchObject({
+        uri: followRecord.uri.toString(),
+        cid: followRecord.cid,
+        actorDid: followerActor.did,
+        subjectDid: followingActor.did,
       });
     });
   });
 
   describe("delete", () => {
-    it("レコードを正しく削除する", async () => {
-      // Arrange
-      const uri = "at://did:plc:deleteuser/app.bsky.feed.post/delete-test";
-      const actor = await actorFactory(ctx.db)
+    test("存在しないレコードの場合、何もしない", async () => {
+      // arrange
+      const uri = AtUri.make(
+        "at://did:plc:deleteuser/app.bsky.feed.post/delete-test",
+      );
+
+      // act
+      await indexRecordService.delete({ ctx, uri });
+
+      // assert
+      const record = await ctx.db.query.records.findFirst({
+        where: (records, { eq }) => eq(records.uri, uri.toString()),
+      });
+      expect(record).toBeUndefined();
+    });
+
+    test("レコードが存在する場合、正しく削除する", async () => {
+      // arrange
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
         .props({
-          did: () => "did:plc:deleteuser",
-          handle: () => "deleteuser.bsky.social",
-        })
-        .create();
-      await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
-        .props({
-          uri: () => uri,
-          cid: () => "cid123",
           json: () => ({
             $type: "app.bsky.feed.post",
-            text: "Hello World",
+            text: "Test post for deletion",
+            createdAt: new Date().toISOString(),
           }),
         })
         .create();
+      const post = await postFactory(ctx.db)
+        .vars({
+          record: () => postRecord,
+        })
+        .create();
 
-      // Act
-      await indexRecordService.delete({ ctx, uri: AtUri.make(uri) });
+      // act
+      await indexRecordService.delete({
+        ctx,
+        uri: new AtUri(post.uri),
+      });
 
-      // Assert
-      const records = await ctx.db
-        .select()
-        .from(schema.records)
-        .where(eq(schema.records.uri, uri))
-        .limit(1);
-      expect(records.length).toBe(0);
+      // assert
+      const record = await ctx.db.query.records.findFirst({
+        where: (records, { eq }) => eq(records.uri, post.uri),
+      });
+      expect(record).toBeUndefined();
     });
   });
 });
