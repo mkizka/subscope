@@ -29,7 +29,17 @@ export class JobQueue implements IJobQueue {
     } satisfies QueueOptions;
     this.queues = {
       resolveDid: new Queue("resolveDid", queueOptions),
-      fetchRecord: new Queue("fetchRecord", queueOptions),
+      fetchRecord: new Queue("fetchRecord", {
+        ...queueOptions,
+        defaultJobOptions: {
+          ...queueOptions.defaultJobOptions,
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 1000, // 1,2,4秒後にリトライ
+          },
+        },
+      }),
       identity: new Queue("identity", queueOptions),
       commit: new Queue("commit", queueOptions),
       backfill: new Queue("backfill", queueOptions),
