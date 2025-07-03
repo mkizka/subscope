@@ -23,9 +23,6 @@ jobs:
       - run: pnpm lint
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        shard: [1/4, 2/4, 3/4, 4/4]
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -37,4 +34,4 @@ jobs:
           cache: pnpm
       - run: pnpm i
       - run: pnpm build
-      - run: pnpm vitest run --shard=${{ matrix.shard }}
+      - run: pnpm test
