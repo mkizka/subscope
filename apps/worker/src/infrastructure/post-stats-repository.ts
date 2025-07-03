@@ -89,4 +89,44 @@ export class PostStatsRepository implements IPostStatsRepository {
         },
       });
   }
+
+  async upsertAllCount({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
+    const postUri = uri.toString();
+
+    const [[likeResult], [repostResult], [replyResult]] = await Promise.all([
+      ctx.db
+        .select({ count: count() })
+        .from(schema.likes)
+        .where(eq(schema.likes.subjectUri, postUri)),
+      ctx.db
+        .select({ count: count() })
+        .from(schema.reposts)
+        .where(eq(schema.reposts.subjectUri, postUri)),
+      ctx.db
+        .select({ count: count() })
+        .from(schema.posts)
+        .where(eq(schema.posts.replyParentUri, postUri)),
+    ]);
+
+    const likeCount = likeResult?.count ?? 0;
+    const repostCount = repostResult?.count ?? 0;
+    const replyCount = replyResult?.count ?? 0;
+
+    await ctx.db
+      .insert(schema.postStats)
+      .values({
+        postUri,
+        likeCount,
+        repostCount,
+        replyCount,
+      })
+      .onConflictDoUpdate({
+        target: schema.postStats.postUri,
+        set: {
+          likeCount,
+          repostCount,
+          replyCount,
+        },
+      });
+  }
 }

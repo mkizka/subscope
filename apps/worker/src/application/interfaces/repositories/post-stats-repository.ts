@@ -16,4 +16,9 @@ export interface IPostStatsRepository {
     ctx: TransactionContext;
     uri: AtUri;
   }) => Promise<void>;
+
+  upsertAllCount: (params: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }) => Promise<void>;
 }

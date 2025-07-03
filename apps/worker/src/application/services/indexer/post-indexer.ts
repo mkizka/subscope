@@ -65,6 +65,14 @@ export class PostIndexer implements ICollectionIndexer {
       actorDid: post.actorDid,
     });
 
+    // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
+    // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
+    //    → このとき、リポスト数が0なので1にする必要がある
+    await this.postStatsRepository.upsertAllCount({
+      ctx,
+      uri: post.uri,
+    });
+
     if (post.replyParent) {
       const parentExists = await this.postRepository.exists(
         ctx,
