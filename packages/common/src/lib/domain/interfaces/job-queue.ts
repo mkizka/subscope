@@ -2,9 +2,14 @@ import type { Did } from "@atproto/did";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { Queue } from "bullmq";
 
+export type FetchRecordJobData = {
+  uri: string;
+  depth: number;
+};
+
 export type JobData = {
   resolveDid: Did;
-  fetchRecord: string; // AtUri
+  fetchRecord: FetchRecordJobData;
   identity: IdentityEvent;
   commit: CommitEvent<string>;
   backfill: Did;

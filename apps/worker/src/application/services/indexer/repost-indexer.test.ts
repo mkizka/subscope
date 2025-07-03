@@ -64,7 +64,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.upsert({ ctx, record });
+      await repostIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
       const [repost] = await ctx.db
@@ -92,7 +92,10 @@ describe("RepostIndexer", () => {
       expect(mockJobQueue.add).toHaveBeenCalledWith({
         queueName: "fetchRecord",
         jobName: subjectUri,
-        data: subjectUri,
+        data: {
+          uri: subjectUri,
+          depth: 0,
+        },
       });
     });
   });

@@ -59,7 +59,10 @@ describe("IndexActorService", () => {
       expect(mockJobQueue.add).toHaveBeenCalledWith({
         queueName: "fetchRecord",
         jobName: `at://${testDid}/app.bsky.actor.profile/self`,
-        data: `at://${testDid}/app.bsky.actor.profile/self`,
+        data: {
+          uri: `at://${testDid}/app.bsky.actor.profile/self`,
+          depth: 0,
+        },
       });
     });
 

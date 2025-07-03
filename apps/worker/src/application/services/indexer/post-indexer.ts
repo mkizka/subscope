@@ -27,7 +27,15 @@ export class PostIndexer implements ICollectionIndexer {
     "fetchRecordScheduler",
   ] as const;
 
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+  async upsert({
+    ctx,
+    record,
+    depth,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+    depth: number;
+  }) {
     const post = Post.from(record);
     await this.postRepository.upsert({ ctx, post });
 
@@ -36,7 +44,7 @@ export class PostIndexer implements ICollectionIndexer {
 
     const embedUri = post.getFetchableEmbedUri();
     if (embedUri) {
-      await this.fetchRecordScheduler.schedule(embedUri);
+      await this.fetchRecordScheduler.schedule(embedUri, depth);
     }
   }
 

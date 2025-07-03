@@ -4,9 +4,11 @@ export interface ICollectionIndexer {
   upsert: ({
     ctx,
     record,
+    depth,
   }: {
     ctx: TransactionContext;
     record: Record;
+    depth: number;
   }) => Promise<void>;
   shouldIndex: ({
     ctx,

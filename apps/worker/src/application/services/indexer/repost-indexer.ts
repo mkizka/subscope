@@ -27,14 +27,22 @@ export class RepostIndexer implements ICollectionIndexer {
     "fetchRecordScheduler",
   ] as const;
 
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+  async upsert({
+    ctx,
+    record,
+    depth,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+    depth: number;
+  }) {
     const repost = Repost.from(record);
     await this.repostRepository.upsert({ ctx, repost });
 
     const feedItem = FeedItem.fromRepost(repost);
     await this.feedItemRepository.upsertRepost({ ctx, feedItem });
 
-    await this.fetchRecordScheduler.schedule(repost.subjectUri);
+    await this.fetchRecordScheduler.schedule(repost.subjectUri, depth);
   }
 
   async shouldIndex({

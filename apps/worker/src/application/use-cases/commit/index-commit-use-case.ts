@@ -38,6 +38,9 @@ export class IndexCommitUseCase {
             ctx,
             record: commit.record,
             jobLogger,
+            // この呼び出しからfetchRecordジョブが再帰的に呼ばれる場合があるので、
+            // depthを0から開始してfetchRecordジョブで+1する
+            depth: 0,
           });
           break;
         }

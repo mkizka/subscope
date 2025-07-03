@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import type { FetchRecordJobData } from "@repo/common/domain";
 import type { SupportedCollection } from "@repo/common/utils";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { WorkerOptions } from "bullmq";
@@ -79,11 +80,12 @@ export class SyncWorker {
           },
         },
       ),
-      new Worker<string>(
+      new Worker<FetchRecordJobData>(
         "fetchRecord",
         async (job) => {
           await fetchRecordUseCase.execute({
-            uri: job.data,
+            uri: job.data.uri,
+            depth: job.data.depth,
             jobLogger: createJobLogger(job),
           });
         },

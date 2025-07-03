@@ -67,7 +67,7 @@ describe("IndexRecordService", () => {
 
       // Act & Assert
       await expect(
-        indexRecordService.upsert({ ctx, record, jobLogger }),
+        indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 }),
       ).rejects.toThrow("Unsupported collection: unsupported.collection");
     });
 
@@ -83,7 +83,7 @@ describe("IndexRecordService", () => {
       });
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -105,7 +105,7 @@ describe("IndexRecordService", () => {
       postIndexer.shouldIndex.mockResolvedValue(false);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -128,7 +128,7 @@ describe("IndexRecordService", () => {
       postIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(postIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -172,7 +172,7 @@ describe("IndexRecordService", () => {
       profileIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(profileIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -199,7 +199,7 @@ describe("IndexRecordService", () => {
       followIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(followIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -229,7 +229,7 @@ describe("IndexRecordService", () => {
       likeIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(likeIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -259,7 +259,7 @@ describe("IndexRecordService", () => {
       repostIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(repostIndexer.shouldIndex).toHaveBeenCalledWith({
@@ -286,7 +286,7 @@ describe("IndexRecordService", () => {
       subscriptionIndexer.shouldIndex.mockResolvedValue(true);
 
       // Act
-      await indexRecordService.upsert({ ctx, record, jobLogger });
+      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
 
       // Assert
       expect(subscriptionIndexer.shouldIndex).toHaveBeenCalledWith({

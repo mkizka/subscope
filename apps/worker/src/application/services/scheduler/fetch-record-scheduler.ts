@@ -5,12 +5,15 @@ export class FetchRecordScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
   static inject = ["jobQueue"] as const;
 
-  async schedule(uri: AtUri): Promise<void> {
+  async schedule(uri: AtUri, depth: number): Promise<void> {
     const uriString = uri.toString();
     await this.jobQueue.add({
       queueName: "fetchRecord",
       jobName: uriString,
-      data: uriString,
+      data: {
+        uri: uriString,
+        depth,
+      },
     });
   }
 }

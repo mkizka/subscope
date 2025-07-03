@@ -22,13 +22,28 @@ export class FetchRecordUseCase {
 
   async execute({
     uri,
+    depth,
     jobLogger,
   }: {
     uri: string;
+    depth: number;
     jobLogger: JobLogger;
   }): Promise<void> {
+    // 深さが2以上の場合は処理を中止
+    //
+    // 例:
+    //   引用投稿
+    //   -> 引用された投稿(0)
+    //   → さらに引用された投稿(1)
+    //   → さらにさらに引用された投稿(2なので中止)
+    if (depth >= 2) {
+      await jobLogger.log(
+        `Skipping fetch for ${uri} - depth limit reached (depth: ${depth})`,
+      );
+      return;
+    }
     try {
-      await this.doFetchRecord(uri, jobLogger);
+      await this.doFetchRecord(uri, depth, jobLogger);
     } catch (error) {
       if (error instanceof RecordFetchError) {
         await jobLogger.log(error.message);
@@ -40,6 +55,7 @@ export class FetchRecordUseCase {
 
   private async doFetchRecord(
     uri: string,
+    depth: number,
     jobLogger: JobLogger,
   ): Promise<void> {
     const atUri = new AtUri(uri);
@@ -51,6 +67,7 @@ export class FetchRecordUseCase {
         jobLogger,
         // サブスクライバーでない、いいねしたアカウントのプロフィールなどルール外のレコードもインデックスする
         force: true,
+        depth: depth + 1,
       });
     });
   }

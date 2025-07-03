@@ -37,7 +37,12 @@ export class BackfillUseCase {
 
     await this.transactionManager.transaction(async (ctx) => {
       for (const record of filteredRecords) {
-        await this.indexRecordService.upsert({ ctx, record, jobLogger });
+        await this.indexRecordService.upsert({
+          ctx,
+          record,
+          jobLogger,
+          depth: 0,
+        });
       }
       await this.actorRepository.updateBackfillStatus({
         ctx,

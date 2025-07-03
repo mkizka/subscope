@@ -75,7 +75,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record });
+      await postIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
       const [post] = await ctx.db
@@ -125,14 +125,17 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record });
+      await postIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
       expect(mockJobQueue.add).toHaveBeenCalledTimes(1);
       expect(mockJobQueue.add).toHaveBeenCalledWith({
         queueName: "fetchRecord",
         jobName: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
-        data: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
+        data: {
+          uri: "at://did:plc:embeduser/app.bsky.feed.post/embedpost",
+          depth: 0,
+        },
       });
     });
 
@@ -155,7 +158,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record });
+      await postIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
       expect(mockJobQueue.add).not.toHaveBeenCalled();
@@ -229,7 +232,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record });
+      await postIndexer.upsert({ ctx, record, depth: 0 });
       await postIndexer.updateStats({ ctx, record });
 
       // assert
@@ -278,7 +281,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record });
+      await postIndexer.upsert({ ctx, record, depth: 0 });
       await postIndexer.updateStats({ ctx, record });
 
       // assert
@@ -328,7 +331,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record });
+      await postIndexer.upsert({ ctx, record, depth: 0 });
       await postIndexer.updateStats({ ctx, record });
 
       // assert

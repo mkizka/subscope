@@ -68,11 +68,13 @@ export class IndexRecordService {
     record,
     jobLogger,
     force = false,
+    depth,
   }: {
     ctx: TransactionContext;
     record: Record;
     jobLogger: JobLogger;
     force?: boolean;
+    depth: number;
   }): Promise<void> {
     if (!isSupportedCollection(record.collection)) {
       throw new Error(`Unsupported collection: ${record.collection}`);
@@ -95,7 +97,7 @@ export class IndexRecordService {
     await this.indexActorService.upsert({ ctx, did: record.actorDid });
     await this.recordRepository.upsert({ ctx, record });
 
-    await indexer.upsert({ ctx, record });
+    await indexer.upsert({ ctx, record, depth });
     await indexer.updateStats?.({ ctx, record });
   }
 
