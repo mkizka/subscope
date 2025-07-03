@@ -31,20 +31,16 @@ export class MetricReporter implements IMetricReporter {
 
   constructor() {
     this.counters = {
-      did_cache_hit_total: new client.Counter({
-        name: "did_cache_hit_total",
+      resolve_did_cache_hit_total: new client.Counter({
+        name: "resolve_did_cache_hit_total",
         help: "Total number of did resolver cache hits",
       }),
-      did_cache_miss_total: new client.Counter({
-        name: "did_cache_miss_total",
+      resolve_did_cache_miss_total: new client.Counter({
+        name: "resolve_did_cache_miss_total",
         help: "Total number of did resolver cache misses",
       }),
-      did_resolve_total: new client.Counter({
-        name: "did_resolve_total",
-        help: "Total number of did resolves",
-      }),
-      did_resolve_error_total: new client.Counter({
-        name: "did_resolve_error_total",
+      resolve_did_error_total: new client.Counter({
+        name: "resolve_did_error_total",
         help: "Total number of did resolve errors",
       }),
       ingester_events_account_total: new client.Counter({

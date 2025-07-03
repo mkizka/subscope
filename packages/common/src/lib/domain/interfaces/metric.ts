@@ -1,8 +1,7 @@
 export type CounterKey =
-  | "did_cache_hit_total"
-  | "did_cache_miss_total"
-  | "did_resolve_total"
-  | "did_resolve_error_total"
+  | "resolve_did_cache_hit_total"
+  | "resolve_did_cache_miss_total"
+  | "resolve_did_error_total"
   | "ingester_events_account_total"
   | "ingester_events_identity_total"
   | "ingester_events_commit_total"

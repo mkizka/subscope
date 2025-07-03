@@ -33,10 +33,10 @@ export class RedisDidCache implements DidCache {
   async checkCache(did: string): Promise<CacheResult | null> {
     const val = await this.cache.get(did);
     if (!val) {
-      this.metricReporter.increment("did_cache_miss_total");
+      this.metricReporter.increment("resolve_did_cache_miss_total");
       return null;
     }
-    this.metricReporter.increment("did_cache_hit_total");
+    this.metricReporter.increment("resolve_did_cache_hit_total");
     return {
       ...val,
       did,

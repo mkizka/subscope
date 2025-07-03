@@ -31,7 +31,6 @@ export class DidResolver implements IDidResolver {
 
   async resolve(did: string) {
     try {
-      this.metricReporter.increment("did_resolve_total");
       const data = await this.resolver.resolveAtprotoData(did);
       return {
         signingKey: data.signingKey,
@@ -39,7 +38,7 @@ export class DidResolver implements IDidResolver {
         pds: new URL(data.pds),
       };
     } catch (error) {
-      this.metricReporter.increment("did_resolve_error_total");
+      this.metricReporter.increment("resolve_did_error_total");
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
       throw new DidResolutionError(did);
     }
