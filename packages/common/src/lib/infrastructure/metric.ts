@@ -65,6 +65,10 @@ export class MetricReporter implements IMetricReporter {
         name: "blob_proxy_cache_miss_total",
         help: "Total number of blob cache misses",
       }),
+      blob_proxy_error_total: new client.Counter({
+        name: "blob_proxy_error_total",
+        help: "Total number of blob proxy errors",
+      }),
     };
     this.gauges = {
       ingester_events_time_delay: new client.Gauge({

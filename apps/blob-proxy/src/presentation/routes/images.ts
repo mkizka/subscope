@@ -1,4 +1,4 @@
-import { DidResolutionError } from "@repo/common/domain";
+import { DidResolutionError, type IMetricReporter } from "@repo/common/domain";
 import type { Router } from "express";
 import { Router as expressRouter } from "express";
 
@@ -8,6 +8,7 @@ import { ImageTransformRequest } from "../../domain/image-transform-request.js";
 
 export function imagesRouterFactory(
   imageTransformService: ImageTransformService,
+  metricReporter: IMetricReporter,
 ): Router {
   const router = expressRouter();
 
@@ -24,13 +25,22 @@ export function imagesRouterFactory(
         e instanceof BlobFetchFailedError ||
         e instanceof DidResolutionError
       ) {
+        metricReporter.increment("blob_proxy_error_total", {
+          error: e.name,
+        });
         res.status(404).send(e.message);
         return;
       }
+      metricReporter.increment("blob_proxy_error_total", {
+        error: String(e),
+      });
       throw e;
     }
   });
 
   return router;
 }
-imagesRouterFactory.inject = ["imageTransformService"] as const;
+imagesRouterFactory.inject = [
+  "imageTransformService",
+  "metricReporter",
+] as const;
