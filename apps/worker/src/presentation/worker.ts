@@ -1,8 +1,5 @@
-import type { Did } from "@atproto/did";
-import type { FetchRecordJobData } from "@repo/common/domain";
-import type { SupportedCollection } from "@repo/common/utils";
-import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
-import type { WorkerOptions } from "bullmq";
+import type { JobData } from "@repo/common/domain";
+import type { Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
 import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
@@ -16,12 +13,19 @@ import type { UpsertIdentityUseCase } from "../application/use-cases/identity/up
 import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
-const baseWorkerOptions = {
-  autorun: false,
-  connection: {
-    url: env.REDIS_URL,
-  },
-} satisfies WorkerOptions;
+const createWorker = <T extends keyof JobData>(
+  name: T,
+  process: Processor<JobData[T], void>,
+  options?: Omit<WorkerOptions, "connection" | "autorun">,
+) => {
+  return new Worker<JobData[T]>(name, process, {
+    autorun: false,
+    connection: {
+      url: env.REDIS_URL,
+    },
+    ...options,
+  });
+};
 
 export class SyncWorker {
   private readonly workers: Worker[];
@@ -35,15 +39,11 @@ export class SyncWorker {
     temp__cleanupDatabaseUseCase: Temp__CleanupDatabaseUseCase,
   ) {
     this.workers = [
-      new Worker<IdentityEvent>(
-        "identity",
-        async (job) => {
-          const command = upsertIdentityCommandFactory(job.data);
-          await upsertIdentityUseCase.execute(command);
-        },
-        baseWorkerOptions,
-      ),
-      new Worker<CommitEvent<SupportedCollection>>(
+      createWorker("identity", async (job) => {
+        const command = upsertIdentityCommandFactory(job.data);
+        await upsertIdentityUseCase.execute(command);
+      }),
+      createWorker(
         "commit",
         async (job) => {
           const command = indexCommitCommandFactory({
@@ -53,34 +53,28 @@ export class SyncWorker {
           await indexCommitUseCase.execute(command);
         },
         {
-          ...baseWorkerOptions,
           concurrency: 32,
         },
       ),
-      new Worker<Did>(
-        "backfill",
-        async (job) => {
-          await backfillUseCase.execute({
-            did: job.data,
-            jobLogger: createJobLogger(job),
-          });
-        },
-        baseWorkerOptions,
-      ),
-      new Worker<Did>(
+      createWorker("backfill", async (job) => {
+        await backfillUseCase.execute({
+          did: job.data,
+          jobLogger: createJobLogger(job),
+        });
+      }),
+      createWorker(
         "resolveDid",
         async (job) => {
           await resolveDidUseCase.execute(job.data);
         },
         {
-          ...baseWorkerOptions,
           limiter: {
             max: 10, // plc.directoryの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
       ),
-      new Worker<FetchRecordJobData>(
+      createWorker(
         "fetchRecord",
         async (job) => {
           await fetchRecordUseCase.execute({
@@ -90,7 +84,6 @@ export class SyncWorker {
           });
         },
         {
-          ...baseWorkerOptions,
           limiter: {
             max: 10, // PDSの負荷を抑えるためにrpsを制限
             duration: 1000,
@@ -98,14 +91,13 @@ export class SyncWorker {
         },
       ),
       // 開発用
-      new Worker(
+      createWorker(
         "temp__cleanupDatabase",
         async (job) => {
           const jobLogger = createJobLogger(job);
           await temp__cleanupDatabaseUseCase.execute(jobLogger);
         },
         {
-          ...baseWorkerOptions,
           stalledInterval: 5 * 60 * 1000,
         },
       ),

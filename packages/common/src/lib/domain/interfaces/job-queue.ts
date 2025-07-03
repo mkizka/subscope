@@ -2,16 +2,18 @@ import type { Did } from "@atproto/did";
 import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
 import type { Queue } from "bullmq";
 
-export type FetchRecordJobData = {
+import type { SupportedCollection } from "../../utils/collection.js";
+
+type FetchRecordData = {
   uri: string;
   depth: number;
 };
 
 export type JobData = {
   resolveDid: Did;
-  fetchRecord: FetchRecordJobData;
+  fetchRecord: FetchRecordData;
   identity: IdentityEvent;
-  commit: CommitEvent<string>;
+  commit: CommitEvent<SupportedCollection>;
   backfill: Did;
   temp__cleanupDatabase: undefined;
 };
