@@ -55,6 +55,7 @@ describe("IndexCommitUseCase", () => {
         ctx: mockTransactionContext,
         record: commit.record,
         jobLogger: mockJobLogger,
+        depth: 0,
       });
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         "Indexing completed successfully.",
