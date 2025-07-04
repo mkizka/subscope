@@ -1,6 +1,7 @@
 import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
 import { required, SUPPORTED_COLLECTIONS } from "@repo/common/utils";
 import { Jetstream } from "@skyware/jetstream";
+import { setTimeout as sleep } from "timers/promises";
 import WebSocket from "ws";
 
 import type { HandleAccountUseCase } from "../application/handle-account-use-case.js";
@@ -9,9 +10,17 @@ import type { HandleIdentityUseCase } from "../application/handle-identity-use-c
 import type { ICursorRepository } from "../application/interfaces/cursor-repository.js";
 import { env } from "../shared/env.js";
 
+// cursorの変化を監視するための確認間隔
 const CONNECTION_CHECK_INTERVAL = 2000;
+
+// 再接続間隔の指数バックオフの最大遅延
 const INITIAL_RECONNECT_DELAY = 2000;
+
+// 再接続間隔の指数バックオフの最大値
 const MAX_RECONNECT_DELAY = 30000;
+
+// 再接続する際のcloseからstartまでの間隔
+const RECONNECT_DELAY = 1000;
 
 export class JetstreamIngester {
   private readonly jetstream;
@@ -94,7 +103,12 @@ export class JetstreamIngester {
       { reconnectDelay: this.reconnectDelay },
       `The cursor did not change, so attempting to reconnect`,
     );
+    this.metricReporter.setConnectionStateGauge("reconnecting");
     this.jetstream.close();
+
+    // 終了からWebsocketが完全にクローズするまで少し待つ
+    await sleep(RECONNECT_DELAY);
+
     await this.start();
   }
 
