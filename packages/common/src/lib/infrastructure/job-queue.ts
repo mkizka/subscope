@@ -8,42 +8,45 @@ import type {
   QueueName,
 } from "../domain/interfaces/job-queue.js";
 
+const createQueueOptionsBuilder =
+  (redisUrl: string) =>
+  (jobOptions?: QueueOptions["defaultJobOptions"]): QueueOptions => ({
+    defaultJobOptions: {
+      removeOnComplete: {
+        age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
+      },
+      removeOnFail: {
+        age: 24 * 60 * 60,
+      },
+      ...jobOptions,
+    },
+    connection: {
+      url: redisUrl,
+    },
+  });
+
+const withRetry = {
+  attempts: 3,
+  backoff: {
+    type: "exponential",
+    delay: 1000, // 1,2,4秒後にリトライ
+  },
+} satisfies QueueOptions["defaultJobOptions"];
+
 export class JobQueue implements IJobQueue {
   private readonly queues: {
     [key in QueueName]: Queue;
   };
 
   constructor(redisUrl: string) {
-    const queueOptions = {
-      defaultJobOptions: {
-        removeOnComplete: {
-          age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
-        },
-        removeOnFail: {
-          age: 24 * 60 * 60,
-        },
-      },
-      connection: {
-        url: redisUrl,
-      },
-    } satisfies QueueOptions;
+    const queueOptions = createQueueOptionsBuilder(redisUrl);
     this.queues = {
-      resolveDid: new Queue("resolveDid", queueOptions),
-      fetchRecord: new Queue("fetchRecord", {
-        ...queueOptions,
-        defaultJobOptions: {
-          ...queueOptions.defaultJobOptions,
-          attempts: 3,
-          backoff: {
-            type: "exponential",
-            delay: 1000, // 1,2,4秒後にリトライ
-          },
-        },
-      }),
-      identity: new Queue("identity", queueOptions),
-      commit: new Queue("commit", queueOptions),
-      backfill: new Queue("backfill", queueOptions),
-      temp__cleanupDatabase: new Queue("temp__cleanupDatabase", queueOptions),
+      resolveDid: new Queue("resolveDid", queueOptions(withRetry)),
+      fetchRecord: new Queue("fetchRecord", queueOptions(withRetry)),
+      identity: new Queue("identity", queueOptions(withRetry)),
+      commit: new Queue("commit", queueOptions(withRetry)),
+      backfill: new Queue("backfill", queueOptions()),
+      temp__cleanupDatabase: new Queue("temp__cleanupDatabase", queueOptions()),
     };
     this.queues.temp__cleanupDatabase
       .upsertJobScheduler(
