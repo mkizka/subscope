@@ -19,4 +19,5 @@ export * as AppBskyFeedGetAuthorFeed from "./generated/server/types/app/bsky/fee
 export * as AppBskyFeedGetLikes from "./generated/server/types/app/bsky/feed/getLikes";
 export * as AppBskyFeedGetRepostedBy from "./generated/server/types/app/bsky/feed/getRepostedBy";
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline";
+export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows";
 export { $Typed } from "./generated/server/util";

@@ -13,6 +13,7 @@ import { ActorLikesService } from "./application/service/feed/actor-likes-servic
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
+import { FollowService } from "./application/service/graph/follow-service.js";
 import { AuthVerifierService } from "./application/service/request/auth-verifier-service.js";
 import { HandleService } from "./application/service/request/handle-service.js";
 import { EmbedViewService } from "./application/service/view/embed-view-service.js";
@@ -29,10 +30,12 @@ import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thre
 import { GetPostsUseCase } from "./application/use-cases/feed/get-posts-use-case.js";
 import { GetRepostedByUseCase } from "./application/use-cases/feed/get-reposted-by-use-case.js";
 import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-use-case.js";
+import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use-case.js";
 import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { AuthorFeedRepository } from "./infrastructure/author-feed-repository.js";
+import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
@@ -51,6 +54,7 @@ import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetPostThread } from "./presentation/routes/app/bsky/feed/getPostThread.js";
 import { GetRepostedBy } from "./presentation/routes/app/bsky/feed/getRepostedBy.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
+import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
 import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
@@ -76,6 +80,7 @@ createInjector()
   .provideClass("authorFeedRepository", AuthorFeedRepository)
   .provideClass("likeRepository", LikeRepository)
   .provideClass("repostRepository", RepostRepository)
+  .provideClass("followRepository", FollowRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
@@ -94,6 +99,7 @@ createInjector()
   .provideClass("authVerifierService", AuthVerifierService)
   .provideClass("atUriService", AtUriService)
   .provideClass("handleService", HandleService)
+  .provideClass("followService", FollowService)
   .provideClass("feedProcessor", FeedProcessor)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
@@ -104,6 +110,7 @@ createInjector()
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
   .provideClass("getLikesUseCase", GetLikesUseCase)
   .provideClass("getRepostedByUseCase", GetRepostedByUseCase)
+  .provideClass("getFollowsUseCase", GetFollowsUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
@@ -115,6 +122,7 @@ createInjector()
   .provideClass("getJobStatus", GetJobStatus)
   .provideClass("getLikes", GetLikes)
   .provideClass("getRepostedBy", GetRepostedBy)
+  .provideClass("getFollows", GetFollows)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();
