@@ -8,6 +8,7 @@ import { createInjector } from "typed-inject";
 import { HandleAccountUseCase } from "./application/handle-account-use-case.js";
 import { HandleCommitUseCase } from "./application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "./application/handle-identity-use-case.js";
+import { RedisCursorRepository } from "./infrastructure/redis-cursor-repository.js";
 import { JetstreamIngester } from "./presentation/jetstream.js";
 import { dashboardRouterFactory } from "./presentation/routes/dashboard.js";
 import { metricsRouterFactory } from "./presentation/routes/metrics.js";
@@ -22,6 +23,7 @@ createInjector()
   .provideClass("loggerManager", LoggerManager)
   .provideClass("jobQueue", JobQueue)
   .provideClass("metricReporter", MetricReporter)
+  .provideClass("cursorRepository", RedisCursorRepository)
   // application
   .provideClass("handleAccountUseCase", HandleAccountUseCase)
   .provideClass("handleIdentityUseCase", HandleIdentityUseCase)

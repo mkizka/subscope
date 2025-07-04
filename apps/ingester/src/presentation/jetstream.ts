@@ -6,6 +6,7 @@ import WebSocket from "ws";
 import type { HandleAccountUseCase } from "../application/handle-account-use-case.js";
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
+import type { ICursorRepository } from "../application/interfaces/cursor-repository.js";
 import { env } from "../shared/env.js";
 
 const CONNECTION_CHECK_INTERVAL = 2000;
@@ -16,6 +17,7 @@ export class JetstreamIngester {
   private readonly jetstream;
   private readonly logger;
 
+  // 接続監視のために一定時間でcusorを保存
   private lastCursor: number = 0;
   private reconnectDelay = INITIAL_RECONNECT_DELAY;
 
@@ -25,11 +27,11 @@ export class JetstreamIngester {
     private readonly handleAccountUseCase: HandleAccountUseCase,
     private readonly handleIdentityUseCase: HandleIdentityUseCase,
     private readonly handleCommitUseCase: HandleCommitUseCase,
+    private readonly cursorRepository: ICursorRepository,
   ) {
     this.logger = loggerManager.createLogger("JetstreamIngester");
     this.jetstream = new Jetstream({
       ws: WebSocket,
-      cursor: env.NODE_ENV === "development" ? -1 : undefined,
       endpoint: env.JETSTREAM_URL,
       wantedCollections: SUPPORTED_COLLECTIONS,
     });
@@ -37,7 +39,7 @@ export class JetstreamIngester {
     this.jetstream.on("open", () => {
       this.logger.info(
         { cursor: this.jetstream.cursor },
-        `Jetstream subscription started at ${env.JETSTREAM_URL}`,
+        `Jetstream subscription started at ${env.JETSTREAM_URL} with cursor ${this.jetstream.cursor}`,
       );
       this.metricReporter.setConnectionStateGauge("open");
     });
@@ -55,16 +57,19 @@ export class JetstreamIngester {
     this.jetstream.on("account", async (event) => {
       await this.handleAccountUseCase.execute(event);
       this.jetstream.cursor = event.time_us;
+      await this.cursorRepository.set(event.time_us);
     });
 
     this.jetstream.on("identity", async (event) => {
       await this.handleIdentityUseCase.execute(event);
       this.jetstream.cursor = event.time_us;
+      await this.cursorRepository.set(event.time_us);
     });
 
     this.jetstream.on("commit", async (event) => {
       await this.handleCommitUseCase.execute(event);
       this.jetstream.cursor = event.time_us;
+      await this.cursorRepository.set(event.time_us);
     });
   }
   static inject = [
@@ -73,6 +78,7 @@ export class JetstreamIngester {
     "handleAccountUseCase",
     "handleIdentityUseCase",
     "handleCommitUseCase",
+    "cursorRepository",
   ] as const;
 
   private shouldReconnect() {
@@ -86,22 +92,23 @@ export class JetstreamIngester {
     return this.jetstream.cursor === this.lastCursor;
   }
 
-  private reconnect() {
+  private async reconnect() {
     this.logger.info(
       { reconnectDelay: this.reconnectDelay },
       `The cursor did not change, so attempting to reconnect`,
     );
     this.jetstream.close();
-    this.start();
+    await this.start();
   }
 
-  private startConnectionMonitoring() {
+  private scheduleConnectionMonitoring() {
     this.logger.info("Starting connection monitoring");
     this.lastCursor = required(this.jetstream.cursor);
-    const intervalId = setInterval(() => {
+
+    const intervalId = setInterval(async () => {
       if (this.shouldReconnect()) {
         clearInterval(intervalId);
-        this.reconnect();
+        await this.reconnect();
       }
       this.lastCursor = required(this.jetstream.cursor);
     }, CONNECTION_CHECK_INTERVAL);
@@ -111,22 +118,28 @@ export class JetstreamIngester {
     return Math.min(this.reconnectDelay * 2, MAX_RECONNECT_DELAY);
   }
 
-  /**
-   * Starts the Jetstream connection and performs an initial health check.
-   * - After starting, it checks if the cursor has changed.
-   * - If the cursor remains the same, it assumes a connection failure and attempts a reconnect with an exponential backoff delay.
-   * - If the cursor updates normally, it resets the reconnect delay and starts periodic connection monitoring.
-   */
-  start() {
-    this.jetstream.start();
-    setTimeout(() => {
+  private startConnectionMonitoring() {
+    setTimeout(async () => {
+      // cursorが変化していなければ指数バックオフで再接続
       if (this.shouldReconnect()) {
         this.reconnectDelay = this.nextReconnectDelay();
-        this.reconnect();
-      } else {
+        await this.reconnect();
+      }
+      // cursorが変化していれば再接続遅延をリセットしてsetIntervalの監視を開始
+      else {
         this.reconnectDelay = INITIAL_RECONNECT_DELAY;
-        this.startConnectionMonitoring();
+        this.scheduleConnectionMonitoring();
       }
     }, this.reconnectDelay);
+  }
+
+  async start() {
+    const savedCursor = await this.cursorRepository.get();
+    if (savedCursor !== null) {
+      this.jetstream.cursor = savedCursor;
+    }
+    this.jetstream.start();
+
+    this.startConnectionMonitoring();
   }
 }

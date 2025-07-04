@@ -32,10 +32,10 @@ export class IngesterServer {
   ] as const;
 
   start() {
-    this.app.listen(env.PORT, () => {
+    this.app.listen(env.PORT, async () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
       if (!env.DISABLE_INGESTER) {
-        this.ingester.start();
+        await this.ingester.start();
       }
     });
   }
