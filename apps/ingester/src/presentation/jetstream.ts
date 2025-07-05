@@ -147,7 +147,7 @@ export class JetstreamIngester {
   private async getCursor() {
     const savedCursor = await this.cursorRepository.get();
     if (!savedCursor && env.NODE_ENV === "development") {
-      return 0;
+      return -1;
     }
     return savedCursor;
   }
