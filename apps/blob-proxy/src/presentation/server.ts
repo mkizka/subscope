@@ -3,7 +3,7 @@ import { loggingMiddleware } from "@repo/common/utils";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
-import type { CacheScheduler } from "../application/services/cache-scheduler.js";
+import type { CacheCleanupScheduler } from "../application/services/cache-cleanup-scheduler.js";
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
 
@@ -14,7 +14,7 @@ export class BlobProxyServer {
   constructor(
     loggerManager: ILoggerManager,
     imagesRouter: express.Router,
-    private readonly cacheScheduler: CacheScheduler,
+    private readonly cacheCleanupScheduler: CacheCleanupScheduler,
   ) {
     this.logger = loggerManager.createLogger("BlobProxyServer");
     this.app = express();
@@ -23,12 +23,16 @@ export class BlobProxyServer {
     this.app.use("/health", healthRouter);
     this.app.use("/images", imagesRouter);
   }
-  static inject = ["loggerManager", "imagesRouter", "cacheScheduler"] as const;
+  static inject = [
+    "loggerManager",
+    "imagesRouter",
+    "cacheCleanupScheduler",
+  ] as const;
 
   start() {
     this.app.listen(env.PORT, () => {
       this.logger.info(`Blob proxy server listening on port ${env.PORT}`);
-      this.cacheScheduler.start();
+      this.cacheCleanupScheduler.start();
     });
   }
 }
