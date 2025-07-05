@@ -16,8 +16,10 @@ export class ProfileRepository implements IProfileRepository {
         avatar: true,
       },
     });
-    return profiles.map(
-      (profile) =>
+
+    const profileMap = new Map(
+      profiles.map((profile) => [
+        profile.actorDid,
         new ProfileDetailed({
           uri: profile.uri,
           cid: profile.cid,
@@ -33,6 +35,11 @@ export class ProfileRepository implements IProfileRepository {
           createdAt: profile.createdAt,
           indexedAt: profile.indexedAt,
         }),
+      ]),
     );
+
+    return dids
+      .map((did) => profileMap.get(did.toString()))
+      .filter((profile) => !!profile);
   }
 }

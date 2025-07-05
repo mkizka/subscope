@@ -34,6 +34,7 @@ paths=(
   "app/bsky/graph/defs.json"
   "app/bsky/graph/follow.json"
   "app/bsky/graph/getFollows.json"
+  "app/bsky/graph/getFollowers.json"
   "app/bsky/labeler/defs.json"
   "app/bsky/richtext/facet.json"
 

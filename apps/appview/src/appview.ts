@@ -30,6 +30,7 @@ import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thre
 import { GetPostsUseCase } from "./application/use-cases/feed/get-posts-use-case.js";
 import { GetRepostedByUseCase } from "./application/use-cases/feed/get-reposted-by-use-case.js";
 import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-use-case.js";
+import { GetFollowersUseCase } from "./application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use-case.js";
 import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
@@ -54,6 +55,7 @@ import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetPostThread } from "./presentation/routes/app/bsky/feed/getPostThread.js";
 import { GetRepostedBy } from "./presentation/routes/app/bsky/feed/getRepostedBy.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
+import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
 import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
@@ -111,6 +113,7 @@ createInjector()
   .provideClass("getLikesUseCase", GetLikesUseCase)
   .provideClass("getRepostedByUseCase", GetRepostedByUseCase)
   .provideClass("getFollowsUseCase", GetFollowsUseCase)
+  .provideClass("getFollowersUseCase", GetFollowersUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
@@ -123,6 +126,7 @@ createInjector()
   .provideClass("getLikes", GetLikes)
   .provideClass("getRepostedBy", GetRepostedBy)
   .provideClass("getFollows", GetFollows)
+  .provideClass("getFollowers", GetFollowers)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();

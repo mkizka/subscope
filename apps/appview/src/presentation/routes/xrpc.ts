@@ -9,6 +9,7 @@ import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
+import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetJobStatus } from "./dev/mkizka/test/getJobStatus.js";
 
@@ -26,6 +27,7 @@ export class XRPCRouter {
     getRepostedBy: GetRepostedBy,
     getTimeline: GetTimeline,
     getFollows: GetFollows,
+    getFollowers: GetFollowers,
     getJobStatus: GetJobStatus,
   ) {
     this.handlers = [
@@ -39,6 +41,7 @@ export class XRPCRouter {
       getRepostedBy,
       getTimeline,
       getFollows,
+      getFollowers,
       getJobStatus,
     ];
   }
@@ -53,6 +56,7 @@ export class XRPCRouter {
     "getRepostedBy",
     "getTimeline",
     "getFollows",
+    "getFollowers",
     "getJobStatus",
   ] as const;
 

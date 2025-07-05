@@ -39,4 +39,34 @@ export class FollowRepository implements IFollowRepository {
         }),
     );
   }
+
+  async findFollowers(params: {
+    actorDid: Did;
+    limit: number;
+    cursor?: string;
+  }): Promise<Follow[]> {
+    const filters = [eq(schema.follows.subjectDid, params.actorDid.toString())];
+
+    if (params.cursor) {
+      const cursor = new Date(params.cursor);
+      filters.push(lt(schema.follows.sortAt, cursor));
+    }
+
+    const results = await this.db.query.follows.findMany({
+      where: and(...filters),
+      orderBy: [desc(schema.follows.sortAt)],
+      limit: params.limit,
+    });
+
+    return results.map(
+      (result) =>
+        new Follow({
+          uri: result.uri,
+          cid: result.cid,
+          actorDid: result.actorDid,
+          subjectDid: result.subjectDid,
+          createdAt: result.createdAt,
+        }),
+    );
+  }
 }

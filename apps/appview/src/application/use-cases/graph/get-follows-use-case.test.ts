@@ -90,7 +90,7 @@ describe("GetFollowsUseCase", () => {
     });
   });
 
-  test("limitパラメータが適用され、cursorが正しく設定される", async () => {
+  test("limitパラメータで指定した件数より多くのフォローがいる場合、指定件数のフォローとcursorを返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Actor User" }))

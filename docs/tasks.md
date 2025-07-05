@@ -34,7 +34,7 @@
 
 ## app.bsky.graph
 
-- [ ] app/bsky/graph/getFollowers.json
+- [x] app/bsky/graph/getFollowers.json
 - [x] app/bsky/graph/getFollows.json
 
 優先度低い

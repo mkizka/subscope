@@ -30,4 +30,27 @@ export class FollowService {
 
     return paginator.extractPage(follows);
   }
+
+  async findFollowersWithPagination({
+    actorDid,
+    cursor,
+    limit,
+  }: {
+    actorDid: Did;
+    cursor?: string;
+    limit: number;
+  }): Promise<Page<Follow>> {
+    const paginator = createCursorPaginator<Follow>({
+      limit,
+      getCursor: (item) => item.createdAt.toISOString(),
+    });
+
+    const followers = await this.followRepository.findFollowers({
+      actorDid,
+      limit: paginator.queryLimit,
+      cursor,
+    });
+
+    return paginator.extractPage(followers);
+  }
 }
