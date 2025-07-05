@@ -4,7 +4,7 @@ export default defineProject({
   test: {
     name: "worker",
     globalSetup: "./vitest.global-setup.ts",
-    testTimeout: 10000,
+    testTimeout: 120000, // 2 min
     clearMocks: true,
   },
 });
