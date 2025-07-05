@@ -2,20 +2,20 @@ import type { IMetricReporter } from "@repo/common/domain";
 
 import type { ImageBlob } from "../domain/image-blob.js";
 import type { ImageProxyRequest } from "../domain/image-proxy-request.js";
+import type { IImageResizer } from "./interfaces/image-resizer.js";
 import type { FetchBlobService } from "./services/fetch-blob-service.js";
 import type { ImageCacheService } from "./services/image-cache-service.js";
-import type { ImageResizeService } from "./services/image-resize-service.js";
 
 export class ImageProxyUseCase {
   constructor(
     private fetchBlobService: FetchBlobService,
-    private imageResizeService: ImageResizeService,
+    private imageResizer: IImageResizer,
     private imageCacheService: ImageCacheService,
     private metricReporter: IMetricReporter,
   ) {}
   static inject = [
     "fetchBlobService",
-    "imageResizeService",
+    "imageResizer",
     "imageCacheService",
     "metricReporter",
   ] as const;
@@ -33,7 +33,7 @@ export class ImageProxyUseCase {
       did: request.did,
       cid: request.cid,
     });
-    const resizedBlob = await this.imageResizeService.resize({
+    const resizedBlob = await this.imageResizer.resize({
       blob: originalBlob,
       preset: request.preset,
     });

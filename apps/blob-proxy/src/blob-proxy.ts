@@ -13,10 +13,10 @@ import { CacheCleanupService } from "./application/services/cache-cleanup-servic
 import { CacheScheduler } from "./application/services/cache-scheduler.js";
 import { FetchBlobService } from "./application/services/fetch-blob-service.js";
 import { ImageCacheService } from "./application/services/image-cache-service.js";
-import { ImageResizeService } from "./application/services/image-resize-service.js";
 import { BlobFetcher } from "./infrastructure/blob-fetcher.js";
 import { CacheMetadataRepository } from "./infrastructure/cache-metadata-repository.js";
 import { ImageDiskStorage } from "./infrastructure/image-disk-storage.js";
+import { ImageResizer } from "./infrastructure/image-resizer.js";
 import { imagesRouterFactory } from "./presentation/routes/images.js";
 import { BlobProxyServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -37,8 +37,8 @@ createInjector()
   .provideClass("imageCacheStorage", ImageDiskStorage)
   .provideClass("cacheMetadataRepository", CacheMetadataRepository)
   .provideClass("blobFetcher", BlobFetcher)
+  .provideClass("imageResizer", ImageResizer)
   // application
-  .provideClass("imageResizeService", ImageResizeService)
   .provideClass("fetchBlobService", FetchBlobService)
   .provideClass("imageCacheService", ImageCacheService)
 

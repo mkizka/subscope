@@ -1,9 +1,10 @@
 import sharp from "sharp";
 
-import { ImageBlob } from "../../domain/image-blob.js";
-import type { ImagePreset } from "../../domain/image-preset.js";
+import type { IImageResizer } from "../application/interfaces/image-resizer.js";
+import { ImageBlob } from "../domain/image-blob.js";
+import type { ImagePreset } from "../domain/image-preset.js";
 
-export class ImageResizeService {
+export class ImageResizer implements IImageResizer {
   async resize({
     blob,
     preset,
