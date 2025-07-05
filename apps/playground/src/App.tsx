@@ -15,7 +15,7 @@ export function App() {
       repo: agent.session!.did,
       collection: "dev.mkizka.test.subscription",
       record: {
-        appviewDid: "did:web:localhost%3A3000",
+        appviewDid: "did:web:appview.localhost",
         createdAt: new Date().toISOString(),
       },
     });
