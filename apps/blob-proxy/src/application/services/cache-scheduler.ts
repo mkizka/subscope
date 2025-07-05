@@ -1,7 +1,7 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import * as cron from "node-cron";
 
-import { env } from "../shared/env.js";
+import { env } from "../../shared/env.js";
 import type { CacheCleanupService } from "./cache-cleanup-service.js";
 
 export class CacheScheduler {

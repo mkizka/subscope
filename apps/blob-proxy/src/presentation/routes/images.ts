@@ -2,20 +2,20 @@ import { DidResolutionError, type IMetricReporter } from "@repo/common/domain";
 import type { Router } from "express";
 import { Router as expressRouter } from "express";
 
-import type { ImageTransformService } from "../../application/image-transform-service.js";
+import type { ImageProxyUseCase } from "../../application/image-proxy-use-case.js";
 import { BlobFetchFailedError } from "../../application/interfaces/blob-fetcher.js";
-import { ImageTransformRequest } from "../../domain/image-transform-request.js";
+import { ImageProxyRequest } from "../../domain/image-proxy-request.js";
 
 export function imagesRouterFactory(
-  imageTransformService: ImageTransformService,
+  imageProxyUseCase: ImageProxyUseCase,
   metricReporter: IMetricReporter,
 ): Router {
   const router = expressRouter();
 
   router.get("/:type/:did/:cid.jpg", async (req, res) => {
     try {
-      const request = ImageTransformRequest.fromParams(req.params);
-      const result = await imageTransformService.getTransformedImage(request);
+      const request = ImageProxyRequest.fromParams(req.params);
+      const result = await imageProxyUseCase.execute(request);
       res
         .type(result.contentType)
         .header("Cache-Control", "public, max-age=86400")
@@ -40,7 +40,4 @@ export function imagesRouterFactory(
 
   return router;
 }
-imagesRouterFactory.inject = [
-  "imageTransformService",
-  "metricReporter",
-] as const;
+imagesRouterFactory.inject = ["imageProxyUseCase", "metricReporter"] as const;

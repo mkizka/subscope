@@ -3,7 +3,7 @@ import { loggingMiddleware } from "@repo/common/utils";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
-import type { CacheScheduler } from "../application/cache-scheduler.js";
+import type { CacheScheduler } from "../application/services/cache-scheduler.js";
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
 

@@ -2,7 +2,7 @@ import { type Did, isDid } from "@atproto/did";
 
 import { ImagePreset } from "./image-preset.js";
 
-export class ImageTransformRequest {
+export class ImageProxyRequest {
   readonly did: Did;
   readonly cid: string;
   readonly preset: ImagePreset;
@@ -17,9 +17,9 @@ export class ImageTransformRequest {
     did: string;
     cid: string;
     type: string;
-  }): ImageTransformRequest {
+  }): ImageProxyRequest {
     this.assertDid(params.did);
-    return new ImageTransformRequest({
+    return new ImageProxyRequest({
       did: params.did,
       cid: params.cid,
       preset: ImagePreset.fromType(params.type),

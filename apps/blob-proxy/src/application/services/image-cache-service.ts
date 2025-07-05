@@ -1,6 +1,6 @@
-import { ImageBlob } from "../domain/image-blob.js";
-import type { ICacheMetadataRepository } from "./interfaces/cache-metadata-repository.js";
-import type { IImageCacheStorage } from "./interfaces/image-cache-storage.js";
+import { ImageBlob } from "../../domain/image-blob.js";
+import type { ICacheMetadataRepository } from "../interfaces/cache-metadata-repository.js";
+import type { IImageCacheStorage } from "../interfaces/image-cache-storage.js";
 
 export class ImageCacheService {
   static inject = ["cacheMetadataRepository", "imageCacheStorage"] as const;

@@ -1,10 +1,10 @@
 import sharp from "sharp";
 
-import { ImageBlob } from "../image-blob.js";
-import type { ImagePreset } from "../image-preset.js";
+import { ImageBlob } from "../../domain/image-blob.js";
+import type { ImagePreset } from "../../domain/image-preset.js";
 
-export class ImageBlobService {
-  async transform({
+export class ImageResizeService {
+  async resize({
     blob,
     preset,
   }: {
@@ -13,7 +13,7 @@ export class ImageBlobService {
   }): Promise<ImageBlob> {
     const presetConfig = preset.getValue();
 
-    const transformedData = await sharp(blob.data)
+    const resizedBlob = await sharp(blob.data)
       .resize({
         width: presetConfig.width,
         height: presetConfig.height,
@@ -22,6 +22,6 @@ export class ImageBlobService {
       .jpeg({ quality: 90 })
       .toBuffer();
 
-    return ImageBlob.jpeg(transformedData);
+    return ImageBlob.jpeg(resizedBlob);
   }
 }

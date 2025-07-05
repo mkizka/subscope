@@ -1,7 +1,7 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 
-import type { ICacheMetadataRepository } from "./interfaces/cache-metadata-repository.js";
-import type { IImageCacheStorage } from "./interfaces/image-cache-storage.js";
+import type { ICacheMetadataRepository } from "../interfaces/cache-metadata-repository.js";
+import type { IImageCacheStorage } from "../interfaces/image-cache-storage.js";
 
 export class CacheCleanupService {
   private readonly logger: Logger;

@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { IDidResolver } from "@repo/common/domain";
 
-import type { ImageBlob } from "../domain/image-blob.js";
-import type { IBlobFetcher } from "./interfaces/blob-fetcher.js";
+import type { ImageBlob } from "../../domain/image-blob.js";
+import type { IBlobFetcher } from "../interfaces/blob-fetcher.js";
 
 export class FetchBlobService {
   static inject = ["didResolver", "blobFetcher"] as const;

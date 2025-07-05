@@ -1,28 +1,26 @@
 import type { IMetricReporter } from "@repo/common/domain";
 
 import type { ImageBlob } from "../domain/image-blob.js";
-import type { ImageTransformRequest } from "../domain/image-transform-request.js";
-import type { ImageBlobService } from "../domain/services/image-blob-service.js";
-import type { FetchBlobService } from "./fetch-blob-service.js";
-import type { ImageCacheService } from "./image-cache-service.js";
+import type { ImageProxyRequest } from "../domain/image-proxy-request.js";
+import type { FetchBlobService } from "./services/fetch-blob-service.js";
+import type { ImageCacheService } from "./services/image-cache-service.js";
+import type { ImageResizeService } from "./services/image-resize-service.js";
 
-export class ImageTransformService {
+export class ImageProxyUseCase {
   constructor(
     private fetchBlobService: FetchBlobService,
-    private imageBlobService: ImageBlobService,
+    private imageResizeService: ImageResizeService,
     private imageCacheService: ImageCacheService,
     private metricReporter: IMetricReporter,
   ) {}
   static inject = [
     "fetchBlobService",
-    "imageBlobService",
+    "imageResizeService",
     "imageCacheService",
     "metricReporter",
   ] as const;
 
-  async getTransformedImage(
-    request: ImageTransformRequest,
-  ): Promise<ImageBlob> {
+  async execute(request: ImageProxyRequest): Promise<ImageBlob> {
     const cacheKey = request.getCacheKey();
     const cached = await this.imageCacheService.get(cacheKey);
     if (cached) {
@@ -35,12 +33,12 @@ export class ImageTransformService {
       did: request.did,
       cid: request.cid,
     });
-    const transformedBlob = await this.imageBlobService.transform({
+    const resizedBlob = await this.imageResizeService.resize({
       blob: originalBlob,
       preset: request.preset,
     });
 
-    await this.imageCacheService.set(cacheKey, transformedBlob);
-    return transformedBlob;
+    await this.imageCacheService.set(cacheKey, resizedBlob);
+    return resizedBlob;
   }
 }
