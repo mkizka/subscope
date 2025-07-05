@@ -44,6 +44,7 @@ paths=(
   "com/atproto/repo/defs.json"
   "com/atproto/repo/deleteRecord.json"
   "com/atproto/repo/getRecord.json"
+  "com/atproto/repo/putRecord.json"
   "com/atproto/repo/listRecords.json"
   "com/atproto/repo/strongRef.json"
   "com/atproto/sync/getBlob.json"

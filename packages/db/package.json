@@ -16,16 +16,16 @@
   },
   "dependencies": {
     "drizzle-orm": "0.44.2",
-    "pg": "8.16.0"
+    "pg": "8.16.3"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "7.0.1",
-    "@tsconfig/node-lts": "22.0.1",
-    "@types/node": "22.15.30",
+    "@tsconfig/node-lts": "22.0.2",
+    "@types/node": "24.0.10",
     "@types/pg": "8.15.4",
-    "dotenv": "16.5.0",
-    "drizzle-kit": "0.31.1",
-    "eslint": "9.19.0"
+    "dotenv": "17.0.1",
+    "drizzle-kit": "0.31.4",
+    "eslint": "9.30.1"
   },
   "sideEffects": false
 }
