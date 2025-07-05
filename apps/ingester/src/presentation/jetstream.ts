@@ -144,10 +144,18 @@ export class JetstreamIngester {
     }, this.reconnectDelay);
   }
 
-  async start() {
+  private async getCursor() {
     const savedCursor = await this.cursorRepository.get();
-    if (savedCursor !== null) {
-      this.jetstream.cursor = savedCursor;
+    if (!savedCursor && env.NODE_ENV === "development") {
+      return 0;
+    }
+    return savedCursor;
+  }
+
+  async start() {
+    const cursor = await this.getCursor();
+    if (cursor !== null) {
+      this.jetstream.cursor = cursor;
     }
     this.jetstream.start();
 
