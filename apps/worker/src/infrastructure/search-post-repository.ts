@@ -21,7 +21,7 @@ export class SearchPostRepository implements ISearchPostRepository {
     await index.addDocuments([
       {
         id: this.getDocumentId(searchPost.uri),
-        uri: searchPost.uri,
+        uri: searchPost.uri.toString(),
         text: searchPost.text,
       },
     ]);
