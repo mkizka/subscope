@@ -4,6 +4,7 @@ import {
   DidResolver,
   JobQueue,
   LoggerManager,
+  meilisearchFactory,
   MetricReporter,
   RedisDidCache,
   TransactionManager,
@@ -40,6 +41,7 @@ import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { GeneratorRepository } from "./infrastructure/generator-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
+import { MeilisearchMigrator } from "./infrastructure/meilisearch-migrator.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "./infrastructure/profile-repository.js";
@@ -48,6 +50,7 @@ import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepoFetcher } from "./infrastructure/repo-fetcher.js";
 import { FeedItemRepository } from "./infrastructure/repositories/feed-item-repository.js";
 import { RepostRepository } from "./infrastructure/repost-repository.js";
+import { SearchPostRepository } from "./infrastructure/search-post-repository.js";
 import { SubscriptionRepository } from "./infrastructure/subscription-repository.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
@@ -61,6 +64,8 @@ createInjector()
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("indexLevel", env.INDEX_LEVEL)
+  .provideValue("meilisearchHost", env.MEILISEARCH_HOST)
+  .provideValue("meilisearchApiKey", env.MEILISEARCH_API_KEY)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)
@@ -70,6 +75,7 @@ createInjector()
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
   .provideClass("jobQueue", JobQueue)
+  .provideFactory("meilisearch", meilisearchFactory)
   .provideClass("repoFetcher", RepoFetcher)
   .provideClass("recordFetcher", RecordFetcher)
   .provideClass("actorRepository", ActorRepository)
@@ -84,6 +90,8 @@ createInjector()
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
+  .provideClass("searchPostRepository", SearchPostRepository)
+  .provideClass("meilisearchMigrator", MeilisearchMigrator)
   // application(service)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)
   .provideClass("backfillScheduler", BackfillScheduler)
@@ -112,6 +120,5 @@ createInjector()
   .provideClass("temp__cleanupDatabaseUseCase", Temp__CleanupDatabaseUseCase)
   .provideClass("backfillUseCase", BackfillUseCase)
   .provideClass("syncWorker", SyncWorker)
-  // presentation
   .injectClass(WorkerServer)
   .start();

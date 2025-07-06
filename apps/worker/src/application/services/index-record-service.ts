@@ -110,6 +110,10 @@ export class IndexRecordService {
         ctx,
         record: existingRecord,
       });
+      await indexer.beforeDelete?.({
+        ctx,
+        record: existingRecord,
+      });
     }
 
     await this.recordRepository.delete({ ctx, uri });

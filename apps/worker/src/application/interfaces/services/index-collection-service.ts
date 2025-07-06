@@ -24,4 +24,11 @@ export interface ICollectionIndexer {
     ctx: TransactionContext;
     record: Record;
   }) => Promise<void>;
+  beforeDelete?: ({
+    ctx,
+    record,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+  }) => Promise<void>;
 }

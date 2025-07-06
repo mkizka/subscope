@@ -35,6 +35,14 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("redis://localhost:6379"),
   }),
+  MEILISEARCH_HOST: match({
+    prod: z.url(),
+    dev: z.url().default("http://localhost:7700"),
+  }),
+  MEILISEARCH_API_KEY: match({
+    prod: z.string(),
+    dev: z.string().default("searchkey"),
+  }),
 });
 
 export const env = (() => {

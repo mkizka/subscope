@@ -5,6 +5,7 @@ import { loggingMiddleware } from "@repo/common/utils";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
+import type { MeilisearchMigrator } from "../infrastructure/meilisearch-migrator.js";
 import { env } from "../shared/env.js";
 import { healthRouter } from "./routes/health.js";
 import type { SyncWorker } from "./worker.js";
@@ -17,6 +18,7 @@ export class WorkerServer {
   constructor(
     loggerManager: ILoggerManager,
     private readonly syncWorker: SyncWorker,
+    private readonly meilisearchMigrator: MeilisearchMigrator,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
@@ -24,11 +26,17 @@ export class WorkerServer {
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(healthRouter);
   }
-  static inject = ["loggerManager", "syncWorker"] as const;
+  static inject = [
+    "loggerManager",
+    "syncWorker",
+    "meilisearchMigrator",
+  ] as const;
 
   start() {
     this.server = this.app.listen(env.PORT, async () => {
       this.logger.info(`Worker server listening on port ${env.PORT}`);
+
+      await this.meilisearchMigrator.migrate();
       await this.syncWorker.start();
     });
 
