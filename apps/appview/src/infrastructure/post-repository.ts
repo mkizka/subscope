@@ -37,6 +37,10 @@ export class PostRepository implements IPostRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
+  private escapeWildcards(query: string): string {
+    return query.replace(/[%_]/g, "\\$&");
+  }
+
   private convertToEmbed(post: SelectPost) {
     if (post.embedExternal) {
       return new PostEmbedExternal(
@@ -165,8 +169,9 @@ export class PostRepository implements IPostRepository {
     limit: number;
     cursor?: string;
   }): Promise<Post[]> {
+    const escapedQuery = this.escapeWildcards(params.query);
     const filters = [
-      ilike(schema.posts.text, `%${params.query}%`),
+      ilike(schema.posts.text, `%${escapedQuery}%`),
       isNull(schema.posts.replyParentUri),
     ];
 

@@ -347,4 +347,94 @@ describe("SearchPostsUseCase", () => {
       },
     });
   });
+
+  test("ワイルドカード文字が含まれる検索クエリの場合、文字をエスケープして検索する", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Wildcard Test User" }))
+      .create();
+
+    // %を含む投稿
+    const percentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "これは100%正確な情報です",
+        }),
+      })
+      .create();
+    const percentPost = await postFactory(ctx.db)
+      .vars({ record: () => percentRecord })
+      .props({ text: () => "これは100%正確な情報です" })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => percentPost })
+      .create();
+
+    // _を含む投稿
+    const underscoreRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "user_nameという変数です",
+        }),
+      })
+      .create();
+    const underscorePost = await postFactory(ctx.db)
+      .vars({ record: () => underscoreRecord })
+      .props({ text: () => "user_nameという変数です" })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => underscorePost })
+      .create();
+
+    // 関係ない投稿
+    const otherRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "これは関係ない投稿です",
+        }),
+      })
+      .create();
+    const otherPost = await postFactory(ctx.db)
+      .vars({ record: () => otherRecord })
+      .props({ text: () => "これは関係ない投稿です" })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => otherPost })
+      .create();
+
+    // act - %文字を検索
+    const percentResult = await searchPostsUseCase.execute({
+      q: "100%",
+      limit: 10,
+    });
+
+    // act - _文字を検索
+    const underscoreResult = await searchPostsUseCase.execute({
+      q: "user_name",
+      limit: 10,
+    });
+
+    // assert
+    expect(percentResult.posts).toHaveLength(1);
+    expect(percentResult.posts[0]).toMatchObject({
+      uri: percentPost.uri,
+      record: {
+        text: "これは100%正確な情報です",
+      },
+    });
+
+    expect(underscoreResult.posts).toHaveLength(1);
+    expect(underscoreResult.posts[0]).toMatchObject({
+      uri: underscorePost.uri,
+      record: {
+        text: "user_nameという変数です",
+      },
+    });
+  });
 });
