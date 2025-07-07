@@ -283,4 +283,68 @@ describe("SearchPostsUseCase", () => {
     });
     expect(secondPage.cursor).toBeUndefined();
   });
+
+  test("リプライ投稿がある場合、リプライを除外して元投稿のみを返す", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Reply Test User" }))
+      .create();
+
+    // 元投稿
+    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "元投稿のリプライ検証内容です",
+        }),
+      })
+      .create();
+    const originalPost = await postFactory(ctx.db)
+      .vars({ record: () => originalRecord })
+      .props({ text: () => "元投稿のリプライ検証内容です" })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => originalPost })
+      .create();
+
+    // リプライ投稿
+    const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "これはリプライ検証内容のリプライです",
+        }),
+      })
+      .create();
+    const replyPost = await postFactory(ctx.db)
+      .vars({ record: () => replyRecord })
+      .props({
+        text: () => "これはリプライ検証内容のリプライです",
+        replyParentUri: () => originalPost.uri,
+        replyParentCid: () => originalPost.cid,
+        replyRootUri: () => originalPost.uri,
+        replyRootCid: () => originalPost.cid,
+      })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => replyPost })
+      .create();
+
+    // act
+    const result = await searchPostsUseCase.execute({
+      q: "リプライ検証内容",
+      limit: 10,
+    });
+
+    // assert
+    expect(result.posts).toHaveLength(1);
+    expect(result.posts[0]).toMatchObject({
+      uri: originalPost.uri,
+      record: {
+        text: "元投稿のリプライ検証内容です",
+      },
+    });
+  });
 });

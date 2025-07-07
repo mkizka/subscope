@@ -7,7 +7,7 @@ import {
   PostEmbedRecord,
 } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, ilike, inArray, lt } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNull, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
@@ -165,7 +165,10 @@ export class PostRepository implements IPostRepository {
     limit: number;
     cursor?: string;
   }): Promise<Post[]> {
-    const filters = [ilike(schema.posts.text, `%${params.query}%`)];
+    const filters = [
+      ilike(schema.posts.text, `%${params.query}%`),
+      isNull(schema.posts.replyParentUri),
+    ];
 
     if (params.cursor) {
       const cursor = new Date(params.cursor);
