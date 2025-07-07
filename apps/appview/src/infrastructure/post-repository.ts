@@ -7,7 +7,7 @@ import {
   PostEmbedRecord,
 } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, eq, inArray, lt } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 
@@ -148,6 +148,34 @@ export class PostRepository implements IPostRepository {
     const postsWithEmbeds = await this.db.query.posts.findMany({
       where: eq(schema.posts.replyParentUri, uri.toString()),
       orderBy: (posts, { asc }) => [asc(posts.createdAt)],
+      with: {
+        embedImages: {
+          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
+        },
+        embedExternal: true,
+        embedRecord: true,
+      },
+    });
+
+    return postsWithEmbeds.map((post) => this.convertToPost(post));
+  }
+
+  async search(params: {
+    query: string;
+    limit: number;
+    cursor?: string;
+  }): Promise<Post[]> {
+    const filters = [ilike(schema.posts.text, `%${params.query}%`)];
+
+    if (params.cursor) {
+      const cursor = new Date(params.cursor);
+      filters.push(lt(schema.posts.sortAt, cursor));
+    }
+
+    const postsWithEmbeds = await this.db.query.posts.findMany({
+      where: and(...filters),
+      orderBy: [desc(schema.posts.sortAt)],
+      limit: params.limit,
       with: {
         embedImages: {
           orderBy: (embedImages, { asc }) => [asc(embedImages.position)],

@@ -12,6 +12,7 @@ import { createInjector } from "typed-inject";
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
+import { SearchService } from "./application/service/feed/search-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { AuthVerifierService } from "./application/service/request/auth-verifier-service.js";
@@ -30,6 +31,7 @@ import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thre
 import { GetPostsUseCase } from "./application/use-cases/feed/get-posts-use-case.js";
 import { GetRepostedByUseCase } from "./application/use-cases/feed/get-reposted-by-use-case.js";
 import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-use-case.js";
+import { SearchPostsUseCase } from "./application/use-cases/feed/search-posts-use-case.js";
 import { GetFollowersUseCase } from "./application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use-case.js";
 import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
@@ -55,6 +57,7 @@ import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetPostThread } from "./presentation/routes/app/bsky/feed/getPostThread.js";
 import { GetRepostedBy } from "./presentation/routes/app/bsky/feed/getRepostedBy.js";
 import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js";
+import { SearchPosts } from "./presentation/routes/app/bsky/feed/searchPosts.js";
 import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
 import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
@@ -94,6 +97,7 @@ createInjector()
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("timelineService", TimelineService)
+  .provideClass("searchService", SearchService)
   .provideClass("authorFeedService", AuthorFeedService)
   .provideClass("actorLikesService", ActorLikesService)
   .provideClass("likeService", LikeService)
@@ -107,6 +111,7 @@ createInjector()
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getPostThreadUseCase", GetPostThreadUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
+  .provideClass("searchPostsUseCase", SearchPostsUseCase)
   .provideClass("getActorLikesUseCase", GetActorLikesUseCase)
   .provideClass("getAuthorFeedUseCase", GetAuthorFeedUseCase)
   .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
@@ -120,6 +125,7 @@ createInjector()
   .provideClass("getPosts", GetPosts)
   .provideClass("getPostThread", GetPostThread)
   .provideClass("getTimeline", GetTimeline)
+  .provideClass("searchPosts", SearchPosts)
   .provideClass("getActorLikes", GetActorLikes)
   .provideClass("getAuthorFeed", GetAuthorFeed)
   .provideClass("getJobStatus", GetJobStatus)

@@ -1,0 +1,286 @@
+import { LoggerManager } from "@repo/common/infrastructure";
+import {
+  actorFactory,
+  getTestSetup,
+  postFactory,
+  postStatsFactory,
+  recordFactory,
+} from "@repo/test-utils";
+import { describe, expect, test } from "vitest";
+
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { PostRepository } from "../../../infrastructure/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { SearchService } from "../../service/feed/search-service.js";
+import { EmbedViewService } from "../../service/view/embed-view-service.js";
+import { PostViewService } from "../../service/view/post-view-service.js";
+import { ProfileViewService } from "../../service/view/profile-view-service.js";
+import { SearchPostsUseCase } from "./search-posts-use-case.js";
+
+describe("SearchPostsUseCase", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const searchPostsUseCase = testInjector
+    .provideValue("loggerManager", new LoggerManager("info"))
+    .provideClass("postRepository", PostRepository)
+    .provideClass("recordRepository", RecordRepository)
+    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("profileViewService", ProfileViewService)
+    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("postViewService", PostViewService)
+    .provideClass("searchService", SearchService)
+    .injectClass(SearchPostsUseCase);
+
+  test("検索クエリが空の場合、空の結果を返す", async () => {
+    // act
+    const result = await searchPostsUseCase.execute({
+      q: "",
+      limit: 10,
+    });
+
+    // assert
+    expect(result).toMatchObject({
+      posts: [],
+      cursor: undefined,
+    });
+  });
+
+  test("空白文字のみの検索クエリの場合、空の結果を返す", async () => {
+    // act
+    const result = await searchPostsUseCase.execute({
+      q: "   ",
+      limit: 10,
+    });
+
+    // assert
+    expect(result).toMatchObject({
+      posts: [],
+      cursor: undefined,
+    });
+  });
+
+  test("検索クエリに一致する投稿がある場合、該当する投稿を返す", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Test User" }))
+      .create();
+    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "これはテスト投稿です",
+        }),
+      })
+      .create();
+    const post = await postFactory(ctx.db)
+      .vars({ record: () => record })
+      .props({ text: () => "これはテスト投稿です" })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => post })
+      .create();
+
+    // act
+    const result = await searchPostsUseCase.execute({
+      q: "テスト",
+      limit: 10,
+    });
+
+    // assert
+    expect(result.posts.length).toBeGreaterThan(0);
+    expect(result.posts[0]).toMatchObject({
+      $type: "app.bsky.feed.defs#postView",
+      uri: post.uri,
+      author: {
+        did: actor.did,
+        displayName: "Test User",
+      },
+      record: {
+        $type: "app.bsky.feed.post",
+        text: "これはテスト投稿です",
+      },
+    });
+  });
+
+  test("検索クエリに一致する投稿がない場合、空の配列を返す", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "No Match User" }))
+      .create();
+    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "これは関係ない投稿です",
+        }),
+      })
+      .create();
+    const post = await postFactory(ctx.db)
+      .vars({ record: () => record })
+      .props({ text: () => "これは関係ない投稿です" })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => post })
+      .create();
+
+    // act
+    const result = await searchPostsUseCase.execute({
+      q: "存在しないキーワード",
+      limit: 10,
+    });
+
+    // assert
+    expect(result).toMatchObject({
+      posts: [],
+      cursor: undefined,
+    });
+  });
+
+  test("limitパラメータが指定された場合、指定した件数で結果を制限する", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Limit Test User" }))
+      .create();
+
+    const firstRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "最初のリミット検証投稿です",
+        }),
+      })
+      .create();
+    const firstPost = await postFactory(ctx.db)
+      .vars({ record: () => firstRecord })
+      .props({
+        text: () => "最初のリミット検証投稿です",
+        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+      })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => firstPost })
+      .create();
+
+    const secondRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "二番目のリミット検証投稿です",
+        }),
+      })
+      .create();
+    const secondPost = await postFactory(ctx.db)
+      .vars({ record: () => secondRecord })
+      .props({
+        text: () => "二番目のリミット検証投稿です",
+        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+      })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => secondPost })
+      .create();
+
+    // act
+    const result = await searchPostsUseCase.execute({
+      q: "リミット検証",
+      limit: 1,
+    });
+
+    // assert
+    expect(result.posts).toHaveLength(1);
+    expect(result.posts[0]).toMatchObject({
+      uri: firstPost.uri,
+      record: {
+        text: "最初のリミット検証投稿です",
+      },
+    });
+    expect(result.cursor).toBeDefined();
+  });
+
+  test("cursorパラメータが指定された場合、ページネーションで次のページを返す", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Pagination Test User" }))
+      .create();
+
+    const firstRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "最初のページネーション検証投稿です",
+        }),
+      })
+      .create();
+    const firstPost = await postFactory(ctx.db)
+      .vars({ record: () => firstRecord })
+      .props({
+        text: () => "最初のページネーション検証投稿です",
+        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+      })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => firstPost })
+      .create();
+
+    const secondRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => actor })
+      .props({
+        json: () => ({
+          $type: "app.bsky.feed.post",
+          text: "二番目のページネーション検証投稿です",
+        }),
+      })
+      .create();
+    const secondPost = await postFactory(ctx.db)
+      .vars({ record: () => secondRecord })
+      .props({
+        text: () => "二番目のページネーション検証投稿です",
+        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+      })
+      .create();
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => secondPost })
+      .create();
+
+    // act - 最初のページ
+    const firstPage = await searchPostsUseCase.execute({
+      q: "ページネーション検証",
+      limit: 1,
+    });
+
+    // act - 次のページ
+    const secondPage = await searchPostsUseCase.execute({
+      q: "ページネーション検証",
+      limit: 1,
+      cursor: firstPage.cursor,
+    });
+
+    // assert
+    expect(firstPage.posts).toHaveLength(1);
+    expect(firstPage.posts[0]).toMatchObject({
+      uri: firstPost.uri,
+      record: {
+        text: "最初のページネーション検証投稿です",
+      },
+    });
+    expect(firstPage.cursor).toBeDefined();
+
+    expect(secondPage.posts).toHaveLength(1);
+    expect(secondPage.posts[0]).toMatchObject({
+      uri: secondPost.uri,
+      record: {
+        text: "二番目のページネーション検証投稿です",
+      },
+    });
+    expect(secondPage.cursor).toBeUndefined();
+  });
+});

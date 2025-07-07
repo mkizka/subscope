@@ -6,4 +6,9 @@ export interface IPostRepository {
   findByUris: (uris: AtUri[]) => Promise<Post[]>;
   findByUri: (uri: AtUri) => Promise<Post | null>;
   findReplies: (uri: AtUri) => Promise<Post[]>;
+  search: (params: {
+    query: string;
+    limit: number;
+    cursor?: string;
+  }) => Promise<Post[]>;
 }

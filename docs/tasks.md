@@ -22,7 +22,7 @@
 - [x] app/bsky/feed/getPosts.json
   - ブロックなどは未反映
 - [x] app/bsky/feed/getTimeline.json
-- [ ] app/bsky/feed/searchPosts.json
+- [x] app/bsky/feed/searchPosts.json
 - [x] app/bsky/feed/getAuthorFeed.json
 
 優先度低い
