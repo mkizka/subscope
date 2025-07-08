@@ -1,10 +1,12 @@
 import type { Did } from "@atproto/did";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
+import { required } from "@repo/common/utils";
 
 import { env } from "../../../shared/env.js";
 import type { IActorStatsRepository } from "../../interfaces/actor-stats-repository.js";
 import type { IProfileRepository } from "../../interfaces/profile-repository.js";
+import { createCursorPaginator, type Page } from "../../utils/pagination.js";
 
 export class ProfileViewService {
   constructor(
@@ -79,6 +81,40 @@ export class ProfileViewService {
       description: profile.description ?? undefined,
       indexedAt: profile.indexedAt?.toISOString(),
     }));
+  }
+
+  async searchActorsWithPagination({
+    query,
+    cursor,
+    limit,
+  }: {
+    query: string;
+    cursor?: string;
+    limit: number;
+  }): Promise<Page<AppBskyActorDefs.ProfileView>> {
+    const paginator = createCursorPaginator<ProfileDetailed>({
+      limit,
+      // TODO: sortAtに変える？
+      getCursor: (item) => required(item.indexedAt?.toISOString()),
+    });
+
+    const profiles = await this.profileRepository.searchActors({
+      query,
+      limit: paginator.queryLimit,
+      cursor,
+    });
+
+    const page = paginator.extractPage(profiles);
+
+    return {
+      items: page.items.map((profile) => ({
+        ...this.createProfileViewBasic(profile),
+        $type: "app.bsky.actor.defs#profileView" as const,
+        description: profile.description ?? undefined,
+        indexedAt: profile.indexedAt?.toISOString(),
+      })),
+      cursor: page.cursor,
+    };
   }
 
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {
