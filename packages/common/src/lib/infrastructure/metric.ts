@@ -67,6 +67,7 @@ export class MetricReporter implements IMetricReporter {
       }),
       blob_proxy_error_total: new client.Counter({
         name: "blob_proxy_error_total",
+        labelNames: ["error"],
         help: "Total number of blob proxy errors",
       }),
     };
