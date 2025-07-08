@@ -1,12 +1,11 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
-import { FeedItem, Post, SearchPost } from "@repo/common/domain";
+import { FeedItem, Post } from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
-import type { ISearchPostRepository } from "../../interfaces/search-post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
@@ -18,7 +17,6 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly actorStatsRepository: IActorStatsRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
-    private readonly searchPostRepository: ISearchPostRepository,
   ) {}
   static inject = [
     "postRepository",
@@ -27,7 +25,6 @@ export class PostIndexer implements ICollectionIndexer {
     "feedItemRepository",
     "actorStatsRepository",
     "fetchRecordScheduler",
-    "searchPostRepository",
   ] as const;
 
   async upsert({
@@ -49,9 +46,6 @@ export class PostIndexer implements ICollectionIndexer {
     if (embedUri) {
       await this.fetchRecordScheduler.schedule(embedUri, depth);
     }
-
-    const searchPost = SearchPost.from(post);
-    await this.searchPostRepository.upsert(searchPost);
   }
 
   async shouldIndex({
@@ -99,11 +93,5 @@ export class PostIndexer implements ICollectionIndexer {
         });
       }
     }
-  }
-
-  async beforeDelete({ record }: { record: Record }): Promise<void> {
-    const post = Post.from(record);
-    const searchPost = SearchPost.from(post);
-    await this.searchPostRepository.delete(searchPost);
   }
 }

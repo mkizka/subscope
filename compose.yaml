@@ -1,6 +1,5 @@
 volumes:
   db_data:
-  meilisearch_data:
 
 services:
   db:
@@ -23,12 +22,3 @@ services:
       - JETSTREAM_WS_URL=ws://localhost:2583/xrpc/com.atproto.sync.subscribeRepos
       - JETSTREAM_WORKER_COUNT=1
       - JETSTREAM_LIVENESS_TTL=10m
-  meilisearch:
-    image: getmeili/meilisearch:v1.15.1
-    ports:
-      - 7700:7700
-    volumes:
-      - meilisearch_data:/meili_data
-    environment:
-      - MEILI_NO_ANALYTICS=true
-      - MEILI_MASTER_KEY=searchkey

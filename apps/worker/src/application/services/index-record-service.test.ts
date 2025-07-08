@@ -30,7 +30,6 @@ import { RecordRepository } from "../../infrastructure/record-repository.js";
 import { FeedItemRepository } from "../../infrastructure/repositories/feed-item-repository.js";
 import { RepostRepository } from "../../infrastructure/repost-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/subscription-repository.js";
-import type { ISearchPostRepository } from "../interfaces/search-post-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { IndexRecordService } from "./index-record-service.js";
 import { FollowIndexer } from "./indexer/follow-indexer.js";
@@ -63,7 +62,6 @@ describe("IndexRecordService", () => {
     .provideClass("repostRepository", RepostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("feedItemRepository", FeedItemRepository)
-    .provideValue("searchPostRepository", mockDeep<ISearchPostRepository>())
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)

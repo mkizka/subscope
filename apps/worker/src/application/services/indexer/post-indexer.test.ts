@@ -19,13 +19,11 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
-import type { ISearchPostRepository } from "../../interfaces/search-post-repository.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
 describe("PostIndexer", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const mockSearchPostRepository = mock<ISearchPostRepository>();
   const { testInjector, ctx } = getTestSetup();
 
   const postIndexer = testInjector
@@ -36,7 +34,6 @@ describe("PostIndexer", () => {
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideValue("searchPostRepository", mockSearchPostRepository)
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .injectClass(PostIndexer);
