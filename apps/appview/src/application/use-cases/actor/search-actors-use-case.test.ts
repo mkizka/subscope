@@ -65,39 +65,10 @@ describe("SearchActorsUseCase", () => {
     });
   });
 
-  test("displayNameに検索クエリが含まれるアクターを返す", async () => {
-    // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Test User 検索対象" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => actor })
-      .create();
-
-    // act
-    const result = await searchActorsUseCase.execute({
-      query: "検索対象",
-      limit: 10,
-    });
-
-    // assert
-    expect(result.actors.length).toBeGreaterThan(0);
-    expect(result).toMatchObject({
-      actors: [
-        {
-          $type: "app.bsky.actor.defs#profileView",
-          did: actor.did,
-          handle: actor.handle ?? "handle.invalid",
-          displayName: "Test User 検索対象",
-        },
-      ],
-    });
-  });
-
-  test("複数のアクターがある場合、検索クエリに一致するもののみを返す", async () => {
+  test("displayNameに検索クエリが含まれるアクターがある場合、そのアクターを返す", async () => {
     // arrange
     const matchActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Unique Match Target" }))
+      .use((t) => t.withProfile({ displayName: "Test User 検索対象" }))
       .create();
     await actorStatsFactory(ctx.db)
       .vars({ actor: () => matchActor })
@@ -112,7 +83,7 @@ describe("SearchActorsUseCase", () => {
 
     // act
     const result = await searchActorsUseCase.execute({
-      query: "Unique Match",
+      query: "検索対象",
       limit: 10,
     });
 
@@ -122,7 +93,8 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: matchActor.did,
-          displayName: "Unique Match Target",
+          handle: matchActor.handle ?? "handle.invalid",
+          displayName: "Test User 検索対象",
         },
       ],
     });
@@ -291,6 +263,52 @@ describe("SearchActorsUseCase", () => {
       $type: "app.bsky.actor.defs#profileView",
       did: underscoreActor.did,
       displayName: "user_name_test",
+    });
+  });
+
+  test("displayNameまたはhandleのいずれかに検索クエリが含まれる場合、該当するアクターを返す", async () => {
+    // arrange
+    const displayNameActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "テスト User" }))
+      .props({ handle: () => "different.handle.com" })
+      .create();
+    await actorStatsFactory(ctx.db)
+      .vars({ actor: () => displayNameActor })
+      .create();
+
+    const handleActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Different Name" }))
+      .props({ handle: () => "testhandle.example.com" })
+      .create();
+    await actorStatsFactory(ctx.db)
+      .vars({ actor: () => handleActor })
+      .create();
+
+    // act - displayNameで検索
+    const displayNameResult = await searchActorsUseCase.execute({
+      query: "テスト",
+      limit: 10,
+    });
+
+    // act - handleで検索
+    const handleResult = await searchActorsUseCase.execute({
+      query: "testhandle",
+      limit: 10,
+    });
+
+    // assert
+    expect(displayNameResult.actors.length).toBe(1);
+    expect(displayNameResult.actors[0]).toMatchObject({
+      $type: "app.bsky.actor.defs#profileView",
+      did: displayNameActor.did,
+      displayName: "テスト User",
+    });
+
+    expect(handleResult.actors.length).toBe(1);
+    expect(handleResult.actors[0]).toMatchObject({
+      $type: "app.bsky.actor.defs#profileView",
+      did: handleActor.did,
+      handle: "testhandle.example.com",
     });
   });
 });
