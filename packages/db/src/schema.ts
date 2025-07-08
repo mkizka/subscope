@@ -60,24 +60,29 @@ export const follows = pgTable(
     index("follows_sort_at_idx").on(table.sortAt),
     index("follows_actor_did_idx").on(table.actorDid),
     index("follows_subject_did_idx").on(table.subjectDid),
+    index("follows_actor_subject_idx").on(table.actorDid, table.subjectDid),
   ],
 );
 
-export const profiles = pgTable("profiles", {
-  uri: varchar({ length: 256 })
-    .primaryKey()
-    .references(() => records.uri, { onDelete: "cascade" }),
-  cid: varchar({ length: 256 }).notNull(),
-  actorDid: varchar({ length: 256 })
-    .notNull()
-    .references(() => actors.did),
-  avatarCid: varchar({ length: 256 }),
-  description: text(),
-  displayName: varchar({ length: 256 }),
-  createdAt: timestamp(),
-  indexedAt: timestamp().defaultNow(),
-  updatedAt: timestamp().$onUpdate(() => new Date()),
-});
+export const profiles = pgTable(
+  "profiles",
+  {
+    uri: varchar({ length: 256 })
+      .primaryKey()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did),
+    avatarCid: varchar({ length: 256 }),
+    description: text(),
+    displayName: varchar({ length: 256 }),
+    createdAt: timestamp(),
+    indexedAt: timestamp().defaultNow(),
+    updatedAt: timestamp().$onUpdate(() => new Date()),
+  },
+  (table) => [index("profiles_actor_idx").on(table.actorDid)],
+);
 
 export const posts = pgTable(
   "posts",
@@ -108,6 +113,10 @@ export const posts = pgTable(
     // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
     index("posts_indexed_at_idx").on(table.indexedAt),
     index("posts_reply_parent_uri_idx").on(table.replyParentUri),
+    index("posts_reply_parent_sort_idx").on(
+      table.replyParentUri,
+      table.sortAt.desc(),
+    ),
   ],
 );
 
@@ -190,6 +199,7 @@ export const likes = pgTable(
   (table) => [
     index("likes_sort_at_idx").on(table.sortAt),
     index("likes_subject_uri_idx").on(table.subjectUri),
+    index("likes_subject_sort_idx").on(table.subjectUri, table.sortAt.desc()),
   ],
 );
 
@@ -214,6 +224,7 @@ export const reposts = pgTable(
   (table) => [
     index("reposts_sort_at_idx").on(table.sortAt),
     index("reposts_subject_uri_idx").on(table.subjectUri),
+    index("reposts_subject_sort_idx").on(table.subjectUri, table.sortAt.desc()),
   ],
 );
 
@@ -237,6 +248,7 @@ export const feedItems = pgTable(
   (table) => [
     index("feed_items_sort_at_idx").on(table.sortAt),
     index("feed_items_actor_did_idx").on(table.actorDid),
+    index("feed_items_actor_sort_idx").on(table.actorDid, table.sortAt.desc()),
   ],
 );
 
