@@ -239,4 +239,58 @@ describe("SearchActorsUseCase", () => {
       cursor: undefined,
     });
   });
+
+  test("ワイルドカード文字が含まれる検索クエリの場合、文字をエスケープして検索する", async () => {
+    // arrange
+    // %を含むdisplayName
+    const percentActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "100%完璧なユーザー" }))
+      .create();
+    await actorStatsFactory(ctx.db)
+      .vars({ actor: () => percentActor })
+      .create();
+
+    // _を含むdisplayName
+    const underscoreActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "user_name_test" }))
+      .create();
+    await actorStatsFactory(ctx.db)
+      .vars({ actor: () => underscoreActor })
+      .create();
+
+    // 関係ないdisplayName
+    const otherActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "これは関係ないユーザー" }))
+      .create();
+    await actorStatsFactory(ctx.db)
+      .vars({ actor: () => otherActor })
+      .create();
+
+    // act - %文字を検索
+    const percentResult = await searchActorsUseCase.execute({
+      query: "100%",
+      limit: 10,
+    });
+
+    // act - _文字を検索
+    const underscoreResult = await searchActorsUseCase.execute({
+      query: "user_name",
+      limit: 10,
+    });
+
+    // assert
+    expect(percentResult.actors).toHaveLength(1);
+    expect(percentResult.actors[0]).toMatchObject({
+      $type: "app.bsky.actor.defs#profileView",
+      did: percentActor.did,
+      displayName: "100%完璧なユーザー",
+    });
+
+    expect(underscoreResult.actors).toHaveLength(1);
+    expect(underscoreResult.actors[0]).toMatchObject({
+      $type: "app.bsky.actor.defs#profileView",
+      did: underscoreActor.did,
+      displayName: "user_name_test",
+    });
+  });
 });

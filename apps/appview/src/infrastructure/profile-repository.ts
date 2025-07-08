@@ -10,6 +10,10 @@ export class ProfileRepository implements IProfileRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
+  private escapeWildcards(query: string): string {
+    return query.replace(/[%_]/g, "\\$&");
+  }
+
   async findManyDetailed(dids: Did[]) {
     const profiles = await this.db.query.profiles.findMany({
       where: (profiles, { inArray }) => inArray(profiles.actorDid, dids),
@@ -50,7 +54,8 @@ export class ProfileRepository implements IProfileRepository {
     limit: number;
     cursor?: string;
   }): Promise<ProfileDetailed[]> {
-    const filters = [ilike(schema.profiles.displayName, `%${params.query}%`)];
+    const escapedQuery = this.escapeWildcards(params.query);
+    const filters = [ilike(schema.profiles.displayName, `%${escapedQuery}%`)];
 
     if (params.cursor) {
       const cursor = new Date(params.cursor);
