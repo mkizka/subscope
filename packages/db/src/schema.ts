@@ -56,7 +56,11 @@ export const follows = pgTable(
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),
   },
-  (table) => [index("follows_sort_at_idx").on(table.sortAt)],
+  (table) => [
+    index("follows_sort_at_idx").on(table.sortAt),
+    index("follows_actor_did_idx").on(table.actorDid),
+    index("follows_subject_did_idx").on(table.subjectDid),
+  ],
 );
 
 export const profiles = pgTable("profiles", {
@@ -103,6 +107,7 @@ export const posts = pgTable(
     index("posts_sort_at_idx").on(table.sortAt),
     // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
     index("posts_indexed_at_idx").on(table.indexedAt),
+    index("posts_reply_parent_uri_idx").on(table.replyParentUri),
   ],
 );
 
@@ -182,7 +187,10 @@ export const likes = pgTable(
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),
   },
-  (table) => [index("likes_sort_at_idx").on(table.sortAt)],
+  (table) => [
+    index("likes_sort_at_idx").on(table.sortAt),
+    index("likes_subject_uri_idx").on(table.subjectUri),
+  ],
 );
 
 export const reposts = pgTable(
