@@ -36,10 +36,7 @@ export class ImageCacheService {
     return new CacheMetadata({
       cacheKey: cacheEntry.cacheKey,
       status: "success",
-      imageBlob: new ImageBlob({
-        data,
-        contentType: "image/jpeg",
-      }),
+      imageBlob: ImageBlob.jpeg(data),
     });
   }
 
