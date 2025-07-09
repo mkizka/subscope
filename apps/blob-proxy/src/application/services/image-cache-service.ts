@@ -23,6 +23,7 @@ export class ImageCacheService {
         cacheKey: cacheEntry.cacheKey,
         status: "failed",
         imageBlob: null,
+        expiredAt: cacheEntry.expiredAt,
       });
     }
 
@@ -37,14 +38,13 @@ export class ImageCacheService {
       cacheKey: cacheEntry.cacheKey,
       status: "success",
       imageBlob: ImageBlob.jpeg(data),
+      expiredAt: cacheEntry.expiredAt,
     });
   }
 
   async set(cacheKey: string, blob: ImageBlob | null): Promise<void> {
-    const status = blob ? "success" : "failed";
-    const cacheMetadata = new CacheMetadata({
+    const cacheMetadata = CacheMetadata.create({
       cacheKey,
-      status,
       imageBlob: blob,
     });
 
@@ -53,5 +53,10 @@ export class ImageCacheService {
     if (blob) {
       await this.imageCacheStorage.save(cacheMetadata.getPath(), blob.data);
     }
+  }
+
+  async delete(cacheMetadata: CacheMetadata): Promise<void> {
+    await this.imageCacheStorage.remove(cacheMetadata.getPath());
+    await this.cacheMetadataRepository.delete(cacheMetadata.cacheKey);
   }
 }

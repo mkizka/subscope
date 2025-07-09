@@ -21,6 +21,7 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
           cacheKey: row.cacheKey,
           status: row.status,
           imageBlob: null,
+          expiredAt: row.expiredAt,
         })
       : null;
   }
@@ -30,13 +31,13 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
       .insert(schema.imageBlobCache)
       .values({
         cacheKey: cacheMetadata.cacheKey,
-        createdAt: new Date(),
+        expiredAt: cacheMetadata.expiredAt,
         status: cacheMetadata.status,
       })
       .onConflictDoUpdate({
         target: schema.imageBlobCache.cacheKey,
         set: {
-          createdAt: new Date(),
+          expiredAt: cacheMetadata.expiredAt,
           status: cacheMetadata.status,
         },
       });
@@ -48,11 +49,11 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
       .where(eq(schema.imageBlobCache.cacheKey, key));
   }
 
-  async findExpiredEntries(expirationDate: Date): Promise<CacheMetadata[]> {
+  async findExpired(): Promise<CacheMetadata[]> {
     const rows = await this.db
       .select()
       .from(schema.imageBlobCache)
-      .where(lt(schema.imageBlobCache.createdAt, expirationDate));
+      .where(lt(schema.imageBlobCache.expiredAt, new Date()));
 
     return rows.map(
       (row) =>
@@ -60,6 +61,7 @@ export class CacheMetadataRepository implements ICacheMetadataRepository {
           cacheKey: row.cacheKey,
           status: row.status,
           imageBlob: null,
+          expiredAt: row.expiredAt,
         }),
     );
   }

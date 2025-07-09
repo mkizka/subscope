@@ -52,7 +52,7 @@ describe("ImageProxyUseCase", () => {
 
     await ctx.db.insert(schema.imageBlobCache).values({
       cacheKey: "avatar/did:plc:example123/bafkreiabc123",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-01T00:00:00.000Z"),
     });
 
     mockImageCacheStorage.read.mockResolvedValueOnce(cachedData);
@@ -308,7 +308,7 @@ describe("ImageProxyUseCase", () => {
     // arrange
     await ctx.db.insert(schema.imageBlobCache).values({
       cacheKey: "avatar/did:plc:example555/bafkreiabc555",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-01T00:00:00.000Z"),
       status: "failed",
     });
 

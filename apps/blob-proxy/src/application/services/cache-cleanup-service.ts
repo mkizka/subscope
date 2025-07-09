@@ -1,7 +1,7 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 
 import type { ICacheMetadataRepository } from "../interfaces/cache-metadata-repository.js";
-import type { IImageCacheStorage } from "../interfaces/image-cache-storage.js";
+import type { ImageCacheService } from "./image-cache-service.js";
 
 export class CacheCleanupService {
   private readonly logger: Logger;
@@ -9,7 +9,7 @@ export class CacheCleanupService {
   constructor(
     loggerManager: ILoggerManager,
     private readonly cacheMetadataRepository: ICacheMetadataRepository,
-    private readonly imageStorage: IImageCacheStorage,
+    private readonly imageCacheService: ImageCacheService,
   ) {
     this.logger = loggerManager.createLogger("CacheCleanupService");
   }
@@ -17,20 +17,16 @@ export class CacheCleanupService {
   static inject = [
     "loggerManager",
     "cacheMetadataRepository",
-    "imageCacheStorage",
+    "imageCacheService",
   ] as const;
 
-  async cleanup(retentionTimeMs: number): Promise<number> {
-    const expirationDate = new Date(Date.now() - retentionTimeMs);
-
-    const expiredEntries =
-      await this.cacheMetadataRepository.findExpiredEntries(expirationDate);
+  async cleanup(): Promise<number> {
+    const expiredEntries = await this.cacheMetadataRepository.findExpired();
 
     let deletedCount = 0;
     for (const entry of expiredEntries) {
       try {
-        await this.imageStorage.remove(entry.getPath());
-        await this.cacheMetadataRepository.delete(entry.cacheKey);
+        await this.imageCacheService.delete(entry);
         deletedCount++;
       } catch (error) {
         this.logger.error(

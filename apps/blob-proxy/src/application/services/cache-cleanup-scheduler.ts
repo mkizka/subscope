@@ -29,16 +29,14 @@ export class CacheCleanupScheduler {
     );
 
     this.logger.info(
-      `Cache scheduling started with cron expression '${env.CACHE_CLEANUP_CRON}' (${env.CACHE_CLEANUP_TIMEZONE}), retaining files for ${env.CACHE_RETENTION_TIME}ms`,
+      `Cache scheduling started with cron expression '${env.CACHE_CLEANUP_CRON}' (${env.CACHE_CLEANUP_TIMEZONE}), TTL: success=1week, failed=5minutes`,
     );
   }
 
   private async performCleanup(): Promise<void> {
     try {
       this.logger.info("Starting cache cleanup");
-      const deletedCount = await this.cacheCleanupService.cleanup(
-        env.CACHE_RETENTION_TIME,
-      );
+      const deletedCount = await this.cacheCleanupService.cleanup();
       this.logger.info(
         `Cache cleanup completed. Deleted ${deletedCount} entries`,
       );

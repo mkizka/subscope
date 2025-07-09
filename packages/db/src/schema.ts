@@ -359,12 +359,12 @@ export const imageBlobCache = pgTable(
   "image_blob_cache",
   {
     cacheKey: varchar({ length: 512 }).primaryKey(),
-    createdAt: timestamp().notNull().defaultNow(),
+    expiredAt: timestamp().notNull(),
     status: varchar({ length: 20, enum: ["success", "failed"] as const })
       .notNull()
       .default("success"),
   },
-  (table) => [index("image_blob_cache_created_at_idx").on(table.createdAt)],
+  (table) => [index("image_blob_cache_expired_at_idx").on(table.expiredAt)],
 );
 
 export const postStatsRelations = relations(postStats, ({ one }) => ({

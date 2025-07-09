@@ -1,4 +1,3 @@
-import ms, { type StringValue } from "ms";
 import { z } from "zod/v4";
 import { fromError } from "zod-validation-error";
 
@@ -27,18 +26,8 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default("./cache"),
   }),
-  CACHE_CLEANUP_CRON: match({
-    prod: z.string().default("0 2 * * *"),
-    dev: z.string().default("* * * * *"),
-  }),
+  CACHE_CLEANUP_CRON: z.string().default("* * * * *"), // 1分間隔
   CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
-  CACHE_RETENTION_TIME: match({
-    prod: z.string().default("1d"),
-    dev: z.string().default("1m"),
-  }).transform((val) =>
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    ms(val as StringValue),
-  ),
 });
 
 export const env = (() => {
