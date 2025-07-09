@@ -1,5 +1,8 @@
 import { AtUri } from "@atproto/syntax";
-import type { ITransactionManager } from "@repo/common/domain";
+import {
+  type ITransactionManager,
+  RecordValidationError,
+} from "@repo/common/domain";
 
 import type { JobLogger } from "../../../shared/job.js";
 import {
@@ -45,7 +48,10 @@ export class FetchRecordUseCase {
     try {
       await this.doFetchRecord(uri, depth, jobLogger);
     } catch (error) {
-      if (error instanceof RecordFetchError) {
+      if (
+        error instanceof RecordFetchError ||
+        error instanceof RecordValidationError
+      ) {
         await jobLogger.log(error.message);
         return;
       }
