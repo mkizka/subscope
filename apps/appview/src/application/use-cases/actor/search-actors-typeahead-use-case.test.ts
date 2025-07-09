@@ -1,6 +1,8 @@
 import { LoggerManager } from "@repo/common/infrastructure";
 import { required } from "@repo/common/utils";
+import { schema } from "@repo/db";
 import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
@@ -106,15 +108,29 @@ describe("SearchActorsTypeaheadUseCase", () => {
 
   test("limit数を超えるactorが存在する場合、指定されたlimit数のactorを返す", async () => {
     // arrange
-    await actorFactory(ctx.db)
+    const actor1 = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Limit Test User 1" }))
       .create();
-    await actorFactory(ctx.db)
+    const actor2 = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Limit Test User 2" }))
       .create();
-    await actorFactory(ctx.db)
+    const actor3 = await actorFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Limit Test User 3" }))
       .create();
+
+    // indexedAtの順序を制御（新しい順）
+    await ctx.db
+      .update(schema.profiles)
+      .set({ indexedAt: new Date("2024-01-03T00:00:00.000Z") })
+      .where(eq(schema.profiles.actorDid, actor1.did));
+    await ctx.db
+      .update(schema.profiles)
+      .set({ indexedAt: new Date("2024-01-02T00:00:00.000Z") })
+      .where(eq(schema.profiles.actorDid, actor2.did));
+    await ctx.db
+      .update(schema.profiles)
+      .set({ indexedAt: new Date("2024-01-01T00:00:00.000Z") })
+      .where(eq(schema.profiles.actorDid, actor3.did));
 
     // act
     const result = await searchActorsTypeaheadUseCase.execute({
@@ -123,11 +139,18 @@ describe("SearchActorsTypeaheadUseCase", () => {
     });
 
     // assert
-    expect(result.actors).toHaveLength(2);
-
-    const displayNames = result.actors.map((actor) => actor.displayName);
-    expect(displayNames).toContain("Limit Test User 1");
-    expect(displayNames).toContain("Limit Test User 2");
+    expect(result).toMatchObject({
+      actors: [
+        {
+          $type: "app.bsky.actor.defs#profileViewBasic",
+          displayName: "Limit Test User 1",
+        },
+        {
+          $type: "app.bsky.actor.defs#profileViewBasic",
+          displayName: "Limit Test User 2",
+        },
+      ],
+    });
   });
 
   test("該当するactorが存在しない場合、空のactors配列を返す", async () => {
