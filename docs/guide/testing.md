@@ -73,6 +73,13 @@ Arrange-Act-Assertの各セクション間には1行の空行を入れます。�
 
 ```typescript
 describe("GetTimelineUseCase", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const getTimelineUseCase = testInjector
+    .provideValue("loggerManager", new LoggerManager("info"))
+    // ... 他の依存関係
+    .injectClass(GetTimelineUseCase);
+
   test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
@@ -112,6 +119,33 @@ describe("GetTimelineUseCase", () => {
 ## Factoryの使い方
 
 このプロジェクトでは、テストデータの作成にFactoryパターンを使用しています。`@repo/test-utils`パッケージから提供される各種Factoryを活用することで、一貫性のあるテストデータを簡潔に作成できます。
+
+### テストセットアップ
+
+テストファイルでは`getTestSetup()`を使用してテストインジェクターとデータベースコンテキストを取得します：
+
+```typescript
+import { LoggerManager } from "@repo/common/infrastructure";
+import {
+  actorFactory,
+  actorStatsFactory,
+  getTestSetup,
+} from "@repo/test-utils";
+import { describe, expect, test } from "vitest";
+
+describe("UseCase名", () => {
+  const { testInjector, ctx } = getTestSetup();
+
+  const useCase = testInjector
+    .provideValue("loggerManager", new LoggerManager("info"))
+    .provideClass("repository", Repository)
+    .injectClass(UseCase);
+
+  test("テストケース名", async () => {
+    // テスト実装
+  });
+});
+```
 
 ### 基本的な使い方
 
