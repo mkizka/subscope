@@ -1,5 +1,6 @@
 import { DidResolutionError, type IMetricReporter } from "@repo/common/domain";
 
+import { CacheMetadata } from "../domain/cache-metadata.js";
 import type { ImageBlob } from "../domain/image-blob.js";
 import type { ImageProxyRequest } from "../domain/image-proxy-request.js";
 import { BlobFetchFailedError } from "./interfaces/blob-fetcher.js";
@@ -44,7 +45,11 @@ export class ImageProxyUseCase {
         preset: request.preset,
       });
 
-      await this.imageCacheService.set(cacheKey, resizedBlob);
+      const successCacheMetadata = CacheMetadata.create({
+        cacheKey,
+        imageBlob: resizedBlob,
+      });
+      await this.imageCacheService.set(successCacheMetadata);
       return resizedBlob;
     } catch (e) {
       if (
@@ -54,7 +59,11 @@ export class ImageProxyUseCase {
         this.metricReporter.increment("blob_proxy_error_total", {
           error: e.name,
         });
-        await this.imageCacheService.set(cacheKey, null);
+        const failedCacheMetadata = CacheMetadata.create({
+          cacheKey,
+          imageBlob: null,
+        });
+        await this.imageCacheService.set(failedCacheMetadata);
         return null;
       }
       throw e;

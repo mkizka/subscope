@@ -42,16 +42,14 @@ export class ImageCacheService {
     });
   }
 
-  async set(cacheKey: string, blob: ImageBlob | null): Promise<void> {
-    const cacheMetadata = CacheMetadata.create({
-      cacheKey,
-      imageBlob: blob,
-    });
-
+  async set(cacheMetadata: CacheMetadata): Promise<void> {
     await this.cacheMetadataRepository.save(cacheMetadata);
 
-    if (blob) {
-      await this.imageCacheStorage.save(cacheMetadata.getPath(), blob.data);
+    if (cacheMetadata.imageBlob) {
+      await this.imageCacheStorage.save(
+        cacheMetadata.getPath(),
+        cacheMetadata.imageBlob.data,
+      );
     }
   }
 
