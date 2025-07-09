@@ -11,6 +11,7 @@ export * as DevMkizkaTestSyncGetJobStatus from "./generated/api/types/dev/mkizka
 export * from "./generated/server";
 export { lexicons } from "./generated/server/lexicons";
 export * as AppBskyActorSearchActors from "./generated/server/types/app/bsky/actor/searchActors";
+export * as AppBskyActorSearchActorsTypeahead from "./generated/server/types/app/bsky/actor/searchActorsTypeahead";
 export * as AppBskyEmbedExternal from "./generated/server/types/app/bsky/embed/external";
 export * as AppBskyEmbedImages from "./generated/server/types/app/bsky/embed/images";
 export * as AppBskyEmbedRecord from "./generated/server/types/app/bsky/embed/record";

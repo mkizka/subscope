@@ -117,6 +117,21 @@ export class ProfileViewService {
     };
   }
 
+  async searchActorsTypeahead({
+    query,
+    limit,
+  }: {
+    query: string;
+    limit: number;
+  }): Promise<$Typed<AppBskyActorDefs.ProfileViewBasic>[]> {
+    const profiles = await this.profileRepository.searchActors({
+      query,
+      limit,
+    });
+
+    return profiles.map((profile) => this.createProfileViewBasic(profile));
+  }
+
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {
     if (!profile.avatar) {
       return undefined;

@@ -5,13 +5,13 @@
 - [x] app/bsky/actor/getProfile.json
 - [x] app/bsky/actor/getProfiles.json
 - [x] app/bsky/actor/searchActors.json
+- [x] app/bsky/actor/searchActorsTypeahead.json
 
 優先度低い
 
 - [ ] app/bsky/actor/getPreferences.json
 - [ ] app/bsky/actor/putPreferences.json
 - [ ] app/bsky/actor/getSuggestions.json
-- [ ] app/bsky/actor/searchActorsTypeahead.json
 
 ## app.bsky.feed
 

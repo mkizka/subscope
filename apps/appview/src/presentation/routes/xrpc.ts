@@ -3,6 +3,7 @@ import { createServer } from "@repo/client/server";
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
 import type { SearchActors } from "./app/bsky/actor/searchActors.js";
+import type { SearchActorsTypeahead } from "./app/bsky/actor/searchActorsTypeahead.js";
 import type { GetActorLikes } from "./app/bsky/feed/getActorLikes.js";
 import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
 import type { GetLikes } from "./app/bsky/feed/getLikes.js";
@@ -22,6 +23,7 @@ export class XRPCRouter {
     getProfile: GetProfile,
     getProfiles: GetProfiles,
     searchActors: SearchActors,
+    searchActorsTypeahead: SearchActorsTypeahead,
     getActorLikes: GetActorLikes,
     getAuthorFeed: GetAuthorFeed,
     getLikes: GetLikes,
@@ -38,6 +40,7 @@ export class XRPCRouter {
       getProfile,
       getProfiles,
       searchActors,
+      searchActorsTypeahead,
       getActorLikes,
       getAuthorFeed,
       getLikes,
@@ -55,6 +58,7 @@ export class XRPCRouter {
     "getProfile",
     "getProfiles",
     "searchActors",
+    "searchActorsTypeahead",
     "getActorLikes",
     "getAuthorFeed",
     "getLikes",

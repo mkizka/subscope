@@ -24,6 +24,7 @@ import { ProfileViewService } from "./application/service/view/profile-view-serv
 import { ReplyRefService } from "./application/service/view/reply-ref-service.js";
 import { RepostService } from "./application/service/view/repost-service.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
+import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
 import { GetActorLikesUseCase } from "./application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
@@ -52,6 +53,7 @@ import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { SearchActors } from "./presentation/routes/app/bsky/actor/searchActors.js";
+import { SearchActorsTypeahead } from "./presentation/routes/app/bsky/actor/searchActorsTypeahead.js";
 import { GetActorLikes } from "./presentation/routes/app/bsky/feed/getActorLikes.js";
 import { GetAuthorFeed } from "./presentation/routes/app/bsky/feed/getAuthorFeed.js";
 import { GetLikes } from "./presentation/routes/app/bsky/feed/getLikes.js";
@@ -111,6 +113,7 @@ createInjector()
   .provideClass("feedProcessor", FeedProcessor)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)
   .provideClass("searchActorsUseCase", SearchActorsUseCase)
+  .provideClass("searchActorsTypeaheadUseCase", SearchActorsTypeaheadUseCase)
   .provideClass("getPostsUseCase", GetPostsUseCase)
   .provideClass("getPostThreadUseCase", GetPostThreadUseCase)
   .provideClass("getTimelineUseCase", GetTimelineUseCase)
@@ -126,6 +129,7 @@ createInjector()
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
   .provideClass("searchActors", SearchActors)
+  .provideClass("searchActorsTypeahead", SearchActorsTypeahead)
   .provideClass("getPosts", GetPosts)
   .provideClass("getPostThread", GetPostThread)
   .provideClass("getTimeline", GetTimeline)

@@ -12,6 +12,7 @@ paths=(
   "app/bsky/actor/getProfiles.json"
   "app/bsky/actor/profile.json"
   "app/bsky/actor/searchActors.json"
+  "app/bsky/actor/searchActorsTypeahead.json"
   "app/bsky/embed/defs.json"
   "app/bsky/embed/external.json"
   "app/bsky/embed/images.json"
