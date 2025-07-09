@@ -360,6 +360,9 @@ export const imageBlobCache = pgTable(
   {
     cacheKey: varchar({ length: 512 }).primaryKey(),
     createdAt: timestamp().notNull().defaultNow(),
+    status: varchar({ length: 20, enum: ["success", "failed"] as const })
+      .notNull()
+      .default("success"),
   },
   (table) => [index("image_blob_cache_created_at_idx").on(table.createdAt)],
 );

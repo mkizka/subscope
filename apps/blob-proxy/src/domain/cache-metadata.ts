@@ -1,14 +1,21 @@
 import path from "path";
 
 import { env } from "../shared/env.js";
+import type { ImageBlob } from "./image-blob.js";
 
 export class CacheMetadata {
   readonly cacheKey: string;
-  readonly createdAt: Date;
+  readonly status: "success" | "failed";
+  readonly imageBlob: ImageBlob | null;
 
-  constructor(params: { cacheKey: string; createdAt: Date }) {
+  constructor(params: {
+    cacheKey: string;
+    status: "success" | "failed";
+    imageBlob: ImageBlob | null;
+  }) {
     this.cacheKey = params.cacheKey;
-    this.createdAt = params.createdAt;
+    this.status = params.status;
+    this.imageBlob = params.imageBlob;
   }
 
   getPath(): string {

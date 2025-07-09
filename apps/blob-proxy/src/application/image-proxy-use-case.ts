@@ -26,7 +26,11 @@ export class ImageProxyUseCase {
     const cached = await this.imageCacheService.get(cacheKey);
     if (cached) {
       this.metricReporter.increment("blob_proxy_cache_hit_total");
-      return cached;
+      if (cached.status === "success") {
+        return cached.imageBlob;
+      } else {
+        return null;
+      }
     }
     this.metricReporter.increment("blob_proxy_cache_miss_total");
 
@@ -50,6 +54,7 @@ export class ImageProxyUseCase {
         this.metricReporter.increment("blob_proxy_error_total", {
           error: e.name,
         });
+        await this.imageCacheService.set(cacheKey, null);
         return null;
       }
       throw e;

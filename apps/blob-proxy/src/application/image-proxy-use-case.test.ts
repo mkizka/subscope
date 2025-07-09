@@ -1,4 +1,5 @@
 import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
+import { DidResolutionError } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { getTestSetup } from "@repo/test-utils";
 import { eq, or } from "drizzle-orm";
@@ -10,6 +11,7 @@ import { ImageProxyRequest } from "../domain/image-proxy-request.js";
 import { CacheMetadataRepository } from "../infrastructure/cache-metadata-repository.js";
 import { ImageProxyUseCase } from "./image-proxy-use-case.js";
 import type { IBlobFetcher } from "./interfaces/blob-fetcher.js";
+import { BlobFetchFailedError } from "./interfaces/blob-fetcher.js";
 import type { IImageCacheStorage } from "./interfaces/image-cache-storage.js";
 import type { IImageResizer } from "./interfaces/image-resizer.js";
 import { FetchBlobService } from "./services/fetch-blob-service.js";
@@ -300,5 +302,128 @@ describe("ImageProxyUseCase", () => {
     });
 
     expect(mockImageCacheStorage.save).toHaveBeenCalled();
+  });
+
+  test("ネガティブキャッシュがヒットした場合、nullを返してヒットメトリクスを記録する", async () => {
+    // arrange
+    await ctx.db.insert(schema.imageBlobCache).values({
+      cacheKey: "avatar/did:plc:example555/bafkreiabc555",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      status: "failed",
+    });
+
+    // act
+    const result = await imageProxyUseCase.execute(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example555",
+        cid: "bafkreiabc555",
+        type: "avatar",
+      }),
+    );
+
+    // assert
+    expect(result).toBeNull();
+    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
+      "blob_proxy_cache_hit_total",
+    );
+    expect(mockImageCacheStorage.read).not.toHaveBeenCalled();
+    expect(mockDidResolver.resolve).not.toHaveBeenCalled();
+    expect(mockBlobFetcher.fetchBlob).not.toHaveBeenCalled();
+    expect(mockImageResizer.resize).not.toHaveBeenCalled();
+    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+  });
+
+  test("BlobFetchFailedErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
+    // arrange
+    mockDidResolver.resolve.mockResolvedValueOnce({
+      pds: new URL("https://example.pds.com"),
+      signingKey: "test-signing-key",
+      handle: "test.handle" as const,
+    });
+    mockBlobFetcher.fetchBlob.mockRejectedValueOnce(
+      new BlobFetchFailedError("NOT_FOUND"),
+    );
+
+    // act
+    const result = await imageProxyUseCase.execute(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example999",
+        cid: "bafkreiabc999",
+        type: "banner",
+      }),
+    );
+
+    // assert
+    expect(result).toBeNull();
+    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
+      "blob_proxy_cache_miss_total",
+    );
+    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
+      "blob_proxy_error_total",
+      { error: "BlobFetchFailedError" },
+    );
+    expect(mockImageResizer.resize).not.toHaveBeenCalled();
+    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+
+    const savedCache = await ctx.db
+      .select()
+      .from(schema.imageBlobCache)
+      .where(
+        eq(
+          schema.imageBlobCache.cacheKey,
+          "banner/did:plc:example999/bafkreiabc999",
+        ),
+      );
+    expect(savedCache).toHaveLength(1);
+    expect(savedCache[0]).toMatchObject({
+      cacheKey: "banner/did:plc:example999/bafkreiabc999",
+      status: "failed",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+  });
+
+  test("DidResolutionErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
+    // arrange
+    mockDidResolver.resolve.mockRejectedValueOnce(
+      new DidResolutionError("DID resolution failed"),
+    );
+
+    // act
+    const result = await imageProxyUseCase.execute(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example888",
+        cid: "bafkreiabc888",
+        type: "feed_fullsize",
+      }),
+    );
+
+    // assert
+    expect(result).toBeNull();
+    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
+      "blob_proxy_cache_miss_total",
+    );
+    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
+      "blob_proxy_error_total",
+      { error: "DidResolutionError" },
+    );
+    expect(mockBlobFetcher.fetchBlob).not.toHaveBeenCalled();
+    expect(mockImageResizer.resize).not.toHaveBeenCalled();
+    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+
+    const savedCache = await ctx.db
+      .select()
+      .from(schema.imageBlobCache)
+      .where(
+        eq(
+          schema.imageBlobCache.cacheKey,
+          "feed_fullsize/did:plc:example888/bafkreiabc888",
+        ),
+      );
+    expect(savedCache).toHaveLength(1);
+    expect(savedCache[0]).toMatchObject({
+      cacheKey: "feed_fullsize/did:plc:example888/bafkreiabc888",
+      status: "failed",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
   });
 });
