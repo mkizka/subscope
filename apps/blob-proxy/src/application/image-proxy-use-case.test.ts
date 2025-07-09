@@ -52,7 +52,7 @@ describe("ImageProxyUseCase", () => {
 
     await ctx.db.insert(schema.imageBlobCache).values({
       cacheKey: "avatar/did:plc:example123/bafkreiabc123",
-      expiredAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
     });
 
     mockImageCacheStorage.read.mockResolvedValueOnce(cachedData);
@@ -133,7 +133,7 @@ describe("ImageProxyUseCase", () => {
     expect(savedCache).toHaveLength(1);
     expect(savedCache[0]).toMatchObject({
       cacheKey: "feed_thumbnail/did:plc:example123/bafkreiabc456",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
     });
 
     expect(mockImageCacheStorage.save).toHaveBeenCalledWith(
@@ -193,11 +193,11 @@ describe("ImageProxyUseCase", () => {
     expect(savedCaches).toMatchObject([
       {
         cacheKey: "avatar/did:plc:example789/bafkreidef789",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
       },
       {
         cacheKey: "avatar_thumbnail/did:plc:example789/bafkreidef789",
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
       },
     ]);
 
@@ -298,7 +298,7 @@ describe("ImageProxyUseCase", () => {
     expect(savedCache).toHaveLength(1);
     expect(savedCache[0]).toMatchObject({
       cacheKey: "avatar/did:plc:example777/bafkreiabc777",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
     });
 
     expect(mockImageCacheStorage.save).toHaveBeenCalled();
@@ -308,7 +308,7 @@ describe("ImageProxyUseCase", () => {
     // arrange
     await ctx.db.insert(schema.imageBlobCache).values({
       cacheKey: "avatar/did:plc:example555/bafkreiabc555",
-      expiredAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-01T00:05:00.000Z"), // 失敗キャッシュは5分後
       status: "failed",
     });
 
@@ -378,7 +378,7 @@ describe("ImageProxyUseCase", () => {
     expect(savedCache[0]).toMatchObject({
       cacheKey: "banner/did:plc:example999/bafkreiabc999",
       status: "failed",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-01T00:05:00.000Z"), // 失敗キャッシュは5分後
     });
   });
 
@@ -423,7 +423,7 @@ describe("ImageProxyUseCase", () => {
     expect(savedCache[0]).toMatchObject({
       cacheKey: "feed_fullsize/did:plc:example888/bafkreiabc888",
       status: "failed",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiredAt: new Date("2024-01-01T00:05:00.000Z"), // 失敗キャッシュは5分後
     });
   });
 });
