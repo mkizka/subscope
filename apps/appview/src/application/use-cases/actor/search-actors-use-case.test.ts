@@ -152,14 +152,14 @@ describe("SearchActorsUseCase", () => {
   test("cursorパラメータが指定された場合、ページネーションで次のページを返す", async () => {
     // arrange
     const actor1 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Pagination Test User 1" }))
+      .use((t) => t.withProfile({ displayName: "ActorPaginationTest User 1" }))
       .create();
     await actorStatsFactory(ctx.db)
       .vars({ actor: () => actor1 })
       .create();
 
     const actor2 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Pagination Test User 2" }))
+      .use((t) => t.withProfile({ displayName: "ActorPaginationTest User 2" }))
       .create();
     await actorStatsFactory(ctx.db)
       .vars({ actor: () => actor2 })
@@ -177,13 +177,13 @@ describe("SearchActorsUseCase", () => {
 
     // act - 最初のページ
     const firstPage = await searchActorsUseCase.execute({
-      query: "Pagination Test",
+      query: "ActorPaginationTest",
       limit: 1,
     });
 
     // act - 次のページ
     const secondPage = await searchActorsUseCase.execute({
-      query: "Pagination Test",
+      query: "ActorPaginationTest",
       limit: 1,
       cursor: firstPage.cursor,
     });
@@ -194,7 +194,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: actor2.did,
-          displayName: "Pagination Test User 2",
+          displayName: "ActorPaginationTest User 2",
         },
       ],
     });
@@ -205,7 +205,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: actor1.did,
-          displayName: "Pagination Test User 1",
+          displayName: "ActorPaginationTest User 1",
         },
       ],
       cursor: undefined,
