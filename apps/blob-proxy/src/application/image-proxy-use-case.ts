@@ -1,7 +1,8 @@
-import type { IMetricReporter } from "@repo/common/domain";
+import { DidResolutionError, type IMetricReporter } from "@repo/common/domain";
 
 import type { ImageBlob } from "../domain/image-blob.js";
 import type { ImageProxyRequest } from "../domain/image-proxy-request.js";
+import { BlobFetchFailedError } from "./interfaces/blob-fetcher.js";
 import type { IImageResizer } from "./interfaces/image-resizer.js";
 import type { FetchBlobService } from "./services/fetch-blob-service.js";
 import type { ImageCacheService } from "./services/image-cache-service.js";
@@ -20,7 +21,7 @@ export class ImageProxyUseCase {
     "metricReporter",
   ] as const;
 
-  async execute(request: ImageProxyRequest): Promise<ImageBlob> {
+  async execute(request: ImageProxyRequest): Promise<ImageBlob | null> {
     const cacheKey = request.getCacheKey();
     const cached = await this.imageCacheService.get(cacheKey);
     if (cached) {
@@ -29,16 +30,29 @@ export class ImageProxyUseCase {
     }
     this.metricReporter.increment("blob_proxy_cache_miss_total");
 
-    const originalBlob = await this.fetchBlobService.fetchBlob({
-      did: request.did,
-      cid: request.cid,
-    });
-    const resizedBlob = await this.imageResizer.resize({
-      blob: originalBlob,
-      preset: request.preset,
-    });
+    try {
+      const originalBlob = await this.fetchBlobService.fetchBlob({
+        did: request.did,
+        cid: request.cid,
+      });
+      const resizedBlob = await this.imageResizer.resize({
+        blob: originalBlob,
+        preset: request.preset,
+      });
 
-    await this.imageCacheService.set(cacheKey, resizedBlob);
-    return resizedBlob;
+      await this.imageCacheService.set(cacheKey, resizedBlob);
+      return resizedBlob;
+    } catch (e) {
+      if (
+        e instanceof BlobFetchFailedError ||
+        e instanceof DidResolutionError
+      ) {
+        this.metricReporter.increment("blob_proxy_error_total", {
+          error: e.name,
+        });
+        return null;
+      }
+      throw e;
+    }
   }
 }

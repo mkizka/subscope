@@ -1,9 +1,8 @@
-import { DidResolutionError, type IMetricReporter } from "@repo/common/domain";
+import type { IMetricReporter } from "@repo/common/domain";
 import type { Router } from "express";
 import { Router as expressRouter } from "express";
 
 import type { ImageProxyUseCase } from "../../application/image-proxy-use-case.js";
-import { BlobFetchFailedError } from "../../application/interfaces/blob-fetcher.js";
 import { ImageProxyRequest } from "../../domain/image-proxy-request.js";
 
 export function imagesRouterFactory(
@@ -16,21 +15,15 @@ export function imagesRouterFactory(
     try {
       const request = ImageProxyRequest.fromParams(req.params);
       const result = await imageProxyUseCase.execute(request);
+      if (!result) {
+        res.status(404).send("Image not found");
+        return;
+      }
       res
         .type(result.contentType)
         .header("Cache-Control", "public, max-age=86400")
         .send(result.data);
     } catch (e) {
-      if (
-        e instanceof BlobFetchFailedError ||
-        e instanceof DidResolutionError
-      ) {
-        metricReporter.increment("blob_proxy_error_total", {
-          error: e.name,
-        });
-        res.status(404).send(e.message);
-        return;
-      }
       metricReporter.increment("blob_proxy_error_total", {
         error: String(e),
       });
