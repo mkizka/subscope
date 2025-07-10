@@ -18,6 +18,12 @@
       "Bash(cat:*)",
       "Bash(ls:*)"
     ],
-    "deny": ["Bash(npm:*)", "Bash(yarn:*)"]
+    "deny": [
+      "Bash(npm:*)",
+      "Bash(yarn:*)",
+      "Edit(*/generated/*)",
+      "Write(*/generated/*)",
+      "MultiEdit(*/generated/*)"
+    ]
   }
 }
