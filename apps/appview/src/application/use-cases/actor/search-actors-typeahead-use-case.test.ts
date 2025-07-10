@@ -108,14 +108,15 @@ describe("SearchActorsTypeaheadUseCase", () => {
 
   test("limit数を超えるactorが存在する場合、指定されたlimit数のactorを返す", async () => {
     // arrange
+    const uniqueId = Date.now();
     const actor1 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Limit Test User 1" }))
+      .use((t) => t.withProfile({ displayName: `UniqueLimit${uniqueId}User1` }))
       .create();
     const actor2 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Limit Test User 2" }))
+      .use((t) => t.withProfile({ displayName: `UniqueLimit${uniqueId}User2` }))
       .create();
     const actor3 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Limit Test User 3" }))
+      .use((t) => t.withProfile({ displayName: `UniqueLimit${uniqueId}User3` }))
       .create();
 
     // indexedAtの順序を制御（新しい順）
@@ -134,7 +135,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
 
     // act
     const result = await searchActorsTypeaheadUseCase.execute({
-      query: "Limit Test",
+      query: `UniqueLimit${uniqueId}`,
       limit: 2,
     });
 
@@ -143,11 +144,11 @@ describe("SearchActorsTypeaheadUseCase", () => {
       actors: [
         {
           $type: "app.bsky.actor.defs#profileViewBasic",
-          displayName: "Limit Test User 1",
+          displayName: `UniqueLimit${uniqueId}User1`,
         },
         {
           $type: "app.bsky.actor.defs#profileViewBasic",
-          displayName: "Limit Test User 2",
+          displayName: `UniqueLimit${uniqueId}User2`,
         },
       ],
     });
