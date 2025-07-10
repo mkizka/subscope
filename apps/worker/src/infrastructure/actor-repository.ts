@@ -12,10 +12,6 @@ import type { IActorRepository } from "../application/interfaces/repositories/ac
 const CURRENT_BACKFILL_VERSION = 1;
 
 export class ActorRepository implements IActorRepository {
-  async createIfNotExists({ ctx, did }: { ctx: TransactionContext; did: Did }) {
-    await ctx.db.insert(schema.actors).values({ did }).onConflictDoNothing();
-  }
-
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
