@@ -44,6 +44,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
@@ -85,6 +86,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
@@ -119,6 +121,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
@@ -149,6 +152,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
@@ -176,6 +180,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
+        indexedAt: new Date(),
       });
 
       // act

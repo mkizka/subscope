@@ -60,6 +60,7 @@ describe("ProfileIndexingPolicy", () => {
         uri: profileRecord.uri,
         cid: profileRecord.cid,
         json: profileJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -93,6 +94,7 @@ describe("ProfileIndexingPolicy", () => {
         uri: profileRecord.uri,
         cid: profileRecord.cid,
         json: profileJson,
+        indexedAt: new Date(),
       });
 
       // act

@@ -45,6 +45,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${subscriberActor.did}/app.bsky.feed.post/123`,
           cid: "abc123",
           json: postJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -90,6 +91,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${followedActor.did}/app.bsky.feed.post/123`,
           cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
           json: postJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -147,6 +149,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${replierActor.did}/app.bsky.feed.post/reply123`,
           cid: "bafyreihj7fbbzsqgahvoa4f5qhevzxvbcfi6mjlvvinjlfl3uvp5nzl5eu",
           json: replyJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -172,6 +175,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${unrelatedActor.did}/app.bsky.feed.post/123`,
           cid: "abc123",
           json: postJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -207,6 +211,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${replierActor.did}/app.bsky.feed.post/reply456`,
           cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
           json: replyJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -250,6 +255,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${subscriberActor.did}/app.bsky.feed.post/123`,
           cid: "abc123",
           json: postJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -298,6 +304,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${replierActor.did}/app.bsky.feed.post/reply123`,
           cid: "bafyreihj7fbbzsqgahvoa4f5qhevzxvbcfi6mjlvvinjlfl3uvp5nzl5eu",
           json: replyJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -346,6 +353,7 @@ describe("PostIndexingPolicy", () => {
           uri: `at://${replierActor.did}/app.bsky.feed.post/reply456`,
           cid: "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe",
           json: replyJson,
+          indexedAt: new Date(),
         });
 
         // act

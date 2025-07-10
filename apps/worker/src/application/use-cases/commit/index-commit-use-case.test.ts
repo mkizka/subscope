@@ -36,6 +36,7 @@ describe("IndexCommitUseCase", () => {
         uri,
         cid: "cid123",
         json: { text: "Hello world", createdAt: new Date().toISOString() },
+        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,
@@ -100,6 +101,7 @@ describe("IndexCommitUseCase", () => {
         uri,
         cid: "cid123",
         json: { text: "Hello world", createdAt: new Date().toISOString() },
+        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,
@@ -134,6 +136,7 @@ describe("IndexCommitUseCase", () => {
         uri,
         cid: "cid123",
         json: { text: "Hello world", createdAt: new Date().toISOString() },
+        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,

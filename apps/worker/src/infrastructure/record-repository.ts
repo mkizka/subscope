@@ -28,6 +28,7 @@ export class RecordRepository implements IRecordRepository {
       uri,
       cid: row.cid,
       json: row.json,
+      indexedAt: row.indexedAt,
     });
   }
 
@@ -41,6 +42,7 @@ export class RecordRepository implements IRecordRepository {
       .insert(schema.records)
       .values({
         uri: record.uri.toString(),
+        indexedAt: record.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({

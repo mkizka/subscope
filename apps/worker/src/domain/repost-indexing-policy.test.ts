@@ -61,6 +61,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/123`,
           cid: "repost123",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -125,6 +126,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/321`,
           cid: "repost321",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -176,6 +178,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
           cid: "repost789",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -206,6 +209,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/888`,
           cid: "repost888",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -255,6 +259,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/456`,
           cid: "repost456",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -296,6 +301,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
           cid: "repost789",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -337,6 +343,7 @@ describe("RepostIndexingPolicy", () => {
           uri: `at://${reposterActor.did}/app.bsky.feed.repost/999`,
           cid: "repost999",
           json: repostJson,
+          indexedAt: new Date(),
         });
 
         // act

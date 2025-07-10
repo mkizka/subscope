@@ -44,6 +44,7 @@ describe("ProfileIndexer", () => {
         uri: profileRecord.uri,
         cid: profileRecord.cid,
         json: profileJson,
+        indexedAt: new Date(),
       });
 
       // act

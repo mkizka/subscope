@@ -24,6 +24,7 @@ describe("SubscriptionIndexingPolicy", () => {
         uri: "at://did:plc:user/dev.mkizka.test.subscription/123",
         cid: "sub123",
         json: subscriptionJson,
+        indexedAt: new Date(),
       });
 
       // Act
@@ -47,6 +48,7 @@ describe("SubscriptionIndexingPolicy", () => {
         uri: "at://did:plc:user/dev.mkizka.test.subscription/123",
         cid: "sub123",
         json: subscriptionJson,
+        indexedAt: new Date(),
       });
 
       // Act

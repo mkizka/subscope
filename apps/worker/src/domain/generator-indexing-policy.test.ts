@@ -49,6 +49,7 @@ describe("GeneratorIndexingPolicy", () => {
         uri: generatorRecord.uri,
         cid: generatorRecord.cid,
         json: generatorJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -103,6 +104,7 @@ describe("GeneratorIndexingPolicy", () => {
         uri: generatorRecord.uri,
         cid: generatorRecord.cid,
         json: generatorJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -137,6 +139,7 @@ describe("GeneratorIndexingPolicy", () => {
         uri: generatorRecord.uri,
         cid: generatorRecord.cid,
         json: generatorJson,
+        indexedAt: new Date(),
       });
 
       // act

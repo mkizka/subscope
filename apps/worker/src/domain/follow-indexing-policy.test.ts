@@ -57,6 +57,7 @@ describe("FollowIndexingPolicy", () => {
         uri: followRecord.uri,
         cid: followRecord.cid,
         json: followJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -108,6 +109,7 @@ describe("FollowIndexingPolicy", () => {
         uri: followRecord.uri,
         cid: followRecord.cid,
         json: followJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -139,6 +141,7 @@ describe("FollowIndexingPolicy", () => {
         uri: followRecord.uri,
         cid: followRecord.cid,
         json: followJson,
+        indexedAt: new Date(),
       });
 
       // act

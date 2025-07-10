@@ -72,6 +72,7 @@ describe("PostIndexer", () => {
         uri: postRecord.uri,
         cid: postRecord.cid,
         json: postJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -122,6 +123,7 @@ describe("PostIndexer", () => {
         uri: recordData.uri,
         cid: recordData.cid,
         json: postJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -155,6 +157,7 @@ describe("PostIndexer", () => {
         uri: recordData.uri,
         cid: recordData.cid,
         json: postJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -229,6 +232,7 @@ describe("PostIndexer", () => {
         uri: newReplyRecord.uri,
         cid: newReplyRecord.cid,
         json: replyJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -278,6 +282,7 @@ describe("PostIndexer", () => {
         uri: regularRecord.uri,
         cid: regularRecord.cid,
         json: postJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -328,6 +333,7 @@ describe("PostIndexer", () => {
         uri: replyRecord.uri,
         cid: replyRecord.cid,
         json: replyJson,
+        indexedAt: new Date(),
       });
 
       // act

@@ -75,6 +75,7 @@ describe("LikeIndexer", () => {
         uri: likeRecord.uri,
         cid: likeRecord.cid,
         json: likeJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -139,6 +140,7 @@ describe("LikeIndexer", () => {
         uri: user5LikeRecord.uri,
         cid: user5LikeRecord.cid,
         json: likeJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -204,6 +206,7 @@ describe("LikeIndexer", () => {
         uri: user6LikeRecord.uri,
         cid: user6LikeRecord.cid,
         json: likeJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -246,6 +249,7 @@ describe("LikeIndexer", () => {
         uri: likeRecord.uri,
         cid: likeRecord.cid,
         json: likeJson,
+        indexedAt: new Date(),
       });
 
       // act

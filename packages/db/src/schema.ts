@@ -34,7 +34,7 @@ export const records = pgTable("records", {
     .notNull()
     .references(() => actors.did),
   json: jsonb().notNull(),
-  indexedAt: timestamp().defaultNow(),
+  indexedAt: timestamp().notNull(),
 });
 
 export const follows = pgTable(

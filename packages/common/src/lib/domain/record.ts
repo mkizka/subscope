@@ -12,7 +12,7 @@ import type {
 type BaseRecordParams = {
   uri: AtUri | string;
   cid: string;
-  indexedAt?: Date | null;
+  indexedAt: Date;
 };
 
 type LexRecordParams = BaseRecordParams & {
@@ -35,7 +35,7 @@ export class Record {
     this.cid = params.cid;
     this.json = params.json;
     this.lex = params.lex;
-    this.indexedAt = params.indexedAt ?? null;
+    this.indexedAt = params.indexedAt;
   }
 
   static fromLex(params: LexRecordParams) {

@@ -53,6 +53,7 @@ describe("LikeIndexingPolicy", () => {
           uri: likeRecord.uri,
           cid: likeRecord.cid,
           json: likeJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -106,6 +107,7 @@ describe("LikeIndexingPolicy", () => {
           uri: likeRecord.uri,
           cid: likeRecord.cid,
           json: likeJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -138,6 +140,7 @@ describe("LikeIndexingPolicy", () => {
           uri: likeRecord.uri,
           cid: likeRecord.cid,
           json: likeJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -189,6 +192,7 @@ describe("LikeIndexingPolicy", () => {
           uri: likeRecord.uri,
           cid: likeRecord.cid,
           json: likeJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -229,6 +233,7 @@ describe("LikeIndexingPolicy", () => {
           uri: likeRecord.uri,
           cid: likeRecord.cid,
           json: likeJson,
+          indexedAt: new Date(),
         });
 
         // act
@@ -272,6 +277,7 @@ describe("LikeIndexingPolicy", () => {
           uri: likeRecord.uri,
           cid: likeRecord.cid,
           json: likeJson,
+          indexedAt: new Date(),
         });
 
         // act

@@ -53,6 +53,7 @@ describe("FollowIndexer", () => {
         uri: followRecord.uri,
         cid: followRecord.cid,
         json: followJson,
+        indexedAt: new Date(),
       });
 
       // act
@@ -90,6 +91,7 @@ describe("FollowIndexer", () => {
         uri: followRecord.uri,
         cid: followRecord.cid,
         json: followJson,
+        indexedAt: new Date(),
       });
 
       // フォロイーのactorが存在しないことを確認
@@ -148,6 +150,7 @@ describe("FollowIndexer", () => {
         uri: followRecord.uri,
         cid: followRecord.cid,
         json: followJson,
+        indexedAt: new Date(),
       });
 
       // act

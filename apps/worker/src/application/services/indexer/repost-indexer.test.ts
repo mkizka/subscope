@@ -61,6 +61,7 @@ describe("RepostIndexer", () => {
         uri: repostRecord.uri,
         cid: repostRecord.cid,
         json: repostRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
@@ -129,6 +130,7 @@ describe("RepostIndexer", () => {
         uri: newRepostRecord.uri,
         cid: newRepostRecord.cid,
         json: newRepostRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
@@ -175,6 +177,7 @@ describe("RepostIndexer", () => {
         uri: orphanRepostRecord.uri,
         cid: orphanRepostRecord.cid,
         json: orphanRepostRecord.json,
+        indexedAt: new Date(),
       });
 
       // act
