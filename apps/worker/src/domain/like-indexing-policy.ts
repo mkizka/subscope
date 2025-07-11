@@ -1,19 +1,13 @@
 import type { Like, TransactionContext } from "@repo/common/domain";
 
-import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
 
 export class LikeIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly postRepository: IPostRepository,
     private readonly indexLevel: number,
   ) {}
-  static inject = [
-    "subscriptionRepository",
-    "postRepository",
-    "indexLevel",
-  ] as const;
+  static inject = ["subscriptionRepository", "indexLevel"] as const;
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
     // いいねしたactorがsubscriberかチェック
@@ -25,28 +19,21 @@ export class LikeIndexingPolicy {
       return true;
     }
 
-    // いいね対象の投稿者をチェック
-    const targetActorDid = await this.postRepository.findActorDidByUri(
+    // Level1: いいね対象の投稿者がsubscriberかチェック
+    const isTargetSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
-      like.subjectUri.toString(),
+      like.subjectUri.hostname,
     );
-    if (targetActorDid) {
-      // Level1: いいね対象の投稿者がsubscriberかチェック
-      const isTargetSubscriber = await this.subscriptionRepository.isSubscriber(
-        ctx,
-        targetActorDid,
-      );
-      if (isTargetSubscriber) {
-        return true;
-      }
+    if (isTargetSubscriber) {
+      return true;
+    }
 
-      // Level2: いいね対象の投稿者がsubscribersのフォロイーかチェック
-      if (this.indexLevel === 2) {
-        return await this.subscriptionRepository.hasSubscriberFollower(
-          ctx,
-          targetActorDid,
-        );
-      }
+    // Level2: いいね対象の投稿者がsubscribersのフォロイーかチェック
+    if (this.indexLevel === 2) {
+      return await this.subscriptionRepository.hasSubscriberFollower(
+        ctx,
+        like.subjectUri.hostname,
+      );
     }
 
     return false;
