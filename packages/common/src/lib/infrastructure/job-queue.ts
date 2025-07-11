@@ -29,7 +29,7 @@ const withRetry = {
   attempts: 3,
   backoff: {
     type: "exponential",
-    delay: 1000, // 1,2,4秒後にリトライ
+    delay: 10000, // 10,20,40秒後にリトライ
   },
 } satisfies QueueOptions["defaultJobOptions"];
 
