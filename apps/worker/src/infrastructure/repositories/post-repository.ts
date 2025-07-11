@@ -1,4 +1,3 @@
-import { asDid, type Did } from "@atproto/did";
 import {
   type Post,
   PostEmbedExternal,
@@ -7,7 +6,7 @@ import {
   type TransactionContext,
 } from "@repo/common/domain";
 import { type PostInsert, schema } from "@repo/db";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { IPostRepository } from "../../application/interfaces/repositories/post-repository.js";
 
@@ -125,33 +124,5 @@ export class PostRepository implements IPostRepository {
       .limit(1);
 
     return result.length > 0;
-  }
-
-  async existsAny(ctx: TransactionContext, uris: string[]): Promise<boolean> {
-    if (uris.length === 0) {
-      return false;
-    }
-
-    const result = await ctx.db
-      .select({ uri: schema.posts.uri })
-      .from(schema.posts)
-      .where(inArray(schema.posts.uri, uris))
-      .limit(1);
-
-    return result.length > 0;
-  }
-
-  async findActorDidByUri(
-    ctx: TransactionContext,
-    uri: string,
-  ): Promise<Did | null> {
-    const result = await ctx.db
-      .select({ actorDid: schema.posts.actorDid })
-      .from(schema.posts)
-      .where(eq(schema.posts.uri, uri))
-      .limit(1);
-
-    const actorDid = result[0]?.actorDid;
-    return actorDid ? asDid(actorDid) : null;
   }
 }
