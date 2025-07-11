@@ -1,38 +1,17 @@
 import type { TransactionContext } from "@repo/common/domain";
 import type { Repost } from "@repo/common/domain";
 
-import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
 
 export class RepostIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly postRepository: IPostRepository,
     private readonly indexLevel: number,
   ) {}
-  static inject = [
-    "subscriptionRepository",
-    "postRepository",
-    "indexLevel",
-  ] as const;
+  static inject = ["subscriptionRepository", "indexLevel"] as const;
 
   async shouldIndex(ctx: TransactionContext, repost: Repost): Promise<boolean> {
-    const level1Result = await this.shouldIndexLevel1(ctx, repost);
-    if (level1Result) {
-      return true;
-    }
-
-    if (this.indexLevel === 2) {
-      return await this.shouldIndexLevel2(ctx, repost);
-    }
-
-    return false;
-  }
-
-  private async shouldIndexLevel1(
-    ctx: TransactionContext,
-    repost: Repost,
-  ): Promise<boolean> {
+    // リポストしたactorがsubscriberかチェック
     const isSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       repost.actorDid,
@@ -41,6 +20,7 @@ export class RepostIndexingPolicy {
       return true;
     }
 
+    // リポストしたactorがsubscribersのフォロイーかチェック
     const hasSubscriberFollower =
       await this.subscriptionRepository.hasSubscriberFollower(
         ctx,
@@ -50,21 +30,23 @@ export class RepostIndexingPolicy {
       return true;
     }
 
-    const targetActorDid = await this.postRepository.findActorDidByUri(
+    // リポスト対象の投稿者がsubscriberかチェック
+    const isTargetSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
-      repost.subjectUri.toString(),
+      repost.subjectUri.hostname,
     );
-    if (targetActorDid) {
-      return this.subscriptionRepository.isSubscriber(ctx, targetActorDid);
+    if (isTargetSubscriber) {
+      return true;
+    }
+
+    // Level2: リポスト対象の投稿者がsubscribersのフォロイーかチェック
+    if (this.indexLevel === 2) {
+      return await this.subscriptionRepository.hasSubscriberFollower(
+        ctx,
+        repost.subjectUri.hostname,
+      );
     }
 
     return false;
-  }
-
-  private async shouldIndexLevel2(
-    ctx: TransactionContext,
-    repost: Repost,
-  ): Promise<boolean> {
-    return this.postRepository.exists(ctx, repost.subjectUri.toString());
   }
 }

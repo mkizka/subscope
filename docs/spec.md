@@ -20,16 +20,16 @@
 
 レコードは条件に基づいてsubscribersに関係があるレコードのみ保存する。ただしINDEX_LEVEL環境変数によって保存範囲を調整できる。
 
-| NSID                             | INDEX_LEVEL=1                                                                                 | INDEX_LEVEL=2（追加分）                 |
-| -------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------- |
-| app.bsky.feed.post               | subscribersの投稿<br>subscribersのフォロイーの投稿                                            | なし                                    |
-| app.bsky.feed.post<br>(リプライ) | subscribersのリプライ<br>subscribersへのリプライ                                              | subscribersのフォロイーへのリプライ     |
-| app.bsky.feed.repost             | subscribersのリポスト<br>subscribersのフォロイーのリポスト<br>subscribersのポストへのリポスト | 保存された投稿へのリポスト              |
-| app.bsky.feed.like               | subscribersのいいね<br>subscribersのポストへのいいね                                          | subscribersのフォロイーの投稿へのいいね |
-| app.bsky.graph.follow            | フォローまたはフォロイーがsubscribers                                                         | なし                                    |
-| app.bsky.actor.profile           | subscribersのプロフール                                                                       | なし                                    |
-| app.bsky.feed.generator          | subscribersのフィード                                                                         | なし                                    |
-| dev.mkizka.test.subscription     | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                                    |
+| NSID                             | INDEX_LEVEL=1                                                                                 | INDEX_LEVEL=2（追加分）                   |
+| -------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| app.bsky.feed.post               | subscribersの投稿<br>subscribersのフォロイーの投稿                                            | なし                                      |
+| app.bsky.feed.post<br>(リプライ) | subscribersのリプライ<br>subscribersへのリプライ                                              | subscribersのフォロイーへのリプライ       |
+| app.bsky.feed.repost             | subscribersのリポスト<br>subscribersのフォロイーのリポスト<br>subscribersのポストへのリポスト | subscribersのフォロイーの投稿へのリポスト |
+| app.bsky.feed.like               | subscribersのいいね<br>subscribersのポストへのいいね                                          | subscribersのフォロイーの投稿へのいいね   |
+| app.bsky.graph.follow            | フォローまたはフォロイーがsubscribers                                                         | なし                                      |
+| app.bsky.actor.profile           | subscribersのプロフール                                                                       | なし                                      |
+| app.bsky.feed.generator          | subscribersのフィード                                                                         | なし                                      |
+| dev.mkizka.test.subscription     | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                                      |
 
 さらに、以下はPDSにリクエストを送って追加で保存する。再帰処理になる場合の連鎖は2回まで。
 
