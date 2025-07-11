@@ -13,7 +13,7 @@ const createQueueOptionsBuilder =
   (jobOptions?: QueueOptions["defaultJobOptions"]): QueueOptions => ({
     defaultJobOptions: {
       removeOnComplete: {
-        age: 24 * 60 * 60,
+        age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
       },
       removeOnFail: {
         age: 24 * 60 * 60,
@@ -44,15 +44,7 @@ export class JobQueue implements IJobQueue {
       resolveDid: new Queue("resolveDid", queueOptions(withRetry)),
       fetchRecord: new Queue("fetchRecord", queueOptions(withRetry)),
       identity: new Queue("identity", queueOptions(withRetry)),
-      commit: new Queue(
-        "commit",
-        queueOptions({
-          ...withRetry,
-          removeOnComplete: {
-            age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
-          },
-        }),
-      ),
+      commit: new Queue("commit", queueOptions(withRetry)),
       backfill: new Queue("backfill", queueOptions()),
       temp__cleanupDatabase: new Queue("temp__cleanupDatabase", queueOptions()),
     };
