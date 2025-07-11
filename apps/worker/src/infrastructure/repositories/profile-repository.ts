@@ -4,7 +4,7 @@ import type { Profile } from "@repo/common/domain";
 import { type BlobInsert, type ProfileInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IProfileRepository } from "../application/interfaces/repositories/profile-repository.js";
+import type { IProfileRepository } from "../../application/interfaces/repositories/profile-repository.js";
 
 export class ProfileRepository implements IProfileRepository {
   async upsert({

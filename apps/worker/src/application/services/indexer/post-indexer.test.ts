@@ -14,11 +14,11 @@ import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
-import { PostRepository } from "../../../infrastructure/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 

@@ -7,11 +7,11 @@ import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
-import { ActorRepository } from "../../../infrastructure/actor-repository.js";
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/repositories/follow-repository.js";
+import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { IndexActorService } from "../index-actor-service.js";
 import { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";

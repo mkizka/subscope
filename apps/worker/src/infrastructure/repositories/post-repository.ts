@@ -9,7 +9,7 @@ import {
 import { type PostInsert, schema } from "@repo/db";
 import { eq, inArray } from "drizzle-orm";
 
-import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
+import type { IPostRepository } from "../../application/interfaces/repositories/post-repository.js";
 
 export class PostRepository implements IPostRepository {
   async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {

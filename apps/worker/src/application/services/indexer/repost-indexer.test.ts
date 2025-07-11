@@ -13,11 +13,11 @@ import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
-import { PostRepository } from "../../../infrastructure/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
-import { RepostRepository } from "../../../infrastructure/repost-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
+import { RepostRepository } from "../../../infrastructure/repositories/repost-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { RepostIndexer } from "./repost-indexer.js";
 

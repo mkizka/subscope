@@ -1,7 +1,7 @@
 import type { Like, TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
-import type { ILikeRepository } from "../application/interfaces/repositories/like-repository.js";
+import type { ILikeRepository } from "../../application/interfaces/repositories/like-repository.js";
 
 export class LikeRepository implements ILikeRepository {
   async upsert({ ctx, like }: { ctx: TransactionContext; like: Like }) {

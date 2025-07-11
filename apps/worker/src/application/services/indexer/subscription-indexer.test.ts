@@ -6,8 +6,8 @@ import { describe, expect, it } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
 import { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
-import { ActorRepository } from "../../../infrastructure/actor-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { env } from "../../../shared/env.js";
 import type { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 import { SubscriptionIndexer } from "./subscription-indexer.js";

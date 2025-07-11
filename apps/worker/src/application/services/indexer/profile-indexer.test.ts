@@ -5,8 +5,8 @@ import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { ProfileIndexingPolicy } from "../../../domain/profile-indexing-policy.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { ProfileIndexer } from "./profile-indexer.js";
 
 describe("ProfileIndexer", () => {

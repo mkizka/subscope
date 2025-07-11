@@ -9,7 +9,7 @@ import { required } from "@repo/common/utils";
 import {
   type IRecordFetcher,
   RecordFetchError,
-} from "../application/interfaces/external/record-fetcher.js";
+} from "../../application/interfaces/external/record-fetcher.js";
 
 export class RecordFetcher implements IRecordFetcher {
   constructor(private readonly didResolver: IDidResolver) {}

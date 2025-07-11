@@ -1,7 +1,7 @@
 import type { Generator, TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
-import type { IGeneratorRepository } from "../application/interfaces/repositories/generator-repository.js";
+import type { IGeneratorRepository } from "../../application/interfaces/repositories/generator-repository.js";
 
 export class GeneratorRepository implements IGeneratorRepository {
   async upsert({

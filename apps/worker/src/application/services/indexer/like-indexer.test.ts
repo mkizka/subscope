@@ -12,10 +12,10 @@ import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
-import { LikeRepository } from "../../../infrastructure/like-repository.js";
-import { PostRepository } from "../../../infrastructure/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
+import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
+import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
+import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { LikeIndexer } from "./like-indexer.js";
 
 describe("LikeIndexer", () => {

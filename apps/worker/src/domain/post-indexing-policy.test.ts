@@ -9,7 +9,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, it } from "vitest";
 
-import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
+import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
 
 describe("PostIndexingPolicy", () => {

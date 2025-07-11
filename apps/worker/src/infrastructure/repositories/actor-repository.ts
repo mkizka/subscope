@@ -7,7 +7,7 @@ import type { Handle } from "@repo/common/utils";
 import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
+import type { IActorRepository } from "../../application/interfaces/repositories/actor-repository.js";
 
 const CURRENT_BACKFILL_VERSION = 1;
 
