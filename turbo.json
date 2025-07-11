@@ -6,16 +6,16 @@
       "outputs": ["dist/**", "src/generated/**"]
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build"]
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build"]
     },
     "format": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build"]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build"],
       "cache": false
     }
   }
