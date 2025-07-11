@@ -84,4 +84,33 @@ export class SubscriptionRepository implements ISubscriptionRepository {
 
     return result.length > 0;
   }
+
+  async hasAnySubscriberFollower(
+    ctx: TransactionContext,
+    actorDids: string[],
+  ): Promise<boolean> {
+    if (actorDids.length === 0) {
+      return false;
+    }
+
+    const result = await ctx.db
+      .select({ actorDid: schema.follows.actorDid })
+      .from(schema.follows)
+      .where(
+        and(
+          inArray(schema.follows.subjectDid, actorDids), // actorDidsのいずれかがフォロイーであるフォロー関係
+          exists(
+            ctx.db
+              .select()
+              .from(schema.subscriptions)
+              .where(
+                eq(schema.subscriptions.actorDid, schema.follows.actorDid),
+              ),
+          ),
+        ),
+      )
+      .limit(1);
+
+    return result.length > 0;
+  }
 }

@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 import type { Repost } from "@repo/common/domain";
 
@@ -11,42 +12,24 @@ export class RepostIndexingPolicy {
   static inject = ["subscriptionRepository", "indexLevel"] as const;
 
   async shouldIndex(ctx: TransactionContext, repost: Repost): Promise<boolean> {
-    // リポストしたactorがsubscriberかチェック
-    const isSubscriber = await this.subscriptionRepository.isSubscriber(
+    // リポストしたactorまたはリポストされたactorがsubscriberなら保存
+    const hasAnySubscriber = await this.subscriptionRepository.hasAnySubscriber(
       ctx,
-      repost.actorDid,
+      [repost.actorDid, asDid(repost.subjectUri.hostname)],
     );
-    if (isSubscriber) {
+    if (hasAnySubscriber) {
       return true;
     }
 
-    // リポストしたactorがsubscribersのフォロイーかチェック
-    const hasSubscriberFollower =
-      await this.subscriptionRepository.hasSubscriberFollower(
-        ctx,
-        repost.actorDid,
-      );
-    if (hasSubscriberFollower) {
-      return true;
-    }
-
-    // リポスト対象の投稿者がsubscriberかチェック
-    const isTargetSubscriber = await this.subscriptionRepository.isSubscriber(
-      ctx,
-      repost.subjectUri.hostname,
-    );
-    if (isTargetSubscriber) {
-      return true;
-    }
-
-    // Level2: リポスト対象の投稿者がsubscribersのフォロイーかチェック
+    const followerCheckDids = [repost.actorDid];
     if (this.indexLevel === 2) {
-      return await this.subscriptionRepository.hasSubscriberFollower(
-        ctx,
-        repost.subjectUri.hostname,
-      );
+      followerCheckDids.push(asDid(repost.subjectUri.hostname));
     }
 
-    return false;
+    // リポストしたactorまたはリポストされたactorがsubscriberのフォロイーなら保存
+    return this.subscriptionRepository.hasAnySubscriberFollower(
+      ctx,
+      followerCheckDids,
+    );
   }
 }

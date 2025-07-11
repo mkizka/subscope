@@ -10,25 +10,16 @@ export class LikeIndexingPolicy {
   static inject = ["subscriptionRepository", "indexLevel"] as const;
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
-    // いいねしたactorがsubscriberかチェック
-    const isSubscriber = await this.subscriptionRepository.isSubscriber(
+    // いいねしたactorまたはいいねされたactorがsubscriberなら保存
+    const hasAnySubscriber = await this.subscriptionRepository.hasAnySubscriber(
       ctx,
-      like.actorDid,
+      [like.actorDid, like.subjectUri.hostname],
     );
-    if (isSubscriber) {
+    if (hasAnySubscriber) {
       return true;
     }
 
-    // Level1: いいね対象の投稿者がsubscriberかチェック
-    const isTargetSubscriber = await this.subscriptionRepository.isSubscriber(
-      ctx,
-      like.subjectUri.hostname,
-    );
-    if (isTargetSubscriber) {
-      return true;
-    }
-
-    // Level2: いいね対象の投稿者がsubscribersのフォロイーかチェック
+    // Level2: いいねされたactorがsubscribersのフォロイーなら保存
     if (this.indexLevel === 2) {
       return await this.subscriptionRepository.hasSubscriberFollower(
         ctx,

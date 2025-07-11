@@ -14,4 +14,8 @@ export interface ISubscriptionRepository {
     ctx: TransactionContext,
     actorDid: string,
   ) => Promise<boolean>;
+  hasAnySubscriberFollower: (
+    ctx: TransactionContext,
+    actorDids: string[],
+  ) => Promise<boolean>;
 }
