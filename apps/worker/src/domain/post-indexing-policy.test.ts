@@ -268,18 +268,38 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("保存された投稿へのリプライは保存すべき", async () => {
+      it("subscribersのフォロイーへのリプライは保存すべき", async () => {
         // arrange
-        const originalPosterActor = await actorFactory(ctx.db).create();
-        const originalPost = await postFactory(ctx.db)
+        const subscriberActor = await actorFactory(ctx.db).create();
+        await subscriptionFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+          })
+          .create();
+
+        const followeeActor = await actorFactory(ctx.db).create();
+        await followFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.graph.follow")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+            followee: () => followeeActor,
+          })
+          .create();
+
+        const followeePost = await postFactory(ctx.db)
           .vars({
             record: () =>
               recordFactory(ctx.db, "app.bsky.feed.post")
-                .vars({ actor: () => originalPosterActor })
+                .vars({ actor: () => followeeActor })
                 .create(),
           })
           .props({
-            text: () => "original post",
+            text: () => "followee post",
           })
           .create();
 
@@ -287,15 +307,15 @@ describe("PostIndexingPolicy", () => {
 
         const replyJson = {
           $type: "app.bsky.feed.post",
-          text: "reply to original post",
+          text: "reply to followee post",
           reply: {
             parent: {
-              uri: originalPost.uri,
-              cid: originalPost.cid,
+              uri: followeePost.uri,
+              cid: followeePost.cid,
             },
             root: {
-              uri: originalPost.uri,
-              cid: originalPost.cid,
+              uri: followeePost.uri,
+              cid: followeePost.cid,
             },
           },
           createdAt: new Date().toISOString(),
@@ -317,18 +337,28 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("INDEX_LEVEL=1では保存されない投稿へのリプライでも、INDEX_LEVEL=2では保存すべき", async () => {
+      it("subscribersがフォローしていないユーザーへのリプライは保存すべきでない", async () => {
         // arrange
-        const nonSubscriberActor = await actorFactory(ctx.db).create();
-        const nonSubscriberPost = await postFactory(ctx.db)
+        const subscriberActor = await actorFactory(ctx.db).create();
+        await subscriptionFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+          })
+          .create();
+
+        const nonFolloweeActor = await actorFactory(ctx.db).create();
+        const nonFolloweePost = await postFactory(ctx.db)
           .vars({
             record: () =>
               recordFactory(ctx.db, "app.bsky.feed.post")
-                .vars({ actor: () => nonSubscriberActor })
+                .vars({ actor: () => nonFolloweeActor })
                 .create(),
           })
           .props({
-            text: () => "non-subscriber post",
+            text: () => "non-followee post",
           })
           .create();
 
@@ -336,15 +366,15 @@ describe("PostIndexingPolicy", () => {
 
         const replyJson = {
           $type: "app.bsky.feed.post",
-          text: "reply to non-subscriber post",
+          text: "reply to non-followee post",
           reply: {
             parent: {
-              uri: nonSubscriberPost.uri,
-              cid: nonSubscriberPost.cid,
+              uri: nonFolloweePost.uri,
+              cid: nonFolloweePost.cid,
             },
             root: {
-              uri: nonSubscriberPost.uri,
-              cid: nonSubscriberPost.cid,
+              uri: nonFolloweePost.uri,
+              cid: nonFolloweePost.cid,
             },
           },
           createdAt: new Date().toISOString(),
@@ -363,7 +393,7 @@ describe("PostIndexingPolicy", () => {
         );
 
         // assert
-        expect(result).toBe(true);
+        expect(result).toBe(false);
       });
     });
   });

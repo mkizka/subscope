@@ -16,22 +16,7 @@ export class PostIndexingPolicy {
   ] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
-    const level1Result = await this.shouldIndexLevel1(ctx, post);
-    if (level1Result) {
-      return true;
-    }
-
-    if (this.indexLevel === 2) {
-      return await this.shouldIndexLevel2(ctx, post);
-    }
-
-    return false;
-  }
-
-  private async shouldIndexLevel1(
-    ctx: TransactionContext,
-    post: Post,
-  ): Promise<boolean> {
+    // actorがsubscriberかチェック
     const isActorSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       post.actorDid,
@@ -40,6 +25,7 @@ export class PostIndexingPolicy {
       return true;
     }
 
+    // リプライの場合の処理
     if (post.isReply()) {
       const replyTargetUris = post.getReplyTargetUris();
       for (const targetUri of replyTargetUris) {
@@ -48,30 +34,33 @@ export class PostIndexingPolicy {
           targetUri,
         );
         if (targetActorDid) {
+          // Level1: リプライ先がsubscriberかチェック
           const isTargetActorSubscriber =
             await this.subscriptionRepository.isSubscriber(ctx, targetActorDid);
           if (isTargetActorSubscriber) {
             return true;
+          }
+
+          // Level2: リプライ先がsubscribersのフォロイーかチェック
+          if (this.indexLevel === 2) {
+            const isFollowedBySubscriber =
+              await this.subscriptionRepository.hasSubscriberFollower(
+                ctx,
+                targetActorDid,
+              );
+            if (isFollowedBySubscriber) {
+              return true;
+            }
           }
         }
       }
       return false;
     }
 
+    // 非リプライの場合: subscribersのフォロイーかチェック
     return this.subscriptionRepository.hasSubscriberFollower(
       ctx,
       post.actorDid,
     );
-  }
-
-  private async shouldIndexLevel2(
-    ctx: TransactionContext,
-    post: Post,
-  ): Promise<boolean> {
-    const replyTargetUris = post.getReplyTargetUris();
-    if (replyTargetUris.length === 0) {
-      return false;
-    }
-    return this.postRepository.existsAny(ctx, replyTargetUris);
   }
 }
