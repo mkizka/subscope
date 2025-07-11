@@ -16,22 +16,7 @@ export class LikeIndexingPolicy {
   ] as const;
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
-    const level1Result = await this.shouldIndexLevel1(ctx, like);
-    if (level1Result) {
-      return true;
-    }
-
-    if (this.indexLevel === 2) {
-      return await this.shouldIndexLevel2(ctx, like);
-    }
-
-    return false;
-  }
-
-  private async shouldIndexLevel1(
-    ctx: TransactionContext,
-    like: Like,
-  ): Promise<boolean> {
+    // いいねしたactorがsubscriberかチェック
     const isSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       like.actorDid,
@@ -40,24 +25,30 @@ export class LikeIndexingPolicy {
       return true;
     }
 
+    // いいね対象の投稿者をチェック
     const targetActorDid = await this.postRepository.findActorDidByUri(
       ctx,
       like.subjectUri.toString(),
     );
     if (targetActorDid) {
-      return await this.subscriptionRepository.isSubscriber(
+      // Level1: いいね対象の投稿者がsubscriberかチェック
+      const isTargetSubscriber = await this.subscriptionRepository.isSubscriber(
         ctx,
         targetActorDid,
       );
+      if (isTargetSubscriber) {
+        return true;
+      }
+
+      // Level2: いいね対象の投稿者がsubscribersのフォロイーかチェック
+      if (this.indexLevel === 2) {
+        return await this.subscriptionRepository.hasSubscriberFollower(
+          ctx,
+          targetActorDid,
+        );
+      }
     }
 
     return false;
-  }
-
-  private async shouldIndexLevel2(
-    ctx: TransactionContext,
-    like: Like,
-  ): Promise<boolean> {
-    return this.postRepository.exists(ctx, like.subjectUri.toString());
   }
 }

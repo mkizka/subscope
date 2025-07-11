@@ -1,6 +1,7 @@
 import { Like, Record } from "@repo/common/domain";
 import {
   actorFactory,
+  followFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -205,23 +206,47 @@ describe("LikeIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("保存された投稿へのいいねは保存すべき", async () => {
+      it("subscribersのフォロイーの投稿へのいいねは保存すべき", async () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 
-        const posterActor = await actorFactory(ctx.db).create();
-        const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-          .vars({ actor: () => posterActor })
+        const subscriberActor = await actorFactory(ctx.db).create();
+        const subscriptionRecord = await recordFactory(
+          ctx.db,
+          "dev.mkizka.test.subscription",
+        )
+          .vars({ actor: () => subscriberActor })
           .create();
-        const post = await postFactory(ctx.db)
-          .vars({ record: () => postRecord })
+        await subscriptionFactory(ctx.db)
+          .vars({ record: () => subscriptionRecord })
+          .create();
+
+        const followeeActor = await actorFactory(ctx.db).create();
+        await followFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.graph.follow")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+            followee: () => followeeActor,
+          })
+          .create();
+
+        const followeePostRecord = await recordFactory(
+          ctx.db,
+          "app.bsky.feed.post",
+        )
+          .vars({ actor: () => followeeActor })
+          .create();
+        const followeePost = await postFactory(ctx.db)
+          .vars({ record: () => followeePostRecord })
           .create();
 
         const likeJson = {
           $type: "app.bsky.feed.like",
           subject: {
-            uri: post.uri,
-            cid: post.cid,
+            uri: followeePost.uri,
+            cid: followeePost.cid,
           },
           createdAt: new Date().toISOString(),
         };
@@ -246,26 +271,37 @@ describe("LikeIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("INDEX_LEVEL=1では保存されない投稿へのいいねでも、INDEX_LEVEL=2では保存すべき", async () => {
+      it("subscribersがフォローしていないユーザーの投稿へのいいねは保存すべきでない", async () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 
-        const nonSubscriberActor = await actorFactory(ctx.db).create();
-        const nonSubscriberPostRecord = await recordFactory(
+        const subscriberActor = await actorFactory(ctx.db).create();
+        const subscriptionRecord = await recordFactory(
+          ctx.db,
+          "dev.mkizka.test.subscription",
+        )
+          .vars({ actor: () => subscriberActor })
+          .create();
+        await subscriptionFactory(ctx.db)
+          .vars({ record: () => subscriptionRecord })
+          .create();
+
+        const nonFolloweeActor = await actorFactory(ctx.db).create();
+        const nonFolloweePostRecord = await recordFactory(
           ctx.db,
           "app.bsky.feed.post",
         )
-          .vars({ actor: () => nonSubscriberActor })
+          .vars({ actor: () => nonFolloweeActor })
           .create();
-        const nonSubscriberPost = await postFactory(ctx.db)
-          .vars({ record: () => nonSubscriberPostRecord })
+        const nonFolloweePost = await postFactory(ctx.db)
+          .vars({ record: () => nonFolloweePostRecord })
           .create();
 
         const likeJson = {
           $type: "app.bsky.feed.like",
           subject: {
-            uri: nonSubscriberPost.uri,
-            cid: nonSubscriberPost.cid,
+            uri: nonFolloweePost.uri,
+            cid: nonFolloweePost.cid,
           },
           createdAt: new Date().toISOString(),
         };
@@ -287,7 +323,7 @@ describe("LikeIndexingPolicy", () => {
         );
 
         // assert
-        expect(result).toBe(true);
+        expect(result).toBe(false);
       });
     });
   });
