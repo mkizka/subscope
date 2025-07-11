@@ -81,7 +81,7 @@ export class Post {
     return null;
   }
 
-  getReplyTargetUris(): string[] {
+  getReplyTargetUris(): AtUri[] {
     const uris = new Set<string>();
     if (this.replyParent) {
       uris.add(this.replyParent.uri.toString());
@@ -89,7 +89,7 @@ export class Post {
     if (this.replyRoot) {
       uris.add(this.replyRoot.uri.toString());
     }
-    return Array.from(uris);
+    return Array.from(uris).map((uri) => new AtUri(uri));
   }
 
   static from(record: Record) {

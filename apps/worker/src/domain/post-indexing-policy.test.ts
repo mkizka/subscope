@@ -9,7 +9,6 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, it } from "vitest";
 
-import { PostRepository } from "../infrastructure/post-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
 
@@ -18,7 +17,6 @@ describe("PostIndexingPolicy", () => {
 
   describe("INDEX_LEVEL=1", () => {
     const postIndexingPolicy = testInjector
-      .provideClass("postRepository", PostRepository)
       .provideClass("subscriptionRepository", SubscriptionRepository)
       .provideValue("indexLevel", 1)
       .injectClass(PostIndexingPolicy);
@@ -228,7 +226,6 @@ describe("PostIndexingPolicy", () => {
 
   describe("INDEX_LEVEL=2", () => {
     const postIndexingPolicyLevel2 = testInjector
-      .provideClass("postRepository", PostRepository)
       .provideClass("subscriptionRepository", SubscriptionRepository)
       .provideValue("indexLevel", 2)
       .injectClass(PostIndexingPolicy);
