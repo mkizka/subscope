@@ -22,6 +22,7 @@ export class ActorRepository implements IActorRepository {
       .insert(schema.actors)
       .values({
         did: actor.did,
+        indexedAt: actor.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({
@@ -44,6 +45,7 @@ export class ActorRepository implements IActorRepository {
       handle: row.handle || undefined,
       backfillStatus: row.backfillStatus,
       backfillVersion: row.backfillVersion,
+      indexedAt: row.indexedAt,
     });
   }
 

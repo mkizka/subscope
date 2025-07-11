@@ -26,10 +26,12 @@ export class IndexActorService {
     ctx,
     did,
     handle,
+    indexedAt,
   }: {
     ctx: TransactionContext;
     did: Did;
     handle?: Handle;
+    indexedAt: Date;
   }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
     if (existingActor) {
@@ -43,7 +45,7 @@ export class IndexActorService {
       }
     } else {
       // インデックスされていない場合は新規登録
-      const actor = new Actor({ did, handle });
+      const actor = new Actor({ did, handle, indexedAt });
       await this.actorRepository.upsert({ ctx, actor });
 
       // handleが無い場合はresolveする

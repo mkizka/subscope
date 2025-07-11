@@ -94,7 +94,11 @@ export class IndexRecordService {
       return;
     }
 
-    await this.indexActorService.upsert({ ctx, did: record.actorDid });
+    await this.indexActorService.upsert({
+      ctx,
+      did: record.actorDid,
+      indexedAt: record.indexedAt,
+    });
     await this.recordRepository.upsert({ ctx, record });
 
     await indexer.upsert({ ctx, record, depth });

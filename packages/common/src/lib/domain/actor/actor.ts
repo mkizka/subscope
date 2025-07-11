@@ -10,6 +10,7 @@ type ActorParams = {
   handle?: string;
   backfillStatus?: BackfillStatus;
   backfillVersion?: number | null;
+  indexedAt: Date;
 };
 
 export class Actor {
@@ -17,11 +18,13 @@ export class Actor {
   readonly handle: Handle | null; // handle can fail to resolve
   readonly backfillStatus: BackfillStatus;
   readonly backfillVersion: number | null;
+  readonly indexedAt: Date;
 
   constructor(params: ActorParams) {
     this.did = asDid(params.did);
     this.handle = params.handle ? asHandle(params.handle) : null;
     this.backfillStatus = params.backfillStatus ?? "dirty";
     this.backfillVersion = params.backfillVersion ?? null;
+    this.indexedAt = params.indexedAt;
   }
 }

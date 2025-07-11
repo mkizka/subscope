@@ -6,6 +6,7 @@ export const upsertIdentityCommandFactory = (event: IdentityEvent) => {
   return {
     did: asDid(event.identity.did),
     handle: event.identity.handle ? asHandle(event.identity.handle) : undefined,
+    indexedAt: new Date(event.time_us / 1000),
   };
 };
 

@@ -21,7 +21,7 @@ export const actors = pgTable(
       .notNull()
       .default("dirty"),
     backfillVersion: integer(),
-    indexedAt: timestamp().defaultNow(),
+    indexedAt: timestamp().notNull(),
     updatedAt: timestamp().$onUpdate(() => new Date()),
   },
   (table) => [index("handle_idx").on(table.handle)],

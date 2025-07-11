@@ -16,7 +16,7 @@ export class ResolveDidUseCase {
     const { handle } = await this.didResolver.resolve(did);
     await this.actorRepository.upsert({
       ctx: { db: this.db },
-      actor: new Actor({ did, handle }),
+      actor: new Actor({ did, handle, indexedAt: new Date() }),
     });
   }
 }
