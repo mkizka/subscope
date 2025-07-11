@@ -151,7 +151,7 @@ export class PostRepository implements IPostRepository {
   async findReplies(uri: AtUri, limit?: number): Promise<Post[]> {
     const postsWithEmbeds = await this.db.query.posts.findMany({
       where: eq(schema.posts.replyParentUri, uri.toString()),
-      orderBy: (posts, { asc }) => [asc(posts.createdAt)],
+      orderBy: (posts, { asc }) => [asc(posts.sortAt)],
       limit,
       with: {
         embedImages: {
