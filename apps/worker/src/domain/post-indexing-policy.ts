@@ -36,7 +36,7 @@ export class PostIndexingPolicy {
         // Level2: リプライ先がsubscribersのフォロイーかチェック
         if (this.indexLevel === 2) {
           const isFollowedBySubscriber =
-            await this.subscriptionRepository.hasSubscriberFollower(
+            await this.subscriptionRepository.isFolloweeOfSubscribers(
               ctx,
               targetUri.hostname,
             );
@@ -49,7 +49,7 @@ export class PostIndexingPolicy {
     }
 
     // 非リプライの場合: subscribersのフォロイーかチェック
-    return this.subscriptionRepository.hasSubscriberFollower(
+    return this.subscriptionRepository.isFolloweeOfSubscribers(
       ctx,
       post.actorDid,
     );

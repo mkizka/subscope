@@ -45,6 +45,6 @@ export class UpsertIdentityUseCase {
     if (isSubscriber) {
       return true;
     }
-    return this.subscriptionRepository.hasSubscriberFollower(ctx, did);
+    return this.subscriptionRepository.isFolloweeOfSubscribers(ctx, did);
   }
 }

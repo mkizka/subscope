@@ -11,7 +11,7 @@ export class LikeIndexingPolicy {
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
     // いいねしたactorまたはいいねされたactorがsubscriberなら保存
-    const hasAnySubscriber = await this.subscriptionRepository.hasAnySubscriber(
+    const hasAnySubscriber = await this.subscriptionRepository.hasSubscriber(
       ctx,
       [like.actorDid, like.subjectUri.hostname],
     );
@@ -21,7 +21,7 @@ export class LikeIndexingPolicy {
 
     // Level2: いいねされたactorがsubscribersのフォロイーなら保存
     if (this.indexLevel === 2) {
-      return await this.subscriptionRepository.hasSubscriberFollower(
+      return await this.subscriptionRepository.isFolloweeOfSubscribers(
         ctx,
         like.subjectUri.hostname,
       );

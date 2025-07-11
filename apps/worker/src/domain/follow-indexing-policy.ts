@@ -9,7 +9,7 @@ export class FollowIndexingPolicy {
   static inject = ["subscriptionRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, follow: Follow): Promise<boolean> {
-    return this.subscriptionRepository.hasAnySubscriber(ctx, [
+    return this.subscriptionRepository.hasSubscriber(ctx, [
       follow.actorDid,
       follow.subjectDid,
     ]);

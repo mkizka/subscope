@@ -43,7 +43,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     return result.length > 0;
   }
 
-  async hasAnySubscriber(
+  async hasSubscriber(
     ctx: TransactionContext,
     actorDids: string[],
   ): Promise<boolean> {
@@ -60,7 +60,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     return result.length > 0;
   }
 
-  async hasSubscriberFollower(
+  async isFolloweeOfSubscribers(
     ctx: TransactionContext,
     actorDid: string,
   ): Promise<boolean> {
@@ -85,7 +85,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     return result.length > 0;
   }
 
-  async hasAnySubscriberFollower(
+  async hasFolloweeOfSubscribers(
     ctx: TransactionContext,
     actorDids: string[],
   ): Promise<boolean> {

@@ -13,7 +13,7 @@ export class RepostIndexingPolicy {
 
   async shouldIndex(ctx: TransactionContext, repost: Repost): Promise<boolean> {
     // リポストしたactorまたはリポストされたactorがsubscriberなら保存
-    const hasAnySubscriber = await this.subscriptionRepository.hasAnySubscriber(
+    const hasAnySubscriber = await this.subscriptionRepository.hasSubscriber(
       ctx,
       [repost.actorDid, asDid(repost.subjectUri.hostname)],
     );
@@ -27,7 +27,7 @@ export class RepostIndexingPolicy {
     }
 
     // リポストしたactorまたはリポストされたactorがsubscriberのフォロイーなら保存
-    return this.subscriptionRepository.hasAnySubscriberFollower(
+    return this.subscriptionRepository.hasFolloweeOfSubscribers(
       ctx,
       followerCheckDids,
     );

@@ -6,15 +6,15 @@ export interface ISubscriptionRepository {
     subscription: Subscription;
   }) => Promise<void>;
   isSubscriber: (ctx: TransactionContext, actorDid: string) => Promise<boolean>;
-  hasAnySubscriber: (
+  hasSubscriber: (
     ctx: TransactionContext,
     actorDids: string[],
   ) => Promise<boolean>;
-  hasSubscriberFollower: (
+  isFolloweeOfSubscribers: (
     ctx: TransactionContext,
     actorDid: string,
   ) => Promise<boolean>;
-  hasAnySubscriberFollower: (
+  hasFolloweeOfSubscribers: (
     ctx: TransactionContext,
     actorDids: string[],
   ) => Promise<boolean>;
