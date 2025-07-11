@@ -15,6 +15,8 @@ type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
 type NotFoundPost = $Typed<AppBskyFeedDefs.NotFoundPost>;
 
+const MAX_REPLIES_PER_POST = 20;
+
 export class GetPostThreadUseCase {
   constructor(
     private readonly postRepository: IPostRepository,
@@ -174,7 +176,10 @@ export class GetPostThreadUseCase {
       return structure;
     }
 
-    const directReplies = await this.postRepository.findReplies(post.uri);
+    const directReplies = await this.postRepository.findReplies(
+      post.uri,
+      MAX_REPLIES_PER_POST,
+    );
     structure.set(post.uri.toString(), directReplies);
 
     await Promise.all(
