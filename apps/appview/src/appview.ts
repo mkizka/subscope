@@ -21,8 +21,6 @@ import { RepostService } from "./application/service/feed/repost-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
-import { AuthVerifierService } from "./application/service/request/auth-verifier-service.js";
-import { HandleService } from "./application/service/request/handle-service.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
@@ -52,6 +50,8 @@ import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepostRepository } from "./infrastructure/repost-repository.js";
 import { TimelineRepository } from "./infrastructure/timeline-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
+import { AuthVerifierMiddleware } from "./presentation/middleware/auth-verifier-middleware.js";
+import { HandleMiddleware } from "./presentation/middleware/handle-middleware.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { SearchActors } from "./presentation/routes/app/bsky/actor/searchActors.js";
@@ -110,9 +110,9 @@ createInjector()
   .provideClass("actorLikesService", ActorLikesService)
   .provideClass("likeService", LikeService)
   .provideClass("repostService", RepostService)
-  .provideClass("authVerifierService", AuthVerifierService)
+  .provideClass("authVerifierMiddleware", AuthVerifierMiddleware)
   .provideClass("atUriService", AtUriService)
-  .provideClass("handleService", HandleService)
+  .provideClass("handleMiddleware", HandleMiddleware)
   .provideClass("followService", FollowService)
   .provideClass("feedProcessor", FeedProcessor)
   .provideClass("getProfilesUseCase", GetProfilesUseCase)

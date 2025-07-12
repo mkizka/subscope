@@ -3,20 +3,20 @@ import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { AuthVerifierService } from "../../../../../application/service/request/auth-verifier-service.js";
-import type { HandleService } from "../../../../../application/service/request/handle-service.js";
 import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";
+import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
 
 export class GetProfile {
   constructor(
     private getProfilesUseCase: GetProfilesUseCase,
-    private handleService: HandleService,
-    private authVerifierService: AuthVerifierService,
+    private handleMiddleware: HandleMiddleware,
+    private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
   static inject = [
     "getProfilesUseCase",
-    "handleService",
-    "authVerifierService",
+    "handleMiddleware",
+    "authVerifierMiddleware",
   ] as const;
 
   handle(server: Server) {
@@ -27,8 +27,8 @@ export class GetProfile {
         }
 
         const [did, viewerDid] = await Promise.all([
-          this.handleService.resolveHandleOrDid(params.actor),
-          this.authVerifierService.getViewerDid(req),
+          this.handleMiddleware.resolveHandleOrDid(params.actor),
+          this.authVerifierMiddleware.getViewerDid(req),
         ]);
 
         const [profile] = await this.getProfilesUseCase.execute(

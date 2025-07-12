@@ -2,15 +2,15 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { HandleService } from "../../../../../application/service/request/handle-service.js";
 import type { GetFollowsUseCase } from "../../../../../application/use-cases/graph/get-follows-use-case.js";
+import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
 
 export class GetFollows {
   constructor(
     private getFollowsUseCase: GetFollowsUseCase,
-    private handleService: HandleService,
+    private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getFollowsUseCase", "handleService"] as const;
+  static inject = ["getFollowsUseCase", "handleMiddleware"] as const;
 
   handle(server: Server) {
     server.app.bsky.graph.getFollows({
@@ -22,7 +22,7 @@ export class GetFollows {
           };
         }
 
-        const actorDid = await this.handleService.resolveHandleOrDid(
+        const actorDid = await this.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
 

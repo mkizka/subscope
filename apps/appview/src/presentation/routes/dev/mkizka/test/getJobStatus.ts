@@ -1,18 +1,18 @@
 import type { Server } from "@repo/client/server";
 
-import type { AuthVerifierService } from "../../../../../application/service/request/auth-verifier-service.js";
 import type { GetJobStatusUseCase } from "../../../../../application/use-cases/job/get-job-status-use-case.js";
+import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
 
 export class GetJobStatus {
   constructor(
-    private readonly authVerifierService: AuthVerifierService,
+    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getJobStatusUseCase: GetJobStatusUseCase,
   ) {}
-  static inject = ["authVerifierService", "getJobStatusUseCase"] as const;
+  static inject = ["authVerifierMiddleware", "getJobStatusUseCase"] as const;
 
   handle(server: Server) {
     server.dev.mkizka.test.sync.getJobStatus({
-      auth: (ctx) => this.authVerifierService.loginRequired(ctx.req),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
       handler: async ({ auth }) => {
         const result = await this.getJobStatusUseCase.execute(
           auth.credentials.did,

@@ -2,16 +2,16 @@ import { type Did, isDid } from "@atproto/did";
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { type Handle, isHandle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../../interfaces/handle-resolver.js";
+import type { IHandleResolver } from "../../application/interfaces/handle-resolver.js";
 
-export class HandleService {
+export class HandleMiddleware {
   private readonly logger: Logger;
 
   constructor(
     private readonly handleResolver: IHandleResolver,
     loggerManager: ILoggerManager,
   ) {
-    this.logger = loggerManager.createLogger("HandleService");
+    this.logger = loggerManager.createLogger("HandleMiddleware");
   }
   static inject = ["handleResolver", "loggerManager"] as const;
 

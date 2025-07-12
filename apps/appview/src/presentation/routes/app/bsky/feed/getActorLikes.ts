@@ -2,15 +2,15 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { HandleService } from "../../../../../application/service/request/handle-service.js";
 import type { GetActorLikesUseCase } from "../../../../../application/use-cases/feed/get-actor-likes-use-case.js";
+import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
 
 export class GetActorLikes {
   constructor(
     private getActorLikesUseCase: GetActorLikesUseCase,
-    private handleService: HandleService,
+    private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getActorLikesUseCase", "handleService"] as const;
+  static inject = ["getActorLikesUseCase", "handleMiddleware"] as const;
 
   handle(server: Server) {
     server.app.bsky.feed.getActorLikes({
@@ -22,7 +22,7 @@ export class GetActorLikes {
           };
         }
 
-        const actorDid = await this.handleService.resolveHandleOrDid(
+        const actorDid = await this.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
 

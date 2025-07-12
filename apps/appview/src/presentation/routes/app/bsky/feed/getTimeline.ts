@@ -1,18 +1,18 @@
 import type { Server } from "@repo/client/server";
 
-import type { AuthVerifierService } from "../../../../../application/service/request/auth-verifier-service.js";
 import type { GetTimelineUseCase } from "../../../../../application/use-cases/feed/get-timeline-use-case.js";
+import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
 
 export class GetTimeline {
   constructor(
-    private readonly authVerifierService: AuthVerifierService,
+    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getTimelineUseCase: GetTimelineUseCase,
   ) {}
-  static inject = ["authVerifierService", "getTimelineUseCase"] as const;
+  static inject = ["authVerifierMiddleware", "getTimelineUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.feed.getTimeline({
-      auth: (ctx) => this.authVerifierService.loginRequired(ctx.req),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
       handler: async ({ params, auth }) => {
         const timeline = await this.getTimelineUseCase.execute(
           params,

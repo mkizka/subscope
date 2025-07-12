@@ -4,20 +4,7 @@ DDD/オニオンアーキテクチャの観点から特定された問題点と�
 
 ## 改善が必要な問題点の詳細分析
 
-### 1. HTTP関連サービスの配置ミス（重要度：高）
-
-**問題箇所：**
-
-- `/apps/appview/src/application/service/request/auth-verifier-service.ts`
-- `/apps/appview/src/application/service/request/handle-service.ts`
-
-**問題内容：**
-
-- `AuthVerifierService`と`HandleService`は本来HTTP関連の処理であり、presentation層に属すべき
-- これらはドメインロジックではなく、リクエスト処理に特化したサービス
-- 現在の配置により、application層にHTTP関連の知識が漏れている
-
-### 2. Presentation層のDB依存（重要度：高）
+### 1. Presentation層のDB依存（重要度：高）
 
 **問題箇所：**
 
@@ -117,20 +104,7 @@ throw new InvalidRequestError("Invalid actor");
 
 ### Phase 1: 緊急度の高い責務分離修正
 
-#### タスク1: Request関連サービスの移動
-
-- **優先度**: 高
-- **対象ファイル**:
-  - `/apps/appview/src/application/service/request/auth-verifier-service.ts`
-  - `/apps/appview/src/application/service/request/handle-service.ts`
-- **作業内容**:
-  1. 新しいディレクトリ `/apps/appview/src/presentation/middleware/` を作成
-  2. `AuthVerifierService` を `auth-verifier-middleware.ts` として移動
-  3. `HandleService` を `handle-middleware.ts` として移動
-  4. 依存関係の更新（DIコンテナ、インポート文）
-  5. テストファイルの移動・更新
-
-#### タスク2: Presentation層のDB依存除去
+#### タスク1: Presentation層のDB依存除去
 
 - **優先度**: 高
 - **対象ファイル**:
@@ -144,7 +118,7 @@ throw new InvalidRequestError("Invalid actor");
 
 ### Phase 2: アーキテクチャの整理
 
-#### タスク3: Builder層からインフラ関連処理を分離
+#### タスク2: Builder層からインフラ関連処理を分離
 
 - **優先度**: 中
 - **対象ファイル**:
@@ -156,7 +130,7 @@ throw new InvalidRequestError("Invalid actor");
   3. Builderクラスから環境変数参照を除去
   4. URLサービスをBuilderに注入する形に変更
 
-#### タスク4: ビジネスロジックのドメインサービス移動
+#### タスク3: ビジネスロジックのドメインサービス移動
 
 - **優先度**: 中
 - **対象ファイル**:
@@ -167,7 +141,7 @@ throw new InvalidRequestError("Invalid actor");
   3. use-caseからドメインサービスを呼び出す形に変更
   4. ハードコードされたビジネスルールを設定可能にする
 
-#### タスク5: エラーハンドリングの統一化
+#### タスク4: エラーハンドリングの統一化
 
 - **優先度**: 中
 - **対象ファイル**: 全ルートハンドラー
@@ -177,7 +151,7 @@ throw new InvalidRequestError("Invalid actor");
   3. 全ルートハンドラーでエラー形式を統一
   4. カスタム例外クラスの整理・統一
 
-#### タスク6: パラメータ変換の整理
+#### タスク5: パラメータ変換の整理
 
 - **優先度**: 低
 - **対象ファイル**: データ変換が散在するルートハンドラー
@@ -188,12 +162,12 @@ throw new InvalidRequestError("Invalid actor");
 
 ### Phase 3: 長期的改善（オプション）
 
-#### タスク7: ドメインイベントの導入
+#### タスク6: ドメインイベントの導入
 
 - **優先度**: 低
 - **作業内容**: 複雑なビジネスロジックのイベント駆動設計への移行
 
-#### タスク8: CQRSパターンの適用
+#### タスク7: CQRSパターンの適用
 
 - **優先度**: 低
 - **作業内容**: 読み取り専用の複雑なクエリの分離

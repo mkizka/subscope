@@ -3,7 +3,7 @@ import type { IncomingMessage } from "node:http";
 import { asDid, type Did } from "@atproto/did";
 import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
 
-import type { ITokenVerifier } from "../../interfaces/token-verifier.js";
+import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
 
 type MaybeHeaders = {
   [key: string]: string | string[] | undefined;
@@ -14,7 +14,7 @@ type MaybeRequest = {
   path: string;
 };
 
-export class AuthVerifierService {
+export class AuthVerifierMiddleware {
   constructor(private readonly tokenVerifier: ITokenVerifier) {}
   static inject = ["tokenVerifier"] as const;
 

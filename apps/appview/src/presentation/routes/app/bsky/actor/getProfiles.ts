@@ -2,15 +2,15 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { HandleService } from "../../../../../application/service/request/handle-service.js";
 import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";
+import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
 
 export class GetProfiles {
   constructor(
     private getProfilesUseCase: GetProfilesUseCase,
-    private handleService: HandleService,
+    private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getProfilesUseCase", "handleService"] as const;
+  static inject = ["getProfilesUseCase", "handleMiddleware"] as const;
 
   handle(server: Server) {
     server.app.bsky.actor.getProfiles({
@@ -18,7 +18,8 @@ export class GetProfiles {
         const handleOrDids = params.actors.filter(
           (actor) => isDid(actor) || isHandle(actor),
         );
-        const dids = await this.handleService.resolveHandleOrDids(handleOrDids);
+        const dids =
+          await this.handleMiddleware.resolveHandleOrDids(handleOrDids);
         const profiles = await this.getProfilesUseCase.execute(dids);
         return {
           encoding: "application/json",
