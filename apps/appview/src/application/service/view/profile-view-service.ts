@@ -1,4 +1,5 @@
-import { asDid, type Did } from "@atproto/did";
+import { type Did } from "@atproto/did";
+import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
@@ -34,32 +35,29 @@ export class ProfileViewService {
       handle: profile.handle?.toString() ?? "handle.invalid",
       displayName: profile.displayName ?? undefined,
       avatar: this.getAvatarThumbnailUrl(profile),
-      // associated?: ProfileAssociated
-      // viewer?: ViewerState
-      // labels?: ComAtprotoLabelDefs.Label[]
       createdAt: profile.createdAt?.toISOString(),
     };
   }
 
   private createProfileViewDetailed(
     profile: ProfileDetailed,
-    stats?: {
-      followsCount: number;
-      followersCount: number;
-      postsCount: number;
+    options?: {
+      viewerState?: $Typed<AppBskyActorDefs.ViewerState>;
+      stats?: {
+        followsCount: number;
+        followersCount: number;
+        postsCount: number;
+      };
     },
   ): $Typed<AppBskyActorDefs.ProfileViewDetailed> {
     return {
       ...this.createProfileViewBasic(profile),
       $type: "app.bsky.actor.defs#profileViewDetailed",
-      // description?: string
-      // banner?: string
-      followersCount: stats?.followersCount,
-      followsCount: stats?.followsCount,
-      postsCount: stats?.postsCount,
-      // joinedViaStarterPack?: AppBskyGraphDefs.StarterPackViewBasic
+      followersCount: options?.stats?.followersCount,
+      followsCount: options?.stats?.followsCount,
+      postsCount: options?.stats?.postsCount,
       indexedAt: profile.indexedAt?.toISOString(),
-      // pinnedPost?: ComAtprotoRepoStrongRef.Main
+      viewer: options?.viewerState,
     };
   }
 
@@ -75,54 +73,53 @@ export class ProfileViewService {
     if (!viewerDid) {
       return profiles.map((profile) => {
         const stats = statsMap.get(profile.actorDid);
-        return this.createProfileViewDetailed(profile, stats);
+        return this.createProfileViewDetailed(profile, { stats });
       });
     }
 
-    // バッチでフォロー関係を取得
-    const targetDids = profiles.map((profile) => asDid(profile.actorDid));
-    const followingMapPromise = this.followRepository.findFollowingMap({
-      actorDid: viewerDid,
-      targetDids,
-    });
-    const followedByMapPromise = this.followRepository.findFollowedByMap({
-      actorDid: viewerDid,
-      targetDids,
-    });
-
+    const targetDids = profiles.map((profile) => profile.actorDid);
     const [followingMap, followedByMap] = await Promise.all([
-      followingMapPromise,
-      followedByMapPromise,
+      this.followRepository.findFollowingMap({
+        actorDid: viewerDid,
+        targetDids,
+      }),
+      this.followRepository.findFollowedByMap({
+        actorDid: viewerDid,
+        targetDids,
+      }),
     ]);
 
     return profiles.map((profile) => {
       const stats = statsMap.get(profile.actorDid);
-      const profileView = this.createProfileViewDetailed(profile, stats);
-
-      const profileDid = asDid(profile.actorDid);
-      const following = followingMap.get(profileDid)?.toString();
-      const followedBy = followedByMap.get(profileDid)?.toString();
-
-      const viewerState: $Typed<AppBskyActorDefs.ViewerState> = {
-        $type: "app.bsky.actor.defs#viewerState",
-        following,
-        followedBy,
-      };
-
+      const viewerState = this.createViewerState(
+        profile,
+        followingMap,
+        followedByMap,
+      );
+      const profileView = this.createProfileViewDetailed(profile, {
+        stats,
+        viewerState,
+      });
       return { ...profileView, viewer: viewerState };
     });
+  }
+
+  private createProfileView(
+    profile: ProfileDetailed,
+  ): $Typed<AppBskyActorDefs.ProfileView> {
+    return {
+      ...this.createProfileViewBasic(profile),
+      $type: "app.bsky.actor.defs#profileView" as const,
+      description: profile.description ?? undefined,
+      indexedAt: profile.indexedAt?.toISOString(),
+    };
   }
 
   async findProfileView(
     dids: Did[],
   ): Promise<$Typed<AppBskyActorDefs.ProfileView>[]> {
     const profiles = await this.findProfile(dids);
-    return profiles.map((profile) => ({
-      ...this.createProfileViewBasic(profile),
-      $type: "app.bsky.actor.defs#profileView" as const,
-      description: profile.description ?? undefined,
-      indexedAt: profile.indexedAt?.toISOString(),
-    }));
+    return profiles.map((profile) => this.createProfileView(profile));
   }
 
   async searchActorsWithPagination({
@@ -133,7 +130,7 @@ export class ProfileViewService {
     query: string;
     cursor?: string;
     limit: number;
-  }): Promise<Page<AppBskyActorDefs.ProfileView>> {
+  }): Promise<Page<$Typed<AppBskyActorDefs.ProfileView>>> {
     const paginator = createCursorPaginator<ProfileDetailed>({
       limit,
       // TODO: sortAtに変える？
@@ -149,12 +146,7 @@ export class ProfileViewService {
     const page = paginator.extractPage(profiles);
 
     return {
-      items: page.items.map((profile) => ({
-        ...this.createProfileViewBasic(profile),
-        $type: "app.bsky.actor.defs#profileView" as const,
-        description: profile.description ?? undefined,
-        indexedAt: profile.indexedAt?.toISOString(),
-      })),
+      items: page.items.map((profile) => this.createProfileView(profile)),
       cursor: page.cursor,
     };
   }
@@ -172,6 +164,21 @@ export class ProfileViewService {
     });
 
     return profiles.map((profile) => this.createProfileViewBasic(profile));
+  }
+
+  private createViewerState(
+    profile: ProfileDetailed,
+    followingMap: Map<Did, AtUri>,
+    followedByMap: Map<Did, AtUri>,
+  ): $Typed<AppBskyActorDefs.ViewerState> {
+    const following = followingMap.get(profile.actorDid)?.toString();
+    const followedBy = followedByMap.get(profile.actorDid)?.toString();
+
+    return {
+      $type: "app.bsky.actor.defs#viewerState",
+      following,
+      followedBy,
+    };
   }
 
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {
