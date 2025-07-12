@@ -9,22 +9,22 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { ProfileViewBuilder } from "./application/service/actor/profile-view-builder.js";
+import { ProfileViewService } from "./application/service/actor/profile-view-service.js";
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
+import { PostEmbedViewService } from "./application/service/feed/post-embed-view-service.js";
+import { PostViewService } from "./application/service/feed/post-view-service.js";
+import { ReplyRefService } from "./application/service/feed/reply-ref-service.js";
+import { RepostService } from "./application/service/feed/repost-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
+import { LikeService } from "./application/service/graph/like-service.js";
 import { AuthVerifierService } from "./application/service/request/auth-verifier-service.js";
 import { HandleService } from "./application/service/request/handle-service.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
-import { EmbedViewService } from "./application/service/view/embed-view-service.js";
-import { LikeService } from "./application/service/view/like-service.js";
-import { PostViewService } from "./application/service/view/post-view-service.js";
-import { ProfileViewBuilder } from "./application/service/view/profile-view-builder.js";
-import { ProfileViewService } from "./application/service/view/profile-view-service.js";
-import { ReplyRefService } from "./application/service/view/reply-ref-service.js";
-import { RepostService } from "./application/service/view/repost-service.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
@@ -101,7 +101,7 @@ createInjector()
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)
-  .provideClass("embedViewService", EmbedViewService)
+  .provideClass("postEmbedViewService", PostEmbedViewService)
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("timelineService", TimelineService)

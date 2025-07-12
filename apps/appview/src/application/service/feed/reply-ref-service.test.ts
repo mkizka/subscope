@@ -15,11 +15,11 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
+import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
-import { EmbedViewService } from "./embed-view-service.js";
+import { PostEmbedViewService } from "./post-embed-view-service.js";
 import { PostViewService } from "./post-view-service.js";
-import { ProfileViewBuilder } from "./profile-view-builder.js";
-import { ProfileViewService } from "./profile-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
 describe("ReplyRefService", () => {
@@ -33,7 +33,7 @@ describe("ReplyRefService", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("postEmbedViewService", PostEmbedViewService)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)

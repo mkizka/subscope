@@ -19,13 +19,13 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
+import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
-import { EmbedViewService } from "../view/embed-view-service.js";
-import { PostViewService } from "../view/post-view-service.js";
-import { ProfileViewBuilder } from "../view/profile-view-builder.js";
-import { ProfileViewService } from "../view/profile-view-service.js";
-import { ReplyRefService } from "../view/reply-ref-service.js";
 import { FeedProcessor } from "./feed-processor.js";
+import { PostEmbedViewService } from "./post-embed-view-service.js";
+import { PostViewService } from "./post-view-service.js";
+import { ReplyRefService } from "./reply-ref-service.js";
 
 describe("FeedProcessor", () => {
   const { testInjector, ctx } = getTestSetup();
@@ -38,7 +38,7 @@ describe("FeedProcessor", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("postEmbedViewService", PostEmbedViewService)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)

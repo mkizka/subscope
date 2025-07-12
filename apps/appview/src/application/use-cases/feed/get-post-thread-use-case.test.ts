@@ -15,11 +15,11 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
+import { ProfileViewService } from "../../service/actor/profile-view-service.js";
+import { PostEmbedViewService } from "../../service/feed/post-embed-view-service.js";
+import { PostViewService } from "../../service/feed/post-view-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
-import { EmbedViewService } from "../../service/view/embed-view-service.js";
-import { PostViewService } from "../../service/view/post-view-service.js";
-import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
 
 describe("GetPostThreadUseCase", () => {
@@ -37,7 +37,7 @@ describe("GetPostThreadUseCase", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
-    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("postEmbedViewService", PostEmbedViewService)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)

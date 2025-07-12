@@ -10,10 +10,10 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
+import { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import { FollowService } from "../../service/graph/follow-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
-import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetFollowsUseCase } from "./get-follows-use-case.js";
 
 describe("GetFollowsUseCase", () => {

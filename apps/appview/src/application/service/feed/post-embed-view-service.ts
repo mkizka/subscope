@@ -13,7 +13,7 @@ import {
 
 import { env } from "../../../shared/env.js";
 
-export class EmbedViewService {
+export class PostEmbedViewService {
   toView(
     embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null,
     actorDid: string,

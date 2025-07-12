@@ -16,14 +16,14 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
+import { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import { ActorLikesService } from "../../service/feed/actor-likes-service.js";
 import { FeedProcessor } from "../../service/feed/feed-processor.js";
+import { PostEmbedViewService } from "../../service/feed/post-embed-view-service.js";
+import { PostViewService } from "../../service/feed/post-view-service.js";
+import { ReplyRefService } from "../../service/feed/reply-ref-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
-import { EmbedViewService } from "../../service/view/embed-view-service.js";
-import { PostViewService } from "../../service/view/post-view-service.js";
-import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
-import { ReplyRefService } from "../../service/view/reply-ref-service.js";
 import { GetActorLikesUseCase } from "./get-actor-likes-use-case.js";
 
 describe("GetActorLikesUseCase", () => {
@@ -40,7 +40,7 @@ describe("GetActorLikesUseCase", () => {
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
-    .provideClass("embedViewService", EmbedViewService)
+    .provideClass("postEmbedViewService", PostEmbedViewService)
     .provideClass("postViewService", PostViewService)
     .provideClass("replyRefService", ReplyRefService)
     .provideClass("actorLikesService", ActorLikesService)

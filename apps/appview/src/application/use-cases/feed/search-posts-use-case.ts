@@ -1,7 +1,7 @@
 import type { AppBskyFeedDefs } from "@repo/client/server";
 
+import type { PostViewService } from "../../service/feed/post-view-service.js";
 import type { PostSearchService } from "../../service/search/post-search-service.js";
-import type { PostViewService } from "../../service/view/post-view-service.js";
 
 type SearchPostsParams = {
   q: string;

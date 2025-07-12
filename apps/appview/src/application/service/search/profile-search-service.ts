@@ -4,7 +4,7 @@ import { required } from "@repo/common/utils";
 
 import type { IProfileRepository } from "../../interfaces/profile-repository.js";
 import { createCursorPaginator, type Page } from "../../utils/pagination.js";
-import type { ProfileViewBuilder } from "../view/profile-view-builder.js";
+import type { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 
 export class ProfileSearchService {
   constructor(

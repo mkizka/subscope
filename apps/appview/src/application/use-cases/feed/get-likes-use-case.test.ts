@@ -11,10 +11,10 @@ import { ActorStatsRepository } from "../../../infrastructure/actor-stats-reposi
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
+import { ProfileViewService } from "../../service/actor/profile-view-service.js";
+import { LikeService } from "../../service/graph/like-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
-import { LikeService } from "../../service/view/like-service.js";
-import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetLikesUseCase } from "./get-likes-use-case.js";
 
 describe("GetLikesUseCase", () => {

@@ -1,7 +1,7 @@
 import type { AppBskyFeedGetRepostedBy } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/view/profile-view-service.js";
-import type { RepostService } from "../../service/view/repost-service.js";
+import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
+import type { RepostService } from "../../service/feed/repost-service.js";
 
 export class GetRepostedByUseCase {
   constructor(

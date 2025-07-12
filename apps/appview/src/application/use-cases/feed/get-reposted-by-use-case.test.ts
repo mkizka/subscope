@@ -11,10 +11,10 @@ import { ActorStatsRepository } from "../../../infrastructure/actor-stats-reposi
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RepostRepository } from "../../../infrastructure/repost-repository.js";
+import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
+import { ProfileViewService } from "../../service/actor/profile-view-service.js";
+import { RepostService } from "../../service/feed/repost-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
-import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
-import { RepostService } from "../../service/view/repost-service.js";
 import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
 
 describe("GetRepostedByUseCase", () => {

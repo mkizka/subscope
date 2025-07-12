@@ -1,6 +1,6 @@
 import type { AtUri } from "@atproto/syntax";
 
-import type { PostViewService } from "../../service/view/post-view-service.js";
+import type { PostViewService } from "../../service/feed/post-view-service.js";
 
 export class GetPostsUseCase {
   constructor(private readonly postViewService: PostViewService) {}
