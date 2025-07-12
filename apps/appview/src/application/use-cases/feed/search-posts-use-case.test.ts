@@ -16,7 +16,7 @@ import { ProfileRepository } from "../../../infrastructure/profile-repository.js
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { PostEmbedViewService } from "../../service/feed/post-embed-view-service.js";
+import { PostEmbedViewBuilder } from "../../service/feed/post-embed-view-builder.js";
 import { PostViewService } from "../../service/feed/post-view-service.js";
 import { PostSearchService } from "../../service/search/post-search-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
@@ -36,7 +36,7 @@ describe("SearchPostsUseCase", () => {
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
-    .provideClass("postEmbedViewService", PostEmbedViewService)
+    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("postViewService", PostViewService)
     .provideClass("searchService", PostSearchService)
     .injectClass(SearchPostsUseCase);

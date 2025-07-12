@@ -13,25 +13,25 @@ import {
 
 import { env } from "../../../shared/env.js";
 
-export class PostEmbedViewService {
-  toView(
+export class PostEmbedViewBuilder {
+  embedView(
     embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null,
     actorDid: string,
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
   ) {
     if (Array.isArray(embed)) {
-      return this.toImagesView(embed, actorDid);
+      return this.imagesView(embed, actorDid);
     }
     if (embed instanceof PostEmbedExternal) {
-      return this.toExternalView(embed, actorDid);
+      return this.externalView(embed, actorDid);
     }
     if (embed instanceof PostEmbedRecord) {
-      return this.toRecordView(embed, embedPostViewMap);
+      return this.recordView(embed, embedPostViewMap);
     }
     return undefined;
   }
 
-  private toExternalView(
+  private externalView(
     embed: PostEmbedExternal,
     actorDid: string,
   ): $Typed<AppBskyEmbedExternal.View> {
@@ -48,7 +48,7 @@ export class PostEmbedViewService {
     };
   }
 
-  private toImagesView(
+  private imagesView(
     images: PostEmbedImage[],
     actorDid: string,
   ): $Typed<AppBskyEmbedImages.View> {
@@ -63,7 +63,7 @@ export class PostEmbedViewService {
     };
   }
 
-  private toRecordView(
+  private recordView(
     embed: PostEmbedRecord,
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
   ): $Typed<AppBskyEmbedRecord.View> {

@@ -14,7 +14,7 @@ import { ProfileViewService } from "./application/service/actor/profile-view-ser
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
-import { PostEmbedViewService } from "./application/service/feed/post-embed-view-service.js";
+import { PostEmbedViewBuilder } from "./application/service/feed/post-embed-view-builder.js";
 import { PostViewService } from "./application/service/feed/post-view-service.js";
 import { ReplyRefService } from "./application/service/feed/reply-ref-service.js";
 import { RepostService } from "./application/service/feed/repost-service.js";
@@ -101,7 +101,7 @@ createInjector()
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)
-  .provideClass("postEmbedViewService", PostEmbedViewService)
+  .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("timelineService", TimelineService)

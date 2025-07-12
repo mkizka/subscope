@@ -23,7 +23,7 @@ import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
 import { FeedProcessor } from "./feed-processor.js";
-import { PostEmbedViewService } from "./post-embed-view-service.js";
+import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 import { PostViewService } from "./post-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
@@ -38,7 +38,7 @@ describe("FeedProcessor", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
-    .provideClass("postEmbedViewService", PostEmbedViewService)
+    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)

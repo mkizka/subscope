@@ -20,7 +20,7 @@ import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js"
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import { ActorLikesService } from "../../service/feed/actor-likes-service.js";
 import { FeedProcessor } from "../../service/feed/feed-processor.js";
-import { PostEmbedViewService } from "../../service/feed/post-embed-view-service.js";
+import { PostEmbedViewBuilder } from "../../service/feed/post-embed-view-builder.js";
 import { PostViewService } from "../../service/feed/post-view-service.js";
 import { ReplyRefService } from "../../service/feed/reply-ref-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
@@ -40,7 +40,7 @@ describe("GetActorLikesUseCase", () => {
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
-    .provideClass("postEmbedViewService", PostEmbedViewService)
+    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("postViewService", PostViewService)
     .provideClass("replyRefService", ReplyRefService)
     .provideClass("actorLikesService", ActorLikesService)

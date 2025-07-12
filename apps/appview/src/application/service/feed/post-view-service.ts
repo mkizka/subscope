@@ -16,7 +16,7 @@ import type {
 } from "../../interfaces/post-stats-repository.js";
 import type { IRecordRepository } from "../../interfaces/record-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
-import type { PostEmbedViewService } from "./post-embed-view-service.js";
+import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
 type PostViewMap = Map<string, PostView>;
@@ -37,7 +37,7 @@ export class PostViewService {
     private readonly recordRepository: IRecordRepository,
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly profileViewService: ProfileViewService,
-    private readonly embedViewService: PostEmbedViewService,
+    private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
     loggerManager: ILoggerManager,
   ) {
     this.logger = loggerManager.createLogger("PostViewService");
@@ -47,7 +47,7 @@ export class PostViewService {
     "recordRepository",
     "postStatsRepository",
     "profileViewService",
-    "postEmbedViewService",
+    "postEmbedViewBuilder",
     "loggerManager",
   ] as const;
 
@@ -202,7 +202,7 @@ export class PostViewService {
       cid: post.cid,
       author,
       record: record.json,
-      embed: this.embedViewService.toView(
+      embed: this.postEmbedViewBuilder.embedView(
         post.embed,
         post.actorDid,
         embedPostViewMap,
