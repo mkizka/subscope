@@ -13,6 +13,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
@@ -29,6 +30,7 @@ describe("FeedProcessor", () => {
 
   const feedProcessor = testInjector
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)

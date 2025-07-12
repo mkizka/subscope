@@ -1,8 +1,9 @@
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
 import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 
@@ -68,5 +69,57 @@ export class FollowRepository implements IFollowRepository {
           createdAt: result.createdAt,
         }),
     );
+  }
+
+  async findFollowingMap(params: {
+    actorDid: Did;
+    targetDids: Did[];
+  }): Promise<Map<Did, AtUri>> {
+    if (params.targetDids.length === 0) {
+      return new Map();
+    }
+
+    const results = await this.db.query.follows.findMany({
+      where: and(
+        eq(schema.follows.actorDid, params.actorDid.toString()),
+        inArray(
+          schema.follows.subjectDid,
+          params.targetDids.map((did) => did.toString()),
+        ),
+      ),
+    });
+
+    const followingMap = new Map<Did, AtUri>();
+    for (const result of results) {
+      followingMap.set(asDid(result.subjectDid), new AtUri(result.uri));
+    }
+
+    return followingMap;
+  }
+
+  async findFollowedByMap(params: {
+    actorDid: Did;
+    targetDids: Did[];
+  }): Promise<Map<Did, AtUri>> {
+    if (params.targetDids.length === 0) {
+      return new Map();
+    }
+
+    const results = await this.db.query.follows.findMany({
+      where: and(
+        inArray(
+          schema.follows.actorDid,
+          params.targetDids.map((did) => did.toString()),
+        ),
+        eq(schema.follows.subjectDid, params.actorDid.toString()),
+      ),
+    });
+
+    const followedByMap = new Map<Did, AtUri>();
+    for (const result of results) {
+      followedByMap.set(asDid(result.actorDid), new AtUri(result.uri));
+    }
+
+    return followedByMap;
   }
 }

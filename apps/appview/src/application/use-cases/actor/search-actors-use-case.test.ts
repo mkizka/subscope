@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { SearchActorsUseCase } from "./search-actors-use-case.js";
@@ -19,6 +20,7 @@ describe("SearchActorsUseCase", () => {
   const searchActorsUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("profileViewService", ProfileViewService)
     .injectClass(SearchActorsUseCase);

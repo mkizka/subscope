@@ -6,7 +6,10 @@ export class GetProfilesUseCase {
   constructor(private readonly profileViewService: ProfileViewService) {}
   static inject = ["profileViewService"] as const;
 
-  async execute(dids: Did[]) {
-    return await this.profileViewService.findProfileViewDetailed(dids);
+  async execute(dids: Did[], viewerDid?: Did | null) {
+    return await this.profileViewService.findProfileViewDetailed(
+      dids,
+      viewerDid,
+    );
   }
 }

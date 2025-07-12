@@ -8,6 +8,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
@@ -20,6 +21,7 @@ describe("GetRepostedByUseCase", () => {
   const getRepostedByUseCase = testInjector
     .provideClass("repostRepository", RepostRepository)
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("repostService", RepostService)
     .provideClass("profileViewService", ProfileViewService)

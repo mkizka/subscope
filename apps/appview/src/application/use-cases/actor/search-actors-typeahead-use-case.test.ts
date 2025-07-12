@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { SearchActorsTypeaheadUseCase } from "./search-actors-typeahead-use-case.js";
@@ -16,6 +17,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
   const searchActorsTypeaheadUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("profileViewService", ProfileViewService)
     .injectClass(SearchActorsTypeaheadUseCase);

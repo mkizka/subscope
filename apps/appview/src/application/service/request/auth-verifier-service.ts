@@ -1,5 +1,6 @@
 import type { IncomingMessage } from "node:http";
 
+import { asDid, type Did } from "@atproto/did";
 import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
 
 import type { ITokenVerifier } from "../../interfaces/token-verifier.js";
@@ -44,5 +45,14 @@ export class AuthVerifierService {
       credentials,
       artifacts: token,
     };
+  }
+
+  async getViewerDid(request: MaybeRequest): Promise<Did | null> {
+    try {
+      const authResult = await this.loginRequired(request);
+      return asDid(authResult.credentials.did);
+    } catch {
+      return null;
+    }
   }
 }

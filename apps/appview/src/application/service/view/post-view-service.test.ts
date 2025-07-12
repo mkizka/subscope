@@ -12,6 +12,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
@@ -27,6 +28,7 @@ describe("PostViewService", () => {
   const postViewService = testInjector
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("followRepository", FollowRepository)
     .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)

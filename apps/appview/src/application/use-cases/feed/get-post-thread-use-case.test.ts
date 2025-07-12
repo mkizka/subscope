@@ -9,6 +9,7 @@ import { describe, expect, test, vi } from "vitest";
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { AtUriService } from "../../../domain/service/at-uri-service.js";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
@@ -28,6 +29,7 @@ describe("GetPostThreadUseCase", () => {
 
   const getPostThreadUseCase = testInjector
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("handleResolver", HandleResolver)
     .provideClass("postRepository", PostRepository)
