@@ -4,27 +4,7 @@ DDD/オニオンアーキテクチャの観点から特定された問題点と�
 
 ## 改善が必要な問題点の詳細分析
 
-### 1. Presentation層のDB依存（重要度：高）
-
-**問題箇所：**
-
-- `/apps/appview/src/presentation/routes/app/bsky/feed/getLikes.ts`
-- その他の複数のルートハンドラー
-
-**問題内容：**
-
-```typescript
-export class GetLikes {
-  constructor(
-    private getLikesUseCase: GetLikesUseCase,
-    private db: DatabaseClient, // ← presentation層にDB依存が漏れている
-  ) {}
-```
-
-- presentation層がDataBaseClientに直接依存している
-- ルートハンドラーがデータベースの知識を持つべきではない
-
-### 3. Builderクラスの責務混在（重要度：中）
+### 1. Builderクラスの責務混在（重要度：中）
 
 **問題箇所：**
 
@@ -47,7 +27,7 @@ private getAvatarThumbnailUrl(profile: ProfileDetailed) {
 - URL構築ロジックがBuilderに混在している
 - Builderの責務が表示形式の変換を超えて、インフラストラクチャ関連の処理を含んでいる
 
-### 4. ビジネスロジックの不備（重要度：中）
+### 2. ビジネスロジックの不備（重要度：中）
 
 **問題箇所：**
 
@@ -68,7 +48,7 @@ if (params.filter !== "posts_and_author_threads") {
 - ビジネスルールがハードコードされている
 - フィルタロジックが適切にドメインサービスに分離されていない
 
-### 5. バリデーションロジックの分散（重要度：中）
+### 3. バリデーションロジックの分散（重要度：中）
 
 **問題箇所：**
 
@@ -84,7 +64,7 @@ cursor: params.cursor ? new Date(params.cursor) : undefined,
 - データ変換ロジックがpresentation層に散在している
 - 本来はapplication層またはドメイン層で処理すべき
 
-### 6. エラーハンドリングの不統一（重要度：中）
+### 4. エラーハンドリングの不統一（重要度：中）
 
 **問題内容：**
 各ルートハンドラーでエラーレスポンスの形式が統一されていない
