@@ -11,6 +11,8 @@ import { ActorStatsRepository } from "../../../infrastructure/actor-stats-reposi
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { FollowService } from "../../service/graph/follow-service.js";
+import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { GetFollowersUseCase } from "./get-followers-use-case.js";
 
@@ -22,6 +24,8 @@ describe("GetFollowersUseCase", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("followService", FollowService)
+    .provideClass("profileViewBuilder", ProfileViewBuilder)
+    .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
     .injectClass(GetFollowersUseCase);
 

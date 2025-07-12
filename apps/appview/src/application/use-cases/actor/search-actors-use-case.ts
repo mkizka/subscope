@@ -1,6 +1,6 @@
 import type { AppBskyActorSearchActors } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/view/profile-view-service.js";
+import type { ProfileSearchService } from "../../service/search/profile-search-service.js";
 
 type SearchActorsParams = {
   query: string | undefined;
@@ -9,8 +9,8 @@ type SearchActorsParams = {
 };
 
 export class SearchActorsUseCase {
-  constructor(private readonly profileViewService: ProfileViewService) {}
-  static inject = ["profileViewService"] as const;
+  constructor(private readonly profileSearchService: ProfileSearchService) {}
+  static inject = ["profileSearchService"] as const;
 
   async execute(
     params: SearchActorsParams,
@@ -22,7 +22,7 @@ export class SearchActorsUseCase {
       };
     }
 
-    const result = await this.profileViewService.searchActorsWithPagination({
+    const result = await this.profileSearchService.searchActorsWithPagination({
       query: params.query,
       limit: params.limit,
       cursor: params.cursor,

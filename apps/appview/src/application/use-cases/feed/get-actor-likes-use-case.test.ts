@@ -18,8 +18,10 @@ import { ProfileRepository } from "../../../infrastructure/profile-repository.js
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
 import { ActorLikesService } from "../../service/feed/actor-likes-service.js";
 import { FeedProcessor } from "../../service/feed/feed-processor.js";
+import { ProfileSearchService } from "../../service/search/profile-search-service.js";
 import { EmbedViewService } from "../../service/view/embed-view-service.js";
 import { PostViewService } from "../../service/view/post-view-service.js";
+import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { ReplyRefService } from "../../service/view/reply-ref-service.js";
 import { GetActorLikesUseCase } from "./get-actor-likes-use-case.js";
@@ -35,6 +37,8 @@ describe("GetActorLikesUseCase", () => {
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("recordRepository", RecordRepository)
+    .provideClass("profileViewBuilder", ProfileViewBuilder)
+    .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
     .provideClass("embedViewService", EmbedViewService)
     .provideClass("postViewService", PostViewService)

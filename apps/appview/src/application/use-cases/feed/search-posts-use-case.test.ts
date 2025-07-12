@@ -15,8 +15,10 @@ import { PostStatsRepository } from "../../../infrastructure/post-stats-reposito
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
 import { SearchService } from "../../service/feed/search-service.js";
+import { ProfileSearchService } from "../../service/search/profile-search-service.js";
 import { EmbedViewService } from "../../service/view/embed-view-service.js";
 import { PostViewService } from "../../service/view/post-view-service.js";
+import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
 import { ProfileViewService } from "../../service/view/profile-view-service.js";
 import { SearchPostsUseCase } from "./search-posts-use-case.js";
 
@@ -31,6 +33,8 @@ describe("SearchPostsUseCase", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("profileViewBuilder", ProfileViewBuilder)
+    .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
     .provideClass("embedViewService", EmbedViewService)
     .provideClass("postViewService", PostViewService)

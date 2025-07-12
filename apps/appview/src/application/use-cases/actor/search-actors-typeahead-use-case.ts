@@ -1,6 +1,6 @@
 import type { AppBskyActorSearchActorsTypeahead } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/view/profile-view-service.js";
+import type { ProfileSearchService } from "../../service/search/profile-search-service.js";
 
 type SearchActorsTypeaheadParams = {
   query: string | undefined;
@@ -8,8 +8,8 @@ type SearchActorsTypeaheadParams = {
 };
 
 export class SearchActorsTypeaheadUseCase {
-  constructor(private readonly profileViewService: ProfileViewService) {}
-  static inject = ["profileViewService"] as const;
+  constructor(private readonly profileSearchService: ProfileSearchService) {}
+  static inject = ["profileSearchService"] as const;
 
   async execute(
     params: SearchActorsTypeaheadParams,
@@ -20,7 +20,7 @@ export class SearchActorsTypeaheadUseCase {
       };
     }
 
-    const actors = await this.profileViewService.searchActorsTypeahead({
+    const actors = await this.profileSearchService.searchActorsTypeahead({
       query: params.query,
       limit: params.limit,
     });

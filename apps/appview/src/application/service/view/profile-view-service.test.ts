@@ -13,6 +13,8 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { ProfileSearchService } from "../search/profile-search-service.js";
+import { ProfileViewBuilder } from "./profile-view-builder.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
 describe("ProfileViewService", () => {
@@ -22,6 +24,8 @@ describe("ProfileViewService", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("profileViewBuilder", ProfileViewBuilder)
+    .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
     .resolve("profileViewService");
 
@@ -261,8 +265,8 @@ describe("ProfileViewService", () => {
         $type: "app.bsky.actor.defs#profileViewDetailed",
         did: actor.did,
         displayName: "Test User",
+        viewer: undefined,
       });
-      expect(results[0]).not.toHaveProperty("viewer");
     });
 
     test("viewerDidが指定され、フォロー関係がない場合、空のviewerStateを含むProfileViewDetailedを返す", async () => {

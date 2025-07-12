@@ -11,7 +11,8 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
+import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
 import { SearchActorsUseCase } from "./search-actors-use-case.js";
 
 describe("SearchActorsUseCase", () => {
@@ -22,7 +23,9 @@ describe("SearchActorsUseCase", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("profileViewService", ProfileViewService)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("profileViewBuilder", ProfileViewBuilder)
+    .provideClass("profileSearchService", ProfileSearchService)
     .injectClass(SearchActorsUseCase);
 
   test("検索クエリが空の場合、空の結果を返す", async () => {

@@ -8,7 +8,8 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
-import { ProfileViewService } from "../../service/view/profile-view-service.js";
+import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { ProfileViewBuilder } from "../../service/view/profile-view-builder.js";
 import { SearchActorsTypeaheadUseCase } from "./search-actors-typeahead-use-case.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {
@@ -19,7 +20,9 @@ describe("SearchActorsTypeaheadUseCase", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("profileViewService", ProfileViewService)
+    .provideClass("profileRepository", ProfileRepository)
+    .provideClass("profileViewBuilder", ProfileViewBuilder)
+    .provideClass("profileSearchService", ProfileSearchService)
     .injectClass(SearchActorsTypeaheadUseCase);
 
   test("クエリが空の場合、空のactors配列を返す", async () => {

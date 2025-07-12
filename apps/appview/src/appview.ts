@@ -17,9 +17,11 @@ import { TimelineService } from "./application/service/feed/timeline-service.js"
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { AuthVerifierService } from "./application/service/request/auth-verifier-service.js";
 import { HandleService } from "./application/service/request/handle-service.js";
+import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { EmbedViewService } from "./application/service/view/embed-view-service.js";
 import { LikeService } from "./application/service/view/like-service.js";
 import { PostViewService } from "./application/service/view/post-view-service.js";
+import { ProfileViewBuilder } from "./application/service/view/profile-view-builder.js";
 import { ProfileViewService } from "./application/service/view/profile-view-service.js";
 import { ReplyRefService } from "./application/service/view/reply-ref-service.js";
 import { RepostService } from "./application/service/view/repost-service.js";
@@ -96,6 +98,8 @@ createInjector()
   .provideClass("tokenVerifier", TokenVerifier)
   .provideClass("jobQueue", JobQueue)
   // application
+  .provideClass("profileViewBuilder", ProfileViewBuilder)
+  .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)
   .provideClass("embedViewService", EmbedViewService)
   .provideClass("postViewService", PostViewService)
