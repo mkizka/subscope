@@ -4,7 +4,7 @@ import { required } from "@repo/common/utils";
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import { createCursorPaginator, type Page } from "../../utils/pagination.js";
 
-export class SearchService {
+export class PostSearchService {
   constructor(private readonly postRepository: IPostRepository) {}
   static inject = ["postRepository"] as const;
 

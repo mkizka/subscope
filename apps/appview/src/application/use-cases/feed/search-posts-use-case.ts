@@ -1,6 +1,6 @@
 import type { AppBskyFeedDefs } from "@repo/client/server";
 
-import type { SearchService } from "../../service/feed/search-service.js";
+import type { PostSearchService } from "../../service/search/post-search-service.js";
 import type { PostViewService } from "../../service/view/post-view-service.js";
 
 type SearchPostsParams = {
@@ -16,7 +16,7 @@ type SearchPostsResult = {
 
 export class SearchPostsUseCase {
   constructor(
-    private readonly searchService: SearchService,
+    private readonly searchService: PostSearchService,
     private readonly postViewService: PostViewService,
   ) {}
   static inject = ["searchService", "postViewService"] as const;

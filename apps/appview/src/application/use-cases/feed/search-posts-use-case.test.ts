@@ -14,7 +14,7 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
-import { SearchService } from "../../service/feed/search-service.js";
+import { PostSearchService } from "../../service/search/post-search-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";
 import { EmbedViewService } from "../../service/view/embed-view-service.js";
 import { PostViewService } from "../../service/view/post-view-service.js";
@@ -38,7 +38,7 @@ describe("SearchPostsUseCase", () => {
     .provideClass("profileViewService", ProfileViewService)
     .provideClass("embedViewService", EmbedViewService)
     .provideClass("postViewService", PostViewService)
-    .provideClass("searchService", SearchService)
+    .provideClass("searchService", PostSearchService)
     .injectClass(SearchPostsUseCase);
 
   test("検索クエリが空の場合、空の結果を返す", async () => {

@@ -12,11 +12,11 @@ import { createInjector } from "typed-inject";
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
-import { SearchService } from "./application/service/feed/search-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { AuthVerifierService } from "./application/service/request/auth-verifier-service.js";
 import { HandleService } from "./application/service/request/handle-service.js";
+import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { EmbedViewService } from "./application/service/view/embed-view-service.js";
 import { LikeService } from "./application/service/view/like-service.js";
@@ -105,7 +105,7 @@ createInjector()
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("timelineService", TimelineService)
-  .provideClass("searchService", SearchService)
+  .provideClass("searchService", PostSearchService)
   .provideClass("authorFeedService", AuthorFeedService)
   .provideClass("actorLikesService", ActorLikesService)
   .provideClass("likeService", LikeService)
