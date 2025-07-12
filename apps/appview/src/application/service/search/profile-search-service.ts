@@ -1,27 +1,22 @@
-import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
 import type { IProfileRepository } from "../../interfaces/profile-repository.js";
 import { createCursorPaginator, type Page } from "../../utils/pagination.js";
-import type { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 
 export class ProfileSearchService {
-  constructor(
-    private readonly profileRepository: IProfileRepository,
-    private readonly profileViewBuilder: ProfileViewBuilder,
-  ) {}
-  static inject = ["profileRepository", "profileViewBuilder"] as const;
+  constructor(private readonly profileRepository: IProfileRepository) {}
+  static inject = ["profileRepository"] as const;
 
-  async searchActorsWithPagination({
+  async findActorsWithPagination({
     query,
     cursor,
     limit,
   }: {
     query: string;
-    cursor?: string;
+    cursor?: Date;
     limit: number;
-  }): Promise<Page<$Typed<AppBskyActorDefs.ProfileView>>> {
+  }): Promise<Page<ProfileDetailed>> {
     const paginator = createCursorPaginator<ProfileDetailed>({
       limit,
       getCursor: (item) => required(item.indexedAt?.toISOString()),
@@ -30,33 +25,22 @@ export class ProfileSearchService {
     const profiles = await this.profileRepository.searchActors({
       query,
       limit: paginator.queryLimit,
-      cursor,
+      cursor: cursor?.toISOString(),
     });
 
-    const page = paginator.extractPage(profiles);
-
-    return {
-      items: page.items.map((profile) =>
-        this.profileViewBuilder.profileView(profile),
-      ),
-      cursor: page.cursor,
-    };
+    return paginator.extractPage(profiles);
   }
 
-  async searchActorsTypeahead({
+  async findActorsTypeahead({
     query,
     limit,
   }: {
     query: string;
     limit: number;
-  }): Promise<$Typed<AppBskyActorDefs.ProfileViewBasic>[]> {
-    const profiles = await this.profileRepository.searchActors({
+  }): Promise<ProfileDetailed[]> {
+    return await this.profileRepository.searchActors({
       query,
       limit,
     });
-
-    return profiles.map((profile) =>
-      this.profileViewBuilder.profileViewBasic(profile),
-    );
   }
 }
