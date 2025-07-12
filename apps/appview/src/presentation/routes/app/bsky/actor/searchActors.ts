@@ -4,7 +4,7 @@ import type { SearchActorsUseCase } from "../../../../../application/use-cases/a
 
 export class SearchActors {
   constructor(private searchActorsUseCase: SearchActorsUseCase) {}
-  static inject = ["searchActorsUseCase", "db"] as const;
+  static inject = ["searchActorsUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.actor.searchActors({
