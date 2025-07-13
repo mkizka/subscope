@@ -50,7 +50,6 @@ actorは以下のいずれかの条件を満たす場合のみデータベース
   did: string,        // Primary Key
   handle: string?,    // nullable
   indexedAt: Date,
-  updatedAt: Date     // 自動更新
 }
 ```
 

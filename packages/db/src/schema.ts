@@ -22,7 +22,6 @@ export const actors = pgTable(
       .default("dirty"),
     backfillVersion: integer(),
     indexedAt: timestamp().notNull(),
-    updatedAt: timestamp().$onUpdate(() => new Date()),
   },
   (table) => [index("handle_idx").on(table.handle)],
 );
@@ -79,7 +78,6 @@ export const profiles = pgTable(
     displayName: varchar({ length: 256 }),
     createdAt: timestamp(),
     indexedAt: timestamp().defaultNow(),
-    updatedAt: timestamp().$onUpdate(() => new Date()),
   },
   (table) => [index("profiles_actor_idx").on(table.actorDid)],
 );
@@ -103,7 +101,6 @@ export const posts = pgTable(
     createdAt: timestamp().notNull(),
     // TODO: defaultNowではなくnotNullにする
     indexedAt: timestamp().defaultNow(),
-    updatedAt: timestamp().$onUpdate(() => new Date()),
     sortAt: timestamp()
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),
@@ -136,9 +133,6 @@ export const actorStats = pgTable("actor_stats", {
   followsCount: integer().notNull().default(0),
   followersCount: integer().notNull().default(0),
   postsCount: integer().notNull().default(0),
-  updatedAt: timestamp()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
 });
 
 export const blobs = pgTable("blobs", {
@@ -146,7 +140,6 @@ export const blobs = pgTable("blobs", {
   mimeType: varchar({ length: 256 }).notNull(),
   size: integer().notNull(),
   indexedAt: timestamp().defaultNow(),
-  updatedAt: timestamp().$onUpdate(() => new Date()),
 });
 
 export const subscriptions = pgTable("subscriptions", {

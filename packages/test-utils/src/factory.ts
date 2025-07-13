@@ -33,7 +33,6 @@ export const actorFactory = (db: Database) =>
             "dirty" as "dirty" | "in-process" | "synchronized",
           backfillVersion: () => null,
           indexedAt: () => faker.date.recent(),
-          updatedAt: () => faker.date.recent(),
         },
         vars: {},
       },
@@ -145,7 +144,6 @@ export const profileFactory = (db: Database) =>
           displayName: () => faker.person.fullName() as string | null,
           createdAt: () => faker.date.recent(),
           indexedAt: () => faker.date.recent(),
-          updatedAt: () => faker.date.recent(),
         },
         vars: {
           record: () => recordFactory(db, "app.bsky.actor.profile").create(),
@@ -223,7 +221,6 @@ export const blobFactory = (db: Database) =>
         mimeType: () => "image/jpeg",
         size: () => faker.number.int({ min: 1000, max: 100000 }),
         indexedAt: () => faker.date.recent(),
-        updatedAt: () => faker.date.recent(),
       },
       vars: {},
     },

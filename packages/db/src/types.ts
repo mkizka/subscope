@@ -4,22 +4,22 @@ import type * as schema from "./schema.js";
 
 export type ActorInsert = Omit<
   InferInsertModel<typeof schema.actors>,
-  "did" | "indexedAt" | "updatedAt"
+  "did" | "indexedAt"
 >;
 
 export type PostInsert = Omit<
   InferInsertModel<typeof schema.posts>,
-  "uri" | "indexedAt" | "updatedAt" | "sortAt"
+  "uri" | "indexedAt" | "sortAt"
 >;
 
 export type ProfileInsert = Omit<
   InferInsertModel<typeof schema.profiles>,
-  "uri" | "indexedAt" | "updatedAt"
+  "uri" | "indexedAt"
 >;
 
 export type BlobInsert = Omit<
   InferInsertModel<typeof schema.blobs>,
-  "cid" | "indexedAt" | "updatedAt"
+  "cid" | "indexedAt"
 >;
 
 export type RecordInsert = Omit<
