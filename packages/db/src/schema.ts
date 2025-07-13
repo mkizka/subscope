@@ -167,7 +167,7 @@ export const generators = pgTable("generators", {
   description: text(),
   avatarCid: varchar({ length: 256 }),
   createdAt: timestamp().notNull(),
-  indexedAt: timestamp().defaultNow(),
+  indexedAt: timestamp().notNull(),
 });
 
 export const likes = pgTable(

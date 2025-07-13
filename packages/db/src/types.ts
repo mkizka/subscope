@@ -36,3 +36,8 @@ export type SubscriptionInsert = Omit<
   InferInsertModel<typeof schema.subscriptions>,
   "uri" | "indexedAt"
 >;
+
+export type GeneratorInsert = Omit<
+  InferInsertModel<typeof schema.generators>,
+  "uri" | "indexedAt"
+>;

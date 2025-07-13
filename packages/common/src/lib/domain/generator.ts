@@ -12,6 +12,7 @@ type GeneratorParams = {
   description?: string;
   avatarCid?: string;
   createdAt: Date;
+  indexedAt: Date;
 };
 
 export class Generator {
@@ -23,6 +24,7 @@ export class Generator {
   readonly description?: string;
   readonly avatarCid?: string;
   readonly createdAt: Date;
+  readonly indexedAt: Date;
 
   constructor(params: GeneratorParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -33,6 +35,7 @@ export class Generator {
     this.description = params.description;
     this.avatarCid = params.avatarCid;
     this.createdAt = params.createdAt;
+    this.indexedAt = params.indexedAt;
   }
 
   static from(record: Record) {
@@ -46,6 +49,7 @@ export class Generator {
       description: parsed.description,
       avatarCid: parsed.avatar?.ref.toString(),
       createdAt: new Date(parsed.createdAt),
+      indexedAt: record.indexedAt,
     });
   }
 }
