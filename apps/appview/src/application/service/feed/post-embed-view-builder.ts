@@ -11,9 +11,11 @@ import {
   PostEmbedRecord,
 } from "@repo/common/domain";
 
-import { env } from "../../../shared/env.js";
+import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 
 export class PostEmbedViewBuilder {
+  constructor(private readonly assetUrlBuilder: AssetUrlBuilder) {}
+  static inject = ["assetUrlBuilder"] as const;
   embedView(
     embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null,
     actorDid: string,
@@ -42,7 +44,7 @@ export class PostEmbedViewBuilder {
         title: embed.title,
         description: embed.description,
         thumb: embed.thumbCid
-          ? `${env.BLOB_PROXY_URL}/images/feed_thumbnail/${actorDid}/${embed.thumbCid}.jpg`
+          ? this.assetUrlBuilder.getFeedThumbnailUrl(actorDid, embed.thumbCid)
           : undefined,
       },
     };
@@ -56,8 +58,8 @@ export class PostEmbedViewBuilder {
       $type: "app.bsky.embed.images#view" as const,
       images: images.map((image) => ({
         alt: image.alt,
-        thumb: `${env.BLOB_PROXY_URL}/images/feed_thumbnail/${actorDid}/${image.cid}.jpg`,
-        fullsize: `${env.BLOB_PROXY_URL}/images/feed_fullsize/${actorDid}/${image.cid}.jpg`,
+        thumb: this.assetUrlBuilder.getFeedThumbnailUrl(actorDid, image.cid),
+        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(actorDid, image.cid),
         aspectRatio: image.aspectRatio,
       })),
     };

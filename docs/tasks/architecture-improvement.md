@@ -98,19 +98,7 @@ throw new InvalidRequestError("Invalid actor");
 
 ### Phase 2: アーキテクチャの整理
 
-#### タスク2: Builder層からインフラ関連処理を分離
-
-- **優先度**: 中
-- **対象ファイル**:
-  - `/apps/appview/src/application/service/actor/profile-view-builder.ts`
-  - `/apps/appview/src/application/service/feed/post-embed-view-builder.ts`
-- **作業内容**:
-  1. URL構築専用のサービスを infrastructure層に作成
-  2. `UrlBuilderService` または `AssetUrlService` の実装
-  3. Builderクラスから環境変数参照を除去
-  4. URLサービスをBuilderに注入する形に変更
-
-#### タスク3: ビジネスロジックのドメインサービス移動
+#### タスク4: ビジネスロジックのドメインサービス移動
 
 - **優先度**: 中
 - **対象ファイル**:
@@ -121,7 +109,7 @@ throw new InvalidRequestError("Invalid actor");
   3. use-caseからドメインサービスを呼び出す形に変更
   4. ハードコードされたビジネスルールを設定可能にする
 
-#### タスク4: エラーハンドリングの統一化
+#### タスク5: エラーハンドリングの統一化
 
 - **優先度**: 中
 - **対象ファイル**: 全ルートハンドラー
@@ -131,7 +119,7 @@ throw new InvalidRequestError("Invalid actor");
   3. 全ルートハンドラーでエラー形式を統一
   4. カスタム例外クラスの整理・統一
 
-#### タスク5: パラメータ変換の整理
+#### タスク6: パラメータ変換の整理
 
 - **優先度**: 低
 - **対象ファイル**: データ変換が散在するルートハンドラー
@@ -142,12 +130,12 @@ throw new InvalidRequestError("Invalid actor");
 
 ### Phase 3: 長期的改善（オプション）
 
-#### タスク6: ドメインイベントの導入
+#### タスク7: ドメインイベントの導入
 
 - **優先度**: 低
 - **作業内容**: 複雑なビジネスロジックのイベント駆動設計への移行
 
-#### タスク7: CQRSパターンの適用
+#### タスク8: CQRSパターンの適用
 
 - **優先度**: 低
 - **作業内容**: 読み取り専用の複雑なクエリの分離

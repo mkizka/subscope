@@ -11,6 +11,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
@@ -24,6 +25,7 @@ describe("ProfileViewService", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)

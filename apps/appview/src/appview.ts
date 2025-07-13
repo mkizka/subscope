@@ -39,6 +39,7 @@ import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use
 import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
+import { AssetUrlBuilder } from "./infrastructure/asset-url-builder.js";
 import { AuthorFeedRepository } from "./infrastructure/author-feed-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
@@ -97,6 +98,7 @@ createInjector()
   .provideClass("didResolver", DidResolver)
   .provideClass("tokenVerifier", TokenVerifier)
   .provideClass("jobQueue", JobQueue)
+  .provideClass("assetUrlBuilder", AssetUrlBuilder)
   // application
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)

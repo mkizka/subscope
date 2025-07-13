@@ -8,6 +8,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
@@ -25,6 +26,7 @@ describe("GetLikesUseCase", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("likeService", LikeService)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)

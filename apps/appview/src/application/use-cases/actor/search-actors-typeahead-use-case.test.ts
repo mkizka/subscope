@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
@@ -21,6 +22,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("profileRepository", ProfileRepository)
+    .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .injectClass(SearchActorsTypeaheadUseCase);

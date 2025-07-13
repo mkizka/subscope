@@ -8,6 +8,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
@@ -23,6 +24,7 @@ describe("GetFollowersUseCase", () => {
     .provideClass("followRepository", FollowRepository)
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("followService", FollowService)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)

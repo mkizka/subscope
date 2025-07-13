@@ -3,10 +3,11 @@ import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import { env } from "../../../shared/env.js";
+import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 
 export class ProfileViewBuilder {
-  static inject = [] as const;
+  constructor(private readonly assetUrlBuilder: AssetUrlBuilder) {}
+  static inject = ["assetUrlBuilder"] as const;
 
   profileViewBasic(
     profile: ProfileDetailed,
@@ -71,6 +72,9 @@ export class ProfileViewBuilder {
     if (!profile.avatar) {
       return undefined;
     }
-    return `${env.BLOB_PROXY_URL}/images/avatar_thumbnail/${profile.actorDid}/${profile.avatar.cid}.jpg`;
+    return this.assetUrlBuilder.getAvatarThumbnailUrl(
+      profile.actorDid,
+      profile.avatar.cid,
+    );
   }
 }
