@@ -4,6 +4,9 @@ import type { IImageResizer } from "../application/interfaces/image-resizer.js";
 import { ImageBlob } from "../domain/image-blob.js";
 import type { ImagePreset } from "../domain/image-preset.js";
 
+sharp.concurrency(1);
+sharp.cache(false);
+
 export class ImageResizer implements IImageResizer {
   async resize({
     blob,
