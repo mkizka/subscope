@@ -40,6 +40,7 @@ export class RepostRepository implements IRepostRepository {
           subjectUri: repost.subjectUri,
           subjectCid: repost.subjectCid,
           createdAt: repost.createdAt,
+          indexedAt: repost.indexedAt,
           sortAt: repost.sortAt,
         }),
     );

@@ -46,3 +46,8 @@ export type LikeInsert = Omit<
   InferInsertModel<typeof schema.likes>,
   "uri" | "indexedAt" | "sortAt"
 >;
+
+export type RepostInsert = Omit<
+  InferInsertModel<typeof schema.reposts>,
+  "uri" | "indexedAt" | "sortAt"
+>;

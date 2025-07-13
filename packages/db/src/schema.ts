@@ -208,7 +208,7 @@ export const reposts = pgTable(
     subjectUri: varchar({ length: 256 }).notNull(),
     subjectCid: varchar({ length: 256 }).notNull(),
     createdAt: timestamp().notNull(),
-    indexedAt: timestamp().defaultNow(),
+    indexedAt: timestamp().notNull(),
     sortAt: timestamp()
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),
