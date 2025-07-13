@@ -41,3 +41,8 @@ export type GeneratorInsert = Omit<
   InferInsertModel<typeof schema.generators>,
   "uri" | "indexedAt"
 >;
+
+export type LikeInsert = Omit<
+  InferInsertModel<typeof schema.likes>,
+  "uri" | "indexedAt" | "sortAt"
+>;

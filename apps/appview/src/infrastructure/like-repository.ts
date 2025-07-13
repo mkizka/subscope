@@ -41,6 +41,7 @@ export class LikeRepository implements ILikeRepository {
           subjectUri: like.subjectUri,
           subjectCid: like.subjectCid,
           createdAt: like.createdAt,
+          indexedAt: like.indexedAt,
           sortAt: like.sortAt,
         }),
     );
@@ -78,6 +79,7 @@ export class LikeRepository implements ILikeRepository {
           subjectUri: like.subjectUri,
           subjectCid: like.subjectCid,
           createdAt: like.createdAt,
+          indexedAt: like.indexedAt,
           sortAt: like.sortAt,
         }),
     );
