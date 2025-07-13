@@ -44,7 +44,7 @@ export class Repost {
       subjectUri: parsed.subject.uri,
       subjectCid: parsed.subject.cid,
       createdAt: new Date(parsed.createdAt),
-      indexedAt: new Date(),
+      indexedAt: record.indexedAt,
     });
   }
 }
