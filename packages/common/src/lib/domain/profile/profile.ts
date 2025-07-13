@@ -17,7 +17,7 @@ export type ProfileParams = {
   description?: string | null;
   displayName?: string | null;
   createdAt?: Date | string | null;
-  indexedAt?: Date | string | null;
+  indexedAt: Date | string;
 };
 
 export class Profile {
@@ -28,7 +28,7 @@ export class Profile {
   readonly description: string | null;
   readonly displayName: string | null;
   readonly createdAt: Date | null;
-  readonly indexedAt: Date | null;
+  readonly indexedAt: Date;
 
   constructor(params: ProfileParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -38,7 +38,7 @@ export class Profile {
     this.description = params.description ?? null;
     this.displayName = params.displayName ?? null;
     this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
-    this.indexedAt = params.indexedAt ? new Date(params.indexedAt) : null;
+    this.indexedAt = new Date(params.indexedAt);
   }
 
   static from(record: Record) {
@@ -55,6 +55,7 @@ export class Profile {
       description: parsed.description,
       displayName: parsed.displayName,
       createdAt: parsed.createdAt,
+      indexedAt: record.indexedAt,
     });
   }
 }

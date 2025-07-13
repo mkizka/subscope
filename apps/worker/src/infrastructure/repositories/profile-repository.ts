@@ -42,6 +42,7 @@ export class ProfileRepository implements IProfileRepository {
       .insert(schema.profiles)
       .values({
         uri: profile.uri.toString(),
+        indexedAt: profile.indexedAt,
         ...profileData,
       })
       .onConflictDoUpdate({

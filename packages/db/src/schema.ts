@@ -77,7 +77,7 @@ export const profiles = pgTable(
     description: text(),
     displayName: varchar({ length: 256 }),
     createdAt: timestamp(),
-    indexedAt: timestamp().defaultNow(),
+    indexedAt: timestamp().notNull(),
   },
   (table) => [index("profiles_actor_idx").on(table.actorDid)],
 );
