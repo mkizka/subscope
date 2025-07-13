@@ -23,6 +23,7 @@ export class ProfileRepository implements IProfileRepository {
         .insert(schema.blobs)
         .values({
           cid: profile.avatar.cid,
+          indexedAt: profile.indexedAt,
           ...blobData,
         })
         .onConflictDoUpdate({

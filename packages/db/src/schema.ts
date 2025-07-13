@@ -138,7 +138,7 @@ export const blobs = pgTable("blobs", {
   cid: varchar({ length: 256 }).primaryKey(),
   mimeType: varchar({ length: 256 }).notNull(),
   size: integer().notNull(),
-  indexedAt: timestamp().defaultNow(),
+  indexedAt: timestamp().notNull(),
 });
 
 export const subscriptions = pgTable("subscriptions", {
