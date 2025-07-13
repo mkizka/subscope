@@ -9,6 +9,7 @@ type SubscriptionParams = {
   actorDid: string;
   appviewDid: string;
   createdAt: Date;
+  indexedAt: Date;
 };
 
 export class Subscription {
@@ -17,6 +18,7 @@ export class Subscription {
   readonly actorDid: Did;
   readonly appviewDid: Did;
   readonly createdAt: Date;
+  readonly indexedAt: Date;
 
   constructor(params: SubscriptionParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -24,6 +26,7 @@ export class Subscription {
     this.actorDid = asDid(params.actorDid);
     this.appviewDid = asDid(params.appviewDid);
     this.createdAt = params.createdAt;
+    this.indexedAt = params.indexedAt;
   }
 
   static from(record: Record) {
@@ -34,6 +37,7 @@ export class Subscription {
       actorDid: record.actorDid,
       appviewDid: parsed.appviewDid,
       createdAt: new Date(parsed.createdAt),
+      indexedAt: record.indexedAt,
     });
   }
 }

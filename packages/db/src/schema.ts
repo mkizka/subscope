@@ -151,7 +151,7 @@ export const subscriptions = pgTable("subscriptions", {
     .references(() => actors.did),
   appviewDid: varchar({ length: 256 }).notNull(),
   createdAt: timestamp().notNull(),
-  indexedAt: timestamp().defaultNow(),
+  indexedAt: timestamp().notNull(),
 });
 
 export const generators = pgTable("generators", {

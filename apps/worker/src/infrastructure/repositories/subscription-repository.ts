@@ -1,5 +1,5 @@
 import type { Subscription, TransactionContext } from "@repo/common/domain";
-import { schema } from "@repo/db";
+import { schema, type SubscriptionInsert } from "@repo/db";
 import { and, eq, exists, inArray } from "drizzle-orm";
 
 import type { ISubscriptionRepository } from "../../application/interfaces/repositories/subscription-repository.js";
@@ -17,11 +17,12 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       actorDid: subscription.actorDid,
       appviewDid: subscription.appviewDid,
       createdAt: subscription.createdAt,
-    };
+    } satisfies SubscriptionInsert;
     await ctx.db
       .insert(schema.subscriptions)
       .values({
         uri: subscription.uri.toString(),
+        indexedAt: subscription.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({
