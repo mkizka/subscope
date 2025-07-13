@@ -9,6 +9,7 @@ type FollowParams = {
   actorDid: string;
   subjectDid: string;
   createdAt: Date;
+  indexedAt: Date;
 };
 
 export class Follow {
@@ -17,6 +18,7 @@ export class Follow {
   readonly actorDid: Did;
   readonly subjectDid: Did;
   readonly createdAt: Date;
+  readonly indexedAt: Date;
 
   constructor(params: FollowParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -24,6 +26,7 @@ export class Follow {
     this.actorDid = asDid(params.actorDid);
     this.subjectDid = asDid(params.subjectDid);
     this.createdAt = params.createdAt;
+    this.indexedAt = params.indexedAt;
   }
 
   static from(record: Record) {
@@ -34,6 +37,7 @@ export class Follow {
       actorDid: record.actorDid,
       subjectDid: parsed.subject,
       createdAt: new Date(parsed.createdAt),
+      indexedAt: record.indexedAt,
     });
   }
 }

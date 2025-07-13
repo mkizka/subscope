@@ -10,6 +10,7 @@ export class FollowRepository implements IFollowRepository {
       actorDid: follow.actorDid,
       subjectDid: follow.subjectDid,
       createdAt: follow.createdAt,
+      indexedAt: follow.indexedAt,
     };
     await ctx.db
       .insert(schema.follows)

@@ -50,7 +50,7 @@ export const follows = pgTable(
       .notNull()
       .references(() => actors.did),
     createdAt: timestamp().notNull(),
-    indexedAt: timestamp().defaultNow(),
+    indexedAt: timestamp().notNull(),
     sortAt: timestamp()
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),

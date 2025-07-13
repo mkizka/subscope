@@ -37,6 +37,7 @@ export class FollowRepository implements IFollowRepository {
           actorDid: result.actorDid,
           subjectDid: result.subjectDid,
           createdAt: result.createdAt,
+          indexedAt: result.indexedAt,
         }),
     );
   }
@@ -67,6 +68,7 @@ export class FollowRepository implements IFollowRepository {
           actorDid: result.actorDid,
           subjectDid: result.subjectDid,
           createdAt: result.createdAt,
+          indexedAt: result.indexedAt,
         }),
     );
   }
