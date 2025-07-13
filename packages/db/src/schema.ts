@@ -99,8 +99,7 @@ export const posts = pgTable(
     replyParentCid: varchar({ length: 256 }),
     langs: jsonb().$type<string[]>(),
     createdAt: timestamp().notNull(),
-    // TODO: defaultNowではなくnotNullにする
-    indexedAt: timestamp().defaultNow(),
+    indexedAt: timestamp().notNull(),
     sortAt: timestamp()
       .generatedAlwaysAs(sql`least("created_at", "indexed_at")`)
       .notNull(),

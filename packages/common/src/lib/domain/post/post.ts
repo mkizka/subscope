@@ -31,7 +31,7 @@ type PostParams = {
   embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null;
   createdAt: Date;
   sortAt?: Date | null;
-  indexedAt?: Date | null;
+  indexedAt: Date;
 };
 
 export class Post {
@@ -45,7 +45,7 @@ export class Post {
   readonly embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null;
   readonly createdAt: Date;
   readonly sortAt: Date | null;
-  readonly indexedAt: Date | null;
+  readonly indexedAt: Date;
 
   constructor(params: PostParams) {
     this.uri = new AtUri(params.uri.toString());
@@ -58,7 +58,7 @@ export class Post {
     this.embed = params.embed;
     this.createdAt = params.createdAt;
     this.sortAt = params.sortAt ?? null;
-    this.indexedAt = params.indexedAt ?? null;
+    this.indexedAt = params.indexedAt;
   }
 
   isReply(): boolean {

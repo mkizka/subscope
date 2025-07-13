@@ -28,6 +28,7 @@ export class PostRepository implements IPostRepository {
       .insert(schema.posts)
       .values({
         uri: postUri,
+        indexedAt: post.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({
