@@ -39,7 +39,7 @@ export class ProfileViewBuilder {
       followersCount: options?.stats?.followersCount,
       followsCount: options?.stats?.followsCount,
       postsCount: options?.stats?.postsCount,
-      indexedAt: profile.indexedAt?.toISOString(),
+      indexedAt: profile.indexedAt.toISOString(),
       viewer: options?.viewerState,
     };
   }
@@ -49,7 +49,7 @@ export class ProfileViewBuilder {
       ...this.profileViewBasic(profile),
       $type: "app.bsky.actor.defs#profileView" as const,
       description: profile.description ?? undefined,
-      indexedAt: profile.indexedAt?.toISOString(),
+      indexedAt: profile.indexedAt.toISOString(),
     };
   }
 

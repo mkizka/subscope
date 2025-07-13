@@ -1,5 +1,4 @@
 import type { ProfileDetailed } from "@repo/common/domain";
-import { required } from "@repo/common/utils";
 
 import type { IProfileRepository } from "../../interfaces/profile-repository.js";
 import { createCursorPaginator, type Page } from "../../utils/pagination.js";
@@ -19,7 +18,7 @@ export class ProfileSearchService {
   }): Promise<Page<ProfileDetailed>> {
     const paginator = createCursorPaginator<ProfileDetailed>({
       limit,
-      getCursor: (item) => required(item.indexedAt?.toISOString()),
+      getCursor: (item) => item.indexedAt.toISOString(),
     });
 
     const profiles = await this.profileRepository.searchActors({
