@@ -241,7 +241,7 @@ describe("ProfileViewService", () => {
       expect(results).toEqual([]);
     });
 
-    test("viewerDidが指定されない場合、viewerStateを含まないProfileViewDetailedを返す", async () => {
+    test("viewerDidが指定されない場合、空のviewerStateを含むProfileViewDetailedを返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       await profileFactory(ctx.db)
@@ -267,7 +267,9 @@ describe("ProfileViewService", () => {
         $type: "app.bsky.actor.defs#profileViewDetailed",
         did: actor.did,
         displayName: "Test User",
-        viewer: undefined,
+        viewer: {
+          $type: "app.bsky.actor.defs#viewerState",
+        },
       });
     });
 

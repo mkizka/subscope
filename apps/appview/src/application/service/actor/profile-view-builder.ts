@@ -11,6 +11,7 @@ export class ProfileViewBuilder {
 
   profileViewBasic(
     profile: ProfileDetailed,
+    viewerState: $Typed<AppBskyActorDefs.ViewerState>,
   ): $Typed<AppBskyActorDefs.ProfileViewBasic> {
     return {
       $type: "app.bsky.actor.defs#profileViewBasic",
@@ -18,38 +19,45 @@ export class ProfileViewBuilder {
       handle: profile.handle ?? "handle.invalid",
       displayName: profile.displayName ?? undefined,
       avatar: this.getAvatarThumbnailUrl(profile),
+      viewer: viewerState,
       createdAt: profile.createdAt?.toISOString(),
+    };
+  }
+
+  profileView(
+    profile: ProfileDetailed,
+    viewerState: $Typed<AppBskyActorDefs.ViewerState>,
+  ): $Typed<AppBskyActorDefs.ProfileView> {
+    return {
+      ...this.profileViewBasic(profile, viewerState),
+      $type: "app.bsky.actor.defs#profileView" as const,
+      description: profile.description ?? undefined,
+      indexedAt: profile.indexedAt.toISOString(),
     };
   }
 
   profileViewDetailed(
     profile: ProfileDetailed,
-    options?: {
-      viewerState?: $Typed<AppBskyActorDefs.ViewerState>;
-      stats?: {
-        followsCount: number;
-        followersCount: number;
-        postsCount: number;
-      };
+    viewerState: $Typed<AppBskyActorDefs.ViewerState>,
+    stats?: {
+      followsCount: number;
+      followersCount: number;
+      postsCount: number;
     },
   ): $Typed<AppBskyActorDefs.ProfileViewDetailed> {
     return {
-      ...this.profileViewBasic(profile),
+      ...this.profileViewBasic(profile, viewerState),
       $type: "app.bsky.actor.defs#profileViewDetailed",
-      followersCount: options?.stats?.followersCount,
-      followsCount: options?.stats?.followsCount,
-      postsCount: options?.stats?.postsCount,
+      followersCount: stats?.followersCount,
+      followsCount: stats?.followsCount,
+      postsCount: stats?.postsCount,
       indexedAt: profile.indexedAt.toISOString(),
-      viewer: options?.viewerState,
     };
   }
 
-  profileView(profile: ProfileDetailed): $Typed<AppBskyActorDefs.ProfileView> {
+  emptyViewerState(): $Typed<AppBskyActorDefs.ViewerState> {
     return {
-      ...this.profileViewBasic(profile),
-      $type: "app.bsky.actor.defs#profileView" as const,
-      description: profile.description ?? undefined,
-      indexedAt: profile.indexedAt.toISOString(),
+      $type: "app.bsky.actor.defs#viewerState",
     };
   }
 

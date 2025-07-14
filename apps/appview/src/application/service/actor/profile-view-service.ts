@@ -23,7 +23,10 @@ export class ProfileViewService {
   async findProfileViewBasic(dids: Did[]) {
     const profiles = await this.profileRepository.findManyDetailed(dids);
     return profiles.map((profile) =>
-      this.profileViewBuilder.profileViewBasic(profile),
+      this.profileViewBuilder.profileViewBasic(
+        profile,
+        this.profileViewBuilder.emptyViewerState(),
+      ),
     );
   }
 
@@ -34,9 +37,11 @@ export class ProfileViewService {
     if (!viewerDid) {
       return profiles.map((profile) => {
         const stats = statsMap.get(profile.actorDid);
-        return this.profileViewBuilder.profileViewDetailed(profile, {
+        return this.profileViewBuilder.profileViewDetailed(
+          profile,
+          this.profileViewBuilder.emptyViewerState(),
           stats,
-        });
+        );
       });
     }
 
@@ -59,10 +64,11 @@ export class ProfileViewService {
         followingMap,
         followedByMap,
       );
-      return this.profileViewBuilder.profileViewDetailed(profile, {
-        stats,
+      return this.profileViewBuilder.profileViewDetailed(
+        profile,
         viewerState,
-      });
+        stats,
+      );
     });
   }
 
@@ -71,7 +77,10 @@ export class ProfileViewService {
   ): Promise<$Typed<AppBskyActorDefs.ProfileView>[]> {
     const profiles = await this.profileRepository.findManyDetailed(dids);
     return profiles.map((profile) =>
-      this.profileViewBuilder.profileView(profile),
+      this.profileViewBuilder.profileView(
+        profile,
+        this.profileViewBuilder.emptyViewerState(),
+      ),
     );
   }
 }

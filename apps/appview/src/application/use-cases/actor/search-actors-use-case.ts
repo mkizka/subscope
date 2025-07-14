@@ -35,7 +35,10 @@ export class SearchActorsUseCase {
     });
 
     const actors = result.items.map((profile) =>
-      this.profileViewBuilder.profileView(profile),
+      this.profileViewBuilder.profileView(
+        profile,
+        this.profileViewBuilder.emptyViewerState(),
+      ),
     );
 
     return {

@@ -30,7 +30,10 @@ export class SearchActorsTypeaheadUseCase {
     });
 
     const actors = profiles.map((profile) =>
-      this.profileViewBuilder.profileViewBasic(profile),
+      this.profileViewBuilder.profileViewBasic(
+        profile,
+        this.profileViewBuilder.emptyViewerState(),
+      ),
     );
 
     return {
