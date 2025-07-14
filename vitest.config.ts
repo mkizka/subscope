@@ -8,6 +8,7 @@ export default defineConfig({
       exclude: [
         "**/generated/**",
         "**/dist/**",
+        "**/coverage/**",
         "**/eslint.config.?(m)js",
         "**/vitest.config.ts",
         "**/build.mjs",

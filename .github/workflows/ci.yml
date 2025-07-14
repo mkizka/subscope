@@ -46,4 +46,4 @@ jobs:
           cache: pnpm
       - run: pnpm i
       - run: pnpm build
-      - run: pnpm test
+      - run: pnpm test --coverage
