@@ -235,7 +235,6 @@ export const feedItems = pgTable(
       .notNull()
       .references(() => actors.did),
     sortAt: timestamp().notNull(),
-    indexedAt: timestamp().defaultNow(),
   },
   (table) => [
     index("feed_items_sort_at_idx").on(table.sortAt),
