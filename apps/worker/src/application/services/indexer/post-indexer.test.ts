@@ -4,6 +4,7 @@ import { schema } from "@repo/db";
 import {
   actorFactory,
   getTestSetup,
+  postEmbedRecordFactory,
   postFactory,
   randomCid,
   recordFactory,
@@ -251,6 +252,7 @@ describe("PostIndexer", () => {
         likeCount: 0,
         repostCount: 0,
         replyCount: 3,
+        quoteCount: 0,
       });
 
       const [actorStats] = await ctx.db
@@ -297,6 +299,149 @@ describe("PostIndexer", () => {
 
       expect(actorStats).toMatchObject({
         actorDid: regularActor.did,
+        postsCount: 1,
+        followsCount: 0,
+        followersCount: 0,
+      });
+    });
+
+    it("引用投稿時に引用された投稿のpost_statsのquote数が正しく更新される", async () => {
+      // arrange
+      const quotedActor = await actorFactory(ctx.db).create();
+      const quotedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotedActor })
+        .create();
+      const quotedPost = await postFactory(ctx.db)
+        .vars({ record: () => quotedRecord })
+        .props({
+          text: () => "Original post to be quoted",
+        })
+        .create();
+
+      // 既存の引用投稿を作成（データベースに直接挿入）
+      const existingQuoteActor = await actorFactory(ctx.db).create();
+      const existingQuoteRecord = await recordFactory(
+        ctx.db,
+        "app.bsky.feed.post",
+      )
+        .vars({ actor: () => existingQuoteActor })
+        .create();
+      const existingQuotePost = await postFactory(ctx.db)
+        .vars({ record: () => existingQuoteRecord })
+        .props({
+          text: () => "Existing quote post",
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => existingQuotePost,
+          embeddedPost: () => quotedPost,
+        })
+        .create();
+
+      const quotingActor = await actorFactory(ctx.db).create();
+      const quoteJson = {
+        $type: "app.bsky.feed.post",
+        text: "This is a quote post",
+        embed: {
+          $type: "app.bsky.embed.record",
+          record: {
+            uri: quotedPost.uri,
+            cid: quotedPost.cid,
+          },
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const newQuoteRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotingActor })
+        .props({ json: () => quoteJson })
+        .create();
+      const record = Record.fromJson({
+        uri: newQuoteRecord.uri,
+        cid: newQuoteRecord.cid,
+        json: quoteJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.updateStats({ ctx, record });
+
+      // assert
+      const [stats] = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, quotedPost.uri))
+        .limit(1);
+
+      expect(stats).toMatchObject({
+        postUri: quotedPost.uri,
+        likeCount: 0,
+        repostCount: 0,
+        replyCount: 0,
+        quoteCount: 2, // 既存の1つ + 新しい1つ = 2
+      });
+
+      const [actorStats] = await ctx.db
+        .select()
+        .from(schema.actorStats)
+        .where(eq(schema.actorStats.actorDid, quotingActor.did));
+
+      expect(actorStats).toMatchObject({
+        actorDid: quotingActor.did,
+        postsCount: 1,
+        followsCount: 0,
+        followersCount: 0,
+      });
+    });
+
+    it("引用された投稿が存在しない場合はpost_statsを更新しない", async () => {
+      // arrange
+      const quotingActor = await actorFactory(ctx.db).create();
+      const nonExistentQuotedUri =
+        "at://did:plc:nonexistent/app.bsky.feed.post/quoted";
+      const nonExistentQuotedCid =
+        "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e";
+      const quoteJson = {
+        $type: "app.bsky.feed.post",
+        text: "Quote of non-existent post",
+        embed: {
+          $type: "app.bsky.embed.record",
+          record: {
+            uri: nonExistentQuotedUri,
+            cid: nonExistentQuotedCid,
+          },
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const quoteRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotingActor })
+        .props({ json: () => quoteJson })
+        .create();
+      const record = Record.fromJson({
+        uri: quoteRecord.uri,
+        cid: quoteRecord.cid,
+        json: quoteJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.updateStats({ ctx, record });
+
+      // assert
+      const stats = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, nonExistentQuotedUri));
+      expect(stats).toHaveLength(0);
+
+      const [actorStats] = await ctx.db
+        .select()
+        .from(schema.actorStats)
+        .where(eq(schema.actorStats.actorDid, quotingActor.did));
+      expect(actorStats).toMatchObject({
+        actorDid: quotingActor.did,
         postsCount: 1,
         followsCount: 0,
         followersCount: 0,

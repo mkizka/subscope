@@ -123,6 +123,7 @@ export const postStats = pgTable("post_stats", {
   likeCount: integer().notNull().default(0),
   repostCount: integer().notNull().default(0),
   replyCount: integer().notNull().default(0),
+  quoteCount: integer().notNull().default(0),
 });
 
 export const actorStats = pgTable("actor_stats", {

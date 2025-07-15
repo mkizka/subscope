@@ -117,9 +117,10 @@ export const postStatsFactory = (db: Database) =>
       {
         props: {
           postUri: later<string>(),
-          likeCount: () => faker.number.int({ min: 0, max: 100 }),
-          repostCount: () => faker.number.int({ min: 0, max: 50 }),
-          replyCount: () => faker.number.int({ min: 0, max: 30 }),
+          likeCount: () => faker.number.int({ min: 0, max: 10 }),
+          repostCount: () => faker.number.int({ min: 0, max: 10 }),
+          replyCount: () => faker.number.int({ min: 0, max: 10 }),
+          quoteCount: () => faker.number.int({ min: 0, max: 10 }),
         },
         vars: {
           post: () => postFactory(db).create(),

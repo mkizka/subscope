@@ -1,5 +1,5 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
-import { FeedItem, Post } from "@repo/common/domain";
+import { FeedItem, Post, PostEmbedRecord } from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
@@ -90,6 +90,19 @@ export class PostIndexer implements ICollectionIndexer {
         await this.postStatsRepository.upsertReplyCount({
           ctx,
           uri: post.replyParent.uri,
+        });
+      }
+    }
+
+    if (post.embed instanceof PostEmbedRecord) {
+      const quotedPostExists = await this.postRepository.exists(
+        ctx,
+        post.embed.uri.toString(),
+      );
+      if (quotedPostExists) {
+        await this.postStatsRepository.upsertQuoteCount({
+          ctx,
+          uri: post.embed.uri,
         });
       }
     }

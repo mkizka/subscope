@@ -21,6 +21,7 @@ export class PostStatsRepository implements IPostStatsRepository {
         likeCount,
         repostCount: 0,
         replyCount: 0,
+        quoteCount: 0,
       })
       .onConflictDoUpdate({
         target: schema.postStats.postUri,
@@ -51,6 +52,7 @@ export class PostStatsRepository implements IPostStatsRepository {
         likeCount: 0,
         repostCount,
         replyCount: 0,
+        quoteCount: 0,
       })
       .onConflictDoUpdate({
         target: schema.postStats.postUri,
@@ -81,6 +83,7 @@ export class PostStatsRepository implements IPostStatsRepository {
         likeCount: 0,
         repostCount: 0,
         replyCount,
+        quoteCount: 0,
       })
       .onConflictDoUpdate({
         target: schema.postStats.postUri,
@@ -90,27 +93,64 @@ export class PostStatsRepository implements IPostStatsRepository {
       });
   }
 
+  async upsertQuoteCount({
+    ctx,
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }) {
+    const postUri = uri.toString();
+    const [result] = await ctx.db
+      .select({ count: count() })
+      .from(schema.postEmbedRecords)
+      .where(eq(schema.postEmbedRecords.uri, postUri));
+
+    const quoteCount = result?.count ?? 0;
+    await ctx.db
+      .insert(schema.postStats)
+      .values({
+        postUri,
+        likeCount: 0,
+        repostCount: 0,
+        replyCount: 0,
+        quoteCount,
+      })
+      .onConflictDoUpdate({
+        target: schema.postStats.postUri,
+        set: {
+          quoteCount,
+        },
+      });
+  }
+
   async upsertAllCount({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
     const postUri = uri.toString();
 
-    const [[likeResult], [repostResult], [replyResult]] = await Promise.all([
-      ctx.db
-        .select({ count: count() })
-        .from(schema.likes)
-        .where(eq(schema.likes.subjectUri, postUri)),
-      ctx.db
-        .select({ count: count() })
-        .from(schema.reposts)
-        .where(eq(schema.reposts.subjectUri, postUri)),
-      ctx.db
-        .select({ count: count() })
-        .from(schema.posts)
-        .where(eq(schema.posts.replyParentUri, postUri)),
-    ]);
+    const [[likeResult], [repostResult], [replyResult], [quoteResult]] =
+      await Promise.all([
+        ctx.db
+          .select({ count: count() })
+          .from(schema.likes)
+          .where(eq(schema.likes.subjectUri, postUri)),
+        ctx.db
+          .select({ count: count() })
+          .from(schema.reposts)
+          .where(eq(schema.reposts.subjectUri, postUri)),
+        ctx.db
+          .select({ count: count() })
+          .from(schema.posts)
+          .where(eq(schema.posts.replyParentUri, postUri)),
+        ctx.db
+          .select({ count: count() })
+          .from(schema.postEmbedRecords)
+          .where(eq(schema.postEmbedRecords.uri, postUri)),
+      ]);
 
     const likeCount = likeResult?.count ?? 0;
     const repostCount = repostResult?.count ?? 0;
     const replyCount = replyResult?.count ?? 0;
+    const quoteCount = quoteResult?.count ?? 0;
 
     await ctx.db
       .insert(schema.postStats)
@@ -119,6 +159,7 @@ export class PostStatsRepository implements IPostStatsRepository {
         likeCount,
         repostCount,
         replyCount,
+        quoteCount,
       })
       .onConflictDoUpdate({
         target: schema.postStats.postUri,
@@ -126,6 +167,7 @@ export class PostStatsRepository implements IPostStatsRepository {
           likeCount,
           repostCount,
           replyCount,
+          quoteCount,
         },
       });
   }

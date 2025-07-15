@@ -37,7 +37,7 @@ export class PostStatsRepository implements IPostStatsRepository {
         likeCount: stats.likeCount,
         repostCount: stats.repostCount,
         replyCount: stats.replyCount,
-        quoteCount: 0,
+        quoteCount: stats.quoteCount,
       });
     }
 

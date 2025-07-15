@@ -46,7 +46,7 @@ describe("PostStatsRepository", () => {
         likeCount: postStats.likeCount,
         repostCount: postStats.repostCount,
         replyCount: postStats.replyCount,
-        quoteCount: 0,
+        quoteCount: postStats.quoteCount,
       });
     });
 
@@ -68,13 +68,13 @@ describe("PostStatsRepository", () => {
         likeCount: postStats1.likeCount,
         repostCount: postStats1.repostCount,
         replyCount: postStats1.replyCount,
-        quoteCount: 0,
+        quoteCount: postStats1.quoteCount,
       });
       expect(result.get(postStats2.postUri)).toEqual({
         likeCount: postStats2.likeCount,
         repostCount: postStats2.repostCount,
         replyCount: postStats2.replyCount,
-        quoteCount: 0,
+        quoteCount: postStats2.quoteCount,
       });
     });
   });
