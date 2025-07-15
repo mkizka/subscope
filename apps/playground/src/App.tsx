@@ -1,4 +1,5 @@
 import { AtpAgent } from "@atproto/api";
+import { required } from "@repo/common/utils";
 
 export function App() {
   const createSubscriptionRecord = async () => {
@@ -12,7 +13,7 @@ export function App() {
     });
 
     await agent.com.atproto.repo.createRecord({
-      repo: agent.session!.did,
+      repo: required(agent.session).did,
       collection: "dev.mkizka.test.subscription",
       record: {
         appviewDid: "did:web:appview.localhost",

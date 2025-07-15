@@ -1,4 +1,5 @@
 import type { DatabaseClient } from "@repo/common/domain";
+import { required } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { count, inArray, lt } from "drizzle-orm";
 
@@ -19,7 +20,7 @@ export class Temp__CleanupDatabaseUseCase {
       })
       .from(schema.posts)
       .where(lt(schema.posts.indexedAt, date));
-    return result!.count;
+    return required(result).count;
   }
 
   private async getPostUrisToDelete(date: Date) {

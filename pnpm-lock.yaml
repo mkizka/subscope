@@ -276,6 +276,9 @@ importers:
       "@atproto/api":
         specifier: 0.15.25
         version: 0.15.25
+      "@repo/common":
+        specifier: workspace:*
+        version: link:../../packages/common
       react:
         specifier: ^19.1.0
         version: 19.1.0
