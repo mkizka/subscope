@@ -20,14 +20,38 @@ export class ProfileViewService {
     "profileViewBuilder",
   ] as const;
 
-  async findProfileViewBasic(dids: Did[]) {
+  async findProfileViewBasic(dids: Did[], viewerDid?: Did | null) {
     const profiles = await this.profileRepository.findManyDetailed(dids);
-    return profiles.map((profile) =>
-      this.profileViewBuilder.profileViewBasic(
-        profile,
-        this.profileViewBuilder.emptyViewerState(),
-      ),
-    );
+
+    if (!viewerDid) {
+      return profiles.map((profile) =>
+        this.profileViewBuilder.profileViewBasic(
+          profile,
+          this.profileViewBuilder.emptyViewerState(),
+        ),
+      );
+    }
+
+    const targetDids = profiles.map((profile) => profile.actorDid);
+    const [followingMap, followedByMap] = await Promise.all([
+      this.followRepository.findFollowingMap({
+        actorDid: viewerDid,
+        targetDids,
+      }),
+      this.followRepository.findFollowedByMap({
+        actorDid: viewerDid,
+        targetDids,
+      }),
+    ]);
+
+    return profiles.map((profile) => {
+      const viewerState = this.profileViewBuilder.viewerState(
+        profile.actorDid,
+        followingMap,
+        followedByMap,
+      );
+      return this.profileViewBuilder.profileViewBasic(profile, viewerState);
+    });
   }
 
   async findProfileViewDetailed(dids: Did[], viewerDid?: Did | null) {
@@ -74,13 +98,38 @@ export class ProfileViewService {
 
   async findProfileView(
     dids: Did[],
+    viewerDid?: Did | null,
   ): Promise<$Typed<AppBskyActorDefs.ProfileView>[]> {
     const profiles = await this.profileRepository.findManyDetailed(dids);
-    return profiles.map((profile) =>
-      this.profileViewBuilder.profileView(
-        profile,
-        this.profileViewBuilder.emptyViewerState(),
-      ),
-    );
+
+    if (!viewerDid) {
+      return profiles.map((profile) =>
+        this.profileViewBuilder.profileView(
+          profile,
+          this.profileViewBuilder.emptyViewerState(),
+        ),
+      );
+    }
+
+    const targetDids = profiles.map((profile) => profile.actorDid);
+    const [followingMap, followedByMap] = await Promise.all([
+      this.followRepository.findFollowingMap({
+        actorDid: viewerDid,
+        targetDids,
+      }),
+      this.followRepository.findFollowedByMap({
+        actorDid: viewerDid,
+        targetDids,
+      }),
+    ]);
+
+    return profiles.map((profile) => {
+      const viewerState = this.profileViewBuilder.viewerState(
+        profile.actorDid,
+        followingMap,
+        followedByMap,
+      );
+      return this.profileViewBuilder.profileView(profile, viewerState);
+    });
   }
 }

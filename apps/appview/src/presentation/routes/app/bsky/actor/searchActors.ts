@@ -1,18 +1,25 @@
 import type { Server } from "@repo/client/server";
 
 import type { SearchActorsUseCase } from "../../../../../application/use-cases/actor/search-actors-use-case.js";
+import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
 
 export class SearchActors {
-  constructor(private searchActorsUseCase: SearchActorsUseCase) {}
-  static inject = ["searchActorsUseCase"] as const;
+  constructor(
+    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
+    private readonly searchActorsUseCase: SearchActorsUseCase,
+  ) {}
+  static inject = ["authVerifierMiddleware", "searchActorsUseCase"] as const;
 
   handle(server: Server) {
     server.app.bsky.actor.searchActors({
-      handler: async ({ params }) => {
+      handler: async ({ params, req }) => {
+        const viewerDid = await this.authVerifierMiddleware.getViewerDid(req);
+
         const result = await this.searchActorsUseCase.execute({
           query: params.q,
           limit: params.limit,
           cursor: params.cursor,
+          viewerDid,
         });
 
         return {

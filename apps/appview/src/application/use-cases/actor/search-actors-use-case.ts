@@ -1,20 +1,22 @@
+import { type Did } from "@atproto/did";
 import type { AppBskyActorSearchActors } from "@repo/client/server";
 
-import type { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
+import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import type { ProfileSearchService } from "../../service/search/profile-search-service.js";
 
 type SearchActorsParams = {
   query: string | undefined;
   limit: number;
   cursor?: string;
+  viewerDid?: Did | null;
 };
 
 export class SearchActorsUseCase {
   constructor(
     private readonly profileSearchService: ProfileSearchService,
-    private readonly profileViewBuilder: ProfileViewBuilder,
+    private readonly profileViewService: ProfileViewService,
   ) {}
-  static inject = ["profileSearchService", "profileViewBuilder"] as const;
+  static inject = ["profileSearchService", "profileViewService"] as const;
 
   async execute(
     params: SearchActorsParams,
@@ -34,11 +36,10 @@ export class SearchActorsUseCase {
       cursor,
     });
 
-    const actors = result.items.map((profile) =>
-      this.profileViewBuilder.profileView(
-        profile,
-        this.profileViewBuilder.emptyViewerState(),
-      ),
+    const dids = result.items.map((profile) => profile.actorDid);
+    const actors = await this.profileViewService.findProfileView(
+      dids,
+      params.viewerDid,
     );
 
     return {
