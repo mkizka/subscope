@@ -1,5 +1,7 @@
 import { type Did } from "@atproto/did";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
+import type { ProfileDetailed } from "@repo/common/domain";
+import { required } from "@repo/common/utils";
 
 import type { IActorStatsRepository } from "../../interfaces/actor-stats-repository.js";
 import type { IFollowRepository } from "../../interfaces/follow-repository.js";
@@ -22,78 +24,14 @@ export class ProfileViewService {
 
   async findProfileViewBasic(dids: Did[], viewerDid?: Did | null) {
     const profiles = await this.profileRepository.findManyDetailed(dids);
+    const viewerStatesMap = await this.findViewerStates(profiles, viewerDid);
 
-    if (!viewerDid) {
-      return profiles.map((profile) =>
-        this.profileViewBuilder.profileViewBasic(
-          profile,
-          this.profileViewBuilder.emptyViewerState(),
-        ),
-      );
-    }
-
-    const targetDids = profiles.map((profile) => profile.actorDid);
-    const [followingMap, followedByMap] = await Promise.all([
-      this.followRepository.findFollowingMap({
-        actorDid: viewerDid,
-        targetDids,
-      }),
-      this.followRepository.findFollowedByMap({
-        actorDid: viewerDid,
-        targetDids,
-      }),
-    ]);
-
-    return profiles.map((profile) => {
-      const viewerState = this.profileViewBuilder.viewerState(
-        profile.actorDid,
-        followingMap,
-        followedByMap,
-      );
-      return this.profileViewBuilder.profileViewBasic(profile, viewerState);
-    });
-  }
-
-  async findProfileViewDetailed(dids: Did[], viewerDid?: Did | null) {
-    const profiles = await this.profileRepository.findManyDetailed(dids);
-    const statsMap = await this.actorStatsRepository.findStats(dids);
-
-    if (!viewerDid) {
-      return profiles.map((profile) => {
-        const stats = statsMap.get(profile.actorDid);
-        return this.profileViewBuilder.profileViewDetailed(
-          profile,
-          this.profileViewBuilder.emptyViewerState(),
-          stats,
-        );
-      });
-    }
-
-    const targetDids = profiles.map((profile) => profile.actorDid);
-    const [followingMap, followedByMap] = await Promise.all([
-      this.followRepository.findFollowingMap({
-        actorDid: viewerDid,
-        targetDids,
-      }),
-      this.followRepository.findFollowedByMap({
-        actorDid: viewerDid,
-        targetDids,
-      }),
-    ]);
-
-    return profiles.map((profile) => {
-      const stats = statsMap.get(profile.actorDid);
-      const viewerState = this.profileViewBuilder.viewerState(
-        profile.actorDid,
-        followingMap,
-        followedByMap,
-      );
-      return this.profileViewBuilder.profileViewDetailed(
+    return profiles.map((profile) =>
+      this.profileViewBuilder.profileViewBasic(
         profile,
-        viewerState,
-        stats,
-      );
-    });
+        required(viewerStatesMap.get(profile.actorDid)),
+      ),
+    );
   }
 
   async findProfileView(
@@ -101,14 +39,47 @@ export class ProfileViewService {
     viewerDid?: Did | null,
   ): Promise<$Typed<AppBskyActorDefs.ProfileView>[]> {
     const profiles = await this.profileRepository.findManyDetailed(dids);
+    const viewerStatesMap = await this.findViewerStates(profiles, viewerDid);
+
+    return profiles.map((profile) =>
+      this.profileViewBuilder.profileView(
+        profile,
+        required(viewerStatesMap.get(profile.actorDid)),
+      ),
+    );
+  }
+
+  async findProfileViewDetailed(dids: Did[], viewerDid?: Did | null) {
+    const profiles = await this.profileRepository.findManyDetailed(dids);
+    const viewerStatesMap = await this.findViewerStates(profiles, viewerDid);
+    const statsMap = await this.actorStatsRepository.findStats(dids);
+
+    return profiles.map((profile) => {
+      return this.profileViewBuilder.profileViewDetailed(
+        profile,
+        required(viewerStatesMap.get(profile.actorDid)),
+        statsMap.get(profile.actorDid),
+      );
+    });
+  }
+
+  private async findViewerStates(
+    profiles: ProfileDetailed[],
+    viewerDid?: Did | null,
+  ): Promise<Map<Did, $Typed<AppBskyActorDefs.ViewerState>>> {
+    const viewerStatesMap = new Map<
+      Did,
+      $Typed<AppBskyActorDefs.ViewerState>
+    >();
 
     if (!viewerDid) {
-      return profiles.map((profile) =>
-        this.profileViewBuilder.profileView(
-          profile,
+      for (const profile of profiles) {
+        viewerStatesMap.set(
+          profile.actorDid,
           this.profileViewBuilder.emptyViewerState(),
-        ),
-      );
+        );
+      }
+      return viewerStatesMap;
     }
 
     const targetDids = profiles.map((profile) => profile.actorDid);
@@ -123,13 +94,15 @@ export class ProfileViewService {
       }),
     ]);
 
-    return profiles.map((profile) => {
+    for (const profile of profiles) {
       const viewerState = this.profileViewBuilder.viewerState(
         profile.actorDid,
         followingMap,
         followedByMap,
       );
-      return this.profileViewBuilder.profileView(profile, viewerState);
-    });
+      viewerStatesMap.set(profile.actorDid, viewerState);
+    }
+
+    return viewerStatesMap;
   }
 }
