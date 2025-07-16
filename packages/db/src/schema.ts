@@ -76,7 +76,7 @@ export const profiles = pgTable(
     avatarCid: varchar({ length: 256 }),
     description: text(),
     displayName: varchar({ length: 256 }),
-    createdAt: timestamp(),
+    createdAt: timestamp().notNull(),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("profiles_actor_idx").on(table.actorDid)],
@@ -157,7 +157,7 @@ export const generators = pgTable("generators", {
     .notNull()
     .references(() => actors.did),
   did: varchar({ length: 256 }).notNull(),
-  displayName: varchar({ length: 240 }).notNull(),
+  displayName: varchar({ length: 256 }).notNull(),
   description: text(),
   avatarCid: varchar({ length: 256 }),
   createdAt: timestamp().notNull(),
@@ -239,7 +239,7 @@ export const feedItems = pgTable(
 
 export const postEmbedImages = pgTable("post_embed_images", {
   postUri: varchar({ length: 256 })
-    .notNull()
+    .primaryKey()
     .references(() => posts.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
   position: integer().notNull(),
