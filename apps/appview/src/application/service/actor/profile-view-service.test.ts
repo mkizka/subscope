@@ -2,7 +2,6 @@ import { asDid } from "@atproto/did";
 import {
   actorFactory,
   actorStatsFactory,
-  blobFactory,
   followFactory,
   getTestSetup,
   profileFactory,
@@ -35,17 +34,16 @@ describe("ProfileViewService", () => {
     test("プロフィールが存在する場合、ProfileViewBasicを返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
-      const avatar = await blobFactory(ctx.db).create();
-      await profileFactory(ctx.db)
+      const profile = await profileFactory(ctx.db)
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.actor.profile")
               .vars({ actor: () => actor })
               .create(),
-          avatar: () => avatar,
         })
         .props({
           displayName: () => "Test User",
+          avatarCid: () => "test-avatar-cid",
         })
         .create();
 
@@ -61,7 +59,7 @@ describe("ProfileViewService", () => {
         did: actor.did,
         handle: actor.handle,
         displayName: "Test User",
-        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${avatar.cid}.jpg`,
+        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${profile.avatarCid}.jpg`,
         createdAt: expect.any(String),
       });
     });
@@ -84,17 +82,16 @@ describe("ProfileViewService", () => {
     test("プロフィールと統計情報が存在する場合、統計情報を含むProfileViewDetailedを返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
-      const avatar = await blobFactory(ctx.db).create();
-      await profileFactory(ctx.db)
+      const profile = await profileFactory(ctx.db)
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.actor.profile")
               .vars({ actor: () => actor })
               .create(),
-          avatar: () => avatar,
         })
         .props({
           displayName: () => "Test User With Stats",
+          avatarCid: () => "test-avatar-cid-2",
         })
         .create();
       await actorStatsFactory(ctx.db)
@@ -118,7 +115,7 @@ describe("ProfileViewService", () => {
         did: actor.did,
         handle: actor.handle,
         displayName: "Test User With Stats",
-        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${avatar.cid}.jpg`,
+        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${profile.avatarCid}.jpg`,
         followsCount: 10,
         followersCount: 20,
         postsCount: 30,

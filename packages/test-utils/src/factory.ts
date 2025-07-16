@@ -148,7 +148,6 @@ export const profileFactory = (db: Database) =>
         },
         vars: {
           record: () => recordFactory(db, "app.bsky.actor.profile").create(),
-          avatar: () => blobFactory(db).create(),
         },
       },
       (props) => create(db, schema.profiles, props),
@@ -157,7 +156,7 @@ export const profileFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
-      avatarCid: async ({ vars }) => (await vars.avatar).cid,
+      avatarCid: () => (Math.random() > 0.5 ? randomCid() : null),
     });
 
 export const followFactory = (db: Database) =>
@@ -213,20 +212,6 @@ export const likeFactory = (db: Database) =>
       subjectUri: async ({ vars }) => (await vars.subject).uri,
       subjectCid: async ({ vars }) => (await vars.subject).cid,
     });
-
-export const blobFactory = (db: Database) =>
-  factory.define(
-    {
-      props: {
-        cid: () => randomCid(),
-        mimeType: () => "image/jpeg",
-        size: () => faker.number.int({ min: 1000, max: 100000 }),
-        indexedAt: () => faker.date.recent(),
-      },
-      vars: {},
-    },
-    (props) => create(db, schema.blobs, props),
-  );
 
 export const actorStatsFactory = (db: Database) =>
   factory

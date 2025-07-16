@@ -3,17 +3,11 @@ import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record.js";
 
-type Avatar = {
-  readonly cid: string;
-  readonly mimeType: string;
-  readonly size: number;
-};
-
 export type ProfileParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;
-  avatar?: Avatar | null;
+  avatarCid?: string | null;
   description?: string | null;
   displayName?: string | null;
   createdAt?: Date | string | null;
@@ -24,7 +18,7 @@ export class Profile {
   readonly uri: AtUri;
   readonly cid: string;
   readonly actorDid: Did;
-  readonly avatar: Avatar | null;
+  readonly avatarCid: string | null;
   readonly description: string | null;
   readonly displayName: string | null;
   readonly createdAt: Date | null;
@@ -34,7 +28,7 @@ export class Profile {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.actorDid = asDid(params.actorDid);
-    this.avatar = params.avatar ?? null;
+    this.avatarCid = params.avatarCid ?? null;
     this.description = params.description ?? null;
     this.displayName = params.displayName ?? null;
     this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
@@ -47,11 +41,7 @@ export class Profile {
       uri: record.uri,
       cid: record.cid,
       actorDid: record.actorDid,
-      avatar: parsed.avatar && {
-        cid: parsed.avatar.ref.toString(),
-        mimeType: parsed.avatar.mimeType,
-        size: parsed.avatar.size,
-      },
+      avatarCid: parsed.avatar?.ref.toString() ?? null,
       description: parsed.description,
       displayName: parsed.displayName,
       createdAt: parsed.createdAt,

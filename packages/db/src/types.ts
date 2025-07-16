@@ -17,11 +17,6 @@ export type ProfileInsert = Omit<
   "uri" | "indexedAt"
 >;
 
-export type BlobInsert = Omit<
-  InferInsertModel<typeof schema.blobs>,
-  "cid" | "indexedAt"
->;
-
 export type RecordInsert = Omit<
   InferInsertModel<typeof schema.records>,
   "uri" | "indexedAt"

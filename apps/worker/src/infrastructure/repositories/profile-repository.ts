@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 import type { Profile } from "@repo/common/domain";
-import { type BlobInsert, type ProfileInsert, schema } from "@repo/db";
+import { type ProfileInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IProfileRepository } from "../../application/interfaces/repositories/profile-repository.js";
@@ -14,27 +14,10 @@ export class ProfileRepository implements IProfileRepository {
     ctx: TransactionContext;
     profile: Profile;
   }) {
-    if (profile.avatar) {
-      const blobData = {
-        mimeType: profile.avatar.mimeType,
-        size: profile.avatar.size,
-      } satisfies BlobInsert;
-      await ctx.db
-        .insert(schema.blobs)
-        .values({
-          cid: profile.avatar.cid,
-          indexedAt: profile.indexedAt,
-          ...blobData,
-        })
-        .onConflictDoUpdate({
-          target: schema.blobs.cid,
-          set: blobData,
-        });
-    }
     const profileData = {
       cid: profile.cid,
       actorDid: profile.actorDid,
-      avatarCid: profile.avatar?.cid,
+      avatarCid: profile.avatarCid,
       description: profile.description,
       displayName: profile.displayName,
       createdAt: profile.createdAt,

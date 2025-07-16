@@ -19,7 +19,6 @@ export class ProfileRepository implements IProfileRepository {
       where: (profiles, { inArray }) => inArray(profiles.actorDid, dids),
       with: {
         user: true,
-        avatar: true,
       },
     });
 
@@ -31,11 +30,7 @@ export class ProfileRepository implements IProfileRepository {
           cid: profile.cid,
           actorDid: profile.actorDid,
           handle: profile.user.handle,
-          avatar: profile.avatar && {
-            cid: profile.avatar.cid,
-            mimeType: profile.avatar.mimeType,
-            size: profile.avatar.size,
-          },
+          avatarCid: profile.avatarCid,
           description: profile.description,
           displayName: profile.displayName,
           createdAt: profile.createdAt,
@@ -71,11 +66,9 @@ export class ProfileRepository implements IProfileRepository {
       .select({
         profile: schema.profiles,
         actor: schema.actors,
-        avatar: schema.blobs,
       })
       .from(schema.profiles)
       .innerJoin(schema.actors, eq(schema.profiles.actorDid, schema.actors.did))
-      .leftJoin(schema.blobs, eq(schema.profiles.avatarCid, schema.blobs.cid))
       .where(and(...filters))
       .orderBy(desc(schema.profiles.indexedAt))
       .limit(params.limit);
@@ -87,11 +80,7 @@ export class ProfileRepository implements IProfileRepository {
           cid: result.profile.cid,
           actorDid: result.profile.actorDid,
           handle: result.actor.handle,
-          avatar: result.avatar && {
-            cid: result.avatar.cid,
-            mimeType: result.avatar.mimeType,
-            size: result.avatar.size,
-          },
+          avatarCid: result.profile.avatarCid,
           description: result.profile.description,
           displayName: result.profile.displayName,
           createdAt: result.profile.createdAt,

@@ -77,12 +77,12 @@ export class ProfileViewBuilder {
   }
 
   private getAvatarThumbnailUrl(profile: ProfileDetailed) {
-    if (!profile.avatar) {
+    if (!profile.avatarCid) {
       return undefined;
     }
     return this.assetUrlBuilder.getAvatarThumbnailUrl(
       profile.actorDid,
-      profile.avatar.cid,
+      profile.avatarCid,
     );
   }
 }

@@ -135,13 +135,6 @@ export const actorStats = pgTable("actor_stats", {
   postsCount: integer().notNull().default(0),
 });
 
-export const blobs = pgTable("blobs", {
-  cid: varchar({ length: 256 }).primaryKey(),
-  mimeType: varchar({ length: 256 }).notNull(),
-  size: integer().notNull(),
-  indexedAt: timestamp().notNull(),
-});
-
 export const subscriptions = pgTable("subscriptions", {
   uri: varchar({ length: 256 })
     .primaryKey()
@@ -311,10 +304,6 @@ export const profilesRelations = relations(profiles, ({ one }) => ({
     fields: [profiles.actorDid],
     references: [actors.did],
   }),
-  avatar: one(blobs, {
-    fields: [profiles.avatarCid],
-    references: [blobs.cid],
-  }),
 }));
 
 export const postEmbedImagesRelations = relations(
@@ -371,8 +360,4 @@ export const actorStatsRelations = relations(actorStats, ({ one }) => ({
     fields: [actorStats.actorDid],
     references: [actors.did],
   }),
-}));
-
-export const blobsRelations = relations(blobs, ({ many }) => ({
-  profiles: many(profiles),
 }));
