@@ -5,6 +5,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   varchar,
@@ -237,16 +238,20 @@ export const feedItems = pgTable(
   ],
 );
 
-export const postEmbedImages = pgTable("post_embed_images", {
-  postUri: varchar({ length: 256 })
-    .primaryKey()
-    .references(() => posts.uri, { onDelete: "cascade" }),
-  cid: varchar({ length: 256 }).notNull(),
-  position: integer().notNull(),
-  alt: text().notNull(),
-  aspectRatioWidth: integer(),
-  aspectRatioHeight: integer(),
-});
+export const postEmbedImages = pgTable(
+  "post_embed_images",
+  {
+    postUri: varchar({ length: 256 })
+      .notNull()
+      .references(() => posts.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    position: integer().notNull(),
+    alt: text().notNull(),
+    aspectRatioWidth: integer(),
+    aspectRatioHeight: integer(),
+  },
+  (table) => [primaryKey({ columns: [table.postUri, table.position] })],
+);
 
 export const postEmbedExternals = pgTable("post_embed_externals", {
   postUri: varchar({ length: 256 })
