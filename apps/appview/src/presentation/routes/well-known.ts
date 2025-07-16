@@ -10,9 +10,8 @@ wellKnownRouter.get("/.well-known/did.json", (req, res) => {
     id: `did:web:${env.PUBLIC_DOMAIN}`,
     service: [
       {
-        // TODO: fix
-        id: `#${env.PUBLIC_DOMAIN.replaceAll(".", "-").toLowerCase()}`,
-        type: "AtprotoAppView",
+        id: `#appview`,
+        type: "AppView",
         serviceEndpoint: `https://${env.PUBLIC_DOMAIN}`,
       },
     ],
