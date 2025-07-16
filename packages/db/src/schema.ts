@@ -76,7 +76,7 @@ export const profiles = pgTable(
     avatarCid: varchar({ length: 256 }),
     description: text(),
     displayName: varchar({ length: 256 }),
-    createdAt: timestamp().notNull(),
+    createdAt: timestamp(), // 他のLexiconと違いprofilesのcreatedAtはnullable
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("profiles_actor_idx").on(table.actorDid)],
