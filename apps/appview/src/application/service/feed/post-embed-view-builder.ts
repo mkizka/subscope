@@ -3,12 +3,14 @@ import type {
   AppBskyEmbedExternal,
   AppBskyEmbedImages,
   AppBskyEmbedRecord,
+  AppBskyEmbedRecordWithMedia,
   AppBskyFeedDefs,
 } from "@repo/client/server";
 import {
   PostEmbedExternal,
   type PostEmbedImage,
   PostEmbedRecord,
+  PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 
 import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
@@ -17,7 +19,12 @@ export class PostEmbedViewBuilder {
   constructor(private readonly assetUrlBuilder: AssetUrlBuilder) {}
   static inject = ["assetUrlBuilder"] as const;
   embedView(
-    embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null,
+    embed:
+      | PostEmbedExternal
+      | PostEmbedImage[]
+      | PostEmbedRecord
+      | PostEmbedRecordWithMedia
+      | null,
     actorDid: string,
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
   ) {
@@ -29,6 +36,9 @@ export class PostEmbedViewBuilder {
     }
     if (embed instanceof PostEmbedRecord) {
       return this.recordView(embed, embedPostViewMap);
+    }
+    if (embed instanceof PostEmbedRecordWithMedia) {
+      return this.recordWithMediaView(embed, actorDid, embedPostViewMap);
     }
     return undefined;
   }
@@ -98,6 +108,30 @@ export class PostEmbedViewBuilder {
         uri: embed.uri.toString(),
         notFound: true,
       },
+    };
+  }
+
+  private recordWithMediaView(
+    embed: PostEmbedRecordWithMedia,
+    actorDid: string,
+    embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
+  ): $Typed<AppBskyEmbedRecordWithMedia.View> {
+    const recordView = this.recordView(
+      new PostEmbedRecord({
+        uri: embed.uri,
+        cid: embed.cid,
+      }),
+      embedPostViewMap,
+    );
+
+    const mediaView = Array.isArray(embed.media)
+      ? this.imagesView(embed.media, actorDid)
+      : this.externalView(embed.media, actorDid);
+
+    return {
+      $type: "app.bsky.embed.recordWithMedia#view" as const,
+      record: recordView,
+      media: mediaView,
     };
   }
 }

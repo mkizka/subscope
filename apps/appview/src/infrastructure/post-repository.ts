@@ -68,7 +68,10 @@ export class PostRepository implements IPostRepository {
       );
     }
     if (post.embedRecord) {
-      return new PostEmbedRecord(post.embedRecord.uri, post.embedRecord.cid);
+      return new PostEmbedRecord({
+        uri: post.embedRecord.uri,
+        cid: post.embedRecord.cid,
+      });
     }
     return null;
   }

@@ -3,6 +3,7 @@ import {
   PostEmbedExternal,
   type PostEmbedImage,
   PostEmbedRecord,
+  PostEmbedRecordWithMedia,
   type TransactionContext,
 } from "@repo/common/domain";
 import { type PostInsert, schema } from "@repo/db";
@@ -43,6 +44,8 @@ export class PostRepository implements IPostRepository {
         await this.upsertEmbedExternal(ctx, postUri, post.embed);
       } else if (post.embed instanceof PostEmbedRecord) {
         await this.upsertEmbedRecord(ctx, postUri, post.embed);
+      } else if (post.embed instanceof PostEmbedRecordWithMedia) {
+        await this.upsertEmbedRecordWithMedia(ctx, postUri, post.embed);
       }
     }
   }
@@ -115,6 +118,35 @@ export class PostRepository implements IPostRepository {
           cid: embedRecord.cid,
         },
       });
+  }
+
+  private async upsertEmbedRecordWithMedia(
+    ctx: TransactionContext,
+    postUri: string,
+    embedRecordWithMedia: PostEmbedRecordWithMedia,
+  ) {
+    // record部分を保存
+    await ctx.db
+      .insert(schema.postEmbedRecords)
+      .values({
+        postUri,
+        uri: embedRecordWithMedia.uri.toString(),
+        cid: embedRecordWithMedia.cid,
+      })
+      .onConflictDoUpdate({
+        target: schema.postEmbedRecords.postUri,
+        set: {
+          uri: embedRecordWithMedia.uri.toString(),
+          cid: embedRecordWithMedia.cid,
+        },
+      });
+
+    // media部分を保存
+    if (Array.isArray(embedRecordWithMedia.media)) {
+      await this.upsertEmbedImages(ctx, postUri, embedRecordWithMedia.media);
+    } else if (embedRecordWithMedia.media instanceof PostEmbedExternal) {
+      await this.upsertEmbedExternal(ctx, postUri, embedRecordWithMedia.media);
+    }
   }
 
   async exists(ctx: TransactionContext, uri: string): Promise<boolean> {

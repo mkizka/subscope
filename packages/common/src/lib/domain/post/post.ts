@@ -5,6 +5,7 @@ import type { Record } from "../record.js";
 import { PostEmbedExternal } from "./embed-external.js";
 import { PostEmbedImage } from "./embed-images.js";
 import { PostEmbedRecord } from "./embed-record.js";
+import { PostEmbedRecordWithMedia } from "./embed-record-with-media.js";
 
 type StrongRef = Readonly<{
   uri: AtUri;
@@ -28,7 +29,12 @@ type PostParams = {
   replyRoot?: StrongRef | null;
   replyParent?: StrongRef | null;
   langs: string[] | null;
-  embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null;
+  embed:
+    | PostEmbedExternal
+    | PostEmbedImage[]
+    | PostEmbedRecord
+    | PostEmbedRecordWithMedia
+    | null;
   createdAt: Date;
   sortAt?: Date | null;
   indexedAt: Date;
@@ -42,7 +48,12 @@ export class Post {
   readonly replyRoot: StrongRef | null;
   readonly replyParent: StrongRef | null;
   readonly langs: string[] | null;
-  readonly embed: PostEmbedExternal | PostEmbedImage[] | PostEmbedRecord | null;
+  readonly embed:
+    | PostEmbedExternal
+    | PostEmbedImage[]
+    | PostEmbedRecord
+    | PostEmbedRecordWithMedia
+    | null;
   readonly createdAt: Date;
   readonly sortAt: Date | null;
   readonly indexedAt: Date;
@@ -71,7 +82,8 @@ export class Post {
    */
   getFetchableEmbedUri(): AtUri | null {
     if (
-      this.embed instanceof PostEmbedRecord &&
+      (this.embed instanceof PostEmbedRecord ||
+        this.embed instanceof PostEmbedRecordWithMedia) &&
       ["app.bsky.feed.post", "app.bsky.feed.generator"].includes(
         this.embed.uri.collection,
       )
@@ -116,6 +128,13 @@ export class Post {
         "record" in parsed.embed
       ) {
         return PostEmbedRecord.from(parsed.embed);
+      }
+      if (
+        parsed.embed.$type === "app.bsky.embed.recordWithMedia" &&
+        "record" in parsed.embed &&
+        "media" in parsed.embed
+      ) {
+        return PostEmbedRecordWithMedia.from(parsed.embed);
       }
       return null;
     })();

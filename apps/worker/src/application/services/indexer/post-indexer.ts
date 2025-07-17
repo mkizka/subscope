@@ -1,5 +1,10 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
-import { FeedItem, Post, PostEmbedRecord } from "@repo/common/domain";
+import {
+  FeedItem,
+  Post,
+  PostEmbedRecord,
+  PostEmbedRecordWithMedia,
+} from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
@@ -94,7 +99,10 @@ export class PostIndexer implements ICollectionIndexer {
       }
     }
 
-    if (post.embed instanceof PostEmbedRecord) {
+    if (
+      post.embed instanceof PostEmbedRecord ||
+      post.embed instanceof PostEmbedRecordWithMedia
+    ) {
       const quotedPostExists = await this.postRepository.exists(
         ctx,
         post.embed.uri.toString(),

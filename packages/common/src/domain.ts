@@ -11,6 +11,7 @@ export * from "./lib/domain/like.js";
 export * from "./lib/domain/post/embed-external.js";
 export * from "./lib/domain/post/embed-images.js";
 export * from "./lib/domain/post/embed-record.js";
+export * from "./lib/domain/post/embed-record-with-media.js";
 export * from "./lib/domain/post/post.js";
 export * from "./lib/domain/profile/profile.js";
 export * from "./lib/domain/profile/profile-detailed.js";

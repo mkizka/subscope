@@ -15,6 +15,7 @@ export * as AppBskyActorSearchActorsTypeahead from "./generated/server/types/app
 export * as AppBskyEmbedExternal from "./generated/server/types/app/bsky/embed/external";
 export * as AppBskyEmbedImages from "./generated/server/types/app/bsky/embed/images";
 export * as AppBskyEmbedRecord from "./generated/server/types/app/bsky/embed/record";
+export * as AppBskyEmbedRecordWithMedia from "./generated/server/types/app/bsky/embed/recordWithMedia";
 export * as AppBskyFeedDefs from "./generated/server/types/app/bsky/feed/defs";
 export * as AppBskyFeedGetActorLikes from "./generated/server/types/app/bsky/feed/getActorLikes";
 export * as AppBskyFeedGetAuthorFeed from "./generated/server/types/app/bsky/feed/getAuthorFeed";
