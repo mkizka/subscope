@@ -107,8 +107,6 @@ export const posts = pgTable(
   },
   (table) => [
     index("posts_sort_at_idx").on(table.sortAt),
-    // temp__cleanupDatabaseUseCaseで使用しているので消せるかも
-    index("posts_indexed_at_idx").on(table.indexedAt),
     index("posts_reply_parent_uri_idx").on(table.replyParentUri),
     index("posts_reply_parent_sort_idx").on(
       table.replyParentUri,

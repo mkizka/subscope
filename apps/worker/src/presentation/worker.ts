@@ -3,7 +3,6 @@ import type { Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
 import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
-import type { Temp__CleanupDatabaseUseCase } from "../application/use-cases/async/cleanup-database-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
@@ -36,7 +35,6 @@ export class SyncWorker {
     backfillUseCase: BackfillUseCase,
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
-    temp__cleanupDatabaseUseCase: Temp__CleanupDatabaseUseCase,
   ) {
     this.workers = [
       createWorker("identity", async (job) => {
@@ -90,17 +88,6 @@ export class SyncWorker {
           },
         },
       ),
-      // 開発用
-      createWorker(
-        "temp__cleanupDatabase",
-        async (job) => {
-          const jobLogger = createJobLogger(job);
-          await temp__cleanupDatabaseUseCase.execute(jobLogger);
-        },
-        {
-          stalledInterval: 5 * 60 * 1000,
-        },
-      ),
     ];
   }
   static inject = [
@@ -109,7 +96,6 @@ export class SyncWorker {
     "backfillUseCase",
     "resolveDidUseCase",
     "fetchRecordUseCase",
-    "temp__cleanupDatabaseUseCase",
   ] as const;
 
   async start() {

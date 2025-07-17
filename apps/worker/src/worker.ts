@@ -23,7 +23,6 @@ import { BackfillScheduler } from "./application/services/scheduler/backfill-sch
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { BackfillUseCase } from "./application/use-cases/async/backfill-use-case.js";
-import { Temp__CleanupDatabaseUseCase } from "./application/use-cases/async/cleanup-database-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
@@ -109,7 +108,6 @@ createInjector()
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("fetchRecordUseCase", FetchRecordUseCase)
-  .provideClass("temp__cleanupDatabaseUseCase", Temp__CleanupDatabaseUseCase)
   .provideClass("backfillUseCase", BackfillUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation

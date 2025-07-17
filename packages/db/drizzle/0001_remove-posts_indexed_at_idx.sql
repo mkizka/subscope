@@ -1,0 +1,1 @@
+DROP INDEX "posts_indexed_at_idx";

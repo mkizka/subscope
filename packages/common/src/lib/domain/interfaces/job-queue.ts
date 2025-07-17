@@ -15,7 +15,6 @@ export type JobData = {
   identity: IdentityEvent;
   commit: CommitEvent<SupportedCollection>;
   backfill: Did;
-  temp__cleanupDatabase: undefined;
 };
 
 export type QueueName = keyof JobData;
