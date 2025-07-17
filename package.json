@@ -9,6 +9,7 @@
     "_prettier": "prettier --ignore-path .prettier --ignore-path .gitignore",
     "all": "turbo run typecheck format && pnpm test --run",
     "build": "turbo run build",
+    "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "./scripts/dev.sh",
     "format": "turbo run format && pnpm -s _prettier . --write",
