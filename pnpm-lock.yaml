@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  "@atproto/lex-cli":
+    hash: 6e1a3864d8fdc73a0badfecd0cb5b512346a2d3c0cdd2b4d785be6916a3e61db
+    path: patches/@atproto__lex-cli.patch
   "@factory-js/factory":
     hash: 29084f476bd94e8cdbfc6bac28f952cd7eb61e8991bc9548961dde23b1ba8162
     path: patches/@factory-js__factory.patch
@@ -421,7 +424,7 @@ importers:
     devDependencies:
       "@atproto/lex-cli":
         specifier: 0.9.0
-        version: 0.9.0
+        version: 0.9.0(patch_hash=6e1a3864d8fdc73a0badfecd0cb5b512346a2d3c0cdd2b4d785be6916a3e61db)
       "@mkizka/eslint-config":
         specifier: 7.1.1
         version: 7.1.1(@typescript-eslint/eslint-plugin@8.37.0(@typescript-eslint/parser@8.37.0(eslint@9.31.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.31.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.31.0(jiti@1.21.7))(typescript@5.8.3)
@@ -8186,7 +8189,7 @@ snapshots:
       "@atproto/common-web": 0.4.2
       "@atproto/crypto": 0.4.4
 
-  "@atproto/lex-cli@0.9.0":
+  "@atproto/lex-cli@0.9.0(patch_hash=6e1a3864d8fdc73a0badfecd0cb5b512346a2d3c0cdd2b4d785be6916a3e61db)":
     dependencies:
       "@atproto/lexicon": 0.4.12
       "@atproto/syntax": 0.4.0

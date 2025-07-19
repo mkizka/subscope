@@ -1,9 +1,5 @@
 {
   "extends": ["@tsconfig/node-lts/tsconfig"],
-  "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node"
-  },
   "include": ["**/*.ts"],
   "exclude": ["dist"]
 }

@@ -1,2 +1,2 @@
-export * from "./generated/api";
-export { RecordNotFoundError } from "./generated/api/types/com/atproto/repo/getRecord";
+export * from "./generated/api/index.js";
+export { RecordNotFoundError } from "./generated/api/types/com/atproto/repo/getRecord.js";
