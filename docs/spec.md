@@ -6,7 +6,7 @@
 
 ### アカウントの登録からタイムラインが見れるようになるまで
 
-- なんらかの手段でdev.mkizka.test.subscriptionレコードを作成
+- なんらかの手段でme.subsco.sync.subscriptionレコードを作成
   - レコードにはAppViewのDIDが入っている
   - did:web:api.bsky.app#bsky_appview のような
 - Appviewがsubscriptionレコードを監視してsubscribersテーブルに保存
@@ -29,7 +29,7 @@
 | app.bsky.graph.follow            | フォローまたはフォロイーがsubscribers                                                         | なし                                      |
 | app.bsky.actor.profile           | subscribersのプロフール                                                                       | なし                                      |
 | app.bsky.feed.generator          | subscribersのフィード                                                                         | なし                                      |
-| dev.mkizka.test.subscription     | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                                      |
+| me.subsco.sync.subscription      | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                                      |
 
 さらに、以下はPDSにリクエストを送って追加で保存する。再帰処理になる場合の連鎖は2回まで。
 

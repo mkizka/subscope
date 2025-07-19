@@ -334,7 +334,7 @@ Jetstream WebSocket → Ingester → BullMQ Queue → Worker → IndexCommitServ
 
 ## サンプル実装：Subscriptionレコード
 
-実際の実装例として`dev.mkizka.test.subscription`の場合：
+実際の実装例として`me.subsco.sync.subscription`の場合：
 
 ### 具体的なファイル名
 
@@ -344,6 +344,6 @@ Jetstream WebSocket → Ingester → BullMQ Queue → Worker → IndexCommitServ
 - ドメインサービス: `subscription-indexing-policy.ts`
 - アプリケーションサービス: `subscription-indexer.ts`
 - テーブル名: `subscriptions`
-- Collection ID: `dev.mkizka.test.subscription`
+- Collection ID: `me.subsco.sync.subscription`
 
 このガイドを参考に、任意のlexiconレコードタイプを同様のパターンで実装できます。

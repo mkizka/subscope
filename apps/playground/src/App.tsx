@@ -14,7 +14,7 @@ export function App() {
 
     await agent.com.atproto.repo.createRecord({
       repo: required(agent.session).did,
-      collection: "dev.mkizka.test.subscription",
+      collection: "me.subsco.sync.subscription",
       record: {
         appviewDid: "did:web:appview.localhost",
         createdAt: new Date().toISOString(),
