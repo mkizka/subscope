@@ -2,6 +2,8 @@ import type { JobData } from "@repo/common/domain";
 import type { Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
+import { handleAccountCommandFactory } from "../application/use-cases/account/handle-account-command.js";
+import type { HandleAccountUseCase } from "../application/use-cases/account/handle-account-use-case.js";
 import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
@@ -35,11 +37,16 @@ export class SyncWorker {
     backfillUseCase: BackfillUseCase,
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
+    handleAccountUseCase: HandleAccountUseCase,
   ) {
     this.workers = [
       createWorker("identity", async (job) => {
         const command = upsertIdentityCommandFactory(job.data);
         await upsertIdentityUseCase.execute(command);
+      }),
+      createWorker("account", async (job) => {
+        const command = handleAccountCommandFactory(job.data);
+        await handleAccountUseCase.execute(command);
       }),
       createWorker(
         "commit",
@@ -96,6 +103,7 @@ export class SyncWorker {
     "backfillUseCase",
     "resolveDidUseCase",
     "fetchRecordUseCase",
+    "handleAccountUseCase",
   ] as const;
 
   async start() {

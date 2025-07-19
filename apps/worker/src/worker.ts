@@ -22,6 +22,7 @@ import { SubscriptionIndexer } from "./application/services/indexer/subscription
 import { BackfillScheduler } from "./application/services/scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
+import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
 import { BackfillUseCase } from "./application/use-cases/async/backfill-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
@@ -109,6 +110,7 @@ createInjector()
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("fetchRecordUseCase", FetchRecordUseCase)
   .provideClass("backfillUseCase", BackfillUseCase)
+  .provideClass("handleAccountUseCase", HandleAccountUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(WorkerServer)

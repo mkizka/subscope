@@ -43,6 +43,7 @@ export class JobQueue implements IJobQueue {
     this.queues = {
       resolveDid: new Queue("resolveDid", queueOptions(withRetry)),
       fetchRecord: new Queue("fetchRecord", queueOptions(withRetry)),
+      account: new Queue("account", queueOptions(withRetry)),
       identity: new Queue("identity", queueOptions(withRetry)),
       commit: new Queue("commit", queueOptions(withRetry)),
       backfill: new Queue("backfill", queueOptions()),

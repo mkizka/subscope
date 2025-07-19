@@ -83,4 +83,8 @@ export class ActorRepository implements IActorRepository {
       })
       .where(eq(schema.actors.did, did));
   }
+
+  async delete({ ctx, did }: { ctx: TransactionContext; did: Did }) {
+    await ctx.db.delete(schema.actors).where(eq(schema.actors.did, did));
+  }
 }

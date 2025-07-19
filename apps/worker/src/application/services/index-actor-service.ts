@@ -64,4 +64,14 @@ export class IndexActorService {
       await this.fetchRecordScheduler.schedule(profileUri, 0);
     }
   }
+
+  async delete({
+    ctx,
+    did,
+  }: {
+    ctx: TransactionContext;
+    did: Did;
+  }): Promise<void> {
+    await this.actorRepository.delete({ ctx, did });
+  }
 }

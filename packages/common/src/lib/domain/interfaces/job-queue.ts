@@ -1,5 +1,9 @@
 import type { Did } from "@atproto/did";
-import type { CommitEvent, IdentityEvent } from "@skyware/jetstream";
+import type {
+  AccountEvent,
+  CommitEvent,
+  IdentityEvent,
+} from "@skyware/jetstream";
 import type { Queue } from "bullmq";
 
 import type { SupportedCollection } from "../../utils/collection.js";
@@ -12,6 +16,7 @@ type FetchRecordData = {
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
+  account: AccountEvent;
   identity: IdentityEvent;
   commit: CommitEvent<SupportedCollection>;
   backfill: Did;

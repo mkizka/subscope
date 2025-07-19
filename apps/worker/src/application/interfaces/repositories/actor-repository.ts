@@ -22,4 +22,6 @@ export interface IActorRepository {
     did: Did;
     handle: Handle;
   }) => Promise<void>;
+
+  delete: (params: { ctx: TransactionContext; did: Did }) => Promise<void>;
 }
