@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "dev.mkizka.test.subscription",
+  "id": "me.subsco.sync.subscription",
   "defs": {
     "main": {
       "type": "record",

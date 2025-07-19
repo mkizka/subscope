@@ -45,12 +45,12 @@ describe("PostIndexer", () => {
       const subscriber = await actorFactory(ctx.db).create();
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({ actor: () => subscriber })
         .props({
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: "did:web:appview.test",
             createdAt: new Date().toISOString(),
           }),

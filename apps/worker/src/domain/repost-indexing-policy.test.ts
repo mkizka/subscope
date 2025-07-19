@@ -31,12 +31,12 @@ describe("RepostIndexingPolicy", () => {
         // repost者をsubscriberとして登録
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => reposterActor })
           .props({
             uri: () =>
-              `at://${reposterActor.did}/dev.mkizka.test.subscription/123`,
+              `at://${reposterActor.did}/me.subsco.sync.subscription/123`,
             cid: () => "sub123",
           })
           .create();
@@ -81,12 +81,12 @@ describe("RepostIndexingPolicy", () => {
         // フォロワーをsubscriberとして登録
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => followerActor })
           .props({
             uri: () =>
-              `at://${followerActor.did}/dev.mkizka.test.subscription/789`,
+              `at://${followerActor.did}/me.subsco.sync.subscription/789`,
             cid: () => "sub789",
           })
           .create();
@@ -144,7 +144,7 @@ describe("RepostIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();
@@ -234,7 +234,7 @@ describe("RepostIndexingPolicy", () => {
         const reposterActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => reposterActor })
           .create();
@@ -276,7 +276,7 @@ describe("RepostIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();
@@ -339,7 +339,7 @@ describe("RepostIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();

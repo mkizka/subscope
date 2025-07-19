@@ -6,8 +6,6 @@ export * as AppBskyFeedLike from "./generated/api/types/app/bsky/feed/like.js";
 export * as AppBskyFeedPost from "./generated/api/types/app/bsky/feed/post.js";
 export * as AppBskyFeedRepost from "./generated/api/types/app/bsky/feed/repost.js";
 export * as AppBskyGraphFollow from "./generated/api/types/app/bsky/graph/follow.js";
-export * as DevMkizkaTestSubscription from "./generated/api/types/dev/mkizka/test/subscription.js";
-export * as DevMkizkaTestSyncGetJobStatus from "./generated/api/types/dev/mkizka/test/sync/getJobStatus.js";
 export * from "./generated/server/index.js";
 export { lexicons } from "./generated/server/lexicons.js";
 export * as AppBskyActorSearchActors from "./generated/server/types/app/bsky/actor/searchActors.js";
@@ -24,4 +22,7 @@ export * as AppBskyFeedGetRepostedBy from "./generated/server/types/app/bsky/fee
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline.js";
 export * as AppBskyGraphGetFollowers from "./generated/server/types/app/bsky/graph/getFollowers.js";
 export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows.js";
+export * as DevMkizkaTestSyncGetJobStatus from "./generated/server/types/dev/mkizka/test/sync/getJobStatus.js";
+export * as DevMkizkaTestSyncRequestBackfill from "./generated/server/types/dev/mkizka/test/sync/requestBackfill.js";
+export * as MeSubscoSyncSubscription from "./generated/server/types/me/subsco/sync/subscription.js";
 export { $Typed } from "./generated/server/util.js";

@@ -48,7 +48,7 @@ export class IndexRecordService {
       "app.bsky.actor.profile": profileIndexer,
       "app.bsky.graph.follow": followIndexer,
       "app.bsky.feed.like": likeIndexer,
-      "dev.mkizka.test.subscription": subscriptionIndexer,
+      "me.subsco.sync.subscription": subscriptionIndexer,
     };
   }
   static inject = [

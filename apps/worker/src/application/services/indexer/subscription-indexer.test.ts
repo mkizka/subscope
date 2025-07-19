@@ -29,12 +29,12 @@ describe("SubscriptionIndexer", () => {
       const actor = await actorFactory(ctx.db).create();
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({ actor: () => actor })
         .props({
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
             createdAt: new Date().toISOString(),
           }),
@@ -71,12 +71,12 @@ describe("SubscriptionIndexer", () => {
         .create();
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({ actor: () => actor })
         .props({
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
             createdAt: new Date().toISOString(),
           }),
@@ -106,12 +106,12 @@ describe("SubscriptionIndexer", () => {
         .create();
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({ actor: () => actor })
         .props({
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
             createdAt: new Date().toISOString(),
           }),
@@ -138,11 +138,11 @@ describe("SubscriptionIndexer", () => {
       // arrange
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .props({
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
             createdAt: new Date().toISOString(),
           }),
@@ -166,11 +166,11 @@ describe("SubscriptionIndexer", () => {
       // arrange
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .props({
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: "did:web:other.appview.test",
             createdAt: new Date().toISOString(),
           }),

@@ -1,2 +1,2 @@
-**/*.json
-!dev/mkizka/**/*.json
+app/bsky/**/*.json
+com/atproto/**/*.json

@@ -30,7 +30,7 @@ export class Subscription {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("dev.mkizka.test.subscription");
+    const parsed = record.validate("me.subsco.sync.subscription");
     return new Subscription({
       uri: record.uri,
       cid: record.cid,

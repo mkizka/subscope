@@ -16,12 +16,12 @@ describe("SubscriptionIndexingPolicy", () => {
     test("appviewDidが環境変数のAPPVIEW_DIDと一致する場合はtrueを返すべき", async () => {
       // Arrange
       const subscriptionJson = {
-        $type: "dev.mkizka.test.subscription",
+        $type: "me.subsco.sync.subscription",
         appviewDid: env.APPVIEW_DID,
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:user/dev.mkizka.test.subscription/123",
+        uri: "at://did:plc:user/me.subsco.sync.subscription/123",
         cid: "sub123",
         json: subscriptionJson,
         indexedAt: new Date(),
@@ -40,12 +40,12 @@ describe("SubscriptionIndexingPolicy", () => {
     test("appviewDidが環境変数のAPPVIEW_DIDと一致しない場合はfalseを返すべき", async () => {
       // Arrange
       const subscriptionJson = {
-        $type: "dev.mkizka.test.subscription",
+        $type: "me.subsco.sync.subscription",
         appviewDid: "did:web:other.appview.test",
         createdAt: new Date().toISOString(),
       };
       const record = Record.fromJson({
-        uri: "at://did:plc:user/dev.mkizka.test.subscription/123",
+        uri: "at://did:plc:user/me.subsco.sync.subscription/123",
         cid: "sub123",
         json: subscriptionJson,
         indexedAt: new Date(),

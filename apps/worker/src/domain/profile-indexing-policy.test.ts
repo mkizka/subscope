@@ -25,15 +25,15 @@ describe("ProfileIndexingPolicy", () => {
       // subscriberとして登録
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({ actor: () => subscriberActor })
         .props({
           uri: () =>
-            `at://${subscriberActor.did}/dev.mkizka.test.subscription/123`,
+            `at://${subscriberActor.did}/me.subsco.sync.subscription/123`,
           cid: () => "sub123",
           json: () => ({
-            $type: "dev.mkizka.test.subscription",
+            $type: "me.subsco.sync.subscription",
             appviewDid: "did:web:appview.test",
             createdAt: new Date().toISOString(),
           }),

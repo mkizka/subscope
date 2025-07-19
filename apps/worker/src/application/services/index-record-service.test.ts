@@ -151,7 +151,7 @@ describe("IndexRecordService", () => {
 
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({
           actor: () => followingActor,

@@ -28,18 +28,18 @@ describe("FollowIndexingPolicy", () => {
       await subscriptionFactory(ctx.db)
         .vars({
           record: () =>
-            recordFactory(ctx.db, "dev.mkizka.test.subscription")
+            recordFactory(ctx.db, "me.subsco.sync.subscription")
               .vars({ actor: () => followerActor })
               .props({
                 uri: () =>
-                  `at://${followerActor.did}/dev.mkizka.test.subscription/123`,
+                  `at://${followerActor.did}/me.subsco.sync.subscription/123`,
                 cid: () => "sub123",
               })
               .create(),
         })
         .props({
           uri: () =>
-            `at://${followerActor.did}/dev.mkizka.test.subscription/123`,
+            `at://${followerActor.did}/me.subsco.sync.subscription/123`,
           cid: () => "sub123",
         })
         .create();
@@ -80,18 +80,18 @@ describe("FollowIndexingPolicy", () => {
       await subscriptionFactory(ctx.db)
         .vars({
           record: () =>
-            recordFactory(ctx.db, "dev.mkizka.test.subscription")
+            recordFactory(ctx.db, "me.subsco.sync.subscription")
               .vars({ actor: () => followeeActor })
               .props({
                 uri: () =>
-                  `at://${followeeActor.did}/dev.mkizka.test.subscription/456`,
+                  `at://${followeeActor.did}/me.subsco.sync.subscription/456`,
                 cid: () => "sub456",
               })
               .create(),
         })
         .props({
           uri: () =>
-            `at://${followeeActor.did}/dev.mkizka.test.subscription/456`,
+            `at://${followeeActor.did}/me.subsco.sync.subscription/456`,
           cid: () => "sub456",
         })
         .create();

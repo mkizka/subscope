@@ -38,12 +38,12 @@ describe("LikeIndexer", () => {
       // subscriptionレコード用のrecordsテーブルエントリ
       const subscriptionRecord = await recordFactory(
         ctx.db,
-        "dev.mkizka.test.subscription",
+        "me.subsco.sync.subscription",
       )
         .vars({ actor: () => subscriberActor })
         .props({
           uri: () =>
-            `at://${subscriberActor.did}/dev.mkizka.test.subscription/123`,
+            `at://${subscriberActor.did}/me.subsco.sync.subscription/123`,
           cid: () => "sub123",
         })
         .create();

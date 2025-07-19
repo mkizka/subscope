@@ -28,7 +28,7 @@ describe("PostIndexingPolicy", () => {
         await subscriptionFactory(ctx.db)
           .vars({
             record: () =>
-              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+              recordFactory(ctx.db, "me.subsco.sync.subscription")
                 .vars({ actor: () => subscriberActor })
                 .create(),
           })
@@ -62,7 +62,7 @@ describe("PostIndexingPolicy", () => {
         await subscriptionFactory(ctx.db)
           .vars({
             record: () =>
-              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+              recordFactory(ctx.db, "me.subsco.sync.subscription")
                 .vars({ actor: () => subscriberActor })
                 .create(),
           })
@@ -108,7 +108,7 @@ describe("PostIndexingPolicy", () => {
         await subscriptionFactory(ctx.db)
           .vars({
             record: () =>
-              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+              recordFactory(ctx.db, "me.subsco.sync.subscription")
                 .vars({ actor: () => subscriberActor })
                 .create(),
           })
@@ -237,7 +237,7 @@ describe("PostIndexingPolicy", () => {
         await subscriptionFactory(ctx.db)
           .vars({
             record: () =>
-              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+              recordFactory(ctx.db, "me.subsco.sync.subscription")
                 .vars({ actor: () => subscriberActor })
                 .create(),
           })
@@ -271,7 +271,7 @@ describe("PostIndexingPolicy", () => {
         await subscriptionFactory(ctx.db)
           .vars({
             record: () =>
-              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+              recordFactory(ctx.db, "me.subsco.sync.subscription")
                 .vars({ actor: () => subscriberActor })
                 .create(),
           })
@@ -340,7 +340,7 @@ describe("PostIndexingPolicy", () => {
         await subscriptionFactory(ctx.db)
           .vars({
             record: () =>
-              recordFactory(ctx.db, "dev.mkizka.test.subscription")
+              recordFactory(ctx.db, "me.subsco.sync.subscription")
                 .vars({ actor: () => subscriberActor })
                 .create(),
           })

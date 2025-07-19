@@ -28,7 +28,7 @@ describe("LikeIndexingPolicy", () => {
 
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();
@@ -72,7 +72,7 @@ describe("LikeIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();
@@ -166,7 +166,7 @@ describe("LikeIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();
@@ -210,7 +210,7 @@ describe("LikeIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();
@@ -275,7 +275,7 @@ describe("LikeIndexingPolicy", () => {
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
           ctx.db,
-          "dev.mkizka.test.subscription",
+          "me.subsco.sync.subscription",
         )
           .vars({ actor: () => subscriberActor })
           .create();

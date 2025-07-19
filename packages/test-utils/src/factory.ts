@@ -328,7 +328,7 @@ export const subscriptionFactory = (db: Database) =>
         },
         vars: {
           record: () =>
-            recordFactory(db, "dev.mkizka.test.subscription").create(),
+            recordFactory(db, "me.subsco.sync.subscription").create(),
           actor: () => actorFactory(db).create(),
         },
       },
