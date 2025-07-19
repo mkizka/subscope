@@ -58,7 +58,7 @@ export class SyncWorker {
           await indexCommitUseCase.execute(command);
         },
         {
-          concurrency: 32,
+          concurrency: 8,
         },
       ),
       createWorker("backfill", async (job) => {
