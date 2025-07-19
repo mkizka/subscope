@@ -58,6 +58,7 @@ packagesディレクトリ(共通パッケージ)
 ## 開発コマンド
 
 ```bash
+pnpm install   # 依存パッケージのインストールと`@repo/client`パッケージのコード生成
 pnpm typecheck # 全パッケージの型チェック
 pnpm lint      # 全コードのlintとフォーマットチェック
 pnpm format    # コードフォーマットとlint問題の自動修正
