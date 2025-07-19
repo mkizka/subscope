@@ -36,7 +36,6 @@ import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-us
 import { SearchPostsUseCase } from "./application/use-cases/feed/search-posts-use-case.js";
 import { GetFollowersUseCase } from "./application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use-case.js";
-import { GetJobStatusUseCase } from "./application/use-cases/job/get-job-status-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "./infrastructure/asset-url-builder.js";
@@ -67,7 +66,6 @@ import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js"
 import { SearchPosts } from "./presentation/routes/app/bsky/feed/searchPosts.js";
 import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
-import { GetJobStatus } from "./presentation/routes/dev/mkizka/test/getJobStatus.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -126,7 +124,6 @@ createInjector()
   .provideClass("searchPostsUseCase", SearchPostsUseCase)
   .provideClass("getActorLikesUseCase", GetActorLikesUseCase)
   .provideClass("getAuthorFeedUseCase", GetAuthorFeedUseCase)
-  .provideClass("getJobStatusUseCase", GetJobStatusUseCase)
   .provideClass("getLikesUseCase", GetLikesUseCase)
   .provideClass("getRepostedByUseCase", GetRepostedByUseCase)
   .provideClass("getFollowsUseCase", GetFollowsUseCase)
@@ -142,7 +139,6 @@ createInjector()
   .provideClass("searchPosts", SearchPosts)
   .provideClass("getActorLikes", GetActorLikes)
   .provideClass("getAuthorFeed", GetAuthorFeed)
-  .provideClass("getJobStatus", GetJobStatus)
   .provideClass("getLikes", GetLikes)
   .provideClass("getRepostedBy", GetRepostedBy)
   .provideClass("getFollows", GetFollows)
