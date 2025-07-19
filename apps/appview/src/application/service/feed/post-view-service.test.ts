@@ -573,6 +573,7 @@ describe("PostViewService", () => {
         .props({
           displayName: () => "My Cool Feed",
           description: () => "A custom algorithmic feed",
+          avatarCid: () => "bafyreiavatarcid123",
         })
         .create();
 
@@ -657,6 +658,7 @@ describe("PostViewService", () => {
             },
             displayName: "My Cool Feed",
             description: "A custom algorithmic feed",
+            avatar: `http://localhost:3004/images/avatar_thumbnail/${generatorActor.did}/bafyreiavatarcid123.jpg`,
             indexedAt: generator.indexedAt.toISOString(),
           },
         },

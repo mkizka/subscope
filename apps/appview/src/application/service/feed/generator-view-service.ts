@@ -1,6 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 
+import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import type { IGeneratorRepository } from "../../interfaces/generator-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 
@@ -8,8 +9,13 @@ export class GeneratorViewService {
   constructor(
     private readonly generatorRepository: IGeneratorRepository,
     private readonly profileViewService: ProfileViewService,
+    private readonly assetUrlBuilder: AssetUrlBuilder,
   ) {}
-  static inject = ["generatorRepository", "profileViewService"] as const;
+  static inject = [
+    "generatorRepository",
+    "profileViewService",
+    "assetUrlBuilder",
+  ] as const;
 
   async findGeneratorViews(
     uris: AtUri[],
@@ -44,7 +50,12 @@ export class GeneratorViewService {
         creator,
         displayName: generator.displayName,
         description: generator.description,
-        avatar: generator.avatarCid,
+        avatar:
+          generator.avatarCid &&
+          this.assetUrlBuilder.getAvatarThumbnailUrl(
+            generator.actorDid.toString(),
+            generator.avatarCid,
+          ),
         indexedAt: generator.indexedAt.toISOString(),
       };
 
