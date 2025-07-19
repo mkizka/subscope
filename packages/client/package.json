@@ -16,8 +16,8 @@
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
-    "build": "tsup && tsc --project tsconfig.build.json",
-    "dev": "tsup --watch --dts",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "postinstall": "./scripts/postinstall.sh",
@@ -34,10 +34,8 @@
     "@mkizka/eslint-config": "7.1.1",
     "@tsconfig/node-lts": "22.0.2",
     "@types/express": "5.0.3",
-    "esbuild": "0.25.6",
     "eslint": "9.31.0",
     "giget": "2.0.0",
-    "tsup": "8.5.0",
     "typescript": "5.8.3"
   },
   "sideEffects": false
