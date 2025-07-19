@@ -14,6 +14,7 @@ import { ProfileViewService } from "./application/service/actor/profile-view-ser
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
+import { GeneratorViewService } from "./application/service/feed/generator-view-service.js";
 import { PostEmbedViewBuilder } from "./application/service/feed/post-embed-view-builder.js";
 import { PostViewService } from "./application/service/feed/post-view-service.js";
 import { ReplyRefService } from "./application/service/feed/reply-ref-service.js";
@@ -41,6 +42,7 @@ import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js
 import { AssetUrlBuilder } from "./infrastructure/asset-url-builder.js";
 import { AuthorFeedRepository } from "./infrastructure/author-feed-repository.js";
 import { FollowRepository } from "./infrastructure/follow-repository.js";
+import { GeneratorRepository } from "./infrastructure/generator-repository.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
@@ -91,6 +93,7 @@ createInjector()
   .provideClass("likeRepository", LikeRepository)
   .provideClass("repostRepository", RepostRepository)
   .provideClass("followRepository", FollowRepository)
+  .provideClass("generatorRepository", GeneratorRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
@@ -101,6 +104,7 @@ createInjector()
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)
+  .provideClass("generatorViewService", GeneratorViewService)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)

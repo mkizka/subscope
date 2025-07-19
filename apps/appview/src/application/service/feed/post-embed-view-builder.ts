@@ -18,6 +18,7 @@ import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.
 export class PostEmbedViewBuilder {
   constructor(private readonly assetUrlBuilder: AssetUrlBuilder) {}
   static inject = ["assetUrlBuilder"] as const;
+
   embedView(
     embed:
       | PostEmbedExternal
@@ -27,6 +28,7 @@ export class PostEmbedViewBuilder {
       | null,
     actorDid: string,
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
+    embedGeneratorViewMap?: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>,
   ) {
     if (Array.isArray(embed)) {
       return this.imagesView(embed, actorDid);
@@ -35,10 +37,15 @@ export class PostEmbedViewBuilder {
       return this.externalView(embed, actorDid);
     }
     if (embed instanceof PostEmbedRecord) {
-      return this.recordView(embed, embedPostViewMap);
+      return this.recordView(embed, embedPostViewMap, embedGeneratorViewMap);
     }
     if (embed instanceof PostEmbedRecordWithMedia) {
-      return this.recordWithMediaView(embed, actorDid, embedPostViewMap);
+      return this.recordWithMediaView(
+        embed,
+        actorDid,
+        embedPostViewMap,
+        embedGeneratorViewMap,
+      );
     }
     return undefined;
   }
@@ -77,10 +84,11 @@ export class PostEmbedViewBuilder {
 
   private recordView(
     embed: PostEmbedRecord,
+    // TODO: postViewではなくviewRecordを渡すことはできるか確認
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
+    embedGeneratorViewMap?: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>,
   ): $Typed<AppBskyEmbedRecord.View> {
     const postView = embedPostViewMap?.get(embed.uri.toString());
-
     if (postView) {
       return {
         $type: "app.bsky.embed.record#view" as const,
@@ -100,7 +108,14 @@ export class PostEmbedViewBuilder {
       };
     }
 
-    // 見つからない場合は従来通りviewNotFoundを返す
+    const generatorView = embedGeneratorViewMap?.get(embed.uri.toString());
+    if (generatorView) {
+      return {
+        $type: "app.bsky.embed.record#view" as const,
+        record: generatorView,
+      };
+    }
+
     return {
       $type: "app.bsky.embed.record#view" as const,
       record: {
@@ -115,6 +130,7 @@ export class PostEmbedViewBuilder {
     embed: PostEmbedRecordWithMedia,
     actorDid: string,
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
+    embedGeneratorViewMap?: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>,
   ): $Typed<AppBskyEmbedRecordWithMedia.View> {
     const recordView = this.recordView(
       new PostEmbedRecord({
@@ -122,6 +138,7 @@ export class PostEmbedViewBuilder {
         cid: embed.cid,
       }),
       embedPostViewMap,
+      embedGeneratorViewMap,
     );
 
     const mediaView = Array.isArray(embed.media)

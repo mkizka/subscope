@@ -11,12 +11,14 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
+import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";
+import { GeneratorViewService } from "../../service/feed/generator-view-service.js";
 import { PostEmbedViewBuilder } from "../../service/feed/post-embed-view-builder.js";
 import { PostViewService } from "../../service/feed/post-view-service.js";
 import { PostSearchService } from "../../service/search/post-search-service.js";
@@ -38,6 +40,8 @@ describe("SearchPostsUseCase", () => {
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
+    .provideClass("generatorRepository", GeneratorRepository)
+    .provideClass("generatorViewService", GeneratorViewService)
     .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("postViewService", PostViewService)
     .provideClass("searchService", PostSearchService)

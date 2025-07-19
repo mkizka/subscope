@@ -15,6 +15,7 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
+import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
@@ -24,6 +25,7 @@ import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
 import { FeedProcessor } from "./feed-processor.js";
+import { GeneratorViewService } from "./generator-view-service.js";
 import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 import { PostViewService } from "./post-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
@@ -40,10 +42,12 @@ describe("FeedProcessor", () => {
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
     .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
+    .provideClass("generatorRepository", GeneratorRepository)
+    .provideClass("generatorViewService", GeneratorViewService)
+    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("postViewService", PostViewService)
     .provideClass("replyRefService", ReplyRefService)
     .injectClass(FeedProcessor);

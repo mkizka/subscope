@@ -6,7 +6,6 @@ import type {
   AppBskyFeedDefs,
 } from "@repo/client/server";
 import type { ILoggerManager, Logger, Post, Record } from "@repo/common/domain";
-import { PostEmbedRecord } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "../../interfaces/post-repository.js";
@@ -16,10 +15,12 @@ import type {
 } from "../../interfaces/post-stats-repository.js";
 import type { IRecordRepository } from "../../interfaces/record-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
+import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
 type PostViewMap = Map<string, PostView>;
+type GeneratorViewMap = Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
 type ProfileViewBasic = $Typed<AppBskyActorDefs.ProfileViewBasic>;
 
 interface PostDataMaps {
@@ -29,6 +30,7 @@ interface PostDataMaps {
   statsMap: Map<string, PostStats>;
 }
 
+// TODO: コードを整理する
 export class PostViewService {
   private readonly logger: Logger;
 
@@ -38,6 +40,7 @@ export class PostViewService {
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly profileViewService: ProfileViewService,
     private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
+    private readonly generatorViewService: GeneratorViewService,
     loggerManager: ILoggerManager,
   ) {
     this.logger = loggerManager.createLogger("PostViewService");
@@ -48,6 +51,7 @@ export class PostViewService {
     "postStatsRepository",
     "profileViewService",
     "postEmbedViewBuilder",
+    "generatorViewService",
     "loggerManager",
   ] as const;
 
@@ -57,7 +61,9 @@ export class PostViewService {
     }
 
     const posts = await this.postRepository.findByUris(uris);
-    const embedUris = this.extractEmbedUris(posts);
+    const embedUris = posts
+      .map((post) => post.getFetchableEmbedUri())
+      .filter((uri) => uri !== null);
 
     if (embedUris.length === 0) {
       return this.hydratePostViews(uris, posts);
@@ -71,26 +77,49 @@ export class PostViewService {
     posts: Post[],
     embedUris: AtUri[],
   ): Promise<PostView[]> {
-    const embedPosts = await this.postRepository.findByUris(embedUris);
-    const embedPostViews = await this.hydratePostViews(embedUris, embedPosts);
+    const { postUris, generatorUris } = this.separateEmbedUris(embedUris);
+
+    const [embedPosts, generatorViewMap] = await Promise.all([
+      this.postRepository.findByUris(postUris),
+      this.generatorViewService.findGeneratorViews(generatorUris),
+    ]);
+
+    const embedPostViews = await this.hydratePostViews(postUris, embedPosts);
     const embedPostViewMap = new Map<string, PostView>(
       embedPostViews.map((view) => [view.uri, view]),
     );
 
-    return this.hydratePostViews(uris, posts, embedPostViewMap);
+    return this.hydratePostViews(
+      uris,
+      posts,
+      embedPostViewMap,
+      generatorViewMap,
+    );
   }
 
-  private extractEmbedUris(posts: Post[]): AtUri[] {
-    return posts
-      .map((post) => post.embed)
-      .filter((embed) => embed instanceof PostEmbedRecord)
-      .map((embed) => embed.uri);
+  private separateEmbedUris(embedUris: AtUri[]): {
+    postUris: AtUri[];
+    generatorUris: AtUri[];
+  } {
+    const postUris: AtUri[] = [];
+    const generatorUris: AtUri[] = [];
+
+    for (const uri of embedUris) {
+      if (uri.collection === "app.bsky.feed.post") {
+        postUris.push(uri);
+      } else if (uri.collection === "app.bsky.feed.generator") {
+        generatorUris.push(uri);
+      }
+    }
+
+    return { postUris, generatorUris };
   }
 
   private async hydratePostViews(
     uris: AtUri[],
     providedPosts: Post[],
     embedPostViewMap?: PostViewMap,
+    embedGeneratorViewMap?: GeneratorViewMap,
   ): Promise<PostView[]> {
     if (uris.length === 0) {
       return [];
@@ -99,9 +128,15 @@ export class PostViewService {
     const postData = await this.fetchPostData(uris, providedPosts);
     const dataMaps = this.createDataMaps(postData);
 
-    return uris
-      .map((uri) => this.tryCreatePostView(uri, dataMaps, embedPostViewMap))
-      .filter((postView) => postView !== null);
+    const postViews = uris.map((uri) =>
+      this.tryCreatePostView(
+        uri,
+        dataMaps,
+        embedPostViewMap,
+        embedGeneratorViewMap,
+      ),
+    );
+    return postViews.filter((postView) => postView !== null);
   }
 
   private async fetchPostData(uris: AtUri[], providedPosts: Post[]) {
@@ -142,6 +177,7 @@ export class PostViewService {
     uri: AtUri,
     dataMaps: PostDataMaps,
     embedPostViewMap?: PostViewMap,
+    embedGeneratorViewMap?: GeneratorViewMap,
   ): PostView | null {
     const uriString = uri.toString();
     const post = dataMaps.postMap.get(uriString);
@@ -158,6 +194,7 @@ export class PostViewService {
       requiredData.author,
       requiredData.stats,
       embedPostViewMap,
+      embedGeneratorViewMap,
     );
   }
 
@@ -191,6 +228,7 @@ export class PostViewService {
     author: ProfileViewBasic,
     stats: PostStats,
     embedPostViewMap?: PostViewMap,
+    embedGeneratorViewMap?: GeneratorViewMap,
   ): PostView {
     if (!this.isRecordObject(record.json)) {
       throw new Error(`Invalid record json for post: ${post.uri.toString()}`);
@@ -206,6 +244,7 @@ export class PostViewService {
         post.embed,
         post.actorDid,
         embedPostViewMap,
+        embedGeneratorViewMap,
       ),
       replyCount: stats.replyCount,
       repostCount: stats.repostCount,

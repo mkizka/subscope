@@ -1,6 +1,7 @@
 import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
+  generatorFactory,
   getTestSetup,
   postEmbedExternalFactory,
   postEmbedImageFactory,
@@ -14,6 +15,7 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
+import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
@@ -22,6 +24,7 @@ import { RecordRepository } from "../../../infrastructure/record-repository.js";
 import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
+import { GeneratorViewService } from "./generator-view-service.js";
 import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 import { PostViewService } from "./post-view-service.js";
 
@@ -37,10 +40,12 @@ describe("PostViewService", () => {
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
     .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
     .provideClass("profileViewService", ProfileViewService)
+    .provideClass("generatorRepository", GeneratorRepository)
+    .provideClass("generatorViewService", GeneratorViewService)
+    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
     .injectClass(PostViewService);
 
   describe("findPostView", () => {
@@ -545,6 +550,175 @@ describe("PostViewService", () => {
           record: {
             $type: "app.bsky.embed.record#viewNotFound",
             uri: notFoundUri,
+            notFound: true,
+          },
+        },
+      });
+    });
+
+    test("フィードジェネレーターの埋め込み(app.bsky.embed.record)の場合、ジェネレータービューを含む投稿ビューを取得できる", async () => {
+      // arrange
+      const generatorActor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Generator Creator" }))
+        .props({ handle: () => "generator.bsky.social" })
+        .create();
+      const generatorRecord = await recordFactory(
+        ctx.db,
+        "app.bsky.feed.generator",
+      )
+        .vars({ actor: () => generatorActor })
+        .create();
+      const generator = await generatorFactory(ctx.db)
+        .vars({ record: () => generatorRecord })
+        .props({
+          displayName: () => "My Cool Feed",
+          description: () => "A custom algorithmic feed",
+        })
+        .create();
+
+      const quotingAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
+        .props({ handle: () => "quoting.bsky.social" })
+        .create();
+      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotingAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Check out this feed!",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: generator.uri,
+                cid: generator.cid,
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      const quotingPost = await postFactory(ctx.db)
+        .vars({ record: () => quotingRecord })
+        .props({
+          text: () => "Check out this feed!",
+          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({ post: () => quotingPost })
+        .props({
+          uri: () => generator.uri,
+          cid: () => generator.cid,
+        })
+        .create();
+      const quotingPostUri = new AtUri(quotingPost.uri);
+
+      // act
+      const result = await postViewService.findPostView([quotingPostUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        $type: "app.bsky.feed.defs#postView",
+        uri: quotingPost.uri,
+        cid: quotingRecord.cid,
+        author: {
+          $type: "app.bsky.actor.defs#profileViewBasic",
+          did: quotingAuthor.did,
+          handle: "quoting.bsky.social",
+          displayName: "Quoting Author",
+        },
+        record: {
+          $type: "app.bsky.feed.post",
+          text: "Check out this feed!",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: generator.uri,
+              cid: generator.cid,
+            },
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        embed: {
+          $type: "app.bsky.embed.record#view",
+          record: {
+            $type: "app.bsky.feed.defs#generatorView",
+            uri: generator.uri,
+            cid: generator.cid,
+            did: generator.did,
+            creator: {
+              $type: "app.bsky.actor.defs#profileView",
+              did: generatorActor.did,
+              handle: "generator.bsky.social",
+              displayName: "Generator Creator",
+            },
+            displayName: "My Cool Feed",
+            description: "A custom algorithmic feed",
+            indexedAt: generator.indexedAt.toISOString(),
+          },
+        },
+        replyCount: 0,
+        repostCount: 0,
+        likeCount: 0,
+        quoteCount: 0,
+        indexedAt: "2024-01-01T01:00:00.000Z",
+      });
+    });
+
+    test("フィードジェネレーターの埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
+      // arrange
+      const quotingAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
+        .props({ handle: () => "quoting.bsky.social" })
+        .create();
+      const notFoundGeneratorUri = AtUri.make(
+        "did:plc:notfound",
+        "app.bsky.feed.generator",
+        "notfound123",
+      ).toString();
+      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => quotingAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting a deleted generator",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: notFoundGeneratorUri,
+                cid: "bafyreighost123456789",
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+        })
+        .create();
+      const quotingPost = await postFactory(ctx.db)
+        .vars({ record: () => quotingRecord })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({ post: () => quotingPost })
+        .props({
+          uri: () => notFoundGeneratorUri,
+          cid: () => "bafyreighost123456789",
+        })
+        .create();
+      const quotingPostUri = new AtUri(quotingPost.uri);
+
+      // act
+      const result = await postViewService.findPostView([quotingPostUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        embed: {
+          $type: "app.bsky.embed.record#view",
+          record: {
+            $type: "app.bsky.embed.record#viewNotFound",
+            uri: notFoundGeneratorUri,
             notFound: true,
           },
         },
