@@ -7,7 +7,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
@@ -22,7 +22,7 @@ describe("PostIndexingPolicy", () => {
       .injectClass(PostIndexingPolicy);
 
     describe("shouldIndex", () => {
-      it("subscriberの投稿は保存すべき", async () => {
+      test("subscriberの投稿は保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
@@ -56,7 +56,7 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscriberにフォローされているユーザーの投稿は保存すべき", async () => {
+      test("subscriberにフォローされているユーザーの投稿は保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
@@ -102,7 +102,7 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersへのリプライは保存すべき", async () => {
+      test("subscribersへのリプライは保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
@@ -160,7 +160,7 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscriberでもフォロワーでもないユーザーの投稿は保存すべきでない", async () => {
+      test("subscriberでもフォロワーでもないユーザーの投稿は保存すべきでない", async () => {
         // arrange
         const unrelatedActor = await actorFactory(ctx.db).create();
 
@@ -186,7 +186,7 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(false);
       });
 
-      it("DBに存在しない投稿への返信は保存すべきでない", async () => {
+      test("DBに存在しない投稿への返信は保存すべきでない", async () => {
         // arrange
         const replierActor = await actorFactory(ctx.db).create();
 
@@ -231,7 +231,7 @@ describe("PostIndexingPolicy", () => {
       .injectClass(PostIndexingPolicy);
 
     describe("shouldIndex", () => {
-      it("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
+      test("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
@@ -265,7 +265,7 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersのフォロイーへのリプライは保存すべき", async () => {
+      test("subscribersのフォロイーへのリプライは保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
@@ -334,7 +334,7 @@ describe("PostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersがフォローしていないユーザーへのリプライは保存すべきでない", async () => {
+      test("subscribersがフォローしていないユーザーへのリプライは保存すべきでない", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)

@@ -9,7 +9,7 @@ import {
   repostFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
@@ -38,7 +38,7 @@ describe("RepostIndexer", () => {
     .injectClass(RepostIndexer);
 
   describe("upsert", () => {
-    it("リポストレコードを正しく保存する", async () => {
+    test("リポストレコードを正しく保存する", async () => {
       // arrange
       const [reposter, author] = await actorFactory(ctx.db).createList(2);
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
@@ -102,7 +102,7 @@ describe("RepostIndexer", () => {
   });
 
   describe("updateStats", () => {
-    it("リポスト追加時にpost_statsのリポスト数が正しく更新される", async () => {
+    test("リポスト追加時にpost_statsのリポスト数が正しく更新される", async () => {
       // arrange
       const post = await postFactory(ctx.db).create();
 
@@ -152,7 +152,7 @@ describe("RepostIndexer", () => {
       });
     });
 
-    it("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const nonExistentPostUri = `at://${actor.did}/app.bsky.feed.post/nonexistent`;

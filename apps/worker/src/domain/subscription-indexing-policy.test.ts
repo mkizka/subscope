@@ -1,6 +1,6 @@
 import { Record, Subscription } from "@repo/common/domain";
 import { getTestSetup } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { env } from "../shared/env.js";
 import { SubscriptionIndexingPolicy } from "./subscription-indexing-policy.js";
@@ -13,7 +13,7 @@ describe("SubscriptionIndexingPolicy", () => {
   );
 
   describe("shouldIndex", () => {
-    it("appviewDidが環境変数のAPPVIEW_DIDと一致する場合はtrueを返すべき", async () => {
+    test("appviewDidが環境変数のAPPVIEW_DIDと一致する場合はtrueを返すべき", async () => {
       // Arrange
       const subscriptionJson = {
         $type: "dev.mkizka.test.subscription",
@@ -37,7 +37,7 @@ describe("SubscriptionIndexingPolicy", () => {
       expect(result).toBe(true);
     });
 
-    it("appviewDidが環境変数のAPPVIEW_DIDと一致しない場合はfalseを返すべき", async () => {
+    test("appviewDidが環境変数のAPPVIEW_DIDと一致しない場合はfalseを返すべき", async () => {
       // Arrange
       const subscriptionJson = {
         $type: "dev.mkizka.test.subscription",

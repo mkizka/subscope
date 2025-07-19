@@ -8,7 +8,7 @@ import {
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
@@ -36,7 +36,7 @@ describe("UpsertIdentityUseCase", () => {
     .provideClass("indexActorService", IndexActorService)
     .injectClass(UpsertIdentityUseCase);
 
-  it("ハンドルがない場合は何もしない", async () => {
+  test("ハンドルがない場合は何もしない", async () => {
     // arrange
     const command: UpsertIdentityCommand = {
       did: "did:plc:nohandle",
@@ -55,7 +55,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(actors.length).toBe(0);
   });
 
-  it("subscriberの場合はactorを保存する", async () => {
+  test("subscriberの場合はactorを保存する", async () => {
     // arrange
     const command: UpsertIdentityCommand = {
       did: "did:plc:identity-subscriber",
@@ -99,7 +99,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(actors[0]?.handle).toBe(command.handle);
   });
 
-  it("subscriberでないがsubscriberのフォロワーがいる場合はactorを保存する", async () => {
+  test("subscriberでないがsubscriberのフォロワーがいる場合はactorを保存する", async () => {
     // arrange
     const subscriberDid = "did:plc:identity-follower-subscriber";
     const followedDid = "did:plc:identity-followed";
@@ -173,7 +173,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(actors[0]?.handle).toBe(command.handle);
   });
 
-  it("subscriberでもなくsubscriberのフォロワーもいない場合はactorを保存しない", async () => {
+  test("subscriberでもなくsubscriberのフォロワーもいない場合はactorを保存しない", async () => {
     // arrange
     const command: UpsertIdentityCommand = {
       did: "did:plc:identity-unrelated",

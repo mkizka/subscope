@@ -11,7 +11,7 @@ import {
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
@@ -40,7 +40,7 @@ describe("PostIndexer", () => {
     .injectClass(PostIndexer);
 
   describe("upsert", () => {
-    it("subscriberの投稿は実際にDBに保存される", async () => {
+    test("subscriberの投稿は実際にDBに保存される", async () => {
       // arrange
       const subscriber = await actorFactory(ctx.db).create();
       const subscriptionRecord = await recordFactory(
@@ -100,7 +100,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    it("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
+    test("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const embedCid = await randomCid();
@@ -142,7 +142,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    it("embedがない場合、fetchRecordジョブは追加されない", async () => {
+    test("embedがない場合、fetchRecordジョブは追加されない", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const postJson = {
@@ -170,7 +170,7 @@ describe("PostIndexer", () => {
   });
 
   describe("updateStats", () => {
-    it("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
+    test("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
       // arrange
       const parentActor = await actorFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -268,7 +268,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    it("投稿時にactor_statsの投稿数が更新される", async () => {
+    test("投稿時にactor_statsの投稿数が更新される", async () => {
       // arrange
       const regularActor = await actorFactory(ctx.db).create();
       const postJson = {
@@ -305,7 +305,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    it("引用投稿時に引用された投稿のpost_statsのquote数が正しく更新される", async () => {
+    test("引用投稿時に引用された投稿のpost_statsのquote数が正しく更新される", async () => {
       // arrange
       const quotedActor = await actorFactory(ctx.db).create();
       const quotedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -395,7 +395,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    it("引用された投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("引用された投稿が存在しない場合はpost_statsを更新しない", async () => {
       // arrange
       const quotingActor = await actorFactory(ctx.db).create();
       const nonExistentQuotedUri =
@@ -448,7 +448,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    it("親投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("親投稿が存在しない場合はpost_statsを更新しない", async () => {
       // arrange
       const replierActor = await actorFactory(ctx.db).create();
       const nonExistentParentUri =

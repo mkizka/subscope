@@ -9,7 +9,7 @@ import {
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
@@ -31,7 +31,7 @@ describe("LikeIndexer", () => {
     .injectClass(LikeIndexer);
 
   describe("upsert", () => {
-    it("subscriberのいいねは実際にDBに保存される", async () => {
+    test("subscriberのいいねは実際にDBに保存される", async () => {
       // arrange
       // subscriberとしてactor情報を準備
       const subscriberActor = await actorFactory(ctx.db).create();
@@ -92,7 +92,7 @@ describe("LikeIndexer", () => {
   });
 
   describe("updateStats", () => {
-    it("いいね追加時にpost_statsのいいね数が正しく更新される", async () => {
+    test("いいね追加時にpost_statsのいいね数が正しく更新される", async () => {
       // arrange
       // actorとrecordsテーブルを準備
       const [authorActor, ...likeActors] = await actorFactory(
@@ -161,7 +161,7 @@ describe("LikeIndexer", () => {
       });
     });
 
-    it("いいねが削除された場合にpost_statsのいいね数が正しく更新される", async () => {
+    test("いいねが削除された場合にpost_statsのいいね数が正しく更新される", async () => {
       // arrange
       // actorとrecordsテーブルを準備
       const [authorActor, user5Actor, user6Actor] = await actorFactory(
@@ -227,7 +227,7 @@ describe("LikeIndexer", () => {
       });
     });
 
-    it("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
       // arrange
       const likerActor = await actorFactory(ctx.db).create();
       const nonExistentPostUri =

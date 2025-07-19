@@ -5,7 +5,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
@@ -18,7 +18,7 @@ describe("ProfileIndexingPolicy", () => {
     .injectClass(ProfileIndexingPolicy);
 
   describe("shouldIndex", () => {
-    it("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
+    test("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
 
@@ -73,7 +73,7 @@ describe("ProfileIndexingPolicy", () => {
       expect(result).toBe(true);
     });
 
-    it("プロフィール作成者がsubscriberでない場合は保存すべきでない", async () => {
+    test("プロフィール作成者がsubscriberでない場合は保存すべきでない", async () => {
       // arrange
       const unrelatedActor = await actorFactory(ctx.db).create();
 

@@ -2,7 +2,7 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
 import { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
@@ -24,7 +24,7 @@ describe("SubscriptionIndexer", () => {
     .injectClass(SubscriptionIndexer);
 
   describe("upsert", () => {
-    it("サブスクリプションレコードをupsertする場合、subscriptionsテーブルに保存する", async () => {
+    test("サブスクリプションレコードをupsertする場合、subscriptionsテーブルに保存する", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const subscriptionRecord = await recordFactory(
@@ -64,7 +64,7 @@ describe("SubscriptionIndexer", () => {
       });
     });
 
-    it("actorのbackfillStatusがdirtyの場合、backfillSchedulerでスケジュールする", async () => {
+    test("actorのbackfillStatusがdirtyの場合、backfillSchedulerでスケジュールする", async () => {
       // arrange
       const actor = await actorFactory(ctx.db)
         .props({ backfillStatus: () => "dirty" })
@@ -99,7 +99,7 @@ describe("SubscriptionIndexer", () => {
       expect(mockBackfillScheduler.schedule).toHaveBeenCalledWith(actor.did);
     });
 
-    it("actorのbackfillStatusがsynchronizedの場合、backfillSchedulerは呼ばれない", async () => {
+    test("actorのbackfillStatusがsynchronizedの場合、backfillSchedulerは呼ばれない", async () => {
       // arrange
       const actor = await actorFactory(ctx.db)
         .props({ backfillStatus: () => "synchronized" })
@@ -134,7 +134,7 @@ describe("SubscriptionIndexer", () => {
   });
 
   describe("shouldIndex", () => {
-    it("appviewDidが環境変数APPVIEW_DIDと一致する場合、trueを返す", async () => {
+    test("appviewDidが環境変数APPVIEW_DIDと一致する場合、trueを返す", async () => {
       // arrange
       const subscriptionRecord = await recordFactory(
         ctx.db,
@@ -162,7 +162,7 @@ describe("SubscriptionIndexer", () => {
       expect(result).toBe(true);
     });
 
-    it("appviewDidが環境変数APPVIEW_DIDと一致しない場合、falseを返す", async () => {
+    test("appviewDidが環境変数APPVIEW_DIDと一致しない場合、falseを返す", async () => {
       // arrange
       const subscriptionRecord = await recordFactory(
         ctx.db,

@@ -6,7 +6,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { GeneratorIndexingPolicy } from "./generator-indexing-policy.js";
@@ -19,7 +19,7 @@ describe("GeneratorIndexingPolicy", () => {
     .injectClass(GeneratorIndexingPolicy);
 
   describe("shouldIndex", () => {
-    it("subscriberが作成したgeneratorは保存すべき", async () => {
+    test("subscriberが作成したgeneratorは保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
@@ -62,7 +62,7 @@ describe("GeneratorIndexingPolicy", () => {
       expect(result).toBe(true);
     });
 
-    it("subscriberにフォローされているユーザーが作成したgeneratorは保存すべきでない", async () => {
+    test("subscriberにフォローされているユーザーが作成したgeneratorは保存すべきでない", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
@@ -117,7 +117,7 @@ describe("GeneratorIndexingPolicy", () => {
       expect(result).toBe(false);
     });
 
-    it("subscriberでもフォローされているユーザーでもない場合は保存すべきでない", async () => {
+    test("subscriberでもフォローされているユーザーでもない場合は保存すべきでない", async () => {
       // arrange
       const unrelatedActor = await actorFactory(ctx.db).create();
 

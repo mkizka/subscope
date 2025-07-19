@@ -7,7 +7,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
@@ -22,7 +22,7 @@ describe("LikeIndexingPolicy", () => {
       .injectClass(LikeIndexingPolicy);
 
     describe("shouldIndex", () => {
-      it("subscriberのいいねは保存すべき", async () => {
+      test("subscriberのいいねは保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
 
@@ -65,7 +65,7 @@ describe("LikeIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersの投稿へのいいねは保存すべき", async () => {
+      test("subscribersの投稿へのいいねは保存すべき", async () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 
@@ -119,7 +119,7 @@ describe("LikeIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscriberでもなく、DBに存在しない投稿へのいいねは保存すべきでない", async () => {
+      test("subscriberでもなく、DBに存在しない投稿へのいいねは保存すべきでない", async () => {
         // arrange
         const unrelatedActor = await actorFactory(ctx.db).create();
 
@@ -161,7 +161,7 @@ describe("LikeIndexingPolicy", () => {
       .injectClass(LikeIndexingPolicy);
 
     describe("shouldIndex", () => {
-      it("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
+      test("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
@@ -203,7 +203,7 @@ describe("LikeIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersのフォロイーの投稿へのいいねは保存すべき", async () => {
+      test("subscribersのフォロイーの投稿へのいいねは保存すべき", async () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 
@@ -268,7 +268,7 @@ describe("LikeIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersがフォローしていないユーザーの投稿へのいいねは保存すべきでない", async () => {
+      test("subscribersがフォローしていないユーザーの投稿へのいいねは保存すべきでない", async () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 

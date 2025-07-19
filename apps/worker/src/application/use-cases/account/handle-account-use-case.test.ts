@@ -3,7 +3,7 @@ import type { IJobQueue } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { actorFactory, getTestSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
@@ -27,7 +27,7 @@ describe("HandleAccountUseCase", () => {
     .provideClass("indexActorService", IndexActorService)
     .injectClass(HandleAccountUseCase);
 
-  it("ステータスがdeletedの場合、actorがデータベースから削除される", async () => {
+  test("ステータスがdeletedの場合、actorがデータベースから削除される", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
     const command: HandleAccountCommand = {
@@ -48,7 +48,7 @@ describe("HandleAccountUseCase", () => {
     expect(actors).toHaveLength(0);
   });
 
-  it("ステータスがdeleted以外の場合、何も処理しない", async () => {
+  test("ステータスがdeleted以外の場合、何も処理しない", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
     const command: HandleAccountCommand = {

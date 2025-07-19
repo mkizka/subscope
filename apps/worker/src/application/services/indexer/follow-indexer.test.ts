@@ -3,7 +3,7 @@ import type { JobQueue } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
 import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
@@ -36,7 +36,7 @@ describe("FollowIndexer", () => {
     .injectClass(FollowIndexer);
 
   describe("upsert", () => {
-    it("フォローレコードを正しく保存する", async () => {
+    test("フォローレコードを正しく保存する", async () => {
       // arrange
       const [follower, followee] = await actorFactory(ctx.db).createList(2);
 
@@ -73,7 +73,7 @@ describe("FollowIndexer", () => {
       });
     });
 
-    it("フォロイーのactorが存在しない場合、自動的に作成される", async () => {
+    test("フォロイーのactorが存在しない場合、自動的に作成される", async () => {
       // arrange
       const follower = await actorFactory(ctx.db).create();
       const followeeDid = "did:plc:nonexistent-followee";
@@ -133,7 +133,7 @@ describe("FollowIndexer", () => {
   });
 
   describe("updateStats", () => {
-    it("フォロー作成時にfollowsCountとfollowersCountが更新される", async () => {
+    test("フォロー作成時にfollowsCountとfollowersCountが更新される", async () => {
       // arrange
       const [follower, followee] = await actorFactory(ctx.db).createList(2);
 

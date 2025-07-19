@@ -5,7 +5,7 @@ import {
   recordFactory,
   repostFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { RepostRepository } from "./repost-repository.js";
 
@@ -15,7 +15,7 @@ describe("RepostRepository", () => {
   const repostRepository = testInjector.injectClass(RepostRepository);
 
   describe("findRepostsByPost", () => {
-    it("指定された投稿へのリポストがない場合、空の配列を返す", async () => {
+    test("指定された投稿へのリポストがない場合、空の配列を返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -35,7 +35,7 @@ describe("RepostRepository", () => {
       expect(result).toEqual([]);
     });
 
-    it("指定された投稿へのリポストがある場合、リポストのリストを返す", async () => {
+    test("指定された投稿へのリポストがある場合、リポストのリストを返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -74,7 +74,7 @@ describe("RepostRepository", () => {
       });
     });
 
-    it("複数のリポストがある場合、sortAtの降順で返す", async () => {
+    test("複数のリポストがある場合、sortAtの降順で返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -124,7 +124,7 @@ describe("RepostRepository", () => {
       expect(result[1]?.uri.href).toBe(repost1.uri);
     });
 
-    it("limitパラメータが指定された場合、その件数だけ返す", async () => {
+    test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -163,7 +163,7 @@ describe("RepostRepository", () => {
       expect(result).toHaveLength(2);
     });
 
-    it("cursorパラメータが指定された場合、そのカーソル以前のリポストを返す", async () => {
+    test("cursorパラメータが指定された場合、そのカーソル以前のリポストを返す", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -215,7 +215,7 @@ describe("RepostRepository", () => {
       expect(result[0]?.uri.href).toBe(repost1.uri);
     });
 
-    it("異なる投稿へのリポストは含まれない", async () => {
+    test("異なる投稿へのリポストは含まれない", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")

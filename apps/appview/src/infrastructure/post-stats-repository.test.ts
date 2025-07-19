@@ -1,5 +1,5 @@
 import { getTestSetup, postStatsFactory } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { PostStatsRepository } from "./post-stats-repository.js";
 
@@ -9,7 +9,7 @@ describe("PostStatsRepository", () => {
   const postStatsRepository = testInjector.injectClass(PostStatsRepository);
 
   describe("findStats", () => {
-    it("空の配列が指定された場合、空のMapを返す", async () => {
+    test("空の配列が指定された場合、空のMapを返す", async () => {
       // act
       const result = await postStatsRepository.findStats([]);
 
@@ -17,7 +17,7 @@ describe("PostStatsRepository", () => {
       expect(result.size).toBe(0);
     });
 
-    it("統計が存在しない投稿が指定された場合、全て0の統計を返す", async () => {
+    test("統計が存在しない投稿が指定された場合、全て0の統計を返す", async () => {
       // arrange
       const postUri = "at://did:plc:123/posts/456";
 
@@ -34,7 +34,7 @@ describe("PostStatsRepository", () => {
       });
     });
 
-    it("統計が存在する投稿が指定された場合、保存された統計を返す", async () => {
+    test("統計が存在する投稿が指定された場合、保存された統計を返す", async () => {
       // arrange
       const postStats = await postStatsFactory(ctx.db).create();
 
@@ -50,7 +50,7 @@ describe("PostStatsRepository", () => {
       });
     });
 
-    it("複数の投稿が指定された場合、それぞれの統計を含むMapを返す", async () => {
+    test("複数の投稿が指定された場合、それぞれの統計を含むMapを返す", async () => {
       // arrange
       const [postStats1, postStats2] = await postStatsFactory(
         ctx.db,

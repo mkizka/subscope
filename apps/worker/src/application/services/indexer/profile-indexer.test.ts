@@ -2,7 +2,7 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { ProfileIndexingPolicy } from "../../../domain/profile-indexing-policy.js";
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
@@ -19,7 +19,7 @@ describe("ProfileIndexer", () => {
     .injectClass(ProfileIndexer);
 
   describe("upsert", () => {
-    it("プロフィールレコードを正しく保存する", async () => {
+    test("プロフィールレコードを正しく保存する", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
 

@@ -4,7 +4,7 @@ import { asHandle } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { actorFactory, getTestSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/repositories/actor-repository.js";
@@ -30,7 +30,7 @@ describe("IndexActorService", () => {
     .injectClass(IndexActorService);
 
   describe("upsert", () => {
-    it("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
+    test("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
       // arrange
       const testDid = asDid("did:plc:new-with-handle");
       const testHandle = asHandle("new-with-handle.bsky.social");
@@ -67,7 +67,7 @@ describe("IndexActorService", () => {
       });
     });
 
-    it("handle指定あり、既存actorなしの場合は、backfillジョブを追加しない", async () => {
+    test("handle指定あり、既存actorなしの場合は、backfillジョブを追加しない", async () => {
       // arrange
       const testDid = asDid("did:plc:new-no-backfill");
       const testHandle = asHandle("new-no-backfill.bsky.social");
@@ -96,7 +96,7 @@ describe("IndexActorService", () => {
       );
     });
 
-    it("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
+    test("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
       // arrange
       const existingDid = asDid("did:plc:no-handle-to-handle");
       const newHandle = asHandle("new-handle.bsky.social");
@@ -129,7 +129,7 @@ describe("IndexActorService", () => {
       );
     });
 
-    it("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
+    test("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
       // arrange
       const existingDid = asDid("did:plc:same-handle");
       const existingHandle = asHandle("same-handle.bsky.social");
@@ -162,7 +162,7 @@ describe("IndexActorService", () => {
       );
     });
 
-    it("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
+    test("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
       // arrange
       const existingDid = asDid("did:plc:changed-handle");
       const oldHandle = asHandle("old-handle.bsky.social");
@@ -196,7 +196,7 @@ describe("IndexActorService", () => {
       );
     });
 
-    it("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
+    test("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
       // arrange
       const newDid = asDid("did:plc:new-no-handle");
 
@@ -228,7 +228,7 @@ describe("IndexActorService", () => {
       );
     });
 
-    it("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
+    test("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
       await actorFactory(ctx.db)
@@ -260,7 +260,7 @@ describe("IndexActorService", () => {
       });
     });
 
-    it("handle指定なし、既存actorあり、既存actorのhandleありの場合は、何もしない", async () => {
+    test("handle指定なし、既存actorあり、既存actorのhandleありの場合は、何もしない", async () => {
       // arrange
       const existingDid = asDid("did:plc:existing-with-handle");
       const existingHandle = asHandle("existing-with-handle.bsky.social");

@@ -6,7 +6,7 @@ import type {
 } from "@repo/common/domain";
 import { Record, RecordValidationError } from "@repo/common/domain";
 import { createInjector } from "typed-inject";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import type { JobLogger } from "../../../shared/job.js";
@@ -29,7 +29,7 @@ const indexCommitUseCase = createInjector()
 
 describe("IndexCommitUseCase", () => {
   describe("create/updateオペレーション", () => {
-    it("upsertメソッドを呼び出す", async () => {
+    test("upsertメソッドを呼び出す", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const record = Record.fromJson({
@@ -65,7 +65,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("deleteオペレーション", () => {
-    it("削除オペレーションの場合、レコードを削除する", async () => {
+    test("削除オペレーションの場合、レコードを削除する", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const commit = {
@@ -93,7 +93,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("RecordValidationError", () => {
-    it("RecordValidationErrorが発生した場合、エラーメッセージをログに記録して正常終了する", async () => {
+    test("RecordValidationErrorが発生した場合、エラーメッセージをログに記録して正常終了する", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const validationErrorMessage = "Invalid record schema";
@@ -129,7 +129,7 @@ describe("IndexCommitUseCase", () => {
       );
     });
 
-    it("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
+    test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const record = Record.fromJson({

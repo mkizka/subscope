@@ -7,7 +7,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
@@ -22,7 +22,7 @@ describe("RepostIndexingPolicy", () => {
       .injectClass(RepostIndexingPolicy);
 
     describe("shouldIndex", () => {
-      it("repost者がsubscriberの場合は保存すべき", async () => {
+      test("repost者がsubscriberの場合は保存すべき", async () => {
         // arrange
         const [reposterActor, authorActor] = await actorFactory(
           ctx.db,
@@ -72,7 +72,7 @@ describe("RepostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
+      test("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
         // arrange
         const [reposterActor, followerActor, authorActor] = await actorFactory(
           ctx.db,
@@ -137,7 +137,7 @@ describe("RepostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersの投稿へのリポストは保存すべき", async () => {
+      test("subscribersの投稿へのリポストは保存すべき", async () => {
         // arrange
         const reposterActor = await actorFactory(ctx.db).create();
 
@@ -189,7 +189,7 @@ describe("RepostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
+      test("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
         // arrange
         const [reposterActor, authorActor] = await actorFactory(
           ctx.db,
@@ -229,7 +229,7 @@ describe("RepostIndexingPolicy", () => {
       .injectClass(RepostIndexingPolicy);
 
     describe("shouldIndex", () => {
-      it("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
+      test("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
         // arrange
         const reposterActor = await actorFactory(ctx.db).create();
         const subscriptionRecord = await recordFactory(
@@ -269,7 +269,7 @@ describe("RepostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersのフォロイーの投稿へのリポストは保存すべき", async () => {
+      test("subscribersのフォロイーの投稿へのリポストは保存すべき", async () => {
         // arrange
         const reposterActor = await actorFactory(ctx.db).create();
 
@@ -332,7 +332,7 @@ describe("RepostIndexingPolicy", () => {
         expect(result).toBe(true);
       });
 
-      it("subscribersがフォローしていないユーザーの投稿へのリポストは保存すべきでない", async () => {
+      test("subscribersがフォローしていないユーザーの投稿へのリポストは保存すべきでない", async () => {
         // arrange
         const reposterActor = await actorFactory(ctx.db).create();
 

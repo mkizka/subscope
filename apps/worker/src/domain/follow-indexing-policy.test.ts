@@ -5,7 +5,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { FollowIndexingPolicy } from "./follow-indexing-policy.js";
@@ -18,7 +18,7 @@ describe("FollowIndexingPolicy", () => {
     .injectClass(FollowIndexingPolicy);
 
   describe("shouldIndex", () => {
-    it("フォロワーがsubscriberの場合は保存すべき", async () => {
+    test("フォロワーがsubscriberの場合は保存すべき", async () => {
       // arrange
       const [followerActor, followeeActor] = await actorFactory(
         ctx.db,
@@ -70,7 +70,7 @@ describe("FollowIndexingPolicy", () => {
       expect(result).toBe(true);
     });
 
-    it("フォロイーがsubscriberの場合は保存すべき", async () => {
+    test("フォロイーがsubscriberの場合は保存すべき", async () => {
       // arrange
       const [followerActor, followeeActor] = await actorFactory(
         ctx.db,
@@ -122,7 +122,7 @@ describe("FollowIndexingPolicy", () => {
       expect(result).toBe(true);
     });
 
-    it("フォロワーもフォロイーもsubscriberでない場合は保存すべきでない", async () => {
+    test("フォロワーもフォロイーもsubscriberでない場合は保存すべきでない", async () => {
       // arrange
       const [followerActor, followeeActor] = await actorFactory(
         ctx.db,
