@@ -5,11 +5,11 @@
   "private": true,
   "exports": {
     "./api": {
-      "import": "./dist/api.mjs",
+      "import": "./dist/api.js",
       "types": "./dist/api.d.ts"
     },
     "./server": {
-      "import": "./dist/server.mjs",
+      "import": "./dist/server.js",
       "types": "./dist/server.d.ts"
     }
   },
