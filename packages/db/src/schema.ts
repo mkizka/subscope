@@ -32,7 +32,7 @@ export const records = pgTable("records", {
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
-    .references(() => actors.did),
+    .references(() => actors.did, { onDelete: "cascade" }),
   json: jsonb().notNull(),
   indexedAt: timestamp().notNull(),
 });
@@ -46,10 +46,10 @@ export const follows = pgTable(
     cid: varchar({ length: 256 }).notNull(),
     actorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     subjectDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().notNull(),
     sortAt: timestamp()
@@ -73,7 +73,7 @@ export const profiles = pgTable(
     cid: varchar({ length: 256 }).notNull(),
     actorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     avatarCid: varchar({ length: 256 }),
     description: text(),
     displayName: varchar({ length: 256 }),
@@ -92,7 +92,7 @@ export const posts = pgTable(
     cid: varchar({ length: 256 }).notNull(),
     actorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     text: text().notNull(),
     replyRootUri: varchar({ length: 256 }),
     replyRootCid: varchar({ length: 256 }),
@@ -141,7 +141,7 @@ export const subscriptions = pgTable("subscriptions", {
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
-    .references(() => actors.did),
+    .references(() => actors.did, { onDelete: "cascade" }),
   appviewDid: varchar({ length: 256 }).notNull(),
   createdAt: timestamp().notNull(),
   indexedAt: timestamp().notNull(),
@@ -154,7 +154,7 @@ export const generators = pgTable("generators", {
   cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
     .notNull()
-    .references(() => actors.did),
+    .references(() => actors.did, { onDelete: "cascade" }),
   did: varchar({ length: 256 }).notNull(),
   displayName: varchar({ length: 256 }).notNull(),
   description: text(),
@@ -172,7 +172,7 @@ export const likes = pgTable(
     cid: varchar({ length: 256 }).notNull(),
     actorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     subjectUri: varchar({ length: 256 }).notNull(),
     subjectCid: varchar({ length: 256 }).notNull(),
     createdAt: timestamp().notNull(),
@@ -197,7 +197,7 @@ export const reposts = pgTable(
     cid: varchar({ length: 256 }).notNull(),
     actorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     subjectUri: varchar({ length: 256 }).notNull(),
     subjectCid: varchar({ length: 256 }).notNull(),
     createdAt: timestamp().notNull(),
@@ -226,7 +226,7 @@ export const feedItems = pgTable(
     subjectUri: varchar({ length: 256 }),
     actorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did),
+      .references(() => actors.did, { onDelete: "cascade" }),
     sortAt: timestamp().notNull(),
   },
   (table) => [
