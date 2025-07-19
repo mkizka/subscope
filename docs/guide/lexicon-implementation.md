@@ -12,7 +12,7 @@ AT Protocolにおける新しいレコードタイプを追加する際の標準
 
 実装時に以下の変数を適切な値に置き換えてください：
 
-- `{namespace}`: レコードの名前空間（例：`dev.mkizka.test`）
+- `{namespace}`: レコードの名前空間（例：`me.subsco.sync`）
 - `{collection}`: コレクション名（例：`subscription`）
 - `{RecordType}`: ドメインクラス名（例：`Subscription`）
 - `{recordType}`: 変数名（例：`subscription`）

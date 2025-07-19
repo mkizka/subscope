@@ -1,9 +1,0 @@
-{
-  "lexicon": 1,
-  "id": "dev.mkizka.test.sync.requestBackfill",
-  "defs": {
-    "main": {
-      "type": "procedure"
-    }
-  }
-}

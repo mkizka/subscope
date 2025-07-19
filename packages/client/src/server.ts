@@ -22,7 +22,5 @@ export * as AppBskyFeedGetRepostedBy from "./generated/server/types/app/bsky/fee
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline.js";
 export * as AppBskyGraphGetFollowers from "./generated/server/types/app/bsky/graph/getFollowers.js";
 export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows.js";
-export * as DevMkizkaTestSyncGetJobStatus from "./generated/server/types/dev/mkizka/test/sync/getJobStatus.js";
-export * as DevMkizkaTestSyncRequestBackfill from "./generated/server/types/dev/mkizka/test/sync/requestBackfill.js";
 export * as MeSubscoSyncSubscription from "./generated/server/types/me/subsco/sync/subscription.js";
 export { $Typed } from "./generated/server/util.js";
