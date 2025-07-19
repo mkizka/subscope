@@ -44,8 +44,10 @@ paths=(
 ### Lexicon定義の取得手順
 
 1. `/packages/client/scripts/postinstall.sh`のpaths配列に該当するlexiconファイルパスを追加
-2. `pnpm install`を実行してAT Protocol公式リポジトリからlexicon定義を取得
-3. `pnpm build`を実行してTypeScript型定義を生成
+2. `pnpm install`を実行すると以下が自動的に行われます：
+   - AT Protocol公式リポジトリ（bluesky-social/atproto）からlexicon定義ファイルを取得
+   - 取得したファイルを`/packages/client/lexicons`ディレクトリにコピー
+   - `@atproto/lex-cli`を使用してクライアントコードを自動生成
 
 ### 生成されるファイル例
 
@@ -272,7 +274,9 @@ const container = createContainer()
 
 ### 事前準備
 
-- [ ] Lexicon定義ファイルの取得（`/packages/client/scripts/postinstall.sh`を更新）
+- [ ] Lexicon定義ファイルの取得
+  - [ ] `/packages/client/scripts/postinstall.sh`のpaths配列にlexiconファイルパスを追加
+  - [ ] `pnpm install`を実行してlexicon定義を取得し、クライアントコードを自動生成
 - [ ] データベーステーブル定義追加 (`/packages/db/src/schema.ts`)
 
 ### 実装ファイル

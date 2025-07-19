@@ -30,16 +30,11 @@ paths=(
 
 #### 1.2 Lexiconファイルの配置とクライアントコード生成
 
-```bash
-# Lexiconファイルをコピー
-pnpm install
+`pnpm install`を実行すると以下が自動的に行われます：
 
-# クライアントコードを生成
-pnpm build
-
-# キャッシュに問題がある場合
-pnpm build --force
-```
+- AT Protocol公式リポジトリ（bluesky-social/atproto）からlexicon定義ファイルを取得
+- 取得したファイルを`/packages/client/lexicons`ディレクトリにコピー
+- `@atproto/lex-cli`を使用してクライアントコードを自動生成
 
 #### 1.3 クライアントパッケージの型エクスポート設定（必要に応じて）
 
