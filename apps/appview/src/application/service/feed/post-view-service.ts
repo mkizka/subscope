@@ -12,17 +12,10 @@ import type {
   PostStats,
 } from "../../interfaces/post-stats-repository.js";
 import type { IRecordRepository } from "../../interfaces/record-repository.js";
+import { toMapByDid, toMapByUri } from "../../utils/map.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
-
-const toMapByUri = <T extends { uri: AtUri }>(items: T[]): Map<string, T> => {
-  return new Map(items.map((item) => [item.uri.toString(), item]));
-};
-
-const toMapByDid = <T extends { did: string }>(items: T[]): Map<string, T> => {
-  return new Map(items.map((item) => [item.did, item]));
-};
 
 export class PostViewService {
   constructor(
@@ -66,7 +59,7 @@ export class PostViewService {
 
     const [embedPostViewMap, embedGeneratorViewMap] = await Promise.all([
       this.findEmbedPostViewMap(postEmbedUris),
-      this.generatorViewService.findGeneratorViews(generatorEmbedUris),
+      this.generatorViewService.findGeneratorViewMap(generatorEmbedUris),
     ]);
 
     return this.buildPostViews(
@@ -93,7 +86,7 @@ export class PostViewService {
     const authorDids = [...new Set(posts.map((post) => post.actorDid))];
 
     const [statsMap, profileMap] = await Promise.all([
-      this.postStatsRepository.findByUris(postUris),
+      this.postStatsRepository.findMap(postUris),
       this.profileViewService.findProfileViewBasic(authorDids).then(toMapByDid),
     ]);
 
@@ -119,7 +112,7 @@ export class PostViewService {
       found.profileMap,
     );
 
-    return new Map(postViews.map((view) => [view.uri, view]));
+    return toMapByUri(postViews);
   }
 
   private isRecordObject(value: unknown): value is { [x: string]: unknown } {

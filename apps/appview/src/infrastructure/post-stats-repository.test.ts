@@ -11,7 +11,7 @@ describe("PostStatsRepository", () => {
   describe("findStats", () => {
     test("空の配列が指定された場合、空のMapを返す", async () => {
       // act
-      const result = await postStatsRepository.findByUris([]);
+      const result = await postStatsRepository.findMap([]);
 
       // assert
       expect(result.size).toBe(0);
@@ -22,7 +22,7 @@ describe("PostStatsRepository", () => {
       const postUri = "at://did:plc:123/posts/456";
 
       // act
-      const result = await postStatsRepository.findByUris([postUri]);
+      const result = await postStatsRepository.findMap([postUri]);
 
       // assert
       expect(result.size).toBe(1);
@@ -39,7 +39,7 @@ describe("PostStatsRepository", () => {
       const postStats = await postStatsFactory(ctx.db).create();
 
       // act
-      const result = await postStatsRepository.findByUris([postStats.postUri]);
+      const result = await postStatsRepository.findMap([postStats.postUri]);
 
       // assert
       expect(result.get(postStats.postUri)).toEqual({
@@ -57,7 +57,7 @@ describe("PostStatsRepository", () => {
       ).createList(2);
 
       // act
-      const result = await postStatsRepository.findByUris([
+      const result = await postStatsRepository.findMap([
         postStats1.postUri,
         postStats2.postUri,
       ]);

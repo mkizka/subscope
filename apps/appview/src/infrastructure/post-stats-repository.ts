@@ -11,7 +11,7 @@ export class PostStatsRepository implements IPostStatsRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findByUris(postUris: string[]): Promise<Map<string, PostStats>> {
+  async findMap(postUris: string[]): Promise<Map<string, PostStats>> {
     if (postUris.length === 0) {
       return new Map();
     }

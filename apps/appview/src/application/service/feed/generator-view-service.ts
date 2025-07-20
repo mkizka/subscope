@@ -3,6 +3,7 @@ import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 
 import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import type { IGeneratorRepository } from "../../interfaces/generator-repository.js";
+import { toMapByDid } from "../../utils/map.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 
 export class GeneratorViewService {
@@ -17,7 +18,7 @@ export class GeneratorViewService {
     "assetUrlBuilder",
   ] as const;
 
-  async findGeneratorViews(
+  async findGeneratorViewMap(
     uris: AtUri[],
   ): Promise<Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>> {
     if (uris.length === 0) {
@@ -26,12 +27,9 @@ export class GeneratorViewService {
 
     const generators = await this.generatorRepository.findByUris(uris);
 
-    const creatorDids = [...new Set(generators.map((g) => g.actorDid))];
-    const creatorProfiles =
-      await this.profileViewService.findProfileView(creatorDids);
-    const creatorProfileMap = new Map(
-      creatorProfiles.map((profile) => [profile.did, profile]),
-    );
+    const profilesMap = await this.profileViewService
+      .findProfileView([...new Set(generators.map((g) => g.actorDid))])
+      .then(toMapByDid);
 
     const generatorViewMap = new Map<
       string,
@@ -39,7 +37,7 @@ export class GeneratorViewService {
     >();
 
     for (const generator of generators) {
-      const creator = creatorProfileMap.get(generator.actorDid.toString());
+      const creator = profilesMap.get(generator.actorDid);
       if (!creator) continue;
 
       const generatorView: $Typed<AppBskyFeedDefs.GeneratorView> = {

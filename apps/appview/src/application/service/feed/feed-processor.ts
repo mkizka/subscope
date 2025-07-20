@@ -8,6 +8,7 @@ import type {
 import type { FeedItem } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../interfaces/post-repository.js";
+import { toMapByDid, toMapByUri } from "../../utils/map.js";
 import type { Page } from "../../utils/pagination.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { PostViewService } from "./post-view-service.js";
@@ -35,13 +36,13 @@ export class FeedProcessor {
       paginationResult.items,
     );
 
-    const { postViewMap, profileViewBasicMap, replyRefMap } =
+    const { postViewMap, replyRefMap, reposterProfileMap } =
       await this.fetchViewData(postUris, repostActorDids);
 
     const feed = this.buildFeedItems(
       paginationResult.items,
       postViewMap,
-      profileViewBasicMap,
+      reposterProfileMap,
       replyRefMap,
     );
 
@@ -67,24 +68,24 @@ export class FeedProcessor {
     return { postUris, repostActorDids };
   }
 
-  private async fetchViewData(postUris: AtUri[], repostActorDids: Did[]) {
+  private async fetchViewData(postUris: AtUri[], reposterDids: Did[]) {
     const posts = await this.postRepository.findByUris(postUris);
-    const [postViews, replyRefMap, repostProfiles] = await Promise.all([
-      this.postViewService.findPostView(postUris),
-      this.replyRefService.createReplyRefs(posts),
-      this.profileViewService.findProfileViewBasic(repostActorDids),
+
+    const [postViewMap, replyRefMap, reposterProfileMap] = await Promise.all([
+      this.postViewService.findPostView(postUris).then(toMapByUri),
+      this.replyRefService.findMap(posts),
+      this.profileViewService
+        .findProfileViewBasic(reposterDids)
+        .then(toMapByDid),
     ]);
 
-    const postViewMap = new Map(postViews.map((pv) => [pv.uri, pv]));
-    const profileViewBasicMap = new Map(repostProfiles.map((p) => [p.did, p]));
-
-    return { postViewMap, profileViewBasicMap, replyRefMap };
+    return { postViewMap, replyRefMap, reposterProfileMap };
   }
 
   private buildFeedItems(
     items: FeedItem[],
     postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
-    profileViewBasicMap: Map<string, $Typed<AppBskyActorDefs.ProfileViewBasic>>,
+    reposterProfileMap: Map<string, $Typed<AppBskyActorDefs.ProfileViewBasic>>,
     replyRefMap: Map<string, $Typed<AppBskyFeedDefs.ReplyRef>>,
   ): $Typed<AppBskyFeedDefs.FeedViewPost>[] {
     const feed: $Typed<AppBskyFeedDefs.FeedViewPost>[] = [];
@@ -97,7 +98,7 @@ export class FeedProcessor {
         const feedItem = this.buildRepostFeedItem(
           item,
           postViewMap,
-          profileViewBasicMap,
+          reposterProfileMap,
           replyRefMap,
         );
         if (feedItem) feed.push(feedItem);
@@ -125,15 +126,15 @@ export class FeedProcessor {
   private buildRepostFeedItem(
     item: FeedItem,
     postViewMap: Map<string, AppBskyFeedDefs.PostView>,
-    profileViewBasicMap: Map<string, AppBskyActorDefs.ProfileViewBasic>,
+    reposterProfileMap: Map<string, AppBskyActorDefs.ProfileViewBasic>,
     replyRefMap: Map<string, AppBskyFeedDefs.ReplyRef | undefined>,
   ): $Typed<AppBskyFeedDefs.FeedViewPost> | null {
     if (item.subjectUri === null) return null;
 
     const postView = postViewMap.get(item.subjectUri);
-    const profileViewBasic = profileViewBasicMap.get(item.actorDid);
+    const reposter = reposterProfileMap.get(item.actorDid);
 
-    if (!postView || !profileViewBasic) return null;
+    if (!postView || !reposter) return null;
 
     return {
       $type: "app.bsky.feed.defs#feedViewPost" as const,
@@ -141,7 +142,7 @@ export class FeedProcessor {
       reply: replyRefMap.get(postView.uri),
       reason: {
         $type: "app.bsky.feed.defs#reasonRepost" as const,
-        by: profileViewBasic,
+        by: reposter,
         indexedAt: item.sortAt.toISOString(),
       },
     };

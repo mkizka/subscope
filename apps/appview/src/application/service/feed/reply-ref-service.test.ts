@@ -65,7 +65,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.createReplyRefs(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result).toEqual(new Map());
@@ -113,7 +113,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.createReplyRefs(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({
@@ -189,7 +189,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.createReplyRefs(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(reply1Uri.toString())).toMatchObject({
@@ -237,7 +237,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.createReplyRefs(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({
@@ -317,7 +317,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.createReplyRefs(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({

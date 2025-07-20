@@ -2,6 +2,7 @@ import type { AppBskyFeedGetRepostedBy } from "@repo/client/server";
 
 import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import type { RepostService } from "../../service/feed/repost-service.js";
+import { toMapByDid } from "../../utils/map.js";
 
 export class GetRepostedByUseCase {
   constructor(
@@ -24,14 +25,13 @@ export class GetRepostedByUseCase {
     );
 
     const actorDids = paginationResult.items.map((repost) => repost.actorDid);
-    const profiles = await this.profileViewService.findProfileView(actorDids);
-    const profileViewMap = new Map(
-      profiles.map((profile) => [profile.did, profile]),
-    );
+    const profileViewMap = await this.profileViewService
+      .findProfileView(actorDids)
+      .then(toMapByDid);
 
     const repostedBy: AppBskyFeedGetRepostedBy.OutputSchema["repostedBy"] =
       paginationResult.items.map((repost) => {
-        const profileView = profileViewMap.get(repost.actorDid.toString());
+        const profileView = profileViewMap.get(repost.actorDid);
         if (!profileView) {
           throw new Error(`Profile not found for actor: ${repost.actorDid}`);
         }

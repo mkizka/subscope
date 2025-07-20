@@ -6,5 +6,5 @@ export interface PostStats {
 }
 
 export interface IPostStatsRepository {
-  findByUris: (postUris: string[]) => Promise<Map<string, PostStats>>;
+  findMap: (postUris: string[]) => Promise<Map<string, PostStats>>;
 }

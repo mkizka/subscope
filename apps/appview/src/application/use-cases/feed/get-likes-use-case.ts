@@ -2,6 +2,7 @@ import type { AppBskyFeedGetLikes } from "@repo/client/server";
 
 import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import type { LikeService } from "../../service/graph/like-service.js";
+import { toMapByDid } from "../../utils/map.js";
 
 export class GetLikesUseCase {
   constructor(
@@ -22,14 +23,13 @@ export class GetLikesUseCase {
     });
 
     const actorDids = paginationResult.items.map((like) => like.actorDid);
-    const profiles = await this.profileViewService.findProfileView(actorDids);
-    const profileViewMap = new Map(
-      profiles.map((profile) => [profile.did, profile]),
-    );
+    const profileViewMap = await this.profileViewService
+      .findProfileView(actorDids)
+      .then(toMapByDid);
 
     const likes: AppBskyFeedGetLikes.Like[] = paginationResult.items.map(
       (like) => {
-        const profileView = profileViewMap.get(like.actorDid.toString());
+        const profileView = profileViewMap.get(like.actorDid);
         if (!profileView) {
           throw new Error(`Profile not found for actor: ${like.actorDid}`);
         }

@@ -13,7 +13,7 @@ export class ReplyRefService {
   constructor(private readonly postViewService: PostViewService) {}
   static inject = ["postViewService"] as const;
 
-  async createReplyRefs(
+  async findMap(
     posts: Post[],
   ): Promise<Map<string, $Typed<AppBskyFeedDefs.ReplyRef>>> {
     const replyPosts = posts.filter((post): post is ReplyPost =>

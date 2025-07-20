@@ -10,6 +10,7 @@ import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { type AtUriService } from "../../../domain/service/at-uri-service.js";
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type { PostViewService } from "../../service/feed/post-view-service.js";
+import { toMapByUri } from "../../utils/map.js";
 
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
@@ -107,8 +108,7 @@ export class GetPostThreadUseCase {
     uris: Set<string>,
   ): Promise<Map<string, PostView>> {
     const uriArray = Array.from(uris).map((uri) => new AtUri(uri));
-    const postViews = await this.postViewService.findPostView(uriArray);
-    return new Map(postViews.map((view) => [view.uri, view]));
+    return await this.postViewService.findPostView(uriArray).then(toMapByUri);
   }
 
   private buildThreadStructure({
