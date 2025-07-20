@@ -24,8 +24,7 @@ export class PostEmbedViewBuilder {
       | PostEmbedExternal
       | PostEmbedImage[]
       | PostEmbedRecord
-      | PostEmbedRecordWithMedia
-      | null,
+      | PostEmbedRecordWithMedia,
     actorDid: string,
     embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
     embedGeneratorViewMap?: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>,

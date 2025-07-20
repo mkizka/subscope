@@ -80,7 +80,7 @@ export class Post {
    * embedのURIがインデックス可能なコレクションの場合そのURIを返す。
    * アプリケーション層でPostのインデックス時にこのURIのレコードもインデックスする。
    */
-  getFetchableEmbedUri(): AtUri | null {
+  getEmbedRecordUri(): AtUri | null {
     if (
       (this.embed instanceof PostEmbedRecord ||
         this.embed instanceof PostEmbedRecordWithMedia) &&

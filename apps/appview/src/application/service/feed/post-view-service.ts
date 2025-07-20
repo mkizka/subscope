@@ -1,12 +1,10 @@
-import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type {
   $Typed,
   AppBskyActorDefs,
   AppBskyFeedDefs,
 } from "@repo/client/server";
-import type { ILoggerManager, Logger, Post, Record } from "@repo/common/domain";
-import { required } from "@repo/common/utils";
+import type { Post, Record } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type {
@@ -18,22 +16,15 @@ import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 
-type PostView = $Typed<AppBskyFeedDefs.PostView>;
-type PostViewMap = Map<string, PostView>;
-type GeneratorViewMap = Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
-type ProfileViewBasic = $Typed<AppBskyActorDefs.ProfileViewBasic>;
+const toMapByUri = <T extends { uri: AtUri }>(items: T[]): Map<string, T> => {
+  return new Map(items.map((item) => [item.uri.toString(), item]));
+};
 
-interface PostDataMaps {
-  postMap: Map<string, Post>;
-  recordMap: Map<string, Record>;
-  authorMap: Map<string, ProfileViewBasic>;
-  statsMap: Map<string, PostStats>;
-}
+const toMapByDid = <T extends { did: string }>(items: T[]): Map<string, T> => {
+  return new Map(items.map((item) => [item.did, item]));
+};
 
-// TODO: コードを整理する
 export class PostViewService {
-  private readonly logger: Logger;
-
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly recordRepository: IRecordRepository,
@@ -41,10 +32,7 @@ export class PostViewService {
     private readonly profileViewService: ProfileViewService,
     private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
     private readonly generatorViewService: GeneratorViewService,
-    loggerManager: ILoggerManager,
-  ) {
-    this.logger = loggerManager.createLogger("PostViewService");
-  }
+  ) {}
   static inject = [
     "postRepository",
     "recordRepository",
@@ -52,205 +40,139 @@ export class PostViewService {
     "profileViewService",
     "postEmbedViewBuilder",
     "generatorViewService",
-    "loggerManager",
   ] as const;
 
-  async findPostView(uris: AtUri[]): Promise<PostView[]> {
+  async findPostView(
+    uris: AtUri[],
+  ): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
     if (uris.length === 0) {
       return [];
     }
 
-    const posts = await this.postRepository.findByUris(uris);
-    const embedUris = posts
-      .map((post) => post.getFetchableEmbedUri())
+    const found = await this.findPostsAndMaps(uris);
+    if (!found) {
+      return [];
+    }
+
+    const embedUris = found.posts
+      .map((post) => post.getEmbedRecordUri())
       .filter((uri) => uri !== null);
+    const postEmbedUris = embedUris.filter(
+      (uri) => uri.collection === "app.bsky.feed.post",
+    );
+    const generatorEmbedUris = embedUris.filter(
+      (uri) => uri.collection === "app.bsky.feed.generator",
+    );
 
-    if (embedUris.length === 0) {
-      return this.hydratePostViews(uris, posts);
-    }
-
-    return this.hydratePostViewsWithEmbeds(uris, posts, embedUris);
-  }
-
-  private async hydratePostViewsWithEmbeds(
-    uris: AtUri[],
-    posts: Post[],
-    embedUris: AtUri[],
-  ): Promise<PostView[]> {
-    const { postUris, generatorUris } = this.separateEmbedUris(embedUris);
-
-    const [embedPosts, generatorViewMap] = await Promise.all([
-      this.postRepository.findByUris(postUris),
-      this.generatorViewService.findGeneratorViews(generatorUris),
+    const [embedPostViewMap, embedGeneratorViewMap] = await Promise.all([
+      this.findEmbedPostViewMap(postEmbedUris),
+      this.generatorViewService.findGeneratorViews(generatorEmbedUris),
     ]);
 
-    const embedPostViews = await this.hydratePostViews(postUris, embedPosts);
-    const embedPostViewMap = new Map<string, PostView>(
-      embedPostViews.map((view) => [view.uri, view]),
-    );
-
-    return this.hydratePostViews(
-      uris,
-      posts,
-      embedPostViewMap,
-      generatorViewMap,
-    );
-  }
-
-  private separateEmbedUris(embedUris: AtUri[]): {
-    postUris: AtUri[];
-    generatorUris: AtUri[];
-  } {
-    const postUris: AtUri[] = [];
-    const generatorUris: AtUri[] = [];
-
-    for (const uri of embedUris) {
-      if (uri.collection === "app.bsky.feed.post") {
-        postUris.push(uri);
-      } else if (uri.collection === "app.bsky.feed.generator") {
-        generatorUris.push(uri);
-      }
-    }
-
-    return { postUris, generatorUris };
-  }
-
-  private async hydratePostViews(
-    uris: AtUri[],
-    providedPosts: Post[],
-    embedPostViewMap?: PostViewMap,
-    embedGeneratorViewMap?: GeneratorViewMap,
-  ): Promise<PostView[]> {
-    if (uris.length === 0) {
-      return [];
-    }
-
-    const postData = await this.fetchPostData(uris, providedPosts);
-    const dataMaps = this.createDataMaps(postData);
-
-    const postViews = uris.map((uri) =>
-      this.tryCreatePostView(
-        uri,
-        dataMaps,
-        embedPostViewMap,
-        embedGeneratorViewMap,
-      ),
-    );
-    return postViews.filter((postView) => postView !== null);
-  }
-
-  private async fetchPostData(uris: AtUri[], providedPosts: Post[]) {
-    const records = await this.recordRepository.findMany(uris);
-    const postUris = providedPosts.map((post) => post.uri.toString());
-    const authorDids = this.extractUniqueAuthorDids(providedPosts);
-
-    const [authors, stats] = await Promise.all([
-      this.profileViewService.findProfileViewBasic(authorDids),
-      this.postStatsRepository.findStats(postUris),
-    ]);
-
-    return { posts: providedPosts, records, authors, stats };
-  }
-
-  private extractUniqueAuthorDids(posts: Post[]): Did[] {
-    return [...new Set(posts.map((post) => post.actorDid))];
-  }
-
-  private createDataMaps(postData: {
-    posts: Post[];
-    records: Record[];
-    authors: ProfileViewBasic[];
-    stats: Map<string, PostStats>;
-  }): PostDataMaps {
-    const { posts, records, authors, stats } = postData;
-    return {
-      postMap: new Map(posts.map((post) => [post.uri.toString(), post])),
-      recordMap: new Map(
-        records.map((record) => [record.uri.toString(), record]),
-      ),
-      authorMap: new Map(authors.map((author) => [author.did, author])),
-      statsMap: stats,
-    };
-  }
-
-  private tryCreatePostView(
-    uri: AtUri,
-    dataMaps: PostDataMaps,
-    embedPostViewMap?: PostViewMap,
-    embedGeneratorViewMap?: GeneratorViewMap,
-  ): PostView | null {
-    const uriString = uri.toString();
-    const post = dataMaps.postMap.get(uriString);
-    if (!post) return null;
-
-    const requiredData = this.getRequiredPostData(post, uriString, dataMaps);
-    if (!requiredData) {
-      return null;
-    }
-
-    return this.createPostView(
-      post,
-      requiredData.record,
-      requiredData.author,
-      requiredData.stats,
+    return this.buildPostViews(
+      found.posts,
+      found.recordMap,
+      found.statsMap,
+      found.profileMap,
       embedPostViewMap,
       embedGeneratorViewMap,
     );
   }
 
-  private getRequiredPostData(
-    post: Post,
-    uriString: string,
-    dataMaps: PostDataMaps,
-  ) {
-    const author = dataMaps.authorMap.get(post.actorDid);
-    const record = dataMaps.recordMap.get(uriString);
-    const stats = dataMaps.statsMap.get(uriString);
+  private async findPostsAndMaps(uris: AtUri[]) {
+    const [posts, recordMap] = await Promise.all([
+      this.postRepository.findByUris(uris),
+      this.recordRepository.findByUris(uris).then(toMapByUri),
+    ]);
 
-    if (!author || !record || !stats) {
-      this.logger.warn(
-        { author, record, stats },
-        `Missing data for post ${uriString}`,
-      );
+    if (posts.length === 0) {
       return null;
     }
 
-    return { author, record, stats };
+    const postUris = posts.map((post) => post.uri.toString());
+    const authorDids = [...new Set(posts.map((post) => post.actorDid))];
+
+    const [statsMap, profileMap] = await Promise.all([
+      this.postStatsRepository.findByUris(postUris),
+      this.profileViewService.findProfileViewBasic(authorDids).then(toMapByDid),
+    ]);
+
+    return { posts, recordMap, statsMap, profileMap };
+  }
+
+  private async findEmbedPostViewMap(
+    uris: AtUri[],
+  ): Promise<Map<string, $Typed<AppBskyFeedDefs.PostView>>> {
+    if (uris.length === 0) {
+      return new Map();
+    }
+
+    const found = await this.findPostsAndMaps(uris);
+    if (!found) {
+      return new Map();
+    }
+
+    const postViews = this.buildPostViews(
+      found.posts,
+      found.recordMap,
+      found.statsMap,
+      found.profileMap,
+    );
+
+    return new Map(postViews.map((view) => [view.uri, view]));
   }
 
   private isRecordObject(value: unknown): value is { [x: string]: unknown } {
     return typeof value === "object" && value !== null && !Array.isArray(value);
   }
 
-  private createPostView(
-    post: Post,
-    record: Record,
-    author: ProfileViewBasic,
-    stats: PostStats,
-    embedPostViewMap?: PostViewMap,
-    embedGeneratorViewMap?: GeneratorViewMap,
-  ): PostView {
-    if (!this.isRecordObject(record.json)) {
-      throw new Error(`Invalid record json for post: ${post.uri.toString()}`);
-    }
+  private buildPostViews(
+    posts: Post[],
+    recordMap: Map<string, Record>,
+    statsMap: Map<string, PostStats>,
+    profileMap: Map<string, $Typed<AppBskyActorDefs.ProfileViewBasic>>,
+    embedPostViewMap?: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
+    embedGeneratorViewMap?: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>,
+  ): $Typed<AppBskyFeedDefs.PostView>[] {
+    return posts
+      .map((post) => {
+        const record = recordMap.get(post.uri.toString());
+        const author = profileMap.get(post.actorDid.toString());
+        const stats = statsMap.get(post.uri.toString());
 
-    return {
-      $type: "app.bsky.feed.defs#postView",
-      uri: post.uri.toString(),
-      cid: post.cid,
-      author,
-      record: record.json,
-      embed: this.postEmbedViewBuilder.embedView(
-        post.embed,
-        post.actorDid,
-        embedPostViewMap,
-        embedGeneratorViewMap,
-      ),
-      replyCount: stats.replyCount,
-      repostCount: stats.repostCount,
-      likeCount: stats.likeCount,
-      quoteCount: stats.quoteCount,
-      indexedAt: required(post.indexedAt).toISOString(),
-    };
+        if (!record || !author) {
+          return null;
+        }
+
+        if (!this.isRecordObject(record.json)) {
+          throw new Error(
+            `Invalid record format for post ${post.uri.toString()}: ${JSON.stringify(record.json)}`,
+          );
+        }
+
+        const postView: $Typed<AppBskyFeedDefs.PostView> = {
+          $type: "app.bsky.feed.defs#postView" as const,
+          uri: post.uri.toString(),
+          cid: record.cid,
+          author,
+          record: record.json,
+          replyCount: stats?.replyCount,
+          repostCount: stats?.repostCount,
+          likeCount: stats?.likeCount,
+          quoteCount: stats?.quoteCount,
+          indexedAt: post.indexedAt.toISOString(),
+        };
+
+        if (post.embed) {
+          postView.embed = this.postEmbedViewBuilder.embedView(
+            post.embed,
+            post.actorDid.toString(),
+            embedPostViewMap,
+            embedGeneratorViewMap,
+          );
+        }
+        return postView;
+      })
+      .filter((postView) => postView !== null);
   }
 }

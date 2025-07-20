@@ -10,7 +10,7 @@ export class RecordRepository implements IRecordRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findMany(uris: AtUri[]): Promise<Record[]> {
+  async findByUris(uris: AtUri[]): Promise<Record[]> {
     const stringUris = uris.map((uri) => uri.toString());
     const records = await this.db
       .select()
