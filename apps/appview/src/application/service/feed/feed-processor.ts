@@ -1,13 +1,10 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type {
-  $Typed,
-  AppBskyActorDefs,
-  AppBskyFeedDefs,
-} from "@repo/client/server";
+import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 import type { FeedItem } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../interfaces/post-repository.js";
+import type { IRepostRepository } from "../../interfaces/repost-repository.js";
 import { toMapByDid, toMapByUri } from "../../utils/map.js";
 import type { Page } from "../../utils/pagination.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
@@ -17,134 +14,96 @@ import type { ReplyRefService } from "./reply-ref-service.js";
 export class FeedProcessor {
   constructor(
     private readonly postRepository: IPostRepository,
+    private readonly repostRepository: IRepostRepository,
     private readonly postViewService: PostViewService,
-    private readonly replyRefService: ReplyRefService,
     private readonly profileViewService: ProfileViewService,
+    private readonly replyRefService: ReplyRefService,
   ) {}
   static inject = [
     "postRepository",
+    "repostRepository",
     "postViewService",
-    "replyRefService",
     "profileViewService",
+    "replyRefService",
   ] as const;
 
-  async processFeedItems(paginationResult: Page<FeedItem>): Promise<{
+  // TODO: FeedItemだけ受け取るようにする
+  async processFeedItems(page: Page<FeedItem>): Promise<{
     feed: $Typed<AppBskyFeedDefs.FeedViewPost>[];
     cursor: string | undefined;
   }> {
-    const { postUris, repostActorDids } = this.extractUrisAndActors(
-      paginationResult.items,
-    );
+    const postUris = new Set<string>();
+    const repostUris = new Set<string>();
+    const reposterDids = new Set<Did>();
 
-    const { postViewMap, replyRefMap, reposterProfileMap } =
-      await this.fetchViewData(postUris, repostActorDids);
-
-    const feed = this.buildFeedItems(
-      paginationResult.items,
-      postViewMap,
-      reposterProfileMap,
-      replyRefMap,
-    );
-
-    return {
-      feed,
-      cursor: paginationResult.cursor,
-    };
-  }
-
-  private extractUrisAndActors(items: FeedItem[]) {
-    const postUris: AtUri[] = [];
-    const repostActorDids: Did[] = [];
-
-    for (const item of items) {
+    for (const item of page.items) {
       if (item.type === "post") {
-        postUris.push(new AtUri(item.uri));
-      } else if (item.subjectUri !== null) {
-        postUris.push(new AtUri(item.subjectUri));
-        repostActorDids.push(item.actorDid);
+        postUris.add(item.uri);
+      } else if (item.subjectUri) {
+        postUris.add(item.subjectUri);
+        repostUris.add(item.uri);
+        reposterDids.add(item.actorDid);
       }
     }
 
-    return { postUris, repostActorDids };
-  }
+    const postAtUris = Array.from(postUris).map((uri) => new AtUri(uri));
+    const postViewMap = await this.postViewService
+      .findPostView(postAtUris)
+      .then(toMapByUri);
 
-  private async fetchViewData(postUris: AtUri[], reposterDids: Did[]) {
-    const posts = await this.postRepository.findByUris(postUris);
-
-    const [postViewMap, replyRefMap, reposterProfileMap] = await Promise.all([
-      this.postViewService.findPostView(postUris).then(toMapByUri),
-      this.replyRefService.findMap(posts),
+    const [repostMap, reposterMap] = await Promise.all([
+      this.repostRepository.findByUris(Array.from(repostUris)).then(toMapByUri),
       this.profileViewService
-        .findProfileViewBasic(reposterDids)
+        .findProfileViewBasic(Array.from(reposterDids))
         .then(toMapByDid),
     ]);
 
-    return { postViewMap, replyRefMap, reposterProfileMap };
-  }
+    const posts = await this.postRepository.findByUris(postAtUris);
+    const replyRefMap = await this.replyRefService.findMap(posts);
 
-  private buildFeedItems(
-    items: FeedItem[],
-    postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>,
-    reposterProfileMap: Map<string, $Typed<AppBskyActorDefs.ProfileViewBasic>>,
-    replyRefMap: Map<string, $Typed<AppBskyFeedDefs.ReplyRef>>,
-  ): $Typed<AppBskyFeedDefs.FeedViewPost>[] {
-    const feed: $Typed<AppBskyFeedDefs.FeedViewPost>[] = [];
+    const feedViewPosts = page.items
+      .map((item) => {
+        const postUri = item.type === "post" ? item.uri : item.subjectUri;
+        if (!postUri) {
+          return null;
+        }
 
-    for (const item of items) {
-      if (item.type === "post") {
-        const feedItem = this.buildPostFeedItem(item, postViewMap, replyRefMap);
-        if (feedItem) feed.push(feedItem);
-      } else if (item.subjectUri !== null) {
-        const feedItem = this.buildRepostFeedItem(
-          item,
-          postViewMap,
-          reposterProfileMap,
-          replyRefMap,
-        );
-        if (feedItem) feed.push(feedItem);
-      }
-    }
+        const postView = postViewMap.get(postUri);
+        if (!postView) {
+          return null;
+        }
 
-    return feed;
-  }
+        const feedViewPost: $Typed<AppBskyFeedDefs.FeedViewPost> = {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: postView,
+        };
 
-  private buildPostFeedItem(
-    item: FeedItem,
-    postViewMap: Map<string, AppBskyFeedDefs.PostView>,
-    replyRefMap: Map<string, AppBskyFeedDefs.ReplyRef | undefined>,
-  ): $Typed<AppBskyFeedDefs.FeedViewPost> | null {
-    const postView = postViewMap.get(item.uri);
-    if (!postView) return null;
+        const replyRef = replyRefMap.get(postUri);
+        if (replyRef) {
+          feedViewPost.reply = replyRef;
+        }
 
-    return {
-      $type: "app.bsky.feed.defs#feedViewPost" as const,
-      post: postView,
-      reply: replyRefMap.get(postView.uri),
-    };
-  }
+        if (item.type === "repost") {
+          const repost = repostMap.get(item.uri);
+          if (repost) {
+            const reposter = reposterMap.get(repost.actorDid);
+            if (reposter) {
+              feedViewPost.reason = {
+                $type: "app.bsky.feed.defs#reasonRepost",
+                by: reposter,
+                indexedAt: repost.indexedAt.toISOString(),
+              };
+            }
+          }
+        }
 
-  private buildRepostFeedItem(
-    item: FeedItem,
-    postViewMap: Map<string, AppBskyFeedDefs.PostView>,
-    reposterProfileMap: Map<string, AppBskyActorDefs.ProfileViewBasic>,
-    replyRefMap: Map<string, AppBskyFeedDefs.ReplyRef | undefined>,
-  ): $Typed<AppBskyFeedDefs.FeedViewPost> | null {
-    if (item.subjectUri === null) return null;
-
-    const postView = postViewMap.get(item.subjectUri);
-    const reposter = reposterProfileMap.get(item.actorDid);
-
-    if (!postView || !reposter) return null;
+        return feedViewPost;
+      })
+      .filter((post) => post !== null);
 
     return {
-      $type: "app.bsky.feed.defs#feedViewPost" as const,
-      post: postView,
-      reply: replyRefMap.get(postView.uri),
-      reason: {
-        $type: "app.bsky.feed.defs#reasonRepost" as const,
-        by: reposter,
-        indexedAt: item.sortAt.toISOString(),
-      },
+      feed: feedViewPosts,
+      cursor: page.cursor,
     };
   }
 }

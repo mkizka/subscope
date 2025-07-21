@@ -6,4 +6,6 @@ export interface IRepostRepository {
     limit: number;
     cursor?: Date;
   }) => Promise<Repost[]>;
+
+  findByUris: (uris: string[]) => Promise<Repost[]>;
 }

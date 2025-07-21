@@ -21,6 +21,7 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
@@ -41,6 +42,7 @@ describe("FeedProcessor", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
+    .provideClass("repostRepository", RepostRepository)
     .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
@@ -137,6 +139,7 @@ describe("FeedProcessor", () => {
         subjectUri: () => originalPost.uri,
         subjectCid: () => originalPost.cid,
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
       })
       .create();
 
@@ -317,6 +320,7 @@ describe("FeedProcessor", () => {
       .props({
         subjectUri: () => post2.uri,
         subjectCid: () => post2.cid,
+        indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
       })
       .create();
     const feedItem2 = await repostFeedItemFactory(ctx.db)

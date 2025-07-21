@@ -18,6 +18,7 @@ import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import { ActorLikesService } from "../../service/feed/actor-likes-service.js";
@@ -40,6 +41,7 @@ describe("GetActorLikesUseCase", () => {
     .provideClass("followRepository", FollowRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("recordRepository", RecordRepository)
+    .provideClass("repostRepository", RepostRepository)
     .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)
