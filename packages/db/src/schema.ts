@@ -339,6 +339,12 @@ export const postEmbedRecordsRelations = relations(
   }),
 );
 
+export const inviteCodes = pgTable("invite_codes", {
+  code: varchar({ length: 256 }).primaryKey(),
+  expiresAt: timestamp().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+});
+
 export const imageBlobCache = pgTable(
   "image_blob_cache",
   {

@@ -35,6 +35,10 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("http://localhost:3004"),
   }),
+  ADMIN_DID: match({
+    prod: z.string(),
+    dev: z.string().default("did:web:admin.localhost"),
+  }),
 });
 
 export const env = (() => {

@@ -14,6 +14,7 @@ import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
+import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 
 export class XRPCRouter {
   private readonly handlers;
@@ -33,6 +34,7 @@ export class XRPCRouter {
     searchPosts: SearchPosts,
     getFollows: GetFollows,
     getFollowers: GetFollowers,
+    createInviteCode: CreateInviteCode,
   ) {
     this.handlers = [
       getProfile,
@@ -49,6 +51,7 @@ export class XRPCRouter {
       searchPosts,
       getFollows,
       getFollowers,
+      createInviteCode,
     ];
   }
   static inject = [
@@ -66,6 +69,7 @@ export class XRPCRouter {
     "searchPosts",
     "getFollows",
     "getFollowers",
+    "createInviteCode",
   ] as const;
 
   create() {

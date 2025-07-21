@@ -27,6 +27,7 @@ import { ProfileSearchService } from "./application/service/search/profile-searc
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
+import { CreateInviteCodeUseCase } from "./application/use-cases/admin/create-invite-code-use-case.js";
 import { GetActorLikesUseCase } from "./application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
 import { GetLikesUseCase } from "./application/use-cases/feed/get-likes-use-case.js";
@@ -44,6 +45,7 @@ import { AuthorFeedRepository } from "./infrastructure/author-feed-repository.js
 import { FollowRepository } from "./infrastructure/follow-repository.js";
 import { GeneratorRepository } from "./infrastructure/generator-repository.js";
 import { HandleResolver } from "./infrastructure/handle-resolver.js";
+import { InviteCodeRepository } from "./infrastructure/invite-code-repository.js";
 import { LikeRepository } from "./infrastructure/like-repository.js";
 import { PostRepository } from "./infrastructure/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/post-stats-repository.js";
@@ -52,6 +54,7 @@ import { RecordRepository } from "./infrastructure/record-repository.js";
 import { RepostRepository } from "./infrastructure/repost-repository.js";
 import { TimelineRepository } from "./infrastructure/timeline-repository.js";
 import { TokenVerifier } from "./infrastructure/token-verifier.js";
+import { AdminMiddleware } from "./presentation/middleware/admin-middleware.js";
 import { AuthVerifierMiddleware } from "./presentation/middleware/auth-verifier-middleware.js";
 import { HandleMiddleware } from "./presentation/middleware/handle-middleware.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
@@ -68,6 +71,7 @@ import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js"
 import { SearchPosts } from "./presentation/routes/app/bsky/feed/searchPosts.js";
 import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
+import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createInviteCode.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -78,6 +82,7 @@ createInjector()
   .provideValue("databaseUrl", env.DATABASE_URL)
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
+  .provideValue("publicDomain", env.PUBLIC_DOMAIN)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)
@@ -94,6 +99,7 @@ createInjector()
   .provideClass("repostRepository", RepostRepository)
   .provideClass("followRepository", FollowRepository)
   .provideClass("generatorRepository", GeneratorRepository)
+  .provideClass("inviteCodeRepository", InviteCodeRepository)
   .provideClass("metricReporter", MetricReporter)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
@@ -115,6 +121,7 @@ createInjector()
   .provideClass("likeService", LikeService)
   .provideClass("repostService", RepostService)
   .provideClass("authVerifierMiddleware", AuthVerifierMiddleware)
+  .provideClass("adminMiddleware", AdminMiddleware)
   .provideClass("atUriService", AtUriService)
   .provideClass("handleMiddleware", HandleMiddleware)
   .provideClass("followService", FollowService)
@@ -132,6 +139,7 @@ createInjector()
   .provideClass("getRepostedByUseCase", GetRepostedByUseCase)
   .provideClass("getFollowsUseCase", GetFollowsUseCase)
   .provideClass("getFollowersUseCase", GetFollowersUseCase)
+  .provideClass("createInviteCodeUseCase", CreateInviteCodeUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
@@ -147,6 +155,7 @@ createInjector()
   .provideClass("getRepostedBy", GetRepostedBy)
   .provideClass("getFollows", GetFollows)
   .provideClass("getFollowers", GetFollowers)
+  .provideClass("createInviteCode", CreateInviteCode)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();

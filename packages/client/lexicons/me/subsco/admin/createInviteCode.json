@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.createInviteCode",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new invitation code for subscribing to the AppView service",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "daysToExpire": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365,
+              "description": "Number of days until the invitation code expires"
+            }
+          },
+          "required": ["daysToExpire"]
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Generated invitation code for subscribing to the AppView"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "datetime",
+              "description": "Expiration date of the invitation code"
+            }
+          },
+          "required": ["code", "expiresAt"]
+        }
+      },
+      "errors": [
+        {
+          "name": "AdminRequired",
+          "description": "Administrative privileges required to create invitation codes"
+        }
+      ]
+    }
+  }
+}
