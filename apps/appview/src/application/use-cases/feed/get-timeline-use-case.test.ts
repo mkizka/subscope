@@ -30,10 +30,7 @@ describe("GetTimelineUseCase", () => {
     mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getTimelineUseCase.execute(params, authDid);
@@ -63,10 +60,7 @@ describe("GetTimelineUseCase", () => {
     mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getTimelineUseCase.execute(params, authDid);
@@ -111,17 +105,14 @@ describe("GetTimelineUseCase", () => {
     mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: "2024-01-01T00:00:00.000Z",
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getTimelineUseCase.execute(params, authDid);
 
     // assert
     expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
-      mockPaginationResult,
+      mockPaginationResult.items,
     );
   });
 
@@ -135,32 +126,33 @@ describe("GetTimelineUseCase", () => {
       cursor: undefined,
     };
 
-    const expectedResult = {
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost" as const,
-          post: {
-            uri: "at://example.com/post/1",
-            cid: "cid123",
-            author: { did: "did:plc:author1", handle: "author.test" },
-            record: { $type: "app.bsky.feed.post", text: "Test post" },
-            indexedAt: "2024-01-01T00:00:00.000Z",
-          },
+    const expectedFeed = [
+      {
+        $type: "app.bsky.feed.defs#feedViewPost" as const,
+        post: {
+          uri: "at://example.com/post/1",
+          cid: "cid123",
+          author: { did: "did:plc:author1", handle: "author.test" },
+          record: { $type: "app.bsky.feed.post", text: "Test post" },
+          indexedAt: "2024-01-01T00:00:00.000Z",
         },
-      ],
-      cursor: "2024-01-01T00:00:00.000Z",
-    };
+      },
+    ];
 
-    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
-      mockPaginationResult,
-    );
-    mockFeedProcessor.processFeedItems.mockResolvedValue(expectedResult);
+    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue({
+      ...mockPaginationResult,
+      cursor: "2024-01-01T00:00:00.000Z",
+    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue(expectedFeed);
 
     // act
     const result = await getTimelineUseCase.execute(params, authDid);
 
     // assert
-    expect(result).toEqual(expectedResult);
+    expect(result).toEqual({
+      feed: expectedFeed,
+      cursor: "2024-01-01T00:00:00.000Z",
+    });
   });
 
   test("limit=0の場合も正しく処理される", async () => {
@@ -176,10 +168,7 @@ describe("GetTimelineUseCase", () => {
     mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     const result = await getTimelineUseCase.execute(params, authDid);

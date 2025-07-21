@@ -84,30 +84,27 @@ describe("FeedProcessor", () => {
     };
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult);
+    const result = await feedProcessor.processFeedItems(paginationResult.items);
 
     // assert
-    expect(result).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: post.uri,
-            cid: post.cid,
-            author: {
-              did: actor.did,
-              handle: actor.handle,
-              displayName: "Post Author",
-            },
-            record: {
-              $type: "app.bsky.feed.post",
-            },
-            indexedAt: expect.any(String),
+    expect(result).toMatchObject([
+      {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: {
+          uri: post.uri,
+          cid: post.cid,
+          author: {
+            did: actor.did,
+            handle: actor.handle,
+            displayName: "Post Author",
           },
+          record: {
+            $type: "app.bsky.feed.post",
+          },
+          indexedAt: expect.any(String),
         },
-      ],
-      cursor: "2024-01-01T00:00:00.000Z",
-    });
+      },
+    ]);
   });
 
   test("リポストの場合、reasonを含むFeedViewPostを返す", async () => {
@@ -161,35 +158,32 @@ describe("FeedProcessor", () => {
     };
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult);
+    const result = await feedProcessor.processFeedItems(paginationResult.items);
 
     // assert
-    expect(result).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: originalPost.uri,
-            author: {
-              displayName: "Original Author",
-            },
-            record: {
-              $type: "app.bsky.feed.post",
-            },
+    expect(result).toMatchObject([
+      {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: {
+          uri: originalPost.uri,
+          author: {
+            displayName: "Original Author",
           },
-          reason: {
-            $type: "app.bsky.feed.defs#reasonRepost",
-            by: {
-              did: reposter.did,
-              handle: reposter.handle,
-              displayName: "Reposter",
-            },
-            indexedAt: "2024-01-01T01:00:00.000Z",
+          record: {
+            $type: "app.bsky.feed.post",
           },
         },
-      ],
-      cursor: "2024-01-01T01:00:00.000Z",
-    });
+        reason: {
+          $type: "app.bsky.feed.defs#reasonRepost",
+          by: {
+            did: reposter.did,
+            handle: reposter.handle,
+            displayName: "Reposter",
+          },
+          indexedAt: "2024-01-01T01:00:00.000Z",
+        },
+      },
+    ]);
   });
 
   test("リプライ投稿の場合、replyを含むFeedViewPostを返す", async () => {
@@ -240,42 +234,39 @@ describe("FeedProcessor", () => {
     };
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult);
+    const result = await feedProcessor.processFeedItems(paginationResult.items);
 
     // assert
-    expect(result).toMatchObject({
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost",
-          post: {
-            uri: replyPost.uri,
+    expect(result).toMatchObject([
+      {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: {
+          uri: replyPost.uri,
+          author: {
+            displayName: "Reply Author",
+          },
+          record: {
+            $type: "app.bsky.feed.post",
+          },
+        },
+        reply: {
+          root: {
+            $type: "app.bsky.feed.defs#postView",
+            uri: rootPost.uri,
             author: {
-              displayName: "Reply Author",
-            },
-            record: {
-              $type: "app.bsky.feed.post",
+              displayName: "Root Author",
             },
           },
-          reply: {
-            root: {
-              $type: "app.bsky.feed.defs#postView",
-              uri: rootPost.uri,
-              author: {
-                displayName: "Root Author",
-              },
-            },
-            parent: {
-              $type: "app.bsky.feed.defs#postView",
-              uri: rootPost.uri,
-              author: {
-                displayName: "Root Author",
-              },
+          parent: {
+            $type: "app.bsky.feed.defs#postView",
+            uri: rootPost.uri,
+            author: {
+              displayName: "Root Author",
             },
           },
         },
-      ],
-      cursor: undefined,
-    });
+      },
+    ]);
   });
 
   test("複数の投稿とリポストが混在する場合、正しい順序で返す", async () => {
@@ -345,15 +336,15 @@ describe("FeedProcessor", () => {
     };
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult);
+    const result = await feedProcessor.processFeedItems(paginationResult.items);
 
     // assert
-    expect(result.feed).toHaveLength(2);
-    expect(result.feed[0]).toMatchObject({
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({
       post: { uri: post1.uri },
     });
-    expect(result.feed[0]).not.toHaveProperty("reason");
-    expect(result.feed[1]).toMatchObject({
+    expect(result[0]).not.toHaveProperty("reason");
+    expect(result[1]).toMatchObject({
       post: { uri: post2.uri },
       reason: {
         $type: "app.bsky.feed.defs#reasonRepost",
@@ -390,12 +381,9 @@ describe("FeedProcessor", () => {
     };
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult);
+    const result = await feedProcessor.processFeedItems(paginationResult.items);
 
     // assert
-    expect(result).toMatchObject({
-      feed: [],
-      cursor: undefined,
-    });
+    expect(result).toMatchObject([]);
   });
 });

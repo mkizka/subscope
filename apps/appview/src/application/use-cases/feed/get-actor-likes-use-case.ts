@@ -16,13 +16,17 @@ export class GetActorLikesUseCase {
     limit: number;
     cursor?: Date;
   }): Promise<AppBskyFeedGetActorLikes.OutputSchema> {
-    const paginationResult =
-      await this.actorLikesService.findLikesWithPagination({
-        actorDid: params.actorDid,
-        cursor: params.cursor,
-        limit: params.limit,
-      });
+    const page = await this.actorLikesService.findLikesWithPagination({
+      actorDid: params.actorDid,
+      cursor: params.cursor,
+      limit: params.limit,
+    });
 
-    return await this.feedProcessor.processFeedItems(paginationResult);
+    const feed = await this.feedProcessor.processFeedItems(page.items);
+
+    return {
+      feed,
+      cursor: page.cursor,
+    };
   }
 }

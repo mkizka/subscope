@@ -16,13 +16,17 @@ export class GetTimelineUseCase {
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const cursor = params.cursor ? new Date(params.cursor) : undefined;
 
-    const paginationResult =
-      await this.timelineService.findFeedItemsWithPagination({
-        authDid,
-        cursor,
-        limit: params.limit,
-      });
+    const page = await this.timelineService.findFeedItemsWithPagination({
+      authDid,
+      cursor,
+      limit: params.limit,
+    });
 
-    return await this.feedProcessor.processFeedItems(paginationResult);
+    const feed = await this.feedProcessor.processFeedItems(page.items);
+
+    return {
+      feed,
+      cursor: page.cursor,
+    };
   }
 }

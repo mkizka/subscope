@@ -26,13 +26,17 @@ export class GetAuthorFeedUseCase {
       };
     }
 
-    const paginationResult =
-      await this.authorFeedService.findFeedItemsWithPagination({
-        actorDid: params.actorDid,
-        cursor: params.cursor,
-        limit: params.limit,
-      });
+    const page = await this.authorFeedService.findFeedItemsWithPagination({
+      actorDid: params.actorDid,
+      cursor: params.cursor,
+      limit: params.limit,
+    });
 
-    return await this.feedProcessor.processFeedItems(paginationResult);
+    const feed = await this.feedProcessor.processFeedItems(page.items);
+
+    return {
+      feed,
+      cursor: page.cursor,
+    };
   }
 }

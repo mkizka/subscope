@@ -6,7 +6,6 @@ import type { FeedItem } from "@repo/common/domain";
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repost-repository.js";
 import { toMapByDid, toMapByUri } from "../../utils/map.js";
-import type { Page } from "../../utils/pagination.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { PostViewService } from "./post-view-service.js";
 import type { ReplyRefService } from "./reply-ref-service.js";
@@ -27,16 +26,14 @@ export class FeedProcessor {
     "replyRefService",
   ] as const;
 
-  // TODO: FeedItemだけ受け取るようにする
-  async processFeedItems(page: Page<FeedItem>): Promise<{
-    feed: $Typed<AppBskyFeedDefs.FeedViewPost>[];
-    cursor: string | undefined;
-  }> {
+  async processFeedItems(
+    feedItems: FeedItem[],
+  ): Promise<$Typed<AppBskyFeedDefs.FeedViewPost>[]> {
     const postUris = new Set<string>();
     const repostUris = new Set<string>();
     const reposterDids = new Set<Did>();
 
-    for (const item of page.items) {
+    for (const item of feedItems) {
       if (item.type === "post") {
         postUris.add(item.uri);
       } else if (item.subjectUri) {
@@ -61,7 +58,7 @@ export class FeedProcessor {
     const posts = await this.postRepository.findByUris(postAtUris);
     const replyRefMap = await this.replyRefService.findMap(posts);
 
-    const feedViewPosts = page.items
+    return feedItems
       .map((item) => {
         const postUri = item.type === "post" ? item.uri : item.subjectUri;
         if (!postUri) {
@@ -100,10 +97,5 @@ export class FeedProcessor {
         return feedViewPost;
       })
       .filter((post) => post !== null);
-
-    return {
-      feed: feedViewPosts,
-      cursor: page.cursor,
-    };
   }
 }

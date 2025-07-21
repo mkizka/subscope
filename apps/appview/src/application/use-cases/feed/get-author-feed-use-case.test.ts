@@ -35,10 +35,7 @@ describe("GetAuthorFeedUseCase", () => {
     mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getAuthorFeedUseCase.execute(params);
@@ -73,10 +70,7 @@ describe("GetAuthorFeedUseCase", () => {
     mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getAuthorFeedUseCase.execute(params);
@@ -126,17 +120,14 @@ describe("GetAuthorFeedUseCase", () => {
     mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: "2024-01-01T00:00:00.000Z",
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getAuthorFeedUseCase.execute(params);
 
     // assert
     expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
-      mockPaginationResult,
+      mockPaginationResult.items,
     );
   });
 
@@ -155,32 +146,33 @@ describe("GetAuthorFeedUseCase", () => {
       cursor: undefined,
     };
 
-    const expectedResult = {
-      feed: [
-        {
-          $type: "app.bsky.feed.defs#feedViewPost" as const,
-          post: {
-            uri: "at://example.com/post/1",
-            cid: "cid123",
-            author: { did: "did:plc:author1", handle: "author.test" },
-            record: { $type: "app.bsky.feed.post", text: "Test post" },
-            indexedAt: "2024-01-01T00:00:00.000Z",
-          },
+    const expectedFeed = [
+      {
+        $type: "app.bsky.feed.defs#feedViewPost" as const,
+        post: {
+          uri: "at://example.com/post/1",
+          cid: "cid123",
+          author: { did: "did:plc:author1", handle: "author.test" },
+          record: { $type: "app.bsky.feed.post", text: "Test post" },
+          indexedAt: "2024-01-01T00:00:00.000Z",
         },
-      ],
-      cursor: "2024-01-01T00:00:00.000Z",
-    };
+      },
+    ];
 
-    mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
-      mockPaginationResult,
-    );
-    mockFeedProcessor.processFeedItems.mockResolvedValue(expectedResult);
+    mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue({
+      ...mockPaginationResult,
+      cursor: "2024-01-01T00:00:00.000Z",
+    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue(expectedFeed);
 
     // act
     const result = await getAuthorFeedUseCase.execute(params);
 
     // assert
-    expect(result).toEqual(expectedResult);
+    expect(result).toEqual({
+      feed: expectedFeed,
+      cursor: "2024-01-01T00:00:00.000Z",
+    });
   });
 
   test("サポートされていないフィルターの場合、空のフィードを返す", async () => {
@@ -225,10 +217,7 @@ describe("GetAuthorFeedUseCase", () => {
     mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     const result = await getAuthorFeedUseCase.execute(params);
@@ -265,10 +254,7 @@ describe("GetAuthorFeedUseCase", () => {
     mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
       mockPaginationResult,
     );
-    mockFeedProcessor.processFeedItems.mockResolvedValue({
-      feed: [],
-      cursor: undefined,
-    });
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
     await getAuthorFeedUseCase.execute(params);
