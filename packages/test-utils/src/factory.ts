@@ -431,3 +431,16 @@ export const generatorFactory = (db: Database) =>
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
+
+export const inviteCodeFactory = (db: Database) =>
+  factory.define(
+    {
+      props: {
+        code: () => `example-com-${faker.string.alphanumeric(5)}`,
+        expiresAt: () => faker.date.future(),
+        createdAt: () => faker.date.recent(),
+      },
+      vars: {},
+    },
+    (props) => create(db, schema.inviteCodes, props),
+  );

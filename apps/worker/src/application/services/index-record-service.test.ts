@@ -23,6 +23,7 @@ import { ActorStatsRepository } from "../../infrastructure/repositories/actor-st
 import { FeedItemRepository } from "../../infrastructure/repositories/feed-item-repository.js";
 import { FollowRepository } from "../../infrastructure/repositories/follow-repository.js";
 import { GeneratorRepository } from "../../infrastructure/repositories/generator-repository.js";
+import { InviteCodeRepository } from "../../infrastructure/repositories/invite-code-repository.js";
 import { LikeRepository } from "../../infrastructure/repositories/like-repository.js";
 import { PostRepository } from "../../infrastructure/repositories/post-repository.js";
 import { PostStatsRepository } from "../../infrastructure/repositories/post-stats-repository.js";
@@ -62,6 +63,7 @@ describe("IndexRecordService", () => {
     .provideClass("repostRepository", RepostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("feedItemRepository", FeedItemRepository)
+    .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)

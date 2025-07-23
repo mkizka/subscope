@@ -143,6 +143,7 @@ export const subscriptions = pgTable("subscriptions", {
     .notNull()
     .references(() => actors.did, { onDelete: "cascade" }),
   appviewDid: varchar({ length: 256 }).notNull(),
+  inviteCode: varchar({ length: 256 }).references(() => inviteCodes.code),
   createdAt: timestamp().notNull(),
   indexedAt: timestamp().notNull(),
 });

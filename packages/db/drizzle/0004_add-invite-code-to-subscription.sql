@@ -1,0 +1,2 @@
+ALTER TABLE "subscriptions" ADD COLUMN "invite_code" varchar(256);--> statement-breakpoint
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_invite_code_invite_codes_code_fk" FOREIGN KEY ("invite_code") REFERENCES "public"."invite_codes"("code") ON DELETE no action ON UPDATE no action;

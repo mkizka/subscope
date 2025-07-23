@@ -15,6 +15,10 @@
             "format": "did",
             "description": "DID of the AppView service being subscribed to (e.g., did:web:api.bsky.app#bsky_appview)"
           },
+          "inviteCode": {
+            "type": "string",
+            "description": "Optional invitation code used to create the subscription"
+          },
           "createdAt": {
             "type": "string",
             "format": "datetime",

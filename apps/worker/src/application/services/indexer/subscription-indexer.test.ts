@@ -1,12 +1,19 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
+import {
+  actorFactory,
+  getTestSetup,
+  inviteCodeFactory,
+  recordFactory,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
 import { SubscriptionIndexingPolicy } from "../../../domain/subscription-indexing-policy.js";
 import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
+import { InviteCodeRepository } from "../../../infrastructure/repositories/invite-code-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { env } from "../../../shared/env.js";
 import type { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
@@ -15,13 +22,24 @@ import { SubscriptionIndexer } from "./subscription-indexer.js";
 describe("SubscriptionIndexer", () => {
   const mockBackfillScheduler = mockDeep<BackfillScheduler>();
   const { testInjector, ctx } = getTestSetup();
+  const fakeDate = new Date("2024-01-01T12:00:00.000Z");
 
   const subscriptionIndexer = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("actorRepository", ActorRepository)
+    .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideValue("backfillScheduler", mockBackfillScheduler)
     .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
     .injectClass(SubscriptionIndexer);
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(fakeDate);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   describe("upsert", () => {
     test("サブスクリプションレコードをupsertする場合、subscriptionsテーブルに保存する", async () => {
@@ -36,7 +54,7 @@ describe("SubscriptionIndexer", () => {
           json: () => ({
             $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
-            createdAt: new Date().toISOString(),
+            createdAt: fakeDate.toISOString(),
           }),
         })
         .create();
@@ -44,7 +62,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
-        indexedAt: new Date(),
+        indexedAt: fakeDate,
       });
 
       // act
@@ -78,7 +96,7 @@ describe("SubscriptionIndexer", () => {
           json: () => ({
             $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
-            createdAt: new Date().toISOString(),
+            createdAt: fakeDate.toISOString(),
           }),
         })
         .create();
@@ -86,16 +104,14 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
-        indexedAt: new Date(),
+        indexedAt: fakeDate,
       });
 
       // act
       await subscriptionIndexer.upsert({ ctx, record });
 
       // assert
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockBackfillScheduler.schedule).toHaveBeenCalledTimes(1);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockBackfillScheduler.schedule).toHaveBeenCalledWith(actor.did);
     });
 
@@ -113,7 +129,7 @@ describe("SubscriptionIndexer", () => {
           json: () => ({
             $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
-            createdAt: new Date().toISOString(),
+            createdAt: fakeDate.toISOString(),
           }),
         })
         .create();
@@ -121,21 +137,25 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
-        indexedAt: new Date(),
+        indexedAt: fakeDate,
       });
 
       // act
       await subscriptionIndexer.upsert({ ctx, record });
 
       // assert
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockBackfillScheduler.schedule).not.toHaveBeenCalled();
     });
   });
 
   describe("shouldIndex", () => {
-    test("appviewDidが環境変数APPVIEW_DIDと一致する場合、trueを返す", async () => {
+    test("appviewDidが一致し有効な招待コードがある場合、trueを返す", async () => {
       // arrange
+      const inviteCode = await inviteCodeFactory(ctx.db)
+        .props({
+          expiresAt: () => new Date("2024-01-02T12:00:00.000Z"), // 1日後
+        })
+        .create();
       const subscriptionRecord = await recordFactory(
         ctx.db,
         "me.subsco.sync.subscription",
@@ -144,7 +164,8 @@ describe("SubscriptionIndexer", () => {
           json: () => ({
             $type: "me.subsco.sync.subscription",
             appviewDid: env.APPVIEW_DID,
-            createdAt: new Date().toISOString(),
+            inviteCode: inviteCode.code,
+            createdAt: fakeDate.toISOString(),
           }),
         })
         .create();
@@ -152,7 +173,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
-        indexedAt: new Date(),
+        indexedAt: fakeDate,
       });
 
       // act
@@ -162,7 +183,7 @@ describe("SubscriptionIndexer", () => {
       expect(result).toBe(true);
     });
 
-    test("appviewDidが環境変数APPVIEW_DIDと一致しない場合、falseを返す", async () => {
+    test("appviewDidが一致しないか招待コードがない場合、falseを返す", async () => {
       // arrange
       const subscriptionRecord = await recordFactory(
         ctx.db,
@@ -172,7 +193,7 @@ describe("SubscriptionIndexer", () => {
           json: () => ({
             $type: "me.subsco.sync.subscription",
             appviewDid: "did:web:other.appview.test",
-            createdAt: new Date().toISOString(),
+            createdAt: fakeDate.toISOString(),
           }),
         })
         .create();
@@ -180,7 +201,7 @@ describe("SubscriptionIndexer", () => {
         uri: subscriptionRecord.uri,
         cid: subscriptionRecord.cid,
         json: subscriptionRecord.json,
-        indexedAt: new Date(),
+        indexedAt: fakeDate,
       });
 
       // act

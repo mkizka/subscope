@@ -8,6 +8,7 @@ type SubscriptionParams = {
   cid: string;
   actorDid: string;
   appviewDid: string;
+  inviteCode?: string;
   createdAt: Date;
   indexedAt: Date;
 };
@@ -17,6 +18,7 @@ export class Subscription {
   readonly cid: string;
   readonly actorDid: Did;
   readonly appviewDid: Did;
+  readonly inviteCode?: string;
   readonly createdAt: Date;
   readonly indexedAt: Date;
 
@@ -25,6 +27,7 @@ export class Subscription {
     this.cid = params.cid;
     this.actorDid = asDid(params.actorDid);
     this.appviewDid = asDid(params.appviewDid);
+    this.inviteCode = params.inviteCode;
     this.createdAt = params.createdAt;
     this.indexedAt = params.indexedAt;
   }
@@ -36,6 +39,7 @@ export class Subscription {
       cid: record.cid,
       actorDid: record.actorDid,
       appviewDid: parsed.appviewDid,
+      inviteCode: parsed.inviteCode,
       createdAt: new Date(parsed.createdAt),
       indexedAt: record.indexedAt,
     });

@@ -16,6 +16,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       cid: subscription.cid,
       actorDid: subscription.actorDid,
       appviewDid: subscription.appviewDid,
+      inviteCode: subscription.inviteCode,
       createdAt: subscription.createdAt,
     } satisfies SubscriptionInsert;
     await ctx.db
