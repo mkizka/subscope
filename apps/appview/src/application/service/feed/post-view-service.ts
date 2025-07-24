@@ -195,8 +195,7 @@ export class PostViewService {
 
         if (post.embed && embedMaps) {
           const embedView = this.postEmbedViewBuilder.embedView(
-            post.embed,
-            post.actorDid.toString(),
+            post,
             embedMaps,
           );
           if (embedView) {
@@ -256,8 +255,7 @@ export class PostViewService {
 
         if (post.embed && embedMaps) {
           const embedView = this.postEmbedViewBuilder.embedView(
-            post.embed,
-            post.actorDid.toString(),
+            post,
             embedMaps,
           );
           if (embedView) {

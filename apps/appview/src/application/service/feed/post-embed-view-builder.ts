@@ -6,6 +6,7 @@ import type {
   AppBskyEmbedRecordWithMedia,
   AppBskyFeedDefs,
 } from "@repo/client/server";
+import type { Post } from "@repo/common/domain";
 import {
   PostEmbedExternal,
   type PostEmbedImage,
@@ -20,28 +21,23 @@ export class PostEmbedViewBuilder {
   static inject = ["assetUrlBuilder"] as const;
 
   embedView(
-    embed:
-      | PostEmbedExternal
-      | PostEmbedImage[]
-      | PostEmbedRecord
-      | PostEmbedRecordWithMedia,
-    actorDid: string,
+    post: Post,
     embedMaps?: {
       viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
       generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
     },
   ) {
-    if (Array.isArray(embed)) {
-      return this.imagesView(embed, actorDid);
+    if (Array.isArray(post.embed)) {
+      return this.imagesView(post.embed, post.actorDid);
     }
-    if (embed instanceof PostEmbedExternal) {
-      return this.externalView(embed, actorDid);
+    if (post.embed instanceof PostEmbedExternal) {
+      return this.externalView(post.embed, post.actorDid);
     }
-    if (embed instanceof PostEmbedRecord) {
-      return this.recordView(embed, embedMaps);
+    if (post.embed instanceof PostEmbedRecord) {
+      return this.recordView(post.embed, embedMaps);
     }
-    if (embed instanceof PostEmbedRecordWithMedia) {
-      return this.recordWithMediaView(embed, actorDid, embedMaps);
+    if (post.embed instanceof PostEmbedRecordWithMedia) {
+      return this.recordWithMediaView(post.embed, post.actorDid, embedMaps);
     }
     return undefined;
   }
