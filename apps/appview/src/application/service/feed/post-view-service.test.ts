@@ -545,6 +545,9 @@ describe("PostViewService", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
+        record: {
+          text: "Quoting a deleted post",
+        },
         embed: {
           $type: "app.bsky.embed.record#view",
           record: {
@@ -716,12 +719,357 @@ describe("PostViewService", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
+        record: {
+          text: "Quoting a deleted generator",
+        },
         embed: {
           $type: "app.bsky.embed.record#view",
           record: {
             $type: "app.bsky.embed.record#viewNotFound",
             uri: notFoundGeneratorUri,
             notFound: true,
+          },
+        },
+      });
+    });
+
+    test("埋め込みの埋め込み（A→B→C）の場合、3階層すべての投稿ビューを取得できる", async () => {
+      // arrange
+      // C: 最初の投稿
+      const authorC = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author C" }))
+        .props({ handle: () => "authorc.bsky.social" })
+        .create();
+      const recordC = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorC })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Original post C",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+      const postC = await postFactory(ctx.db)
+        .vars({ record: () => recordC })
+        .props({
+          text: () => "Original post C",
+          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+
+      // B: Cを埋め込む投稿
+      const authorB = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author B" }))
+        .props({ handle: () => "authorb.bsky.social" })
+        .create();
+      const recordB = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorB })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting post C",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: postC.uri,
+                cid: postC.cid,
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      const postB = await postFactory(ctx.db)
+        .vars({ record: () => recordB })
+        .props({
+          text: () => "Quoting post C",
+          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => postB,
+          embeddedPost: () => postC,
+        })
+        .create();
+
+      // A: Bを埋め込む投稿
+      const authorA = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author A" }))
+        .props({ handle: () => "authora.bsky.social" })
+        .create();
+      const recordA = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorA })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting post B",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: postB.uri,
+                cid: postB.cid,
+              },
+            },
+            createdAt: "2024-01-01T02:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        })
+        .create();
+      const postA = await postFactory(ctx.db)
+        .vars({ record: () => recordA })
+        .props({
+          text: () => "Quoting post B",
+          createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => postA,
+          embeddedPost: () => postB,
+        })
+        .create();
+
+      const postAUri = new AtUri(postA.uri);
+
+      // act
+      const result = await postViewService.findPostView([postAUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        $type: "app.bsky.feed.defs#postView",
+        uri: postA.uri,
+        author: {
+          displayName: "Author A",
+        },
+        record: {
+          text: "Quoting post B",
+        },
+        embed: {
+          $type: "app.bsky.embed.record#view",
+          record: {
+            $type: "app.bsky.embed.record#viewRecord",
+            uri: postB.uri,
+            author: {
+              displayName: "Author B",
+            },
+            value: {
+              text: "Quoting post C",
+            },
+            embeds: [
+              {
+                $type: "app.bsky.embed.record#view",
+                record: {
+                  $type: "app.bsky.embed.record#viewRecord",
+                  uri: postC.uri,
+                  author: {
+                    displayName: "Author C",
+                  },
+                  value: {
+                    text: "Original post C",
+                  },
+                  embeds: undefined,
+                },
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    test("埋め込みの深度が最大2階層に制限されることを確認（A→B→C→Dのパターン）", async () => {
+      // arrange
+      // D: 最深の投稿
+      const authorD = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author D" }))
+        .props({ handle: () => "authord.bsky.social" })
+        .create();
+      const recordD = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorD })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Original post D",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+      const postD = await postFactory(ctx.db)
+        .vars({ record: () => recordD })
+        .props({
+          text: () => "Original post D",
+          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+
+      // C: Dを埋め込む投稿
+      const authorC = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author C" }))
+        .props({ handle: () => "authorc.bsky.social" })
+        .create();
+      const recordC = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorC })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting post D",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: postD.uri,
+                cid: postD.cid,
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      const postC = await postFactory(ctx.db)
+        .vars({ record: () => recordC })
+        .props({
+          text: () => "Quoting post D",
+          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => postC,
+          embeddedPost: () => postD,
+        })
+        .create();
+
+      // B: Cを埋め込む投稿
+      const authorB = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author B" }))
+        .props({ handle: () => "authorb.bsky.social" })
+        .create();
+      const recordB = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorB })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting post C",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: postC.uri,
+                cid: postC.cid,
+              },
+            },
+            createdAt: "2024-01-01T02:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        })
+        .create();
+      const postB = await postFactory(ctx.db)
+        .vars({ record: () => recordB })
+        .props({
+          text: () => "Quoting post C",
+          createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => postB,
+          embeddedPost: () => postC,
+        })
+        .create();
+
+      // A: Bを埋め込む投稿
+      const authorA = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author A" }))
+        .props({ handle: () => "authora.bsky.social" })
+        .create();
+      const recordA = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => authorA })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Quoting post B",
+            embed: {
+              $type: "app.bsky.embed.record",
+              record: {
+                uri: postB.uri,
+                cid: postB.cid,
+              },
+            },
+            createdAt: "2024-01-01T03:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T03:00:00.000Z"),
+        })
+        .create();
+      const postA = await postFactory(ctx.db)
+        .vars({ record: () => recordA })
+        .props({
+          text: () => "Quoting post B",
+          createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T03:00:00.000Z"),
+        })
+        .create();
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => postA,
+          embeddedPost: () => postB,
+        })
+        .create();
+
+      const postAUri = new AtUri(postA.uri);
+
+      // act
+      const result = await postViewService.findPostView([postAUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      // A→B→Cまでは取得されるが、Dは取得されない（notFoundになる）
+      expect(result[0]).toMatchObject({
+        $type: "app.bsky.feed.defs#postView",
+        uri: postA.uri,
+        author: {
+          displayName: "Author A",
+        },
+        record: {
+          text: "Quoting post B",
+        },
+        embed: {
+          $type: "app.bsky.embed.record#view",
+          record: {
+            $type: "app.bsky.embed.record#viewRecord",
+            uri: postB.uri,
+            author: {
+              displayName: "Author B",
+            },
+            value: {
+              text: "Quoting post C",
+            },
+            embeds: [
+              {
+                $type: "app.bsky.embed.record#view",
+                record: {
+                  $type: "app.bsky.embed.record#viewRecord",
+                  uri: postC.uri,
+                  author: {
+                    displayName: "Author C",
+                  },
+                  value: {
+                    text: "Quoting post D",
+                  },
+                  // Dの埋め込みは深度制限により取得されないため、embedsはundefinedになる
+                  embeds: undefined,
+                },
+              },
+            ],
           },
         },
       });
