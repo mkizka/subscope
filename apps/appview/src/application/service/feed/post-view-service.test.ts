@@ -488,7 +488,6 @@ describe("PostViewService", () => {
             repostCount: 0,
             likeCount: 0,
             quoteCount: 0,
-            embeds: undefined,
           },
         },
         replyCount: 0,
@@ -875,7 +874,6 @@ describe("PostViewService", () => {
                   value: {
                     text: "Original post C",
                   },
-                  embeds: undefined,
                 },
               },
             ],
@@ -1066,7 +1064,6 @@ describe("PostViewService", () => {
                     text: "Quoting post D",
                   },
                   // Dの埋め込みは深度制限により取得されないため、embedsはundefinedになる
-                  embeds: undefined,
                 },
               },
             ],

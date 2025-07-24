@@ -2,6 +2,7 @@ import type { AtUri } from "@atproto/syntax";
 import type {
   $Typed,
   AppBskyActorDefs,
+  AppBskyEmbedRecord,
   AppBskyFeedDefs,
 } from "@repo/client/server";
 import type { Post, Record } from "@repo/common/domain";
@@ -51,14 +52,14 @@ export class PostViewService {
       found.posts,
     );
 
-    const [postViewMap, generatorViewMap] = await Promise.all([
-      this.findEmbedPostViewMap(postEmbedUris, { recursiveEmbed: true }),
+    const [viewRecordMap, generatorViewMap] = await Promise.all([
+      this.findEmbedViewRecordMap(postEmbedUris, { recursiveEmbed: true }),
       this.generatorViewService.findGeneratorViewMap(generatorEmbedUris),
     ]);
 
     return this.buildPostViews({
       ...found,
-      embedMaps: { postViewMap, generatorViewMap },
+      embedMaps: { viewRecordMap, generatorViewMap },
     });
   }
 
@@ -96,12 +97,12 @@ export class PostViewService {
     return { postEmbedUris, generatorEmbedUris };
   }
 
-  private async findEmbedPostViewMap(
+  private async findEmbedViewRecordMap(
     uris: AtUri[],
     options?: {
       recursiveEmbed: boolean;
     },
-  ): Promise<Map<string, $Typed<AppBskyFeedDefs.PostView>>> {
+  ): Promise<Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>> {
     if (uris.length === 0) {
       return new Map();
     }
@@ -113,7 +114,7 @@ export class PostViewService {
 
     let embedMaps:
       | {
-          postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>;
+          viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
           generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
         }
       | undefined;
@@ -124,27 +125,88 @@ export class PostViewService {
         found.posts,
       );
 
-      const [embedPostViewMap, embedGeneratorViewMap] = await Promise.all([
-        this.findEmbedPostViewMap(postEmbedUris),
+      const [embedViewRecordMap, embedGeneratorViewMap] = await Promise.all([
+        this.findEmbedViewRecordMap(postEmbedUris),
         this.generatorViewService.findGeneratorViewMap(generatorEmbedUris),
       ]);
 
       embedMaps = {
-        postViewMap: embedPostViewMap,
+        viewRecordMap: embedViewRecordMap,
         generatorViewMap: embedGeneratorViewMap,
       };
     }
 
-    const postViews = this.buildPostViews({
+    const viewRecords = this.buildViewRecords({
       ...found,
       embedMaps,
     });
 
-    return toMapByUri(postViews);
+    return toMapByUri(viewRecords);
   }
 
   private isRecordObject(value: unknown): value is { [x: string]: unknown } {
     return typeof value === "object" && value !== null && !Array.isArray(value);
+  }
+
+  private buildViewRecords({
+    posts,
+    recordMap,
+    statsMap,
+    profileMap,
+    embedMaps,
+  }: {
+    posts: Post[];
+    recordMap: Map<string, Record>;
+    statsMap: Map<string, PostStats>;
+    profileMap: Map<string, $Typed<AppBskyActorDefs.ProfileViewBasic>>;
+    embedMaps?: {
+      viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
+      generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
+    };
+  }): $Typed<AppBskyEmbedRecord.ViewRecord>[] {
+    return posts
+      .map((post) => {
+        const record = recordMap.get(post.uri.toString());
+        const author = profileMap.get(post.actorDid.toString());
+        const stats = statsMap.get(post.uri.toString());
+
+        if (!record || !author) {
+          return null;
+        }
+
+        if (!this.isRecordObject(record.json)) {
+          throw new Error(
+            `Invalid record format for post ${post.uri.toString()}: ${JSON.stringify(record.json)}`,
+          );
+        }
+
+        const viewRecord: $Typed<AppBskyEmbedRecord.ViewRecord> = {
+          $type: "app.bsky.embed.record#viewRecord" as const,
+          uri: post.uri.toString(),
+          cid: record.cid,
+          author,
+          value: record.json,
+          indexedAt: post.indexedAt.toISOString(),
+          replyCount: stats?.replyCount,
+          repostCount: stats?.repostCount,
+          likeCount: stats?.likeCount,
+          quoteCount: stats?.quoteCount,
+        };
+
+        if (post.embed && embedMaps) {
+          const embedView = this.postEmbedViewBuilder.embedView(
+            post.embed,
+            post.actorDid.toString(),
+            embedMaps,
+          );
+          if (embedView) {
+            viewRecord.embeds = [embedView];
+          }
+        }
+
+        return viewRecord;
+      })
+      .filter((viewRecord) => viewRecord !== null);
   }
 
   private buildPostViews({
@@ -159,7 +221,7 @@ export class PostViewService {
     statsMap: Map<string, PostStats>;
     profileMap: Map<string, $Typed<AppBskyActorDefs.ProfileViewBasic>>;
     embedMaps?: {
-      postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>;
+      viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
       generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
     };
   }): $Typed<AppBskyFeedDefs.PostView>[] {

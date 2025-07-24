@@ -27,7 +27,7 @@ export class PostEmbedViewBuilder {
       | PostEmbedRecordWithMedia,
     actorDid: string,
     embedMaps?: {
-      postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>;
+      viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
       generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
     },
   ) {
@@ -80,29 +80,16 @@ export class PostEmbedViewBuilder {
 
   private recordView(
     embed: PostEmbedRecord,
-    // TODO: postViewではなくviewRecordを渡すことはできるか確認
     embedMaps?: {
-      postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>;
+      viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
       generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
     },
   ): $Typed<AppBskyEmbedRecord.View> {
-    const postView = embedMaps?.postViewMap.get(embed.uri.toString());
-    if (postView) {
+    const viewRecord = embedMaps?.viewRecordMap.get(embed.uri.toString());
+    if (viewRecord) {
       return {
         $type: "app.bsky.embed.record#view" as const,
-        record: {
-          $type: "app.bsky.embed.record#viewRecord" as const,
-          uri: postView.uri,
-          cid: postView.cid,
-          author: postView.author,
-          value: postView.record,
-          indexedAt: postView.indexedAt,
-          replyCount: postView.replyCount,
-          repostCount: postView.repostCount,
-          likeCount: postView.likeCount,
-          quoteCount: postView.quoteCount,
-          embeds: postView.embed ? [postView.embed] : undefined,
-        },
+        record: viewRecord,
       };
     }
 
@@ -128,7 +115,7 @@ export class PostEmbedViewBuilder {
     embed: PostEmbedRecordWithMedia,
     actorDid: string,
     embedMaps?: {
-      postViewMap: Map<string, $Typed<AppBskyFeedDefs.PostView>>;
+      viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
       generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
     },
   ): $Typed<AppBskyEmbedRecordWithMedia.View> {
