@@ -1,7 +1,6 @@
 import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
-import { required, SUPPORTED_COLLECTIONS } from "@repo/common/utils";
+import { SUPPORTED_COLLECTIONS } from "@repo/common/utils";
 import { Jetstream } from "@skyware/jetstream";
-import { setTimeout as sleep } from "timers/promises";
 import WebSocket from "ws";
 
 import type { HandleAccountUseCase } from "../application/handle-account-use-case.js";
@@ -10,25 +9,25 @@ import type { HandleIdentityUseCase } from "../application/handle-identity-use-c
 import type { ICursorRepository } from "../application/interfaces/cursor-repository.js";
 import { env } from "../shared/env.js";
 
-// cursorの変化を監視するための確認間隔
-const CONNECTION_CHECK_INTERVAL = 2000;
-
-// 再接続間隔の指数バックオフの最大遅延
-const INITIAL_RECONNECT_DELAY = 2000;
-
-// 再接続間隔の指数バックオフの最大値
-const MAX_RECONNECT_DELAY = 30000;
-
-// 再接続する際のcloseからstartまでの間隔
-const RECONNECT_DELAY = 1000;
+const DEFAULT_STARTUP_BACKOFF = 1000;
 
 export class JetstreamIngester {
   private readonly jetstream;
   private readonly logger;
 
-  // 接続監視のために一定時間でcusorを保存
-  private lastCursor: number = 0;
-  private reconnectDelay = INITIAL_RECONNECT_DELAY;
+  private lastProcessedCursor: number | null = null;
+  private lastCheckedCursor: number | null = null;
+
+  // startupCheck
+  //   起動後にcursorが変化して新しいイベントを受け続けていることを確認するチェック
+  //   setTimeoutの再帰処理によって実行されるのでtimeoutは保持しない
+  private startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
+  private readonly maxStartupBackoffMs = 60000;
+
+  // healthCheck
+  //   startupCheck通過後に定期的にcursorが変化しているかを確認するチェック
+  private healthCheckInterval?: NodeJS.Timeout;
+  private readonly healthCheckIntervalMs = 30000;
 
   constructor(
     loggerManager: ILoggerManager,
@@ -51,6 +50,7 @@ export class JetstreamIngester {
         `Jetstream subscription started at ${env.JETSTREAM_URL} with cursor ${this.jetstream.cursor}`,
       );
       this.metricReporter.setConnectionStateGauge("open");
+      this.startStartupCheck();
     });
 
     this.jetstream.on("close", () => {
@@ -65,17 +65,17 @@ export class JetstreamIngester {
 
     this.jetstream.on("account", async (event) => {
       await this.handleAccountUseCase.execute(event);
-      await this.cursorRepository.set(event.time_us);
+      this.lastProcessedCursor = event.time_us;
     });
 
     this.jetstream.on("identity", async (event) => {
       await this.handleIdentityUseCase.execute(event);
-      await this.cursorRepository.set(event.time_us);
+      this.lastProcessedCursor = event.time_us;
     });
 
     this.jetstream.on("commit", async (event) => {
       await this.handleCommitUseCase.execute(event);
-      await this.cursorRepository.set(event.time_us);
+      this.lastProcessedCursor = event.time_us;
     });
   }
   static inject = [
@@ -87,61 +87,62 @@ export class JetstreamIngester {
     "cursorRepository",
   ] as const;
 
-  private shouldReconnect() {
-    this.logger.debug(
-      {
-        cursor: this.jetstream.cursor,
-        lastCursor: this.lastCursor,
-      },
-      "Checking if should reconnect",
-    );
-    return this.jetstream.cursor === this.lastCursor;
+  private stopHealthCheck() {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = undefined;
+    }
+  }
+
+  private startStartupCheck() {
+    this.lastCheckedCursor = this.lastProcessedCursor;
+    this.scheduleStartupCheck();
+  }
+
+  private scheduleStartupCheck() {
+    setTimeout(() => {
+      if (this.lastProcessedCursor === this.lastCheckedCursor) {
+        this.logger.warn(
+          { backoff: this.startupBackoffMs },
+          "Startup check: No cursor change detected, initiating reconnection",
+        );
+        this.startupBackoffMs = Math.min(
+          this.startupBackoffMs * 2,
+          this.maxStartupBackoffMs,
+        );
+        void this.reconnect();
+      } else {
+        this.logger.info(
+          "Startup check: Cursor change detected, startup complete",
+        );
+        this.startHealthCheck();
+      }
+    }, this.startupBackoffMs);
+  }
+
+  private startHealthCheck() {
+    this.healthCheckInterval = setInterval(() => {
+      if (this.lastProcessedCursor === this.lastCheckedCursor) {
+        this.logger.warn(
+          "Health check: No cursor change detected, initiating reconnection",
+        );
+        this.startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
+        void this.reconnect();
+      } else {
+        this.logger.info(
+          "Health check: Cursor change detected, connection is healthy",
+        );
+        this.lastCheckedCursor = this.lastProcessedCursor;
+      }
+    }, this.healthCheckIntervalMs);
   }
 
   private async reconnect() {
-    this.logger.info(
-      { reconnectDelay: this.reconnectDelay },
-      `The cursor did not change, so attempting to reconnect`,
-    );
-    this.metricReporter.setConnectionStateGauge("reconnecting");
+    this.stopHealthCheck();
     this.jetstream.close();
 
-    // 終了からWebsocketが完全にクローズするまで少し待つ
-    await sleep(RECONNECT_DELAY);
-
+    this.logger.info("Reconnecting to Jetstream");
     await this.start();
-  }
-
-  private scheduleConnectionMonitoring() {
-    this.logger.info("Starting connection monitoring");
-    this.lastCursor = required(this.jetstream.cursor);
-
-    const intervalId = setInterval(async () => {
-      if (this.shouldReconnect()) {
-        clearInterval(intervalId);
-        await this.reconnect();
-      }
-      this.lastCursor = required(this.jetstream.cursor);
-    }, CONNECTION_CHECK_INTERVAL);
-  }
-
-  private nextReconnectDelay() {
-    return Math.min(this.reconnectDelay * 2, MAX_RECONNECT_DELAY);
-  }
-
-  private startConnectionMonitoring() {
-    setTimeout(async () => {
-      // cursorが変化していなければ指数バックオフで再接続
-      if (this.shouldReconnect()) {
-        this.reconnectDelay = this.nextReconnectDelay();
-        await this.reconnect();
-      }
-      // cursorが変化していれば再接続遅延をリセットしてsetIntervalの監視を開始
-      else {
-        this.reconnectDelay = INITIAL_RECONNECT_DELAY;
-        this.scheduleConnectionMonitoring();
-      }
-    }, this.reconnectDelay);
   }
 
   private async getCursor() {
@@ -158,7 +159,5 @@ export class JetstreamIngester {
       this.jetstream.cursor = cursor;
     }
     this.jetstream.start();
-
-    this.startConnectionMonitoring();
   }
 }
