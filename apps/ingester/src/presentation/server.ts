@@ -19,10 +19,12 @@ export class IngesterServer {
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
+    // ダッシュボードへのアクセスはログに出さない
+    // TODO: adminパッケージに移動する
+    this.app.use(dashboardRouter);
     this.app.use(loggingMiddleware(this.logger));
     this.app.use(healthRouter);
     this.app.use(metricsRouter);
-    this.app.use(dashboardRouter);
   }
   static inject = [
     "loggerManager",
