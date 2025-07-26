@@ -8,14 +8,6 @@ import type {
   LabelsValue,
 } from "../domain/interfaces/metric.js";
 
-const connectionStates = {
-  opened: 1,
-  stable: 2,
-  closed: 3,
-} satisfies {
-  [key in ConnectionStates]: number;
-};
-
 type CounterMap = {
   [key in CounterKey]: client.Counter;
 };
@@ -77,6 +69,7 @@ export class MetricReporter implements IMetricReporter {
       }),
       ingester_websocket_connection_state: new client.Gauge({
         name: "ingester_websocket_connection_state",
+        labelNames: ["state"],
         help: "State of the websocket connection",
       }),
     };
@@ -91,9 +84,7 @@ export class MetricReporter implements IMetricReporter {
   }
 
   setConnectionStateGauge(state: ConnectionStates) {
-    this.gauges.ingester_websocket_connection_state.set(
-      connectionStates[state],
-    );
+    this.gauges.ingester_websocket_connection_state.set({ state }, 1);
   }
 
   setTimeDelayGauge(timeUs: number) {
