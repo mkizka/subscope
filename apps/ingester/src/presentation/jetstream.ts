@@ -1,5 +1,5 @@
 import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
-import { SUPPORTED_COLLECTIONS } from "@repo/common/utils";
+import { required, SUPPORTED_COLLECTIONS } from "@repo/common/utils";
 import { Jetstream } from "@skyware/jetstream";
 import WebSocket from "ws";
 
@@ -133,6 +133,9 @@ export class JetstreamIngester {
           "Health check: Cursor change detected, connection is healthy",
         );
         this.lastCheckedCursor = this.lastProcessedCursor;
+
+        // 意図：イベントごとではなくヘルスチェック通過時にcursorを保存することでRedisへの負荷を抑える
+        void this.cursorRepository.set(required(this.lastProcessedCursor));
       }
     }, this.healthCheckIntervalMs);
   }
