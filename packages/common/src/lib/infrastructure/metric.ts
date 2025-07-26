@@ -9,10 +9,9 @@ import type {
 } from "../domain/interfaces/metric.js";
 
 const connectionStates = {
-  open: 1,
-  error: 2,
-  close: 3,
-  reconnecting: 4,
+  opened: 1,
+  stable: 2,
+  closed: 3,
 } satisfies {
   [key in ConnectionStates]: number;
 };

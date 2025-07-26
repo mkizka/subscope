@@ -49,18 +49,17 @@ export class JetstreamIngester {
         { cursor: this.jetstream.cursor },
         `Jetstream subscription started at ${env.JETSTREAM_URL} with cursor ${this.jetstream.cursor}`,
       );
-      this.metricReporter.setConnectionStateGauge("open");
+      this.metricReporter.setConnectionStateGauge("opened");
       this.startStartupCheck();
     });
 
     this.jetstream.on("close", () => {
       this.logger.info(`Jetstream subscription closed`);
-      this.metricReporter.setConnectionStateGauge("close");
+      this.metricReporter.setConnectionStateGauge("closed");
     });
 
     this.jetstream.on("error", (error) => {
       this.logger.error(error, "Jetstream error occurred");
-      this.metricReporter.setConnectionStateGauge("error");
     });
 
     this.jetstream.on("account", async (event) => {
@@ -115,6 +114,7 @@ export class JetstreamIngester {
         this.logger.info(
           "Startup check: Cursor change detected, startup complete",
         );
+        this.metricReporter.setConnectionStateGauge("stable");
         this.startHealthCheck();
       }
     }, this.startupBackoffMs);

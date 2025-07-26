@@ -15,7 +15,7 @@ export type GaugeKey =
 
 export type LabelsValue = Record<string, string | number>;
 
-export type ConnectionStates = "open" | "close" | "error" | "reconnecting";
+export type ConnectionStates = "opened" | "stable" | "closed";
 
 export interface IMetricReporter {
   increment: (key: CounterKey, labels?: LabelsValue) => void;
