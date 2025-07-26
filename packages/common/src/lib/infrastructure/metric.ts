@@ -8,17 +8,19 @@ import type {
   LabelsValue,
 } from "../domain/interfaces/metric.js";
 
-type CounterMap = {
-  [key in CounterKey]: client.Counter;
-};
-
-type GaugeMap = {
-  [key in GaugeKey]: client.Gauge;
-};
-
 export class MetricReporter implements IMetricReporter {
-  private readonly counters: CounterMap;
-  private readonly gauges: GaugeMap;
+  private readonly counters: {
+    [key in CounterKey]: client.Counter;
+  };
+  private readonly gauges: {
+    [key in GaugeKey]: client.Gauge;
+  };
+
+  private readonly connectionStates: ConnectionStates[] = [
+    "opened",
+    "stable",
+    "closed",
+  ];
 
   constructor() {
     this.counters = {
@@ -83,8 +85,13 @@ export class MetricReporter implements IMetricReporter {
     }
   }
 
-  setConnectionStateGauge(state: ConnectionStates) {
-    this.gauges.ingester_websocket_connection_state.set({ state }, 1);
+  setConnectionStateGauge(newState: ConnectionStates) {
+    for (const state of this.connectionStates) {
+      this.gauges.ingester_websocket_connection_state.set(
+        { state },
+        state === newState ? 1 : 0,
+      );
+    }
   }
 
   setTimeDelayGauge(timeUs: number) {
