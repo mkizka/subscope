@@ -14,6 +14,8 @@
     "startCommand": "cd apps/blob-proxy && NODE_ENV=production node --import tsx ./src/blob-proxy.ts",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
+    "restartPolicyType": "ALWAYS",
+    "restartPolicyMaxRetries": 3,
     "limitOverride": {
       "containers": {
         "cpu": 1,

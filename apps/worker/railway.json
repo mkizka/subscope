@@ -16,6 +16,8 @@
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "drainingSeconds": 60,
+    "restartPolicyType": "ALWAYS",
+    "restartPolicyMaxRetries": 3,
     "limitOverride": {
       "containers": {
         "cpu": 1,

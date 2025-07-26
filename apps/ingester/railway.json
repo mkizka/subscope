@@ -13,6 +13,8 @@
     "startCommand": "cd apps/ingester && NODE_ENV=production node --import tsx ./src/ingester.ts",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
+    "restartPolicyType": "ALWAYS",
+    "restartPolicyMaxRetries": 3,
     "limitOverride": {
       "containers": {
         "cpu": 1,
