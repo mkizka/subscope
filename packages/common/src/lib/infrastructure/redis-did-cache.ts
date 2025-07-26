@@ -8,10 +8,13 @@ type CacheVal = {
   updatedAt: number;
 };
 
-const TTL = 30 * 24 * 60 * 60 * 1000;
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
 
 export class RedisDidCache implements DidCache {
   private readonly cache: Keyv<CacheVal>;
+  private readonly maxTTL = DAY;
+  private readonly staleTTL = HOUR;
 
   constructor(
     redisUrl: string,
@@ -27,7 +30,7 @@ export class RedisDidCache implements DidCache {
   static inject = ["redisUrl", "metricReporter"] as const;
 
   async cacheDid(did: string, doc: DidDocument): Promise<void> {
-    await this.cache.set(did, { doc, updatedAt: Date.now() }, TTL);
+    await this.cache.set(did, { doc, updatedAt: Date.now() }, this.maxTTL);
   }
 
   async checkCache(did: string): Promise<CacheResult | null> {
@@ -37,11 +40,15 @@ export class RedisDidCache implements DidCache {
       return null;
     }
     this.metricReporter.increment("resolve_did_cache_hit_total");
+
+    const stale = Date.now() > val.updatedAt + this.staleTTL;
+
     return {
       ...val,
       did,
-      stale: false,
-      expired: false, // expiring is handled by redis
+      stale,
+      // TTLが切れたらRedisが自動的に削除するため使わない
+      expired: false,
     };
   }
 
