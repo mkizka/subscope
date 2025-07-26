@@ -66,18 +66,16 @@ export class JetstreamIngester {
     this.jetstream.on("account", async (event) => {
       await this.handleAccountUseCase.execute(event);
       await this.cursorRepository.set(event.time_us);
-      this.lastCursor = event.time_us;
     });
 
     this.jetstream.on("identity", async (event) => {
       await this.handleIdentityUseCase.execute(event);
       await this.cursorRepository.set(event.time_us);
-      this.lastCursor = event.time_us;
     });
 
     this.jetstream.on("commit", async (event) => {
       await this.handleCommitUseCase.execute(event);
-      this.lastCursor = event.time_us;
+      await this.cursorRepository.set(event.time_us);
     });
   }
   static inject = [
@@ -123,6 +121,7 @@ export class JetstreamIngester {
         clearInterval(intervalId);
         await this.reconnect();
       }
+      this.lastCursor = required(this.jetstream.cursor);
     }, CONNECTION_CHECK_INTERVAL);
   }
 
