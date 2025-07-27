@@ -7,6 +7,12 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
-  return <p>home</p>;
+export async function loader({ context }: Route.LoaderArgs) {
+  return {
+    message: context.VALUE_FROM_EXPRESS,
+  };
+}
+
+export default function Home({ loaderData }: Route.ComponentProps) {
+  return <p>{loaderData.message}</p>;
 }

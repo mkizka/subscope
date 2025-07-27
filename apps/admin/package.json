@@ -4,14 +4,15 @@
   "private": true,
   "scripts": {
     "build": "react-router build",
-    "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
+    "dev": "NODE_ENV=development tsx node/server.ts",
+    "start": "NODE_ENV=production tsx node/server.ts",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@react-router/express": "7.7.1",
     "@react-router/fs-routes": "7.7.1",
     "@react-router/node": "^7.7.1",
-    "@react-router/serve": "^7.7.1",
+    "express": "5.1.0",
     "isbot": "^5.1.27",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -20,10 +21,12 @@
   "devDependencies": {
     "@react-router/dev": "^7.7.1",
     "@tailwindcss/vite": "^4.1.4",
+    "@types/express": "5.0.3",
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "tailwindcss": "^4.1.4",
+    "tsx": "4.20.3",
     "typescript": "^5.8.3",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4"
