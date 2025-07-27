@@ -30,6 +30,7 @@ export class DidResolver implements IDidResolver {
   ] as const;
 
   async resolve(did: string) {
+    this.metricReporter.increment("resolve_did_request_total");
     try {
       const data = await this.resolver.resolveAtprotoData(did);
       return {

@@ -1,4 +1,5 @@
 export type CounterKey =
+  | "resolve_did_request_total"
   | "resolve_did_cache_hit_total"
   | "resolve_did_cache_miss_total"
   | "resolve_did_error_total"
