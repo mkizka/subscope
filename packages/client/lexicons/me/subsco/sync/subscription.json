@@ -13,7 +13,7 @@
           "appviewDid": {
             "type": "string",
             "format": "did",
-            "description": "DID of the AppView service being subscribed to (e.g., did:web:api.bsky.app#bsky_appview)"
+            "description": "DID of the AppView service being subscribed to (e.g., did:web:example.com)"
           },
           "inviteCode": {
             "type": "string",
