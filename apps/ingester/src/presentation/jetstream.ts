@@ -20,7 +20,7 @@ export class JetstreamIngester {
 
   // startupCheck
   //   起動後にcursorが変化して新しいイベントを受け続けていることを確認するチェック
-  //   setTimeoutの再帰処理によって実行されるのでtimeoutは保持しない
+  private startupCheckTimeout?: NodeJS.Timeout;
   private startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
   private readonly maxStartupBackoffMs = 60000;
 
@@ -46,7 +46,7 @@ export class JetstreamIngester {
 
     this.jetstream.on("open", () => {
       this.logger.info(
-        { cursor: this.jetstream.cursor },
+        this.getStatus(),
         `Jetstream subscription started at ${env.JETSTREAM_URL} with cursor ${this.jetstream.cursor}`,
       );
       this.metricReporter.setConnectionStateGauge("opened");
@@ -54,7 +54,9 @@ export class JetstreamIngester {
     });
 
     this.jetstream.on("close", () => {
-      this.logger.info(`Jetstream subscription closed`);
+      this.logger.info(this.getStatus(), `Jetstream subscription closed`);
+      this.stopStartupCheck();
+      this.stopHealthCheck();
       this.metricReporter.setConnectionStateGauge("closed");
     });
 
@@ -86,7 +88,25 @@ export class JetstreamIngester {
     "cursorRepository",
   ] as const;
 
+  private getStatus() {
+    return {
+      lastProcessedCursor: this.lastProcessedCursor,
+      lastCheckedCursor: this.lastCheckedCursor,
+      startupBackoffMs: this.startupBackoffMs,
+    };
+  }
+
+  private stopStartupCheck() {
+    this.logger.info(this.getStatus(), "Stopping startup check");
+    if (this.startupCheckTimeout) {
+      clearTimeout(this.startupCheckTimeout);
+      this.startupCheckTimeout = undefined;
+    }
+    this.startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
+  }
+
   private stopHealthCheck() {
+    this.logger.info(this.getStatus(), "Stopping health check");
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = undefined;
@@ -102,7 +122,7 @@ export class JetstreamIngester {
     setTimeout(() => {
       if (this.lastProcessedCursor === this.lastCheckedCursor) {
         this.logger.warn(
-          { backoff: this.startupBackoffMs },
+          this.getStatus(),
           "Startup check: No cursor change detected, initiating reconnection",
         );
         this.startupBackoffMs = Math.min(
@@ -112,6 +132,7 @@ export class JetstreamIngester {
         void this.reconnect();
       } else {
         this.logger.info(
+          this.getStatus(),
           "Startup check: Cursor change detected, startup complete",
         );
         this.metricReporter.setConnectionStateGauge("stable");
@@ -124,12 +145,14 @@ export class JetstreamIngester {
     this.healthCheckInterval = setInterval(() => {
       if (this.lastProcessedCursor === this.lastCheckedCursor) {
         this.logger.warn(
+          this.getStatus(),
           "Health check: No cursor change detected, initiating reconnection",
         );
         this.startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
         void this.reconnect();
       } else {
         this.logger.info(
+          this.getStatus(),
           "Health check: Cursor change detected, connection is healthy",
         );
         this.lastCheckedCursor = this.lastProcessedCursor;
@@ -141,10 +164,8 @@ export class JetstreamIngester {
   }
 
   private async reconnect() {
-    this.stopHealthCheck();
     this.jetstream.close();
-
-    this.logger.info("Reconnecting to Jetstream");
+    this.logger.info(this.getStatus(), "Reconnecting to Jetstream");
     await this.start();
   }
 
