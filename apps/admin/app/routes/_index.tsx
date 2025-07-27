@@ -1,13 +1,13 @@
 import type { Route } from "./+types/_index";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
     { title: "New React Router App" },
     { name: "description", content: "Welcome to React Router!" },
   ];
 }
 
-export async function loader({ context }: Route.LoaderArgs) {
+export function loader({ context }: Route.LoaderArgs) {
   return {
     message: context.VALUE_FROM_EXPRESS,
   };

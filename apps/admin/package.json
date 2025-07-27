@@ -3,8 +3,12 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "react-router build",
     "dev": "NODE_ENV=development tsx node/server.ts",
+    "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
+    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "start": "NODE_ENV=production tsx node/server.ts",
     "typecheck": "react-router typegen && tsc"
   },
@@ -19,12 +23,15 @@
     "react-router": "^7.7.1"
   },
   "devDependencies": {
+    "@mkizka/eslint-config": "7.1.1",
     "@react-router/dev": "^7.7.1",
     "@tailwindcss/vite": "^4.1.4",
     "@types/express": "5.0.3",
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "eslint": "9.31.0",
+    "prettier": "3.5.1",
     "tailwindcss": "^4.1.4",
     "tsx": "4.20.3",
     "typescript": "^5.8.3",

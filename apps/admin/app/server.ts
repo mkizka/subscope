@@ -1,4 +1,5 @@
 import "react-router";
+
 import { createRequestHandler } from "@react-router/express";
 import express from "express";
 
@@ -8,7 +9,7 @@ declare module "react-router" {
   }
 }
 
-export const app = express() as express.Express;
+export const app: express.Express = express();
 
 app.use(
   createRequestHandler({
