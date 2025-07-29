@@ -4,7 +4,7 @@ import { ExpressAdapter } from "@bull-board/express";
 import type { IJobQueue } from "@repo/common/domain";
 import { Router } from "express";
 
-export const dashboardRouterFactory = (jobQueue: IJobQueue) => {
+export const dashboardRouterFactory = (jobQueue: IJobQueue): Router => {
   const dashboardRouter = Router();
 
   const serverAdapter = new ExpressAdapter();

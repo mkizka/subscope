@@ -14,24 +14,15 @@ export class IngesterServer {
   constructor(
     loggerManager: ILoggerManager,
     metricsRouter: Router,
-    dashboardRouter: Router,
     private readonly ingester: JetstreamIngester,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
-    // ダッシュボードへのアクセスはログに出さない
-    // TODO: adminパッケージに移動する
-    this.app.use(dashboardRouter);
     this.app.use(loggingMiddleware(this.logger));
     this.app.use(healthRouter);
     this.app.use(metricsRouter);
   }
-  static inject = [
-    "loggerManager",
-    "metricsRouter",
-    "dashboardRouter",
-    "ingester",
-  ] as const;
+  static inject = ["loggerManager", "metricsRouter", "ingester"] as const;
 
   start() {
     this.app.listen(env.PORT, async () => {
