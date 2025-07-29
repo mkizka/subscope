@@ -4,6 +4,9 @@ generated/
 .env
 *.log
 
+# typescript
+*.tsbuildinfo
+
 # turbo
 .turbo/
 
