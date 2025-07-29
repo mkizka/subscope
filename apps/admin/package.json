@@ -10,7 +10,7 @@
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "start": "NODE_ENV=production tsx node/server.ts",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
     "@bull-board/api": "^6.1.3",
