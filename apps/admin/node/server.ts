@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import express from "express";
 
-const BUILD_PATH = "./build/server/index.js";
+const BUILD_PATH = "../build/server/index.js";
 const DEVELOPMENT = process.env.NODE_ENV === "development";
 const PORT = Number.parseInt(process.env.PORT || "3000");
 
