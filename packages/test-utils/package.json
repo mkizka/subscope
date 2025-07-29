@@ -20,7 +20,7 @@
     "@faker-js/faker": "9.9.0",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
-    "@testcontainers/postgresql": "11.3.0",
+    "@testcontainers/postgresql": "11.4.0",
     "execa": "9.6.0",
     "multiformats": "13.3.7",
     "typed-inject": "5.0.0",
@@ -29,8 +29,8 @@
   "devDependencies": {
     "@mkizka/eslint-config": "7.1.1",
     "@tsconfig/node-lts": "22.0.2",
-    "drizzle-orm": "0.44.3",
-    "eslint": "9.31.0",
+    "drizzle-orm": "0.44.4",
+    "eslint": "9.32.0",
     "typescript": "5.8.3"
   },
   "sideEffects": false

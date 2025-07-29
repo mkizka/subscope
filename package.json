@@ -28,10 +28,10 @@
     "prettier": "3.6.2",
     "prettier-plugin-pkg": "0.21.2",
     "prettier-plugin-sh": "0.18.0",
-    "repomix": "1.2.0",
+    "repomix": "1.2.1",
     "turbo": "2.5.5",
     "vitest": "^3.2.4",
-    "wait-on": "8.0.3"
+    "wait-on": "8.0.4"
   },
   "lint-staged": {
     "*": "prettier --ignore-unknown --write"
