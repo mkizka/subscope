@@ -4,6 +4,8 @@ import { createRequestHandler } from "@react-router/express";
 import type { Router } from "express";
 import express from "express";
 
+import { healthRouter } from "./routes/health.js";
+
 declare module "react-router" {
   interface AppLoadContext {
     VALUE_FROM_EXPRESS: string;
@@ -14,6 +16,7 @@ export const appFactory = (dashboardRouter: Router): express.Express => {
   const app = express();
 
   app.use(dashboardRouter);
+  app.use(healthRouter);
 
   app.use(
     createRequestHandler({
