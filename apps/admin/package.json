@@ -10,7 +10,7 @@
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "react-router typegen && pnpm -s _eslint && pnpm -s _prettier --check",
     "start": "NODE_ENV=production tsx node/server.ts",
-    "typecheck": "react-router typegen && tsc -b"
+    "typecheck": "react-router typegen && tsc -b --noEmit"
   },
   "dependencies": {
     "@bull-board/api": "^6.12.0",
@@ -32,6 +32,7 @@
     "@mkizka/eslint-config": "7.1.1",
     "@react-router/dev": "^7.7.1",
     "@tailwindcss/vite": "^4.1.11",
+    "@tsconfig/node-lts": "22.0.2",
     "@types/express": "5.0.3",
     "@types/node": "^24.1.0",
     "@types/react": "^19.1.9",
