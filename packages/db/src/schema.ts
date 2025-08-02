@@ -358,6 +358,16 @@ export const imageBlobCache = pgTable(
   (table) => [index("image_blob_cache_expired_at_idx").on(table.expiredAt)],
 );
 
+export const authState = pgTable("auth_state", {
+  key: varchar({ length: 256 }).primaryKey(),
+  state: text().notNull(),
+});
+
+export const authSession = pgTable("auth_session", {
+  key: varchar({ length: 256 }).primaryKey(),
+  session: text().notNull(),
+});
+
 export const postStatsRelations = relations(postStats, ({ one }) => ({
   post: one(posts, {
     fields: [postStats.postUri],

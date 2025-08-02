@@ -1,9 +1,15 @@
 import { z } from "zod/v4";
 import { fromError } from "zod-validation-error";
 
+export const isProduction =
+  process.env.NODE_ENV === "production" && !process.env.E2E;
+
 const match = <Prod, Default>({ prod, dev }: { prod: Prod; dev: Default }) => {
-  return process.env.NODE_ENV === "production" ? prod : dev;
+  return isProduction ? prod : dev;
 };
+
+const DEVELOPMENT_PRIVATE_KEY =
+  "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JR0hBZ0VBTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEJHMHdhd0lCQVFRZ1hoS1ZMc2pwVSszSm9wd2kKcjhUcjBBVXVMNTNyRzR6V2duQkNSZUNRQjdTaFJBTkNBQVRaNzlHaGQxYnphVVpHb1lzcitLRVJxNnIyUXZJZApRQXZ4ZUpqRkdMbDJ0TDRmZUhSWmVkc3NxZjdDNUpjdGZWN2hKd2hYOG5ackxjYXU3OWtEQ25PTQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==";
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
@@ -13,6 +19,29 @@ const schema = z.object({
   REDIS_URL: match({
     prod: z.url(),
     dev: z.url().default("redis://localhost:6379"),
+  }),
+  PUBLIC_URL: match({
+    prod: z.string(),
+    dev: z.string().default("http://subsco.localhost:3000"),
+  }),
+  COOKIE_SECRET: match({
+    prod: z.string(),
+    dev: z.string().default("dev-cookie-secret"),
+  }),
+  // openssl ecparam -name prime256v1 -genkey | openssl pkcs8 -topk8 -nocrypt | openssl base64 -A
+  PRIVATE_KEY_ES256_B64: match({
+    prod: z.string(),
+    dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
+  }),
+  ATPROTO_PLC_URL: match({
+    prod: z.url(),
+    dev: z.url().default("https://plc.directory"),
+  }),
+  DATABASE_URL: match({
+    prod: z.string(),
+    dev: z
+      .string()
+      .default("postgresql://postgres:password@localhost:5432/subscope"),
   }),
 });
 
