@@ -10,7 +10,6 @@ const app = express();
 app.disable("x-powered-by");
 
 if (DEVELOPMENT) {
-  console.log("Starting development server");
   const viteDevServer = await import("vite").then((vite) =>
     vite.createServer({
       server: { middlewareMode: true },
@@ -30,7 +29,6 @@ if (DEVELOPMENT) {
     }
   });
 } else {
-  console.log("Starting production server");
   app.use(
     "/assets",
     express.static("build/client/assets", { immutable: true, maxAge: "1y" }),
@@ -42,5 +40,7 @@ if (DEVELOPMENT) {
 }
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(
+    `Server is running on http://admin.localhost:${PORT} in ${process.env.NODE_ENV} mode`,
+  );
 });

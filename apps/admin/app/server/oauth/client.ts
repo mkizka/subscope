@@ -7,6 +7,13 @@ import { injector } from "../injector";
 import { SessionStore, StateStore } from "./storage";
 
 const baseUrl = isProduction ? env.PUBLIC_URL : "http://127.0.0.1:3000";
+const redirectUri = `${baseUrl}/oauth-callback`;
+const scope = "atproto transition:generic";
+
+// https://atproto.com/ja/specs/oauth#localhost-client-development
+const localClientId = new URL("http://localhost");
+localClientId.searchParams.set("redirect_uri", redirectUri);
+localClientId.searchParams.set("scope", scope);
 
 const privateKey = Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString();
 
@@ -15,11 +22,11 @@ const oauthClientOptions: NodeOAuthClientOptions = {
     client_name: "Linkat",
     client_id: isProduction
       ? `${env.PUBLIC_URL}/client-metadata.json`
-      : `http://localhost?redirect_uri=${encodeURIComponent(`${baseUrl}/oauth/callback`)}`,
+      : localClientId.toString(),
     client_uri: baseUrl,
     jwks_uri: `${baseUrl}/jwks.json`,
-    redirect_uris: [`${baseUrl}/oauth/callback`],
-    scope: "atproto transition:generic",
+    redirect_uris: [redirectUri],
+    scope,
     grant_types: ["authorization_code", "refresh_token"],
     response_types: ["code"],
     application_type: "web",

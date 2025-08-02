@@ -22,7 +22,7 @@ const schema = z.object({
   }),
   PUBLIC_URL: match({
     prod: z.string(),
-    dev: z.string().default("http://subsco.localhost:3000"),
+    dev: z.string().default("http://admin.localhost:3000"),
   }),
   COOKIE_SECRET: match({
     prod: z.string(),
@@ -34,14 +34,14 @@ const schema = z.object({
     dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
   }),
   ATPROTO_PLC_URL: match({
-    prod: z.url(),
-    dev: z.url().default("https://plc.directory"),
+    prod: z.url().default("https://plc.directly"),
+    dev: z.url().default("http://localhost:2582/"),
   }),
   DATABASE_URL: match({
-    prod: z.string(),
+    prod: z.url(),
     dev: z
-      .string()
-      .default("postgresql://postgres:password@localhost:5432/subscope"),
+      .url()
+      .default("postgresql://postgres:password@localhost:5432/postgres"),
   }),
 });
 
