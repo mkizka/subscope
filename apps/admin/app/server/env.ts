@@ -24,6 +24,7 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default("http://admin.localhost:3000"),
   }),
+  // openssl rand -base64 33
   COOKIE_SECRET: match({
     prod: z.string(),
     dev: z.string().default("dev-cookie-secret"),
@@ -34,8 +35,8 @@ const schema = z.object({
     dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
   }),
   ATPROTO_PLC_URL: match({
-    prod: z.url().default("https://plc.directly"),
-    dev: z.url().default("http://localhost:2582/"),
+    prod: z.url().default("https://plc.directory"),
+    dev: z.url().default("http://localhost:2582"),
   }),
   DATABASE_URL: match({
     prod: z.url(),
