@@ -35,6 +35,7 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("redis://localhost:6379"),
   }),
+  COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
 });
 
 export const env = (() => {
