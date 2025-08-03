@@ -10,19 +10,12 @@ const baseUrl = isProduction ? env.PUBLIC_URL : "http://127.0.0.1:3000";
 const redirectUri = `${baseUrl}/oauth-callback`;
 const scope = "atproto transition:generic";
 
-// https://atproto.com/ja/specs/oauth#localhost-client-development
-const localClientId = new URL("http://localhost");
-localClientId.searchParams.set("redirect_uri", redirectUri);
-localClientId.searchParams.set("scope", scope);
-
 const privateKey = Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString();
 
 const oauthClientOptions: NodeOAuthClientOptions = {
   clientMetadata: {
     client_name: "Linkat",
-    client_id: isProduction
-      ? `${env.PUBLIC_URL}/client-metadata.json`
-      : localClientId.toString(),
+    client_id: `${env.PUBLIC_URL}/client-metadata.json`,
     client_uri: baseUrl,
     jwks_uri: `${baseUrl}/jwks.json`,
     redirect_uris: [redirectUri],
@@ -41,6 +34,15 @@ const oauthClientOptions: NodeOAuthClientOptions = {
 };
 
 if (!isProduction) {
+  // https://atproto.com/ja/specs/oauth#localhost-client-development
+  const localClientId = new URL("http://localhost");
+  localClientId.searchParams.set("redirect_uri", redirectUri);
+  localClientId.searchParams.set("scope", scope);
+
+  oauthClientOptions.clientMetadata = {
+    ...oauthClientOptions.clientMetadata,
+    client_id: localClientId.toString(),
+  };
   oauthClientOptions.handleResolver = "http://localhost:2583";
   oauthClientOptions.allowHttp = true; // httpを許可しないとOAuthProtectedResourceMetadataResolverがエラーを投げる
 }
