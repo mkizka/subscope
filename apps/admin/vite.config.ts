@@ -10,6 +10,7 @@ export default defineConfig(({ isSsrBuild }) => ({
           input: "./app/server.ts",
         }
       : undefined,
+    sourcemap: true,
   },
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 }));
