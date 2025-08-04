@@ -35,6 +35,42 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     setInviteCode(fetcher.data.inviteCode);
   }
 
+  if (!loaderData.userDid) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+            <form method="post" action="/login" className="space-y-4">
+              <div>
+                <label
+                  htmlFor="identifier"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Bluesky Handle
+                </label>
+                <input
+                  type="text"
+                  name="identifier"
+                  id="identifier"
+                  required
+                  placeholder="example.bsky.social"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                ログイン
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
