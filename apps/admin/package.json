@@ -20,6 +20,7 @@
     "@react-router/express": "7.7.1",
     "@react-router/fs-routes": "7.7.1",
     "@react-router/node": "^7.7.1",
+    "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
     "drizzle-orm": "0.44.4",

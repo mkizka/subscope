@@ -75,6 +75,9 @@ importers:
       "@react-router/node":
         specifier: ^7.7.1
         version: 7.7.1(react-router@7.7.1(patch_hash=bb73d2e4321cb1a1624e74ab32ad0fa153a5ee153f945a2ec15e771098e60c0a)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(typescript@5.8.3)
+      "@repo/client":
+        specifier: workspace:*
+        version: link:../../packages/client
       "@repo/common":
         specifier: workspace:*
         version: link:../../packages/common
@@ -509,6 +512,9 @@ importers:
 
   packages/client:
     dependencies:
+      "@atproto/api":
+        specifier: 0.15.27
+        version: 0.15.27
       "@atproto/lexicon":
         specifier: 0.4.12
         version: 0.4.12

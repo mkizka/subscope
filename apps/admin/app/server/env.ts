@@ -44,6 +44,14 @@ const schema = z.object({
       .url()
       .default("postgresql://postgres:password@localhost:5432/postgres"),
   }),
+  APPVIEW_URL: match({
+    prod: z.url(),
+    dev: z.url().default("http://localhost:3001"),
+  }),
+  ATPROTO_PROXY: match({
+    prod: z.string().default("did:web:appview.subsco.me#appview"),
+    dev: z.string().default("did:web:appview.localhost#appview"),
+  }),
 });
 
 export const env = (() => {
