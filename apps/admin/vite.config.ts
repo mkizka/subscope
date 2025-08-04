@@ -12,12 +12,5 @@ export default defineConfig(({ isSsrBuild }) => ({
       : undefined,
     sourcemap: true,
   },
-  ssr: {
-    noExternal: [
-      "@atproto/xrpc",
-      "@atproto/lexicon",
-      "@atproto/oauth-client-node",
-    ],
-  },
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 }));
