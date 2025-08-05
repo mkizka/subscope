@@ -12,5 +12,13 @@ export default defineConfig(({ isSsrBuild }) => ({
       : undefined,
     sourcemap: true,
   },
+  ssr: {
+    // なぜかzodがundefinedになってしまうのでバンドルして対処
+    // - @repo/client → ESM
+    // - @atproto/lexicon → CJS
+    // - zod → CJS
+    // で、CJSからCJSの読み込みがViteのSSRビルドだとうまくいかない？
+    noExternal: ["@repo/client", "@atproto/lexicon", "zod"],
+  },
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 }));
