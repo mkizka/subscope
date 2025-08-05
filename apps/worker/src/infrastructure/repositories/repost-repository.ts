@@ -7,7 +7,7 @@ export class RepostRepository implements IRepostRepository {
   async upsert({ ctx, repost }: { ctx: TransactionContext; repost: Repost }) {
     const data = {
       cid: repost.cid,
-      actorDid: repost.actorDid.toString(),
+      actorDid: repost.actorDid,
       subjectUri: repost.subjectUri.toString(),
       subjectCid: repost.subjectCid,
       createdAt: repost.createdAt,

@@ -18,20 +18,20 @@
     "express": "5.1.0",
     "typed-inject": "5.0.0",
     "ws": "8.18.3",
-    "zod": "4.0.13",
+    "zod": "4.0.14",
     "zod-validation-error": "4.0.1"
   },
   "devDependencies": {
-    "@keyv/redis": "5.0.0",
+    "@keyv/redis": "5.1.0",
     "@mkizka/eslint-config": "7.1.1",
     "@tsconfig/node-lts": "22.0.2",
     "@types/express": "5.0.3",
-    "@types/node": "24.1.0",
+    "@types/node": "24.2.0",
     "@types/ws": "8.18.1",
     "eslint": "9.32.0",
-    "keyv": "5.4.0",
-    "pino-pretty": "13.0.0",
+    "keyv": "5.5.0",
+    "pino-pretty": "13.1.1",
     "tsx": "4.20.3",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   }
 }

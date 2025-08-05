@@ -76,7 +76,7 @@ describe("SubscriptionIndexer", () => {
         .limit(1);
       expect(subscription).toMatchObject({
         uri: record.uri.toString(),
-        cid: record.cid.toString(),
+        cid: record.cid,
         actorDid: actor.did,
         appviewDid: env.APPVIEW_DID,
       });

@@ -67,7 +67,7 @@ describe("FollowIndexer", () => {
         .limit(1);
       expect(follow).toMatchObject({
         uri: record.uri.toString(),
-        cid: record.cid.toString(),
+        cid: record.cid,
         actorDid: follower.did,
         subjectDid: followee.did,
       });
@@ -125,7 +125,7 @@ describe("FollowIndexer", () => {
         .limit(1);
       expect(follow).toMatchObject({
         uri: record.uri.toString(),
-        cid: record.cid.toString(),
+        cid: record.cid,
         actorDid: follower.did,
         subjectDid: followeeDid,
       });

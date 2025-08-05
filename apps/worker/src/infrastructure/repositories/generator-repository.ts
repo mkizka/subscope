@@ -13,8 +13,8 @@ export class GeneratorRepository implements IGeneratorRepository {
   }) {
     const data = {
       cid: generator.cid,
-      actorDid: generator.actorDid.toString(),
-      did: generator.did.toString(),
+      actorDid: generator.actorDid,
+      did: generator.did,
       displayName: generator.displayName,
       description: generator.description,
       avatarCid: generator.avatarCid,

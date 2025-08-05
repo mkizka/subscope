@@ -44,14 +44,14 @@ export class GeneratorViewService {
         $type: "app.bsky.feed.defs#generatorView",
         uri: generator.uri.toString(),
         cid: generator.cid,
-        did: generator.did.toString(),
+        did: generator.did,
         creator,
         displayName: generator.displayName,
         description: generator.description,
         avatar:
           generator.avatarCid &&
           this.assetUrlBuilder.getAvatarThumbnailUrl(
-            generator.actorDid.toString(),
+            generator.actorDid,
             generator.avatarCid,
           ),
         indexedAt: generator.indexedAt.toISOString(),

@@ -56,7 +56,7 @@ export class LikeRepository implements ILikeRepository {
     limit: number;
     cursor?: string;
   }): Promise<Like[]> {
-    const filters = [eq(schema.likes.actorDid, actorDid.toString())];
+    const filters = [eq(schema.likes.actorDid, actorDid)];
 
     if (cursor) {
       const cursorDate = new Date(cursor);

@@ -40,7 +40,7 @@ export class ProfileRepository implements IProfileRepository {
     );
 
     return dids
-      .map((did) => profileMap.get(did.toString()))
+      .map((did) => profileMap.get(did))
       .filter((profile) => !!profile);
   }
 

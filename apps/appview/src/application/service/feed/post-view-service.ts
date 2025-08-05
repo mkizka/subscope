@@ -167,7 +167,7 @@ export class PostViewService {
     return posts
       .map((post) => {
         const record = recordMap.get(post.uri.toString());
-        const author = profileMap.get(post.actorDid.toString());
+        const author = profileMap.get(post.actorDid);
         const stats = statsMap.get(post.uri.toString());
 
         if (!record || !author) {
@@ -227,7 +227,7 @@ export class PostViewService {
     return posts
       .map((post) => {
         const record = recordMap.get(post.uri.toString());
-        const author = profileMap.get(post.actorDid.toString());
+        const author = profileMap.get(post.actorDid);
         const stats = statsMap.get(post.uri.toString());
 
         if (!record || !author) {

@@ -30,7 +30,7 @@
     "react-dom": "^19.1.1",
     "react-router": "^7.7.1",
     "typed-inject": "^5.0.0",
-    "zod": "4.0.13",
+    "zod": "4.0.14",
     "zod-validation-error": "^4.0.1"
   },
   "devDependencies": {
@@ -39,14 +39,14 @@
     "@tailwindcss/vite": "^4.1.11",
     "@tsconfig/node-lts": "22.0.2",
     "@types/express": "5.0.3",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "eslint": "9.32.0",
     "prettier": "3.6.2",
     "tailwindcss": "^4.1.11",
     "tsx": "4.20.3",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vite": "^7.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   }

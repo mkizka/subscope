@@ -22,7 +22,7 @@
   "devDependencies": {
     "@mkizka/eslint-config": "7.1.1",
     "@tsconfig/node-lts": "22.0.2",
-    "@types/node": "24.1.0",
+    "@types/node": "24.2.0",
     "@types/pg": "8.15.5",
     "dotenv": "17.2.1",
     "drizzle-kit": "0.31.4",

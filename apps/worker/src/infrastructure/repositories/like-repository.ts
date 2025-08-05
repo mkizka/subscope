@@ -7,7 +7,7 @@ export class LikeRepository implements ILikeRepository {
   async upsert({ ctx, like }: { ctx: TransactionContext; like: Like }) {
     const data = {
       cid: like.cid,
-      actorDid: like.actorDid.toString(),
+      actorDid: like.actorDid,
       subjectUri: like.subjectUri.toString(),
       subjectCid: like.subjectCid,
       createdAt: like.createdAt,

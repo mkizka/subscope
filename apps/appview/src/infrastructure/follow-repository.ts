@@ -16,7 +16,7 @@ export class FollowRepository implements IFollowRepository {
     limit: number;
     cursor?: string;
   }): Promise<Follow[]> {
-    const filters = [eq(schema.follows.actorDid, params.actorDid.toString())];
+    const filters = [eq(schema.follows.actorDid, params.actorDid)];
 
     if (params.cursor) {
       const cursor = new Date(params.cursor);
@@ -47,7 +47,7 @@ export class FollowRepository implements IFollowRepository {
     limit: number;
     cursor?: string;
   }): Promise<Follow[]> {
-    const filters = [eq(schema.follows.subjectDid, params.actorDid.toString())];
+    const filters = [eq(schema.follows.subjectDid, params.actorDid)];
 
     if (params.cursor) {
       const cursor = new Date(params.cursor);
@@ -83,11 +83,8 @@ export class FollowRepository implements IFollowRepository {
 
     const results = await this.db.query.follows.findMany({
       where: and(
-        eq(schema.follows.actorDid, params.actorDid.toString()),
-        inArray(
-          schema.follows.subjectDid,
-          params.targetDids.map((did) => did.toString()),
-        ),
+        eq(schema.follows.actorDid, params.actorDid),
+        inArray(schema.follows.subjectDid, params.targetDids),
       ),
     });
 
@@ -109,11 +106,8 @@ export class FollowRepository implements IFollowRepository {
 
     const results = await this.db.query.follows.findMany({
       where: and(
-        inArray(
-          schema.follows.actorDid,
-          params.targetDids.map((did) => did.toString()),
-        ),
-        eq(schema.follows.subjectDid, params.actorDid.toString()),
+        inArray(schema.follows.actorDid, params.targetDids),
+        eq(schema.follows.subjectDid, params.actorDid),
       ),
     });
 
