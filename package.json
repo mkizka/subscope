@@ -34,7 +34,7 @@
     "wait-on": "8.0.4"
   },
   "lint-staged": {
-    "*": "prettier --ignore-unknown --write"
+    "*": "pnpm -s _prettier --ignore-unknown --write"
   },
   "prettier": {
     "plugins": [
