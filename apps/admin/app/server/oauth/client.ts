@@ -7,7 +7,7 @@ import { injector } from "../injector";
 import { SessionStore, StateStore } from "./storage";
 
 const baseUrl = isProduction ? env.PUBLIC_URL : "http://127.0.0.1:3000";
-const redirectUri = `${baseUrl}/oauth-callback`;
+const redirectUri = `${baseUrl}/oauth/callback`;
 const scope = "atproto transition:generic";
 
 const privateKey = Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString();
