@@ -19,7 +19,12 @@ export class AdminMiddleware {
   async requireAdmin(request: MaybeRequest) {
     const authResult = await this.authVerifier.loginRequired(request);
 
-    if (authResult.credentials.did !== env.ADMIN_DID) {
+    if (
+      // ローカル開発環境での動作確認に使用するalice.testなどのアカウントはDIDが未確定なので、
+      // ADMIN_DIDとの一致をチェックしない
+      env.NODE_ENV === "production" &&
+      authResult.credentials.did !== env.ADMIN_DID
+    ) {
       throw new AuthRequiredError("Admin access required");
     }
 

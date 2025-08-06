@@ -41,7 +41,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <div className="max-w-md w-full">
           <div className="bg-white rounded-lg shadow-md p-8">
             <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-            <form method="post" action="/login" className="space-y-4">
+            <form method="post" action="/oauth/login" className="space-y-4">
               <div>
                 <label
                   htmlFor="identifier"
