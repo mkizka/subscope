@@ -18,7 +18,7 @@ const keyof = <T extends Record<string, unknown>, K extends keyof T>(
 healthRouter.get("/health", (req, res) => {
   res.json({
     status: "ok",
-    env: keyof(env, ["NODE_ENV", "LOG_LEVEL", "PORT", "PUBLIC_DOMAIN"]),
+    env: keyof(env, ["NODE_ENV", "LOG_LEVEL", "PORT", "PUBLIC_URL"]),
   });
 });
 

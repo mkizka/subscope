@@ -9,7 +9,7 @@ describe("CreateInviteCodeUseCase", () => {
 
   const useCase = testInjector
     .provideClass("inviteCodeRepository", InviteCodeRepository)
-    .provideValue("publicDomain", "example.com")
+    .provideValue("publicUrl", "https://example.com")
     .injectClass(CreateInviteCodeUseCase);
 
   test("有効期限が適切に指定されている場合、招待コードと有効期限を返す", async () => {
