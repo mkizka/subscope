@@ -44,7 +44,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+          <div className="flex justify-between items-start mb-4">
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <fetcher.Form method="post" action="/oauth/logout">
+              <button
+                type="submit"
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm"
+              >
+                ログアウト
+              </button>
+            </fetcher.Form>
+          </div>
           <div className="space-y-2 text-sm text-gray-600">
             <p>{loaderData.message}</p>
             <p>
