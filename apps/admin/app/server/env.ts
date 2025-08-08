@@ -45,8 +45,8 @@ const schema = z.object({
       .default("postgresql://postgres:password@localhost:5432/postgres"),
   }),
   ATPROTO_PROXY: match({
-    prod: z.string().default("did:web:appview.subsco.me#appview"),
-    dev: z.string().default("did:web:appview.localhost#appview"),
+    prod: z.string(),
+    dev: z.string().default("did:web:localhost%3A3001#appview"),
   }),
 });
 

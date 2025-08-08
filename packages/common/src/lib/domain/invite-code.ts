@@ -15,12 +15,13 @@ export class InviteCode {
     this.createdAt = params.createdAt;
   }
 
-  static generate(domain: string, daysToExpire: number): InviteCode {
+  static generate(publicUrl: string, daysToExpire: number): InviteCode {
     const randomSuffix = Math.random()
       .toString(36)
       .substring(2, 7)
       .toLowerCase();
 
+    const domain = new URL(publicUrl).hostname;
     const domainKebab = domain.replace(/\./g, "-");
     const code = `${domainKebab}-${randomSuffix}`;
 

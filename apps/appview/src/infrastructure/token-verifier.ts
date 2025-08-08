@@ -16,7 +16,7 @@ export class TokenVerifier implements ITokenVerifier {
     };
     const payload = await verifyJwt(
       params.token,
-      `did:web:${env.PUBLIC_DOMAIN}`,
+      env.SERVICE_DID, // TODO: 引数から受け取る
       params.nsid,
       getSigninKey,
     );

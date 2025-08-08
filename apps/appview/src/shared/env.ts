@@ -11,10 +11,14 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3001),
-  PUBLIC_DOMAIN:
-    process.env.NODE_ENV === "production"
-      ? z.string()
-      : z.string().default("appview.localhost"),
+  SERVICE_DID: match({
+    prod: z.string(),
+    dev: z.string().default("did:web:localhost%3A3001"),
+  }),
+  PUBLIC_URL: match({
+    prod: z.url(),
+    dev: z.url().default("http://localhost:3001"),
+  }),
   DATABASE_URL: match({
     prod: z.url(),
     dev: z

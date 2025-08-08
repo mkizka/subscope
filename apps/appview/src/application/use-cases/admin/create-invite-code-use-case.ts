@@ -5,17 +5,14 @@ import type { IInviteCodeRepository } from "../../interfaces/invite-code-reposit
 export class CreateInviteCodeUseCase {
   constructor(
     private readonly inviteCodeRepository: IInviteCodeRepository,
-    private readonly publicDomain: string,
+    private readonly publicUrl: string,
   ) {}
-  static inject = ["inviteCodeRepository", "publicDomain"] as const;
+  static inject = ["inviteCodeRepository", "publicUrl"] as const;
 
   async execute(params: {
     daysToExpire: number;
   }): Promise<{ code: string; expiresAt: string }> {
-    const inviteCode = InviteCode.generate(
-      this.publicDomain,
-      params.daysToExpire,
-    );
+    const inviteCode = InviteCode.generate(this.publicUrl, params.daysToExpire);
 
     await this.inviteCodeRepository.save(inviteCode);
 

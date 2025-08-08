@@ -82,7 +82,7 @@ createInjector()
   .provideValue("databaseUrl", env.DATABASE_URL)
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
-  .provideValue("publicDomain", env.PUBLIC_DOMAIN)
+  .provideValue("publicUrl", env.PUBLIC_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)
