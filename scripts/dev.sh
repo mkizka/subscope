@@ -3,7 +3,7 @@ set -euo pipefail
 
 cleanup() {
   echo "[dev.sh] Cleaning up..."
-  docker compose down -v
+  docker compose down
   pnpm kill-port 2583
 }
 
