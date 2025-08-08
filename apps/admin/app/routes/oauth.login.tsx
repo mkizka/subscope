@@ -1,17 +1,26 @@
+import { parseWithZod } from "@conform-to/zod/v4";
 import { redirect } from "react-router";
-import { z } from "zod";
 
+import { loginSchema } from "~/schemas/login.schema";
 import { oauthClient } from "~/server/oauth/client";
 
 import type { Route } from "./+types/oauth.login";
 
-const schema = z.object({
-  identifier: z.string().min(1, "Identifier is required"),
-});
-
 export async function action({ request }: Route.ActionArgs) {
-  const form = await request.formData();
-  const input = schema.parse(Object.fromEntries(form));
-  const url = await oauthClient.authorize(input.identifier);
-  return redirect(url.toString());
+  const formData = await request.formData();
+  const submission = parseWithZod(formData, { schema: loginSchema });
+
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
+
+  try {
+    const url = await oauthClient.authorize(submission.value.identifier);
+    return redirect(url.toString());
+  } catch (error) {
+    // ビジネスロジックエラーをフォームエラーとして返す
+    return submission.reply({
+      formErrors: ["認証に失敗しました。もう一度お試しください。"],
+    });
+  }
 }
