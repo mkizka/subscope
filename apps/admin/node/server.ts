@@ -41,6 +41,6 @@ if (DEVELOPMENT) {
 
 app.listen(PORT, () => {
   console.log(
-    `Server is running on http://admin.localhost:${PORT} in ${process.env.NODE_ENV} mode`,
+    `Server is running on ${process.env.PUBLIC_URL} in ${process.env.NODE_ENV} mode`,
   );
 });
