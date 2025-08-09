@@ -1,5 +1,6 @@
 import "./app.css";
 
+import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -11,7 +12,6 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { useEffect } from "react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
