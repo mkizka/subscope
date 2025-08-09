@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFetcher } from "react-router";
 
+import { Layout } from "~/components/Layout";
 import { LoginForm } from "~/components/LoginForm";
 import { getSessionUserDid } from "~/server/oauth/session";
 
@@ -13,12 +14,9 @@ export function meta() {
   ];
 }
 
-export async function loader({ request, context }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const userDid = await getSessionUserDid(request);
-  return {
-    userDid,
-    message: context.VALUE_FROM_EXPRESS,
-  };
+  return { userDid };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
@@ -41,56 +39,50 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <fetcher.Form method="post" action="/oauth/logout">
-              <button
-                type="submit"
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm"
-              >
-                ログアウト
-              </button>
-            </fetcher.Form>
-          </div>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>{loaderData.message}</p>
-            <p>
-              User DID:{" "}
-              <span className="font-mono text-xs">{loaderData.userDid}</span>
-            </p>
+    <Layout userDid={loaderData.userDid}>
+      <div className="space-y-6">
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body">
+            <h1 className="card-title text-2xl">Admin Dashboard</h1>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">招待コード管理</h2>
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body">
+            <h2 className="card-title text-xl mb-4">招待コード管理</h2>
 
-          <button
-            onClick={handleCreateInviteCode}
-            disabled={fetcher.state === "submitting"}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {fetcher.state === "submitting" ? "作成中..." : "招待コード作成"}
-          </button>
+            <button
+              onClick={handleCreateInviteCode}
+              disabled={fetcher.state === "submitting"}
+              className="btn btn-primary gap-2"
+            >
+              <span className="icon-[tabler--qrcode] size-4"></span>
+              {fetcher.state === "submitting" ? "作成中..." : "招待コード作成"}
+            </button>
 
-          {inviteCode && (
-            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-green-800">招待コードが作成されました:</p>
-              <code className="block mt-2 p-2 bg-gray-100 rounded text-sm font-mono select-all">
-                {inviteCode}
-              </code>
-            </div>
-          )}
+            {inviteCode && (
+              <div className="alert alert-success mt-4">
+                <span className="icon-[tabler--check] size-5"></span>
+                <div>
+                  <h3 className="font-bold">招待コードが作成されました</h3>
+                  <div className="text-xs">
+                    <code className="bg-success/20 px-2 py-1 rounded font-mono text-sm select-all">
+                      {inviteCode}
+                    </code>
+                  </div>
+                </div>
+              </div>
+            )}
 
-          {fetcher.data?.error && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-800">エラー: {fetcher.data.error}</p>
-            </div>
-          )}
+            {fetcher.data?.error && (
+              <div className="alert alert-error mt-4">
+                <span className="icon-[tabler--exclamation-circle] size-5"></span>
+                <span>エラー: {fetcher.data.error}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
