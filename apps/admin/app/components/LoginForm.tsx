@@ -4,6 +4,7 @@ import { Form, useActionData } from "react-router";
 
 import type { action } from "~/routes/oauth.login";
 import { loginSchema } from "~/schemas/login.schema";
+import { cn } from "~/utils/cn";
 
 export function LoginForm() {
   const lastResult = useActionData<typeof action>();
@@ -14,14 +15,20 @@ export function LoginForm() {
       return parseWithZod(formData, { schema: loginSchema });
     },
     shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center p-4">
+      <div className="card bg-base-100 w-full max-w-sm shadow-2xl">
+        <div className="card-body">
+          <div className="text-center space-y-2">
+            <div className="w-12 h-12 bg-primary rounded-2xl mx-auto flex items-center justify-center">
+              <span className="icon-[tabler--atom] text-primary-content text-lg"></span>
+            </div>
+            <h1 className="text-2xl font-bold text-base-content">Subscope</h1>
+            <p className="text-base-content/60 text-sm">管理画面にログイン</p>
+          </div>
+
           <Form
             method="post"
             action="/oauth/login"
@@ -29,35 +36,35 @@ export function LoginForm() {
             {...getFormProps(form)}
           >
             {form.errors && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-700">{form.errors}</p>
+              <div className="alert alert-error">
+                <span className="icon-[tabler--exclamation-circle] size-5"></span>
+                <span className="text-sm">{form.errors}</span>
               </div>
             )}
-            <div>
-              <label
-                htmlFor={fields.identifier.id}
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Bluesky Handle
+
+            <div className="form-control">
+              <label className="label" htmlFor={fields.identifier.id}>
+                <span className="label-text font-medium">ハンドル</span>
               </label>
               <input
                 {...getInputProps(fields.identifier, { type: "text" })}
                 placeholder="example.bsky.social"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={cn(
+                  "input input-bordered w-full focus:input-primary",
+                  fields.identifier.errors && "input-error",
+                )}
               />
               {fields.identifier.errors && (
-                <p
-                  className="mt-1 text-sm text-red-600"
-                  id={fields.identifier.errorId}
-                >
-                  {fields.identifier.errors}
-                </p>
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {fields.identifier.errors}
+                  </span>
+                </label>
               )}
             </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-            >
+
+            <button type="submit" className="btn btn-primary btn-block gap-2">
+              <span className="icon-[tabler--login] size-4"></span>
               ログイン
             </button>
           </Form>
