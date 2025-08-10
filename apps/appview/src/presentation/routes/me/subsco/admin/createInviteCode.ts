@@ -12,9 +12,8 @@ export class CreateInviteCode {
 
   handle(server: Server) {
     server.me.subsco.admin.createInviteCode({
-      handler: async ({ input, req }) => {
-        await this.adminMiddleware.requireAdmin(req);
-
+      auth: (ctx) => this.adminMiddleware.requireAdmin(ctx.req),
+      handler: async ({ input }) => {
         const result = await this.createInviteCodeUseCase.execute({
           daysToExpire: input.body.daysToExpire,
         });

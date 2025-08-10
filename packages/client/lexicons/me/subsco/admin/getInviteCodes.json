@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.getInviteCodes",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get all invite codes",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["codes"],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "codes": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#inviteCode"
+              }
+            }
+          }
+        }
+      }
+    },
+    "inviteCode": {
+      "type": "object",
+      "required": ["code", "expiresAt", "createdAt"],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@ import { createInjector } from "typed-inject";
 
 import { ProfileViewBuilder } from "./application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./application/service/actor/profile-view-service.js";
+import { InviteCodeService } from "./application/service/admin/invite-code-service.js";
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "./application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "./application/service/feed/feed-processor.js";
@@ -28,6 +29,7 @@ import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-u
 import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
 import { CreateInviteCodeUseCase } from "./application/use-cases/admin/create-invite-code-use-case.js";
+import { GetInviteCodesUseCase } from "./application/use-cases/admin/get-invite-codes-use-case.js";
 import { GetActorLikesUseCase } from "./application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
 import { GetLikesUseCase } from "./application/use-cases/feed/get-likes-use-case.js";
@@ -72,6 +74,7 @@ import { SearchPosts } from "./presentation/routes/app/bsky/feed/searchPosts.js"
 import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
 import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createInviteCode.js";
+import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppviewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -110,6 +113,7 @@ createInjector()
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)
+  .provideClass("inviteCodeService", InviteCodeService)
   .provideClass("generatorViewService", GeneratorViewService)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("postViewService", PostViewService)
@@ -140,6 +144,7 @@ createInjector()
   .provideClass("getFollowsUseCase", GetFollowsUseCase)
   .provideClass("getFollowersUseCase", GetFollowersUseCase)
   .provideClass("createInviteCodeUseCase", CreateInviteCodeUseCase)
+  .provideClass("getInviteCodesUseCase", GetInviteCodesUseCase)
   // presentation
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
@@ -156,6 +161,7 @@ createInjector()
   .provideClass("getFollows", GetFollows)
   .provideClass("getFollowers", GetFollowers)
   .provideClass("createInviteCode", CreateInviteCode)
+  .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppviewServer)
   .start();
