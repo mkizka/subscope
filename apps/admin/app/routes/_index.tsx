@@ -1,8 +1,12 @@
+import { SubscoAgent } from "@repo/client/api";
 import { useState } from "react";
 import { useFetcher } from "react-router";
 
 import { Layout } from "~/components/Layout";
 import { LoginForm } from "~/components/LoginForm";
+import { env } from "~/server/env";
+import { injector } from "~/server/injector";
+import { oauthClient } from "~/server/oauth/client";
 import { getSessionUserDid } from "~/server/oauth/session";
 
 import type { Route } from "./+types/_index";
@@ -14,9 +18,33 @@ export function meta() {
   ];
 }
 
+const loggerManager = injector.resolve("loggerManager");
+const logger = loggerManager.createLogger("index");
+
 export async function loader({ request }: Route.LoaderArgs) {
   const userDid = await getSessionUserDid(request);
-  return { userDid };
+
+  if (!userDid) {
+    return { userDid: null, inviteCodes: [] };
+  }
+
+  try {
+    const oauthSession = await oauthClient.restore(userDid);
+    const agent = new SubscoAgent({
+      sessionManager: oauthSession,
+      atprotoProxy: env.ATPROTO_PROXY,
+    });
+
+    const response = await agent.me.subsco.admin.getInviteCodes({});
+
+    return {
+      userDid,
+      inviteCodes: response.data.codes,
+    };
+  } catch (error) {
+    logger.error(error, "Failed to get invite codes");
+    return { userDid, inviteCodes: [] };
+  }
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
@@ -78,6 +106,53 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               <div className="alert alert-error mt-4">
                 <span className="icon-[tabler--exclamation-circle] size-5"></span>
                 <span>エラー: {fetcher.data.error}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="card bg-base-100 shadow-md">
+          <div className="card-body">
+            <h2 className="card-title text-xl mb-4">招待コード一覧</h2>
+
+            {loaderData.inviteCodes.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>コード</th>
+                      <th>有効期限</th>
+                      <th>作成日時</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loaderData.inviteCodes.map((inviteCode) => (
+                      <tr key={inviteCode.code}>
+                        <td>
+                          <code className="bg-base-200 px-2 py-1 rounded font-mono text-xs">
+                            {inviteCode.code}
+                          </code>
+                        </td>
+                        <td>
+                          {new Date(inviteCode.expiresAt).toLocaleDateString(
+                            "ja-JP",
+                          )}
+                        </td>
+                        <td>
+                          {new Date(inviteCode.createdAt).toLocaleDateString(
+                            "ja-JP",
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {loaderData.inviteCodes.length === 0 && (
+              <div className="text-center text-base-content/60 py-4">
+                招待コードがありません
               </div>
             )}
           </div>
