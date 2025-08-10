@@ -1,5 +1,4 @@
 import { SubscoAgent } from "@repo/client/api";
-import { useState } from "react";
 import { useFetcher } from "react-router";
 
 import { Layout } from "~/components/Layout";
@@ -10,6 +9,7 @@ import { oauthClient } from "~/server/oauth/client";
 import { getSessionUserDid } from "~/server/oauth/session";
 
 import type { Route } from "./+types/_index";
+import type { action as createInviteCodeAction } from "./bff.[me.subsco.admin.createInviteCode]";
 
 export function meta() {
   return [
@@ -48,8 +48,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const fetcher = useFetcher<{ inviteCode?: string; error?: string }>();
-  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const fetcher = useFetcher<typeof createInviteCodeAction>();
 
   const handleCreateInviteCode = () => {
     void fetcher.submit(null, {
@@ -57,10 +56,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       action: "/bff/me.subsco.admin.createInviteCode",
     });
   };
-
-  if (fetcher.data?.inviteCode && !inviteCode) {
-    setInviteCode(fetcher.data.inviteCode);
-  }
 
   if (!loaderData.userDid) {
     return <LoginForm />;
@@ -88,14 +83,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               {fetcher.state === "submitting" ? "作成中..." : "招待コード作成"}
             </button>
 
-            {inviteCode && (
+            {fetcher.data?.inviteCode && (
               <div className="alert alert-success mt-4">
                 <span className="icon-[tabler--check] size-5"></span>
                 <div>
                   <h3 className="font-bold">招待コードが作成されました</h3>
                   <div className="text-xs">
                     <code className="bg-success/20 px-2 py-1 rounded font-mono text-sm select-all">
-                      {inviteCode}
+                      {fetcher.data.inviteCode}
                     </code>
                   </div>
                 </div>
