@@ -1,6 +1,8 @@
+import { SubscoAgent } from "@repo/client/api";
 import { createCookieSessionStorage } from "react-router"; // or cloudflare/deno
 
 import { env } from "../env";
+import { oauthClient } from "./client";
 
 type SessionData = {
   did: string;
@@ -35,4 +37,16 @@ export const getSessionUserDid = async (request: Request) => {
     return null;
   }
   return session.data.did;
+};
+
+export const getSessionAgent = async (request: Request) => {
+  const session = await getSession(request);
+  if (!session.data.did) {
+    return null;
+  }
+  const oauthSession = await oauthClient.restore(session.data.did);
+  return new SubscoAgent({
+    oauthSession,
+    atprotoProxy: env.ATPROTO_PROXY,
+  });
 };

@@ -26,6 +26,7 @@
   "dependencies": {
     "@atproto/api": "0.16.2",
     "@atproto/lexicon": "0.4.12",
+    "@atproto/oauth-client": "0.5.1",
     "@atproto/xrpc": "0.7.1",
     "@atproto/xrpc-server": "0.9.1",
     "multiformats": "13.3.7"

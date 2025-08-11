@@ -1,12 +1,9 @@
-import { SubscoAgent } from "@repo/client/api";
 import { useFetcher } from "react-router";
 
 import { Layout } from "~/components/Layout";
 import { LoginForm } from "~/components/LoginForm";
-import { env } from "~/server/env";
 import { injector } from "~/server/injector";
-import { oauthClient } from "~/server/oauth/client";
-import { getSessionUserDid } from "~/server/oauth/session";
+import { getSessionAgent } from "~/server/oauth/session";
 
 import type { Route } from "./+types/_index";
 import type { action as createInviteCodeAction } from "./bff.[me.subsco.admin.createInviteCode]";
@@ -22,28 +19,21 @@ const loggerManager = injector.resolve("loggerManager");
 const logger = loggerManager.createLogger("index");
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const userDid = await getSessionUserDid(request);
+  const agent = await getSessionAgent(request);
 
-  if (!userDid) {
+  if (!agent) {
     return { userDid: null, inviteCodes: [] };
   }
 
   try {
-    const oauthSession = await oauthClient.restore(userDid);
-    const agent = new SubscoAgent({
-      sessionManager: oauthSession,
-      atprotoProxy: env.ATPROTO_PROXY,
-    });
-
-    const response = await agent.me.subsco.admin.getInviteCodes({});
-
+    const response = await agent.me.subsco.admin.getInviteCodes();
     return {
-      userDid,
+      userDid: agent.did,
       inviteCodes: response.data.codes,
     };
   } catch (error) {
     logger.error(error, "Failed to get invite codes");
-    return { userDid, inviteCodes: [] };
+    return { userDid: agent.did, inviteCodes: [] };
   }
 }
 

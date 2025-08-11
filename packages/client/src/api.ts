@@ -1,4 +1,4 @@
-import type { FetchHandlerObject } from "@atproto/xrpc";
+import type { OAuthSession } from "@atproto/oauth-client";
 
 import { AtpBaseClient } from "./generated/api/index.js";
 
@@ -6,17 +6,24 @@ export * from "./generated/api/index.js";
 export { RecordNotFoundError } from "./generated/api/types/com/atproto/repo/getRecord.js";
 
 export class SubscoAgent extends AtpBaseClient {
+  private oauthSession;
+
   constructor({
-    sessionManager,
+    oauthSession,
     atprotoProxy,
   }: {
-    sessionManager: FetchHandlerObject;
+    oauthSession: OAuthSession;
     atprotoProxy: string;
   }) {
     super(async (url, init) => {
       const headers = new Headers(init.headers);
       headers.set("atproto-proxy", atprotoProxy);
-      return await sessionManager.fetchHandler(url, { ...init, headers });
+      return await oauthSession.fetchHandler(url, { ...init, headers });
     });
+    this.oauthSession = oauthSession;
+  }
+
+  get did() {
+    return this.oauthSession.did;
   }
 }
