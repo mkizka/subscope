@@ -1,19 +1,11 @@
-import { useFetcher } from "react-router";
+import { redirect, useFetcher } from "react-router";
 
 import { Layout } from "~/components/Layout";
-import { LoginForm } from "~/components/LoginForm";
 import { injector } from "~/server/injector";
 import { getSessionAgent } from "~/server/oauth/session";
 
 import type { Route } from "./+types/_index";
 import type { action as createInviteCodeAction } from "./bff.[me.subsco.admin.createInviteCode]";
-
-export function meta() {
-  return [
-    { title: "Subscope Admin Dashboard" },
-    { name: "description", content: "Subscope administration panel" },
-  ];
-}
 
 const loggerManager = injector.resolve("loggerManager");
 const logger = loggerManager.createLogger("index");
@@ -22,7 +14,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const agent = await getSessionAgent(request);
 
   if (!agent) {
-    return { userDid: null, inviteCodes: [] };
+    return redirect("/login");
   }
 
   try {
@@ -46,10 +38,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       action: "/bff/me.subsco.admin.createInviteCode",
     });
   };
-
-  if (!loaderData.userDid) {
-    return <LoginForm />;
-  }
 
   return (
     <Layout userDid={loaderData.userDid}>
