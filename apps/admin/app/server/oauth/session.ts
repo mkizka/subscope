@@ -1,3 +1,4 @@
+import { DidError, OAuthResolverError } from "@atproto/oauth-client-node";
 import { SubscoAgent } from "@repo/client/api";
 import { createCookieSessionStorage } from "react-router"; // or cloudflare/deno
 
@@ -44,7 +45,17 @@ export const getSessionAgent = async (request: Request) => {
   if (!session.data.did) {
     return null;
   }
-  const oauthSession = await oauthClient.restore(session.data.did);
+  let oauthSession;
+  try {
+    oauthSession = await oauthClient.restore(session.data.did);
+  } catch (e) {
+    // ローカル開発環境での再起動後などにセッション情報が持つDIDが不正なときがある
+    // その場合はログインしていない扱いにする
+    if (e instanceof OAuthResolverError && e.cause instanceof DidError) {
+      return null;
+    }
+    throw e;
+  }
   return new SubscoAgent({
     oauthSession,
     atprotoProxy: env.ATPROTO_PROXY,
