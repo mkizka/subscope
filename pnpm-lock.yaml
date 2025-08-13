@@ -55,6 +55,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@atproto/did':
+        specifier: 0.1.5
+        version: 0.1.5
       '@atproto/jwk-jose':
         specifier: ^0.1.9
         version: 0.1.9

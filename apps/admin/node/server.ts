@@ -18,7 +18,9 @@ if (DEVELOPMENT) {
   app.use(viteDevServer.middlewares);
   app.use(async (req, res, next) => {
     try {
-      const source = await viteDevServer.ssrLoadModule("./app/server.ts");
+      const source = await viteDevServer.ssrLoadModule(
+        "./app/server/inject.ts",
+      );
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       return await source.app(req, res, next);
     } catch (error) {

@@ -1,14 +1,14 @@
 import { redirect } from "react-router";
 
-import { destroySession, getSession } from "~/server/oauth/session";
+import { oauthSession } from "~/server/inject";
 
 import type { Route } from "./+types/oauth.logout";
 
 export const action = async ({ request }: Route.ActionArgs) => {
-  const session = await getSession(request);
+  const session = await oauthSession.getSession(request.headers.get("Cookie"));
   return redirect("/", {
     headers: {
-      "Set-Cookie": await destroySession(session),
+      "Set-Cookie": await oauthSession.destroySession(session),
     },
   });
 };

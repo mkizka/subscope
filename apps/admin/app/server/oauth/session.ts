@@ -1,63 +1,61 @@
-import { DidError, OAuthResolverError } from "@atproto/oauth-client-node";
+import type { Did } from "@atproto/did";
+import type { NodeOAuthClient } from "@atproto/oauth-client-node";
 import { SubscoAgent } from "@repo/client/api";
-import { createCookieSessionStorage } from "react-router"; // or cloudflare/deno
+import { createCookieSessionStorage } from "react-router";
 
 import { env } from "../env";
-import { oauthClient } from "./client";
 
 type SessionData = {
-  did: string;
+  did: Did;
 };
 
 type SessionFlashData = {
   error: string;
 };
 
-const {
-  getSession: _getSession,
-  commitSession,
-  destroySession,
-} = createCookieSessionStorage<SessionData, SessionFlashData>({
-  cookie: {
-    httpOnly: true,
-    maxAge: 30 * 24 * 60 * 60,
-    secure: process.env.NODE_ENV === "production",
-    secrets: [env.COOKIE_SECRET],
-  },
-});
+export class OAuthSession {
+  readonly getSession;
+  readonly commitSession;
+  readonly destroySession;
 
-export { commitSession, destroySession };
-
-export const getSession = (request: Request) => {
-  return _getSession(request.headers.get("Cookie"));
-};
-
-export const getSessionUserDid = async (request: Request) => {
-  const session = await getSession(request);
-  if (!session.data.did) {
-    return null;
+  constructor(private readonly oauthClient: Promise<NodeOAuthClient>) {
+    const sessionStorage = createCookieSessionStorage<
+      SessionData,
+      SessionFlashData
+    >({
+      cookie: {
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60,
+        secure: process.env.NODE_ENV === "production",
+        secrets: [env.COOKIE_SECRET],
+      },
+    });
+    this.getSession = sessionStorage.getSession;
+    this.commitSession = sessionStorage.commitSession;
+    this.destroySession = sessionStorage.destroySession;
   }
-  return session.data.did;
-};
+  static inject = ["oauthClient"] as const;
 
-export const getSessionAgent = async (request: Request) => {
-  const session = await getSession(request);
-  if (!session.data.did) {
-    return null;
+  async getUserDid(request: Request): Promise<string | null> {
+    const session = await this.getSession(request.headers.get("Cookie"));
+    return session.data.did ?? null;
   }
-  let oauthSession;
-  try {
-    oauthSession = await oauthClient.restore(session.data.did);
-  } catch (e) {
-    // ローカル開発環境での再起動後などにセッション情報が持つDIDが不正なときがある
-    // その場合はログインしていない扱いにする
-    if (e instanceof OAuthResolverError && e.cause instanceof DidError) {
+
+  async getAgent(request: Request) {
+    const did = await this.getUserDid(request);
+    if (!did) {
       return null;
     }
-    throw e;
+    let oauthSession;
+    try {
+      const client = await this.oauthClient;
+      oauthSession = await client.restore(did);
+    } catch (e) {
+      return null;
+    }
+    return new SubscoAgent({
+      oauthSession,
+      atprotoProxy: env.ATPROTO_PROXY,
+    });
   }
-  return new SubscoAgent({
-    oauthSession,
-    atprotoProxy: env.ATPROTO_PROXY,
-  });
-};
+}

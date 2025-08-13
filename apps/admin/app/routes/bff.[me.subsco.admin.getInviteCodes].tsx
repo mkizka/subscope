@@ -1,11 +1,11 @@
 import { data } from "react-router";
 
-import { getSessionAgent } from "~/server/oauth/session";
+import { oauthSession } from "~/server/inject";
 
 import type { Route } from "./+types/bff.[me.subsco.admin.getInviteCodes]";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const agent = await getSessionAgent(request);
+  const agent = await oauthSession.getAgent(request);
 
   if (!agent) {
     return data({ error: "Unauthorized" }, { status: 401 });

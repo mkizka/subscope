@@ -9,7 +9,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     build: {
       rollupOptions: isSsrBuild
         ? {
-            input: "./app/server.ts",
+            input: "./app/server/inject.ts",
           }
         : undefined,
       sourcemap: true,
