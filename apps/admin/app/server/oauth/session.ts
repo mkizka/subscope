@@ -1,6 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { NodeOAuthClient } from "@atproto/oauth-client-node";
 import { SubscoAgent } from "@repo/client/api";
+import type { Request as ExpressRequest } from "express";
 import { createCookieSessionStorage } from "react-router";
 
 import { env } from "../env";
@@ -38,6 +39,11 @@ export class OAuthSession {
 
   async getUserDid(request: Request): Promise<string | null> {
     const session = await this.getSession(request.headers.get("Cookie"));
+    return session.data.did ?? null;
+  }
+
+  async getExpressUserDid(request: ExpressRequest): Promise<string | null> {
+    const session = await this.getSession(request.get("Cookie") ?? null);
     return session.data.did ?? null;
   }
 

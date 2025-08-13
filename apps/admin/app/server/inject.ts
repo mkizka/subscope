@@ -8,6 +8,7 @@ import { createInjector } from "typed-inject";
 
 import { appFactory } from "./app";
 import { env } from "./env";
+import { authMiddlewareFactory } from "./middleware/auth";
 import { oauthClientFactory } from "./oauth/client";
 import { OAuthSession } from "./oauth/session";
 import { SessionStore, StateStore } from "./oauth/storage";
@@ -28,6 +29,7 @@ const injector = createInjector()
   .provideClass("oauthSessionStore", SessionStore)
   .provideFactory("oauthClient", oauthClientFactory)
   .provideClass("oauthSession", OAuthSession)
+  .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("dashboardRouter", dashboardRouterFactory)
   .provideFactory("app", appFactory);
 

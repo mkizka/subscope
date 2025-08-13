@@ -1,7 +1,7 @@
 import "react-router";
 
 import { createRequestHandler } from "@react-router/express";
-import type { Router } from "express";
+import type { RequestHandler, Router } from "express";
 import express from "express";
 
 import { env } from "./env.js";
@@ -13,7 +13,10 @@ declare module "react-router" {
   }
 }
 
-export const appFactory = (dashboardRouter: Router): express.Express => {
+export const appFactory = (
+  dashboardRouter: Router,
+  authMiddleware: RequestHandler,
+): express.Express => {
   const app = express();
 
   // 開発環境でのOAuthログイン時 http://127.0.0.1/oauth/callback にリダイレクトされるので、
@@ -26,8 +29,8 @@ export const appFactory = (dashboardRouter: Router): express.Express => {
     }
   });
 
-  app.use(dashboardRouter);
   app.use(healthRouter);
+  app.use("/dashboard", authMiddleware, dashboardRouter);
 
   app.use(
     createRequestHandler({
@@ -42,4 +45,4 @@ export const appFactory = (dashboardRouter: Router): express.Express => {
 
   return app;
 };
-appFactory.inject = ["dashboardRouter"] as const;
+appFactory.inject = ["dashboardRouter", "authMiddleware"] as const;

@@ -14,8 +14,8 @@ export const dashboardRouterFactory = (jobQueue: IJobQueue): Router => {
     queues: jobQueue.getQueues().map((queue) => new BullMQAdapter(queue)),
     serverAdapter,
   });
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  dashboardRouter.use("/dashboard", serverAdapter.getRouter() as Router);
+
+  dashboardRouter.use(serverAdapter.getRouter());
   return dashboardRouter;
 };
 dashboardRouterFactory.inject = ["jobQueue"] as const;
