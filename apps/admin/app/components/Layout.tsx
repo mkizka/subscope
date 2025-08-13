@@ -18,9 +18,12 @@ export function Layout({ children, userDid }: LayoutProps) {
     }
   }, [userDid, fetcher]);
 
+  const profile = fetcher.data && "$type" in fetcher.data ? fetcher.data : null;
+  const displayName = profile?.displayName ?? profile?.handle ?? userDid;
+
   return (
     <div className="bg-base-200 flex min-h-screen flex-col">
-      <div className="bg-base-100 border-base-content/20 sticky top-0 z-50 flex border-b">
+      <header className="bg-base-100 border-base-content/20 sticky top-0 z-50 flex border-b">
         <div className="mx-auto w-full max-w-7xl">
           <nav className="navbar h-16">
             <div className="navbar-start">
@@ -33,61 +36,63 @@ export function Layout({ children, userDid }: LayoutProps) {
                 </span>
               </div>
             </div>
-
             <div className="navbar-end">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  {fetcher.state === "loading" ? (
-                    <div className="skeleton w-8 h-8 rounded-full"></div>
-                  ) : fetcher.data &&
-                    "avatar" in fetcher.data &&
-                    fetcher.data.avatar ? (
-                    <img
-                      src={fetcher.data.avatar}
-                      alt={fetcher.data.displayName || fetcher.data.handle}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
-                      <span className="icon-[tabler--user] size-4 text-base-content/60"></span>
-                    </div>
-                  )}
-                  <div className="text-sm">
-                    {fetcher.state === "loading" ? (
-                      <div>
-                        <div className="skeleton h-4 w-24 mb-1"></div>
-                        <div className="skeleton h-3 w-16"></div>
-                      </div>
-                    ) : fetcher.data && "handle" in fetcher.data ? (
-                      <>
-                        <div className="font-medium text-base-content">
-                          {fetcher.data.displayName || fetcher.data.handle}
+              <div className="dropdown relative inline-flex">
+                <button
+                  id="dropdown-avatar"
+                  type="button"
+                  className="dropdown-toggle btn btn-ghost btn-circle"
+                  aria-haspopup="menu"
+                  aria-expanded="false"
+                  aria-label="ユーザーメニュー"
+                >
+                  <div className="avatar hover:opacity-80 transition-opacity">
+                    <div className="size-10 rounded-full">
+                      {!fetcher.data ? (
+                        <div className="skeleton w-full h-full rounded-full" />
+                      ) : profile?.avatar ? (
+                        <img src={profile.avatar} alt={displayName} />
+                      ) : (
+                        <div className="w-full h-full bg-base-200 flex items-center justify-center">
+                          <span className="icon-[tabler--user] size-6 text-base-content"></span>
                         </div>
-                        {fetcher.data.handle && (
-                          <div className="text-xs text-base-content/60">
-                            @{fetcher.data.handle}
-                          </div>
-                        )}
-                      </>
-                    ) : null}
+                      )}
+                    </div>
                   </div>
-                </div>
-
-                <Form method="post" action="/oauth/logout">
-                  <button
-                    type="submit"
-                    className="btn btn-sm btn-soft btn-error gap-2"
-                  >
-                    <span className="icon-[tabler--logout] size-4"></span>
-                    ログアウト
-                  </button>
-                </Form>
+                </button>
+                <ul
+                  className="dropdown-menu dropdown-open:opacity-100 hidden min-w-60"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="dropdown-avatar"
+                >
+                  <li className="dropdown-header">
+                    <div>
+                      <h6 className="text-base-content text-base font-semibold">
+                        {displayName}
+                      </h6>
+                      <small className="text-base-content/50 text-sm font-normal">
+                        at://{userDid}
+                      </small>
+                    </div>
+                  </li>
+                  <li>
+                    <Form method="post" action="/oauth/logout">
+                      <button
+                        type="submit"
+                        className="dropdown-item text-error"
+                      >
+                        <span className="icon-[tabler--logout] size-5 mr-2"></span>
+                        ログアウト
+                      </button>
+                    </Form>
+                  </li>
+                </ul>
               </div>
             </div>
           </nav>
         </div>
-      </div>
-
+      </header>
       <div className="flex grow flex-col">
         <main className="mx-auto w-full max-w-7xl flex-1 p-6">{children}</main>
       </div>
