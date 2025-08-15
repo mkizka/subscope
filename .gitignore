@@ -13,6 +13,9 @@ generated/
 # claude
 .claude/settings.local.json
 
+# serena mcp
+.serena/
+
 # repomix
 *.xml
 
