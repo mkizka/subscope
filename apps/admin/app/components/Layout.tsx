@@ -77,6 +77,17 @@ export function Layout({ children, userDid }: LayoutProps) {
                     </div>
                   </li>
                   <li>
+                    <a
+                      href="/dashboard"
+                      className="dropdown-item"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span className="icon-[tabler--chart-bar] size-5 mr-2"></span>
+                      Bull Dashboard
+                    </a>
+                  </li>
+                  <li>
                     <Form method="post" action="/oauth/logout">
                       <button
                         type="submit"
