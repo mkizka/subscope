@@ -74,12 +74,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <div className="space-y-6">
         <div className="card bg-base-100 shadow-md">
           <div className="card-body">
-            <h1 className="card-title text-2xl">Admin Dashboard</h1>
-          </div>
-        </div>
-
-        <div className="card bg-base-100 shadow-md">
-          <div className="card-body">
             <h2 className="card-title text-xl mb-4">招待コード管理</h2>
 
             <button

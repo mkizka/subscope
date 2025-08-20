@@ -22,9 +22,9 @@ export function Layout({ children, userDid }: LayoutProps) {
   const displayName = profile?.displayName ?? profile?.handle ?? userDid;
 
   return (
-    <div className="bg-base-200 flex min-h-screen flex-col">
-      <header className="bg-base-100 border-base-content/20 sticky top-0 z-50 flex border-b">
-        <div className="mx-auto w-full max-w-7xl">
+    <div className="bg-gradient-to-br from-primary/5 via-base-200 to-secondary/5 flex min-h-screen flex-col">
+      <header className="bg-base-100 border-base-content/20 sticky top-0 z-50 flex border-b shadow-sm">
+        <div className="mx-auto w-full max-w-md px-4">
           <nav className="navbar h-16">
             <div className="navbar-start">
               <div className="flex items-center gap-2">
@@ -37,7 +37,7 @@ export function Layout({ children, userDid }: LayoutProps) {
               </div>
             </div>
             <div className="navbar-end">
-              <div className="dropdown relative inline-flex">
+              <div className="dropdown relative inline-flex [--placement:bottom-end]">
                 <button
                   id="dropdown-avatar"
                   type="button"
@@ -105,7 +105,11 @@ export function Layout({ children, userDid }: LayoutProps) {
         </div>
       </header>
       <div className="flex grow flex-col">
-        <main className="mx-auto w-full max-w-7xl flex-1 p-6">{children}</main>
+        <main className="mx-auto w-full max-w-md flex-1 p-4 flex flex-col">
+          <div className="bg-base-100 rounded-2xl shadow-lg p-6 flex-1 flex flex-col">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );
