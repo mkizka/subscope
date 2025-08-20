@@ -12,7 +12,6 @@ export default defineConfig(({ mode, isSsrBuild }) => {
             input: "./app/server/inject.ts",
           }
         : undefined,
-      sourcemap: true,
     },
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   };

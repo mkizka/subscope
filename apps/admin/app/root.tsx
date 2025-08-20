@@ -13,7 +13,7 @@ import type { Route } from "./+types/root";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang="ja" className="h-full">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,7 +21,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <div className="bg-base-200 min-h-dvh">
+          <div className="container mx-auto h-full min-h-dvh max-w-md p-4">
+            {children}
+          </div>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>

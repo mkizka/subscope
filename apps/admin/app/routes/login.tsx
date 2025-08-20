@@ -16,5 +16,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function LoginPage() {
-  return <LoginForm />;
+  return (
+    <div className="flex items-center justify-center min-h-dvh fixed inset-0">
+      <LoginForm />
+    </div>
+  );
 }
