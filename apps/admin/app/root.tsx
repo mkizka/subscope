@@ -1,6 +1,5 @@
 import "./app.css";
 
-import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -8,7 +7,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -31,29 +29,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// https://flyonui.com/docs/framework-integrations/remix/
-async function loadFlyonUI() {
-  return import("flyonui/flyonui");
-}
-
 export default function App() {
-  const location = useLocation();
-
-  useEffect(() => {
-    void loadFlyonUI();
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (
-        window.HSStaticMethods &&
-        typeof window.HSStaticMethods.autoInit === "function"
-      ) {
-        window.HSStaticMethods.autoInit();
-      }
-    }, 100);
-  }, [location.pathname]);
-
   return <Outlet />;
 }
 
