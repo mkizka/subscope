@@ -1,6 +1,5 @@
-import { schema } from "@repo/db";
 import { getTestSetup, inviteCodeFactory } from "@repo/test-utils";
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository.js";
 import { InviteCodeService } from "../../service/admin/invite-code-service.js";
@@ -8,10 +7,6 @@ import { GetInviteCodesUseCase } from "./get-invite-codes-use-case.js";
 
 describe("GetInviteCodesUseCase", () => {
   const { testInjector, ctx } = getTestSetup();
-
-  beforeEach(async () => {
-    await ctx.db.delete(schema.inviteCodes);
-  });
 
   const getInviteCodesUseCase = testInjector
     .provideClass("inviteCodeRepository", InviteCodeRepository)
