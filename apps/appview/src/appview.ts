@@ -78,6 +78,7 @@ import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js"
 import { SearchPosts } from "./presentation/routes/app/bsky/feed/searchPosts.js";
 import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
+import { ListNotifications } from "./presentation/routes/app/bsky/notification/listNotifications.js";
 import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createInviteCode.js";
 import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GetSubscribers } from "./presentation/routes/me/subsco/admin/getSubscribers.js";
@@ -171,6 +172,7 @@ createInjector()
   .provideClass("getRepostedBy", GetRepostedBy)
   .provideClass("getFollows", GetFollows)
   .provideClass("getFollowers", GetFollowers)
+  .provideClass("listNotifications", ListNotifications)
   .provideClass("createInviteCode", CreateInviteCode)
   .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("getSubscribers", GetSubscribers)

@@ -16,6 +16,7 @@ import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
+import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
@@ -40,6 +41,7 @@ export class XRPCRouter {
     searchPosts: SearchPosts,
     getFollows: GetFollows,
     getFollowers: GetFollowers,
+    listNotifications: ListNotifications,
     createInviteCode: CreateInviteCode,
     getInviteCodes: GetInviteCodes,
     getSubscribers: GetSubscribers,
@@ -61,6 +63,7 @@ export class XRPCRouter {
       searchPosts,
       getFollows,
       getFollowers,
+      listNotifications,
       createInviteCode,
       getInviteCodes,
       getSubscribers,
@@ -83,6 +86,7 @@ export class XRPCRouter {
     "searchPosts",
     "getFollows",
     "getFollowers",
+    "listNotifications",
     "createInviteCode",
     "getInviteCodes",
     "getSubscribers",
