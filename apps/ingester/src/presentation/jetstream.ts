@@ -135,7 +135,6 @@ export class JetstreamIngester {
           this.getStatus(),
           "Startup check: Cursor change detected, startup complete",
         );
-        this.metricReporter.setConnectionStateGauge("stable");
         this.startHealthCheck();
       }
     }, this.startupBackoffMs);
@@ -156,6 +155,7 @@ export class JetstreamIngester {
           "Health check: Cursor change detected, connection is healthy",
         );
         this.lastCheckedCursor = this.lastProcessedCursor;
+        this.metricReporter.setConnectionStateGauge("stable");
 
         // 意図：イベントごとではなくヘルスチェック通過時にcursorを保存することでRedisへの負荷を抑える
         void this.cursorRepository.set(required(this.lastProcessedCursor));
