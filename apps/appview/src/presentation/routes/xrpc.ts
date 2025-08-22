@@ -1,5 +1,6 @@
 import { createServer } from "@repo/client/server";
 
+import type { GetPreferences } from "./app/bsky/actor/getPreferences.js";
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
 import type { SearchActors } from "./app/bsky/actor/searchActors.js";
@@ -22,6 +23,7 @@ export class XRPCRouter {
   private readonly handlers;
 
   constructor(
+    getPreferences: GetPreferences,
     getProfile: GetProfile,
     getProfiles: GetProfiles,
     searchActors: SearchActors,
@@ -41,6 +43,7 @@ export class XRPCRouter {
     getSubscribers: GetSubscribers,
   ) {
     this.handlers = [
+      getPreferences,
       getProfile,
       getProfiles,
       searchActors,
@@ -61,6 +64,7 @@ export class XRPCRouter {
     ];
   }
   static inject = [
+    "getPreferences",
     "getProfile",
     "getProfiles",
     "searchActors",

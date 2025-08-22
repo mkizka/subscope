@@ -62,6 +62,7 @@ import { TokenVerifier } from "./infrastructure/token-verifier.js";
 import { AdminMiddleware } from "./presentation/middleware/admin-middleware.js";
 import { AuthVerifierMiddleware } from "./presentation/middleware/auth-verifier-middleware.js";
 import { HandleMiddleware } from "./presentation/middleware/handle-middleware.js";
+import { GetPreferences } from "./presentation/routes/app/bsky/actor/getPreferences.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
 import { SearchActors } from "./presentation/routes/app/bsky/actor/searchActors.js";
@@ -153,6 +154,7 @@ createInjector()
   .provideClass("getInviteCodesUseCase", GetInviteCodesUseCase)
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
   // presentation
+  .provideClass("getPreferences", GetPreferences)
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
   .provideClass("searchActors", SearchActors)
