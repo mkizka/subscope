@@ -10,8 +10,8 @@ wellKnownRouter.get("/.well-known/did.json", (req, res) => {
     id: env.SERVICE_DID,
     service: [
       {
-        id: `#appview`,
-        type: "AppView",
+        id: `#bsky_appview`,
+        type: "BskyAppView",
         serviceEndpoint: env.PUBLIC_URL,
       },
     ],

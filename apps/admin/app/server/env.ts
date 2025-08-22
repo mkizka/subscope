@@ -46,7 +46,7 @@ const schema = z.object({
   }),
   ATPROTO_PROXY: match({
     prod: z.string(),
-    dev: z.string().default("did:web:localhost%3A3001#appview"),
+    dev: z.string().default("did:web:localhost%3A3001#bsky_appview"),
   }),
 });
 
