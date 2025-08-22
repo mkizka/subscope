@@ -7,7 +7,19 @@ export class GetPreferences {
         return {
           encoding: "application/json",
           body: {
-            preferences: [],
+            preferences: [
+              {
+                $type: "app.bsky.actor.defs#savedFeedsPrefV2",
+                items: [
+                  {
+                    id: "3ksog462gr22d",
+                    type: "timeline",
+                    value: "following",
+                    pinned: true,
+                  },
+                ],
+              },
+            ],
           },
         };
       },
