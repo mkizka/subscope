@@ -65,6 +65,7 @@ import { HandleMiddleware } from "./presentation/middleware/handle-middleware.js
 import { GetPreferences } from "./presentation/routes/app/bsky/actor/getPreferences.js";
 import { GetProfile } from "./presentation/routes/app/bsky/actor/getProfile.js";
 import { GetProfiles } from "./presentation/routes/app/bsky/actor/getProfiles.js";
+import { PutPreferences } from "./presentation/routes/app/bsky/actor/putPreferences.js";
 import { SearchActors } from "./presentation/routes/app/bsky/actor/searchActors.js";
 import { SearchActorsTypeahead } from "./presentation/routes/app/bsky/actor/searchActorsTypeahead.js";
 import { GetActorLikes } from "./presentation/routes/app/bsky/feed/getActorLikes.js";
@@ -155,6 +156,7 @@ createInjector()
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
   // presentation
   .provideClass("getPreferences", GetPreferences)
+  .provideClass("putPreferences", PutPreferences)
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)
   .provideClass("searchActors", SearchActors)

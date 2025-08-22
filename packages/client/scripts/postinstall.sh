@@ -9,6 +9,7 @@ paths=(
   # app.bsky
   "app/bsky/actor/defs.json"
   "app/bsky/actor/getPreferences.json"
+  "app/bsky/actor/putPreferences.json"
   "app/bsky/actor/getProfile.json"
   "app/bsky/actor/getProfiles.json"
   "app/bsky/actor/profile.json"

@@ -3,6 +3,7 @@ import { createServer } from "@repo/client/server";
 import type { GetPreferences } from "./app/bsky/actor/getPreferences.js";
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
+import type { PutPreferences } from "./app/bsky/actor/putPreferences.js";
 import type { SearchActors } from "./app/bsky/actor/searchActors.js";
 import type { SearchActorsTypeahead } from "./app/bsky/actor/searchActorsTypeahead.js";
 import type { GetActorLikes } from "./app/bsky/feed/getActorLikes.js";
@@ -24,6 +25,7 @@ export class XRPCRouter {
 
   constructor(
     getPreferences: GetPreferences,
+    putPreferences: PutPreferences,
     getProfile: GetProfile,
     getProfiles: GetProfiles,
     searchActors: SearchActors,
@@ -44,6 +46,7 @@ export class XRPCRouter {
   ) {
     this.handlers = [
       getPreferences,
+      putPreferences,
       getProfile,
       getProfiles,
       searchActors,
@@ -65,6 +68,7 @@ export class XRPCRouter {
   }
   static inject = [
     "getPreferences",
+    "putPreferences",
     "getProfile",
     "getProfiles",
     "searchActors",
