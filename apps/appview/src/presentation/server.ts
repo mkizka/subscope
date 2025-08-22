@@ -1,5 +1,6 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { loggingMiddleware } from "@repo/common/utils";
+import cors from "cors";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
@@ -20,6 +21,7 @@ export class AppviewServer {
   ) {
     this.logger = loggerManager.createLogger("AppviewServer");
     this.app = express();
+    this.app.use(cors());
     this.app.use(loggingMiddleware(this.logger));
     this.app.use(
       promBundle({
