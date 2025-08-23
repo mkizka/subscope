@@ -732,6 +732,231 @@ describe("PostViewService", () => {
       });
     });
 
+    test("embedがapp.bsky.embed.recordWithMedia#viewの場合、画像と投稿の両方を含む埋め込みビューを取得できる", async () => {
+      // arrange
+      // 埋め込まれる投稿の作成
+      const embeddedAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Embedded Author" }))
+        .props({ handle: () => "embedded.bsky.social" })
+        .create();
+      const embeddedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => embeddedAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "This is the embedded post",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+      const embeddedPost = await postFactory(ctx.db)
+        .vars({ record: () => embeddedRecord })
+        .props({
+          text: () => "This is the embedded post",
+          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        })
+        .create();
+
+      // recordWithMediaを含む投稿の作成
+      const mainAuthor = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Main Author" }))
+        .props({ handle: () => "main.bsky.social" })
+        .create();
+      const imageCid1 =
+        "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
+      const imageCid2 =
+        "bafyreihg3cyqnx3cekbrrqxifcrphjkemcblsp5p4gey5ytnvqegeconoq";
+      const mainRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => mainAuthor })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Post with both images and quoted post",
+            embed: {
+              $type: "app.bsky.embed.recordWithMedia",
+              record: {
+                record: {
+                  uri: embeddedPost.uri,
+                  cid: embeddedPost.cid,
+                },
+              },
+              media: {
+                $type: "app.bsky.embed.images",
+                images: [
+                  {
+                    alt: "First image",
+                    image: {
+                      $type: "blob",
+                      ref: {
+                        $link: imageCid1,
+                      },
+                      mimeType: "image/jpeg",
+                      size: 123456,
+                    },
+                  },
+                  {
+                    alt: "Second image",
+                    image: {
+                      $type: "blob",
+                      ref: {
+                        $link: imageCid2,
+                      },
+                      mimeType: "image/png",
+                      size: 234567,
+                    },
+                  },
+                ],
+              },
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+      const mainPost = await postFactory(ctx.db)
+        .vars({ record: () => mainRecord })
+        .props({
+          text: () => "Post with both images and quoted post",
+          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
+        .create();
+
+      // 画像の埋め込みデータを作成
+      await postEmbedImageFactory(ctx.db)
+        .vars({ post: () => mainPost })
+        .props({
+          cid: () => imageCid1,
+          position: () => 0,
+          alt: () => "First image",
+        })
+        .create();
+      await postEmbedImageFactory(ctx.db)
+        .vars({ post: () => mainPost })
+        .props({
+          cid: () => imageCid2,
+          position: () => 1,
+          alt: () => "Second image",
+        })
+        .create();
+
+      // 投稿の埋め込みデータを作成
+      await postEmbedRecordFactory(ctx.db)
+        .vars({
+          post: () => mainPost,
+          embeddedPost: () => embeddedPost,
+        })
+        .create();
+
+      const mainPostUri = new AtUri(mainPost.uri);
+
+      // act
+      const result = await postViewService.findPostView([mainPostUri]);
+
+      // assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        $type: "app.bsky.feed.defs#postView",
+        uri: mainPost.uri,
+        cid: mainRecord.cid,
+        author: {
+          $type: "app.bsky.actor.defs#profileViewBasic",
+          did: mainAuthor.did,
+          handle: "main.bsky.social",
+          displayName: "Main Author",
+        },
+        record: {
+          $type: "app.bsky.feed.post",
+          text: "Post with both images and quoted post",
+          embed: {
+            $type: "app.bsky.embed.recordWithMedia",
+            record: {
+              record: {
+                uri: embeddedPost.uri,
+                cid: embeddedPost.cid,
+              },
+            },
+            media: {
+              $type: "app.bsky.embed.images",
+              images: [
+                {
+                  alt: "First image",
+                  image: {
+                    $type: "blob",
+                    ref: {
+                      $link: imageCid1,
+                    },
+                    mimeType: "image/jpeg",
+                    size: 123456,
+                  },
+                },
+                {
+                  alt: "Second image",
+                  image: {
+                    $type: "blob",
+                    ref: {
+                      $link: imageCid2,
+                    },
+                    mimeType: "image/png",
+                    size: 234567,
+                  },
+                },
+              ],
+            },
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        embed: {
+          $type: "app.bsky.embed.recordWithMedia#view",
+          record: {
+            record: {
+              $type: "app.bsky.embed.record#viewRecord",
+              uri: embeddedPost.uri,
+              cid: embeddedRecord.cid,
+              author: {
+                $type: "app.bsky.actor.defs#profileViewBasic",
+                did: embeddedAuthor.did,
+                handle: "embedded.bsky.social",
+                displayName: "Embedded Author",
+              },
+              value: {
+                $type: "app.bsky.feed.post",
+                text: "This is the embedded post",
+                createdAt: "2024-01-01T00:00:00.000Z",
+              },
+              indexedAt: "2024-01-01T00:00:00.000Z",
+              replyCount: 0,
+              repostCount: 0,
+              likeCount: 0,
+              quoteCount: 0,
+            },
+          },
+          media: {
+            $type: "app.bsky.embed.images#view",
+            images: [
+              {
+                alt: "First image",
+                thumb: `http://localhost:3004/images/feed_thumbnail/${mainAuthor.did}/${imageCid1}.jpg`,
+                fullsize: `http://localhost:3004/images/feed_fullsize/${mainAuthor.did}/${imageCid1}.jpg`,
+              },
+              {
+                alt: "Second image",
+                thumb: `http://localhost:3004/images/feed_thumbnail/${mainAuthor.did}/${imageCid2}.jpg`,
+                fullsize: `http://localhost:3004/images/feed_fullsize/${mainAuthor.did}/${imageCid2}.jpg`,
+              },
+            ],
+          },
+        },
+        replyCount: 0,
+        repostCount: 0,
+        likeCount: 0,
+        quoteCount: 0,
+        indexedAt: "2024-01-01T01:00:00.000Z",
+      });
+    });
+
     test("埋め込みの埋め込み（A→B→C）の場合、3階層すべての投稿ビューを取得できる", async () => {
       // arrange
       // C: 最初の投稿

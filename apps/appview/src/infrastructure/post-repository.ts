@@ -5,6 +5,7 @@ import {
   PostEmbedExternal,
   PostEmbedImage,
   PostEmbedRecord,
+  PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, ilike, inArray, isNull, lt } from "drizzle-orm";
@@ -37,47 +38,90 @@ export class PostRepository implements IPostRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  private escapeWildcards(query: string): string {
-    return query.replace(/[%_]/g, "\\$&");
+  private createPostEmbedImage(image: SelectPostEmbedImage): PostEmbedImage {
+    return new PostEmbedImage({
+      cid: image.cid,
+      position: image.position,
+      alt: image.alt,
+      aspectRatio:
+        image.aspectRatioWidth && image.aspectRatioHeight
+          ? {
+              width: image.aspectRatioWidth,
+              height: image.aspectRatioHeight,
+            }
+          : undefined,
+    });
   }
 
-  private convertToEmbed(post: SelectPost) {
+  private postEmbedImages(images: SelectPostEmbedImage[]): PostEmbedImage[] {
+    return images.map((image) => this.createPostEmbedImage(image));
+  }
+
+  private postEmbedExternal(
+    external: SelectPostEmbedExternal,
+  ): PostEmbedExternal {
+    return new PostEmbedExternal(
+      external.uri,
+      external.title,
+      external.description,
+      external.thumbCid,
+    );
+  }
+
+  private postEmbedRecord(record: SelectPostEmbedRecord): PostEmbedRecord {
+    return new PostEmbedRecord({
+      uri: record.uri,
+      cid: record.cid,
+    });
+  }
+
+  private recordWithMedia(
+    record: SelectPostEmbedRecord,
+    media: PostEmbedImage[] | PostEmbedExternal,
+  ): PostEmbedRecordWithMedia {
+    return new PostEmbedRecordWithMedia({
+      uri: record.uri,
+      cid: record.cid,
+      media,
+    });
+  }
+
+  private embed(post: SelectPost) {
+    // レコードと画像の両方がある場合
+    if (post.embedRecord && post.embedImages.length > 0) {
+      return this.recordWithMedia(
+        post.embedRecord,
+        this.postEmbedImages(post.embedImages),
+      );
+    }
+
+    // レコードと外部リンクの両方がある場合
+    if (post.embedRecord && post.embedExternal) {
+      return this.recordWithMedia(
+        post.embedRecord,
+        this.postEmbedExternal(post.embedExternal),
+      );
+    }
+
+    //  外部リンクのみ
     if (post.embedExternal) {
-      return new PostEmbedExternal(
-        post.embedExternal.uri,
-        post.embedExternal.title,
-        post.embedExternal.description,
-        post.embedExternal.thumbCid,
-      );
+      return this.postEmbedExternal(post.embedExternal);
     }
+
+    // 画像のみ
     if (post.embedImages.length > 0) {
-      return post.embedImages.map(
-        (image) =>
-          new PostEmbedImage({
-            cid: image.cid,
-            position: image.position,
-            alt: image.alt,
-            aspectRatio:
-              image.aspectRatioWidth && image.aspectRatioHeight
-                ? {
-                    width: image.aspectRatioWidth,
-                    height: image.aspectRatioHeight,
-                  }
-                : undefined,
-          }),
-      );
+      return this.postEmbedImages(post.embedImages);
     }
+
+    // レコードのみ
     if (post.embedRecord) {
-      return new PostEmbedRecord({
-        uri: post.embedRecord.uri,
-        cid: post.embedRecord.cid,
-      });
+      return this.postEmbedRecord(post.embedRecord);
     }
+
     return null;
   }
 
-  private convertToPost(post: SelectPost) {
-    const embed = this.convertToEmbed(post);
+  private post(post: SelectPost) {
     return new Post({
       uri: post.uri,
       cid: post.cid,
@@ -86,7 +130,7 @@ export class PostRepository implements IPostRepository {
       replyRoot: getStrongRef(post.replyRootUri, post.replyRootCid),
       replyParent: getStrongRef(post.replyParentUri, post.replyParentCid),
       langs: post.langs,
-      embed,
+      embed: this.embed(post),
       createdAt: post.createdAt,
       sortAt: post.sortAt,
       indexedAt: post.indexedAt,
@@ -107,7 +151,7 @@ export class PostRepository implements IPostRepository {
         embedRecord: true,
       },
     });
-    return postsWithEmbeds.map((post) => this.convertToPost(post));
+    return postsWithEmbeds.map((post) => this.post(post));
   }
 
   async findMany(params: { limit: number; cursor?: string }) {
@@ -129,7 +173,7 @@ export class PostRepository implements IPostRepository {
         embedRecord: true,
       },
     });
-    return postsWithEmbeds.map((post) => this.convertToPost(post));
+    return postsWithEmbeds.map((post) => this.post(post));
   }
 
   async findByUri(uri: AtUri): Promise<Post | null> {
@@ -148,7 +192,7 @@ export class PostRepository implements IPostRepository {
       return null;
     }
 
-    return this.convertToPost(postWithEmbeds);
+    return this.post(postWithEmbeds);
   }
 
   async findReplies(uri: AtUri, limit?: number): Promise<Post[]> {
@@ -165,7 +209,11 @@ export class PostRepository implements IPostRepository {
       },
     });
 
-    return postsWithEmbeds.map((post) => this.convertToPost(post));
+    return postsWithEmbeds.map((post) => this.post(post));
+  }
+
+  private escapeWildcards(query: string): string {
+    return query.replace(/[%_]/g, "\\$&");
   }
 
   async search(params: {
@@ -197,6 +245,6 @@ export class PostRepository implements IPostRepository {
       },
     });
 
-    return postsWithEmbeds.map((post) => this.convertToPost(post));
+    return postsWithEmbeds.map((post) => this.post(post));
   }
 }
