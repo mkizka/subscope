@@ -9,7 +9,7 @@ import type { HandleIdentityUseCase } from "../application/handle-identity-use-c
 import type { ICursorRepository } from "../application/interfaces/cursor-repository.js";
 import { env } from "../shared/env.js";
 
-const DEFAULT_STARTUP_BACKOFF = 1000;
+const DEFAULT_RESTART_BACKOFF_MS = 1000;
 
 export class JetstreamIngester {
   private readonly jetstream;
@@ -18,16 +18,12 @@ export class JetstreamIngester {
   private lastProcessedCursor: number | null = null;
   private lastCheckedCursor: number | null = null;
 
-  // startupCheck
-  //   起動後にcursorが変化して新しいイベントを受け続けていることを確認するチェック
-  private startupCheckTimeout?: NodeJS.Timeout;
-  private startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
-  private readonly maxStartupBackoffMs = 60000;
+  private restartBackoffMs = DEFAULT_RESTART_BACKOFF_MS;
+  private readonly maxRestartBackoffMs = 60000;
 
-  // healthCheck
-  //   startupCheck通過後に定期的にcursorが変化しているかを確認するチェック
+  private isFirstHealthCheckPassed = false;
   private healthCheckInterval?: NodeJS.Timeout;
-  private readonly healthCheckIntervalMs = 30000;
+  private readonly healthCheckIntervalMs = 3000;
 
   constructor(
     loggerManager: ILoggerManager,
@@ -46,18 +42,23 @@ export class JetstreamIngester {
 
     this.jetstream.on("open", () => {
       this.logger.info(
-        this.getStatus(),
         `Jetstream subscription started at ${env.JETSTREAM_URL} with cursor ${this.jetstream.cursor}`,
       );
       this.metricReporter.setConnectionStateGauge("opened");
-      this.startStartupCheck();
+
+      this.startHealthCheck();
     });
 
     this.jetstream.on("close", () => {
-      this.logger.info(this.getStatus(), `Jetstream subscription closed`);
-      this.stopStartupCheck();
-      this.stopHealthCheck();
+      this.logger.info(
+        `Jetstream subscription closed, restarting in ${this.restartBackoffMs}ms`,
+      );
       this.metricReporter.setConnectionStateGauge("closed");
+
+      // どんな原因でクローズしたとして必ず再度スタートする
+      setTimeout(() => {
+        void this.start();
+      }, this.restartBackoffMs);
     });
 
     this.jetstream.on("error", (error) => {
@@ -88,72 +89,40 @@ export class JetstreamIngester {
     "cursorRepository",
   ] as const;
 
-  private getStatus() {
-    return {
-      lastProcessedCursor: this.lastProcessedCursor,
-      lastCheckedCursor: this.lastCheckedCursor,
-      startupBackoffMs: this.startupBackoffMs,
-    };
-  }
-
-  private stopStartupCheck() {
-    this.logger.info(this.getStatus(), "Stopping startup check");
-    if (this.startupCheckTimeout) {
-      clearTimeout(this.startupCheckTimeout);
-      this.startupCheckTimeout = undefined;
-    }
-    this.startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
-  }
-
-  private stopHealthCheck() {
-    this.logger.info(this.getStatus(), "Stopping health check");
+  private startHealthCheck() {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = undefined;
     }
-  }
 
-  private startStartupCheck() {
-    this.lastCheckedCursor = this.lastProcessedCursor;
-    this.scheduleStartupCheck();
-  }
-
-  private scheduleStartupCheck() {
-    setTimeout(() => {
-      if (this.lastProcessedCursor === this.lastCheckedCursor) {
-        this.logger.warn(
-          this.getStatus(),
-          "Startup check: No cursor change detected, initiating reconnection",
-        );
-        this.startupBackoffMs = Math.min(
-          this.startupBackoffMs * 2,
-          this.maxStartupBackoffMs,
-        );
-        void this.reconnect();
-      } else {
-        this.logger.info(
-          this.getStatus(),
-          "Startup check: Cursor change detected, startup complete",
-        );
-        this.startHealthCheck();
-      }
-    }, this.startupBackoffMs);
-  }
-
-  private startHealthCheck() {
     this.healthCheckInterval = setInterval(() => {
       if (this.lastProcessedCursor === this.lastCheckedCursor) {
-        this.logger.warn(
-          this.getStatus(),
-          "Health check: No cursor change detected, initiating reconnection",
-        );
-        this.startupBackoffMs = DEFAULT_STARTUP_BACKOFF;
-        void this.reconnect();
+        this.logger.warn("HealthCheck: No cursor change detected");
+
+        // this.jetstream.close()が完了するより前に次のヘルスチェックが来る可能性があるので
+        // 失敗と分かったらすぐ終了
+        clearInterval(this.healthCheckInterval);
+
+        // 最初のヘルスチェックが成功した後2度目以降のヘルスチェックで問題があった場合は
+        // 再接続までの待機時間をリセットしてからクローズする
+        if (this.isFirstHealthCheckPassed) {
+          this.isFirstHealthCheckPassed = false;
+          this.restartBackoffMs = DEFAULT_RESTART_BACKOFF_MS;
+        }
+        // 最初のヘルスチェックから失敗した場合は次回の再接続時間を延ばしてクローズる
+        else {
+          this.restartBackoffMs = Math.min(
+            this.restartBackoffMs * 2,
+            this.maxRestartBackoffMs,
+          );
+        }
+
+        this.jetstream.close(); // closeイベントで再接続される
       } else {
         this.logger.info(
-          this.getStatus(),
-          "Health check: Cursor change detected, connection is healthy",
+          "HealthCheck: Cursor change detected, connection is healthy",
         );
+
+        this.isFirstHealthCheckPassed = true;
         this.lastCheckedCursor = this.lastProcessedCursor;
         this.metricReporter.setConnectionStateGauge("stable");
 
@@ -161,12 +130,6 @@ export class JetstreamIngester {
         void this.cursorRepository.set(required(this.lastProcessedCursor));
       }
     }, this.healthCheckIntervalMs);
-  }
-
-  private async reconnect() {
-    this.jetstream.close();
-    this.logger.info(this.getStatus(), "Reconnecting to Jetstream");
-    await this.start();
   }
 
   private async getCursor() {
