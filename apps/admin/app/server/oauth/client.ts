@@ -24,9 +24,9 @@ export const oauthClientFactory = async (
   const oauthClientOptions: NodeOAuthClientOptions = {
     clientMetadata: {
       client_name: "Linkat",
-      client_id: `${env.PUBLIC_URL}/client-metadata.json`,
+      client_id: `${env.PUBLIC_URL}/oauth/client-metadata.json`,
       client_uri: baseUrl,
-      jwks_uri: `${baseUrl}/jwks.json`,
+      jwks_uri: `${baseUrl}/oauth/jwks.json`,
       redirect_uris: [redirectUri],
       scope,
       grant_types: ["authorization_code", "refresh_token"],
