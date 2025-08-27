@@ -23,7 +23,7 @@ export class JetstreamIngester {
 
   private isFirstHealthCheckPassed = false;
   private healthCheckInterval?: NodeJS.Timeout;
-  private readonly healthCheckIntervalMs = 3000;
+  private readonly healthCheckIntervalMs = 30000;
 
   constructor(
     loggerManager: ILoggerManager,
