@@ -10,28 +10,20 @@ import type {
 
 const createQueueOptionsBuilder =
   (redisUrl: string) =>
-  (jobOptions?: QueueOptions["defaultJobOptions"]): QueueOptions => {
-    // https://docs.railway.com/reference/errors/enotfound-redis-railway-internal#using-bullmq
-    const redisURL = new URL(redisUrl);
-    return {
-      defaultJobOptions: {
-        removeOnComplete: {
-          age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
-        },
-        removeOnFail: {
-          age: 24 * 60 * 60,
-        },
-        ...jobOptions,
+  (jobOptions?: QueueOptions["defaultJobOptions"]): QueueOptions => ({
+    defaultJobOptions: {
+      removeOnComplete: {
+        age: 10, // 完了速度を測定するために短時間(Prometheusのスクレイピング時間5秒と少し)で削除
       },
-      connection: {
-        family: 0,
-        host: redisURL.hostname,
-        port: Number(redisURL.port),
-        username: redisURL.username,
-        password: redisURL.password,
+      removeOnFail: {
+        age: 24 * 60 * 60,
       },
-    };
-  };
+      ...jobOptions,
+    },
+    connection: {
+      url: redisUrl,
+    },
+  });
 
 const withRetry = {
   attempts: 3,
