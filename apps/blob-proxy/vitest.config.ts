@@ -1,9 +1,5 @@
-import { defineProject } from "vitest/config";
+import { defineProject, mergeConfig } from "vitest/config";
 
-export default defineProject({
-  test: {
-    globalSetup: "./vitest.global-setup.ts",
-    testTimeout: 120000, // 2 min
-    clearMocks: true,
-  },
-});
+import baseConfig from "../../vitest.shared.js";
+
+export default mergeConfig(baseConfig, defineProject({}));
