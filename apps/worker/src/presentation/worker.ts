@@ -19,16 +19,10 @@ const createWorker = <T extends keyof JobData>(
   process: Processor<JobData[T], void>,
   options?: Omit<WorkerOptions, "connection" | "autorun">,
 ) => {
-  // https://docs.railway.com/reference/errors/enotfound-redis-railway-internal#using-bullmq
-  const redisURL = new URL(env.REDIS_URL);
   return new Worker<JobData[T]>(name, process, {
     autorun: false,
     connection: {
-      family: 0,
-      host: redisURL.hostname,
-      port: Number(redisURL.port),
-      username: redisURL.username,
-      password: redisURL.password,
+      url: env.REDIS_URL,
     },
     ...options,
   });
