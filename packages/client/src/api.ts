@@ -27,3 +27,5 @@ export class SubscoAgent extends AtpBaseClient {
     return this.oauthSession.did;
   }
 }
+
+export class SubscoBrowserAgent extends AtpBaseClient {}
