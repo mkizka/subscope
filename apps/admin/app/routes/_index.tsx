@@ -1,6 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { Link, redirect } from "react-router";
 
+import { HeaderCard } from "~/components/HeaderCard";
 import { oauthSession } from "~/server/inject";
 
 import type { Route } from "./+types/_index";
@@ -37,11 +38,7 @@ function LinkCard({
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="grid grid-cols-2 gap-2">
-      <div className="card bg-base-100 w-full shadow-sm col-span-2">
-        <div className="card-body items-center">
-          <h1 className="text-xl font-bold">Subscope Admin</h1>
-        </div>
-      </div>
+      <HeaderCard className="col-span-2" />
       <LinkCard to="/invite-codes">
         <span className="icon-[tabler--ticket] size-10"></span>
         招待コード
