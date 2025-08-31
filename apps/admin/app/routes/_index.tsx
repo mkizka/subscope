@@ -1,4 +1,5 @@
-import { redirect } from "react-router";
+import type { ComponentProps, ReactNode } from "react";
+import { Link, redirect } from "react-router";
 
 import { oauthSession } from "~/server/inject";
 
@@ -16,17 +17,39 @@ export async function loader({ request }: Route.LoaderArgs) {
   };
 }
 
+function LinkCard({
+  to,
+  children,
+}: {
+  to: ComponentProps<typeof Link>["to"];
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      className="card bg-base-100 w-full shadow-sm hover:bg-base-200"
+      to={to}
+    >
+      <div className="card-body items-center">{children}</div>
+    </Link>
+  );
+}
+
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="min-h-screen bg-base-200">
-      <div className="container mx-auto p-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">ホーム</h1>
-          <p className="text-base-content/60 mt-2">
-            ログイン済み: {loaderData.userDid}
-          </p>
+    <div className="grid grid-cols-2 gap-2">
+      <div className="card bg-base-100 w-full shadow-sm col-span-2">
+        <div className="card-body items-center">
+          <h1 className="text-xl font-bold">Subscope Admin</h1>
         </div>
       </div>
+      <LinkCard to="/invite-codes">
+        <span className="icon-[tabler--ticket] size-10"></span>
+        招待コード
+      </LinkCard>
+      <LinkCard to="/subscribers">
+        <span className="icon-[tabler--user] size-10"></span>
+        サブスクライバー
+      </LinkCard>
     </div>
   );
 }

@@ -8,8 +8,8 @@
   prefersdark: false;
   color-scheme: "light";
   --color-base-100: oklch(100% 0 0);
-  --color-base-200: oklch(93% 0 0);
-  --color-base-300: oklch(86% 0 0);
+  --color-base-200: oklch(96% 0 0);
+  --color-base-300: oklch(92% 0 0);
   --color-base-content: oklch(22.389% 0.031 278.072);
   --color-primary: oklch(51% 0.262 276.966);
   --color-primary-content: oklch(100% 0 0);
@@ -35,4 +35,12 @@
   --border: 2px;
   --depth: 1;
   --noise: 1;
+}
+
+body {
+  font-family: "Murecho", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  --font-weight-bold: 800;
 }

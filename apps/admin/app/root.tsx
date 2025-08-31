@@ -19,9 +19,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Murecho:wght@100..900&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body>
-        <div className="bg-base-200 min-h-dvh">
+        <div className="bg-base-300 min-h-dvh">
           <div className="container mx-auto h-full min-h-dvh max-w-md p-4">
             {children}
           </div>
