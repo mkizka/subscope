@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 
-import { LoginForm } from "~/components/LoginForm";
+import { LoginForm } from "~/components/login-form";
 import { oauthSession } from "~/server/inject";
 
 import type { Route } from "./+types/login";

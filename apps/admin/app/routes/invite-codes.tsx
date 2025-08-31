@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { redirect } from "react-router";
 import useSWRInfinite from "swr/infinite";
 
-import { HeaderCard } from "~/components/HeaderCard";
+import { HeaderCard } from "~/components/header-card";
 import { InfiniteScroll } from "~/components/infinite-scroll";
 import { oauthSession } from "~/server/inject";
 

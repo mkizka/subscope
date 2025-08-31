@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { Link, redirect } from "react-router";
 
-import { HeaderCard } from "~/components/HeaderCard";
+import { HeaderCard } from "~/components/header-card";
 import { oauthSession } from "~/server/inject";
 
 import type { Route } from "./+types/_index";
