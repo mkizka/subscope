@@ -74,7 +74,7 @@ const getKey = (pageIndex: number, previousPageData: XRPCResponse | null) => {
 };
 
 const fetcher = async ([, cursor]: [string, string | null]) => {
-  const agent = new SubscoBrowserAgent(location.href);
+  const agent = new SubscoBrowserAgent();
   const response = await agent.me.subsco.admin.getInviteCodes({
     limit: 5,
     cursor: cursor ?? undefined,
@@ -94,6 +94,7 @@ export default function Page() {
     return data.flatMap((page) => page.codes);
   }, [data]);
 
+  // 初期描画時からspinnerを出しておきたいので、初回読み込み(isLoading=true)の時もtrueにする
   const hasMore = Boolean(data?.at(-1)?.cursor) || isLoading;
   const loadMore = () => setSize((size) => size + 1);
   const reload = () => mutate();

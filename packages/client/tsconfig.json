@@ -1,6 +1,7 @@
 {
   "extends": ["@tsconfig/node-lts/tsconfig"],
   "compilerOptions": {
+    "lib": ["DOM"],
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,

@@ -28,4 +28,8 @@ export class SubscoAgent extends AtpBaseClient {
   }
 }
 
-export class SubscoBrowserAgent extends AtpBaseClient {}
+export class SubscoBrowserAgent extends AtpBaseClient {
+  constructor() {
+    super({ service: location.href });
+  }
+}
