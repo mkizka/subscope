@@ -46,6 +46,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 const queryClient = new QueryClient();
 
+// Devツール用
+if (typeof window !== "undefined") {
+  // @ts-expect-error
+  window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
