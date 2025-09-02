@@ -1,15 +1,19 @@
 import { useEffect, useRef } from "react";
 
+import { cn } from "~/utils/cn";
+
 interface InfiniteScrollProps {
   onIntersect: () => void;
   hasMore: boolean;
   isLoading: boolean;
+  className?: string;
 }
 
 export function InfiniteScroll({
   onIntersect,
   hasMore,
   isLoading,
+  className,
 }: InfiniteScrollProps) {
   const triggerRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,9 +39,9 @@ export function InfiniteScroll({
   if (!hasMore) return null;
 
   return (
-    <div ref={triggerRef} className="flex justify-center py-4">
+    <div ref={triggerRef} className={cn("flex justify-center", className)}>
       {isLoading && (
-        <span className="loading loading-spinner loading-md"></span>
+        <span className="loading loading-spinner loading-xl"></span>
       )}
     </div>
   );
