@@ -15,6 +15,7 @@ declare module "react-router" {
 
 export const appFactory = (
   dashboardRouter: Router,
+  xrpcProxyRouter: Router,
   authMiddleware: RequestHandler,
 ): express.Express => {
   const app = express();
@@ -31,6 +32,7 @@ export const appFactory = (
 
   app.use(healthRouter);
   app.use("/dashboard", authMiddleware, dashboardRouter);
+  app.use("/xrpc", authMiddleware, express.json(), xrpcProxyRouter);
 
   app.use(
     createRequestHandler({
@@ -45,4 +47,8 @@ export const appFactory = (
 
   return app;
 };
-appFactory.inject = ["dashboardRouter", "authMiddleware"] as const;
+appFactory.inject = [
+  "dashboardRouter",
+  "xrpcProxyRouter",
+  "authMiddleware",
+] as const;

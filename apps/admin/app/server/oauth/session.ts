@@ -52,6 +52,18 @@ export class OAuthSession {
     if (!did) {
       return null;
     }
+    return this.createAgent(did);
+  }
+
+  async getExpressAgent(request: ExpressRequest) {
+    const did = await this.getExpressUserDid(request);
+    if (!did) {
+      return null;
+    }
+    return this.createAgent(did);
+  }
+
+  private async createAgent(did: string) {
     let oauthSession;
     try {
       const client = await this.oauthClient;

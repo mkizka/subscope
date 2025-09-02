@@ -13,6 +13,7 @@ import { oauthClientFactory } from "./oauth/client";
 import { OAuthSession } from "./oauth/session";
 import { SessionStore, StateStore } from "./oauth/storage";
 import { dashboardRouterFactory } from "./routes/dashboard";
+import { xrpcProxyRouterFactory } from "./routes/xrpc-proxy";
 
 const injector = createInjector()
   // envs
@@ -31,6 +32,7 @@ const injector = createInjector()
   .provideClass("oauthSession", OAuthSession)
   .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("dashboardRouter", dashboardRouterFactory)
+  .provideFactory("xrpcProxyRouter", xrpcProxyRouterFactory)
   .provideFactory("app", appFactory);
 
 export const loggerManager = injector.resolve("loggerManager");
