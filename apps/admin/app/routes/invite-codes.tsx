@@ -1,6 +1,6 @@
 import type { MeSubscoAdminGetInviteCodes } from "@repo/client/api";
 import { SubscoBrowserAgent } from "@repo/client/api";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { redirect } from "react-router";
 
 import { HeaderCard } from "~/components/header-card";
@@ -97,6 +97,17 @@ export default function Page() {
     refetchOnWindowFocus: false,
   });
 
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const agent = new SubscoBrowserAgent();
+      const response = await agent.me.subsco.admin.createInviteCode({
+        daysToExpire: 30,
+      });
+      return response.data;
+    },
+    onSuccess: () => refetch(),
+  });
+
   // 初期描画時からspinnerを出しておきたいので、初回読み込み(isPending=true)の時もtrueにする
   const hasMore = isPending || hasNextPage;
   const loadMore = () => fetchNextPage();
@@ -107,14 +118,28 @@ export default function Page() {
       <HeaderCard />
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body flex-row justify-center">
-          <button className="btn btn-primary w-fit">
-            <span className="icon-[tabler--circle-plus] size-5"></span>
-            招待コードを新規作成
-          </button>
-          <button className="btn btn-secondary w-fit" onClick={reload}>
+          <button
+            className="btn btn-primary w-fit"
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
+          >
             <span
-              className={cn("icon-[tabler--refresh] size-5", {
-                "animate-spin": isRefetching,
+              className={cn("size-5", {
+                "icon-[tabler--circle-plus]": !mutation.isPending,
+                "icon-[tabler--loader-2] animate-spin": mutation.isPending,
+              })}
+            ></span>
+            招待コード作成
+          </button>
+          <button
+            className="btn btn-secondary w-fit"
+            onClick={reload}
+            disabled={isRefetching}
+          >
+            <span
+              className={cn("size-5", {
+                "icon-[tabler--refresh]": !isRefetching,
+                "icon-[tabler--loader-2] animate-spin": isRefetching,
               })}
             ></span>
             一覧を更新
