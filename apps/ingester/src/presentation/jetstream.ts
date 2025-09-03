@@ -9,8 +9,6 @@ import type { HandleIdentityUseCase } from "../application/handle-identity-use-c
 import type { ICursorRepository } from "../application/interfaces/cursor-repository.js";
 import { env } from "../shared/env.js";
 
-const DEFAULT_RESTART_BACKOFF_MS = 1000;
-
 export class JetstreamIngester {
   private readonly jetstream;
   private readonly logger;
@@ -18,10 +16,6 @@ export class JetstreamIngester {
   private lastProcessedCursor: number | null = null;
   private lastCheckedCursor: number | null = null;
 
-  private restartBackoffMs = DEFAULT_RESTART_BACKOFF_MS;
-  private readonly maxRestartBackoffMs = 60000;
-
-  private isFirstHealthCheckPassed = false;
   private healthCheckInterval?: NodeJS.Timeout;
   private readonly healthCheckIntervalMs = 30000;
 
@@ -50,15 +44,8 @@ export class JetstreamIngester {
     });
 
     this.jetstream.on("close", () => {
-      this.logger.info(
-        `Jetstream subscription closed, restarting in ${this.restartBackoffMs}ms`,
-      );
+      this.logger.info("Jetstream subscription closed");
       this.metricReporter.setConnectionStateGauge("closed");
-
-      // どんな原因でクローズしたとして必ず再度スタートする
-      setTimeout(() => {
-        void this.start();
-      }, this.restartBackoffMs);
     });
 
     this.jetstream.on("error", (error) => {
@@ -98,31 +85,16 @@ export class JetstreamIngester {
       if (this.lastProcessedCursor === this.lastCheckedCursor) {
         this.logger.warn("HealthCheck: No cursor change detected");
 
-        // this.jetstream.close()が完了するより前に次のヘルスチェックが来る可能性があるので
-        // 失敗と分かったらすぐ終了
+        // Websocketのクローズ処理が完了するより前に次のインターバルが来る可能性があるので
+        // 失敗と分かったらすぐ終了しておく
         clearInterval(this.healthCheckInterval);
 
-        // 最初のヘルスチェックが成功した後2度目以降のヘルスチェックで問題があった場合は
-        // 再接続までの待機時間をリセットしてからクローズする
-        if (this.isFirstHealthCheckPassed) {
-          this.isFirstHealthCheckPassed = false;
-          this.restartBackoffMs = DEFAULT_RESTART_BACKOFF_MS;
-        }
-        // 最初のヘルスチェックから失敗した場合は次回の再接続時間を延ばしてクローズる
-        else {
-          this.restartBackoffMs = Math.min(
-            this.restartBackoffMs * 2,
-            this.maxRestartBackoffMs,
-          );
-        }
-
-        this.jetstream.close(); // closeイベントで再接続される
+        required(this.jetstream.ws).reconnect();
       } else {
         this.logger.info(
           "HealthCheck: Cursor change detected, connection is healthy",
         );
 
-        this.isFirstHealthCheckPassed = true;
         this.lastCheckedCursor = this.lastProcessedCursor;
         this.metricReporter.setConnectionStateGauge("stable");
 
