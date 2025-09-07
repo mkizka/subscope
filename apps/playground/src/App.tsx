@@ -1,5 +1,4 @@
 import { AtpAgent } from "@atproto/api";
-import { required } from "@repo/common/utils";
 
 export function App() {
   const createSubscriptionRecord = async () => {
@@ -13,11 +12,13 @@ export function App() {
     });
 
     await agent.com.atproto.repo.createRecord({
-      repo: required(agent.session).did,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      repo: agent.session!.did,
       collection: "me.subsco.sync.subscription",
       record: {
         appviewDid: "did:web:appview.localhost",
         createdAt: new Date().toISOString(),
+        inviteCode: "localhost-sreuv",
       },
     });
 
