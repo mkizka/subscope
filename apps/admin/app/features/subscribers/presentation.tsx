@@ -78,7 +78,7 @@ export function SubscribersPresentation({
           <SubscribersList subscribers={subscribers} />
         )}
         <InfiniteScroll
-          className="mt-8 mb-4"
+          className="p-6"
           onIntersect={loadMore}
           hasMore={hasMore}
           isLoading={isFetching}
