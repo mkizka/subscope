@@ -25,3 +25,6 @@ coverage/
 # react-router
 .react-router/
 build/
+
+*storybook.log
+storybook-static

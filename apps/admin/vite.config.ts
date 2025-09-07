@@ -4,6 +4,8 @@ import type { UserConfig } from "vite";
 import { defineConfig, loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+const isStorybook = process.argv[1]?.includes("storybook");
+
 export default defineConfig(({ mode, isSsrBuild }) => {
   const configs: UserConfig = {
     build: {
@@ -13,7 +15,12 @@ export default defineConfig(({ mode, isSsrBuild }) => {
           }
         : undefined,
     },
-    plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+    plugins: [
+      tailwindcss(),
+      // https://v2.remix.run/docs/guides/vite/#plugin-usage-with-other-vite-based-tools-eg-vitest-storybook
+      !isStorybook && reactRouter(),
+      tsconfigPaths(),
+    ],
   };
 
   // https://vite.dev/config/#using-environment-variables-in-config

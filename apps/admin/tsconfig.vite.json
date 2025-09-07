@@ -3,7 +3,8 @@
     ".react-router/types/**/*",
     "app/**/*",
     "app/**/.server/**/*",
-    "app/**/.client/**/*"
+    "app/**/.client/**/*",
+    ".storybook/**/*"
   ],
   "compilerOptions": {
     "composite": true,
