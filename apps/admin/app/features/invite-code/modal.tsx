@@ -8,7 +8,7 @@ interface InviteCodeModalProps {
   inviteCode: string;
 }
 
-export function InviteCodeModal({
+export function CreatedInviteCodeModal({
   isOpen,
   onClose,
   inviteCode,
