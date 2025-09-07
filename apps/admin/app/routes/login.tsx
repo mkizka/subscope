@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 
-import { LoginForm } from "~/components/login-form";
+import { LoginContainer } from "~/features/login/container";
 import { oauthSession } from "~/server/inject";
 
 import type { Route } from "./+types/login";
@@ -16,9 +16,5 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function LoginPage() {
-  return (
-    <div className="flex items-center justify-center min-h-dvh fixed inset-0">
-      <LoginForm />
-    </div>
-  );
+  return <LoginContainer />;
 }
