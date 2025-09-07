@@ -8,6 +8,7 @@ const SUPPORTED_NSIDS = [
   "app.bsky.actor.getProfile",
   "me.subsco.admin.getInviteCodes",
   "me.subsco.admin.createInviteCode",
+  "me.subsco.admin.getSubscribers",
 ];
 
 export const xrpcProxyRouterFactory = (
