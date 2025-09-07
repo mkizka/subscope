@@ -38,7 +38,7 @@ function LinkCard({
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="grid grid-cols-2 gap-2">
-      <HeaderCard className="col-span-2" />
+      <HeaderCard className="col-span-2">Subscope Admin</HeaderCard>
       <LinkCard to="/invite-codes">
         <span className="icon-[tabler--ticket] size-10"></span>
         招待コード

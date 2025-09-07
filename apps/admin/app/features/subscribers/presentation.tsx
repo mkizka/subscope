@@ -74,7 +74,7 @@ export function SubscribersPresentation({
 }: SubscribersPresentationProps) {
   return (
     <div className="grid gap-2">
-      <HeaderCard />
+      <HeaderCard showBackButton>サブスクライバー</HeaderCard>
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
           {error ? (

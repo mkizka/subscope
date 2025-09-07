@@ -80,7 +80,7 @@ export function InviteCodePresentation({
   return (
     <>
       <div className="grid gap-2">
-        <HeaderCard />
+        <HeaderCard showBackButton>招待コード</HeaderCard>
         <div className="card bg-base-100 shadow-sm">
           <div className="card-body flex-row justify-center">
             <button
