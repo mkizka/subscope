@@ -3,16 +3,16 @@ import "../app/app.css";
 import type { Preview } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 
+import { RootLayout } from "~/components/root-layout";
+
 const preview: Preview = {
   decorators: [
     (Story) => (
       // <Link />コンポーネントを使用できるようにする
       <MemoryRouter>
-        <div className="bg-base-300 min-h-dvh">
-          <div className="container mx-auto h-full min-h-dvh max-w-md p-4">
-            <Story />
-          </div>
-        </div>
+        <RootLayout>
+          <Story />
+        </RootLayout>
       </MemoryRouter>
     ),
   ],

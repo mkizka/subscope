@@ -11,6 +11,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { RootLayout } from "./components/root-layout";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -32,11 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body>
-        <div className="bg-base-300 min-h-dvh">
-          <div className="container mx-auto h-full min-h-dvh max-w-md p-4">
-            {children}
-          </div>
-        </div>
+        <RootLayout>{children}</RootLayout>
         <ScrollRestoration />
         <Scripts />
       </body>
