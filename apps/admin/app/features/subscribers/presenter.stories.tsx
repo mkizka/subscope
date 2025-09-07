@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 
-import { SubscribersPresentation } from "./presentation";
+import { SubscribersPresenter } from "./presenter";
 
 const dummyDid = "did:plc:xxxxxxxxxxxxxxxxxxxxxx";
 
 const meta = {
   title: "Features/Subscribers",
-  component: SubscribersPresentation,
+  component: SubscribersPresenter,
   args: {
     subscribers: [
       {
@@ -35,10 +35,10 @@ const meta = {
     hasMore: false,
     isFetching: false,
   },
-} satisfies Meta<typeof SubscribersPresentation>;
+} satisfies Meta<typeof SubscribersPresenter>;
 
 export default meta;
-type Story = StoryObj<typeof SubscribersPresentation>;
+type Story = StoryObj<typeof SubscribersPresenter>;
 
 export const Default: Story = {};
 

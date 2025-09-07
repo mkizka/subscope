@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 
-import { InviteCodePresentation } from "./presentation";
+import { InviteCodePresenter } from "./presenter";
 
 const meta = {
   title: "Features/InviteCode",
-  component: InviteCodePresentation,
+  component: InviteCodePresenter,
   args: {
     inviteCodes: [
       {
@@ -36,10 +36,10 @@ const meta = {
     isFetching: false,
     isRefetching: false,
   },
-} satisfies Meta<typeof InviteCodePresentation>;
+} satisfies Meta<typeof InviteCodePresenter>;
 
 export default meta;
-type Story = StoryObj<typeof InviteCodePresentation>;
+type Story = StoryObj<typeof InviteCodePresenter>;
 
 export const Default: Story = {};
 

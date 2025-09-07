@@ -5,11 +5,11 @@ import { Form } from "react-router";
 
 import { loginSchema } from "~/schemas/login.schema";
 
-type LoginPresentationProps = {
+type LoginPresenterProps = {
   lastResult?: SubmissionResult | null;
 };
 
-export function LoginPresentation({ lastResult }: LoginPresentationProps) {
+export function LoginPresenter({ lastResult }: LoginPresenterProps) {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {

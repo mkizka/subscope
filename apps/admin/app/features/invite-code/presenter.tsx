@@ -48,7 +48,7 @@ function ErrorMessageRow({ reload }: { reload: () => void }) {
   );
 }
 
-type InviteCodePresentationProps = {
+type InviteCodePresenterProps = {
   inviteCodes?: InviteCode[];
   error: Error | null;
   createInviteCode: () => void;
@@ -63,7 +63,7 @@ type InviteCodePresentationProps = {
   isRefetching: boolean;
 };
 
-export function InviteCodePresentation({
+export function InviteCodePresenter({
   inviteCodes,
   error,
   createInviteCode,
@@ -76,7 +76,7 @@ export function InviteCodePresentation({
   hasMore,
   isFetching,
   isRefetching,
-}: InviteCodePresentationProps) {
+}: InviteCodePresenterProps) {
   return (
     <>
       <div className="grid gap-2">

@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { createInviteCode, fetchInviteCodes } from "./fetcher";
-import { InviteCodePresentation } from "./presentation";
+import { InviteCodePresenter } from "./presenter";
 
 export function InviteCodeContainer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +39,7 @@ export function InviteCodeContainer() {
   const reload = () => refetch();
 
   return (
-    <InviteCodePresentation
+    <InviteCodePresenter
       inviteCodes={inviteCodes}
       error={error}
       createInviteCode={() => mutation.mutate()}

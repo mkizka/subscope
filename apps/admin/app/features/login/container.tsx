@@ -2,10 +2,10 @@ import { useActionData } from "react-router";
 
 import type { action } from "~/routes/oauth.login";
 
-import { LoginPresentation } from "./presentation";
+import { LoginPresenter } from "./presenter";
 
 export function LoginContainer() {
   const lastResult = useActionData<typeof action>();
 
-  return <LoginPresentation lastResult={lastResult} />;
+  return <LoginPresenter lastResult={lastResult} />;
 }

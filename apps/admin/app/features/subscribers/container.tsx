@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { fetchSubscribers } from "./fetcher";
-import { SubscribersPresentation } from "./presentation";
+import { SubscribersPresenter } from "./presenter";
 
 export function SubscribersContainer() {
   const {
@@ -27,7 +27,7 @@ export function SubscribersContainer() {
   const reload = () => refetch();
 
   return (
-    <SubscribersPresentation
+    <SubscribersPresenter
       subscribers={subscribers}
       error={error}
       reload={reload}

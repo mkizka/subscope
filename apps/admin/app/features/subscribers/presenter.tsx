@@ -51,7 +51,7 @@ function ErrorMessage({ reload }: { reload: () => void }) {
   );
 }
 
-type SubscribersPresentationProps = {
+type SubscribersPresenterProps = {
   subscribers?: Subscriber[];
   error: Error | null;
   reload: () => void;
@@ -60,14 +60,14 @@ type SubscribersPresentationProps = {
   isFetching: boolean;
 };
 
-export function SubscribersPresentation({
+export function SubscribersPresenter({
   subscribers,
   error,
   reload,
   loadMore,
   hasMore,
   isFetching,
-}: SubscribersPresentationProps) {
+}: SubscribersPresenterProps) {
   return (
     <div className="grid gap-2">
       <HeaderCard showBackButton>サブスクライバー</HeaderCard>
