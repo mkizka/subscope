@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { Link, redirect } from "react-router";
+import { Form, Link, redirect } from "react-router";
 
 import { HeaderCard } from "~/components/header-card";
 import { oauthSession } from "~/server/inject";
@@ -35,7 +35,13 @@ function LinkCard({
   );
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
+export default function Home() {
+  const handleLogout = (e: React.FormEvent) => {
+    if (!window.confirm("ログアウトしますか？")) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <HeaderCard className="col-span-2">Subscope Admin</HeaderCard>
@@ -47,6 +53,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <span className="icon-[tabler--user] size-10"></span>
         サブスクライバー
       </LinkCard>
+      <Form method="post" action="/oauth/logout" onSubmit={handleLogout}>
+        <button
+          type="submit"
+          className="card bg-base-100 w-full shadow-sm hover:bg-base-200"
+        >
+          <div className="card-body items-center">
+            <span className="icon-[tabler--logout] size-10"></span>
+            ログアウト
+          </div>
+        </button>
+      </Form>
     </div>
   );
 }
