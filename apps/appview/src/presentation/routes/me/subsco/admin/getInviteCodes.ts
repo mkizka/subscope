@@ -15,7 +15,7 @@ export class GetInviteCodes {
       auth: (ctx) => this.adminMiddleware.requireAdmin(ctx.req),
       handler: async ({ params }) => {
         const result = await this.getInviteCodesUseCase.execute({
-          limit: params.limit || 50,
+          limit: params.limit,
           cursor: params.cursor,
         });
 
