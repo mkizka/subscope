@@ -1,3 +1,4 @@
+import { XRPCError } from "@atproto/xrpc";
 import type { ILoggerManager } from "@repo/common/domain";
 import type { Request, Response } from "express";
 import { Router } from "express";
@@ -36,9 +37,13 @@ export const xrpcProxyRouterFactory = (
       const response = await agent.call(nsid, req.query, body);
       return res.json(response.data);
     } catch (error) {
-      const message = `Failed to call ${nsid}`;
-      logger.error(error, message);
-      return res.status(500).json({ error: message });
+      logger.error(error, "Error in XRPC proxy");
+      if (error instanceof XRPCError) {
+        return res
+          .status(error.status)
+          .json({ error: error.name, message: error.message });
+      }
+      throw error;
     }
   });
 
