@@ -1,5 +1,6 @@
 import "./app.css";
 
+import { XRPCError } from "@atproto/xrpc";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   isRouteErrorResponse,
@@ -12,7 +13,6 @@ import {
 
 import type { Route } from "./+types/root";
 import { RootLayout } from "./components/root-layout";
-import { XRPCError } from "@atproto/xrpc";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
