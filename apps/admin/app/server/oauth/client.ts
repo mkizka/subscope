@@ -8,18 +8,17 @@ import { NodeOAuthClient } from "@atproto/oauth-client-node";
 
 import { env, isProduction } from "../env";
 
-export const oauthClientFactory = async (
+const privateKey = Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString();
+
+const joseKey = await JoseKey.fromImportable(privateKey, "key1");
+
+export const oauthClientFactory = (
   oauthStateStore: NodeSavedStateStore,
   oauthSessionStore: NodeSavedSessionStore,
 ) => {
   const baseUrl = isProduction ? env.PUBLIC_URL : "http://127.0.0.1:3000";
   const redirectUri = `${baseUrl}/oauth/callback`;
   const scope = "atproto transition:generic";
-
-  const privateKey = Buffer.from(
-    env.PRIVATE_KEY_ES256_B64,
-    "base64",
-  ).toString();
 
   const oauthClientOptions: NodeOAuthClientOptions = {
     clientMetadata: {
@@ -36,7 +35,7 @@ export const oauthClientFactory = async (
       token_endpoint_auth_signing_alg: "ES256",
       dpop_bound_access_tokens: true,
     },
-    keyset: [await JoseKey.fromImportable(privateKey, "key1")],
+    keyset: [joseKey],
     plcDirectoryUrl: env.ATPROTO_PLC_URL,
     stateStore: oauthStateStore,
     sessionStore: oauthSessionStore,

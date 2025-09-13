@@ -19,7 +19,7 @@ export class OAuthSession {
   readonly commitSession;
   readonly destroySession;
 
-  constructor(private readonly oauthClient: Promise<NodeOAuthClient>) {
+  constructor(private readonly oauthClient: NodeOAuthClient) {
     const sessionStorage = createCookieSessionStorage<
       SessionData,
       SessionFlashData
@@ -66,8 +66,7 @@ export class OAuthSession {
   private async createAgent(did: string) {
     let oauthSession;
     try {
-      const client = await this.oauthClient;
-      oauthSession = await client.restore(did);
+      oauthSession = await this.oauthClient.restore(did);
     } catch (e) {
       return null;
     }

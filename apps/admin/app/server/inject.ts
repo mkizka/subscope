@@ -36,6 +36,6 @@ const injector = createInjector()
   .provideFactory("app", appFactory);
 
 export const loggerManager = injector.resolve("loggerManager");
-export const oauthClient = await injector.resolve("oauthClient");
+export const oauthClient = injector.resolve("oauthClient");
 export const oauthSession = injector.resolve("oauthSession");
 export const app = injector.resolve("app");
