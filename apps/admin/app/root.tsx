@@ -12,6 +12,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { RootLayout } from "./components/root-layout";
+import { XRPCError } from "@atproto/xrpc";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -41,7 +42,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-const queryClient = new QueryClient();
+const MAX_RETRY_COUNT = 2;
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (failureCount >= MAX_RETRY_COUNT) {
+          return false;
+        }
+        if (error instanceof XRPCError) {
+          // 5xxのときだけリトライする
+          return error.status % 100 === 5;
+        }
+        return true;
+      },
+    },
+  },
+});
 
 // Devツール用
 if (typeof window !== "undefined") {
