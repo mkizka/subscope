@@ -1,4 +1,4 @@
-import { asDid } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
 import { type DatabaseClient, FeedItem } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, exists, lt, sql } from "drizzle-orm";
@@ -10,11 +10,11 @@ export class TimelineRepository implements ITimelineRepository {
   static inject = ["db"] as const;
 
   async findFeedItems({
-    authDid,
+    viewerDid,
     cursor,
     limit,
   }: {
-    authDid: string;
+    viewerDid: Did;
     cursor?: Date;
     limit: number;
   }): Promise<FeedItem[]> {
@@ -42,7 +42,7 @@ export class TimelineRepository implements ITimelineRepository {
               .from(schema.follows)
               .where(
                 and(
-                  eq(schema.follows.actorDid, authDid),
+                  eq(schema.follows.actorDid, viewerDid),
                   eq(schema.follows.subjectDid, schema.feedItems.actorDid),
                 ),
               ),
@@ -60,7 +60,7 @@ export class TimelineRepository implements ITimelineRepository {
             subjectUri: schema.feedItems.subjectUri,
           })
           .from(schema.feedItems)
-          .where(and(...filters, eq(schema.feedItems.actorDid, authDid))),
+          .where(and(...filters, eq(schema.feedItems.actorDid, viewerDid))),
       )
       .orderBy(desc(sql`"sort_at"`))
       .limit(limit);

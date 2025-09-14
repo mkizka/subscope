@@ -1,8 +1,9 @@
+import type { Did } from "@atproto/did";
 import type { FeedItem } from "@repo/common/domain";
 
 export interface ITimelineRepository {
   findFeedItems: (params: {
-    authDid: string;
+    viewerDid: Did;
     limit: number;
     cursor?: Date;
   }) => Promise<FeedItem[]>;

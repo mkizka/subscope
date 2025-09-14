@@ -18,8 +18,7 @@ const getTimelineUseCase = new GetTimelineUseCase(
 describe("GetTimelineUseCase", () => {
   test("パラメータが渡された場合、TimelineServiceに正しいパラメータを渡して呼び出す", async () => {
     // arrange
-    const authDid = "did:plc:testuser";
-    const params = { limit: 50 };
+    const params = { limit: 50, viewerDid: "did:plc:testuser" } as const;
     const expectedCursor = undefined;
 
     const mockPaginationResult: Page<FeedItem> = {
@@ -33,13 +32,13 @@ describe("GetTimelineUseCase", () => {
     mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
-    await getTimelineUseCase.execute(params, authDid);
+    await getTimelineUseCase.execute(params);
 
     // assert
     expect(
       mockTimelineService.findFeedItemsWithPagination,
     ).toHaveBeenCalledWith({
-      authDid,
+      viewerDid: params.viewerDid,
       cursor: expectedCursor,
       limit: params.limit,
     });
@@ -47,9 +46,12 @@ describe("GetTimelineUseCase", () => {
 
   test("カーソルが指定された場合、Date型に変換してTimelineServiceに渡す", async () => {
     // arrange
-    const authDid = "did:plc:testuser";
     const cursorString = "2024-01-01T00:00:00.000Z";
-    const params = { limit: 50, cursor: cursorString };
+    const params = {
+      limit: 50,
+      cursor: cursorString,
+      viewerDid: "did:plc:testuser",
+    } as const;
     const expectedCursor = new Date(cursorString);
 
     const mockPaginationResult: Page<FeedItem> = {
@@ -63,13 +65,13 @@ describe("GetTimelineUseCase", () => {
     mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
-    await getTimelineUseCase.execute(params, authDid);
+    await getTimelineUseCase.execute(params);
 
     // assert
     expect(
       mockTimelineService.findFeedItemsWithPagination,
     ).toHaveBeenCalledWith({
-      authDid,
+      viewerDid: params.viewerDid,
       cursor: expectedCursor,
       limit: params.limit,
     });
@@ -77,8 +79,7 @@ describe("GetTimelineUseCase", () => {
 
   test("TimelineServiceから結果を取得した場合、FeedProcessorに結果を渡す", async () => {
     // arrange
-    const authDid = "did:plc:testuser";
-    const params = { limit: 50 };
+    const params = { limit: 50, viewerDid: "did:plc:testuser" } as const;
 
     const mockPaginationResult: Page<FeedItem> = {
       items: [
@@ -108,18 +109,18 @@ describe("GetTimelineUseCase", () => {
     mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
-    await getTimelineUseCase.execute(params, authDid);
+    await getTimelineUseCase.execute(params);
 
     // assert
     expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
       mockPaginationResult.items,
+      params.viewerDid,
     );
   });
 
   test("FeedProcessorから結果を取得した場合、その結果をそのまま返す", async () => {
     // arrange
-    const authDid = "did:plc:testuser";
-    const params = { limit: 50 };
+    const params = { limit: 50, viewerDid: "did:plc:testuser" } as const;
 
     const mockPaginationResult: Page<FeedItem> = {
       items: [],
@@ -146,7 +147,7 @@ describe("GetTimelineUseCase", () => {
     mockFeedProcessor.processFeedItems.mockResolvedValue(expectedFeed);
 
     // act
-    const result = await getTimelineUseCase.execute(params, authDid);
+    const result = await getTimelineUseCase.execute(params);
 
     // assert
     expect(result).toEqual({
@@ -157,8 +158,7 @@ describe("GetTimelineUseCase", () => {
 
   test("limit=0の場合も正しく処理される", async () => {
     // arrange
-    const authDid = "did:plc:testuser";
-    const params = { limit: 0 };
+    const params = { limit: 0, viewerDid: "did:plc:testuser" } as const;
 
     const mockPaginationResult: Page<FeedItem> = {
       items: [],
@@ -171,13 +171,13 @@ describe("GetTimelineUseCase", () => {
     mockFeedProcessor.processFeedItems.mockResolvedValue([]);
 
     // act
-    const result = await getTimelineUseCase.execute(params, authDid);
+    const result = await getTimelineUseCase.execute(params);
 
     // assert
     expect(
       mockTimelineService.findFeedItemsWithPagination,
     ).toHaveBeenCalledWith({
-      authDid,
+      viewerDid: params.viewerDid,
       cursor: undefined,
       limit: 0,
     });

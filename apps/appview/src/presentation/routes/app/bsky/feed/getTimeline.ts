@@ -14,10 +14,12 @@ export class GetTimeline {
     server.app.bsky.feed.getTimeline({
       auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
       handler: async ({ params, auth }) => {
-        const timeline = await this.getTimelineUseCase.execute(
-          params,
-          auth.credentials.did,
-        );
+        const timeline = await this.getTimelineUseCase.execute({
+          algorithm: params.algorithm,
+          limit: params.limit,
+          cursor: params.cursor,
+          viewerDid: auth.credentials.did,
+        });
         return {
           encoding: "application/json",
           body: timeline,

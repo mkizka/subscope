@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { FeedItem } from "@repo/common/domain";
 
 import type { ITimelineRepository } from "../../interfaces/timeline-repository.js";
@@ -8,13 +9,13 @@ export class TimelineService {
   static inject = ["timelineRepository"] as const;
 
   async findFeedItemsWithPagination({
-    authDid,
-    cursor,
+    viewerDid,
     limit,
+    cursor,
   }: {
-    authDid: string;
-    cursor?: Date;
+    viewerDid: Did;
     limit: number;
+    cursor?: Date;
   }): Promise<Page<FeedItem>> {
     const paginator = createCursorPaginator<FeedItem>({
       limit,
@@ -22,7 +23,7 @@ export class TimelineService {
     });
 
     const feedItems = await this.timelineRepository.findFeedItems({
-      authDid,
+      viewerDid,
       limit: paginator.queryLimit,
       cursor,
     });

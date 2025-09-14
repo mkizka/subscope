@@ -4,6 +4,13 @@ import type { AppBskyFeedGetTimeline } from "@repo/client/server";
 import type { FeedProcessor } from "../../service/feed/feed-processor.js";
 import type { TimelineService } from "../../service/feed/timeline-service.js";
 
+type GetTimelineParams = {
+  limit: number;
+  viewerDid: Did;
+  algorithm?: string;
+  cursor?: string;
+};
+
 export class GetTimelineUseCase {
   constructor(
     private readonly timelineService: TimelineService,
@@ -11,19 +18,22 @@ export class GetTimelineUseCase {
   ) {}
   static inject = ["timelineService", "feedProcessor"] as const;
 
-  async execute(
-    params: AppBskyFeedGetTimeline.QueryParams,
-    authDid: Did,
-  ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
-    const cursor = params.cursor ? new Date(params.cursor) : undefined;
-
+  async execute({
+    limit,
+    viewerDid,
+    algorithm: _, // TODO: アルゴリズムごとに実装を追加
+    cursor,
+  }: GetTimelineParams): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const page = await this.timelineService.findFeedItemsWithPagination({
-      authDid,
-      cursor,
-      limit: params.limit,
+      viewerDid,
+      limit,
+      cursor: cursor ? new Date(cursor) : undefined,
     });
 
-    const feed = await this.feedProcessor.processFeedItems(page.items, authDid);
+    const feed = await this.feedProcessor.processFeedItems(
+      page.items,
+      viewerDid,
+    );
 
     return {
       feed,
