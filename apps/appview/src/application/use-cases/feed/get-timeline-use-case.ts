@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { AppBskyFeedGetTimeline } from "@repo/client/server";
 
 import type { FeedProcessor } from "../../service/feed/feed-processor.js";
@@ -12,7 +13,7 @@ export class GetTimelineUseCase {
 
   async execute(
     params: AppBskyFeedGetTimeline.QueryParams,
-    authDid: string,
+    authDid: Did,
   ): Promise<AppBskyFeedGetTimeline.OutputSchema> {
     const cursor = params.cursor ? new Date(params.cursor) : undefined;
 
@@ -22,7 +23,7 @@ export class GetTimelineUseCase {
       limit: params.limit,
     });
 
-    const feed = await this.feedProcessor.processFeedItems(page.items);
+    const feed = await this.feedProcessor.processFeedItems(page.items, authDid);
 
     return {
       feed,
