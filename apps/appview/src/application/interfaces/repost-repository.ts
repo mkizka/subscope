@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { Repost } from "@repo/common/domain";
 
 export interface IRepostRepository {
@@ -8,4 +9,9 @@ export interface IRepostRepository {
   }) => Promise<Repost[]>;
 
   findByUris: (uris: string[]) => Promise<Repost[]>;
+
+  findViewerReposts: (params: {
+    viewerDid: Did;
+    subjectUris: string[];
+  }) => Promise<Map<string, Repost>>;
 }

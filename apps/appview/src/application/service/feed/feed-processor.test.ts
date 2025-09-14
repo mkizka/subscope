@@ -3,6 +3,7 @@ import { schema } from "@repo/db";
 import {
   actorFactory,
   getTestSetup,
+  likeFactory,
   postFactory,
   postFeedItemFactory,
   recordFactory,
@@ -17,6 +18,7 @@ import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
+import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
@@ -42,6 +44,7 @@ describe("FeedProcessor", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
+    .provideClass("likeRepository", LikeRepository)
     .provideClass("repostRepository", RepostRepository)
     .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
@@ -264,6 +267,142 @@ describe("FeedProcessor", () => {
               displayName: "Root Author",
             },
           },
+        },
+      },
+    ]);
+  });
+
+  test("viewerDidが渡された場合、viewerStateにlikeとrepostを含める", async () => {
+    // arrange
+    const viewer = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Viewer" }))
+      .create();
+    const viewerDid = asDid(viewer.did);
+
+    const postAuthor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Post Author" }))
+      .create();
+
+    // 投稿1（viewerがいいねとリポスト）
+    const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => postAuthor })
+      .create();
+    const post1 = await postFactory(ctx.db)
+      .vars({ record: () => record1 })
+      .props({
+        text: () => "Post with like and repost",
+        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+      })
+      .create();
+
+    const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
+      .vars({ actor: () => viewer })
+      .create();
+    await likeFactory(ctx.db)
+      .vars({ record: () => likeRecord })
+      .props({
+        subjectUri: () => post1.uri,
+        subjectCid: () => post1.cid,
+      })
+      .create();
+
+    const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
+      .vars({ actor: () => viewer })
+      .create();
+    await repostFactory(ctx.db)
+      .vars({ record: () => repostRecord })
+      .props({
+        subjectUri: () => post1.uri,
+        subjectCid: () => post1.cid,
+      })
+      .create();
+
+    // 投稿2（viewerがいいねのみ）
+    const record2 = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => postAuthor })
+      .create();
+    const post2 = await postFactory(ctx.db)
+      .vars({ record: () => record2 })
+      .props({
+        text: () => "Post with like only",
+        createdAt: () => new Date("2024-01-02T00:00:00.000Z"),
+      })
+      .create();
+
+    const likeRecord2 = await recordFactory(ctx.db, "app.bsky.feed.like")
+      .vars({ actor: () => viewer })
+      .create();
+    await likeFactory(ctx.db)
+      .vars({ record: () => likeRecord2 })
+      .props({
+        subjectUri: () => post2.uri,
+        subjectCid: () => post2.cid,
+      })
+      .create();
+
+    // 投稿3（viewerがインタラクションなし）
+    const record3 = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => postAuthor })
+      .create();
+    const post3 = await postFactory(ctx.db)
+      .vars({ record: () => record3 })
+      .props({
+        text: () => "Post without interaction",
+        createdAt: () => new Date("2024-01-03T00:00:00.000Z"),
+      })
+      .create();
+
+    const feedItem1 = await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post1 })
+      .create();
+    const feedItem2 = await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post2 })
+      .create();
+    const feedItem3 = await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post3 })
+      .create();
+
+    const paginationResult = {
+      items: [
+        { ...feedItem1, actorDid: asDid(feedItem1.actorDid) },
+        { ...feedItem2, actorDid: asDid(feedItem2.actorDid) },
+        { ...feedItem3, actorDid: asDid(feedItem3.actorDid) },
+      ],
+      cursor: undefined,
+    };
+
+    // act
+    const result = await feedProcessor.processFeedItems(
+      paginationResult.items,
+      viewerDid,
+    );
+
+    // assert
+    expect(result).toMatchObject([
+      {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: {
+          uri: post1.uri,
+          viewer: {
+            like: likeRecord.uri,
+            repost: repostRecord.uri,
+          },
+        },
+      },
+      {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: {
+          uri: post2.uri,
+          viewer: {
+            like: likeRecord2.uri,
+          },
+        },
+      },
+      {
+        $type: "app.bsky.feed.defs#feedViewPost",
+        post: {
+          uri: post3.uri,
+          viewer: {},
         },
       },
     ]);

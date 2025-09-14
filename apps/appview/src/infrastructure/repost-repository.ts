@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { Repost } from "@repo/common/domain";
 import { schema } from "@repo/db";
@@ -65,5 +66,46 @@ export class RepostRepository implements IRepostRepository {
           sortAt: repost.sortAt,
         }),
     );
+  }
+
+  async findViewerReposts({
+    viewerDid,
+    subjectUris,
+  }: {
+    viewerDid: Did;
+    subjectUris: string[];
+  }): Promise<Map<string, Repost>> {
+    if (subjectUris.length === 0) {
+      return new Map();
+    }
+
+    const reposts = await this.db
+      .select()
+      .from(schema.reposts)
+      .where(
+        and(
+          eq(schema.reposts.actorDid, viewerDid),
+          inArray(schema.reposts.subjectUri, subjectUris),
+        ),
+      );
+
+    const repostsMap = new Map<string, Repost>();
+    for (const repost of reposts) {
+      repostsMap.set(
+        repost.subjectUri,
+        new Repost({
+          uri: repost.uri,
+          cid: repost.cid,
+          actorDid: repost.actorDid,
+          subjectUri: repost.subjectUri,
+          subjectCid: repost.subjectCid,
+          createdAt: repost.createdAt,
+          indexedAt: repost.indexedAt,
+          sortAt: repost.sortAt,
+        }),
+      );
+    }
+
+    return repostsMap;
   }
 }

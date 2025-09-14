@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { Like } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 
@@ -83,5 +83,46 @@ export class LikeRepository implements ILikeRepository {
           sortAt: like.sortAt,
         }),
     );
+  }
+
+  async findViewerLikes({
+    viewerDid,
+    subjectUris,
+  }: {
+    viewerDid: Did;
+    subjectUris: string[];
+  }): Promise<Map<string, Like>> {
+    if (subjectUris.length === 0) {
+      return new Map();
+    }
+
+    const likes = await this.db
+      .select()
+      .from(schema.likes)
+      .where(
+        and(
+          eq(schema.likes.actorDid, viewerDid),
+          inArray(schema.likes.subjectUri, subjectUris),
+        ),
+      );
+
+    const likesMap = new Map<string, Like>();
+    for (const like of likes) {
+      likesMap.set(
+        like.subjectUri,
+        new Like({
+          uri: like.uri,
+          cid: like.cid,
+          actorDid: like.actorDid,
+          subjectUri: like.subjectUri,
+          subjectCid: like.subjectCid,
+          createdAt: like.createdAt,
+          indexedAt: like.indexedAt,
+          sortAt: like.sortAt,
+        }),
+      );
+    }
+
+    return likesMap;
   }
 }
