@@ -1,12 +1,12 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
-import type { FeedItem, Like, Repost } from "@repo/common/domain";
+import type { FeedItem } from "@repo/common/domain";
 
 import type { ILikeRepository } from "../../interfaces/like-repository.js";
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repost-repository.js";
-import { toMapByDid, toMapByUri } from "../../utils/map.js";
+import { toMapByDid, toMapBySubjectUri, toMapByUri } from "../../utils/map.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { PostViewService } from "./post-view-service.js";
 import type { ReplyRefService } from "./reply-ref-service.js";
@@ -60,18 +60,20 @@ export class FeedProcessor {
         this.profileViewService
           .findProfileViewBasic(Array.from(reposterDids))
           .then(toMapByDid),
-        viewerDid
-          ? this.likeRepository.findViewerLikes({
+        viewerDid &&
+          this.likeRepository
+            .findViewerLikes({
               viewerDid,
               subjectUris: Array.from(postUris),
             })
-          : Promise.resolve(new Map<string, Like>()),
-        viewerDid
-          ? this.repostRepository.findViewerReposts({
+            .then(toMapBySubjectUri),
+        viewerDid &&
+          this.repostRepository
+            .findViewerReposts({
               viewerDid,
               subjectUris: Array.from(postUris),
             })
-          : Promise.resolve(new Map<string, Repost>()),
+            .then(toMapBySubjectUri),
       ]);
 
     const posts = await this.postRepository.findByUris(postAtUris);
@@ -92,12 +94,12 @@ export class FeedProcessor {
         if (viewerDid) {
           const viewer: AppBskyFeedDefs.ViewerState = {};
 
-          const viewerLike = viewerLikesMap.get(postUri);
+          const viewerLike = viewerLikesMap?.get(postUri);
           if (viewerLike) {
             viewer.like = viewerLike.uri.toString();
           }
 
-          const viewerRepost = viewerRepostsMap.get(postUri);
+          const viewerRepost = viewerRepostsMap?.get(postUri);
           if (viewerRepost) {
             viewer.repost = viewerRepost.uri.toString();
           }

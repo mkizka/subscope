@@ -19,3 +19,9 @@ export const toMapByDid = <T extends { did: string }>(
 ): Map<Did, T> => {
   return toMap(items, (item) => asDid(item.did));
 };
+
+export const toMapBySubjectUri = <T extends { subjectUri: AtUri }>(
+  items: T[],
+): Map<string, T> => {
+  return toMap(items, (item) => item.subjectUri.toString());
+};

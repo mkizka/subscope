@@ -91,11 +91,7 @@ export class LikeRepository implements ILikeRepository {
   }: {
     viewerDid: Did;
     subjectUris: string[];
-  }): Promise<Map<string, Like>> {
-    if (subjectUris.length === 0) {
-      return new Map();
-    }
-
+  }): Promise<Like[]> {
     const likes = await this.db
       .select()
       .from(schema.likes)
@@ -106,10 +102,8 @@ export class LikeRepository implements ILikeRepository {
         ),
       );
 
-    const likesMap = new Map<string, Like>();
-    for (const like of likes) {
-      likesMap.set(
-        like.subjectUri,
+    return likes.map(
+      (like) =>
         new Like({
           uri: like.uri,
           cid: like.cid,
@@ -120,9 +114,6 @@ export class LikeRepository implements ILikeRepository {
           indexedAt: like.indexedAt,
           sortAt: like.sortAt,
         }),
-      );
-    }
-
-    return likesMap;
+    );
   }
 }

@@ -74,11 +74,7 @@ export class RepostRepository implements IRepostRepository {
   }: {
     viewerDid: Did;
     subjectUris: string[];
-  }): Promise<Map<string, Repost>> {
-    if (subjectUris.length === 0) {
-      return new Map();
-    }
-
+  }): Promise<Repost[]> {
     const reposts = await this.db
       .select()
       .from(schema.reposts)
@@ -89,10 +85,8 @@ export class RepostRepository implements IRepostRepository {
         ),
       );
 
-    const repostsMap = new Map<string, Repost>();
-    for (const repost of reposts) {
-      repostsMap.set(
-        repost.subjectUri,
+    return reposts.map(
+      (repost) =>
         new Repost({
           uri: repost.uri,
           cid: repost.cid,
@@ -103,9 +97,6 @@ export class RepostRepository implements IRepostRepository {
           indexedAt: repost.indexedAt,
           sortAt: repost.sortAt,
         }),
-      );
-    }
-
-    return repostsMap;
+    );
   }
 }

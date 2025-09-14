@@ -17,5 +17,5 @@ export interface ILikeRepository {
   findViewerLikes: (params: {
     viewerDid: Did;
     subjectUris: string[];
-  }) => Promise<Map<string, Like>>;
+  }) => Promise<Like[]>;
 }

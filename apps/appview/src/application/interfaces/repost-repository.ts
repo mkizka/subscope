@@ -13,5 +13,5 @@ export interface IRepostRepository {
   findViewerReposts: (params: {
     viewerDid: Did;
     subjectUris: string[];
-  }) => Promise<Map<string, Repost>>;
+  }) => Promise<Repost[]>;
 }
