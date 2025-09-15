@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
@@ -11,11 +12,12 @@ export class PostStatsRepository implements IPostStatsRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async findMap(postUris: string[]): Promise<Map<string, PostStats>> {
-    if (postUris.length === 0) {
+  async findMap(uris: AtUri[]): Promise<Map<string, PostStats>> {
+    if (uris.length === 0) {
       return new Map();
     }
 
+    const postUris = uris.map((uri) => uri.toString());
     const postStats = await this.db
       .select()
       .from(schema.postStats)

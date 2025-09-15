@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { getTestSetup, postStatsFactory } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -19,14 +20,14 @@ describe("PostStatsRepository", () => {
 
     test("統計が存在しない投稿が指定された場合、全て0の統計を返す", async () => {
       // arrange
-      const postUri = "at://did:plc:123/posts/456";
+      const postUri = new AtUri("at://did:plc:123/posts/456");
 
       // act
       const result = await postStatsRepository.findMap([postUri]);
 
       // assert
       expect(result.size).toBe(1);
-      expect(result.get(postUri)).toEqual({
+      expect(result.get(postUri.toString())).toEqual({
         likeCount: 0,
         repostCount: 0,
         replyCount: 0,
@@ -39,7 +40,9 @@ describe("PostStatsRepository", () => {
       const postStats = await postStatsFactory(ctx.db).create();
 
       // act
-      const result = await postStatsRepository.findMap([postStats.postUri]);
+      const result = await postStatsRepository.findMap([
+        new AtUri(postStats.postUri),
+      ]);
 
       // assert
       expect(result.get(postStats.postUri)).toEqual({
@@ -58,8 +61,8 @@ describe("PostStatsRepository", () => {
 
       // act
       const result = await postStatsRepository.findMap([
-        postStats1.postUri,
-        postStats2.postUri,
+        new AtUri(postStats1.postUri),
+        new AtUri(postStats2.postUri),
       ]);
 
       // assert

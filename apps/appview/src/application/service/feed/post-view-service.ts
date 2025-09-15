@@ -96,9 +96,7 @@ export class PostViewService {
       this.profileViewService
         .findProfileViewBasic(posts.map((post) => post.actorDid))
         .then(toMapByDid),
-      this.postStatsRepository.findMap(
-        posts.map((post) => post.uri.toString()),
-      ),
+      this.postStatsRepository.findMap(posts.map((post) => post.uri)),
     ]);
 
     const deepEmbedMaps = await this.findEmbedMaps(
@@ -164,10 +162,7 @@ export class PostViewService {
       this.profileViewService
         .findProfileViewBasic(posts.map((post) => post.actorDid))
         .then(toMapByDid),
-      // TODO: AtUri[]を受け取るようにする
-      this.postStatsRepository.findMap(
-        posts.map((post) => post.uri.toString()),
-      ),
+      this.postStatsRepository.findMap(posts.map((post) => post.uri)),
     ]);
 
     const embedMaps = await this.findEmbedMaps(

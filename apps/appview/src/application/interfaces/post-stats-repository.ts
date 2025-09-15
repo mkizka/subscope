@@ -1,3 +1,5 @@
+import type { AtUri } from "@atproto/syntax";
+
 export interface PostStats {
   likeCount: number;
   repostCount: number;
@@ -6,5 +8,5 @@ export interface PostStats {
 }
 
 export interface IPostStatsRepository {
-  findMap: (postUris: string[]) => Promise<Map<string, PostStats>>;
+  findMap: (uris: AtUri[]) => Promise<Map<string, PostStats>>;
 }
