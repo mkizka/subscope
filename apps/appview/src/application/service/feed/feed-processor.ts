@@ -3,10 +3,9 @@ import { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 import type { FeedItem } from "@repo/common/domain";
 
-import type { ILikeRepository } from "../../interfaces/like-repository.js";
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repost-repository.js";
-import { toMapByDid, toMapBySubjectUri, toMapByUri } from "../../utils/map.js";
+import { toMapByDid, toMapByUri } from "../../utils/map.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { PostViewService } from "./post-view-service.js";
 import type { ReplyRefService } from "./reply-ref-service.js";
@@ -15,7 +14,6 @@ export class FeedProcessor {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly repostRepository: IRepostRepository,
-    private readonly likeRepository: ILikeRepository,
     private readonly postViewService: PostViewService,
     private readonly profileViewService: ProfileViewService,
     private readonly replyRefService: ReplyRefService,
@@ -23,7 +21,6 @@ export class FeedProcessor {
   static inject = [
     "postRepository",
     "repostRepository",
-    "likeRepository",
     "postViewService",
     "profileViewService",
     "replyRefService",
@@ -52,29 +49,12 @@ export class FeedProcessor {
       .findPostView(postAtUris)
       .then(toMapByUri);
 
-    const [repostMap, reposterMap, viewerLikesMap, viewerRepostsMap] =
-      await Promise.all([
-        this.repostRepository
-          .findByUris(Array.from(repostUris))
-          .then(toMapByUri),
-        this.profileViewService
-          .findProfileViewBasic(Array.from(reposterDids))
-          .then(toMapByDid),
-        viewerDid &&
-          this.likeRepository
-            .findViewerLikes({
-              viewerDid,
-              subjectUris: Array.from(postUris),
-            })
-            .then(toMapBySubjectUri),
-        viewerDid &&
-          this.repostRepository
-            .findViewerReposts({
-              viewerDid,
-              subjectUris: Array.from(postUris),
-            })
-            .then(toMapBySubjectUri),
-      ]);
+    const [repostMap, reposterMap] = await Promise.all([
+      this.repostRepository.findByUris(Array.from(repostUris)).then(toMapByUri),
+      this.profileViewService
+        .findProfileViewBasic(Array.from(reposterDids))
+        .then(toMapByDid),
+    ]);
 
     const posts = await this.postRepository.findByUris(postAtUris);
     const replyRefMap = await this.replyRefService.findMap(posts);
@@ -89,22 +69,6 @@ export class FeedProcessor {
         const postView = postViewMap.get(postUri);
         if (!postView) {
           return null;
-        }
-
-        if (viewerDid) {
-          const viewer: AppBskyFeedDefs.ViewerState = {};
-
-          const viewerLike = viewerLikesMap?.get(postUri);
-          if (viewerLike) {
-            viewer.like = viewerLike.uri.toString();
-          }
-
-          const viewerRepost = viewerRepostsMap?.get(postUri);
-          if (viewerRepost) {
-            viewer.repost = viewerRepost.uri.toString();
-          }
-
-          postView.viewer = viewer;
         }
 
         const feedViewPost: $Typed<AppBskyFeedDefs.FeedViewPost> = {
