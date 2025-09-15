@@ -4,22 +4,36 @@ import type { AppBskyFeedGetAuthorFeed } from "@repo/client/server";
 import type { AuthorFeedService } from "../../service/feed/author-feed-service.js";
 import type { FeedProcessor } from "../../service/feed/feed-processor.js";
 
+type Filter = AppBskyFeedGetAuthorFeed.QueryParams["filter"];
+
+type GetAuthorFeedParams = {
+  actorDid: Did;
+  limit: number;
+  filter: Filter;
+  includePins: boolean;
+  cursor?: Date;
+};
+
 export class GetAuthorFeedUseCase {
+  // TODO: 残りのフィルターもサポート
+  private supportedFilters: Filter[] = [
+    "posts_with_replies",
+    // "posts_no_replies",
+    // "posts_with_media",
+    // "posts_and_author_threads",
+    // "posts_with_video",
+  ];
+
   constructor(
     private readonly authorFeedService: AuthorFeedService,
     private readonly feedProcessor: FeedProcessor,
   ) {}
   static inject = ["authorFeedService", "feedProcessor"] as const;
 
-  async execute(params: {
-    actorDid: Did;
-    limit: number;
-    cursor?: Date;
-    filter: AppBskyFeedGetAuthorFeed.QueryParams["filter"];
-    includePins: boolean;
-  }): Promise<AppBskyFeedGetAuthorFeed.OutputSchema> {
-    // TODO: posts_and_author_threads以外もサポート
-    if (params.filter !== "posts_and_author_threads") {
+  async execute(
+    params: GetAuthorFeedParams,
+  ): Promise<AppBskyFeedGetAuthorFeed.OutputSchema> {
+    if (!this.supportedFilters.includes(params.filter)) {
       return {
         feed: [],
         cursor: undefined,

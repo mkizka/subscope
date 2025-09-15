@@ -17,13 +17,13 @@ const getAuthorFeedUseCase = new GetAuthorFeedUseCase(
 );
 
 describe("GetAuthorFeedUseCase", () => {
-  test("posts_and_author_threadsフィルターの場合、AuthorFeedServiceを呼び出す", async () => {
+  test("posts_with_repliesフィルターの場合、AuthorFeedServiceを呼び出す", async () => {
     // arrange
     const actorDid = asDid("did:plc:testuser");
     const params = {
       actorDid,
       limit: 50,
-      filter: "posts_and_author_threads" as const,
+      filter: "posts_with_replies" as const,
       includePins: false,
     };
 
@@ -58,7 +58,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid,
       limit: 50,
       cursor,
-      filter: "posts_and_author_threads" as const,
+      filter: "posts_with_replies" as const,
       includePins: false,
     };
 
@@ -91,7 +91,7 @@ describe("GetAuthorFeedUseCase", () => {
     const params = {
       actorDid,
       limit: 50,
-      filter: "posts_and_author_threads" as const,
+      filter: "posts_with_replies" as const,
       includePins: false,
     };
 
@@ -137,7 +137,7 @@ describe("GetAuthorFeedUseCase", () => {
     const params = {
       actorDid,
       limit: 50,
-      filter: "posts_and_author_threads" as const,
+      filter: "posts_with_replies" as const,
       includePins: false,
     };
 
@@ -205,7 +205,7 @@ describe("GetAuthorFeedUseCase", () => {
     const params = {
       actorDid,
       limit: 0,
-      filter: "posts_and_author_threads" as const,
+      filter: "posts_with_replies" as const,
       includePins: false,
     };
 
@@ -242,7 +242,7 @@ describe("GetAuthorFeedUseCase", () => {
     const params = {
       actorDid,
       limit: 50,
-      filter: "posts_and_author_threads" as const,
+      filter: "posts_with_replies" as const,
       includePins: true,
     };
 
