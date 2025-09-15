@@ -46,7 +46,7 @@ export class FeedProcessor {
 
     const postAtUris = Array.from(postUris).map((uri) => new AtUri(uri));
     const postViewMap = await this.postViewService
-      .findPostView(postAtUris)
+      .findPostView(postAtUris, viewerDid)
       .then(toMapByUri);
 
     const [repostMap, reposterMap] = await Promise.all([
