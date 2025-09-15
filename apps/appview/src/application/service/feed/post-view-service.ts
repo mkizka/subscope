@@ -1,4 +1,4 @@
-import type { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atproto/syntax";
 import type {
   $Typed,
   AppBskyEmbedRecord,
@@ -6,216 +6,199 @@ import type {
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
 
-import type { IPostRepository } from "../../interfaces/post-repository.js";
-import type { IPostStatsRepository } from "../../interfaces/post-stats-repository.js";
-import type { IRecordRepository } from "../../interfaces/record-repository.js";
 import { toMapByDid, toMapByUri } from "../../utils/map.js";
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function asObject(value: unknown): Record<string, unknown> {
+  if (isObject(value)) {
+    return value;
+  }
+  throw new Error("Value is not an object");
+}
+
+import type { PostRepository } from "../../../infrastructure/post-repository.js";
+import type { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
+import type { RecordRepository } from "../../../infrastructure/record-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 
 export class PostViewService {
   constructor(
-    private readonly postRepository: IPostRepository,
-    private readonly recordRepository: IRecordRepository,
-    private readonly postStatsRepository: IPostStatsRepository,
+    private readonly postRepository: PostRepository,
+    private readonly postStatsRepository: PostStatsRepository,
+    private readonly recordRepository: RecordRepository,
     private readonly profileViewService: ProfileViewService,
-    private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
     private readonly generatorViewService: GeneratorViewService,
+    private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
   ) {}
-  static inject = [
+  static readonly inject = [
     "postRepository",
-    "recordRepository",
     "postStatsRepository",
+    "recordRepository",
     "profileViewService",
-    "postEmbedViewBuilder",
     "generatorViewService",
+    "postEmbedViewBuilder",
   ] as const;
+
+  private getEmbedRecordUris(posts: Post[]): AtUri[] {
+    const embedRecordUris = new Set<string>();
+    for (const post of posts) {
+      const uri = post.getEmbedRecordUri();
+      if (uri) {
+        embedRecordUris.add(uri.toString());
+      }
+    }
+    return Array.from(embedRecordUris).map((uri) => new AtUri(uri));
+  }
+
+  private async findGeneratorViewMap(
+    uris: AtUri[],
+  ): Promise<Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>> {
+    const generatorUris = uris.filter(
+      (uri) => uri.collection === "app.bsky.feed.generator",
+    );
+    if (generatorUris.length === 0) {
+      return new Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>();
+    }
+    return await this.generatorViewService.findGeneratorViewMap(generatorUris);
+  }
+
+  private async findViewRecordMap(
+    embedUris: AtUri[],
+    maxDepth: number,
+  ): Promise<Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>> {
+    const viewRecordMap = new Map<
+      string,
+      $Typed<AppBskyEmbedRecord.ViewRecord>
+    >();
+
+    if (maxDepth <= 0) {
+      return viewRecordMap;
+    }
+
+    const postUris = embedUris.filter(
+      (uri) => uri.collection === "app.bsky.feed.post",
+    );
+    if (postUris.length === 0) {
+      return viewRecordMap;
+    }
+
+    const posts = await this.postRepository.findByUris(postUris);
+
+    const [recordMap, profileMap, postStats] = await Promise.all([
+      this.recordRepository
+        .findByUris(posts.map((post) => post.uri))
+        .then(toMapByUri),
+      this.profileViewService
+        .findProfileViewBasic(posts.map((post) => post.actorDid))
+        .then(toMapByDid),
+      this.postStatsRepository.findMap(
+        posts.map((post) => post.uri.toString()),
+      ),
+    ]);
+
+    const deepEmbedMaps = await this.findEmbedMaps(
+      this.getEmbedRecordUris(posts),
+      maxDepth - 1,
+    );
+
+    for (const post of posts) {
+      const record = recordMap.get(post.uri.toString());
+      const profile = profileMap.get(post.actorDid);
+      const stats = postStats.get(post.uri.toString());
+      if (!record || !profile) continue;
+
+      // なんでここ配列なんだっけ
+      const embeds = [
+        this.postEmbedViewBuilder.embedView(post, deepEmbedMaps),
+      ].filter((embed) => !!embed);
+
+      const viewRecord: $Typed<AppBskyEmbedRecord.ViewRecord> = {
+        $type: "app.bsky.embed.record#viewRecord",
+        uri: post.uri.toString(),
+        cid: record.cid,
+        author: profile,
+        value: asObject(record.json),
+        replyCount: stats?.replyCount ?? 0,
+        repostCount: stats?.repostCount ?? 0,
+        likeCount: stats?.likeCount ?? 0,
+        quoteCount: stats?.quoteCount ?? 0,
+        embeds,
+        indexedAt: post.indexedAt.toISOString(),
+      };
+
+      viewRecordMap.set(post.uri.toString(), viewRecord);
+    }
+
+    return viewRecordMap;
+  }
+
+  private async findEmbedMaps(
+    embedUris: AtUri[],
+    maxDepth: number,
+  ): Promise<{
+    viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
+    generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
+  }> {
+    const [viewRecordMap, generatorViewMap] = await Promise.all([
+      this.findViewRecordMap(embedUris, maxDepth),
+      this.findGeneratorViewMap(embedUris),
+    ]);
+    return { viewRecordMap, generatorViewMap };
+  }
 
   async findPostView(
     uris: AtUri[],
   ): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
-    if (uris.length === 0) {
-      return [];
-    }
+    const posts = await this.postRepository.findByUris(uris);
+    const postMap = toMapByUri(posts);
 
-    const found = await this.findPostsAndMaps(uris);
-    if (!found) {
-      return [];
-    }
-
-    const { postEmbedUris, generatorEmbedUris } = this.getEmbedUris(
-      found.posts,
-    );
-
-    const [viewRecordMap, generatorViewMap] = await Promise.all([
-      this.findEmbedViewRecordMap(postEmbedUris, { recursiveEmbed: true }),
-      this.generatorViewService.findGeneratorViewMap(generatorEmbedUris),
+    const [recordMap, profileMap, postStats] = await Promise.all([
+      this.recordRepository
+        .findByUris(posts.map((post) => post.uri))
+        .then(toMapByUri),
+      this.profileViewService
+        .findProfileViewBasic(posts.map((post) => post.actorDid))
+        .then(toMapByDid),
+      // TODO: AtUri[]を受け取るようにする
+      this.postStatsRepository.findMap(
+        posts.map((post) => post.uri.toString()),
+      ),
     ]);
 
-    return found.posts
-      .map((post) => {
-        const record = found.recordMap.get(post.uri.toString());
-        const author = found.profileMap.get(post.actorDid);
-        const stats = found.statsMap.get(post.uri.toString());
+    const embedMaps = await this.findEmbedMaps(
+      this.getEmbedRecordUris(posts),
+      2,
+    );
 
-        if (!record || !author) {
-          return null;
-        }
+    return uris
+      .map((uri) => {
+        const post = postMap.get(uri.toString());
+        if (!post) return null;
 
-        if (!this.isRecordObject(record.json)) {
-          throw new Error(
-            `Invalid record format for post ${post.uri.toString()}: ${JSON.stringify(record.json)}`,
-          );
-        }
+        const record = recordMap.get(post.uri.toString());
+        const profile = profileMap.get(post.actorDid);
+        const stats = postStats.get(post.uri.toString());
+        if (!record || !profile) return null;
 
-        const postView: $Typed<AppBskyFeedDefs.PostView> = {
-          $type: "app.bsky.feed.defs#postView" as const,
+        return {
+          $type: "app.bsky.feed.defs#postView",
           uri: post.uri.toString(),
           cid: record.cid,
-          author,
-          record: record.json,
-          replyCount: stats?.replyCount,
-          repostCount: stats?.repostCount,
-          likeCount: stats?.likeCount,
-          quoteCount: stats?.quoteCount,
+          author: profile,
+          record: asObject(record.json),
+          embed: this.postEmbedViewBuilder.embedView(post, embedMaps),
+          replyCount: stats?.replyCount ?? 0,
+          repostCount: stats?.repostCount ?? 0,
+          likeCount: stats?.likeCount ?? 0,
+          quoteCount: stats?.quoteCount ?? 0,
           indexedAt: post.indexedAt.toISOString(),
-        };
-
-        if (post.embed) {
-          const embedView = this.postEmbedViewBuilder.embedView(post, {
-            viewRecordMap,
-            generatorViewMap,
-          });
-          if (embedView) {
-            postView.embed = embedView;
-          }
-        }
-        return postView;
+        } as const;
       })
       .filter((postView) => postView !== null);
-  }
-
-  private async findPostsAndMaps(uris: AtUri[]) {
-    const [posts, recordMap] = await Promise.all([
-      this.postRepository.findByUris(uris),
-      this.recordRepository.findByUris(uris).then(toMapByUri),
-    ]);
-
-    if (posts.length === 0) {
-      return null;
-    }
-
-    const postUris = posts.map((post) => post.uri.toString());
-    const authorDids = [...new Set(posts.map((post) => post.actorDid))];
-
-    const [statsMap, profileMap] = await Promise.all([
-      this.postStatsRepository.findMap(postUris),
-      this.profileViewService.findProfileViewBasic(authorDids).then(toMapByDid),
-    ]);
-
-    return { posts, recordMap, statsMap, profileMap };
-  }
-
-  private getEmbedUris(posts: Post[]) {
-    const embedUris = posts
-      .map((post) => post.getEmbedRecordUri())
-      .filter((uri) => uri !== null);
-    const postEmbedUris = embedUris.filter(
-      (uri) => uri.collection === "app.bsky.feed.post",
-    );
-    const generatorEmbedUris = embedUris.filter(
-      (uri) => uri.collection === "app.bsky.feed.generator",
-    );
-    return { postEmbedUris, generatorEmbedUris };
-  }
-
-  private async findEmbedViewRecordMap(
-    uris: AtUri[],
-    options?: {
-      recursiveEmbed: boolean;
-    },
-  ): Promise<Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>> {
-    if (uris.length === 0) {
-      return new Map();
-    }
-
-    const found = await this.findPostsAndMaps(uris);
-    if (!found) {
-      return new Map();
-    }
-
-    let embedMaps:
-      | {
-          viewRecordMap: Map<string, $Typed<AppBskyEmbedRecord.ViewRecord>>;
-          generatorViewMap: Map<string, $Typed<AppBskyFeedDefs.GeneratorView>>;
-        }
-      | undefined;
-
-    // 投稿 → 埋め込み投稿 → 埋め込み投稿 まで読み込む
-    if (options?.recursiveEmbed) {
-      const { postEmbedUris, generatorEmbedUris } = this.getEmbedUris(
-        found.posts,
-      );
-
-      const [embedViewRecordMap, embedGeneratorViewMap] = await Promise.all([
-        this.findEmbedViewRecordMap(postEmbedUris),
-        this.generatorViewService.findGeneratorViewMap(generatorEmbedUris),
-      ]);
-
-      embedMaps = {
-        viewRecordMap: embedViewRecordMap,
-        generatorViewMap: embedGeneratorViewMap,
-      };
-    }
-
-    const viewRecords = found.posts
-      .map((post) => {
-        const record = found.recordMap.get(post.uri.toString());
-        const author = found.profileMap.get(post.actorDid);
-        const stats = found.statsMap.get(post.uri.toString());
-
-        if (!record || !author) {
-          return null;
-        }
-
-        if (!this.isRecordObject(record.json)) {
-          throw new Error(
-            `Invalid record format for post ${post.uri.toString()}: ${JSON.stringify(record.json)}`,
-          );
-        }
-
-        const viewRecord: $Typed<AppBskyEmbedRecord.ViewRecord> = {
-          $type: "app.bsky.embed.record#viewRecord" as const,
-          uri: post.uri.toString(),
-          cid: record.cid,
-          author,
-          value: record.json,
-          indexedAt: post.indexedAt.toISOString(),
-          replyCount: stats?.replyCount,
-          repostCount: stats?.repostCount,
-          likeCount: stats?.likeCount,
-          quoteCount: stats?.quoteCount,
-        };
-
-        if (post.embed && embedMaps) {
-          const embedView = this.postEmbedViewBuilder.embedView(
-            post,
-            embedMaps,
-          );
-          if (embedView) {
-            viewRecord.embeds = [embedView];
-          }
-        }
-
-        return viewRecord;
-      })
-      .filter((viewRecord) => viewRecord !== null);
-
-    return toMapByUri(viewRecords);
-  }
-
-  private isRecordObject(value: unknown): value is { [x: string]: unknown } {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
   }
 }
