@@ -34,14 +34,11 @@ export class CacheCleanupScheduler {
   }
 
   private async performCleanup(): Promise<void> {
-    try {
-      this.logger.info("Starting cache cleanup");
-      const deletedCount = await this.cacheCleanupService.cleanup();
+    const deletedCount = await this.cacheCleanupService.cleanup();
+    if (deletedCount > 0) {
       this.logger.info(
         `Cache cleanup completed. Deleted ${deletedCount} entries`,
       );
-    } catch (error) {
-      this.logger.error(error, "Cache cleanup failed");
     }
   }
 }

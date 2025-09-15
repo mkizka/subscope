@@ -25,15 +25,8 @@ export class CacheCleanupService {
 
     let deletedCount = 0;
     for (const entry of expiredEntries) {
-      try {
-        await this.imageCacheService.delete(entry);
-        deletedCount++;
-      } catch (error) {
-        this.logger.error(
-          error,
-          `Failed to delete cache entry: ${entry.cacheKey}`,
-        );
-      }
+      await this.imageCacheService.delete(entry);
+      deletedCount++;
     }
     return deletedCount;
   }
