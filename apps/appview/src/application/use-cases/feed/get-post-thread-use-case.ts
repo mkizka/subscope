@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type {
   $Typed,
@@ -7,7 +8,6 @@ import type {
 import type { Post } from "@repo/common/domain";
 
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import { type AtUriService } from "../../../domain/service/at-uri-service.js";
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import type { PostViewService } from "../../service/feed/post-view-service.js";
 import { toMapByUri } from "../../utils/map.js";
@@ -22,18 +22,14 @@ export class GetPostThreadUseCase {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly postViewService: PostViewService,
-    private readonly atUriService: AtUriService,
   ) {}
-  static inject = [
-    "postRepository",
-    "postViewService",
-    "atUriService",
-  ] as const;
+  static inject = ["postRepository", "postViewService"] as const;
 
   async execute(params: {
     uri: ResolvedAtUri;
     depth: number;
     parentHeight: number;
+    viewerDid?: Did;
   }): Promise<AppBskyFeedGetPostThread.OutputSchema> {
     // 1. ターゲット投稿を取得
     const targetPost = await this.postRepository.findByUri(
@@ -51,7 +47,10 @@ export class GetPostThreadUseCase {
     });
 
     // 3. すべての投稿のPostViewを一括取得
-    const postViewMap = await this.hydratePostViewMap(threadData.allPostUris);
+    const postViewMap = await this.hydratePostViewMap(
+      threadData.allPostUris,
+      params.viewerDid,
+    );
 
     // 4. ターゲット投稿のPostViewを確認
     const targetPostView = postViewMap.get(targetPost.uri.toString());
@@ -106,9 +105,12 @@ export class GetPostThreadUseCase {
 
   private async hydratePostViewMap(
     uris: Set<string>,
+    viewerDid?: Did,
   ): Promise<Map<string, PostView>> {
     const uriArray = Array.from(uris).map((uri) => new AtUri(uri));
-    return await this.postViewService.findPostView(uriArray).then(toMapByUri);
+    return await this.postViewService
+      .findPostView(uriArray, viewerDid)
+      .then(toMapByUri);
   }
 
   private buildThreadStructure({
