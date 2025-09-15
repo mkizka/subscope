@@ -1,14 +1,17 @@
+import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
   generatorFactory,
   getTestSetup,
+  likeFactory,
   postEmbedExternalFactory,
   postEmbedImageFactory,
   postEmbedRecordFactory,
   postFactory,
   profileFactory,
   recordFactory,
+  repostFactory,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -17,10 +20,12 @@ import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
+import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 import { ProfileViewService } from "../actor/profile-view-service.js";
 import { ProfileSearchService } from "../search/profile-search-service.js";
@@ -46,6 +51,8 @@ describe("PostViewService", () => {
     .provideClass("generatorRepository", GeneratorRepository)
     .provideClass("generatorViewService", GeneratorViewService)
     .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
+    .provideClass("repostRepository", RepostRepository)
+    .provideClass("likeRepository", LikeRepository)
     .injectClass(PostViewService);
 
   describe("findPostView", () => {
@@ -1293,6 +1300,115 @@ describe("PostViewService", () => {
               },
             ],
           },
+        },
+      });
+    });
+
+    test("閲覧者が投稿をいいねとリポストしている場合、viewerにそれぞれのURIが含まれる", async () => {
+      // arrange
+      const viewer = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Viewer" }))
+        .create();
+      const author1 = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author 1" }))
+        .create();
+      const author2 = await actorFactory(ctx.db)
+        .use((t) => t.withProfile({ displayName: "Author 2" }))
+        .create();
+
+      // 投稿1: いいねのみ
+      const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => author1 })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Post 1",
+            createdAt: "2024-01-01T00:00:00.000Z",
+          }),
+        })
+        .create();
+      const post1 = await postFactory(ctx.db)
+        .vars({ record: () => postRecord1 })
+        .create();
+      const likeRecord1 = await recordFactory(ctx.db, "app.bsky.feed.like")
+        .vars({ actor: () => viewer })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.like",
+            subject: {
+              uri: post1.uri,
+              cid: postRecord1.cid,
+            },
+            createdAt: "2024-01-01T01:00:00.000Z",
+          }),
+        })
+        .create();
+      const like1 = await likeFactory(ctx.db)
+        .vars({ record: () => likeRecord1 })
+        .props({
+          subjectUri: () => post1.uri,
+          subjectCid: () => postRecord1.cid,
+        })
+        .create();
+
+      // 投稿2: リポストのみ
+      const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => author2 })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.post",
+            text: "Post 2",
+            createdAt: "2024-01-01T02:00:00.000Z",
+          }),
+        })
+        .create();
+      const post2 = await postFactory(ctx.db)
+        .vars({ record: () => postRecord2 })
+        .create();
+      const repostRecord2 = await recordFactory(ctx.db, "app.bsky.feed.repost")
+        .vars({ actor: () => viewer })
+        .props({
+          json: () => ({
+            $type: "app.bsky.feed.repost",
+            subject: {
+              uri: post2.uri,
+              cid: postRecord2.cid,
+            },
+            createdAt: "2024-01-01T03:00:00.000Z",
+          }),
+        })
+        .create();
+      const repost2 = await repostFactory(ctx.db)
+        .vars({ record: () => repostRecord2 })
+        .props({
+          subjectUri: () => post2.uri,
+          subjectCid: () => postRecord2.cid,
+        })
+        .create();
+
+      const postUri1 = new AtUri(post1.uri);
+      const postUri2 = new AtUri(post2.uri);
+
+      // act
+      const result = await postViewService.findPostView(
+        [postUri1, postUri2],
+        asDid(viewer.did),
+      );
+
+      // assert
+      expect(result).toHaveLength(2);
+      expect(result[0]).toMatchObject({
+        uri: post1.uri,
+        viewer: {
+          like: like1.uri,
+          repost: undefined,
+        },
+      });
+      expect(result[1]).toMatchObject({
+        uri: post2.uri,
+        viewer: {
+          repost: repost2.uri,
+          like: undefined,
         },
       });
     });

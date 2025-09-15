@@ -17,6 +17,7 @@ import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
+import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
@@ -43,6 +44,7 @@ describe("FeedProcessor", () => {
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("recordRepository", RecordRepository)
     .provideClass("repostRepository", RepostRepository)
+    .provideClass("likeRepository", LikeRepository)
     .provideClass("assetUrlBuilder", AssetUrlBuilder)
     .provideClass("profileViewBuilder", ProfileViewBuilder)
     .provideClass("profileSearchService", ProfileSearchService)

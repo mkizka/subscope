@@ -12,10 +12,12 @@ import { ActorStatsRepository } from "../../../infrastructure/actor-stats-reposi
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository.js";
 import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
+import { LikeRepository } from "../../../infrastructure/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
 import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import { GeneratorViewService } from "../../service/feed/generator-view-service.js";
@@ -43,6 +45,8 @@ describe("SearchPostsUseCase", () => {
     .provideClass("generatorRepository", GeneratorRepository)
     .provideClass("generatorViewService", GeneratorViewService)
     .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
+    .provideClass("repostRepository", RepostRepository)
+    .provideClass("likeRepository", LikeRepository)
     .provideClass("postViewService", PostViewService)
     .provideClass("searchService", PostSearchService)
     .injectClass(SearchPostsUseCase);

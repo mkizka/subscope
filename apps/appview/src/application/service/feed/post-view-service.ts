@@ -6,7 +6,7 @@ import type {
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
 
-import { toMapByDid, toMapByUri } from "../../utils/map.js";
+import { toMapByDid, toMapBySubjectUri, toMapByUri } from "../../utils/map.js";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -19,9 +19,13 @@ function asObject(value: unknown): Record<string, unknown> {
   throw new Error("Value is not an object");
 }
 
+import type { Did } from "@atproto/did";
+
+import type { LikeRepository } from "../../../infrastructure/like-repository.js";
 import type { PostRepository } from "../../../infrastructure/post-repository.js";
 import type { PostStatsRepository } from "../../../infrastructure/post-stats-repository.js";
 import type { RecordRepository } from "../../../infrastructure/record-repository.js";
+import type { RepostRepository } from "../../../infrastructure/repost-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
@@ -34,6 +38,8 @@ export class PostViewService {
     private readonly profileViewService: ProfileViewService,
     private readonly generatorViewService: GeneratorViewService,
     private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
+    private readonly repostRepository: RepostRepository,
+    private readonly likeRepository: LikeRepository,
   ) {}
   static readonly inject = [
     "postRepository",
@@ -42,6 +48,8 @@ export class PostViewService {
     "profileViewService",
     "generatorViewService",
     "postEmbedViewBuilder",
+    "repostRepository",
+    "likeRepository",
   ] as const;
 
   private getEmbedRecordUris(posts: Post[]): AtUri[] {
@@ -151,19 +159,32 @@ export class PostViewService {
 
   async findPostView(
     uris: AtUri[],
+    viewerDid?: Did,
   ): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
     const posts = await this.postRepository.findByUris(uris);
     const postMap = toMapByUri(posts);
 
-    const [recordMap, profileMap, postStats] = await Promise.all([
-      this.recordRepository
-        .findByUris(posts.map((post) => post.uri))
-        .then(toMapByUri),
-      this.profileViewService
-        .findProfileViewBasic(posts.map((post) => post.actorDid))
-        .then(toMapByDid),
-      this.postStatsRepository.findMap(posts.map((post) => post.uri)),
-    ]);
+    const postUris = posts.map((post) => post.uri.toString());
+
+    const [recordMap, profileMap, postStats, viewerRepostMap, viewerLikeMap] =
+      await Promise.all([
+        this.recordRepository
+          .findByUris(posts.map((post) => post.uri))
+          .then(toMapByUri),
+        this.profileViewService
+          .findProfileViewBasic(posts.map((post) => post.actorDid))
+          .then(toMapByDid),
+        this.postStatsRepository.findMap(posts.map((post) => post.uri)),
+        viewerDid &&
+          this.repostRepository
+            // TODO: AtUriのまま渡せるようにする
+            .findViewerReposts({ viewerDid, subjectUris: postUris })
+            .then(toMapBySubjectUri),
+        viewerDid &&
+          this.likeRepository
+            .findViewerLikes({ viewerDid, subjectUris: postUris })
+            .then(toMapBySubjectUri),
+      ]);
 
     const embedMaps = await this.findEmbedMaps(
       this.getEmbedRecordUris(posts),
@@ -191,6 +212,10 @@ export class PostViewService {
           repostCount: stats?.repostCount ?? 0,
           likeCount: stats?.likeCount ?? 0,
           quoteCount: stats?.quoteCount ?? 0,
+          viewer: {
+            repost: viewerRepostMap?.get(post.uri.toString())?.uri.toString(),
+            like: viewerLikeMap?.get(post.uri.toString())?.uri.toString(),
+          },
           indexedAt: post.indexedAt.toISOString(),
         } as const;
       })
