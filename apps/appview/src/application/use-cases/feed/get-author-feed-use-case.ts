@@ -12,6 +12,7 @@ type GetAuthorFeedParams = {
   filter: Filter;
   includePins: boolean;
   cursor?: Date;
+  viewerDid?: Did;
 };
 
 export class GetAuthorFeedUseCase {
@@ -46,7 +47,10 @@ export class GetAuthorFeedUseCase {
       limit: params.limit,
     });
 
-    const feed = await this.feedProcessor.processFeedItems(page.items);
+    const feed = await this.feedProcessor.processFeedItems(
+      page.items,
+      params.viewerDid,
+    );
 
     return {
       feed,

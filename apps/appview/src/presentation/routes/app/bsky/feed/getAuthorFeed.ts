@@ -3,18 +3,24 @@ import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
 import type { GetAuthorFeedUseCase } from "../../../../../application/use-cases/feed/get-author-feed-use-case.js";
+import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
 
 export class GetAuthorFeed {
   constructor(
     private getAuthorFeedUseCase: GetAuthorFeedUseCase,
     private handleMiddleware: HandleMiddleware,
+    private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = ["getAuthorFeedUseCase", "handleMiddleware"] as const;
+  static inject = [
+    "getAuthorFeedUseCase",
+    "handleMiddleware",
+    "authVerifierMiddleware",
+  ] as const;
 
   handle(server: Server) {
     server.app.bsky.feed.getAuthorFeed({
-      handler: async ({ params }) => {
+      handler: async ({ params, req }) => {
         if (!isDid(params.actor) && !isHandle(params.actor)) {
           return {
             status: 400,
@@ -22,9 +28,10 @@ export class GetAuthorFeed {
           };
         }
 
-        const actorDid = await this.handleMiddleware.resolveHandleOrDid(
-          params.actor,
-        );
+        const [actorDid, viewerDid] = await Promise.all([
+          this.handleMiddleware.resolveHandleOrDid(params.actor),
+          this.authVerifierMiddleware.getViewerDid(req),
+        ]);
 
         const result = await this.getAuthorFeedUseCase.execute({
           actorDid,
@@ -32,6 +39,7 @@ export class GetAuthorFeed {
           cursor: params.cursor ? new Date(params.cursor) : undefined,
           filter: params.filter,
           includePins: params.includePins,
+          viewerDid: viewerDid || undefined,
         });
 
         return {

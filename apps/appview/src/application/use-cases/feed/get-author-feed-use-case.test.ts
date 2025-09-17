@@ -128,6 +128,7 @@ describe("GetAuthorFeedUseCase", () => {
     // assert
     expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
       mockPaginationResult.items,
+      undefined,
     );
   });
 
@@ -267,5 +268,46 @@ describe("GetAuthorFeedUseCase", () => {
       cursor: undefined,
       limit: 50,
     });
+  });
+
+  test("viewerDidが指定された場合、FeedProcessorに渡される", async () => {
+    // arrange
+    const actorDid = asDid("did:plc:testuser");
+    const viewerDid = asDid("did:plc:viewer");
+    const params = {
+      actorDid,
+      limit: 50,
+      filter: "posts_with_replies" as const,
+      includePins: false,
+      viewerDid,
+    };
+
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [
+        {
+          type: "post",
+          uri: "at://example.com/post/1",
+          actorDid: "did:plc:author1",
+          cid: "cid1",
+          sortAt: new Date(),
+          subjectUri: null,
+        },
+      ],
+      cursor: undefined,
+    };
+
+    mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
+    );
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
+
+    // act
+    await getAuthorFeedUseCase.execute(params);
+
+    // assert
+    expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
+      mockPaginationResult.items,
+      viewerDid,
+    );
   });
 });
