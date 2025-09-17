@@ -6,4 +6,10 @@ export interface IAuthorFeedRepository {
     limit: number;
     cursor?: Date;
   }) => Promise<FeedItem[]>;
+
+  findFeedItemsWithoutReplies: (params: {
+    actorDid: string;
+    limit: number;
+    cursor?: Date;
+  }) => Promise<FeedItem[]>;
 }

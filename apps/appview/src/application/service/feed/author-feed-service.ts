@@ -11,22 +11,51 @@ export class AuthorFeedService {
     actorDid,
     cursor,
     limit,
+    filter,
   }: {
     actorDid: string;
     cursor?: Date;
     limit: number;
+    filter?: string;
   }): Promise<Page<FeedItem>> {
     const paginator = createCursorPaginator<FeedItem>({
       limit,
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feedItems = await this.authorFeedRepository.findFeedItems({
+    const feedItems = await this.fetchFeedItems({
       actorDid,
       limit: paginator.queryLimit,
       cursor,
+      filter,
     });
 
     return paginator.extractPage(feedItems);
+  }
+
+  private async fetchFeedItems({
+    actorDid,
+    cursor,
+    limit,
+    filter,
+  }: {
+    actorDid: string;
+    cursor?: Date;
+    limit: number;
+    filter?: string;
+  }): Promise<FeedItem[]> {
+    if (filter === "posts_no_replies") {
+      return this.authorFeedRepository.findFeedItemsWithoutReplies({
+        actorDid,
+        limit,
+        cursor,
+      });
+    }
+
+    return this.authorFeedRepository.findFeedItems({
+      actorDid,
+      limit,
+      cursor,
+    });
   }
 }

@@ -47,6 +47,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid,
       cursor: undefined,
       limit: 50,
+      filter: "posts_with_replies",
     });
   });
 
@@ -82,6 +83,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid,
       cursor,
       limit: 50,
+      filter: "posts_with_replies",
     });
   });
 
@@ -176,6 +178,40 @@ describe("GetAuthorFeedUseCase", () => {
     });
   });
 
+  test("posts_no_repliesフィルターの場合、AuthorFeedServiceを呼び出す", async () => {
+    // arrange
+    const actorDid = asDid("did:plc:testuser");
+    const params = {
+      actorDid,
+      limit: 50,
+      filter: "posts_no_replies" as const,
+      includePins: false,
+    };
+
+    const mockPaginationResult: Page<FeedItem> = {
+      items: [],
+      cursor: undefined,
+    };
+
+    mockAuthorFeedService.findFeedItemsWithPagination.mockResolvedValue(
+      mockPaginationResult,
+    );
+    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
+
+    // act
+    await getAuthorFeedUseCase.execute(params);
+
+    // assert
+    expect(
+      mockAuthorFeedService.findFeedItemsWithPagination,
+    ).toHaveBeenCalledWith({
+      actorDid,
+      cursor: undefined,
+      limit: 50,
+      filter: "posts_no_replies",
+    });
+  });
+
   test("サポートされていないフィルターの場合、空のフィードを返す", async () => {
     // arrange
     const actorDid = asDid("did:plc:testuser");
@@ -230,6 +266,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid,
       cursor: undefined,
       limit: 0,
+      filter: "posts_with_replies",
     });
     expect(result).toEqual({
       feed: [],
@@ -267,6 +304,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid,
       cursor: undefined,
       limit: 50,
+      filter: "posts_with_replies",
     });
   });
 
