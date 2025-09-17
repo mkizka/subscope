@@ -413,6 +413,87 @@ describe("GetActorLikesUseCase", () => {
     });
   });
 
+  test("viewerDidが指定された場合、viewer情報を含むフィードを返す", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Actor User" }))
+      .create();
+    const viewerActor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Viewer User" }))
+      .create();
+    const postAuthor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Post Author" }))
+      .create();
+
+    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+      .vars({ actor: () => postAuthor })
+      .create();
+    const post = await postFactory(ctx.db)
+      .vars({ record: () => postRecord })
+      .create();
+
+    await postStatsFactory(ctx.db)
+      .vars({ post: () => post })
+      .props({
+        likeCount: () => 2,
+        repostCount: () => 1,
+        replyCount: () => 0,
+      })
+      .create();
+
+    // actorのいいね（これがフィードとして返される）
+    await likeFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.like")
+            .vars({ actor: () => actor })
+            .create(),
+        subject: () => post,
+      })
+      .create();
+
+    // viewerもいいねしている
+    const like = await likeFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.like")
+            .vars({ actor: () => viewerActor })
+            .create(),
+        subject: () => post,
+      })
+      .create();
+
+    // act
+    const result = await getActorLikesUseCase.execute({
+      actorDid: asDid(actor.did),
+      limit: 50,
+      viewerDid: asDid(viewerActor.did),
+    });
+
+    // assert
+    expect(result).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            uri: post.uri,
+            cid: post.cid,
+            author: {
+              did: postAuthor.did,
+              displayName: "Post Author",
+            },
+            likeCount: 2,
+            repostCount: 1,
+            replyCount: 0,
+            viewer: {
+              like: like.uri,
+            },
+          },
+        },
+      ],
+    });
+  });
+
   test("複数のいいねがある場合、sortAt（createdAtとindexedAtの早い方）の降順でソートされて返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)

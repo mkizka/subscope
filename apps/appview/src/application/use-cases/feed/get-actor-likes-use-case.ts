@@ -15,6 +15,7 @@ export class GetActorLikesUseCase {
     actorDid: Did;
     limit: number;
     cursor?: Date;
+    viewerDid?: Did;
   }): Promise<AppBskyFeedGetActorLikes.OutputSchema> {
     const page = await this.actorLikesService.findLikesWithPagination({
       actorDid: params.actorDid,
@@ -22,7 +23,10 @@ export class GetActorLikesUseCase {
       limit: params.limit,
     });
 
-    const feed = await this.feedProcessor.processFeedItems(page.items);
+    const feed = await this.feedProcessor.processFeedItems(
+      page.items,
+      params.viewerDid,
+    );
 
     return {
       feed,
