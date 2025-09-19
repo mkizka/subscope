@@ -108,6 +108,10 @@ export class IndexRecordService {
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
     const existingRecord = await this.recordRepository.findByUri({ ctx, uri });
 
+    // レコードを先に削除
+    await this.recordRepository.delete({ ctx, uri });
+
+    // その後でstatsを更新
     if (existingRecord && isSupportedCollection(existingRecord.collection)) {
       const indexer = this.indexers[existingRecord.collection];
       await indexer.updateStats?.({
@@ -115,7 +119,5 @@ export class IndexRecordService {
         record: existingRecord,
       });
     }
-
-    await this.recordRepository.delete({ ctx, uri });
   }
 }

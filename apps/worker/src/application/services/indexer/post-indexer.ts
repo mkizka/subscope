@@ -78,13 +78,20 @@ export class PostIndexer implements ICollectionIndexer {
       actorDid: post.actorDid,
     });
 
-    // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
-    // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
-    //    → このとき、リポスト数が0なので1にする必要がある
-    await this.postStatsRepository.upsertAllCount({
+    // 削除時にupdateStatsが呼ばれる場合は投稿が存在しないので更新もしない
+    const postExists = await this.postRepository.exists(
       ctx,
-      uri: post.uri,
-    });
+      post.uri.toString(),
+    );
+    if (postExists) {
+      // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
+      // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
+      //    → このとき、リポスト数が0なので1にする必要がある
+      await this.postStatsRepository.upsertAllCount({
+        ctx,
+        uri: post.uri,
+      });
+    }
 
     if (post.replyParent) {
       const parentExists = await this.postRepository.exists(

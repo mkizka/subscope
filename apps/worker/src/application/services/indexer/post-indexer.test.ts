@@ -503,5 +503,57 @@ describe("PostIndexer", () => {
         followersCount: 0,
       });
     });
+
+    test("削除済みの投稿に対してupdateStatsを呼んだ場合、post_statsの更新をスキップする", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "Post that will be deleted",
+        createdAt: new Date().toISOString(),
+      };
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => actor })
+        .props({ json: () => postJson })
+        .create();
+
+      // postを作成
+      const post = await postFactory(ctx.db)
+        .vars({ record: () => postRecord })
+        .create();
+
+      // postを削除（実際の削除処理をシミュレート）
+      await ctx.db.delete(schema.posts).where(eq(schema.posts.uri, post.uri));
+
+      const record = Record.fromJson({
+        uri: postRecord.uri,
+        cid: postRecord.cid,
+        json: postJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      await postIndexer.updateStats({ ctx, record });
+
+      // assert
+      // post_statsが作成されていないことを確認
+      const stats = await ctx.db
+        .select()
+        .from(schema.postStats)
+        .where(eq(schema.postStats.postUri, post.uri));
+      expect(stats).toHaveLength(0);
+
+      // actor_statsは更新される（削除済みpostも含めて集計されるため0になる）
+      const [actorStats] = await ctx.db
+        .select()
+        .from(schema.actorStats)
+        .where(eq(schema.actorStats.actorDid, actor.did));
+      expect(actorStats).toMatchObject({
+        actorDid: actor.did,
+        postsCount: 0, // 削除済みなので0
+        followsCount: 0,
+        followersCount: 0,
+      });
+    });
   });
 });
