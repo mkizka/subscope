@@ -22,7 +22,7 @@ export const oauthClientFactory = (
 
   const oauthClientOptions: NodeOAuthClientOptions = {
     clientMetadata: {
-      client_name: "Linkat",
+      client_name: "Subscope Admin",
       client_id: `${env.PUBLIC_URL}/oauth/client-metadata.json`,
       client_uri: baseUrl,
       jwks_uri: `${baseUrl}/oauth/jwks.json`,
