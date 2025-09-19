@@ -81,7 +81,7 @@ import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createIn
 import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GetSubscribers } from "./presentation/routes/me/subsco/admin/getSubscribers.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
-import { AppviewServer } from "./presentation/server.js";
+import { AppViewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
 createInjector()
@@ -173,5 +173,5 @@ createInjector()
   .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("getSubscribers", GetSubscribers)
   .provideClass("xrpcRouter", XRPCRouter)
-  .injectClass(AppviewServer)
+  .injectClass(AppViewServer)
   .start();

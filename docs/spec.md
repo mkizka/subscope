@@ -2,24 +2,24 @@
 
 ## 1. コンセプト
 
-ActivityPubを参考に、登録されたアカウントに直接関連しているレコードのみをインデックスしてDBサイズを抑えるAppview
+ActivityPubを参考に、登録されたアカウントに直接関連しているレコードのみをインデックスしてDBサイズを抑えるAppView
 
 ### 用語の定義
 
 - subscription
-  - Appviewにアカウントを登録し関連レコードのインデックスを要求するためのレコード
+  - AppViewにアカウントを登録し関連レコードのインデックスを要求するためのレコード
   - me.subsco.sync.subscriptionレコード
 - subscribers
-  - subscriptionレコードを作成しAppviewに登録されたアカウント
+  - subscriptionレコードを作成しAppViewに登録されたアカウント
 - 招待コード
-  - Appviewが発行し、subscriptionの作成時にレコードに含める
-  - 形式は`{Appviewドメインをケバブケースにした文字列}-{ランダムな5文字}`
+  - AppViewが発行し、subscriptionの作成時にレコードに含める
+  - 形式は`{AppViewドメインをケバブケースにした文字列}-{ランダムな5文字}`
 
 ### アカウントの登録からタイムラインが見れるようになるまで
 
-1. Appviewの管理者が招待コードを発行する
+1. AppViewの管理者が招待コードを発行する
 2. アカウント保有者は招待コードを元にsubscriptionレコードを作成する
-3. リレーを介してAppviewがsubscriptionレコードをインデックスする
+3. リレーを介してAppViewがsubscriptionレコードをインデックスする
 4. Jetstreamイベントを「レコードのインデックスポリシー」の条件でsubscribersに関連するレコードを保存する
 5. app.bsky.feed.getTimelineがタイムラインを返すようになる
 

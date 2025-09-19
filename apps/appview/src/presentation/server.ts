@@ -11,7 +11,7 @@ import type { XRPCRouter } from "./routes/xrpc.js";
 
 const MONITORING_PATHS = ["/xrpc", "/health", "/.well-known"];
 
-export class AppviewServer {
+export class AppViewServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
 
@@ -19,7 +19,7 @@ export class AppviewServer {
     private readonly xrpcRouter: XRPCRouter,
     loggerManager: ILoggerManager,
   ) {
-    this.logger = loggerManager.createLogger("AppviewServer");
+    this.logger = loggerManager.createLogger("AppViewServer");
     this.app = express();
     this.app.use(cors());
     this.app.use(loggingMiddleware(this.logger));
@@ -43,7 +43,7 @@ export class AppviewServer {
 
   start() {
     this.app.listen(env.PORT, () => {
-      this.logger.info(`Appview server listening on port ${env.PORT}`);
+      this.logger.info(`AppView server listening on port ${env.PORT}`);
     });
   }
 }

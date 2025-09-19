@@ -1,8 +1,8 @@
 # Subscope
 
-保存するデータを限定することで小規模なBluesky互換Appviewを実装する試み
+保存するデータを限定することで小規模なBluesky互換AppViewを実装する試み
 
-Subscribe & Scoped Appview = Subscope
+Subscribe & Scoped AppView = Subscope
 
 ## アイデア
 
