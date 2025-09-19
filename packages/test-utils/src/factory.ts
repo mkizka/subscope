@@ -109,6 +109,19 @@ export const postFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
+    })
+    .traits({
+      asReplyTo: (
+        parent: { uri: string; cid: string },
+        root?: { uri: string; cid: string },
+      ) => ({
+        props: {
+          replyParentUri: () => parent.uri,
+          replyParentCid: () => parent.cid,
+          replyRootUri: () => (root ?? parent).uri,
+          replyRootCid: () => (root ?? parent).cid,
+        },
+      }),
     });
 
 export const postStatsFactory = (db: Database) =>
@@ -269,7 +282,7 @@ export const postFeedItemFactory = (db: Database) =>
           uri: later<string>(),
           cid: later<string>(),
           type: () => "post" as const,
-          subjectUri: () => null,
+          subjectUri: later<string>(),
           actorDid: later<string>(),
           sortAt: later<Date>(),
           indexedAt: () => faker.date.recent(),
@@ -284,6 +297,7 @@ export const postFeedItemFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.post).uri,
       cid: async ({ vars }) => (await vars.post).cid,
       actorDid: async ({ vars }) => (await vars.post).actorDid,
+      subjectUri: async ({ vars }) => (await vars.post).uri,
       sortAt: async ({ vars }) => (await vars.post).createdAt,
     });
 
