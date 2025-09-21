@@ -6,11 +6,9 @@ ActivityPubを参考に、登録されたアカウントに直接関連してい
 
 ### 用語の定義
 
-- subscription
-  - AppViewにアカウントを登録し関連レコードのインデックスを要求するためのレコード
-  - me.subsco.sync.subscriptionレコード
 - subscribers
-  - subscriptionレコードを作成しAppViewに登録されたアカウント
+  - AppViewに登録したアカウント
+  - me.subsco.sync.subscribeServerで登録
 - 招待コード
   - AppViewが発行し、subscriptionの作成時にレコードに含める
   - 形式は`{AppViewドメインをケバブケースにした文字列}-{ランダムな5文字}`
@@ -18,9 +16,9 @@ ActivityPubを参考に、登録されたアカウントに直接関連してい
 ### アカウントの登録からタイムラインが見れるようになるまで
 
 1. AppViewの管理者が招待コードを発行する
-2. アカウント保有者は招待コードを元にsubscriptionレコードを作成する
-3. リレーを介してAppViewがsubscriptionレコードをインデックスする
-4. Jetstreamイベントを「レコードのインデックスポリシー」の条件でsubscribersに関連するレコードを保存する
+2. ユーザーが招待コードをつけてme.subsco.sync.subscribeServerへリクエスト
+3. 招待コードが有効な場合、AppView上にユーザーが登録される
+4. Jetstreamイベントから「レコードのインデックスポリシー」の条件でsubscribersに関連するレコードを保存する
 5. app.bsky.feed.getTimelineがタイムラインを返すようになる
 
 ### レコードのインデックスポリシー
@@ -36,7 +34,6 @@ ActivityPubを参考に、登録されたアカウントに直接関連してい
 | app.bsky.graph.follow            | フォローまたはフォロイーがsubscribers                                                         | なし                                      |
 | app.bsky.actor.profile           | subscribersのプロフール                                                                       | なし                                      |
 | app.bsky.feed.generator          | subscribersのフィード                                                                         | なし                                      |
-| me.subsco.sync.subscription      | appviewDidが環境変数APPVIEW_DIDと一致                                                         | なし                                      |
 
 さらに、以下はPDSにリクエストを送って追加で保存する。再帰処理になる場合の連鎖は2回まで。
 
