@@ -18,7 +18,6 @@ import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
-import { SubscriptionIndexer } from "./application/services/indexer/subscription-indexer.js";
 import { BackfillScheduler } from "./application/services/scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
@@ -34,7 +33,6 @@ import { LikeIndexingPolicy } from "./domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "./domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "./domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "./domain/repost-indexing-policy.js";
-import { SubscriptionIndexingPolicy } from "./domain/subscription-indexing-policy.js";
 import { RecordFetcher } from "./infrastructure/fetchers/record-fetcher.js";
 import { RepoFetcher } from "./infrastructure/fetchers/repo-fetcher.js";
 import { ActorRepository } from "./infrastructure/repositories/actor-repository.js";
@@ -96,7 +94,6 @@ createInjector()
   .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
   .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
   .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
-  .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
   .provideClass("profileIndexer", ProfileIndexer)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)
@@ -104,7 +101,6 @@ createInjector()
   .provideClass("generatorIndexer", GeneratorIndexer)
   .provideClass("likeIndexer", LikeIndexer)
   .provideClass("repostIndexer", RepostIndexer)
-  .provideClass("subscriptionIndexer", SubscriptionIndexer)
   .provideClass("indexRecordService", IndexRecordService)
   // application(use-case)
   .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)

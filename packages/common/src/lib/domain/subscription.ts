@@ -1,8 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import type { Record } from "./record.js";
-
 type SubscriptionParams = {
   uri: AtUri | string;
   cid: string;
@@ -30,18 +28,5 @@ export class Subscription {
     this.inviteCode = params.inviteCode;
     this.createdAt = params.createdAt;
     this.indexedAt = params.indexedAt;
-  }
-
-  static from(record: Record) {
-    const parsed = record.validate("me.subsco.sync.subscription");
-    return new Subscription({
-      uri: record.uri,
-      cid: record.cid,
-      actorDid: record.actorDid,
-      appviewDid: parsed.appviewDid,
-      inviteCode: parsed.inviteCode,
-      createdAt: new Date(parsed.createdAt),
-      indexedAt: record.indexedAt,
-    });
   }
 }

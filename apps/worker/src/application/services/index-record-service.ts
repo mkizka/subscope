@@ -16,7 +16,6 @@ import type { LikeIndexer } from "./indexer/like-indexer.js";
 import type { PostIndexer } from "./indexer/post-indexer.js";
 import type { ProfileIndexer } from "./indexer/profile-indexer.js";
 import type { RepostIndexer } from "./indexer/repost-indexer.js";
-import type { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
 
 type CollectionIndexerMap = {
   [key in SupportedCollection]: ICollectionIndexer;
@@ -39,7 +38,6 @@ export class IndexRecordService {
     generatorIndexer: GeneratorIndexer,
     likeIndexer: LikeIndexer,
     repostIndexer: RepostIndexer,
-    subscriptionIndexer: SubscriptionIndexer,
   ) {
     this.indexers = {
       "app.bsky.feed.post": postIndexer,
@@ -48,7 +46,6 @@ export class IndexRecordService {
       "app.bsky.actor.profile": profileIndexer,
       "app.bsky.graph.follow": followIndexer,
       "app.bsky.feed.like": likeIndexer,
-      "me.subsco.sync.subscription": subscriptionIndexer,
     };
   }
   static inject = [
@@ -60,7 +57,6 @@ export class IndexRecordService {
     "generatorIndexer",
     "likeIndexer",
     "repostIndexer",
-    "subscriptionIndexer",
   ] as const;
 
   async upsert({

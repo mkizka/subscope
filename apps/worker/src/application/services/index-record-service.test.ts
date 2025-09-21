@@ -8,7 +8,6 @@ import {
   getTestSetup,
   postFactory,
   recordFactory,
-  subscriptionFactory,
 } from "@repo/test-utils";
 import { describe, expect, test, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
@@ -19,7 +18,6 @@ import { LikeIndexingPolicy } from "../../domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "../../domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "../../domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "../../domain/repost-indexing-policy.js";
-import { SubscriptionIndexingPolicy } from "../../domain/subscription-indexing-policy.js";
 import { ActorRepository } from "../../infrastructure/repositories/actor-repository.js";
 import { ActorStatsRepository } from "../../infrastructure/repositories/actor-stats-repository.js";
 import { FeedItemRepository } from "../../infrastructure/repositories/feed-item-repository.js";
@@ -41,7 +39,6 @@ import { LikeIndexer } from "./indexer/like-indexer.js";
 import { PostIndexer } from "./indexer/post-indexer.js";
 import { ProfileIndexer } from "./indexer/profile-indexer.js";
 import { RepostIndexer } from "./indexer/repost-indexer.js";
-import { SubscriptionIndexer } from "./indexer/subscription-indexer.js";
 import { BackfillScheduler } from "./scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
@@ -73,7 +70,6 @@ describe("IndexRecordService", () => {
     .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
     .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
-    .provideClass("subscriptionIndexingPolicy", SubscriptionIndexingPolicy)
     .provideClass("backfillScheduler", BackfillScheduler)
     .provideClass("resolveDidScheduler", ResolveDidScheduler)
     .provideClass("profileIndexer", ProfileIndexer)
@@ -83,7 +79,6 @@ describe("IndexRecordService", () => {
     .provideClass("generatorIndexer", GeneratorIndexer)
     .provideClass("likeIndexer", LikeIndexer)
     .provideClass("repostIndexer", RepostIndexer)
-    .provideClass("subscriptionIndexer", SubscriptionIndexer)
     .injectClass(IndexRecordService);
 
   describe("upsert", () => {
@@ -152,20 +147,6 @@ describe("IndexRecordService", () => {
       // arrange
       const followingActor = await actorFactory(ctx.db).create();
       const followerActor = await actorFactory(ctx.db).create();
-
-      const subscriptionRecord = await recordFactory(
-        ctx.db,
-        "me.subsco.sync.subscription",
-      )
-        .vars({
-          actor: () => followingActor,
-        })
-        .create();
-      await subscriptionFactory(ctx.db)
-        .vars({
-          record: () => subscriptionRecord,
-        })
-        .create();
 
       const followRecord = Record.fromJson({
         uri: `at://${followerActor.did}/app.bsky.graph.follow/456`,
@@ -264,23 +245,6 @@ describe("IndexRecordService", () => {
       // arrange
       const followerActor = await actorFactory(ctx.db).create();
       const followingActor = await actorFactory(ctx.db).create();
-
-      // subscriberを作成
-      const subscriptionRecord = await recordFactory(
-        ctx.db,
-        "me.subsco.sync.subscription",
-      )
-        .vars({
-          actor: () => followerActor,
-        })
-        .create();
-      await subscriptionFactory(ctx.db)
-        .vars({
-          record: () => subscriptionRecord,
-        })
-        .create();
-
-      // フォローレコードを作成
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({
           actor: () => followerActor,
