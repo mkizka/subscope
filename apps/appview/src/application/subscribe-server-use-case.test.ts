@@ -57,12 +57,7 @@ describe("SubscribeServerUseCase", () => {
       subscribeServerUseCase.execute({
         actorDid: asDid(actor.did),
       }),
-    ).rejects.toThrow(InvalidInviteCodeError);
-    await expect(
-      subscribeServerUseCase.execute({
-        actorDid: asDid(actor.did),
-      }),
-    ).rejects.toThrow("Invite code is required");
+    ).rejects.toThrow(new InvalidInviteCodeError("Invite code is required"));
   });
 
   test("すでにサブスクライブ済みの場合、AlreadySubscribedErrorをthrowする", async () => {
@@ -82,13 +77,9 @@ describe("SubscribeServerUseCase", () => {
         inviteCode: "test-code",
         actorDid: asDid(actor.did),
       }),
-    ).rejects.toThrow(AlreadySubscribedError);
-    await expect(
-      subscribeServerUseCase.execute({
-        inviteCode: "test-code",
-        actorDid: asDid(actor.did),
-      }),
-    ).rejects.toThrow("Already subscribed to this server");
+    ).rejects.toThrow(
+      new AlreadySubscribedError("Already subscribed to this server"),
+    );
   });
 
   test("招待コードが存在しない場合、InvalidInviteCodeErrorをthrowする", async () => {
@@ -101,13 +92,7 @@ describe("SubscribeServerUseCase", () => {
         inviteCode: "invalid-code",
         actorDid: asDid(actor.did),
       }),
-    ).rejects.toThrow(InvalidInviteCodeError);
-    await expect(
-      subscribeServerUseCase.execute({
-        inviteCode: "invalid-code",
-        actorDid: asDid(actor.did),
-      }),
-    ).rejects.toThrow("Invalid invite code");
+    ).rejects.toThrow(new InvalidInviteCodeError("Invalid invite code"));
   });
 
   test("招待コードが期限切れの場合、InvalidInviteCodeErrorをthrowする", async () => {
@@ -125,13 +110,7 @@ describe("SubscribeServerUseCase", () => {
         inviteCode: expiredInviteCode.code,
         actorDid: asDid(actor.did),
       }),
-    ).rejects.toThrow(InvalidInviteCodeError);
-    await expect(
-      subscribeServerUseCase.execute({
-        inviteCode: expiredInviteCode.code,
-        actorDid: asDid(actor.did),
-      }),
-    ).rejects.toThrow("Invite code has expired");
+    ).rejects.toThrow(new InvalidInviteCodeError("Invite code has expired"));
   });
 
   test("招待コードがすでに使用されている場合、InvalidInviteCodeErrorをthrowする", async () => {
@@ -156,12 +135,8 @@ describe("SubscribeServerUseCase", () => {
         inviteCode: inviteCode.code,
         actorDid: asDid(actor.did),
       }),
-    ).rejects.toThrow(InvalidInviteCodeError);
-    await expect(
-      subscribeServerUseCase.execute({
-        inviteCode: inviteCode.code,
-        actorDid: asDid(actor.did),
-      }),
-    ).rejects.toThrow("Invite code has already been used");
+    ).rejects.toThrow(
+      new InvalidInviteCodeError("Invite code has already been used"),
+    );
   });
 });
