@@ -43,21 +43,8 @@ describe("PostIndexer", () => {
     test("subscriberの投稿は実際にDBに保存される", async () => {
       // arrange
       const subscriber = await actorFactory(ctx.db).create();
-      const subscriptionRecord = await recordFactory(
-        ctx.db,
-        "me.subsco.sync.subscription",
-      )
-        .vars({ actor: () => subscriber })
-        .props({
-          json: () => ({
-            $type: "me.subsco.sync.subscription",
-            appviewDid: "did:web:appview.test",
-            createdAt: new Date().toISOString(),
-          }),
-        })
-        .create();
       await subscriptionFactory(ctx.db)
-        .vars({ record: () => subscriptionRecord })
+        .vars({ actor: () => subscriber })
         .create();
 
       const postJson = {

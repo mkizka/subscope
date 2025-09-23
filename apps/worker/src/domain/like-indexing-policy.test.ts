@@ -26,14 +26,8 @@ describe("LikeIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
 
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const likeJson = {
@@ -70,14 +64,8 @@ describe("LikeIndexingPolicy", () => {
         const likerActor = await actorFactory(ctx.db).create();
 
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const subscriberPostRecord = await recordFactory(
@@ -164,14 +152,8 @@ describe("LikeIndexingPolicy", () => {
       test("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const likeJson = {
@@ -208,14 +190,8 @@ describe("LikeIndexingPolicy", () => {
         const likerActor = await actorFactory(ctx.db).create();
 
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const followeeActor = await actorFactory(ctx.db).create();
@@ -273,14 +249,8 @@ describe("LikeIndexingPolicy", () => {
         const likerActor = await actorFactory(ctx.db).create();
 
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const nonFolloweeActor = await actorFactory(ctx.db).create();

@@ -23,24 +23,8 @@ describe("ProfileIndexingPolicy", () => {
       const subscriberActor = await actorFactory(ctx.db).create();
 
       // subscriberとして登録
-      const subscriptionRecord = await recordFactory(
-        ctx.db,
-        "me.subsco.sync.subscription",
-      )
-        .vars({ actor: () => subscriberActor })
-        .props({
-          uri: () =>
-            `at://${subscriberActor.did}/me.subsco.sync.subscription/123`,
-          cid: () => "sub123",
-          json: () => ({
-            $type: "me.subsco.sync.subscription",
-            appviewDid: "did:web:appview.test",
-            createdAt: new Date().toISOString(),
-          }),
-        })
-        .create();
       await subscriptionFactory(ctx.db)
-        .vars({ record: () => subscriptionRecord })
+        .vars({ actor: () => subscriberActor })
         .create();
 
       const profileJson = {

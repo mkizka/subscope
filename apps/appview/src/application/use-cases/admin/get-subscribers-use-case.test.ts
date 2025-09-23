@@ -54,11 +54,8 @@ describe("GetSubscribersUseCase", () => {
       .vars({ record: () => profileRecord1 })
       .props({ displayName: () => "Subscriber One" })
       .create();
-    const record1 = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-      .vars({ actor: () => actor1 })
-      .create();
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => record1 })
+      .vars({ actor: () => actor1 })
       .props({ createdAt: () => new Date("2024-01-01T00:00:00Z") })
       .create();
 
@@ -70,11 +67,8 @@ describe("GetSubscribersUseCase", () => {
       .vars({ record: () => profileRecord2 })
       .props({ displayName: () => "Subscriber Two" })
       .create();
-    const record2 = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-      .vars({ actor: () => actor2 })
-      .create();
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => record2 })
+      .vars({ actor: () => actor2 })
       .props({ createdAt: () => new Date("2024-01-01T00:00:01Z") })
       .create();
 
@@ -132,11 +126,8 @@ describe("GetSubscribersUseCase", () => {
         .vars({ record: () => profileRecord })
         .props({ displayName: () => `Test User ${index}` })
         .create();
-      const record = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-        .vars({ actor: () => actor })
-        .create();
       await subscriptionFactory(ctx.db)
-        .vars({ record: () => record })
+        .vars({ actor: () => actor })
         .props({ createdAt: () => new Date(`2024-01-01T00:00:0${index}Z`) })
         .create();
       actors.push({ actor, displayName: `Test User ${index}` });
@@ -174,11 +165,8 @@ describe("GetSubscribersUseCase", () => {
       .vars({ record: () => profileRecord1 })
       .props({ displayName: () => "First" })
       .create();
-    const record1 = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-      .vars({ actor: () => actor1 })
-      .create();
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => record1 })
+      .vars({ actor: () => actor1 })
       .props({ createdAt: () => new Date("2024-01-01T00:00:02Z") })
       .create();
 
@@ -190,11 +178,8 @@ describe("GetSubscribersUseCase", () => {
       .vars({ record: () => profileRecord2 })
       .props({ displayName: () => "Second" })
       .create();
-    const record2 = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-      .vars({ actor: () => actor2 })
-      .create();
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => record2 })
+      .vars({ actor: () => actor2 })
       .props({ createdAt: () => new Date("2024-01-01T00:00:01Z") })
       .create();
 
@@ -206,11 +191,8 @@ describe("GetSubscribersUseCase", () => {
       .vars({ record: () => profileRecord3 })
       .props({ displayName: () => "Third" })
       .create();
-    const record3 = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-      .vars({ actor: () => actor3 })
-      .create();
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => record3 })
+      .vars({ actor: () => actor3 })
       .props({ createdAt: () => new Date("2024-01-01T00:00:00Z") })
       .create();
 

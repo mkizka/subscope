@@ -135,17 +135,11 @@ export const actorStats = pgTable("actor_stats", {
 });
 
 export const subscriptions = pgTable("subscriptions", {
-  uri: varchar({ length: 256 })
-    .primaryKey()
-    .references(() => records.uri, { onDelete: "cascade" }),
-  cid: varchar({ length: 256 }).notNull(),
   actorDid: varchar({ length: 256 })
-    .notNull()
+    .primaryKey()
     .references(() => actors.did, { onDelete: "cascade" }),
-  appviewDid: varchar({ length: 256 }).notNull(),
   inviteCode: varchar({ length: 256 }).references(() => inviteCodes.code),
   createdAt: timestamp().notNull(),
-  indexedAt: timestamp().notNull(),
 });
 
 export const generators = pgTable("generators", {

@@ -28,13 +28,9 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     return results.map(
       (sub) =>
         new Subscription({
-          uri: sub.uri,
-          cid: sub.cid,
           actorDid: sub.actorDid,
-          appviewDid: sub.appviewDid,
-          inviteCode: undefined,
+          inviteCode: sub.inviteCode,
           createdAt: sub.createdAt,
-          indexedAt: sub.indexedAt,
         }),
     );
   }

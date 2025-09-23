@@ -11,18 +11,7 @@ export function App() {
       password: "hunter2",
     });
 
-    await agent.com.atproto.repo.createRecord({
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      repo: agent.session!.did,
-      collection: "me.subsco.sync.subscription",
-      record: {
-        appviewDid: "did:web:appview.localhost",
-        createdAt: new Date().toISOString(),
-        inviteCode: "localhost-sreuv",
-      },
-    });
-
-    alert("Subscription record created successfully!");
+    alert("Login successful!");
   };
 
   return (

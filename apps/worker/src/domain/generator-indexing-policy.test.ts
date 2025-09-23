@@ -23,12 +23,7 @@ describe("GeneratorIndexingPolicy", () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "me.subsco.sync.subscription")
-              .vars({ actor: () => subscriberActor })
-              .create(),
-        })
+        .vars({ actor: () => subscriberActor })
         .create();
 
       const generatorJson = {
@@ -66,12 +61,7 @@ describe("GeneratorIndexingPolicy", () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "me.subsco.sync.subscription")
-              .vars({ actor: () => subscriberActor })
-              .create(),
-        })
+        .vars({ actor: () => subscriberActor })
         .create();
 
       const followedActor = await actorFactory(ctx.db).create();

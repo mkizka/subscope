@@ -72,19 +72,8 @@ describe("UpsertIdentityUseCase", () => {
       .create();
 
     // subscriberとして登録
-    const record = await recordFactory(ctx.db, "me.subsco.sync.subscription")
-      .vars({ actorDid: () => actor.did })
-      .props({
-        json: () => ({
-          $type: "me.subsco.sync.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        }),
-      })
-      .create();
-
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => record })
+      .vars({ actor: () => actor })
       .create();
 
     // act
@@ -117,22 +106,8 @@ describe("UpsertIdentityUseCase", () => {
       })
       .create();
 
-    const subscriberRecord = await recordFactory(
-      ctx.db,
-      "me.subsco.sync.subscription",
-    )
-      .vars({ actorDid: () => subscriberActor.did })
-      .props({
-        json: () => ({
-          $type: "me.subsco.sync.subscription",
-          appviewDid: "did:web:appview.test",
-          createdAt: new Date().toISOString(),
-        }),
-      })
-      .create();
-
     await subscriptionFactory(ctx.db)
-      .vars({ record: () => subscriberRecord })
+      .vars({ actor: () => subscriberActor })
       .create();
 
     // followedDidのactorを先に作成（外部キー制約のため）

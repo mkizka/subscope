@@ -36,22 +36,8 @@ describe("LikeIndexer", () => {
       // subscriberとしてactor情報を準備
       const subscriberActor = await actorFactory(ctx.db).create();
       // subscriptionレコード用のrecordsテーブルエントリ
-      const subscriptionRecord = await recordFactory(
-        ctx.db,
-        "me.subsco.sync.subscription",
-      )
-        .vars({ actor: () => subscriberActor })
-        .props({
-          uri: () =>
-            `at://${subscriberActor.did}/me.subsco.sync.subscription/123`,
-          cid: () => "sub123",
-        })
-        .create();
       await subscriptionFactory(ctx.db)
-        .vars({ record: () => subscriptionRecord })
-        .props({
-          appviewDid: () => "did:web:appview.test",
-        })
+        .vars({ actor: () => subscriberActor })
         .create();
 
       // いいねレコード用のrecordsテーブルエントリ

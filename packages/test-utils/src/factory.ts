@@ -333,25 +333,18 @@ export const subscriptionFactory = (db: Database) =>
     .define(
       {
         props: {
-          uri: later<string>(),
-          cid: later<string>(),
           actorDid: later<string>(),
-          appviewDid: () => "did:web:appview.test",
+          inviteCode: () => null, // 外部キー制約を避けるためnullに設定
           createdAt: () => faker.date.recent(),
-          indexedAt: () => faker.date.recent(),
         },
         vars: {
-          record: () =>
-            recordFactory(db, "me.subsco.sync.subscription").create(),
           actor: () => actorFactory(db).create(),
         },
       },
       (props) => create(db, schema.subscriptions, props),
     )
     .props({
-      uri: async ({ vars }) => (await vars.record).uri,
-      cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      actorDid: async ({ vars }) => (await vars.actor).did,
     });
 
 export const postEmbedImageFactory = (db: Database) =>

@@ -8,6 +8,7 @@ import {
   getTestSetup,
   postFactory,
   recordFactory,
+  subscriptionFactory,
 } from "@repo/test-utils";
 import { describe, expect, test, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
@@ -147,6 +148,10 @@ describe("IndexRecordService", () => {
       // arrange
       const followingActor = await actorFactory(ctx.db).create();
       const followerActor = await actorFactory(ctx.db).create();
+
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => followerActor })
+        .create();
 
       const followRecord = Record.fromJson({
         uri: `at://${followerActor.did}/app.bsky.graph.follow/456`,

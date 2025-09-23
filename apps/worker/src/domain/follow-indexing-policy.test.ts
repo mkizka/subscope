@@ -26,22 +26,7 @@ describe("FollowIndexingPolicy", () => {
 
       // フォロワーをsubscriberとして登録
       await subscriptionFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "me.subsco.sync.subscription")
-              .vars({ actor: () => followerActor })
-              .props({
-                uri: () =>
-                  `at://${followerActor.did}/me.subsco.sync.subscription/123`,
-                cid: () => "sub123",
-              })
-              .create(),
-        })
-        .props({
-          uri: () =>
-            `at://${followerActor.did}/me.subsco.sync.subscription/123`,
-          cid: () => "sub123",
-        })
+        .vars({ actor: () => followerActor })
         .create();
 
       const followJson = {
@@ -78,22 +63,7 @@ describe("FollowIndexingPolicy", () => {
 
       // フォロイーをsubscriberとして登録
       await subscriptionFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "me.subsco.sync.subscription")
-              .vars({ actor: () => followeeActor })
-              .props({
-                uri: () =>
-                  `at://${followeeActor.did}/me.subsco.sync.subscription/456`,
-                cid: () => "sub456",
-              })
-              .create(),
-        })
-        .props({
-          uri: () =>
-            `at://${followeeActor.did}/me.subsco.sync.subscription/456`,
-          cid: () => "sub456",
-        })
+        .vars({ actor: () => followeeActor })
         .create();
 
       const followJson = {

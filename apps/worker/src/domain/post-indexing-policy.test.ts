@@ -26,12 +26,7 @@ describe("PostIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "me.subsco.sync.subscription")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const postJson = {
@@ -60,12 +55,7 @@ describe("PostIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "me.subsco.sync.subscription")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const followedActor = await actorFactory(ctx.db).create();
@@ -106,12 +96,7 @@ describe("PostIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "me.subsco.sync.subscription")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const subscriberPost = await postFactory(ctx.db)
@@ -235,12 +220,7 @@ describe("PostIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "me.subsco.sync.subscription")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const postJson = {
@@ -269,12 +249,7 @@ describe("PostIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "me.subsco.sync.subscription")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const followeeActor = await actorFactory(ctx.db).create();
@@ -338,12 +313,7 @@ describe("PostIndexingPolicy", () => {
         // arrange
         const subscriberActor = await actorFactory(ctx.db).create();
         await subscriptionFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "me.subsco.sync.subscription")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const nonFolloweeActor = await actorFactory(ctx.db).create();

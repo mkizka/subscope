@@ -29,22 +29,8 @@ describe("RepostIndexingPolicy", () => {
         ).createList(2);
 
         // repost者をsubscriberとして登録
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => reposterActor })
-          .props({
-            uri: () =>
-              `at://${reposterActor.did}/me.subsco.sync.subscription/123`,
-            cid: () => "sub123",
-          })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
-          .props({
-            appviewDid: () => "did:web:appview.test",
-          })
+          .vars({ actor: () => reposterActor })
           .create();
 
         const repostJson = {
@@ -79,22 +65,8 @@ describe("RepostIndexingPolicy", () => {
         ).createList(3);
 
         // フォロワーをsubscriberとして登録
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => followerActor })
-          .props({
-            uri: () =>
-              `at://${followerActor.did}/me.subsco.sync.subscription/789`,
-            cid: () => "sub789",
-          })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
-          .props({
-            appviewDid: () => "did:web:appview.test",
-          })
+          .vars({ actor: () => followerActor })
           .create();
 
         // フォローレコード作成
@@ -142,14 +114,8 @@ describe("RepostIndexingPolicy", () => {
         const reposterActor = await actorFactory(ctx.db).create();
 
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const subscriberPost = await postFactory(ctx.db)
@@ -232,14 +198,8 @@ describe("RepostIndexingPolicy", () => {
       test("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
         // arrange
         const reposterActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => reposterActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => reposterActor })
           .create();
 
         const authorActor = await actorFactory(ctx.db).create();
@@ -274,14 +234,8 @@ describe("RepostIndexingPolicy", () => {
         const reposterActor = await actorFactory(ctx.db).create();
 
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const followeeActor = await actorFactory(ctx.db).create();
@@ -337,14 +291,8 @@ describe("RepostIndexingPolicy", () => {
         const reposterActor = await actorFactory(ctx.db).create();
 
         const subscriberActor = await actorFactory(ctx.db).create();
-        const subscriptionRecord = await recordFactory(
-          ctx.db,
-          "me.subsco.sync.subscription",
-        )
-          .vars({ actor: () => subscriberActor })
-          .create();
         await subscriptionFactory(ctx.db)
-          .vars({ record: () => subscriptionRecord })
+          .vars({ actor: () => subscriberActor })
           .create();
 
         const nonFolloweeActor = await actorFactory(ctx.db).create();

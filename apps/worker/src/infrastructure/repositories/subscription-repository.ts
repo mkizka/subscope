@@ -13,22 +13,19 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     subscription: Subscription;
   }) {
     const data = {
-      cid: subscription.cid,
       actorDid: subscription.actorDid,
-      appviewDid: subscription.appviewDid,
       inviteCode: subscription.inviteCode,
       createdAt: subscription.createdAt,
     } satisfies SubscriptionInsert;
     await ctx.db
       .insert(schema.subscriptions)
-      .values({
-        uri: subscription.uri.toString(),
-        indexedAt: subscription.indexedAt,
-        ...data,
-      })
+      .values(data)
       .onConflictDoUpdate({
-        target: schema.subscriptions.uri,
-        set: data,
+        target: schema.subscriptions.actorDid,
+        set: {
+          inviteCode: subscription.inviteCode,
+          createdAt: subscription.createdAt,
+        },
       });
   }
 
