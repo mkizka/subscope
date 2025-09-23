@@ -6,4 +6,5 @@ export interface IInviteCodeRepository {
     limit: number;
     cursor?: string;
   }) => Promise<InviteCode[]>;
+  findFirst: (code: string) => Promise<InviteCode | null>;
 }

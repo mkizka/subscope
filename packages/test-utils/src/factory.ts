@@ -334,17 +334,19 @@ export const subscriptionFactory = (db: Database) =>
       {
         props: {
           actorDid: later<string>(),
-          inviteCode: () => null, // 外部キー制約を避けるためnullに設定
+          inviteCode: later<string>(),
           createdAt: () => faker.date.recent(),
         },
         vars: {
           actor: () => actorFactory(db).create(),
+          inviteCode: () => inviteCodeFactory(db).create(),
         },
       },
       (props) => create(db, schema.subscriptions, props),
     )
     .props({
       actorDid: async ({ vars }) => (await vars.actor).did,
+      inviteCode: async ({ vars }) => (await vars.inviteCode).code,
     });
 
 export const postEmbedImageFactory = (db: Database) =>

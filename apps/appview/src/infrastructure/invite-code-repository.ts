@@ -1,7 +1,7 @@
 import type { DatabaseClient, InviteCode } from "@repo/common/domain";
 import { InviteCode as InviteCodeDomain } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, lt } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 
@@ -38,13 +38,31 @@ export class InviteCodeRepository implements IInviteCodeRepository {
       query.where(and(...filters));
     }
 
-    const results = await query;
+    const rows = await query;
 
-    return results.map((result) => {
-      const code = result.code;
-      const expiresAt = result.expiresAt;
-      const createdAt = result.createdAt;
+    return rows.map((row) => {
+      const code = row.code;
+      const expiresAt = row.expiresAt;
+      const createdAt = row.createdAt;
       return new InviteCodeDomain({ code, expiresAt, createdAt });
+    });
+  }
+
+  async findFirst(code: string): Promise<InviteCode | null> {
+    const [row] = await this.db
+      .select()
+      .from(schema.inviteCodes)
+      .where(eq(schema.inviteCodes.code, code))
+      .limit(1);
+
+    if (!row) {
+      return null;
+    }
+
+    return new InviteCodeDomain({
+      code: row.code,
+      expiresAt: row.expiresAt,
+      createdAt: row.createdAt,
     });
   }
 }

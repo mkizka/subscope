@@ -26,6 +26,7 @@ import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
+import { SubscribeServerUseCase } from "./application/subscribe-server-use-case.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
@@ -80,6 +81,7 @@ import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
 import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createInviteCode.js";
 import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GetSubscribers } from "./presentation/routes/me/subsco/admin/getSubscribers.js";
+import { SubscribeServer } from "./presentation/routes/me/subsco/sync/subscribeServer.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppViewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -153,6 +155,7 @@ createInjector()
   .provideClass("createInviteCodeUseCase", CreateInviteCodeUseCase)
   .provideClass("getInviteCodesUseCase", GetInviteCodesUseCase)
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
+  .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   // presentation
   .provideClass("getPreferences", GetPreferences)
   .provideClass("getProfile", GetProfile)
@@ -172,6 +175,7 @@ createInjector()
   .provideClass("createInviteCode", CreateInviteCode)
   .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("getSubscribers", GetSubscribers)
+  .provideClass("subscribeServer", SubscribeServer)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppViewServer)
   .start();
