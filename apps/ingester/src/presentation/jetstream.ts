@@ -9,6 +9,11 @@ import type { HandleIdentityUseCase } from "../application/handle-identity-use-c
 import type { ICursorRepository } from "../application/interfaces/cursor-repository.js";
 import { env } from "../shared/env.js";
 
+const toJSTDate = (timeUs: number): string => {
+  const date = new Date(Math.floor(timeUs / 1000));
+  return date.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+};
+
 export class JetstreamIngester {
   private readonly jetstream;
   private readonly logger;
@@ -36,6 +41,7 @@ export class JetstreamIngester {
 
     this.jetstream.on("open", () => {
       this.logger.info(
+        this.stats(),
         `Jetstream subscription started at ${env.JETSTREAM_URL} with cursor ${this.jetstream.cursor}`,
       );
       this.metricReporter.setConnectionStateGauge("opened");
@@ -76,6 +82,20 @@ export class JetstreamIngester {
     "cursorRepository",
   ] as const;
 
+  private stats() {
+    return {
+      lastProcessedCursor: this.lastProcessedCursor
+        ? toJSTDate(this.lastProcessedCursor)
+        : null,
+      lastCheckedCursor: this.lastCheckedCursor
+        ? toJSTDate(this.lastCheckedCursor)
+        : null,
+      jetstreamCursor: this.jetstream.cursor
+        ? toJSTDate(this.jetstream.cursor)
+        : null,
+    };
+  }
+
   private startHealthCheck() {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
@@ -83,7 +103,10 @@ export class JetstreamIngester {
 
     this.healthCheckInterval = setInterval(() => {
       if (this.lastProcessedCursor === this.lastCheckedCursor) {
-        this.logger.warn("HealthCheck: No cursor change detected");
+        this.logger.warn(
+          this.stats(),
+          "HealthCheck: No cursor change detected",
+        );
 
         // Websocketのクローズ処理が完了するより前に次のインターバルが来る可能性があるので
         // 失敗と分かったらすぐ終了しておく
@@ -92,6 +115,7 @@ export class JetstreamIngester {
         required(this.jetstream.ws).reconnect();
       } else {
         this.logger.info(
+          this.stats(),
           "HealthCheck: Cursor change detected, connection is healthy",
         );
 
