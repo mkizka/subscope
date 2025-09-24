@@ -71,7 +71,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
           eq(schema.follows.subjectDid, actorDid), // actorDidがフォロイーであるフォロー関係
           exists(
             ctx.db
-              .select()
+              .select({ actorDid: schema.subscriptions.actorDid })
               .from(schema.subscriptions)
               .where(
                 eq(schema.subscriptions.actorDid, schema.follows.actorDid),
@@ -100,7 +100,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
           inArray(schema.follows.subjectDid, actorDids), // actorDidsのいずれかがフォロイーであるフォロー関係
           exists(
             ctx.db
-              .select()
+              .select({ actorDid: schema.subscriptions.actorDid })
               .from(schema.subscriptions)
               .where(
                 eq(schema.subscriptions.actorDid, schema.follows.actorDid),
