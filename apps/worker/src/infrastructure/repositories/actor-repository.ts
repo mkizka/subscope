@@ -17,6 +17,7 @@ export class ActorRepository implements IActorRepository {
       handle: actor.handle,
       backfillStatus: actor.backfillStatus,
       backfillVersion: actor.backfillVersion,
+      isFollowedBySubscriber: actor.isFollowedBySubscriber,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)

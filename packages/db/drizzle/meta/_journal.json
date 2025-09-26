@@ -50,6 +50,13 @@
       "when": 1758433730450,
       "tag": "0006_change-subscription",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1758893119581,
+      "tag": "0007_add-is_followed_by_subscriber",
+      "breakpoints": true
     }
   ]
 }

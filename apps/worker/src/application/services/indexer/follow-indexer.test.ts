@@ -36,7 +36,7 @@ describe("FollowIndexer", () => {
     .injectClass(FollowIndexer);
 
   describe("upsert", () => {
-    test("フォローレコードを正しく保存する", async () => {
+    test("非サブスクライバーがフォローした場合、フォローレコードが保存され、フォロイーのisFollowedBySubscriberがfalseになる", async () => {
       // arrange
       const [follower, followee] = await actorFactory(ctx.db).createList(2);
 
@@ -71,6 +71,48 @@ describe("FollowIndexer", () => {
         actorDid: follower.did,
         subjectDid: followee.did,
       });
+
+      const [followeeActor] = await ctx.db
+        .select()
+        .from(schema.actors)
+        .where(eq(schema.actors.did, followee.did))
+        .limit(1);
+      expect(followeeActor?.isFollowedBySubscriber).toBe(false);
+    });
+
+    test("サブスクライバーがフォローした場合、フォロイーのisFollowedBySubscriberがtrueになる", async () => {
+      // arrange
+      const [subscriber, followee] = await actorFactory(ctx.db).createList(2);
+      await ctx.db
+        .insert(schema.subscriptions)
+        .values({ actorDid: subscriber.did, createdAt: new Date() });
+
+      const followJson = {
+        $type: "app.bsky.graph.follow",
+        subject: followee.did,
+        createdAt: new Date().toISOString(),
+      };
+      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => subscriber })
+        .props({ json: () => followJson })
+        .create();
+      const record = Record.fromJson({
+        uri: followRecord.uri,
+        cid: followRecord.cid,
+        json: followJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      await followIndexer.upsert({ ctx, record });
+
+      // assert
+      const [followeeActor] = await ctx.db
+        .select()
+        .from(schema.actors)
+        .where(eq(schema.actors.did, followee.did))
+        .limit(1);
+      expect(followeeActor?.isFollowedBySubscriber).toBe(true);
     });
 
     test("フォロイーのactorが存在しない場合、自動的に作成される", async () => {
@@ -94,30 +136,21 @@ describe("FollowIndexer", () => {
         indexedAt: new Date(),
       });
 
-      // フォロイーのactorが存在しないことを確認
-      const followeeBeforeUpsert = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, followeeDid))
-        .limit(1);
-      expect(followeeBeforeUpsert).toHaveLength(0);
-
       // act
       await followIndexer.upsert({ ctx, record });
 
       // assert
-      // フォロイーのactorが作成されたことを確認
-      const [followeeAfterUpsert] = await ctx.db
+      const [followeeActor] = await ctx.db
         .select()
         .from(schema.actors)
         .where(eq(schema.actors.did, followeeDid))
         .limit(1);
-      expect(followeeAfterUpsert).toMatchObject({
+      expect(followeeActor).toMatchObject({
         did: followeeDid,
         handle: null,
+        isFollowedBySubscriber: false,
       });
 
-      // フォローレコードも正しく保存されたことを確認
       const [follow] = await ctx.db
         .select()
         .from(schema.follows)
@@ -158,7 +191,6 @@ describe("FollowIndexer", () => {
       await followIndexer.updateStats({ ctx, record });
 
       // assert
-      // フォローした人のfollowsCountが更新される
       const [followerStats] = await ctx.db
         .select()
         .from(schema.actorStats)
@@ -171,7 +203,6 @@ describe("FollowIndexer", () => {
         postsCount: 0,
       });
 
-      // フォローされた人のfollowersCountが更新される
       const [followeeStats] = await ctx.db
         .select()
         .from(schema.actorStats)
