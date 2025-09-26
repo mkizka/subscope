@@ -46,10 +46,6 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     ctx: TransactionContext,
     actorDids: string[],
   ): Promise<boolean> {
-    if (actorDids.length === 0) {
-      return false;
-    }
-
     const result = await ctx.db
       .select({ actorDid: schema.subscriptions.actorDid })
       .from(schema.subscriptions)
@@ -88,24 +84,13 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     ctx: TransactionContext,
     actorDids: string[],
   ): Promise<boolean> {
-    if (actorDids.length === 0) {
-      return false;
-    }
-
     const result = await ctx.db
-      .select({ actorDid: schema.follows.actorDid })
-      .from(schema.follows)
+      .select({ did: schema.actors.did })
+      .from(schema.actors)
       .where(
         and(
-          inArray(schema.follows.subjectDid, actorDids), // actorDidsのいずれかがフォロイーであるフォロー関係
-          exists(
-            ctx.db
-              .select({ actorDid: schema.subscriptions.actorDid })
-              .from(schema.subscriptions)
-              .where(
-                eq(schema.subscriptions.actorDid, schema.follows.actorDid),
-              ),
-          ),
+          inArray(schema.actors.did, actorDids),
+          eq(schema.actors.isFollowedBySubscriber, true),
         ),
       )
       .limit(1);

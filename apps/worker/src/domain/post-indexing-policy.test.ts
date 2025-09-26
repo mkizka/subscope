@@ -1,7 +1,6 @@
 import { Post, Record } from "@repo/common/domain";
 import {
   actorFactory,
-  followFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -53,21 +52,8 @@ describe("PostIndexingPolicy", () => {
 
       test("subscriberにフォローされているユーザーの投稿は保存すべき", async () => {
         // arrange
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
-
-        const followedActor = await actorFactory(ctx.db).create();
-
-        await followFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.graph.follow")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-            followee: () => followedActor,
-          })
+        const followedActor = await actorFactory(ctx.db)
+          .props({ isFollowedBySubscriber: () => true })
           .create();
 
         const postJson = {
@@ -247,20 +233,8 @@ describe("PostIndexingPolicy", () => {
 
       test("subscribersのフォロイーへのリプライは保存すべき", async () => {
         // arrange
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
-
-        const followeeActor = await actorFactory(ctx.db).create();
-        await followFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.graph.follow")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-            followee: () => followeeActor,
-          })
+        const followeeActor = await actorFactory(ctx.db)
+          .props({ isFollowedBySubscriber: () => true })
           .create();
 
         const followeePost = await postFactory(ctx.db)

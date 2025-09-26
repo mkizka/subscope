@@ -1,7 +1,6 @@
 import { Record, Repost } from "@repo/common/domain";
 import {
   actorFactory,
-  followFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -60,28 +59,10 @@ describe("RepostIndexingPolicy", () => {
 
       test("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
         // arrange
-        const [reposterActor, followerActor, authorActor] = await actorFactory(
-          ctx.db,
-        ).createList(3);
+        const [authorActor] = await actorFactory(ctx.db).createList(1);
 
-        // フォロワーをsubscriberとして登録
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => followerActor })
-          .create();
-
-        // フォローレコード作成
-        const followRecord = await recordFactory(
-          ctx.db,
-          "app.bsky.graph.follow",
-        )
-          .vars({ actor: () => followerActor })
-          .props({
-            uri: () => `at://${followerActor.did}/app.bsky.graph.follow/987`,
-            cid: () => "follow987",
-          })
-          .create();
-        await followFactory(ctx.db)
-          .vars({ record: () => followRecord, followee: () => reposterActor })
+        const reposterActor = await actorFactory(ctx.db)
+          .props({ isFollowedBySubscriber: () => true })
           .create();
 
         const repostJson = {
@@ -233,20 +214,8 @@ describe("RepostIndexingPolicy", () => {
         // arrange
         const reposterActor = await actorFactory(ctx.db).create();
 
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
-
-        const followeeActor = await actorFactory(ctx.db).create();
-        await followFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.graph.follow")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-            followee: () => followeeActor,
-          })
+        const followeeActor = await actorFactory(ctx.db)
+          .props({ isFollowedBySubscriber: () => true })
           .create();
 
         const followeePost = await postFactory(ctx.db)

@@ -33,6 +33,7 @@ export const actorFactory = (db: Database) =>
             "dirty" as "dirty" | "in-process" | "synchronized",
           backfillVersion: () => null,
           indexedAt: () => faker.date.recent(),
+          isFollowedBySubscriber: () => false,
         },
         vars: {},
       },
