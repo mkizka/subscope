@@ -1,7 +1,6 @@
 import { Like, Record } from "@repo/common/domain";
 import {
   actorFactory,
-  followFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -189,20 +188,8 @@ describe("LikeIndexingPolicy", () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
-
-        const followeeActor = await actorFactory(ctx.db).create();
-        await followFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.graph.follow")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-            followee: () => followeeActor,
-          })
+        const followeeActor = await actorFactory(ctx.db)
+          .props({ isFollowedBySubscriber: () => true })
           .create();
 
         const followeePostRecord = await recordFactory(
