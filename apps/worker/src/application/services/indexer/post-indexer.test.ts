@@ -156,7 +156,7 @@ describe("PostIndexer", () => {
     });
   });
 
-  describe("updateStats", () => {
+  describe("afterAction", () => {
     test("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
       // arrange
       const parentActor = await actorFactory(ctx.db).create();
@@ -225,7 +225,7 @@ describe("PostIndexer", () => {
 
       // act
       await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.updateStats({ ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const [stats] = await ctx.db
@@ -276,7 +276,7 @@ describe("PostIndexer", () => {
 
       // act
       await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.updateStats({ ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const [actorStats] = await ctx.db
@@ -352,7 +352,7 @@ describe("PostIndexer", () => {
 
       // act
       await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.updateStats({ ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const [stats] = await ctx.db
@@ -414,7 +414,7 @@ describe("PostIndexer", () => {
 
       // act
       await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.updateStats({ ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const stats = await ctx.db
@@ -470,7 +470,7 @@ describe("PostIndexer", () => {
 
       // act
       await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.updateStats({ ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const stats = await ctx.db
@@ -491,7 +491,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    test("削除済みの投稿に対してupdateStatsを呼んだ場合、post_statsの更新をスキップする", async () => {
+    test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しない", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const postJson = {
@@ -520,7 +520,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.updateStats({ ctx, record });
+      await postIndexer.afterAction({ action: "delete", ctx, record });
 
       // assert
       // post_statsが作成されていないことを確認

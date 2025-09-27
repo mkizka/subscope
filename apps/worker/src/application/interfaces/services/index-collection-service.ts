@@ -17,11 +17,13 @@ export interface ICollectionIndexer {
     ctx: TransactionContext;
     record: Record;
   }) => Promise<boolean>;
-  updateStats?: ({
+  afterAction?: ({
     ctx,
     record,
+    action,
   }: {
     ctx: TransactionContext;
     record: Record;
+    action: "upsert" | "delete";
   }) => Promise<void>;
 }

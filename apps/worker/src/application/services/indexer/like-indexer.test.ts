@@ -77,7 +77,7 @@ describe("LikeIndexer", () => {
     });
   });
 
-  describe("updateStats", () => {
+  describe("afterAction", () => {
     test("いいね追加時にpost_statsのいいね数が正しく更新される", async () => {
       // arrange
       // actorとrecordsテーブルを準備
@@ -130,7 +130,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.updateStats({ ctx, record });
+      await likeIndexer.afterAction({ ctx, record });
 
       // assert
       const [stats] = await ctx.db
@@ -196,7 +196,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.updateStats({ ctx, record });
+      await likeIndexer.afterAction({ ctx, record });
 
       // assert
       const [stats] = await ctx.db
@@ -239,7 +239,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.updateStats({ ctx, record });
+      await likeIndexer.afterAction({ ctx, record });
 
       // assert
       const stats = await ctx.db

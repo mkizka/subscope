@@ -56,7 +56,7 @@ export class RepostIndexer implements ICollectionIndexer {
     return await this.repostIndexingPolicy.shouldIndex(ctx, repost);
   }
 
-  async updateStats({
+  async afterAction({
     ctx,
     record,
   }: {

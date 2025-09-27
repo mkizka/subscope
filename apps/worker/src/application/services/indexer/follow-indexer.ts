@@ -48,7 +48,7 @@ export class FollowIndexer implements ICollectionIndexer {
     return await this.followIndexingPolicy.shouldIndex(ctx, follow);
   }
 
-  async updateStats({
+  async afterAction({
     ctx,
     record,
   }: {

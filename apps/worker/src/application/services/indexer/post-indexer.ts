@@ -64,12 +64,14 @@ export class PostIndexer implements ICollectionIndexer {
     return await this.postIndexingPolicy.shouldIndex(ctx, post);
   }
 
-  async updateStats({
+  async afterAction({
     ctx,
     record,
+    action,
   }: {
     ctx: TransactionContext;
     record: Record;
+    action: "upsert" | "delete";
   }): Promise<void> {
     const post = Post.from(record);
 
@@ -78,12 +80,8 @@ export class PostIndexer implements ICollectionIndexer {
       actorDid: post.actorDid,
     });
 
-    // 削除時にupdateStatsが呼ばれる場合は投稿が存在しないので更新もしない
-    const postExists = await this.postRepository.exists(
-      ctx,
-      post.uri.toString(),
-    );
-    if (postExists) {
+    // 削除時にafterActionが呼ばれる場合は投稿が存在しないのでupsertに限定
+    if (action === "upsert") {
       // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
       // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
       //    → このとき、リポスト数が0なので1にする必要がある

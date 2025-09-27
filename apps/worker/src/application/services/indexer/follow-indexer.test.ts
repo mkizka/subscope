@@ -165,7 +165,7 @@ describe("FollowIndexer", () => {
     });
   });
 
-  describe("updateStats", () => {
+  describe("afterAction", () => {
     test("フォロー作成時にfollowsCountとfollowersCountが更新される", async () => {
       // arrange
       const [follower, followee] = await actorFactory(ctx.db).createList(2);
@@ -188,7 +188,7 @@ describe("FollowIndexer", () => {
 
       // act
       await followIndexer.upsert({ ctx, record });
-      await followIndexer.updateStats({ ctx, record });
+      await followIndexer.afterAction({ ctx, record });
 
       // assert
       const [followerStats] = await ctx.db

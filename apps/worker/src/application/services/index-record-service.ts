@@ -98,7 +98,7 @@ export class IndexRecordService {
     await this.recordRepository.upsert({ ctx, record });
 
     await indexer.upsert({ ctx, record, depth });
-    await indexer.updateStats?.({ ctx, record });
+    await indexer.afterAction?.({ ctx, record, action: "upsert" });
   }
 
   async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
@@ -108,9 +108,10 @@ export class IndexRecordService {
 
     if (existingRecord && isSupportedCollection(existingRecord.collection)) {
       const indexer = this.indexers[existingRecord.collection];
-      await indexer.updateStats?.({
+      await indexer.afterAction?.({
         ctx,
         record: existingRecord,
+        action: "delete",
       });
     }
   }

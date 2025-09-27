@@ -37,7 +37,7 @@ export class LikeIndexer implements ICollectionIndexer {
     return await this.likeIndexingPolicy.shouldIndex(ctx, like);
   }
 
-  async updateStats({
+  async afterAction({
     ctx,
     record,
   }: {

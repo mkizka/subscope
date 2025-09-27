@@ -101,7 +101,7 @@ describe("RepostIndexer", () => {
     });
   });
 
-  describe("updateStats", () => {
+  describe("afterAction", () => {
     test("リポスト追加時にpost_statsのリポスト数が正しく更新される", async () => {
       // arrange
       const post = await postFactory(ctx.db).create();
@@ -134,7 +134,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.updateStats({ ctx, record });
+      await repostIndexer.afterAction({ ctx, record });
 
       // assert
       const [stats] = await ctx.db
@@ -181,7 +181,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.updateStats({ ctx, record });
+      await repostIndexer.afterAction({ ctx, record });
 
       // assert
       const stats = await ctx.db
