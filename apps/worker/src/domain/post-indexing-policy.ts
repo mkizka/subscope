@@ -1,13 +1,19 @@
 import type { Post, TransactionContext } from "@repo/common/domain";
 
+import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
 
 export class PostIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly actorRepository: IActorRepository,
     private readonly indexLevel: number,
   ) {}
-  static inject = ["subscriptionRepository", "indexLevel"] as const;
+  static inject = [
+    "subscriptionRepository",
+    "actorRepository",
+    "indexLevel",
+  ] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
     // リプライの場合の処理
@@ -25,10 +31,10 @@ export class PostIndexingPolicy {
 
       // Level2: リプライ先がsubscribersのフォロイーなら保存
       if (this.indexLevel === 2) {
-        return this.subscriptionRepository.hasFolloweeOfSubscribers(
+        return this.actorRepository.hasFollowedBySubscribers({
           ctx,
-          targetDids,
-        );
+          actorDids: targetDids,
+        });
       }
 
       return false;
@@ -43,8 +49,10 @@ export class PostIndexingPolicy {
     }
 
     // 投稿者がsubscribersのフォロイーなら保存
-    return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, [
-      post.actorDid,
-    ]);
+    const actor = await this.actorRepository.findByDid({
+      ctx,
+      did: post.actorDid,
+    });
+    return actor?.isFollowedBySubscriber ?? false;
   }
 }

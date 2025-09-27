@@ -1,5 +1,7 @@
+import type { Did } from "@atproto/did";
 import type { DatabaseClient, TransactionContext } from "@repo/common/domain";
 
+import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { IndexActorService } from "../../services/index-actor-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
@@ -9,11 +11,13 @@ export class UpsertIdentityUseCase {
     private readonly db: DatabaseClient,
     private readonly indexActorService: IndexActorService,
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly actorRepository: IActorRepository,
   ) {}
   static inject = [
     "db",
     "indexActorService",
     "subscriptionRepository",
+    "actorRepository",
   ] as const;
 
   async execute(command: UpsertIdentityCommand) {
@@ -35,7 +39,7 @@ export class UpsertIdentityUseCase {
 
   private async shouldIndexActor(
     ctx: TransactionContext,
-    did: string,
+    did: Did,
   ): Promise<boolean> {
     // subscriberであるか、subscriberのフォロワーがいるactorのみインデックス
     const isSubscriber = await this.subscriptionRepository.isSubscriber(
@@ -45,6 +49,7 @@ export class UpsertIdentityUseCase {
     if (isSubscriber) {
       return true;
     }
-    return this.subscriptionRepository.isFolloweeOfSubscribers(ctx, did);
+    const actor = await this.actorRepository.findByDid({ ctx, did });
+    return actor?.isFollowedBySubscriber ?? false;
   }
 }

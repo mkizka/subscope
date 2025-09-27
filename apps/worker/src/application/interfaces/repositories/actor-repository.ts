@@ -24,4 +24,9 @@ export interface IActorRepository {
   }) => Promise<void>;
 
   delete: (params: { ctx: TransactionContext; did: Did }) => Promise<void>;
+
+  hasFollowedBySubscribers: (params: {
+    ctx: TransactionContext;
+    actorDids: string[];
+  }) => Promise<boolean>;
 }

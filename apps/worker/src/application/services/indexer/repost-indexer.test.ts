@@ -13,6 +13,7 @@ import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
+import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
@@ -29,6 +30,7 @@ describe("RepostIndexer", () => {
     .provideClass("repostRepository", RepostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("actorRepository", ActorRepository)
     .provideClass("postRepository", PostRepository)
     .provideValue("indexLevel", 1)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)

@@ -8,6 +8,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { ActorRepository } from "../infrastructure/repositories/actor-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
 
@@ -17,6 +18,7 @@ describe("PostIndexingPolicy", () => {
   describe("INDEX_LEVEL=1", () => {
     const postIndexingPolicy = testInjector
       .provideClass("subscriptionRepository", SubscriptionRepository)
+      .provideClass("actorRepository", ActorRepository)
       .provideValue("indexLevel", 1)
       .injectClass(PostIndexingPolicy);
 
@@ -198,6 +200,7 @@ describe("PostIndexingPolicy", () => {
   describe("INDEX_LEVEL=2", () => {
     const postIndexingPolicyLevel2 = testInjector
       .provideClass("subscriptionRepository", SubscriptionRepository)
+      .provideClass("actorRepository", ActorRepository)
       .provideValue("indexLevel", 2)
       .injectClass(PostIndexingPolicy);
 
