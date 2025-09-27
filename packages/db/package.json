@@ -16,17 +16,17 @@
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check"
   },
   "dependencies": {
-    "drizzle-orm": "0.44.4",
+    "drizzle-orm": "0.44.5",
     "pg": "8.16.3"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "7.1.1",
+    "@mkizka/eslint-config": "7.1.2",
     "@tsconfig/node-lts": "22.0.2",
-    "@types/node": "24.2.0",
+    "@types/node": "24.5.2",
     "@types/pg": "8.15.5",
-    "dotenv": "17.2.1",
-    "drizzle-kit": "0.31.4",
-    "eslint": "9.32.0"
+    "dotenv": "17.2.2",
+    "drizzle-kit": "0.31.5",
+    "eslint": "9.36.0"
   },
   "sideEffects": false
 }

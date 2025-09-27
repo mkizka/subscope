@@ -48,7 +48,7 @@ export class WorkerServer {
       await this.syncWorker.stop();
       this.logger.info("Workers stopped successfully");
     } catch (error) {
-      this.logger.error("Error stopping workers", { error });
+      this.logger.error({ error }, "Error stopping workers");
     }
   }
 
