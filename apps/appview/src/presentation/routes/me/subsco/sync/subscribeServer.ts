@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { Server } from "@repo/client/server";
 
 import {
@@ -33,23 +34,11 @@ export class SubscribeServer {
             },
           };
         } catch (error) {
-          if (error instanceof InvalidInviteCodeError) {
-            return {
-              status: 400,
-              body: {
-                error: "InvalidInviteCode",
-                message: error.message,
-              },
-            };
-          }
-          if (error instanceof AlreadySubscribedError) {
-            return {
-              status: 400,
-              body: {
-                error: "AlreadySubscribed",
-                message: error.message,
-              },
-            };
+          if (
+            error instanceof InvalidInviteCodeError ||
+            error instanceof AlreadySubscribedError
+          ) {
+            throw new InvalidRequestError(error.message, error.name);
           }
           throw error;
         }

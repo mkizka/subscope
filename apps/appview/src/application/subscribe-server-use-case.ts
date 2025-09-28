@@ -7,14 +7,14 @@ import type { ISubscriptionRepository } from "./interfaces/subscription-reposito
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "InvalidInviteCodeError";
+    this.name = "InvalidInviteCode";
   }
 }
 
 export class AlreadySubscribedError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "AlreadySubscribedError";
+    this.name = "AlreadySubscribed";
   }
 }
 
