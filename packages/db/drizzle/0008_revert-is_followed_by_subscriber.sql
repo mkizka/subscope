@@ -1,0 +1,1 @@
+ALTER TABLE "actors" DROP COLUMN "is_followed_by_subscriber";
