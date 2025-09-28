@@ -7,11 +7,10 @@ export type BackfillStatus = "dirty" | "in-process" | "synchronized";
 
 type ActorParams = {
   did: string;
-  handle?: string | null;
+  handle?: string;
   backfillStatus?: BackfillStatus;
   backfillVersion?: number | null;
   indexedAt: Date;
-  isFollowedBySubscriber?: boolean;
 };
 
 export class Actor {
@@ -20,7 +19,6 @@ export class Actor {
   readonly backfillStatus: BackfillStatus;
   readonly backfillVersion: number | null;
   readonly indexedAt: Date;
-  readonly isFollowedBySubscriber: boolean;
 
   constructor(params: ActorParams) {
     this.did = asDid(params.did);
@@ -28,6 +26,5 @@ export class Actor {
     this.backfillStatus = params.backfillStatus ?? "dirty";
     this.backfillVersion = params.backfillVersion ?? null;
     this.indexedAt = params.indexedAt;
-    this.isFollowedBySubscriber = params.isFollowedBySubscriber ?? false;
   }
 }

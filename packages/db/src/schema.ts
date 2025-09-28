@@ -1,7 +1,6 @@
 // 参考： https://github.com/bluesky-social/atproto/tree/main/packages/bsky/src/data-plane/server/db/tables
 import { relations, sql } from "drizzle-orm";
 import {
-  boolean,
   index,
   integer,
   jsonb,
@@ -24,7 +23,6 @@ export const actors = pgTable(
       .default("dirty"),
     backfillVersion: integer(),
     indexedAt: timestamp().notNull(),
-    isFollowedBySubscriber: boolean().notNull().default(false),
   },
   (table) => [index("handle_idx").on(table.handle)],
 );

@@ -27,27 +27,31 @@ export class IndexActorService {
     did,
     handle,
     indexedAt,
-    isFollowedBySubscriber,
   }: {
     ctx: TransactionContext;
     did: Did;
     handle?: Handle;
     indexedAt: Date;
-    isFollowedBySubscriber?: boolean;
   }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
+    if (existingActor) {
+      // インデックスされたactorのhandleと異なるhandleが指定された場合は更新
+      if (handle && existingActor.handle !== handle) {
+        await this.actorRepository.updateHandle({ ctx, did, handle });
+      }
+      // インデックスされたactorがhandleを持っていなければresolveする
+      if (!existingActor.handle) {
+        await this.resolveDidScheduler.schedule(did);
+      }
+    } else {
+      // インデックスされていない場合は新規登録
+      const actor = new Actor({ did, handle, indexedAt });
+      await this.actorRepository.upsert({ ctx, actor });
 
-    const actor = new Actor({
-      did,
-      handle: handle ?? existingActor?.handle,
-      indexedAt,
-      isFollowedBySubscriber,
-    });
-    await this.actorRepository.upsert({ ctx, actor });
-
-    // handleが無い場合はresolveDidジョブを追加
-    if (!handle && !existingActor?.handle) {
-      await this.resolveDidScheduler.schedule(did);
+      // handleが無い場合はresolveする
+      if (!handle) {
+        await this.resolveDidScheduler.schedule(did);
+      }
     }
 
     // profileが存在しない場合はfetchRecordジョブを追加

@@ -1,6 +1,7 @@
 import { Post, Record } from "@repo/common/domain";
 import {
   actorFactory,
+  followFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -8,7 +9,6 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { ActorRepository } from "../infrastructure/repositories/actor-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
 
@@ -18,7 +18,6 @@ describe("PostIndexingPolicy", () => {
   describe("INDEX_LEVEL=1", () => {
     const postIndexingPolicy = testInjector
       .provideClass("subscriptionRepository", SubscriptionRepository)
-      .provideClass("actorRepository", ActorRepository)
       .provideValue("indexLevel", 1)
       .injectClass(PostIndexingPolicy);
 
@@ -54,8 +53,21 @@ describe("PostIndexingPolicy", () => {
 
       test("subscriberにフォローされているユーザーの投稿は保存すべき", async () => {
         // arrange
-        const followedActor = await actorFactory(ctx.db)
-          .props({ isFollowedBySubscriber: () => true })
+        const subscriberActor = await actorFactory(ctx.db).create();
+        await subscriptionFactory(ctx.db)
+          .vars({ actor: () => subscriberActor })
+          .create();
+
+        const followedActor = await actorFactory(ctx.db).create();
+
+        await followFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.graph.follow")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+            followee: () => followedActor,
+          })
           .create();
 
         const postJson = {
@@ -200,7 +212,6 @@ describe("PostIndexingPolicy", () => {
   describe("INDEX_LEVEL=2", () => {
     const postIndexingPolicyLevel2 = testInjector
       .provideClass("subscriptionRepository", SubscriptionRepository)
-      .provideClass("actorRepository", ActorRepository)
       .provideValue("indexLevel", 2)
       .injectClass(PostIndexingPolicy);
 
@@ -236,8 +247,20 @@ describe("PostIndexingPolicy", () => {
 
       test("subscribersのフォロイーへのリプライは保存すべき", async () => {
         // arrange
-        const followeeActor = await actorFactory(ctx.db)
-          .props({ isFollowedBySubscriber: () => true })
+        const subscriberActor = await actorFactory(ctx.db).create();
+        await subscriptionFactory(ctx.db)
+          .vars({ actor: () => subscriberActor })
+          .create();
+
+        const followeeActor = await actorFactory(ctx.db).create();
+        await followFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.graph.follow")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+            followee: () => followeeActor,
+          })
           .create();
 
         const followeePost = await postFactory(ctx.db)

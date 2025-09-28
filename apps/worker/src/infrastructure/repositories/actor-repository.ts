@@ -5,7 +5,7 @@ import type { Actor, BackfillStatus } from "@repo/common/domain";
 import { Actor as ActorDomain } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 import { type ActorInsert, schema } from "@repo/db";
-import { and, eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../../application/interfaces/repositories/actor-repository.js";
 
@@ -17,7 +17,6 @@ export class ActorRepository implements IActorRepository {
       handle: actor.handle,
       backfillStatus: actor.backfillStatus,
       backfillVersion: actor.backfillVersion,
-      isFollowedBySubscriber: actor.isFollowedBySubscriber,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
@@ -43,11 +42,10 @@ export class ActorRepository implements IActorRepository {
     }
     return new ActorDomain({
       did: asDid(row.did),
-      handle: row.handle,
+      handle: row.handle || undefined,
       backfillStatus: row.backfillStatus,
       backfillVersion: row.backfillVersion,
       indexedAt: row.indexedAt,
-      isFollowedBySubscriber: row.isFollowedBySubscriber,
     });
   }
 
@@ -88,26 +86,5 @@ export class ActorRepository implements IActorRepository {
 
   async delete({ ctx, did }: { ctx: TransactionContext; did: Did }) {
     await ctx.db.delete(schema.actors).where(eq(schema.actors.did, did));
-  }
-
-  async hasFollowedBySubscribers({
-    ctx,
-    actorDids,
-  }: {
-    ctx: TransactionContext;
-    actorDids: string[];
-  }): Promise<boolean> {
-    const result = await ctx.db
-      .select({ did: schema.actors.did })
-      .from(schema.actors)
-      .where(
-        and(
-          inArray(schema.actors.did, actorDids),
-          eq(schema.actors.isFollowedBySubscriber, true),
-        ),
-      )
-      .limit(1);
-
-    return result.length > 0;
   }
 }

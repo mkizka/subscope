@@ -12,7 +12,6 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
 import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
@@ -27,7 +26,6 @@ describe("LikeIndexer", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("actorRepository", ActorRepository)
     .provideValue("indexLevel", 1)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
     .injectClass(LikeIndexer);

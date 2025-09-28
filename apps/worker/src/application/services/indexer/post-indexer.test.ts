@@ -15,7 +15,6 @@ import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
 import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
@@ -32,7 +31,6 @@ describe("PostIndexer", () => {
     .provideClass("postRepository", PostRepository)
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("actorRepository", ActorRepository)
     .provideValue("indexLevel", 1)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)

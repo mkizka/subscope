@@ -1,6 +1,7 @@
 import { Like, Record } from "@repo/common/domain";
 import {
   actorFactory,
+  followFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -8,7 +9,6 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { ActorRepository } from "../infrastructure/repositories/actor-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
 
@@ -18,7 +18,6 @@ describe("LikeIndexingPolicy", () => {
   describe("INDEX_LEVEL=1", () => {
     const likeIndexingPolicy = testInjector
       .provideClass("subscriptionRepository", SubscriptionRepository)
-      .provideClass("actorRepository", ActorRepository)
       .provideValue("indexLevel", 1)
       .injectClass(LikeIndexingPolicy);
 
@@ -146,7 +145,6 @@ describe("LikeIndexingPolicy", () => {
   describe("INDEX_LEVEL=2", () => {
     const likeIndexingPolicyLevel2 = testInjector
       .provideClass("subscriptionRepository", SubscriptionRepository)
-      .provideClass("actorRepository", ActorRepository)
       .provideValue("indexLevel", 2)
       .injectClass(LikeIndexingPolicy);
 
@@ -191,8 +189,20 @@ describe("LikeIndexingPolicy", () => {
         // arrange
         const likerActor = await actorFactory(ctx.db).create();
 
-        const followeeActor = await actorFactory(ctx.db)
-          .props({ isFollowedBySubscriber: () => true })
+        const subscriberActor = await actorFactory(ctx.db).create();
+        await subscriptionFactory(ctx.db)
+          .vars({ actor: () => subscriberActor })
+          .create();
+
+        const followeeActor = await actorFactory(ctx.db).create();
+        await followFactory(ctx.db)
+          .vars({
+            record: () =>
+              recordFactory(ctx.db, "app.bsky.graph.follow")
+                .vars({ actor: () => subscriberActor })
+                .create(),
+            followee: () => followeeActor,
+          })
           .create();
 
         const followeePostRecord = await recordFactory(

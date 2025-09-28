@@ -2,7 +2,9 @@ import type { IJobQueue } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
+  followFactory,
   getTestSetup,
+  recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
@@ -86,8 +88,9 @@ describe("UpsertIdentityUseCase", () => {
     expect(actors[0]?.handle).toBe(command.handle);
   });
 
-  test("subscriberのフォロイーである場合はactorを保存する", async () => {
+  test("subscriberでないがsubscriberのフォロワーがいる場合はactorを保存する", async () => {
     // arrange
+    const subscriberDid = "did:plc:identity-follower-subscriber";
     const followedDid = "did:plc:identity-followed";
     const command: UpsertIdentityCommand = {
       did: followedDid,
@@ -95,10 +98,41 @@ describe("UpsertIdentityUseCase", () => {
       indexedAt: new Date(),
     };
 
-    await actorFactory(ctx.db)
+    // subscriberを作成
+    const subscriberActor = await actorFactory(ctx.db)
+      .props({
+        did: () => subscriberDid,
+        handle: () => "identity-follower-subscriber.bsky.social",
+      })
+      .create();
+
+    await subscriptionFactory(ctx.db)
+      .vars({ actor: () => subscriberActor })
+      .create();
+
+    // followedDidのactorを先に作成（外部キー制約のため）
+    const followedActor = await actorFactory(ctx.db)
       .props({
         did: () => followedDid,
-        isFollowedBySubscriber: () => true,
+      })
+      .create();
+
+    // subscriberがfollowedDidをフォロー
+    const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
+      .vars({ actorDid: () => subscriberActor.did })
+      .props({
+        json: () => ({
+          $type: "app.bsky.graph.follow",
+          subject: followedDid,
+          createdAt: new Date().toISOString(),
+        }),
+      })
+      .create();
+
+    await followFactory(ctx.db)
+      .vars({
+        record: () => followRecord,
+        followee: () => followedActor,
       })
       .create();
 

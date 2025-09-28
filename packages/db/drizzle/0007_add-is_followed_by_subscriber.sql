@@ -1,1 +1,0 @@
-ALTER TABLE "actors" ADD COLUMN "is_followed_by_subscriber" boolean DEFAULT false NOT NULL;

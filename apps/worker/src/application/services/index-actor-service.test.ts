@@ -291,28 +291,5 @@ describe("IndexActorService", () => {
         }),
       );
     });
-
-    test("isFollowedBySubscriberを指定した場合、DBに保存される", async () => {
-      // arrange
-      const testDid = asDid("did:plc:followed-by-subscriber");
-      const testHandle = asHandle("followed.bsky.social");
-
-      // act
-      await indexActorService.upsert({
-        ctx,
-        did: testDid,
-        handle: testHandle,
-        indexedAt: new Date(),
-        isFollowedBySubscriber: true,
-      });
-
-      // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, testDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.isFollowedBySubscriber).toBe(true);
-    });
   });
 });

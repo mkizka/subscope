@@ -2,20 +2,14 @@ import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 import type { Repost } from "@repo/common/domain";
 
-import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
 
 export class RepostIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly actorRepository: IActorRepository,
     private readonly indexLevel: number,
   ) {}
-  static inject = [
-    "subscriptionRepository",
-    "actorRepository",
-    "indexLevel",
-  ] as const;
+  static inject = ["subscriptionRepository", "indexLevel"] as const;
 
   async shouldIndex(ctx: TransactionContext, repost: Repost): Promise<boolean> {
     // リポストしたactorまたはリポストされたactorがsubscriberなら保存
@@ -33,9 +27,9 @@ export class RepostIndexingPolicy {
     }
 
     // リポストしたactorまたはリポストされたactorがsubscriberのフォロイーなら保存
-    return this.actorRepository.hasFollowedBySubscribers({
+    return this.subscriptionRepository.hasFolloweeOfSubscribers(
       ctx,
-      actorDids: followerCheckDids,
-    });
+      followerCheckDids,
+    );
   }
 }
