@@ -443,6 +443,9 @@ importers:
       '@atproto/api':
         specifier: 0.16.11
         version: 0.16.11
+      '@repo/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
