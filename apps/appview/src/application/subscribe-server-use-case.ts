@@ -3,6 +3,7 @@ import { Subscription } from "@repo/common/domain";
 
 import type { IInviteCodeRepository } from "./interfaces/invite-code-repository.js";
 import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
+import type { BackfillScheduler } from "./service/scheduler/backfill-scheduler.js";
 
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {
@@ -27,8 +28,13 @@ export class SubscribeServerUseCase {
   constructor(
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly backfillScheduler: BackfillScheduler,
   ) {}
-  static inject = ["inviteCodeRepository", "subscriptionRepository"] as const;
+  static inject = [
+    "inviteCodeRepository",
+    "subscriptionRepository",
+    "backfillScheduler",
+  ] as const;
 
   async execute(params: SubscribeServerParams): Promise<void> {
     // 将来的には設定から招待コード不要にも出来るようにする
@@ -39,7 +45,6 @@ export class SubscribeServerUseCase {
     const existingSubscription = await this.subscriptionRepository.findFirst(
       params.actorDid,
     );
-
     if (existingSubscription) {
       throw new AlreadySubscribedError("Already subscribed to this server");
     }
@@ -47,11 +52,9 @@ export class SubscribeServerUseCase {
     const inviteCode = await this.inviteCodeRepository.findFirst(
       params.inviteCode,
     );
-
     if (!inviteCode) {
       throw new InvalidInviteCodeError("Invalid invite code");
     }
-
     if (inviteCode.isExpired()) {
       throw new InvalidInviteCodeError("Invite code has expired");
     }
@@ -71,5 +74,6 @@ export class SubscribeServerUseCase {
     });
 
     await this.subscriptionRepository.save(subscription);
+    await this.backfillScheduler.schedule(params.actorDid);
   }
 }

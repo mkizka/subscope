@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import type { IJobQueue } from "@repo/common/domain";
 import {
   actorFactory,
   getTestSetup,
@@ -6,9 +7,11 @@ import {
   subscriptionFactory,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
+import { mock } from "vitest-mock-extended";
 
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
+import { BackfillScheduler } from "./service/scheduler/backfill-scheduler.js";
 import {
   AlreadySubscribedError,
   InvalidInviteCodeError,
@@ -16,11 +19,14 @@ import {
 } from "./subscribe-server-use-case.js";
 
 describe("SubscribeServerUseCase", () => {
+  const mockJobQueue = mock<IJobQueue>();
   const { testInjector, ctx } = getTestSetup();
 
   const subscribeServerUseCase = testInjector
     .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideValue("jobQueue", mockJobQueue)
+    .provideClass("backfillScheduler", BackfillScheduler)
     .injectClass(SubscribeServerUseCase);
 
   test("有効な招待コードの場合、サブスクリプションを作成する", async () => {
@@ -45,6 +51,11 @@ describe("SubscribeServerUseCase", () => {
     expect(savedSubscription).toMatchObject({
       actorDid: actor.did,
       inviteCode: inviteCode.code,
+    });
+    expect(mockJobQueue.add).toHaveBeenCalledWith({
+      queueName: "backfill",
+      jobName: `at://${actor.did}`,
+      data: asDid(actor.did),
     });
   });
 

@@ -15,7 +15,6 @@ import { ActorRepository } from "../../../infrastructure/repositories/actor-repo
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { IndexActorService } from "../../services/index-actor-service.js";
-import { BackfillScheduler } from "../../services/scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "../../services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../../services/scheduler/resolve-did-scheduler.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
@@ -31,7 +30,6 @@ describe("UpsertIdentityUseCase", () => {
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("backfillScheduler", BackfillScheduler)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .provideClass("indexActorService", IndexActorService)
     .injectClass(UpsertIdentityUseCase);

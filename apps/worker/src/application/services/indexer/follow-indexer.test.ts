@@ -13,7 +13,6 @@ import { FollowRepository } from "../../../infrastructure/repositories/follow-re
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { IndexActorService } from "../index-actor-service.js";
-import { BackfillScheduler } from "../scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../scheduler/resolve-did-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
@@ -30,7 +29,6 @@ describe("FollowIndexer", () => {
     .provideClass("profileRepository", ProfileRepository)
     .provideValue("jobQueue", mock<JobQueue>())
     .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("backfillScheduler", BackfillScheduler)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .provideClass("indexActorService", IndexActorService)
     .injectClass(FollowIndexer);

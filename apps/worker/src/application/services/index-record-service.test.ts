@@ -40,7 +40,6 @@ import { LikeIndexer } from "./indexer/like-indexer.js";
 import { PostIndexer } from "./indexer/post-indexer.js";
 import { ProfileIndexer } from "./indexer/profile-indexer.js";
 import { RepostIndexer } from "./indexer/repost-indexer.js";
-import { BackfillScheduler } from "./scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
@@ -71,7 +70,6 @@ describe("IndexRecordService", () => {
     .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
     .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
-    .provideClass("backfillScheduler", BackfillScheduler)
     .provideClass("resolveDidScheduler", ResolveDidScheduler)
     .provideClass("profileIndexer", ProfileIndexer)
     .provideClass("postIndexer", PostIndexer)

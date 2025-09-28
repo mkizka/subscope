@@ -18,7 +18,6 @@ import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
-import { BackfillScheduler } from "./application/services/scheduler/backfill-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
@@ -86,7 +85,6 @@ createInjector()
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)
-  .provideClass("backfillScheduler", BackfillScheduler)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
