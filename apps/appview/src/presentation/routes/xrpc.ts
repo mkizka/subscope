@@ -18,6 +18,7 @@ import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
+import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
 import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 
 export class XRPCRouter {
@@ -42,6 +43,7 @@ export class XRPCRouter {
     createInviteCode: CreateInviteCode,
     getInviteCodes: GetInviteCodes,
     getSubscribers: GetSubscribers,
+    getSubscriptionStatus: GetSubscriptionStatus,
     subscribeServer: SubscribeServer,
   ) {
     this.handlers = [
@@ -63,6 +65,7 @@ export class XRPCRouter {
       createInviteCode,
       getInviteCodes,
       getSubscribers,
+      getSubscriptionStatus,
       subscribeServer,
     ];
   }
@@ -85,6 +88,7 @@ export class XRPCRouter {
     "createInviteCode",
     "getInviteCodes",
     "getSubscribers",
+    "getSubscriptionStatus",
     "subscribeServer",
   ] as const;
 

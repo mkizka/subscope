@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.sync.getSubscriptionStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the subscription status for the authenticated user",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "union",
+          "refs": ["#subscribed", "#notSubscribed"]
+        }
+      }
+    },
+    "subscribed": {
+      "type": "object",
+      "required": ["isSubscriber", "backfillStatus"],
+      "properties": {
+        "isSubscriber": {
+          "type": "boolean",
+          "const": true,
+          "description": "The user is a subscriber"
+        },
+        "backfillStatus": {
+          "type": "string",
+          "enum": ["dirty", "in-process", "synchronized"],
+          "description": "Current backfill status"
+        }
+      }
+    },
+    "notSubscribed": {
+      "type": "object",
+      "required": ["isSubscriber"],
+      "properties": {
+        "isSubscriber": {
+          "type": "boolean",
+          "const": false,
+          "description": "The user is not a subscriber"
+        }
+      }
+    }
+  }
+}

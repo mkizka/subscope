@@ -7,7 +7,7 @@ export type BackfillStatus = "dirty" | "in-process" | "synchronized";
 
 type ActorParams = {
   did: string;
-  handle?: string;
+  handle?: string | null;
   backfillStatus?: BackfillStatus;
   backfillVersion?: number | null;
   indexedAt: Date;

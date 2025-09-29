@@ -9,6 +9,7 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { GetSubscriptionStatusUseCase } from "./application/get-subscription-status-use-case.js";
 import { ProfileViewBuilder } from "./application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./application/service/actor/profile-view-service.js";
 import { InviteCodeService } from "./application/service/admin/invite-code-service.js";
@@ -45,6 +46,7 @@ import { SearchPostsUseCase } from "./application/use-cases/feed/search-posts-us
 import { GetFollowersUseCase } from "./application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
+import { ActorRepository } from "./infrastructure/actor-repository.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "./infrastructure/asset-url-builder.js";
 import { AuthorFeedRepository } from "./infrastructure/author-feed-repository.js";
@@ -82,6 +84,7 @@ import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
 import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createInviteCode.js";
 import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GetSubscribers } from "./presentation/routes/me/subsco/admin/getSubscribers.js";
+import { GetSubscriptionStatus } from "./presentation/routes/me/subsco/sync/getSubscriptionStatus.js";
 import { SubscribeServer } from "./presentation/routes/me/subsco/sync/subscribeServer.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppViewServer } from "./presentation/server.js";
@@ -99,6 +102,7 @@ createInjector()
   .provideFactory("connectionPool", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("profileRepository", ProfileRepository)
+  .provideClass("actorRepository", ActorRepository)
   .provideClass("actorStatsRepository", ActorStatsRepository)
   .provideClass("handleResolver", HandleResolver)
   .provideClass("recordRepository", RecordRepository)
@@ -157,6 +161,7 @@ createInjector()
   .provideClass("createInviteCodeUseCase", CreateInviteCodeUseCase)
   .provideClass("getInviteCodesUseCase", GetInviteCodesUseCase)
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
+  .provideClass("getSubscriptionStatusUseCase", GetSubscriptionStatusUseCase)
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   // presentation
   .provideClass("getPreferences", GetPreferences)
@@ -177,6 +182,7 @@ createInjector()
   .provideClass("createInviteCode", CreateInviteCode)
   .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("getSubscribers", GetSubscribers)
+  .provideClass("getSubscriptionStatus", GetSubscriptionStatus)
   .provideClass("subscribeServer", SubscribeServer)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppViewServer)
