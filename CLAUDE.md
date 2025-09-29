@@ -23,7 +23,9 @@ appsディレクトリ(アプリケーション)
 packagesディレクトリ(共通パッケージ)
 
 - `@repo/db` - Drizzle ORMデータベース層
-- `@repo/common` - 共有ユーティリティとBullMQジョブ定義
+- `@repo/common/domain` - ドメインモデル
+- `@repo/common/infrastructure` - インフラストラクチャ
+- `@repo/common/utils` - 共有ユーティリティ関数
 - `@repo/client` - AT Protocolクライアントラッパー
 - `@repo/test-utils` - テスト用ユーティリティとファクトリーパターンによるテストデータ生成
 
