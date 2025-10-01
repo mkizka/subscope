@@ -71,4 +71,10 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       createdAt: subscription.createdAt,
     });
   }
+
+  async delete(actorDid: Did): Promise<void> {
+    await this.db
+      .delete(schema.subscriptions)
+      .where(eq(schema.subscriptions.actorDid, actorDid));
+  }
 }

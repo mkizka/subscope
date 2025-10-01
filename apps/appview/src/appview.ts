@@ -29,6 +29,7 @@ import { BackfillScheduler } from "./application/service/scheduler/backfill-sche
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { SubscribeServerUseCase } from "./application/subscribe-server-use-case.js";
+import { UnsubscribeServerUseCase } from "./application/unsubscribe-server-use-case.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
@@ -86,6 +87,7 @@ import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteC
 import { GetSubscribers } from "./presentation/routes/me/subsco/admin/getSubscribers.js";
 import { GetSubscriptionStatus } from "./presentation/routes/me/subsco/sync/getSubscriptionStatus.js";
 import { SubscribeServer } from "./presentation/routes/me/subsco/sync/subscribeServer.js";
+import { UnsubscribeServer } from "./presentation/routes/me/subsco/sync/unsubscribeServer.js";
 import { XRPCRouter } from "./presentation/routes/xrpc.js";
 import { AppViewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -163,6 +165,7 @@ createInjector()
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
   .provideClass("getSubscriptionStatusUseCase", GetSubscriptionStatusUseCase)
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
+  .provideClass("unsubscribeServerUseCase", UnsubscribeServerUseCase)
   // presentation
   .provideClass("getPreferences", GetPreferences)
   .provideClass("getProfile", GetProfile)
@@ -184,6 +187,7 @@ createInjector()
   .provideClass("getSubscribers", GetSubscribers)
   .provideClass("getSubscriptionStatus", GetSubscriptionStatus)
   .provideClass("subscribeServer", SubscribeServer)
+  .provideClass("unsubscribeServer", UnsubscribeServer)
   .provideClass("xrpcRouter", XRPCRouter)
   .injectClass(AppViewServer)
   .start();

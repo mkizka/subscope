@@ -9,4 +9,5 @@ export interface ISubscriptionRepository {
   findFirst: (actorDid: Did) => Promise<Subscription | null>;
   existsByInviteCode: (inviteCode: string) => Promise<boolean>;
   save: (subscription: Subscription) => Promise<void>;
+  delete: (actorDid: Did) => Promise<void>;
 }

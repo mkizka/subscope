@@ -20,6 +20,7 @@ import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
 import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
+import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
 export class XRPCRouter {
   private readonly handlers;
@@ -45,6 +46,7 @@ export class XRPCRouter {
     getSubscribers: GetSubscribers,
     getSubscriptionStatus: GetSubscriptionStatus,
     subscribeServer: SubscribeServer,
+    unsubscribeServer: UnsubscribeServer,
   ) {
     this.handlers = [
       getPreferences,
@@ -67,6 +69,7 @@ export class XRPCRouter {
       getSubscribers,
       getSubscriptionStatus,
       subscribeServer,
+      unsubscribeServer,
     ];
   }
   static inject = [
@@ -90,6 +93,7 @@ export class XRPCRouter {
     "getSubscribers",
     "getSubscriptionStatus",
     "subscribeServer",
+    "unsubscribeServer",
   ] as const;
 
   create() {

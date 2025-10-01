@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.sync.unsubscribeServer",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Unsubscribe from an AppView server",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["success"],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the unsubscription was successful"
+            },
+            "message": {
+              "type": "string",
+              "description": "Optional message about the unsubscription status"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotSubscribed",
+          "description": "The user is not subscribed to this server"
+        }
+      ]
+    }
+  }
+}
