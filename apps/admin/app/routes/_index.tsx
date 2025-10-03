@@ -20,15 +20,18 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 function LinkCard({
   to,
+  reloadDocument,
   children,
 }: {
   to: ComponentProps<typeof Link>["to"];
+  reloadDocument?: boolean;
   children: ReactNode;
 }) {
   return (
     <Link
       className="card bg-base-100 w-full shadow-sm hover:bg-base-200"
       to={to}
+      reloadDocument={reloadDocument}
     >
       <div className="card-body items-center">{children}</div>
     </Link>
@@ -52,6 +55,10 @@ export default function Home() {
       <LinkCard to="/subscribers">
         <span className="icon-[tabler--user] size-10"></span>
         サブスクライバー
+      </LinkCard>
+      <LinkCard to="/dashboard" reloadDocument>
+        <span className="icon-[tabler--chart-bar] size-10"></span>
+        Bull Dashboard
       </LinkCard>
       <Form method="post" action="/oauth/logout" onSubmit={handleLogout}>
         <button
