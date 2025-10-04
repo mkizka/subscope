@@ -1,6 +1,11 @@
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
+import {
+  actorFactory,
+  getTestSetup,
+  randomCid,
+  recordFactory,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -22,11 +27,25 @@ describe("ProfileIndexer", () => {
     test("プロフィールレコードを正しく保存する", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
+      const avatarCid = await randomCid();
+      const bannerCid = await randomCid();
 
       const profileJson = {
         $type: "app.bsky.actor.profile",
         displayName: "Test User",
         description: "Test description",
+        avatar: {
+          $type: "blob",
+          ref: { $link: avatarCid },
+          mimeType: "image/jpeg",
+          size: 1000,
+        },
+        banner: {
+          $type: "blob",
+          ref: { $link: bannerCid },
+          mimeType: "image/jpeg",
+          size: 2000,
+        },
         createdAt: new Date().toISOString(),
       };
       const profileRecord = await recordFactory(
@@ -35,8 +54,6 @@ describe("ProfileIndexer", () => {
       )
         .vars({ actor: () => actor })
         .props({
-          uri: () => `at://${actor.did}/app.bsky.actor.profile/self`,
-          cid: () => "profile123",
           json: () => profileJson,
         })
         .create();
@@ -56,10 +73,14 @@ describe("ProfileIndexer", () => {
         .from(schema.profiles)
         .where(eq(schema.profiles.uri, record.uri.toString()))
         .limit(1);
-      expect(profiles.length).toBe(1);
-      expect(profiles[0]?.actorDid).toBe(actor.did);
-      expect(profiles[0]?.displayName).toBe("Test User");
-      expect(profiles[0]?.description).toBe("Test description");
+      expect(profiles).toHaveLength(1);
+      expect(profiles[0]).toMatchObject({
+        actorDid: actor.did,
+        displayName: "Test User",
+        description: "Test description",
+        avatarCid,
+        bannerCid,
+      });
     });
   });
 });
