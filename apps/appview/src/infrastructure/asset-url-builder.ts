@@ -9,6 +9,10 @@ export class AssetUrlBuilder {
     return `${env.BLOB_PROXY_URL}/images/avatar_thumbnail/${actorDid}/${cid}.jpg`;
   }
 
+  getBannerUrl(actorDid: string, cid: string): string {
+    return `${env.BLOB_PROXY_URL}/images/banner/${actorDid}/${cid}.jpg`;
+  }
+
   getFeedThumbnailUrl(actorDid: string, cid: string): string {
     return `${env.BLOB_PROXY_URL}/images/feed_thumbnail/${actorDid}/${cid}.jpg`;
   }

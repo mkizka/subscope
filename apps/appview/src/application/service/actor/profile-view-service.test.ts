@@ -89,10 +89,6 @@ describe("ProfileViewService", () => {
               .vars({ actor: () => actor })
               .create(),
         })
-        .props({
-          displayName: () => "Test User With Stats",
-          avatarCid: () => "test-avatar-cid-2",
-        })
         .create();
       await actorStatsFactory(ctx.db)
         .vars({ actor: () => actor })
@@ -114,8 +110,10 @@ describe("ProfileViewService", () => {
         $type: "app.bsky.actor.defs#profileViewDetailed",
         did: actor.did,
         handle: actor.handle,
-        displayName: "Test User With Stats",
+        displayName: profile.displayName,
         avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${profile.avatarCid}.jpg`,
+        banner: `http://localhost:3004/images/banner/${actor.did}/${profile.bannerCid}.jpg`,
+        description: profile.description,
         followsCount: 10,
         followersCount: 20,
         postsCount: 30,

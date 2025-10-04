@@ -8,6 +8,7 @@ export type ProfileParams = {
   cid: string;
   actorDid: string;
   avatarCid?: string | null;
+  bannerCid?: string | null;
   description?: string | null;
   displayName?: string | null;
   createdAt?: Date | string | null;
@@ -19,6 +20,7 @@ export class Profile {
   readonly cid: string;
   readonly actorDid: Did;
   readonly avatarCid: string | null;
+  readonly bannerCid: string | null;
   readonly description: string | null;
   readonly displayName: string | null;
   readonly createdAt: Date | null;
@@ -29,6 +31,7 @@ export class Profile {
     this.cid = params.cid;
     this.actorDid = asDid(params.actorDid);
     this.avatarCid = params.avatarCid ?? null;
+    this.bannerCid = params.bannerCid ?? null;
     this.description = params.description ?? null;
     this.displayName = params.displayName ?? null;
     this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
@@ -42,6 +45,7 @@ export class Profile {
       cid: record.cid,
       actorDid: record.actorDid,
       avatarCid: parsed.avatar?.ref.toString() ?? null,
+      bannerCid: parsed.banner?.ref.toString() ?? null,
       description: parsed.description,
       displayName: parsed.displayName,
       createdAt: parsed.createdAt,

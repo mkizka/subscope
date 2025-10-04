@@ -75,6 +75,7 @@ export const profiles = pgTable(
       .notNull()
       .references(() => actors.did, { onDelete: "cascade" }),
     avatarCid: varchar({ length: 256 }),
+    bannerCid: varchar({ length: 256 }),
     description: text(),
     displayName: varchar({ length: 256 }),
     createdAt: timestamp(), // 他のLexiconと違いprofilesのcreatedAtはnullable

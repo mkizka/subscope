@@ -153,7 +153,8 @@ export const profileFactory = (db: Database) =>
           uri: later<string>(),
           cid: later<string>(),
           actorDid: later<string>(),
-          avatarCid: later<string | null>(),
+          avatarCid: () => randomCid(),
+          bannerCid: () => randomCid(),
           description: () => faker.lorem.sentence(),
           displayName: () => faker.person.fullName() as string | null,
           createdAt: () => faker.date.recent(),
@@ -169,7 +170,6 @@ export const profileFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
-      avatarCid: () => (Math.random() > 0.5 ? randomCid() : null),
     });
 
 export const followFactory = (db: Database) =>

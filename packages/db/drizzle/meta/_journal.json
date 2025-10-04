@@ -64,6 +64,13 @@
       "when": 1759033115804,
       "tag": "0008_revert-is_followed_by_subscriber",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1759584284570,
+      "tag": "0009_add-banner-cid",
+      "breakpoints": true
     }
   ]
 }

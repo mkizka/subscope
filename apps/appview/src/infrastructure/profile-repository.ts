@@ -31,6 +31,7 @@ export class ProfileRepository implements IProfileRepository {
           actorDid: profile.actorDid,
           handle: profile.user.handle,
           avatarCid: profile.avatarCid,
+          bannerCid: profile.bannerCid,
           description: profile.description,
           displayName: profile.displayName,
           createdAt: profile.createdAt,

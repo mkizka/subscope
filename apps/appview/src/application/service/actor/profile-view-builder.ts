@@ -48,6 +48,8 @@ export class ProfileViewBuilder {
     return {
       ...this.profileViewBasic(profile, viewerState),
       $type: "app.bsky.actor.defs#profileViewDetailed",
+      banner: this.getBannerUrl(profile),
+      description: profile.description ?? undefined,
       followersCount: stats?.followersCount,
       followsCount: stats?.followsCount,
       postsCount: stats?.postsCount,
@@ -83,6 +85,16 @@ export class ProfileViewBuilder {
     return this.assetUrlBuilder.getAvatarThumbnailUrl(
       profile.actorDid,
       profile.avatarCid,
+    );
+  }
+
+  private getBannerUrl(profile: ProfileDetailed) {
+    if (!profile.bannerCid) {
+      return undefined;
+    }
+    return this.assetUrlBuilder.getBannerUrl(
+      profile.actorDid,
+      profile.bannerCid,
     );
   }
 }
