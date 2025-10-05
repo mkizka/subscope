@@ -49,7 +49,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act
     await subscribeServerUseCase.execute({
-      inviteCode: inviteCode.code,
+      code: inviteCode.code,
       actorDid: asDid(actor.did),
     });
 
@@ -98,7 +98,7 @@ describe("SubscribeServerUseCase", () => {
     // act & assert
     await expect(
       subscribeServerUseCase.execute({
-        inviteCode: "test-code",
+        code: "test-code",
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(
@@ -113,7 +113,7 @@ describe("SubscribeServerUseCase", () => {
     // act & assert
     await expect(
       subscribeServerUseCase.execute({
-        inviteCode: "invalid-code",
+        code: "invalid-code",
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(new InvalidInviteCodeError("Invalid invite code"));
@@ -131,7 +131,7 @@ describe("SubscribeServerUseCase", () => {
     // act & assert
     await expect(
       subscribeServerUseCase.execute({
-        inviteCode: expiredInviteCode.code,
+        code: expiredInviteCode.code,
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(
@@ -154,7 +154,7 @@ describe("SubscribeServerUseCase", () => {
     // act & assert
     await expect(
       subscribeServerUseCase.execute({
-        inviteCode: inviteCode.code,
+        code: inviteCode.code,
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(

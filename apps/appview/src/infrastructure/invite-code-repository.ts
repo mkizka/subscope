@@ -13,13 +13,28 @@ export class InviteCodeRepository implements IInviteCodeRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
 
-  async save(inviteCode: InviteCode): Promise<void> {
-    await this.db.insert(schema.inviteCodes).values({
-      code: inviteCode.code,
-      expiresAt: inviteCode.expiresAt,
-      usedAt: inviteCode.usedAt,
-      createdAt: inviteCode.createdAt,
-    });
+  async upsert({
+    inviteCode,
+    ctx,
+  }: {
+    inviteCode: InviteCode;
+    ctx: TransactionContext;
+  }): Promise<void> {
+    await ctx.db
+      .insert(schema.inviteCodes)
+      .values({
+        code: inviteCode.code,
+        expiresAt: inviteCode.expiresAt,
+        usedAt: inviteCode.usedAt,
+        createdAt: inviteCode.createdAt,
+      })
+      .onConflictDoUpdate({
+        target: schema.inviteCodes.code,
+        set: {
+          expiresAt: inviteCode.expiresAt,
+          usedAt: inviteCode.usedAt,
+        },
+      });
   }
 
   async findAll(params: {
@@ -71,18 +86,5 @@ export class InviteCodeRepository implements IInviteCodeRepository {
       usedAt: row.usedAt,
       createdAt: row.createdAt,
     });
-  }
-
-  async markAsUsed({
-    code,
-    ctx,
-  }: {
-    code: string;
-    ctx: TransactionContext;
-  }): Promise<void> {
-    await ctx.db
-      .update(schema.inviteCodes)
-      .set({ usedAt: new Date() })
-      .where(eq(schema.inviteCodes.code, code));
   }
 }

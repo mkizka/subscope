@@ -5,7 +5,7 @@ import { InviteCodeRepository } from "../../../infrastructure/invite-code-reposi
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector } = getTestSetup();
 
   const useCase = testInjector
     .provideClass("inviteCodeRepository", InviteCodeRepository)

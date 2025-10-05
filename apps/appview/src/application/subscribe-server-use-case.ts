@@ -21,7 +21,7 @@ export class AlreadySubscribedError extends Error {
 
 type SubscribeServerParams = {
   actorDid: Did;
-  inviteCode?: string;
+  code?: string;
 };
 
 export class SubscribeServerUseCase {
@@ -38,12 +38,9 @@ export class SubscribeServerUseCase {
     "backfillScheduler",
   ] as const;
 
-  async execute({
-    actorDid,
-    inviteCode,
-  }: SubscribeServerParams): Promise<void> {
+  async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
     // 将来的には設定から招待コード不要にも出来るようにする
-    if (!inviteCode) {
+    if (!code) {
       throw new InvalidInviteCodeError("Invite code is required");
     }
 
@@ -53,12 +50,11 @@ export class SubscribeServerUseCase {
       throw new AlreadySubscribedError("Already subscribed to this server");
     }
 
-    const inviteCodeEntity =
-      await this.inviteCodeRepository.findFirst(inviteCode);
-    if (!inviteCodeEntity) {
+    const inviteCode = await this.inviteCodeRepository.findFirst(code);
+    if (!inviteCode) {
       throw new InvalidInviteCodeError("Invalid invite code");
     }
-    if (!inviteCodeEntity.canBeUsed()) {
+    if (!inviteCode.canBeUsed()) {
       throw new InvalidInviteCodeError(
         "Invite code has expired or already been used",
       );
@@ -66,16 +62,14 @@ export class SubscribeServerUseCase {
 
     const subscription = new Subscription({
       actorDid,
-      inviteCode,
+      inviteCode: code,
       createdAt: new Date(),
     });
 
     await this.transactionManager.transaction(async (ctx) => {
       await this.subscriptionRepository.save({ ctx, subscription });
-      await this.inviteCodeRepository.markAsUsed({
-        ctx,
-        code: inviteCode,
-      });
+      inviteCode.markAsUsed();
+      await this.inviteCodeRepository.upsert({ ctx, inviteCode });
     });
     await this.backfillScheduler.schedule(actorDid);
   }

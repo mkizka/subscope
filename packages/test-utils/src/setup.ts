@@ -2,6 +2,7 @@ import {
   connectionPoolFactory,
   databaseFactory,
   LoggerManager,
+  TransactionManager,
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 import { inject } from "vitest";
@@ -17,7 +18,8 @@ const testInjector = createInjector()
   .provideValue("databaseUrl", inject("databaseUrl"))
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)
-  .provideFactory("db", databaseFactory);
+  .provideFactory("db", databaseFactory)
+  .provideClass("transactionManager", TransactionManager);
 
 export const getTestSetup = () => {
   return {

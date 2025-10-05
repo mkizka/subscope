@@ -8,7 +8,7 @@ type InviteCodeParams = {
 export class InviteCode {
   readonly code: string;
   readonly expiresAt: Date;
-  readonly usedAt: Date | null;
+  usedAt: Date | null;
   readonly createdAt: Date;
 
   constructor(params: InviteCodeParams) {
@@ -50,5 +50,14 @@ export class InviteCode {
 
   canBeUsed(): boolean {
     return !this.isExpired() && !this.isUsed();
+  }
+
+  markAsUsed(): void {
+    if (!this.canBeUsed()) {
+      throw new Error(
+        "Cannot mark as used: invite code has expired or already been used",
+      );
+    }
+    this.usedAt = new Date();
   }
 }

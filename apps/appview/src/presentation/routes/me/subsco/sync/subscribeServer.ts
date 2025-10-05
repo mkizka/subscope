@@ -22,7 +22,7 @@ export class SubscribeServer {
       handler: async ({ input, auth }) => {
         try {
           await this.subscribeServerUseCase.execute({
-            inviteCode: input.body.inviteCode,
+            code: input.body.inviteCode,
             actorDid: asDid(auth.credentials.did),
           });
 
