@@ -10,28 +10,28 @@
 
 ### 概要
 
-3つのアプリケーションでBluesky AppViewを実装するmonorepoになっています。
+AppViewの各機能を複数アプリケーションに分割したmonorepoです。
 
 appsディレクトリ(アプリケーション)
 
-- `@repo/appview` - XRPCエンドポイント経由でタイムラインやプロフィールなどを提供するAT ProtocolのAppViewサーバー
-- `@repo/ingester` - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送るWebSocketクライアント
-- `@repo/worker` - BullMQを使用してレコードをデータベースにインデックスするバックグラウンドジョブプロセッサー
+- `@repo/appview` - XRPCを実装したAPIサーバー
+- `@repo/ingester` - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送信
+- `@repo/worker` - BullMQを使用してレコードをデータベースにインデックスするワーカー
 - `@repo/blob-proxy` - PDSの画像をキャッシュして配信するプロキシサーバー
-- `@repo/playground` - React 19を使用したフロントエンド開発環境
+- `@repo/admin` - 招待コードの発行などを行うAppView管理者向け管理画面
 
 packagesディレクトリ(共通パッケージ)
 
-- `@repo/db` - Drizzle ORMデータベース層
+- `@repo/db` - Drizzle ORMデータベースの定義
 - `@repo/common/domain` - ドメインモデル
 - `@repo/common/infrastructure` - インフラストラクチャ
 - `@repo/common/utils` - 共有ユーティリティ関数
-- `@repo/client` - AT Protocolクライアントラッパー
-- `@repo/test-utils` - テスト用ユーティリティとファクトリーパターンによるテストデータ生成
+- `@repo/client` - lex-cliで生成したXRPCクライアント実装
+- `@repo/test-utils` - テスト用データ生成ファクトリを含むユーティリティ
 
 ### 実装パターン
 
-各アプリはオニオンアーキテクチャパターンを参考に実装しています。
+各アプリはオニオンアーキテクチャパターンを参考に以下のような構成で実装しています。
 
 - `application/` - ユースケースとビジネスロジック
 - `infrastructure/` - 外部サービス実装
