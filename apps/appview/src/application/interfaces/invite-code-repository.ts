@@ -1,4 +1,4 @@
-import type { InviteCode } from "@repo/common/domain";
+import type { InviteCode, TransactionContext } from "@repo/common/domain";
 
 export interface IInviteCodeRepository {
   save: (inviteCode: InviteCode) => Promise<void>;
@@ -7,5 +7,8 @@ export interface IInviteCodeRepository {
     cursor?: string;
   }) => Promise<InviteCode[]>;
   findFirst: (code: string) => Promise<InviteCode | null>;
-  markAsUsed: (code: string) => Promise<void>;
+  markAsUsed: (params: {
+    code: string;
+    ctx: TransactionContext;
+  }) => Promise<void>;
 }

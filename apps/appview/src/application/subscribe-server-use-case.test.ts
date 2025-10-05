@@ -1,5 +1,6 @@
 import { asDid } from "@atproto/did";
 import type { IJobQueue } from "@repo/common/domain";
+import { TransactionManager } from "@repo/common/infrastructure";
 import {
   actorFactory,
   getTestSetup,
@@ -25,6 +26,7 @@ describe("SubscribeServerUseCase", () => {
   const { testInjector, ctx } = getTestSetup();
 
   const subscribeServerUseCase = testInjector
+    .provideClass("transactionManager", TransactionManager)
     .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)

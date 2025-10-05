@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import { Subscription } from "@repo/common/domain";
+import { type ITransactionManager, Subscription } from "@repo/common/domain";
 
 import type { IInviteCodeRepository } from "./interfaces/invite-code-repository.js";
 import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
@@ -26,49 +26,57 @@ type SubscribeServerParams = {
 
 export class SubscribeServerUseCase {
   constructor(
+    private readonly transactionManager: ITransactionManager,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly backfillScheduler: BackfillScheduler,
   ) {}
   static inject = [
+    "transactionManager",
     "inviteCodeRepository",
     "subscriptionRepository",
     "backfillScheduler",
   ] as const;
 
-  async execute(params: SubscribeServerParams): Promise<void> {
+  async execute({
+    actorDid,
+    inviteCode,
+  }: SubscribeServerParams): Promise<void> {
     // 将来的には設定から招待コード不要にも出来るようにする
-    if (!params.inviteCode) {
+    if (!inviteCode) {
       throw new InvalidInviteCodeError("Invite code is required");
     }
 
-    const existingSubscription = await this.subscriptionRepository.findFirst(
-      params.actorDid,
-    );
+    const existingSubscription =
+      await this.subscriptionRepository.findFirst(actorDid);
     if (existingSubscription) {
       throw new AlreadySubscribedError("Already subscribed to this server");
     }
 
-    const inviteCode = await this.inviteCodeRepository.findFirst(
-      params.inviteCode,
-    );
-    if (!inviteCode) {
+    const inviteCodeEntity =
+      await this.inviteCodeRepository.findFirst(inviteCode);
+    if (!inviteCodeEntity) {
       throw new InvalidInviteCodeError("Invalid invite code");
     }
-    if (!inviteCode.canBeUsed()) {
+    if (!inviteCodeEntity.canBeUsed()) {
       throw new InvalidInviteCodeError(
         "Invite code has expired or already been used",
       );
     }
 
     const subscription = new Subscription({
-      actorDid: params.actorDid,
-      inviteCode: params.inviteCode,
+      actorDid,
+      inviteCode,
       createdAt: new Date(),
     });
 
-    await this.subscriptionRepository.save(subscription);
-    await this.inviteCodeRepository.markAsUsed(params.inviteCode);
-    await this.backfillScheduler.schedule(params.actorDid);
+    await this.transactionManager.transaction(async (ctx) => {
+      await this.subscriptionRepository.save({ ctx, subscription });
+      await this.inviteCodeRepository.markAsUsed({
+        ctx,
+        code: inviteCode,
+      });
+    });
+    await this.backfillScheduler.schedule(actorDid);
   }
 }

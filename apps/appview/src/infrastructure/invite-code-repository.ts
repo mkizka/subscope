@@ -1,4 +1,8 @@
-import type { DatabaseClient, InviteCode } from "@repo/common/domain";
+import type {
+  DatabaseClient,
+  InviteCode,
+  TransactionContext,
+} from "@repo/common/domain";
 import { InviteCode as InviteCodeDomain } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, lt } from "drizzle-orm";
@@ -69,8 +73,14 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     });
   }
 
-  async markAsUsed(code: string): Promise<void> {
-    await this.db
+  async markAsUsed({
+    code,
+    ctx,
+  }: {
+    code: string;
+    ctx: TransactionContext;
+  }): Promise<void> {
+    await ctx.db
       .update(schema.inviteCodes)
       .set({ usedAt: new Date() })
       .where(eq(schema.inviteCodes.code, code));

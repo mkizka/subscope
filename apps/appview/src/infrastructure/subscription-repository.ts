@@ -1,5 +1,9 @@
 import type { Did } from "@atproto/did";
-import { type DatabaseClient, Subscription } from "@repo/common/domain";
+import {
+  type DatabaseClient,
+  Subscription,
+  type TransactionContext,
+} from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq, lt } from "drizzle-orm";
 
@@ -64,8 +68,14 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     return !!row;
   }
 
-  async save(subscription: Subscription): Promise<void> {
-    await this.db.insert(schema.subscriptions).values({
+  async save({
+    subscription,
+    ctx,
+  }: {
+    subscription: Subscription;
+    ctx: TransactionContext;
+  }): Promise<void> {
+    await ctx.db.insert(schema.subscriptions).values({
       actorDid: subscription.actorDid,
       inviteCode: subscription.inviteCode,
       createdAt: subscription.createdAt,

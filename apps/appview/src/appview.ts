@@ -6,6 +6,7 @@ import {
   LoggerManager,
   MetricReporter,
   RedisDidCache,
+  TransactionManager,
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
@@ -103,6 +104,7 @@ createInjector()
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
+  .provideClass("transactionManager", TransactionManager)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("actorRepository", ActorRepository)
   .provideClass("actorStatsRepository", ActorStatsRepository)
