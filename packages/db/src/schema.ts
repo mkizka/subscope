@@ -338,6 +338,7 @@ export const postEmbedRecordsRelations = relations(
 export const inviteCodes = pgTable("invite_codes", {
   code: varchar({ length: 256 }).primaryKey(),
   expiresAt: timestamp().notNull(),
+  usedAt: timestamp(),
   createdAt: timestamp().defaultNow().notNull(),
 });
 

@@ -13,6 +13,7 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     await this.db.insert(schema.inviteCodes).values({
       code: inviteCode.code,
       expiresAt: inviteCode.expiresAt,
+      usedAt: inviteCode.usedAt,
       createdAt: inviteCode.createdAt,
     });
   }
@@ -43,8 +44,9 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     return rows.map((row) => {
       const code = row.code;
       const expiresAt = row.expiresAt;
+      const usedAt = row.usedAt;
       const createdAt = row.createdAt;
-      return new InviteCodeDomain({ code, expiresAt, createdAt });
+      return new InviteCodeDomain({ code, expiresAt, usedAt, createdAt });
     });
   }
 
@@ -62,7 +64,15 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     return new InviteCodeDomain({
       code: row.code,
       expiresAt: row.expiresAt,
+      usedAt: row.usedAt,
       createdAt: row.createdAt,
     });
+  }
+
+  async markAsUsed(code: string): Promise<void> {
+    await this.db
+      .update(schema.inviteCodes)
+      .set({ usedAt: new Date() })
+      .where(eq(schema.inviteCodes.code, code));
   }
 }

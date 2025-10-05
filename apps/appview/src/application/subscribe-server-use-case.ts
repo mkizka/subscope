@@ -55,16 +55,10 @@ export class SubscribeServerUseCase {
     if (!inviteCode) {
       throw new InvalidInviteCodeError("Invalid invite code");
     }
-    if (inviteCode.isExpired()) {
-      throw new InvalidInviteCodeError("Invite code has expired");
-    }
-
-    const isCodeUsed = await this.subscriptionRepository.existsByInviteCode(
-      params.inviteCode,
-    );
-
-    if (isCodeUsed) {
-      throw new InvalidInviteCodeError("Invite code has already been used");
+    if (!inviteCode.canBeUsed()) {
+      throw new InvalidInviteCodeError(
+        "Invite code has expired or already been used",
+      );
     }
 
     const subscription = new Subscription({
@@ -74,6 +68,7 @@ export class SubscribeServerUseCase {
     });
 
     await this.subscriptionRepository.save(subscription);
+    await this.inviteCodeRepository.markAsUsed(params.inviteCode);
     await this.backfillScheduler.schedule(params.actorDid);
   }
 }

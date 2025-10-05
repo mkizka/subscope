@@ -5,4 +5,5 @@ export interface IInviteCodeRepository {
     ctx: TransactionContext,
     code: string,
   ) => Promise<InviteCode | null>;
+  markAsUsed: (ctx: TransactionContext, code: string) => Promise<void>;
 }

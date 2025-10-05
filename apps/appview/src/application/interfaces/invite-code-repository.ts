@@ -7,4 +7,5 @@ export interface IInviteCodeRepository {
     cursor?: string;
   }) => Promise<InviteCode[]>;
   findFirst: (code: string) => Promise<InviteCode | null>;
+  markAsUsed: (code: string) => Promise<void>;
 }

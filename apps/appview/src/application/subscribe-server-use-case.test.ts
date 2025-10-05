@@ -6,7 +6,7 @@ import {
   inviteCodeFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository.js";
@@ -17,6 +17,8 @@ import {
   InvalidInviteCodeError,
   SubscribeServerUseCase,
 } from "./subscribe-server-use-case.js";
+
+const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
   const mockJobQueue = mock<IJobQueue>();
@@ -29,12 +31,17 @@ describe("SubscribeServerUseCase", () => {
     .provideClass("backfillScheduler", BackfillScheduler)
     .injectClass(SubscribeServerUseCase);
 
-  test("有効な招待コードの場合、サブスクリプションを作成する", async () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+  });
+
+  test("有効な招待コードの場合、サブスクリプションを作成して招待コードの使用時間を更新する", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
     const inviteCode = await inviteCodeFactory(ctx.db)
       .props({
-        expiresAt: () => new Date("2030-01-01"),
+        expiresAt: () => now,
       })
       .create();
 
@@ -52,6 +59,10 @@ describe("SubscribeServerUseCase", () => {
       actorDid: actor.did,
       inviteCode: inviteCode.code,
     });
+    const updatedInviteCode = await ctx.db.query.inviteCodes.findFirst({
+      where: (inviteCodes, { eq }) => eq(inviteCodes.code, inviteCode.code),
+    });
+    expect(updatedInviteCode?.usedAt).toEqual(now);
     expect(mockJobQueue.add).toHaveBeenCalledWith({
       queueName: "backfill",
       jobName: `at://${actor.did}`,
@@ -111,7 +122,7 @@ describe("SubscribeServerUseCase", () => {
     const actor = await actorFactory(ctx.db).create();
     const expiredInviteCode = await inviteCodeFactory(ctx.db)
       .props({
-        expiresAt: () => new Date("2020-01-01"),
+        expiresAt: () => new Date("2024-12-31T23:59:59.999Z"), // nowより1ミリ秒前
       })
       .create();
 
@@ -121,7 +132,11 @@ describe("SubscribeServerUseCase", () => {
         inviteCode: expiredInviteCode.code,
         actorDid: asDid(actor.did),
       }),
-    ).rejects.toThrow(new InvalidInviteCodeError("Invite code has expired"));
+    ).rejects.toThrow(
+      new InvalidInviteCodeError(
+        "Invite code has expired or already been used",
+      ),
+    );
   });
 
   test("招待コードがすでに使用されている場合、InvalidInviteCodeErrorをthrowする", async () => {
@@ -129,14 +144,8 @@ describe("SubscribeServerUseCase", () => {
     const actor = await actorFactory(ctx.db).create();
     const inviteCode = await inviteCodeFactory(ctx.db)
       .props({
-        expiresAt: () => new Date("2030-01-01"),
-      })
-      .create();
-    const otherActor = await actorFactory(ctx.db).create();
-    await subscriptionFactory(ctx.db)
-      .vars({
-        actor: () => otherActor,
-        inviteCode: () => inviteCode,
+        expiresAt: () => new Date("2025-01-01T00:00:00.001Z"), // 有効期限は未来
+        usedAt: () => new Date("2024-12-31T23:59:59.999Z"), // すでに使用済み
       })
       .create();
 
@@ -147,7 +156,9 @@ describe("SubscribeServerUseCase", () => {
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(
-      new InvalidInviteCodeError("Invite code has already been used"),
+      new InvalidInviteCodeError(
+        "Invite code has expired or already been used",
+      ),
     );
   });
 });

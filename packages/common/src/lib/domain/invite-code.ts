@@ -1,17 +1,20 @@
 type InviteCodeParams = {
   code: string;
   expiresAt: Date;
+  usedAt?: Date | null;
   createdAt: Date;
 };
 
 export class InviteCode {
   readonly code: string;
   readonly expiresAt: Date;
+  readonly usedAt: Date | null;
   readonly createdAt: Date;
 
   constructor(params: InviteCodeParams) {
     this.code = params.code;
     this.expiresAt = params.expiresAt;
+    this.usedAt = params.usedAt ?? null;
     this.createdAt = params.createdAt;
   }
 
@@ -37,7 +40,15 @@ export class InviteCode {
     });
   }
 
-  isExpired(): boolean {
+  private isExpired(): boolean {
     return new Date() > this.expiresAt;
+  }
+
+  private isUsed(): boolean {
+    return this.usedAt !== null;
+  }
+
+  canBeUsed(): boolean {
+    return !this.isExpired() && !this.isUsed();
   }
 }

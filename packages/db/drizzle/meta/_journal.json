@@ -71,6 +71,13 @@
       "when": 1759584284570,
       "tag": "0009_add-banner-cid",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1759659013887,
+      "tag": "0010_add-invite-code-used_at",
+      "breakpoints": true
     }
   ]
 }

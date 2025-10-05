@@ -447,6 +447,7 @@ export const inviteCodeFactory = (db: Database) =>
       props: {
         code: () => `example-com-${faker.string.alphanumeric(5)}`,
         expiresAt: () => faker.date.future(),
+        usedAt: (): Date | null => null,
         createdAt: () => faker.date.recent(),
       },
       vars: {},

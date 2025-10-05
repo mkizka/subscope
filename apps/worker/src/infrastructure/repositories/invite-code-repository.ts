@@ -22,7 +22,15 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     return new InviteCode({
       code: row.code,
       expiresAt: row.expiresAt,
+      usedAt: row.usedAt,
       createdAt: row.createdAt,
     });
+  }
+
+  async markAsUsed(ctx: TransactionContext, code: string): Promise<void> {
+    await ctx.db
+      .update(schema.inviteCodes)
+      .set({ usedAt: new Date() })
+      .where(eq(schema.inviteCodes.code, code));
   }
 }
