@@ -1,5 +1,4 @@
-import type { InviteCode } from "@repo/common/domain";
-
+import type { InviteCodeDto } from "../../dto/invite-code-with-handle.js";
 import type { IInviteCodeRepository } from "../../interfaces/invite-code-repository.js";
 import { createCursorPaginator, type Page } from "../../utils/pagination.js";
 
@@ -13,8 +12,8 @@ export class InviteCodeService {
   }: {
     cursor?: string;
     limit: number;
-  }): Promise<Page<InviteCode>> {
-    const paginator = createCursorPaginator<InviteCode>({
+  }): Promise<Page<InviteCodeDto>> {
+    const paginator = createCursorPaginator<InviteCodeDto>({
       limit,
       getCursor: (item) => item.createdAt.toISOString(),
     });

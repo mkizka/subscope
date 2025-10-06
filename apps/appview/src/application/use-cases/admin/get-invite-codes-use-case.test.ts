@@ -1,4 +1,11 @@
-import { getTestSetup, inviteCodeFactory } from "@repo/test-utils";
+import { schema } from "@repo/db";
+import {
+  actorFactory,
+  getTestSetup,
+  inviteCodeFactory,
+  subscriptionFactory,
+} from "@repo/test-utils";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository.js";
@@ -35,19 +42,24 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // assert
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       codes: [
         {
           code: inviteCode2.code,
           expiresAt: inviteCode2.expiresAt.toISOString(),
           createdAt: inviteCode2.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
         },
         {
           code: inviteCode1.code,
           expiresAt: inviteCode1.expiresAt.toISOString(),
           createdAt: inviteCode1.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
         },
       ],
+      cursor: undefined,
     });
   });
 
@@ -75,8 +87,23 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // assert
-    expect(result).toMatchObject({
-      codes: [{ code: inviteCode3.code }, { code: inviteCode2.code }],
+    expect(result).toEqual({
+      codes: [
+        {
+          code: inviteCode3.code,
+          expiresAt: inviteCode3.expiresAt.toISOString(),
+          createdAt: inviteCode3.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+        {
+          code: inviteCode2.code,
+          expiresAt: inviteCode2.expiresAt.toISOString(),
+          createdAt: inviteCode2.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+      ],
       cursor: inviteCode2.createdAt.toISOString(),
     });
   });
@@ -106,8 +133,16 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // assert
-    expect(result).toMatchObject({
-      codes: [{ code: inviteCode1.code }],
+    expect(result).toEqual({
+      codes: [
+        {
+          code: inviteCode1.code,
+          expiresAt: inviteCode1.expiresAt.toISOString(),
+          createdAt: inviteCode1.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+      ],
       cursor: undefined,
     });
   });
@@ -141,8 +176,23 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // assert
-    expect(page1).toMatchObject({
-      codes: [{ code: inviteCode4.code }, { code: inviteCode3.code }],
+    expect(page1).toEqual({
+      codes: [
+        {
+          code: inviteCode4.code,
+          expiresAt: inviteCode4.expiresAt.toISOString(),
+          createdAt: inviteCode4.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+        {
+          code: inviteCode3.code,
+          expiresAt: inviteCode3.expiresAt.toISOString(),
+          createdAt: inviteCode3.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+      ],
       cursor: inviteCode3.createdAt.toISOString(),
     });
 
@@ -153,8 +203,103 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // assert
-    expect(page2).toMatchObject({
-      codes: [{ code: inviteCode2.code }, { code: inviteCode1.code }],
+    expect(page2).toEqual({
+      codes: [
+        {
+          code: inviteCode2.code,
+          expiresAt: inviteCode2.expiresAt.toISOString(),
+          createdAt: inviteCode2.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+        {
+          code: inviteCode1.code,
+          expiresAt: inviteCode1.expiresAt.toISOString(),
+          createdAt: inviteCode1.createdAt.toISOString(),
+          usedAt: undefined,
+          usedBy: undefined,
+        },
+      ],
+      cursor: undefined,
+    });
+  });
+
+  test("使用済み招待コードの場合、使用情報を返す", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db).create();
+    const inviteCode = await inviteCodeFactory(ctx.db)
+      .props({
+        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        expiresAt: () => new Date("2024-01-08T00:00:00.000Z"),
+        usedAt: () => new Date("2024-01-02T00:00:00.000Z"),
+      })
+      .create();
+    await subscriptionFactory(ctx.db)
+      .props({
+        actorDid: () => actor.did,
+        inviteCode: () => inviteCode.code,
+      })
+      .create();
+
+    // act
+    const result = await getInviteCodesUseCase.execute({
+      limit: 50,
+    });
+
+    // assert
+    expect(result).toEqual({
+      codes: [
+        {
+          code: inviteCode.code,
+          expiresAt: inviteCode.expiresAt.toISOString(),
+          createdAt: inviteCode.createdAt.toISOString(),
+          usedAt: "2024-01-02T00:00:00.000Z",
+          usedBy: {
+            did: actor.did,
+            handle: actor.handle,
+          },
+        },
+      ],
+      cursor: undefined,
+    });
+  });
+
+  test("使用済み招待コードでActorが削除されている場合、usedByはnullになる", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db).create();
+    const inviteCode = await inviteCodeFactory(ctx.db)
+      .props({
+        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        expiresAt: () => new Date("2024-01-08T00:00:00.000Z"),
+        usedAt: () => new Date("2024-01-02T00:00:00.000Z"),
+      })
+      .create();
+    await subscriptionFactory(ctx.db)
+      .props({
+        actorDid: () => actor.did,
+        inviteCode: () => inviteCode.code,
+      })
+      .create();
+
+    // Actorを削除
+    await ctx.db.delete(schema.actors).where(eq(schema.actors.did, actor.did));
+
+    // act
+    const result = await getInviteCodesUseCase.execute({
+      limit: 50,
+    });
+
+    // assert
+    expect(result).toEqual({
+      codes: [
+        {
+          code: inviteCode.code,
+          expiresAt: inviteCode.expiresAt.toISOString(),
+          createdAt: inviteCode.createdAt.toISOString(),
+          usedAt: "2024-01-02T00:00:00.000Z",
+          usedBy: undefined,
+        },
+      ],
       cursor: undefined,
     });
   });

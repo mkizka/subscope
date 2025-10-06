@@ -53,6 +53,26 @@
         "createdAt": {
           "type": "string",
           "format": "datetime"
+        },
+        "usedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "usedBy": {
+          "type": "ref",
+          "ref": "#usedByUser"
+        }
+      }
+    },
+    "usedByUser": {
+      "type": "object",
+      "required": ["did"],
+      "properties": {
+        "did": {
+          "type": "string"
+        },
+        "handle": {
+          "type": "string"
         }
       }
     }

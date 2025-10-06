@@ -1,21 +1,21 @@
 type InviteCodeParams = {
   code: string;
   expiresAt: Date;
-  usedAt?: Date | null;
   createdAt: Date;
+  usedAt?: Date | null;
 };
 
 export class InviteCode {
   readonly code: string;
   readonly expiresAt: Date;
-  usedAt: Date | null;
   readonly createdAt: Date;
+  private _usedAt: Date | null;
 
   constructor(params: InviteCodeParams) {
     this.code = params.code;
     this.expiresAt = params.expiresAt;
-    this.usedAt = params.usedAt ?? null;
     this.createdAt = params.createdAt;
+    this._usedAt = params.usedAt ?? null;
   }
 
   static generate(publicUrl: string, daysToExpire: number): InviteCode {
@@ -44,12 +44,16 @@ export class InviteCode {
     return new Date() > this.expiresAt;
   }
 
-  private isUsed(): boolean {
-    return this.usedAt !== null;
+  isUsed(): boolean {
+    return this._usedAt !== null;
   }
 
   canBeUsed(): boolean {
     return !this.isExpired() && !this.isUsed();
+  }
+
+  get usedAt(): Date | null {
+    return this._usedAt;
   }
 
   markAsUsed(): void {
@@ -58,6 +62,6 @@ export class InviteCode {
         "Cannot mark as used: invite code has expired or already been used",
       );
     }
-    this.usedAt = new Date();
+    this._usedAt = new Date();
   }
 }

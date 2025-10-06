@@ -18,10 +18,17 @@ export class GetInviteCodesUseCase {
 
     return {
       cursor: paginationResult.cursor,
-      codes: paginationResult.items.map((code) => ({
-        code: code.code,
-        expiresAt: code.expiresAt.toISOString(),
-        createdAt: code.createdAt.toISOString(),
+      codes: paginationResult.items.map((item) => ({
+        code: item.code,
+        expiresAt: item.expiresAt.toISOString(),
+        createdAt: item.createdAt.toISOString(),
+        usedAt: item.usedAt?.toISOString(),
+        usedBy: item.usedBy
+          ? {
+              did: item.usedBy.did,
+              handle: item.usedBy.handle ?? undefined,
+            }
+          : undefined,
       })),
     };
   }
