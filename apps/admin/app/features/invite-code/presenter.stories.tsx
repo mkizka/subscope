@@ -17,11 +17,17 @@ const meta = {
         code: "subscope-def34",
         createdAt: "2024-01-02T10:00:00.000Z",
         expiresAt: "2024-02-02T10:00:00.000Z",
+        usedAt: "2024-01-06T13:00:00.000Z",
       },
       {
         code: "subscope-ghi56",
         createdAt: "2024-01-03T11:00:00.000Z",
         expiresAt: "2024-02-03T11:00:00.000Z",
+        usedAt: "2024-01-05T12:00:00.000Z",
+        usedBy: {
+          did: "did:plc:abc123",
+          handle: "alice.test",
+        },
       },
     ],
     error: null,

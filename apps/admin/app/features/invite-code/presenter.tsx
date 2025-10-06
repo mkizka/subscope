@@ -11,13 +11,27 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("ja-JP");
 };
 
+function UsedBy({ handleOdDid }: { handleOdDid?: string }) {
+  if (!handleOdDid) return "-";
+  return (
+    <a
+      href={`https://bsky.app/profile/${handleOdDid}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="link link-primary"
+    >
+      {handleOdDid}
+    </a>
+  );
+}
+
 function InviteCodesRow({ inviteCodes }: { inviteCodes?: InviteCode[] }) {
   if (!inviteCodes) return null;
 
   if (inviteCodes.length === 0) {
     return (
       <tr>
-        <td colSpan={3} className="text-center pt-8">
+        <td colSpan={5} className="text-center pt-8">
           招待コードがありません
         </td>
       </tr>
@@ -29,6 +43,10 @@ function InviteCodesRow({ inviteCodes }: { inviteCodes?: InviteCode[] }) {
       <th className="font-mono">{code.code}</th>
       <td>{formatDate(code.createdAt)}</td>
       <td>{formatDate(code.expiresAt)}</td>
+      <td>
+        <UsedBy handleOdDid={code.usedBy?.handle ?? code.usedBy?.did} />
+      </td>
+      <td>{code.usedAt ? formatDate(code.usedAt) : "-"}</td>
     </tr>
   ));
 }
@@ -36,7 +54,7 @@ function InviteCodesRow({ inviteCodes }: { inviteCodes?: InviteCode[] }) {
 function ErrorMessageRow({ reload }: { reload: () => void }) {
   return (
     <tr>
-      <td colSpan={3} className="text-center pt-8">
+      <td colSpan={5} className="text-center pt-8">
         <div className="flex flex-col items-center gap-4">
           <p className="text-error">データの読み込みに失敗しました</p>
           <button className="btn btn-secondary btn-sm" onClick={reload}>
@@ -120,6 +138,8 @@ export function InviteCodePresenter({
                     <th>招待コード</th>
                     <th>作成日</th>
                     <th>期限日</th>
+                    <th>使用者</th>
+                    <th>使用日</th>
                   </tr>
                 </thead>
                 <tbody>
