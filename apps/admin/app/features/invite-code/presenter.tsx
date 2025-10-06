@@ -1,4 +1,5 @@
 import type { MeSubscoAdminGetInviteCodes } from "@repo/client/api";
+import { useState } from "react";
 
 import { HeaderCard } from "~/components/header-card";
 import { InfiniteScroll } from "~/components/infinite-scroll";
@@ -11,7 +12,38 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("ja-JP");
 };
 
-function UsedBy({ handleOdDid }: { handleOdDid?: string }) {
+function CopyButton({ code }: { code: string }) {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      alert("クリップボードへのコピーに失敗しました");
+    }
+  };
+
+  return (
+    <button
+      className={cn("btn w-40", isCopied ? "btn-success" : "font-mono")}
+      onClick={handleCopy}
+      title="クリックしてコピー"
+    >
+      {isCopied ? (
+        <span className="inline-flex items-center gap-1 animate-in fade-in">
+          <span className="icon-[tabler--check] size-4" />
+          コピーしました
+        </span>
+      ) : (
+        <span className="truncate">{code}</span>
+      )}
+    </button>
+  );
+}
+
+function UsedBy({ handleOrDid: handleOdDid }: { handleOrDid?: string }) {
   if (!handleOdDid) return "-";
   return (
     <a
@@ -38,15 +70,19 @@ function InviteCodesRow({ inviteCodes }: { inviteCodes?: InviteCode[] }) {
     );
   }
 
-  return inviteCodes.map((code) => (
-    <tr key={code.code}>
-      <th className="font-mono">{code.code}</th>
-      <td>{formatDate(code.createdAt)}</td>
-      <td>{formatDate(code.expiresAt)}</td>
+  return inviteCodes.map((inviteCode) => (
+    <tr key={inviteCode.code}>
+      <th>
+        <CopyButton code={inviteCode.code} />
+      </th>
+      <td>{formatDate(inviteCode.createdAt)}</td>
+      <td>{formatDate(inviteCode.expiresAt)}</td>
       <td>
-        <UsedBy handleOdDid={code.usedBy?.handle ?? code.usedBy?.did} />
+        <UsedBy
+          handleOrDid={inviteCode.usedBy?.handle ?? inviteCode.usedBy?.did}
+        />
       </td>
-      <td>{code.usedAt ? formatDate(code.usedAt) : "-"}</td>
+      <td>{inviteCode.usedAt ? formatDate(inviteCode.usedAt) : "-"}</td>
     </tr>
   ));
 }

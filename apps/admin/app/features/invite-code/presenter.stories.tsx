@@ -49,6 +49,18 @@ type Story = StoryObj<typeof InviteCodePresenter>;
 
 export const Default: Story = {};
 
+export const TooLongCode: Story = {
+  args: {
+    inviteCodes: [
+      {
+        code: "subscope-abcdefghijklmnopqrstuvwxyz",
+        createdAt: "2024-01-01T09:00:00.000Z",
+        expiresAt: "2024-02-01T09:00:00.000Z",
+      },
+    ],
+  },
+};
+
 export const Empty: Story = {
   args: {
     inviteCodes: [],
