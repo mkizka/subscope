@@ -6,13 +6,11 @@ import { InfiniteScroll } from "~/components/infinite-scroll";
 import { CreatedInviteCodeModal } from "~/features/invite-code/modal";
 import { cn } from "~/utils/cn";
 
-type InviteCode = MeSubscoAdminGetInviteCodes.InviteCode;
-
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("ja-JP");
 };
 
-function CopyButton({ code }: { code: string }) {
+function CopyButton({ code, disabled }: { code: string; disabled: boolean }) {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -29,7 +27,7 @@ function CopyButton({ code }: { code: string }) {
     <button
       className={cn("btn w-40", isCopied ? "btn-success" : "font-mono")}
       onClick={handleCopy}
-      title="クリックしてコピー"
+      disabled={disabled}
     >
       {isCopied ? (
         <span className="inline-flex items-center gap-1 animate-in fade-in">
@@ -57,6 +55,10 @@ function UsedBy({ handleOrDid: handleOdDid }: { handleOrDid?: string }) {
   );
 }
 
+type InviteCode = MeSubscoAdminGetInviteCodes.InviteCode & {
+  disabled: boolean;
+};
+
 function InviteCodesRow({ inviteCodes }: { inviteCodes?: InviteCode[] }) {
   if (!inviteCodes) return null;
 
@@ -73,7 +75,7 @@ function InviteCodesRow({ inviteCodes }: { inviteCodes?: InviteCode[] }) {
   return inviteCodes.map((inviteCode) => (
     <tr key={inviteCode.code}>
       <th>
-        <CopyButton code={inviteCode.code} />
+        <CopyButton code={inviteCode.code} disabled={inviteCode.disabled} />
       </th>
       <td>{formatDate(inviteCode.createdAt)}</td>
       <td>{formatDate(inviteCode.expiresAt)}</td>

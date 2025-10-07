@@ -4,6 +4,15 @@ import { useState } from "react";
 import { createInviteCode, fetchInviteCodes } from "./fetcher";
 import { InviteCodePresenter } from "./presenter";
 
+const canUseInviteCode = (inviteCode: {
+  expiresAt: string;
+  usedAt?: string;
+}) => {
+  const isExpired = new Date(inviteCode.expiresAt) < new Date();
+  const isUsed = !!inviteCode.usedAt;
+  return !isExpired && !isUsed;
+};
+
 export function InviteCodeContainer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -20,7 +29,10 @@ export function InviteCodeContainer() {
     queryKey: ["invite-codes"],
     queryFn: fetchInviteCodes,
     getNextPageParam: (lastPage) => lastPage.cursor,
-    select: (data) => data.pages.flatMap((page) => page.codes),
+    select: (data) =>
+      data.pages
+        .flatMap((page) => page.codes)
+        .map((code) => ({ ...code, disabled: !canUseInviteCode(code) })),
     initialPageParam: undefined,
     refetchOnWindowFocus: false,
   });
