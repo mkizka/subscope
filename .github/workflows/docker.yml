@@ -1,4 +1,4 @@
-name: Docker Build
+name: Docker
 
 on:
   push:
@@ -6,9 +6,10 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         target:
           - appview
@@ -16,6 +17,8 @@ jobs:
           - blob-proxy
           - ingester
           - worker
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: docker/login-action@v3
