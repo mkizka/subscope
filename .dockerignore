@@ -1,0 +1,30 @@
+node_modules/
+dist/
+generated/
+.env
+*.log
+
+# typescript
+*.tsbuildinfo
+
+# turbo
+.turbo/
+
+# claude
+.claude/settings.local.json
+
+# serena mcp
+.serena/
+
+# repomix
+*.xml
+
+# vitest
+coverage/
+
+# react-router
+.react-router/
+build/
+
+*storybook.log
+storybook-static
