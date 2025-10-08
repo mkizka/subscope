@@ -2,7 +2,8 @@ FROM node:22.12.0-slim AS base
 ARG TARGET
 ENV PKG=@repo/${TARGET}
 RUN npm i -g turbo@^2 corepack@latest
-RUN corepack enable pnpm && pnpm config set store-dir ~/.pnpm-store
+ENV PNPM_HOME="/pnpm"
+RUN corepack enable pnpm
 
 FROM base AS pruner
 WORKDIR /app
@@ -14,7 +15,7 @@ WORKDIR /app
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY --from=pruner /app/out/json/ .
-RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfile --ignore-scripts
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --ignore-scripts
 
 COPY --from=pruner /app/out/full/ .
 RUN pnpm --filter @repo/client postinstall
