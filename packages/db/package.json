@@ -16,6 +16,7 @@
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check"
   },
   "dependencies": {
+    "drizzle-kit": "0.31.5",
     "drizzle-orm": "0.44.5",
     "pg": "8.16.3"
   },
@@ -25,7 +26,6 @@
     "@types/node": "24.5.2",
     "@types/pg": "8.15.5",
     "dotenv": "17.2.2",
-    "drizzle-kit": "0.31.5",
     "eslint": "9.36.0"
   },
   "sideEffects": false
