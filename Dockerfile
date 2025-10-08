@@ -6,7 +6,7 @@ FROM base AS pruner
 ARG TARGET
 WORKDIR /app
 COPY . .
-RUN turbo prune --scope=@repo/${TARGET} --docker
+RUN turbo prune --scope=${TARGET} --docker
 
 FROM base AS builder
 ARG TARGET
@@ -18,8 +18,8 @@ RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfi
 
 COPY --from=pruner /app/out/full/ .
 RUN pnpm --filter @repo/client postinstall
-RUN turbo build --filter=@repo/${TARGET}
-RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm prune --prod --no-optional
+RUN turbo build --filter=${TARGET}
+RUN pnpm prune --prod --no-optional
 
 FROM base AS runner
 ARG TARGET
@@ -29,7 +29,6 @@ USER nodejs
 WORKDIR /app
 COPY --from=builder --chown=nodejs:nodejs /app .
 RUN corepack prepare
-WORKDIR /app/apps/${TARGET}
 
 ENV PORT=8080
 ENV NODE_ENV=production
