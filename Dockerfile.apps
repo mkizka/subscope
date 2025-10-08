@@ -20,7 +20,10 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY --from=pruner /app/out/full/ .
 RUN pnpm --filter @repo/client postinstall
 RUN turbo build --filter=${PKG}
-RUN pnpm prune --prod --no-optional
+# pnpm pruneはmonorepoでは完全には動作しないためinstall --prodを使用する
+# https://pnpm.io/ja/next/cli/prune
+RUN rm -rf **/node_modules && \
+  pnpm install --prod --ignore-scripts --config.confirmModulesPurge=false
 
 FROM base AS runner
 RUN addgroup --system --gid 1001 nodejs
@@ -34,4 +37,4 @@ ENV PORT=8080
 ENV NODE_ENV=production
 EXPOSE ${PORT}
 
-CMD pnpm --filter ${PKG} start
+CMD ["sh", "-c", "pnpm --filter ${PKG} start"]
