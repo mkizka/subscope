@@ -693,6 +693,9 @@ importers:
 
   packages/db:
     dependencies:
+      drizzle-kit:
+        specifier: 0.31.5
+        version: 0.31.5
       drizzle-orm:
         specifier: 0.44.5
         version: 0.44.5(@opentelemetry/api@1.9.0)(@prisma/client@6.1.0(prisma@6.1.0))(@types/pg@8.15.5)(gel@2.0.1)(mysql2@3.12.0)(pg@8.16.3)(postgres@3.4.7)(prisma@6.1.0)
@@ -715,9 +718,6 @@ importers:
       dotenv:
         specifier: 17.2.2
         version: 17.2.2
-      drizzle-kit:
-        specifier: 0.31.5
-        version: 0.31.5
       eslint:
         specifier: 9.36.0
         version: 9.36.0(jiti@2.6.0)
