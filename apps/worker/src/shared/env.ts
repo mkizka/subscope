@@ -11,10 +11,6 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3003),
-  APPVIEW_DID: match({
-    prod: z.string(),
-    dev: z.string().default("did:web:appview.localhost"),
-  }),
   INDEX_LEVEL: z
     .enum(["1", "2"])
     .transform((val) => parseInt(val))
