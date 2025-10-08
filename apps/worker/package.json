@@ -9,7 +9,7 @@
     "dev": "NODE_ENV=development tsx watch ./src/worker.ts | pino-pretty",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
-    "start": "NODE_ENV=production tsx ./src/worker.ts",
+    "start": "NODE_ENV=production node ./src/worker.ts",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
