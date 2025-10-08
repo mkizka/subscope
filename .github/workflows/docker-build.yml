@@ -29,6 +29,6 @@ jobs:
           push: true
           build-args: |
             TARGET=${{ matrix.target }}
-          tags: ghcr.io/${{ github.repository }}/subscope-${{ matrix.target }}:latest
+          tags: ghcr.io/${{ github.repository }}-${{ matrix.target }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
