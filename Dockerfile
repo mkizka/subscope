@@ -33,4 +33,5 @@ ENV PORT=8080
 ENV NODE_ENV=production
 EXPOSE ${PORT}
 
-CMD ["pnpm", "--filter", "${PKG}", "start"]
+WORKDIR /app/apps/${TARGET}
+CMD ["pnpm", "start"]
