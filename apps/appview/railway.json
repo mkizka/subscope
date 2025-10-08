@@ -12,7 +12,7 @@
   },
   "deploy": {
     "preDeployCommand": "pnpm db:migrate",
-    "startCommand": "cd apps/appview && NODE_ENV=production node --import tsx ./src/appview.ts",
+    "startCommand": "pnpm --filter @repo/appview start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "restartPolicyType": "ALWAYS",

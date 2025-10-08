@@ -10,7 +10,7 @@
     ]
   },
   "deploy": {
-    "startCommand": "cd apps/admin && pnpm start",
+    "startCommand": "pnpm --filter @repo/admin start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "restartPolicyType": "ALWAYS",
