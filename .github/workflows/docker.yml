@@ -12,11 +12,11 @@ jobs:
       fail-fast: false
       matrix:
         target:
-          - appview
-          - admin
-          - blob-proxy
-          - ingester
-          - worker
+          - "@repo/appview"
+          - "@repo/admin"
+          - "@repo/blob-proxy"
+          - "@repo/ingester"
+          - "@repo/worker"
     permissions:
       packages: write
     steps:
