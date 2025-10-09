@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./utils": "./src/utils.ts",
-    "./domain": "./src/domain.ts",
-    "./infrastructure": "./src/infrastructure.ts"
+    "./utils": "./src/utils.js",
+    "./domain": "./src/domain.js",
+    "./infrastructure": "./src/infrastructure.js"
   },
   "scripts": {
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
