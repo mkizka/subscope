@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@keyv/redis": "5.1.2",
     "@repo/common": "workspace:*",
     "@skyware/jetstream": "0.2.5",
     "express": "5.1.0",
@@ -23,7 +24,6 @@
     "zod-validation-error": "4.0.2"
   },
   "devDependencies": {
-    "@keyv/redis": "5.1.2",
     "@mkizka/eslint-config": "7.1.2",
     "@tsconfig/node-lts": "22.0.2",
     "@types/express": "5.0.3",

@@ -300,6 +300,9 @@ importers:
 
   apps/blob-proxy:
     dependencies:
+      '@atproto/did':
+        specifier: 0.2.0
+        version: 0.2.0
       '@atproto/identity':
         specifier: 0.4.9
         version: 0.4.9
@@ -343,9 +346,6 @@ importers:
         specifier: 4.0.2
         version: 4.0.2(zod@4.1.11)
     devDependencies:
-      '@atproto/did':
-        specifier: 0.2.0
-        version: 0.2.0
       '@mkizka/eslint-config':
         specifier: 7.1.2
         version: 7.1.2(@typescript-eslint/eslint-plugin@8.44.1(@typescript-eslint/parser@8.44.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
@@ -382,6 +382,9 @@ importers:
 
   apps/ingester:
     dependencies:
+      '@keyv/redis':
+        specifier: 5.1.2
+        version: 5.1.2(keyv@5.5.2)
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
@@ -407,9 +410,6 @@ importers:
         specifier: 4.0.2
         version: 4.0.2(zod@4.1.11)
     devDependencies:
-      '@keyv/redis':
-        specifier: 5.1.2
-        version: 5.1.2(keyv@5.5.2)
       '@mkizka/eslint-config':
         specifier: 7.1.2
         version: 7.1.2(@typescript-eslint/eslint-plugin@8.44.1(@typescript-eslint/parser@8.44.1(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2))(eslint@9.36.0(jiti@2.6.0))(typescript@5.9.2)
@@ -662,6 +662,9 @@ importers:
       pino:
         specifier: 9.11.0
         version: 9.11.0
+      pino-http:
+        specifier: 10.5.0
+        version: 10.5.0
       prom-client:
         specifier: 15.1.3
         version: 15.1.3
@@ -684,9 +687,6 @@ importers:
       eslint:
         specifier: 9.36.0
         version: 9.36.0(jiti@2.6.0)
-      pino-http:
-        specifier: 10.5.0
-        version: 10.5.0
       typescript:
         specifier: 5.9.2
         version: 5.9.2

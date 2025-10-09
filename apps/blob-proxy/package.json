@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atproto/did": "0.2.0",
     "@atproto/identity": "0.4.9",
     "@atproto/xrpc": "0.7.5",
     "@repo/client": "workspace:*",
@@ -30,7 +31,6 @@
     "zod-validation-error": "4.0.2"
   },
   "devDependencies": {
-    "@atproto/did": "0.2.0",
     "@mkizka/eslint-config": "7.1.2",
     "@repo/test-utils": "workspace:*",
     "@tsconfig/node-lts": "22.0.2",
