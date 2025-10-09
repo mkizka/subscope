@@ -279,6 +279,9 @@ importers:
       '@types/ws':
         specifier: 8.18.1
         version: 8.18.1
+      esbuild:
+        specifier: 0.25.10
+        version: 0.25.10
       eslint:
         specifier: 9.36.0
         version: 9.36.0(jiti@2.6.0)
