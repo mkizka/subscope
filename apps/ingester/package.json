@@ -17,6 +17,7 @@
     "@repo/common": "workspace:*",
     "@skyware/jetstream": "0.2.5",
     "express": "5.1.0",
+    "keyv": "5.5.2",
     "tsx": "4.20.6",
     "typed-inject": "5.0.0",
     "ws": "8.18.3",
@@ -30,7 +31,6 @@
     "@types/node": "24.5.2",
     "@types/ws": "8.18.1",
     "eslint": "9.36.0",
-    "keyv": "5.5.2",
     "pino-pretty": "13.1.1",
     "typescript": "5.9.2"
   }
