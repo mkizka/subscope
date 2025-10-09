@@ -1,7 +1,6 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "buildCommand": "pnpm build --filter @repo/worker",
     "watchPatterns": [
       "/apps/worker/**/*",
       "/packages/client/**/*",
@@ -12,7 +11,6 @@
   },
   "deploy": {
     "preDeployCommand": "pnpm db:migrate",
-    "startCommand": "pnpm --filter @repo/worker start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "drainingSeconds": 60,

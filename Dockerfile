@@ -1,6 +1,6 @@
 FROM node:22.20.0-slim AS base
-ARG TARGET
-ENV PKG=@repo/${TARGET}
+ARG BUILD_TARGET
+ENV BUILD_PACKAGE=@repo/${BUILD_TARGET}
 RUN npm i -g turbo@^2 corepack@latest
 ENV PNPM_HOME="/pnpm"
 RUN corepack enable pnpm
@@ -8,7 +8,7 @@ RUN corepack enable pnpm
 FROM base AS pruner
 WORKDIR /app
 COPY . .
-RUN turbo prune --scope=${PKG} --docker
+RUN turbo prune --scope=${BUILD_PACKAGE} --docker
 
 FROM base AS builder
 WORKDIR /app
@@ -19,11 +19,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
 RUN pnpm --filter @repo/client postinstall
-RUN turbo build --filter=${PKG}
+RUN turbo build --filter=${BUILD_PACKAGE}
 # pnpm pruneはmonorepoでは完全には動作しないためinstall --prodを使用する
 # https://pnpm.io/ja/next/cli/prune
-RUN rm -rf **/node_modules && \
-  pnpm install --prod --ignore-scripts --config.confirmModulesPurge=false
+RUN rm -rf **/node_modules \
+  && pnpm install --prod --ignore-scripts --config.confirmModulesPurge=false
 
 FROM base AS runner
 RUN addgroup --system --gid 1001 nodejs
@@ -37,4 +37,4 @@ ENV PORT=8080
 ENV NODE_ENV=production
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "pnpm --filter ${PKG} start"]
+CMD ["sh", "-c", "pnpm --filter ${BUILD_PACKAGE} start"]

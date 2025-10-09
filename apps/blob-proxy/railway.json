@@ -1,7 +1,6 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "buildCommand": "pnpm build --filter @repo/blob-proxy",
     "watchPatterns": [
       "/apps/blob-proxy/**/*",
       "/packages/client/**/*",
@@ -11,7 +10,6 @@
   },
   "deploy": {
     "preDeployCommand": "pnpm db:migrate",
-    "startCommand": "pnpm --filter @repo/blob-proxy start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "restartPolicyType": "ALWAYS",
