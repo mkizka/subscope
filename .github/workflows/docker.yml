@@ -30,9 +30,8 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           push: true
-          file: Dockerfile
           build-args: |
-            TARGET=${{ matrix.target }}
+            BUILD_TARGET=${{ matrix.target }}
           tags: ghcr.io/${{ github.repository }}-${{ matrix.target }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
