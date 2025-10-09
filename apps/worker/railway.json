@@ -6,7 +6,8 @@
       "/packages/client/**/*",
       "/packages/common/**/*",
       "/packages/db/**/*",
-      "pnpm-lock.yaml"
+      "pnpm-lock.yaml",
+      "Dockerfile"
     ]
   },
   "deploy": {
