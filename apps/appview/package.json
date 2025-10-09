@@ -9,7 +9,7 @@
     "dev": "NODE_ENV=development tsx watch ./src/appview.ts | pino-pretty",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
-    "start": "NODE_ENV=production node ./src/appview.ts",
+    "start": "NODE_ENV=production tsx ./src/appview.ts",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
