@@ -10,6 +10,7 @@ import {
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
+import { ActorRepository } from "../infrastructure/actor-repository.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
 import { BackfillScheduler } from "./service/scheduler/backfill-scheduler.js";
@@ -27,6 +28,7 @@ describe("SubscribeServerUseCase", () => {
 
   const subscribeServerUseCase = testInjector
     .provideClass("transactionManager", TransactionManager)
+    .provideClass("actorRepository", ActorRepository)
     .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
@@ -162,5 +164,42 @@ describe("SubscribeServerUseCase", () => {
         "Invite code has expired or already been used",
       ),
     );
+  });
+
+  test("Actorが存在しない場合、Actorを作成してサブスクリプションを作成する", async () => {
+    // arrange
+    const did = asDid("did:plc:test123456789abcdefghijk");
+    const inviteCode = await inviteCodeFactory(ctx.db)
+      .props({
+        expiresAt: () => now,
+      })
+      .create();
+
+    // act
+    await subscribeServerUseCase.execute({
+      code: inviteCode.code,
+      actorDid: did,
+    });
+
+    // assert
+    const savedActor = await ctx.db.query.actors.findFirst({
+      where: (actors, { eq }) => eq(actors.did, did),
+    });
+    expect(savedActor).toEqual({
+      did,
+      handle: null,
+      backfillStatus: "dirty",
+      backfillVersion: null,
+      indexedAt: now,
+    });
+
+    const savedSubscription = await ctx.db.query.subscriptions.findFirst({
+      where: (subscriptions, { eq }) => eq(subscriptions.actorDid, did),
+    });
+    expect(savedSubscription).toEqual({
+      actorDid: did,
+      inviteCode: inviteCode.code,
+      createdAt: now,
+    });
   });
 });

@@ -1,6 +1,11 @@
 import type { Did } from "@atproto/did";
-import { Actor, type DatabaseClient } from "@repo/common/domain";
-import { schema } from "@repo/db";
+import { asDid } from "@atproto/did";
+import {
+  Actor,
+  type DatabaseClient,
+  type TransactionContext,
+} from "@repo/common/domain";
+import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
@@ -8,6 +13,25 @@ import type { IActorRepository } from "../application/interfaces/actor-repositor
 export class ActorRepository implements IActorRepository {
   constructor(private readonly db: DatabaseClient) {}
   static inject = ["db"] as const;
+
+  async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
+    const data = {
+      handle: actor.handle,
+      backfillStatus: actor.backfillStatus,
+      backfillVersion: actor.backfillVersion,
+    } satisfies ActorInsert;
+    await ctx.db
+      .insert(schema.actors)
+      .values({
+        did: actor.did,
+        indexedAt: actor.indexedAt,
+        ...data,
+      })
+      .onConflictDoUpdate({
+        target: schema.actors.did,
+        set: data,
+      });
+  }
 
   async findByDid(did: Did): Promise<Actor | null> {
     const [row] = await this.db
@@ -27,7 +51,7 @@ export class ActorRepository implements IActorRepository {
     }
 
     return new Actor({
-      did: row.did,
+      did: asDid(row.did),
       handle: row.handle,
       backfillStatus: row.backfillStatus,
       backfillVersion: row.backfillVersion,

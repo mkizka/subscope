@@ -1,6 +1,11 @@
 import type { Did } from "@atproto/did";
-import { type ITransactionManager, Subscription } from "@repo/common/domain";
+import {
+  Actor,
+  type ITransactionManager,
+  Subscription,
+} from "@repo/common/domain";
 
+import type { IActorRepository } from "./interfaces/actor-repository.js";
 import type { IInviteCodeRepository } from "./interfaces/invite-code-repository.js";
 import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
 import type { BackfillScheduler } from "./service/scheduler/backfill-scheduler.js";
@@ -27,12 +32,14 @@ type SubscribeServerParams = {
 export class SubscribeServerUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
+    private readonly actorRepository: IActorRepository,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly backfillScheduler: BackfillScheduler,
   ) {}
   static inject = [
     "transactionManager",
+    "actorRepository",
     "inviteCodeRepository",
     "subscriptionRepository",
     "backfillScheduler",
@@ -67,10 +74,21 @@ export class SubscribeServerUseCase {
     });
 
     await this.transactionManager.transaction(async (ctx) => {
+      const existingActor = await this.actorRepository.findByDid(actorDid);
+      if (!existingActor) {
+        const actor = new Actor({
+          did: actorDid,
+          indexedAt: new Date(),
+        });
+        await this.actorRepository.upsert({ ctx, actor });
+      }
+
       await this.subscriptionRepository.save({ ctx, subscription });
+
       inviteCode.markAsUsed();
       await this.inviteCodeRepository.upsert({ ctx, inviteCode });
     });
+
     await this.backfillScheduler.schedule(actorDid);
   }
 }
