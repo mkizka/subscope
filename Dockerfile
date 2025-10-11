@@ -26,11 +26,9 @@ RUN rm -rf **/node_modules \
   && pnpm install --prod --ignore-scripts --config.confirmModulesPurge=false
 
 FROM base AS runner
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs --home /home/nodejs
-USER nodejs
 WORKDIR /app
-COPY --from=builder --chown=nodejs:nodejs /app .
+USER node
+COPY --from=builder --chown=node:node /app .
 RUN corepack prepare
 
 ENV PORT=8080
