@@ -12,6 +12,12 @@ type Story = StoryObj<typeof LoginPresenter>;
 
 export const Default: Story = {};
 
+export const Submitting: Story = {
+  args: {
+    isSubmitting: true,
+  },
+};
+
 export const WithFormError: Story = {
   args: {
     lastResult: {

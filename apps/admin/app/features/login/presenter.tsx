@@ -6,10 +6,14 @@ import { Form } from "react-router";
 import { loginSchema } from "~/schemas/login.schema";
 
 type LoginPresenterProps = {
-  lastResult?: SubmissionResult | null;
+  isSubmitting: boolean;
+  lastResult?: SubmissionResult;
 };
 
-export function LoginPresenter({ lastResult }: LoginPresenterProps) {
+export function LoginPresenter({
+  isSubmitting,
+  lastResult,
+}: LoginPresenterProps) {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
@@ -51,7 +55,14 @@ export function LoginPresenter({ lastResult }: LoginPresenterProps) {
                 </div>
               )}
             </div>
-            <button type="submit" className="btn btn-primary w-full">
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting && (
+                <span className="loading loading-spinner loading-sm" />
+              )}
               ログイン
             </button>
           </Form>
