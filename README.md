@@ -1,5 +1,7 @@
 # Subscope
 
+<img src="./icon.png" width="128">
+
 保存するデータを限定することで小規模なBluesky互換AppViewを実装する試み
 
 Subscribe & Scoped AppView = Subscope
