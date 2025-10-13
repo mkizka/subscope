@@ -41,6 +41,7 @@ export class BackfillUseCase {
           ctx,
           record,
           jobLogger,
+          force: true,
           depth: 0,
         });
       }
