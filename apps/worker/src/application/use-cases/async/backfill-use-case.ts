@@ -1,7 +1,12 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient, ITransactionManager } from "@repo/common/domain";
+import type {
+  DatabaseClient,
+  ITransactionManager,
+  Record,
+} from "@repo/common/domain";
 import { isSupportedCollection } from "@repo/common/utils";
 
+import { env } from "../../../shared/env.js";
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
@@ -31,9 +36,21 @@ export class BackfillUseCase {
     });
 
     const repoRecords = await this.repoFetcher.fetch(did, jobLogger);
-    const filteredRecords = repoRecords.filter((record) =>
-      isSupportedCollection(record.collection),
-    );
+
+    const filteredRecords: Record[] = [];
+    let postCount = 0;
+    for (const record of repoRecords) {
+      if (!isSupportedCollection(record.collection)) {
+        continue;
+      }
+      if (record.collection === "app.bsky.feed.post") {
+        if (postCount >= env.BACKFILL_POST_LIMIT) {
+          continue;
+        }
+        postCount++;
+      }
+      filteredRecords.push(record);
+    }
 
     await this.transactionManager.transaction(async (ctx) => {
       for (const record of filteredRecords) {
