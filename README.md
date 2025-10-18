@@ -6,6 +6,8 @@
 
 Subscribe & Scoped AppView = Subscope
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/3u7GrK?referralCode=mveF9L)
+
 ## アイデア
 
 ActivityPub実装のようにフォローしているアカウントやその関連データのみを保存することでストレージ容量を節約します。
@@ -24,7 +26,7 @@ appsディレクトリ以下に各サーバー実装があります。
 
 ## デプロイ方法
 
-未定。Railwayまたはdocker composeで起動出来る設定を追加予定です。
+[docs/user/deploy.md](docs/user/deploy.md) を参照してください。
 
 ## 開発方法
 
