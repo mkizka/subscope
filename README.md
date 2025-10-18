@@ -2,6 +2,10 @@
 
 <img src="./icon.png" width="128">
 
+> [!WARNING]  
+> このプロジェクトは開発中です。あらゆる機能が今後破壊的に変更される可能性があります。  
+> いずれの機能も正常に動作することを保証していません。
+
 保存するデータを限定することで小規模なBluesky互換AppViewを実装する試み
 
 Subscribe & Scoped AppView = Subscope
