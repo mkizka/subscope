@@ -43,8 +43,14 @@ export class BackfillUseCase {
       if (!isSupportedCollection(record.collection)) {
         continue;
       }
-      if (record.collection === "app.bsky.feed.post") {
-        if (postCount >= env.BACKFILL_POST_LIMIT) {
+      if (
+        record.collection === "app.bsky.feed.post" ||
+        record.collection === "app.bsky.feed.repost"
+      ) {
+        if (
+          env.BACKFILL_POST_LIMIT >= 0 &&
+          postCount >= env.BACKFILL_POST_LIMIT
+        ) {
           continue;
         }
         postCount++;
