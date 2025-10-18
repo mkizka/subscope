@@ -43,13 +43,13 @@ packagesディレクトリ(共通パッケージ)
 - システム仕様
   - docs/specs 以下を参照
 - Lexiconのインデックス実装追加ガイド
-  - docs/guide/lexicon-implementation.md
+  - docs/dev/lexicon-implementation.md
 - Identity Event処理
-  - docs/guide/identity-event-handling.md
+  - docs/dev/identity-event-handling.md
 - テストケースの書き方
-  - docs/guide/testing.md を参照
+  - docs/dev/testing.md を参照
 - XRPCエンドポイント実装ガイド
-  - docs/guide/xrpc-implementation.md
+  - docs/dev/xrpc-implementation.md
 - `@atproto`各種ライブラリやAT Protocol仕様について知りたい時の資料
   - docs/repomix/atproto-repomix-output.xml
 - `factory-js/factory`ライブラリについて知りたい時の資料
