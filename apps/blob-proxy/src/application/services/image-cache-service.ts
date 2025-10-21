@@ -54,7 +54,9 @@ export class ImageCacheService {
   }
 
   async delete(cacheMetadata: CacheMetadata): Promise<void> {
-    await this.imageCacheStorage.remove(cacheMetadata.getPath());
+    if (cacheMetadata.status === "success") {
+      await this.imageCacheStorage.remove(cacheMetadata.getPath());
+    }
     await this.cacheMetadataRepository.delete(cacheMetadata.cacheKey);
   }
 }
