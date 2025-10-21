@@ -74,7 +74,7 @@ export class SyncWorker {
         },
         {
           limiter: {
-            max: 10, // plc.directoryの負荷を抑えるためにrpsを制限
+            max: 4, // plc.directoryの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
@@ -90,7 +90,7 @@ export class SyncWorker {
         },
         {
           limiter: {
-            max: 10, // PDSの負荷を抑えるためにrpsを制限
+            max: 4, // PDSの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
