@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
-import type { Actor, BackfillStatus } from "@repo/common/domain";
+import type { Actor } from "@repo/common/domain";
 import { Actor as ActorDomain } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 import { type ActorInsert, schema } from "@repo/db";
@@ -47,24 +47,6 @@ export class ActorRepository implements IActorRepository {
       backfillVersion: row.backfillVersion,
       indexedAt: row.indexedAt,
     });
-  }
-
-  async updateBackfillStatus({
-    ctx,
-    did,
-    status,
-  }: {
-    ctx: TransactionContext;
-    did: Did;
-    status: BackfillStatus;
-  }) {
-    await ctx.db
-      .update(schema.actors)
-      .set({
-        backfillStatus: status,
-        backfillVersion: CURRENT_BACKFILL_VERSION,
-      })
-      .where(eq(schema.actors.did, did));
   }
 
   async updateHandle({

@@ -16,14 +16,14 @@ type ActorParams = {
 export class Actor {
   readonly did: Did;
   private _handle: Handle | null = null;
-  readonly backfillStatus: BackfillStatus;
-  readonly backfillVersion: number | null;
+  private _backfillStatus: BackfillStatus;
+  private _backfillVersion: number | null;
   readonly indexedAt: Date;
 
   constructor(params: ActorParams) {
     this.did = asDid(params.did);
-    this.backfillStatus = params.backfillStatus ?? "dirty";
-    this.backfillVersion = params.backfillVersion ?? null;
+    this._backfillStatus = params.backfillStatus ?? "dirty";
+    this._backfillVersion = params.backfillVersion ?? null;
     this.indexedAt = params.indexedAt;
 
     this.updateHandle(params.handle ?? null);
@@ -33,7 +33,19 @@ export class Actor {
     return this._handle;
   }
 
+  get backfillStatus(): BackfillStatus {
+    return this._backfillStatus;
+  }
+
+  get backfillVersion(): number | null {
+    return this._backfillVersion;
+  }
+
   updateHandle(handle: string | null): void {
     this._handle = handle ? asHandle(handle) : null;
+  }
+
+  updateBackfillStatus(status: BackfillStatus): void {
+    this._backfillStatus = status;
   }
 }

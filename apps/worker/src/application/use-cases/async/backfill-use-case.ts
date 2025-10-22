@@ -24,10 +24,17 @@ export class BackfillUseCase {
   ] as const;
 
   async execute({ did, jobLogger }: { did: Did; jobLogger: JobLogger }) {
-    await this.actorRepository.updateBackfillStatus({
+    const actor = await this.actorRepository.findByDid({
       ctx: { db: this.db },
       did,
-      status: "in-process",
+    });
+    if (!actor) {
+      throw new Error(`Actor not found: ${did}`);
+    }
+    actor.updateBackfillStatus("in-process");
+    await this.actorRepository.upsert({
+      ctx: { db: this.db },
+      actor,
     });
 
     const repoRecords = await this.repoFetcher.fetch(did, jobLogger);
@@ -45,10 +52,10 @@ export class BackfillUseCase {
           depth: 0,
         });
       }
-      await this.actorRepository.updateBackfillStatus({
+      actor.updateBackfillStatus("synchronized");
+      await this.actorRepository.upsert({
         ctx,
-        did,
-        status: "synchronized",
+        actor,
       });
     });
   }
