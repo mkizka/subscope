@@ -33,29 +33,22 @@ export class IndexActorService {
     handle?: Handle;
     indexedAt: Date;
   }): Promise<void> {
-    const existingActor = await this.actorRepository.findByDid({ ctx, did });
-    if (existingActor) {
-      // インデックスされたactorのhandleと異なるhandleが指定された場合は更新
-      if (handle && existingActor.handle !== handle) {
-        existingActor.setHandle(handle);
-        await this.actorRepository.upsert({ ctx, actor: existingActor });
+    const actor = await (async () => {
+      const existingActor = await this.actorRepository.findByDid({ ctx, did });
+      if (existingActor) {
+        if (handle) {
+          existingActor.setHandle(handle);
+        }
+        return existingActor;
       }
-      // インデックスされたactorがhandleを持っていなければresolveする
-      if (!existingActor.handle) {
-        await this.resolveDidScheduler.schedule(did);
-      }
-    } else {
-      // インデックスされていない場合は新規登録
-      const actor = new Actor({ did, handle, indexedAt });
-      await this.actorRepository.upsert({ ctx, actor });
+      return new Actor({ did, handle, indexedAt });
+    })();
 
-      // handleが無い場合はresolveする
-      if (!handle) {
-        await this.resolveDidScheduler.schedule(did);
-      }
+    await this.actorRepository.upsert({ ctx, actor });
+    if (!actor.handle) {
+      await this.resolveDidScheduler.schedule(did);
     }
 
-    // profileが存在しない場合はfetchRecordジョブを追加
     const profileExists = await this.profileRepository.exists({
       ctx,
       actorDid: did,
