@@ -37,7 +37,8 @@ export class IndexActorService {
     if (existingActor) {
       // インデックスされたactorのhandleと異なるhandleが指定された場合は更新
       if (handle && existingActor.handle !== handle) {
-        await this.actorRepository.updateHandle({ ctx, did, handle });
+        existingActor.setHandle(handle);
+        await this.actorRepository.upsert({ ctx, actor: existingActor });
       }
       // インデックスされたactorがhandleを持っていなければresolveする
       if (!existingActor.handle) {

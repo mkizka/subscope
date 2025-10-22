@@ -3,7 +3,6 @@ import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 import type { Actor } from "@repo/common/domain";
 import { Actor as ActorDomain } from "@repo/common/domain";
-import type { Handle } from "@repo/common/utils";
 import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
@@ -47,23 +46,6 @@ export class ActorRepository implements IActorRepository {
       backfillVersion: row.backfillVersion,
       indexedAt: row.indexedAt,
     });
-  }
-
-  async updateHandle({
-    ctx,
-    did,
-    handle,
-  }: {
-    ctx: TransactionContext;
-    did: Did;
-    handle: Handle;
-  }) {
-    await ctx.db
-      .update(schema.actors)
-      .set({
-        handle,
-      })
-      .where(eq(schema.actors.did, did));
   }
 
   async delete({ ctx, did }: { ctx: TransactionContext; did: Did }) {

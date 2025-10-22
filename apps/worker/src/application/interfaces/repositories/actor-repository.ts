@@ -1,6 +1,5 @@
 import type { Did } from "@atproto/did";
 import type { Actor, TransactionContext } from "@repo/common/domain";
-import type { Handle } from "@repo/common/utils";
 
 export interface IActorRepository {
   upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
@@ -9,12 +8,6 @@ export interface IActorRepository {
     ctx: TransactionContext;
     did: Did;
   }) => Promise<Actor | null>;
-
-  updateHandle: (params: {
-    ctx: TransactionContext;
-    did: Did;
-    handle: Handle;
-  }) => Promise<void>;
 
   delete: (params: { ctx: TransactionContext; did: Did }) => Promise<void>;
 }
