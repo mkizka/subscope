@@ -31,7 +31,7 @@ export class BackfillUseCase {
     if (!actor) {
       throw new Error(`Actor not found: ${did}`);
     }
-    actor.updateBackfillStatus("in-process");
+    actor.setBackfillStatus("in-process");
     await this.actorRepository.upsert({
       ctx: { db: this.db },
       actor,
@@ -52,7 +52,7 @@ export class BackfillUseCase {
           depth: 0,
         });
       }
-      actor.updateBackfillStatus("synchronized");
+      actor.setBackfillStatus("synchronized");
       await this.actorRepository.upsert({
         ctx,
         actor,

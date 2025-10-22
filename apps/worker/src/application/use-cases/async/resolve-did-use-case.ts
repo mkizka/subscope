@@ -21,7 +21,7 @@ export class ResolveDidUseCase {
         did,
       });
       if (existingActor) {
-        existingActor.updateHandle(handle);
+        existingActor.setHandle(handle);
         return existingActor;
       }
       return new Actor({ did, handle, indexedAt: new Date() });

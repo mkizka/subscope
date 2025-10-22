@@ -26,7 +26,7 @@ export class Actor {
     this._backfillVersion = params.backfillVersion ?? null;
     this.indexedAt = params.indexedAt;
 
-    this.updateHandle(params.handle ?? null);
+    this.setHandle(params.handle ?? null);
   }
 
   get handle(): Handle | null {
@@ -41,11 +41,11 @@ export class Actor {
     return this._backfillVersion;
   }
 
-  updateHandle(handle: string | null): void {
+  setHandle(handle: string | null): void {
     this._handle = handle ? asHandle(handle) : null;
   }
 
-  updateBackfillStatus(status: BackfillStatus): void {
+  setBackfillStatus(status: BackfillStatus): void {
     this._backfillStatus = status;
   }
 }
