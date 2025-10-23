@@ -45,7 +45,7 @@ export class PostIndexer implements ICollectionIndexer {
     await this.postRepository.upsert({ ctx, post });
 
     const feedItem = FeedItem.fromPost(post);
-    await this.feedItemRepository.upsertPost({ ctx, feedItem });
+    await this.feedItemRepository.upsert({ ctx, feedItem });
 
     const embedUri = post.getEmbedRecordUri();
     if (embedUri) {

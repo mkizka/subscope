@@ -46,3 +46,8 @@ export type RepostInsert = Omit<
   InferInsertModel<typeof schema.reposts>,
   "uri" | "indexedAt" | "sortAt"
 >;
+
+export type FeedItemInsert = Omit<
+  InferInsertModel<typeof schema.feedItems>,
+  "uri"
+>;

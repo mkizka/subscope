@@ -40,7 +40,7 @@ export class RepostIndexer implements ICollectionIndexer {
     await this.repostRepository.upsert({ ctx, repost });
 
     const feedItem = FeedItem.fromRepost(repost);
-    await this.feedItemRepository.upsertRepost({ ctx, feedItem });
+    await this.feedItemRepository.upsert({ ctx, feedItem });
 
     await this.fetchRecordScheduler.schedule(repost.subjectUri, depth);
   }
