@@ -42,7 +42,6 @@ export class LikeRepository implements ILikeRepository {
           subjectCid: like.subjectCid,
           createdAt: like.createdAt,
           indexedAt: like.indexedAt,
-          sortAt: like.sortAt,
         }),
     );
   }
@@ -80,7 +79,6 @@ export class LikeRepository implements ILikeRepository {
           subjectCid: like.subjectCid,
           createdAt: like.createdAt,
           indexedAt: like.indexedAt,
-          sortAt: like.sortAt,
         }),
     );
   }
@@ -112,7 +110,6 @@ export class LikeRepository implements ILikeRepository {
           subjectCid: like.subjectCid,
           createdAt: like.createdAt,
           indexedAt: like.indexedAt,
-          sortAt: like.sortAt,
         }),
     );
   }

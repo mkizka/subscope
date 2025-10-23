@@ -36,7 +36,6 @@ type PostParams = {
     | PostEmbedRecordWithMedia
     | null;
   createdAt: Date;
-  sortAt?: Date | null;
   indexedAt: Date;
 };
 
@@ -55,7 +54,6 @@ export class Post {
     | PostEmbedRecordWithMedia
     | null;
   readonly createdAt: Date;
-  readonly sortAt: Date | null;
   readonly indexedAt: Date;
 
   constructor(params: PostParams) {
@@ -68,8 +66,11 @@ export class Post {
     this.langs = params.langs;
     this.embed = params.embed;
     this.createdAt = params.createdAt;
-    this.sortAt = params.sortAt ?? null;
     this.indexedAt = params.indexedAt;
+  }
+
+  get sortAt(): Date {
+    return this.indexedAt > this.createdAt ? this.indexedAt : this.createdAt;
   }
 
   isReply(): boolean {

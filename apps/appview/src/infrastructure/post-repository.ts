@@ -132,7 +132,6 @@ export class PostRepository implements IPostRepository {
       langs: post.langs,
       embed: this.embed(post),
       createdAt: post.createdAt,
-      sortAt: post.sortAt,
       indexedAt: post.indexedAt,
     });
   }

@@ -240,7 +240,8 @@ describe("SearchPostsUseCase", () => {
       .vars({ record: () => firstRecord })
       .props({
         text: () => "最初のページネーション検証投稿です",
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
       })
       .create();
     await postStatsFactory(ctx.db)
@@ -261,6 +262,7 @@ describe("SearchPostsUseCase", () => {
       .props({
         text: () => "二番目のページネーション検証投稿です",
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
       })
       .create();
     await postStatsFactory(ctx.db)
@@ -281,20 +283,22 @@ describe("SearchPostsUseCase", () => {
     });
 
     // assert
+    // 降順なので、新しい投稿（二番目）が最初のページに返される
     expect(firstPage.posts).toHaveLength(1);
     expect(firstPage.posts[0]).toMatchObject({
-      uri: firstPost.uri,
+      uri: secondPost.uri,
       record: {
-        text: "最初のページネーション検証投稿です",
+        text: "二番目のページネーション検証投稿です",
       },
     });
     expect(firstPage.cursor).toBeDefined();
 
+    // 古い投稿（最初）が次のページに返される
     expect(secondPage.posts).toHaveLength(1);
     expect(secondPage.posts[0]).toMatchObject({
-      uri: secondPost.uri,
+      uri: firstPost.uri,
       record: {
-        text: "二番目のページネーション検証投稿です",
+        text: "最初のページネーション検証投稿です",
       },
     });
     expect(secondPage.cursor).toBeUndefined();

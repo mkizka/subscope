@@ -42,7 +42,6 @@ export class RepostRepository implements IRepostRepository {
           subjectCid: repost.subjectCid,
           createdAt: repost.createdAt,
           indexedAt: repost.indexedAt,
-          sortAt: repost.sortAt,
         }),
     );
   }
@@ -63,7 +62,6 @@ export class RepostRepository implements IRepostRepository {
           subjectCid: repost.subjectCid,
           createdAt: repost.createdAt,
           indexedAt: repost.indexedAt,
-          sortAt: repost.sortAt,
         }),
     );
   }
@@ -95,7 +93,6 @@ export class RepostRepository implements IRepostRepository {
           subjectCid: repost.subjectCid,
           createdAt: repost.createdAt,
           indexedAt: repost.indexedAt,
-          sortAt: repost.sortAt,
         }),
     );
   }

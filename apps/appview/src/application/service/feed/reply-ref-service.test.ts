@@ -63,7 +63,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
     ];
@@ -111,7 +110,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
     ];
@@ -174,7 +172,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
       new Post({
@@ -187,7 +184,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
     ];
@@ -235,7 +231,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
     ];
@@ -302,7 +297,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
       new Post({
@@ -315,7 +309,6 @@ describe("ReplyRefService", () => {
         langs: null,
         embed: null,
         createdAt: new Date(),
-        sortAt: null,
         indexedAt: new Date(),
       }),
     ];

@@ -237,6 +237,7 @@ describe("GetActorLikesUseCase", () => {
       })
       .props({
         createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
       })
       .create();
 
@@ -250,6 +251,7 @@ describe("GetActorLikesUseCase", () => {
       })
       .props({
         createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
       })
       .create();
 
@@ -263,6 +265,7 @@ describe("GetActorLikesUseCase", () => {
       })
       .props({
         createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
+        indexedAt: () => new Date("2024-01-01T03:00:00.000Z"),
       })
       .create();
 

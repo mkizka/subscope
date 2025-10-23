@@ -38,7 +38,7 @@ export class FeedItem {
       type: "post",
       subjectUri: null,
       actorDid: post.actorDid,
-      sortAt: post.createdAt, // TODO: sortAtに修正
+      sortAt: post.sortAt,
     });
   }
 
