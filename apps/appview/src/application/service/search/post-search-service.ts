@@ -1,5 +1,4 @@
 import type { Post } from "@repo/common/domain";
-import { required } from "@repo/common/utils";
 
 import type { IPostRepository } from "../../interfaces/post-repository.js";
 import { createCursorPaginator, type Page } from "../../utils/pagination.js";
@@ -19,8 +18,7 @@ export class PostSearchService {
   }): Promise<Page<Post>> {
     const paginator = createCursorPaginator<Post>({
       limit,
-      // TODO: PostのsortAtを必須にする
-      getCursor: (post) => required(post.sortAt?.toISOString()),
+      getCursor: (post) => post.sortAt.toISOString(),
     });
 
     const posts = await this.postRepository.search({

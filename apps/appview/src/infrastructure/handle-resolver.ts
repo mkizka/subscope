@@ -25,7 +25,7 @@ export class HandleResolver implements IHandleResolver {
     if (!actor) {
       throw new HandleResolutionError(handle);
     }
-    return asDid(required(actor.did));
+    return asDid(actor.did);
   }
 
   async resolveMany(handles: Handle[]) {
