@@ -5,6 +5,7 @@ import { type ProfileInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IProfileRepository } from "../../application/interfaces/repositories/profile-repository.js";
+import { sanitizeDate } from "../utils/data-sanitizer.js";
 
 export class ProfileRepository implements IProfileRepository {
   async upsert({
@@ -21,13 +22,13 @@ export class ProfileRepository implements IProfileRepository {
       bannerCid: profile.bannerCid,
       description: profile.description,
       displayName: profile.displayName,
-      createdAt: profile.createdAt,
+      createdAt: profile.createdAt ? sanitizeDate(profile.createdAt) : null,
     } satisfies ProfileInsert;
     await ctx.db
       .insert(schema.profiles)
       .values({
         uri: profile.uri.toString(),
-        indexedAt: profile.indexedAt,
+        indexedAt: sanitizeDate(profile.indexedAt),
         ...profileData,
       })
       .onConflictDoUpdate({

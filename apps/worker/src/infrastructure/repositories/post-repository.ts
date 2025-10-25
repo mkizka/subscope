@@ -11,6 +11,7 @@ import { type PostInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IPostRepository } from "../../application/interfaces/repositories/post-repository.js";
+import { sanitizeDate } from "../utils/data-sanitizer.js";
 
 export class PostRepository implements IPostRepository {
   async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {
@@ -24,13 +25,13 @@ export class PostRepository implements IPostRepository {
       replyParentUri: post.replyParent?.uri.toString(),
       replyParentCid: post.replyParent?.cid,
       langs: post.langs,
-      createdAt: post.createdAt,
+      createdAt: sanitizeDate(post.createdAt),
     } satisfies PostInsert;
     await ctx.db
       .insert(schema.posts)
       .values({
         uri: postUri,
-        indexedAt: post.indexedAt,
+        indexedAt: sanitizeDate(post.indexedAt),
         ...data,
       })
       .onConflictDoUpdate({
