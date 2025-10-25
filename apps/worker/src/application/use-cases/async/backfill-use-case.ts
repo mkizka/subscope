@@ -51,7 +51,13 @@ export class BackfillUseCase {
       isSupportedCollection(record.collection),
     );
 
-    for (const chunk of chunkArray(filteredRecords, env.BACKFILL_BATCH_SIZE)) {
+    const chunks = chunkArray(filteredRecords, env.BACKFILL_BATCH_SIZE);
+    for (const [index, chunk] of Object.entries(chunks)) {
+      const chunkNumber = Number(index) + 1;
+      await jobLogger.log(
+        `Processing chunk ${chunkNumber}/${chunks.length} (${chunk.length} records)`,
+      );
+
       await this.transactionManager.transaction(async (ctx) => {
         for (const record of chunk) {
           await this.indexRecordService.upsert({
@@ -70,5 +76,6 @@ export class BackfillUseCase {
       ctx: { db: this.db },
       actor,
     });
+    await jobLogger.log(`Backfill completed for actor: ${did}`);
   }
 }
