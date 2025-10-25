@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { FeedItem } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
@@ -75,18 +76,15 @@ describe("FeedProcessor", () => {
       .vars({ post: () => post })
       .create();
 
-    const paginationResult = {
-      items: [
-        {
-          ...feedItem,
-          actorDid: asDid(feedItem.actorDid),
-        },
-      ],
-      cursor: "2024-01-01T00:00:00.000Z",
-    };
+    const feedItems = [
+      new FeedItem({
+        ...feedItem,
+        actorDid: asDid(feedItem.actorDid),
+      }),
+    ];
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult.items);
+    const result = await feedProcessor.processFeedItems(feedItems);
 
     // assert
     expect(result).toMatchObject([
@@ -149,18 +147,15 @@ describe("FeedProcessor", () => {
       })
       .create();
 
-    const paginationResult = {
-      items: [
-        {
-          ...feedItem,
-          actorDid: asDid(feedItem.actorDid),
-        },
-      ],
-      cursor: "2024-01-01T01:00:00.000Z",
-    };
+    const feedItems = [
+      new FeedItem({
+        ...feedItem,
+        actorDid: asDid(feedItem.actorDid),
+      }),
+    ];
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult.items);
+    const result = await feedProcessor.processFeedItems(feedItems);
 
     // assert
     expect(result).toMatchObject([
@@ -225,18 +220,15 @@ describe("FeedProcessor", () => {
       .vars({ post: () => replyPost })
       .create();
 
-    const paginationResult = {
-      items: [
-        {
-          ...feedItem,
-          actorDid: asDid(feedItem.actorDid),
-        },
-      ],
-      cursor: undefined,
-    };
+    const feedItems = [
+      new FeedItem({
+        ...feedItem,
+        actorDid: asDid(feedItem.actorDid),
+      }),
+    ];
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult.items);
+    const result = await feedProcessor.processFeedItems(feedItems);
 
     // assert
     expect(result).toMatchObject([
@@ -323,22 +315,19 @@ describe("FeedProcessor", () => {
       })
       .create();
 
-    const paginationResult = {
-      items: [
-        {
-          ...feedItem1,
-          actorDid: asDid(feedItem1.actorDid),
-        },
-        {
-          ...feedItem2,
-          actorDid: asDid(feedItem2.actorDid),
-        },
-      ],
-      cursor: undefined,
-    };
+    const feedItems = [
+      new FeedItem({
+        ...feedItem1,
+        actorDid: asDid(feedItem1.actorDid),
+      }),
+      new FeedItem({
+        ...feedItem2,
+        actorDid: asDid(feedItem2.actorDid),
+      }),
+    ];
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult.items);
+    const result = await feedProcessor.processFeedItems(feedItems);
 
     // assert
     expect(result).toHaveLength(2);
@@ -372,18 +361,15 @@ describe("FeedProcessor", () => {
     // 投稿を削除してPostViewが見つからない状態を作る
     await ctx.db.delete(schema.posts).where(eq(schema.posts.uri, post.uri));
 
-    const paginationResult = {
-      items: [
-        {
-          ...feedItem,
-          actorDid: asDid(feedItem.actorDid),
-        },
-      ],
-      cursor: undefined,
-    };
+    const feedItems = [
+      new FeedItem({
+        ...feedItem,
+        actorDid: asDid(feedItem.actorDid),
+      }),
+    ];
 
     // act
-    const result = await feedProcessor.processFeedItems(paginationResult.items);
+    const result = await feedProcessor.processFeedItems(feedItems);
 
     // assert
     expect(result).toMatchObject([]);

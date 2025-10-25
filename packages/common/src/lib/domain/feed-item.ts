@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 
 import type { Post } from "./post/post.js";
 import type { Repost } from "./repost.js";
@@ -6,7 +7,7 @@ import type { Repost } from "./repost.js";
 export type FeedType = "post" | "repost";
 
 type FeedItemParams = {
-  uri: string;
+  uri: AtUri | string;
   cid: string;
   type: FeedType;
   subjectUri: string | null;
@@ -15,7 +16,7 @@ type FeedItemParams = {
 };
 
 export class FeedItem {
-  readonly uri: string;
+  readonly uri: AtUri;
   readonly cid: string;
   readonly type: FeedType;
   readonly subjectUri: string | null;
@@ -23,7 +24,7 @@ export class FeedItem {
   readonly sortAt: Date;
 
   constructor(params: FeedItemParams) {
-    this.uri = params.uri;
+    this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.type = params.type;
     this.subjectUri = params.subjectUri;
@@ -33,7 +34,7 @@ export class FeedItem {
 
   static fromPost(post: Post): FeedItem {
     return new FeedItem({
-      uri: post.uri.toString(),
+      uri: post.uri,
       cid: post.cid,
       type: "post",
       subjectUri: null,
@@ -44,7 +45,7 @@ export class FeedItem {
 
   static fromRepost(repost: Repost): FeedItem {
     return new FeedItem({
-      uri: repost.uri.toString(),
+      uri: repost.uri,
       cid: repost.cid,
       type: "repost",
       subjectUri: repost.subjectUri.toString(),

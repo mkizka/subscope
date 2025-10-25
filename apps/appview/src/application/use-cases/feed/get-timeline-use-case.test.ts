@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import type { FeedItem } from "@repo/common/domain";
+import { FeedItem } from "@repo/common/domain";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
@@ -83,22 +83,22 @@ describe("GetTimelineUseCase", () => {
 
     const mockPaginationResult: Page<FeedItem> = {
       items: [
-        {
+        new FeedItem({
           type: "post",
           uri: "at://example.com/post/1",
           actorDid: "did:plc:author1",
           cid: "cid1",
           sortAt: new Date(),
           subjectUri: null,
-        },
-        {
+        }),
+        new FeedItem({
           type: "repost",
           uri: "at://example.com/repost/1",
           actorDid: "did:plc:reposter",
           cid: "cid2",
           sortAt: new Date(),
           subjectUri: "at://example.com/post/2",
-        },
+        }),
       ],
       cursor: "2024-01-01T00:00:00.000Z",
     };

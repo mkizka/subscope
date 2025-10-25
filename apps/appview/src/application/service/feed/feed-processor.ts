@@ -36,10 +36,10 @@ export class FeedProcessor {
 
     for (const item of feedItems) {
       if (item.type === "post") {
-        postUris.add(item.uri);
+        postUris.add(item.uri.toString());
       } else if (item.subjectUri) {
         postUris.add(item.subjectUri);
-        repostUris.add(item.uri);
+        repostUris.add(item.uri.toString());
         reposterDids.add(item.actorDid);
       }
     }
@@ -61,7 +61,8 @@ export class FeedProcessor {
 
     return feedItems
       .map((item) => {
-        const postUri = item.type === "post" ? item.uri : item.subjectUri;
+        const postUri =
+          item.type === "post" ? item.uri.toString() : item.subjectUri;
         if (!postUri) {
           return null;
         }
@@ -82,7 +83,7 @@ export class FeedProcessor {
         }
 
         if (item.type === "repost") {
-          const repost = repostMap.get(item.uri);
+          const repost = repostMap.get(item.uri.toString());
           if (repost) {
             const reposter = reposterMap.get(repost.actorDid);
             if (reposter) {

@@ -21,7 +21,7 @@ export class FeedItemRepository implements IFeedItemRepository {
     await ctx.db
       .insert(schema.feedItems)
       .values({
-        uri: feedItem.uri,
+        uri: feedItem.uri.toString(),
         ...data,
       })
       .onConflictDoUpdate({
