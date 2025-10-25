@@ -2,10 +2,19 @@ import type { Did } from "@atproto/did";
 import type { DatabaseClient, ITransactionManager } from "@repo/common/domain";
 import { isSupportedCollection } from "@repo/common/utils";
 
+import { env } from "../../../shared/env.js";
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 import type { IndexRecordService } from "../../services/index-record-service.js";
+
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
 
 export class BackfillUseCase {
   constructor(
@@ -42,21 +51,24 @@ export class BackfillUseCase {
       isSupportedCollection(record.collection),
     );
 
-    await this.transactionManager.transaction(async (ctx) => {
-      for (const record of filteredRecords) {
-        await this.indexRecordService.upsert({
-          ctx,
-          record,
-          jobLogger,
-          force: true,
-          depth: 0,
-        });
-      }
-      actor.setBackfillStatus("synchronized");
-      await this.actorRepository.upsert({
-        ctx,
-        actor,
+    for (const chunk of chunkArray(filteredRecords, env.BACKFILL_BATCH_SIZE)) {
+      await this.transactionManager.transaction(async (ctx) => {
+        for (const record of chunk) {
+          await this.indexRecordService.upsert({
+            ctx,
+            record,
+            jobLogger,
+            force: true,
+            depth: 0,
+          });
+        }
       });
+    }
+
+    actor.setBackfillStatus("synchronized");
+    await this.actorRepository.upsert({
+      ctx: { db: this.db },
+      actor,
     });
   }
 }

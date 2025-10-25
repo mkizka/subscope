@@ -32,6 +32,7 @@ const schema = z.object({
     dev: z.url().default("redis://localhost:6379"),
   }),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
+  BACKFILL_BATCH_SIZE: z.coerce.number().default(100),
 });
 
 export const env = (() => {
