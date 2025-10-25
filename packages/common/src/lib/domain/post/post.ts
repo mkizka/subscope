@@ -70,7 +70,7 @@ export class Post {
   }
 
   get sortAt(): Date {
-    return this.indexedAt > this.createdAt ? this.indexedAt : this.createdAt;
+    return this.indexedAt < this.createdAt ? this.indexedAt : this.createdAt;
   }
 
   isReply(): boolean {
