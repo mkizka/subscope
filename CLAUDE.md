@@ -47,7 +47,7 @@ packagesディレクトリ(共通パッケージ)
 - Identity Event処理
   - docs/dev/identity-event-handling.md
 - テストケースの書き方
-  - docs/dev/testing.md を参照
+  - @docs/dev/testing.md を参照
 - XRPCエンドポイント実装ガイド
   - docs/dev/xrpc-implementation.md
 - `@atproto`各種ライブラリやAT Protocol仕様について知りたい時の資料
