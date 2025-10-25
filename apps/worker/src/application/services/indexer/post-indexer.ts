@@ -49,7 +49,10 @@ export class PostIndexer implements ICollectionIndexer {
 
     const embedUri = post.getEmbedRecordUri();
     if (embedUri) {
-      await this.fetchRecordScheduler.schedule(embedUri, depth);
+      const embedExists = await this.postRepository.exists(ctx, embedUri);
+      if (!embedExists) {
+        await this.fetchRecordScheduler.schedule(embedUri, depth);
+      }
     }
   }
 
@@ -94,7 +97,7 @@ export class PostIndexer implements ICollectionIndexer {
     if (post.replyParent) {
       const parentExists = await this.postRepository.exists(
         ctx,
-        post.replyParent.uri.toString(),
+        post.replyParent.uri,
       );
       if (parentExists) {
         await this.postStatsRepository.upsertReplyCount({
@@ -110,7 +113,7 @@ export class PostIndexer implements ICollectionIndexer {
     ) {
       const quotedPostExists = await this.postRepository.exists(
         ctx,
-        post.embed.uri.toString(),
+        post.embed.uri,
       );
       if (quotedPostExists) {
         await this.postStatsRepository.upsertQuoteCount({

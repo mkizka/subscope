@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import {
   type Post,
   PostEmbedExternal,
@@ -149,11 +150,11 @@ export class PostRepository implements IPostRepository {
     }
   }
 
-  async exists(ctx: TransactionContext, uri: string): Promise<boolean> {
+  async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
     const result = await ctx.db
       .select({ uri: schema.posts.uri })
       .from(schema.posts)
-      .where(eq(schema.posts.uri, uri))
+      .where(eq(schema.posts.uri, uri.toString()))
       .limit(1);
 
     return result.length > 0;

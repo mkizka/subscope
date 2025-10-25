@@ -42,7 +42,13 @@ export class RepostIndexer implements ICollectionIndexer {
     const feedItem = FeedItem.fromRepost(repost);
     await this.feedItemRepository.upsert({ ctx, feedItem });
 
-    await this.fetchRecordScheduler.schedule(repost.subjectUri, depth);
+    const subjectExists = await this.postRepository.exists(
+      ctx,
+      repost.subjectUri,
+    );
+    if (!subjectExists) {
+      await this.fetchRecordScheduler.schedule(repost.subjectUri, depth);
+    }
   }
 
   async shouldIndex({
@@ -66,10 +72,7 @@ export class RepostIndexer implements ICollectionIndexer {
     const repost = Repost.from(record);
 
     // 対象の投稿が存在する場合のみstatsを更新
-    const postExists = await this.postRepository.exists(
-      ctx,
-      repost.subjectUri.toString(),
-    );
+    const postExists = await this.postRepository.exists(ctx, repost.subjectUri);
     if (postExists) {
       await this.postStatsRepository.upsertRepostCount({
         ctx,

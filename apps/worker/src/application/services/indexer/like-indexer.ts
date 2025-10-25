@@ -47,10 +47,7 @@ export class LikeIndexer implements ICollectionIndexer {
     const like = Like.from(record);
 
     // 対象の投稿が存在する場合のみstatsを更新
-    const postExists = await this.postRepository.exists(
-      ctx,
-      like.subjectUri.toString(),
-    );
+    const postExists = await this.postRepository.exists(ctx, like.subjectUri);
     if (postExists) {
       await this.postStatsRepository.upsertLikeCount({
         ctx,
