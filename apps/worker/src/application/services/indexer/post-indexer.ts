@@ -10,7 +10,6 @@ import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
@@ -19,7 +18,6 @@ export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly postIndexingPolicy: PostIndexingPolicy,
-    private readonly postStatsRepository: IPostStatsRepository,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly actorStatsRepository: IActorStatsRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
@@ -28,7 +26,6 @@ export class PostIndexer implements ICollectionIndexer {
   static inject = [
     "postRepository",
     "postIndexingPolicy",
-    "postStatsRepository",
     "feedItemRepository",
     "actorStatsRepository",
     "fetchRecordScheduler",
@@ -105,16 +102,7 @@ export class PostIndexer implements ICollectionIndexer {
       post.embed instanceof PostEmbedRecord ||
       post.embed instanceof PostEmbedRecordWithMedia
     ) {
-      const quotedPostExists = await this.postRepository.exists(
-        ctx,
-        post.embed.uri,
-      );
-      if (quotedPostExists) {
-        await this.postStatsRepository.upsertQuoteCount({
-          ctx,
-          uri: post.embed.uri,
-        });
-      }
+      await this.aggregateStatsScheduler.schedule(post.embed.uri, "quote");
     }
   }
 }

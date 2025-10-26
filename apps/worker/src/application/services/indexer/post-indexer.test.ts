@@ -6,7 +6,6 @@ import { schema } from "@repo/db";
 import {
   actorFactory,
   getTestSetup,
-  postEmbedRecordFactory,
   postFactory,
   randomCid,
   recordFactory,
@@ -20,7 +19,6 @@ import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
@@ -33,7 +31,6 @@ describe("PostIndexer", () => {
 
   const postIndexer = testInjector
     .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("indexLevel", 1)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
@@ -310,40 +307,9 @@ describe("PostIndexer", () => {
       });
     });
 
-    test("引用投稿時に引用された投稿のpost_statsのquote数が正しく更新される", async () => {
+    test("引用投稿の場合、引用された投稿に対してquote集計ジョブがスケジュールされる", async () => {
       // arrange
-      const quotedActor = await actorFactory(ctx.db).create();
-      const quotedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => quotedActor })
-        .create();
-      const quotedPost = await postFactory(ctx.db)
-        .vars({ record: () => quotedRecord })
-        .props({
-          text: () => "Original post to be quoted",
-        })
-        .create();
-
-      // 既存の引用投稿を作成（データベースに直接挿入）
-      const existingQuoteActor = await actorFactory(ctx.db).create();
-      const existingQuoteRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.feed.post",
-      )
-        .vars({ actor: () => existingQuoteActor })
-        .create();
-      const existingQuotePost = await postFactory(ctx.db)
-        .vars({ record: () => existingQuoteRecord })
-        .props({
-          text: () => "Existing quote post",
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => existingQuotePost,
-          embeddedPost: () => quotedPost,
-        })
-        .create();
-
+      const quotedPost = await postFactory(ctx.db).create();
       const quotingActor = await actorFactory(ctx.db).create();
       const quoteJson = {
         $type: "app.bsky.feed.post",
@@ -373,34 +339,13 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const [stats] = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, quotedPost.uri))
-        .limit(1);
-
-      expect(stats).toMatchObject({
-        postUri: quotedPost.uri,
-        likeCount: 0,
-        repostCount: 0,
-        replyCount: 0,
-        quoteCount: 2, // 既存の1つ + 新しい1つ = 2
-      });
-
-      const [actorStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, quotingActor.did));
-
-      expect(actorStats).toMatchObject({
-        actorDid: quotingActor.did,
-        postsCount: 1,
-        followsCount: 0,
-        followersCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(quotedPost.uri),
+        "quote",
+      );
     });
 
-    test("引用された投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("引用投稿の場合、引用された投稿が存在しなくても集計ジョブがスケジュールされる", async () => {
       // arrange
       const quotingActor = await actorFactory(ctx.db).create();
       const nonExistentQuotedUri =
@@ -435,22 +380,10 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const stats = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, nonExistentQuotedUri));
-      expect(stats).toHaveLength(0);
-
-      const [actorStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, quotingActor.did));
-      expect(actorStats).toMatchObject({
-        actorDid: quotingActor.did,
-        postsCount: 1,
-        followsCount: 0,
-        followersCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(nonExistentQuotedUri),
+        "quote",
+      );
     });
 
     test("親投稿が存在しない場合は集計ジョブをスケジュールしない", async () => {

@@ -15,7 +15,7 @@ type FetchRecordData = {
 
 type AggregateStatsData = {
   postUri: string;
-  type: "reply" | "repost" | "all";
+  type: "reply" | "repost" | "quote" | "all";
 };
 
 export type JobData = {
