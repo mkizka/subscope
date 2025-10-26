@@ -44,8 +44,4 @@ export interface IJobQueue {
     data: JobData[T];
     options?: JobOptions;
   }) => Promise<void>;
-  getJobState: (params: {
-    queueName: QueueName;
-    jobId: string;
-  }) => Promise<JobState>;
 }
