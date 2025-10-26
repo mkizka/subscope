@@ -31,6 +31,8 @@ export class AggregateStatsUseCase {
       await this.postStatsRepository.upsertRepostCount({ ctx, uri });
     } else if (command.type === "quote") {
       await this.postStatsRepository.upsertQuoteCount({ ctx, uri });
+    } else if (command.type === "like") {
+      await this.postStatsRepository.upsertLikeCount({ ctx, uri });
     } else {
       await this.postStatsRepository.upsertAllCount({ ctx, uri });
     }

@@ -1,33 +1,34 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
   getTestSetup,
-  likeFactory,
   postFactory,
   recordFactory,
   subscriptionFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+import { mock } from "vitest-mock-extended";
 
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
-import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
+import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import { LikeIndexer } from "./like-indexer.js";
 
 describe("LikeIndexer", () => {
+  const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
   const { testInjector, ctx } = getTestSetup();
 
   const likeIndexer = testInjector
     .provideClass("likeRepository", LikeRepository)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("indexLevel", 1)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
+    .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
     .injectClass(LikeIndexer);
 
   describe("upsert", () => {
@@ -78,38 +79,11 @@ describe("LikeIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("いいね追加時にpost_statsのいいね数が正しく更新される", async () => {
+    test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
       // arrange
-      // actorとrecordsテーブルを準備
-      const [authorActor, ...likeActors] = await actorFactory(
-        ctx.db,
-      ).createList(3);
+      const post = await postFactory(ctx.db).create();
 
-      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorActor })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => postRecord })
-        .props({
-          text: () => "Test post",
-        })
-        .create();
-
-      // 既存のいいねを2つ追加
-      for (const actor of likeActors.slice(0, 2)) {
-        const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-          .vars({ actor: () => actor })
-          .create();
-        await likeFactory(ctx.db)
-          .vars({ record: () => likeRecord })
-          .props({
-            subjectUri: () => post.uri,
-            subjectCid: () => post.cid,
-          })
-          .create();
-      }
-
-      const user5Actor = await actorFactory(ctx.db).create();
+      const likerActor = await actorFactory(ctx.db).create();
       const likeJson = {
         $type: "app.bsky.feed.like",
         subject: {
@@ -118,13 +92,13 @@ describe("LikeIndexer", () => {
         },
         createdAt: new Date().toISOString(),
       };
-      const user5LikeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => user5Actor })
+      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
+        .vars({ actor: () => likerActor })
         .props({ json: () => likeJson })
         .create();
       const record = Record.fromJson({
-        uri: user5LikeRecord.uri,
-        cid: user5LikeRecord.cid,
+        uri: likeRecord.uri,
+        cid: likeRecord.cid,
         json: likeJson,
         indexedAt: new Date(),
       });
@@ -133,49 +107,17 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      const [stats] = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, post.uri))
-        .limit(1);
-
-      expect(stats).toMatchObject({
-        postUri: post.uri,
-        likeCount: 2,
-        repostCount: 0,
-        replyCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(post.uri),
+        "like",
+      );
     });
 
-    test("いいねが削除された場合にpost_statsのいいね数が正しく更新される", async () => {
+    test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
       // arrange
-      // actorとrecordsテーブルを準備
-      const [authorActor, user5Actor, user6Actor] = await actorFactory(
-        ctx.db,
-      ).createList(3);
+      const post = await postFactory(ctx.db).create();
 
-      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorActor })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => postRecord })
-        .props({
-          text: () => "Test post 2",
-        })
-        .create();
-
-      // 既存のいいねを1つ追加
-      const user5LikeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => user5Actor })
-        .create();
-      await likeFactory(ctx.db)
-        .vars({ record: () => user5LikeRecord })
-        .props({
-          subjectUri: () => post.uri,
-          subjectCid: () => post.cid,
-        })
-        .create();
-
+      const likerActor = await actorFactory(ctx.db).create();
       const likeJson = {
         $type: "app.bsky.feed.like",
         subject: {
@@ -184,13 +126,13 @@ describe("LikeIndexer", () => {
         },
         createdAt: new Date().toISOString(),
       };
-      const user6LikeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => user6Actor })
+      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
+        .vars({ actor: () => likerActor })
         .props({ json: () => likeJson })
         .create();
       const record = Record.fromJson({
-        uri: user6LikeRecord.uri,
-        cid: user6LikeRecord.cid,
+        uri: likeRecord.uri,
+        cid: likeRecord.cid,
         json: likeJson,
         indexedAt: new Date(),
       });
@@ -199,21 +141,13 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      const [stats] = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, post.uri))
-        .limit(1);
-
-      expect(stats).toMatchObject({
-        postUri: post.uri,
-        likeCount: 1,
-        repostCount: 0,
-        replyCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(post.uri),
+        "like",
+      );
     });
 
-    test("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", async () => {
       // arrange
       const likerActor = await actorFactory(ctx.db).create();
       const nonExistentPostUri =
@@ -242,12 +176,10 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      const stats = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, nonExistentPostUri));
-
-      expect(stats).toHaveLength(0);
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(nonExistentPostUri),
+        "like",
+      );
     });
   });
 });

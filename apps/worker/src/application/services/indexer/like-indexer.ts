@@ -3,22 +3,19 @@ import { Like } from "@repo/common/domain";
 
 import type { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
-import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
     private readonly likeRepository: ILikeRepository,
     private readonly likeIndexingPolicy: LikeIndexingPolicy,
-    private readonly postStatsRepository: IPostStatsRepository,
-    private readonly postRepository: IPostRepository,
+    private readonly aggregateStatsScheduler: AggregateStatsScheduler,
   ) {}
   static inject = [
     "likeRepository",
     "likeIndexingPolicy",
-    "postStatsRepository",
-    "postRepository",
+    "aggregateStatsScheduler",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -45,14 +42,6 @@ export class LikeIndexer implements ICollectionIndexer {
     record: Record;
   }): Promise<void> {
     const like = Like.from(record);
-
-    // 対象の投稿が存在する場合のみstatsを更新
-    const postExists = await this.postRepository.exists(ctx, like.subjectUri);
-    if (postExists) {
-      await this.postStatsRepository.upsertLikeCount({
-        ctx,
-        uri: like.subjectUri,
-      });
-    }
+    await this.aggregateStatsScheduler.schedule(like.subjectUri, "like");
   }
 }
