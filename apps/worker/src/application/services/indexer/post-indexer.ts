@@ -91,7 +91,7 @@ export class PostIndexer implements ICollectionIndexer {
       // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
       // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
       //    → このとき、リポスト数が0なので1にする必要がある
-      await this.aggregateStatsScheduler.schedule(post.uri);
+      await this.aggregateStatsScheduler.schedule(post.uri, "all");
     }
 
     if (post.replyParent) {
@@ -100,10 +100,10 @@ export class PostIndexer implements ICollectionIndexer {
         post.replyParent.uri,
       );
       if (parentExists) {
-        await this.postStatsRepository.upsertReplyCount({
-          ctx,
-          uri: post.replyParent.uri,
-        });
+        await this.aggregateStatsScheduler.schedule(
+          post.replyParent.uri,
+          "reply",
+        );
       }
     }
 

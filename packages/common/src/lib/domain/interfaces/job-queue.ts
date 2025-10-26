@@ -15,6 +15,7 @@ type FetchRecordData = {
 
 type AggregateStatsData = {
   postUri: string;
+  type: "reply" | "all";
 };
 
 export type JobData = {

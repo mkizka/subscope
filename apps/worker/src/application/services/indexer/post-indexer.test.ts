@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+import { AtUri } from "@atproto/syntax";
 import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
@@ -202,7 +204,7 @@ describe("PostIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("リプライ投稿時に親投稿のpost_statsのリプライ数が正しく更新される", async () => {
+    test("リプライ投稿の場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
       // arrange
       const parentActor = await actorFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -215,33 +217,7 @@ describe("PostIndexer", () => {
         })
         .create();
 
-      const replier1 = await actorFactory(ctx.db).create();
-      const reply1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => replier1 })
-        .create();
-      await postFactory(ctx.db)
-        .vars({ record: () => reply1Record })
-        .props({
-          text: () => "Reply 1",
-          replyParentUri: () => parentPost.uri,
-          replyParentCid: () => parentPost.cid,
-        })
-        .create();
-
-      const replier2 = await actorFactory(ctx.db).create();
-      const reply2Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => replier2 })
-        .create();
-      await postFactory(ctx.db)
-        .vars({ record: () => reply2Record })
-        .props({
-          text: () => "Reply 2",
-          replyParentUri: () => parentPost.uri,
-          replyParentCid: () => parentPost.cid,
-        })
-        .create();
-
-      const replier3 = await actorFactory(ctx.db).create();
+      const replier = await actorFactory(ctx.db).create();
       const replyJson = {
         $type: "app.bsky.feed.post",
         text: "New reply",
@@ -258,7 +234,7 @@ describe("PostIndexer", () => {
         createdAt: new Date().toISOString(),
       };
       const newReplyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => replier3 })
+        .vars({ actor: () => replier })
         .props({ json: () => replyJson })
         .create();
       const record = Record.fromJson({
@@ -273,27 +249,24 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const [stats] = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, parentPost.uri))
-        .limit(1);
-
-      expect(stats).toMatchObject({
-        postUri: parentPost.uri,
-        likeCount: 0,
-        repostCount: 0,
-        replyCount: 3,
-        quoteCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledTimes(2);
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenNthCalledWith(
+        1,
+        new AtUri(record.uri.toString()),
+        "all",
+      );
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenNthCalledWith(
+        2,
+        new AtUri(parentPost.uri),
+        "reply",
+      );
 
       const [actorStats] = await ctx.db
         .select()
         .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, replier3.did));
-
-      expect(actorStats).toMatchObject({
-        actorDid: replier3.did,
+        .where(eq(schema.actorStats.actorDid, replier.did));
+      expect(actorStats).toEqual({
+        actorDid: replier.did,
         postsCount: 1,
         followsCount: 0,
         followersCount: 0,
@@ -480,7 +453,7 @@ describe("PostIndexer", () => {
       });
     });
 
-    test("親投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("親投稿が存在しない場合は集計ジョブをスケジュールしない", async () => {
       // arrange
       const replierActor = await actorFactory(ctx.db).create();
       const nonExistentParentUri =
@@ -518,11 +491,10 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const stats = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, nonExistentParentUri));
-      expect(stats).toHaveLength(0);
+      expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalledWith(
+        nonExistentParentUri,
+        "reply",
+      );
 
       const [actorStats] = await ctx.db
         .select()
