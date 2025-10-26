@@ -33,6 +33,7 @@ const schema = z.object({
   }),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
   BACKFILL_BATCH_SIZE: z.coerce.number().default(100),
+  AGGREGATE_STATS_DELAY_SECONDS: z.coerce.number().default(10),
 });
 
 export const env = (() => {

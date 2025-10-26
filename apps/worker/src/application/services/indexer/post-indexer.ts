@@ -12,6 +12,7 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class PostIndexer implements ICollectionIndexer {
@@ -22,6 +23,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly actorStatsRepository: IActorStatsRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
+    private readonly aggregateStatsScheduler: AggregateStatsScheduler,
   ) {}
   static inject = [
     "postRepository",
@@ -30,6 +32,7 @@ export class PostIndexer implements ICollectionIndexer {
     "feedItemRepository",
     "actorStatsRepository",
     "fetchRecordScheduler",
+    "aggregateStatsScheduler",
   ] as const;
 
   async upsert({
@@ -88,10 +91,7 @@ export class PostIndexer implements ICollectionIndexer {
       // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
       // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
       //    → このとき、リポスト数が0なので1にする必要がある
-      await this.postStatsRepository.upsertAllCount({
-        ctx,
-        uri: post.uri,
-      });
+      await this.aggregateStatsScheduler.schedule(post.uri);
     }
 
     if (post.replyParent) {

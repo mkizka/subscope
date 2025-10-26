@@ -11,6 +11,7 @@ import { indexCommitCommandFactory } from "../application/use-cases/commit/index
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
+import type { AggregateStatsUseCase } from "../application/use-cases/stats/aggregate-stats-use-case.js";
 import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
@@ -38,6 +39,7 @@ export class SyncWorker {
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
     handleAccountUseCase: HandleAccountUseCase,
+    aggregateStatsUseCase: AggregateStatsUseCase,
   ) {
     this.workers = [
       createWorker("identity", async (job) => {
@@ -95,6 +97,9 @@ export class SyncWorker {
           },
         },
       ),
+      createWorker("aggregateStats", async (job) => {
+        await aggregateStatsUseCase.execute(job.data);
+      }),
     ];
   }
   static inject = [
@@ -104,6 +109,7 @@ export class SyncWorker {
     "resolveDidUseCase",
     "fetchRecordUseCase",
     "handleAccountUseCase",
+    "aggregateStatsUseCase",
   ] as const;
 
   async start() {

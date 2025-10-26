@@ -18,6 +18,7 @@ import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
+import { AggregateStatsScheduler } from "./application/services/scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
@@ -26,6 +27,7 @@ import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-u
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
+import { AggregateStatsUseCase } from "./application/use-cases/stats/aggregate-stats-use-case.js";
 import { FollowIndexingPolicy } from "./domain/follow-indexing-policy.js";
 import { GeneratorIndexingPolicy } from "./domain/generator-indexing-policy.js";
 import { LikeIndexingPolicy } from "./domain/like-indexing-policy.js";
@@ -86,6 +88,7 @@ createInjector()
   // application(service)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("aggregateStatsScheduler", AggregateStatsScheduler)
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
@@ -107,6 +110,7 @@ createInjector()
   .provideClass("fetchRecordUseCase", FetchRecordUseCase)
   .provideClass("backfillUseCase", BackfillUseCase)
   .provideClass("handleAccountUseCase", HandleAccountUseCase)
+  .provideClass("aggregateStatsUseCase", AggregateStatsUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(WorkerServer)

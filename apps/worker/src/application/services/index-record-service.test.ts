@@ -40,6 +40,7 @@ import { LikeIndexer } from "./indexer/like-indexer.js";
 import { PostIndexer } from "./indexer/post-indexer.js";
 import { ProfileIndexer } from "./indexer/profile-indexer.js";
 import { RepostIndexer } from "./indexer/repost-indexer.js";
+import type { AggregateStatsScheduler } from "./scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
@@ -48,6 +49,10 @@ describe("IndexRecordService", () => {
   const jobLogger = { log: vi.fn() };
 
   const indexRecordService = testInjector
+    .provideValue(
+      "aggregateStatsScheduler",
+      mockDeep<AggregateStatsScheduler>(),
+    )
     .provideValue("jobQueue", mockDeep<IJobQueue>())
     .provideValue("indexLevel", 1)
     .provideClass("actorRepository", ActorRepository)

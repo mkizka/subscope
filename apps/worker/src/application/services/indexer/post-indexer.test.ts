@@ -12,7 +12,7 @@ import {
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { mock, mockDeep } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
@@ -20,11 +20,13 @@ import { FeedItemRepository } from "../../../infrastructure/repositories/feed-it
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
+import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
 describe("PostIndexer", () => {
-  const mockJobQueue = mock<IJobQueue>();
+  const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
+  const mockJobQueue = mockDeep<IJobQueue>();
   const { testInjector, ctx } = getTestSetup();
 
   const postIndexer = testInjector
@@ -35,6 +37,7 @@ describe("PostIndexer", () => {
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
+    .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .injectClass(PostIndexer);

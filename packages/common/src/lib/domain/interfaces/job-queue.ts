@@ -13,6 +13,10 @@ type FetchRecordData = {
   depth: number;
 };
 
+type AggregateStatsData = {
+  postUri: string;
+};
+
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
@@ -20,11 +24,17 @@ export type JobData = {
   identity: IdentityEvent;
   commit: CommitEvent<SupportedCollection>;
   backfill: Did;
+  aggregateStats: AggregateStatsData;
 };
 
 export type QueueName = keyof JobData;
 
 export type JobState = "inProgress" | "completed" | "failed";
+
+type JobOptions = {
+  jobId?: string;
+  delay?: number;
+};
 
 export interface IJobQueue {
   getQueues: () => Queue[];
@@ -32,6 +42,7 @@ export interface IJobQueue {
     queueName: T;
     jobName: string;
     data: JobData[T];
+    options?: JobOptions;
   }) => Promise<void>;
   getJobState: (params: {
     queueName: QueueName;

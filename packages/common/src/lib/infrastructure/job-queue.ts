@@ -47,6 +47,7 @@ export class JobQueue implements IJobQueue {
       identity: new Queue("identity", queueOptions(withRetry)),
       commit: new Queue("commit", queueOptions(withRetry)),
       backfill: new Queue("backfill", queueOptions()),
+      aggregateStats: new Queue("aggregateStats", queueOptions(withRetry)),
     };
   }
   static inject = ["redisUrl"] as const;
@@ -55,12 +56,17 @@ export class JobQueue implements IJobQueue {
     queueName,
     jobName,
     data,
+    options,
   }: {
     queueName: T;
     jobName: string;
     data: JobData[T];
+    options?: {
+      jobId?: string;
+      delay?: number;
+    };
   }) {
-    await this.queues[queueName].add(jobName, data);
+    await this.queues[queueName].add(jobName, data, options);
   }
 
   getQueues() {
