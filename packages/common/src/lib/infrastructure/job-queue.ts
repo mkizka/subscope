@@ -66,7 +66,11 @@ export class JobQueue implements IJobQueue {
       delay?: number;
     };
   }) {
-    await this.queues[queueName].add(jobName, data, options);
+    await this.queues[queueName].add(jobName, data, {
+      ...options,
+      // https://docs.bullmq.io/guide/jobs/job-ids
+      jobId: options?.jobId?.replaceAll(":", "_"),
+    });
   }
 
   getQueues() {
