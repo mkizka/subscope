@@ -2,22 +2,22 @@ import type { Record, TransactionContext } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
 import type { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
-import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
+import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly followIndexingPolicy: FollowIndexingPolicy,
-    private readonly actorStatsRepository: IActorStatsRepository,
+    private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
     private readonly indexActorService: IndexActorService,
   ) {}
   static inject = [
     "followRepository",
     "followIndexingPolicy",
-    "actorStatsRepository",
+    "aggregateActorStatsScheduler",
     "indexActorService",
   ] as const;
 
@@ -43,22 +43,19 @@ export class FollowIndexer implements ICollectionIndexer {
   }
 
   async afterAction({
-    ctx,
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<void> {
     const follow = Follow.from(record);
-
-    await this.actorStatsRepository.upsertFollowsCount({
-      ctx,
-      actorDid: follow.actorDid,
-    });
-
-    await this.actorStatsRepository.upsertFollowersCount({
-      ctx,
-      actorDid: follow.subjectDid,
-    });
+    await this.aggregateActorStatsScheduler.schedule(
+      follow.actorDid,
+      "follows",
+    );
+    await this.aggregateActorStatsScheduler.schedule(
+      follow.subjectDid,
+      "followers",
+    );
   }
 }

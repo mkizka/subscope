@@ -7,10 +7,10 @@ import {
 } from "@repo/common/domain";
 
 import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
-import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
@@ -19,17 +19,17 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postRepository: IPostRepository,
     private readonly postIndexingPolicy: PostIndexingPolicy,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly actorStatsRepository: IActorStatsRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
     private readonly aggregateStatsScheduler: AggregateStatsScheduler,
+    private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
   ) {}
   static inject = [
     "postRepository",
     "postIndexingPolicy",
     "feedItemRepository",
-    "actorStatsRepository",
     "fetchRecordScheduler",
     "aggregateStatsScheduler",
+    "aggregateActorStatsScheduler",
   ] as const;
 
   async upsert({
@@ -68,7 +68,6 @@ export class PostIndexer implements ICollectionIndexer {
   }
 
   async afterAction({
-    ctx,
     record,
     action,
   }: {
@@ -78,10 +77,7 @@ export class PostIndexer implements ICollectionIndexer {
   }): Promise<void> {
     const post = Post.from(record);
 
-    await this.actorStatsRepository.upsertPostsCount({
-      ctx,
-      actorDid: post.actorDid,
-    });
+    await this.aggregateActorStatsScheduler.schedule(post.actorDid, "posts");
 
     // 削除時にafterActionが呼ばれる場合は投稿が存在しないのでupsertに限定
     if (action === "upsert") {

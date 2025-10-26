@@ -4,6 +4,8 @@ import { Worker } from "bullmq";
 
 import { handleAccountCommandFactory } from "../application/use-cases/account/handle-account-command.js";
 import type { HandleAccountUseCase } from "../application/use-cases/account/handle-account-use-case.js";
+import { aggregateActorStatsCommandFactory } from "../application/use-cases/async/aggregate-actor-stats-command.js";
+import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { aggregateStatsCommandFactory } from "../application/use-cases/async/aggregate-stats-command.js";
 import type { AggregateStatsUseCase } from "../application/use-cases/async/aggregate-stats-use-case.js";
 import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
@@ -41,6 +43,7 @@ export class SyncWorker {
     fetchRecordUseCase: FetchRecordUseCase,
     handleAccountUseCase: HandleAccountUseCase,
     aggregateStatsUseCase: AggregateStatsUseCase,
+    aggregateActorStatsUseCase: AggregateActorStatsUseCase,
   ) {
     this.workers = [
       createWorker("identity", async (job) => {
@@ -105,6 +108,13 @@ export class SyncWorker {
         });
         await aggregateStatsUseCase.execute(command);
       }),
+      createWorker("aggregateActorStats", async (job) => {
+        const command = aggregateActorStatsCommandFactory({
+          data: job.data,
+          jobLogger: createJobLogger(job),
+        });
+        await aggregateActorStatsUseCase.execute(command);
+      }),
     ];
   }
   static inject = [
@@ -115,6 +125,7 @@ export class SyncWorker {
     "fetchRecordUseCase",
     "handleAccountUseCase",
     "aggregateStatsUseCase",
+    "aggregateActorStatsUseCase",
   ] as const;
 
   async start() {

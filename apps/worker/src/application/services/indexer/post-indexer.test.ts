@@ -20,12 +20,14 @@ import { ActorStatsRepository } from "../../../infrastructure/repositories/actor
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
+import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
 describe("PostIndexer", () => {
   const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
+  const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
   const mockJobQueue = mockDeep<IJobQueue>();
   const { testInjector, ctx } = getTestSetup();
 
@@ -37,6 +39,10 @@ describe("PostIndexer", () => {
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
+    .provideValue(
+      "aggregateActorStatsScheduler",
+      mockAggregateActorStatsScheduler,
+    )
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .injectClass(PostIndexer);
@@ -201,7 +207,41 @@ describe("PostIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("リプライ投稿の場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
+    test("投稿時にpost_statsとactorの投稿数の集計がスケジュールされる", async () => {
+      // arrange
+      const regularActor = await actorFactory(ctx.db).create();
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "Regular post without reply",
+        createdAt: new Date().toISOString(),
+      };
+      const regularRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => regularActor })
+        .props({ json: () => postJson })
+        .create();
+      const record = Record.fromJson({
+        uri: regularRecord.uri,
+        cid: regularRecord.cid,
+        json: postJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
+
+      // assert
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledWith(
+        regularActor.did,
+        "posts",
+      );
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(record.uri.toString()),
+        "all",
+      );
+    });
+
+    test("リプライの場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
       // arrange
       const parentActor = await actorFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
@@ -246,68 +286,17 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledTimes(2);
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenNthCalledWith(
-        1,
-        new AtUri(record.uri.toString()),
-        "all",
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledWith(
+        replier.did,
+        "posts",
       );
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenNthCalledWith(
-        2,
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(parentPost.uri),
         "reply",
       );
-
-      const [actorStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, replier.did));
-      expect(actorStats).toEqual({
-        actorDid: replier.did,
-        postsCount: 1,
-        followsCount: 0,
-        followersCount: 0,
-      });
     });
 
-    test("投稿時にactor_statsの投稿数が更新される", async () => {
-      // arrange
-      const regularActor = await actorFactory(ctx.db).create();
-      const postJson = {
-        $type: "app.bsky.feed.post",
-        text: "Regular post without reply",
-        createdAt: new Date().toISOString(),
-      };
-      const regularRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => regularActor })
-        .props({ json: () => postJson })
-        .create();
-      const record = Record.fromJson({
-        uri: regularRecord.uri,
-        cid: regularRecord.cid,
-        json: postJson,
-        indexedAt: new Date(),
-      });
-
-      // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.afterAction({ action: "upsert", ctx, record });
-
-      // assert
-      const [actorStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, regularActor.did));
-
-      expect(actorStats).toMatchObject({
-        actorDid: regularActor.did,
-        postsCount: 1,
-        followsCount: 0,
-        followersCount: 0,
-      });
-    });
-
-    test("引用投稿の場合、引用された投稿に対してquote集計ジョブがスケジュールされる", async () => {
+    test("引用投稿の場合、quote集計ジョブがスケジュールされる", async () => {
       // arrange
       const quotedPost = await postFactory(ctx.db).create();
       const quotingActor = await actorFactory(ctx.db).create();
@@ -345,48 +334,7 @@ describe("PostIndexer", () => {
       );
     });
 
-    test("引用投稿の場合、引用された投稿が存在しなくても集計ジョブがスケジュールされる", async () => {
-      // arrange
-      const quotingActor = await actorFactory(ctx.db).create();
-      const nonExistentQuotedUri =
-        "at://did:plc:nonexistent/app.bsky.feed.post/quoted";
-      const nonExistentQuotedCid =
-        "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e";
-      const quoteJson = {
-        $type: "app.bsky.feed.post",
-        text: "Quote of non-existent post",
-        embed: {
-          $type: "app.bsky.embed.record",
-          record: {
-            uri: nonExistentQuotedUri,
-            cid: nonExistentQuotedCid,
-          },
-        },
-        createdAt: new Date().toISOString(),
-      };
-      const quoteRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => quotingActor })
-        .props({ json: () => quoteJson })
-        .create();
-      const record = Record.fromJson({
-        uri: quoteRecord.uri,
-        cid: quoteRecord.cid,
-        json: quoteJson,
-        indexedAt: new Date(),
-      });
-
-      // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
-      await postIndexer.afterAction({ action: "upsert", ctx, record });
-
-      // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
-        new AtUri(nonExistentQuotedUri),
-        "quote",
-      );
-    });
-
-    test("親投稿が存在しない場合は集計ジョブをスケジュールしない", async () => {
+    test("親投稿が存在しない場合は親投稿に対する集計ジョブをスケジュールしない", async () => {
       // arrange
       const replierActor = await actorFactory(ctx.db).create();
       const nonExistentParentUri =
@@ -424,24 +372,17 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledWith(
+        replierActor.did,
+        "posts",
+      );
       expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalledWith(
         nonExistentParentUri,
         "reply",
       );
-
-      const [actorStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, replierActor.did));
-      expect(actorStats).toMatchObject({
-        actorDid: replierActor.did,
-        postsCount: 1,
-        followsCount: 0,
-        followersCount: 0,
-      });
     });
 
-    test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しない", async () => {
+    test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがactor_statsは更新する", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const postJson = {
@@ -473,24 +414,11 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "delete", ctx, record });
 
       // assert
-      // post_statsが作成されていないことを確認
-      const stats = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, post.uri));
-      expect(stats).toHaveLength(0);
-
-      // actor_statsは更新される（削除済みpostも含めて集計されるため0になる）
-      const [actorStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, actor.did));
-      expect(actorStats).toMatchObject({
-        actorDid: actor.did,
-        postsCount: 0, // 削除済みなので0
-        followsCount: 0,
-        followersCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalled();
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledWith(
+        actor.did,
+        "posts",
+      );
     });
   });
 });

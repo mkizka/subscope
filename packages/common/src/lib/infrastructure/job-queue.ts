@@ -47,6 +47,10 @@ export class JobQueue implements IJobQueue {
       commit: new Queue("commit", queueOptions(withRetry)),
       backfill: new Queue("backfill", queueOptions()),
       aggregateStats: new Queue("aggregateStats", queueOptions(withRetry)),
+      aggregateActorStats: new Queue(
+        "aggregateActorStats",
+        queueOptions(withRetry),
+      ),
     };
   }
   static inject = ["redisUrl"] as const;

@@ -1,10 +1,8 @@
 import { AtUri } from "@atproto/syntax";
 import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
-import { schema } from "@repo/db";
 import {
   actorFactory,
-  actorStatsFactory,
   getTestSetup,
   postFactory,
   recordFactory,
@@ -40,6 +38,7 @@ import { LikeIndexer } from "./indexer/like-indexer.js";
 import { PostIndexer } from "./indexer/post-indexer.js";
 import { ProfileIndexer } from "./indexer/profile-indexer.js";
 import { RepostIndexer } from "./indexer/repost-indexer.js";
+import type { AggregateActorStatsScheduler } from "./scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregateStatsScheduler } from "./scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
@@ -52,6 +51,10 @@ describe("IndexRecordService", () => {
     .provideValue(
       "aggregateStatsScheduler",
       mockDeep<AggregateStatsScheduler>(),
+    )
+    .provideValue(
+      "aggregateActorStatsScheduler",
+      mockDeep<AggregateActorStatsScheduler>(),
     )
     .provideValue("jobQueue", mockDeep<IJobQueue>())
     .provideValue("indexLevel", 1)
@@ -247,71 +250,6 @@ describe("IndexRecordService", () => {
         where: (records, { eq }) => eq(records.uri, post.uri),
       });
       expect(record).toBeUndefined();
-    });
-
-    test("フォロー解除時にstatsが正しく更新される", async () => {
-      // arrange
-      const followerActor = await actorFactory(ctx.db).create();
-      const followingActor = await actorFactory(ctx.db).create();
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({
-          actor: () => followerActor,
-        })
-        .props({
-          json: () => ({
-            $type: "app.bsky.graph.follow",
-            subject: followingActor.did,
-            createdAt: new Date().toISOString(),
-          }),
-        })
-        .create();
-
-      // フォローを作成
-      await ctx.db.insert(schema.follows).values({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
-        actorDid: followerActor.did,
-        subjectDid: followingActor.did,
-        createdAt: new Date(),
-        indexedAt: new Date(),
-      });
-
-      // 初期のstatsを作成
-      await actorStatsFactory(ctx.db)
-        .vars({
-          actor: () => followerActor,
-        })
-        .props({
-          followsCount: () => 1, // 1人フォローしている
-        })
-        .create();
-
-      await actorStatsFactory(ctx.db)
-        .vars({
-          actor: () => followingActor,
-        })
-        .props({
-          followersCount: () => 1, // 1人にフォローされている
-        })
-        .create();
-
-      // act
-      await indexRecordService.delete({
-        ctx,
-        uri: new AtUri(followRecord.uri),
-      });
-
-      // assert
-      const followerStats = await ctx.db.query.actorStats.findFirst({
-        where: (stats, { eq }) => eq(stats.actorDid, followerActor.did),
-      });
-      const followingStats = await ctx.db.query.actorStats.findFirst({
-        where: (stats, { eq }) => eq(stats.actorDid, followingActor.did),
-      });
-
-      // フォロー解除後、カウントが0になるはず
-      expect(followerStats?.followsCount).toBe(0);
-      expect(followingStats?.followersCount).toBe(0);
     });
   });
 });

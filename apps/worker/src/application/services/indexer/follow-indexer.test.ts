@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Record } from "@repo/common/domain";
 import type { JobQueue } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
@@ -13,11 +14,13 @@ import { FollowRepository } from "../../../infrastructure/repositories/follow-re
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { IndexActorService } from "../index-actor-service.js";
+import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../scheduler/resolve-did-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
 describe("FollowIndexer", () => {
+  const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
   const { testInjector, ctx } = getTestSetup();
 
   const followIndexer = testInjector
@@ -31,6 +34,10 @@ describe("FollowIndexer", () => {
     .provideClass("resolveDidScheduler", ResolveDidScheduler)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)
     .provideClass("indexActorService", IndexActorService)
+    .provideValue(
+      "aggregateActorStatsScheduler",
+      mockAggregateActorStatsScheduler,
+    )
     .injectClass(FollowIndexer);
 
   describe("upsert", () => {
@@ -131,7 +138,7 @@ describe("FollowIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("フォロー作成時にfollowsCountとfollowersCountが更新される", async () => {
+    test("フォロー作成時にfollows/followers集計ジョブがスケジュールされる", async () => {
       // arrange
       const [follower, followee] = await actorFactory(ctx.db).createList(2);
 
@@ -156,31 +163,19 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record });
 
       // assert
-      // フォローした人のfollowsCountが更新される
-      const [followerStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, follower.did));
-
-      expect(followerStats).toMatchObject({
-        actorDid: follower.did,
-        followsCount: 1,
-        followersCount: 0,
-        postsCount: 0,
-      });
-
-      // フォローされた人のfollowersCountが更新される
-      const [followeeStats] = await ctx.db
-        .select()
-        .from(schema.actorStats)
-        .where(eq(schema.actorStats.actorDid, followee.did));
-
-      expect(followeeStats).toMatchObject({
-        actorDid: followee.did,
-        followsCount: 0,
-        followersCount: 1,
-        postsCount: 0,
-      });
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledTimes(
+        2,
+      );
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenNthCalledWith(
+        1,
+        follower.did,
+        "follows",
+      );
+      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenNthCalledWith(
+        2,
+        followee.did,
+        "followers",
+      );
     });
   });
 });

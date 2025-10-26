@@ -18,6 +18,11 @@ type AggregateStatsData = {
   type: "reply" | "repost" | "quote" | "like" | "all";
 };
 
+type AggregateActorStatsData = {
+  actorDid: Did;
+  type: "follows" | "followers" | "posts";
+};
+
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
@@ -26,6 +31,7 @@ export type JobData = {
   commit: CommitEvent<SupportedCollection>;
   backfill: Did;
   aggregateStats: AggregateStatsData;
+  aggregateActorStats: AggregateActorStatsData;
 };
 
 export type QueueName = keyof JobData;

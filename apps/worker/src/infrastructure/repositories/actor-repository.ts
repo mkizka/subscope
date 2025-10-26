@@ -46,6 +46,11 @@ export class ActorRepository implements IActorRepository {
     });
   }
 
+  async exists({ ctx, did }: { ctx: TransactionContext; did: Did }) {
+    const actor = await this.findByDid({ ctx, did });
+    return actor !== null;
+  }
+
   async delete({ ctx, did }: { ctx: TransactionContext; did: Did }) {
     await ctx.db.delete(schema.actors).where(eq(schema.actors.did, did));
   }

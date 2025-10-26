@@ -9,5 +9,7 @@ export interface IActorRepository {
     did: Did;
   }) => Promise<Actor | null>;
 
+  exists: (params: { ctx: TransactionContext; did: Did }) => Promise<boolean>;
+
   delete: (params: { ctx: TransactionContext; did: Did }) => Promise<void>;
 }
