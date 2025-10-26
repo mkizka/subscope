@@ -95,16 +95,10 @@ export class PostIndexer implements ICollectionIndexer {
     }
 
     if (post.replyParent) {
-      const parentExists = await this.postRepository.exists(
-        ctx,
+      await this.aggregateStatsScheduler.schedule(
         post.replyParent.uri,
+        "reply",
       );
-      if (parentExists) {
-        await this.aggregateStatsScheduler.schedule(
-          post.replyParent.uri,
-          "reply",
-        );
-      }
     }
 
     if (

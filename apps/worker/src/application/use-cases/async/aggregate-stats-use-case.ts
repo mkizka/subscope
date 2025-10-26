@@ -1,23 +1,29 @@
 import { AtUri } from "@atproto/syntax";
-import type { DatabaseClient, JobData } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/domain";
 
+import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
-
-type AggregateStatsCommand = {
-  postUri: string;
-  type: JobData["aggregateStats"]["type"];
-};
+import type { AggregateStatsCommand } from "./aggregate-stats-command.js";
 
 export class AggregateStatsUseCase {
   constructor(
     private readonly postStatsRepository: IPostStatsRepository,
+    private readonly postRepository: IPostRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = ["postStatsRepository", "db"] as const;
+  static inject = ["postStatsRepository", "postRepository", "db"] as const;
 
   async execute(command: AggregateStatsCommand) {
     const ctx = { db: this.db };
     const uri = new AtUri(command.postUri);
+
+    const postExists = await this.postRepository.exists(ctx, uri);
+    if (!postExists) {
+      await command.jobLogger.log(
+        `Skipping aggregation for ${command.postUri} - post not found`,
+      );
+      return;
+    }
 
     if (command.type === "reply") {
       await this.postStatsRepository.upsertReplyCount({ ctx, uri });

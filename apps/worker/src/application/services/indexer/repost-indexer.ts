@@ -70,10 +70,6 @@ export class RepostIndexer implements ICollectionIndexer {
     record: Record;
   }): Promise<void> {
     const repost = Repost.from(record);
-
-    const postExists = await this.postRepository.exists(ctx, repost.subjectUri);
-    if (postExists) {
-      await this.aggregateStatsScheduler.schedule(repost.subjectUri, "repost");
-    }
+    await this.aggregateStatsScheduler.schedule(repost.subjectUri, "repost");
   }
 }

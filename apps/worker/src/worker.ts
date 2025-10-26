@@ -22,12 +22,12 @@ import { AggregateStatsScheduler } from "./application/services/scheduler/aggreg
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
+import { AggregateStatsUseCase } from "./application/use-cases/async/aggregate-stats-use-case.js";
 import { BackfillUseCase } from "./application/use-cases/async/backfill-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
-import { AggregateStatsUseCase } from "./application/use-cases/stats/aggregate-stats-use-case.js";
 import { FollowIndexingPolicy } from "./domain/follow-indexing-policy.js";
 import { GeneratorIndexingPolicy } from "./domain/generator-indexing-policy.js";
 import { LikeIndexingPolicy } from "./domain/like-indexing-policy.js";

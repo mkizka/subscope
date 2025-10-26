@@ -140,43 +140,5 @@ describe("RepostIndexer", () => {
         "repost",
       );
     });
-
-    test("対象の投稿が存在しない場合は集計ジョブをスケジュールしない", async () => {
-      // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const nonExistentPostUri = `at://${actor.did}/app.bsky.feed.post/nonexistent`;
-
-      const orphanRepostRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.feed.repost",
-      )
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.repost",
-            subject: {
-              uri: nonExistentPostUri,
-              cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-            },
-            createdAt: new Date().toISOString(),
-          }),
-        })
-        .create();
-
-      const record = Record.fromJson({
-        uri: orphanRepostRecord.uri,
-        cid: orphanRepostRecord.cid,
-        json: orphanRepostRecord.json,
-        indexedAt: new Date(),
-      });
-
-      // act
-      await repostIndexer.afterAction({ ctx, record });
-
-      // assert
-      expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalledWith(
-        new AtUri(nonExistentPostUri),
-        "repost",
-      );
-    });
   });
 });

@@ -4,6 +4,8 @@ import { Worker } from "bullmq";
 
 import { handleAccountCommandFactory } from "../application/use-cases/account/handle-account-command.js";
 import type { HandleAccountUseCase } from "../application/use-cases/account/handle-account-use-case.js";
+import { aggregateStatsCommandFactory } from "../application/use-cases/async/aggregate-stats-command.js";
+import type { AggregateStatsUseCase } from "../application/use-cases/async/aggregate-stats-use-case.js";
 import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
@@ -11,7 +13,6 @@ import { indexCommitCommandFactory } from "../application/use-cases/commit/index
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
-import type { AggregateStatsUseCase } from "../application/use-cases/stats/aggregate-stats-use-case.js";
 import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
@@ -98,7 +99,11 @@ export class SyncWorker {
         },
       ),
       createWorker("aggregateStats", async (job) => {
-        await aggregateStatsUseCase.execute(job.data);
+        const command = aggregateStatsCommandFactory({
+          data: job.data,
+          jobLogger: createJobLogger(job),
+        });
+        await aggregateStatsUseCase.execute(command);
       }),
     ];
   }
