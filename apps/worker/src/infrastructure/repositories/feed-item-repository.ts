@@ -2,6 +2,7 @@ import type { FeedItem, TransactionContext } from "@repo/common/domain";
 import { type FeedItemInsert, schema } from "@repo/db";
 
 import type { IFeedItemRepository } from "../../application/interfaces/repositories/feed-item-repository.js";
+import { sanitizeDate } from "../utils/data-sanitizer.js";
 
 export class FeedItemRepository implements IFeedItemRepository {
   async upsert({
@@ -16,7 +17,7 @@ export class FeedItemRepository implements IFeedItemRepository {
       type: feedItem.type,
       subjectUri: feedItem.subjectUri,
       actorDid: feedItem.actorDid,
-      sortAt: feedItem.sortAt,
+      sortAt: sanitizeDate(feedItem.sortAt),
     } satisfies FeedItemInsert;
     await ctx.db
       .insert(schema.feedItems)

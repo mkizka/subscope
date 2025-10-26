@@ -16,7 +16,7 @@ export class FollowRepository implements IFollowRepository {
       .insert(schema.follows)
       .values({
         uri: follow.uri.toString(),
-        indexedAt: sanitizeDate(follow.indexedAt),
+        indexedAt: follow.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({

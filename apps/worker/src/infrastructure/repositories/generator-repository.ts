@@ -25,7 +25,7 @@ export class GeneratorRepository implements IGeneratorRepository {
       .insert(schema.generators)
       .values({
         uri: generator.uri.toString(),
-        indexedAt: sanitizeDate(generator.indexedAt),
+        indexedAt: generator.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({

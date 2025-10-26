@@ -154,6 +154,48 @@ describe("PostIndexer", () => {
       // assert
       expect(mockJobQueue.add).not.toHaveBeenCalled();
     });
+
+    test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {
+      // arrange
+      const subscriber = await actorFactory(ctx.db).create();
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => subscriber })
+        .create();
+
+      const postJson = {
+        $type: "app.bsky.feed.post",
+        text: "投稿に無効な日付が含まれている",
+        createdAt: "0000-01-01T00:00:00.000Z",
+      };
+      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
+        .vars({ actor: () => subscriber })
+        .props({ json: () => postJson })
+        .create();
+      const record = Record.fromJson({
+        uri: postRecord.uri,
+        cid: postRecord.cid,
+        json: postJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, depth: 0 });
+
+      // assert
+      const [post] = await ctx.db
+        .select()
+        .from(schema.posts)
+        .where(eq(schema.posts.uri, record.uri.toString()))
+        .limit(1);
+      expect(post?.createdAt).toEqual(new Date(0));
+
+      const [feedItem] = await ctx.db
+        .select()
+        .from(schema.feedItems)
+        .where(eq(schema.feedItems.uri, record.uri.toString()))
+        .limit(1);
+      expect(feedItem?.sortAt).toEqual(new Date(0));
+    });
   });
 
   describe("afterAction", () => {

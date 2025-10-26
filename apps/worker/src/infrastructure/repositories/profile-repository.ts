@@ -28,7 +28,7 @@ export class ProfileRepository implements IProfileRepository {
       .insert(schema.profiles)
       .values({
         uri: profile.uri.toString(),
-        indexedAt: sanitizeDate(profile.indexedAt),
+        indexedAt: profile.indexedAt,
         ...profileData,
       })
       .onConflictDoUpdate({

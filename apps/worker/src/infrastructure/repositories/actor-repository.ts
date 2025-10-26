@@ -8,8 +8,6 @@ import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../../application/interfaces/repositories/actor-repository.js";
 
-const CURRENT_BACKFILL_VERSION = 1;
-
 export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {

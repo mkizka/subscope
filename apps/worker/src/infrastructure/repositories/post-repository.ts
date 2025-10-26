@@ -31,7 +31,7 @@ export class PostRepository implements IPostRepository {
       .insert(schema.posts)
       .values({
         uri: postUri,
-        indexedAt: sanitizeDate(post.indexedAt),
+        indexedAt: post.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({

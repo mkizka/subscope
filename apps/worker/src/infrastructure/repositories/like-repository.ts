@@ -17,7 +17,7 @@ export class LikeRepository implements ILikeRepository {
       .insert(schema.likes)
       .values({
         uri: like.uri.toString(),
-        indexedAt: sanitizeDate(like.indexedAt),
+        indexedAt: like.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({

@@ -17,7 +17,7 @@ export class RepostRepository implements IRepostRepository {
       .insert(schema.reposts)
       .values({
         uri: repost.uri.toString(),
-        indexedAt: sanitizeDate(repost.indexedAt),
+        indexedAt: repost.indexedAt,
         ...data,
       })
       .onConflictDoUpdate({
