@@ -8,18 +8,18 @@ export class AggregateActorStatsScheduler {
   static inject = ["jobQueue"] as const;
 
   async schedule(
-    actorDid: Did,
+    did: Did,
     type: JobData["aggregateActorStats"]["type"],
   ): Promise<void> {
     await this.jobQueue.add({
       queueName: "aggregateActorStats",
-      jobName: actorDid,
+      jobName: did,
       data: {
-        actorDid,
+        did,
         type,
       },
       options: {
-        jobId: `${type}__${actorDid}`,
+        jobId: `${type}__${did}`,
         delay: env.AGGREGATE_STATS_DELAY_SECONDS * 1000,
       },
     });

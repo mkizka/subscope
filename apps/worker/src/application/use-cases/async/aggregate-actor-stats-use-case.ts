@@ -17,11 +17,11 @@ export class AggregateActorStatsUseCase {
 
     const actorExists = await this.actorRepository.exists({
       ctx,
-      did: command.actorDid,
+      did: command.did,
     });
     if (!actorExists) {
       await command.jobLogger.log(
-        `Skipping aggregation for ${command.actorDid} - actor not found`,
+        `Skipping aggregation for ${command.did} - actor not found`,
       );
       return;
     }
@@ -29,17 +29,17 @@ export class AggregateActorStatsUseCase {
     if (command.type === "follows") {
       await this.actorStatsRepository.upsertFollowsCount({
         ctx,
-        actorDid: command.actorDid,
+        actorDid: command.did,
       });
     } else if (command.type === "followers") {
       await this.actorStatsRepository.upsertFollowersCount({
         ctx,
-        actorDid: command.actorDid,
+        actorDid: command.did,
       });
     } else {
       await this.actorStatsRepository.upsertPostsCount({
         ctx,
-        actorDid: command.actorDid,
+        actorDid: command.did,
       });
     }
   }

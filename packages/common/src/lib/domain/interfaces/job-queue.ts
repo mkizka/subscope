@@ -19,7 +19,7 @@ type AggregatePostStatsData = {
 };
 
 type AggregateActorStatsData = {
-  actorDid: Did;
+  did: Did;
   type: "follows" | "followers" | "posts";
 };
 
