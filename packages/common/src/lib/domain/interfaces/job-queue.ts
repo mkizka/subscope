@@ -13,7 +13,7 @@ type FetchRecordData = {
   depth: number;
 };
 
-type AggregateStatsData = {
+type AggregatePostStatsData = {
   postUri: string;
   type: "reply" | "repost" | "quote" | "like" | "all";
 };
@@ -30,7 +30,7 @@ export type JobData = {
   identity: IdentityEvent;
   commit: CommitEvent<SupportedCollection>;
   backfill: Did;
-  aggregateStats: AggregateStatsData;
+  aggregatePostStats: AggregatePostStatsData;
   aggregateActorStats: AggregateActorStatsData;
 };
 

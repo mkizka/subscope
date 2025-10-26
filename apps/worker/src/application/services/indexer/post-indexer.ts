@@ -11,7 +11,7 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
-import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
+import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class PostIndexer implements ICollectionIndexer {
@@ -20,7 +20,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postIndexingPolicy: PostIndexingPolicy,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
-    private readonly aggregateStatsScheduler: AggregateStatsScheduler,
+    private readonly aggregatePostStatsScheduler: AggregatePostStatsScheduler,
     private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
   ) {}
   static inject = [
@@ -28,7 +28,7 @@ export class PostIndexer implements ICollectionIndexer {
     "postIndexingPolicy",
     "feedItemRepository",
     "fetchRecordScheduler",
-    "aggregateStatsScheduler",
+    "aggregatePostStatsScheduler",
     "aggregateActorStatsScheduler",
   ] as const;
 
@@ -84,11 +84,11 @@ export class PostIndexer implements ICollectionIndexer {
       // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
       // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
       //    → このとき、リポスト数が0なので1にする必要がある
-      await this.aggregateStatsScheduler.schedule(post.uri, "all");
+      await this.aggregatePostStatsScheduler.schedule(post.uri, "all");
     }
 
     if (post.replyParent) {
-      await this.aggregateStatsScheduler.schedule(
+      await this.aggregatePostStatsScheduler.schedule(
         post.replyParent.uri,
         "reply",
       );
@@ -98,7 +98,7 @@ export class PostIndexer implements ICollectionIndexer {
       post.embed instanceof PostEmbedRecord ||
       post.embed instanceof PostEmbedRecordWithMedia
     ) {
-      await this.aggregateStatsScheduler.schedule(post.embed.uri, "quote");
+      await this.aggregatePostStatsScheduler.schedule(post.embed.uri, "quote");
     }
   }
 }

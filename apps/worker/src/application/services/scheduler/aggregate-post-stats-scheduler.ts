@@ -3,17 +3,17 @@ import type { IJobQueue, JobData } from "@repo/common/domain";
 
 import { env } from "../../../shared/env.js";
 
-export class AggregateStatsScheduler {
+export class AggregatePostStatsScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
   static inject = ["jobQueue"] as const;
 
   async schedule(
     uri: AtUri,
-    type: JobData["aggregateStats"]["type"],
+    type: JobData["aggregatePostStats"]["type"],
   ): Promise<void> {
     const postUri = uri.toString();
     await this.jobQueue.add({
-      queueName: "aggregateStats",
+      queueName: "aggregatePostStats",
       jobName: postUri,
       data: {
         postUri,

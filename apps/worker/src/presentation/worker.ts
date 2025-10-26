@@ -6,8 +6,8 @@ import { handleAccountCommandFactory } from "../application/use-cases/account/ha
 import type { HandleAccountUseCase } from "../application/use-cases/account/handle-account-use-case.js";
 import { aggregateActorStatsCommandFactory } from "../application/use-cases/async/aggregate-actor-stats-command.js";
 import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
-import { aggregateStatsCommandFactory } from "../application/use-cases/async/aggregate-stats-command.js";
-import type { AggregateStatsUseCase } from "../application/use-cases/async/aggregate-stats-use-case.js";
+import { aggregatePostStatsCommandFactory } from "../application/use-cases/async/aggregate-post-stats-command.js";
+import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
@@ -42,7 +42,7 @@ export class SyncWorker {
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
     handleAccountUseCase: HandleAccountUseCase,
-    aggregateStatsUseCase: AggregateStatsUseCase,
+    aggregatePostStatsUseCase: AggregatePostStatsUseCase,
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
   ) {
     this.workers = [
@@ -101,12 +101,12 @@ export class SyncWorker {
           },
         },
       ),
-      createWorker("aggregateStats", async (job) => {
-        const command = aggregateStatsCommandFactory({
+      createWorker("aggregatePostStats", async (job) => {
+        const command = aggregatePostStatsCommandFactory({
           data: job.data,
           jobLogger: createJobLogger(job),
         });
-        await aggregateStatsUseCase.execute(command);
+        await aggregatePostStatsUseCase.execute(command);
       }),
       createWorker("aggregateActorStats", async (job) => {
         const command = aggregateActorStatsCommandFactory({
@@ -124,7 +124,7 @@ export class SyncWorker {
     "resolveDidUseCase",
     "fetchRecordUseCase",
     "handleAccountUseCase",
-    "aggregateStatsUseCase",
+    "aggregatePostStatsUseCase",
     "aggregateActorStatsUseCase",
   ] as const;
 

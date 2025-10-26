@@ -21,12 +21,12 @@ import { FeedItemRepository } from "../../../infrastructure/repositories/feed-it
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
-import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
+import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { PostIndexer } from "./post-indexer.js";
 
 describe("PostIndexer", () => {
-  const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
+  const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
   const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
   const mockJobQueue = mockDeep<IJobQueue>();
   const { testInjector, ctx } = getTestSetup();
@@ -38,7 +38,10 @@ describe("PostIndexer", () => {
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
+    .provideValue(
+      "aggregatePostStatsScheduler",
+      mockAggregatePostStatsScheduler,
+    )
     .provideValue(
       "aggregateActorStatsScheduler",
       mockAggregateActorStatsScheduler,
@@ -235,7 +238,7 @@ describe("PostIndexer", () => {
         regularActor.did,
         "posts",
       );
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(record.uri.toString()),
         "all",
       );
@@ -290,7 +293,7 @@ describe("PostIndexer", () => {
         replier.did,
         "posts",
       );
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(parentPost.uri),
         "reply",
       );
@@ -328,7 +331,7 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(quotedPost.uri),
         "quote",
       );
@@ -376,7 +379,7 @@ describe("PostIndexer", () => {
         replierActor.did,
         "posts",
       );
-      expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).not.toHaveBeenCalledWith(
         nonExistentParentUri,
         "reply",
       );
@@ -414,7 +417,7 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "delete", ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalled();
+      expect(mockAggregatePostStatsScheduler.schedule).not.toHaveBeenCalled();
       expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledWith(
         actor.did,
         "posts",

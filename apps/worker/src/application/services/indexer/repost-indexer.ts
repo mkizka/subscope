@@ -6,14 +6,14 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
+import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
     private readonly repostIndexingPolicy: RepostIndexingPolicy,
-    private readonly aggregateStatsScheduler: AggregateStatsScheduler,
+    private readonly aggregatePostStatsScheduler: AggregatePostStatsScheduler,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postRepository: IPostRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
@@ -21,7 +21,7 @@ export class RepostIndexer implements ICollectionIndexer {
   static inject = [
     "repostRepository",
     "repostIndexingPolicy",
-    "aggregateStatsScheduler",
+    "aggregatePostStatsScheduler",
     "feedItemRepository",
     "postRepository",
     "fetchRecordScheduler",
@@ -70,6 +70,9 @@ export class RepostIndexer implements ICollectionIndexer {
     record: Record;
   }): Promise<void> {
     const repost = Repost.from(record);
-    await this.aggregateStatsScheduler.schedule(repost.subjectUri, "repost");
+    await this.aggregatePostStatsScheduler.schedule(
+      repost.subjectUri,
+      "repost",
+    );
   }
 }

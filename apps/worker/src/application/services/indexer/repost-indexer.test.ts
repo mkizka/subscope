@@ -18,18 +18,21 @@ import { FeedItemRepository } from "../../../infrastructure/repositories/feed-it
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { RepostRepository } from "../../../infrastructure/repositories/repost-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
-import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
+import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { RepostIndexer } from "./repost-indexer.js";
 
 describe("RepostIndexer", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
+  const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
   const { testInjector, ctx } = getTestSetup();
 
   const repostIndexer = testInjector
     .provideClass("repostRepository", RepostRepository)
-    .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
+    .provideValue(
+      "aggregatePostStatsScheduler",
+      mockAggregatePostStatsScheduler,
+    )
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("postRepository", PostRepository)
     .provideValue("indexLevel", 1)
@@ -135,7 +138,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(post.uri),
         "repost",
       );

@@ -3,9 +3,9 @@ import type { DatabaseClient } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
-import type { AggregateStatsCommand } from "./aggregate-stats-command.js";
+import type { AggregatePostStatsCommand } from "./aggregate-post-stats-command.js";
 
-export class AggregateStatsUseCase {
+export class AggregatePostStatsUseCase {
   constructor(
     private readonly postStatsRepository: IPostStatsRepository,
     private readonly postRepository: IPostRepository,
@@ -13,7 +13,7 @@ export class AggregateStatsUseCase {
   ) {}
   static inject = ["postStatsRepository", "postRepository", "db"] as const;
 
-  async execute(command: AggregateStatsCommand) {
+  async execute(command: AggregatePostStatsCommand) {
     const ctx = { db: this.db };
     const uri = new AtUri(command.postUri);
 

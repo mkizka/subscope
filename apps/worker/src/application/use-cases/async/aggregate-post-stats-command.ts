@@ -2,11 +2,11 @@ import type { JobData } from "@repo/common/domain";
 
 import type { JobLogger } from "../../../shared/job.js";
 
-export const aggregateStatsCommandFactory = ({
+export const aggregatePostStatsCommandFactory = ({
   data,
   jobLogger,
 }: {
-  data: JobData["aggregateStats"];
+  data: JobData["aggregatePostStats"];
   jobLogger: JobLogger;
 }) => {
   return {
@@ -16,6 +16,6 @@ export const aggregateStatsCommandFactory = ({
   };
 };
 
-export type AggregateStatsCommand = ReturnType<
-  typeof aggregateStatsCommandFactory
+export type AggregatePostStatsCommand = ReturnType<
+  typeof aggregatePostStatsCommandFactory
 >;

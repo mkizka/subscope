@@ -16,11 +16,11 @@ import { mock } from "vitest-mock-extended";
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
-import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
+import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import { LikeIndexer } from "./like-indexer.js";
 
 describe("LikeIndexer", () => {
-  const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
+  const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
   const { testInjector, ctx } = getTestSetup();
 
   const likeIndexer = testInjector
@@ -28,7 +28,10 @@ describe("LikeIndexer", () => {
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("indexLevel", 1)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
-    .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
+    .provideValue(
+      "aggregatePostStatsScheduler",
+      mockAggregatePostStatsScheduler,
+    )
     .injectClass(LikeIndexer);
 
   describe("upsert", () => {
@@ -107,7 +110,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(post.uri),
         "like",
       );
@@ -141,7 +144,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(post.uri),
         "like",
       );
@@ -176,7 +179,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
         new AtUri(nonExistentPostUri),
         "like",
       );
