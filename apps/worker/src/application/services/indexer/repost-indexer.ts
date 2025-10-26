@@ -4,16 +4,16 @@ import { FeedItem, Repost } from "@repo/common/domain";
 import type { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
     private readonly repostIndexingPolicy: RepostIndexingPolicy,
-    private readonly postStatsRepository: IPostStatsRepository,
+    private readonly aggregateStatsScheduler: AggregateStatsScheduler,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postRepository: IPostRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
@@ -21,7 +21,7 @@ export class RepostIndexer implements ICollectionIndexer {
   static inject = [
     "repostRepository",
     "repostIndexingPolicy",
-    "postStatsRepository",
+    "aggregateStatsScheduler",
     "feedItemRepository",
     "postRepository",
     "fetchRecordScheduler",
@@ -71,13 +71,9 @@ export class RepostIndexer implements ICollectionIndexer {
   }): Promise<void> {
     const repost = Repost.from(record);
 
-    // 対象の投稿が存在する場合のみstatsを更新
     const postExists = await this.postRepository.exists(ctx, repost.subjectUri);
     if (postExists) {
-      await this.postStatsRepository.upsertRepostCount({
-        ctx,
-        uri: repost.subjectUri,
-      });
+      await this.aggregateStatsScheduler.schedule(repost.subjectUri, "repost");
     }
   }
 }

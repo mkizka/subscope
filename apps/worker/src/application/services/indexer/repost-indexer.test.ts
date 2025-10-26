@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+import { AtUri } from "@atproto/syntax";
 import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
@@ -6,7 +8,6 @@ import {
   getTestSetup,
   postFactory,
   recordFactory,
-  repostFactory,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -15,19 +16,20 @@ import { mock } from "vitest-mock-extended";
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/repositories/post-stats-repository.js";
 import { RepostRepository } from "../../../infrastructure/repositories/repost-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
+import type { AggregateStatsScheduler } from "../scheduler/aggregate-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { RepostIndexer } from "./repost-indexer.js";
 
 describe("RepostIndexer", () => {
   const mockJobQueue = mock<IJobQueue>();
+  const mockAggregateStatsScheduler = mock<AggregateStatsScheduler>();
   const { testInjector, ctx } = getTestSetup();
 
   const repostIndexer = testInjector
     .provideClass("repostRepository", RepostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
+    .provideValue("aggregateStatsScheduler", mockAggregateStatsScheduler)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("postRepository", PostRepository)
     .provideValue("indexLevel", 1)
@@ -102,13 +104,9 @@ describe("RepostIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("リポスト追加時にpost_statsのリポスト数が正しく更新される", async () => {
+    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
       // arrange
       const post = await postFactory(ctx.db).create();
-
-      await repostFactory(ctx.db)
-        .vars({ subject: () => post })
-        .createList(2);
 
       const newRepostRecord = await recordFactory(
         ctx.db,
@@ -137,22 +135,13 @@ describe("RepostIndexer", () => {
       await repostIndexer.afterAction({ ctx, record });
 
       // assert
-      const [stats] = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, post.uri))
-        .limit(1);
-
-      // 既存の2つのリポストがカウントされるため、repostCount=2
-      expect(stats).toMatchObject({
-        postUri: post.uri,
-        likeCount: 0,
-        repostCount: 2,
-        replyCount: 0,
-      });
+      expect(mockAggregateStatsScheduler.schedule).toHaveBeenCalledWith(
+        new AtUri(post.uri),
+        "repost",
+      );
     });
 
-    test("対象の投稿が存在しない場合はpost_statsを更新しない", async () => {
+    test("対象の投稿が存在しない場合は集計ジョブをスケジュールしない", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const nonExistentPostUri = `at://${actor.did}/app.bsky.feed.post/nonexistent`;
@@ -184,13 +173,10 @@ describe("RepostIndexer", () => {
       await repostIndexer.afterAction({ ctx, record });
 
       // assert
-      const stats = await ctx.db
-        .select()
-        .from(schema.postStats)
-        .where(eq(schema.postStats.postUri, nonExistentPostUri));
-
-      // 対象の投稿がpostsテーブルに存在しないため、post_statsレコードは作成されない（0件）
-      expect(stats).toHaveLength(0);
+      expect(mockAggregateStatsScheduler.schedule).not.toHaveBeenCalledWith(
+        new AtUri(nonExistentPostUri),
+        "repost",
+      );
     });
   });
 });

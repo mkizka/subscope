@@ -21,6 +21,8 @@ export class AggregateStatsUseCase {
 
     if (command.type === "reply") {
       await this.postStatsRepository.upsertReplyCount({ ctx, uri });
+    } else if (command.type === "repost") {
+      await this.postStatsRepository.upsertRepostCount({ ctx, uri });
     } else {
       await this.postStatsRepository.upsertAllCount({ ctx, uri });
     }
