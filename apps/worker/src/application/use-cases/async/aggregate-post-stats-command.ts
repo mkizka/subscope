@@ -10,7 +10,7 @@ export const aggregatePostStatsCommandFactory = ({
   jobLogger: JobLogger;
 }) => {
   return {
-    postUri: data.postUri,
+    uri: data.uri,
     type: data.type,
     jobLogger,
   };

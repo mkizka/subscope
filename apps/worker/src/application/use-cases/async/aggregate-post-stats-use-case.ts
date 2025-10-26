@@ -15,12 +15,12 @@ export class AggregatePostStatsUseCase {
 
   async execute(command: AggregatePostStatsCommand) {
     const ctx = { db: this.db };
-    const uri = new AtUri(command.postUri);
+    const uri = new AtUri(command.uri);
 
     const postExists = await this.postRepository.exists(ctx, uri);
     if (!postExists) {
       await command.jobLogger.log(
-        `Skipping aggregation for ${command.postUri} - post not found`,
+        `Skipping aggregation for ${command.uri} - post not found`,
       );
       return;
     }

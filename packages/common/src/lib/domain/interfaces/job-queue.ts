@@ -14,7 +14,7 @@ type FetchRecordData = {
 };
 
 type AggregatePostStatsData = {
-  postUri: string;
+  uri: string;
   type: "reply" | "repost" | "quote" | "like" | "all";
 };
 

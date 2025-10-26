@@ -16,7 +16,7 @@ export class AggregatePostStatsScheduler {
       queueName: "aggregatePostStats",
       jobName: postUri,
       data: {
-        postUri,
+        uri: postUri,
         type,
       },
       options: {
