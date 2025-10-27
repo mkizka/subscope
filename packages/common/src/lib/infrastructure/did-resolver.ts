@@ -1,5 +1,5 @@
-import type { DidCache } from "@atproto/identity";
-import { DidResolver as Resolver } from "@atproto/identity";
+import type { DidCache, DidResolverOpts } from "@atproto/identity";
+import { DidResolver as AtprotoDidResolver } from "@atproto/identity";
 
 import {
   DidResolutionError,
@@ -8,6 +8,20 @@ import {
 import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
 import type { IMetricReporter } from "../domain/interfaces/metric.js";
 import { asHandle } from "../utils/handle.js";
+
+class Resolver extends AtprotoDidResolver {
+  constructor(
+    options: DidResolverOpts,
+    private readonly metricReporter: IMetricReporter,
+  ) {
+    super(options);
+  }
+
+  async resolveNoCheck(did: string): Promise<unknown> {
+    this.metricReporter.increment("resolve_did_request_total");
+    return await super.resolveNoCheck(did);
+  }
+}
 
 export class DidResolver implements IDidResolver {
   private readonly resolver: Resolver;
@@ -19,7 +33,7 @@ export class DidResolver implements IDidResolver {
     didCache: DidCache,
     private readonly metricReporter: IMetricReporter,
   ) {
-    this.resolver = new Resolver({ didCache, plcUrl });
+    this.resolver = new Resolver({ didCache, plcUrl }, metricReporter);
     this.logger = loggerManager.createLogger("DidResolver");
   }
   static inject = [
@@ -30,7 +44,6 @@ export class DidResolver implements IDidResolver {
   ] as const;
 
   async resolve(did: string) {
-    this.metricReporter.increment("resolve_did_request_total");
     try {
       const data = await this.resolver.resolveAtprotoData(did);
       return {
