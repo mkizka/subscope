@@ -8,7 +8,9 @@ export type CounterKey =
   | "ingester_events_commit_total"
   | "blob_proxy_cache_hit_total"
   | "blob_proxy_cache_miss_total"
-  | "blob_proxy_error_total";
+  | "blob_proxy_error_total"
+  | "fetch_record_request_total"
+  | "fetch_record_error_total";
 
 export type GaugeKey =
   | "ingester_events_time_delay"

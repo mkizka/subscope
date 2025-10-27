@@ -73,6 +73,14 @@ export class MetricReporter implements IMetricReporter {
         labelNames: ["error"],
         help: "Total number of blob proxy errors",
       }),
+      fetch_record_request_total: new client.Counter({
+        name: "fetch_record_request_total",
+        help: "Total number of record fetch requests",
+      }),
+      fetch_record_error_total: new client.Counter({
+        name: "fetch_record_error_total",
+        help: "Total number of record fetch errors",
+      }),
     };
     this.gauges = {
       ingester_events_time_delay: new client.Gauge({
