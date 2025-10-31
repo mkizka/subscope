@@ -21,7 +21,7 @@ describe("ProfileIndexingPolicy", () => {
     test("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db)
-        .use((t) => t.withSubscriber())
+        .use((t) => t.subscriber())
         .create();
 
       const profileJson = {
@@ -91,7 +91,7 @@ describe("ProfileIndexingPolicy", () => {
     test("プロフィール作成者が追跡アカウント(サブスクライバーがフォローしているアカウント)の場合は保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db)
-        .use((t) => t.withSubscriber())
+        .use((t) => t.subscriber())
         .create();
 
       const followeeActor = await actorFactory(ctx.db).create();

@@ -52,7 +52,7 @@ export const actorFactory = (db: Database) =>
             .create();
         },
       }),
-      withSubscriber: () => ({
+      subscriber: () => ({
         after: async (actor) => {
           await subscriptionFactory(db)
             .vars({ actor: () => actor })

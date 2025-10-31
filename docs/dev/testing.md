@@ -159,6 +159,30 @@ const actor = await actorFactory(ctx.db)
   .create();
 ```
 
+### actorFactoryのtrait
+
+`actorFactory`には以下のtraitが用意されています：
+
+#### withProfile
+
+プロフィールレコードとプロフィール情報を持つアカウントを作成します。
+
+```typescript
+const actor = await actorFactory(ctx.db)
+  .use((t) => t.withProfile({ displayName: "Test User" }))
+  .create();
+```
+
+#### subscriber
+
+サブスクライバー(AppViewに登録したアカウント)として作成します。内部的にsubscriptionレコードも作成されます。
+
+```typescript
+const subscriberActor = await actorFactory(ctx.db)
+  .use((t) => t.subscriber())
+  .create();
+```
+
 ### varsメソッドによる依存関係の定義
 
 `vars`メソッドを使用して、他のFactoryで作成したデータを参照できます：
