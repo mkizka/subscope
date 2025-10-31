@@ -13,6 +13,17 @@ export class ProfileIndexingPolicy {
     ctx: TransactionContext,
     profile: Profile,
   ): Promise<boolean> {
-    return this.subscriptionRepository.isSubscriber(ctx, profile.actorDid);
+    const isSubscriber = await this.subscriptionRepository.isSubscriber(
+      ctx,
+      profile.actorDid,
+    );
+    if (isSubscriber) {
+      return true;
+    }
+
+    return this.subscriptionRepository.isFolloweeOfSubscribers(
+      ctx,
+      profile.actorDid,
+    );
   }
 }

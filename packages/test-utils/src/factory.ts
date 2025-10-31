@@ -52,6 +52,13 @@ export const actorFactory = (db: Database) =>
             .create();
         },
       }),
+      withSubscriber: () => ({
+        after: async (actor) => {
+          await subscriptionFactory(db)
+            .vars({ actor: () => actor })
+            .create();
+        },
+      }),
     });
 
 export const recordFactory = (db: Database, collection: string) =>

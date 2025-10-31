@@ -1,9 +1,9 @@
 import { Profile, Record } from "@repo/common/domain";
 import {
   actorFactory,
+  followFactory,
   getTestSetup,
   recordFactory,
-  subscriptionFactory,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -20,11 +20,8 @@ describe("ProfileIndexingPolicy", () => {
   describe("shouldIndex", () => {
     test("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db).create();
-
-      // subscriberとして登録
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
+      const subscriberActor = await actorFactory(ctx.db)
+        .use((t) => t.withSubscriber())
         .create();
 
       const profileJson = {
@@ -89,6 +86,53 @@ describe("ProfileIndexingPolicy", () => {
 
       // assert
       expect(result).toBe(false);
+    });
+
+    test("プロフィール作成者が追跡アカウント(サブスクライバーがフォローしているアカウント)の場合は保存すべき", async () => {
+      // arrange
+      const subscriberActor = await actorFactory(ctx.db)
+        .use((t) => t.withSubscriber())
+        .create();
+
+      const followeeActor = await actorFactory(ctx.db).create();
+      await followFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.graph.follow")
+              .vars({ actor: () => subscriberActor })
+              .create(),
+          followee: () => followeeActor,
+        })
+        .create();
+
+      const profileJson = {
+        $type: "app.bsky.actor.profile",
+        displayName: "Followee User",
+        description: "Followee description",
+        createdAt: new Date().toISOString(),
+      };
+      const profileRecord = await recordFactory(
+        ctx.db,
+        "app.bsky.actor.profile",
+      )
+        .vars({ actor: () => followeeActor })
+        .props({ json: () => profileJson })
+        .create();
+      const record = Record.fromJson({
+        uri: profileRecord.uri,
+        cid: profileRecord.cid,
+        json: profileJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      const result = await profileIndexingPolicy.shouldIndex(
+        ctx,
+        Profile.from(record),
+      );
+
+      // assert
+      expect(result).toBe(true);
     });
   });
 });
