@@ -51,7 +51,15 @@ export class BackfillUseCase {
       isSupportedCollection(record.collection),
     );
 
-    const chunks = chunkArray(filteredRecords, env.BACKFILL_BATCH_SIZE);
+    const followRecords = filteredRecords.filter(
+      (record) => record.collection === "app.bsky.graph.follow",
+    );
+    const otherRecords = filteredRecords.filter(
+      (record) => record.collection !== "app.bsky.graph.follow",
+    );
+    const prioritizedRecords = [...followRecords, ...otherRecords];
+
+    const chunks = chunkArray(prioritizedRecords, env.BACKFILL_BATCH_SIZE);
     for (const [index, chunk] of Object.entries(chunks)) {
       const chunkNumber = Number(index) + 1;
       await jobLogger.log(

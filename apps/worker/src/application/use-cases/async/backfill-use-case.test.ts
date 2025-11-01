@@ -142,4 +142,59 @@ describe("BackfillUseCase", () => {
       .where(eq(schema.actors.did, did));
     expect(actors[0]?.backfillStatus).toBe("synchronized");
   });
+
+  test("フォローレコードが他のレコードより先に処理される", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db).create();
+    const did = asDid(actor.did);
+    const records = [
+      Record.fromJson({
+        uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
+        cid: "cid1",
+        json: { record: {} },
+        indexedAt: new Date(),
+      }),
+      Record.fromJson({
+        uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
+        cid: "cid2",
+        json: { record: {} },
+        indexedAt: new Date(),
+      }),
+      Record.fromJson({
+        uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
+        cid: "cid3",
+        json: { record: {} },
+        indexedAt: new Date(),
+      }),
+      Record.fromJson({
+        uri: AtUri.make(did, "app.bsky.graph.follow", "2").toString(),
+        cid: "cid4",
+        json: { record: {} },
+        indexedAt: new Date(),
+      }),
+    ];
+    mockRepoFetcher.fetch.mockResolvedValue(records);
+
+    // act
+    await backfillUseCase.execute({ did, jobLogger: mockJobLogger });
+
+    // assert
+    expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(4);
+    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ record: records[1] }),
+    );
+    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ record: records[3] }),
+    );
+    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ record: records[0] }),
+    );
+    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({ record: records[2] }),
+    );
+  });
 });
