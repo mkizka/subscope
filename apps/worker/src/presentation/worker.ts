@@ -1,5 +1,5 @@
 import type { JobData } from "@repo/common/domain";
-import type { Processor, WorkerOptions } from "bullmq";
+import type { BackoffStrategy, Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
 import { handleAccountCommandFactory } from "../application/use-cases/account/handle-account-command.js";
@@ -18,6 +18,28 @@ import type { UpsertIdentityUseCase } from "../application/use-cases/identity/up
 import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
+const SECONDS = 1000;
+const MINUTES = 60 * SECONDS;
+const HOURS = 60 * MINUTES;
+
+// prettier-ignore
+const RETRY_DELAYS = [
+  10 * SECONDS,
+  60 * SECONDS,
+  60 * MINUTES,
+  24 * HOURS,
+];
+
+const backoffStrategy: BackoffStrategy = (attemptsMade) => {
+  const delay = RETRY_DELAYS[attemptsMade - 1];
+  if (delay === undefined) {
+    throw new Error(
+      `Retry attempt ${attemptsMade} exceeds maximum retries (${RETRY_DELAYS.length})`,
+    );
+  }
+  return delay;
+};
+
 const createWorker = <T extends keyof JobData>(
   name: T,
   process: Processor<JobData[T], void>,
@@ -27,6 +49,9 @@ const createWorker = <T extends keyof JobData>(
     autorun: false,
     connection: {
       url: env.REDIS_URL,
+    },
+    settings: {
+      backoffStrategy,
     },
     ...options,
   });

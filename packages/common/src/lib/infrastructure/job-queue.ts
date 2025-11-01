@@ -25,10 +25,9 @@ const createQueueOptionsBuilder =
   });
 
 const withRetry = {
-  attempts: 3,
+  attempts: 4,
   backoff: {
-    type: "exponential",
-    delay: 10000, // 10,20,40秒後にリトライ
+    type: "custom",
   },
 } satisfies QueueOptions["defaultJobOptions"];
 
