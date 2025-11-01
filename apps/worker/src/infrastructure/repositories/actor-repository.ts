@@ -12,8 +12,8 @@ export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
-      backfillStatus: actor.backfillStatus,
-      backfillVersion: actor.backfillVersion,
+      syncRepoStatus: actor.syncRepoStatus,
+      syncRepoVersion: actor.syncRepoVersion,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
@@ -40,8 +40,8 @@ export class ActorRepository implements IActorRepository {
     return new ActorDomain({
       did: asDid(row.did),
       handle: row.handle || undefined,
-      backfillStatus: row.backfillStatus,
-      backfillVersion: row.backfillVersion,
+      syncRepoStatus: row.syncRepoStatus,
+      syncRepoVersion: row.syncRepoVersion,
       indexedAt: row.indexedAt,
     });
   }

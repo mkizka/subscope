@@ -25,9 +25,9 @@ import { ResolveDidScheduler } from "./application/services/scheduler/resolve-di
 import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
 import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "./application/use-cases/async/aggregate-post-stats-use-case.js";
-import { BackfillUseCase } from "./application/use-cases/async/backfill-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
+import { SyncRepoUseCase } from "./application/use-cases/async/sync-repo-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
 import { FollowIndexingPolicy } from "./domain/follow-indexing-policy.js";
@@ -111,7 +111,7 @@ createInjector()
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("fetchRecordUseCase", FetchRecordUseCase)
-  .provideClass("backfillUseCase", BackfillUseCase)
+  .provideClass("syncRepoUseCase", SyncRepoUseCase)
   .provideClass("handleAccountUseCase", HandleAccountUseCase)
   .provideClass("aggregatePostStatsUseCase", AggregatePostStatsUseCase)
   .provideClass("aggregateActorStatsUseCase", AggregateActorStatsUseCase)

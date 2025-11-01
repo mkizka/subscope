@@ -26,7 +26,7 @@ import { RepostService } from "./application/service/feed/repost-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
-import { BackfillScheduler } from "./application/service/scheduler/backfill-scheduler.js";
+import { SyncRepoScheduler } from "./application/service/scheduler/sync-repo-scheduler.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { SubscribeServerUseCase } from "./application/subscribe-server-use-case.js";
@@ -127,7 +127,7 @@ createInjector()
   .provideClass("jobQueue", JobQueue)
   .provideClass("assetUrlBuilder", AssetUrlBuilder)
   // application
-  .provideClass("backfillScheduler", BackfillScheduler)
+  .provideClass("syncRepoScheduler", SyncRepoScheduler)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)

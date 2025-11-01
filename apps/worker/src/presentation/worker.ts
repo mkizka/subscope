@@ -8,9 +8,9 @@ import { aggregateActorStatsCommandFactory } from "../application/use-cases/asyn
 import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { aggregatePostStatsCommandFactory } from "../application/use-cases/async/aggregate-post-stats-command.js";
 import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
-import type { BackfillUseCase } from "../application/use-cases/async/backfill-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
+import type { SyncRepoUseCase } from "../application/use-cases/async/sync-repo-use-case.js";
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
@@ -38,7 +38,7 @@ export class SyncWorker {
   constructor(
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
-    backfillUseCase: BackfillUseCase,
+    syncRepoUseCase: SyncRepoUseCase,
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
     handleAccountUseCase: HandleAccountUseCase,
@@ -67,8 +67,8 @@ export class SyncWorker {
           concurrency: env.COMMIT_WORKER_CONCURRENCY,
         },
       ),
-      createWorker("backfill", async (job) => {
-        await backfillUseCase.execute({
+      createWorker("syncRepo", async (job) => {
+        await syncRepoUseCase.execute({
           did: job.data,
           jobLogger: createJobLogger(job),
         });
@@ -120,7 +120,7 @@ export class SyncWorker {
   static inject = [
     "upsertIdentityUseCase",
     "indexCommitUseCase",
-    "backfillUseCase",
+    "syncRepoUseCase",
     "resolveDidUseCase",
     "fetchRecordUseCase",
     "handleAccountUseCase",

@@ -35,11 +35,11 @@ describe("GetSubscriptionStatusUseCase", () => {
     });
   });
 
-  test("サブスクリプションが存在する場合、subscribedとbackfillStatusを返す", async () => {
+  test("サブスクリプションが存在する場合、subscribedとsyncRepoStatusを返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .props({
-        backfillStatus: () => "synchronized",
+        syncRepoStatus: () => "synchronized",
       })
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
@@ -59,15 +59,15 @@ describe("GetSubscriptionStatusUseCase", () => {
     expect(result).toEqual({
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true,
-      backfillStatus: "synchronized",
+      syncRepoStatus: "synchronized",
     });
   });
 
-  test("サブスクリプションが存在し、backfillStatusがdirtyの場合、dirtyを返す", async () => {
+  test("サブスクリプションが存在し、syncRepoStatusがdirtyの場合、dirtyを返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .props({
-        backfillStatus: () => "dirty",
+        syncRepoStatus: () => "dirty",
       })
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
@@ -87,15 +87,15 @@ describe("GetSubscriptionStatusUseCase", () => {
     expect(result).toEqual({
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true,
-      backfillStatus: "dirty",
+      syncRepoStatus: "dirty",
     });
   });
 
-  test("サブスクリプションが存在し、backfillStatusがin-processの場合、in-processを返す", async () => {
+  test("サブスクリプションが存在し、syncRepoStatusがin-processの場合、in-processを返す", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .props({
-        backfillStatus: () => "in-process",
+        syncRepoStatus: () => "in-process",
       })
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
@@ -115,7 +115,7 @@ describe("GetSubscriptionStatusUseCase", () => {
     expect(result).toEqual({
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true,
-      backfillStatus: "in-process",
+      syncRepoStatus: "in-process",
     });
   });
 });

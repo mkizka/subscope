@@ -29,7 +29,7 @@ export type JobData = {
   account: AccountEvent;
   identity: IdentityEvent;
   commit: CommitEvent<SupportedCollection>;
-  backfill: Did;
+  syncRepo: Did;
   aggregatePostStats: AggregatePostStatsData;
   aggregateActorStats: AggregateActorStatsData;
 };

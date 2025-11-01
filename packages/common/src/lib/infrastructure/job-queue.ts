@@ -45,7 +45,7 @@ export class JobQueue implements IJobQueue {
       account: new Queue("account", queueOptions(withRetry)),
       identity: new Queue("identity", queueOptions(withRetry)),
       commit: new Queue("commit", queueOptions(withRetry)),
-      backfill: new Queue("backfill", queueOptions()),
+      syncRepo: new Queue("syncRepo", queueOptions()),
       aggregatePostStats: new Queue(
         "aggregatePostStats",
         queueOptions(withRetry),

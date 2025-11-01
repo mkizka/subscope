@@ -13,7 +13,7 @@ import { mock } from "vitest-mock-extended";
 import { ActorRepository } from "../infrastructure/actor-repository.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
-import { BackfillScheduler } from "./service/scheduler/backfill-scheduler.js";
+import { SyncRepoScheduler } from "./service/scheduler/sync-repo-scheduler.js";
 import {
   AlreadySubscribedError,
   InvalidInviteCodeError,
@@ -32,7 +32,7 @@ describe("SubscribeServerUseCase", () => {
     .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
-    .provideClass("backfillScheduler", BackfillScheduler)
+    .provideClass("syncRepoScheduler", SyncRepoScheduler)
     .injectClass(SubscribeServerUseCase);
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe("SubscribeServerUseCase", () => {
     });
     expect(updatedInviteCode?.usedAt).toEqual(now);
     expect(mockJobQueue.add).toHaveBeenCalledWith({
-      queueName: "backfill",
+      queueName: "syncRepo",
       jobName: `at://${actor.did}`,
       data: asDid(actor.did),
     });
@@ -188,8 +188,8 @@ describe("SubscribeServerUseCase", () => {
     expect(savedActor).toEqual({
       did,
       handle: null,
-      backfillStatus: "dirty",
-      backfillVersion: null,
+      syncRepoStatus: "dirty",
+      syncRepoVersion: null,
       indexedAt: now,
     });
 

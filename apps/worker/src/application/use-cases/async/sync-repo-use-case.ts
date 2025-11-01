@@ -16,7 +16,7 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
   return chunks;
 }
 
-export class BackfillUseCase {
+export class SyncRepoUseCase {
   constructor(
     private readonly repoFetcher: IRepoFetcher,
     private readonly transactionManager: ITransactionManager,
@@ -40,7 +40,7 @@ export class BackfillUseCase {
     if (!actor) {
       throw new Error(`Actor not found: ${did}`);
     }
-    actor.setBackfillStatus("in-process");
+    actor.setSyncRepoStatus("in-process");
     await this.actorRepository.upsert({
       ctx: { db: this.db },
       actor,
@@ -79,11 +79,11 @@ export class BackfillUseCase {
       });
     }
 
-    actor.setBackfillStatus("synchronized");
+    actor.setSyncRepoStatus("synchronized");
     await this.actorRepository.upsert({
       ctx: { db: this.db },
       actor,
     });
-    await jobLogger.log(`Backfill completed for actor: ${did}`);
+    await jobLogger.log(`Repository sync completed for actor: ${did}`);
   }
 }

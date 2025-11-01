@@ -52,7 +52,7 @@ describe("IndexActorService", () => {
 
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
       expect(mockJobQueue.add).toHaveBeenCalledWith({
@@ -65,7 +65,7 @@ describe("IndexActorService", () => {
       });
     });
 
-    test("handle指定あり、既存actorなしの場合は、backfillジョブを追加しない", async () => {
+    test("handle指定あり、既存actorなしの場合は、syncRepoジョブを追加しない", async () => {
       // arrange
       const testDid = asDid("did:plc:new-no-backfill");
       const testHandle = asHandle("new-no-backfill.bsky.social");
@@ -89,7 +89,7 @@ describe("IndexActorService", () => {
 
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
     });
@@ -122,7 +122,7 @@ describe("IndexActorService", () => {
       expect(actors[0]?.handle).toBe(newHandle);
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
     });
@@ -155,7 +155,7 @@ describe("IndexActorService", () => {
       expect(actors[0]?.handle).toBe(existingHandle);
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
     });
@@ -189,7 +189,7 @@ describe("IndexActorService", () => {
       expect(actors[0]?.handle).toBe(newHandle);
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
     });
@@ -221,7 +221,7 @@ describe("IndexActorService", () => {
       });
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
     });
@@ -285,7 +285,7 @@ describe("IndexActorService", () => {
       expect(actors[0]?.handle).toBe(existingHandle);
       expect(mockJobQueue.add).not.toHaveBeenCalledWith(
         expect.objectContaining({
-          queueName: "backfill",
+          queueName: "syncRepo",
         }),
       );
     });

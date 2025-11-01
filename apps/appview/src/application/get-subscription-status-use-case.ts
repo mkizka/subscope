@@ -32,7 +32,7 @@ export class GetSubscriptionStatusUseCase {
     return {
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true as const,
-      backfillStatus: required(actor).backfillStatus,
+      syncRepoStatus: required(actor).syncRepoStatus,
     };
   }
 }

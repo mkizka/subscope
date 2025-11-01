@@ -11,17 +11,17 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-const backfillStatus = ["dirty", "in-process", "synchronized"] as const;
+const syncRepoStatus = ["dirty", "in-process", "synchronized"] as const;
 
 export const actors = pgTable(
   "actors",
   {
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
-    backfillStatus: varchar({ length: 20, enum: backfillStatus })
+    syncRepoStatus: varchar({ length: 20, enum: syncRepoStatus })
       .notNull()
       .default("dirty"),
-    backfillVersion: integer(),
+    syncRepoVersion: integer(),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("handle_idx").on(table.handle)],

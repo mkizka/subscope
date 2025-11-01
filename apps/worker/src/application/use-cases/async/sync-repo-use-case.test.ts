@@ -12,7 +12,7 @@ import { ActorRepository } from "../../../infrastructure/repositories/actor-repo
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
 import type { IndexRecordService } from "../../services/index-record-service.js";
-import { BackfillUseCase } from "./backfill-use-case.js";
+import { SyncRepoUseCase } from "./sync-repo-use-case.js";
 
 vi.mock("../../../shared/env.js", () => ({
   env: { BACKFILL_BATCH_SIZE: 2, INDEX_LEVEL: 1 },
@@ -23,13 +23,13 @@ const mockJobLogger = mock<JobLogger>();
 const mockIndexRecordService = mock<IndexRecordService>();
 
 const { testInjector, ctx } = getTestSetup();
-const backfillUseCase = testInjector
+const syncRepoUseCase = testInjector
   .provideValue("repoFetcher", mockRepoFetcher)
   .provideValue("indexRecordService", mockIndexRecordService)
   .provideClass("actorRepository", ActorRepository)
-  .injectClass(BackfillUseCase);
+  .injectClass(SyncRepoUseCase);
 
-describe("BackfillUseCase", () => {
+describe("SyncRepoUseCase", () => {
   test("レコードがバッチサイズで分割されて処理される", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
@@ -45,7 +45,7 @@ describe("BackfillUseCase", () => {
     mockRepoFetcher.fetch.mockResolvedValue(records);
 
     // act
-    await backfillUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
 
     // assert
     expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(5);
@@ -58,7 +58,7 @@ describe("BackfillUseCase", () => {
     mockRepoFetcher.fetch.mockResolvedValue([]);
 
     // act
-    await backfillUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
 
     // assert
     expect(mockIndexRecordService.upsert).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe("BackfillUseCase", () => {
       .select()
       .from(schema.actors)
       .where(eq(schema.actors.did, did));
-    expect(actors[0]?.backfillStatus).toBe("synchronized");
+    expect(actors[0]?.syncRepoStatus).toBe("synchronized");
   });
 
   test("サポートされていないコレクションはフィルタリングされる", async () => {
@@ -96,7 +96,7 @@ describe("BackfillUseCase", () => {
     mockRepoFetcher.fetch.mockResolvedValue(records);
 
     // act
-    await backfillUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
 
     // assert
     expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(2);
@@ -115,7 +115,7 @@ describe("BackfillUseCase", () => {
 
     // act & assert
     await expect(
-      backfillUseCase.execute({ did, jobLogger: mockJobLogger }),
+      syncRepoUseCase.execute({ did, jobLogger: mockJobLogger }),
     ).rejects.toThrow(`Actor not found: ${did}`);
   });
 
@@ -133,14 +133,14 @@ describe("BackfillUseCase", () => {
     ]);
 
     // act
-    await backfillUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
 
     // assert
     const actors = await ctx.db
       .select()
       .from(schema.actors)
       .where(eq(schema.actors.did, did));
-    expect(actors[0]?.backfillStatus).toBe("synchronized");
+    expect(actors[0]?.syncRepoStatus).toBe("synchronized");
   });
 
   test("フォローレコードが他のレコードより先に処理される", async () => {
@@ -176,7 +176,7 @@ describe("BackfillUseCase", () => {
     mockRepoFetcher.fetch.mockResolvedValue(records);
 
     // act
-    await backfillUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
 
     // assert
     expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(4);
