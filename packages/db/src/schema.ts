@@ -61,6 +61,7 @@ export const follows = pgTable(
     index("follows_actor_did_idx").on(table.actorDid),
     index("follows_subject_did_idx").on(table.subjectDid),
     index("follows_actor_subject_idx").on(table.actorDid, table.subjectDid),
+    index("follows_subject_actor_idx").on(table.subjectDid, table.actorDid),
   ],
 );
 
@@ -107,6 +108,7 @@ export const posts = pgTable(
       .notNull(),
   },
   (table) => [
+    index("posts_actor_did_idx").on(table.actorDid),
     index("posts_sort_at_idx").on(table.sortAt),
     index("posts_reply_parent_uri_idx").on(table.replyParentUri),
     index("posts_reply_parent_sort_idx").on(

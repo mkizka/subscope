@@ -85,6 +85,13 @@
       "when": 1762009309754,
       "tag": "0011_rename-backfill-to-syncRepo",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1762010744514,
+      "tag": "0012_add-index",
+      "breakpoints": true
     }
   ]
 }
