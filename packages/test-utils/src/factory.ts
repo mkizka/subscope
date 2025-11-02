@@ -7,6 +7,7 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 import { randomCid } from "./cid.js";
 import { create } from "./create.js";
+import { refreshSubscriberFollowees } from "./setup.js";
 
 type Database = NodePgDatabase<typeof schema>;
 
@@ -203,6 +204,9 @@ export const followFactory = (db: Database) =>
       cid: async ({ vars }) => (await vars.record).cid,
       actorDid: async ({ vars }) => (await vars.record).actorDid,
       subjectDid: async ({ vars }) => (await vars.followee).did,
+    })
+    .after(async () => {
+      await refreshSubscriberFollowees();
     });
 
 export const likeFactory = (db: Database) =>

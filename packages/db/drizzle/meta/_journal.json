@@ -92,6 +92,13 @@
       "when": 1762010744514,
       "tag": "0012_add-index",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1762067572784,
+      "tag": "0013_create-view-subscriber_followees",
+      "breakpoints": true
     }
   ]
 }

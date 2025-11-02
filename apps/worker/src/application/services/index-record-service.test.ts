@@ -41,6 +41,7 @@ import { RepostIndexer } from "./indexer/repost-indexer.js";
 import type { AggregateActorStatsScheduler } from "./scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregatePostStatsScheduler } from "./scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
+import type { RefreshSubscriberFolloweesScheduler } from "./scheduler/refresh-subscriber-followees-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 describe("IndexRecordService", () => {
@@ -55,6 +56,10 @@ describe("IndexRecordService", () => {
     .provideValue(
       "aggregateActorStatsScheduler",
       mockDeep<AggregateActorStatsScheduler>(),
+    )
+    .provideValue(
+      "refreshSubscriberFolloweesScheduler",
+      mockDeep<RefreshSubscriberFolloweesScheduler>(),
     )
     .provideValue("jobQueue", mockDeep<IJobQueue>())
     .provideValue("indexLevel", 1)

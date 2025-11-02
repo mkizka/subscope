@@ -6,6 +6,7 @@ import type { IFollowRepository } from "../../interfaces/repositories/follow-rep
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
+import type { RefreshSubscriberFolloweesScheduler } from "../scheduler/refresh-subscriber-followees-scheduler.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
@@ -13,12 +14,14 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly followIndexingPolicy: FollowIndexingPolicy,
     private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
     private readonly indexActorService: IndexActorService,
+    private readonly refreshSubscriberFolloweesScheduler: RefreshSubscriberFolloweesScheduler,
   ) {}
   static inject = [
     "followRepository",
     "followIndexingPolicy",
     "aggregateActorStatsScheduler",
     "indexActorService",
+    "refreshSubscriberFolloweesScheduler",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -57,5 +60,6 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.subjectDid,
       "followers",
     );
+    await this.refreshSubscriberFolloweesScheduler.schedule();
   }
 }

@@ -1,9 +1,10 @@
 // 参考： https://github.com/bluesky-social/atproto/tree/main/packages/bsky/src/data-plane/server/db/tables
-import { relations, sql } from "drizzle-orm";
+import { eq, relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
   jsonb,
+  pgMaterializedView,
   pgTable,
   primaryKey,
   text,
@@ -379,3 +380,12 @@ export const actorStatsRelations = relations(actorStats, ({ one }) => ({
     references: [actors.did],
   }),
 }));
+
+export const subscriberFollowees = pgMaterializedView(
+  "subscriber_followees",
+).as((qb) =>
+  qb
+    .selectDistinct({ followeeDid: follows.subjectDid })
+    .from(follows)
+    .innerJoin(subscriptions, eq(follows.actorDid, subscriptions.actorDid)),
+);

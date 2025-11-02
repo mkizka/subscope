@@ -4,6 +4,7 @@ import {
   LoggerManager,
   TransactionManager,
 } from "@repo/common/infrastructure";
+import { schema } from "@repo/db";
 import { createInjector } from "typed-inject";
 import { inject } from "vitest";
 
@@ -21,13 +22,18 @@ const testInjector = createInjector()
   .provideFactory("db", databaseFactory)
   .provideClass("transactionManager", TransactionManager);
 
+const db = testInjector.resolve("db");
+
+export const refreshSubscriberFollowees = async () => {
+  await db.refreshMaterializedView(schema.subscriberFollowees);
+};
+
 export const getTestSetup = () => {
   return {
     testInjector,
     ctx: {
-      // typed-injectはデフォルトでシングルトンなので、getTestSetupを呼び出す度に同じクライアントインスタンスが使われるはず
-      // https://github.com/nicojs/typed-inject/blob/5d3c0276e65ade1d683239346488708b7a11e443/README.md?plain=1#L266
-      db: testInjector.resolve("db"),
+      db,
     },
+    refreshSubscriberFollowees,
   };
 };

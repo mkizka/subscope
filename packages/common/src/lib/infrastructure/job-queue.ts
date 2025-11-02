@@ -53,6 +53,10 @@ export class JobQueue implements IJobQueue {
         "aggregateActorStats",
         queueOptions(withRetry),
       ),
+      refreshSubscriberFollowees: new Queue(
+        "refreshSubscriberFollowees",
+        queueOptions(withRetry),
+      ),
     };
   }
   static inject = ["redisUrl"] as const;

@@ -1,0 +1,1529 @@
+{
+  "id": "cfcfc195-9ece-47de-afb5-dfc40449488e",
+  "prevId": "9fb78ab0-ffe1-4581-bbbc-f762b1d87244",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.actor_stats": {
+      "name": "actor_stats",
+      "schema": "",
+      "columns": {
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "follows_count": {
+          "name": "follows_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "followers_count": {
+          "name": "followers_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "posts_count": {
+          "name": "posts_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "actor_stats_actor_did_actors_did_fk": {
+          "name": "actor_stats_actor_did_actors_did_fk",
+          "tableFrom": "actor_stats",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.actors": {
+      "name": "actors",
+      "schema": "",
+      "columns": {
+        "did": {
+          "name": "did",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "handle": {
+          "name": "handle",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sync_repo_status": {
+          "name": "sync_repo_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'dirty'"
+        },
+        "sync_repo_version": {
+          "name": "sync_repo_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "handle_idx": {
+          "name": "handle_idx",
+          "columns": [
+            {
+              "expression": "handle",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auth_session": {
+      "name": "auth_session",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "session": {
+          "name": "session",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auth_state": {
+      "name": "auth_state",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.feed_items": {
+      "name": "feed_items",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_uri": {
+          "name": "subject_uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_at": {
+          "name": "sort_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "feed_items_sort_at_idx": {
+          "name": "feed_items_sort_at_idx",
+          "columns": [
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "feed_items_actor_did_idx": {
+          "name": "feed_items_actor_did_idx",
+          "columns": [
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "feed_items_actor_sort_idx": {
+          "name": "feed_items_actor_sort_idx",
+          "columns": [
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "feed_items_uri_records_uri_fk": {
+          "name": "feed_items_uri_records_uri_fk",
+          "tableFrom": "feed_items",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "feed_items_actor_did_actors_did_fk": {
+          "name": "feed_items_actor_did_actors_did_fk",
+          "tableFrom": "feed_items",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.follows": {
+      "name": "follows",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_did": {
+          "name": "subject_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_at": {
+          "name": "sort_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "least(\"created_at\", \"indexed_at\")",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "follows_sort_at_idx": {
+          "name": "follows_sort_at_idx",
+          "columns": [
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "follows_actor_did_idx": {
+          "name": "follows_actor_did_idx",
+          "columns": [
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "follows_subject_did_idx": {
+          "name": "follows_subject_did_idx",
+          "columns": [
+            {
+              "expression": "subject_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "follows_actor_subject_idx": {
+          "name": "follows_actor_subject_idx",
+          "columns": [
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "subject_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "follows_subject_actor_idx": {
+          "name": "follows_subject_actor_idx",
+          "columns": [
+            {
+              "expression": "subject_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "follows_uri_records_uri_fk": {
+          "name": "follows_uri_records_uri_fk",
+          "tableFrom": "follows",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "follows_actor_did_actors_did_fk": {
+          "name": "follows_actor_did_actors_did_fk",
+          "tableFrom": "follows",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "follows_subject_did_actors_did_fk": {
+          "name": "follows_subject_did_actors_did_fk",
+          "tableFrom": "follows",
+          "tableTo": "actors",
+          "columnsFrom": ["subject_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.generators": {
+      "name": "generators",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "did": {
+          "name": "did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_cid": {
+          "name": "avatar_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "generators_uri_records_uri_fk": {
+          "name": "generators_uri_records_uri_fk",
+          "tableFrom": "generators",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "generators_actor_did_actors_did_fk": {
+          "name": "generators_actor_did_actors_did_fk",
+          "tableFrom": "generators",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.image_blob_cache": {
+      "name": "image_blob_cache",
+      "schema": "",
+      "columns": {
+        "cache_key": {
+          "name": "cache_key",
+          "type": "varchar(512)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expired_at": {
+          "name": "expired_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'success'"
+        }
+      },
+      "indexes": {
+        "image_blob_cache_expired_at_idx": {
+          "name": "image_blob_cache_expired_at_idx",
+          "columns": [
+            {
+              "expression": "expired_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.invite_codes": {
+      "name": "invite_codes",
+      "schema": "",
+      "columns": {
+        "code": {
+          "name": "code",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "used_at": {
+          "name": "used_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.likes": {
+      "name": "likes",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_uri": {
+          "name": "subject_uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_cid": {
+          "name": "subject_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_at": {
+          "name": "sort_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "least(\"created_at\", \"indexed_at\")",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "likes_sort_at_idx": {
+          "name": "likes_sort_at_idx",
+          "columns": [
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "likes_subject_uri_idx": {
+          "name": "likes_subject_uri_idx",
+          "columns": [
+            {
+              "expression": "subject_uri",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "likes_subject_sort_idx": {
+          "name": "likes_subject_sort_idx",
+          "columns": [
+            {
+              "expression": "subject_uri",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "likes_uri_records_uri_fk": {
+          "name": "likes_uri_records_uri_fk",
+          "tableFrom": "likes",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "likes_actor_did_actors_did_fk": {
+          "name": "likes_actor_did_actors_did_fk",
+          "tableFrom": "likes",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.post_embed_externals": {
+      "name": "post_embed_externals",
+      "schema": "",
+      "columns": {
+        "post_uri": {
+          "name": "post_uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uri": {
+          "name": "uri",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thumb_cid": {
+          "name": "thumb_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_embed_externals_post_uri_posts_uri_fk": {
+          "name": "post_embed_externals_post_uri_posts_uri_fk",
+          "tableFrom": "post_embed_externals",
+          "tableTo": "posts",
+          "columnsFrom": ["post_uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.post_embed_images": {
+      "name": "post_embed_images",
+      "schema": "",
+      "columns": {
+        "post_uri": {
+          "name": "post_uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alt": {
+          "name": "alt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aspect_ratio_width": {
+          "name": "aspect_ratio_width",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aspect_ratio_height": {
+          "name": "aspect_ratio_height",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_embed_images_post_uri_posts_uri_fk": {
+          "name": "post_embed_images_post_uri_posts_uri_fk",
+          "tableFrom": "post_embed_images",
+          "tableTo": "posts",
+          "columnsFrom": ["post_uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "post_embed_images_post_uri_position_pk": {
+          "name": "post_embed_images_post_uri_position_pk",
+          "columns": ["post_uri", "position"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.post_embed_records": {
+      "name": "post_embed_records",
+      "schema": "",
+      "columns": {
+        "post_uri": {
+          "name": "post_uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_embed_records_post_uri_posts_uri_fk": {
+          "name": "post_embed_records_post_uri_posts_uri_fk",
+          "tableFrom": "post_embed_records",
+          "tableTo": "posts",
+          "columnsFrom": ["post_uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.post_stats": {
+      "name": "post_stats",
+      "schema": "",
+      "columns": {
+        "post_uri": {
+          "name": "post_uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "like_count": {
+          "name": "like_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "repost_count": {
+          "name": "repost_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "reply_count": {
+          "name": "reply_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "quote_count": {
+          "name": "quote_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_stats_post_uri_posts_uri_fk": {
+          "name": "post_stats_post_uri_posts_uri_fk",
+          "tableFrom": "post_stats",
+          "tableTo": "posts",
+          "columnsFrom": ["post_uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.posts": {
+      "name": "posts",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reply_root_uri": {
+          "name": "reply_root_uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reply_root_cid": {
+          "name": "reply_root_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reply_parent_uri": {
+          "name": "reply_parent_uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reply_parent_cid": {
+          "name": "reply_parent_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "langs": {
+          "name": "langs",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_at": {
+          "name": "sort_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "least(\"created_at\", \"indexed_at\")",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "posts_actor_did_idx": {
+          "name": "posts_actor_did_idx",
+          "columns": [
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "posts_sort_at_idx": {
+          "name": "posts_sort_at_idx",
+          "columns": [
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "posts_reply_parent_uri_idx": {
+          "name": "posts_reply_parent_uri_idx",
+          "columns": [
+            {
+              "expression": "reply_parent_uri",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "posts_reply_parent_sort_idx": {
+          "name": "posts_reply_parent_sort_idx",
+          "columns": [
+            {
+              "expression": "reply_parent_uri",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "posts_uri_records_uri_fk": {
+          "name": "posts_uri_records_uri_fk",
+          "tableFrom": "posts",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "posts_actor_did_actors_did_fk": {
+          "name": "posts_actor_did_actors_did_fk",
+          "tableFrom": "posts",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.profiles": {
+      "name": "profiles",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_cid": {
+          "name": "avatar_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "banner_cid": {
+          "name": "banner_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "profiles_actor_idx": {
+          "name": "profiles_actor_idx",
+          "columns": [
+            {
+              "expression": "actor_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "profiles_uri_records_uri_fk": {
+          "name": "profiles_uri_records_uri_fk",
+          "tableFrom": "profiles",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "profiles_actor_did_actors_did_fk": {
+          "name": "profiles_actor_did_actors_did_fk",
+          "tableFrom": "profiles",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.records": {
+      "name": "records",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "json": {
+          "name": "json",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "records_actor_did_actors_did_fk": {
+          "name": "records_actor_did_actors_did_fk",
+          "tableFrom": "records",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reposts": {
+      "name": "reposts",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cid": {
+          "name": "cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_uri": {
+          "name": "subject_uri",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subject_cid": {
+          "name": "subject_cid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indexed_at": {
+          "name": "indexed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_at": {
+          "name": "sort_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "generated": {
+            "as": "least(\"created_at\", \"indexed_at\")",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "reposts_sort_at_idx": {
+          "name": "reposts_sort_at_idx",
+          "columns": [
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "reposts_subject_uri_idx": {
+          "name": "reposts_subject_uri_idx",
+          "columns": [
+            {
+              "expression": "subject_uri",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "reposts_subject_sort_idx": {
+          "name": "reposts_subject_sort_idx",
+          "columns": [
+            {
+              "expression": "subject_uri",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "reposts_uri_records_uri_fk": {
+          "name": "reposts_uri_records_uri_fk",
+          "tableFrom": "reposts",
+          "tableTo": "records",
+          "columnsFrom": ["uri"],
+          "columnsTo": ["uri"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "reposts_actor_did_actors_did_fk": {
+          "name": "reposts_actor_did_actors_did_fk",
+          "tableFrom": "reposts",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subscriptions": {
+      "name": "subscriptions",
+      "schema": "",
+      "columns": {
+        "actor_did": {
+          "name": "actor_did",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "invite_code": {
+          "name": "invite_code",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subscriptions_actor_did_actors_did_fk": {
+          "name": "subscriptions_actor_did_actors_did_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "actors",
+          "columnsFrom": ["actor_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "subscriptions_invite_code_invite_codes_code_fk": {
+          "name": "subscriptions_invite_code_invite_codes_code_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "invite_codes",
+          "columnsFrom": ["invite_code"],
+          "columnsTo": ["code"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.subscriber_followees": {
+      "columns": {
+        "subjectDid": {
+          "name": "subjectDid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "definition": "select distinct \"follows\".\"subject_did\" from \"follows\" inner join \"subscriptions\" on \"follows\".\"actor_did\" = \"subscriptions\".\"actor_did\"",
+      "name": "subscriber_followees",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": true
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

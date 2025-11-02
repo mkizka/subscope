@@ -1,0 +1,1 @@
+CREATE MATERIALIZED VIEW "public"."subscriber_followees" AS (select distinct "follows"."subject_did" from "follows" inner join "subscriptions" on "follows"."actor_did" = "subscriptions"."actor_did");
