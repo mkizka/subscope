@@ -1,10 +1,10 @@
 import { required } from "@repo/common/utils";
 import {
   actorFactory,
-  getTestSetup,
   profileFactory,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -20,7 +20,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetSubscribersUseCase } from "./get-subscribers-use-case.js";
 
 describe("GetSubscribersUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   beforeEach(() => {
     vi.useFakeTimers();

@@ -1,11 +1,11 @@
 import { AtUri } from "@atproto/syntax";
-import { getTestSetup, postStatsFactory } from "@repo/test-utils";
+import { postStatsFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { PostStatsRepository } from "./post-stats-repository.js";
 
 describe("PostStatsRepository", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const postStatsRepository = testInjector.injectClass(PostStatsRepository);
 

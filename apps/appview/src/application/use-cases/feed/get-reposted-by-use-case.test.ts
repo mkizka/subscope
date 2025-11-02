@@ -1,9 +1,9 @@
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
   repostFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -19,7 +19,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
 
 describe("GetRepostedByUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getRepostedByUseCase = testInjector
     .provideClass("repostRepository", RepostRepository)

@@ -3,9 +3,9 @@ import type { IJobQueue } from "@repo/common/domain";
 import { TransactionManager } from "@repo/common/infrastructure";
 import {
   actorFactory,
-  getTestSetup,
   inviteCodeFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -24,7 +24,7 @@ const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const subscribeServerUseCase = testInjector
     .provideClass("transactionManager", TransactionManager)

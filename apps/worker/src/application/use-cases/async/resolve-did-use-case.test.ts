@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import type { IDidResolver } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -11,7 +11,7 @@ import { ResolveDidUseCase } from "./resolve-did-use-case.js";
 
 describe("ResolveDidUseCase", () => {
   const mockDidResolver = mock<IDidResolver>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const resolveDidUseCase = testInjector
     .provideValue("didResolver", mockDidResolver)

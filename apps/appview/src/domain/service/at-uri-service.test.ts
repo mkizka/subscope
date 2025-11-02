@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
@@ -7,7 +7,7 @@ import { HandleResolver } from "../../infrastructure/handle-resolver.js";
 import { AtUriService, InvalidHostnameError } from "./at-uri-service.js";
 
 describe("AtUriService", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const atUriService = testInjector
     .provideClass("handleResolver", HandleResolver)

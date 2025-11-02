@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import type { IJobQueue } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -16,7 +16,7 @@ import { HandleAccountUseCase } from "./handle-account-use-case.js";
 
 describe("HandleAccountUseCase", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const handleAccountUseCase = testInjector
     .provideClass("actorRepository", ActorRepository)

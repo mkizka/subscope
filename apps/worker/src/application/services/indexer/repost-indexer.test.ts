@@ -5,9 +5,9 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -25,7 +25,7 @@ import { RepostIndexer } from "./repost-indexer.js";
 describe("RepostIndexer", () => {
   const mockJobQueue = mock<IJobQueue>();
   const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const repostIndexer = testInjector
     .provideClass("repostRepository", RepostRepository)

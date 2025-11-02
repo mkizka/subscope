@@ -1,11 +1,11 @@
 import { asDid } from "@atproto/did";
 import {
   actorFactory,
-  getTestSetup,
   likeFactory,
   postFactory,
   postStatsFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -31,7 +31,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetActorLikesUseCase } from "./get-actor-likes-use-case.js";
 
 describe("GetActorLikesUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getActorLikesUseCase = testInjector
     .provideClass("likeRepository", LikeRepository)

@@ -1,7 +1,7 @@
 import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
 import { DidResolutionError } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { getTestSetup } from "@repo/test-utils";
+import { testSetup } from "@repo/test-utils";
 import { eq, or } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -24,7 +24,7 @@ describe("ImageProxyUseCase", () => {
   const mockImageResizer = mock<IImageResizer>();
   const mockMetricReporter = mock<IMetricReporter>();
 
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   beforeEach(() => {
     vi.useFakeTimers();

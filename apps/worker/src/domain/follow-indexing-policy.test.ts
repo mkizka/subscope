@@ -1,9 +1,9 @@
 import { Follow, Record } from "@repo/common/domain";
 import {
   actorFactory,
-  getTestSetup,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -11,7 +11,7 @@ import { SubscriptionRepository } from "../infrastructure/repositories/subscript
 import { FollowIndexingPolicy } from "./follow-indexing-policy.js";
 
 describe("FollowIndexingPolicy", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const followIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)

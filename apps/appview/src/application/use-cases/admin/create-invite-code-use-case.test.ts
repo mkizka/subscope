@@ -1,11 +1,11 @@
-import { getTestSetup } from "@repo/test-utils";
+import { testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository.js";
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  const { testInjector } = getTestSetup();
+  const { testInjector } = testSetup;
 
   const useCase = testInjector
     .provideClass("inviteCodeRepository", InviteCodeRepository)

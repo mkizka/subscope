@@ -24,16 +24,12 @@ const testInjector = createInjector()
 
 const db = testInjector.resolve("db");
 
-export const refreshSubscriberFollowees = async () => {
+const refreshSubscriberFollowees = async () => {
   await db.refreshMaterializedView(schema.subscriberFollowees);
 };
 
-export const getTestSetup = () => {
-  return {
-    testInjector,
-    ctx: {
-      db,
-    },
-    refreshSubscriberFollowees,
-  };
+export const testSetup = {
+  testInjector,
+  ctx: { db },
+  refreshSubscriberFollowees,
 };

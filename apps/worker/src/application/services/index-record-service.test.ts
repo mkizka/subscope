@@ -3,10 +3,10 @@ import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
@@ -45,7 +45,7 @@ import type { RefreshSubscriberFolloweesScheduler } from "./scheduler/refresh-su
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 describe("IndexRecordService", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
   const jobLogger = { log: vi.fn() };
 
   const indexRecordService = testInjector

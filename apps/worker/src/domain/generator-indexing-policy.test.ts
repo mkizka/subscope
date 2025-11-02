@@ -2,9 +2,9 @@ import { Generator, Record } from "@repo/common/domain";
 import {
   actorFactory,
   followFactory,
-  getTestSetup,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -12,7 +12,7 @@ import { SubscriptionRepository } from "../infrastructure/repositories/subscript
 import { GeneratorIndexingPolicy } from "./generator-indexing-policy.js";
 
 describe("GeneratorIndexingPolicy", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const generatorIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)

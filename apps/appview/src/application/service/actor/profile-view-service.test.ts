@@ -3,9 +3,9 @@ import {
   actorFactory,
   actorStatsFactory,
   followFactory,
-  getTestSetup,
   profileFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -18,7 +18,7 @@ import { ProfileViewBuilder } from "./profile-view-builder.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
 describe("ProfileViewService", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const profileViewService = testInjector
     .provideClass("profileRepository", ProfileRepository)

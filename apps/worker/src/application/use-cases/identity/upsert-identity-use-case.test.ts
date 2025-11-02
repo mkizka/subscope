@@ -3,9 +3,9 @@ import { schema } from "@repo/db";
 import {
   actorFactory,
   followFactory,
-  getTestSetup,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -22,7 +22,7 @@ import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 
 describe("UpsertIdentityUseCase", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const upsertIdentityUseCase = testInjector
     .provideClass("actorRepository", ActorRepository)

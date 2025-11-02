@@ -73,7 +73,7 @@ Arrange-Act-Assertの各セクション間には1行の空行を入れます。�
 
 ```typescript
 describe("GetTimelineUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getTimelineUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))
@@ -122,19 +122,15 @@ describe("GetTimelineUseCase", () => {
 
 ### テストセットアップ
 
-テストファイルでは`getTestSetup()`を使用してテストインジェクターとデータベースコンテキストを取得します：
+テストファイルでは`testSetup`を使用してテストインジェクターとデータベースコンテキストを取得します：
 
 ```typescript
 import { LoggerManager } from "@repo/common/infrastructure";
-import {
-  actorFactory,
-  actorStatsFactory,
-  getTestSetup,
-} from "@repo/test-utils";
+import { actorFactory, actorStatsFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 describe("UseCase名", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const useCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))

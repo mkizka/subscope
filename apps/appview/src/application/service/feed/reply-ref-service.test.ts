@@ -2,9 +2,9 @@ import { AtUri } from "@atproto/syntax";
 import { Post } from "@repo/common/domain";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -28,7 +28,7 @@ import { PostViewService } from "./post-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
 describe("ReplyRefService", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const replyRefService = testInjector
     .provideClass("profileRepository", ProfileRepository)

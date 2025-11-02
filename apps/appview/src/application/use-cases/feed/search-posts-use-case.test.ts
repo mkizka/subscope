@@ -1,10 +1,10 @@
 import { LoggerManager } from "@repo/common/infrastructure";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   postStatsFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -28,7 +28,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { SearchPostsUseCase } from "./search-posts-use-case.js";
 
 describe("SearchPostsUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const searchPostsUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))

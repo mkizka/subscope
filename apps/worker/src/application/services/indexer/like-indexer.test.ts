@@ -4,10 +4,10 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -21,7 +21,7 @@ import { LikeIndexer } from "./like-indexer.js";
 
 describe("LikeIndexer", () => {
   const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const likeIndexer = testInjector
     .provideClass("likeRepository", LikeRepository)

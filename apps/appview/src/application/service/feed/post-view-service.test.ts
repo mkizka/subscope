@@ -3,7 +3,6 @@ import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
   generatorFactory,
-  getTestSetup,
   likeFactory,
   postEmbedExternalFactory,
   postEmbedImageFactory,
@@ -12,6 +11,7 @@ import {
   profileFactory,
   recordFactory,
   repostFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -34,7 +34,7 @@ import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 import { PostViewService } from "./post-view-service.js";
 
 describe("PostViewService", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const postViewService = testInjector
     .provideClass("profileRepository", ProfileRepository)

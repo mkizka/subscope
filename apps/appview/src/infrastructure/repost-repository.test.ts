@@ -1,16 +1,16 @@
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
   repostFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { RepostRepository } from "./repost-repository.js";
 
 describe("RepostRepository", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const repostRepository = testInjector.injectClass(RepostRepository);
 

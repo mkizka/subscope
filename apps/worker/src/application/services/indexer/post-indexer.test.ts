@@ -5,11 +5,11 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   randomCid,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -29,7 +29,7 @@ describe("PostIndexer", () => {
   const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
   const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
   const mockJobQueue = mockDeep<IJobQueue>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const postIndexer = testInjector
     .provideClass("postRepository", PostRepository)

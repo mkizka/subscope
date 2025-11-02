@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import type { IJobQueue } from "@repo/common/domain";
 import { asHandle } from "@repo/common/utils";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -16,7 +16,7 @@ import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 describe("IndexActorService", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const indexActorService = testInjector
     .provideClass("actorRepository", ActorRepository)

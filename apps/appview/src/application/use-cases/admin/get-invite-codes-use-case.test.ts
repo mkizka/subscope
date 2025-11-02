@@ -1,9 +1,9 @@
 import { schema } from "@repo/db";
 import {
   actorFactory,
-  getTestSetup,
   inviteCodeFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -13,7 +13,7 @@ import { InviteCodeService } from "../../service/admin/invite-code-service.js";
 import { GetInviteCodesUseCase } from "./get-invite-codes-use-case.js";
 
 describe("GetInviteCodesUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getInviteCodesUseCase = testInjector
     .provideClass("inviteCodeRepository", InviteCodeRepository)

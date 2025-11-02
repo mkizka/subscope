@@ -2,10 +2,10 @@ import { Like, Record } from "@repo/common/domain";
 import {
   actorFactory,
   followFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -13,7 +13,7 @@ import { SubscriptionRepository } from "../infrastructure/repositories/subscript
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
 
 describe("LikeIndexingPolicy", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   describe("INDEX_LEVEL=1", () => {
     const likeIndexingPolicy = testInjector

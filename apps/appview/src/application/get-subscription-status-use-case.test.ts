@@ -1,9 +1,9 @@
 import { asDid } from "@atproto/did";
 import {
   actorFactory,
-  getTestSetup,
   inviteCodeFactory,
   subscriptionFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -12,7 +12,7 @@ import { SubscriptionRepository } from "../infrastructure/subscription-repositor
 import { GetSubscriptionStatusUseCase } from "./get-subscription-status-use-case.js";
 
 describe("GetSubscriptionStatusUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getSubscriptionStatusUseCase = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)

@@ -1,9 +1,9 @@
 import {
   actorFactory,
-  getTestSetup,
   likeFactory,
   postFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -19,7 +19,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetLikesUseCase } from "./get-likes-use-case.js";
 
 describe("GetLikesUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getLikesUseCase = testInjector
     .provideClass("likeRepository", LikeRepository)

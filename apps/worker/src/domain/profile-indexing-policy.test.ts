@@ -2,8 +2,8 @@ import { Profile, Record } from "@repo/common/domain";
 import {
   actorFactory,
   followFactory,
-  getTestSetup,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -11,7 +11,7 @@ import { SubscriptionRepository } from "../infrastructure/repositories/subscript
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
 
 describe("ProfileIndexingPolicy", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const profileIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)

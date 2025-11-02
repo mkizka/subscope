@@ -2,7 +2,7 @@
 import { Record } from "@repo/common/domain";
 import type { JobQueue } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup, recordFactory } from "@repo/test-utils";
+import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -24,7 +24,7 @@ describe("FollowIndexer", () => {
   const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
   const mockRefreshSubscriberFolloweesScheduler =
     mock<RefreshSubscriberFolloweesScheduler>();
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const followIndexer = testInjector
     .provideClass("followRepository", FollowRepository)

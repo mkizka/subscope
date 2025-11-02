@@ -3,7 +3,7 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
@@ -22,7 +22,7 @@ const mockRepoFetcher = mock<IRepoFetcher>();
 const mockJobLogger = mock<JobLogger>();
 const mockIndexRecordService = mock<IndexRecordService>();
 
-const { testInjector, ctx } = getTestSetup();
+const { testInjector, ctx } = testSetup;
 const syncRepoUseCase = testInjector
   .provideValue("repoFetcher", mockRepoFetcher)
   .provideValue("indexRecordService", mockIndexRecordService)

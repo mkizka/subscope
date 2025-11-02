@@ -1,7 +1,7 @@
 import { LoggerManager } from "@repo/common/infrastructure";
 import { required } from "@repo/common/utils";
 import { schema } from "@repo/db";
-import { actorFactory, getTestSetup } from "@repo/test-utils";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -15,7 +15,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { SearchActorsTypeaheadUseCase } from "./search-actors-typeahead-use-case.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const searchActorsTypeaheadUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))

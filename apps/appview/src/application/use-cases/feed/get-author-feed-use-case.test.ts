@@ -1,13 +1,13 @@
 import { asDid } from "@atproto/did";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   postFeedItemFactory,
   postStatsFactory,
   recordFactory,
   repostFactory,
   repostFeedItemFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -34,7 +34,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
 
 describe("GetAuthorFeedUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getAuthorFeedUseCase = testInjector
     .provideClass("authorFeedRepository", AuthorFeedRepository)

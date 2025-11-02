@@ -1,8 +1,8 @@
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test, vi } from "vitest";
 
@@ -28,7 +28,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
 
 describe("GetPostThreadUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const spyFindByUri = vi.spyOn(PostRepository.prototype, "findByUri");
   const spyFindPostView = vi.spyOn(PostViewService.prototype, "findPostView");

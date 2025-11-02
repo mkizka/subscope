@@ -2,8 +2,8 @@ import { asDid } from "@atproto/did";
 import {
   actorFactory,
   followFactory,
-  getTestSetup,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -18,7 +18,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { GetFollowsUseCase } from "./get-follows-use-case.js";
 
 describe("GetFollowsUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const getFollowsUseCase = testInjector
     .provideClass("followRepository", FollowRepository)

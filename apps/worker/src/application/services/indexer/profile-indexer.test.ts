@@ -2,9 +2,9 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
-  getTestSetup,
   randomCid,
   recordFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -15,7 +15,7 @@ import { SubscriptionRepository } from "../../../infrastructure/repositories/sub
 import { ProfileIndexer } from "./profile-indexer.js";
 
 describe("ProfileIndexer", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const profileIndexer = testInjector
     .provideClass("profileRepository", ProfileRepository)

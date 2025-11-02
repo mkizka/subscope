@@ -3,12 +3,12 @@ import { FeedItem } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   actorFactory,
-  getTestSetup,
   postFactory,
   postFeedItemFactory,
   recordFactory,
   repostFactory,
   repostFeedItemFactory,
+  testSetup,
 } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
@@ -34,7 +34,7 @@ import { PostViewService } from "./post-view-service.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
 describe("FeedProcessor", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const feedProcessor = testInjector
     .provideClass("profileRepository", ProfileRepository)

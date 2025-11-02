@@ -1,10 +1,6 @@
 import { LoggerManager } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
-import {
-  actorFactory,
-  actorStatsFactory,
-  getTestSetup,
-} from "@repo/test-utils";
+import { actorFactory, actorStatsFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -18,7 +14,7 @@ import { ProfileSearchService } from "../../service/search/profile-search-servic
 import { SearchActorsUseCase } from "./search-actors-use-case.js";
 
 describe("SearchActorsUseCase", () => {
-  const { testInjector, ctx } = getTestSetup();
+  const { testInjector, ctx } = testSetup;
 
   const searchActorsUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))
