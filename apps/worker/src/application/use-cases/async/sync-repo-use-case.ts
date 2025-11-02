@@ -1,5 +1,10 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient, ITransactionManager } from "@repo/common/domain";
+import type {
+  Actor,
+  DatabaseClient,
+  ITransactionManager,
+  Record,
+} from "@repo/common/domain";
 import { isSupportedCollection } from "@repo/common/utils";
 
 import { env } from "../../../shared/env.js";
@@ -32,38 +37,23 @@ export class SyncRepoUseCase {
     "db",
   ] as const;
 
-  async execute({ did, jobLogger }: { did: Did; jobLogger: JobLogger }) {
-    const actor = await this.actorRepository.findByDid({
-      ctx: { db: this.db },
-      did,
-    });
-    if (!actor) {
-      throw new Error(`Actor not found: ${did}`);
-    }
-    actor.setSyncRepoStatus("in-process");
+  private updateSyncRepoStatus = async (
+    actor: Actor,
+    status: Actor["syncRepoStatus"],
+  ) => {
+    actor.setSyncRepoStatus(status);
     await this.actorRepository.upsert({
       ctx: { db: this.db },
       actor,
     });
+  };
 
-    const repoRecords = await this.repoFetcher.fetch(did, jobLogger);
-    const filteredRecords = repoRecords.filter((record) =>
-      isSupportedCollection(record.collection),
-    );
-
-    const followRecords = filteredRecords.filter(
-      (record) => record.collection === "app.bsky.graph.follow",
-    );
-    const otherRecords = filteredRecords.filter(
-      (record) => record.collection !== "app.bsky.graph.follow",
-    );
-    const prioritizedRecords = [...followRecords, ...otherRecords];
-
-    const chunks = chunkArray(prioritizedRecords, env.BACKFILL_BATCH_SIZE);
+  private indexRecords = async (records: Record[], jobLogger: JobLogger) => {
+    const chunks = chunkArray(records, env.BACKFILL_BATCH_SIZE);
     for (const [index, chunk] of Object.entries(chunks)) {
       const chunkNumber = Number(index) + 1;
       await jobLogger.log(
-        `Processing chunk ${chunkNumber}/${chunks.length} (${chunk.length} records)`,
+        `Processing other chunk ${chunkNumber}/${chunks.length} (${chunk.length} records)`,
       );
 
       await this.transactionManager.transaction(async (ctx) => {
@@ -78,12 +68,52 @@ export class SyncRepoUseCase {
         }
       });
     }
+  };
 
-    actor.setSyncRepoStatus("synchronized");
-    await this.actorRepository.upsert({
+  private async doSyncRepo({
+    actor,
+    jobLogger,
+  }: {
+    actor: Actor;
+    jobLogger: JobLogger;
+  }) {
+    await this.updateSyncRepoStatus(actor, "in-process");
+
+    const repoRecords = await this.repoFetcher.fetch(actor.did, jobLogger);
+    const filteredRecords = repoRecords.filter((record) =>
+      isSupportedCollection(record.collection),
+    );
+    const followRecords = filteredRecords.filter(
+      (record) => record.collection === "app.bsky.graph.follow",
+    );
+    const otherRecords = filteredRecords.filter(
+      (record) => record.collection !== "app.bsky.graph.follow",
+    );
+
+    await this.indexRecords(followRecords, jobLogger);
+    await this.updateSyncRepoStatus(actor, "ready");
+    await jobLogger.log(
+      `Follow records sync completed for actor: ${actor.did}`,
+    );
+
+    await this.indexRecords(otherRecords, jobLogger);
+    await this.updateSyncRepoStatus(actor, "synchronized");
+    await jobLogger.log(`Repository sync completed for actor: ${actor.did}`);
+  }
+
+  async execute({ did, jobLogger }: { did: Did; jobLogger: JobLogger }) {
+    const actor = await this.actorRepository.findByDid({
       ctx: { db: this.db },
-      actor,
+      did,
     });
-    await jobLogger.log(`Repository sync completed for actor: ${did}`);
+    if (!actor) {
+      throw new Error(`Actor not found: ${did}`);
+    }
+    try {
+      await this.doSyncRepo({ actor, jobLogger });
+    } catch (error) {
+      await this.updateSyncRepoStatus(actor, "failed");
+      throw error;
+    }
   }
 }

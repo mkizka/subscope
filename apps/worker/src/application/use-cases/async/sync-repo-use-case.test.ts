@@ -197,4 +197,70 @@ describe("SyncRepoUseCase", () => {
       expect.objectContaining({ record: records[2] }),
     );
   });
+
+  test("フォローレコード処理完了後、ステータスがreadyに更新される", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db).create();
+    const did = asDid(actor.did);
+    const followRecord = Record.fromJson({
+      uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
+      cid: "cid1",
+      json: { record: {} },
+      indexedAt: new Date(),
+    });
+    const postRecord = Record.fromJson({
+      uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
+      cid: "cid2",
+      json: { record: {} },
+      indexedAt: new Date(),
+    });
+    mockRepoFetcher.fetch.mockResolvedValue([followRecord, postRecord]);
+
+    let statusAfterFollowRecords: string | undefined;
+    mockIndexRecordService.upsert.mockImplementation(async ({ record }) => {
+      if (record.collection === "app.bsky.feed.post") {
+        const actors = await ctx.db
+          .select()
+          .from(schema.actors)
+          .where(eq(schema.actors.did, did));
+        statusAfterFollowRecords = actors[0]?.syncRepoStatus;
+      }
+    });
+
+    // act
+    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+
+    // assert
+    expect(statusAfterFollowRecords).toBe("ready");
+    const actors = await ctx.db
+      .select()
+      .from(schema.actors)
+      .where(eq(schema.actors.did, did));
+    expect(actors[0]?.syncRepoStatus).toBe("synchronized");
+  });
+
+  test("処理中にエラーが発生した場合、ステータスがfailedに更新される", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db).create();
+    const did = asDid(actor.did);
+    const record = Record.fromJson({
+      uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
+      cid: "cid1",
+      json: { record: {} },
+      indexedAt: new Date(),
+    });
+    mockRepoFetcher.fetch.mockResolvedValue([record]);
+    mockIndexRecordService.upsert.mockRejectedValue(new Error("Index error"));
+
+    // act & assert
+    await expect(
+      syncRepoUseCase.execute({ did, jobLogger: mockJobLogger }),
+    ).rejects.toThrow("Index error");
+
+    const actors = await ctx.db
+      .select()
+      .from(schema.actors)
+      .where(eq(schema.actors.did, did));
+    expect(actors[0]?.syncRepoStatus).toBe("failed");
+  });
 });

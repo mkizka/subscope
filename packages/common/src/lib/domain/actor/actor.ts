@@ -3,7 +3,12 @@ import { asDid, type Did } from "@atproto/did";
 import type { Handle } from "../../utils/handle.js";
 import { asHandle } from "../../utils/handle.js";
 
-export type SyncRepoStatus = "dirty" | "in-process" | "synchronized";
+export type SyncRepoStatus =
+  | "dirty"
+  | "in-process"
+  | "ready"
+  | "synchronized"
+  | "failed";
 
 type ActorParams = {
   did: string;

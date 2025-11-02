@@ -12,7 +12,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-const syncRepoStatus = ["dirty", "in-process", "synchronized"] as const;
+const syncRepoStatus = [
+  "dirty",
+  "in-process",
+  "ready",
+  "synchronized",
+  "failed",
+] as const;
 
 export const actors = pgTable(
   "actors",
