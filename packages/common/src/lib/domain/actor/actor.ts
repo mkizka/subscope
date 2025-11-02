@@ -52,5 +52,6 @@ export class Actor {
 
   setSyncRepoStatus(status: SyncRepoStatus): void {
     this._syncRepoStatus = status;
+    this._syncRepoVersion = 1;
   }
 }

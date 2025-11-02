@@ -67,6 +67,7 @@ describe("SyncRepoUseCase", () => {
       .from(schema.actors)
       .where(eq(schema.actors.did, did));
     expect(actors[0]?.syncRepoStatus).toBe("synchronized");
+    expect(actors[0]?.syncRepoVersion).toBe(1);
   });
 
   test("サポートされていないコレクションはフィルタリングされる", async () => {
@@ -141,6 +142,7 @@ describe("SyncRepoUseCase", () => {
       .from(schema.actors)
       .where(eq(schema.actors.did, did));
     expect(actors[0]?.syncRepoStatus).toBe("synchronized");
+    expect(actors[0]?.syncRepoVersion).toBe(1);
   });
 
   test("フォローレコードが他のレコードより先に処理される", async () => {
@@ -237,6 +239,7 @@ describe("SyncRepoUseCase", () => {
       .from(schema.actors)
       .where(eq(schema.actors.did, did));
     expect(actors[0]?.syncRepoStatus).toBe("synchronized");
+    expect(actors[0]?.syncRepoVersion).toBe(1);
   });
 
   test("処理中にエラーが発生した場合、ステータスがfailedに更新される", async () => {
@@ -262,5 +265,6 @@ describe("SyncRepoUseCase", () => {
       .from(schema.actors)
       .where(eq(schema.actors.did, did));
     expect(actors[0]?.syncRepoStatus).toBe("failed");
+    expect(actors[0]?.syncRepoVersion).toBe(1);
   });
 });
