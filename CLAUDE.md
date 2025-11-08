@@ -57,7 +57,7 @@ packagesディレクトリ(共通パッケージ)
 
 ## 開発コマンド
 
-以下のコマンドだけを使用すること。`--filter`オプションの使用は避けてください。
+以下のコマンドを使用します。
 
 ```bash
 pnpm install   # 依存パッケージのインストールと`@repo/client`パッケージのコード生成
@@ -65,6 +65,12 @@ pnpm typecheck # 全パッケージの型チェック
 pnpm lint      # 全コードのlintとフォーマットチェック
 pnpm format    # コードフォーマットとlint問題の自動修正
 pnpm test      # vitestを実行
+```
+
+特定パッケージだけを対象にしたい場合は、コマンドの後ろに`--filter`オプションを付与してください。
+
+```bash
+pnpm typecheck --filter @repo/appview
 ```
 
 ## メモリ

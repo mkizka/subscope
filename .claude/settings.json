@@ -9,6 +9,7 @@
       "Bash(pnpm db:generate:*)"
     ],
     "deny": [
+      "Bash(cd:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(yarn:*)",
