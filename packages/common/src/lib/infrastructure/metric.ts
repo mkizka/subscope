@@ -60,6 +60,14 @@ export class MetricReporter implements IMetricReporter {
         labelNames: ["collection"],
         help: "Total number of commit events processed by the ingester",
       }),
+      ingester_labels_info_total: new client.Counter({
+        name: "ingester_labels_info_total",
+        help: "Total number of label info messages processed by the ingester",
+      }),
+      ingester_labels_labels_total: new client.Counter({
+        name: "ingester_labels_labels_total",
+        help: "Total number of label messages processed by the ingester",
+      }),
       blob_proxy_cache_hit_total: new client.Counter({
         name: "blob_proxy_cache_hit_total",
         help: "Total number of blob cache hits",

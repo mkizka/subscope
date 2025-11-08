@@ -45,6 +45,7 @@ paths=(
 
   # com.atproto
   "com/atproto/label/defs.json"
+  "com/atproto/label/subscribeLabels.json"
   "com/atproto/moderation/defs.json"
   "com/atproto/repo/createRecord.json"
   "com/atproto/repo/defs.json"

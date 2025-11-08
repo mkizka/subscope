@@ -13,7 +13,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atproto/xrpc-server": "0.9.5",
     "@keyv/redis": "5.1.2",
+    "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
     "@skyware/jetstream": "0.2.5",
     "express": "5.1.0",

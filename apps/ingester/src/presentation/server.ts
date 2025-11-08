@@ -5,6 +5,7 @@ import express from "express";
 
 import { env } from "../shared/env.js";
 import type { JetstreamIngester } from "./jetstream.js";
+import type { LabelIngester } from "./label.js";
 import { healthRouter } from "./routes/health.js";
 
 export class IngesterServer {
@@ -14,7 +15,8 @@ export class IngesterServer {
   constructor(
     loggerManager: ILoggerManager,
     metricsRouter: Router,
-    private readonly ingester: JetstreamIngester,
+    private readonly jetstreamIngester: JetstreamIngester,
+    private readonly labelIngester: LabelIngester,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
@@ -22,13 +24,19 @@ export class IngesterServer {
     this.app.use(healthRouter);
     this.app.use(metricsRouter);
   }
-  static inject = ["loggerManager", "metricsRouter", "ingester"] as const;
+  static inject = [
+    "loggerManager",
+    "metricsRouter",
+    "jetstreamIngester",
+    "labelIngester",
+  ] as const;
 
   start() {
-    this.app.listen(env.PORT, async () => {
+    this.app.listen(env.PORT, () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
       if (!env.DISABLE_INGESTER) {
-        await this.ingester.start();
+        void this.jetstreamIngester.start();
+        void this.labelIngester.start();
       }
     });
   }

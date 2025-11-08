@@ -17,6 +17,12 @@ const schema = z.object({
       dev: "ws://localhost:6008/subscribe",
     }),
   ),
+  MODERATION_URL: z.url().default(
+    match({
+      prod: "wss://mod.bsky.app",
+      dev: "ws://localhost:2587",
+    }),
+  ),
   DISABLE_INGESTER: z.stringbool().default(false),
   REDIS_URL: match({
     prod: z.url(),

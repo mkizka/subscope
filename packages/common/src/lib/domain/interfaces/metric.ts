@@ -6,6 +6,8 @@ export type CounterKey =
   | "ingester_events_account_total"
   | "ingester_events_identity_total"
   | "ingester_events_commit_total"
+  | "ingester_labels_info_total"
+  | "ingester_labels_labels_total"
   | "blob_proxy_cache_hit_total"
   | "blob_proxy_cache_miss_total"
   | "blob_proxy_error_total"

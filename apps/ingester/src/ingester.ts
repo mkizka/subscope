@@ -10,6 +10,7 @@ import { HandleCommitUseCase } from "./application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "./application/handle-identity-use-case.js";
 import { RedisCursorRepository } from "./infrastructure/redis-cursor-repository.js";
 import { JetstreamIngester } from "./presentation/jetstream.js";
+import { LabelIngester } from "./presentation/label.js";
 import { metricsRouterFactory } from "./presentation/routes/metrics.js";
 import { IngesterServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
@@ -29,6 +30,7 @@ createInjector()
   .provideClass("handleCommitUseCase", HandleCommitUseCase)
   // presentation
   .provideFactory("metricsRouter", metricsRouterFactory)
-  .provideClass("ingester", JetstreamIngester)
+  .provideClass("jetstreamIngester", JetstreamIngester)
+  .provideClass("labelIngester", LabelIngester)
   .injectClass(IngesterServer)
   .start();

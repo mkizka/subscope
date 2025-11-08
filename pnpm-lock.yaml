@@ -382,9 +382,15 @@ importers:
 
   apps/ingester:
     dependencies:
+      '@atproto/xrpc-server':
+        specifier: 0.9.5
+        version: 0.9.5
       '@keyv/redis':
         specifier: 5.1.2
         version: 5.1.2(keyv@5.5.2)
+      '@repo/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@repo/common':
         specifier: workspace:*
         version: link:../../packages/common
