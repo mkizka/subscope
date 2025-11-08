@@ -1,18 +1,13 @@
 import { Subscription } from "@atproto/xrpc-server";
 import { ComAtprotoLabelSubscribeLabels } from "@repo/client/api";
-import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
+import type { IMetricReporter } from "@repo/common/domain";
 
 import { env } from "../shared/env.js";
 
 export class LabelIngester {
   private readonly subscription;
-  private readonly logger;
 
-  constructor(
-    private readonly metricReporter: IMetricReporter,
-    loggerManager: ILoggerManager,
-  ) {
-    this.logger = loggerManager.createLogger("LabelIngester");
+  constructor(private readonly metricReporter: IMetricReporter) {
     this.subscription = new Subscription({
       service: env.MODERATION_URL,
       method: "com.atproto.label.subscribeLabels",
@@ -29,7 +24,7 @@ export class LabelIngester {
       },
     });
   }
-  static inject = ["metricReporter", "loggerManager"] as const;
+  static inject = ["metricReporter"] as const;
 
   async start() {
     for await (const message of this.subscription) {
@@ -38,7 +33,6 @@ export class LabelIngester {
       } else if (ComAtprotoLabelSubscribeLabels.isInfo(message)) {
         this.metricReporter.increment("ingester_labels_info_total");
       }
-      this.logger.info({ message }, "Received label message");
     }
   }
 }
