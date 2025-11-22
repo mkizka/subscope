@@ -4,7 +4,6 @@ import {
   LoggerManager,
   TransactionManager,
 } from "@repo/common/infrastructure";
-import { schema } from "@repo/db";
 import { createInjector } from "typed-inject";
 import { inject } from "vitest";
 
@@ -24,12 +23,7 @@ const testInjector = createInjector()
 
 const db = testInjector.resolve("db");
 
-const refreshSubscriberFollowees = async () => {
-  await db.refreshMaterializedView(schema.subscriberFollowees);
-};
-
 export const testSetup = {
   testInjector,
   ctx: { db },
-  refreshSubscriberFollowees,
 };

@@ -99,6 +99,13 @@
       "when": 1762067572784,
       "tag": "0013_create-view-subscriber_followees",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1763781957531,
+      "tag": "0014_drop-view-subscriber_followees",
+      "breakpoints": true
     }
   ]
 }

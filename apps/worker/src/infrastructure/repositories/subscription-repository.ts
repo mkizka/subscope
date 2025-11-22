@@ -64,9 +64,13 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     actorDid: string,
   ): Promise<boolean> {
     const result = await ctx.db
-      .select({ followeeDid: schema.subscriberFollowees.followeeDid })
-      .from(schema.subscriberFollowees)
-      .where(eq(schema.subscriberFollowees.followeeDid, actorDid))
+      .select({ actorDid: schema.follows.actorDid })
+      .from(schema.follows)
+      .innerJoin(
+        schema.subscriptions,
+        eq(schema.follows.actorDid, schema.subscriptions.actorDid),
+      )
+      .where(eq(schema.follows.subjectDid, actorDid))
       .limit(1);
 
     return result.length > 0;
@@ -81,9 +85,13 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     }
 
     const result = await ctx.db
-      .select({ followeeDid: schema.subscriberFollowees.followeeDid })
-      .from(schema.subscriberFollowees)
-      .where(inArray(schema.subscriberFollowees.followeeDid, actorDids))
+      .select({ actorDid: schema.follows.actorDid })
+      .from(schema.follows)
+      .innerJoin(
+        schema.subscriptions,
+        eq(schema.follows.actorDid, schema.subscriptions.actorDid),
+      )
+      .where(inArray(schema.follows.subjectDid, actorDids))
       .limit(1);
 
     return result.length > 0;

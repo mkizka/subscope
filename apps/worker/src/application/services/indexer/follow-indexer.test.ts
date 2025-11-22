@@ -16,14 +16,11 @@ import { SubscriptionRepository } from "../../../infrastructure/repositories/sub
 import { IndexActorService } from "../index-actor-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
-import type { RefreshSubscriberFolloweesScheduler } from "../scheduler/refresh-subscriber-followees-scheduler.js";
 import { ResolveDidScheduler } from "../scheduler/resolve-did-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
 describe("FollowIndexer", () => {
   const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
-  const mockRefreshSubscriberFolloweesScheduler =
-    mock<RefreshSubscriberFolloweesScheduler>();
   const { testInjector, ctx } = testSetup;
 
   const followIndexer = testInjector
@@ -40,10 +37,6 @@ describe("FollowIndexer", () => {
     .provideValue(
       "aggregateActorStatsScheduler",
       mockAggregateActorStatsScheduler,
-    )
-    .provideValue(
-      "refreshSubscriberFolloweesScheduler",
-      mockRefreshSubscriberFolloweesScheduler,
     )
     .injectClass(FollowIndexer);
 

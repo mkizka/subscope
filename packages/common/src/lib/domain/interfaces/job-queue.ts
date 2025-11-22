@@ -32,7 +32,6 @@ export type JobData = {
   syncRepo: Did;
   aggregatePostStats: AggregatePostStatsData;
   aggregateActorStats: AggregateActorStatsData;
-  refreshSubscriberFollowees: undefined;
 };
 
 export type QueueName = keyof JobData;
