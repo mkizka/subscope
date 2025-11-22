@@ -5,9 +5,8 @@ import type { ISubscriptionRepository } from "../application/interfaces/reposito
 export class LikeIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly indexLevel: number,
   ) {}
-  static inject = ["subscriptionRepository", "indexLevel"] as const;
+  static inject = ["subscriptionRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, like: Like): Promise<boolean> {
     // いいねしたactorまたはいいねされたactorがsubscriberなら保存
@@ -19,14 +18,10 @@ export class LikeIndexingPolicy {
       return true;
     }
 
-    // Level2: いいねされたactorがsubscribersのフォロイーなら保存
-    if (this.indexLevel === 2) {
-      return await this.subscriptionRepository.isFolloweeOfSubscribers(
-        ctx,
-        like.subjectUri.hostname,
-      );
-    }
-
-    return false;
+    // いいねされたactorがsubscribersのフォロイーなら保存
+    return await this.subscriptionRepository.isFolloweeOfSubscribers(
+      ctx,
+      like.subjectUri.hostname,
+    );
   }
 }

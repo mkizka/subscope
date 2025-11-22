@@ -34,7 +34,6 @@ describe("PostIndexer", () => {
   const postIndexer = testInjector
     .provideClass("postRepository", PostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideValue("indexLevel", 1)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)

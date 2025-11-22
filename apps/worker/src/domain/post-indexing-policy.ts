@@ -5,9 +5,8 @@ import type { ISubscriptionRepository } from "../application/interfaces/reposito
 export class PostIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly indexLevel: number,
   ) {}
-  static inject = ["subscriptionRepository", "indexLevel"] as const;
+  static inject = ["subscriptionRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
     // リプライの場合の処理
@@ -23,15 +22,11 @@ export class PostIndexingPolicy {
         return true;
       }
 
-      // Level2: リプライ先がsubscribersのフォロイーなら保存
-      if (this.indexLevel === 2) {
-        return this.subscriptionRepository.hasFolloweeOfSubscribers(
-          ctx,
-          targetDids,
-        );
-      }
-
-      return false;
+      // リプライ先がsubscribersのフォロイーなら保存
+      return this.subscriptionRepository.hasFolloweeOfSubscribers(
+        ctx,
+        targetDids,
+      );
     }
 
     // 投稿者がsubscriberなら保存

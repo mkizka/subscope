@@ -15,7 +15,7 @@ import type { IndexRecordService } from "../../services/index-record-service.js"
 import { SyncRepoUseCase } from "./sync-repo-use-case.js";
 
 vi.mock("../../../shared/env.js", () => ({
-  env: { SYNC_REPO_BATCH_SIZE: 2, INDEX_LEVEL: 1 },
+  env: { BACKFILL_BATCH_SIZE: 2 },
 }));
 
 const mockRepoFetcher = mock<IRepoFetcher>();
