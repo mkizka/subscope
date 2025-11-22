@@ -67,8 +67,8 @@ describe("IndexActorService", () => {
 
     test("handle指定あり、既存actorなしの場合は、syncRepoジョブを追加しない", async () => {
       // arrange
-      const testDid = asDid("did:plc:new-no-backfill");
-      const testHandle = asHandle("new-no-backfill.bsky.social");
+      const testDid = asDid("did:plc:new-no-syncrepo");
+      const testHandle = asHandle("new-no-syncrepo.bsky.social");
 
       // act
       await indexActorService.upsert({

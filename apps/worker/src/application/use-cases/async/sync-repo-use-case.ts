@@ -49,7 +49,7 @@ export class SyncRepoUseCase {
   };
 
   private indexRecords = async (records: Record[], jobLogger: JobLogger) => {
-    const chunks = chunkArray(records, env.BACKFILL_BATCH_SIZE);
+    const chunks = chunkArray(records, env.SYNC_REPO_BATCH_SIZE);
     for (const [index, chunk] of Object.entries(chunks)) {
       const chunkNumber = Number(index) + 1;
       await jobLogger.log(
