@@ -20,7 +20,7 @@ export class RepostIndexingPolicy {
       return true;
     }
 
-    // リポストしたactorまたはリポストされたactorがsubscriberのフォロイーなら保存
+    // リポストしたactorまたはリポストされたactorが追跡アクターなら保存
     return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, [
       repost.actorDid,
       asDid(repost.subjectUri.hostname),

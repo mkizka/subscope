@@ -49,7 +49,7 @@ describe("PostIndexingPolicy", () => {
       expect(result).toBe(true);
     });
 
-    test("subscriberにフォローされているユーザーの投稿は保存すべき", async () => {
+    test("追跡アクターの投稿は保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
@@ -205,7 +205,7 @@ describe("PostIndexingPolicy", () => {
       expect(result).toBe(false);
     });
 
-    test("subscribersのフォロイーへのリプライは保存すべき", async () => {
+    test("追跡アクターへのリプライは保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)

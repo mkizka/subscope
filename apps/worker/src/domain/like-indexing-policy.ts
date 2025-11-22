@@ -18,7 +18,7 @@ export class LikeIndexingPolicy {
       return true;
     }
 
-    // いいねされたactorがsubscribersのフォロイーなら保存
+    // いいねされたactorが追跡アクターなら保存
     return await this.subscriptionRepository.isFolloweeOfSubscribers(
       ctx,
       like.subjectUri.hostname,

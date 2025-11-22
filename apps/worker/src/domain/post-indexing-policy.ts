@@ -22,7 +22,7 @@ export class PostIndexingPolicy {
         return true;
       }
 
-      // リプライ先がsubscribersのフォロイーなら保存
+      // リプライ先が追跡アクターなら保存
       return this.subscriptionRepository.hasFolloweeOfSubscribers(
         ctx,
         targetDids,
@@ -37,7 +37,7 @@ export class PostIndexingPolicy {
       return true;
     }
 
-    // 投稿者がsubscribersのフォロイーなら保存
+    // 投稿者が追跡アクターなら保存
     return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, [
       post.actorDid,
     ]);

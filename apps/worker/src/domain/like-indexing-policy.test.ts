@@ -138,7 +138,7 @@ describe("LikeIndexingPolicy", () => {
       expect(result).toBe(false);
     });
 
-    test("subscribersのフォロイーの投稿へのいいねは保存すべき", async () => {
+    test("追跡アクターの投稿へのいいねは保存すべき", async () => {
       // arrange
       const likerActor = await actorFactory(ctx.db).create();
 

@@ -88,7 +88,7 @@ describe("ProfileIndexingPolicy", () => {
       expect(result).toBe(false);
     });
 
-    test("プロフィール作成者が追跡アカウント(サブスクライバーがフォローしているアカウント)の場合は保存すべき", async () => {
+    test("プロフィール作成者が追跡アクター(サブスクライバーまたはサブスクライバーのフォロイー)の場合は保存すべき", async () => {
       // arrange
       const subscriberActor = await actorFactory(ctx.db)
         .use((t) => t.subscriber())

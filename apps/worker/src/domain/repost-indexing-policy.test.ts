@@ -181,7 +181,7 @@ describe("RepostIndexingPolicy", () => {
       expect(result).toBe(false);
     });
 
-    test("subscribersのフォロイーの投稿へのリポストは保存すべき", async () => {
+    test("追跡アクターの投稿へのリポストは保存すべき", async () => {
       // arrange
       const reposterActor = await actorFactory(ctx.db).create();
 
