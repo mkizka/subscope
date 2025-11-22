@@ -9,7 +9,6 @@ import type { AggregateActorStatsUseCase } from "../application/use-cases/async/
 import { aggregatePostStatsCommandFactory } from "../application/use-cases/async/aggregate-post-stats-command.js";
 import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
-import type { RefreshSubscriberFolloweesUseCase } from "../application/use-cases/async/refresh-subscriber-followees-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import type { SyncRepoUseCase } from "../application/use-cases/async/sync-repo-use-case.js";
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
@@ -70,7 +69,6 @@ export class SyncWorker {
     handleAccountUseCase: HandleAccountUseCase,
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
-    refreshSubscriberFolloweesUseCase: RefreshSubscriberFolloweesUseCase,
   ) {
     this.workers = [
       createWorker("identity", async (job) => {
@@ -142,15 +140,6 @@ export class SyncWorker {
         });
         await aggregateActorStatsUseCase.execute(command);
       }),
-      createWorker(
-        "refreshSubscriberFollowees",
-        async () => {
-          await refreshSubscriberFolloweesUseCase.execute();
-        },
-        {
-          concurrency: 1,
-        },
-      ),
     ];
   }
   static inject = [
@@ -162,7 +151,6 @@ export class SyncWorker {
     "handleAccountUseCase",
     "aggregatePostStatsUseCase",
     "aggregateActorStatsUseCase",
-    "refreshSubscriberFolloweesUseCase",
   ] as const;
 
   async start() {

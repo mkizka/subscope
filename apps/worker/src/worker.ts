@@ -21,13 +21,11 @@ import { RepostIndexer } from "./application/services/indexer/repost-indexer.js"
 import { AggregateActorStatsScheduler } from "./application/services/scheduler/aggregate-actor-stats-scheduler.js";
 import { AggregatePostStatsScheduler } from "./application/services/scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
-import { RefreshSubscriberFolloweesScheduler } from "./application/services/scheduler/refresh-subscriber-followees-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
 import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "./application/use-cases/async/aggregate-post-stats-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
-import { RefreshSubscriberFolloweesUseCase } from "./application/use-cases/async/refresh-subscriber-followees-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
 import { SyncRepoUseCase } from "./application/use-cases/async/sync-repo-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
@@ -94,10 +92,6 @@ createInjector()
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
-  .provideClass(
-    "refreshSubscriberFolloweesScheduler",
-    RefreshSubscriberFolloweesScheduler,
-  )
   .provideClass("postIndexingPolicy", PostIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
@@ -121,10 +115,6 @@ createInjector()
   .provideClass("handleAccountUseCase", HandleAccountUseCase)
   .provideClass("aggregatePostStatsUseCase", AggregatePostStatsUseCase)
   .provideClass("aggregateActorStatsUseCase", AggregateActorStatsUseCase)
-  .provideClass(
-    "refreshSubscriberFolloweesUseCase",
-    RefreshSubscriberFolloweesUseCase,
-  )
   .provideClass("syncWorker", SyncWorker)
   // presentation
   .injectClass(WorkerServer)
