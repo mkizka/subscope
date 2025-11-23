@@ -26,7 +26,6 @@ describe("LikeIndexer", () => {
   const likeIndexer = testInjector
     .provideClass("likeRepository", LikeRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideValue("indexLevel", 1)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
     .provideValue(
       "aggregatePostStatsScheduler",

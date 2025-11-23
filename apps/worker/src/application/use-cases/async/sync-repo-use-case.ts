@@ -40,7 +40,7 @@ export class SyncRepoUseCase {
   private indexRecords = async (records: Record[], jobLogger: JobLogger) => {
     /* eslint-disable no-console */
     console.log("[DEBUG] indexRecords called with", records.length, "records");
-    const chunks = chunkArray(records, env.BACKFILL_BATCH_SIZE);
+    const chunks = chunkArray(records, env.SYNC_REPO_BATCH_SIZE);
     console.log("[DEBUG] chunks count:", chunks.length);
     for (const [index, chunk] of Object.entries(chunks)) {
       const chunkNumber = Number(index) + 1;

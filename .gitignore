@@ -7,6 +7,7 @@ node-compile-cache/
 
 # typescript
 *.tsbuildinfo
+node-compile-cache/
 
 # turbo
 .turbo/

@@ -11,10 +11,6 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3003),
-  INDEX_LEVEL: z
-    .enum(["1", "2"])
-    .transform((val) => parseInt(val))
-    .default(2),
   PLC_URL: z.url().default(
     match({
       prod: "https://plc.directory",
@@ -32,7 +28,7 @@ const schema = z.object({
     dev: z.url().default("redis://localhost:6379"),
   }),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
-  BACKFILL_BATCH_SIZE: z.coerce.number().default(1000),
+  SYNC_REPO_BATCH_SIZE: z.coerce.number().default(1000),
   AGGREGATE_STATS_DELAY_SECONDS: z.coerce.number().default(10),
 });
 

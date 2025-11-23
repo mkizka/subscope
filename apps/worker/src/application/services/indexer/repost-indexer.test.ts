@@ -35,7 +35,6 @@ describe("RepostIndexer", () => {
     )
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("postRepository", PostRepository)
-    .provideValue("indexLevel", 1)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideValue("jobQueue", mockJobQueue)

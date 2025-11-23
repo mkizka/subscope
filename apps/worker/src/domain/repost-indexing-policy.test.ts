@@ -15,323 +15,274 @@ import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
 describe("RepostIndexingPolicy", () => {
   const { testInjector, ctx } = testSetup;
 
-  describe("INDEX_LEVEL=1", () => {
-    const repostIndexingPolicy = testInjector
-      .provideClass("subscriptionRepository", SubscriptionRepository)
-      .provideValue("indexLevel", 1)
-      .injectClass(RepostIndexingPolicy);
+  const repostIndexingPolicy = testInjector
+    .provideClass("subscriptionRepository", SubscriptionRepository)
+    .injectClass(RepostIndexingPolicy);
 
-    describe("shouldIndex", () => {
-      test("repost者がsubscriberの場合は保存すべき", async () => {
-        // arrange
-        const [reposterActor, authorActor] = await actorFactory(
-          ctx.db,
-        ).createList(2);
+  describe("shouldIndex", () => {
+    test("repost者がsubscriberの場合は保存すべき", async () => {
+      // arrange
+      const [reposterActor, authorActor] = await actorFactory(
+        ctx.db,
+      ).createList(2);
 
-        // repost者をsubscriberとして登録
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => reposterActor })
-          .create();
+      // repost者をsubscriberとして登録
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => reposterActor })
+        .create();
 
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: `at://${authorActor.did}/app.bsky.feed.post/456`,
-            cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/123`,
-          cid: "repost123",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
-
-        // act
-        const result = await repostIndexingPolicy.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(true);
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: `at://${authorActor.did}/app.bsky.feed.post/456`,
+          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/123`,
+        cid: "repost123",
+        json: repostJson,
+        indexedAt: new Date(),
       });
 
-      test("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
-        // arrange
-        const [reposterActor, followerActor, authorActor] = await actorFactory(
-          ctx.db,
-        ).createList(3);
+      // act
+      const result = await repostIndexingPolicy.shouldIndex(
+        ctx,
+        Repost.from(record),
+      );
 
-        // フォロワーをsubscriberとして登録
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => followerActor })
-          .create();
-
-        // フォローレコード作成
-        const followRecord = await recordFactory(
-          ctx.db,
-          "app.bsky.graph.follow",
-        )
-          .vars({ actor: () => followerActor })
-          .props({
-            uri: () => `at://${followerActor.did}/app.bsky.graph.follow/987`,
-            cid: () => "follow987",
-          })
-          .create();
-        await followFactory(ctx.db)
-          .vars({ record: () => followRecord, followee: () => reposterActor })
-          .create();
-
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: `at://${authorActor.did}/app.bsky.feed.post/654`,
-            cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/321`,
-          cid: "repost321",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
-
-        // act
-        const result = await repostIndexingPolicy.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(true);
-      });
-
-      test("subscribersの投稿へのリポストは保存すべき", async () => {
-        // arrange
-        const reposterActor = await actorFactory(ctx.db).create();
-
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
-
-        const subscriberPost = await postFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.feed.post")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-          })
-          .props({
-            text: () => "subscriber post",
-          })
-          .create();
-
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: subscriberPost.uri,
-            cid: subscriberPost.cid,
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
-          cid: "repost789",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
-
-        // act
-        const result = await repostIndexingPolicy.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(true);
-      });
-
-      test("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
-        // arrange
-        const [reposterActor, authorActor] = await actorFactory(
-          ctx.db,
-        ).createList(2);
-
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: `at://${authorActor.did}/app.bsky.feed.post/999`,
-            cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/888`,
-          cid: "repost888",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
-
-        // act
-        const result = await repostIndexingPolicy.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(false);
-      });
+      // assert
+      expect(result).toBe(true);
     });
-  });
 
-  describe("INDEX_LEVEL=2", () => {
-    const repostIndexingPolicyLevel2 = testInjector
-      .provideClass("subscriptionRepository", SubscriptionRepository)
-      .provideValue("indexLevel", 2)
-      .injectClass(RepostIndexingPolicy);
+    test("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
+      // arrange
+      const [reposterActor, followerActor, authorActor] = await actorFactory(
+        ctx.db,
+      ).createList(3);
 
-    describe("shouldIndex", () => {
-      test("INDEX_LEVEL=1の条件も満たす場合は保存すべき", async () => {
-        // arrange
-        const reposterActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => reposterActor })
-          .create();
+      // フォロワーをsubscriberとして登録
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => followerActor })
+        .create();
 
-        const authorActor = await actorFactory(ctx.db).create();
+      // フォローレコード作成
+      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => followerActor })
+        .props({
+          uri: () => `at://${followerActor.did}/app.bsky.graph.follow/987`,
+          cid: () => "follow987",
+        })
+        .create();
+      await followFactory(ctx.db)
+        .vars({ record: () => followRecord, followee: () => reposterActor })
+        .create();
 
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: `at://${authorActor.did}/app.bsky.feed.post/123`,
-            cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/456`,
-          cid: "repost456",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
-
-        // act
-        const result = await repostIndexingPolicyLevel2.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(true);
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: `at://${authorActor.did}/app.bsky.feed.post/654`,
+          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/321`,
+        cid: "repost321",
+        json: repostJson,
+        indexedAt: new Date(),
       });
 
-      test("subscribersのフォロイーの投稿へのリポストは保存すべき", async () => {
-        // arrange
-        const reposterActor = await actorFactory(ctx.db).create();
+      // act
+      const result = await repostIndexingPolicy.shouldIndex(
+        ctx,
+        Repost.from(record),
+      );
 
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
+      // assert
+      expect(result).toBe(true);
+    });
 
-        const followeeActor = await actorFactory(ctx.db).create();
-        await followFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.graph.follow")
-                .vars({ actor: () => subscriberActor })
-                .create(),
-            followee: () => followeeActor,
-          })
-          .create();
+    test("subscribersの投稿へのリポストは保存すべき", async () => {
+      // arrange
+      const reposterActor = await actorFactory(ctx.db).create();
 
-        const followeePost = await postFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.feed.post")
-                .vars({ actor: () => followeeActor })
-                .create(),
-          })
-          .props({
-            text: () => "followee post",
-          })
-          .create();
+      const subscriberActor = await actorFactory(ctx.db).create();
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => subscriberActor })
+        .create();
 
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: followeePost.uri,
-            cid: followeePost.cid,
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
-          cid: "repost789",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
+      const subscriberPost = await postFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.feed.post")
+              .vars({ actor: () => subscriberActor })
+              .create(),
+        })
+        .props({
+          text: () => "subscriber post",
+        })
+        .create();
 
-        // act
-        const result = await repostIndexingPolicyLevel2.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(true);
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: subscriberPost.uri,
+          cid: subscriberPost.cid,
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
+        cid: "repost789",
+        json: repostJson,
+        indexedAt: new Date(),
       });
 
-      test("subscribersがフォローしていないユーザーの投稿へのリポストは保存すべきでない", async () => {
-        // arrange
-        const reposterActor = await actorFactory(ctx.db).create();
+      // act
+      const result = await repostIndexingPolicy.shouldIndex(
+        ctx,
+        Repost.from(record),
+      );
 
-        const subscriberActor = await actorFactory(ctx.db).create();
-        await subscriptionFactory(ctx.db)
-          .vars({ actor: () => subscriberActor })
-          .create();
+      // assert
+      expect(result).toBe(true);
+    });
 
-        const nonFolloweeActor = await actorFactory(ctx.db).create();
-        const nonFolloweePost = await postFactory(ctx.db)
-          .vars({
-            record: () =>
-              recordFactory(ctx.db, "app.bsky.feed.post")
-                .vars({ actor: () => nonFolloweeActor })
-                .create(),
-          })
-          .props({
-            text: () => "non-followee post",
-          })
-          .create();
+    test("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
+      // arrange
+      const [reposterActor, authorActor] = await actorFactory(
+        ctx.db,
+      ).createList(2);
 
-        const repostJson = {
-          $type: "app.bsky.feed.repost",
-          subject: {
-            uri: nonFolloweePost.uri,
-            cid: nonFolloweePost.cid,
-          },
-          createdAt: new Date().toISOString(),
-        };
-        const record = Record.fromJson({
-          uri: `at://${reposterActor.did}/app.bsky.feed.repost/999`,
-          cid: "repost999",
-          json: repostJson,
-          indexedAt: new Date(),
-        });
-
-        // act
-        const result = await repostIndexingPolicyLevel2.shouldIndex(
-          ctx,
-          Repost.from(record),
-        );
-
-        // assert
-        expect(result).toBe(false);
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: `at://${authorActor.did}/app.bsky.feed.post/999`,
+          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/888`,
+        cid: "repost888",
+        json: repostJson,
+        indexedAt: new Date(),
       });
+
+      // act
+      const result = await repostIndexingPolicy.shouldIndex(
+        ctx,
+        Repost.from(record),
+      );
+
+      // assert
+      expect(result).toBe(false);
+    });
+
+    test("追跡アクターの投稿へのリポストは保存すべき", async () => {
+      // arrange
+      const reposterActor = await actorFactory(ctx.db).create();
+
+      const subscriberActor = await actorFactory(ctx.db).create();
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => subscriberActor })
+        .create();
+
+      const followeeActor = await actorFactory(ctx.db).create();
+      await followFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.graph.follow")
+              .vars({ actor: () => subscriberActor })
+              .create(),
+          followee: () => followeeActor,
+        })
+        .create();
+
+      const followeePost = await postFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.feed.post")
+              .vars({ actor: () => followeeActor })
+              .create(),
+        })
+        .props({
+          text: () => "followee post",
+        })
+        .create();
+
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: followeePost.uri,
+          cid: followeePost.cid,
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
+        cid: "repost789",
+        json: repostJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      const result = await repostIndexingPolicy.shouldIndex(
+        ctx,
+        Repost.from(record),
+      );
+
+      // assert
+      expect(result).toBe(true);
+    });
+
+    test("subscribersがフォローしていないユーザーの投稿へのリポストは保存すべきでない", async () => {
+      // arrange
+      const reposterActor = await actorFactory(ctx.db).create();
+
+      const subscriberActor = await actorFactory(ctx.db).create();
+      await subscriptionFactory(ctx.db)
+        .vars({ actor: () => subscriberActor })
+        .create();
+
+      const nonFolloweeActor = await actorFactory(ctx.db).create();
+      const nonFolloweePost = await postFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.feed.post")
+              .vars({ actor: () => nonFolloweeActor })
+              .create(),
+        })
+        .props({
+          text: () => "non-followee post",
+        })
+        .create();
+
+      const repostJson = {
+        $type: "app.bsky.feed.repost",
+        subject: {
+          uri: nonFolloweePost.uri,
+          cid: nonFolloweePost.cid,
+        },
+        createdAt: new Date().toISOString(),
+      };
+      const record = Record.fromJson({
+        uri: `at://${reposterActor.did}/app.bsky.feed.repost/999`,
+        cid: "repost999",
+        json: repostJson,
+        indexedAt: new Date(),
+      });
+
+      // act
+      const result = await repostIndexingPolicy.shouldIndex(
+        ctx,
+        Repost.from(record),
+      );
+
+      // assert
+      expect(result).toBe(false);
     });
   });
 });

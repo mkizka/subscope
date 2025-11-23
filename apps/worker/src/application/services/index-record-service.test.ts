@@ -57,7 +57,6 @@ describe("IndexRecordService", () => {
       mockDeep<AggregateActorStatsScheduler>(),
     )
     .provideValue("jobQueue", mockDeep<IJobQueue>())
-    .provideValue("indexLevel", 1)
     .provideClass("actorRepository", ActorRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)
     .provideClass("profileRepository", ProfileRepository)

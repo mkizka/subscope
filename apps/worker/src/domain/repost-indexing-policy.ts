@@ -7,9 +7,8 @@ import type { ISubscriptionRepository } from "../application/interfaces/reposito
 export class RepostIndexingPolicy {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly indexLevel: number,
   ) {}
-  static inject = ["subscriptionRepository", "indexLevel"] as const;
+  static inject = ["subscriptionRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, repost: Repost): Promise<boolean> {
     // リポストしたactorまたはリポストされたactorがsubscriberなら保存
@@ -21,15 +20,10 @@ export class RepostIndexingPolicy {
       return true;
     }
 
-    const followerCheckDids = [repost.actorDid];
-    if (this.indexLevel === 2) {
-      followerCheckDids.push(asDid(repost.subjectUri.hostname));
-    }
-
-    // リポストしたactorまたはリポストされたactorがsubscriberのフォロイーなら保存
-    return this.subscriptionRepository.hasFolloweeOfSubscribers(
-      ctx,
-      followerCheckDids,
-    );
+    // リポストしたactorまたはリポストされたactorが追跡アクターなら保存
+    return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, [
+      repost.actorDid,
+      asDid(repost.subjectUri.hostname),
+    ]);
   }
 }
