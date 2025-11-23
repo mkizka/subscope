@@ -5,7 +5,7 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
@@ -30,6 +30,10 @@ const syncRepoUseCase = testInjector
   .injectClass(SyncRepoUseCase);
 
 describe("SyncRepoUseCase", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("レコードがバッチサイズで分割されて処理される", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
