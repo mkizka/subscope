@@ -10,7 +10,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorRepository } from "../infrastructure/repositories/tracked-actor-repository.js";
+import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
 
 describe("LikeIndexingPolicy", () => {
@@ -18,7 +18,7 @@ describe("LikeIndexingPolicy", () => {
 
   const likeIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorRepository", TrackedActorRepository)
+    .provideClass("trackedActorChecker", TrackedActorChecker)
     .injectClass(LikeIndexingPolicy);
 
   describe("shouldIndex", () => {

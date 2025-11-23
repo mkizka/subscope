@@ -20,7 +20,7 @@ import { ActorStatsRepository } from "../../../infrastructure/repositories/actor
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorRepository } from "../../../infrastructure/repositories/tracked-actor-repository.js";
+import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
@@ -35,7 +35,7 @@ describe("PostIndexer", () => {
   const postIndexer = testInjector
     .provideClass("postRepository", PostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorRepository", TrackedActorRepository)
+    .provideClass("trackedActorChecker", TrackedActorChecker)
     .provideClass("postIndexingPolicy", PostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("actorStatsRepository", ActorStatsRepository)

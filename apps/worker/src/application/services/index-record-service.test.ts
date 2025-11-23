@@ -30,7 +30,7 @@ import { ProfileRepository } from "../../infrastructure/repositories/profile-rep
 import { RecordRepository } from "../../infrastructure/repositories/record-repository.js";
 import { RepostRepository } from "../../infrastructure/repositories/repost-repository.js";
 import { SubscriptionRepository } from "../../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorRepository } from "../../infrastructure/repositories/tracked-actor-repository.js";
+import { TrackedActorChecker } from "../../infrastructure/repositories/tracked-actor-checker.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { IndexRecordService } from "./index-record-service.js";
 import { FollowIndexer } from "./indexer/follow-indexer.js";
@@ -69,7 +69,7 @@ describe("IndexRecordService", () => {
     .provideClass("postStatsRepository", PostStatsRepository)
     .provideClass("repostRepository", RepostRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorRepository", TrackedActorRepository)
+    .provideClass("trackedActorChecker", TrackedActorChecker)
     .provideClass("feedItemRepository", FeedItemRepository)
     .provideClass("inviteCodeRepository", InviteCodeRepository)
     .provideClass("fetchRecordScheduler", FetchRecordScheduler)

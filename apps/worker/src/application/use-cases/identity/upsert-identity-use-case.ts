@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { DatabaseClient, TransactionContext } from "@repo/common/domain";
 
-import type { ITrackedActorRepository } from "../../interfaces/repositories/tracked-actor-repository.js";
+import type { ITrackedActorChecker } from "../../interfaces/repositories/tracked-actor-checker.js";
 import type { IndexActorService } from "../../services/index-actor-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
@@ -9,13 +9,9 @@ export class UpsertIdentityUseCase {
   constructor(
     private readonly db: DatabaseClient,
     private readonly indexActorService: IndexActorService,
-    private readonly trackedActorRepository: ITrackedActorRepository,
+    private readonly trackedActorChecker: ITrackedActorChecker,
   ) {}
-  static inject = [
-    "db",
-    "indexActorService",
-    "trackedActorRepository",
-  ] as const;
+  static inject = ["db", "indexActorService", "trackedActorChecker"] as const;
 
   async execute(command: UpsertIdentityCommand) {
     if (!command.handle) {
@@ -38,6 +34,6 @@ export class UpsertIdentityUseCase {
     ctx: TransactionContext,
     did: Did,
   ): Promise<boolean> {
-    return this.trackedActorRepository.isTrackedActor(ctx, did);
+    return this.trackedActorChecker.isTrackedActor(ctx, did);
   }
 }

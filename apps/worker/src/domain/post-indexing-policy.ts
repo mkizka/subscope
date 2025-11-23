@@ -1,13 +1,11 @@
 import { asDid } from "@atproto/did";
 import type { Post, TransactionContext } from "@repo/common/domain";
 
-import type { ITrackedActorRepository } from "../application/interfaces/repositories/tracked-actor-repository.js";
+import type { ITrackedActorChecker } from "../application/interfaces/repositories/tracked-actor-checker.js";
 
 export class PostIndexingPolicy {
-  constructor(
-    private readonly trackedActorRepository: ITrackedActorRepository,
-  ) {}
-  static inject = ["trackedActorRepository"] as const;
+  constructor(private readonly trackedActorChecker: ITrackedActorChecker) {}
+  static inject = ["trackedActorChecker"] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
     if (post.isReply()) {
@@ -15,12 +13,12 @@ export class PostIndexingPolicy {
         .getReplyTargetUris()
         .map((uri) => asDid(uri.hostname));
 
-      return this.trackedActorRepository.hasTrackedActor(ctx, [
+      return this.trackedActorChecker.hasTrackedActor(ctx, [
         post.actorDid,
         ...targetDids,
       ]);
     }
 
-    return this.trackedActorRepository.isTrackedActor(ctx, post.actorDid);
+    return this.trackedActorChecker.isTrackedActor(ctx, post.actorDid);
   }
 }

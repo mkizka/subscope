@@ -12,7 +12,7 @@ import { describe, expect, test } from "vitest";
 import { ProfileIndexingPolicy } from "../../../domain/profile-indexing-policy.js";
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorRepository } from "../../../infrastructure/repositories/tracked-actor-repository.js";
+import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker.js";
 import { ProfileIndexer } from "./profile-indexer.js";
 
 describe("ProfileIndexer", () => {
@@ -21,7 +21,7 @@ describe("ProfileIndexer", () => {
   const profileIndexer = testInjector
     .provideClass("profileRepository", ProfileRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorRepository", TrackedActorRepository)
+    .provideClass("trackedActorChecker", TrackedActorChecker)
     .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
     .injectClass(ProfileIndexer);
 

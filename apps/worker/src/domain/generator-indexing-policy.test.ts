@@ -9,7 +9,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorRepository } from "../infrastructure/repositories/tracked-actor-repository.js";
+import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
 import { GeneratorIndexingPolicy } from "./generator-indexing-policy.js";
 
 describe("GeneratorIndexingPolicy", () => {
@@ -17,7 +17,7 @@ describe("GeneratorIndexingPolicy", () => {
 
   const generatorIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorRepository", TrackedActorRepository)
+    .provideClass("trackedActorChecker", TrackedActorChecker)
     .injectClass(GeneratorIndexingPolicy);
 
   describe("shouldIndex", () => {

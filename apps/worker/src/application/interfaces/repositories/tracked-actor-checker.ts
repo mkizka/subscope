@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 
-export interface ITrackedActorRepository {
+export interface ITrackedActorChecker {
   isTrackedActor: (ctx: TransactionContext, actorDid: Did) => Promise<boolean>;
   hasTrackedActor: (
     ctx: TransactionContext,
