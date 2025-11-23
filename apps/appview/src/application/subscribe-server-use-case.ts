@@ -76,7 +76,7 @@ export class SubscribeServerUseCase {
     await this.transactionManager.transaction(async (ctx) => {
       const existingActor = await this.actorRepository.findByDid(actorDid);
       if (!existingActor) {
-        const actor = new Actor({
+        const actor = Actor.create({
           did: actorDid,
           indexedAt: new Date(),
         });

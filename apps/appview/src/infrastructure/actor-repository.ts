@@ -50,7 +50,7 @@ export class ActorRepository implements IActorRepository {
       return null;
     }
 
-    return new Actor({
+    return Actor.reconstruct({
       did: asDid(row.did),
       handle: row.handle,
       syncRepoStatus: row.syncRepoStatus,

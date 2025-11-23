@@ -37,17 +37,6 @@ export class SyncRepoUseCase {
     "db",
   ] as const;
 
-  private updateSyncRepoStatus = async (
-    actor: Actor,
-    status: Actor["syncRepoStatus"],
-  ) => {
-    actor.setSyncRepoStatus(status);
-    await this.actorRepository.upsert({
-      ctx: { db: this.db },
-      actor,
-    });
-  };
-
   private indexRecords = async (records: Record[], jobLogger: JobLogger) => {
     const chunks = chunkArray(records, env.BACKFILL_BATCH_SIZE);
     for (const [index, chunk] of Object.entries(chunks)) {
@@ -77,7 +66,8 @@ export class SyncRepoUseCase {
     actor: Actor;
     jobLogger: JobLogger;
   }) {
-    await this.updateSyncRepoStatus(actor, "in-process");
+    actor.startSyncRepo();
+    await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
 
     const repoRecords = await this.repoFetcher.fetch(actor.did, jobLogger);
     const filteredRecords = repoRecords.filter((record) =>
@@ -91,13 +81,15 @@ export class SyncRepoUseCase {
     );
 
     await this.indexRecords(followRecords, jobLogger);
-    await this.updateSyncRepoStatus(actor, "ready");
+    actor.markSyncRepoReady();
+    await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
     await jobLogger.log(
       `Follow records sync completed for actor: ${actor.did}`,
     );
 
     await this.indexRecords(otherRecords, jobLogger);
-    await this.updateSyncRepoStatus(actor, "synchronized");
+    actor.completeSyncRepo();
+    await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
     await jobLogger.log(`Repository sync completed for actor: ${actor.did}`);
   }
 
@@ -112,7 +104,8 @@ export class SyncRepoUseCase {
     try {
       await this.doSyncRepo({ actor, jobLogger });
     } catch (error) {
-      await this.updateSyncRepoStatus(actor, "failed");
+      actor.failSyncRepo();
+      await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
       throw error;
     }
   }

@@ -3,6 +3,7 @@ dist/
 generated/
 .env
 *.log
+node-compile-cache/
 
 # typescript
 *.tsbuildinfo
