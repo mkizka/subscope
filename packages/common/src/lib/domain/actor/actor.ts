@@ -92,5 +92,6 @@ export class Actor {
 
   failSyncRepo(): void {
     this._syncRepoStatus = "failed";
+    this._syncRepoVersion = 1;
   }
 }
