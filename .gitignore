@@ -3,11 +3,9 @@ dist/
 generated/
 .env
 *.log
-node-compile-cache/
 
 # typescript
 *.tsbuildinfo
-node-compile-cache/
 
 # turbo
 .turbo/
