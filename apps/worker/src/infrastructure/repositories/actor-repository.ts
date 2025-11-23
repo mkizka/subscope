@@ -37,9 +37,9 @@ export class ActorRepository implements IActorRepository {
     if (!row) {
       return null;
     }
-    return new ActorDomain({
+    return ActorDomain.reconstruct({
       did: asDid(row.did),
-      handle: row.handle || undefined,
+      handle: row.handle || null,
       syncRepoStatus: row.syncRepoStatus,
       syncRepoVersion: row.syncRepoVersion,
       indexedAt: row.indexedAt,

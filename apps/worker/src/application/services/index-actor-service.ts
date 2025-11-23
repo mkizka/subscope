@@ -33,18 +33,15 @@ export class IndexActorService {
     handle?: Handle;
     indexedAt: Date;
   }): Promise<void> {
-    const actor = await (async () => {
-      const existingActor = await this.actorRepository.findByDid({ ctx, did });
-      if (existingActor) {
-        if (handle) {
-          existingActor.setHandle(handle);
-        }
-        return existingActor;
-      }
-      return new Actor({ did, handle, indexedAt });
-    })();
+    const existingActor = await this.actorRepository.findByDid({ ctx, did });
+    const actor = existingActor ?? Actor.create({ did, indexedAt });
+
+    if (handle) {
+      actor.updateHandle(handle);
+    }
 
     await this.actorRepository.upsert({ ctx, actor });
+
     if (!actor.handle) {
       await this.resolveDidScheduler.schedule(did);
     }

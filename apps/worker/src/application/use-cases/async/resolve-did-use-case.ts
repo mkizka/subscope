@@ -15,17 +15,13 @@ export class ResolveDidUseCase {
   async execute(did: Did) {
     const { handle } = await this.didResolver.resolve(did);
 
-    const actor = await (async () => {
-      const existingActor = await this.actorRepository.findByDid({
-        ctx: { db: this.db },
-        did,
-      });
-      if (existingActor) {
-        existingActor.setHandle(handle);
-        return existingActor;
-      }
-      return new Actor({ did, handle, indexedAt: new Date() });
-    })();
+    const existingActor = await this.actorRepository.findByDid({
+      ctx: { db: this.db },
+      did,
+    });
+    const actor = existingActor ?? Actor.create({ did, indexedAt: new Date() });
+
+    actor.updateHandle(handle);
 
     await this.actorRepository.upsert({
       ctx: { db: this.db },
