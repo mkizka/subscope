@@ -2,26 +2,16 @@ import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 import type { Repost } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
+import type { ITrackedActorRepository } from "../application/interfaces/repositories/tracked-actor-repository.js";
 
 export class RepostIndexingPolicy {
   constructor(
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly trackedActorRepository: ITrackedActorRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
+  static inject = ["trackedActorRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, repost: Repost): Promise<boolean> {
-    // リポストしたactorまたはリポストされたactorがsubscriberなら保存
-    const hasAnySubscriber = await this.subscriptionRepository.hasSubscriber(
-      ctx,
-      [repost.actorDid, asDid(repost.subjectUri.hostname)],
-    );
-    if (hasAnySubscriber) {
-      return true;
-    }
-
-    // リポストしたactorまたはリポストされたactorが追跡アクターなら保存
-    return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, [
+    return this.trackedActorRepository.hasTrackedActor(ctx, [
       repost.actorDid,
       asDid(repost.subjectUri.hostname),
     ]);

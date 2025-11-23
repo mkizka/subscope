@@ -51,6 +51,7 @@ import { ProfileRepository } from "./infrastructure/repositories/profile-reposit
 import { RecordRepository } from "./infrastructure/repositories/record-repository.js";
 import { RepostRepository } from "./infrastructure/repositories/repost-repository.js";
 import { SubscriptionRepository } from "./infrastructure/repositories/subscription-repository.js";
+import { TrackedActorRepository } from "./infrastructure/repositories/tracked-actor-repository.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
@@ -85,6 +86,7 @@ createInjector()
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
+  .provideClass("trackedActorRepository", TrackedActorRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)

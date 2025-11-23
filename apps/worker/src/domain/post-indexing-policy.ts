@@ -1,45 +1,26 @@
+import { asDid } from "@atproto/did";
 import type { Post, TransactionContext } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
+import type { ITrackedActorRepository } from "../application/interfaces/repositories/tracked-actor-repository.js";
 
 export class PostIndexingPolicy {
   constructor(
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly trackedActorRepository: ITrackedActorRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
+  static inject = ["trackedActorRepository"] as const;
 
   async shouldIndex(ctx: TransactionContext, post: Post): Promise<boolean> {
-    // リプライの場合の処理
     if (post.isReply()) {
-      const targetDids = post.getReplyTargetUris().map((uri) => uri.hostname);
+      const targetDids = post
+        .getReplyTargetUris()
+        .map((uri) => asDid(uri.hostname));
 
-      // 投稿者またはリプライ先のいずれかがsubscriberなら保存
-      const hasAnySubscriber = await this.subscriptionRepository.hasSubscriber(
-        ctx,
-        [post.actorDid, ...targetDids],
-      );
-      if (hasAnySubscriber) {
-        return true;
-      }
-
-      // リプライ先が追跡アクターなら保存
-      return this.subscriptionRepository.hasFolloweeOfSubscribers(
-        ctx,
-        targetDids,
-      );
+      return this.trackedActorRepository.hasTrackedActor(ctx, [
+        post.actorDid,
+        ...targetDids,
+      ]);
     }
 
-    // 投稿者がsubscriberなら保存
-    const isSubscriber = await this.subscriptionRepository.hasSubscriber(ctx, [
-      post.actorDid,
-    ]);
-    if (isSubscriber) {
-      return true;
-    }
-
-    // 投稿者が追跡アクターなら保存
-    return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, [
-      post.actorDid,
-    ]);
+    return this.trackedActorRepository.isTrackedActor(ctx, post.actorDid);
   }
 }

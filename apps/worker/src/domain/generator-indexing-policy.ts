@@ -1,21 +1,18 @@
 import type { TransactionContext } from "@repo/common/domain";
 import type { Generator } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
+import type { ITrackedActorRepository } from "../application/interfaces/repositories/tracked-actor-repository.js";
 
 export class GeneratorIndexingPolicy {
   constructor(
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly trackedActorRepository: ITrackedActorRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
+  static inject = ["trackedActorRepository"] as const;
 
   async shouldIndex(
     ctx: TransactionContext,
     generator: Generator,
   ): Promise<boolean> {
-    return await this.subscriptionRepository.isSubscriber(
-      ctx,
-      generator.actorDid,
-    );
+    return this.trackedActorRepository.isTrackedActor(ctx, generator.actorDid);
   }
 }

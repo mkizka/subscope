@@ -8,6 +8,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
+import { TrackedActorRepository } from "../infrastructure/repositories/tracked-actor-repository.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
 
 describe("ProfileIndexingPolicy", () => {
@@ -15,6 +16,7 @@ describe("ProfileIndexingPolicy", () => {
 
   const profileIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("trackedActorRepository", TrackedActorRepository)
     .injectClass(ProfileIndexingPolicy);
 
   describe("shouldIndex", () => {

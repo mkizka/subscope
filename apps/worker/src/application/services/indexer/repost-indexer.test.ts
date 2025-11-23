@@ -18,6 +18,7 @@ import { FeedItemRepository } from "../../../infrastructure/repositories/feed-it
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { RepostRepository } from "../../../infrastructure/repositories/repost-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
+import { TrackedActorRepository } from "../../../infrastructure/repositories/tracked-actor-repository.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { RepostIndexer } from "./repost-indexer.js";
@@ -34,6 +35,7 @@ describe("RepostIndexer", () => {
       mockAggregatePostStatsScheduler,
     )
     .provideClass("subscriptionRepository", SubscriptionRepository)
+    .provideClass("trackedActorRepository", TrackedActorRepository)
     .provideClass("postRepository", PostRepository)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)

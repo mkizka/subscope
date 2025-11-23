@@ -1,6 +1,7 @@
+import type { Did } from "@atproto/did";
 import type { DatabaseClient, TransactionContext } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
+import type { ITrackedActorRepository } from "../../interfaces/repositories/tracked-actor-repository.js";
 import type { IndexActorService } from "../../services/index-actor-service.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
@@ -8,12 +9,12 @@ export class UpsertIdentityUseCase {
   constructor(
     private readonly db: DatabaseClient,
     private readonly indexActorService: IndexActorService,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly trackedActorRepository: ITrackedActorRepository,
   ) {}
   static inject = [
     "db",
     "indexActorService",
-    "subscriptionRepository",
+    "trackedActorRepository",
   ] as const;
 
   async execute(command: UpsertIdentityCommand) {
@@ -35,16 +36,8 @@ export class UpsertIdentityUseCase {
 
   private async shouldIndexActor(
     ctx: TransactionContext,
-    did: string,
+    did: Did,
   ): Promise<boolean> {
-    // subscriberであるか、subscriberのフォロワーがいるactorのみインデックス
-    const isSubscriber = await this.subscriptionRepository.isSubscriber(
-      ctx,
-      did,
-    );
-    if (isSubscriber) {
-      return true;
-    }
-    return this.subscriptionRepository.isFolloweeOfSubscribers(ctx, did);
+    return this.trackedActorRepository.isTrackedActor(ctx, did);
   }
 }
