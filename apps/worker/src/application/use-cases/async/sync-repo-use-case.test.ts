@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
+import type {
+  ITransactionManager,
+  TransactionContext,
+} from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { actorFactory, testSetup } from "@repo/test-utils";
@@ -15,16 +19,22 @@ import type { IndexRecordService } from "../../services/index-record-service.js"
 import { SyncRepoUseCase } from "./sync-repo-use-case.js";
 
 vi.mock("../../../shared/env.js", () => ({
-  env: { BACKFILL_BATCH_SIZE: 2 },
+  env: { SYNC_REPO_BATCH_SIZE: 2 },
 }));
 
 const mockRepoFetcher = mock<IRepoFetcher>();
 const mockJobLogger = mock<JobLogger>();
 const mockIndexRecordService = mock<IndexRecordService>();
+const mockTransactionManager = mock<ITransactionManager>();
+const mockTransactionContext = mock<TransactionContext>();
+mockTransactionManager.transaction.mockImplementation(async (fn) => {
+  await fn(mockTransactionContext);
+});
 
 const { testInjector, ctx } = testSetup;
 const syncRepoUseCase = testInjector
   .provideValue("repoFetcher", mockRepoFetcher)
+  .provideValue("transactionManager", mockTransactionManager)
   .provideValue("indexRecordService", mockIndexRecordService)
   .provideClass("actorRepository", ActorRepository)
   .injectClass(SyncRepoUseCase);
