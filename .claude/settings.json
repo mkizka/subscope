@@ -6,7 +6,8 @@
       "Bash(pnpm lint:*)",
       "Bash(pnpm format:*)",
       "Bash(pnpm test:*)",
-      "Bash(pnpm db:generate:*)"
+      "Bash(pnpm db:generate:*)",
+      "Bash(pnpm all)"
     ],
     "deny": [
       "Bash(cd:*)",
