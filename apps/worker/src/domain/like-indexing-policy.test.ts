@@ -9,6 +9,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { PostgresIndexTargetRepository } from "../infrastructure/repositories/postgres-index-target-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
@@ -19,6 +20,7 @@ describe("LikeIndexingPolicy", () => {
   const likeIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("trackedActorChecker", TrackedActorChecker)
+    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
     .injectClass(LikeIndexingPolicy);
 
   describe("shouldIndex", () => {
@@ -50,10 +52,7 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // act
-      const result = await likeIndexingPolicy.shouldIndex(
-        ctx,
-        Like.from(record),
-      );
+      const result = await likeIndexingPolicy.shouldIndex(Like.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -98,10 +97,7 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // act
-      const result = await likeIndexingPolicy.shouldIndex(
-        ctx,
-        Like.from(record),
-      );
+      const result = await likeIndexingPolicy.shouldIndex(Like.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -131,10 +127,7 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // act
-      const result = await likeIndexingPolicy.shouldIndex(
-        ctx,
-        Like.from(record),
-      );
+      const result = await likeIndexingPolicy.shouldIndex(Like.from(record));
 
       // assert
       expect(result).toBe(false);
@@ -190,10 +183,7 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // act
-      const result = await likeIndexingPolicy.shouldIndex(
-        ctx,
-        Like.from(record),
-      );
+      const result = await likeIndexingPolicy.shouldIndex(Like.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -239,10 +229,7 @@ describe("LikeIndexingPolicy", () => {
       });
 
       // act
-      const result = await likeIndexingPolicy.shouldIndex(
-        ctx,
-        Like.from(record),
-      );
+      const result = await likeIndexingPolicy.shouldIndex(Like.from(record));
 
       // assert
       expect(result).toBe(false);

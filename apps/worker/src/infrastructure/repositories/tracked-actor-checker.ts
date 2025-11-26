@@ -1,19 +1,18 @@
 import type { Did } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/domain";
 
 import type { ISubscriptionRepository } from "../../application/interfaces/repositories/subscription-repository.js";
 import type { ITrackedActorChecker } from "../../application/interfaces/repositories/tracked-actor-checker.js";
 
 export class TrackedActorChecker implements ITrackedActorChecker {
   constructor(
+    private readonly db: DatabaseClient,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
+  static inject = ["db", "subscriptionRepository"] as const;
 
-  async isTrackedActor(
-    ctx: TransactionContext,
-    actorDid: Did,
-  ): Promise<boolean> {
+  async isTrackedActor(actorDid: Did): Promise<boolean> {
+    const ctx = { db: this.db };
     const isSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       actorDid,
@@ -25,14 +24,12 @@ export class TrackedActorChecker implements ITrackedActorChecker {
     return this.subscriptionRepository.isFolloweeOfSubscribers(ctx, actorDid);
   }
 
-  async hasTrackedActor(
-    ctx: TransactionContext,
-    actorDids: Did[],
-  ): Promise<boolean> {
+  async hasTrackedActor(actorDids: Did[]): Promise<boolean> {
     if (actorDids.length === 0) {
       return false;
     }
 
+    const ctx = { db: this.db };
     const hasSubscriber = await this.subscriptionRepository.hasSubscriber(
       ctx,
       actorDids,

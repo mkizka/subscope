@@ -18,13 +18,12 @@ export class GeneratorIndexer implements ICollectionIndexer {
   }
 
   async shouldIndex({
-    ctx,
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<boolean> {
     const generator = Generator.from(record);
-    return await this.generatorIndexingPolicy.shouldIndex(ctx, generator);
+    return await this.generatorIndexingPolicy.shouldIndex(generator);
   }
 }

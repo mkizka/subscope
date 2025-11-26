@@ -7,6 +7,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { PostgresIndexTargetRepository } from "../infrastructure/repositories/postgres-index-target-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
@@ -17,6 +18,7 @@ describe("ProfileIndexingPolicy", () => {
   const profileIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("trackedActorChecker", TrackedActorChecker)
+    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
     .injectClass(ProfileIndexingPolicy);
 
   describe("shouldIndex", () => {
@@ -48,7 +50,6 @@ describe("ProfileIndexingPolicy", () => {
 
       // act
       const result = await profileIndexingPolicy.shouldIndex(
-        ctx,
         Profile.from(record),
       );
 
@@ -82,7 +83,6 @@ describe("ProfileIndexingPolicy", () => {
 
       // act
       const result = await profileIndexingPolicy.shouldIndex(
-        ctx,
         Profile.from(record),
       );
 
@@ -129,7 +129,6 @@ describe("ProfileIndexingPolicy", () => {
 
       // act
       const result = await profileIndexingPolicy.shouldIndex(
-        ctx,
         Profile.from(record),
       );
 

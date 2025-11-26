@@ -9,6 +9,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { PostgresIndexTargetRepository } from "../infrastructure/repositories/postgres-index-target-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
 import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
@@ -19,6 +20,7 @@ describe("RepostIndexingPolicy", () => {
   const repostIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("trackedActorChecker", TrackedActorChecker)
+    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
     .injectClass(RepostIndexingPolicy);
 
   describe("shouldIndex", () => {
@@ -50,7 +52,6 @@ describe("RepostIndexingPolicy", () => {
 
       // act
       const result = await repostIndexingPolicy.shouldIndex(
-        ctx,
         Repost.from(record),
       );
 
@@ -98,7 +99,6 @@ describe("RepostIndexingPolicy", () => {
 
       // act
       const result = await repostIndexingPolicy.shouldIndex(
-        ctx,
         Repost.from(record),
       );
 
@@ -144,7 +144,6 @@ describe("RepostIndexingPolicy", () => {
 
       // act
       const result = await repostIndexingPolicy.shouldIndex(
-        ctx,
         Repost.from(record),
       );
 
@@ -175,7 +174,6 @@ describe("RepostIndexingPolicy", () => {
 
       // act
       const result = await repostIndexingPolicy.shouldIndex(
-        ctx,
         Repost.from(record),
       );
 
@@ -232,7 +230,6 @@ describe("RepostIndexingPolicy", () => {
 
       // act
       const result = await repostIndexingPolicy.shouldIndex(
-        ctx,
         Repost.from(record),
       );
 
@@ -279,7 +276,6 @@ describe("RepostIndexingPolicy", () => {
 
       // act
       const result = await repostIndexingPolicy.shouldIndex(
-        ctx,
         Repost.from(record),
       );
 

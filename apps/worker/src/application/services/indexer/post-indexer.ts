@@ -57,14 +57,13 @@ export class PostIndexer implements ICollectionIndexer {
   }
 
   async shouldIndex({
-    ctx,
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<boolean> {
     const post = Post.from(record);
-    return await this.postIndexingPolicy.shouldIndex(ctx, post);
+    return await this.postIndexingPolicy.shouldIndex(post);
   }
 
   async afterAction({

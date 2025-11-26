@@ -9,6 +9,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { PostgresIndexTargetRepository } from "../infrastructure/repositories/postgres-index-target-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
 import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
 import { PostIndexingPolicy } from "./post-indexing-policy.js";
@@ -19,6 +20,7 @@ describe("PostIndexingPolicy", () => {
   const postIndexingPolicy = testInjector
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("trackedActorChecker", TrackedActorChecker)
+    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
     .injectClass(PostIndexingPolicy);
 
   describe("shouldIndex", () => {
@@ -42,10 +44,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -83,10 +82,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -136,10 +132,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -162,10 +155,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(false);
@@ -198,10 +188,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(false);
@@ -262,10 +249,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(true);
@@ -316,10 +300,7 @@ describe("PostIndexingPolicy", () => {
       });
 
       // act
-      const result = await postIndexingPolicy.shouldIndex(
-        ctx,
-        Post.from(record),
-      );
+      const result = await postIndexingPolicy.shouldIndex(Post.from(record));
 
       // assert
       expect(result).toBe(false);

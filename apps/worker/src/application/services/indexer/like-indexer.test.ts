@@ -15,6 +15,7 @@ import { mock } from "vitest-mock-extended";
 
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
+import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/postgres-index-target-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
@@ -28,6 +29,7 @@ describe("LikeIndexer", () => {
     .provideClass("likeRepository", LikeRepository)
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("trackedActorChecker", TrackedActorChecker)
+    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
     .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
     .provideValue(
       "aggregatePostStatsScheduler",

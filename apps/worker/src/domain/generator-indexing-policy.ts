@@ -1,16 +1,10 @@
-import type { TransactionContext } from "@repo/common/domain";
-import type { Generator } from "@repo/common/domain";
-
-import type { ITrackedActorChecker } from "../application/interfaces/repositories/tracked-actor-checker.js";
+import type { Generator, IIndexTargetRepository } from "@repo/common/domain";
 
 export class GeneratorIndexingPolicy {
-  constructor(private readonly trackedActorChecker: ITrackedActorChecker) {}
-  static inject = ["trackedActorChecker"] as const;
+  constructor(private readonly indexTargetRepository: IIndexTargetRepository) {}
+  static inject = ["indexTargetRepository"] as const;
 
-  async shouldIndex(
-    ctx: TransactionContext,
-    generator: Generator,
-  ): Promise<boolean> {
-    return this.trackedActorChecker.isTrackedActor(ctx, generator.actorDid);
+  async shouldIndex(generator: Generator): Promise<boolean> {
+    return this.indexTargetRepository.isTrackedActor(generator.actorDid);
   }
 }

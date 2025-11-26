@@ -18,13 +18,12 @@ export class ProfileIndexer implements ICollectionIndexer {
   }
 
   async shouldIndex({
-    ctx,
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<boolean> {
     const profile = Profile.from(record);
-    return await this.profileIndexingPolicy.shouldIndex(ctx, profile);
+    return await this.profileIndexingPolicy.shouldIndex(profile);
   }
 }

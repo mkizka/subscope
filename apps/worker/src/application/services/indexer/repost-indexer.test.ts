@@ -16,6 +16,7 @@ import { mock } from "vitest-mock-extended";
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
+import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/postgres-index-target-repository.js";
 import { RepostRepository } from "../../../infrastructure/repositories/repost-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
 import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker.js";
@@ -36,6 +37,7 @@ describe("RepostIndexer", () => {
     )
     .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideClass("trackedActorChecker", TrackedActorChecker)
+    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
     .provideClass("postRepository", PostRepository)
     .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
     .provideClass("feedItemRepository", FeedItemRepository)

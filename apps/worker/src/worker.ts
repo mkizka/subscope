@@ -47,6 +47,7 @@ import { InviteCodeRepository } from "./infrastructure/repositories/invite-code-
 import { LikeRepository } from "./infrastructure/repositories/like-repository.js";
 import { PostRepository } from "./infrastructure/repositories/post-repository.js";
 import { PostStatsRepository } from "./infrastructure/repositories/post-stats-repository.js";
+import { PostgresIndexTargetRepository } from "./infrastructure/repositories/postgres-index-target-repository.js";
 import { ProfileRepository } from "./infrastructure/repositories/profile-repository.js";
 import { RecordRepository } from "./infrastructure/repositories/record-repository.js";
 import { RepostRepository } from "./infrastructure/repositories/repost-repository.js";
@@ -87,6 +88,7 @@ createInjector()
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
   .provideClass("trackedActorChecker", TrackedActorChecker)
+  .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)

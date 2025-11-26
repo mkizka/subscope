@@ -1,16 +1,10 @@
-import type { TransactionContext } from "@repo/common/domain";
-import type { Profile } from "@repo/common/domain";
-
-import type { ITrackedActorChecker } from "../application/interfaces/repositories/tracked-actor-checker.js";
+import type { IIndexTargetRepository, Profile } from "@repo/common/domain";
 
 export class ProfileIndexingPolicy {
-  constructor(private readonly trackedActorChecker: ITrackedActorChecker) {}
-  static inject = ["trackedActorChecker"] as const;
+  constructor(private readonly indexTargetRepository: IIndexTargetRepository) {}
+  static inject = ["indexTargetRepository"] as const;
 
-  async shouldIndex(
-    ctx: TransactionContext,
-    profile: Profile,
-  ): Promise<boolean> {
-    return this.trackedActorChecker.isTrackedActor(ctx, profile.actorDid);
+  async shouldIndex(profile: Profile): Promise<boolean> {
+    return this.indexTargetRepository.isTrackedActor(profile.actorDid);
   }
 }

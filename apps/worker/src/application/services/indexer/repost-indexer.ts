@@ -52,14 +52,13 @@ export class RepostIndexer implements ICollectionIndexer {
   }
 
   async shouldIndex({
-    ctx,
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<boolean> {
     const repost = Repost.from(record);
-    return await this.repostIndexingPolicy.shouldIndex(ctx, repost);
+    return await this.repostIndexingPolicy.shouldIndex(repost);
   }
 
   async afterAction({

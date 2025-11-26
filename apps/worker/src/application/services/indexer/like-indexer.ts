@@ -24,14 +24,13 @@ export class LikeIndexer implements ICollectionIndexer {
   }
 
   async shouldIndex({
-    ctx,
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<boolean> {
     const like = Like.from(record);
-    return await this.likeIndexingPolicy.shouldIndex(ctx, like);
+    return await this.likeIndexingPolicy.shouldIndex(like);
   }
 
   async afterAction({
