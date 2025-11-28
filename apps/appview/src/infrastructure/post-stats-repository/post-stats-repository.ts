@@ -6,7 +6,7 @@ import { inArray } from "drizzle-orm";
 import type {
   IPostStatsRepository,
   PostStats,
-} from "../application/interfaces/post-stats-repository.js";
+} from "../../application/interfaces/post-stats-repository.js";
 
 export class PostStatsRepository implements IPostStatsRepository {
   constructor(private readonly db: DatabaseClient) {}

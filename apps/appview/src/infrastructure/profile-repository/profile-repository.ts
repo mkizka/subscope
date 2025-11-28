@@ -4,7 +4,7 @@ import { ProfileDetailed } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, ilike, lt, or } from "drizzle-orm";
 
-import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
+import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
 
 export class ProfileRepository implements IProfileRepository {
   constructor(private readonly db: DatabaseClient) {}

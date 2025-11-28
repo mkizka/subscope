@@ -7,8 +7,8 @@ import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";
 import { ProfileSearchService } from "../../service/search/profile-search-service.js";

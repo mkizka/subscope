@@ -4,7 +4,7 @@ import { Like } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
-import type { ILikeRepository } from "../application/interfaces/like-repository.js";
+import type { ILikeRepository } from "../../application/interfaces/like-repository.js";
 
 export class LikeRepository implements ILikeRepository {
   constructor(private readonly db: DatabaseClient) {}

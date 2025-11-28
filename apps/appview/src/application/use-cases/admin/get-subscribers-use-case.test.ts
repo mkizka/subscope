@@ -10,8 +10,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository.js";
+import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
+import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/subscription-repository.js";
 import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../../service/actor/profile-view-service.js";

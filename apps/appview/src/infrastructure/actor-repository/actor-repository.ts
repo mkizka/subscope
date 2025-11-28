@@ -8,7 +8,7 @@ import {
 import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IActorRepository } from "../application/interfaces/actor-repository.js";
+import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
   constructor(private readonly db: DatabaseClient) {}

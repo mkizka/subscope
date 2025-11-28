@@ -5,7 +5,7 @@ import { Follow } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
-import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
+import type { IFollowRepository } from "../../application/interfaces/follow-repository.js";
 
 export class FollowRepository implements IFollowRepository {
   constructor(private readonly db: DatabaseClient) {}
