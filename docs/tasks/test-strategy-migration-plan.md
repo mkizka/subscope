@@ -4,7 +4,7 @@
 
 ### Phase 0: 基盤整備
 
-- [ ] **Phase 0-A**: ドメインモデルのディレクトリ構造統一
+- [x] **Phase 0-A**: ドメインモデルのディレクトリ構造統一
 - [ ] **Phase 0-B**: ドメインモデルFactory関数の作成（基本: actor, post, profile, feedItem）
 - [ ] **Phase 0-C**: ドメインモデルFactory関数の作成（残り: follow, like, repost, generator）
 - [ ] **Phase 0-D**: appviewリポジトリのディレクトリ構造統一（Part 1: 主要リポジトリ）

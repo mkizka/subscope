@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import type { Post } from "./post/post.js";
-import type { Repost } from "./repost.js";
+import type { Post } from "../post/post.js";
+import type { Repost } from "../repost/repost.js";
 
 export type FeedType = "post" | "repost";
 
