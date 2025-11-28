@@ -3,7 +3,7 @@ import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record.js";
 
-type LikeParams = {
+export type LikeParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;

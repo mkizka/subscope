@@ -21,7 +21,7 @@ const getStrongRef = (ref: { uri: string; cid: string } | undefined) => {
   );
 };
 
-type PostParams = {
+export type PostParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;

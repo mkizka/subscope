@@ -3,7 +3,7 @@ import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record.js";
 
-type FollowParams = {
+export type FollowParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;

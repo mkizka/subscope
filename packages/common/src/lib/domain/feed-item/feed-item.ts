@@ -6,7 +6,7 @@ import type { Repost } from "../repost/repost.js";
 
 export type FeedType = "post" | "repost";
 
-type FeedItemParams = {
+export type FeedItemParams = {
   uri: AtUri | string;
   cid: string;
   type: FeedType;

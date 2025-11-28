@@ -3,7 +3,7 @@ import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record.js";
 
-type RepostParams = {
+export type RepostParams = {
   uri: AtUri | string;
   cid: string;
   actorDid: string;

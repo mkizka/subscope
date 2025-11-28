@@ -10,7 +10,7 @@ export type SyncRepoStatus =
   | "synchronized"
   | "failed";
 
-type ActorParams = {
+export type ActorParams = {
   did: string;
   handle: string | null;
   syncRepoStatus: SyncRepoStatus;
