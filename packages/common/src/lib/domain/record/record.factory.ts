@@ -9,9 +9,6 @@ export type RecordFactoryParams = {
   indexedAt?: Date;
 };
 
-/**
- * Recordドメインモデルのテスト用Factory関数
- */
 export function recordFactory(params: RecordFactoryParams): Record {
   return Record.fromJson({
     uri: params.uri,
