@@ -1,98 +1,75 @@
 import {
   actorFactory,
   postFactory,
-  recordFactory,
+  profileDetailedFactory,
   repostFactory,
-  testSetup,
-} from "@repo/test-utils";
-import { describe, expect, test } from "vitest";
+} from "@repo/common/test";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
-import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { RepostService } from "../../service/feed/repost-service.js";
-import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-injector.js";
 import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
 
 describe("GetRepostedByUseCase", () => {
-  const { testInjector, ctx } = testSetup;
+  const getRepostedByUseCase = testInjector.injectClass(GetRepostedByUseCase);
 
-  const getRepostedByUseCase = testInjector
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("repostService", RepostService)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .injectClass(GetRepostedByUseCase);
+  const repostRepo = testInjector.resolve("repostRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
+
+  beforeEach(() => {
+    repostRepo.clear();
+    profileRepo.clear();
+  });
 
   test("リポストがない場合、空のrepostedByを返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Test User" }))
-      .create();
-    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => actor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => record })
-      .create();
+    const actor = actorFactory();
+    const { post } = postFactory({
+      actorDid: actor.did,
+    });
 
     // act
     const result = await getRepostedByUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 50,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: post.uri,
+      uri: post.uri.toString(),
       repostedBy: [],
     });
   });
 
   test("リポストがある場合、リポストしたユーザーのプロフィールを返す", async () => {
     // arrange
-    const originalActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Original User" }))
-      .create();
-    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => originalActor })
-      .create();
-    const originalPost = await postFactory(ctx.db)
-      .vars({ record: () => originalRecord })
-      .create();
+    const originalActor = actorFactory();
+    const { post: originalPost } = postFactory({
+      actorDid: originalActor.did,
+    });
 
-    const repostActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reposter" }))
-      .create();
-    const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
-      .vars({ actor: () => repostActor })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => repostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-      })
-      .create();
+    const repostActor = actorFactory();
+    const profile = profileDetailedFactory({
+      actorDid: repostActor.did,
+      displayName: "Reposter",
+    });
+    profileRepo.add(profile);
+
+    const repost = repostFactory({
+      actorDid: repostActor.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+    });
+    repostRepo.add(repost);
 
     // act
     const result = await getRepostedByUseCase.execute({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       limit: 50,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       repostedBy: [
         {
           $type: "app.bsky.actor.defs#profileView",
@@ -106,61 +83,50 @@ describe("GetRepostedByUseCase", () => {
 
   test("複数のリポストがある場合、時系列の降順で返す", async () => {
     // arrange
-    const originalActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Original User" }))
-      .create();
-    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => originalActor })
-      .create();
-    const originalPost = await postFactory(ctx.db)
-      .vars({ record: () => originalRecord })
-      .create();
+    const originalActor = actorFactory();
+    const { post: originalPost } = postFactory({
+      actorDid: originalActor.did,
+    });
 
-    const firstReposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "First Reposter" }))
-      .create();
-    const firstRepostRecord = await recordFactory(
-      ctx.db,
-      "app.bsky.feed.repost",
-    )
-      .vars({ actor: () => firstReposter })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => firstRepostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const firstReposter = actorFactory();
+    const firstProfile = profileDetailedFactory({
+      actorDid: firstReposter.did,
+      displayName: "First Reposter",
+    });
+    profileRepo.add(firstProfile);
 
-    const secondReposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Second Reposter" }))
-      .create();
-    const secondRepostRecord = await recordFactory(
-      ctx.db,
-      "app.bsky.feed.repost",
-    )
-      .vars({ actor: () => secondReposter })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => secondRepostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
+    const firstRepost = repostFactory({
+      actorDid: firstReposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+    });
+    repostRepo.add(firstRepost);
+
+    const secondReposter = actorFactory();
+    const secondProfile = profileDetailedFactory({
+      actorDid: secondReposter.did,
+      displayName: "Second Reposter",
+    });
+    profileRepo.add(secondProfile);
+
+    const secondRepost = repostFactory({
+      actorDid: secondReposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T02:00:00.000Z"),
+    });
+    repostRepo.add(secondRepost);
 
     // act
     const result = await getRepostedByUseCase.execute({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       limit: 50,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       repostedBy: [
         {
           $type: "app.bsky.actor.defs#profileView",
@@ -178,61 +144,50 @@ describe("GetRepostedByUseCase", () => {
 
   test("limitパラメータによる制限が正しく動作する", async () => {
     // arrange
-    const originalActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Original User" }))
-      .create();
-    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => originalActor })
-      .create();
-    const originalPost = await postFactory(ctx.db)
-      .vars({ record: () => originalRecord })
-      .create();
+    const originalActor = actorFactory();
+    const { post: originalPost } = postFactory({
+      actorDid: originalActor.did,
+    });
 
-    const firstReposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "First Reposter" }))
-      .create();
-    const firstRepostRecord = await recordFactory(
-      ctx.db,
-      "app.bsky.feed.repost",
-    )
-      .vars({ actor: () => firstReposter })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => firstRepostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
+    const firstReposter = actorFactory();
+    const firstProfile = profileDetailedFactory({
+      actorDid: firstReposter.did,
+      displayName: "First Reposter",
+    });
+    profileRepo.add(firstProfile);
 
-    const secondReposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Second Reposter" }))
-      .create();
-    const secondRepostRecord = await recordFactory(
-      ctx.db,
-      "app.bsky.feed.repost",
-    )
-      .vars({ actor: () => secondReposter })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => secondRepostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const firstRepost = repostFactory({
+      actorDid: firstReposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T02:00:00.000Z"),
+    });
+    repostRepo.add(firstRepost);
+
+    const secondReposter = actorFactory();
+    const secondProfile = profileDetailedFactory({
+      actorDid: secondReposter.did,
+      displayName: "Second Reposter",
+    });
+    profileRepo.add(secondProfile);
+
+    const secondRepost = repostFactory({
+      actorDid: secondReposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+    });
+    repostRepo.add(secondRepost);
 
     // act
     const result = await getRepostedByUseCase.execute({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       limit: 1,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       repostedBy: [
         {
           $type: "app.bsky.actor.defs#profileView",
@@ -246,68 +201,57 @@ describe("GetRepostedByUseCase", () => {
 
   test("cursorパラメータによるページネーションが正しく動作する", async () => {
     // arrange
-    const originalActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Original User" }))
-      .create();
-    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => originalActor })
-      .create();
-    const originalPost = await postFactory(ctx.db)
-      .vars({ record: () => originalRecord })
-      .create();
+    const originalActor = actorFactory();
+    const { post: originalPost } = postFactory({
+      actorDid: originalActor.did,
+    });
 
-    const firstReposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "First Reposter" }))
-      .create();
-    const firstRepostRecord = await recordFactory(
-      ctx.db,
-      "app.bsky.feed.repost",
-    )
-      .vars({ actor: () => firstReposter })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => firstRepostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
+    const firstReposter = actorFactory();
+    const firstProfile = profileDetailedFactory({
+      actorDid: firstReposter.did,
+      displayName: "First Reposter",
+    });
+    profileRepo.add(firstProfile);
 
-    const secondReposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Second Reposter" }))
-      .create();
-    const secondRepostRecord = await recordFactory(
-      ctx.db,
-      "app.bsky.feed.repost",
-    )
-      .vars({ actor: () => secondReposter })
-      .create();
-    await repostFactory(ctx.db)
-      .vars({ record: () => secondRepostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const firstRepost = repostFactory({
+      actorDid: firstReposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T02:00:00.000Z"),
+    });
+    repostRepo.add(firstRepost);
+
+    const secondReposter = actorFactory();
+    const secondProfile = profileDetailedFactory({
+      actorDid: secondReposter.did,
+      displayName: "Second Reposter",
+    });
+    profileRepo.add(secondProfile);
+
+    const secondRepost = repostFactory({
+      actorDid: secondReposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+    });
+    repostRepo.add(secondRepost);
 
     // act - 最初のページ
     const firstPage = await getRepostedByUseCase.execute({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       limit: 1,
     });
 
     // act - 次のページ
     const secondPage = await getRepostedByUseCase.execute({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       limit: 1,
       cursor: firstPage.cursor,
     });
 
     // assert
     expect(firstPage).toMatchObject({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       repostedBy: [
         {
           $type: "app.bsky.actor.defs#profileView",
@@ -319,7 +263,7 @@ describe("GetRepostedByUseCase", () => {
     expect(firstPage.cursor).toBeDefined();
 
     expect(secondPage).toMatchObject({
-      uri: originalPost.uri,
+      uri: originalPost.uri.toString(),
       repostedBy: [
         {
           $type: "app.bsky.actor.defs#profileView",

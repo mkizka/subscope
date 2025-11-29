@@ -2,72 +2,55 @@ import {
   actorFactory,
   likeFactory,
   postFactory,
-  recordFactory,
-  testSetup,
-} from "@repo/test-utils";
-import { describe, expect, test } from "vitest";
+  profileDetailedFactory,
+} from "@repo/common/test";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { LikeService } from "../../service/graph/like-service.js";
-import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-injector.js";
 import { GetLikesUseCase } from "./get-likes-use-case.js";
 
 describe("GetLikesUseCase", () => {
-  const { testInjector, ctx } = testSetup;
+  const getLikesUseCase = testInjector.injectClass(GetLikesUseCase);
 
-  const getLikesUseCase = testInjector
-    .provideClass("likeRepository", LikeRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("likeService", LikeService)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .injectClass(GetLikesUseCase);
+  const likeRepo = testInjector.resolve("likeRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
+
+  beforeEach(() => {
+    likeRepo.clear();
+    profileRepo.clear();
+  });
 
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
-    const likerActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Liker User" }))
-      .create();
+    const targetActor = actorFactory();
+    const likerActor = actorFactory();
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const profile = profileDetailedFactory({
+      actorDid: likerActor.did,
+      displayName: "Liker User",
+    });
+    profileRepo.add(profile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => likerActor })
-            .create(),
-        subject: () => post,
-      })
-      .create();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
+
+    const like = likeFactory({
+      actorDid: likerActor.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+    });
+    likeRepo.add(like);
 
     // act
     const result = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 50,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: post.uri,
+      uri: post.uri.toString(),
       likes: [
         {
           $type: "app.bsky.feed.getLikes#like",
@@ -82,61 +65,51 @@ describe("GetLikesUseCase", () => {
 
   test("投稿にいいねが付いていない場合、空のlikesを返す", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
+    const targetActor = actorFactory();
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
 
     // act
     const result = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 50,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: post.uri,
+      uri: post.uri.toString(),
       likes: [],
     });
   });
 
   test("limitパラメータが指定された場合、指定した件数分のいいねを返しカーソルを含む", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
-    const likerActors = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({}))
-      .createList(3);
+    const targetActor = actorFactory();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const likerActors = [actorFactory(), actorFactory(), actorFactory()];
 
     for (const likerActor of likerActors) {
-      await likeFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.feed.like")
-              .vars({ actor: () => likerActor })
-              .create(),
-          subject: () => post,
-        })
-        .create();
+      const profile = profileDetailedFactory({
+        actorDid: likerActor.did,
+      });
+      profileRepo.add(profile);
+
+      const like = likeFactory({
+        actorDid: likerActor.did,
+        subjectUri: post.uri.toString(),
+        subjectCid: post.cid,
+      });
+      likeRepo.add(like);
     }
 
     // act
     const result = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 2,
     });
 
@@ -147,73 +120,63 @@ describe("GetLikesUseCase", () => {
 
   test("カーソルを指定した場合、ページネーションが動作する", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
+    const targetActor = actorFactory();
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
 
-    // 複数のいいねを時系列で作成
-    const firstLiker = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "First Liker" }))
-      .create();
-    const secondLiker = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Second Liker" }))
-      .create();
-    const thirdLiker = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Third Liker" }))
-      .create();
+    const firstLiker = actorFactory();
+    const firstProfile = profileDetailedFactory({
+      actorDid: firstLiker.did,
+      displayName: "First Liker",
+    });
+    profileRepo.add(firstProfile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => firstLiker })
-            .create(),
-        subject: () => post,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const secondLiker = actorFactory();
+    const secondProfile = profileDetailedFactory({
+      actorDid: secondLiker.did,
+      displayName: "Second Liker",
+    });
+    profileRepo.add(secondProfile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => secondLiker })
-            .create(),
-        subject: () => post,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
+    const thirdLiker = actorFactory();
+    const thirdProfile = profileDetailedFactory({
+      actorDid: thirdLiker.did,
+      displayName: "Third Liker",
+    });
+    profileRepo.add(thirdProfile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => thirdLiker })
-            .create(),
-        subject: () => post,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T03:00:00.000Z"),
-      })
-      .create();
+    const firstLike = likeFactory({
+      actorDid: firstLiker.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+    });
+    likeRepo.add(firstLike);
+
+    const secondLike = likeFactory({
+      actorDid: secondLiker.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+      createdAt: new Date("2024-01-01T02:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T02:00:00.000Z"),
+    });
+    likeRepo.add(secondLike);
+
+    const thirdLike = likeFactory({
+      actorDid: thirdLiker.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+      createdAt: new Date("2024-01-01T03:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T03:00:00.000Z"),
+    });
+    likeRepo.add(thirdLike);
 
     // act - 最初のページ（limit=2）
     const firstPage = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 2,
     });
 
@@ -236,7 +199,7 @@ describe("GetLikesUseCase", () => {
 
     // act - 次のページ
     const secondPage = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 2,
       cursor: firstPage.cursor,
     });
@@ -256,33 +219,29 @@ describe("GetLikesUseCase", () => {
 
   test("limitパラメータが0または1の場合、指定した件数のいいねを返す", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
-    const likerActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Liker User" }))
-      .create();
+    const targetActor = actorFactory();
+    const likerActor = actorFactory();
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const profile = profileDetailedFactory({
+      actorDid: likerActor.did,
+      displayName: "Liker User",
+    });
+    profileRepo.add(profile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => likerActor })
-            .create(),
-        subject: () => post,
-      })
-      .create();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
+
+    const like = likeFactory({
+      actorDid: likerActor.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+    });
+    likeRepo.add(like);
 
     // act - limit=0
     const zeroLimitResult = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 0,
     });
 
@@ -293,7 +252,7 @@ describe("GetLikesUseCase", () => {
 
     // act - limit=1
     const oneLimitResult = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 1,
     });
 
@@ -311,27 +270,22 @@ describe("GetLikesUseCase", () => {
 
   test("cidパラメータが指定された場合、レスポンスにcidを含む", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
+    const targetActor = actorFactory();
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
 
     // act
     const result = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       cid: post.cid,
       limit: 50,
     });
 
     // assert
     expect(result).toMatchObject({
-      uri: post.uri,
+      uri: post.uri.toString(),
       cid: post.cid,
       likes: [],
     });
@@ -339,79 +293,63 @@ describe("GetLikesUseCase", () => {
 
   test("複数のいいねがある場合、sortAt（createdAtとindexedAtの早い方）の降順でソートされて返す", async () => {
     // arrange
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
+    const targetActor = actorFactory();
 
-    const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => postRecord })
-      .create();
+    const { post } = postFactory({
+      actorDid: targetActor.did,
+    });
 
-    // 異なる時間のいいねを作成（sortAtの順序を確認するため）
-    const earlyLiker = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Early Liker" }))
-      .create();
-    const latestLiker = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Latest Liker" }))
-      .create();
-    const middleLiker = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Middle Liker" }))
-      .create();
+    const earlyLiker = actorFactory();
+    const earlyProfile = profileDetailedFactory({
+      actorDid: earlyLiker.did,
+      displayName: "Early Liker",
+    });
+    profileRepo.add(earlyProfile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => earlyLiker })
-            .props({
-              indexedAt: () => new Date("2024-01-01T01:30:00.000Z"),
-            })
-            .create(),
-        subject: () => post,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const latestLiker = actorFactory();
+    const latestProfile = profileDetailedFactory({
+      actorDid: latestLiker.did,
+      displayName: "Latest Liker",
+    });
+    profileRepo.add(latestProfile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => latestLiker })
-            .props({
-              indexedAt: () => new Date("2024-01-01T02:30:00.000Z"),
-            })
-            .create(),
-        subject: () => post,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
-      })
-      .create();
+    const middleLiker = actorFactory();
+    const middleProfile = profileDetailedFactory({
+      actorDid: middleLiker.did,
+      displayName: "Middle Liker",
+    });
+    profileRepo.add(middleProfile);
 
-    await likeFactory(ctx.db)
-      .vars({
-        record: () =>
-          recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => middleLiker })
-            .props({
-              indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-            })
-            .create(),
-        subject: () => post,
-      })
-      .props({
-        createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
+    const earlyLike = likeFactory({
+      actorDid: earlyLiker.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T01:30:00.000Z"),
+    });
+    likeRepo.add(earlyLike);
+
+    const latestLike = likeFactory({
+      actorDid: latestLiker.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+      createdAt: new Date("2024-01-01T03:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T02:30:00.000Z"),
+    });
+    likeRepo.add(latestLike);
+
+    const middleLike = likeFactory({
+      actorDid: middleLiker.did,
+      subjectUri: post.uri.toString(),
+      subjectCid: post.cid,
+      createdAt: new Date("2024-01-01T02:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T02:00:00.000Z"),
+    });
+    likeRepo.add(middleLike);
 
     // act
     const result = await getLikesUseCase.execute({
-      uri: post.uri,
+      uri: post.uri.toString(),
       limit: 50,
     });
 
