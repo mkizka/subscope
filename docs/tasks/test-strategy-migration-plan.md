@@ -7,8 +7,8 @@
 - [x] **Phase 0-A**: ドメインモデルのディレクトリ構造統一
 - [x] **Phase 0-B**: ドメインモデルFactory関数の作成（基本: actor, post, profile, feedItem）
 - [x] **Phase 0-C**: ドメインモデルFactory関数の作成（残り: follow, like, repost, generator）
-- [ ] **Phase 0-D**: appviewリポジトリのディレクトリ構造統一（Part 1: 主要リポジトリ）
-- [ ] **Phase 0-E**: appviewリポジトリのディレクトリ構造統一（Part 2: フィード・タイムライン系）
+- [x] **Phase 0-D**: appviewリポジトリのディレクトリ構造統一（Part 1: 主要リポジトリ）
+- [x] **Phase 0-E**: appviewリポジトリのディレクトリ構造統一（Part 2: フィード・タイムライン系）
 - [ ] **Phase 0-F**: appviewリポジトリのディレクトリ構造統一（Part 3: その他）
 
 ### Phase 1: インメモリリポジトリ作成（appview）
