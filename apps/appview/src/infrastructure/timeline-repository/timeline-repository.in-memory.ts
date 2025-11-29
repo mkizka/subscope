@@ -40,10 +40,8 @@ export class InMemoryTimelineRepository implements ITimelineRepository {
       items = items.filter((item) => item.sortAt < cursor);
     }
 
-    return Promise.resolve(
-      items
-        .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
-        .slice(0, limit),
-    );
+    return items
+      .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
+      .slice(0, limit);
   }
 }

@@ -31,11 +31,9 @@ export class InMemoryLikeRepository implements ILikeRepository {
       likes = likes.filter((l) => l.createdAt < cursor);
     }
 
-    return Promise.resolve(
-      likes
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        .slice(0, limit),
-    );
+    return likes
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
   }
 
   async findLikesByActor({
@@ -56,11 +54,9 @@ export class InMemoryLikeRepository implements ILikeRepository {
       likes = likes.filter((l) => l.createdAt < cursorDate);
     }
 
-    return Promise.resolve(
-      likes
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        .slice(0, limit),
-    );
+    return likes
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
   }
 
   async findViewerLikes({
@@ -70,12 +66,10 @@ export class InMemoryLikeRepository implements ILikeRepository {
     viewerDid: Did;
     subjectUris: string[];
   }): Promise<Like[]> {
-    return Promise.resolve(
-      Array.from(this.likes.values()).filter(
-        (l) =>
-          l.actorDid === viewerDid &&
-          subjectUris.includes(l.subjectUri.toString()),
-      ),
+    return Array.from(this.likes.values()).filter(
+      (l) =>
+        l.actorDid === viewerDid &&
+        subjectUris.includes(l.subjectUri.toString()),
     );
   }
 }

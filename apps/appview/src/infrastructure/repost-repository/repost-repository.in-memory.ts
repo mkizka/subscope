@@ -31,18 +31,14 @@ export class InMemoryRepostRepository implements IRepostRepository {
       reposts = reposts.filter((r) => r.createdAt < cursor);
     }
 
-    return Promise.resolve(
-      reposts
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        .slice(0, limit),
-    );
+    return reposts
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
   }
 
   async findByUris(uris: string[]): Promise<Repost[]> {
-    return Promise.resolve(
-      Array.from(this.reposts.values()).filter((r) =>
-        uris.includes(r.uri.toString()),
-      ),
+    return Array.from(this.reposts.values()).filter((r) =>
+      uris.includes(r.uri.toString()),
     );
   }
 
@@ -53,12 +49,10 @@ export class InMemoryRepostRepository implements IRepostRepository {
     viewerDid: Did;
     subjectUris: string[];
   }): Promise<Repost[]> {
-    return Promise.resolve(
-      Array.from(this.reposts.values()).filter(
-        (r) =>
-          r.actorDid === viewerDid &&
-          subjectUris.includes(r.subjectUri.toString()),
-      ),
+    return Array.from(this.reposts.values()).filter(
+      (r) =>
+        r.actorDid === viewerDid &&
+        subjectUris.includes(r.subjectUri.toString()),
     );
   }
 }
