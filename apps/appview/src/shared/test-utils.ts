@@ -2,14 +2,18 @@ import { createInjector } from "typed-inject";
 
 import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../application/service/actor/profile-view-service.js";
+import { ActorLikesService } from "../application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "../application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "../application/service/feed/feed-processor.js";
 import { GeneratorViewService } from "../application/service/feed/generator-view-service.js";
 import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-view-builder.js";
 import { PostViewService } from "../application/service/feed/post-view-service.js";
 import { ReplyRefService } from "../application/service/feed/reply-ref-service.js";
+import { RepostService } from "../application/service/feed/repost-service.js";
 import { TimelineService } from "../application/service/feed/timeline-service.js";
+import { LikeService } from "../application/service/graph/like-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
+import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
 import { InMemoryAuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.in-memory.js";
@@ -39,13 +43,17 @@ export const testInjector = createInjector()
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("profileViewService", ProfileViewService)
+  .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("generatorViewService", GeneratorViewService)
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("feedProcessor", FeedProcessor)
   .provideClass("timelineService", TimelineService)
   .provideClass("searchService", PostSearchService)
-  .provideClass("authorFeedService", AuthorFeedService);
+  .provideClass("authorFeedService", AuthorFeedService)
+  .provideClass("likeService", LikeService)
+  .provideClass("actorLikesService", ActorLikesService)
+  .provideClass("repostService", RepostService);
 
 export const clearAllInMemoryRepositories = () => {
   testInjector.resolve("authorFeedRepository").clear();
