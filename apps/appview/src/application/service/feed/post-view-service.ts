@@ -24,7 +24,7 @@ import type { Did } from "@atproto/did";
 import type { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
 import type { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
 import type { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
-import type { RecordRepository } from "../../../infrastructure/record-repository.js";
+import type { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
 import type { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
