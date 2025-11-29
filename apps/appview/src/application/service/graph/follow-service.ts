@@ -19,7 +19,7 @@ export class FollowService {
   }): Promise<Page<Follow>> {
     const paginator = createCursorPaginator<Follow>({
       limit,
-      getCursor: (item) => item.createdAt.toISOString(),
+      getCursor: (item) => item.sortAt.toISOString(),
     });
 
     const follows = await this.followRepository.findFollows({
@@ -42,7 +42,7 @@ export class FollowService {
   }): Promise<Page<Follow>> {
     const paginator = createCursorPaginator<Follow>({
       limit,
-      getCursor: (item) => item.createdAt.toISOString(),
+      getCursor: (item) => item.sortAt.toISOString(),
     });
 
     const followers = await this.followRepository.findFollowers({
