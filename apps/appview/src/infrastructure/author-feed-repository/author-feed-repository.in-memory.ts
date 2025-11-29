@@ -14,20 +14,11 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
     this.feedItems.push({ feedItem, isReply });
   }
 
-  addAll(feedItems: Array<{ feedItem: FeedItem; isReply?: boolean }>): void {
-    this.feedItems.push(
-      ...feedItems.map((item) => ({
-        feedItem: item.feedItem,
-        isReply: item.isReply ?? false,
-      })),
-    );
-  }
-
   clear(): void {
     this.feedItems = [];
   }
 
-  findFeedItems(params: {
+  async findFeedItems(params: {
     actorDid: string;
     limit: number;
     cursor?: Date;
@@ -43,10 +34,10 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
 
     items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
-    return Promise.resolve(items.slice(0, params.limit));
+    return items.slice(0, params.limit);
   }
 
-  findFeedItemsWithoutReplies(params: {
+  async findFeedItemsWithoutReplies(params: {
     actorDid: string;
     limit: number;
     cursor?: Date;
@@ -70,6 +61,6 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
 
     items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
-    return Promise.resolve(items.slice(0, params.limit));
+    return items.slice(0, params.limit);
   }
 }

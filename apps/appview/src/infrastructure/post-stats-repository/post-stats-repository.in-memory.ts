@@ -8,19 +8,15 @@ import type {
 export class InMemoryPostStatsRepository implements IPostStatsRepository {
   private stats: Map<string, PostStats> = new Map();
 
-  set(uri: string, stats: PostStats): void {
+  add(uri: string, stats: PostStats): void {
     this.stats.set(uri, stats);
-  }
-
-  setAll(entries: Array<[string, PostStats]>): void {
-    entries.forEach(([uri, stats]) => this.stats.set(uri, stats));
   }
 
   clear(): void {
     this.stats.clear();
   }
 
-  findMap(uris: AtUri[]): Promise<Map<string, PostStats>> {
+  async findMap(uris: AtUri[]): Promise<Map<string, PostStats>> {
     const result = new Map<string, PostStats>();
 
     for (const uri of uris) {
@@ -31,6 +27,6 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
       }
     }
 
-    return Promise.resolve(result);
+    return result;
   }
 }

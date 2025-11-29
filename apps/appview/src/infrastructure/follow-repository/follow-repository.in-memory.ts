@@ -11,10 +11,6 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.push(follow);
   }
 
-  addAll(follows: Follow[]): void {
-    this.follows.push(...follows);
-  }
-
   clear(): void {
     this.follows = [];
   }
@@ -25,7 +21,7 @@ export class InMemoryFollowRepository implements IFollowRepository {
       : follow.createdAt;
   }
 
-  findFollows(params: {
+  async findFollows(params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
@@ -43,10 +39,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
       (a, b) => this.getSortAt(b).getTime() - this.getSortAt(a).getTime(),
     );
 
-    return Promise.resolve(items.slice(0, params.limit));
+    return items.slice(0, params.limit);
   }
 
-  findFollowers(params: {
+  async findFollowers(params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
@@ -64,15 +60,15 @@ export class InMemoryFollowRepository implements IFollowRepository {
       (a, b) => this.getSortAt(b).getTime() - this.getSortAt(a).getTime(),
     );
 
-    return Promise.resolve(items.slice(0, params.limit));
+    return items.slice(0, params.limit);
   }
 
-  findFollowingMap(params: {
+  async findFollowingMap(params: {
     actorDid: Did;
     targetDids: Did[];
   }): Promise<Map<Did, AtUri>> {
     if (params.targetDids.length === 0) {
-      return Promise.resolve(new Map<Did, AtUri>());
+      return new Map<Did, AtUri>();
     }
 
     const followingMap = new Map<Did, AtUri>();
@@ -86,15 +82,15 @@ export class InMemoryFollowRepository implements IFollowRepository {
       }
     }
 
-    return Promise.resolve(followingMap);
+    return followingMap;
   }
 
-  findFollowedByMap(params: {
+  async findFollowedByMap(params: {
     actorDid: Did;
     targetDids: Did[];
   }): Promise<Map<Did, AtUri>> {
     if (params.targetDids.length === 0) {
-      return Promise.resolve(new Map<Did, AtUri>());
+      return new Map<Did, AtUri>();
     }
 
     const followedByMap = new Map<Did, AtUri>();
@@ -108,6 +104,6 @@ export class InMemoryFollowRepository implements IFollowRepository {
       }
     }
 
-    return Promise.resolve(followedByMap);
+    return followedByMap;
   }
 }

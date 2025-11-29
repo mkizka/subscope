@@ -10,17 +10,11 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
     this.generators.set(generator.uri.toString(), generator);
   }
 
-  addAll(generators: Generator[]): void {
-    generators.forEach((generator) =>
-      this.generators.set(generator.uri.toString(), generator),
-    );
-  }
-
   clear(): void {
     this.generators.clear();
   }
 
-  findByUris(uris: AtUri[]): Promise<Generator[]> {
+  async findByUris(uris: AtUri[]): Promise<Generator[]> {
     const result: Generator[] = [];
 
     for (const uri of uris) {
@@ -31,6 +25,6 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
       }
     }
 
-    return Promise.resolve(result);
+    return result;
   }
 }
