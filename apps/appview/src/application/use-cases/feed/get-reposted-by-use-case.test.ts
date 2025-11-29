@@ -74,7 +74,6 @@ describe("GetRepostedByUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: repostActor.did,
-          handle: repostActor.handle,
           displayName: "Reposter",
         },
       ],
