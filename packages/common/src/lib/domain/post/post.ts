@@ -1,7 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import type { Record } from "../record.js";
+import type { Record } from "../record/record.js";
 import { PostEmbedExternal } from "./embed-external.js";
 import { PostEmbedImage } from "./embed-images.js";
 import { PostEmbedRecord } from "./embed-record.js";

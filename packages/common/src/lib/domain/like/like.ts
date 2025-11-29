@@ -1,7 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import type { Record } from "../record.js";
+import type { Record } from "../record/record.js";
 
 export type LikeParams = {
   uri: AtUri | string;

@@ -21,25 +21,25 @@ function asObject(value: unknown): Record<string, unknown> {
 
 import type { Did } from "@atproto/did";
 
-import type { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
-import type { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
-import type { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
-import type { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
-import type { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
+import type { ILikeRepository } from "../../interfaces/like-repository.js";
+import type { IPostRepository } from "../../interfaces/post-repository.js";
+import type { IPostStatsRepository } from "../../interfaces/post-stats-repository.js";
+import type { IRecordRepository } from "../../interfaces/record-repository.js";
+import type { IRepostRepository } from "../../interfaces/repost-repository.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 
 export class PostViewService {
   constructor(
-    private readonly postRepository: PostRepository,
-    private readonly postStatsRepository: PostStatsRepository,
-    private readonly recordRepository: RecordRepository,
+    private readonly postRepository: IPostRepository,
+    private readonly postStatsRepository: IPostStatsRepository,
+    private readonly recordRepository: IRecordRepository,
     private readonly profileViewService: ProfileViewService,
     private readonly generatorViewService: GeneratorViewService,
     private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
-    private readonly repostRepository: RepostRepository,
-    private readonly likeRepository: LikeRepository,
+    private readonly repostRepository: IRepostRepository,
+    private readonly likeRepository: ILikeRepository,
   ) {}
   static readonly inject = [
     "postRepository",

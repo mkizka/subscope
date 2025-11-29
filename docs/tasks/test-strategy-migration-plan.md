@@ -396,6 +396,21 @@ asset-url-builder.ts       → asset-url-builder/asset-url-builder.ts
 - Timeline/PostThreadに比べて複雑なリレーション処理が少ない
 - スレッド構造などの再帰的な処理がない
 
+**重要な実装:**
+
+このフェーズで`apps/appview/src/shared/test-injector.ts`を作成しました。すべてのInMemoryリポジトリとServiceが事前設定されているため、テストファイルでは以下のようにシンプルに記述できます：
+
+```typescript
+import { testInjector } from "../../../shared/test-injector.js";
+
+const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
+const postRepo = testInjector.resolve("postRepository");
+const recordRepo = testInjector.resolve("recordRepository");
+// ... 他のリポジトリ
+```
+
+個別にDI設定を記述する必要はありません。typed-injectが依存関係を自動解決します。
+
 ---
 
 ### Phase 3-A: appview Feed UseCaseの移行（Part 1）
@@ -745,26 +760,154 @@ export class InMemoryPostRepository implements IPostRepository {
 
 ### 移行後のテストパターン
 
+**重要: Factory関数のインポート元**
+
+- ドメインモデル（Post, Actor等）: `@repo/common/domain`からインポート
+- Factory関数（postFactory, actorFactory等）: `@repo/common/test`からインポート
+
+**重要: Factory関数の引数最小化**
+
+Factory関数のすべての引数はオプショナルであり、デフォルト値が提供されています。
+テストコードでは、**必要な引数のみを指定**し、不要な引数は削除してください。
+
+以下の場合のみ引数を指定します：
+
+- **アサーションで検証する値**（例: `displayName`, `text`, `likeCount`）
+- **オブジェクト間の関係を定義する値**（例: `actorDid`, `subjectUri`, `replyRoot`）
+- **テストの順序保証に必要な値**（例: カーソルテストの`createdAt`）
+
+以下の場合は引数を削除します：
+
+- アサーションで使用されない値（例: 結果に含まれない投稿の`text`）
+- デフォルト値で問題ない識別子（例: 特定の値が不要な`did`, `handle`）
+- テストロジックに影響しない値（例: 順序が関係ない場合の`createdAt`）
+
+**悪い例（不要な引数が多い）:**
+
+```typescript
+const author = actorFactory({
+  did: "did:plc:author123", // 不要（アサーションで使用しない）
+  handle: "author.test", // 不要（アサーションで使用しない）
+});
+
+const profile = profileDetailedFactory({
+  actorDid: author.did, // 必要（関係性）
+  displayName: "Author User", // 必要（アサーション）
+  handle: "author.test", // 不要（アサーションで使用しない）
+});
+
+const post = postFactory({
+  actorDid: author.did, // 必要（関係性）
+  text: "Post that won't appear", // 不要（結果に含まれない）
+  createdAt: new Date("2024-01-01T00:00:00Z"), // 不要（順序が関係ない）
+});
+```
+
+**良い例（必要最小限の引数のみ）:**
+
+```typescript
+const author = actorFactory();
+
+const profile = profileDetailedFactory({
+  actorDid: author.did, // 必要（関係性）
+  displayName: "Author User", // 必要（アサーション）
+});
+
+const post = postFactory({
+  actorDid: author.did, // 必要（関係性）
+});
+```
+
+**重要: postFactoryの戻り値**
+
+`postFactory`は`{post, record}`のオブジェクトを返します。PostViewServiceがrecordRepositoryを使用するため、テストでは両方をリポジトリに追加する必要があります。
+
+```typescript
+// postFactoryの使い方
+const { post, record } = postFactory({
+  actorDid: author.did,
+  text: "Test post",
+});
+postRepo.add(post);
+recordRepo.add(record); // recordも追加が必要
+
+// recordRepoの取得と初期化も忘れずに
+const recordRepo = injector.resolve("recordRepository");
+
+beforeEach(() => {
+  postRepo.clear();
+  recordRepo.clear(); // recordRepoもクリア
+});
+```
+
+**appview用testInjectorの使用**
+
+`apps/appview`では、すべてのInMemoryリポジトリとServiceが事前設定されたtestInjectorが利用可能です。
+
+```typescript
+import { testInjector } from "../../../shared/test-injector.js";
+
+// ユースケースをDI経由で取得（依存関係は自動解決される）
+const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
+
+// 必要なリポジトリを取得
+const postRepo = testInjector.resolve("postRepository");
+const recordRepo = testInjector.resolve("recordRepository");
+const profileRepo = testInjector.resolve("profileRepository");
+
+// beforeEachでリポジトリをクリア
+beforeEach(() => {
+  postRepo.clear();
+  recordRepo.clear();
+  profileRepo.clear();
+});
+```
+
+testInjectorに含まれるもの：
+
+- **InMemoryリポジトリ（12個）**: authorFeedRepository, postRepository, postStatsRepository, profileRepository, followRepository, actorStatsRepository, recordRepository, repostRepository, likeRepository, generatorRepository, timelineRepository, assetUrlBuilder
+- **Service（8個）**: profileViewBuilder, postEmbedViewBuilder, profileViewService, generatorViewService, postViewService, replyRefService, feedProcessor, authorFeedService
+
+typed-injectが依存関係を自動的に解決するため、個別にDI設定を記述する必要はありません。
+
+**インメモリテストの実行方法**
+
+Docker環境が利用できない場合は、インメモリリポジトリ専用のvitest設定を使用してテストを実行できます。
+
+```bash
+# インメモリテスト用の設定でテストを実行
+pnpm --filter @repo/appview test:in-memory <テストファイル名>
+
+# 例: get-author-feed-use-case.test.ts を実行
+pnpm --filter @repo/appview test:in-memory get-author-feed-use-case.test.ts
+```
+
+この設定（`vitest.config.in-memory.ts`）は：
+
+- globalSetupを除外（PostgreSQL Dockerコンテナを起動しない）
+- setupFilesを除外（DBリセットを実行しない）
+- インメモリリポジトリのみを使用
+
 ```typescript
 // 移行後のUseCaseテスト例
-import { postFactory, actorFactory } from "@repo/common/domain";
-import { InMemoryPostRepository } from "../../infrastructure/post-repository/post-repository.in-memory.js";
-import { InMemoryProfileRepository } from "../../infrastructure/profile-repository/profile-repository.in-memory.js";
+import { FeedItem, Post } from "@repo/common/domain";
+import {
+  actorFactory,
+  postFactory,
+  profileDetailedFactory,
+} from "@repo/common/test";
+import { testInjector } from "../../../shared/test-injector.js";
 
 describe("GetPostThreadUseCase", () => {
-  const { testInjector } = testSetup;
+  const useCase = testInjector.injectClass(GetPostThreadUseCase);
 
-  const injector = testInjector
-    .provideClass("postRepository", InMemoryPostRepository)
-    .provideClass("profileRepository", InMemoryProfileRepository);
-    // ...
-
-  const useCase = injector.injectClass(GetPostThreadUseCase);
-  const postRepo = injector.resolve("postRepository");
-  const profileRepo = injector.resolve("profileRepository");
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
 
   beforeEach(() => {
     postRepo.clear();
+    recordRepo.clear();
     profileRepo.clear();
   });
 
@@ -786,18 +929,27 @@ describe("GetPostThreadUseCase", () => {
 
   test("投稿が存在する場合、ThreadViewPostを返す", async () => {
     // arrange
-    const actor = actorFactory({ did: "did:plc:testuser" });
-    const post = postFactory({
-      uri: "at://did:plc:testuser/app.bsky.feed.post/abc123",
+    const actor = actorFactory();
+    const { post, record } = postFactory({
       actorDid: actor.did,
     });
     postRepo.add(post);
+    recordRepo.add(record);
 
     // act
-    const result = await useCase.execute({...});
+    const result = await useCase.execute({
+      uri: post.uri,
+      depth: 6,
+      parentHeight: 80,
+    });
 
     // assert
-    expect(result.thread).toMatchObject({...});
+    expect(result.thread).toMatchObject({
+      $type: "app.bsky.feed.defs#threadViewPost",
+      post: {
+        uri: post.uri.toString(),
+      },
+    });
   });
 });
 ```
@@ -812,6 +964,7 @@ describe("GetPostThreadUseCase", () => {
 - [setup.ts](packages/test-utils/src/setup.ts) - テストセットアップ
 - リポジトリインターフェース（各アプリのapplication/interfaces/配下）
 - ドメインモデル（packages/common/src/lib/domain/配下）
+- **重要**: Factory関数は `packages/common/src/test.ts` からエクスポートされる
 
 ### 新規作成が必要なファイル
 
@@ -821,8 +974,8 @@ describe("GetPostThreadUseCase", () => {
 
 ### 変更が必要なファイル
 
-- `packages/common/src/lib/domain/index.ts` - Factory関数のエクスポート追加
-- `packages/common/package.json` - devDependencies に "@faker-js/faker" を追加
+- `packages/common/src/test.ts` - Factory関数のエクスポート追加（**domainではなくtest**）
+- `packages/common/package.json` - devDependencies に "@faker-js/faker" を追加（既に追加済み）
 
 ---
 

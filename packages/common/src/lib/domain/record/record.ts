@@ -7,7 +7,7 @@ import { lexicons } from "@repo/client/server";
 import type {
   SupportedCollection,
   SupportedCollectionMap,
-} from "../utils/collection.js";
+} from "../../utils/collection.js";
 
 type BaseRecordParams = {
   uri: AtUri | string;
