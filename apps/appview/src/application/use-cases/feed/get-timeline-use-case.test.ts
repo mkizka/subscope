@@ -1,189 +1,372 @@
-/* eslint-disable @typescript-eslint/unbound-method */
+import { asDid } from "@atproto/did";
 import { FeedItem } from "@repo/common/domain";
+import {
+  actorFactory,
+  postFactory,
+  profileDetailedFactory,
+} from "@repo/common/test";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import type { FeedProcessor } from "../../service/feed/feed-processor.js";
-import type { TimelineService } from "../../service/feed/timeline-service.js";
-import type { Page } from "../../utils/pagination.js";
+import { testInjector } from "../../../shared/test-utils.js";
+import type { PostStats } from "../../interfaces/post-stats-repository.js";
 import { GetTimelineUseCase } from "./get-timeline-use-case.js";
 
-const mockTimelineService = mock<TimelineService>();
-const mockFeedProcessor = mock<FeedProcessor>();
-const getTimelineUseCase = new GetTimelineUseCase(
-  mockTimelineService,
-  mockFeedProcessor,
-);
-
 describe("GetTimelineUseCase", () => {
-  test("パラメータが渡された場合、TimelineServiceに正しいパラメータを渡して呼び出す", async () => {
+  const getTimelineUseCase = testInjector.injectClass(GetTimelineUseCase);
+
+  const timelineRepo = testInjector.resolve("timelineRepository");
+  const postRepo = testInjector.resolve("postRepository");
+  const postStatsRepo = testInjector.resolve("postStatsRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+
+  test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
     // arrange
-    const params = { limit: 50, viewerDid: "did:plc:testuser" } as const;
-    const expectedCursor = undefined;
-
-    const mockPaginationResult: Page<FeedItem> = {
-      items: [],
-      cursor: undefined,
-    };
-
-    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
-      mockPaginationResult,
-    );
-    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
+    const viewer = actorFactory();
 
     // act
-    await getTimelineUseCase.execute(params);
-
-    // assert
-    expect(
-      mockTimelineService.findFeedItemsWithPagination,
-    ).toHaveBeenCalledWith({
-      viewerDid: params.viewerDid,
-      cursor: expectedCursor,
-      limit: params.limit,
-    });
-  });
-
-  test("カーソルが指定された場合、Date型に変換してTimelineServiceに渡す", async () => {
-    // arrange
-    const cursorString = "2024-01-01T00:00:00.000Z";
-    const params = {
+    const result = await getTimelineUseCase.execute({
       limit: 50,
-      cursor: cursorString,
-      viewerDid: "did:plc:testuser",
-    } as const;
-    const expectedCursor = new Date(cursorString);
-
-    const mockPaginationResult: Page<FeedItem> = {
-      items: [],
-      cursor: undefined,
-    };
-
-    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
-      mockPaginationResult,
-    );
-    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
-
-    // act
-    await getTimelineUseCase.execute(params);
+      viewerDid: asDid(viewer.did),
+    });
 
     // assert
-    expect(
-      mockTimelineService.findFeedItemsWithPagination,
-    ).toHaveBeenCalledWith({
-      viewerDid: params.viewerDid,
-      cursor: expectedCursor,
-      limit: params.limit,
-    });
-  });
-
-  test("TimelineServiceから結果を取得した場合、FeedProcessorに結果を渡す", async () => {
-    // arrange
-    const params = { limit: 50, viewerDid: "did:plc:testuser" } as const;
-
-    const mockPaginationResult: Page<FeedItem> = {
-      items: [
-        new FeedItem({
-          type: "post",
-          uri: "at://example.com/post/1",
-          actorDid: "did:plc:author1",
-          cid: "cid1",
-          sortAt: new Date(),
-          subjectUri: null,
-        }),
-        new FeedItem({
-          type: "repost",
-          uri: "at://example.com/repost/1",
-          actorDid: "did:plc:reposter",
-          cid: "cid2",
-          sortAt: new Date(),
-          subjectUri: "at://example.com/post/2",
-        }),
-      ],
-      cursor: "2024-01-01T00:00:00.000Z",
-    };
-
-    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
-      mockPaginationResult,
-    );
-    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
-
-    // act
-    await getTimelineUseCase.execute(params);
-
-    // assert
-    expect(mockFeedProcessor.processFeedItems).toHaveBeenCalledWith(
-      mockPaginationResult.items,
-      params.viewerDid,
-    );
-  });
-
-  test("FeedProcessorから結果を取得した場合、その結果をそのまま返す", async () => {
-    // arrange
-    const params = { limit: 50, viewerDid: "did:plc:testuser" } as const;
-
-    const mockPaginationResult: Page<FeedItem> = {
-      items: [],
-      cursor: undefined,
-    };
-
-    const expectedFeed = [
-      {
-        $type: "app.bsky.feed.defs#feedViewPost" as const,
-        post: {
-          uri: "at://example.com/post/1",
-          cid: "cid123",
-          author: { did: "did:plc:author1", handle: "author.test" },
-          record: { $type: "app.bsky.feed.post", text: "Test post" },
-          indexedAt: "2024-01-01T00:00:00.000Z",
-        },
-      },
-    ];
-
-    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue({
-      ...mockPaginationResult,
-      cursor: "2024-01-01T00:00:00.000Z",
-    });
-    mockFeedProcessor.processFeedItems.mockResolvedValue(expectedFeed);
-
-    // act
-    const result = await getTimelineUseCase.execute(params);
-
-    // assert
-    expect(result).toEqual({
-      feed: expectedFeed,
-      cursor: "2024-01-01T00:00:00.000Z",
-    });
-  });
-
-  test("limit=0の場合も正しく処理される", async () => {
-    // arrange
-    const params = { limit: 0, viewerDid: "did:plc:testuser" } as const;
-
-    const mockPaginationResult: Page<FeedItem> = {
-      items: [],
-      cursor: undefined,
-    };
-
-    mockTimelineService.findFeedItemsWithPagination.mockResolvedValue(
-      mockPaginationResult,
-    );
-    mockFeedProcessor.processFeedItems.mockResolvedValue([]);
-
-    // act
-    const result = await getTimelineUseCase.execute(params);
-
-    // assert
-    expect(
-      mockTimelineService.findFeedItemsWithPagination,
-    ).toHaveBeenCalledWith({
-      viewerDid: params.viewerDid,
-      cursor: undefined,
-      limit: 0,
-    });
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       feed: [],
       cursor: undefined,
+    });
+  });
+
+  test("フォローしているユーザーが投稿している場合、そのユーザーの投稿を返す", async () => {
+    // arrange
+    const viewer = actorFactory();
+    const author = actorFactory();
+
+    const authorProfile = profileDetailedFactory({
+      actorDid: author.did,
+      displayName: "Followed User",
+    });
+    profileRepo.add(authorProfile);
+
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+
+    const { post, record } = postFactory({
+      actorDid: author.did,
+      text: "Hello from followed user",
+      createdAt: new Date("2024-01-01T00:00:00Z"),
+    });
+    postRepo.add(post);
+    recordRepo.add(record);
+
+    const postStats: PostStats = {
+      likeCount: 5,
+      repostCount: 2,
+      replyCount: 3,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(post.uri.toString(), postStats);
+
+    const feedItem = FeedItem.fromPost(post);
+    timelineRepo.addFeedItem(feedItem);
+
+    // act
+    const result = await getTimelineUseCase.execute({
+      limit: 50,
+      viewerDid: asDid(viewer.did),
+    });
+
+    // assert
+    expect(result).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            uri: post.uri.toString(),
+            author: {
+              did: author.did,
+              displayName: "Followed User",
+            },
+            record: {
+              text: "Hello from followed user",
+            },
+            likeCount: 5,
+            repostCount: 2,
+            replyCount: 3,
+          },
+        },
+      ],
+    });
+  });
+
+  test("自分自身の投稿もタイムラインに含まれる", async () => {
+    // arrange
+    const viewer = actorFactory();
+
+    const viewerProfile = profileDetailedFactory({
+      actorDid: viewer.did,
+      displayName: "Viewer User",
+    });
+    profileRepo.add(viewerProfile);
+
+    const { post, record } = postFactory({
+      actorDid: viewer.did,
+      text: "My own post",
+      createdAt: new Date("2024-01-02T00:00:00Z"),
+    });
+    postRepo.add(post);
+    recordRepo.add(record);
+
+    const postStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(post.uri.toString(), postStats);
+
+    const feedItem = FeedItem.fromPost(post);
+    timelineRepo.addFeedItem(feedItem);
+
+    // act
+    const result = await getTimelineUseCase.execute({
+      limit: 50,
+      viewerDid: asDid(viewer.did),
+    });
+
+    // assert
+    expect(result).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            uri: post.uri.toString(),
+            author: {
+              did: viewer.did,
+              displayName: "Viewer User",
+            },
+            record: {
+              text: "My own post",
+            },
+          },
+        },
+      ],
+    });
+  });
+
+  test("カーソルが指定された場合、カーソル以前の投稿のみを返す", async () => {
+    // arrange
+    const viewer = actorFactory();
+    const author = actorFactory();
+
+    const authorProfile = profileDetailedFactory({
+      actorDid: author.did,
+      displayName: "Author",
+    });
+    profileRepo.add(authorProfile);
+
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+
+    const { post: olderPost, record: olderRecord } = postFactory({
+      actorDid: author.did,
+      text: "Older post",
+      createdAt: new Date("2024-01-01T00:00:00Z"),
+    });
+    postRepo.add(olderPost);
+    recordRepo.add(olderRecord);
+
+    const olderPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(olderPost.uri.toString(), olderPostStats);
+
+    const olderFeedItem = FeedItem.fromPost(olderPost);
+    timelineRepo.addFeedItem(olderFeedItem);
+
+    const { post: newerPost, record: newerRecord } = postFactory({
+      actorDid: author.did,
+      text: "Newer post",
+      createdAt: new Date("2024-01-03T00:00:00Z"),
+    });
+    postRepo.add(newerPost);
+    recordRepo.add(newerRecord);
+
+    const newerPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(newerPost.uri.toString(), newerPostStats);
+
+    const newerFeedItem = FeedItem.fromPost(newerPost);
+    timelineRepo.addFeedItem(newerFeedItem);
+
+    // act
+    const result = await getTimelineUseCase.execute({
+      limit: 50,
+      viewerDid: asDid(viewer.did),
+      cursor: "2024-01-02T00:00:00.000Z",
+    });
+
+    // assert
+    expect(result.feed).toHaveLength(1);
+    expect(result).toMatchObject({
+      feed: [
+        {
+          post: {
+            uri: olderPost.uri.toString(),
+            record: {
+              text: "Older post",
+            },
+          },
+        },
+      ],
+    });
+  });
+
+  test("limitパラメータが0または1の場合、指定した件数の投稿を返す", async () => {
+    // arrange
+    const viewer = actorFactory();
+    const author = actorFactory();
+
+    const authorProfile = profileDetailedFactory({
+      actorDid: author.did,
+      displayName: "Author",
+    });
+    profileRepo.add(authorProfile);
+
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+
+    const { post, record } = postFactory({
+      actorDid: author.did,
+      createdAt: new Date("2024-01-04T00:00:00Z"),
+    });
+    postRepo.add(post);
+    recordRepo.add(record);
+
+    const postStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(post.uri.toString(), postStats);
+
+    const feedItem = FeedItem.fromPost(post);
+    timelineRepo.addFeedItem(feedItem);
+
+    // act - limit=0
+    const zeroLimitResult = await getTimelineUseCase.execute({
+      limit: 0,
+      viewerDid: asDid(viewer.did),
+    });
+
+    // assert
+    expect(zeroLimitResult).toMatchObject({
+      feed: [],
+    });
+
+    // act - limit=1
+    const oneLimitResult = await getTimelineUseCase.execute({
+      limit: 1,
+      viewerDid: asDid(viewer.did),
+    });
+
+    // assert
+    expect(oneLimitResult.feed).toHaveLength(1);
+    expect(oneLimitResult).toMatchObject({
+      feed: [
+        {
+          $type: "app.bsky.feed.defs#feedViewPost",
+          post: {
+            uri: post.uri.toString(),
+          },
+        },
+      ],
+    });
+  });
+
+  test("複数の投稿がある場合、新しい順に並べて返す", async () => {
+    // arrange
+    const viewer = actorFactory();
+    const author = actorFactory();
+
+    const authorProfile = profileDetailedFactory({
+      actorDid: author.did,
+      displayName: "Author",
+    });
+    profileRepo.add(authorProfile);
+
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+
+    const { post: post1, record: record1 } = postFactory({
+      actorDid: author.did,
+      text: "First post",
+      createdAt: new Date("2024-01-05T00:00:00Z"),
+    });
+    postRepo.add(post1);
+    recordRepo.add(record1);
+
+    const post1Stats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(post1.uri.toString(), post1Stats);
+
+    const feedItem1 = FeedItem.fromPost(post1);
+    timelineRepo.addFeedItem(feedItem1);
+
+    const { post: post2, record: record2 } = postFactory({
+      actorDid: author.did,
+      text: "Second post",
+      createdAt: new Date("2024-01-06T00:00:00Z"),
+    });
+    postRepo.add(post2);
+    recordRepo.add(record2);
+
+    const post2Stats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(post2.uri.toString(), post2Stats);
+
+    const feedItem2 = FeedItem.fromPost(post2);
+    timelineRepo.addFeedItem(feedItem2);
+
+    // act
+    const result = await getTimelineUseCase.execute({
+      limit: 50,
+      viewerDid: asDid(viewer.did),
+    });
+
+    // assert
+    expect(result.feed).toHaveLength(2);
+    expect(result).toMatchObject({
+      feed: [
+        {
+          post: {
+            uri: post2.uri.toString(),
+            record: {
+              text: "Second post",
+            },
+          },
+        },
+        {
+          post: {
+            uri: post1.uri.toString(),
+            record: {
+              text: "First post",
+            },
+          },
+        },
+      ],
     });
   });
 });

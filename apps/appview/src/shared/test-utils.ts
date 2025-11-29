@@ -10,7 +10,9 @@ import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-vie
 import { PostViewService } from "../application/service/feed/post-view-service.js";
 import { ReplyRefService } from "../application/service/feed/reply-ref-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
+import { TimelineService } from "../application/service/feed/timeline-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
+import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
@@ -46,6 +48,8 @@ export const testInjector = createInjector()
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("feedProcessor", FeedProcessor)
+  .provideClass("timelineService", TimelineService)
+  .provideClass("searchService", PostSearchService)
   .provideClass("authorFeedService", AuthorFeedService)
   .provideClass("likeService", LikeService)
   .provideClass("actorLikesService", ActorLikesService)

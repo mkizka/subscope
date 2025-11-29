@@ -20,7 +20,7 @@
 ### Phase 2-6: appviewテスト移行
 
 - [x] **Phase 2**: 最初のテスト移行（パイロット: get-author-feed-use-case）
-- [ ] **Phase 3-A**: appview Feed UseCaseの移行（Part 1: timeline, post-thread, search-posts）
+- [x] **Phase 3-A**: appview Feed UseCaseの移行（Part 1: timeline, post-thread, search-posts）
 - [x] **Phase 3-B**: appview Feed UseCaseの移行（Part 2: likes, actor-likes, reposted-by）
 - [ ] **Phase 4**: appview Feed/Actor Serviceの移行
 - [ ] **Phase 5**: appview Graph/Actor UseCaseの移行

@@ -1,59 +1,25 @@
 import {
   actorFactory,
   postFactory,
-  recordFactory,
-  testSetup,
-} from "@repo/test-utils";
+  profileDetailedFactory,
+} from "@repo/common/test";
 import { describe, expect, test, vi } from "vitest";
 
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import { AtUriService } from "../../../domain/service/at-uri-service.js";
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";
-import { HandleResolver } from "../../../infrastructure/handle-resolver/handle-resolver.js";
-import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
-import { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
-import { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
-import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { GeneratorViewService } from "../../service/feed/generator-view-service.js";
-import { PostEmbedViewBuilder } from "../../service/feed/post-embed-view-builder.js";
-import { PostViewService } from "../../service/feed/post-view-service.js";
-import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
+import type { PostStats } from "../../interfaces/post-stats-repository.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
 
 describe("GetPostThreadUseCase", () => {
-  const { testInjector, ctx } = testSetup;
+  const getPostThreadUseCase = testInjector.injectClass(GetPostThreadUseCase);
 
-  const spyFindByUri = vi.spyOn(PostRepository.prototype, "findByUri");
-  const spyFindPostView = vi.spyOn(PostViewService.prototype, "findPostView");
-  const spyFindReplies = vi.spyOn(PostRepository.prototype, "findReplies");
+  const postRepo = testInjector.resolve("postRepository");
+  const postStatsRepo = testInjector.resolve("postStatsRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
 
-  const getPostThreadUseCase = testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("generatorRepository", GeneratorRepository)
-    .provideClass("generatorViewService", GeneratorViewService)
-    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("likeRepository", LikeRepository)
-    .provideClass("postViewService", PostViewService)
-    .provideClass("atUriService", AtUriService)
-    .injectClass(GetPostThreadUseCase);
+  const spyFindByUri = vi.spyOn(postRepo, "findByUri");
+  const spyFindReplies = vi.spyOn(postRepo, "findReplies");
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // act
@@ -71,23 +37,35 @@ describe("GetPostThreadUseCase", () => {
       uri: "at://did:plc:notexist/app.bsky.feed.post/notexist",
       notFound: true,
     });
-    // ターゲット投稿の取得1回のみ
+    // ターゲット投稿の取得で1回のみ
     expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // 投稿が見つからないのでリプライ取得は行われない
     expect(spyFindReplies).toHaveBeenCalledTimes(0);
-    expect(spyFindPostView).toHaveBeenCalledTimes(0);
   });
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Single User" }))
-      .create();
-    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => actor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => record })
-      .create();
+    const actor = actorFactory();
+
+    const profile = profileDetailedFactory({
+      actorDid: actor.did,
+      displayName: "Single User",
+    });
+    profileRepo.add(profile);
+
+    const { post, record } = postFactory({
+      actorDid: actor.did,
+    });
+    postRepo.add(post);
+    recordRepo.add(record);
+
+    const postStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     // act
     const result = await getPostThreadUseCase.execute({
@@ -100,7 +78,7 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: post.uri,
+        uri: post.uri.toString(),
         author: {
           displayName: "Single User",
         },
@@ -108,55 +86,80 @@ describe("GetPostThreadUseCase", () => {
       parent: undefined,
       replies: [],
     });
-    // ターゲット投稿とリプライ取得1回ずつ
+    // ターゲット投稿の取得で1回
     expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // ターゲット投稿のリプライ取得で1回
     expect(spyFindReplies).toHaveBeenCalledTimes(1);
-    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
     // arrange
-    const rootActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Root User" }))
-      .create();
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .create();
+    const rootActor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootActor.did,
+      displayName: "Root User",
+    });
+    profileRepo.add(rootProfile);
 
-    const parentActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Parent User" }))
-      .create();
-    const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => parentActor })
-      .create();
-    const parentPost = await postFactory(ctx.db)
-      .vars({ record: () => parentRecord })
-      .props({
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => rootPost.uri,
-        replyParentCid: () => rootPost.cid,
-      })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootActor.did,
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
-    const targetRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const targetPost = await postFactory(ctx.db)
-      .vars({ record: () => targetRecord })
-      .props({
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => parentPost.uri,
-        replyParentCid: () => parentPost.cid,
-      })
-      .create();
+    const rootPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(rootPost.uri.toString(), rootPostStats);
+
+    const parentActor = actorFactory();
+    const parentProfile = profileDetailedFactory({
+      actorDid: parentActor.did,
+      displayName: "Parent User",
+    });
+    profileRepo.add(parentProfile);
+
+    const { post: parentPost, record: parentRecord } = postFactory({
+      actorDid: parentActor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: rootPost.uri, cid: rootPost.cid },
+    });
+    postRepo.add(parentPost);
+    recordRepo.add(parentRecord);
+
+    const parentPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(parentPost.uri.toString(), parentPostStats);
+
+    const targetActor = actorFactory();
+    const targetProfile = profileDetailedFactory({
+      actorDid: targetActor.did,
+      displayName: "Target User",
+    });
+    profileRepo.add(targetProfile);
+
+    const { post: targetPost, record: targetRecord } = postFactory({
+      actorDid: targetActor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: parentPost.uri, cid: parentPost.cid },
+    });
+    postRepo.add(targetPost);
+    recordRepo.add(targetRecord);
+
+    const targetPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(targetPost.uri.toString(), targetPostStats);
 
     // act
     const result = await getPostThreadUseCase.execute({
@@ -169,7 +172,7 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: targetPost.uri,
+        uri: targetPost.uri.toString(),
         author: {
           displayName: "Target User",
         },
@@ -177,7 +180,7 @@ describe("GetPostThreadUseCase", () => {
       parent: {
         $type: "app.bsky.feed.defs#threadViewPost",
         post: {
-          uri: parentPost.uri,
+          uri: parentPost.uri.toString(),
           author: {
             displayName: "Parent User",
           },
@@ -185,7 +188,7 @@ describe("GetPostThreadUseCase", () => {
         parent: {
           $type: "app.bsky.feed.defs#threadViewPost",
           post: {
-            uri: rootPost.uri,
+            uri: rootPost.uri.toString(),
             author: {
               displayName: "Root User",
             },
@@ -193,56 +196,80 @@ describe("GetPostThreadUseCase", () => {
         },
       },
     });
-    // ターゲット投稿1回、親2回取得
+    // ターゲット投稿で1回、親投稿チェーンで2回（parent, root）
     expect(spyFindByUri).toHaveBeenCalledTimes(3);
-    // ターゲット投稿のリプライを検索
+    // ターゲット投稿のリプライ取得で1回のみ
     expect(spyFindReplies).toHaveBeenCalledTimes(1);
-    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
     // arrange
-    const rootActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Root User" }))
-      .create();
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .create();
+    const rootActor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootActor.did,
+      displayName: "Root User",
+    });
+    profileRepo.add(rootProfile);
 
-    const replyActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reply User" }))
-      .create();
-    const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => replyActor })
-      .create();
-    const replyPost = await postFactory(ctx.db)
-      .vars({ record: () => replyRecord })
-      .props({
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => rootPost.uri,
-        replyParentCid: () => rootPost.cid,
-      })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootActor.did,
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const grandchildActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Grandchild User" }))
-      .create();
-    const grandchildRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => grandchildActor })
-      .create();
-    const grandchildPost = await postFactory(ctx.db)
-      .vars({ record: () => grandchildRecord })
-      .props({
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => replyPost.uri,
-        replyParentCid: () => replyPost.cid,
-      })
-      .create();
+    const rootPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(rootPost.uri.toString(), rootPostStats);
+
+    const replyActor = actorFactory();
+    const replyProfile = profileDetailedFactory({
+      actorDid: replyActor.did,
+      displayName: "Reply User",
+    });
+    profileRepo.add(replyProfile);
+
+    const { post: replyPost, record: replyRecord } = postFactory({
+      actorDid: replyActor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: rootPost.uri, cid: rootPost.cid },
+    });
+    postRepo.add(replyPost);
+    recordRepo.add(replyRecord);
+
+    const replyPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(replyPost.uri.toString(), replyPostStats);
+
+    const grandchildActor = actorFactory();
+    const grandchildProfile = profileDetailedFactory({
+      actorDid: grandchildActor.did,
+      displayName: "Grandchild User",
+    });
+    profileRepo.add(grandchildProfile);
+
+    const { post: grandchildPost, record: grandchildRecord } = postFactory({
+      actorDid: grandchildActor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: replyPost.uri, cid: replyPost.cid },
+    });
+    postRepo.add(grandchildPost);
+    recordRepo.add(grandchildRecord);
+
+    const grandchildPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(grandchildPost.uri.toString(), grandchildPostStats);
 
     // act
     const result = await getPostThreadUseCase.execute({
@@ -255,7 +282,7 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
         author: {
           displayName: "Root User",
         },
@@ -265,7 +292,7 @@ describe("GetPostThreadUseCase", () => {
         {
           $type: "app.bsky.feed.defs#threadViewPost",
           post: {
-            uri: replyPost.uri,
+            uri: replyPost.uri.toString(),
             author: {
               displayName: "Reply User",
             },
@@ -274,7 +301,7 @@ describe("GetPostThreadUseCase", () => {
             {
               $type: "app.bsky.feed.defs#threadViewPost",
               post: {
-                uri: grandchildPost.uri,
+                uri: grandchildPost.uri.toString(),
                 author: {
                   displayName: "Grandchild User",
                 },
@@ -284,73 +311,103 @@ describe("GetPostThreadUseCase", () => {
         },
       ],
     });
-    // ターゲット投稿の取得1回のみ
+    // ターゲット投稿の取得で1回のみ
     expect(spyFindByUri).toHaveBeenCalledTimes(1);
-    // ターゲット投稿のリプライ、リプライのリプライ、リプライのリプライのリプライ(これは結果無し)で3回
+    // ルート投稿のリプライ、reply投稿のリプライ、grandchild投稿のリプライ（結果なし）で3回
     expect(spyFindReplies).toHaveBeenCalledTimes(3);
-    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("depthより大きい深さのリプライは取得しない", async () => {
     // arrange
-    const rootActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Root User" }))
-      .create();
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .create();
+    const rootActor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootActor.did,
+      displayName: "Root User",
+    });
+    profileRepo.add(rootProfile);
 
-    const level1Actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Level 1 User" }))
-      .create();
-    const level1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => level1Actor })
-      .create();
-    const level1Post = await postFactory(ctx.db)
-      .vars({ record: () => level1Record })
-      .props({
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => rootPost.uri,
-        replyParentCid: () => rootPost.cid,
-      })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootActor.did,
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const level2Actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Level 2 User" }))
-      .create();
-    const level2Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => level2Actor })
-      .create();
-    const level2Post = await postFactory(ctx.db)
-      .vars({ record: () => level2Record })
-      .props({
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => level1Post.uri,
-        replyParentCid: () => level1Post.cid,
-      })
-      .create();
+    const rootPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(rootPost.uri.toString(), rootPostStats);
 
-    const level3Actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Level 3 User" }))
-      .create();
-    const level3Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => level3Actor })
-      .create();
-    await postFactory(ctx.db)
-      .vars({ record: () => level3Record })
-      .props({
-        text: () => "Level 3 reply (should not appear)",
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => level2Post.uri,
-        replyParentCid: () => level2Post.cid,
-      })
-      .create();
+    const level1Actor = actorFactory();
+    const level1Profile = profileDetailedFactory({
+      actorDid: level1Actor.did,
+      displayName: "Level 1 User",
+    });
+    profileRepo.add(level1Profile);
+
+    const { post: level1Post, record: level1Record } = postFactory({
+      actorDid: level1Actor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: rootPost.uri, cid: rootPost.cid },
+    });
+    postRepo.add(level1Post);
+    recordRepo.add(level1Record);
+
+    const level1PostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(level1Post.uri.toString(), level1PostStats);
+
+    const level2Actor = actorFactory();
+    const level2Profile = profileDetailedFactory({
+      actorDid: level2Actor.did,
+      displayName: "Level 2 User",
+    });
+    profileRepo.add(level2Profile);
+
+    const { post: level2Post, record: level2Record } = postFactory({
+      actorDid: level2Actor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: level1Post.uri, cid: level1Post.cid },
+    });
+    postRepo.add(level2Post);
+    recordRepo.add(level2Record);
+
+    const level2PostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(level2Post.uri.toString(), level2PostStats);
+
+    const level3Actor = actorFactory();
+    const level3Profile = profileDetailedFactory({
+      actorDid: level3Actor.did,
+      displayName: "Level 3 User",
+    });
+    profileRepo.add(level3Profile);
+
+    const { post: level3Post, record: level3Record } = postFactory({
+      actorDid: level3Actor.did,
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: level2Post.uri, cid: level2Post.cid },
+    });
+    postRepo.add(level3Post);
+    recordRepo.add(level3Record);
+
+    const level3PostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(level3Post.uri.toString(), level3PostStats);
 
     // act - depth=2で実行（Level 3は取得されないはず）
     const result = await getPostThreadUseCase.execute({
@@ -363,7 +420,7 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
         author: {
           displayName: "Root User",
         },
@@ -373,7 +430,7 @@ describe("GetPostThreadUseCase", () => {
         {
           $type: "app.bsky.feed.defs#threadViewPost",
           post: {
-            uri: level1Post.uri,
+            uri: level1Post.uri.toString(),
             author: {
               displayName: "Level 1 User",
             },
@@ -382,12 +439,12 @@ describe("GetPostThreadUseCase", () => {
             {
               $type: "app.bsky.feed.defs#threadViewPost",
               post: {
-                uri: level2Post.uri,
+                uri: level2Post.uri.toString(),
                 author: {
                   displayName: "Level 2 User",
                 },
               },
-              replies: [], // Level 3はdepth=2の制限により含まれない
+              replies: [],
             },
           ],
         },
@@ -397,68 +454,99 @@ describe("GetPostThreadUseCase", () => {
     expect(spyFindByUri).toHaveBeenCalledTimes(1);
     // depth=2の制限により、ルート投稿と深さ1の投稿のリプライのみ取得（計2回）
     expect(spyFindReplies).toHaveBeenCalledTimes(2);
-    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
     // arrange
-    const level0Actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Level 0 User" }))
-      .create();
-    const level0Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => level0Actor })
-      .create();
-    const level0Post = await postFactory(ctx.db)
-      .vars({ record: () => level0Record })
-      .create();
+    const level0Actor = actorFactory();
+    const level0Profile = profileDetailedFactory({
+      actorDid: level0Actor.did,
+      displayName: "Level 0 User",
+    });
+    profileRepo.add(level0Profile);
 
-    const level1Actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Level 1 User" }))
-      .create();
-    const level1Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => level1Actor })
-      .create();
-    const level1Post = await postFactory(ctx.db)
-      .vars({ record: () => level1Record })
-      .props({
-        replyRootUri: () => level0Post.uri,
-        replyRootCid: () => level0Post.cid,
-        replyParentUri: () => level0Post.uri,
-        replyParentCid: () => level0Post.cid,
-      })
-      .create();
+    const { post: level0Post, record: level0Record } = postFactory({
+      actorDid: level0Actor.did,
+    });
+    postRepo.add(level0Post);
+    recordRepo.add(level0Record);
 
-    const level2Actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Level 2 User" }))
-      .create();
-    const level2Record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => level2Actor })
-      .create();
-    const level2Post = await postFactory(ctx.db)
-      .vars({ record: () => level2Record })
-      .props({
-        replyRootUri: () => level0Post.uri,
-        replyRootCid: () => level0Post.cid,
-        replyParentUri: () => level1Post.uri,
-        replyParentCid: () => level1Post.cid,
-      })
-      .create();
+    const level0PostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(level0Post.uri.toString(), level0PostStats);
 
-    const targetActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Target User" }))
-      .create();
-    const targetRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => targetActor })
-      .create();
-    const targetPost = await postFactory(ctx.db)
-      .vars({ record: () => targetRecord })
-      .props({
-        replyRootUri: () => level0Post.uri,
-        replyRootCid: () => level0Post.cid,
-        replyParentUri: () => level2Post.uri,
-        replyParentCid: () => level2Post.cid,
-      })
-      .create();
+    const level1Actor = actorFactory();
+    const level1Profile = profileDetailedFactory({
+      actorDid: level1Actor.did,
+      displayName: "Level 1 User",
+    });
+    profileRepo.add(level1Profile);
+
+    const { post: level1Post, record: level1Record } = postFactory({
+      actorDid: level1Actor.did,
+      replyRoot: { uri: level0Post.uri, cid: level0Post.cid },
+      replyParent: { uri: level0Post.uri, cid: level0Post.cid },
+    });
+    postRepo.add(level1Post);
+    recordRepo.add(level1Record);
+
+    const level1PostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(level1Post.uri.toString(), level1PostStats);
+
+    const level2Actor = actorFactory();
+    const level2Profile = profileDetailedFactory({
+      actorDid: level2Actor.did,
+      displayName: "Level 2 User",
+    });
+    profileRepo.add(level2Profile);
+
+    const { post: level2Post, record: level2Record } = postFactory({
+      actorDid: level2Actor.did,
+      replyRoot: { uri: level0Post.uri, cid: level0Post.cid },
+      replyParent: { uri: level1Post.uri, cid: level1Post.cid },
+    });
+    postRepo.add(level2Post);
+    recordRepo.add(level2Record);
+
+    const level2PostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(level2Post.uri.toString(), level2PostStats);
+
+    const targetActor = actorFactory();
+    const targetProfile = profileDetailedFactory({
+      actorDid: targetActor.did,
+      displayName: "Target User",
+    });
+    profileRepo.add(targetProfile);
+
+    const { post: targetPost, record: targetRecord } = postFactory({
+      actorDid: targetActor.did,
+      replyRoot: { uri: level0Post.uri, cid: level0Post.cid },
+      replyParent: { uri: level2Post.uri, cid: level2Post.cid },
+    });
+    postRepo.add(targetPost);
+    recordRepo.add(targetRecord);
+
+    const targetPostStats: PostStats = {
+      likeCount: 0,
+      repostCount: 0,
+      replyCount: 0,
+      quoteCount: 0,
+    };
+    postStatsRepo.add(targetPost.uri.toString(), targetPostStats);
 
     // act - parentHeight=2で実行（Level 0は取得されないはず）
     const result = await getPostThreadUseCase.execute({
@@ -471,7 +559,7 @@ describe("GetPostThreadUseCase", () => {
     expect(result.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: {
-        uri: targetPost.uri,
+        uri: targetPost.uri.toString(),
         author: {
           displayName: "Target User",
         },
@@ -479,7 +567,7 @@ describe("GetPostThreadUseCase", () => {
       parent: {
         $type: "app.bsky.feed.defs#threadViewPost",
         post: {
-          uri: level2Post.uri,
+          uri: level2Post.uri.toString(),
           author: {
             displayName: "Level 2 User",
           },
@@ -487,20 +575,19 @@ describe("GetPostThreadUseCase", () => {
         parent: {
           $type: "app.bsky.feed.defs#threadViewPost",
           post: {
-            uri: level1Post.uri,
+            uri: level1Post.uri.toString(),
             author: {
               displayName: "Level 1 User",
             },
           },
-          parent: undefined, // Level 0はparentHeight=2の制限により含まれない
+          parent: undefined,
         },
       },
       replies: [],
     });
-    // ターゲット投稿で1回、親投稿チェーンで2回
+    // ターゲット投稿で1回、親投稿チェーンで2回（level2, level1）
     expect(spyFindByUri).toHaveBeenCalledTimes(3);
-    // ターゲット投稿のリプライ取得1回のみ
+    // ターゲット投稿のリプライ取得で1回のみ
     expect(spyFindReplies).toHaveBeenCalledTimes(1);
-    expect(spyFindPostView).toHaveBeenCalledTimes(1);
   });
 });
