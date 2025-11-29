@@ -1,32 +1,15 @@
-import { LoggerManager } from "@repo/common/infrastructure";
-import { required } from "@repo/common/utils";
-import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory, profileDetailedFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { SearchActorsTypeaheadUseCase } from "./search-actors-typeahead-use-case.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {
-  const { testInjector, ctx } = testSetup;
+  const searchActorsTypeaheadUseCase = testInjector.injectClass(
+    SearchActorsTypeaheadUseCase,
+  );
 
-  const searchActorsTypeaheadUseCase = testInjector
-    .provideValue("loggerManager", new LoggerManager("info"))
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .injectClass(SearchActorsTypeaheadUseCase);
+  const profileRepo = testInjector.resolve("profileRepository");
 
   test("クエリが空の場合、空のactors配列を返す", async () => {
     // act
@@ -69,9 +52,13 @@ describe("SearchActorsTypeaheadUseCase", () => {
 
   test("表示名で検索した場合、該当するactorのProfileViewBasicを返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Unique Test User" }))
-      .create();
+    const actor = actorFactory();
+    const profile = profileDetailedFactory({
+      actorDid: actor.did,
+      displayName: "Unique Test User",
+      handle: actor.handle ?? "unique.test",
+    });
+    profileRepo.add(profile);
 
     // act
     const result = await searchActorsTypeaheadUseCase.execute({
@@ -84,20 +71,24 @@ describe("SearchActorsTypeaheadUseCase", () => {
     expect(result.actors[0]).toMatchObject({
       $type: "app.bsky.actor.defs#profileViewBasic",
       did: actor.did,
-      handle: actor.handle,
+      handle: profile.handle,
       displayName: "Unique Test User",
     });
   });
 
   test("ハンドルで検索した場合、該当するactorのProfileViewBasicを返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "User" }))
-      .create();
+    const actor = actorFactory();
+    const profile = profileDetailedFactory({
+      actorDid: actor.did,
+      displayName: "User",
+      handle: "searchablehandle.test",
+    });
+    profileRepo.add(profile);
 
     // act
     const result = await searchActorsTypeaheadUseCase.execute({
-      query: required(actor.handle),
+      query: "searchablehandle",
       limit: 10,
     });
 
@@ -107,7 +98,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileViewBasic",
           did: actor.did,
-          handle: actor.handle,
+          handle: "searchablehandle.test",
           displayName: "User",
         },
       ],
@@ -117,29 +108,30 @@ describe("SearchActorsTypeaheadUseCase", () => {
   test("limit数を超えるactorが存在する場合、指定されたlimit数のactorを返す", async () => {
     // arrange
     const uniqueId = Date.now();
-    const actor1 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: `UniqueLimit${uniqueId}User1` }))
-      .create();
-    const actor2 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: `UniqueLimit${uniqueId}User2` }))
-      .create();
-    const actor3 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: `UniqueLimit${uniqueId}User3` }))
-      .create();
 
-    // indexedAtの順序を制御（新しい順）
-    await ctx.db
-      .update(schema.profiles)
-      .set({ indexedAt: new Date("2024-01-03T00:00:00.000Z") })
-      .where(eq(schema.profiles.actorDid, actor1.did));
-    await ctx.db
-      .update(schema.profiles)
-      .set({ indexedAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.profiles.actorDid, actor2.did));
-    await ctx.db
-      .update(schema.profiles)
-      .set({ indexedAt: new Date("2024-01-01T00:00:00.000Z") })
-      .where(eq(schema.profiles.actorDid, actor3.did));
+    const actor1 = actorFactory();
+    const profile1 = profileDetailedFactory({
+      actorDid: actor1.did,
+      displayName: `UniqueLimit${uniqueId}User1`,
+      indexedAt: new Date("2024-01-03T00:00:00.000Z"),
+    });
+    profileRepo.add(profile1);
+
+    const actor2 = actorFactory();
+    const profile2 = profileDetailedFactory({
+      actorDid: actor2.did,
+      displayName: `UniqueLimit${uniqueId}User2`,
+      indexedAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    profileRepo.add(profile2);
+
+    const actor3 = actorFactory();
+    const profile3 = profileDetailedFactory({
+      actorDid: actor3.did,
+      displayName: `UniqueLimit${uniqueId}User3`,
+      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+    profileRepo.add(profile3);
 
     // act
     const result = await searchActorsTypeaheadUseCase.execute({
@@ -164,9 +156,12 @@ describe("SearchActorsTypeaheadUseCase", () => {
 
   test("該当するactorが存在しない場合、空のactors配列を返す", async () => {
     // arrange
-    await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Test User" }))
-      .create();
+    const actor = actorFactory();
+    const profile = profileDetailedFactory({
+      actorDid: actor.did,
+      displayName: "Test User",
+    });
+    profileRepo.add(profile);
 
     // act
     const result = await searchActorsTypeaheadUseCase.execute({
