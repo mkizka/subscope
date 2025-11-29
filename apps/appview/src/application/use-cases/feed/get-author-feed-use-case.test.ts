@@ -52,7 +52,6 @@ describe("GetAuthorFeedUseCase", () => {
     .provideClass("generatorRepository", InMemoryGeneratorRepository)
     .provideClass("generatorViewService", GeneratorViewService)
     .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
-    // @ts-expect-error - Type inference issue with PostViewService
     .provideClass("postViewService", PostViewService)
     .provideClass("replyRefService", ReplyRefService)
     .provideClass("authorFeedService", AuthorFeedService)
