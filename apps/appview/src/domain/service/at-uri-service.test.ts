@@ -3,7 +3,7 @@ import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
-import { HandleResolver } from "../../infrastructure/handle-resolver.js";
+import { HandleResolver } from "../../infrastructure/handle-resolver/handle-resolver.js";
 import { AtUriService, InvalidHostnameError } from "./at-uri-service.js";
 
 describe("AtUriService", () => {

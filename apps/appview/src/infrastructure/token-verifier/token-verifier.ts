@@ -2,8 +2,8 @@ import { asDid } from "@atproto/did";
 import { verifyJwt } from "@atproto/xrpc-server";
 import type { IDidResolver } from "@repo/common/domain";
 
-import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
-import { env } from "../shared/env.js";
+import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
+import { env } from "../../shared/env.js";
 
 export class TokenVerifier implements ITokenVerifier {
   constructor(private readonly didResolver: IDidResolver) {}

@@ -1,7 +1,7 @@
 import { testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository.js";
+import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository/invite-code-repository.js";
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {

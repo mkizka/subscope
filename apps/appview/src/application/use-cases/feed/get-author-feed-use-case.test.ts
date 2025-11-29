@@ -12,7 +12,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
+import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
 import { AuthorFeedRepository } from "../../../infrastructure/author-feed-repository/author-feed-repository.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";

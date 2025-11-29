@@ -1,4 +1,4 @@
-import { env } from "../shared/env.js";
+import { env } from "../../shared/env.js";
 
 // TODO: interfaceかく
 export class AssetUrlBuilder {

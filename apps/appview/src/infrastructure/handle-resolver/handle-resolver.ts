@@ -8,7 +8,7 @@ import { eq, inArray } from "drizzle-orm";
 import {
   HandleResolutionError,
   type IHandleResolver,
-} from "../application/interfaces/handle-resolver.js";
+} from "../../application/interfaces/handle-resolver.js";
 
 export class HandleResolver implements IHandleResolver {
   constructor(private readonly db: DatabaseClient) {}
