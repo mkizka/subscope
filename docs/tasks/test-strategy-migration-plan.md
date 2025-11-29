@@ -716,28 +716,9 @@ const replyPost = postFactory({
 
 ### インメモリリポジトリの実装パターン
 
-**ESLint設定:**
-
-`*.in-memory.ts`ファイルに対して`@typescript-eslint/require-await`ルールを無効化：
-
-```javascript
-// apps/appview/eslint.config.js
-export default [
-  ...configs.typescript(),
-  {
-    files: ["**/*.in-memory.ts"],
-    rules: {
-      "@typescript-eslint/require-await": "off",
-    },
-  },
-];
-```
-
-**実装例:**
-
 ```typescript
-// apps/appview/src/infrastructure/post-repository/post-repository.in-memory.ts
-import type { IPostRepository } from "../../application/interfaces/post-repository.js";
+// apps/appview/src/infrastructure/post-repository.in-memory.ts
+import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { Post } from "@repo/common/domain";
 import type { AtUri } from "@atproto/syntax";
 
@@ -761,11 +742,6 @@ export class InMemoryPostRepository implements IPostRepository {
   // 必要に応じて他のメソッドを実装
 }
 ```
-
-**注意事項:**
-
-- `upsert`や`create`などのメソッドがある場合は、冗長な`add`メソッドを実装しない
-- インメモリ実装では実際にawaitする必要がないため、eslint設定により`Promise.resolve()`は不要
 
 ### 移行後のテストパターン
 
