@@ -1,14 +1,12 @@
-import { testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository/invite-code-repository.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  const { testInjector } = testSetup;
-
   const useCase = testInjector
-    .provideClass("inviteCodeRepository", InviteCodeRepository)
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    .provideValue("db", {} as never)
     .provideValue("publicUrl", "https://example.com")
     .injectClass(CreateInviteCodeUseCase);
 

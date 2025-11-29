@@ -1,26 +1,17 @@
-import { required } from "@repo/common/utils";
 import {
   actorFactory,
-  profileFactory,
-  recordFactory,
+  profileDetailedFactory,
   subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
+} from "@repo/common/test";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/subscription-repository/subscription-repository.js";
-import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { SubscriptionService } from "../../service/admin/subscription-service.js";
-import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { GetSubscribersUseCase } from "./get-subscribers-use-case.js";
 
 describe("GetSubscribersUseCase", () => {
-  const { testInjector, ctx } = testSetup;
+  const getSubscribersUseCase = testInjector.injectClass(GetSubscribersUseCase);
+  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -31,46 +22,31 @@ describe("GetSubscribersUseCase", () => {
     vi.useRealTimers();
   });
 
-  const getSubscribersUseCase = testInjector
-    .provideValue("publicUrl", "https://example.com")
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("subscriptionService", SubscriptionService)
-    .injectClass(GetSubscribersUseCase);
-
   test("subscriberが存在する場合、ProfileViewの配列を返す", async () => {
     // arrange
-    const actor1 = await actorFactory(ctx.db).create();
-    const profileRecord1 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-      .vars({ actor: () => actor1 })
-      .create();
-    await profileFactory(ctx.db)
-      .vars({ record: () => profileRecord1 })
-      .props({ displayName: () => "Subscriber One" })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .vars({ actor: () => actor1 })
-      .props({ createdAt: () => new Date("2024-01-01T00:00:00Z") })
-      .create();
+    const actor1 = actorFactory();
+    const profile1 = profileDetailedFactory({
+      actorDid: actor1.did,
+      displayName: "Subscriber One",
+    });
+    profileRepo.add(profile1);
+    const subscription1 = subscriptionFactory({
+      actorDid: actor1.did,
+      createdAt: new Date("2024-01-01T00:00:00Z"),
+    });
+    subscriptionRepo.add(subscription1);
 
-    const actor2 = await actorFactory(ctx.db).create();
-    const profileRecord2 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-      .vars({ actor: () => actor2 })
-      .create();
-    await profileFactory(ctx.db)
-      .vars({ record: () => profileRecord2 })
-      .props({ displayName: () => "Subscriber Two" })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .vars({ actor: () => actor2 })
-      .props({ createdAt: () => new Date("2024-01-01T00:00:01Z") })
-      .create();
+    const actor2 = actorFactory();
+    const profile2 = profileDetailedFactory({
+      actorDid: actor2.did,
+      displayName: "Subscriber Two",
+    });
+    profileRepo.add(profile2);
+    const subscription2 = subscriptionFactory({
+      actorDid: actor2.did,
+      createdAt: new Date("2024-01-01T00:00:01Z"),
+    });
+    subscriptionRepo.add(subscription2);
 
     // act
     const result = await getSubscribersUseCase.execute({
@@ -115,21 +91,17 @@ describe("GetSubscribersUseCase", () => {
     // arrange
     const actors: Array<{ actor: { did: string }; displayName: string }> = [];
     for (let index = 0; index < 3; index++) {
-      const actor = await actorFactory(ctx.db).create();
-      const profileRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.actor.profile",
-      )
-        .vars({ actor: () => actor })
-        .create();
-      await profileFactory(ctx.db)
-        .vars({ record: () => profileRecord })
-        .props({ displayName: () => `Test User ${index}` })
-        .create();
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => actor })
-        .props({ createdAt: () => new Date(`2024-01-01T00:00:0${index}Z`) })
-        .create();
+      const actor = actorFactory();
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: `Test User ${index}`,
+      });
+      profileRepo.add(profile);
+      const subscription = subscriptionFactory({
+        actorDid: actor.did,
+        createdAt: new Date(`2024-01-01T00:00:0${index}Z`),
+      });
+      subscriptionRepo.add(subscription);
       actors.push({ actor, displayName: `Test User ${index}` });
     }
 
@@ -139,15 +111,16 @@ describe("GetSubscribersUseCase", () => {
     });
 
     // assert
-    const [, actor1, actor2] = actors;
+    const actor1 = actors[1];
+    const actor2 = actors[2];
     expect(result).toMatchObject({
       subscribers: [
         {
-          did: required(actor2).actor.did,
+          did: actor2?.actor.did,
           displayName: "Test User 2",
         },
         {
-          did: required(actor1).actor.did,
+          did: actor1?.actor.did,
           displayName: "Test User 1",
         },
       ],
@@ -157,44 +130,44 @@ describe("GetSubscribersUseCase", () => {
 
   test("cursorが指定された場合、その続きから返す", async () => {
     // arrange
-    const actor1 = await actorFactory(ctx.db).create();
-    const profileRecord1 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-      .vars({ actor: () => actor1 })
-      .create();
-    await profileFactory(ctx.db)
-      .vars({ record: () => profileRecord1 })
-      .props({ displayName: () => "First" })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .vars({ actor: () => actor1 })
-      .props({ createdAt: () => new Date("2024-01-01T00:00:02Z") })
-      .create();
+    const actor1 = actorFactory();
+    const profile1 = profileDetailedFactory({
+      actorDid: actor1.did,
+      displayName: "First",
+    });
+    profileRepo.add(profile1);
+    subscriptionRepo.add(
+      subscriptionFactory({
+        actorDid: actor1.did,
+        createdAt: new Date("2024-01-01T00:00:02Z"),
+      }),
+    );
 
-    const actor2 = await actorFactory(ctx.db).create();
-    const profileRecord2 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-      .vars({ actor: () => actor2 })
-      .create();
-    await profileFactory(ctx.db)
-      .vars({ record: () => profileRecord2 })
-      .props({ displayName: () => "Second" })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .vars({ actor: () => actor2 })
-      .props({ createdAt: () => new Date("2024-01-01T00:00:01Z") })
-      .create();
+    const actor2 = actorFactory();
+    const profile2 = profileDetailedFactory({
+      actorDid: actor2.did,
+      displayName: "Second",
+    });
+    profileRepo.add(profile2);
+    subscriptionRepo.add(
+      subscriptionFactory({
+        actorDid: actor2.did,
+        createdAt: new Date("2024-01-01T00:00:01Z"),
+      }),
+    );
 
-    const actor3 = await actorFactory(ctx.db).create();
-    const profileRecord3 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-      .vars({ actor: () => actor3 })
-      .create();
-    await profileFactory(ctx.db)
-      .vars({ record: () => profileRecord3 })
-      .props({ displayName: () => "Third" })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .vars({ actor: () => actor3 })
-      .props({ createdAt: () => new Date("2024-01-01T00:00:00Z") })
-      .create();
+    const actor3 = actorFactory();
+    const profile3 = profileDetailedFactory({
+      actorDid: actor3.did,
+      displayName: "Third",
+    });
+    profileRepo.add(profile3);
+    subscriptionRepo.add(
+      subscriptionFactory({
+        actorDid: actor3.did,
+        createdAt: new Date("2024-01-01T00:00:00Z"),
+      }),
+    );
 
     // act - 最初のページ
     const firstPage = await getSubscribersUseCase.execute({
