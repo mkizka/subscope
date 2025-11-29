@@ -25,8 +25,7 @@ export class InMemoryFollowRepository implements IFollowRepository {
       : follow.createdAt;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findFollows(params: {
+  findFollows(params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
@@ -44,11 +43,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
       (a, b) => this.getSortAt(b).getTime() - this.getSortAt(a).getTime(),
     );
 
-    return items.slice(0, params.limit);
+    return Promise.resolve(items.slice(0, params.limit));
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findFollowers(params: {
+  findFollowers(params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
@@ -66,16 +64,15 @@ export class InMemoryFollowRepository implements IFollowRepository {
       (a, b) => this.getSortAt(b).getTime() - this.getSortAt(a).getTime(),
     );
 
-    return items.slice(0, params.limit);
+    return Promise.resolve(items.slice(0, params.limit));
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findFollowingMap(params: {
+  findFollowingMap(params: {
     actorDid: Did;
     targetDids: Did[];
   }): Promise<Map<Did, AtUri>> {
     if (params.targetDids.length === 0) {
-      return new Map();
+      return Promise.resolve(new Map<Did, AtUri>());
     }
 
     const followingMap = new Map<Did, AtUri>();
@@ -89,16 +86,15 @@ export class InMemoryFollowRepository implements IFollowRepository {
       }
     }
 
-    return followingMap;
+    return Promise.resolve(followingMap);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findFollowedByMap(params: {
+  findFollowedByMap(params: {
     actorDid: Did;
     targetDids: Did[];
   }): Promise<Map<Did, AtUri>> {
     if (params.targetDids.length === 0) {
-      return new Map();
+      return Promise.resolve(new Map<Did, AtUri>());
     }
 
     const followedByMap = new Map<Did, AtUri>();
@@ -112,6 +108,6 @@ export class InMemoryFollowRepository implements IFollowRepository {
       }
     }
 
-    return followedByMap;
+    return Promise.resolve(followedByMap);
   }
 }

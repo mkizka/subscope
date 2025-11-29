@@ -20,8 +20,7 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
     this.generators.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findByUris(uris: AtUri[]): Promise<Generator[]> {
+  findByUris(uris: AtUri[]): Promise<Generator[]> {
     const result: Generator[] = [];
 
     for (const uri of uris) {
@@ -32,6 +31,6 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
       }
     }
 
-    return result;
+    return Promise.resolve(result);
   }
 }

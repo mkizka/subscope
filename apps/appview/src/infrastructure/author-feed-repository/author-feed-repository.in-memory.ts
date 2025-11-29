@@ -27,8 +27,7 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
     this.feedItems = [];
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findFeedItems(params: {
+  findFeedItems(params: {
     actorDid: string;
     limit: number;
     cursor?: Date;
@@ -44,11 +43,10 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
 
     items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
-    return items.slice(0, params.limit);
+    return Promise.resolve(items.slice(0, params.limit));
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findFeedItemsWithoutReplies(params: {
+  findFeedItemsWithoutReplies(params: {
     actorDid: string;
     limit: number;
     cursor?: Date;
@@ -72,6 +70,6 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
 
     items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
-    return items.slice(0, params.limit);
+    return Promise.resolve(items.slice(0, params.limit));
   }
 }

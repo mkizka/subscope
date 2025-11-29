@@ -20,8 +20,7 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     this.stats.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findMap(uris: AtUri[]): Promise<Map<string, PostStats>> {
+  findMap(uris: AtUri[]): Promise<Map<string, PostStats>> {
     const result = new Map<string, PostStats>();
 
     for (const uri of uris) {
@@ -32,6 +31,6 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
       }
     }
 
-    return result;
+    return Promise.resolve(result);
   }
 }

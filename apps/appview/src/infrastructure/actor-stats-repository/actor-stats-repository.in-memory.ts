@@ -18,8 +18,7 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     this.stats.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async findStats(actorDids: string[]): Promise<Map<string, ActorStats>> {
+  findStats(actorDids: string[]): Promise<Map<string, ActorStats>> {
     const result = new Map<string, ActorStats>();
 
     for (const actorDid of actorDids) {
@@ -29,6 +28,6 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
       }
     }
 
-    return result;
+    return Promise.resolve(result);
   }
 }
