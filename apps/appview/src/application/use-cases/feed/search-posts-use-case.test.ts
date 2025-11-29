@@ -1,7 +1,11 @@
-import { actorFactory, postFactory, profileDetailedFactory } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import {
+  actorFactory,
+  postFactory,
+  profileDetailedFactory,
+} from "@repo/common/test";
+import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import type { PostStats } from "../../interfaces/post-stats-repository.js";
 import { SearchPostsUseCase } from "./search-posts-use-case.js";
 
@@ -12,13 +16,6 @@ describe("SearchPostsUseCase", () => {
   const postStatsRepo = testInjector.resolve("postStatsRepository");
   const profileRepo = testInjector.resolve("profileRepository");
   const recordRepo = testInjector.resolve("recordRepository");
-
-  beforeEach(() => {
-    postRepo.clear();
-    postStatsRepo.clear();
-    profileRepo.clear();
-    recordRepo.clear();
-  });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
     // act

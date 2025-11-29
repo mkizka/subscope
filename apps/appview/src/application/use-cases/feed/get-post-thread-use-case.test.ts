@@ -1,8 +1,12 @@
-import { actorFactory, postFactory, profileDetailedFactory } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import {
+  actorFactory,
+  postFactory,
+  profileDetailedFactory,
+} from "@repo/common/test";
+import { describe, expect, test } from "vitest";
 
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import type { PostStats } from "../../interfaces/post-stats-repository.js";
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
 
@@ -13,13 +17,6 @@ describe("GetPostThreadUseCase", () => {
   const postStatsRepo = testInjector.resolve("postStatsRepository");
   const profileRepo = testInjector.resolve("profileRepository");
   const recordRepo = testInjector.resolve("recordRepository");
-
-  beforeEach(() => {
-    postRepo.clear();
-    postStatsRepo.clear();
-    profileRepo.clear();
-    recordRepo.clear();
-  });
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // act
