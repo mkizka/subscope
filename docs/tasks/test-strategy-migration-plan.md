@@ -803,11 +803,56 @@ const post = postFactory({
 });
 ```
 
+**重要: postFactoryの戻り値**
+
+`postFactory`は`{post, record}`のオブジェクトを返します。PostViewServiceがrecordRepositoryを使用するため、テストでは両方をリポジトリに追加する必要があります。
+
+```typescript
+// postFactoryの使い方
+const { post, record } = postFactory({
+  actorDid: author.did,
+  text: "Test post",
+});
+postRepo.add(post);
+recordRepo.add(record); // recordも追加が必要
+
+// recordRepoの取得と初期化も忘れずに
+const recordRepo = injector.resolve("recordRepository");
+
+beforeEach(() => {
+  postRepo.clear();
+  recordRepo.clear(); // recordRepoもクリア
+});
+```
+
+**インメモリテストの実行方法**
+
+Docker環境が利用できない場合は、インメモリリポジトリ専用のvitest設定を使用してテストを実行できます。
+
+```bash
+# インメモリテスト用の設定でテストを実行
+pnpm --filter @repo/appview test:in-memory <テストファイル名>
+
+# 例: get-author-feed-use-case.test.ts を実行
+pnpm --filter @repo/appview test:in-memory get-author-feed-use-case.test.ts
+```
+
+この設定（`vitest.config.in-memory.ts`）は：
+
+- globalSetupを除外（PostgreSQL Dockerコンテナを起動しない）
+- setupFilesを除外（DBリセットを実行しない）
+- インメモリリポジトリのみを使用
+
 ```typescript
 // 移行後のUseCaseテスト例
 import { FeedItem, Post } from "@repo/common/domain";
-import { actorFactory, postFactory, profileDetailedFactory } from "@repo/common/test";
+import {
+  actorFactory,
+  postFactory,
+  profileDetailedFactory,
+} from "@repo/common/test";
 import { InMemoryPostRepository } from "../../infrastructure/post-repository/post-repository.in-memory.js";
+import { InMemoryRecordRepository } from "../../infrastructure/record-repository/record-repository.in-memory.js";
 import { InMemoryProfileRepository } from "../../infrastructure/profile-repository/profile-repository.in-memory.js";
 
 describe("GetPostThreadUseCase", () => {
@@ -815,15 +860,18 @@ describe("GetPostThreadUseCase", () => {
 
   const injector = testInjector
     .provideClass("postRepository", InMemoryPostRepository)
+    .provideClass("recordRepository", InMemoryRecordRepository)
     .provideClass("profileRepository", InMemoryProfileRepository);
-    // ...
+  // ...
 
   const useCase = injector.injectClass(GetPostThreadUseCase);
   const postRepo = injector.resolve("postRepository");
+  const recordRepo = injector.resolve("recordRepository");
   const profileRepo = injector.resolve("profileRepository");
 
   beforeEach(() => {
     postRepo.clear();
+    recordRepo.clear();
     profileRepo.clear();
   });
 
@@ -845,18 +893,27 @@ describe("GetPostThreadUseCase", () => {
 
   test("投稿が存在する場合、ThreadViewPostを返す", async () => {
     // arrange
-    const actor = actorFactory({ did: "did:plc:testuser" });
-    const post = postFactory({
-      uri: "at://did:plc:testuser/app.bsky.feed.post/abc123",
+    const actor = actorFactory();
+    const { post, record } = postFactory({
       actorDid: actor.did,
     });
     postRepo.add(post);
+    recordRepo.add(record);
 
     // act
-    const result = await useCase.execute({...});
+    const result = await useCase.execute({
+      uri: post.uri,
+      depth: 6,
+      parentHeight: 80,
+    });
 
     // assert
-    expect(result.thread).toMatchObject({...});
+    expect(result.thread).toMatchObject({
+      $type: "app.bsky.feed.defs#threadViewPost",
+      post: {
+        uri: post.uri.toString(),
+      },
+    });
   });
 });
 ```
