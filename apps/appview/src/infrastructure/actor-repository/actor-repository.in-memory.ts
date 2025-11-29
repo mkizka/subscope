@@ -6,10 +6,6 @@ import type { IActorRepository } from "../../application/interfaces/actor-reposi
 export class InMemoryActorRepository implements IActorRepository {
   private actors: Map<Did, Actor> = new Map();
 
-  add(actor: Actor): void {
-    this.actors.set(actor.did, actor);
-  }
-
   clear(): void {
     this.actors.clear();
   }
