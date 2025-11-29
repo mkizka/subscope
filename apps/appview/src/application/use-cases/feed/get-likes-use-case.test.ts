@@ -4,9 +4,9 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { GetLikesUseCase } from "./get-likes-use-case.js";
 
 describe("GetLikesUseCase", () => {
@@ -14,11 +14,6 @@ describe("GetLikesUseCase", () => {
 
   const likeRepo = testInjector.resolve("likeRepository");
   const profileRepo = testInjector.resolve("profileRepository");
-
-  beforeEach(() => {
-    likeRepo.clear();
-    profileRepo.clear();
-  });
 
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
     // arrange

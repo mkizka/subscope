@@ -396,20 +396,42 @@ asset-url-builder.ts       → asset-url-builder/asset-url-builder.ts
 - Timeline/PostThreadに比べて複雑なリレーション処理が少ない
 - スレッド構造などの再帰的な処理がない
 
-**重要な実装:**
+**実装内容:**
 
-このフェーズで`apps/appview/src/shared/test-injector.ts`を作成しました。すべてのInMemoryリポジトリとServiceが事前設定されているため、テストファイルでは以下のようにシンプルに記述できます：
+このフェーズで以下のファイルを作成・更新しました：
+
+1. **`apps/appview/src/shared/test-utils.ts`** - テストユーティリティ
+   - `testInjector`: すべてのInMemoryリポジトリとServiceが事前設定されたインジェクター
+   - `clearAllInMemoryRepositories()`: すべてのInMemoryリポジトリをクリアする関数
+
+2. **`apps/appview/vitest.setup.in-memory.ts`** - インメモリテスト用セットアップ
+   - `beforeEach`フックで`clearAllInMemoryRepositories()`を自動実行
+   - テストファイルで個別に`beforeEach`を書く必要なし
+
+3. **`apps/appview/vitest.config.in-memory.ts`** - インメモリテスト用設定
+   - `setupFiles`に`vitest.setup.in-memory.ts`を指定
+   - Docker環境不要でテスト実行可能
+
+**使い方:**
 
 ```typescript
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 
-const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
-const postRepo = testInjector.resolve("postRepository");
-const recordRepo = testInjector.resolve("recordRepository");
-// ... 他のリポジトリ
+describe("GetAuthorFeedUseCase", () => {
+  const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  // ... 他のリポジトリ
+
+  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
+
+  test("テストケース", async () => {
+    // テスト実装
+  });
+});
 ```
 
-個別にDI設定を記述する必要はありません。typed-injectが依存関係を自動解決します。
+個別にDI設定やbeforeEachを記述する必要はありません。typed-injectが依存関係を自動解決し、setupFilesがリポジトリを自動クリアします。
 
 ---
 
@@ -845,30 +867,33 @@ beforeEach(() => {
 `apps/appview`では、すべてのInMemoryリポジトリとServiceが事前設定されたtestInjectorが利用可能です。
 
 ```typescript
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 
-// ユースケースをDI経由で取得（依存関係は自動解決される）
-const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
+describe("GetAuthorFeedUseCase", () => {
+  // ユースケースをDI経由で取得（依存関係は自動解決される）
+  const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
 
-// 必要なリポジトリを取得
-const postRepo = testInjector.resolve("postRepository");
-const recordRepo = testInjector.resolve("recordRepository");
-const profileRepo = testInjector.resolve("profileRepository");
+  // 必要なリポジトリを取得
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
 
-// beforeEachでリポジトリをクリア
-beforeEach(() => {
-  postRepo.clear();
-  recordRepo.clear();
-  profileRepo.clear();
+  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
+
+  test("テストケース", async () => {
+    // テスト実装
+  });
 });
 ```
 
 testInjectorに含まれるもの：
 
-- **InMemoryリポジトリ（12個）**: authorFeedRepository, postRepository, postStatsRepository, profileRepository, followRepository, actorStatsRepository, recordRepository, repostRepository, likeRepository, generatorRepository, timelineRepository, assetUrlBuilder
+- **InMemoryリポジトリ（11個）**: authorFeedRepository, postRepository, postStatsRepository, profileRepository, followRepository, actorStatsRepository, recordRepository, repostRepository, likeRepository, generatorRepository, timelineRepository
+- **InMemoryビルダー（1個）**: assetUrlBuilder
 - **Service（8個）**: profileViewBuilder, postEmbedViewBuilder, profileViewService, generatorViewService, postViewService, replyRefService, feedProcessor, authorFeedService
 
 typed-injectが依存関係を自動的に解決するため、個別にDI設定を記述する必要はありません。
+また、`vitest.setup.in-memory.ts`がすべてのリポジトリを自動的にクリアするため、テストファイルで`beforeEach`を記述する必要もありません。
 
 **インメモリテストの実行方法**
 
@@ -896,7 +921,7 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 
 describe("GetPostThreadUseCase", () => {
   const useCase = testInjector.injectClass(GetPostThreadUseCase);
@@ -905,11 +930,7 @@ describe("GetPostThreadUseCase", () => {
   const recordRepo = testInjector.resolve("recordRepository");
   const profileRepo = testInjector.resolve("profileRepository");
 
-  beforeEach(() => {
-    postRepo.clear();
-    recordRepo.clear();
-    profileRepo.clear();
-  });
+  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // arrange - インメモリリポジトリは空のまま

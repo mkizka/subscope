@@ -4,9 +4,9 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
 
 describe("GetRepostedByUseCase", () => {
@@ -14,11 +14,6 @@ describe("GetRepostedByUseCase", () => {
 
   const repostRepo = testInjector.resolve("repostRepository");
   const profileRepo = testInjector.resolve("profileRepository");
-
-  beforeEach(() => {
-    repostRepo.clear();
-    profileRepo.clear();
-  });
 
   test("リポストがない場合、空のrepostedByを返す", async () => {
     // arrange

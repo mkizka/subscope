@@ -50,3 +50,17 @@ export const testInjector = createInjector()
   .provideClass("likeService", LikeService)
   .provideClass("actorLikesService", ActorLikesService)
   .provideClass("repostService", RepostService);
+
+export const clearAllInMemoryRepositories = () => {
+  testInjector.resolve("authorFeedRepository").clear();
+  testInjector.resolve("postRepository").clear();
+  testInjector.resolve("postStatsRepository").clear();
+  testInjector.resolve("profileRepository").clear();
+  testInjector.resolve("followRepository").clear();
+  testInjector.resolve("actorStatsRepository").clear();
+  testInjector.resolve("recordRepository").clear();
+  testInjector.resolve("repostRepository").clear();
+  testInjector.resolve("likeRepository").clear();
+  testInjector.resolve("generatorRepository").clear();
+  testInjector.resolve("timelineRepository").clear();
+};

@@ -5,9 +5,9 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import type { PostStats } from "../../interfaces/post-stats-repository.js";
 import { GetActorLikesUseCase } from "./get-actor-likes-use-case.js";
 
@@ -19,14 +19,6 @@ describe("GetActorLikesUseCase", () => {
   const postStatsRepo = testInjector.resolve("postStatsRepository");
   const profileRepo = testInjector.resolve("profileRepository");
   const recordRepo = testInjector.resolve("recordRepository");
-
-  beforeEach(() => {
-    likeRepo.clear();
-    postRepo.clear();
-    postStatsRepo.clear();
-    profileRepo.clear();
-    recordRepo.clear();
-  });
 
   test("actorがいいねした投稿がある場合、投稿情報を含むフィードを返す", async () => {
     // arrange
