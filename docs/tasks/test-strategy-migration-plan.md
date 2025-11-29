@@ -750,6 +750,59 @@ export class InMemoryPostRepository implements IPostRepository {
 - ドメインモデル（Post, Actor等）: `@repo/common/domain`からインポート
 - Factory関数（postFactory, actorFactory等）: `@repo/common/test`からインポート
 
+**重要: Factory関数の引数最小化**
+
+Factory関数のすべての引数はオプショナルであり、デフォルト値が提供されています。
+テストコードでは、**必要な引数のみを指定**し、不要な引数は削除してください。
+
+以下の場合のみ引数を指定します：
+
+- **アサーションで検証する値**（例: `displayName`, `text`, `likeCount`）
+- **オブジェクト間の関係を定義する値**（例: `actorDid`, `subjectUri`, `replyRoot`）
+- **テストの順序保証に必要な値**（例: カーソルテストの`createdAt`）
+
+以下の場合は引数を削除します：
+
+- アサーションで使用されない値（例: 結果に含まれない投稿の`text`）
+- デフォルト値で問題ない識別子（例: 特定の値が不要な`did`, `handle`）
+- テストロジックに影響しない値（例: 順序が関係ない場合の`createdAt`）
+
+**悪い例（不要な引数が多い）:**
+
+```typescript
+const author = actorFactory({
+  did: "did:plc:author123", // 不要（アサーションで使用しない）
+  handle: "author.test", // 不要（アサーションで使用しない）
+});
+
+const profile = profileDetailedFactory({
+  actorDid: author.did, // 必要（関係性）
+  displayName: "Author User", // 必要（アサーション）
+  handle: "author.test", // 不要（アサーションで使用しない）
+});
+
+const post = postFactory({
+  actorDid: author.did, // 必要（関係性）
+  text: "Post that won't appear", // 不要（結果に含まれない）
+  createdAt: new Date("2024-01-01T00:00:00Z"), // 不要（順序が関係ない）
+});
+```
+
+**良い例（必要最小限の引数のみ）:**
+
+```typescript
+const author = actorFactory();
+
+const profile = profileDetailedFactory({
+  actorDid: author.did, // 必要（関係性）
+  displayName: "Author User", // 必要（アサーション）
+});
+
+const post = postFactory({
+  actorDid: author.did, // 必要（関係性）
+});
+```
+
 ```typescript
 // 移行後のUseCaseテスト例
 import { FeedItem, Post } from "@repo/common/domain";

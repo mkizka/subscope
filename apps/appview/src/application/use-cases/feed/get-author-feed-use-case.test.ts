@@ -75,15 +75,11 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("posts_with_repliesフィルターで投稿がある場合、投稿とリプライを含むフィードを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:author123",
-      handle: "author.test",
-    });
+    const author = actorFactory();
 
     const profile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "Author User",
-      handle: "author.test",
     });
     profileRepo.add(profile);
 
@@ -174,15 +170,11 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("posts_no_repliesフィルターの場合、リプライを除いた投稿のみを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:noreplies123",
-      handle: "noreplies.test",
-    });
+    const author = actorFactory();
 
     const profile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "No Reply Author",
-      handle: "noreplies.test",
     });
     profileRepo.add(profile);
 
@@ -206,7 +198,6 @@ describe("GetAuthorFeedUseCase", () => {
 
     const reply = postFactory({
       actorDid: author.did,
-      text: "Reply that should not appear",
       replyRoot: { uri: post.uri, cid: post.cid },
       replyParent: { uri: post.uri, cid: post.cid },
       createdAt: new Date("2024-01-04T00:00:00Z"),
@@ -247,26 +238,18 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("リポスト投稿がある場合、reasonを含むフィードアイテムを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:reposter123",
-      handle: "reposter.test",
-    });
-    const originalAuthor = actorFactory({
-      did: "did:plc:original123",
-      handle: "original.test",
-    });
+    const author = actorFactory();
+    const originalAuthor = actorFactory();
 
     const authorProfile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "Reposter",
-      handle: "reposter.test",
     });
     profileRepo.add(authorProfile);
 
     const originalProfile = profileDetailedFactory({
       actorDid: originalAuthor.did,
       displayName: "Original Author",
-      handle: "original.test",
     });
     profileRepo.add(originalProfile);
 
@@ -334,33 +317,23 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("viewerDidが指定された場合、viewer情報が含まれる", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:author456",
-      handle: "author456.test",
-    });
-    const viewer = actorFactory({
-      did: "did:plc:viewer456",
-      handle: "viewer456.test",
-    });
+    const author = actorFactory();
+    const viewer = actorFactory();
 
     const authorProfile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "Author",
-      handle: "author456.test",
     });
     profileRepo.add(authorProfile);
 
     const viewerProfile = profileDetailedFactory({
       actorDid: viewer.did,
       displayName: "Viewer",
-      handle: "viewer456.test",
     });
     profileRepo.add(viewerProfile);
 
     const post = postFactory({
       actorDid: author.did,
-      text: "Post with viewer info",
-      createdAt: new Date("2024-01-07T00:00:00Z"),
     });
     postRepo.add(post);
 
@@ -404,15 +377,11 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("カーソルが指定された場合、指定日時より前の投稿のみを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:cursor123",
-      handle: "cursor.test",
-    });
+    const author = actorFactory();
 
     const authorProfile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "Cursor Test Author",
-      handle: "cursor.test",
     });
     profileRepo.add(authorProfile);
 
@@ -436,7 +405,6 @@ describe("GetAuthorFeedUseCase", () => {
 
     const newerPost = postFactory({
       actorDid: author.did,
-      text: "Newer post",
       createdAt: new Date("2024-01-10T00:00:00Z"),
     });
     postRepo.add(newerPost);
@@ -479,10 +447,7 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("サポートされていないフィルターの場合、空のフィードを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:unsupported123",
-      handle: "unsupported.test",
-    });
+    const author = actorFactory();
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -501,21 +466,16 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("limitが0の場合、空のフィードを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:zerolimit123",
-      handle: "zerolimit.test",
-    });
+    const author = actorFactory();
 
     const profile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "Zero Limit Author",
-      handle: "zerolimit.test",
     });
     profileRepo.add(profile);
 
     const post = postFactory({
       actorDid: author.did,
-      text: "Some post",
     });
     postRepo.add(post);
 
@@ -538,21 +498,16 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("limitが1の場合、1件のみ返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:limitone123",
-      handle: "limitone.test",
-    });
+    const author = actorFactory();
 
     const profile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "Limit Test Author",
-      handle: "limitone.test",
     });
     profileRepo.add(profile);
 
     const post1 = postFactory({
       actorDid: author.did,
-      text: "Post 1",
       createdAt: new Date("2024-01-11T00:00:00Z"),
     });
     postRepo.add(post1);
@@ -612,15 +567,11 @@ describe("GetAuthorFeedUseCase", () => {
 
   test("投稿がない場合、空のフィードを返す", async () => {
     // arrange
-    const author = actorFactory({
-      did: "did:plc:noposts123",
-      handle: "noposts.test",
-    });
+    const author = actorFactory();
 
     const profile = profileDetailedFactory({
       actorDid: author.did,
       displayName: "No Posts User",
-      handle: "noposts.test",
     });
     profileRepo.add(profile);
 
