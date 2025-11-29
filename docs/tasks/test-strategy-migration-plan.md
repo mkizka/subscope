@@ -25,7 +25,7 @@
 - [ ] **Phase 4**: appview Feed/Actor Serviceの移行
 - [ ] **Phase 5**: appview Graph/Actor UseCaseの移行
 - [ ] **Phase 6-A**: appview Admin UseCaseの移行
-- [ ] **Phase 6-B**: appview Subscription UseCaseの移行
+- [x] **Phase 6-B**: appview Subscription UseCaseの移行
 
 ### Phase 7: appviewリポジトリテスト追加
 
