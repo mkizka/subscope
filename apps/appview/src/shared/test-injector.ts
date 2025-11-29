@@ -8,6 +8,8 @@ import { GeneratorViewService } from "../application/service/feed/generator-view
 import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-view-builder.js";
 import { PostViewService } from "../application/service/feed/post-view-service.js";
 import { ReplyRefService } from "../application/service/feed/reply-ref-service.js";
+import { TimelineService } from "../application/service/feed/timeline-service.js";
+import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
 import { InMemoryAuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.in-memory.js";
@@ -41,4 +43,6 @@ export const testInjector = createInjector()
   .provideClass("postViewService", PostViewService)
   .provideClass("replyRefService", ReplyRefService)
   .provideClass("feedProcessor", FeedProcessor)
+  .provideClass("timelineService", TimelineService)
+  .provideClass("searchService", PostSearchService)
   .provideClass("authorFeedService", AuthorFeedService);
