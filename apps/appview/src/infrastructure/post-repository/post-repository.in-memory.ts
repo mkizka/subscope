@@ -24,20 +24,18 @@ export class InMemoryPostRepository implements IPostRepository {
       posts = posts.filter((post) => post.createdAt < cursorDate);
     }
 
-    return Promise.resolve(posts.slice(0, params.limit));
+    return posts.slice(0, params.limit);
   }
 
   async findByUris(uris: AtUri[]): Promise<Post[]> {
     const uriStrings = uris.map((uri) => uri.toString());
-    return Promise.resolve(
-      Array.from(this.posts.values()).filter((post) =>
-        uriStrings.includes(post.uri.toString()),
-      ),
+    return Array.from(this.posts.values()).filter((post) =>
+      uriStrings.includes(post.uri.toString()),
     );
   }
 
   async findByUri(uri: AtUri): Promise<Post | null> {
-    return Promise.resolve(this.posts.get(uri.toString()) ?? null);
+    return this.posts.get(uri.toString()) ?? null;
   }
 
   async findReplies(uri: AtUri, limit?: number): Promise<Post[]> {
@@ -54,7 +52,7 @@ export class InMemoryPostRepository implements IPostRepository {
       replies = replies.slice(0, limit);
     }
 
-    return Promise.resolve(replies);
+    return replies;
   }
 
   async search(params: {
@@ -75,6 +73,6 @@ export class InMemoryPostRepository implements IPostRepository {
       posts = posts.filter((post) => post.createdAt < cursorDate);
     }
 
-    return Promise.resolve(posts.slice(0, params.limit));
+    return posts.slice(0, params.limit);
   }
 }

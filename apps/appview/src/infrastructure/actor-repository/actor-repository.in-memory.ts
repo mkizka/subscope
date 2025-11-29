@@ -15,7 +15,7 @@ export class InMemoryActorRepository implements IActorRepository {
   }
 
   async findByDid(did: Did): Promise<Actor | null> {
-    return Promise.resolve(this.actors.get(did) ?? null);
+    return this.actors.get(did) ?? null;
   }
 
   async upsert(params: {
@@ -23,6 +23,5 @@ export class InMemoryActorRepository implements IActorRepository {
     actor: Actor;
   }): Promise<void> {
     this.actors.set(params.actor.did, params.actor);
-    return Promise.resolve();
   }
 }

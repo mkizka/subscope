@@ -16,10 +16,8 @@ export class InMemoryRecordRepository implements IRecordRepository {
 
   async findByUris(uris: AtUri[]): Promise<Record[]> {
     const uriStrings = uris.map((uri) => uri.toString());
-    return Promise.resolve(
-      Array.from(this.records.values()).filter((record) =>
-        uriStrings.includes(record.uri.toString()),
-      ),
+    return Array.from(this.records.values()).filter((record) =>
+      uriStrings.includes(record.uri.toString()),
     );
   }
 }

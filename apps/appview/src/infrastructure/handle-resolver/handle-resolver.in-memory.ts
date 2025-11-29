@@ -22,18 +22,16 @@ export class InMemoryHandleResolver implements IHandleResolver {
     if (!did) {
       throw new HandleResolutionError(handle);
     }
-    return Promise.resolve(did);
+    return did;
   }
 
   async resolveMany(handles: Handle[]): Promise<Record<Handle, Did>> {
-    return Promise.resolve(
-      handles.reduce<Record<Handle, Did>>((acc, handle) => {
-        const did = this.handleToDid.get(handle);
-        if (did) {
-          acc[handle] = did;
-        }
-        return acc;
-      }, {}),
-    );
+    return handles.reduce<Record<Handle, Did>>((acc, handle) => {
+      const did = this.handleToDid.get(handle);
+      if (did) {
+        acc[handle] = did;
+      }
+      return acc;
+    }, {});
   }
 }

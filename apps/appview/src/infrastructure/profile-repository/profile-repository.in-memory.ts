@@ -15,11 +15,9 @@ export class InMemoryProfileRepository implements IProfileRepository {
   }
 
   async findManyDetailed(dids: Did[]): Promise<ProfileDetailed[]> {
-    return Promise.resolve(
-      dids
-        .map((did) => this.profiles.get(did))
-        .filter((profile): profile is ProfileDetailed => profile !== undefined),
-    );
+    return dids
+      .map((did) => this.profiles.get(did))
+      .filter((profile): profile is ProfileDetailed => profile !== undefined);
   }
 
   async searchActors(params: {
@@ -44,6 +42,6 @@ export class InMemoryProfileRepository implements IProfileRepository {
       profiles = profiles.filter((profile) => profile.indexedAt < cursorDate);
     }
 
-    return Promise.resolve(profiles.slice(0, params.limit));
+    return profiles.slice(0, params.limit);
   }
 }
