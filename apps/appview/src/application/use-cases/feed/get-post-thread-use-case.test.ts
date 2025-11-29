@@ -3,7 +3,7 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { testInjector } from "../../../shared/test-utils.js";
@@ -17,6 +17,9 @@ describe("GetPostThreadUseCase", () => {
   const postStatsRepo = testInjector.resolve("postStatsRepository");
   const profileRepo = testInjector.resolve("profileRepository");
   const recordRepo = testInjector.resolve("recordRepository");
+
+  const spyFindByUri = vi.spyOn(postRepo, "findByUri");
+  const spyFindReplies = vi.spyOn(postRepo, "findReplies");
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // act
@@ -34,6 +37,10 @@ describe("GetPostThreadUseCase", () => {
       uri: "at://did:plc:notexist/app.bsky.feed.post/notexist",
       notFound: true,
     });
+    // ターゲット投稿の取得で1回のみ
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // 投稿が見つからないのでリプライ取得は行われない
+    expect(spyFindReplies).toHaveBeenCalledTimes(0);
   });
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
@@ -79,6 +86,10 @@ describe("GetPostThreadUseCase", () => {
       parent: undefined,
       replies: [],
     });
+    // ターゲット投稿の取得で1回
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // ターゲット投稿のリプライ取得で1回
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
   });
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
@@ -185,6 +196,10 @@ describe("GetPostThreadUseCase", () => {
         },
       },
     });
+    // ターゲット投稿で1回、親投稿チェーンで2回（parent, root）
+    expect(spyFindByUri).toHaveBeenCalledTimes(3);
+    // ターゲット投稿のリプライ取得で1回のみ
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
   });
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
@@ -296,6 +311,10 @@ describe("GetPostThreadUseCase", () => {
         },
       ],
     });
+    // ターゲット投稿の取得で1回のみ
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // ルート投稿のリプライ、reply投稿のリプライ、grandchild投稿のリプライ（結果なし）で3回
+    expect(spyFindReplies).toHaveBeenCalledTimes(3);
   });
 
   test("depthより大きい深さのリプライは取得しない", async () => {
@@ -431,6 +450,10 @@ describe("GetPostThreadUseCase", () => {
         },
       ],
     });
+    // ターゲット投稿の取得で1回
+    expect(spyFindByUri).toHaveBeenCalledTimes(1);
+    // depth=2の制限により、ルート投稿と深さ1の投稿のリプライのみ取得（計2回）
+    expect(spyFindReplies).toHaveBeenCalledTimes(2);
   });
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
@@ -562,5 +585,9 @@ describe("GetPostThreadUseCase", () => {
       },
       replies: [],
     });
+    // ターゲット投稿で1回、親投稿チェーンで2回（level2, level1）
+    expect(spyFindByUri).toHaveBeenCalledTimes(3);
+    // ターゲット投稿のリプライ取得で1回のみ
+    expect(spyFindReplies).toHaveBeenCalledTimes(1);
   });
 });
