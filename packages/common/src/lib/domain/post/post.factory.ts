@@ -7,9 +7,10 @@ import {
   fakeDid,
   fakeText,
 } from "../../utils/fake.js";
+import { recordFactory } from "../record/record.factory.js";
 import { Post, type PostParams } from "./post.js";
 
-export function postFactory(params?: Partial<PostParams>): Post {
+export function postFactory(params?: Partial<PostParams>) {
   const normalizeRef = (
     ref: { uri: AtUri | string; cid: string } | null | undefined,
   ) => {
@@ -20,7 +21,7 @@ export function postFactory(params?: Partial<PostParams>): Post {
     };
   };
 
-  return new Post({
+  const post = new Post({
     uri: params?.uri ?? fakeAtUri({ collection: "app.bsky.feed.post" }),
     cid: params?.cid ?? fakeCid(),
     actorDid: params?.actorDid ?? fakeDid(),
@@ -32,4 +33,17 @@ export function postFactory(params?: Partial<PostParams>): Post {
     createdAt: params?.createdAt ?? fakeDate(),
     indexedAt: params?.indexedAt ?? fakeDate(),
   });
+
+  const record = recordFactory({
+    uri: post.uri.toString(),
+    cid: post.cid,
+    json: {
+      $type: "app.bsky.feed.post",
+      text: post.text,
+      createdAt: post.createdAt.toISOString(),
+    },
+    indexedAt: post.indexedAt,
+  });
+
+  return { post, record };
 }

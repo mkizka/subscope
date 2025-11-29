@@ -17,6 +17,6 @@ export * from "./lib/domain/post/embed-record-with-media.js";
 export * from "./lib/domain/post/post.js";
 export * from "./lib/domain/profile/profile.js";
 export * from "./lib/domain/profile/profile-detailed.js";
-export * from "./lib/domain/record.js";
+export * from "./lib/domain/record/record.js";
 export * from "./lib/domain/repost/repost.js";
 export * from "./lib/domain/subscription.js";

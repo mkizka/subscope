@@ -6,5 +6,6 @@ export * from "./lib/domain/like/like.factory.js";
 export * from "./lib/domain/post/post.factory.js";
 export * from "./lib/domain/profile/profile.factory.js";
 export * from "./lib/domain/profile/profile-detailed.factory.js";
+export * from "./lib/domain/record/record.factory.js";
 export * from "./lib/domain/repost/repost.factory.js";
 export * from "./lib/utils/fake.js";

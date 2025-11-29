@@ -63,6 +63,7 @@ describe("GetAuthorFeedUseCase", () => {
   const postRepo = injector.resolve("postRepository");
   const postStatsRepo = injector.resolve("postStatsRepository");
   const profileRepo = injector.resolve("profileRepository");
+  const recordRepo = injector.resolve("recordRepository");
   const repostRepo = injector.resolve("repostRepository");
 
   beforeEach(() => {
@@ -70,6 +71,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.clear();
     postStatsRepo.clear();
     profileRepo.clear();
+    recordRepo.clear();
     repostRepo.clear();
   });
 
@@ -83,12 +85,13 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(profile);
 
-    const post = postFactory({
+    const { post, record } = postFactory({
       actorDid: author.did,
       text: "Original post",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
     postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 5,
@@ -101,7 +104,7 @@ describe("GetAuthorFeedUseCase", () => {
     const postFeedItem = FeedItem.fromPost(post);
     authorFeedRepo.add(postFeedItem, false);
 
-    const reply = postFactory({
+    const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
       text: "Reply post",
       replyRoot: { uri: post.uri, cid: post.cid },
@@ -109,6 +112,7 @@ describe("GetAuthorFeedUseCase", () => {
       createdAt: new Date("2024-01-02T00:00:00Z"),
     });
     postRepo.add(reply);
+    recordRepo.add(replyRecord);
 
     const replyStats: PostStats = {
       likeCount: 0,
@@ -178,12 +182,13 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(profile);
 
-    const post = postFactory({
+    const { post, record } = postFactory({
       actorDid: author.did,
       text: "Regular post",
       createdAt: new Date("2024-01-03T00:00:00Z"),
     });
     postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -196,13 +201,14 @@ describe("GetAuthorFeedUseCase", () => {
     const postFeedItem = FeedItem.fromPost(post);
     authorFeedRepo.add(postFeedItem, false);
 
-    const reply = postFactory({
+    const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
       replyRoot: { uri: post.uri, cid: post.cid },
       replyParent: { uri: post.uri, cid: post.cid },
       createdAt: new Date("2024-01-04T00:00:00Z"),
     });
     postRepo.add(reply);
+    recordRepo.add(replyRecord);
 
     const replyFeedItem = FeedItem.fromPost(reply);
     authorFeedRepo.add(replyFeedItem, true);
@@ -253,12 +259,13 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(originalProfile);
 
-    const originalPost = postFactory({
+    const { post: originalPost, record: originalRecord } = postFactory({
       actorDid: originalAuthor.did,
       text: "Original post to be reposted",
       createdAt: new Date("2024-01-05T00:00:00Z"),
     });
     postRepo.add(originalPost);
+    recordRepo.add(originalRecord);
 
     const originalPostStats: PostStats = {
       likeCount: 0,
@@ -332,10 +339,11 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(viewerProfile);
 
-    const post = postFactory({
+    const { post, record } = postFactory({
       actorDid: author.did,
     });
     postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -385,12 +393,13 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(authorProfile);
 
-    const olderPost = postFactory({
+    const { post: olderPost, record: olderRecord } = postFactory({
       actorDid: author.did,
       text: "Older post",
       createdAt: new Date("2024-01-08T00:00:00Z"),
     });
     postRepo.add(olderPost);
+    recordRepo.add(olderRecord);
 
     const olderPostStats: PostStats = {
       likeCount: 0,
@@ -403,11 +412,12 @@ describe("GetAuthorFeedUseCase", () => {
     const olderPostFeedItem = FeedItem.fromPost(olderPost);
     authorFeedRepo.add(olderPostFeedItem, false);
 
-    const newerPost = postFactory({
+    const { post: newerPost, record: newerRecord } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-10T00:00:00Z"),
     });
     postRepo.add(newerPost);
+    recordRepo.add(newerRecord);
 
     const newerPostStats: PostStats = {
       likeCount: 0,
@@ -474,10 +484,11 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(profile);
 
-    const post = postFactory({
+    const { post, record } = postFactory({
       actorDid: author.did,
     });
     postRepo.add(post);
+    recordRepo.add(record);
 
     const postFeedItem = FeedItem.fromPost(post);
     authorFeedRepo.add(postFeedItem, false);
@@ -506,11 +517,12 @@ describe("GetAuthorFeedUseCase", () => {
     });
     profileRepo.add(profile);
 
-    const post1 = postFactory({
+    const { post: post1, record: record1 } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-11T00:00:00Z"),
     });
     postRepo.add(post1);
+    recordRepo.add(record1);
 
     const post1Stats: PostStats = {
       likeCount: 0,
@@ -523,12 +535,13 @@ describe("GetAuthorFeedUseCase", () => {
     const post1FeedItem = FeedItem.fromPost(post1);
     authorFeedRepo.add(post1FeedItem, false);
 
-    const post2 = postFactory({
+    const { post: post2, record: record2 } = postFactory({
       actorDid: author.did,
       text: "Post 2",
       createdAt: new Date("2024-01-12T00:00:00Z"),
     });
     postRepo.add(post2);
+    recordRepo.add(record2);
 
     const post2Stats: PostStats = {
       likeCount: 0,
