@@ -5,7 +5,7 @@ import { inArray } from "drizzle-orm";
 import type {
   ActorStats,
   IActorStatsRepository,
-} from "../application/interfaces/actor-stats-repository.js";
+} from "../../application/interfaces/actor-stats-repository.js";
 
 export class ActorStatsRepository implements IActorStatsRepository {
   constructor(private readonly db: DatabaseClient) {}

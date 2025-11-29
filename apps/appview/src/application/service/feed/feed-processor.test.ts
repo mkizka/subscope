@@ -13,16 +13,16 @@ import {
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { GeneratorRepository } from "../../../infrastructure/generator-repository.js";
+import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";
 import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
 import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
 import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { RecordRepository } from "../../../infrastructure/record-repository.js";
+import { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
 import { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
 import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
 import { ProfileViewService } from "../actor/profile-view-service.js";

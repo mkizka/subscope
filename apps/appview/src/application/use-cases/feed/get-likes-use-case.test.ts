@@ -7,7 +7,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
 import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
