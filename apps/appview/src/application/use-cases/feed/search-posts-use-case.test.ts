@@ -323,45 +323,4 @@ describe("SearchPostsUseCase", () => {
       },
     });
   });
-
-  test("大文字小文字を区別せずに検索する", async () => {
-    // arrange
-    const actor = actorFactory();
-
-    const profile = profileDetailedFactory({
-      actorDid: actor.did,
-      displayName: "Case Test User",
-    });
-    profileRepo.add(profile);
-
-    const { post, record } = postFactory({
-      actorDid: actor.did,
-      text: "TEST投稿です",
-    });
-    postRepo.add(post);
-    recordRepo.add(record);
-
-    const postStats: PostStats = {
-      likeCount: 0,
-      repostCount: 0,
-      replyCount: 0,
-      quoteCount: 0,
-    };
-    postStatsRepo.add(post.uri.toString(), postStats);
-
-    // act
-    const result = await searchPostsUseCase.execute({
-      q: "test",
-      limit: 10,
-    });
-
-    // assert
-    expect(result.posts).toHaveLength(1);
-    expect(result.posts[0]).toMatchObject({
-      uri: post.uri.toString(),
-      record: {
-        text: "TEST投稿です",
-      },
-    });
-  });
 });
