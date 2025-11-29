@@ -21,10 +21,6 @@ import { InMemoryRecordRepository } from "../infrastructure/record-repository/re
 import { InMemoryRepostRepository } from "../infrastructure/repost-repository/repost-repository.in-memory.js";
 import { InMemoryTimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.in-memory.js";
 
-/**
- * appview用のインメモリテスト専用injector
- * すべてのInMemoryリポジトリとServiceが事前設定済み
- */
 export const testInjector = createInjector()
   .provideClass("authorFeedRepository", InMemoryAuthorFeedRepository)
   .provideClass("postRepository", InMemoryPostRepository)
