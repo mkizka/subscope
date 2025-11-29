@@ -396,6 +396,21 @@ asset-url-builder.ts       → asset-url-builder/asset-url-builder.ts
 - Timeline/PostThreadに比べて複雑なリレーション処理が少ない
 - スレッド構造などの再帰的な処理がない
 
+**重要な実装:**
+
+このフェーズで`apps/appview/src/shared/test-injector.ts`を作成しました。すべてのInMemoryリポジトリとServiceが事前設定されているため、テストファイルでは以下のようにシンプルに記述できます：
+
+```typescript
+import { testInjector } from "../../../shared/test-injector.js";
+
+const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
+const postRepo = testInjector.resolve("postRepository");
+const recordRepo = testInjector.resolve("recordRepository");
+// ... 他のリポジトリ
+```
+
+個別にDI設定を記述する必要はありません。typed-injectが依存関係を自動解決します。
+
 ---
 
 ### Phase 3-A: appview Feed UseCaseの移行（Part 1）
@@ -825,6 +840,36 @@ beforeEach(() => {
 });
 ```
 
+**appview用testInjectorの使用**
+
+`apps/appview`では、すべてのInMemoryリポジトリとServiceが事前設定されたtestInjectorが利用可能です。
+
+```typescript
+import { testInjector } from "../../../shared/test-injector.js";
+
+// ユースケースをDI経由で取得（依存関係は自動解決される）
+const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
+
+// 必要なリポジトリを取得
+const postRepo = testInjector.resolve("postRepository");
+const recordRepo = testInjector.resolve("recordRepository");
+const profileRepo = testInjector.resolve("profileRepository");
+
+// beforeEachでリポジトリをクリア
+beforeEach(() => {
+  postRepo.clear();
+  recordRepo.clear();
+  profileRepo.clear();
+});
+```
+
+testInjectorに含まれるもの：
+
+- **InMemoryリポジトリ（12個）**: authorFeedRepository, postRepository, postStatsRepository, profileRepository, followRepository, actorStatsRepository, recordRepository, repostRepository, likeRepository, generatorRepository, timelineRepository, assetUrlBuilder
+- **Service（8個）**: profileViewBuilder, postEmbedViewBuilder, profileViewService, generatorViewService, postViewService, replyRefService, feedProcessor, authorFeedService
+
+typed-injectが依存関係を自動的に解決するため、個別にDI設定を記述する必要はありません。
+
 **インメモリテストの実行方法**
 
 Docker環境が利用できない場合は、インメモリリポジトリ専用のvitest設定を使用してテストを実行できます。
@@ -851,23 +896,14 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { InMemoryPostRepository } from "../../infrastructure/post-repository/post-repository.in-memory.js";
-import { InMemoryRecordRepository } from "../../infrastructure/record-repository/record-repository.in-memory.js";
-import { InMemoryProfileRepository } from "../../infrastructure/profile-repository/profile-repository.in-memory.js";
+import { testInjector } from "../../../shared/test-injector.js";
 
 describe("GetPostThreadUseCase", () => {
-  const { testInjector } = testSetup;
+  const useCase = testInjector.injectClass(GetPostThreadUseCase);
 
-  const injector = testInjector
-    .provideClass("postRepository", InMemoryPostRepository)
-    .provideClass("recordRepository", InMemoryRecordRepository)
-    .provideClass("profileRepository", InMemoryProfileRepository);
-  // ...
-
-  const useCase = injector.injectClass(GetPostThreadUseCase);
-  const postRepo = injector.resolve("postRepository");
-  const recordRepo = injector.resolve("recordRepository");
-  const profileRepo = injector.resolve("profileRepository");
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
 
   beforeEach(() => {
     postRepo.clear();
