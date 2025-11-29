@@ -8,7 +8,7 @@ import {
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository.js";
+import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository/invite-code-repository.js";
 import { InviteCodeService } from "../../service/admin/invite-code-service.js";
 import { GetInviteCodesUseCase } from "./get-invite-codes-use-case.js";
 

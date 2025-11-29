@@ -11,8 +11,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../infrastructure/actor-repository/actor-repository.js";
-import { InviteCodeRepository } from "../infrastructure/invite-code-repository.js";
-import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
+import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
+import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import { SyncRepoScheduler } from "./service/scheduler/sync-repo-scheduler.js";
 import {
   AlreadySubscribedError,

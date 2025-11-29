@@ -8,7 +8,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { ActorRepository } from "../infrastructure/actor-repository/actor-repository.js";
-import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
+import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import { GetSubscriptionStatusUseCase } from "./get-subscription-status-use-case.js";
 
 describe("GetSubscriptionStatusUseCase", () => {

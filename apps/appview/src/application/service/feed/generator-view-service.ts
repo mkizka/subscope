@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 
-import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
+import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
 import type { IGeneratorRepository } from "../../interfaces/generator-repository.js";
 import { toMapByDid } from "../../utils/map.js";
 import type { ProfileViewService } from "../actor/profile-view-service.js";

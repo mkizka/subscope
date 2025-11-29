@@ -9,8 +9,8 @@ import { asHandle } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { and, desc, eq, lt } from "drizzle-orm";
 
-import type { InviteCodeDto } from "../application/dto/invite-code-with-handle.js";
-import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
+import type { InviteCodeDto } from "../../application/dto/invite-code-with-handle.js";
+import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
 
 export class InviteCodeRepository implements IInviteCodeRepository {
   constructor(private readonly db: DatabaseClient) {}

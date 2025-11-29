@@ -14,7 +14,7 @@ import {
   PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 
-import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
+import type { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
 
 export class PostEmbedViewBuilder {
   constructor(private readonly assetUrlBuilder: AssetUrlBuilder) {}

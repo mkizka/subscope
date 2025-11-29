@@ -14,10 +14,10 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder.js";
+import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
 import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";
-import { HandleResolver } from "../../../infrastructure/handle-resolver.js";
+import { HandleResolver } from "../../../infrastructure/handle-resolver/handle-resolver.js";
 import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
 import { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
 import { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";

@@ -7,7 +7,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { SubscriptionRepository } from "../infrastructure/subscription-repository.js";
+import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import {
   NotSubscribedError,
   UnsubscribeServerUseCase,
