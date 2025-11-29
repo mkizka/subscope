@@ -29,6 +29,10 @@ export class Follow {
     this.indexedAt = params.indexedAt;
   }
 
+  get sortAt(): Date {
+    return this.indexedAt < this.createdAt ? this.indexedAt : this.createdAt;
+  }
+
   static from(record: Record) {
     const parsed = record.validate("app.bsky.graph.follow");
     return new Follow({

@@ -15,12 +15,6 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows = [];
   }
 
-  private getSortAt(follow: Follow): Date {
-    return follow.indexedAt < follow.createdAt
-      ? follow.indexedAt
-      : follow.createdAt;
-  }
-
   async findFollows(params: {
     actorDid: Did;
     limit: number;
@@ -32,12 +26,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
 
     if (params.cursor) {
       const cursorDate = new Date(params.cursor);
-      items = items.filter((follow) => this.getSortAt(follow) < cursorDate);
+      items = items.filter((follow) => follow.sortAt < cursorDate);
     }
 
-    items.sort(
-      (a, b) => this.getSortAt(b).getTime() - this.getSortAt(a).getTime(),
-    );
+    items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
     return items.slice(0, params.limit);
   }
@@ -53,12 +45,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
 
     if (params.cursor) {
       const cursorDate = new Date(params.cursor);
-      items = items.filter((follow) => this.getSortAt(follow) < cursorDate);
+      items = items.filter((follow) => follow.sortAt < cursorDate);
     }
 
-    items.sort(
-      (a, b) => this.getSortAt(b).getTime() - this.getSortAt(a).getTime(),
-    );
+    items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
     return items.slice(0, params.limit);
   }
