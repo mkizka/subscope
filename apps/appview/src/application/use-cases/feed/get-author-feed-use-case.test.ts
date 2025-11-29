@@ -1,11 +1,11 @@
 import { asDid } from "@atproto/did";
+import { FeedItem } from "@repo/common/domain";
 import {
   actorFactory,
   postFactory,
   profileDetailedFactory,
   repostFactory,
-} from "@repo/common/domain";
-import { FeedItem } from "@repo/common/domain";
+} from "@repo/common/test";
 import { testSetup } from "@repo/test-utils";
 import { beforeEach, describe, expect, test } from "vitest";
 

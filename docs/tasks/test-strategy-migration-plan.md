@@ -745,9 +745,15 @@ export class InMemoryPostRepository implements IPostRepository {
 
 ### 移行後のテストパターン
 
+**重要: Factory関数のインポート元**
+
+- ドメインモデル（Post, Actor等）: `@repo/common/domain`からインポート
+- Factory関数（postFactory, actorFactory等）: `@repo/common/test`からインポート
+
 ```typescript
 // 移行後のUseCaseテスト例
-import { postFactory, actorFactory } from "@repo/common/domain";
+import { FeedItem, Post } from "@repo/common/domain";
+import { actorFactory, postFactory, profileDetailedFactory } from "@repo/common/test";
 import { InMemoryPostRepository } from "../../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryProfileRepository } from "../../infrastructure/profile-repository/profile-repository.in-memory.js";
 
@@ -812,6 +818,7 @@ describe("GetPostThreadUseCase", () => {
 - [setup.ts](packages/test-utils/src/setup.ts) - テストセットアップ
 - リポジトリインターフェース（各アプリのapplication/interfaces/配下）
 - ドメインモデル（packages/common/src/lib/domain/配下）
+- **重要**: Factory関数は `packages/common/src/test.ts` からエクスポートされる
 
 ### 新規作成が必要なファイル
 
@@ -821,8 +828,8 @@ describe("GetPostThreadUseCase", () => {
 
 ### 変更が必要なファイル
 
-- `packages/common/src/lib/domain/index.ts` - Factory関数のエクスポート追加
-- `packages/common/package.json` - devDependencies に "@faker-js/faker" を追加
+- `packages/common/src/test.ts` - Factory関数のエクスポート追加（**domainではなくtest**）
+- `packages/common/package.json` - devDependencies に "@faker-js/faker" を追加（既に追加済み）
 
 ---
 
