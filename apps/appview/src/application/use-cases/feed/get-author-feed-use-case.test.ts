@@ -6,9 +6,9 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-injector.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import type { PostStats } from "../../interfaces/post-stats-repository.js";
 import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
 
@@ -21,15 +21,6 @@ describe("GetAuthorFeedUseCase", () => {
   const profileRepo = testInjector.resolve("profileRepository");
   const recordRepo = testInjector.resolve("recordRepository");
   const repostRepo = testInjector.resolve("repostRepository");
-
-  beforeEach(() => {
-    authorFeedRepo.clear();
-    postRepo.clear();
-    postStatsRepo.clear();
-    profileRepo.clear();
-    recordRepo.clear();
-    repostRepo.clear();
-  });
 
   test("posts_with_repliesフィルターで投稿がある場合、投稿とリプライを含むフィードを返す", async () => {
     // arrange
