@@ -1,16 +1,10 @@
-import { testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository/invite-code-repository.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  const { testInjector } = testSetup;
-
-  const useCase = testInjector
-    .provideClass("inviteCodeRepository", InviteCodeRepository)
-    .provideValue("publicUrl", "https://example.com")
-    .injectClass(CreateInviteCodeUseCase);
+  const useCase = testInjector.injectClass(CreateInviteCodeUseCase);
 
   test("有効期限が適切に指定されている場合、招待コードと有効期限を返す", async () => {
     // arrange
