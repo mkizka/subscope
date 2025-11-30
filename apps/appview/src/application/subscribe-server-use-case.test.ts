@@ -1,18 +1,14 @@
 import { asDid } from "@atproto/did";
 import type { IJobQueue } from "@repo/common/domain";
-import { TransactionManager } from "@repo/common/infrastructure";
 import {
   actorFactory,
   inviteCodeFactory,
   subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
+} from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../infrastructure/actor-repository/actor-repository.js";
-import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
-import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
+import { testInjector } from "../shared/test-utils.js";
 import { SyncRepoScheduler } from "./service/scheduler/sync-repo-scheduler.js";
 import {
   AlreadySubscribedError,
@@ -24,30 +20,28 @@ const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
   const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = testSetup;
 
   const subscribeServerUseCase = testInjector
-    .provideClass("transactionManager", TransactionManager)
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("inviteCodeRepository", InviteCodeRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
     .provideValue("jobQueue", mockJobQueue)
     .provideClass("syncRepoScheduler", SyncRepoScheduler)
     .injectClass(SubscribeServerUseCase);
 
+  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
+  const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
+  const actorRepo = testInjector.resolve("actorRepository");
+
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(now);
+    mockJobQueue.add.mockReset();
   });
 
   test("有効な招待コードの場合、サブスクリプションを作成して招待コードの使用時間を更新する", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const inviteCode = await inviteCodeFactory(ctx.db)
-      .props({
-        expiresAt: () => now,
-      })
-      .create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
+    const inviteCode = inviteCodeFactory({ expiresAt: now });
+    inviteCodeRepo.add(inviteCode);
 
     // act
     await subscribeServerUseCase.execute({
@@ -56,16 +50,14 @@ describe("SubscribeServerUseCase", () => {
     });
 
     // assert
-    const savedSubscription = await ctx.db.query.subscriptions.findFirst({
-      where: (subscriptions, { eq }) => eq(subscriptions.actorDid, actor.did),
-    });
+    const savedSubscription = await subscriptionRepo.findFirst(
+      asDid(actor.did),
+    );
     expect(savedSubscription).toMatchObject({
       actorDid: actor.did,
       inviteCode: inviteCode.code,
     });
-    const updatedInviteCode = await ctx.db.query.inviteCodes.findFirst({
-      where: (inviteCodes, { eq }) => eq(inviteCodes.code, inviteCode.code),
-    });
+    const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).toEqual(now);
     expect(mockJobQueue.add).toHaveBeenCalledWith({
       queueName: "syncRepo",
@@ -76,7 +68,8 @@ describe("SubscribeServerUseCase", () => {
 
   test("招待コードが提供されない場合、InvalidInviteCodeErrorをthrowする", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
 
     // act & assert
     await expect(
@@ -88,14 +81,15 @@ describe("SubscribeServerUseCase", () => {
 
   test("すでにサブスクライブ済みの場合、AlreadySubscribedErrorをthrowする", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const inviteCode = await inviteCodeFactory(ctx.db).create();
-    await subscriptionFactory(ctx.db)
-      .vars({
-        actor: () => actor,
-        inviteCode: () => inviteCode,
-      })
-      .create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
+    const inviteCode = inviteCodeFactory();
+    inviteCodeRepo.add(inviteCode);
+    const subscription = subscriptionFactory({
+      actorDid: actor.did,
+      inviteCode: inviteCode.code,
+    });
+    subscriptionRepo.add(subscription);
 
     // act & assert
     await expect(
@@ -110,7 +104,8 @@ describe("SubscribeServerUseCase", () => {
 
   test("招待コードが存在しない場合、InvalidInviteCodeErrorをthrowする", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
 
     // act & assert
     await expect(
@@ -123,12 +118,12 @@ describe("SubscribeServerUseCase", () => {
 
   test("招待コードが期限切れの場合、InvalidInviteCodeErrorをthrowする", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const expiredInviteCode = await inviteCodeFactory(ctx.db)
-      .props({
-        expiresAt: () => new Date("2024-12-31T23:59:59.999Z"), // nowより1ミリ秒前
-      })
-      .create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
+    const expiredInviteCode = inviteCodeFactory({
+      expiresAt: new Date("2024-12-31T23:59:59.999Z"),
+    });
+    inviteCodeRepo.add(expiredInviteCode);
 
     // act & assert
     await expect(
@@ -145,13 +140,13 @@ describe("SubscribeServerUseCase", () => {
 
   test("招待コードがすでに使用されている場合、InvalidInviteCodeErrorをthrowする", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const inviteCode = await inviteCodeFactory(ctx.db)
-      .props({
-        expiresAt: () => new Date("2025-01-01T00:00:00.001Z"), // 有効期限は未来
-        usedAt: () => new Date("2024-12-31T23:59:59.999Z"), // すでに使用済み
-      })
-      .create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
+    const inviteCode = inviteCodeFactory({
+      expiresAt: new Date("2025-01-01T00:00:00.001Z"),
+      usedAt: new Date("2024-12-31T23:59:59.999Z"),
+    });
+    inviteCodeRepo.add(inviteCode);
 
     // act & assert
     await expect(
@@ -169,11 +164,8 @@ describe("SubscribeServerUseCase", () => {
   test("Actorが存在しない場合、Actorを作成してサブスクリプションを作成する", async () => {
     // arrange
     const did = asDid("did:plc:test123456789abcdefghijk");
-    const inviteCode = await inviteCodeFactory(ctx.db)
-      .props({
-        expiresAt: () => now,
-      })
-      .create();
+    const inviteCode = inviteCodeFactory({ expiresAt: now });
+    inviteCodeRepo.add(inviteCode);
 
     // act
     await subscribeServerUseCase.execute({
@@ -182,10 +174,8 @@ describe("SubscribeServerUseCase", () => {
     });
 
     // assert
-    const savedActor = await ctx.db.query.actors.findFirst({
-      where: (actors, { eq }) => eq(actors.did, did),
-    });
-    expect(savedActor).toEqual({
+    const savedActor = await actorRepo.findByDid(did);
+    expect(savedActor).toMatchObject({
       did,
       handle: null,
       syncRepoStatus: "dirty",
@@ -193,10 +183,8 @@ describe("SubscribeServerUseCase", () => {
       indexedAt: now,
     });
 
-    const savedSubscription = await ctx.db.query.subscriptions.findFirst({
-      where: (subscriptions, { eq }) => eq(subscriptions.actorDid, did),
-    });
-    expect(savedSubscription).toEqual({
+    const savedSubscription = await subscriptionRepo.findFirst(did);
+    expect(savedSubscription).toMatchObject({
       actorDid: did,
       inviteCode: inviteCode.code,
       createdAt: now,

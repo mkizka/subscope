@@ -25,7 +25,7 @@
 - [ ] **Phase 4**: appview Feed/Actor Serviceの移行
 - [x] **Phase 5**: appview Graph/Actor UseCaseの移行
 - [x] **Phase 6-A**: appview Admin UseCaseの移行
-- [ ] **Phase 6-B**: appview Subscription UseCaseの移行
+- [x] **Phase 6-B**: appview Subscription UseCaseの移行
 
 ### Phase 7: appviewリポジトリテスト追加
 
@@ -122,8 +122,8 @@ packages/common/src/lib/domain/index.ts  ← 各Factoryも再エクスポート
 
 ```
 @repo/test-utils → @repo/common/domain （Factoryを再エクスポート可能）
-               → @repo/common
-               → @repo/db
+             → @repo/common
+             → @repo/db
 ```
 
 ### インメモリリポジトリの配置場所

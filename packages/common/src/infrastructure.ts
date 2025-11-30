@@ -4,4 +4,4 @@ export * from "./lib/infrastructure/job-queue.js";
 export * from "./lib/infrastructure/logger.js";
 export * from "./lib/infrastructure/metric.js";
 export * from "./lib/infrastructure/redis-did-cache.js";
-export * from "./lib/infrastructure/transaction.js";
+export * from "./lib/infrastructure/transaction/transaction.js";
