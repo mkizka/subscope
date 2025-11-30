@@ -46,6 +46,7 @@ describe("ReplyRefService", () => {
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootActor.did,
+      handle: rootActor.handle,
       displayName: "User 1",
     });
     profileRepo.add(rootProfile);
@@ -90,10 +91,10 @@ describe("ReplyRefService", () => {
     expect(result.get(replyUri.toString())).toMatchObject({
       $type: "app.bsky.feed.defs#replyRef",
       root: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
       },
       parent: {
-        uri: parentPost.uri,
+        uri: parentPost.uri.toString(),
       },
     });
   });
@@ -103,6 +104,7 @@ describe("ReplyRefService", () => {
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootActor.did,
+      handle: rootActor.handle,
       displayName: "User 3",
     });
     profileRepo.add(rootProfile);
@@ -165,19 +167,19 @@ describe("ReplyRefService", () => {
     expect(result.get(reply1Uri.toString())).toMatchObject({
       $type: "app.bsky.feed.defs#replyRef",
       root: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
       },
       parent: {
-        uri: parentPost.uri,
+        uri: parentPost.uri.toString(),
       },
     });
     expect(result.get(reply2Uri.toString())).toMatchObject({
       $type: "app.bsky.feed.defs#replyRef",
       root: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
       },
       parent: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
       },
     });
   });
@@ -229,6 +231,7 @@ describe("ReplyRefService", () => {
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootActor.did,
+      handle: rootActor.handle,
       displayName: "User 7",
     });
     profileRepo.add(rootProfile);
@@ -291,10 +294,10 @@ describe("ReplyRefService", () => {
     expect(result.get(replyUri.toString())).toMatchObject({
       $type: "app.bsky.feed.defs#replyRef",
       root: {
-        uri: rootPost.uri,
+        uri: rootPost.uri.toString(),
       },
       parent: {
-        uri: parentPost.uri,
+        uri: parentPost.uri.toString(),
       },
     });
     expect(result.get(normalUri.toString())).toBeUndefined();
