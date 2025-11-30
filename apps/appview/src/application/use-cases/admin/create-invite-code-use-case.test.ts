@@ -4,11 +4,7 @@ import { testInjector } from "../../../shared/test-utils.js";
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  const useCase = testInjector
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    .provideValue("db", {} as never)
-    .provideValue("publicUrl", "https://example.com")
-    .injectClass(CreateInviteCodeUseCase);
+  const useCase = testInjector.injectClass(CreateInviteCodeUseCase);
 
   test("有効期限が適切に指定されている場合、招待コードと有効期限を返す", async () => {
     // arrange

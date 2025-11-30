@@ -32,6 +32,9 @@ import { InMemorySubscriptionRepository } from "../infrastructure/subscription-r
 import { InMemoryTimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.in-memory.js";
 
 export const testInjector = createInjector()
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  .provideValue("db", {} as never)
+  .provideValue("publicUrl", "https://example.com")
   .provideClass("authorFeedRepository", InMemoryAuthorFeedRepository)
   .provideClass("postRepository", InMemoryPostRepository)
   .provideClass("postStatsRepository", InMemoryPostStatsRepository)
