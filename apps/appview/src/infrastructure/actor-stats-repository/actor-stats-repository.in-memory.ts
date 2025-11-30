@@ -18,6 +18,14 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     const result = new Map<string, ActorStats>();
 
     for (const actorDid of actorDids) {
+      result.set(actorDid, {
+        followsCount: 0,
+        followersCount: 0,
+        postsCount: 0,
+      });
+    }
+
+    for (const actorDid of actorDids) {
       const stat = this.stats.get(actorDid);
       if (stat) {
         result.set(actorDid, stat);

@@ -23,8 +23,8 @@ describe("ProfileViewService", () => {
       const actor = actorFactory();
       const profile = profileDetailedFactory({
         actorDid: actor.did,
+        handle: actor.handle,
         displayName: "Test User",
-        avatarCid: "test-avatar-cid",
       });
       profileRepo.add(profile);
 
@@ -40,8 +40,6 @@ describe("ProfileViewService", () => {
         did: actor.did,
         handle: actor.handle,
         displayName: "Test User",
-        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/test-avatar-cid.jpg`,
-        createdAt: expect.any(String),
       });
     });
 
@@ -65,6 +63,8 @@ describe("ProfileViewService", () => {
       const actor = actorFactory();
       const profile = profileDetailedFactory({
         actorDid: actor.did,
+        handle: actor.handle,
+        displayName: "Test User",
       });
       profileRepo.add(profile);
 
@@ -86,14 +86,10 @@ describe("ProfileViewService", () => {
         $type: "app.bsky.actor.defs#profileViewDetailed",
         did: actor.did,
         handle: actor.handle,
-        displayName: profile.displayName,
-        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${profile.avatarCid}.jpg`,
-        banner: `http://localhost:3004/images/banner/${actor.did}/${profile.bannerCid}.jpg`,
-        description: profile.description,
+        displayName: "Test User",
         followsCount: 10,
         followersCount: 20,
         postsCount: 30,
-        createdAt: expect.any(String),
         indexedAt: expect.any(String),
       });
     });
@@ -103,6 +99,7 @@ describe("ProfileViewService", () => {
       const actor = actorFactory();
       const profile = profileDetailedFactory({
         actorDid: actor.did,
+        handle: actor.handle,
         displayName: "Test User Without Stats",
       });
       profileRepo.add(profile);
@@ -122,7 +119,6 @@ describe("ProfileViewService", () => {
         followsCount: 0,
         followersCount: 0,
         postsCount: 0,
-        createdAt: expect.any(String),
         indexedAt: expect.any(String),
       });
     });
@@ -282,7 +278,7 @@ describe("ProfileViewService", () => {
         displayName: "Target User",
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
-          following: follow.uri,
+          following: follow.uri.toString(),
           followedBy: undefined,
         },
       });
@@ -319,7 +315,7 @@ describe("ProfileViewService", () => {
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
           following: undefined,
-          followedBy: follow.uri,
+          followedBy: follow.uri.toString(),
         },
       });
     });
@@ -360,8 +356,8 @@ describe("ProfileViewService", () => {
         displayName: "Target User",
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
-          following: followingFollow.uri,
-          followedBy: followedByFollow.uri,
+          following: followingFollow.uri.toString(),
+          followedBy: followedByFollow.uri.toString(),
         },
       });
     });
@@ -410,7 +406,7 @@ describe("ProfileViewService", () => {
         displayName: "Target 1",
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
-          following: follow1.uri,
+          following: follow1.uri.toString(),
           followedBy: undefined,
         },
       });
@@ -421,7 +417,7 @@ describe("ProfileViewService", () => {
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
           following: undefined,
-          followedBy: follow2.uri,
+          followedBy: follow2.uri.toString(),
         },
       });
     });
