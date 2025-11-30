@@ -21,6 +21,7 @@ describe("GetFollowersUseCase", () => {
     const actorProfile = profileDetailedFactory({
       actorDid: actor.did,
       displayName: "Actor User",
+      handle: "actor.test",
     });
     profileRepo.add(actorProfile);
 
@@ -28,6 +29,7 @@ describe("GetFollowersUseCase", () => {
     const followerProfile = profileDetailedFactory({
       actorDid: follower.did,
       displayName: "Follower User",
+      handle: "follower.test",
     });
     profileRepo.add(followerProfile);
 
@@ -48,12 +50,14 @@ describe("GetFollowersUseCase", () => {
       subject: {
         $type: "app.bsky.actor.defs#profileView",
         did: actor.did,
+        handle: "actor.test",
         displayName: "Actor User",
       },
       followers: [
         {
           $type: "app.bsky.actor.defs#profileView",
           did: follower.did,
+          handle: "follower.test",
           displayName: "Follower User",
         },
       ],
@@ -66,6 +70,7 @@ describe("GetFollowersUseCase", () => {
     const actorProfile = profileDetailedFactory({
       actorDid: actor.did,
       displayName: "Actor User",
+      handle: "actor.test",
     });
     profileRepo.add(actorProfile);
 
@@ -80,6 +85,7 @@ describe("GetFollowersUseCase", () => {
       subject: {
         $type: "app.bsky.actor.defs#profileView",
         did: actor.did,
+        handle: "actor.test",
         displayName: "Actor User",
       },
       followers: [],
@@ -208,6 +214,7 @@ describe("GetFollowersUseCase", () => {
     const actorProfile = profileDetailedFactory({
       actorDid: actor.did,
       displayName: "Actor User",
+      handle: "actor.test",
     });
     profileRepo.add(actorProfile);
 
@@ -217,6 +224,7 @@ describe("GetFollowersUseCase", () => {
     const follower1Profile = profileDetailedFactory({
       actorDid: follower1.did,
       displayName: "Follower 1",
+      handle: "follower1.test",
     });
     profileRepo.add(follower1Profile);
     const follow1 = followFactory({
@@ -231,6 +239,7 @@ describe("GetFollowersUseCase", () => {
     const follower2Profile = profileDetailedFactory({
       actorDid: follower2.did,
       displayName: "Follower 2",
+      handle: "follower2.test",
     });
     profileRepo.add(follower2Profile);
     const follow2 = followFactory({
@@ -245,6 +254,7 @@ describe("GetFollowersUseCase", () => {
     const follower3Profile = profileDetailedFactory({
       actorDid: follower3.did,
       displayName: "Follower 3",
+      handle: "follower3.test",
     });
     profileRepo.add(follower3Profile);
     const follow3 = followFactory({
@@ -266,22 +276,26 @@ describe("GetFollowersUseCase", () => {
       subject: {
         $type: "app.bsky.actor.defs#profileView",
         did: actor.did,
+        handle: "actor.test",
         displayName: "Actor User",
       },
       followers: [
         {
           $type: "app.bsky.actor.defs#profileView",
           did: follower3.did,
+          handle: "follower3.test",
           displayName: "Follower 3",
         },
         {
           $type: "app.bsky.actor.defs#profileView",
           did: follower2.did,
+          handle: "follower2.test",
           displayName: "Follower 2",
         },
         {
           $type: "app.bsky.actor.defs#profileView",
           did: follower1.did,
+          handle: "follower1.test",
           displayName: "Follower 1",
         },
       ],

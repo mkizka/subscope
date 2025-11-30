@@ -58,7 +58,7 @@ describe("SearchActorsUseCase", () => {
     const matchProfile = profileDetailedFactory({
       actorDid: matchActor.did,
       displayName: "Test User 検索対象",
-      handle: matchActor.handle ?? "match.test",
+      handle: "match.test",
     });
     profileRepo.add(matchProfile);
     actorStatsRepo.add(matchActor.did, {
@@ -71,7 +71,7 @@ describe("SearchActorsUseCase", () => {
     const noMatchProfile = profileDetailedFactory({
       actorDid: noMatchActor.did,
       displayName: "Different Name",
-      handle: noMatchActor.handle ?? "nomatch.test",
+      handle: "nomatch.test",
     });
     profileRepo.add(noMatchProfile);
     actorStatsRepo.add(noMatchActor.did, {
@@ -92,6 +92,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: matchActor.did,
+          handle: "match.test",
           displayName: "Test User 検索対象",
         },
       ],
@@ -168,6 +169,7 @@ describe("SearchActorsUseCase", () => {
     const profile1 = profileDetailedFactory({
       actorDid: actor1.did,
       displayName: "ActorPaginationTest User 1",
+      handle: "user1.test",
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
     profileRepo.add(profile1);
@@ -181,6 +183,7 @@ describe("SearchActorsUseCase", () => {
     const profile2 = profileDetailedFactory({
       actorDid: actor2.did,
       displayName: "ActorPaginationTest User 2",
+      handle: "user2.test",
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
     profileRepo.add(profile2);
@@ -209,6 +212,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: actor2.did,
+          handle: "user2.test",
           displayName: "ActorPaginationTest User 2",
         },
       ],
@@ -220,6 +224,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: actor1.did,
+          handle: "user1.test",
           displayName: "ActorPaginationTest User 1",
         },
       ],
@@ -233,6 +238,7 @@ describe("SearchActorsUseCase", () => {
     const percentProfile = profileDetailedFactory({
       actorDid: percentActor.did,
       displayName: "100%完璧なユーザー",
+      handle: "percent.test",
     });
     profileRepo.add(percentProfile);
     actorStatsRepo.add(percentActor.did, {
@@ -245,6 +251,7 @@ describe("SearchActorsUseCase", () => {
     const underscoreProfile = profileDetailedFactory({
       actorDid: underscoreActor.did,
       displayName: "user_name_test",
+      handle: "underscore.test",
     });
     profileRepo.add(underscoreProfile);
     actorStatsRepo.add(underscoreActor.did, {
@@ -257,6 +264,7 @@ describe("SearchActorsUseCase", () => {
     const otherProfile = profileDetailedFactory({
       actorDid: otherActor.did,
       displayName: "これは関係ないユーザー",
+      handle: "other.test",
     });
     profileRepo.add(otherProfile);
     actorStatsRepo.add(otherActor.did, {
@@ -282,6 +290,7 @@ describe("SearchActorsUseCase", () => {
     expect(percentResult.actors[0]).toMatchObject({
       $type: "app.bsky.actor.defs#profileView",
       did: percentActor.did,
+      handle: "percent.test",
       displayName: "100%完璧なユーザー",
     });
 
@@ -289,6 +298,7 @@ describe("SearchActorsUseCase", () => {
     expect(underscoreResult.actors[0]).toMatchObject({
       $type: "app.bsky.actor.defs#profileView",
       did: underscoreActor.did,
+      handle: "underscore.test",
       displayName: "user_name_test",
     });
   });
