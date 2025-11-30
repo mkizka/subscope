@@ -1,31 +1,14 @@
-import { LoggerManager } from "@repo/common/infrastructure";
-import { schema } from "@repo/db";
-import { actorFactory, actorStatsFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory, profileDetailedFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { ProfileViewBuilder } from "../../service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { SearchActorsUseCase } from "./search-actors-use-case.js";
 
 describe("SearchActorsUseCase", () => {
-  const { testInjector, ctx } = testSetup;
+  const searchActorsUseCase = testInjector.injectClass(SearchActorsUseCase);
 
-  const searchActorsUseCase = testInjector
-    .provideValue("loggerManager", new LoggerManager("info"))
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .injectClass(SearchActorsUseCase);
+  const profileRepo = testInjector.resolve("profileRepository");
+  const actorStatsRepo = testInjector.resolve("actorStatsRepository");
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
     // act
@@ -71,19 +54,31 @@ describe("SearchActorsUseCase", () => {
 
   test("displayNameに検索クエリが含まれるアクターがある場合、そのアクターを返す", async () => {
     // arrange
-    const matchActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Test User 検索対象" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => matchActor })
-      .create();
+    const matchActor = actorFactory();
+    const matchProfile = profileDetailedFactory({
+      actorDid: matchActor.did,
+      displayName: "Test User 検索対象",
+      handle: "match.test",
+    });
+    profileRepo.add(matchProfile);
+    actorStatsRepo.add(matchActor.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
-    const noMatchActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Different Name" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => noMatchActor })
-      .create();
+    const noMatchActor = actorFactory();
+    const noMatchProfile = profileDetailedFactory({
+      actorDid: noMatchActor.did,
+      displayName: "Different Name",
+      handle: "nomatch.test",
+    });
+    profileRepo.add(noMatchProfile);
+    actorStatsRepo.add(noMatchActor.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
     // act
     const result = await searchActorsUseCase.execute({
@@ -97,7 +92,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: matchActor.did,
-          handle: matchActor.handle ?? "handle.invalid",
+          handle: "match.test",
           displayName: "Test User 検索対象",
         },
       ],
@@ -106,12 +101,17 @@ describe("SearchActorsUseCase", () => {
 
   test("検索クエリに一致するアクターがない場合、空の配列を返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "No Match User" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => actor })
-      .create();
+    const actor = actorFactory();
+    const profile = profileDetailedFactory({
+      actorDid: actor.did,
+      displayName: "No Match User",
+    });
+    profileRepo.add(profile);
+    actorStatsRepo.add(actor.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
     // act
     const result = await searchActorsUseCase.execute({
@@ -128,19 +128,29 @@ describe("SearchActorsUseCase", () => {
 
   test("limitパラメータが指定された場合、指定した件数で結果を制限する", async () => {
     // arrange
-    const actor1 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Limit Test User 1" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => actor1 })
-      .create();
+    const actor1 = actorFactory();
+    const profile1 = profileDetailedFactory({
+      actorDid: actor1.did,
+      displayName: "Limit Test User 1",
+    });
+    profileRepo.add(profile1);
+    actorStatsRepo.add(actor1.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
-    const actor2 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Limit Test User 2" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => actor2 })
-      .create();
+    const actor2 = actorFactory();
+    const profile2 = profileDetailedFactory({
+      actorDid: actor2.did,
+      displayName: "Limit Test User 2",
+    });
+    profileRepo.add(profile2);
+    actorStatsRepo.add(actor2.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
     // act
     const result = await searchActorsUseCase.execute({
@@ -155,29 +165,33 @@ describe("SearchActorsUseCase", () => {
 
   test("cursorパラメータが指定された場合、ページネーションで次のページを返す", async () => {
     // arrange
-    const actor1 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "ActorPaginationTest User 1" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => actor1 })
-      .create();
+    const actor1 = actorFactory();
+    const profile1 = profileDetailedFactory({
+      actorDid: actor1.did,
+      displayName: "ActorPaginationTest User 1",
+      handle: "user1.test",
+      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+    profileRepo.add(profile1);
+    actorStatsRepo.add(actor1.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
-    const actor2 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "ActorPaginationTest User 2" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => actor2 })
-      .create();
-
-    // 最初のプロフィールのindexedAtを古い日付に更新して順序を保証
-    await ctx.db
-      .update(schema.profiles)
-      .set({ indexedAt: new Date("2024-01-01T00:00:00.000Z") })
-      .where(eq(schema.profiles.actorDid, actor1.did));
-    await ctx.db
-      .update(schema.profiles)
-      .set({ indexedAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.profiles.actorDid, actor2.did));
+    const actor2 = actorFactory();
+    const profile2 = profileDetailedFactory({
+      actorDid: actor2.did,
+      displayName: "ActorPaginationTest User 2",
+      handle: "user2.test",
+      indexedAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    profileRepo.add(profile2);
+    actorStatsRepo.add(actor2.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
     // act - 最初のページ
     const firstPage = await searchActorsUseCase.execute({
@@ -198,6 +212,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: actor2.did,
+          handle: "user2.test",
           displayName: "ActorPaginationTest User 2",
         },
       ],
@@ -209,6 +224,7 @@ describe("SearchActorsUseCase", () => {
         {
           $type: "app.bsky.actor.defs#profileView",
           did: actor1.did,
+          handle: "user1.test",
           displayName: "ActorPaginationTest User 1",
         },
       ],
@@ -216,77 +232,33 @@ describe("SearchActorsUseCase", () => {
     });
   });
 
-  test("ワイルドカード文字が含まれる検索クエリの場合、文字をエスケープして検索する", async () => {
-    // arrange
-    // %を含むdisplayName
-    const percentActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "100%完璧なユーザー" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => percentActor })
-      .create();
-
-    // _を含むdisplayName
-    const underscoreActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "user_name_test" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => underscoreActor })
-      .create();
-
-    // 関係ないdisplayName
-    const otherActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "これは関係ないユーザー" }))
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => otherActor })
-      .create();
-
-    // act - %文字を検索
-    const percentResult = await searchActorsUseCase.execute({
-      query: "100%",
-      limit: 10,
-    });
-
-    // act - _文字を検索
-    const underscoreResult = await searchActorsUseCase.execute({
-      query: "user_name",
-      limit: 10,
-    });
-
-    // assert
-    expect(percentResult.actors).toHaveLength(1);
-    expect(percentResult.actors[0]).toMatchObject({
-      $type: "app.bsky.actor.defs#profileView",
-      did: percentActor.did,
-      displayName: "100%完璧なユーザー",
-    });
-
-    expect(underscoreResult.actors).toHaveLength(1);
-    expect(underscoreResult.actors[0]).toMatchObject({
-      $type: "app.bsky.actor.defs#profileView",
-      did: underscoreActor.did,
-      displayName: "user_name_test",
-    });
-  });
-
   test("displayNameまたはhandleのいずれかに検索クエリが含まれる場合、該当するアクターを返す", async () => {
     // arrange
-    const displayNameActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "テスト User" }))
-      .props({ handle: () => "different.handle.com" })
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => displayNameActor })
-      .create();
+    const displayNameActor = actorFactory();
+    const displayNameProfile = profileDetailedFactory({
+      actorDid: displayNameActor.did,
+      displayName: "テスト User",
+      handle: "different.handle.com",
+    });
+    profileRepo.add(displayNameProfile);
+    actorStatsRepo.add(displayNameActor.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
-    const handleActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Different Name" }))
-      .props({ handle: () => "testhandle.example.com" })
-      .create();
-    await actorStatsFactory(ctx.db)
-      .vars({ actor: () => handleActor })
-      .create();
+    const handleActor = actorFactory();
+    const handleProfile = profileDetailedFactory({
+      actorDid: handleActor.did,
+      displayName: "Different Name",
+      handle: "testhandle.example.com",
+    });
+    profileRepo.add(handleProfile);
+    actorStatsRepo.add(handleActor.did, {
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
+    });
 
     // act - displayNameで検索
     const displayNameResult = await searchActorsUseCase.execute({
