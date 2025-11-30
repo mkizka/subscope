@@ -3,6 +3,8 @@ import { createInjector } from "typed-inject";
 
 import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../application/service/actor/profile-view-service.js";
+import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
+import { SubscriptionService } from "../application/service/admin/subscription-service.js";
 import { ActorLikesService } from "../application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "../application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "../application/service/feed/feed-processor.js";
@@ -33,6 +35,9 @@ import { InMemorySubscriptionRepository } from "../infrastructure/subscription-r
 import { InMemoryTimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.in-memory.js";
 
 export const testInjector = createInjector()
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  .provideValue("db", {} as never)
+  .provideValue("publicUrl", "https://example.com")
   .provideClass("authorFeedRepository", InMemoryAuthorFeedRepository)
   .provideClass("postRepository", InMemoryPostRepository)
   .provideClass("postStatsRepository", InMemoryPostStatsRepository)
@@ -63,7 +68,9 @@ export const testInjector = createInjector()
   .provideClass("followService", FollowService)
   .provideClass("likeService", LikeService)
   .provideClass("actorLikesService", ActorLikesService)
-  .provideClass("repostService", RepostService);
+  .provideClass("repostService", RepostService)
+  .provideClass("subscriptionService", SubscriptionService)
+  .provideClass("inviteCodeService", InviteCodeService);
 
 export const clearAllInMemoryRepositories = () => {
   testInjector.resolve("authorFeedRepository").clear();

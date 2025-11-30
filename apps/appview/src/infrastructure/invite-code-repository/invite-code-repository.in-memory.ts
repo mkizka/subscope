@@ -1,71 +1,84 @@
-import { asDid } from "@atproto/did";
+import type { Did } from "@atproto/did";
 import type { InviteCode, TransactionContext } from "@repo/common/domain";
-import { asHandle } from "@repo/common/utils";
+import type { Handle } from "@repo/common/utils";
 
 import type { InviteCodeDto } from "../../application/dto/invite-code-with-handle.js";
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
 
-export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
-  private inviteCodes: Map<string, InviteCode> = new Map();
-  private usedByMap: Map<string, { did: string; handle: string | null }> =
-    new Map();
+type UsedByInfo = {
+  did: Did;
+  handle: Handle | null;
+};
 
-  add(inviteCode: InviteCode): void {
-    this.inviteCodes.set(inviteCode.code, inviteCode);
+type StoredInviteCode = {
+  inviteCode: InviteCode;
+  usedBy: UsedByInfo | null;
+};
+
+export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
+  private inviteCodes: Map<string, StoredInviteCode> = new Map();
+
+  add(inviteCode: InviteCode, usedBy?: UsedByInfo): void {
+    this.inviteCodes.set(inviteCode.code, {
+      inviteCode,
+      usedBy: usedBy ?? null,
+    });
   }
 
-  setUsedBy(
-    code: string,
-    usedBy: { did: string; handle: string | null },
-  ): void {
-    this.usedByMap.set(code, usedBy);
+  setUsedBy(code: string, usedBy: UsedByInfo): void {
+    const stored = this.inviteCodes.get(code);
+    if (stored) {
+      this.inviteCodes.set(code, {
+        ...stored,
+        usedBy,
+      });
+    }
   }
 
   clear(): void {
     this.inviteCodes.clear();
-    this.usedByMap.clear();
   }
 
-  async upsert(params: {
+  async upsert(_params: {
     inviteCode: InviteCode;
     ctx: TransactionContext;
   }): Promise<void> {
-    this.inviteCodes.set(params.inviteCode.code, params.inviteCode);
+    const existing = this.inviteCodes.get(_params.inviteCode.code);
+    this.inviteCodes.set(_params.inviteCode.code, {
+      inviteCode: _params.inviteCode,
+      usedBy: existing?.usedBy ?? null,
+    });
   }
 
   async findAll(params: {
     limit: number;
     cursor?: string;
   }): Promise<InviteCodeDto[]> {
-    let codes = Array.from(this.inviteCodes.values());
+    let entries = Array.from(this.inviteCodes.values());
 
-    codes = codes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    entries = entries.sort(
+      (a, b) =>
+        b.inviteCode.createdAt.getTime() - a.inviteCode.createdAt.getTime(),
+    );
 
     if (params.cursor) {
       const cursorDate = new Date(params.cursor);
-      codes = codes.filter((code) => code.createdAt < cursorDate);
+      entries = entries.filter(
+        (entry) => entry.inviteCode.createdAt < cursorDate,
+      );
     }
 
-    const results = codes.slice(0, params.limit);
-
-    return results.map((code) => {
-      const usedBy = this.usedByMap.get(code.code);
-      return {
-        code: code.code,
-        expiresAt: code.expiresAt,
-        createdAt: code.createdAt,
-        usedAt: code.usedAt,
-        usedBy: usedBy
-          ? {
-              did: asDid(usedBy.did),
-              handle: usedBy.handle ? asHandle(usedBy.handle) : null,
-            }
-          : null,
-      };
-    });
+    return entries.slice(0, params.limit).map((entry) => ({
+      code: entry.inviteCode.code,
+      expiresAt: entry.inviteCode.expiresAt,
+      createdAt: entry.inviteCode.createdAt,
+      usedAt: entry.inviteCode.usedAt,
+      usedBy: entry.usedBy,
+    }));
   }
 
   async findFirst(code: string): Promise<InviteCode | null> {
-    return this.inviteCodes.get(code) ?? null;
+    const stored = this.inviteCodes.get(code);
+    return stored?.inviteCode ?? null;
   }
 }

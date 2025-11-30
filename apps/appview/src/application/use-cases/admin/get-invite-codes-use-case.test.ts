@@ -1,40 +1,28 @@
-import { schema } from "@repo/db";
-import {
-  actorFactory,
-  inviteCodeFactory,
-  subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { asDid } from "@atproto/did";
+import { actorFactory, inviteCodeFactory } from "@repo/common/test";
+import { asHandle } from "@repo/common/utils";
 import { describe, expect, test } from "vitest";
 
-import { InviteCodeRepository } from "../../../infrastructure/invite-code-repository/invite-code-repository.js";
-import { InviteCodeService } from "../../service/admin/invite-code-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { GetInviteCodesUseCase } from "./get-invite-codes-use-case.js";
 
 describe("GetInviteCodesUseCase", () => {
-  const { testInjector, ctx } = testSetup;
-
-  const getInviteCodesUseCase = testInjector
-    .provideClass("inviteCodeRepository", InviteCodeRepository)
-    .provideClass("inviteCodeService", InviteCodeService)
-    .injectClass(GetInviteCodesUseCase);
+  const getInviteCodesUseCase = testInjector.injectClass(GetInviteCodesUseCase);
+  const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
 
   test("招待コードが存在する場合、招待コード一覧を返す", async () => {
     // arrange
-    const inviteCode1 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        expiresAt: () => new Date("2024-01-08T00:00:00.000Z"),
-      })
-      .create();
+    const inviteCode1 = inviteCodeFactory({
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiresAt: new Date("2024-01-08T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode1);
 
-    const inviteCode2 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-02T00:00:00.000Z"),
-        expiresAt: () => new Date("2024-01-09T00:00:00.000Z"),
-      })
-      .create();
+    const inviteCode2 = inviteCodeFactory({
+      createdAt: new Date("2024-01-02T00:00:00.000Z"),
+      expiresAt: new Date("2024-01-09T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode2);
 
     // act
     const result = await getInviteCodesUseCase.execute({
@@ -65,21 +53,19 @@ describe("GetInviteCodesUseCase", () => {
 
   test("limitを指定した場合、指定した件数の招待コードを返す", async () => {
     // arrange
-    await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-      })
-      .create();
-    const inviteCode2 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-02T00:00:00.000Z"),
-      })
-      .create();
-    const inviteCode3 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-03T00:00:00.000Z"),
-      })
-      .create();
+    inviteCodeRepo.add(
+      inviteCodeFactory({
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      }),
+    );
+    const inviteCode2 = inviteCodeFactory({
+      createdAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode2);
+    const inviteCode3 = inviteCodeFactory({
+      createdAt: new Date("2024-01-03T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode3);
 
     // act
     const result = await getInviteCodesUseCase.execute({
@@ -110,21 +96,19 @@ describe("GetInviteCodesUseCase", () => {
 
   test("cursorを指定した場合、cursorより古い招待コードを返す", async () => {
     // arrange
-    const inviteCode1 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-      })
-      .create();
-    const inviteCode2 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-02T00:00:00.000Z"),
-      })
-      .create();
-    await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-03T00:00:00.000Z"),
-      })
-      .create();
+    const inviteCode1 = inviteCodeFactory({
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode1);
+    const inviteCode2 = inviteCodeFactory({
+      createdAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode2);
+    inviteCodeRepo.add(
+      inviteCodeFactory({
+        createdAt: new Date("2024-01-03T00:00:00.000Z"),
+      }),
+    );
 
     // act
     const result = await getInviteCodesUseCase.execute({
@@ -149,26 +133,22 @@ describe("GetInviteCodesUseCase", () => {
 
   test("複数ページのデータがある場合、ページネーションが正しく動作する", async () => {
     // arrange
-    const inviteCode1 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-      })
-      .create();
-    const inviteCode2 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-02T00:00:00.000Z"),
-      })
-      .create();
-    const inviteCode3 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-03T00:00:00.000Z"),
-      })
-      .create();
-    const inviteCode4 = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-04T00:00:00.000Z"),
-      })
-      .create();
+    const inviteCode1 = inviteCodeFactory({
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode1);
+    const inviteCode2 = inviteCodeFactory({
+      createdAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode2);
+    const inviteCode3 = inviteCodeFactory({
+      createdAt: new Date("2024-01-03T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode3);
+    const inviteCode4 = inviteCodeFactory({
+      createdAt: new Date("2024-01-04T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode4);
 
     // act - 1ページ目
     const page1 = await getInviteCodesUseCase.execute({
@@ -226,20 +206,16 @@ describe("GetInviteCodesUseCase", () => {
 
   test("使用済み招待コードの場合、使用情報を返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const inviteCode = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        expiresAt: () => new Date("2024-01-08T00:00:00.000Z"),
-        usedAt: () => new Date("2024-01-02T00:00:00.000Z"),
-      })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .props({
-        actorDid: () => actor.did,
-        inviteCode: () => inviteCode.code,
-      })
-      .create();
+    const actor = actorFactory();
+    const inviteCode = inviteCodeFactory({
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiresAt: new Date("2024-01-08T00:00:00.000Z"),
+      usedAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode, {
+      did: asDid(actor.did),
+      handle: asHandle(actor.handle),
+    });
 
     // act
     const result = await getInviteCodesUseCase.execute({
@@ -266,23 +242,12 @@ describe("GetInviteCodesUseCase", () => {
 
   test("使用済み招待コードでActorが削除されている場合、usedByはnullになる", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const inviteCode = await inviteCodeFactory(ctx.db)
-      .props({
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        expiresAt: () => new Date("2024-01-08T00:00:00.000Z"),
-        usedAt: () => new Date("2024-01-02T00:00:00.000Z"),
-      })
-      .create();
-    await subscriptionFactory(ctx.db)
-      .props({
-        actorDid: () => actor.did,
-        inviteCode: () => inviteCode.code,
-      })
-      .create();
-
-    // Actorを削除
-    await ctx.db.delete(schema.actors).where(eq(schema.actors.did, actor.did));
+    const inviteCode = inviteCodeFactory({
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      expiresAt: new Date("2024-01-08T00:00:00.000Z"),
+      usedAt: new Date("2024-01-02T00:00:00.000Z"),
+    });
+    inviteCodeRepo.add(inviteCode);
 
     // act
     const result = await getInviteCodesUseCase.execute({
