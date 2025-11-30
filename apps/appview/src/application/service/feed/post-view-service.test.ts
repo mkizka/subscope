@@ -1,87 +1,56 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
+  PostEmbedExternal,
+  PostEmbedImage,
+  PostEmbedRecord,
+  PostEmbedRecordWithMedia,
+} from "@repo/common/domain";
+import {
   actorFactory,
   generatorFactory,
   likeFactory,
-  postEmbedExternalFactory,
-  postEmbedImageFactory,
-  postEmbedRecordFactory,
   postFactory,
-  profileFactory,
+  profileDetailedFactory,
   recordFactory,
   repostFactory,
-  testSetup,
-} from "@repo/test-utils";
+} from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";
-import { HandleResolver } from "../../../infrastructure/handle-resolver/handle-resolver.js";
-import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
-import { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
-import { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
-import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
-import { ProfileViewService } from "../actor/profile-view-service.js";
-import { ProfileSearchService } from "../search/profile-search-service.js";
-import { GeneratorViewService } from "./generator-view-service.js";
-import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { PostViewService } from "./post-view-service.js";
 
 describe("PostViewService", () => {
-  const { testInjector, ctx } = testSetup;
+  const postViewService = testInjector.injectClass(PostViewService);
 
-  const postViewService = testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("generatorRepository", GeneratorRepository)
-    .provideClass("generatorViewService", GeneratorViewService)
-    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("likeRepository", LikeRepository)
-    .injectClass(PostViewService);
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
+  const generatorRepo = testInjector.resolve("generatorRepository");
+  const likeRepo = testInjector.resolve("likeRepository");
+  const repostRepo = testInjector.resolve("repostRepository");
 
   describe("findPostView", () => {
     test("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Test User" }))
-        .props({ handle: () => "test.bsky.social" })
-        .create();
-      const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Hello World",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => record })
-        .props({
-          text: () => "Hello World",
-          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const postUri = new AtUri(post.uri);
+      const actor = actorFactory({ handle: "test.bsky.social" });
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Test User",
+        handle: "test.bsky.social",
+      });
+      profileRepo.add(profile);
+
+      const { post, record } = postFactory({
+        actorDid: actor.did,
+        text: "Hello World",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(post);
+      recordRepo.add(record);
+
+      const postUri = new AtUri(post.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postUri]);
@@ -90,7 +59,7 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: post.uri,
+        uri: post.uri.toString(),
         cid: record.cid,
         author: {
           $type: "app.bsky.actor.defs#profileViewBasic",
@@ -113,42 +82,23 @@ describe("PostViewService", () => {
 
     test("プロフィールの表示名がnullの場合、表示名なしでプロフィールビューを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
-        .props({ handle: () => "noProfile.bsky.social" })
-        .create();
-      const profileRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.actor.profile",
-      )
-        .vars({ actor: () => actor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.actor.profile",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-        })
-        .create();
-      await profileFactory(ctx.db)
-        .vars({ record: () => profileRecord })
-        .props({
-          displayName: () => null,
-          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Test post",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-        })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => postRecord })
-        .create();
-      const postUri = new AtUri(post.uri);
+      const actor = actorFactory({ handle: "noProfile.bsky.social" });
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: null,
+        handle: "noProfile.bsky.social",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      profileRepo.add(profile);
+
+      const { post, record } = postFactory({
+        actorDid: actor.did,
+        text: "Test post",
+      });
+      postRepo.add(post);
+      recordRepo.add(record);
+
+      const postUri = new AtUri(post.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postUri]);
@@ -166,50 +116,60 @@ describe("PostViewService", () => {
 
     test("画像埋め込みを含む投稿の場合、画像ビューを含む投稿ビューを取得できる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Image User" }))
-        .props({ handle: () => "imageuser.bsky.social" })
-        .create();
+      const actor = actorFactory({ handle: "imageuser.bsky.social" });
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Image User",
+      });
+      profileRepo.add(profile);
+
       const imageCid =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
-      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Post with images",
-            embed: {
-              $type: "app.bsky.embed.images",
-              images: [
-                {
-                  alt: "Test image",
-                  image: {
-                    $type: "blob",
-                    ref: {
-                      $link: imageCid,
-                    },
-                    mimeType: "image/jpeg",
-                    size: 123456,
-                  },
-                },
-              ],
-            },
-            createdAt: "2024-01-01T00:00:00.000Z",
+
+      const { post, record } = postFactory({
+        actorDid: actor.did,
+        text: "Post with images",
+        embed: [
+          new PostEmbedImage({
+            cid: imageCid,
+            position: 0,
+            alt: "Test image",
           }),
-        })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => postRecord })
-        .create();
-      await postEmbedImageFactory(ctx.db)
-        .vars({ post: () => post })
-        .props({
-          cid: () => imageCid,
-          position: () => 0,
-          alt: () => "Test image",
-        })
-        .create();
-      const postUri = new AtUri(post.uri);
+        ],
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+
+      const recordWithEmbed = recordFactory({
+        uri: record.uri.toString(),
+        cid: record.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Post with images",
+          embed: {
+            $type: "app.bsky.embed.images",
+            images: [
+              {
+                alt: "Test image",
+                image: {
+                  $type: "blob",
+                  ref: {
+                    $link: imageCid,
+                  },
+                  mimeType: "image/jpeg",
+                  size: 123456,
+                },
+              },
+            ],
+          },
+          createdAt: "2024-01-01T00:00:00.000Z",
+        },
+        indexedAt: record.indexedAt,
+      });
+
+      postRepo.add(post);
+      recordRepo.add(recordWithEmbed);
+
+      const postUri = new AtUri(post.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postUri]);
@@ -232,51 +192,59 @@ describe("PostViewService", () => {
 
     test("外部リンク埋め込みを含む投稿の場合、外部リンクビューを含む投稿ビューを取得できる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Link User" }))
-        .props({ handle: () => "linkuser.bsky.social" })
-        .create();
+      const actor = actorFactory({ handle: "linkuser.bsky.social" });
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Link User",
+      });
+      profileRepo.add(profile);
+
       const thumbCid =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
-      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Post with external link",
-            embed: {
-              $type: "app.bsky.embed.external",
-              external: {
-                uri: "https://example.com",
-                title: "Example Site",
-                description: "An example website",
-                thumb: {
-                  $type: "blob",
-                  ref: {
-                    $link: thumbCid,
-                  },
-                  mimeType: "image/jpeg",
-                  size: 50000,
+
+      const { post, record } = postFactory({
+        actorDid: actor.did,
+        text: "Post with external link",
+        embed: new PostEmbedExternal(
+          "https://example.com",
+          "Example Site",
+          "An example website",
+          thumbCid,
+        ),
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+
+      const recordWithEmbed = recordFactory({
+        uri: record.uri.toString(),
+        cid: record.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Post with external link",
+          embed: {
+            $type: "app.bsky.embed.external",
+            external: {
+              uri: "https://example.com",
+              title: "Example Site",
+              description: "An example website",
+              thumb: {
+                $type: "blob",
+                ref: {
+                  $link: thumbCid,
                 },
+                mimeType: "image/jpeg",
+                size: 50000,
               },
             },
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-        })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => postRecord })
-        .create();
-      await postEmbedExternalFactory(ctx.db)
-        .vars({ post: () => post })
-        .props({
-          uri: () => "https://example.com",
-          title: () => "Example Site",
-          description: () => "An example website",
-          thumbCid: () => thumbCid,
-        })
-        .create();
-      const postUri = new AtUri(post.uri);
+          },
+          createdAt: "2024-01-01T00:00:00.000Z",
+        },
+        indexedAt: record.indexedAt,
+      });
+
+      postRepo.add(post);
+      recordRepo.add(recordWithEmbed);
+
+      const postUri = new AtUri(post.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postUri]);
@@ -298,71 +266,68 @@ describe("PostViewService", () => {
 
     test("複数のURIを指定した場合、対応する複数の投稿ビューを取得できる", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "User 1" }))
-        .props({ handle: () => "user1.bsky.social" })
-        .create();
-      const actor2 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "User 2" }))
-        .props({ handle: () => "user2.bsky.social" })
-        .create();
-      const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor1 })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "First post",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-        })
-        .create();
-      const record2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor2 })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Second post",
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-        })
-        .create();
-      const post1 = await postFactory(ctx.db)
-        .vars({ record: () => record1 })
-        .create();
-      const post2 = await postFactory(ctx.db)
-        .vars({ record: () => record2 })
-        .create();
-      const postUri1 = new AtUri(post1.uri);
-      const postUri2 = new AtUri(post2.uri);
+      const actor1 = actorFactory({ handle: "user1.bsky.social" });
+      const profile1 = profileDetailedFactory({
+        actorDid: actor1.did,
+        displayName: "User 1",
+      });
+      profileRepo.add(profile1);
+
+      const actor2 = actorFactory({ handle: "user2.bsky.social" });
+      const profile2 = profileDetailedFactory({
+        actorDid: actor2.did,
+        displayName: "User 2",
+      });
+      profileRepo.add(profile2);
+
+      const { post: post1, record: record1 } = postFactory({
+        actorDid: actor1.did,
+        text: "First post",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(post1);
+      recordRepo.add(record1);
+
+      const { post: post2, record: record2 } = postFactory({
+        actorDid: actor2.did,
+        text: "Second post",
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+      postRepo.add(post2);
+      recordRepo.add(record2);
+
+      const postUri1 = new AtUri(post1.uri.toString());
+      const postUri2 = new AtUri(post2.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postUri1, postUri2]);
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result.map((post) => post.uri)).toEqual([post1.uri, post2.uri]);
+      expect(result.map((post) => post.uri)).toEqual([
+        post1.uri.toString(),
+        post2.uri.toString(),
+      ]);
     });
 
     test("存在しない投稿URIが含まれている場合、そのURIは結果に含まれない", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Existing User" }))
-        .props({ handle: () => "exists.bsky.social" })
-        .create();
-      const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Existing post",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-        })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({ record: () => record })
-        .create();
-      const existingUri = new AtUri(post.uri);
+      const actor = actorFactory({ handle: "exists.bsky.social" });
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Existing User",
+      });
+      profileRepo.add(profile);
+
+      const { post, record } = postFactory({
+        actorDid: actor.did,
+        text: "Existing post",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(post);
+      recordRepo.add(record);
+
+      const existingUri = new AtUri(post.uri.toString());
       const nonExistentUri = AtUri.make(
         "did:plc:ghost",
         "app.bsky.feed.post",
@@ -378,73 +343,68 @@ describe("PostViewService", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: post.uri,
+        uri: post.uri.toString(),
       });
     });
 
     test("投稿の埋め込み(app.bsky.embed.record)を含む投稿の場合、埋め込み投稿ビューを含む投稿ビューを取得できる", async () => {
       // arrange
-      const embeddedAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Embedded Author" }))
-        .props({ handle: () => "embedded.bsky.social" })
-        .create();
-      const embeddedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => embeddedAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "This is the embedded post",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const embeddedPost = await postFactory(ctx.db)
-        .vars({ record: () => embeddedRecord })
-        .props({
-          text: () => "This is the embedded post",
-          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
+      const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
+      const embeddedProfile = profileDetailedFactory({
+        actorDid: embeddedAuthor.did,
+        displayName: "Embedded Author",
+      });
+      profileRepo.add(embeddedProfile);
 
-      const quotingAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
-        .props({ handle: () => "quoting.bsky.social" })
-        .create();
-      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => quotingAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Check out this post!",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: embeddedPost.uri,
-                cid: embeddedPost.cid,
-              },
+      const { post: embeddedPost, record: embeddedRecord } = postFactory({
+        actorDid: embeddedAuthor.did,
+        text: "This is the embedded post",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(embeddedPost);
+      recordRepo.add(embeddedRecord);
+
+      const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
+      const quotingProfile = profileDetailedFactory({
+        actorDid: quotingAuthor.did,
+        displayName: "Quoting Author",
+      });
+      profileRepo.add(quotingProfile);
+
+      const { post: quotingPost, record: quotingRecord } = postFactory({
+        actorDid: quotingAuthor.did,
+        text: "Check out this post!",
+        embed: new PostEmbedRecord({
+          uri: embeddedPost.uri,
+          cid: embeddedPost.cid,
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const quotingRecordWithEmbed = recordFactory({
+        uri: quotingRecord.uri.toString(),
+        cid: quotingRecord.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Check out this post!",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: embeddedPost.uri.toString(),
+              cid: embeddedPost.cid,
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      const quotingPost = await postFactory(ctx.db)
-        .vars({ record: () => quotingRecord })
-        .props({
-          text: () => "Check out this post!",
-          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => quotingPost,
-          embeddedPost: () => embeddedPost,
-        })
-        .create();
-      const quotingPostUri = new AtUri(quotingPost.uri);
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: quotingRecord.indexedAt,
+      });
+
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
+
+      const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
       const result = await postViewService.findPostView([quotingPostUri]);
@@ -453,7 +413,7 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: quotingPost.uri,
+        uri: quotingPost.uri.toString(),
         cid: quotingRecord.cid,
         author: {
           $type: "app.bsky.actor.defs#profileViewBasic",
@@ -467,7 +427,7 @@ describe("PostViewService", () => {
           embed: {
             $type: "app.bsky.embed.record",
             record: {
-              uri: embeddedPost.uri,
+              uri: embeddedPost.uri.toString(),
               cid: embeddedPost.cid,
             },
           },
@@ -477,7 +437,7 @@ describe("PostViewService", () => {
           $type: "app.bsky.embed.record#view",
           record: {
             $type: "app.bsky.embed.record#viewRecord",
-            uri: embeddedPost.uri,
+            uri: embeddedPost.uri.toString(),
             cid: embeddedRecord.cid,
             author: {
               $type: "app.bsky.actor.defs#profileViewBasic",
@@ -507,43 +467,51 @@ describe("PostViewService", () => {
 
     test("投稿の埋め込み(app.bsky.embed.record)の埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
       // arrange
-      const quotingAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
-        .props({ handle: () => "quoting.bsky.social" })
-        .create();
+      const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
+      const quotingProfile = profileDetailedFactory({
+        actorDid: quotingAuthor.did,
+        displayName: "Quoting Author",
+      });
+      profileRepo.add(quotingProfile);
+
       const notFoundUri = AtUri.make(
         "did:plc:notfound",
         "app.bsky.feed.post",
         "notfound123",
       ).toString();
-      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => quotingAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting a deleted post",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: notFoundUri,
-                cid: "bafyreighost123456789",
-              },
+
+      const { post: quotingPost, record: quotingRecord } = postFactory({
+        actorDid: quotingAuthor.did,
+        text: "Quoting a deleted post",
+        embed: new PostEmbedRecord({
+          uri: notFoundUri,
+          cid: "bafyreighost123456789",
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const quotingRecordWithEmbed = recordFactory({
+        uri: quotingRecord.uri.toString(),
+        cid: quotingRecord.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting a deleted post",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: notFoundUri,
+              cid: "bafyreighost123456789",
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-        })
-        .create();
-      const quotingPost = await postFactory(ctx.db)
-        .vars({ record: () => quotingRecord })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({ post: () => quotingPost })
-        .props({
-          uri: () => notFoundUri,
-          cid: () => "bafyreighost123456789",
-        })
-        .create();
-      const quotingPostUri = new AtUri(quotingPost.uri);
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: quotingRecord.indexedAt,
+      });
+
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
+
+      const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
       const result = await postViewService.findPostView([quotingPostUri]);
@@ -567,63 +535,62 @@ describe("PostViewService", () => {
 
     test("フィードジェネレーターの埋め込み(app.bsky.embed.record)の場合、ジェネレータービューを含む投稿ビューを取得できる", async () => {
       // arrange
-      const generatorActor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Generator Creator" }))
-        .props({ handle: () => "generator.bsky.social" })
-        .create();
-      const generatorRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.feed.generator",
-      )
-        .vars({ actor: () => generatorActor })
-        .create();
-      const generator = await generatorFactory(ctx.db)
-        .vars({ record: () => generatorRecord })
-        .props({
-          displayName: () => "My Cool Feed",
-          description: () => "A custom algorithmic feed",
-          avatarCid: () => "bafyreiavatarcid123",
-        })
-        .create();
+      const generatorActor = actorFactory({ handle: "generator.bsky.social" });
+      const generatorProfile = profileDetailedFactory({
+        actorDid: generatorActor.did,
+        displayName: "Generator Creator",
+      });
+      profileRepo.add(generatorProfile);
 
-      const quotingAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
-        .props({ handle: () => "quoting.bsky.social" })
-        .create();
-      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => quotingAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Check out this feed!",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: generator.uri,
-                cid: generator.cid,
-              },
+      const generator = generatorFactory({
+        actorDid: generatorActor.did,
+        did: generatorActor.did,
+        displayName: "My Cool Feed",
+        description: "A custom algorithmic feed",
+        avatarCid: "bafyreiavatarcid123",
+      });
+      generatorRepo.add(generator);
+
+      const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
+      const quotingProfile = profileDetailedFactory({
+        actorDid: quotingAuthor.did,
+        displayName: "Quoting Author",
+      });
+      profileRepo.add(quotingProfile);
+
+      const { post: quotingPost, record: quotingRecord } = postFactory({
+        actorDid: quotingAuthor.did,
+        text: "Check out this feed!",
+        embed: new PostEmbedRecord({
+          uri: generator.uri,
+          cid: generator.cid,
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const quotingRecordWithEmbed = recordFactory({
+        uri: quotingRecord.uri.toString(),
+        cid: quotingRecord.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Check out this feed!",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: generator.uri.toString(),
+              cid: generator.cid,
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      const quotingPost = await postFactory(ctx.db)
-        .vars({ record: () => quotingRecord })
-        .props({
-          text: () => "Check out this feed!",
-          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({ post: () => quotingPost })
-        .props({
-          uri: () => generator.uri,
-          cid: () => generator.cid,
-        })
-        .create();
-      const quotingPostUri = new AtUri(quotingPost.uri);
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: quotingRecord.indexedAt,
+      });
+
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
+
+      const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
       const result = await postViewService.findPostView([quotingPostUri]);
@@ -632,7 +599,7 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: quotingPost.uri,
+        uri: quotingPost.uri.toString(),
         cid: quotingRecord.cid,
         author: {
           $type: "app.bsky.actor.defs#profileViewBasic",
@@ -646,7 +613,7 @@ describe("PostViewService", () => {
           embed: {
             $type: "app.bsky.embed.record",
             record: {
-              uri: generator.uri,
+              uri: generator.uri.toString(),
               cid: generator.cid,
             },
           },
@@ -656,7 +623,7 @@ describe("PostViewService", () => {
           $type: "app.bsky.embed.record#view",
           record: {
             $type: "app.bsky.feed.defs#generatorView",
-            uri: generator.uri,
+            uri: generator.uri.toString(),
             cid: generator.cid,
             did: generator.did,
             creator: {
@@ -681,43 +648,51 @@ describe("PostViewService", () => {
 
     test("フィードジェネレーターの埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
       // arrange
-      const quotingAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Quoting Author" }))
-        .props({ handle: () => "quoting.bsky.social" })
-        .create();
+      const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
+      const quotingProfile = profileDetailedFactory({
+        actorDid: quotingAuthor.did,
+        displayName: "Quoting Author",
+      });
+      profileRepo.add(quotingProfile);
+
       const notFoundGeneratorUri = AtUri.make(
         "did:plc:notfound",
         "app.bsky.feed.generator",
         "notfound123",
       ).toString();
-      const quotingRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => quotingAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting a deleted generator",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: notFoundGeneratorUri,
-                cid: "bafyreighost123456789",
-              },
+
+      const { post: quotingPost, record: quotingRecord } = postFactory({
+        actorDid: quotingAuthor.did,
+        text: "Quoting a deleted generator",
+        embed: new PostEmbedRecord({
+          uri: notFoundGeneratorUri,
+          cid: "bafyreighost123456789",
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const quotingRecordWithEmbed = recordFactory({
+        uri: quotingRecord.uri.toString(),
+        cid: quotingRecord.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting a deleted generator",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: notFoundGeneratorUri,
+              cid: "bafyreighost123456789",
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-        })
-        .create();
-      const quotingPost = await postFactory(ctx.db)
-        .vars({ record: () => quotingRecord })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({ post: () => quotingPost })
-        .props({
-          uri: () => notFoundGeneratorUri,
-          cid: () => "bafyreighost123456789",
-        })
-        .create();
-      const quotingPostUri = new AtUri(quotingPost.uri);
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: quotingRecord.indexedAt,
+      });
+
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
+
+      const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
       const result = await postViewService.findPostView([quotingPostUri]);
@@ -741,123 +716,108 @@ describe("PostViewService", () => {
 
     test("embedがapp.bsky.embed.recordWithMedia#viewの場合、画像と投稿の両方を含む埋め込みビューを取得できる", async () => {
       // arrange
-      // 埋め込まれる投稿の作成
-      const embeddedAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Embedded Author" }))
-        .props({ handle: () => "embedded.bsky.social" })
-        .create();
-      const embeddedRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => embeddedAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "This is the embedded post",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const embeddedPost = await postFactory(ctx.db)
-        .vars({ record: () => embeddedRecord })
-        .props({
-          text: () => "This is the embedded post",
-          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
+      const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
+      const embeddedProfile = profileDetailedFactory({
+        actorDid: embeddedAuthor.did,
+        displayName: "Embedded Author",
+      });
+      profileRepo.add(embeddedProfile);
 
-      // recordWithMediaを含む投稿の作成
-      const mainAuthor = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Main Author" }))
-        .props({ handle: () => "main.bsky.social" })
-        .create();
+      const { post: embeddedPost, record: embeddedRecord } = postFactory({
+        actorDid: embeddedAuthor.did,
+        text: "This is the embedded post",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(embeddedPost);
+      recordRepo.add(embeddedRecord);
+
+      const mainAuthor = actorFactory({ handle: "main.bsky.social" });
+      const mainProfile = profileDetailedFactory({
+        actorDid: mainAuthor.did,
+        displayName: "Main Author",
+      });
+      profileRepo.add(mainProfile);
+
       const imageCid1 =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
       const imageCid2 =
         "bafyreihg3cyqnx3cekbrrqxifcrphjkemcblsp5p4gey5ytnvqegeconoq";
-      const mainRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => mainAuthor })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Post with both images and quoted post",
-            embed: {
-              $type: "app.bsky.embed.recordWithMedia",
+
+      const { post: mainPost, record: mainRecord } = postFactory({
+        actorDid: mainAuthor.did,
+        text: "Post with both images and quoted post",
+        embed: new PostEmbedRecordWithMedia({
+          uri: embeddedPost.uri,
+          cid: embeddedPost.cid,
+          media: [
+            new PostEmbedImage({
+              cid: imageCid1,
+              position: 0,
+              alt: "First image",
+            }),
+            new PostEmbedImage({
+              cid: imageCid2,
+              position: 1,
+              alt: "Second image",
+            }),
+          ],
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const mainRecordWithEmbed = recordFactory({
+        uri: mainRecord.uri.toString(),
+        cid: mainRecord.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Post with both images and quoted post",
+          embed: {
+            $type: "app.bsky.embed.recordWithMedia",
+            record: {
               record: {
-                record: {
-                  uri: embeddedPost.uri,
-                  cid: embeddedPost.cid,
-                },
-              },
-              media: {
-                $type: "app.bsky.embed.images",
-                images: [
-                  {
-                    alt: "First image",
-                    image: {
-                      $type: "blob",
-                      ref: {
-                        $link: imageCid1,
-                      },
-                      mimeType: "image/jpeg",
-                      size: 123456,
-                    },
-                  },
-                  {
-                    alt: "Second image",
-                    image: {
-                      $type: "blob",
-                      ref: {
-                        $link: imageCid2,
-                      },
-                      mimeType: "image/png",
-                      size: 234567,
-                    },
-                  },
-                ],
+                uri: embeddedPost.uri.toString(),
+                cid: embeddedPost.cid,
               },
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      const mainPost = await postFactory(ctx.db)
-        .vars({ record: () => mainRecord })
-        .props({
-          text: () => "Post with both images and quoted post",
-          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
+            media: {
+              $type: "app.bsky.embed.images",
+              images: [
+                {
+                  alt: "First image",
+                  image: {
+                    $type: "blob",
+                    ref: {
+                      $link: imageCid1,
+                    },
+                    mimeType: "image/jpeg",
+                    size: 123456,
+                  },
+                },
+                {
+                  alt: "Second image",
+                  image: {
+                    $type: "blob",
+                    ref: {
+                      $link: imageCid2,
+                    },
+                    mimeType: "image/png",
+                    size: 234567,
+                  },
+                },
+              ],
+            },
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: mainRecord.indexedAt,
+      });
 
-      // 画像の埋め込みデータを作成
-      await postEmbedImageFactory(ctx.db)
-        .vars({ post: () => mainPost })
-        .props({
-          cid: () => imageCid1,
-          position: () => 0,
-          alt: () => "First image",
-        })
-        .create();
-      await postEmbedImageFactory(ctx.db)
-        .vars({ post: () => mainPost })
-        .props({
-          cid: () => imageCid2,
-          position: () => 1,
-          alt: () => "Second image",
-        })
-        .create();
+      postRepo.add(mainPost);
+      recordRepo.add(mainRecordWithEmbed);
 
-      // 投稿の埋め込みデータを作成
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => mainPost,
-          embeddedPost: () => embeddedPost,
-        })
-        .create();
-
-      const mainPostUri = new AtUri(mainPost.uri);
+      const mainPostUri = new AtUri(mainPost.uri.toString());
 
       // act
       const result = await postViewService.findPostView([mainPostUri]);
@@ -866,7 +826,7 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: mainPost.uri,
+        uri: mainPost.uri.toString(),
         cid: mainRecord.cid,
         author: {
           $type: "app.bsky.actor.defs#profileViewBasic",
@@ -881,7 +841,7 @@ describe("PostViewService", () => {
             $type: "app.bsky.embed.recordWithMedia",
             record: {
               record: {
-                uri: embeddedPost.uri,
+                uri: embeddedPost.uri.toString(),
                 cid: embeddedPost.cid,
               },
             },
@@ -920,7 +880,7 @@ describe("PostViewService", () => {
           record: {
             record: {
               $type: "app.bsky.embed.record#viewRecord",
-              uri: embeddedPost.uri,
+              uri: embeddedPost.uri.toString(),
               cid: embeddedRecord.cid,
               author: {
                 $type: "app.bsky.actor.defs#profileViewBasic",
@@ -966,108 +926,101 @@ describe("PostViewService", () => {
 
     test("埋め込みの埋め込み（A→B→C）の場合、3階層すべての投稿ビューを取得できる", async () => {
       // arrange
-      // C: 最初の投稿
-      const authorC = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author C" }))
-        .props({ handle: () => "authorc.bsky.social" })
-        .create();
-      const recordC = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorC })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Original post C",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const postC = await postFactory(ctx.db)
-        .vars({ record: () => recordC })
-        .props({
-          text: () => "Original post C",
-          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
+      const authorC = actorFactory({ handle: "authorc.bsky.social" });
+      const profileC = profileDetailedFactory({
+        actorDid: authorC.did,
+        displayName: "Author C",
+      });
+      profileRepo.add(profileC);
 
-      // B: Cを埋め込む投稿
-      const authorB = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author B" }))
-        .props({ handle: () => "authorb.bsky.social" })
-        .create();
-      const recordB = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorB })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting post C",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: postC.uri,
-                cid: postC.cid,
-              },
+      const { post: postC, record: recordC } = postFactory({
+        actorDid: authorC.did,
+        text: "Original post C",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(postC);
+      recordRepo.add(recordC);
+
+      const authorB = actorFactory({ handle: "authorb.bsky.social" });
+      const profileB = profileDetailedFactory({
+        actorDid: authorB.did,
+        displayName: "Author B",
+      });
+      profileRepo.add(profileB);
+
+      const { post: postB, record: recordB } = postFactory({
+        actorDid: authorB.did,
+        text: "Quoting post C",
+        embed: new PostEmbedRecord({
+          uri: postC.uri,
+          cid: postC.cid,
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const recordBWithEmbed = recordFactory({
+        uri: recordB.uri.toString(),
+        cid: recordB.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting post C",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: postC.uri.toString(),
+              cid: postC.cid,
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      const postB = await postFactory(ctx.db)
-        .vars({ record: () => recordB })
-        .props({
-          text: () => "Quoting post C",
-          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => postB,
-          embeddedPost: () => postC,
-        })
-        .create();
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: recordB.indexedAt,
+      });
 
-      // A: Bを埋め込む投稿
-      const authorA = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author A" }))
-        .props({ handle: () => "authora.bsky.social" })
-        .create();
-      const recordA = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorA })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting post B",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: postB.uri,
-                cid: postB.cid,
-              },
+      postRepo.add(postB);
+      recordRepo.add(recordBWithEmbed);
+
+      const authorA = actorFactory({ handle: "authora.bsky.social" });
+      const profileA = profileDetailedFactory({
+        actorDid: authorA.did,
+        displayName: "Author A",
+      });
+      profileRepo.add(profileA);
+
+      const { post: postA, record: recordA } = postFactory({
+        actorDid: authorA.did,
+        text: "Quoting post B",
+        embed: new PostEmbedRecord({
+          uri: postB.uri,
+          cid: postB.cid,
+        }),
+        createdAt: new Date("2024-01-01T02:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T02:00:00.000Z"),
+      });
+
+      const recordAWithEmbed = recordFactory({
+        uri: recordA.uri.toString(),
+        cid: recordA.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting post B",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: postB.uri.toString(),
+              cid: postB.cid,
             },
-            createdAt: "2024-01-01T02:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-        })
-        .create();
-      const postA = await postFactory(ctx.db)
-        .vars({ record: () => recordA })
-        .props({
-          text: () => "Quoting post B",
-          createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => postA,
-          embeddedPost: () => postB,
-        })
-        .create();
+          },
+          createdAt: "2024-01-01T02:00:00.000Z",
+        },
+        indexedAt: recordA.indexedAt,
+      });
 
-      const postAUri = new AtUri(postA.uri);
+      postRepo.add(postA);
+      recordRepo.add(recordAWithEmbed);
+
+      const postAUri = new AtUri(postA.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postAUri]);
@@ -1076,7 +1029,7 @@ describe("PostViewService", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: postA.uri,
+        uri: postA.uri.toString(),
         author: {
           displayName: "Author A",
         },
@@ -1087,7 +1040,7 @@ describe("PostViewService", () => {
           $type: "app.bsky.embed.record#view",
           record: {
             $type: "app.bsky.embed.record#viewRecord",
-            uri: postB.uri,
+            uri: postB.uri.toString(),
             author: {
               displayName: "Author B",
             },
@@ -1099,7 +1052,7 @@ describe("PostViewService", () => {
                 $type: "app.bsky.embed.record#view",
                 record: {
                   $type: "app.bsky.embed.record#viewRecord",
-                  uri: postC.uri,
+                  uri: postC.uri.toString(),
                   author: {
                     displayName: "Author C",
                   },
@@ -1116,156 +1069,149 @@ describe("PostViewService", () => {
 
     test("埋め込みの深度が最大2階層に制限されることを確認（A→B→C→Dのパターン）", async () => {
       // arrange
-      // D: 最深の投稿
-      const authorD = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author D" }))
-        .props({ handle: () => "authord.bsky.social" })
-        .create();
-      const recordD = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorD })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Original post D",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
-      const postD = await postFactory(ctx.db)
-        .vars({ record: () => recordD })
-        .props({
-          text: () => "Original post D",
-          createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T00:00:00.000Z"),
-        })
-        .create();
+      const authorD = actorFactory({ handle: "authord.bsky.social" });
+      const profileD = profileDetailedFactory({
+        actorDid: authorD.did,
+        displayName: "Author D",
+      });
+      profileRepo.add(profileD);
 
-      // C: Dを埋め込む投稿
-      const authorC = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author C" }))
-        .props({ handle: () => "authorc.bsky.social" })
-        .create();
-      const recordC = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorC })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting post D",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: postD.uri,
-                cid: postD.cid,
-              },
+      const { post: postD, record: recordD } = postFactory({
+        actorDid: authorD.did,
+        text: "Original post D",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(postD);
+      recordRepo.add(recordD);
+
+      const authorC = actorFactory({ handle: "authorc.bsky.social" });
+      const profileC = profileDetailedFactory({
+        actorDid: authorC.did,
+        displayName: "Author C",
+      });
+      profileRepo.add(profileC);
+
+      const { post: postC, record: recordC } = postFactory({
+        actorDid: authorC.did,
+        text: "Quoting post D",
+        embed: new PostEmbedRecord({
+          uri: postD.uri,
+          cid: postD.cid,
+        }),
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+
+      const recordCWithEmbed = recordFactory({
+        uri: recordC.uri.toString(),
+        cid: recordC.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting post D",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: postD.uri.toString(),
+              cid: postD.cid,
             },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      const postC = await postFactory(ctx.db)
-        .vars({ record: () => recordC })
-        .props({
-          text: () => "Quoting post D",
-          createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => postC,
-          embeddedPost: () => postD,
-        })
-        .create();
+          },
+          createdAt: "2024-01-01T01:00:00.000Z",
+        },
+        indexedAt: recordC.indexedAt,
+      });
 
-      // B: Cを埋め込む投稿
-      const authorB = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author B" }))
-        .props({ handle: () => "authorb.bsky.social" })
-        .create();
-      const recordB = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorB })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting post C",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: postC.uri,
-                cid: postC.cid,
-              },
+      postRepo.add(postC);
+      recordRepo.add(recordCWithEmbed);
+
+      const authorB = actorFactory({ handle: "authorb.bsky.social" });
+      const profileB = profileDetailedFactory({
+        actorDid: authorB.did,
+        displayName: "Author B",
+      });
+      profileRepo.add(profileB);
+
+      const { post: postB, record: recordB } = postFactory({
+        actorDid: authorB.did,
+        text: "Quoting post C",
+        embed: new PostEmbedRecord({
+          uri: postC.uri,
+          cid: postC.cid,
+        }),
+        createdAt: new Date("2024-01-01T02:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T02:00:00.000Z"),
+      });
+
+      const recordBWithEmbed = recordFactory({
+        uri: recordB.uri.toString(),
+        cid: recordB.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting post C",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: postC.uri.toString(),
+              cid: postC.cid,
             },
-            createdAt: "2024-01-01T02:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-        })
-        .create();
-      const postB = await postFactory(ctx.db)
-        .vars({ record: () => recordB })
-        .props({
-          text: () => "Quoting post C",
-          createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => postB,
-          embeddedPost: () => postC,
-        })
-        .create();
+          },
+          createdAt: "2024-01-01T02:00:00.000Z",
+        },
+        indexedAt: recordB.indexedAt,
+      });
 
-      // A: Bを埋め込む投稿
-      const authorA = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author A" }))
-        .props({ handle: () => "authora.bsky.social" })
-        .create();
-      const recordA = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => authorA })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Quoting post B",
-            embed: {
-              $type: "app.bsky.embed.record",
-              record: {
-                uri: postB.uri,
-                cid: postB.cid,
-              },
+      postRepo.add(postB);
+      recordRepo.add(recordBWithEmbed);
+
+      const authorA = actorFactory({ handle: "authora.bsky.social" });
+      const profileA = profileDetailedFactory({
+        actorDid: authorA.did,
+        displayName: "Author A",
+      });
+      profileRepo.add(profileA);
+
+      const { post: postA, record: recordA } = postFactory({
+        actorDid: authorA.did,
+        text: "Quoting post B",
+        embed: new PostEmbedRecord({
+          uri: postB.uri,
+          cid: postB.cid,
+        }),
+        createdAt: new Date("2024-01-01T03:00:00.000Z"),
+        indexedAt: new Date("2024-01-01T03:00:00.000Z"),
+      });
+
+      const recordAWithEmbed = recordFactory({
+        uri: recordA.uri.toString(),
+        cid: recordA.cid,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Quoting post B",
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: {
+              uri: postB.uri.toString(),
+              cid: postB.cid,
             },
-            createdAt: "2024-01-01T03:00:00.000Z",
-          }),
-          indexedAt: () => new Date("2024-01-01T03:00:00.000Z"),
-        })
-        .create();
-      const postA = await postFactory(ctx.db)
-        .vars({ record: () => recordA })
-        .props({
-          text: () => "Quoting post B",
-          createdAt: () => new Date("2024-01-01T03:00:00.000Z"),
-          indexedAt: () => new Date("2024-01-01T03:00:00.000Z"),
-        })
-        .create();
-      await postEmbedRecordFactory(ctx.db)
-        .vars({
-          post: () => postA,
-          embeddedPost: () => postB,
-        })
-        .create();
+          },
+          createdAt: "2024-01-01T03:00:00.000Z",
+        },
+        indexedAt: recordA.indexedAt,
+      });
 
-      const postAUri = new AtUri(postA.uri);
+      postRepo.add(postA);
+      recordRepo.add(recordAWithEmbed);
+
+      const postAUri = new AtUri(postA.uri.toString());
 
       // act
       const result = await postViewService.findPostView([postAUri]);
 
       // assert
       expect(result).toHaveLength(1);
-      // A→B→Cまでは取得されるが、Dは取得されない（notFoundになる）
       expect(result[0]).toMatchObject({
         $type: "app.bsky.feed.defs#postView",
-        uri: postA.uri,
+        uri: postA.uri.toString(),
         author: {
           displayName: "Author A",
         },
@@ -1276,7 +1222,7 @@ describe("PostViewService", () => {
           $type: "app.bsky.embed.record#view",
           record: {
             $type: "app.bsky.embed.record#viewRecord",
-            uri: postB.uri,
+            uri: postB.uri.toString(),
             author: {
               displayName: "Author B",
             },
@@ -1288,14 +1234,13 @@ describe("PostViewService", () => {
                 $type: "app.bsky.embed.record#view",
                 record: {
                   $type: "app.bsky.embed.record#viewRecord",
-                  uri: postC.uri,
+                  uri: postC.uri.toString(),
                   author: {
                     displayName: "Author C",
                   },
                   value: {
                     text: "Quoting post D",
                   },
-                  // Dの埋め込みは深度制限により取得されないため、embedsはundefinedになる
                 },
               },
             ],
@@ -1306,88 +1251,61 @@ describe("PostViewService", () => {
 
     test("閲覧者が投稿をいいねとリポストしている場合、viewerにそれぞれのURIが含まれる", async () => {
       // arrange
-      const viewer = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Viewer" }))
-        .create();
-      const author1 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author 1" }))
-        .create();
-      const author2 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Author 2" }))
-        .create();
+      const viewer = actorFactory();
+      const viewerProfile = profileDetailedFactory({
+        actorDid: viewer.did,
+        displayName: "Viewer",
+      });
+      profileRepo.add(viewerProfile);
 
-      // 投稿1: いいねのみ
-      const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => author1 })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Post 1",
-            createdAt: "2024-01-01T00:00:00.000Z",
-          }),
-        })
-        .create();
-      const post1 = await postFactory(ctx.db)
-        .vars({ record: () => postRecord1 })
-        .create();
-      const likeRecord1 = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => viewer })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.like",
-            subject: {
-              uri: post1.uri,
-              cid: postRecord1.cid,
-            },
-            createdAt: "2024-01-01T01:00:00.000Z",
-          }),
-        })
-        .create();
-      const like1 = await likeFactory(ctx.db)
-        .vars({ record: () => likeRecord1 })
-        .props({
-          subjectUri: () => post1.uri,
-          subjectCid: () => postRecord1.cid,
-        })
-        .create();
+      const author1 = actorFactory();
+      const profile1 = profileDetailedFactory({
+        actorDid: author1.did,
+        displayName: "Author 1",
+      });
+      profileRepo.add(profile1);
 
-      // 投稿2: リポストのみ
-      const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => author2 })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Post 2",
-            createdAt: "2024-01-01T02:00:00.000Z",
-          }),
-        })
-        .create();
-      const post2 = await postFactory(ctx.db)
-        .vars({ record: () => postRecord2 })
-        .create();
-      const repostRecord2 = await recordFactory(ctx.db, "app.bsky.feed.repost")
-        .vars({ actor: () => viewer })
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.repost",
-            subject: {
-              uri: post2.uri,
-              cid: postRecord2.cid,
-            },
-            createdAt: "2024-01-01T03:00:00.000Z",
-          }),
-        })
-        .create();
-      const repost2 = await repostFactory(ctx.db)
-        .vars({ record: () => repostRecord2 })
-        .props({
-          subjectUri: () => post2.uri,
-          subjectCid: () => postRecord2.cid,
-        })
-        .create();
+      const author2 = actorFactory();
+      const profile2 = profileDetailedFactory({
+        actorDid: author2.did,
+        displayName: "Author 2",
+      });
+      profileRepo.add(profile2);
 
-      const postUri1 = new AtUri(post1.uri);
-      const postUri2 = new AtUri(post2.uri);
+      const { post: post1, record: record1 } = postFactory({
+        actorDid: author1.did,
+        text: "Post 1",
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      });
+      postRepo.add(post1);
+      recordRepo.add(record1);
+
+      const like1 = likeFactory({
+        actorDid: viewer.did,
+        subjectUri: post1.uri.toString(),
+        subjectCid: post1.cid,
+        createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      });
+      likeRepo.add(like1);
+
+      const { post: post2, record: record2 } = postFactory({
+        actorDid: author2.did,
+        text: "Post 2",
+        createdAt: new Date("2024-01-01T02:00:00.000Z"),
+      });
+      postRepo.add(post2);
+      recordRepo.add(record2);
+
+      const repost2 = repostFactory({
+        actorDid: viewer.did,
+        subjectUri: post2.uri.toString(),
+        subjectCid: post2.cid,
+        createdAt: new Date("2024-01-01T03:00:00.000Z"),
+      });
+      repostRepo.add(repost2);
+
+      const postUri1 = new AtUri(post1.uri.toString());
+      const postUri2 = new AtUri(post2.uri.toString());
 
       // act
       const result = await postViewService.findPostView(
@@ -1398,16 +1316,16 @@ describe("PostViewService", () => {
       // assert
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
-        uri: post1.uri,
+        uri: post1.uri.toString(),
         viewer: {
-          like: like1.uri,
+          like: like1.uri.toString(),
           repost: undefined,
         },
       });
       expect(result[1]).toMatchObject({
-        uri: post2.uri,
+        uri: post2.uri.toString(),
         viewer: {
-          repost: repost2.uri,
+          repost: repost2.uri.toString(),
           like: undefined,
         },
       });

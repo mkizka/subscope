@@ -3,52 +3,19 @@ import { Post } from "@repo/common/domain";
 import {
   actorFactory,
   postFactory,
-  recordFactory,
-  testSetup,
-} from "@repo/test-utils";
+  profileDetailedFactory,
+} from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";
-import { HandleResolver } from "../../../infrastructure/handle-resolver/handle-resolver.js";
-import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
-import { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
-import { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
-import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
-import { ProfileViewService } from "../actor/profile-view-service.js";
-import { ProfileSearchService } from "../search/profile-search-service.js";
-import { GeneratorViewService } from "./generator-view-service.js";
-import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
-import { PostViewService } from "./post-view-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { ReplyRefService } from "./reply-ref-service.js";
 
 describe("ReplyRefService", () => {
-  const { testInjector, ctx } = testSetup;
+  const replyRefService = testInjector.injectClass(ReplyRefService);
 
-  const replyRefService = testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("generatorRepository", GeneratorRepository)
-    .provideClass("generatorViewService", GeneratorViewService)
-    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("likeRepository", LikeRepository)
-    .provideClass("postViewService", PostViewService)
-    .injectClass(ReplyRefService);
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
 
   test("リプライがない投稿のみの場合、空のMapを返す", async () => {
     // arrange
@@ -76,37 +43,39 @@ describe("ReplyRefService", () => {
 
   test("リプライがある場合、reply情報を含むMapを返す", async () => {
     // arrange
-    const rootActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "User 1" }))
-      .create();
-    await actorFactory(ctx.db)
-      .props({ did: () => "did:plc:user2", handle: () => "user2.test" })
-      .create();
+    const rootActor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootActor.did,
+      displayName: "User 1",
+    });
+    profileRepo.add(rootProfile);
 
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .create();
+    const replyActor = actorFactory();
 
-    const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .create();
-    const parentPost = await postFactory(ctx.db)
-      .vars({ record: () => parentRecord })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootActor.did,
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const replyUri = new AtUri("at://did:plc:user2/app.bsky.feed.post/reply");
+    const { post: parentPost, record: parentRecord } = postFactory({
+      actorDid: rootActor.did,
+    });
+    postRepo.add(parentPost);
+    recordRepo.add(parentRecord);
+
+    const replyUri = new AtUri(
+      `at://${replyActor.did}/app.bsky.feed.post/reply`,
+    );
 
     const posts = [
       new Post({
         uri: replyUri,
         cid: "reply-cid",
-        actorDid: "did:plc:user2",
+        actorDid: replyActor.did,
         text: "Reply post",
-        replyRoot: { uri: new AtUri(rootPost.uri), cid: "root-cid" },
-        replyParent: { uri: new AtUri(parentPost.uri), cid: "parent-cid" },
+        replyRoot: { uri: rootPost.uri, cid: "root-cid" },
+        replyParent: { uri: parentPost.uri, cid: "parent-cid" },
         langs: null,
         embed: null,
         createdAt: new Date(),
@@ -131,44 +100,45 @@ describe("ReplyRefService", () => {
 
   test("複数のリプライがある場合、すべてのreply情報を含むMapを返す", async () => {
     // arrange
-    const rootActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "User 3" }))
-      .props({ did: () => "did:plc:user3", handle: () => "user3.test" })
-      .create();
-    await actorFactory(ctx.db)
-      .props({ did: () => "did:plc:user4", handle: () => "user4.test" })
-      .create();
-    await actorFactory(ctx.db)
-      .props({ did: () => "did:plc:user5", handle: () => "user5.test" })
-      .create();
+    const rootActor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootActor.did,
+      displayName: "User 3",
+    });
+    profileRepo.add(rootProfile);
 
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .props({ cid: () => "root-cid-2" })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .create();
+    const reply1Actor = actorFactory();
+    const reply2Actor = actorFactory();
 
-    const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .props({ cid: () => "parent-cid-2" })
-      .create();
-    const parentPost = await postFactory(ctx.db)
-      .vars({ record: () => parentRecord })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootActor.did,
+      cid: "root-cid-2",
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const reply1Uri = new AtUri("at://did:plc:user4/app.bsky.feed.post/reply1");
-    const reply2Uri = new AtUri("at://did:plc:user5/app.bsky.feed.post/reply2");
+    const { post: parentPost, record: parentRecord } = postFactory({
+      actorDid: rootActor.did,
+      cid: "parent-cid-2",
+    });
+    postRepo.add(parentPost);
+    recordRepo.add(parentRecord);
+
+    const reply1Uri = new AtUri(
+      `at://${reply1Actor.did}/app.bsky.feed.post/reply1`,
+    );
+    const reply2Uri = new AtUri(
+      `at://${reply2Actor.did}/app.bsky.feed.post/reply2`,
+    );
 
     const posts = [
       new Post({
         uri: reply1Uri,
         cid: "reply1-cid",
-        actorDid: "did:plc:user4",
+        actorDid: reply1Actor.did,
         text: "Reply 1",
-        replyRoot: { uri: new AtUri(rootPost.uri), cid: "root-cid-2" },
-        replyParent: { uri: new AtUri(parentPost.uri), cid: "parent-cid-2" },
+        replyRoot: { uri: rootPost.uri, cid: "root-cid-2" },
+        replyParent: { uri: parentPost.uri, cid: "parent-cid-2" },
         langs: null,
         embed: null,
         createdAt: new Date(),
@@ -177,10 +147,10 @@ describe("ReplyRefService", () => {
       new Post({
         uri: reply2Uri,
         cid: "reply2-cid",
-        actorDid: "did:plc:user5",
+        actorDid: reply2Actor.did,
         text: "Reply 2",
-        replyRoot: { uri: new AtUri(rootPost.uri), cid: "root-cid-2" },
-        replyParent: { uri: new AtUri(rootPost.uri), cid: "root-cid-2" }, // 同じrootへの直接リプライ
+        replyRoot: { uri: rootPost.uri, cid: "root-cid-2" },
+        replyParent: { uri: rootPost.uri, cid: "root-cid-2" }, // 同じrootへの直接リプライ
         langs: null,
         embed: null,
         createdAt: new Date(),
@@ -256,41 +226,42 @@ describe("ReplyRefService", () => {
 
   test("リプライとノーマル投稿が混在している場合、リプライのみを処理する", async () => {
     // arrange
-    const rootActor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "User 7" }))
-      .props({ did: () => "did:plc:user7", handle: () => "user7.test" })
-      .create();
-    await actorFactory(ctx.db)
-      .props({ did: () => "did:plc:user8", handle: () => "user8.test" })
-      .create();
-    await actorFactory(ctx.db)
-      .props({ did: () => "did:plc:user9", handle: () => "user9.test" })
-      .create();
+    const rootActor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootActor.did,
+      displayName: "User 7",
+    });
+    profileRepo.add(rootProfile);
 
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .props({ cid: () => "root-cid-3" })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .create();
+    const replyActor = actorFactory();
+    const normalActor = actorFactory();
 
-    const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootActor })
-      .props({ cid: () => "parent-cid-3" })
-      .create();
-    const parentPost = await postFactory(ctx.db)
-      .vars({ record: () => parentRecord })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootActor.did,
+      cid: "root-cid-3",
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const replyUri = new AtUri("at://did:plc:user8/app.bsky.feed.post/reply");
-    const normalUri = new AtUri("at://did:plc:user9/app.bsky.feed.post/normal");
+    const { post: parentPost, record: parentRecord } = postFactory({
+      actorDid: rootActor.did,
+      cid: "parent-cid-3",
+    });
+    postRepo.add(parentPost);
+    recordRepo.add(parentRecord);
+
+    const replyUri = new AtUri(
+      `at://${replyActor.did}/app.bsky.feed.post/reply`,
+    );
+    const normalUri = new AtUri(
+      `at://${normalActor.did}/app.bsky.feed.post/normal`,
+    );
 
     const posts = [
       new Post({
         uri: normalUri,
         cid: "normal-cid",
-        actorDid: "did:plc:user9",
+        actorDid: normalActor.did,
         text: "Normal post",
         replyRoot: null,
         replyParent: null,
@@ -302,10 +273,10 @@ describe("ReplyRefService", () => {
       new Post({
         uri: replyUri,
         cid: "reply-cid",
-        actorDid: "did:plc:user8",
+        actorDid: replyActor.did,
         text: "Reply post",
-        replyRoot: { uri: new AtUri(rootPost.uri), cid: "root-cid-3" },
-        replyParent: { uri: new AtUri(parentPost.uri), cid: "parent-cid-3" },
+        replyRoot: { uri: rootPost.uri, cid: "root-cid-3" },
+        replyParent: { uri: parentPost.uri, cid: "parent-cid-3" },
         langs: null,
         embed: null,
         createdAt: new Date(),

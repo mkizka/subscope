@@ -1,51 +1,32 @@
 import { asDid } from "@atproto/did";
 import {
   actorFactory,
-  actorStatsFactory,
   followFactory,
-  profileFactory,
-  recordFactory,
-  testSetup,
-} from "@repo/test-utils";
+  profileDetailedFactory,
+} from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { ProfileSearchService } from "../search/profile-search-service.js";
-import { ProfileViewBuilder } from "./profile-view-builder.js";
+import { testInjector } from "../../../shared/test-utils.js";
+import type { ActorStats } from "../../interfaces/actor-stats-repository.js";
 import { ProfileViewService } from "./profile-view-service.js";
 
 describe("ProfileViewService", () => {
-  const { testInjector, ctx } = testSetup;
+  const profileViewService = testInjector.injectClass(ProfileViewService);
 
-  const profileViewService = testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .resolve("profileViewService");
+  const profileRepo = testInjector.resolve("profileRepository");
+  const actorStatsRepo = testInjector.resolve("actorStatsRepository");
+  const followRepo = testInjector.resolve("followRepository");
 
   describe("findProfileViewBasic", () => {
     test("プロフィールが存在する場合、ProfileViewBasicを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const profile = await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => actor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Test User",
-          avatarCid: () => "test-avatar-cid",
-        })
-        .create();
+      const actor = actorFactory();
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Test User",
+        avatarCid: "test-avatar-cid",
+      });
+      profileRepo.add(profile);
 
       // act
       const results = await profileViewService.findProfileViewBasic([
@@ -59,7 +40,7 @@ describe("ProfileViewService", () => {
         did: actor.did,
         handle: actor.handle,
         displayName: "Test User",
-        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/${profile.avatarCid}.jpg`,
+        avatar: `http://localhost:3004/images/avatar_thumbnail/${actor.did}/test-avatar-cid.jpg`,
         createdAt: expect.any(String),
       });
     });
@@ -81,23 +62,18 @@ describe("ProfileViewService", () => {
   describe("findProfileViewDetailed", () => {
     test("プロフィールと統計情報が存在する場合、統計情報を含むProfileViewDetailedを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const profile = await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => actor })
-              .create(),
-        })
-        .create();
-      await actorStatsFactory(ctx.db)
-        .vars({ actor: () => actor })
-        .props({
-          followsCount: () => 10,
-          followersCount: () => 20,
-          postsCount: () => 30,
-        })
-        .create();
+      const actor = actorFactory();
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+      });
+      profileRepo.add(profile);
+
+      const actorStats: ActorStats = {
+        followsCount: 10,
+        followersCount: 20,
+        postsCount: 30,
+      };
+      actorStatsRepo.add(actor.did, actorStats);
 
       // act
       const results = await profileViewService.findProfileViewDetailed([
@@ -124,18 +100,12 @@ describe("ProfileViewService", () => {
 
     test("プロフィールは存在するが統計情報が存在しない場合、統計情報を0として返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => actor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Test User Without Stats",
-        })
-        .create();
+      const actor = actorFactory();
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Test User Without Stats",
+      });
+      profileRepo.add(profile);
 
       // act
       const results = await profileViewService.findProfileViewDetailed([
@@ -159,43 +129,33 @@ describe("ProfileViewService", () => {
 
     test("複数のプロフィールに対して正しい統計情報を関連付ける", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => actor1 })
-              .create(),
-        })
-        .props({ displayName: () => "User 1" })
-        .create();
-      await actorStatsFactory(ctx.db)
-        .vars({ actor: () => actor1 })
-        .props({
-          followsCount: () => 5,
-          followersCount: () => 10,
-          postsCount: () => 15,
-        })
-        .create();
+      const actor1 = actorFactory();
+      const profile1 = profileDetailedFactory({
+        actorDid: actor1.did,
+        displayName: "User 1",
+      });
+      profileRepo.add(profile1);
 
-      const actor2 = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => actor2 })
-              .create(),
-        })
-        .props({ displayName: () => "User 2" })
-        .create();
-      await actorStatsFactory(ctx.db)
-        .vars({ actor: () => actor2 })
-        .props({
-          followsCount: () => 20,
-          followersCount: () => 25,
-          postsCount: () => 30,
-        })
-        .create();
+      const actorStats1: ActorStats = {
+        followsCount: 5,
+        followersCount: 10,
+        postsCount: 15,
+      };
+      actorStatsRepo.add(actor1.did, actorStats1);
+
+      const actor2 = actorFactory();
+      const profile2 = profileDetailedFactory({
+        actorDid: actor2.did,
+        displayName: "User 2",
+      });
+      profileRepo.add(profile2);
+
+      const actorStats2: ActorStats = {
+        followsCount: 20,
+        followersCount: 25,
+        postsCount: 30,
+      };
+      actorStatsRepo.add(actor2.did, actorStats2);
 
       // act
       const results = await profileViewService.findProfileViewDetailed([
@@ -238,18 +198,12 @@ describe("ProfileViewService", () => {
 
     test("viewerDidが指定されない場合、空のviewerStateを含むProfileViewDetailedを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => actor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Test User",
-        })
-        .create();
+      const actor = actorFactory();
+      const profile = profileDetailedFactory({
+        actorDid: actor.did,
+        displayName: "Test User",
+      });
+      profileRepo.add(profile);
 
       // act
       const results = await profileViewService.findProfileViewDetailed([
@@ -270,19 +224,13 @@ describe("ProfileViewService", () => {
 
     test("viewerDidが指定され、フォロー関係がない場合、空のviewerStateを含むProfileViewDetailedを返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const targetActor = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => targetActor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Target User",
-        })
-        .create();
+      const viewerActor = actorFactory();
+      const targetActor = actorFactory();
+      const targetProfile = profileDetailedFactory({
+        actorDid: targetActor.did,
+        displayName: "Target User",
+      });
+      profileRepo.add(targetProfile);
 
       // act
       const results = await profileViewService.findProfileViewDetailed(
@@ -306,30 +254,19 @@ describe("ProfileViewService", () => {
 
     test("viewerDidが指定され、viewerがtargetをフォローしている場合、followingが設定されたviewerStateを返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const targetActor = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => targetActor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Target User",
-        })
-        .create();
+      const viewerActor = actorFactory();
+      const targetActor = actorFactory();
+      const targetProfile = profileDetailedFactory({
+        actorDid: targetActor.did,
+        displayName: "Target User",
+      });
+      profileRepo.add(targetProfile);
 
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followRecord })
-        .props({
-          actorDid: () => viewerActor.did,
-          subjectDid: () => targetActor.did,
-        })
-        .create();
+      const follow = followFactory({
+        actorDid: viewerActor.did,
+        subjectDid: targetActor.did,
+      });
+      followRepo.add(follow);
 
       // act
       const results = await profileViewService.findProfileViewDetailed(
@@ -345,7 +282,7 @@ describe("ProfileViewService", () => {
         displayName: "Target User",
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
-          following: followRecord.uri,
+          following: follow.uri,
           followedBy: undefined,
         },
       });
@@ -353,30 +290,19 @@ describe("ProfileViewService", () => {
 
     test("viewerDidが指定され、targetがviewerをフォローしている場合、followedByが設定されたviewerStateを返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const targetActor = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => targetActor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Target User",
-        })
-        .create();
+      const viewerActor = actorFactory();
+      const targetActor = actorFactory();
+      const targetProfile = profileDetailedFactory({
+        actorDid: targetActor.did,
+        displayName: "Target User",
+      });
+      profileRepo.add(targetProfile);
 
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => targetActor })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followRecord })
-        .props({
-          actorDid: () => targetActor.did,
-          subjectDid: () => viewerActor.did,
-        })
-        .create();
+      const follow = followFactory({
+        actorDid: targetActor.did,
+        subjectDid: viewerActor.did,
+      });
+      followRepo.add(follow);
 
       // act
       const results = await profileViewService.findProfileViewDetailed(
@@ -393,56 +319,32 @@ describe("ProfileViewService", () => {
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
           following: undefined,
-          followedBy: followRecord.uri,
+          followedBy: follow.uri,
         },
       });
     });
 
     test("viewerDidが指定され、相互フォローの場合、followingとfollowedByの両方が設定されたviewerStateを返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const targetActor = await actorFactory(ctx.db).create();
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => targetActor })
-              .create(),
-        })
-        .props({
-          displayName: () => "Target User",
-        })
-        .create();
+      const viewerActor = actorFactory();
+      const targetActor = actorFactory();
+      const targetProfile = profileDetailedFactory({
+        actorDid: targetActor.did,
+        displayName: "Target User",
+      });
+      profileRepo.add(targetProfile);
 
-      // viewerがtargetをフォロー
-      const followingRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.graph.follow",
-      )
-        .vars({ actor: () => viewerActor })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followingRecord })
-        .props({
-          actorDid: () => viewerActor.did,
-          subjectDid: () => targetActor.did,
-        })
-        .create();
+      const followingFollow = followFactory({
+        actorDid: viewerActor.did,
+        subjectDid: targetActor.did,
+      });
+      followRepo.add(followingFollow);
 
-      // targetがviewerをフォロー
-      const followedByRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.graph.follow",
-      )
-        .vars({ actor: () => targetActor })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followedByRecord })
-        .props({
-          actorDid: () => targetActor.did,
-          subjectDid: () => viewerActor.did,
-        })
-        .create();
+      const followedByFollow = followFactory({
+        actorDid: targetActor.did,
+        subjectDid: viewerActor.did,
+      });
+      followRepo.add(followedByFollow);
 
       // act
       const results = await profileViewService.findProfileViewDetailed(
@@ -458,64 +360,41 @@ describe("ProfileViewService", () => {
         displayName: "Target User",
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
-          following: followingRecord.uri,
-          followedBy: followedByRecord.uri,
+          following: followingFollow.uri,
+          followedBy: followedByFollow.uri,
         },
       });
     });
 
     test("viewerDidが指定され、複数のプロフィールに対して正しいviewerStateを関連付ける", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const target1Actor = await actorFactory(ctx.db).create();
-      const target2Actor = await actorFactory(ctx.db).create();
+      const viewerActor = actorFactory();
+      const target1Actor = actorFactory();
+      const target2Actor = actorFactory();
 
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => target1Actor })
-              .create(),
-        })
-        .props({ displayName: () => "Target 1" })
-        .create();
+      const target1Profile = profileDetailedFactory({
+        actorDid: target1Actor.did,
+        displayName: "Target 1",
+      });
+      profileRepo.add(target1Profile);
 
-      await profileFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.actor.profile")
-              .vars({ actor: () => target2Actor })
-              .create(),
-        })
-        .props({ displayName: () => "Target 2" })
-        .create();
+      const target2Profile = profileDetailedFactory({
+        actorDid: target2Actor.did,
+        displayName: "Target 2",
+      });
+      profileRepo.add(target2Profile);
 
-      // viewerがtarget1のみをフォロー
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followRecord })
-        .props({
-          actorDid: () => viewerActor.did,
-          subjectDid: () => target1Actor.did,
-        })
-        .create();
+      const follow1 = followFactory({
+        actorDid: viewerActor.did,
+        subjectDid: target1Actor.did,
+      });
+      followRepo.add(follow1);
 
-      // target2のみがviewerをフォロー
-      const followedByRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.graph.follow",
-      )
-        .vars({ actor: () => target2Actor })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followedByRecord })
-        .props({
-          actorDid: () => target2Actor.did,
-          subjectDid: () => viewerActor.did,
-        })
-        .create();
+      const follow2 = followFactory({
+        actorDid: target2Actor.did,
+        subjectDid: viewerActor.did,
+      });
+      followRepo.add(follow2);
 
       // act
       const results = await profileViewService.findProfileViewDetailed(
@@ -531,7 +410,7 @@ describe("ProfileViewService", () => {
         displayName: "Target 1",
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
-          following: followRecord.uri,
+          following: follow1.uri,
           followedBy: undefined,
         },
       });
@@ -542,7 +421,7 @@ describe("ProfileViewService", () => {
         viewer: {
           $type: "app.bsky.actor.defs#viewerState",
           following: undefined,
-          followedBy: followedByRecord.uri,
+          followedBy: follow2.uri,
         },
       });
     });

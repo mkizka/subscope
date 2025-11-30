@@ -1,101 +1,55 @@
-import { asDid } from "@atproto/did";
 import { FeedItem } from "@repo/common/domain";
-import { schema } from "@repo/db";
 import {
   actorFactory,
   postFactory,
-  postFeedItemFactory,
-  recordFactory,
+  profileDetailedFactory,
   repostFactory,
-  repostFeedItemFactory,
-  testSetup,
-} from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+} from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { ActorStatsRepository } from "../../../infrastructure/actor-stats-repository/actor-stats-repository.js";
-import { AssetUrlBuilder } from "../../../infrastructure/asset-url-builder/asset-url-builder.js";
-import { FollowRepository } from "../../../infrastructure/follow-repository/follow-repository.js";
-import { GeneratorRepository } from "../../../infrastructure/generator-repository/generator-repository.js";
-import { HandleResolver } from "../../../infrastructure/handle-resolver/handle-resolver.js";
-import { LikeRepository } from "../../../infrastructure/like-repository/like-repository.js";
-import { PostRepository } from "../../../infrastructure/post-repository/post-repository.js";
-import { PostStatsRepository } from "../../../infrastructure/post-stats-repository/post-stats-repository.js";
-import { ProfileRepository } from "../../../infrastructure/profile-repository/profile-repository.js";
-import { RecordRepository } from "../../../infrastructure/record-repository/record-repository.js";
-import { RepostRepository } from "../../../infrastructure/repost-repository/repost-repository.js";
-import { ProfileViewBuilder } from "../actor/profile-view-builder.js";
-import { ProfileViewService } from "../actor/profile-view-service.js";
-import { ProfileSearchService } from "../search/profile-search-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { FeedProcessor } from "./feed-processor.js";
-import { GeneratorViewService } from "./generator-view-service.js";
-import { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
-import { PostViewService } from "./post-view-service.js";
-import { ReplyRefService } from "./reply-ref-service.js";
 
 describe("FeedProcessor", () => {
-  const { testInjector, ctx } = testSetup;
+  const feedProcessor = testInjector.injectClass(FeedProcessor);
 
-  const feedProcessor = testInjector
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("handleResolver", HandleResolver)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("likeRepository", LikeRepository)
-    .provideClass("assetUrlBuilder", AssetUrlBuilder)
-    .provideClass("profileViewBuilder", ProfileViewBuilder)
-    .provideClass("profileSearchService", ProfileSearchService)
-    .provideClass("profileViewService", ProfileViewService)
-    .provideClass("generatorRepository", GeneratorRepository)
-    .provideClass("generatorViewService", GeneratorViewService)
-    .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
-    .provideClass("postViewService", PostViewService)
-    .provideClass("replyRefService", ReplyRefService)
-    .injectClass(FeedProcessor);
+  const postRepo = testInjector.resolve("postRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const profileRepo = testInjector.resolve("profileRepository");
+  const repostRepo = testInjector.resolve("repostRepository");
 
   test("投稿のみの場合、FeedViewPostのリストを返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Post Author" }))
-      .create();
-    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => actor })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => record })
-      .props({
-        text: () => "Test post content",
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-      })
-      .create();
-    const feedItem = await postFeedItemFactory(ctx.db)
-      .vars({ post: () => post })
-      .create();
+    const author = actorFactory();
+    const profile = profileDetailedFactory({
+      actorDid: author.did,
+      displayName: "Post Author",
+    });
+    profileRepo.add(profile);
 
-    const feedItems = [
-      new FeedItem({
-        ...feedItem,
-        actorDid: asDid(feedItem.actorDid),
-      }),
-    ];
+    const { post, record } = postFactory({
+      actorDid: author.did,
+      text: "Test post content",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+    postRepo.add(post);
+    recordRepo.add(record);
+
+    const feedItem = FeedItem.fromPost(post);
 
     // act
-    const result = await feedProcessor.processFeedItems(feedItems);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
       {
         $type: "app.bsky.feed.defs#feedViewPost",
         post: {
-          uri: post.uri,
+          uri: post.uri.toString(),
           cid: post.cid,
           author: {
-            did: actor.did,
-            handle: actor.handle,
+            did: author.did,
+            handle: author.handle,
             displayName: "Post Author",
           },
           record: {
@@ -109,60 +63,48 @@ describe("FeedProcessor", () => {
 
   test("リポストの場合、reasonを含むFeedViewPostを返す", async () => {
     // arrange
-    const originalAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Original Author" }))
-      .create();
-    const reposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reposter" }))
-      .create();
+    const originalAuthor = actorFactory();
+    const originalProfile = profileDetailedFactory({
+      actorDid: originalAuthor.did,
+      displayName: "Original Author",
+    });
+    profileRepo.add(originalProfile);
 
-    const originalRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => originalAuthor })
-      .create();
-    const originalPost = await postFactory(ctx.db)
-      .vars({ record: () => originalRecord })
-      .props({
-        text: () => "Original post",
-        createdAt: () => new Date("2024-01-01T00:00:00.000Z"),
-      })
-      .create();
+    const reposter = actorFactory();
+    const reposterProfile = profileDetailedFactory({
+      actorDid: reposter.did,
+      displayName: "Reposter",
+    });
+    profileRepo.add(reposterProfile);
 
-    const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
-      .vars({ actor: () => reposter })
-      .create();
-    const repost = await repostFactory(ctx.db)
-      .vars({ record: () => repostRecord })
-      .props({
-        subjectUri: () => originalPost.uri,
-        subjectCid: () => originalPost.cid,
-        createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
-        indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const { post: originalPost, record: originalRecord } = postFactory({
+      actorDid: originalAuthor.did,
+      text: "Original post",
+      createdAt: new Date("2024-01-01T00:00:00.000Z"),
+    });
+    postRepo.add(originalPost);
+    recordRepo.add(originalRecord);
 
-    const feedItem = await repostFeedItemFactory(ctx.db)
-      .vars({ repost: () => repost })
-      .props({
-        sortAt: () => new Date("2024-01-01T01:00:00.000Z"),
-      })
-      .create();
+    const repost = repostFactory({
+      actorDid: reposter.did,
+      subjectUri: originalPost.uri.toString(),
+      subjectCid: originalPost.cid,
+      createdAt: new Date("2024-01-01T01:00:00.000Z"),
+      indexedAt: new Date("2024-01-01T01:00:00.000Z"),
+    });
+    repostRepo.add(repost);
 
-    const feedItems = [
-      new FeedItem({
-        ...feedItem,
-        actorDid: asDid(feedItem.actorDid),
-      }),
-    ];
+    const feedItem = FeedItem.fromRepost(repost);
 
     // act
-    const result = await feedProcessor.processFeedItems(feedItems);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
       {
         $type: "app.bsky.feed.defs#feedViewPost",
         post: {
-          uri: originalPost.uri,
+          uri: originalPost.uri.toString(),
           author: {
             displayName: "Original Author",
           },
@@ -185,57 +127,47 @@ describe("FeedProcessor", () => {
 
   test("リプライ投稿の場合、replyを含むFeedViewPostを返す", async () => {
     // arrange
-    const rootAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Root Author" }))
-      .create();
-    const replyAuthor = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reply Author" }))
-      .create();
+    const rootAuthor = actorFactory();
+    const rootProfile = profileDetailedFactory({
+      actorDid: rootAuthor.did,
+      displayName: "Root Author",
+    });
+    profileRepo.add(rootProfile);
 
-    const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => rootAuthor })
-      .create();
-    const rootPost = await postFactory(ctx.db)
-      .vars({ record: () => rootRecord })
-      .props({
-        text: () => "Root post",
-      })
-      .create();
+    const replyAuthor = actorFactory();
+    const replyProfile = profileDetailedFactory({
+      actorDid: replyAuthor.did,
+      displayName: "Reply Author",
+    });
+    profileRepo.add(replyProfile);
 
-    const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => replyAuthor })
-      .create();
-    const replyPost = await postFactory(ctx.db)
-      .vars({ record: () => replyRecord })
-      .props({
-        text: () => "Reply post",
-        replyRootUri: () => rootPost.uri,
-        replyRootCid: () => rootPost.cid,
-        replyParentUri: () => rootPost.uri,
-        replyParentCid: () => rootPost.cid,
-      })
-      .create();
+    const { post: rootPost, record: rootRecord } = postFactory({
+      actorDid: rootAuthor.did,
+      text: "Root post",
+    });
+    postRepo.add(rootPost);
+    recordRepo.add(rootRecord);
 
-    const feedItem = await postFeedItemFactory(ctx.db)
-      .vars({ post: () => replyPost })
-      .create();
+    const { post: replyPost, record: replyRecord } = postFactory({
+      actorDid: replyAuthor.did,
+      text: "Reply post",
+      replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
+      replyParent: { uri: rootPost.uri, cid: rootPost.cid },
+    });
+    postRepo.add(replyPost);
+    recordRepo.add(replyRecord);
 
-    const feedItems = [
-      new FeedItem({
-        ...feedItem,
-        actorDid: asDid(feedItem.actorDid),
-      }),
-    ];
+    const feedItem = FeedItem.fromPost(replyPost);
 
     // act
-    const result = await feedProcessor.processFeedItems(feedItems);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
       {
         $type: "app.bsky.feed.defs#feedViewPost",
         post: {
-          uri: replyPost.uri,
+          uri: replyPost.uri.toString(),
           author: {
             displayName: "Reply Author",
           },
@@ -246,14 +178,14 @@ describe("FeedProcessor", () => {
         reply: {
           root: {
             $type: "app.bsky.feed.defs#postView",
-            uri: rootPost.uri,
+            uri: rootPost.uri.toString(),
             author: {
               displayName: "Root Author",
             },
           },
           parent: {
             $type: "app.bsky.feed.defs#postView",
-            uri: rootPost.uri,
+            uri: rootPost.uri.toString(),
             author: {
               displayName: "Root Author",
             },
@@ -265,78 +197,63 @@ describe("FeedProcessor", () => {
 
   test("複数の投稿とリポストが混在する場合、正しい順序で返す", async () => {
     // arrange
-    const author1 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Author 1" }))
-      .create();
-    const author2 = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Author 2" }))
-      .create();
-    const reposter = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({ displayName: "Reposter" }))
-      .create();
+    const author1 = actorFactory();
+    const profile1 = profileDetailedFactory({
+      actorDid: author1.did,
+      displayName: "Author 1",
+    });
+    profileRepo.add(profile1);
 
-    // 投稿1
-    const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => author1 })
-      .create();
-    const post1 = await postFactory(ctx.db)
-      .vars({ record: () => record1 })
-      .props({ text: () => "Post 1" })
-      .create();
-    const feedItem1 = await postFeedItemFactory(ctx.db)
-      .vars({ post: () => post1 })
-      .create();
+    const author2 = actorFactory();
+    const profile2 = profileDetailedFactory({
+      actorDid: author2.did,
+      displayName: "Author 2",
+    });
+    profileRepo.add(profile2);
 
-    // 投稿2
-    const record2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => author2 })
-      .create();
-    const post2 = await postFactory(ctx.db)
-      .vars({ record: () => record2 })
-      .props({ text: () => "Post 2" })
-      .create();
+    const reposter = actorFactory();
+    const reposterProfile = profileDetailedFactory({
+      actorDid: reposter.did,
+      displayName: "Reposter",
+    });
+    profileRepo.add(reposterProfile);
 
-    // リポスト
-    const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
-      .vars({ actor: () => reposter })
-      .create();
-    const repost = await repostFactory(ctx.db)
-      .vars({ record: () => repostRecord })
-      .props({
-        subjectUri: () => post2.uri,
-        subjectCid: () => post2.cid,
-        indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
-    const feedItem2 = await repostFeedItemFactory(ctx.db)
-      .vars({ repost: () => repost })
-      .props({
-        sortAt: () => new Date("2024-01-01T02:00:00.000Z"),
-      })
-      .create();
+    const { post: post1, record: record1 } = postFactory({
+      actorDid: author1.did,
+      text: "Post 1",
+    });
+    postRepo.add(post1);
+    recordRepo.add(record1);
 
-    const feedItems = [
-      new FeedItem({
-        ...feedItem1,
-        actorDid: asDid(feedItem1.actorDid),
-      }),
-      new FeedItem({
-        ...feedItem2,
-        actorDid: asDid(feedItem2.actorDid),
-      }),
-    ];
+    const { post: post2, record: record2 } = postFactory({
+      actorDid: author2.did,
+      text: "Post 2",
+    });
+    postRepo.add(post2);
+    recordRepo.add(record2);
+
+    const repost = repostFactory({
+      actorDid: reposter.did,
+      subjectUri: post2.uri.toString(),
+      subjectCid: post2.cid,
+      indexedAt: new Date("2024-01-01T02:00:00.000Z"),
+    });
+    repostRepo.add(repost);
+
+    const feedItem1 = FeedItem.fromPost(post1);
+    const feedItem2 = FeedItem.fromRepost(repost);
 
     // act
-    const result = await feedProcessor.processFeedItems(feedItems);
+    const result = await feedProcessor.processFeedItems([feedItem1, feedItem2]);
 
     // assert
     expect(result).toHaveLength(2);
     expect(result[0]).toMatchObject({
-      post: { uri: post1.uri },
+      post: { uri: post1.uri.toString() },
     });
     expect(result[0]).not.toHaveProperty("reason");
     expect(result[1]).toMatchObject({
-      post: { uri: post2.uri },
+      post: { uri: post2.uri.toString() },
       reason: {
         $type: "app.bsky.feed.defs#reasonRepost",
         by: { displayName: "Reposter" },
@@ -347,29 +264,15 @@ describe("FeedProcessor", () => {
 
   test("PostViewが見つからない場合、その項目をスキップする", async () => {
     // arrange
-    const author = await actorFactory(ctx.db).create();
-    const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => author })
-      .create();
-    const post = await postFactory(ctx.db)
-      .vars({ record: () => record })
-      .create();
-    const feedItem = await postFeedItemFactory(ctx.db)
-      .vars({ post: () => post })
-      .create();
+    const author = actorFactory();
+    const { post } = postFactory({
+      actorDid: author.did,
+    });
 
-    // 投稿を削除してPostViewが見つからない状態を作る
-    await ctx.db.delete(schema.posts).where(eq(schema.posts.uri, post.uri));
-
-    const feedItems = [
-      new FeedItem({
-        ...feedItem,
-        actorDid: asDid(feedItem.actorDid),
-      }),
-    ];
+    const feedItem = FeedItem.fromPost(post);
 
     // act
-    const result = await feedProcessor.processFeedItems(feedItems);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([]);
