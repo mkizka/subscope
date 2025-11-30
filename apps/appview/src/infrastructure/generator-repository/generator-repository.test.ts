@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, generatorFactory, testSetup } from "@repo/test-utils";
+import { generatorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { GeneratorRepository } from "./generator-repository.js";
@@ -33,10 +33,7 @@ describe("GeneratorRepository", () => {
 
     test("存在するURIが指定された場合、Generator情報を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const generator = await generatorFactory(ctx.db)
-        .vars({ actor: () => actor })
-        .create();
+      const generator = await generatorFactory(ctx.db).create();
 
       // act
       const result = await generatorRepository.findByUris([
@@ -56,15 +53,8 @@ describe("GeneratorRepository", () => {
 
     test("複数のURIが指定された場合、それぞれのGeneratorを返す", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
-      const generator1 = await generatorFactory(ctx.db)
-        .vars({ actor: () => actor1 })
-        .create();
-
-      const actor2 = await actorFactory(ctx.db).create();
-      const generator2 = await generatorFactory(ctx.db)
-        .vars({ actor: () => actor2 })
-        .create();
+      const generator1 = await generatorFactory(ctx.db).create();
+      const generator2 = await generatorFactory(ctx.db).create();
 
       // act
       const result = await generatorRepository.findByUris([
@@ -81,10 +71,7 @@ describe("GeneratorRepository", () => {
 
     test("一部が存在しないURIの場合、存在するもののみ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const generator = await generatorFactory(ctx.db)
-        .vars({ actor: () => actor })
-        .create();
+      const generator = await generatorFactory(ctx.db).create();
 
       const nonExistentUri = new AtUri(
         "at://did:plc:notfound/app.bsky.feed.generator/notfound123",

@@ -13,8 +13,9 @@ import { SubscriptionRepository } from "./subscription-repository.js";
 describe("SubscriptionRepository", () => {
   const { testInjector, ctx } = testSetup;
 
-  const subscriptionRepository =
-    testInjector.injectClass(SubscriptionRepository);
+  const subscriptionRepository = testInjector.injectClass(
+    SubscriptionRepository,
+  );
 
   describe("findMany", () => {
     test("サブスクリプションが存在しない場合、空の配列を返す", async () => {
