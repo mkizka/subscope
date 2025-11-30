@@ -1,3 +1,4 @@
+import { InMemoryTransactionManager } from "@repo/common/test";
 import { createInjector } from "typed-inject";
 
 import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
@@ -30,7 +31,6 @@ import { InMemoryRecordRepository } from "../infrastructure/record-repository/re
 import { InMemoryRepostRepository } from "../infrastructure/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.in-memory.js";
-import { InMemoryTransactionManager } from "./in-memory-transaction-manager.js";
 
 export const testInjector = createInjector()
   .provideClass("authorFeedRepository", InMemoryAuthorFeedRepository)
