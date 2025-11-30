@@ -23,14 +23,13 @@ describe("FeedProcessor", () => {
     const author = actorFactory();
     const profile = profileDetailedFactory({
       actorDid: author.did,
+      handle: author.handle,
       displayName: "Post Author",
     });
     profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
-      text: "Test post content",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
     postRepo.add(post);
     recordRepo.add(record);
@@ -66,6 +65,7 @@ describe("FeedProcessor", () => {
     const originalAuthor = actorFactory();
     const originalProfile = profileDetailedFactory({
       actorDid: originalAuthor.did,
+      handle: originalAuthor.handle,
       displayName: "Original Author",
     });
     profileRepo.add(originalProfile);
@@ -73,14 +73,13 @@ describe("FeedProcessor", () => {
     const reposter = actorFactory();
     const reposterProfile = profileDetailedFactory({
       actorDid: reposter.did,
+      handle: reposter.handle,
       displayName: "Reposter",
     });
     profileRepo.add(reposterProfile);
 
     const { post: originalPost, record: originalRecord } = postFactory({
       actorDid: originalAuthor.did,
-      text: "Original post",
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
     postRepo.add(originalPost);
     recordRepo.add(originalRecord);
@@ -130,6 +129,7 @@ describe("FeedProcessor", () => {
     const rootAuthor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootAuthor.did,
+      handle: rootAuthor.handle,
       displayName: "Root Author",
     });
     profileRepo.add(rootProfile);
@@ -137,20 +137,19 @@ describe("FeedProcessor", () => {
     const replyAuthor = actorFactory();
     const replyProfile = profileDetailedFactory({
       actorDid: replyAuthor.did,
+      handle: replyAuthor.handle,
       displayName: "Reply Author",
     });
     profileRepo.add(replyProfile);
 
     const { post: rootPost, record: rootRecord } = postFactory({
       actorDid: rootAuthor.did,
-      text: "Root post",
     });
     postRepo.add(rootPost);
     recordRepo.add(rootRecord);
 
     const { post: replyPost, record: replyRecord } = postFactory({
       actorDid: replyAuthor.did,
-      text: "Reply post",
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: rootPost.uri, cid: rootPost.cid },
     });
@@ -200,6 +199,7 @@ describe("FeedProcessor", () => {
     const author1 = actorFactory();
     const profile1 = profileDetailedFactory({
       actorDid: author1.did,
+      handle: author1.handle,
       displayName: "Author 1",
     });
     profileRepo.add(profile1);
@@ -207,6 +207,7 @@ describe("FeedProcessor", () => {
     const author2 = actorFactory();
     const profile2 = profileDetailedFactory({
       actorDid: author2.did,
+      handle: author2.handle,
       displayName: "Author 2",
     });
     profileRepo.add(profile2);
@@ -214,20 +215,19 @@ describe("FeedProcessor", () => {
     const reposter = actorFactory();
     const reposterProfile = profileDetailedFactory({
       actorDid: reposter.did,
+      handle: reposter.handle,
       displayName: "Reposter",
     });
     profileRepo.add(reposterProfile);
 
     const { post: post1, record: record1 } = postFactory({
       actorDid: author1.did,
-      text: "Post 1",
     });
     postRepo.add(post1);
     recordRepo.add(record1);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author2.did,
-      text: "Post 2",
     });
     postRepo.add(post2);
     recordRepo.add(record2);
