@@ -182,8 +182,8 @@ describe("PostViewService", () => {
           images: [
             {
               alt: "Test image",
-              thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/${imageCid}.jpg`,
-              fullsize: `http://localhost:3004/images/feed_fullsize/${actor.did}/${imageCid}.jpg`,
+              thumb: `http://test-blob-proxy.example.com/images/feed_thumbnail/${actor.did}/${imageCid}.jpg`,
+              fullsize: `http://test-blob-proxy.example.com/images/feed_fullsize/${actor.did}/${imageCid}.jpg`,
             },
           ],
         },
@@ -258,7 +258,7 @@ describe("PostViewService", () => {
             uri: "https://example.com",
             title: "Example Site",
             description: "An example website",
-            thumb: `http://localhost:3004/images/feed_thumbnail/${actor.did}/${thumbCid}.jpg`,
+            thumb: `http://test-blob-proxy.example.com/images/feed_thumbnail/${actor.did}/${thumbCid}.jpg`,
           },
         },
       });
@@ -352,6 +352,7 @@ describe("PostViewService", () => {
       const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
       const embeddedProfile = profileDetailedFactory({
         actorDid: embeddedAuthor.did,
+        handle: embeddedAuthor.handle,
         displayName: "Embedded Author",
       });
       profileRepo.add(embeddedProfile);
@@ -368,6 +369,7 @@ describe("PostViewService", () => {
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
         actorDid: quotingAuthor.did,
+        handle: quotingAuthor.handle,
         displayName: "Quoting Author",
       });
       profileRepo.add(quotingProfile);
@@ -538,6 +540,7 @@ describe("PostViewService", () => {
       const generatorActor = actorFactory({ handle: "generator.bsky.social" });
       const generatorProfile = profileDetailedFactory({
         actorDid: generatorActor.did,
+        handle: generatorActor.handle,
         displayName: "Generator Creator",
       });
       profileRepo.add(generatorProfile);
@@ -554,6 +557,7 @@ describe("PostViewService", () => {
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
         actorDid: quotingAuthor.did,
+        handle: quotingAuthor.handle,
         displayName: "Quoting Author",
       });
       profileRepo.add(quotingProfile);
@@ -634,7 +638,7 @@ describe("PostViewService", () => {
             },
             displayName: "My Cool Feed",
             description: "A custom algorithmic feed",
-            avatar: `http://localhost:3004/images/avatar_thumbnail/${generatorActor.did}/bafyreiavatarcid123.jpg`,
+            avatar: `http://test-blob-proxy.example.com/images/avatar_thumbnail/${generatorActor.did}/bafyreiavatarcid123.jpg`,
             indexedAt: generator.indexedAt.toISOString(),
           },
         },
@@ -719,6 +723,7 @@ describe("PostViewService", () => {
       const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
       const embeddedProfile = profileDetailedFactory({
         actorDid: embeddedAuthor.did,
+        handle: embeddedAuthor.handle,
         displayName: "Embedded Author",
       });
       profileRepo.add(embeddedProfile);
@@ -735,6 +740,7 @@ describe("PostViewService", () => {
       const mainAuthor = actorFactory({ handle: "main.bsky.social" });
       const mainProfile = profileDetailedFactory({
         actorDid: mainAuthor.did,
+        handle: mainAuthor.handle,
         displayName: "Main Author",
       });
       profileRepo.add(mainProfile);
@@ -905,13 +911,13 @@ describe("PostViewService", () => {
             images: [
               {
                 alt: "First image",
-                thumb: `http://localhost:3004/images/feed_thumbnail/${mainAuthor.did}/${imageCid1}.jpg`,
-                fullsize: `http://localhost:3004/images/feed_fullsize/${mainAuthor.did}/${imageCid1}.jpg`,
+                thumb: `http://test-blob-proxy.example.com/images/feed_thumbnail/${mainAuthor.did}/${imageCid1}.jpg`,
+                fullsize: `http://test-blob-proxy.example.com/images/feed_fullsize/${mainAuthor.did}/${imageCid1}.jpg`,
               },
               {
                 alt: "Second image",
-                thumb: `http://localhost:3004/images/feed_thumbnail/${mainAuthor.did}/${imageCid2}.jpg`,
-                fullsize: `http://localhost:3004/images/feed_fullsize/${mainAuthor.did}/${imageCid2}.jpg`,
+                thumb: `http://test-blob-proxy.example.com/images/feed_thumbnail/${mainAuthor.did}/${imageCid2}.jpg`,
+                fullsize: `http://test-blob-proxy.example.com/images/feed_fullsize/${mainAuthor.did}/${imageCid2}.jpg`,
               },
             ],
           },
