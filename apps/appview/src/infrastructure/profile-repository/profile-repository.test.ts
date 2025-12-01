@@ -1,5 +1,10 @@
 import { asDid } from "@atproto/did";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import {
+  actorFactory,
+  profileFactory,
+  recordFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { ProfileRepository } from "./profile-repository.js";
@@ -210,12 +215,28 @@ describe("ProfileRepository", () => {
 
     test("複数のアクターが一致する場合、indexedAtの降順で返す", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Alice One" }))
+      const actor1 = await actorFactory(ctx.db).create();
+      const record1 = await recordFactory(ctx.db, "app.bsky.actor.profile")
+        .vars({ actor: () => actor1 })
+        .create();
+      await profileFactory(ctx.db)
+        .vars({ record: () => record1 })
+        .props({
+          displayName: () => "Alice One",
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
         .create();
 
-      const actor2 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Alice Two" }))
+      const actor2 = await actorFactory(ctx.db).create();
+      const record2 = await recordFactory(ctx.db, "app.bsky.actor.profile")
+        .vars({ actor: () => actor2 })
+        .create();
+      await profileFactory(ctx.db)
+        .vars({ record: () => record2 })
+        .props({
+          displayName: () => "Alice Two",
+          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        })
         .create();
 
       // act
@@ -254,18 +275,31 @@ describe("ProfileRepository", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前のアクターを返す", async () => {
       // arrange
-      await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Alice One" }))
+      const actor1 = await actorFactory(ctx.db).create();
+      const record1 = await recordFactory(ctx.db, "app.bsky.actor.profile")
+        .vars({ actor: () => actor1 })
+        .create();
+      await profileFactory(ctx.db)
+        .vars({ record: () => record1 })
+        .props({
+          displayName: () => "Alice One",
+          indexedAt: () => new Date("2024-01-01T01:00:00.000Z"),
+        })
         .create();
 
-      // cursorの基準となる時間を待つ
-      await new Promise((resolve) => setTimeout(resolve, 10));
-      const cursorDate = new Date();
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      const actor2 = await actorFactory(ctx.db)
-        .use((t) => t.withProfile({ displayName: "Alice Two" }))
+      const actor2 = await actorFactory(ctx.db).create();
+      const record2 = await recordFactory(ctx.db, "app.bsky.actor.profile")
+        .vars({ actor: () => actor2 })
         .create();
+      await profileFactory(ctx.db)
+        .vars({ record: () => record2 })
+        .props({
+          displayName: () => "Alice Two",
+          indexedAt: () => new Date("2024-01-01T02:00:00.000Z"),
+        })
+        .create();
+
+      const cursorDate = new Date("2024-01-01T01:30:00.000Z");
 
       // act
       const result = await profileRepository.searchActors({
@@ -276,7 +310,7 @@ describe("ProfileRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.actorDid).not.toBe(actor2.did);
+      expect(result[0]?.actorDid).toBe(actor1.did);
     });
 
     test("検索クエリに含まれるワイルドカード文字はエスケープされる", async () => {

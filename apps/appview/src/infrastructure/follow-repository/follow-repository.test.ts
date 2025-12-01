@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
   followFactory,
@@ -53,7 +54,7 @@ describe("FollowRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: follow.uri,
+        uri: new AtUri(follow.uri),
         cid: follow.cid,
         actorDid: actor.did,
         subjectDid: followee.did,
@@ -100,8 +101,10 @@ describe("FollowRepository", () => {
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri).toBe(follow2.uri);
-      expect(result[1]?.uri).toBe(follow1.uri);
+      expect(result).toEqual([
+        expect.objectContaining({ uri: new AtUri(follow2.uri) }),
+        expect.objectContaining({ uri: new AtUri(follow1.uri) }),
+      ]);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
@@ -194,7 +197,9 @@ describe("FollowRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(follow1.uri);
+      expect(result[0]).toMatchObject({
+        uri: new AtUri(follow1.uri),
+      });
     });
 
     test("他のアクターのフォローは含まれない", async () => {
@@ -263,7 +268,7 @@ describe("FollowRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: follow.uri,
+        uri: new AtUri(follow.uri),
         cid: follow.cid,
         actorDid: follower.did,
         subjectDid: actor.did,
@@ -310,8 +315,10 @@ describe("FollowRepository", () => {
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri).toBe(follow2.uri);
-      expect(result[1]?.uri).toBe(follow1.uri);
+      expect(result).toEqual([
+        expect.objectContaining({ uri: new AtUri(follow2.uri) }),
+        expect.objectContaining({ uri: new AtUri(follow1.uri) }),
+      ]);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
@@ -390,7 +397,9 @@ describe("FollowRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(follow1.uri);
+      expect(result[0]).toMatchObject({
+        uri: new AtUri(follow1.uri),
+      });
     });
 
     test("他のアクターのフォロワーは含まれない", async () => {

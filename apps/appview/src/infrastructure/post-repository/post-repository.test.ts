@@ -41,7 +41,7 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toMatchObject({
-        uri: post.uri,
+        uri: new AtUri(post.uri),
         cid: post.cid,
         actorDid: post.actorDid,
         text: post.text,
@@ -96,8 +96,8 @@ describe("PostRepository", () => {
       expect(result).toHaveLength(2);
       expect(result).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ uri: post1.uri }),
-          expect.objectContaining({ uri: post2.uri }),
+          expect.objectContaining({ uri: new AtUri(post1.uri) }),
+          expect.objectContaining({ uri: new AtUri(post2.uri) }),
         ]),
       );
     });
@@ -140,8 +140,8 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri).toBe(post2.uri);
-      expect(result[1]?.uri).toBe(post1.uri);
+      expect(result[0]?.uri.toString()).toBe(post2.uri);
+      expect(result[1]?.uri.toString()).toBe(post1.uri);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
@@ -202,7 +202,7 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(post1.uri);
+      expect(result[0]?.uri.toString()).toBe(post1.uri);
     });
   });
 
@@ -269,8 +269,8 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri).toBe(reply2.uri);
-      expect(result[1]?.uri).toBe(reply1.uri);
+      expect(result[0]?.uri.toString()).toBe(reply2.uri);
+      expect(result[1]?.uri.toString()).toBe(reply1.uri);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
@@ -399,7 +399,7 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(post.uri);
+      expect(result[0]?.uri.toString()).toBe(post.uri);
     });
 
     test("検索クエリは大文字小文字を区別しない", async () => {
@@ -423,7 +423,7 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(post.uri);
+      expect(result[0]?.uri.toString()).toBe(post.uri);
     });
 
     test("リプライ投稿は検索結果に含まれない", async () => {
@@ -527,7 +527,7 @@ describe("PostRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri).toBe(post1.uri);
+      expect(result[0]?.uri.toString()).toBe(post1.uri);
     });
 
     test("検索クエリに含まれるワイルドカード文字はエスケープされる", async () => {
