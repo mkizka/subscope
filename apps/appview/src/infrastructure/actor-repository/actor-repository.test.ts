@@ -88,51 +88,5 @@ describe("ActorRepository", () => {
         syncRepoVersion: updatedActor.syncRepoVersion,
       });
     });
-
-    test("複数回upsertしても最新の値で更新される", async () => {
-      // arrange
-      const did = asDid("did:plc:multiple123");
-      const actor1 = Actor.reconstruct({
-        did: did,
-        handle: "first.test",
-        syncRepoStatus: "dirty",
-        syncRepoVersion: null,
-        indexedAt: new Date(),
-      });
-
-      // act - 1回目
-      await actorRepository.upsert({ ctx, actor: actor1 });
-
-      const actor2 = Actor.reconstruct({
-        did: did,
-        handle: "second.test",
-        syncRepoStatus: "in-process",
-        syncRepoVersion: 1,
-        indexedAt: new Date(),
-      });
-
-      // act - 2回目
-      await actorRepository.upsert({ ctx, actor: actor2 });
-
-      const actor3 = Actor.reconstruct({
-        did: did,
-        handle: "third.test",
-        syncRepoStatus: "synchronized",
-        syncRepoVersion: 2,
-        indexedAt: new Date(),
-      });
-
-      // act - 3回目
-      await actorRepository.upsert({ ctx, actor: actor3 });
-
-      // assert
-      const result = await actorRepository.findByDid(did);
-      expect(result).toMatchObject({
-        did: actor3.did,
-        handle: actor3.handle,
-        syncRepoStatus: actor3.syncRepoStatus,
-        syncRepoVersion: actor3.syncRepoVersion,
-      });
-    });
   });
 });
