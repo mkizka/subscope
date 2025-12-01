@@ -1,5 +1,6 @@
 import { InMemoryTransactionManager } from "@repo/common/test";
 import { createInjector } from "typed-inject";
+import { beforeEach } from "vitest";
 
 import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../application/service/actor/profile-view-service.js";
@@ -72,19 +73,21 @@ export const testInjector = createInjector()
   .provideClass("subscriptionService", SubscriptionService)
   .provideClass("inviteCodeService", InviteCodeService);
 
-export const clearAllInMemoryRepositories = () => {
-  testInjector.resolve("authorFeedRepository").clear();
-  testInjector.resolve("postRepository").clear();
-  testInjector.resolve("postStatsRepository").clear();
-  testInjector.resolve("profileRepository").clear();
-  testInjector.resolve("followRepository").clear();
-  testInjector.resolve("actorStatsRepository").clear();
-  testInjector.resolve("recordRepository").clear();
-  testInjector.resolve("repostRepository").clear();
-  testInjector.resolve("likeRepository").clear();
-  testInjector.resolve("generatorRepository").clear();
-  testInjector.resolve("timelineRepository").clear();
-  testInjector.resolve("actorRepository").clear();
-  testInjector.resolve("subscriptionRepository").clear();
-  testInjector.resolve("inviteCodeRepository").clear();
+export const setupFiles = () => {
+  beforeEach(() => {
+    testInjector.resolve("authorFeedRepository").clear();
+    testInjector.resolve("postRepository").clear();
+    testInjector.resolve("postStatsRepository").clear();
+    testInjector.resolve("profileRepository").clear();
+    testInjector.resolve("followRepository").clear();
+    testInjector.resolve("actorStatsRepository").clear();
+    testInjector.resolve("recordRepository").clear();
+    testInjector.resolve("repostRepository").clear();
+    testInjector.resolve("likeRepository").clear();
+    testInjector.resolve("generatorRepository").clear();
+    testInjector.resolve("timelineRepository").clear();
+    testInjector.resolve("actorRepository").clear();
+    testInjector.resolve("subscriptionRepository").clear();
+    testInjector.resolve("inviteCodeRepository").clear();
+  });
 };

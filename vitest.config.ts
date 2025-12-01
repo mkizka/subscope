@@ -2,7 +2,13 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    projects: ["apps/*", "packages/*"],
+    projects: [
+      "apps/*",
+      "!apps/appview",
+      "apps/appview/vitest.unit.config.ts",
+      "apps/appview/vitest.integration.config.ts",
+      "packages/*",
+    ],
     coverage: {
       exclude: [
         "**/generated/**",

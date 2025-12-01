@@ -32,6 +32,7 @@
 - [x] **Phase 7-A**: appviewリポジトリテストの追加（Part 1）
 - [x] **Phase 7-B**: appviewリポジトリテストの追加（Part 2）
 - [x] **Phase 7-C**: appviewリポジトリテストの追加（Part 3）
+- [x] **Phase 7-D**: appviewのVitest設定を単体テスト/統合テストに分割
 
 ### Phase 8-9: worker基盤整備
 
@@ -54,10 +55,12 @@
 - [ ] **Phase 12-A**: workerリポジトリテストの追加（Part 1）
 - [ ] **Phase 12-B**: workerリポジトリテストの追加（Part 2）
 - [ ] **Phase 12-C**: workerリポジトリテストの追加（Part 3）
+- [ ] **Phase 12-D**: workerのVitest設定を単体テスト/統合テストに分割
 
 ### Phase 13: blob-proxy
 
-- [ ] **Phase 13**: blob-proxyの移行
+- [ ] **Phase 13-A**: blob-proxyの移行
+- [ ] **Phase 13-B**: blob-proxyのVitest設定を単体テスト/統合テストに分割
 
 ---
 
@@ -532,6 +535,78 @@ describe("GetAuthorFeedUseCase", () => {
 - `record-repository/record-repository.test.ts`
 - `subscription-repository/subscription-repository.test.ts`
 - `invite-code-repository/invite-code-repository.test.ts`
+
+---
+
+### Phase 7-D / 12-D / 13-B: Vitest設定の分割
+
+**appviewで実装済みの構成:**
+
+```
+apps/appview/
+  vitest.config.ts                 # projectsで unit/integration を参照
+  vitest.unit.config.ts            # 単体テスト設定
+  vitest.unit.setup.ts             # インメモリリポジトリのクリア
+  vitest.integration.config.ts     # 統合テスト設定
+  vitest.integration.setup.ts      # DBリセット
+  vitest.integration.global-setup.ts  # DB起動
+```
+
+**ルートvitest.config.tsの設定:**
+
+```typescript
+export default defineConfig({
+  test: {
+    projects: [
+      "apps/*",
+      "!apps/appview", // appviewは個別設定を使用
+      "apps/appview/vitest.unit.config.ts",
+      "apps/appview/vitest.integration.config.ts",
+      "packages/*",
+    ],
+  },
+});
+```
+
+**単体テスト設定 (vitest.unit.config.ts):**
+
+```typescript
+export default defineProject({
+  test: {
+    name: "appview:unit",
+    setupFiles: "./vitest.unit.setup.ts",
+    include: ["./src/{application,domain,presentation}/**/*.test.ts"],
+    clearMocks: true,
+  },
+});
+```
+
+**統合テスト設定 (vitest.integration.config.ts):**
+
+```typescript
+export default defineProject({
+  test: {
+    name: "appview:integration",
+    globalSetup: "./vitest.integration.global-setup.ts",
+    setupFiles: "./vitest.integration.setup.ts",
+    include: ["src/infrastructure/**/*.test.ts"],
+    testTimeout: 120000,
+    clearMocks: true,
+    isolate: false,
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+  },
+});
+```
+
+**worker/blob-proxyへの反映時の注意:**
+
+- 同様のファイル構成を作成
+- ルートvitest.config.tsにappviewと同様のパターンで追加
+- includeパスは各アプリのディレクトリ構造に合わせて調整
 
 ---
 
