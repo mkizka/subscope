@@ -31,7 +31,7 @@
 
 - [x] **Phase 7-A**: appviewリポジトリテストの追加（Part 1）
 - [ ] **Phase 7-B**: appviewリポジトリテストの追加（Part 2）
-- [ ] **Phase 7-C**: appviewリポジトリテストの追加（Part 3）
+- [x] **Phase 7-C**: appviewリポジトリテストの追加（Part 3）
 
 ### Phase 8-9: worker基盤整備
 
