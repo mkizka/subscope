@@ -2,7 +2,7 @@ import type { Subscription, TransactionContext } from "@repo/common/domain";
 import { schema, type SubscriptionInsert } from "@repo/db";
 import { eq, inArray } from "drizzle-orm";
 
-import type { ISubscriptionRepository } from "../../application/interfaces/repositories/subscription-repository.js";
+import type { ISubscriptionRepository } from "../../../application/interfaces/repositories/subscription-repository.js";
 
 export class SubscriptionRepository implements ISubscriptionRepository {
   async upsert({

@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { IIndexTargetRepository } from "@repo/common/domain";
 
-import type { ITrackedActorChecker } from "../../application/interfaces/repositories/tracked-actor-checker.js";
+import type { ITrackedActorChecker } from "../../../application/interfaces/repositories/tracked-actor-checker.js";
 
 export class PostgresIndexTargetRepository implements IIndexTargetRepository {
   constructor(private readonly trackedActorChecker: ITrackedActorChecker) {}

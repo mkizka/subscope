@@ -7,9 +7,9 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { PostgresIndexTargetRepository } from "../infrastructure/repositories/postgres-index-target-repository.js";
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker.js";
+import { PostgresIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
+import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
 
 describe("ProfileIndexingPolicy", () => {
