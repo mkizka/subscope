@@ -12,7 +12,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
+import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
 import type { JobLogger } from "../../../shared/job.js";
 import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
 import type { IndexRecordService } from "../../services/index-record-service.js";
