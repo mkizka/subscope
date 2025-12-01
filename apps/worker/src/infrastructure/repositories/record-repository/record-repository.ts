@@ -4,7 +4,7 @@ import { Record } from "@repo/common/domain";
 import { type RecordInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IRecordRepository } from "../../application/interfaces/repositories/record-repository.js";
+import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
   async findByUri({

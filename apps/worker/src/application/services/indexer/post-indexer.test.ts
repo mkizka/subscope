@@ -16,8 +16,8 @@ import { describe, expect, test } from "vitest";
 import { mock, mockDeep } from "vitest-mock-extended";
 
 import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
-import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
-import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
+import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
 import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/postgres-index-target-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
