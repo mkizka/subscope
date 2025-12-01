@@ -1,17 +1,13 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
-import { HandleResolver } from "../../infrastructure/handle-resolver/handle-resolver.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { AtUriService, InvalidHostnameError } from "./at-uri-service.js";
 
 describe("AtUriService", () => {
-  const { testInjector, ctx } = testSetup;
-
-  const atUriService = testInjector
-    .provideClass("handleResolver", HandleResolver)
-    .injectClass(AtUriService);
+  const atUriService = testInjector.injectClass(AtUriService);
+  const handleResolver = testInjector.resolve("handleResolver");
 
   describe("resolveHostname", () => {
     test("DIDが含まれるURIの場合、そのまま返す", async () => {
@@ -31,12 +27,7 @@ describe("AtUriService", () => {
 
     test("handleが含まれるURIの場合、DIDに変換して返す", async () => {
       // arrange
-      await actorFactory(ctx.db)
-        .props({
-          did: () => "did:plc:resolved123",
-          handle: () => "example.com",
-        })
-        .create();
+      handleResolver.add("example.com", "did:plc:resolved123");
       const uri = new AtUri("at://example.com/app.bsky.feed.post/xyz789");
 
       // act

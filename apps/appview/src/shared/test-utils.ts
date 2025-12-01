@@ -25,6 +25,7 @@ import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/ass
 import { InMemoryAuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/generator-repository/generator-repository.in-memory.js";
+import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
@@ -53,6 +54,7 @@ export const testInjector = createInjector()
   .provideClass("actorRepository", InMemoryActorRepository)
   .provideClass("subscriptionRepository", InMemorySubscriptionRepository)
   .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
+  .provideClass("handleResolver", InMemoryHandleResolver)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("assetUrlBuilder", InMemoryAssetUrlBuilder)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
@@ -89,5 +91,6 @@ export const setupFiles = () => {
     testInjector.resolve("actorRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
+    testInjector.resolve("handleResolver").clear();
   });
 };
