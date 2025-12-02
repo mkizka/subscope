@@ -1,31 +1,19 @@
 import { asDid } from "@atproto/did";
-import type { IJobQueue } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
-import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../infrastructure/repositories/actor-repository/actor-repository.js";
-import { ProfileRepository } from "../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { IndexActorService } from "./index-actor-service.js";
-import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
-import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 describe("IndexActorService", () => {
-  const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = testSetup;
+  const indexActorService = testInjector.injectClass(IndexActorService);
 
-  const indexActorService = testInjector
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideValue("jobQueue", mockJobQueue)
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .injectClass(IndexActorService);
+  const actorRepo = testInjector.resolve("actorRepository");
+  const jobQueue = testInjector.resolve("jobQueue");
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const ctx: TransactionContext = { db: {} as never };
 
   describe("upsert", () => {
     test("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
@@ -42,20 +30,18 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, testDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.did).toBe(testDid);
-      expect(actors[0]?.handle).toBe(testHandle);
+      const actor = await actorRepo.findByDid({ ctx, did: testDid });
+      expect(actor).toMatchObject({
+        did: testDid,
+        handle: testHandle,
+      });
 
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
       );
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
+      expect(jobQueue.getJobs()).toContainEqual({
         queueName: "fetchRecord",
         jobName: `at://${testDid}/app.bsky.actor.profile/self`,
         data: {
@@ -79,15 +65,13 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, testDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.did).toBe(testDid);
-      expect(actors[0]?.handle).toBe(testHandle);
+      const actor = await actorRepo.findByDid({ ctx, did: testDid });
+      expect(actor).toMatchObject({
+        did: testDid,
+        handle: testHandle,
+      });
 
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
@@ -98,12 +82,11 @@ describe("IndexActorService", () => {
       // arrange
       const existingDid = asDid("did:plc:no-handle-to-handle");
       const newHandle = asHandle("new-handle.bsky.social");
-      await actorFactory(ctx.db)
-        .props({
-          did: () => existingDid,
-          handle: () => null,
-        })
-        .create();
+      const existingActor = actorFactory({
+        did: existingDid,
+        handle: null,
+      });
+      actorRepo.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -114,13 +97,11 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, existingDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.handle).toBe(newHandle);
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      expect(actor).toMatchObject({
+        handle: newHandle,
+      });
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
@@ -131,12 +112,11 @@ describe("IndexActorService", () => {
       // arrange
       const existingDid = asDid("did:plc:same-handle");
       const existingHandle = asHandle("same-handle.bsky.social");
-      await actorFactory(ctx.db)
-        .props({
-          did: () => existingDid,
-          handle: () => existingHandle,
-        })
-        .create();
+      const existingActor = actorFactory({
+        did: existingDid,
+        handle: existingHandle,
+      });
+      actorRepo.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -147,13 +127,11 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, existingDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.handle).toBe(existingHandle);
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      expect(actor).toMatchObject({
+        handle: existingHandle,
+      });
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
@@ -165,12 +143,11 @@ describe("IndexActorService", () => {
       const existingDid = asDid("did:plc:changed-handle");
       const oldHandle = asHandle("old-handle.bsky.social");
       const newHandle = asHandle("new-handle.bsky.social");
-      await actorFactory(ctx.db)
-        .props({
-          did: () => existingDid,
-          handle: () => oldHandle,
-        })
-        .create();
+      const existingActor = actorFactory({
+        did: existingDid,
+        handle: oldHandle,
+      });
+      actorRepo.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -181,13 +158,11 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, existingDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.handle).toBe(newHandle);
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      expect(actor).toMatchObject({
+        handle: newHandle,
+      });
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
@@ -206,20 +181,18 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, newDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.did).toBe(newDid);
-      expect(actors[0]?.handle).toBeNull();
+      const actor = await actorRepo.findByDid({ ctx, did: newDid });
+      expect(actor).toMatchObject({
+        did: newDid,
+        handle: null,
+      });
 
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
+      expect(jobQueue.getJobs()).toContainEqual({
         queueName: "resolveDid",
         jobName: `at://${newDid}`,
         data: newDid,
       });
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
@@ -229,12 +202,11 @@ describe("IndexActorService", () => {
     test("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
-      await actorFactory(ctx.db)
-        .props({
-          did: () => existingDidNoHandle,
-          handle: () => null,
-        })
-        .create();
+      const existingActor = actorFactory({
+        did: existingDidNoHandle,
+        handle: null,
+      });
+      actorRepo.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -244,14 +216,15 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, existingDidNoHandle));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.handle).toBeNull();
+      const actor = await actorRepo.findByDid({
+        ctx,
+        did: existingDidNoHandle,
+      });
+      expect(actor).toMatchObject({
+        handle: null,
+      });
 
-      expect(mockJobQueue.add).toHaveBeenCalledWith({
+      expect(jobQueue.getJobs()).toContainEqual({
         queueName: "resolveDid",
         jobName: `at://${existingDidNoHandle}`,
         data: existingDidNoHandle,
@@ -262,12 +235,11 @@ describe("IndexActorService", () => {
       // arrange
       const existingDid = asDid("did:plc:existing-with-handle");
       const existingHandle = asHandle("existing-with-handle.bsky.social");
-      await actorFactory(ctx.db)
-        .props({
-          did: () => existingDid,
-          handle: () => existingHandle,
-        })
-        .create();
+      const existingActor = actorFactory({
+        did: existingDid,
+        handle: existingHandle,
+      });
+      actorRepo.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -277,13 +249,11 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actors = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, existingDid));
-      expect(actors).toHaveLength(1);
-      expect(actors[0]?.handle).toBe(existingHandle);
-      expect(mockJobQueue.add).not.toHaveBeenCalledWith(
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      expect(actor).toMatchObject({
+        handle: existingHandle,
+      });
+      expect(jobQueue.getJobs()).not.toContainEqual(
         expect.objectContaining({
           queueName: "syncRepo",
         }),
