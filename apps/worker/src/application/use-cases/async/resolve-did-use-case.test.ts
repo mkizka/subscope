@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
+import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ResolveDidUseCase } from "./resolve-did-use-case.js";
 
 describe("ResolveDidUseCase", () => {

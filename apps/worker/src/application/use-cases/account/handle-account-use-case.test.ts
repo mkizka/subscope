@@ -6,8 +6,8 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository.js";
-import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository.js";
+import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
+import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository/profile-repository.js";
 import { IndexActorService } from "../../services/index-actor-service.js";
 import { FetchRecordScheduler } from "../../services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../../services/scheduler/resolve-did-scheduler.js";

@@ -6,7 +6,7 @@ import { Actor as ActorDomain } from "@repo/common/domain";
 import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IActorRepository } from "../../application/interfaces/repositories/actor-repository.js";
+import type { IActorRepository } from "../../../application/interfaces/repositories/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {

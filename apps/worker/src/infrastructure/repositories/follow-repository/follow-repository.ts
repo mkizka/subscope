@@ -1,8 +1,8 @@
 import type { Follow, TransactionContext } from "@repo/common/domain";
 import { type FollowInsert, schema } from "@repo/db";
 
-import type { IFollowRepository } from "../../application/interfaces/repositories/follow-repository.js";
-import { sanitizeDate } from "../utils/data-sanitizer.js";
+import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
+import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FollowRepository implements IFollowRepository {
   async upsert({ ctx, follow }: { ctx: TransactionContext; follow: Follow }) {
