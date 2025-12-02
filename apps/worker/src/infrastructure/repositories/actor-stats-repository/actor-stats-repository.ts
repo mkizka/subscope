@@ -2,7 +2,7 @@ import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { count, eq } from "drizzle-orm";
 
-import type { IActorStatsRepository } from "../../application/interfaces/repositories/actor-stats-repository.js";
+import type { IActorStatsRepository } from "../../../application/interfaces/repositories/actor-stats-repository.js";
 
 export class ActorStatsRepository implements IActorStatsRepository {
   async upsertFollowsCount({

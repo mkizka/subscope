@@ -9,7 +9,7 @@ import { mock } from "vitest-mock-extended";
 
 import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
 import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
-import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
+import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/repositories/follow-repository/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository/profile-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";

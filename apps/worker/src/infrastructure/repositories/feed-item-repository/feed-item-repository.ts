@@ -1,8 +1,8 @@
 import type { FeedItem, TransactionContext } from "@repo/common/domain";
 import { type FeedItemInsert, schema } from "@repo/db";
 
-import type { IFeedItemRepository } from "../../application/interfaces/repositories/feed-item-repository.js";
-import { sanitizeDate } from "../utils/data-sanitizer.js";
+import type { IFeedItemRepository } from "../../../application/interfaces/repositories/feed-item-repository.js";
+import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FeedItemRepository implements IFeedItemRepository {
   async upsert({
