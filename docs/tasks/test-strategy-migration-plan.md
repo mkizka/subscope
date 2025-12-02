@@ -39,7 +39,7 @@
 - [x] **Phase 8-A**: workerリポジトリのディレクトリ構造統一（Part 1）
 - [x] **Phase 8-B**: workerリポジトリのディレクトリ構造統一（Part 2）
 - [x] **Phase 8-C**: workerリポジトリのディレクトリ構造統一（Part 3）
-- [ ] **Phase 9-A**: workerインメモリリポジトリの作成（Part 1）
+- [x] **Phase 9-A**: workerインメモリリポジトリの作成（Part 1）
 - [ ] **Phase 9-B**: workerインメモリリポジトリの作成（Part 2）
 - [ ] **Phase 9-C**: workerインメモリリポジトリの作成（Part 3）
 
