@@ -21,13 +21,12 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     return Array.from(this.feedItems.values());
   }
 
-  upsert({
+  async upsert({
     feedItem,
   }: {
     ctx: TransactionContext;
     feedItem: FeedItem;
   }): Promise<void> {
     this.feedItems.set(feedItem.uri.toString(), feedItem);
-    return Promise.resolve();
   }
 }

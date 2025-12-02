@@ -83,7 +83,7 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     return stats;
   }
 
-  upsertLikeCount({
+  async upsertLikeCount({
     uri,
   }: {
     ctx: TransactionContext;
@@ -93,10 +93,9 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     const stats = this.getOrCreateStats(postUri);
     const likeCount = this.likes.get(postUri)?.size ?? 0;
     stats.likeCount = likeCount;
-    return Promise.resolve();
   }
 
-  upsertRepostCount({
+  async upsertRepostCount({
     uri,
   }: {
     ctx: TransactionContext;
@@ -106,10 +105,9 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     const stats = this.getOrCreateStats(postUri);
     const repostCount = this.reposts.get(postUri)?.size ?? 0;
     stats.repostCount = repostCount;
-    return Promise.resolve();
   }
 
-  upsertReplyCount({
+  async upsertReplyCount({
     uri,
   }: {
     ctx: TransactionContext;
@@ -119,10 +117,9 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     const stats = this.getOrCreateStats(postUri);
     const replyCount = this.replies.get(postUri)?.size ?? 0;
     stats.replyCount = replyCount;
-    return Promise.resolve();
   }
 
-  upsertQuoteCount({
+  async upsertQuoteCount({
     uri,
   }: {
     ctx: TransactionContext;
@@ -132,10 +129,9 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     const stats = this.getOrCreateStats(postUri);
     const quoteCount = this.quotes.get(postUri)?.size ?? 0;
     stats.quoteCount = quoteCount;
-    return Promise.resolve();
   }
 
-  upsertAllCount({
+  async upsertAllCount({
     uri,
   }: {
     ctx: TransactionContext;
@@ -147,6 +143,5 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     stats.repostCount = this.reposts.get(postUri)?.size ?? 0;
     stats.replyCount = this.replies.get(postUri)?.size ?? 0;
     stats.quoteCount = this.quotes.get(postUri)?.size ?? 0;
-    return Promise.resolve();
   }
 }

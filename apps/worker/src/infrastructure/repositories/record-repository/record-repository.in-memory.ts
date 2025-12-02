@@ -22,27 +22,30 @@ export class InMemoryRecordRepository implements IRecordRepository {
     return Array.from(this.records.values());
   }
 
-  findByUri({
+  async findByUri({
     uri,
   }: {
     ctx: TransactionContext;
     uri: AtUri;
   }): Promise<Record | null> {
-    return Promise.resolve(this.records.get(uri.toString()) ?? null);
+    return this.records.get(uri.toString()) ?? null;
   }
 
-  upsert({
+  async upsert({
     record,
   }: {
     ctx: TransactionContext;
     record: Record;
   }): Promise<void> {
     this.records.set(record.uri.toString(), record);
-    return Promise.resolve();
   }
 
-  delete({ uri }: { ctx: TransactionContext; uri: AtUri }): Promise<void> {
+  async delete({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<void> {
     this.records.delete(uri.toString());
-    return Promise.resolve();
   }
 }

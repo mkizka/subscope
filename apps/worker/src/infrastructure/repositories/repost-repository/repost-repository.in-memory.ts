@@ -21,13 +21,12 @@ export class InMemoryRepostRepository implements IRepostRepository {
     return Array.from(this.reposts.values());
   }
 
-  upsert({
+  async upsert({
     repost,
   }: {
     ctx: TransactionContext;
     repost: Repost;
   }): Promise<void> {
     this.reposts.set(repost.uri.toString(), repost);
-    return Promise.resolve();
   }
 }

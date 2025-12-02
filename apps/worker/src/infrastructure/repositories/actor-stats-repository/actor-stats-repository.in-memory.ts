@@ -69,7 +69,7 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     return stats;
   }
 
-  upsertFollowsCount({
+  async upsertFollowsCount({
     actorDid,
   }: {
     ctx: TransactionContext;
@@ -78,10 +78,9 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     const stats = this.getOrCreateStats(actorDid);
     const followsCount = this.follows.get(actorDid)?.size ?? 0;
     stats.followsCount = followsCount;
-    return Promise.resolve();
   }
 
-  upsertFollowersCount({
+  async upsertFollowersCount({
     actorDid,
   }: {
     ctx: TransactionContext;
@@ -90,10 +89,9 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     const stats = this.getOrCreateStats(actorDid);
     const followersCount = this.followers.get(actorDid)?.size ?? 0;
     stats.followersCount = followersCount;
-    return Promise.resolve();
   }
 
-  upsertPostsCount({
+  async upsertPostsCount({
     actorDid,
   }: {
     ctx: TransactionContext;
@@ -102,6 +100,5 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     const stats = this.getOrCreateStats(actorDid);
     const postsCount = this.posts.get(actorDid)?.size ?? 0;
     stats.postsCount = postsCount;
-    return Promise.resolve();
   }
 }
