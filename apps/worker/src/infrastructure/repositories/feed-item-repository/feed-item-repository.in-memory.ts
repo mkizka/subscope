@@ -13,14 +13,6 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     this.feedItems.clear();
   }
 
-  get(uri: string): FeedItem | undefined {
-    return this.feedItems.get(uri);
-  }
-
-  getAll(): FeedItem[] {
-    return Array.from(this.feedItems.values());
-  }
-
   async upsert({
     feedItem,
   }: {

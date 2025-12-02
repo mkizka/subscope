@@ -21,14 +21,6 @@ export class InMemoryActorStatsRepository implements IActorStatsRepository {
     this.posts.clear();
   }
 
-  get(actorDid: string): ActorStats | undefined {
-    return this.stats.get(actorDid);
-  }
-
-  getAll(): Map<string, ActorStats> {
-    return new Map(this.stats);
-  }
-
   addFollow(actorDid: string, followUri: string): void {
     let followSet = this.follows.get(actorDid);
     if (!followSet) {

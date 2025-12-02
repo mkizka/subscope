@@ -13,14 +13,6 @@ export class InMemoryRepostRepository implements IRepostRepository {
     this.reposts.clear();
   }
 
-  get(uri: string): Repost | undefined {
-    return this.reposts.get(uri);
-  }
-
-  getAll(): Repost[] {
-    return Array.from(this.reposts.values());
-  }
-
   async upsert({
     repost,
   }: {

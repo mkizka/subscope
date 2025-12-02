@@ -25,14 +25,6 @@ export class InMemoryPostStatsRepository implements IPostStatsRepository {
     this.quotes.clear();
   }
 
-  get(uri: string): PostStats | undefined {
-    return this.stats.get(uri);
-  }
-
-  getAll(): Map<string, PostStats> {
-    return new Map(this.stats);
-  }
-
   addLike(postUri: string, likeUri: string): void {
     let likeSet = this.likes.get(postUri);
     if (!likeSet) {
