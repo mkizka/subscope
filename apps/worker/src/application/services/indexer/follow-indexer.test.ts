@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
@@ -42,12 +43,12 @@ describe("FollowIndexer", () => {
         ctx,
         uri: record.uri,
       });
-      expect(follow).not.toBeNull();
-      if (!follow) return;
-      expect(follow.uri.toString()).toBe(record.uri.toString());
-      expect(follow.cid).toBe(record.cid);
-      expect(follow.actorDid).toBe(follower.did);
-      expect(follow.subjectDid).toBe(followee.did);
+      expect(follow).toMatchObject({
+        uri: new AtUri(record.uri.toString()),
+        cid: record.cid,
+        actorDid: follower.did,
+        subjectDid: followee.did,
+      });
     });
 
     test("フォロイーのactorが存在しない場合、自動的に作成される", async () => {
@@ -93,12 +94,12 @@ describe("FollowIndexer", () => {
         ctx,
         uri: record.uri,
       });
-      expect(follow).not.toBeNull();
-      if (!follow) return;
-      expect(follow.uri.toString()).toBe(record.uri.toString());
-      expect(follow.cid).toBe(record.cid);
-      expect(follow.actorDid).toBe(follower.did);
-      expect(follow.subjectDid).toBe(followeeDid);
+      expect(follow).toMatchObject({
+        uri: new AtUri(record.uri.toString()),
+        cid: record.cid,
+        actorDid: follower.did,
+        subjectDid: followeeDid,
+      });
     });
   });
 

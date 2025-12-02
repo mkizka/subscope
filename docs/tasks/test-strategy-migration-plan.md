@@ -783,38 +783,6 @@ exclude: []; // 削除
 
 ---
 
-### Phase 10-B: worker Indexerの移行（like-indexer）
-
-**対象ファイル:**
-
-1. `services/indexer/like-indexer.test.ts`
-
----
-
-### Phase 10-C: worker Indexerの移行（post-indexer）
-
-**対象ファイル:**
-
-1. `services/indexer/post-indexer.test.ts`
-
----
-
-### Phase 10-D: worker Indexerの移行（profile-indexer）
-
-**対象ファイル:**
-
-1. `services/indexer/profile-indexer.test.ts`
-
----
-
-### Phase 10-E: worker Indexerの移行（repost-indexer）
-
-**対象ファイル:**
-
-1. `services/indexer/repost-indexer.test.ts`
-
----
-
 ### Phase 11-A: worker Serviceの移行
 
 **対象ファイル (2個):**
