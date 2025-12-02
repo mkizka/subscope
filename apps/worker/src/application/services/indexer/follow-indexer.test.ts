@@ -1,86 +1,70 @@
 /* eslint-disable @typescript-eslint/unbound-method */
-import { Record } from "@repo/common/domain";
-import type { JobQueue } from "@repo/common/infrastructure";
-import { schema } from "@repo/db";
-import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
-import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
-import { FollowRepository } from "../../../infrastructure/repositories/follow-repository/follow-repository.js";
-import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { IndexActorService } from "../index-actor-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
-import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
-import { ResolveDidScheduler } from "../scheduler/resolve-did-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
 describe("FollowIndexer", () => {
   const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
-  const { testInjector, ctx } = testSetup;
 
   const followIndexer = testInjector
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("followIndexingPolicy", FollowIndexingPolicy)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideValue("jobQueue", mock<JobQueue>())
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .provideClass("indexActorService", IndexActorService)
     .provideValue(
       "aggregateActorStatsScheduler",
       mockAggregateActorStatsScheduler,
     )
     .injectClass(FollowIndexer);
 
+  const actorRepo = testInjector.resolve("actorRepository");
+  const followRepo = testInjector.resolve("followRepository");
+
+  const createCtx = () => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return { db: {} as never };
+  };
+
   describe("upsert", () => {
     test("フォローレコードを正しく保存する", async () => {
       // arrange
-      const [follower, followee] = await actorFactory(ctx.db).createList(2);
+      const follower = actorFactory();
+      const followee = actorFactory();
+      actorRepo.add(follower);
+      actorRepo.add(followee);
 
       const followJson = {
         $type: "app.bsky.graph.follow",
         subject: followee.did,
         createdAt: new Date().toISOString(),
       };
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower })
-        .props({ json: () => followJson })
-        .create();
-      const record = Record.fromJson({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
+      const record = recordFactory({
+        uri: `at://${follower.did}/app.bsky.graph.follow/followrkey123`,
+        cid: "bafyreifakecid123",
         json: followJson,
-        indexedAt: new Date(),
       });
 
       // act
+      const ctx = createCtx();
       await followIndexer.upsert({ ctx, record });
 
       // assert
-      const [follow] = await ctx.db
-        .select()
-        .from(schema.follows)
-        .where(eq(schema.follows.uri, record.uri.toString()))
-        .limit(1);
-      expect(follow).toMatchObject({
-        uri: record.uri.toString(),
-        cid: record.cid,
-        actorDid: follower.did,
-        subjectDid: followee.did,
+      const follow = await followRepo.findByUri({
+        ctx,
+        uri: record.uri,
       });
+      expect(follow).not.toBeNull();
+      if (!follow) return;
+      expect(follow.uri.toString()).toBe(record.uri.toString());
+      expect(follow.cid).toBe(record.cid);
+      expect(follow.actorDid).toBe(follower.did);
+      expect(follow.subjectDid).toBe(followee.did);
     });
 
     test("フォロイーのactorが存在しない場合、自動的に作成される", async () => {
       // arrange
-      const follower = await actorFactory(ctx.db).create();
+      const follower = actorFactory();
+      actorRepo.add(follower);
       const followeeDid = "did:plc:nonexistent-followee";
 
       const followJson = {
@@ -88,78 +72,71 @@ describe("FollowIndexer", () => {
         subject: followeeDid,
         createdAt: new Date().toISOString(),
       };
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower })
-        .props({ json: () => followJson })
-        .create();
-      const record = Record.fromJson({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
+      const record = recordFactory({
+        uri: `at://${follower.did}/app.bsky.graph.follow/followrkey456`,
+        cid: "bafyreifakecid456",
         json: followJson,
-        indexedAt: new Date(),
       });
 
       // フォロイーのactorが存在しないことを確認
-      const followeeBeforeUpsert = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, followeeDid))
-        .limit(1);
-      expect(followeeBeforeUpsert).toHaveLength(0);
+      const ctx = createCtx();
+      const followeeBeforeUpsert = await actorRepo.findByDid({
+        ctx,
+        did: followeeDid,
+      });
+      expect(followeeBeforeUpsert).toBeNull();
 
       // act
       await followIndexer.upsert({ ctx, record });
 
       // assert
       // フォロイーのactorが作成されたことを確認
-      const [followeeAfterUpsert] = await ctx.db
-        .select()
-        .from(schema.actors)
-        .where(eq(schema.actors.did, followeeDid))
-        .limit(1);
+      const followeeAfterUpsert = await actorRepo.findByDid({
+        ctx,
+        did: followeeDid,
+      });
       expect(followeeAfterUpsert).toMatchObject({
         did: followeeDid,
         handle: null,
       });
 
       // フォローレコードも正しく保存されたことを確認
-      const [follow] = await ctx.db
-        .select()
-        .from(schema.follows)
-        .where(eq(schema.follows.uri, record.uri.toString()))
-        .limit(1);
-      expect(follow).toMatchObject({
-        uri: record.uri.toString(),
-        cid: record.cid,
-        actorDid: follower.did,
-        subjectDid: followeeDid,
+      const follow = await followRepo.findByUri({
+        ctx,
+        uri: record.uri,
       });
+      expect(follow).not.toBeNull();
+      if (!follow) return;
+      expect(follow.uri.toString()).toBe(record.uri.toString());
+      expect(follow.cid).toBe(record.cid);
+      expect(follow.actorDid).toBe(follower.did);
+      expect(follow.subjectDid).toBe(followeeDid);
     });
   });
 
   describe("afterAction", () => {
     test("フォロー作成時にfollows/followers集計ジョブがスケジュールされる", async () => {
       // arrange
-      const [follower, followee] = await actorFactory(ctx.db).createList(2);
+      const follower = actorFactory();
+      const followee = actorFactory();
+      actorRepo.add(follower);
+      actorRepo.add(followee);
 
       const followJson = {
         $type: "app.bsky.graph.follow",
         subject: followee.did,
         createdAt: new Date().toISOString(),
       };
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower })
-        .props({ json: () => followJson })
-        .create();
-      const record = Record.fromJson({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
+      const record = recordFactory({
+        uri: `at://${follower.did}/app.bsky.graph.follow/followrkey789`,
+        cid: "bafyreifakecid789",
         json: followJson,
-        indexedAt: new Date(),
       });
 
-      // act
+      const ctx = createCtx();
       await followIndexer.upsert({ ctx, record });
+
+      // act
       await followIndexer.afterAction({ ctx, record });
 
       // assert

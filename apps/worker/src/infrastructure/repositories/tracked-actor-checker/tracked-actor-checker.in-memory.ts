@@ -40,6 +40,10 @@ export class InMemoryTrackedActorChecker implements ITrackedActorChecker {
     return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, actorDids);
   }
 
+  clear(): void {
+    // InMemoryTrackedActorCheckerは内部状態を持たないため、何もしない
+  }
+
   private createDummyContext(): TransactionContext {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return {} as TransactionContext;

@@ -45,7 +45,7 @@
 
 ### Phase 10-11: workerテスト移行
 
-- [ ] **Phase 10**: worker Indexerの移行
+- [x] **Phase 10**: worker Indexerの移行
 - [ ] **Phase 11-A**: worker Serviceの移行
 - [ ] **Phase 11-B**: worker UseCaseの移行（Part 1）
 - [ ] **Phase 11-C**: worker UseCaseの移行（Part 2）
