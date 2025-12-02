@@ -1,5 +1,7 @@
-import { defineProject, mergeConfig } from "vitest/config";
+import { defineConfig } from "vitest/config";
 
-import baseConfig from "../../vitest.shared.js";
-
-export default mergeConfig(baseConfig, defineProject({}));
+export default defineConfig({
+  test: {
+    projects: ["vitest.unit.config.ts", "vitest.integration.config.ts"],
+  },
+});

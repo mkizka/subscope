@@ -5,10 +5,9 @@ export class InMemoryIndexTargetRepository implements IIndexTargetRepository {
   private subscribers: Set<string> = new Set();
   private trackedActors: Set<string> = new Set();
 
-  clear(): Promise<void> {
+  clear(): void {
     this.subscribers.clear();
     this.trackedActors.clear();
-    return Promise.resolve();
   }
 
   async isSubscriber(did: Did): Promise<boolean> {
