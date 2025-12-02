@@ -25,39 +25,39 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     this.follows.clear();
   }
 
-  upsert({
+  async upsert({
     subscription,
   }: {
     ctx: TransactionContext;
     subscription: Subscription;
   }): Promise<void> {
     this.subscriptions.set(subscription.actorDid, subscription);
-    return Promise.resolve();
   }
 
-  isSubscriber(_ctx: TransactionContext, actorDid: string): Promise<boolean> {
-    return Promise.resolve(this.subscriptions.has(actorDid));
+  async isSubscriber(
+    _ctx: TransactionContext,
+    actorDid: string,
+  ): Promise<boolean> {
+    return this.subscriptions.has(actorDid);
   }
 
-  hasSubscriber(
+  async hasSubscriber(
     _ctx: TransactionContext,
     actorDids: string[],
   ): Promise<boolean> {
-    return Promise.resolve(
-      actorDids.some((did) => this.subscriptions.has(did)),
-    );
+    return actorDids.some((did) => this.subscriptions.has(did));
   }
 
-  isFolloweeOfSubscribers(
+  async isFolloweeOfSubscribers(
     _ctx: TransactionContext,
     actorDid: string,
   ): Promise<boolean> {
     for (const [subscriberDid, followeeDids] of this.follows.entries()) {
       if (this.subscriptions.has(subscriberDid) && followeeDids.has(actorDid)) {
-        return Promise.resolve(true);
+        return true;
       }
     }
-    return Promise.resolve(false);
+    return false;
   }
 
   async hasFolloweeOfSubscribers(

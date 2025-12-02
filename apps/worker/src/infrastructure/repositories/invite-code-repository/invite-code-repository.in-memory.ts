@@ -13,14 +13,14 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     this.inviteCodes.clear();
   }
 
-  findByCode(
+  async findByCode(
     _ctx: TransactionContext,
     code: string,
   ): Promise<InviteCode | null> {
-    return Promise.resolve(this.inviteCodes.get(code) ?? null);
+    return this.inviteCodes.get(code) ?? null;
   }
 
-  markAsUsed(_ctx: TransactionContext, code: string): Promise<void> {
+  async markAsUsed(_ctx: TransactionContext, code: string): Promise<void> {
     const inviteCode = this.inviteCodes.get(code);
     if (inviteCode) {
       const updated = new InviteCode({
@@ -31,6 +31,5 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
       });
       this.inviteCodes.set(code, updated);
     }
-    return Promise.resolve();
   }
 }

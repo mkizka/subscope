@@ -13,13 +13,12 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
     this.generators.clear();
   }
 
-  upsert({
+  async upsert({
     generator,
   }: {
     ctx: TransactionContext;
     generator: Generator;
   }): Promise<void> {
     this.generators.set(generator.uri.toString(), generator);
-    return Promise.resolve();
   }
 }

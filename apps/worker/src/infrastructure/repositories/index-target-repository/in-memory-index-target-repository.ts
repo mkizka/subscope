@@ -5,59 +5,52 @@ export class InMemoryIndexTargetRepository implements IIndexTargetRepository {
   private subscribers: Set<string> = new Set();
   private trackedActors: Set<string> = new Set();
 
-  clear(): Promise<void> {
+  async clear(): Promise<void> {
     this.subscribers.clear();
     this.trackedActors.clear();
-    return Promise.resolve();
   }
 
-  isSubscriber(did: Did): Promise<boolean> {
-    return Promise.resolve(this.subscribers.has(did));
+  async isSubscriber(did: Did): Promise<boolean> {
+    return this.subscribers.has(did);
   }
 
-  hasSubscriber(dids: Did[]): Promise<boolean> {
-    return Promise.resolve(dids.some((did) => this.subscribers.has(did)));
+  async hasSubscriber(dids: Did[]): Promise<boolean> {
+    return dids.some((did) => this.subscribers.has(did));
   }
 
-  isTrackedActor(did: Did): Promise<boolean> {
-    return Promise.resolve(this.trackedActors.has(did));
+  async isTrackedActor(did: Did): Promise<boolean> {
+    return this.trackedActors.has(did);
   }
 
-  hasTrackedActor(dids: Did[]): Promise<boolean> {
-    return Promise.resolve(dids.some((did) => this.trackedActors.has(did)));
+  async hasTrackedActor(dids: Did[]): Promise<boolean> {
+    return dids.some((did) => this.trackedActors.has(did));
   }
 
-  addSubscriber(did: Did): Promise<void> {
+  async addSubscriber(did: Did): Promise<void> {
     this.subscribers.add(did);
-    return Promise.resolve();
   }
 
-  removeSubscriber(did: Did): Promise<void> {
+  async removeSubscriber(did: Did): Promise<void> {
     this.subscribers.delete(did);
-    return Promise.resolve();
   }
 
-  addTrackedActor(did: Did): Promise<void> {
+  async addTrackedActor(did: Did): Promise<void> {
     this.trackedActors.add(did);
-    return Promise.resolve();
   }
 
-  removeTrackedActor(did: Did): Promise<void> {
+  async removeTrackedActor(did: Did): Promise<void> {
     this.trackedActors.delete(did);
-    return Promise.resolve();
   }
 
-  bulkAddSubscribers(dids: Did[]): Promise<void> {
+  async bulkAddSubscribers(dids: Did[]): Promise<void> {
     for (const did of dids) {
       this.subscribers.add(did);
     }
-    return Promise.resolve();
   }
 
-  bulkAddTrackedActors(dids: Did[]): Promise<void> {
+  async bulkAddTrackedActors(dids: Did[]): Promise<void> {
     for (const did of dids) {
       this.trackedActors.add(did);
     }
-    return Promise.resolve();
   }
 }
