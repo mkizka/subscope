@@ -3,7 +3,7 @@ import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { count, eq } from "drizzle-orm";
 
-import type { IPostStatsRepository } from "../../application/interfaces/repositories/post-stats-repository.js";
+import type { IPostStatsRepository } from "../../../application/interfaces/repositories/post-stats-repository.js";
 
 export class PostStatsRepository implements IPostStatsRepository {
   async upsertLikeCount({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
