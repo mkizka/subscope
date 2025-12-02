@@ -11,7 +11,7 @@ export class InMemoryTrackedActorChecker implements ITrackedActorChecker {
   static inject = ["subscriptionRepository"] as const;
 
   async isTrackedActor(actorDid: Did): Promise<boolean> {
-    const ctx = {} as TransactionContext;
+    const ctx = this.createDummyContext();
     const isSubscriber = await this.subscriptionRepository.isSubscriber(
       ctx,
       actorDid,
@@ -28,7 +28,7 @@ export class InMemoryTrackedActorChecker implements ITrackedActorChecker {
       return false;
     }
 
-    const ctx = {} as TransactionContext;
+    const ctx = this.createDummyContext();
     const hasSubscriber = await this.subscriptionRepository.hasSubscriber(
       ctx,
       actorDids,
@@ -38,5 +38,10 @@ export class InMemoryTrackedActorChecker implements ITrackedActorChecker {
     }
 
     return this.subscriptionRepository.hasFolloweeOfSubscribers(ctx, actorDids);
+  }
+
+  private createDummyContext(): TransactionContext {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return {} as TransactionContext;
   }
 }
