@@ -19,7 +19,7 @@ import { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
 import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository.js";
 import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { PostRepository } from "../../../infrastructure/repositories/post-repository.js";
+import { PostRepository } from "../../../infrastructure/repositories/post-repository/post-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";

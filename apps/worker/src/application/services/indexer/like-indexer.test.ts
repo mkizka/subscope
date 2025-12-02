@@ -15,7 +15,7 @@ import { mock } from "vitest-mock-extended";
 
 import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
 import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { LikeRepository } from "../../../infrastructure/repositories/like-repository.js";
+import { LikeRepository } from "../../../infrastructure/repositories/like-repository/like-repository.js";
 import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";

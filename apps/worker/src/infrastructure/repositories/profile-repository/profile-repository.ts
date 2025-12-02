@@ -4,8 +4,8 @@ import type { Profile } from "@repo/common/domain";
 import { type ProfileInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IProfileRepository } from "../../application/interfaces/repositories/profile-repository.js";
-import { sanitizeDate } from "../utils/data-sanitizer.js";
+import type { IProfileRepository } from "../../../application/interfaces/repositories/profile-repository.js";
+import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ProfileRepository implements IProfileRepository {
   async upsert({
