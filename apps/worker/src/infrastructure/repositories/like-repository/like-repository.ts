@@ -1,8 +1,8 @@
 import type { Like, TransactionContext } from "@repo/common/domain";
 import { type LikeInsert, schema } from "@repo/db";
 
-import type { ILikeRepository } from "../../application/interfaces/repositories/like-repository.js";
-import { sanitizeDate } from "../utils/data-sanitizer.js";
+import type { ILikeRepository } from "../../../application/interfaces/repositories/like-repository.js";
+import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class LikeRepository implements ILikeRepository {
   async upsert({ ctx, like }: { ctx: TransactionContext; like: Like }) {
