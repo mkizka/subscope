@@ -23,21 +23,22 @@ export class InMemoryJobQueue implements IJobQueue {
     return [];
   }
 
-  add<T extends QueueName>(params: {
+  async add<T extends QueueName>(params: {
     queueName: T;
     jobName: string;
     data: AddedJob<T>["data"];
     options?: { jobId?: string; delay?: number };
   }): Promise<void> {
     this.jobs.push(params);
-    return Promise.resolve();
   }
 
   clear(): void {
     this.jobs = [];
   }
 
-  getAddedJobs(): readonly AddedJob[] {
-    return this.jobs;
+  findByQueueName<T extends QueueName>(queueName: T): readonly AddedJob<T>[] {
+    return this.jobs.filter(
+      (job): job is AddedJob<T> => job.queueName === queueName,
+    );
   }
 }
