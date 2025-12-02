@@ -63,13 +63,13 @@ export const testInjector = createInjector()
   .provideClass("indexActorService", IndexActorService);
 
 export const setupFiles = () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     testInjector.resolve("actorRepository").clear();
     testInjector.resolve("actorStatsRepository").clear();
     testInjector.resolve("feedItemRepository").clear();
     testInjector.resolve("followRepository").clear();
     testInjector.resolve("generatorRepository").clear();
-    testInjector.resolve("indexTargetRepository").clear();
+    await testInjector.resolve("indexTargetRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("likeRepository").clear();
     testInjector.resolve("postRepository").clear();
