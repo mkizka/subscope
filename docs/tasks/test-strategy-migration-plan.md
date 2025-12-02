@@ -51,7 +51,7 @@
 - [ ] **Phase 10-D**: worker Indexerの移行（profile-indexer）
 - [ ] **Phase 10-E**: worker Indexerの移行（repost-indexer）
 - [ ] **Phase 11-A**: worker Serviceの移行
-- [ ] **Phase 11-B**: worker UseCaseの移行（Part 1）
+- [x] **Phase 11-B**: worker UseCaseの移行（Part 1）
 - [ ] **Phase 11-C**: worker UseCaseの移行（Part 2）
 
 ### Phase 12: workerリポジトリテスト追加
