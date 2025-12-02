@@ -43,13 +43,6 @@ type JobOptions = {
   delay?: number;
 };
 
-export interface AddedJob<T extends QueueName = QueueName> {
-  queueName: T;
-  jobName: string;
-  data: JobData[T];
-  options?: JobOptions;
-}
-
 export interface IJobQueue {
   getQueues: () => Queue[];
   add: <T extends QueueName>(params: {

@@ -1,10 +1,20 @@
 import type { Queue } from "bullmq";
 
 import type {
-  AddedJob,
   IJobQueue,
+  JobData,
   QueueName,
 } from "../../domain/interfaces/job-queue.js";
+
+interface AddedJob<T extends QueueName = QueueName> {
+  queueName: T;
+  jobName: string;
+  data: JobData[T];
+  options?: {
+    jobId?: string;
+    delay?: number;
+  };
+}
 
 export class InMemoryJobQueue implements IJobQueue {
   private jobs: AddedJob[] = [];
