@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { Follow, TransactionContext } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
@@ -11,6 +12,13 @@ export class InMemoryFollowRepository implements IFollowRepository {
 
   clear(): void {
     this.follows.clear();
+  }
+
+  async findByUri(params: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Follow | null> {
+    return this.follows.get(params.uri.toString()) ?? null;
   }
 
   async upsert(params: {

@@ -11,7 +11,7 @@ export interface IIndexTargetRepository {
   addTrackedActor: (did: Did) => Promise<void>;
   removeTrackedActor: (did: Did) => Promise<void>;
 
-  clear: () => Promise<void>;
+  clear: () => void;
   bulkAddSubscribers: (dids: Did[]) => Promise<void>;
   bulkAddTrackedActors: (dids: Did[]) => Promise<void>;
 }

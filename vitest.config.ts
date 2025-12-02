@@ -5,8 +5,11 @@ export default defineConfig({
     projects: [
       "apps/*",
       "!apps/appview",
+      "!apps/worker",
       "apps/appview/vitest.unit.config.ts",
       "apps/appview/vitest.integration.config.ts",
+      "apps/worker/vitest.unit.config.ts",
+      "apps/worker/vitest.integration.config.ts",
       "packages/*",
     ],
     coverage: {
