@@ -12,7 +12,7 @@ import { ActorRepository } from "../../../infrastructure/repositories/actor-repo
 import { ActorStatsRepository } from "../../../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FollowRepository } from "../../../infrastructure/repositories/follow-repository/follow-repository.js";
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { IndexActorService } from "../index-actor-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";

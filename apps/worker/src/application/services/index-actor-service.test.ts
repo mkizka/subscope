@@ -9,7 +9,7 @@ import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ProfileRepository } from "../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/repositories/subscription-repository.js";
+import { SubscriptionRepository } from "../../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { IndexActorService } from "./index-actor-service.js";
 import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";

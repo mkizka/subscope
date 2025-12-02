@@ -15,11 +15,11 @@ import { mock } from "vitest-mock-extended";
 
 import { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
 import { FeedItemRepository } from "../../../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
+import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
 import { PostRepository } from "../../../infrastructure/repositories/post-repository/post-repository.js";
-import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/postgres-index-target-repository.js";
 import { RepostRepository } from "../../../infrastructure/repositories/repost-repository/repost-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 import { RepostIndexer } from "./repost-indexer.js";

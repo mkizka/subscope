@@ -1,8 +1,8 @@
 import type { Generator, TransactionContext } from "@repo/common/domain";
 import { type GeneratorInsert, schema } from "@repo/db";
 
-import type { IGeneratorRepository } from "../../application/interfaces/repositories/generator-repository.js";
-import { sanitizeDate } from "../utils/data-sanitizer.js";
+import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
+import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class GeneratorRepository implements IGeneratorRepository {
   async upsert({

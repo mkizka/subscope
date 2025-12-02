@@ -2,7 +2,7 @@ import { InviteCode, type TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IInviteCodeRepository } from "../../application/interfaces/repositories/invite-code-repository.js";
+import type { IInviteCodeRepository } from "../../../application/interfaces/repositories/invite-code-repository.js";
 
 export class InviteCodeRepository implements IInviteCodeRepository {
   async findByCode(

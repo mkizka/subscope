@@ -12,10 +12,10 @@ import { describe, expect, test } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
-import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/postgres-index-target-repository.js";
+import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
 import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository.js";
-import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker.js";
+import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
 import { IndexActorService } from "../../services/index-actor-service.js";
 import { FetchRecordScheduler } from "../../services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../../services/scheduler/resolve-did-scheduler.js";

@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../application/interfaces/repositories/subscription-repository.js";
-import type { ITrackedActorChecker } from "../../application/interfaces/repositories/tracked-actor-checker.js";
+import type { ISubscriptionRepository } from "../../../application/interfaces/repositories/subscription-repository.js";
+import type { ITrackedActorChecker } from "../../../application/interfaces/repositories/tracked-actor-checker.js";
 
 export class TrackedActorChecker implements ITrackedActorChecker {
   constructor(

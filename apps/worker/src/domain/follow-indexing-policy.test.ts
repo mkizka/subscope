@@ -7,7 +7,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository.js";
+import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { FollowIndexingPolicy } from "./follow-indexing-policy.js";
 
 describe("FollowIndexingPolicy", () => {
