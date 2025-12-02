@@ -11,12 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          npm i -g corepack@latest
-          corepack enable pnpm
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
           cache: pnpm
       - run: pnpm i
       - run: pnpm lint
@@ -24,12 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          npm i -g corepack@latest
-          corepack enable pnpm
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
           cache: pnpm
       - run: pnpm i
       - run: pnpm typecheck
@@ -37,12 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          npm i -g corepack@latest
-          corepack enable pnpm
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
           cache: pnpm
       - run: pnpm i
       - run: pnpm build
