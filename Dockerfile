@@ -1,9 +1,8 @@
-FROM node:22.20.0-slim AS base
+FROM node:24-slim AS base
 ARG BUILD_TARGET
 ENV BUILD_PACKAGE=@repo/${BUILD_TARGET}
-RUN npm i -g turbo@^2 corepack@latest
+RUN npm i -g turbo@^2 pnpm@10
 ENV PNPM_HOME="/pnpm"
-RUN corepack enable pnpm
 
 FROM base AS pruner
 WORKDIR /app
@@ -29,7 +28,6 @@ FROM base AS runner
 WORKDIR /app
 USER node
 COPY --from=builder --chown=node:node /app .
-RUN corepack prepare
 
 ENV PORT=8080
 ENV NODE_ENV=production
