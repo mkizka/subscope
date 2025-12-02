@@ -14,12 +14,10 @@ export class InMemoryPostRepository implements IPostRepository {
     this.posts.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async upsert(params: { ctx: TransactionContext; post: Post }): Promise<void> {
     this.posts.set(params.post.uri.toString(), params.post);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
     return this.posts.has(uri.toString());
   }

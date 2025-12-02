@@ -14,7 +14,6 @@ export class InMemoryProfileRepository implements IProfileRepository {
     this.profiles.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async upsert(params: {
     ctx: TransactionContext;
     profile: Profile;
@@ -22,7 +21,6 @@ export class InMemoryProfileRepository implements IProfileRepository {
     this.profiles.set(params.profile.uri.toString(), params.profile);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async exists(params: {
     ctx: TransactionContext;
     actorDid: Did;

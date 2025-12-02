@@ -13,7 +13,6 @@ export class InMemoryLikeRepository implements ILikeRepository {
     this.likes.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async upsert(params: { ctx: TransactionContext; like: Like }): Promise<void> {
     this.likes.set(params.like.uri.toString(), params.like);
   }

@@ -13,7 +13,6 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async upsert(params: {
     ctx: TransactionContext;
     follow: Follow;

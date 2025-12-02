@@ -14,7 +14,6 @@ export class InMemoryActorRepository implements IActorRepository {
     this.actors.clear();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async upsert(params: {
     ctx: TransactionContext;
     actor: Actor;
@@ -22,7 +21,6 @@ export class InMemoryActorRepository implements IActorRepository {
     this.actors.set(params.actor.did, params.actor);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async findByDid(params: {
     ctx: TransactionContext;
     did: Did;
@@ -30,7 +28,6 @@ export class InMemoryActorRepository implements IActorRepository {
     return this.actors.get(params.did) ?? null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async exists(params: {
     ctx: TransactionContext;
     did: Did;
@@ -38,7 +35,6 @@ export class InMemoryActorRepository implements IActorRepository {
     return this.actors.has(params.did);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async delete(params: { ctx: TransactionContext; did: Did }): Promise<void> {
     this.actors.delete(params.did);
   }
