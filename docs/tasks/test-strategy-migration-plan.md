@@ -698,6 +698,65 @@ tracked-actor-checker.ts           → tracked-actor-checker/tracked-actor-check
 4. `services/indexer/profile-indexer.test.ts`
 5. `services/indexer/repost-indexer.test.ts`
 
+**移行期間中のvitest設定:**
+
+workerの移行期間中は、以下のようにvitest設定を分離します：
+
+```typescript
+// vitest.unit.config.ts
+export default defineProject({
+  test: {
+    name: "worker:unit",
+    setupFiles: "./vitest.unit.setup.ts",
+    include: [
+      "./src/application/services/indexer/follow-indexer.test.ts",
+      // 移行済みテストを順次追加
+    ],
+    clearMocks: true,
+  },
+});
+
+// vitest.integration.config.ts
+export default defineProject({
+  test: {
+    name: "worker:integration",
+    globalSetup: "./vitest.integration.global-setup.ts",
+    setupFiles: "./vitest.integration.setup.ts",
+    include: [
+      "src/infrastructure/**/*.test.ts",
+      "src/{application,domain,presentation}/**/*.test.ts",
+    ],
+    exclude: [
+      "src/application/services/indexer/follow-indexer.test.ts",
+      // unit設定に追加したテストを順次追加
+    ],
+    testTimeout: 120000,
+    clearMocks: true,
+    isolate: false,
+    poolOptions: { forks: { singleFork: true } },
+  },
+});
+```
+
+**移行手順:**
+
+1. テストをインメモリリポジトリに移行
+2. `vitest.unit.config.ts`のincludeに追加
+3. `vitest.integration.config.ts`のexcludeに追加
+
+**移行完了後:**
+
+すべてのテストの移行が完了したら、以下のように変更：
+
+```typescript
+// vitest.unit.config.ts
+include: ["./src/{application,domain,presentation}/**/*.test.ts"];
+
+// vitest.integration.config.ts
+include: ["src/infrastructure/**/*.test.ts"];
+exclude: []; // 削除
+```
+
 ---
 
 ### Phase 11-A: worker Serviceの移行
