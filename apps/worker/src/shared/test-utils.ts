@@ -7,6 +7,7 @@ import { beforeEach } from "vitest";
 
 import { IndexActorService } from "../application/services/index-actor-service.js";
 import { AggregateActorStatsScheduler } from "../application/services/scheduler/aggregate-actor-stats-scheduler.js";
+import { AggregatePostStatsScheduler } from "../application/services/scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../application/services/scheduler/resolve-did-scheduler.js";
 import { FollowIndexingPolicy } from "../domain/follow-indexing-policy.js";
@@ -52,6 +53,7 @@ export const testInjector = createInjector()
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
+  .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
   .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)

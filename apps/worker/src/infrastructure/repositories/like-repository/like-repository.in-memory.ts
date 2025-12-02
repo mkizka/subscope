@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { Like, TransactionContext } from "@repo/common/domain";
 
 import type { ILikeRepository } from "../../../application/interfaces/repositories/like-repository.js";
@@ -15,5 +16,12 @@ export class InMemoryLikeRepository implements ILikeRepository {
 
   async upsert(params: { ctx: TransactionContext; like: Like }): Promise<void> {
     this.likes.set(params.like.uri.toString(), params.like);
+  }
+
+  async findByUri(params: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Like | null> {
+    return this.likes.get(params.uri.toString()) ?? null;
   }
 }

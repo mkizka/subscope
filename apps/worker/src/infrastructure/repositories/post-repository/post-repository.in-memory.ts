@@ -21,4 +21,11 @@ export class InMemoryPostRepository implements IPostRepository {
   async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
     return this.posts.has(uri.toString());
   }
+
+  async findByUri(params: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Post | null> {
+    return this.posts.get(params.uri.toString()) ?? null;
+  }
 }
