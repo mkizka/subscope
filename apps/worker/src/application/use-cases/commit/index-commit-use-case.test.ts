@@ -1,41 +1,33 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { AtUri } from "@atproto/syntax";
-import type {
-  ITransactionManager,
-  TransactionContext,
-} from "@repo/common/domain";
 import { Record, RecordValidationError } from "@repo/common/domain";
-import { createInjector } from "typed-inject";
-import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
+import { describe, expect, test, vi } from "vitest";
 
-import type { JobLogger } from "../../../shared/job.js";
-import type { IndexRecordService } from "../../services/index-record-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
+import { IndexRecordService } from "../../services/index-record-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 import { IndexCommitUseCase } from "./index-commit-use-case.js";
 
-const mockIndexRecordService = mock<IndexRecordService>();
-const mockJobLogger = mock<JobLogger>();
-const mockTransactionManager = mock<ITransactionManager>();
-const mockTransactionContext = mock<TransactionContext>();
-mockTransactionManager.transaction.mockImplementation(async (fn) => {
-  await fn(mockTransactionContext);
+const createMockJobLogger = () => ({
+  log: vi.fn(),
 });
 
-const indexCommitUseCase = createInjector()
-  .provideValue("transactionManager", mockTransactionManager)
-  .provideValue("indexRecordService", mockIndexRecordService)
-  .injectClass(IndexCommitUseCase);
-
 describe("IndexCommitUseCase", () => {
+  const indexCommitUseCase = testInjector.injectClass(IndexCommitUseCase);
+
   describe("create/updateオペレーション", () => {
     test("upsertメソッドを呼び出す", async () => {
       // arrange
+      const spyUpsert = vi.spyOn(IndexRecordService.prototype, "upsert");
+      const mockJobLogger = createMockJobLogger();
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const record = Record.fromJson({
         uri,
         cid: "cid123",
-        json: { text: "Hello world", createdAt: new Date().toISOString() },
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Hello world",
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       });
       const commit = {
@@ -52,12 +44,13 @@ describe("IndexCommitUseCase", () => {
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         `Starting indexing for commit: ${uri.toString()}`,
       );
-      expect(mockIndexRecordService.upsert).toHaveBeenCalledWith({
-        ctx: mockTransactionContext,
-        record: commit.record,
-        jobLogger: mockJobLogger,
-        depth: 0,
-      });
+      expect(spyUpsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          record: commit.record,
+          jobLogger: mockJobLogger,
+          depth: 0,
+        }),
+      );
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         "Indexing completed successfully.",
       );
@@ -67,6 +60,9 @@ describe("IndexCommitUseCase", () => {
   describe("deleteオペレーション", () => {
     test("削除オペレーションの場合、レコードを削除する", async () => {
       // arrange
+      const spyDelete = vi.spyOn(IndexRecordService.prototype, "delete");
+      const spyUpsert = vi.spyOn(IndexRecordService.prototype, "upsert");
+      const mockJobLogger = createMockJobLogger();
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const commit = {
         operation: "delete" as const,
@@ -81,11 +77,12 @@ describe("IndexCommitUseCase", () => {
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         `Starting indexing for commit: ${uri.toString()}`,
       );
-      expect(mockIndexRecordService.delete).toHaveBeenCalledWith({
-        ctx: mockTransactionContext,
-        uri,
-      });
-      expect(mockIndexRecordService.upsert).not.toHaveBeenCalled();
+      expect(spyDelete).toHaveBeenCalledWith(
+        expect.objectContaining({
+          uri,
+        }),
+      );
+      expect(spyUpsert).not.toHaveBeenCalled();
       expect(mockJobLogger.log).toHaveBeenCalledWith(
         "Indexing completed successfully.",
       );
@@ -95,12 +92,18 @@ describe("IndexCommitUseCase", () => {
   describe("RecordValidationError", () => {
     test("RecordValidationErrorが発生した場合、エラーメッセージをログに記録して正常終了する", async () => {
       // arrange
+      const spyUpsert = vi.spyOn(IndexRecordService.prototype, "upsert");
+      const mockJobLogger = createMockJobLogger();
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const validationErrorMessage = "Invalid record schema";
       const record = Record.fromJson({
         uri,
         cid: "cid123",
-        json: { text: "Hello world", createdAt: new Date().toISOString() },
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Hello world",
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       });
       const commit = {
@@ -110,7 +113,7 @@ describe("IndexCommitUseCase", () => {
       };
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
-      mockIndexRecordService.upsert.mockRejectedValueOnce(
+      spyUpsert.mockRejectedValueOnce(
         new RecordValidationError(validationErrorMessage, uri),
       );
 
@@ -131,11 +134,17 @@ describe("IndexCommitUseCase", () => {
 
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
       // arrange
+      const spyUpsert = vi.spyOn(IndexRecordService.prototype, "upsert");
+      const mockJobLogger = createMockJobLogger();
       const uri = new AtUri("at://did:plc:example/app.bsky.feed.post/123");
       const record = Record.fromJson({
         uri,
         cid: "cid123",
-        json: { text: "Hello world", createdAt: new Date().toISOString() },
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Hello world",
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       });
       const commit = {
@@ -146,7 +155,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, jobLogger: mockJobLogger };
 
       const genericError = new Error("Database connection error");
-      mockIndexRecordService.upsert.mockRejectedValueOnce(genericError);
+      spyUpsert.mockRejectedValueOnce(genericError);
 
       // act & assert
       await expect(indexCommitUseCase.execute(command)).rejects.toThrow(

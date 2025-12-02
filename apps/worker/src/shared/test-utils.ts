@@ -6,7 +6,15 @@ import { createInjector } from "typed-inject";
 import { beforeEach } from "vitest";
 
 import { IndexActorService } from "../application/services/index-actor-service.js";
+import { IndexRecordService } from "../application/services/index-record-service.js";
+import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
+import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
+import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
+import { PostIndexer } from "../application/services/indexer/post-indexer.js";
+import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
+import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
 import { AggregateActorStatsScheduler } from "../application/services/scheduler/aggregate-actor-stats-scheduler.js";
+import { AggregatePostStatsScheduler } from "../application/services/scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../application/services/scheduler/resolve-did-scheduler.js";
 import { FollowIndexingPolicy } from "../domain/follow-indexing-policy.js";
@@ -52,6 +60,7 @@ export const testInjector = createInjector()
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
+  .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
   .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
@@ -60,7 +69,14 @@ export const testInjector = createInjector()
   .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-  .provideClass("indexActorService", IndexActorService);
+  .provideClass("indexActorService", IndexActorService)
+  .provideClass("postIndexer", PostIndexer)
+  .provideClass("profileIndexer", ProfileIndexer)
+  .provideClass("followIndexer", FollowIndexer)
+  .provideClass("generatorIndexer", GeneratorIndexer)
+  .provideClass("likeIndexer", LikeIndexer)
+  .provideClass("repostIndexer", RepostIndexer)
+  .provideClass("indexRecordService", IndexRecordService);
 
 export const setupFiles = () => {
   beforeEach(() => {
