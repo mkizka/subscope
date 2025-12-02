@@ -5,6 +5,7 @@ import { beforeEach } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { IndexActorService } from "../application/services/index-actor-service.js";
+import { InMemoryAggregateActorStatsScheduler } from "../application/services/scheduler/aggregate-actor-stats-scheduler.in-memory.js";
 import { FetchRecordScheduler } from "../application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../application/services/scheduler/resolve-did-scheduler.js";
 import { FollowIndexingPolicy } from "../domain/follow-indexing-policy.js";
@@ -51,6 +52,10 @@ export const testInjector = createInjector()
   .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideValue("jobQueue", mockJobQueue)
+  .provideClass(
+    "aggregateActorStatsScheduler",
+    InMemoryAggregateActorStatsScheduler,
+  )
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
   .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
@@ -77,5 +82,6 @@ export const setupFiles = () => {
     testInjector.resolve("recordRepository").clear();
     testInjector.resolve("repostRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
+    testInjector.resolve("aggregateActorStatsScheduler").clear();
   });
 };

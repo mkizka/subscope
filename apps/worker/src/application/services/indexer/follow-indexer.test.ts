@@ -1,28 +1,20 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
 import { testInjector } from "../../../shared/test-utils.js";
-import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import { FollowIndexer } from "./follow-indexer.js";
 
 describe("FollowIndexer", () => {
-  const mockAggregateActorStatsScheduler = mock<AggregateActorStatsScheduler>();
-
-  const followIndexer = testInjector
-    .provideValue(
-      "aggregateActorStatsScheduler",
-      mockAggregateActorStatsScheduler,
-    )
-    .injectClass(FollowIndexer);
+  const followIndexer = testInjector.injectClass(FollowIndexer);
 
   const actorRepo = testInjector.resolve("actorRepository");
   const followRepo = testInjector.resolve("followRepository");
+  const aggregateActorStatsScheduler = testInjector.resolve(
+    "aggregateActorStatsScheduler",
+  );
 
-  const createCtx = () => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return { db: {} as never };
+  const ctx = {
+    db: testInjector.resolve("db"),
   };
 
   describe("upsert", () => {
@@ -45,7 +37,6 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      const ctx = createCtx();
       await followIndexer.upsert({ ctx, record });
 
       // assert
@@ -79,7 +70,6 @@ describe("FollowIndexer", () => {
       });
 
       // フォロイーのactorが存在しないことを確認
-      const ctx = createCtx();
       const followeeBeforeUpsert = await actorRepo.findByDid({
         ctx,
         did: followeeDid,
@@ -133,26 +123,20 @@ describe("FollowIndexer", () => {
         json: followJson,
       });
 
-      const ctx = createCtx();
       await followIndexer.upsert({ ctx, record });
 
       // act
       await followIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenCalledTimes(
-        2,
-      );
-      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenNthCalledWith(
-        1,
-        follower.did,
-        "follows",
-      );
-      expect(mockAggregateActorStatsScheduler.schedule).toHaveBeenNthCalledWith(
-        2,
-        followee.did,
-        "followers",
-      );
+      const scheduledJobs = aggregateActorStatsScheduler.getScheduledJobs();
+      expect(scheduledJobs).toHaveLength(2);
+      expect(
+        aggregateActorStatsScheduler.hasScheduledJob(follower.did, "follows"),
+      ).toBe(true);
+      expect(
+        aggregateActorStatsScheduler.hasScheduledJob(followee.did, "followers"),
+      ).toBe(true);
     });
   });
 });
