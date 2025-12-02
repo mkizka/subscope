@@ -128,21 +128,26 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record });
 
       // assert
-      const jobs = jobQueue.getJobsByQueue("aggregateActorStats");
+      const jobs = jobQueue
+        .getAddedJobs()
+        .filter((job) => job.queueName === "aggregateActorStats");
       expect(jobs).toHaveLength(2);
-      expect(
-        jobQueue.hasJob(
-          "aggregateActorStats",
-          (job) => job.data.did === follower.did && job.data.type === "follows",
-        ),
-      ).toBe(true);
-      expect(
-        jobQueue.hasJob(
-          "aggregateActorStats",
-          (job) =>
-            job.data.did === followee.did && job.data.type === "followers",
-        ),
-      ).toBe(true);
+      expect(jobs).toMatchObject([
+        {
+          queueName: "aggregateActorStats",
+          data: {
+            did: follower.did,
+            type: "follows",
+          },
+        },
+        {
+          queueName: "aggregateActorStats",
+          data: {
+            did: followee.did,
+            type: "followers",
+          },
+        },
+      ]);
     });
   });
 });
