@@ -10,7 +10,7 @@ export const fakeDid = (): Did =>
 export const fakeHandle = () => faker.internet.domainName();
 
 export const fakeCid = () =>
-  faker.string.alphanumeric({ length: 50, casing: "lower" });
+  `bafkrei${faker.string.alphanumeric({ length: 52, casing: "lower" })}`;
 
 export const fakeAtUri = ({
   did,

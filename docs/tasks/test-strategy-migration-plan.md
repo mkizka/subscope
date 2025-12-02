@@ -48,8 +48,8 @@
 - [x] **Phase 10-A**: worker Indexerの移行（follow-indexer + テスト基盤構築）
 - [ ] **Phase 10-B**: worker Indexerの移行（like-indexer）
 - [ ] **Phase 10-C**: worker Indexerの移行（post-indexer）
-- [ ] **Phase 10-D**: worker Indexerの移行（profile-indexer）
-- [ ] **Phase 10-E**: worker Indexerの移行（repost-indexer）
+- [x] **Phase 10-D**: worker Indexerの移行（profile-indexer）
+- [x] **Phase 10-E**: worker Indexerの移行（repost-indexer）
 - [ ] **Phase 11-A**: worker Serviceの移行
 - [ ] **Phase 11-B**: worker UseCaseの移行（Part 1）
 - [ ] **Phase 11-C**: worker UseCaseの移行（Part 2）

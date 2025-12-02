@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { Repost, TransactionContext } from "@repo/common/domain";
 
 import type { IRepostRepository } from "../../../application/interfaces/repositories/repost-repository.js";
@@ -11,6 +12,13 @@ export class InMemoryRepostRepository implements IRepostRepository {
 
   clear(): void {
     this.reposts.clear();
+  }
+
+  async findByUri(params: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Repost | null> {
+    return this.reposts.get(params.uri.toString()) ?? null;
   }
 
   async upsert({

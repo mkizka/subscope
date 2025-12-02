@@ -9,7 +9,11 @@ export default defineProject({
       "src/infrastructure/**/*.test.ts",
       "src/{application,domain,presentation}/**/*.test.ts",
     ],
-    exclude: ["src/application/services/indexer/follow-indexer.test.ts"],
+    exclude: [
+      "src/application/services/indexer/follow-indexer.test.ts",
+      "src/application/services/indexer/profile-indexer.test.ts",
+      "src/application/services/indexer/repost-indexer.test.ts",
+    ],
     testTimeout: 120000,
     clearMocks: true,
     isolate: false,
