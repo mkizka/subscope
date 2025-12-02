@@ -77,6 +77,5 @@ export const setupFiles = () => {
     testInjector.resolve("recordRepository").clear();
     testInjector.resolve("repostRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
-    testInjector.resolve("trackedActorChecker").clear();
   });
 };
