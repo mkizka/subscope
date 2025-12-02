@@ -1,11 +1,12 @@
-import type { IJobQueue } from "@repo/common/domain";
-import { InMemoryTransactionManager } from "@repo/common/test";
+import {
+  InMemoryJobQueue,
+  InMemoryTransactionManager,
+} from "@repo/common/test";
 import { createInjector } from "typed-inject";
 import { beforeEach } from "vitest";
-import { mock } from "vitest-mock-extended";
 
 import { IndexActorService } from "../application/services/index-actor-service.js";
-import { InMemoryAggregateActorStatsScheduler } from "../application/services/scheduler/aggregate-actor-stats-scheduler.in-memory.js";
+import { AggregateActorStatsScheduler } from "../application/services/scheduler/aggregate-actor-stats-scheduler.js";
 import { FetchRecordScheduler } from "../application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../application/services/scheduler/resolve-did-scheduler.js";
 import { FollowIndexingPolicy } from "../domain/follow-indexing-policy.js";
@@ -30,8 +31,6 @@ import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
 
-const mockJobQueue = mock<IJobQueue>();
-
 export const testInjector = createInjector()
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .provideValue("db", {} as never)
@@ -51,11 +50,8 @@ export const testInjector = createInjector()
   .provideClass("subscriptionRepository", InMemorySubscriptionRepository)
   .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
-  .provideValue("jobQueue", mockJobQueue)
-  .provideClass(
-    "aggregateActorStatsScheduler",
-    InMemoryAggregateActorStatsScheduler,
-  )
+  .provideClass("jobQueue", InMemoryJobQueue)
+  .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
   .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
   .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
@@ -82,6 +78,6 @@ export const setupFiles = () => {
     testInjector.resolve("recordRepository").clear();
     testInjector.resolve("repostRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
-    testInjector.resolve("aggregateActorStatsScheduler").clear();
+    testInjector.resolve("jobQueue").clear();
   });
 };

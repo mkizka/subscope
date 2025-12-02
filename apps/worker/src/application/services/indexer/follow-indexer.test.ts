@@ -9,9 +9,7 @@ describe("FollowIndexer", () => {
 
   const actorRepo = testInjector.resolve("actorRepository");
   const followRepo = testInjector.resolve("followRepository");
-  const aggregateActorStatsScheduler = testInjector.resolve(
-    "aggregateActorStatsScheduler",
-  );
+  const jobQueue = testInjector.resolve("jobQueue");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -129,13 +127,20 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record });
 
       // assert
-      const scheduledJobs = aggregateActorStatsScheduler.getScheduledJobs();
-      expect(scheduledJobs).toHaveLength(2);
+      const jobs = jobQueue.getJobsByQueue("aggregateActorStats");
+      expect(jobs).toHaveLength(2);
       expect(
-        aggregateActorStatsScheduler.hasScheduledJob(follower.did, "follows"),
+        jobQueue.hasJob(
+          "aggregateActorStats",
+          (job) => job.data.did === follower.did && job.data.type === "follows",
+        ),
       ).toBe(true);
       expect(
-        aggregateActorStatsScheduler.hasScheduledJob(followee.did, "followers"),
+        jobQueue.hasJob(
+          "aggregateActorStats",
+          (job) =>
+            job.data.did === followee.did && job.data.type === "followers",
+        ),
       ).toBe(true);
     });
   });
