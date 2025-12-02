@@ -5,7 +5,7 @@ export class InMemoryIndexTargetRepository implements IIndexTargetRepository {
   private subscribers: Set<string> = new Set();
   private trackedActors: Set<string> = new Set();
 
-  async clear(): Promise<void> {
+  clear(): void {
     this.subscribers.clear();
     this.trackedActors.clear();
   }
