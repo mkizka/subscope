@@ -41,7 +41,7 @@
 - [x] **Phase 8-C**: workerリポジトリのディレクトリ構造統一（Part 3）
 - [ ] **Phase 9-A**: workerインメモリリポジトリの作成（Part 1）
 - [ ] **Phase 9-B**: workerインメモリリポジトリの作成（Part 2）
-- [ ] **Phase 9-C**: workerインメモリリポジトリの作成（Part 3）
+- [x] **Phase 9-C**: workerインメモリリポジトリの作成（Part 3）
 
 ### Phase 10-11: workerテスト移行
 
