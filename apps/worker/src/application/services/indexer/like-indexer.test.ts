@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, recordFactory } from "@repo/common/test";
+import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
 import { testInjector } from "../../../shared/test-utils.js";
@@ -26,7 +26,7 @@ describe("LikeIndexer", () => {
           $type: "app.bsky.feed.like",
           subject: {
             uri: postUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: fakeCid(),
           },
           createdAt: new Date().toISOString(),
         },
@@ -57,7 +57,7 @@ describe("LikeIndexer", () => {
           $type: "app.bsky.feed.like",
           subject: {
             uri: postUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: fakeCid(),
           },
           createdAt: new Date().toISOString(),
         },
@@ -90,7 +90,7 @@ describe("LikeIndexer", () => {
           $type: "app.bsky.feed.like",
           subject: {
             uri: postUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: fakeCid(),
           },
           createdAt: new Date().toISOString(),
         },
@@ -123,7 +123,7 @@ describe("LikeIndexer", () => {
           $type: "app.bsky.feed.like",
           subject: {
             uri: nonExistentPostUri,
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: fakeCid(),
           },
           createdAt: new Date().toISOString(),
         },
