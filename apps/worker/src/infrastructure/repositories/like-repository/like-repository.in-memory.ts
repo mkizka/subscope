@@ -14,14 +14,11 @@ export class InMemoryLikeRepository implements ILikeRepository {
     this.likes.clear();
   }
 
-  async upsert(params: { ctx: TransactionContext; like: Like }): Promise<void> {
-    this.likes.set(params.like.uri.toString(), params.like);
+  findByUri(uri: AtUri): Like | null {
+    return this.likes.get(uri.toString()) ?? null;
   }
 
-  async findByUri(params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-  }): Promise<Like | null> {
-    return this.likes.get(params.uri.toString()) ?? null;
+  async upsert(params: { ctx: TransactionContext; like: Like }): Promise<void> {
+    this.likes.set(params.like.uri.toString(), params.like);
   }
 }

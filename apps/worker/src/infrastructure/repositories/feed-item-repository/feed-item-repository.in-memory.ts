@@ -14,6 +14,10 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     this.feedItems.clear();
   }
 
+  findByUri(uri: AtUri): FeedItem | null {
+    return this.feedItems.get(uri.toString()) ?? null;
+  }
+
   async upsert({
     feedItem,
   }: {
@@ -21,12 +25,5 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     feedItem: FeedItem;
   }): Promise<void> {
     this.feedItems.set(feedItem.uri.toString(), feedItem);
-  }
-
-  async findByUri(params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-  }): Promise<FeedItem | null> {
-    return this.feedItems.get(params.uri.toString()) ?? null;
   }
 }

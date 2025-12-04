@@ -36,10 +36,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({ ctx, record });
 
       // assert
-      const like = await likeRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const like = likeRepo.findByUri(record.uri);
       expect(like).toMatchObject({
         uri: new AtUri(record.uri.toString()),
         cid: record.cid,

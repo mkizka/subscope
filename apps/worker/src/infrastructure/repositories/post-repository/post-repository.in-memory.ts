@@ -14,18 +14,15 @@ export class InMemoryPostRepository implements IPostRepository {
     this.posts.clear();
   }
 
+  findByUri(uri: AtUri): Post | null {
+    return this.posts.get(uri.toString()) ?? null;
+  }
+
   async upsert(params: { ctx: TransactionContext; post: Post }): Promise<void> {
     this.posts.set(params.post.uri.toString(), params.post);
   }
 
   async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
     return this.posts.has(uri.toString());
-  }
-
-  async findByUri(params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-  }): Promise<Post | null> {
-    return this.posts.get(params.uri.toString()) ?? null;
   }
 }

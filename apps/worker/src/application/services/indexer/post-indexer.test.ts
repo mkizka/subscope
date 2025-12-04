@@ -34,10 +34,7 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
-      const post = await postRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const post = postRepo.findByUri(record.uri);
       expect(post).toMatchObject({
         uri: new AtUri(record.uri.toString()),
         cid: record.cid,
@@ -45,10 +42,7 @@ describe("PostIndexer", () => {
         text: "test post",
       });
 
-      const feedItem = await feedItemRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem).toMatchObject({
         uri: new AtUri(record.uri.toString()),
         type: "post",
@@ -131,16 +125,10 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
-      const post = await postRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const post = postRepo.findByUri(record.uri);
       expect(post?.createdAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
 
-      const feedItem = await feedItemRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem?.sortAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
     });
   });
