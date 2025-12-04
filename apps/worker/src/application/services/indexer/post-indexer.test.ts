@@ -150,18 +150,21 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const jobs = jobQueue.getAll();
-      expect(jobs).toEqual(
+      const actorStatsJobs = jobQueue.findByQueueName("aggregateActorStats");
+      expect(actorStatsJobs).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregateActorStats",
             data: {
               did: author.did,
               type: "posts",
             },
           }),
+        ]),
+      );
+      const postStatsJobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(postStatsJobs).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregatePostStats",
             data: {
               uri: record.uri.toString(),
               type: "all",
@@ -202,18 +205,21 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const jobs = jobQueue.getAll();
-      expect(jobs).toEqual(
+      const actorStatsJobs = jobQueue.findByQueueName("aggregateActorStats");
+      expect(actorStatsJobs).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregateActorStats",
             data: {
               did: replier.did,
               type: "posts",
             },
           }),
+        ]),
+      );
+      const postStatsJobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(postStatsJobs).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregatePostStats",
             data: {
               uri: parentUri,
               type: "reply",
@@ -251,11 +257,10 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const jobs = jobQueue.getAll();
-      expect(jobs).toEqual(
+      const postStatsJobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(postStatsJobs).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregatePostStats",
             data: {
               uri: quotedUri,
               type: "quote",
@@ -295,18 +300,21 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const jobs = jobQueue.getAll();
-      expect(jobs).toEqual(
+      const actorStatsJobs = jobQueue.findByQueueName("aggregateActorStats");
+      expect(actorStatsJobs).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregateActorStats",
             data: {
               did: replier.did,
               type: "posts",
             },
           }),
+        ]),
+      );
+      const postStatsJobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(postStatsJobs).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
-            queueName: "aggregatePostStats",
             data: {
               uri: nonExistentParentUri,
               type: "reply",
