@@ -132,10 +132,9 @@ describe("IndexRecordService", () => {
         actorDid: followerActor.did,
       });
 
-      const savedFollow = await followRepo.findByUri({
-        ctx,
-        uri: new AtUri(followRecord.uri.toString()),
-      });
+      const savedFollow = followRepo.findByUri(
+        new AtUri(followRecord.uri.toString()),
+      );
       expect(savedFollow).toMatchObject({
         uri: followRecord.uri,
         cid: followRecord.cid,
