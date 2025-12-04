@@ -14,11 +14,8 @@ export class InMemoryRepostRepository implements IRepostRepository {
     this.reposts.clear();
   }
 
-  async findByUri(params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-  }): Promise<Repost | null> {
-    return this.reposts.get(params.uri.toString()) ?? null;
+  findByUri(uri: AtUri): Repost | null {
+    return this.reposts.get(uri.toString()) ?? null;
   }
 
   async upsert({

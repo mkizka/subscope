@@ -15,11 +15,8 @@ export class InMemoryProfileRepository implements IProfileRepository {
     this.profiles.clear();
   }
 
-  async findByUri(params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-  }): Promise<Profile | null> {
-    return this.profiles.get(params.uri.toString()) ?? null;
+  findByUri(uri: AtUri): Profile | null {
+    return this.profiles.get(uri.toString()) ?? null;
   }
 
   async upsert(params: {

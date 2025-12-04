@@ -49,10 +49,7 @@ describe("ProfileIndexer", () => {
       await profileIndexer.upsert({ ctx, record });
 
       // assert
-      const profile = await profileRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const profile = profileRepo.findByUri(record.uri);
       expect(profile).toMatchObject({
         uri: record.uri,
         cid: record.cid,

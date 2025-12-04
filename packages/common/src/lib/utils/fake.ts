@@ -9,8 +9,16 @@ export const fakeDid = (): Did =>
 
 export const fakeHandle = () => faker.internet.domainName();
 
+const validCids = [
+  "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+  "bafkreie5cvv4h45feadgeuwhbcutmh6t2ceseocckahdoe6uat64zmz454",
+  "bafkreifoybqitd5ygzaeky7hfhqx5nqx5rbhx2qzrytenfhf2c6vrqm654",
+  "bafkreig5pmj5xqz6ahq3wv5p2k23jiqkhjhazn6cj3dwzgvjmtdma4r5yu",
+  "bafkreiaiq7e3vjkpgncfmdjmb5j62zvn5gglzm4zvwy453pbemx4xqvdwi",
+];
+
 export const fakeCid = () =>
-  `bafkrei${faker.string.alphanumeric({ length: 52, casing: "lower" })}`;
+  validCids[Math.floor(Math.random() * validCids.length)];
 
 export const fakeAtUri = ({
   did,

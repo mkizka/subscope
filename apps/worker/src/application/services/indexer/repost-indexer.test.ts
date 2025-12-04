@@ -43,10 +43,7 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({ ctx, record, depth: 0 });
 
       // assert
-      const repost = await repostRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const repost = repostRepo.findByUri(record.uri);
       expect(repost).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -54,10 +51,7 @@ describe("RepostIndexer", () => {
         subjectUri: new AtUri(subjectUri),
       });
 
-      const feedItem = await feedItemRepo.findByUri({
-        ctx,
-        uri: record.uri,
-      });
+      const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "repost",
@@ -82,9 +76,7 @@ describe("RepostIndexer", () => {
   describe("afterAction", () => {
     test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
       // arrange
-      const { post } = postFactory({
-        cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-      });
+      const { post } = postFactory();
       postRepo.add(post);
 
       const record = recordFactory({
