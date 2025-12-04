@@ -1,3 +1,4 @@
+import type { AtUri } from "@atproto/syntax";
 import type { FeedItem, TransactionContext } from "@repo/common/domain";
 
 import type { IFeedItemRepository } from "../../../application/interfaces/repositories/feed-item-repository.js";
@@ -11,6 +12,10 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
 
   clear(): void {
     this.feedItems.clear();
+  }
+
+  findByUri(uri: AtUri): FeedItem | null {
+    return this.feedItems.get(uri.toString()) ?? null;
   }
 
   async upsert({
