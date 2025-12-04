@@ -1,191 +1,148 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { AtUri } from "@atproto/syntax";
-import { Record } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import {
-  actorFactory,
-  postFactory,
-  recordFactory,
-  subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import { LikeIndexingPolicy } from "../../../domain/like-indexing-policy.js";
-import { PostgresIndexTargetRepository } from "../../../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { LikeRepository } from "../../../infrastructure/repositories/like-repository/like-repository.js";
-import { SubscriptionRepository } from "../../../infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { TrackedActorChecker } from "../../../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
-import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { LikeIndexer } from "./like-indexer.js";
 
 describe("LikeIndexer", () => {
-  const mockAggregatePostStatsScheduler = mock<AggregatePostStatsScheduler>();
-  const { testInjector, ctx } = testSetup;
+  const likeIndexer = testInjector.injectClass(LikeIndexer);
 
-  const likeIndexer = testInjector
-    .provideClass("likeRepository", LikeRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorChecker", TrackedActorChecker)
-    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
-    .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
-    .provideValue(
-      "aggregatePostStatsScheduler",
-      mockAggregatePostStatsScheduler,
-    )
-    .injectClass(LikeIndexer);
+  const likeRepo = testInjector.resolve("likeRepository");
+  const jobQueue = testInjector.resolve("jobQueue");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
   describe("upsert", () => {
-    test("subscriberのいいねは実際にDBに保存される", async () => {
+    test("いいねレコードを正しく保存する", async () => {
       // arrange
-      // subscriberとしてactor情報を準備
-      const subscriberActor = await actorFactory(ctx.db).create();
-      // subscriptionレコード用のrecordsテーブルエントリ
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
-        .create();
-
-      // いいねレコード用のrecordsテーブルエントリ
-      const likeJson = {
-        $type: "app.bsky.feed.like",
-        subject: {
-          uri: "at://did:plc:other/app.bsky.feed.post/123",
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+      const liker = actorFactory();
+      const postUri = "at://did:plc:other/app.bsky.feed.post/123";
+      const record = recordFactory({
+        uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
+        json: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: postUri,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => subscriberActor })
-        .props({
-          uri: () => `at://${subscriberActor.did}/app.bsky.feed.like/123`,
-          cid: () => "abc123",
-          json: () => likeJson,
-        })
-        .create();
-      const record = Record.fromJson({
-        uri: likeRecord.uri,
-        cid: likeRecord.cid,
-        json: likeJson,
-        indexedAt: new Date(),
       });
 
       // act
       await likeIndexer.upsert({ ctx, record });
 
       // assert
-      const [like] = await ctx.db
-        .select()
-        .from(schema.likes)
-        .where(eq(schema.likes.uri, record.uri.toString()))
-        .limit(1);
-      expect(like).toBeDefined();
+      const like = likeRepo.findByUri(record.uri);
+      expect(like).toMatchObject({
+        uri: record.uri,
+        cid: record.cid,
+        actorDid: liker.did,
+        subjectUri: new AtUri(postUri),
+      });
     });
   });
 
   describe("afterAction", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
       // arrange
-      const post = await postFactory(ctx.db).create();
-
-      const likerActor = await actorFactory(ctx.db).create();
-      const likeJson = {
-        $type: "app.bsky.feed.like",
-        subject: {
-          uri: post.uri,
-          cid: post.cid,
+      const liker = actorFactory();
+      const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
+      const record = recordFactory({
+        uri: `at://${liker.did}/app.bsky.feed.like/likerkey456`,
+        json: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: postUri,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => likerActor })
-        .props({ json: () => likeJson })
-        .create();
-      const record = Record.fromJson({
-        uri: likeRecord.uri,
-        cid: likeRecord.cid,
-        json: likeJson,
-        indexedAt: new Date(),
       });
+      await likeIndexer.upsert({ ctx, record });
 
       // act
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
-        new AtUri(post.uri),
-        "like",
-      );
+      const jobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(jobs).toMatchObject([
+        {
+          queueName: "aggregatePostStats",
+          data: {
+            uri: postUri,
+            type: "like",
+          },
+        },
+      ]);
     });
 
     test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
       // arrange
-      const post = await postFactory(ctx.db).create();
-
-      const likerActor = await actorFactory(ctx.db).create();
-      const likeJson = {
-        $type: "app.bsky.feed.like",
-        subject: {
-          uri: post.uri,
-          cid: post.cid,
+      const liker = actorFactory();
+      const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey789";
+      const record = recordFactory({
+        uri: `at://${liker.did}/app.bsky.feed.like/likerkey789`,
+        json: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: postUri,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => likerActor })
-        .props({ json: () => likeJson })
-        .create();
-      const record = Record.fromJson({
-        uri: likeRecord.uri,
-        cid: likeRecord.cid,
-        json: likeJson,
-        indexedAt: new Date(),
       });
 
       // act
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
-        new AtUri(post.uri),
-        "like",
-      );
+      const jobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(jobs).toMatchObject([
+        {
+          queueName: "aggregatePostStats",
+          data: {
+            uri: postUri,
+            type: "like",
+          },
+        },
+      ]);
     });
 
     test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", async () => {
       // arrange
-      const likerActor = await actorFactory(ctx.db).create();
+      const liker = actorFactory();
       const nonExistentPostUri =
         "at://did:plc:nonexistent/app.bsky.feed.post/999";
-
-      const likeJson = {
-        $type: "app.bsky.feed.like",
-        subject: {
-          uri: nonExistentPostUri,
-          cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+      const record = recordFactory({
+        uri: `at://${liker.did}/app.bsky.feed.like/likerkey999`,
+        json: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: nonExistentPostUri,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const likeRecord = await recordFactory(ctx.db, "app.bsky.feed.like")
-        .vars({ actor: () => likerActor })
-        .props({ json: () => likeJson })
-        .create();
-      const record = Record.fromJson({
-        uri: likeRecord.uri,
-        cid: likeRecord.cid,
-        json: likeJson,
-        indexedAt: new Date(),
       });
 
       // act
       await likeIndexer.afterAction({ ctx, record });
 
       // assert
-      expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
-        new AtUri(nonExistentPostUri),
-        "like",
-      );
+      const jobs = jobQueue.findByQueueName("aggregatePostStats");
+      expect(jobs).toMatchObject([
+        {
+          queueName: "aggregatePostStats",
+          data: {
+            uri: nonExistentPostUri,
+            type: "like",
+          },
+        },
+      ]);
     });
   });
 });

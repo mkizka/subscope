@@ -14,11 +14,8 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.clear();
   }
 
-  async findByUri(params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-  }): Promise<Follow | null> {
-    return this.follows.get(params.uri.toString()) ?? null;
+  findByUri(uri: AtUri): Follow | null {
+    return this.follows.get(uri.toString()) ?? null;
   }
 
   async upsert(params: {
