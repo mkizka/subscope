@@ -1,4 +1,3 @@
-import { AtUri } from "@atproto/syntax";
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -36,7 +35,7 @@ describe("PostIndexer", () => {
       // assert
       const post = postRepo.findByUri(record.uri);
       expect(post).toMatchObject({
-        uri: new AtUri(record.uri.toString()),
+        uri: record.uri,
         cid: record.cid,
         actorDid: author.did,
         text: "test post",
@@ -44,7 +43,7 @@ describe("PostIndexer", () => {
 
       const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem).toMatchObject({
-        uri: new AtUri(record.uri.toString()),
+        uri: record.uri,
         type: "post",
         actorDid: author.did,
         subjectUri: null,

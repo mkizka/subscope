@@ -38,7 +38,7 @@ describe("LikeIndexer", () => {
       // assert
       const like = likeRepo.findByUri(record.uri);
       expect(like).toMatchObject({
-        uri: new AtUri(record.uri.toString()),
+        uri: record.uri,
         cid: record.cid,
         actorDid: liker.did,
         subjectUri: new AtUri(postUri),
