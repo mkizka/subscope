@@ -1,4 +1,3 @@
-import { AtUri } from "@atproto/syntax";
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
@@ -35,7 +34,7 @@ describe("FollowIndexer", () => {
       // assert
       const follow = followRepo.findByUri(record.uri);
       expect(follow).toMatchObject({
-        uri: new AtUri(record.uri.toString()),
+        uri: record.uri,
         cid: record.cid,
         actorDid: follower.did,
         subjectDid: followee.did,
