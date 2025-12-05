@@ -17,7 +17,7 @@ export async function action({ request }: Route.ActionArgs) {
   try {
     const url = await oauthClient.authorize(submission.value.identifier);
     return redirect(url.toString());
-  } catch (error) {
+  } catch {
     // ビジネスロジックエラーをフォームエラーとして返す
     return submission.reply({
       formErrors: ["認証に失敗しました。もう一度お試しください。"],

@@ -23,7 +23,7 @@ export const databaseFactory = (
       this.logger = loggerManager.createLogger("db");
     }
 
-    logQuery(query: string, _params: unknown[]): void {
+    logQuery(query: string): void {
       this.logger.debug(query);
     }
   }
