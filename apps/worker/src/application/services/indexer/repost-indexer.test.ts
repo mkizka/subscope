@@ -91,7 +91,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.afterAction({ ctx, record });
+      await repostIndexer.afterAction({ record });
 
       // assert
       const jobs = jobQueue.findByQueueName("aggregatePostStats");
