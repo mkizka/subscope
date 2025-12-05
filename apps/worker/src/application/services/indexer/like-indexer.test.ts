@@ -65,7 +65,7 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({ ctx, record });
 
       // act
-      await likeIndexer.afterAction({ ctx, record });
+      await likeIndexer.afterAction({ record });
 
       // assert
       const jobs = jobQueue.findByQueueName("aggregatePostStats");
@@ -97,7 +97,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.afterAction({ ctx, record });
+      await likeIndexer.afterAction({ record });
 
       // assert
       const jobs = jobQueue.findByQueueName("aggregatePostStats");
@@ -130,7 +130,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.afterAction({ ctx, record });
+      await likeIndexer.afterAction({ record });
 
       // assert
       const jobs = jobQueue.findByQueueName("aggregatePostStats");

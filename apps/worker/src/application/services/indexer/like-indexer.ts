@@ -33,13 +33,7 @@ export class LikeIndexer implements ICollectionIndexer {
     return await this.likeIndexingPolicy.shouldIndex(like);
   }
 
-  async afterAction({
-    ctx,
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }): Promise<void> {
+  async afterAction({ record }: { record: Record }): Promise<void> {
     const like = Like.from(record);
     await this.aggregatePostStatsScheduler.schedule(like.subjectUri, "like");
   }

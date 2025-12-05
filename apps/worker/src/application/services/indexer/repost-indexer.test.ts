@@ -138,7 +138,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.afterAction({ ctx, record });
+      await repostIndexer.afterAction({ record });
 
       // assert
       expect(mockAggregatePostStatsScheduler.schedule).toHaveBeenCalledWith(
