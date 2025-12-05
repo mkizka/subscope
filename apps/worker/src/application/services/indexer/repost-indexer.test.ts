@@ -12,9 +12,6 @@ describe("RepostIndexer", () => {
   const feedItemRepo = testInjector.resolve("feedItemRepository");
   const postRepo = testInjector.resolve("postRepository");
   const jobQueue = testInjector.resolve("jobQueue");
-  const aggregatePostStatsScheduler = testInjector.resolve(
-    "aggregatePostStatsScheduler",
-  );
 
   const ctx = {
     db: testInjector.resolve("db"),
