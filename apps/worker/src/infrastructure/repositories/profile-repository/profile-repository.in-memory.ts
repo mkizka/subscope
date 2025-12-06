@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import type { AtUri } from "@atproto/syntax";
 import type { Profile, TransactionContext } from "@repo/common/domain";
 
 import type { IProfileRepository } from "../../../application/interfaces/repositories/profile-repository.js";
@@ -12,6 +13,10 @@ export class InMemoryProfileRepository implements IProfileRepository {
 
   clear(): void {
     this.profiles.clear();
+  }
+
+  findByUri(uri: AtUri): Profile | null {
+    return this.profiles.get(uri.toString()) ?? null;
   }
 
   async upsert(params: {
