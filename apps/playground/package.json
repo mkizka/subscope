@@ -13,19 +13,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@atproto/api": "0.16.11",
+    "@atproto/api": "0.18.4",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "7.2.0",
-    "@types/react": "^19.1.14",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react-swc": "^4.1.0",
-    "eslint": "^9.36.0",
-    "typescript": "~5.9.2",
-    "vite": "^7.1.7"
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react-swc": "^4.2.2",
+    "eslint": "^9.39.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.6"
   }
 }

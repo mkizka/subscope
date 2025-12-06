@@ -21,7 +21,7 @@ describe("ReplyRefService", () => {
     // arrange
     const posts = [
       new Post({
-        uri: new AtUri("at://user1/app.bsky.feed.post/1"),
+        uri: new AtUri("at://did:plc:user1/app.bsky.feed.post/1"),
         cid: "cid1",
         actorDid: "did:plc:user1",
         text: "Normal post",

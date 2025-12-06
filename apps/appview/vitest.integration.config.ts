@@ -9,10 +9,7 @@ export default defineProject({
     testTimeout: 120000,
     clearMocks: true,
     isolate: false,
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    maxWorkers: 1,
+    sequence: { groupOrder: 2 },
   },
 });

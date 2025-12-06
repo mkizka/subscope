@@ -14,5 +14,6 @@ export default defineProject({
       "./src/application/services/index-record-service.test.ts",
     ],
     clearMocks: true,
+    sequence: { groupOrder: 2 },
   },
 });

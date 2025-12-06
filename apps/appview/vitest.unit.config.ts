@@ -6,5 +6,6 @@ export default defineProject({
     setupFiles: "./vitest.unit.setup.ts",
     include: ["./src/{application,domain,presentation}/**/*.test.ts"],
     clearMocks: true,
+    sequence: { groupOrder: 1 },
   },
 });

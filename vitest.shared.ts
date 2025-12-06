@@ -8,11 +8,7 @@ export default defineProject({
     clearMocks: true,
     // ファイル分離によってコネクションプールが作られ過ぎるのを防ぐため
     isolate: false,
-    poolOptions: {
-      forks: {
-        // 1パッケージにつき1つのPostgresを使用していてデータが競合するので直列実行にする
-        singleFork: true,
-      },
-    },
+    // 1パッケージにつき1つのPostgresを使用していてデータが競合するので直列実行にする
+    maxWorkers: 1,
   },
 });

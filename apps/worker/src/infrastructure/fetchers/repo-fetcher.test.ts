@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { AtpBaseClient } from "@repo/client/api";
+import type { AtpBaseClient } from "@repo/client/api";
 import { type IDidResolver } from "@repo/common/domain";
 import { createInjector } from "typed-inject";
 import { describe, expect, test, vi } from "vitest";
@@ -10,14 +10,18 @@ import { mock, mockDeep } from "vitest-mock-extended";
 import type { JobLogger } from "../../shared/job.js";
 import { RepoFetcher } from "./repo-fetcher.js";
 
-vi.mock("@repo/client/api");
+const mockClient = mockDeep<AtpBaseClient>();
+
+vi.mock("@repo/client/api", () => {
+  return {
+    AtpBaseClient: function () {
+      return mockClient;
+    },
+  };
+});
 
 const mockDidResolver = mock<IDidResolver>();
 const mockJobLogger = mock<JobLogger>();
-
-const mockAtpBaseClient = vi.mocked(AtpBaseClient);
-const mockClient = mockDeep<AtpBaseClient>();
-mockAtpBaseClient.mockReturnValue(mockClient);
 
 const repoFetcher = createInjector()
   .provideValue("didResolver", mockDidResolver)

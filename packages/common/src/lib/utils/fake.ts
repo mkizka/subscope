@@ -17,6 +17,7 @@ export const fakeCid = () => {
   crypto.getRandomValues(randomData);
 
   const hash = identity.digest(randomData);
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- @atproto/lex-dataへの移行はATProtoのCommonJS対応後
   return CID.create(1, raw.code, hash).toString();
 };
 
