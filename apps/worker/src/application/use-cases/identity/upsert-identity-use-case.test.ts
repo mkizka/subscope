@@ -15,6 +15,7 @@ describe("UpsertIdentityUseCase", () => {
   const actorRepo = testInjector.resolve("actorRepository");
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const followRepo = testInjector.resolve("followRepository");
+  const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -36,7 +37,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(foundActor).toBeNull();
   });
 
-  test.skip("subscriberの場合はactorを保存する", async () => {
+  test("subscriberの場合はactorを保存する", async () => {
     // arrange
     const command: UpsertIdentityCommand = {
       did: "did:plc:identity-subscriber",
@@ -49,6 +50,8 @@ describe("UpsertIdentityUseCase", () => {
     });
     subscriptionRepo.add(subscription);
 
+    await indexTargetRepo.addTrackedActor(command.did);
+
     // act
     await upsertIdentityUseCase.execute(command);
 
@@ -58,7 +61,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(foundActor?.handle).toBe(command.handle);
   });
 
-  test.skip("subscriberでないがsubscriberのフォロワーがいる場合はactorを保存する", async () => {
+  test("subscriberでないがsubscriberのフォロワーがいる場合はactorを保存する", async () => {
     // arrange
     const subscriberDid = "did:plc:identity-follower-subscriber";
     const followedDid = "did:plc:identity-followed";
@@ -84,6 +87,8 @@ describe("UpsertIdentityUseCase", () => {
       subjectDid: followedDid,
     });
     followRepo.add(follow);
+
+    await indexTargetRepo.addTrackedActor(followedDid);
 
     // act
     await upsertIdentityUseCase.execute(command);
