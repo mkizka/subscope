@@ -17,6 +17,10 @@ describe("UpsertIdentityUseCase", () => {
   const followRepo = testInjector.resolve("followRepository");
   const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
   test("ハンドルがない場合は何もしない", async () => {
     // arrange
     const command: UpsertIdentityCommand = {
@@ -29,7 +33,6 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const ctx = { db: testInjector.resolve("db") };
     const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
     expect(foundActor).toBeNull();
   });
@@ -56,7 +59,6 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const ctx = { db: testInjector.resolve("db") };
     const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
     expect(foundActor).not.toBeNull();
     expect(foundActor?.handle).toBe(command.handle);
@@ -92,7 +94,6 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const ctx = { db: testInjector.resolve("db") };
     const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
     expect(foundActor).not.toBeNull();
     expect(foundActor?.handle).toBe(command.handle);
@@ -110,7 +111,6 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const ctx = { db: testInjector.resolve("db") };
     const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
     expect(foundActor).toBeNull();
   });

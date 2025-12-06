@@ -11,6 +11,10 @@ describe("HandleAccountUseCase", () => {
 
   const actorRepo = testInjector.resolve("actorRepository");
 
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
   test("ステータスがdeletedの場合、actorがデータベースから削除される", async () => {
     // arrange
     const actor = actorFactory();
@@ -27,7 +31,6 @@ describe("HandleAccountUseCase", () => {
     await handleAccountUseCase.execute(command);
 
     // assert
-    const ctx = { db: testInjector.resolve("db") };
     const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
     expect(foundActor).toBeNull();
   });
@@ -48,7 +51,6 @@ describe("HandleAccountUseCase", () => {
     await handleAccountUseCase.execute(command);
 
     // assert
-    const ctx = { db: testInjector.resolve("db") };
     const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
     expect(foundActor).toMatchObject({
       did: actor.did,

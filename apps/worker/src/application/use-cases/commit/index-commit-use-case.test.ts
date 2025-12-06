@@ -16,6 +16,10 @@ describe("IndexCommitUseCase", () => {
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
   const jobLogger = { log: vi.fn() };
 
   describe("create/updateオペレーション", () => {
@@ -111,7 +115,6 @@ describe("IndexCommitUseCase", () => {
         "Indexing completed successfully.",
       );
 
-      const ctx = { db: testInjector.resolve("db") };
       const deletedRecord = await recordRepo.findByUri({ ctx, uri });
       expect(deletedRecord).toBeNull();
     });

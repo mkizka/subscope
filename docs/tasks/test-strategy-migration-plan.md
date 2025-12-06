@@ -941,6 +941,36 @@ export class InMemoryPostRepository implements IPostRepository {
 
 ### 移行後のテストパターン
 
+**重要: ctxの定義場所**
+
+ctxはdescribe直下で定義し、テストケース間で使いまわしてください。
+
+```typescript
+describe("UseCase名", () => {
+  const useCase = testInjector.injectClass(UseCase);
+
+  const actorRepo = testInjector.resolve("actorRepository");
+  const postRepo = testInjector.resolve("postRepository");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
+  test("テストケース名", async () => {
+    // arrange
+    const actor = actorFactory();
+    actorRepo.add(actor);
+
+    // act
+    await useCase.execute(command);
+
+    // assert
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).not.toBeNull();
+  });
+});
+```
+
 **重要: Factory関数のインポート元**
 
 - ドメインモデル（Post, Actor等）: `@repo/common/domain`からインポート
