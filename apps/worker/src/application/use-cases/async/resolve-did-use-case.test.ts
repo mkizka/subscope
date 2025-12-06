@@ -1,30 +1,25 @@
 import { asDid } from "@atproto/did";
-import type { IDidResolver } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
+import { asHandle } from "@repo/common/utils";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import { setupFiles, testInjector } from "../../../shared/test-utils.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { ResolveDidUseCase } from "./resolve-did-use-case.js";
 
 describe("ResolveDidUseCase", () => {
-  setupFiles();
-
-  const mockDidResolver = mock<IDidResolver>();
   const actorRepository = testInjector.resolve("actorRepository");
+  const didResolver = testInjector.resolve("didResolver");
   const ctx = {
     db: testInjector.resolve("db"),
   };
 
-  const resolveDidUseCase = testInjector
-    .provideValue("didResolver", mockDidResolver)
-    .injectClass(ResolveDidUseCase);
+  const resolveDidUseCase = testInjector.injectClass(ResolveDidUseCase);
 
   test("既存のactorが存在しない場合、新規actorを作成する", async () => {
     // arrange
     const did = asDid("did:plc:new-actor");
-    const handle = "newactor.test";
-    mockDidResolver.resolve.mockResolvedValue({
+    const handle = asHandle("newactor.test");
+    didResolver.setResolveResult(did, {
       handle,
       signingKey: "test-key",
       pds: new URL("https://example.com"),
@@ -42,12 +37,12 @@ describe("ResolveDidUseCase", () => {
 
   test("既存のactorが存在する場合、ハンドルを更新する", async () => {
     // arrange
-    const oldHandle = "oldhandle.test";
-    const newHandle = "newhandle.test";
+    const oldHandle = asHandle("oldhandle.test");
+    const newHandle = asHandle("newhandle.test");
     const actor = actorFactory({ handle: oldHandle });
     actorRepository.add(actor);
 
-    mockDidResolver.resolve.mockResolvedValue({
+    didResolver.setResolveResult(actor.did, {
       handle: newHandle,
       signingKey: "test-key",
       pds: new URL("https://example.com"),

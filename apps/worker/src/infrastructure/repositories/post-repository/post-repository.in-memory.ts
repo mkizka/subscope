@@ -14,6 +14,10 @@ export class InMemoryPostRepository implements IPostRepository {
     this.posts.clear();
   }
 
+  findAll(): Post[] {
+    return Array.from(this.posts.values());
+  }
+
   findByUri(uri: AtUri): Post | null {
     return this.posts.get(uri.toString()) ?? null;
   }

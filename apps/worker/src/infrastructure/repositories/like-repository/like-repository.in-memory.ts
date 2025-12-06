@@ -14,6 +14,10 @@ export class InMemoryLikeRepository implements ILikeRepository {
     this.likes.clear();
   }
 
+  findAll(): Like[] {
+    return Array.from(this.likes.values());
+  }
+
   findByUri(uri: AtUri): Like | null {
     return this.likes.get(uri.toString()) ?? null;
   }

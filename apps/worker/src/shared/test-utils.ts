@@ -1,4 +1,5 @@
 import {
+  InMemoryDidResolver,
   InMemoryJobQueue,
   InMemoryTransactionManager,
 } from "@repo/common/test";
@@ -38,6 +39,7 @@ import { InMemoryRecordRepository } from "../infrastructure/repositories/record-
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
+import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 
 export const testInjector = createInjector()
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -59,6 +61,8 @@ export const testInjector = createInjector()
   .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("jobQueue", InMemoryJobQueue)
+  .provideClass("didResolver", InMemoryDidResolver)
+  .provideClass("jobLogger", InMemoryJobLogger)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
@@ -95,5 +99,7 @@ export const setupFiles = () => {
     testInjector.resolve("repostRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
     testInjector.resolve("jobQueue").clear();
+    testInjector.resolve("didResolver").clear();
+    testInjector.resolve("jobLogger").clear();
   });
 };
