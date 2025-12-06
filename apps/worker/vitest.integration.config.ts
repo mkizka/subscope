@@ -15,6 +15,8 @@ export default defineProject({
       "src/application/services/indexer/post-indexer.test.ts",
       "src/application/services/indexer/profile-indexer.test.ts",
       "src/application/services/indexer/repost-indexer.test.ts",
+      "src/application/services/index-actor-service.test.ts",
+      "src/application/services/index-record-service.test.ts",
     ],
     testTimeout: 120000,
     clearMocks: true,

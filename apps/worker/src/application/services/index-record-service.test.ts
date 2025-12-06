@@ -1,95 +1,30 @@
 import { AtUri } from "@atproto/syntax";
-import type { IJobQueue } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import {
   actorFactory,
   postFactory,
   recordFactory,
   subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
+} from "@repo/common/test";
 import { describe, expect, test, vi } from "vitest";
-import { mockDeep } from "vitest-mock-extended";
 
-import { FollowIndexingPolicy } from "../../domain/follow-indexing-policy.js";
-import { GeneratorIndexingPolicy } from "../../domain/generator-indexing-policy.js";
-import { LikeIndexingPolicy } from "../../domain/like-indexing-policy.js";
-import { PostIndexingPolicy } from "../../domain/post-indexing-policy.js";
-import { ProfileIndexingPolicy } from "../../domain/profile-indexing-policy.js";
-import { RepostIndexingPolicy } from "../../domain/repost-indexing-policy.js";
-import { ActorRepository } from "../../infrastructure/repositories/actor-repository/actor-repository.js";
-import { ActorStatsRepository } from "../../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
-import { FeedItemRepository } from "../../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
-import { FollowRepository } from "../../infrastructure/repositories/follow-repository/follow-repository.js";
-import { GeneratorRepository } from "../../infrastructure/repositories/generator-repository/generator-repository.js";
-import { PostgresIndexTargetRepository } from "../../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { InviteCodeRepository } from "../../infrastructure/repositories/invite-code-repository/invite-code-repository.js";
-import { LikeRepository } from "../../infrastructure/repositories/like-repository/like-repository.js";
-import { PostRepository } from "../../infrastructure/repositories/post-repository/post-repository.js";
-import { PostStatsRepository } from "../../infrastructure/repositories/post-stats-repository/post-stats-repository.js";
-import { ProfileRepository } from "../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { RecordRepository } from "../../infrastructure/repositories/record-repository/record-repository.js";
-import { RepostRepository } from "../../infrastructure/repositories/repost-repository/repost-repository.js";
-import { SubscriptionRepository } from "../../infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { TrackedActorChecker } from "../../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
-import { IndexActorService } from "./index-actor-service.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { IndexRecordService } from "./index-record-service.js";
-import { FollowIndexer } from "./indexer/follow-indexer.js";
-import { GeneratorIndexer } from "./indexer/generator-indexer.js";
-import { LikeIndexer } from "./indexer/like-indexer.js";
-import { PostIndexer } from "./indexer/post-indexer.js";
-import { ProfileIndexer } from "./indexer/profile-indexer.js";
-import { RepostIndexer } from "./indexer/repost-indexer.js";
-import type { AggregateActorStatsScheduler } from "./scheduler/aggregate-actor-stats-scheduler.js";
-import type { AggregatePostStatsScheduler } from "./scheduler/aggregate-post-stats-scheduler.js";
-import { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
-import { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 describe("IndexRecordService", () => {
-  const { testInjector, ctx } = testSetup;
-  const jobLogger = { log: vi.fn() };
+  const indexRecordService = testInjector.injectClass(IndexRecordService);
 
-  const indexRecordService = testInjector
-    .provideValue(
-      "aggregatePostStatsScheduler",
-      mockDeep<AggregatePostStatsScheduler>(),
-    )
-    .provideValue(
-      "aggregateActorStatsScheduler",
-      mockDeep<AggregateActorStatsScheduler>(),
-    )
-    .provideValue("jobQueue", mockDeep<IJobQueue>())
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("actorStatsRepository", ActorStatsRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideClass("postRepository", PostRepository)
-    .provideClass("recordRepository", RecordRepository)
-    .provideClass("followRepository", FollowRepository)
-    .provideClass("generatorRepository", GeneratorRepository)
-    .provideClass("likeRepository", LikeRepository)
-    .provideClass("postStatsRepository", PostStatsRepository)
-    .provideClass("repostRepository", RepostRepository)
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorChecker", TrackedActorChecker)
-    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
-    .provideClass("feedItemRepository", FeedItemRepository)
-    .provideClass("inviteCodeRepository", InviteCodeRepository)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .provideClass("postIndexingPolicy", PostIndexingPolicy)
-    .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
-    .provideClass("followIndexingPolicy", FollowIndexingPolicy)
-    .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
-    .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
-    .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("profileIndexer", ProfileIndexer)
-    .provideClass("postIndexer", PostIndexer)
-    .provideClass("indexActorService", IndexActorService)
-    .provideClass("followIndexer", FollowIndexer)
-    .provideClass("generatorIndexer", GeneratorIndexer)
-    .provideClass("likeIndexer", LikeIndexer)
-    .provideClass("repostIndexer", RepostIndexer)
-    .injectClass(IndexRecordService);
+  const actorRepo = testInjector.resolve("actorRepository");
+  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
+  const recordRepo = testInjector.resolve("recordRepository");
+  const postRepo = testInjector.resolve("postRepository");
+  const followRepo = testInjector.resolve("followRepository");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
+  const jobLogger = { log: vi.fn() };
 
   describe("upsert", () => {
     test("サポートされていないコレクションの場合、エラーを投げる", async () => {
@@ -155,12 +90,16 @@ describe("IndexRecordService", () => {
 
     test("subscriberのフォローレコードの場合、正しく保存する", async () => {
       // arrange
-      const followingActor = await actorFactory(ctx.db).create();
-      const followerActor = await actorFactory(ctx.db).create();
+      const followingActor = actorFactory();
+      actorRepo.add(followingActor);
 
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => followerActor })
-        .create();
+      const followerActor = actorFactory();
+      actorRepo.add(followerActor);
+
+      const subscription = subscriptionFactory({
+        actorDid: followerActor.did,
+      });
+      subscriptionRepo.add(subscription);
 
       const followRecord = Record.fromJson({
         uri: `at://${followerActor.did}/app.bsky.graph.follow/456`,
@@ -185,22 +124,21 @@ describe("IndexRecordService", () => {
       expect(jobLogger.log).not.toHaveBeenCalledWith(
         "Record does not match storage rules, skipping",
       );
-      const savedRecord = await ctx.db.query.records.findFirst({
-        where: (records, { eq }) =>
-          eq(records.uri, followRecord.uri.toString()),
+      const savedRecord = await recordRepo.findByUri({
+        ctx,
+        uri: new AtUri(followRecord.uri.toString()),
       });
       expect(savedRecord).toMatchObject({
-        uri: followRecord.uri.toString(),
+        uri: followRecord.uri,
         cid: followRecord.cid,
         actorDid: followerActor.did,
       });
 
-      const savedFollow = await ctx.db.query.follows.findFirst({
-        where: (follows, { eq }) =>
-          eq(follows.uri, followRecord.uri.toString()),
-      });
+      const savedFollow = followRepo.findByUri(
+        new AtUri(followRecord.uri.toString()),
+      );
       expect(savedFollow).toMatchObject({
-        uri: followRecord.uri.toString(),
+        uri: followRecord.uri,
         cid: followRecord.cid,
         actorDid: followerActor.did,
         subjectDid: followingActor.did,
@@ -219,40 +157,44 @@ describe("IndexRecordService", () => {
       await indexRecordService.delete({ ctx, uri });
 
       // assert
-      const record = await ctx.db.query.records.findFirst({
-        where: (records, { eq }) => eq(records.uri, uri.toString()),
-      });
-      expect(record).toBeUndefined();
+      const record = await recordRepo.findByUri({ ctx, uri });
+      expect(record).toBeNull();
     });
 
     test("レコードが存在する場合、正しく削除する", async () => {
       // arrange
-      const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .props({
-          json: () => ({
-            $type: "app.bsky.feed.post",
-            text: "Test post for deletion",
-            createdAt: new Date().toISOString(),
-          }),
-        })
-        .create();
-      const post = await postFactory(ctx.db)
-        .vars({
-          record: () => postRecord,
-        })
-        .create();
+      const actor = actorFactory();
+      actorRepo.add(actor);
+
+      const record = recordFactory({
+        uri: `at://${actor.did}/app.bsky.feed.post/test123`,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Test post for deletion",
+          createdAt: new Date().toISOString(),
+        },
+      });
+      recordRepo.add(record);
+
+      const { post } = postFactory({
+        actorDid: actor.did,
+        uri: record.uri.toString(),
+        cid: record.cid,
+      });
+      postRepo.add(post);
 
       // act
       await indexRecordService.delete({
         ctx,
-        uri: new AtUri(post.uri),
+        uri: record.uri,
       });
 
       // assert
-      const record = await ctx.db.query.records.findFirst({
-        where: (records, { eq }) => eq(records.uri, post.uri),
+      const deletedRecord = await recordRepo.findByUri({
+        ctx,
+        uri: record.uri,
       });
-      expect(record).toBeUndefined();
+      expect(deletedRecord).toBeNull();
     });
   });
 });
