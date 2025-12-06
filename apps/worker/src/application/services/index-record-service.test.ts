@@ -1,5 +1,4 @@
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import {
   actorFactory,
@@ -20,8 +19,11 @@ describe("IndexRecordService", () => {
   const recordRepo = testInjector.resolve("recordRepository");
   const postRepo = testInjector.resolve("postRepository");
   const followRepo = testInjector.resolve("followRepository");
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const ctx: TransactionContext = { db: {} as never };
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
   const jobLogger = { log: vi.fn() };
 
   describe("upsert", () => {

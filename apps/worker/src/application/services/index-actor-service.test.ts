@@ -1,5 +1,4 @@
 import { asDid } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { describe, expect, test } from "vitest";
@@ -12,8 +11,10 @@ describe("IndexActorService", () => {
 
   const actorRepo = testInjector.resolve("actorRepository");
   const jobQueue = testInjector.resolve("jobQueue");
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const ctx: TransactionContext = { db: {} as never };
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
   describe("upsert", () => {
     test("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
