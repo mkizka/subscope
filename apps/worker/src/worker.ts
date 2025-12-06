@@ -37,7 +37,7 @@ import { PostIndexingPolicy } from "./domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "./domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "./domain/repost-indexing-policy.js";
 import { RecordFetcher } from "./infrastructure/fetchers/record-fetcher.js";
-import { RepoFetcher } from "./infrastructure/fetchers/repo-fetcher.js";
+import { RepoFetcher } from "./infrastructure/fetchers/repo-fetcher/repo-fetcher.js";
 import { ActorRepository } from "./infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "./infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FeedItemRepository } from "./infrastructure/repositories/feed-item-repository/feed-item-repository.js";

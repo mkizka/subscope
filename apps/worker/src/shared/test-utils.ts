@@ -24,6 +24,7 @@ import { LikeIndexingPolicy } from "../domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "../domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "../domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "../domain/repost-indexing-policy.js";
+import { InMemoryRepoFetcher } from "../infrastructure/fetchers/repo-fetcher/repo-fetcher.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
@@ -63,6 +64,7 @@ export const testInjector = createInjector()
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("didResolver", InMemoryDidResolver)
   .provideClass("jobLogger", InMemoryJobLogger)
+  .provideClass("repoFetcher", InMemoryRepoFetcher)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
@@ -101,5 +103,6 @@ export const setupFiles = () => {
     testInjector.resolve("jobQueue").clear();
     testInjector.resolve("didResolver").clear();
     testInjector.resolve("jobLogger").clear();
+    testInjector.resolve("repoFetcher").clear();
   });
 };

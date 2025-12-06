@@ -6,9 +6,9 @@ import type { IDidResolver } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
-import type { IRepoFetcher } from "../../application/interfaces/external/repo-fetcher.js";
-import type { JobLogger } from "../../shared/job.js";
-import { Timer } from "../../shared/timer.js";
+import type { IRepoFetcher } from "../../../application/interfaces/external/repo-fetcher.js";
+import type { JobLogger } from "../../../shared/job.js";
+import { Timer } from "../../../shared/timer.js";
 
 export class RepoFetcher implements IRepoFetcher {
   private timer = new Timer();
