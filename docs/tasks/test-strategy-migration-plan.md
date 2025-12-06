@@ -403,43 +403,6 @@ asset-url-builder.ts       → asset-url-builder/asset-url-builder.ts
 - Timeline/PostThreadに比べて複雑なリレーション処理が少ない
 - スレッド構造などの再帰的な処理がない
 
-**実装内容:**
-
-このフェーズで以下のファイルを作成・更新しました：
-
-1. **`apps/appview/src/shared/test-utils.ts`** - テストユーティリティ
-   - `testInjector`: すべてのInMemoryリポジトリとServiceが事前設定されたインジェクター
-   - `clearAllInMemoryRepositories()`: すべてのInMemoryリポジトリをクリアする関数
-
-2. **`apps/appview/vitest.setup.in-memory.ts`** - インメモリテスト用セットアップ
-   - `beforeEach`フックで`clearAllInMemoryRepositories()`を自動実行
-   - テストファイルで個別に`beforeEach`を書く必要なし
-
-3. **`apps/appview/vitest.config.in-memory.ts`** - インメモリテスト用設定
-   - `setupFiles`に`vitest.setup.in-memory.ts`を指定
-   - Docker環境不要でテスト実行可能
-
-**使い方:**
-
-```typescript
-import { testInjector } from "../../../shared/test-utils.js";
-
-describe("GetAuthorFeedUseCase", () => {
-  const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  // ... 他のリポジトリ
-
-  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
-
-  test("テストケース", async () => {
-    // テスト実装
-  });
-});
-```
-
-個別にDI設定やbeforeEachを記述する必要はありません。typed-injectが依存関係を自動解決し、setupFilesがリポジトリを自動クリアします。
-
 ---
 
 ### Phase 3-A: appview Feed UseCaseの移行（Part 1）
@@ -542,75 +505,106 @@ describe("GetAuthorFeedUseCase", () => {
 
 ---
 
-### Phase 7-D / 12-D / 13-B: Vitest設定の分割
+### Phase 7-D: Vitest設定の分割
 
-**appviewで実装済みの構成:**
+**ルートの共通設定:**
+
+```
+vitest.unit.shared.ts        # 単体テスト共通設定
+vitest.integration.shared.ts # 統合テスト共通設定
+```
+
+**単体テスト共通設定 (vitest.unit.shared.ts):**
+
+```typescript
+import { defineProject } from "vitest/config";
+
+export default defineProject({
+  test: {
+    setupFiles: "./vitest.unit.setup.ts",
+    include: ["./src/{application,domain,presentation}/**/*.test.ts"],
+    clearMocks: true,
+    sequence: { groupOrder: 1 },
+  },
+});
+```
+
+**統合テスト共通設定 (vitest.integration.shared.ts):**
+
+```typescript
+import { defineProject } from "vitest/config";
+
+export default defineProject({
+  test: {
+    globalSetup: "./vitest.integration.global-setup.ts",
+    setupFiles: "./vitest.integration.setup.ts",
+    include: ["src/infrastructure/**/*.test.ts"],
+    testTimeout: 120000, // 2 min
+    clearMocks: true,
+    isolate: false,
+    maxWorkers: 1,
+    sequence: { groupOrder: 2 },
+  },
+});
+```
+
+**appviewの構成（完了）:**
 
 ```
 apps/appview/
   vitest.config.ts                 # projectsで unit/integration を参照
-  vitest.unit.config.ts            # 単体テスト設定
+  vitest.unit.config.ts            # mergeConfig(sharedConfig, ...)
   vitest.unit.setup.ts             # インメモリリポジトリのクリア
-  vitest.integration.config.ts     # 統合テスト設定
+  vitest.integration.config.ts     # mergeConfig(sharedConfig, ...)
   vitest.integration.setup.ts      # DBリセット
   vitest.integration.global-setup.ts  # DB起動
 ```
 
-**ルートvitest.config.tsの設定:**
+**workerの構成（完了）:**
 
-```typescript
-export default defineConfig({
-  test: {
-    projects: [
-      "apps/*",
-      "!apps/appview", // appviewは個別設定を使用
-      "apps/appview/vitest.unit.config.ts",
-      "apps/appview/vitest.integration.config.ts",
-      "packages/*",
-    ],
-  },
-});
+```
+apps/worker/
+  vitest.config.ts                 # projectsで unit/integration を参照
+  vitest.unit.config.ts            # mergeConfig(sharedConfig, ...) + 移行済みテストのinclude
+  vitest.unit.setup.ts             # インメモリリポジトリのクリア
+  vitest.integration.config.ts     # mergeConfig(sharedConfig, ...) + 移行済みテストのexclude
+  vitest.integration.setup.ts      # DBリセット
+  vitest.integration.global-setup.ts  # DB起動
 ```
 
-**単体テスト設定 (vitest.unit.config.ts):**
+**各アプリの設定例:**
 
 ```typescript
-export default defineProject({
-  test: {
-    name: "appview:unit",
-    setupFiles: "./vitest.unit.setup.ts",
-    include: ["./src/{application,domain,presentation}/**/*.test.ts"],
-    clearMocks: true,
-  },
-});
-```
+// apps/appview/vitest.unit.config.ts
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.unit.shared.js";
 
-**統合テスト設定 (vitest.integration.config.ts):**
-
-```typescript
-export default defineProject({
-  test: {
-    name: "appview:integration",
-    globalSetup: "./vitest.integration.global-setup.ts",
-    setupFiles: "./vitest.integration.setup.ts",
-    include: ["src/infrastructure/**/*.test.ts"],
-    testTimeout: 120000,
-    clearMocks: true,
-    isolate: false,
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "appview:unit",
+      // includeはsharedConfigから継承
     },
-  },
-});
+  }),
+);
 ```
 
-**worker/blob-proxyへの反映時の注意:**
+```typescript
+// apps/appview/vitest.integration.config.ts
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.integration.shared.js";
 
-- 同様のファイル構成を作成
-- ルートvitest.config.tsにappviewと同様のパターンで追加
-- includeパスは各アプリのディレクトリ構造に合わせて調整
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "appview:integration",
+      // includeはsharedConfigから継承
+    },
+  }),
+);
+```
 
 ---
 
@@ -724,42 +718,49 @@ tracked-actor-checker.ts           → tracked-actor-checker/tracked-actor-check
 
 **移行期間中のvitest設定:**
 
-workerの移行期間中は、以下のようにvitest設定を分離します：
+workerの移行期間中は、`mergeConfig`を使用してshared設定を継承しつつ、移行済みテストを個別に指定します：
 
 ```typescript
-// vitest.unit.config.ts
-export default defineProject({
-  test: {
-    name: "worker:unit",
-    setupFiles: "./vitest.unit.setup.ts",
-    include: [
-      "./src/application/services/indexer/follow-indexer.test.ts",
-      // 移行済みテストを順次追加
-    ],
-    clearMocks: true,
-  },
-});
+// vitest.unit.config.ts（移行期間中）
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.unit.shared.js";
 
-// vitest.integration.config.ts
-export default defineProject({
-  test: {
-    name: "worker:integration",
-    globalSetup: "./vitest.integration.global-setup.ts",
-    setupFiles: "./vitest.integration.setup.ts",
-    include: [
-      "src/infrastructure/**/*.test.ts",
-      "src/{application,domain,presentation}/**/*.test.ts",
-    ],
-    exclude: [
-      "src/application/services/indexer/follow-indexer.test.ts",
-      // unit設定に追加したテストを順次追加
-    ],
-    testTimeout: 120000,
-    clearMocks: true,
-    isolate: false,
-    poolOptions: { forks: { singleFork: true } },
-  },
-});
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "worker:unit",
+      // sharedConfigのincludeを上書きして、移行済みテストのみを指定
+      include: [
+        "./src/application/services/indexer/follow-indexer.test.ts",
+        // 移行済みテストを順次追加
+      ],
+    },
+  }),
+);
+
+// vitest.integration.config.ts（移行期間中）
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.integration.shared.js";
+
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "worker:integration",
+      // sharedConfigのincludeを上書きして、未移行テストも含める
+      include: [
+        "src/infrastructure/**/*.test.ts",
+        "src/{application,domain,presentation}/**/*.test.ts",
+      ],
+      // 移行済みテストを除外
+      exclude: [
+        "src/application/services/indexer/follow-indexer.test.ts",
+        // 移行済みテストを順次追加
+      ],
+    },
+  }),
+);
 ```
 
 **移行手順:**
@@ -770,15 +771,15 @@ export default defineProject({
 
 **移行完了後:**
 
-すべてのテストの移行が完了したら、以下のように変更：
+すべてのテストの移行が完了したら、include/excludeを削除してsharedConfigから継承：
 
 ```typescript
 // vitest.unit.config.ts
-include: ["./src/{application,domain,presentation}/**/*.test.ts"];
+// includeはsharedConfigから継承（./src/{application,domain,presentation}/**/*.test.ts）
 
 // vitest.integration.config.ts
-include: ["src/infrastructure/**/*.test.ts"];
-exclude: []; // 削除
+// includeはsharedConfigから継承（src/infrastructure/**/*.test.ts）
+// excludeは削除
 ```
 
 ---
@@ -1020,118 +1021,25 @@ beforeEach(() => {
 });
 ```
 
-**appview用testInjectorの使用**
+**単体テストの実行方法**
 
-`apps/appview`では、すべてのInMemoryリポジトリとServiceが事前設定されたtestInjectorが利用可能です。
-
-```typescript
-import { testInjector } from "../../../shared/test-utils.js";
-
-describe("GetAuthorFeedUseCase", () => {
-  // ユースケースをDI経由で取得（依存関係は自動解決される）
-  const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
-
-  // 必要なリポジトリを取得
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-
-  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
-
-  test("テストケース", async () => {
-    // テスト実装
-  });
-});
-```
-
-testInjectorに含まれるもの：
-
-- **InMemoryリポジトリ（11個）**: authorFeedRepository, postRepository, postStatsRepository, profileRepository, followRepository, actorStatsRepository, recordRepository, repostRepository, likeRepository, generatorRepository, timelineRepository
-- **InMemoryビルダー（1個）**: assetUrlBuilder
-- **Service（8個）**: profileViewBuilder, postEmbedViewBuilder, profileViewService, generatorViewService, postViewService, replyRefService, feedProcessor, authorFeedService
-
-typed-injectが依存関係を自動的に解決するため、個別にDI設定を記述する必要はありません。
-また、`vitest.setup.in-memory.ts`がすべてのリポジトリを自動的にクリアするため、テストファイルで`beforeEach`を記述する必要もありません。
-
-**インメモリテストの実行方法**
-
-Docker環境が利用できない場合は、インメモリリポジトリ専用のvitest設定を使用してテストを実行できます。
+単体テスト（インメモリリポジトリを使用したテスト）は、以下のコマンドで実行できます。
 
 ```bash
-# インメモリテスト用の設定でテストを実行
-pnpm --filter @repo/appview test:in-memory <テストファイル名>
-
-# 例: get-author-feed-use-case.test.ts を実行
-pnpm --filter @repo/appview test:in-memory get-author-feed-use-case.test.ts
+# ユニットテストのみ実行（全パッケージの型チェック・フォーマット + worker:unit・appview:unit）
+pnpm all:unit
 ```
 
-この設定（`vitest.config.in-memory.ts`）は：
+**動作確認時のコマンド:**
 
-- globalSetupを除外（PostgreSQL Dockerコンテナを起動しない）
-- setupFilesを除外（DBリセットを実行しない）
-- インメモリリポジトリのみを使用
+Phase移行後の動作確認には `pnpm all:unit` を使用してください。このコマンドは：
 
-```typescript
-// 移行後のUseCaseテスト例
-import { FeedItem, Post } from "@repo/common/domain";
-import {
-  actorFactory,
-  postFactory,
-  profileDetailedFactory,
-} from "@repo/common/test";
-import { testInjector } from "../../../shared/test-utils.js";
+- 全パッケージの型チェック（`turbo run typecheck`）
+- 全パッケージのフォーマットチェック（`turbo run format`）
+- worker:unitプロジェクトの単体テスト
+- appview:unitプロジェクトの単体テスト
 
-describe("GetPostThreadUseCase", () => {
-  const useCase = testInjector.injectClass(GetPostThreadUseCase);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-
-  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
-
-  test("投稿が見つからない場合はnotFoundPostを返す", async () => {
-    // arrange - インメモリリポジトリは空のまま
-
-    // act
-    const result = await useCase.execute({
-      uri: new AtUri("at://did:plc:xxx/app.bsky.feed.post/xxx"),
-      depth: 6,
-      parentHeight: 80,
-    });
-
-    // assert
-    expect(result.thread).toMatchObject({
-      $type: "app.bsky.feed.defs#notFoundPost",
-    });
-  });
-
-  test("投稿が存在する場合、ThreadViewPostを返す", async () => {
-    // arrange
-    const actor = actorFactory();
-    const { post, record } = postFactory({
-      actorDid: actor.did,
-    });
-    postRepo.add(post);
-    recordRepo.add(record);
-
-    // act
-    const result = await useCase.execute({
-      uri: post.uri,
-      depth: 6,
-      parentHeight: 80,
-    });
-
-    // assert
-    expect(result.thread).toMatchObject({
-      $type: "app.bsky.feed.defs#threadViewPost",
-      post: {
-        uri: post.uri.toString(),
-      },
-    });
-  });
-});
-```
+を実行します。Docker環境を必要とせず、インメモリリポジトリのみを使用するため高速に実行できます。
 
 ---
 

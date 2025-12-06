@@ -7,6 +7,7 @@ export async function randomCid() {
   crypto.getRandomValues(randomData);
 
   const hash = await sha256.digest(randomData);
+   
   const cid = CID.create(1, raw.code, hash);
 
   return cid.toString();

@@ -7,7 +7,8 @@
   },
   "scripts": {
     "_prettier": "prettier --ignore-path .prettier --ignore-path .gitignore",
-    "all": "turbo run typecheck format && pnpm test --run",
+    "all": "turbo run typecheck format && vitest run",
+    "all:unit": "turbo run typecheck format && vitest run --project worker:unit --project appview:unit",
     "build": "turbo run build",
     "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
@@ -21,17 +22,17 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/coverage-v8": "4.0.15",
     "husky": "9.1.7",
     "kill-port": "2.0.1",
-    "lint-staged": "16.2.1",
-    "prettier": "3.6.2",
+    "lint-staged": "16.2.7",
+    "prettier": "3.7.4",
     "prettier-plugin-pkg": "0.21.2",
     "prettier-plugin-sh": "0.18.0",
-    "repomix": "1.6.0",
-    "turbo": "2.5.8",
-    "vitest": "^3.2.4",
-    "wait-on": "9.0.1"
+    "repomix": "1.9.2",
+    "turbo": "2.6.3",
+    "vitest": "^4.0.15",
+    "wait-on": "9.0.3"
   },
   "lint-staged": {
     "*": "pnpm -s _prettier --ignore-unknown --write"

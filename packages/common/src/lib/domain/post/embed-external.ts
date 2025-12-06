@@ -13,7 +13,7 @@ export class PostEmbedExternal {
       external.uri,
       external.title,
       external.description,
-      external.thumb ? external.thumb.toJSON().ref.$link : null,
+      external.thumb ? external.thumb.ref.toString() : null,
     );
   }
 }

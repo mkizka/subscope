@@ -15,24 +15,24 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/syntax": "0.4.1",
+    "@atproto/syntax": "0.4.2",
     "@factory-js/factory": "0.4.1",
-    "@faker-js/faker": "10.0.0",
+    "@faker-js/faker": "10.1.0",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
-    "@testcontainers/postgresql": "11.6.0",
+    "@testcontainers/postgresql": "11.9.0",
     "drizzle-seed": "0.3.1",
-    "execa": "9.6.0",
+    "execa": "9.6.1",
     "multiformats": "13.4.1",
     "typed-inject": "5.0.0",
-    "vitest": "3.2.4"
+    "vitest": "4.0.15"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "7.2.0",
-    "@tsconfig/node-lts": "22.0.2",
-    "drizzle-orm": "0.44.5",
-    "eslint": "9.36.0",
-    "typescript": "5.9.2"
+    "@tsconfig/node-lts": "24.0.0",
+    "drizzle-orm": "0.45.0",
+    "eslint": "9.39.1",
+    "typescript": "5.9.3"
   },
   "sideEffects": false
 }

@@ -17,6 +17,7 @@ export const fakeCid = () => {
   crypto.getRandomValues(randomData);
 
   const hash = identity.digest(randomData);
+   
   return CID.create(1, raw.code, hash).toString();
 };
 

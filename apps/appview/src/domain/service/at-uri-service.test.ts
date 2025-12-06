@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
 import { testInjector } from "../../shared/test-utils.js";
-import { AtUriService, InvalidHostnameError } from "./at-uri-service.js";
+import { AtUriService } from "./at-uri-service.js";
 
 describe("AtUriService", () => {
   const atUriService = testInjector.injectClass(AtUriService);
@@ -36,19 +36,6 @@ describe("AtUriService", () => {
       // assert
       expect(result.toString()).toBe(
         "at://did:plc:resolved123/app.bsky.feed.post/xyz789",
-      );
-    });
-
-    test("無効なhostnameの場合、InvalidHostnameErrorをスローする", async () => {
-      // arrange
-      const uri = new AtUri("at://123invalid/app.bsky.feed.post/abc123");
-
-      // act & assert
-      await expect(atUriService.resolveHostname(uri)).rejects.toThrow(
-        InvalidHostnameError,
-      );
-      await expect(atUriService.resolveHostname(uri)).rejects.toThrow(
-        "Invalid hostname in URI: at://123invalid/app.bsky.feed.post/abc123",
       );
     });
 

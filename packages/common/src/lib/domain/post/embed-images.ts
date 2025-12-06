@@ -28,7 +28,7 @@ export class PostEmbedImage {
   static from(images: AppBskyEmbedImages.Image[]) {
     return images.map((image, index) => {
       return new PostEmbedImage({
-        cid: image.image.toJSON().ref.$link,
+        cid: image.image.ref.toString(),
         position: index,
         alt: image.alt,
         aspectRatio: image.aspectRatio,
