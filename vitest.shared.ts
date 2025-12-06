@@ -1,6 +1,9 @@
 import { defineProject } from "vitest/config";
 
 export default defineProject({
+  server: {
+    watch: null,
+  },
   test: {
     globalSetup: "./vitest.global-setup.ts",
     setupFiles: "./vitest.setup.ts",
