@@ -51,7 +51,7 @@
 - [x] **Phase 10-D**: worker Indexerの移行（profile-indexer）
 - [x] **Phase 10-E**: worker Indexerの移行（repost-indexer）
 - [x] **Phase 11-A**: worker Serviceの移行
-- [ ] **Phase 11-B**: worker UseCaseの移行（Part 1）
+- [x] **Phase 11-B**: worker UseCaseの移行（Part 1）
 - [x] **Phase 11-C**: worker UseCaseの移行（Part 2）
 
 ### Phase 12: workerリポジトリテスト追加
@@ -940,6 +940,36 @@ export class InMemoryPostRepository implements IPostRepository {
 ```
 
 ### 移行後のテストパターン
+
+**重要: ctxの定義場所**
+
+ctxはdescribe直下で定義し、テストケース間で使いまわしてください。
+
+```typescript
+describe("UseCase名", () => {
+  const useCase = testInjector.injectClass(UseCase);
+
+  const actorRepo = testInjector.resolve("actorRepository");
+  const postRepo = testInjector.resolve("postRepository");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
+
+  test("テストケース名", async () => {
+    // arrange
+    const actor = actorFactory();
+    actorRepo.add(actor);
+
+    // act
+    await useCase.execute(command);
+
+    // assert
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).not.toBeNull();
+  });
+});
+```
 
 **重要: Factory関数のインポート元**
 
