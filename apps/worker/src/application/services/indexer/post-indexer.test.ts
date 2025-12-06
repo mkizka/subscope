@@ -1,5 +1,5 @@
 import { actorFactory, recordFactory } from "@repo/common/test";
-import { randomCid } from "@repo/test-utils";
+import { randomCid } from "@repo/test-utils/cid";
 import { describe, expect, test } from "vitest";
 
 import { testInjector } from "../../../shared/test-utils.js";
