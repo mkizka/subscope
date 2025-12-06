@@ -5,7 +5,7 @@ import type {
   IJobQueue,
   JobData,
   QueueName,
-} from "../domain/interfaces/job-queue.js";
+} from "../../domain/interfaces/job-queue.js";
 
 const createQueueOptionsBuilder =
   (redisUrl: string) =>

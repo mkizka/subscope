@@ -14,6 +14,10 @@ export class InMemoryRecordRepository implements IRecordRepository {
     this.records.clear();
   }
 
+  findAll(): Record[] {
+    return Array.from(this.records.values());
+  }
+
   async findByUri({
     uri,
   }: {

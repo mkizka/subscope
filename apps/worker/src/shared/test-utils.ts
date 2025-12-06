@@ -1,4 +1,5 @@
 import {
+  InMemoryDidResolver,
   InMemoryJobQueue,
   InMemoryTransactionManager,
 } from "@repo/common/test";
@@ -23,6 +24,7 @@ import { LikeIndexingPolicy } from "../domain/like-indexing-policy.js";
 import { PostIndexingPolicy } from "../domain/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "../domain/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "../domain/repost-indexing-policy.js";
+import { InMemoryRepoFetcher } from "../infrastructure/fetchers/repo-fetcher/repo-fetcher.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
@@ -38,6 +40,7 @@ import { InMemoryRecordRepository } from "../infrastructure/repositories/record-
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
+import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 
 export const testInjector = createInjector()
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -59,6 +62,9 @@ export const testInjector = createInjector()
   .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("jobQueue", InMemoryJobQueue)
+  .provideClass("didResolver", InMemoryDidResolver)
+  .provideClass("jobLogger", InMemoryJobLogger)
+  .provideClass("repoFetcher", InMemoryRepoFetcher)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("followIndexingPolicy", FollowIndexingPolicy)
@@ -95,5 +101,8 @@ export const setupFiles = () => {
     testInjector.resolve("repostRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
     testInjector.resolve("jobQueue").clear();
+    testInjector.resolve("didResolver").clear();
+    testInjector.resolve("jobLogger").clear();
+    testInjector.resolve("repoFetcher").clear();
   });
 };

@@ -14,6 +14,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.clear();
   }
 
+  findAll(): Follow[] {
+    return Array.from(this.follows.values());
+  }
+
   findByUri(uri: AtUri): Follow | null {
     return this.follows.get(uri.toString()) ?? null;
   }
