@@ -9,7 +9,7 @@ export default defineProject({
     // ファイル分離によってコネクションプールが作られ過ぎるのを防ぐため
     isolate: false,
     // 1パッケージにつき1つのPostgresを使用していてデータが競合するので直列実行にする
-    maxConcurrency: 1,
+    maxWorkers: 1,
     sequence: { groupOrder: 2 },
   },
 });
