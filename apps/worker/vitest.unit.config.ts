@@ -8,6 +8,8 @@ export default defineProject({
       "./src/application/services/indexer/follow-indexer.test.ts",
       "./src/application/services/indexer/like-indexer.test.ts",
       "./src/application/services/indexer/post-indexer.test.ts",
+      "./src/application/services/indexer/profile-indexer.test.ts",
+      "./src/application/services/indexer/repost-indexer.test.ts",
     ],
     clearMocks: true,
   },
