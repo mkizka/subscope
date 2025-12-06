@@ -3,30 +3,25 @@ import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
 import { describe, expect, test, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
 
 import { testInjector } from "../../../shared/test-utils.js";
-import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
 import { SyncRepoUseCase } from "./sync-repo-use-case.js";
 
 vi.mock("../../../shared/env.js", () => ({
   env: { SYNC_REPO_BATCH_SIZE: 2 },
 }));
 
-const mockRepoFetcher = mock<IRepoFetcher>();
-
 const actorRepository = testInjector.resolve("actorRepository");
 const recordRepository = testInjector.resolve("recordRepository");
 const postRepository = testInjector.resolve("postRepository");
 const followRepository = testInjector.resolve("followRepository");
 const likeRepository = testInjector.resolve("likeRepository");
+const repoFetcher = testInjector.resolve("repoFetcher");
 const jobLogger = testInjector.resolve("jobLogger");
 const ctx = {
   db: testInjector.resolve("db"),
 };
-const syncRepoUseCase = testInjector
-  .provideValue("repoFetcher", mockRepoFetcher)
-  .injectClass(SyncRepoUseCase);
+const syncRepoUseCase = testInjector.injectClass(SyncRepoUseCase);
 
 describe("SyncRepoUseCase", () => {
   test("レコードがバッチサイズで分割されて処理される", async () => {
@@ -46,7 +41,7 @@ describe("SyncRepoUseCase", () => {
         indexedAt: new Date(),
       }),
     );
-    mockRepoFetcher.fetch.mockResolvedValue(records);
+    repoFetcher.setFetchResult(did, records);
 
     // act
     await syncRepoUseCase.execute({ did, jobLogger });
@@ -61,7 +56,7 @@ describe("SyncRepoUseCase", () => {
     const actor = actorFactory();
     actorRepository.add(actor);
     const did = actor.did;
-    mockRepoFetcher.fetch.mockResolvedValue([]);
+    repoFetcher.setFetchResult(did, []);
 
     // act
     await syncRepoUseCase.execute({ did, jobLogger });
@@ -110,7 +105,7 @@ describe("SyncRepoUseCase", () => {
         indexedAt: new Date(),
       }),
     ];
-    mockRepoFetcher.fetch.mockResolvedValue(records);
+    repoFetcher.setFetchResult(did, records);
 
     // act
     await syncRepoUseCase.execute({ did, jobLogger });
@@ -127,7 +122,7 @@ describe("SyncRepoUseCase", () => {
   test("Actorが見つからない場合、エラーがスローされる", async () => {
     // arrange
     const did = asDid("did:plc:notfound");
-    mockRepoFetcher.fetch.mockResolvedValue([]);
+    repoFetcher.setFetchResult(did, []);
 
     // act & assert
     await expect(syncRepoUseCase.execute({ did, jobLogger })).rejects.toThrow(
@@ -140,7 +135,7 @@ describe("SyncRepoUseCase", () => {
     const actor = actorFactory();
     actorRepository.add(actor);
     const did = actor.did;
-    mockRepoFetcher.fetch.mockResolvedValue([
+    repoFetcher.setFetchResult(did, [
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
         cid: "cid1",
@@ -216,7 +211,7 @@ describe("SyncRepoUseCase", () => {
         indexedAt: new Date(),
       }),
     ];
-    mockRepoFetcher.fetch.mockResolvedValue(records);
+    repoFetcher.setFetchResult(did, records);
 
     // act
     await syncRepoUseCase.execute({ did, jobLogger });
@@ -261,7 +256,7 @@ describe("SyncRepoUseCase", () => {
       },
       indexedAt: new Date(),
     });
-    mockRepoFetcher.fetch.mockResolvedValue([followRecord, postRecord]);
+    repoFetcher.setFetchResult(did, [followRecord, postRecord]);
 
     // act
     await syncRepoUseCase.execute({ did, jobLogger });
@@ -277,7 +272,7 @@ describe("SyncRepoUseCase", () => {
     const actor = actorFactory();
     actorRepository.add(actor);
     const did = actor.did;
-    mockRepoFetcher.fetch.mockRejectedValue(new Error("Fetch error"));
+    repoFetcher.setFetchError(did, new Error("Fetch error"));
 
     // act & assert
     await expect(syncRepoUseCase.execute({ did, jobLogger })).rejects.toThrow(
