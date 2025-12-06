@@ -1053,23 +1053,25 @@ testInjectorに含まれるもの：
 typed-injectが依存関係を自動的に解決するため、個別にDI設定を記述する必要はありません。
 また、`vitest.setup.in-memory.ts`がすべてのリポジトリを自動的にクリアするため、テストファイルで`beforeEach`を記述する必要もありません。
 
-**インメモリテストの実行方法**
+**単体テストの実行方法**
 
-Docker環境が利用できない場合は、インメモリリポジトリ専用のvitest設定を使用してテストを実行できます。
+単体テスト（インメモリリポジトリを使用したテスト）は、以下のコマンドで実行できます。
 
 ```bash
-# インメモリテスト用の設定でテストを実行
-pnpm --filter @repo/appview test:in-memory <テストファイル名>
-
-# 例: get-author-feed-use-case.test.ts を実行
-pnpm --filter @repo/appview test:in-memory get-author-feed-use-case.test.ts
+# ユニットテストのみ実行（全パッケージの型チェック・フォーマット + worker:unit・appview:unit）
+pnpm all:unit
 ```
 
-この設定（`vitest.config.in-memory.ts`）は：
+**動作確認時のコマンド:**
 
-- globalSetupを除外（PostgreSQL Dockerコンテナを起動しない）
-- setupFilesを除外（DBリセットを実行しない）
-- インメモリリポジトリのみを使用
+Phase移行後の動作確認には `pnpm all:unit` を使用してください。このコマンドは：
+
+- 全パッケージの型チェック（`turbo run typecheck`）
+- 全パッケージのフォーマットチェック（`turbo run format`）
+- worker:unitプロジェクトの単体テスト
+- appview:unitプロジェクトの単体テスト
+
+を実行します。Docker環境を必要とせず、インメモリリポジトリのみを使用するため高速に実行できます。
 
 ```typescript
 // 移行後のUseCaseテスト例

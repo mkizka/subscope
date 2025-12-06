@@ -7,7 +7,8 @@
   },
   "scripts": {
     "_prettier": "prettier --ignore-path .prettier --ignore-path .gitignore",
-    "all": "turbo run typecheck format && pnpm test --run",
+    "all": "turbo run typecheck format && vitest run",
+    "all:unit": "turbo run typecheck format && vitest run --project worker:unit --project appview:unit",
     "build": "turbo run build",
     "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
