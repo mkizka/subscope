@@ -41,4 +41,8 @@ export class InMemoryJobQueue implements IJobQueue {
       (job): job is AddedJob<T> => job.queueName === queueName,
     );
   }
+
+  getJobs(): readonly AddedJob[] {
+    return this.jobs;
+  }
 }
