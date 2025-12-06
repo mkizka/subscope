@@ -1,35 +1,25 @@
 import { asDid } from "@atproto/did";
-import type { IJobQueue } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
-import { ProfileRepository } from "../../../infrastructure/repositories/profile-repository/profile-repository.js";
-import { IndexActorService } from "../../services/index-actor-service.js";
-import { FetchRecordScheduler } from "../../services/scheduler/fetch-record-scheduler.js";
-import { ResolveDidScheduler } from "../../services/scheduler/resolve-did-scheduler.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import type { HandleAccountCommand } from "./handle-account-command.js";
 import { HandleAccountUseCase } from "./handle-account-use-case.js";
 
 describe("HandleAccountUseCase", () => {
-  const mockJobQueue = mock<IJobQueue>();
-  const { testInjector, ctx } = testSetup;
+  const handleAccountUseCase = testInjector.injectClass(HandleAccountUseCase);
 
-  const handleAccountUseCase = testInjector
-    .provideClass("actorRepository", ActorRepository)
-    .provideClass("profileRepository", ProfileRepository)
-    .provideValue("jobQueue", mockJobQueue)
-    .provideClass("resolveDidScheduler", ResolveDidScheduler)
-    .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-    .provideClass("indexActorService", IndexActorService)
-    .injectClass(HandleAccountUseCase);
+  const actorRepo = testInjector.resolve("actorRepository");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
   test("ステータスがdeletedの場合、actorがデータベースから削除される", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
+
     const command: HandleAccountCommand = {
       did: asDid(actor.did),
       status: "deleted",
@@ -41,16 +31,15 @@ describe("HandleAccountUseCase", () => {
     await handleAccountUseCase.execute(command);
 
     // assert
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, actor.did));
-    expect(actors).toHaveLength(0);
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).toBeNull();
   });
 
   test("ステータスがdeleted以外の場合、何も処理しない", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const actor = actorFactory();
+    actorRepo.add(actor);
+
     const command: HandleAccountCommand = {
       did: asDid(actor.did),
       status: "deactivated",
@@ -62,10 +51,10 @@ describe("HandleAccountUseCase", () => {
     await handleAccountUseCase.execute(command);
 
     // assert
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, actor.did));
-    expect(actors).toMatchObject([actor]);
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).toMatchObject({
+      did: actor.did,
+      handle: actor.handle,
+    });
   });
 });
