@@ -4,10 +4,10 @@ import { DidResolver as AtprotoDidResolver } from "@atproto/identity";
 import {
   DidResolutionError,
   type IDidResolver,
-} from "../domain/interfaces/did-resolver.js";
-import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
-import type { IMetricReporter } from "../domain/interfaces/metric.js";
-import { asHandle } from "../utils/handle.js";
+} from "../../domain/interfaces/did-resolver.js";
+import type { ILoggerManager, Logger } from "../../domain/interfaces/logger.js";
+import type { IMetricReporter } from "../../domain/interfaces/metric.js";
+import { asHandle } from "../../utils/handle.js";
 
 class Resolver extends AtprotoDidResolver {
   constructor(

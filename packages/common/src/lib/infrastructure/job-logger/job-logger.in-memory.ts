@@ -1,6 +1,6 @@
-import type { JobLogger } from "./job.js";
+import type { IJobLogger } from "../../domain/interfaces/job-logger.js";
 
-export class InMemoryJobLogger implements JobLogger {
+export class InMemoryJobLogger implements IJobLogger {
   private logs: string[] = [];
 
   async log(message: string): Promise<number> {

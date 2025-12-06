@@ -4,6 +4,7 @@ export * from "./lib/domain/follow/follow.js";
 export * from "./lib/domain/generator/generator.js";
 export * from "./lib/domain/interfaces/did-resolver.js";
 export * from "./lib/domain/interfaces/index-target-repository.js";
+export * from "./lib/domain/interfaces/job-logger.js";
 export * from "./lib/domain/interfaces/job-queue.js";
 export * from "./lib/domain/interfaces/logger.js";
 export * from "./lib/domain/interfaces/metric.js";
