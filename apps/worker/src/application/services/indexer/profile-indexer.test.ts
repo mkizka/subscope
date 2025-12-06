@@ -1,4 +1,4 @@
-import { actorFactory, recordFactory } from "@repo/common/test";
+import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
 import { testInjector } from "../../../shared/test-utils.js";
@@ -17,6 +17,8 @@ describe("ProfileIndexer", () => {
     test("プロフィールレコードを正しく保存する", async () => {
       // arrange
       const actor = actorFactory();
+      const avatarCid = fakeCid();
+      const bannerCid = fakeCid();
       const record = recordFactory({
         uri: `at://${actor.did}/app.bsky.actor.profile/self`,
         json: {
@@ -26,8 +28,7 @@ describe("ProfileIndexer", () => {
           avatar: {
             $type: "blob",
             ref: {
-              $link:
-                "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+              $link: avatarCid,
             },
             mimeType: "image/jpeg",
             size: 1000,
@@ -35,8 +36,7 @@ describe("ProfileIndexer", () => {
           banner: {
             $type: "blob",
             ref: {
-              $link:
-                "bafkreie5cvv4h45feadgeuwhbcutmh6t2ceseocckahdoe6uat64zmz454",
+              $link: bannerCid,
             },
             mimeType: "image/jpeg",
             size: 2000,
@@ -56,10 +56,8 @@ describe("ProfileIndexer", () => {
         actorDid: actor.did,
         displayName: "Test User",
         description: "Test description",
-        avatarCid:
-          "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
-        bannerCid:
-          "bafkreie5cvv4h45feadgeuwhbcutmh6t2ceseocckahdoe6uat64zmz454",
+        avatarCid,
+        bannerCid,
       });
     });
   });

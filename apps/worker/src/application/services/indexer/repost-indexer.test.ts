@@ -1,5 +1,10 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, postFactory, recordFactory } from "@repo/common/test";
+import {
+  actorFactory,
+  fakeCid,
+  postFactory,
+  recordFactory,
+} from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
 import { testInjector } from "../../../shared/test-utils.js";
@@ -30,7 +35,7 @@ describe("RepostIndexer", () => {
           $type: "app.bsky.feed.repost",
           subject: {
             uri: subjectUri,
-            cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+            cid: fakeCid(),
           },
           createdAt: new Date().toISOString(),
         },
