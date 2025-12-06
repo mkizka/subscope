@@ -403,43 +403,6 @@ asset-url-builder.ts       → asset-url-builder/asset-url-builder.ts
 - Timeline/PostThreadに比べて複雑なリレーション処理が少ない
 - スレッド構造などの再帰的な処理がない
 
-**実装内容:**
-
-このフェーズで以下のファイルを作成・更新しました：
-
-1. **`apps/appview/src/shared/test-utils.ts`** - テストユーティリティ
-   - `testInjector`: すべてのInMemoryリポジトリとServiceが事前設定されたインジェクター
-   - `clearAllInMemoryRepositories()`: すべてのInMemoryリポジトリをクリアする関数
-
-2. **`apps/appview/vitest.setup.in-memory.ts`** - インメモリテスト用セットアップ
-   - `beforeEach`フックで`clearAllInMemoryRepositories()`を自動実行
-   - テストファイルで個別に`beforeEach`を書く必要なし
-
-3. **`apps/appview/vitest.config.in-memory.ts`** - インメモリテスト用設定
-   - `setupFiles`に`vitest.setup.in-memory.ts`を指定
-   - Docker環境不要でテスト実行可能
-
-**使い方:**
-
-```typescript
-import { testInjector } from "../../../shared/test-utils.js";
-
-describe("GetAuthorFeedUseCase", () => {
-  const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  // ... 他のリポジトリ
-
-  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
-
-  test("テストケース", async () => {
-    // テスト実装
-  });
-});
-```
-
-個別にDI設定やbeforeEachを記述する必要はありません。typed-injectが依存関係を自動解決し、setupFilesがリポジトリを自動クリアします。
-
 ---
 
 ### Phase 3-A: appview Feed UseCaseの移行（Part 1）
@@ -1020,39 +983,6 @@ beforeEach(() => {
 });
 ```
 
-**appview用testInjectorの使用**
-
-`apps/appview`では、すべてのInMemoryリポジトリとServiceが事前設定されたtestInjectorが利用可能です。
-
-```typescript
-import { testInjector } from "../../../shared/test-utils.js";
-
-describe("GetAuthorFeedUseCase", () => {
-  // ユースケースをDI経由で取得（依存関係は自動解決される）
-  const useCase = testInjector.injectClass(GetAuthorFeedUseCase);
-
-  // 必要なリポジトリを取得
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-
-  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
-
-  test("テストケース", async () => {
-    // テスト実装
-  });
-});
-```
-
-testInjectorに含まれるもの：
-
-- **InMemoryリポジトリ（11個）**: authorFeedRepository, postRepository, postStatsRepository, profileRepository, followRepository, actorStatsRepository, recordRepository, repostRepository, likeRepository, generatorRepository, timelineRepository
-- **InMemoryビルダー（1個）**: assetUrlBuilder
-- **Service（8個）**: profileViewBuilder, postEmbedViewBuilder, profileViewService, generatorViewService, postViewService, replyRefService, feedProcessor, authorFeedService
-
-typed-injectが依存関係を自動的に解決するため、個別にDI設定を記述する必要はありません。
-また、`vitest.setup.in-memory.ts`がすべてのリポジトリを自動的にクリアするため、テストファイルで`beforeEach`を記述する必要もありません。
-
 **単体テストの実行方法**
 
 単体テスト（インメモリリポジトリを使用したテスト）は、以下のコマンドで実行できます。
@@ -1072,68 +1002,6 @@ Phase移行後の動作確認には `pnpm all:unit` を使用してください�
 - appview:unitプロジェクトの単体テスト
 
 を実行します。Docker環境を必要とせず、インメモリリポジトリのみを使用するため高速に実行できます。
-
-```typescript
-// 移行後のUseCaseテスト例
-import { FeedItem, Post } from "@repo/common/domain";
-import {
-  actorFactory,
-  postFactory,
-  profileDetailedFactory,
-} from "@repo/common/test";
-import { testInjector } from "../../../shared/test-utils.js";
-
-describe("GetPostThreadUseCase", () => {
-  const useCase = testInjector.injectClass(GetPostThreadUseCase);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-
-  // beforeEachは不要（vitest.setup.in-memory.tsで自動クリア）
-
-  test("投稿が見つからない場合はnotFoundPostを返す", async () => {
-    // arrange - インメモリリポジトリは空のまま
-
-    // act
-    const result = await useCase.execute({
-      uri: new AtUri("at://did:plc:xxx/app.bsky.feed.post/xxx"),
-      depth: 6,
-      parentHeight: 80,
-    });
-
-    // assert
-    expect(result.thread).toMatchObject({
-      $type: "app.bsky.feed.defs#notFoundPost",
-    });
-  });
-
-  test("投稿が存在する場合、ThreadViewPostを返す", async () => {
-    // arrange
-    const actor = actorFactory();
-    const { post, record } = postFactory({
-      actorDid: actor.did,
-    });
-    postRepo.add(post);
-    recordRepo.add(record);
-
-    // act
-    const result = await useCase.execute({
-      uri: post.uri,
-      depth: 6,
-      parentHeight: 80,
-    });
-
-    // assert
-    expect(result.thread).toMatchObject({
-      $type: "app.bsky.feed.defs#threadViewPost",
-      post: {
-        uri: post.uri.toString(),
-      },
-    });
-  });
-});
-```
 
 ---
 
