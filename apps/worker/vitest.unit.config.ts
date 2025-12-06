@@ -15,6 +15,8 @@ export default mergeConfig(
         "./src/application/services/indexer/repost-indexer.test.ts",
         "./src/application/services/index-actor-service.test.ts",
         "./src/application/services/index-record-service.test.ts",
+        "./src/application/use-cases/async/resolve-did-use-case.test.ts",
+        "./src/application/use-cases/async/sync-repo-use-case.test.ts",
       ],
     },
   }),
