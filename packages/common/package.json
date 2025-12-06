@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "9.3.0",
-    "@mkizka/eslint-config": "7.1.2",
+    "@mkizka/eslint-config": "7.2.0",
     "@skyware/jetstream": "0.2.5",
     "@tsconfig/node-lts": "22.0.2",
     "@types/express": "5.0.3",

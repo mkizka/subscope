@@ -61,13 +61,7 @@ export class RepostIndexer implements ICollectionIndexer {
     return await this.repostIndexingPolicy.shouldIndex(repost);
   }
 
-  async afterAction({
-    ctx,
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }): Promise<void> {
+  async afterAction({ record }: { record: Record }): Promise<void> {
     const repost = Repost.from(record);
     await this.aggregatePostStatsScheduler.schedule(
       repost.subjectUri,

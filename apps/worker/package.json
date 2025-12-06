@@ -34,7 +34,7 @@
     "zod-validation-error": "4.0.2"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "7.1.2",
+    "@mkizka/eslint-config": "7.2.0",
     "@repo/test-utils": "workspace:*",
     "@skyware/jetstream": "0.2.5",
     "@tsconfig/node-lts": "22.0.2",

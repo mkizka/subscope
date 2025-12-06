@@ -67,7 +67,7 @@ export class OAuthSession {
     let oauthSession;
     try {
       oauthSession = await this.oauthClient.restore(did);
-    } catch (e) {
+    } catch {
       return null;
     }
     return new SubscoAgent({

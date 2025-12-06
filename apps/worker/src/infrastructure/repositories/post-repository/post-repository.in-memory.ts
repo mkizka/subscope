@@ -14,6 +14,10 @@ export class InMemoryPostRepository implements IPostRepository {
     this.posts.clear();
   }
 
+  findByUri(uri: AtUri): Post | null {
+    return this.posts.get(uri.toString()) ?? null;
+  }
+
   async upsert(params: { ctx: TransactionContext; post: Post }): Promise<void> {
     this.posts.set(params.post.uri.toString(), params.post);
   }

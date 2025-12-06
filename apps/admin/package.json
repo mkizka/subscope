@@ -50,7 +50,7 @@
   "devDependencies": {
     "@iconify-json/tabler": "1.2.23",
     "@iconify/tailwind4": "1.0.6",
-    "@mkizka/eslint-config": "7.1.2",
+    "@mkizka/eslint-config": "7.2.0",
     "@playwright/test": "^1.55.1",
     "@react-router/dev": "^7.9.3",
     "@storybook/react-vite": "^9.1.8",
