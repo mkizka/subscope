@@ -15,7 +15,10 @@ describe("UpsertIdentityUseCase", () => {
   const actorRepo = testInjector.resolve("actorRepository");
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const followRepo = testInjector.resolve("followRepository");
-  const transactionManager = testInjector.resolve("transactionManager");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
   test("ハンドルがない場合は何もしない", async () => {
     // arrange
@@ -29,10 +32,8 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    await transactionManager.transaction(async (ctx) => {
-      const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
-      expect(foundActor).toBeNull();
-    });
+    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    expect(foundActor).toBeNull();
   });
 
   test.skip("subscriberの場合はactorを保存する", async () => {
@@ -52,11 +53,9 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    await transactionManager.transaction(async (ctx) => {
-      const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
-      expect(foundActor).not.toBeNull();
-      expect(foundActor?.handle).toBe(command.handle);
-    });
+    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    expect(foundActor).not.toBeNull();
+    expect(foundActor?.handle).toBe(command.handle);
   });
 
   test.skip("subscriberでないがsubscriberのフォロワーがいる場合はactorを保存する", async () => {
@@ -90,11 +89,9 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    await transactionManager.transaction(async (ctx) => {
-      const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
-      expect(foundActor).not.toBeNull();
-      expect(foundActor?.handle).toBe(command.handle);
-    });
+    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    expect(foundActor).not.toBeNull();
+    expect(foundActor?.handle).toBe(command.handle);
   });
 
   test("subscriberでもなくsubscriberのフォロワーもいない場合はactorを保存しない", async () => {
@@ -109,9 +106,7 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    await transactionManager.transaction(async (ctx) => {
-      const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
-      expect(foundActor).toBeNull();
-    });
+    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    expect(foundActor).toBeNull();
   });
 });

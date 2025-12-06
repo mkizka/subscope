@@ -10,7 +10,10 @@ describe("HandleAccountUseCase", () => {
   const handleAccountUseCase = testInjector.injectClass(HandleAccountUseCase);
 
   const actorRepo = testInjector.resolve("actorRepository");
-  const transactionManager = testInjector.resolve("transactionManager");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
   test("ステータスがdeletedの場合、actorがデータベースから削除される", async () => {
     // arrange
@@ -27,10 +30,8 @@ describe("HandleAccountUseCase", () => {
     await handleAccountUseCase.execute(command);
 
     // assert
-    await transactionManager.transaction(async (ctx) => {
-      const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
-      expect(foundActor).toBeNull();
-    });
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).toBeNull();
   });
 
   test("ステータスがdeleted以外の場合、何も処理しない", async () => {
@@ -48,12 +49,10 @@ describe("HandleAccountUseCase", () => {
     await handleAccountUseCase.execute(command);
 
     // assert
-    await transactionManager.transaction(async (ctx) => {
-      const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
-      expect(foundActor).toMatchObject({
-        did: actor.did,
-        handle: actor.handle,
-      });
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).toMatchObject({
+      did: actor.did,
+      handle: actor.handle,
     });
   });
 });
