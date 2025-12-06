@@ -505,75 +505,106 @@ asset-url-builder.ts       → asset-url-builder/asset-url-builder.ts
 
 ---
 
-### Phase 7-D / 12-D / 13-B: Vitest設定の分割
+### Phase 7-D: Vitest設定の分割
 
-**appviewで実装済みの構成:**
+**ルートの共通設定:**
+
+```
+vitest.unit.shared.ts        # 単体テスト共通設定
+vitest.integration.shared.ts # 統合テスト共通設定
+```
+
+**単体テスト共通設定 (vitest.unit.shared.ts):**
+
+```typescript
+import { defineProject } from "vitest/config";
+
+export default defineProject({
+  test: {
+    setupFiles: "./vitest.unit.setup.ts",
+    include: ["./src/{application,domain,presentation}/**/*.test.ts"],
+    clearMocks: true,
+    sequence: { groupOrder: 1 },
+  },
+});
+```
+
+**統合テスト共通設定 (vitest.integration.shared.ts):**
+
+```typescript
+import { defineProject } from "vitest/config";
+
+export default defineProject({
+  test: {
+    globalSetup: "./vitest.integration.global-setup.ts",
+    setupFiles: "./vitest.integration.setup.ts",
+    include: ["src/infrastructure/**/*.test.ts"],
+    testTimeout: 120000, // 2 min
+    clearMocks: true,
+    isolate: false,
+    maxWorkers: 1,
+    sequence: { groupOrder: 2 },
+  },
+});
+```
+
+**appviewの構成（完了）:**
 
 ```
 apps/appview/
   vitest.config.ts                 # projectsで unit/integration を参照
-  vitest.unit.config.ts            # 単体テスト設定
+  vitest.unit.config.ts            # mergeConfig(sharedConfig, ...)
   vitest.unit.setup.ts             # インメモリリポジトリのクリア
-  vitest.integration.config.ts     # 統合テスト設定
+  vitest.integration.config.ts     # mergeConfig(sharedConfig, ...)
   vitest.integration.setup.ts      # DBリセット
   vitest.integration.global-setup.ts  # DB起動
 ```
 
-**ルートvitest.config.tsの設定:**
+**workerの構成（完了）:**
 
-```typescript
-export default defineConfig({
-  test: {
-    projects: [
-      "apps/*",
-      "!apps/appview", // appviewは個別設定を使用
-      "apps/appview/vitest.unit.config.ts",
-      "apps/appview/vitest.integration.config.ts",
-      "packages/*",
-    ],
-  },
-});
+```
+apps/worker/
+  vitest.config.ts                 # projectsで unit/integration を参照
+  vitest.unit.config.ts            # mergeConfig(sharedConfig, ...) + 移行済みテストのinclude
+  vitest.unit.setup.ts             # インメモリリポジトリのクリア
+  vitest.integration.config.ts     # mergeConfig(sharedConfig, ...) + 移行済みテストのexclude
+  vitest.integration.setup.ts      # DBリセット
+  vitest.integration.global-setup.ts  # DB起動
 ```
 
-**単体テスト設定 (vitest.unit.config.ts):**
+**各アプリの設定例:**
 
 ```typescript
-export default defineProject({
-  test: {
-    name: "appview:unit",
-    setupFiles: "./vitest.unit.setup.ts",
-    include: ["./src/{application,domain,presentation}/**/*.test.ts"],
-    clearMocks: true,
-  },
-});
-```
+// apps/appview/vitest.unit.config.ts
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.unit.shared.js";
 
-**統合テスト設定 (vitest.integration.config.ts):**
-
-```typescript
-export default defineProject({
-  test: {
-    name: "appview:integration",
-    globalSetup: "./vitest.integration.global-setup.ts",
-    setupFiles: "./vitest.integration.setup.ts",
-    include: ["src/infrastructure/**/*.test.ts"],
-    testTimeout: 120000,
-    clearMocks: true,
-    isolate: false,
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "appview:unit",
+      // includeはsharedConfigから継承
     },
-  },
-});
+  }),
+);
 ```
 
-**worker/blob-proxyへの反映時の注意:**
+```typescript
+// apps/appview/vitest.integration.config.ts
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.integration.shared.js";
 
-- 同様のファイル構成を作成
-- ルートvitest.config.tsにappviewと同様のパターンで追加
-- includeパスは各アプリのディレクトリ構造に合わせて調整
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "appview:integration",
+      // includeはsharedConfigから継承
+    },
+  }),
+);
+```
 
 ---
 
@@ -687,42 +718,49 @@ tracked-actor-checker.ts           → tracked-actor-checker/tracked-actor-check
 
 **移行期間中のvitest設定:**
 
-workerの移行期間中は、以下のようにvitest設定を分離します：
+workerの移行期間中は、`mergeConfig`を使用してshared設定を継承しつつ、移行済みテストを個別に指定します：
 
 ```typescript
-// vitest.unit.config.ts
-export default defineProject({
-  test: {
-    name: "worker:unit",
-    setupFiles: "./vitest.unit.setup.ts",
-    include: [
-      "./src/application/services/indexer/follow-indexer.test.ts",
-      // 移行済みテストを順次追加
-    ],
-    clearMocks: true,
-  },
-});
+// vitest.unit.config.ts（移行期間中）
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.unit.shared.js";
 
-// vitest.integration.config.ts
-export default defineProject({
-  test: {
-    name: "worker:integration",
-    globalSetup: "./vitest.integration.global-setup.ts",
-    setupFiles: "./vitest.integration.setup.ts",
-    include: [
-      "src/infrastructure/**/*.test.ts",
-      "src/{application,domain,presentation}/**/*.test.ts",
-    ],
-    exclude: [
-      "src/application/services/indexer/follow-indexer.test.ts",
-      // unit設定に追加したテストを順次追加
-    ],
-    testTimeout: 120000,
-    clearMocks: true,
-    isolate: false,
-    poolOptions: { forks: { singleFork: true } },
-  },
-});
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "worker:unit",
+      // sharedConfigのincludeを上書きして、移行済みテストのみを指定
+      include: [
+        "./src/application/services/indexer/follow-indexer.test.ts",
+        // 移行済みテストを順次追加
+      ],
+    },
+  }),
+);
+
+// vitest.integration.config.ts（移行期間中）
+import { defineProject, mergeConfig } from "vitest/config";
+import sharedConfig from "../../vitest.integration.shared.js";
+
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "worker:integration",
+      // sharedConfigのincludeを上書きして、未移行テストも含める
+      include: [
+        "src/infrastructure/**/*.test.ts",
+        "src/{application,domain,presentation}/**/*.test.ts",
+      ],
+      // 移行済みテストを除外
+      exclude: [
+        "src/application/services/indexer/follow-indexer.test.ts",
+        // 移行済みテストを順次追加
+      ],
+    },
+  }),
+);
 ```
 
 **移行手順:**
@@ -733,15 +771,15 @@ export default defineProject({
 
 **移行完了後:**
 
-すべてのテストの移行が完了したら、以下のように変更：
+すべてのテストの移行が完了したら、include/excludeを削除してsharedConfigから継承：
 
 ```typescript
 // vitest.unit.config.ts
-include: ["./src/{application,domain,presentation}/**/*.test.ts"];
+// includeはsharedConfigから継承（./src/{application,domain,presentation}/**/*.test.ts）
 
 // vitest.integration.config.ts
-include: ["src/infrastructure/**/*.test.ts"];
-exclude: []; // 削除
+// includeはsharedConfigから継承（src/infrastructure/**/*.test.ts）
+// excludeは削除
 ```
 
 ---

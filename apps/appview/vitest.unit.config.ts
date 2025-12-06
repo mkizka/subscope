@@ -1,11 +1,12 @@
-import { defineProject } from "vitest/config";
+import { defineProject, mergeConfig } from "vitest/config";
 
-export default defineProject({
-  test: {
-    name: "appview:unit",
-    setupFiles: "./vitest.unit.setup.ts",
-    include: ["./src/{application,domain,presentation}/**/*.test.ts"],
-    clearMocks: true,
-    sequence: { groupOrder: 1 },
-  },
-});
+import sharedConfig from "../../vitest.unit.shared.js";
+
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      name: "appview:unit",
+    },
+  }),
+);
