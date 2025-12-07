@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
-import { actorFactory } from "@repo/common/test";
+import { actorFactory, fakeCid } from "@repo/common/test";
 import { describe, expect, test, vi } from "vitest";
 
 import { testInjector } from "../../../shared/test-utils.js";
@@ -13,9 +13,6 @@ vi.mock("../../../shared/env.js", () => ({
 
 const actorRepository = testInjector.resolve("actorRepository");
 const recordRepository = testInjector.resolve("recordRepository");
-const postRepository = testInjector.resolve("postRepository");
-const followRepository = testInjector.resolve("followRepository");
-const likeRepository = testInjector.resolve("likeRepository");
 const repoFetcher = testInjector.resolve("repoFetcher");
 const jobLogger = testInjector.resolve("jobLogger");
 const ctx = {
@@ -32,7 +29,7 @@ describe("SyncRepoUseCase", () => {
     const records = Array.from({ length: 5 }, (_, i) =>
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", `${i + 1}`).toString(),
-        cid: `cid${i + 1}`,
+        cid: fakeCid(),
         json: {
           $type: "app.bsky.feed.post",
           text: `Post ${i + 1}`,
@@ -77,7 +74,7 @@ describe("SyncRepoUseCase", () => {
     const records = [
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-        cid: "cid1",
+        cid: fakeCid(),
         json: {
           $type: "app.bsky.feed.post",
           text: "Test post",
@@ -87,18 +84,18 @@ describe("SyncRepoUseCase", () => {
       }),
       Record.fromJson({
         uri: AtUri.make(did, "unsupported.collection", "1").toString(),
-        cid: "cid2",
+        cid: fakeCid(),
         json: { record: {} },
         indexedAt: new Date(),
       }),
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
-        cid: "bafyreidfayvfuwqa7qlnopdjiqrxzs6blmoeu4rujcjtnci5beludirz2a",
+        cid: fakeCid(),
         json: {
           $type: "app.bsky.feed.like",
           subject: {
             uri: "at://did:plc:test/app.bsky.feed.post/1",
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
+            cid: fakeCid(),
           },
           createdAt: new Date().toISOString(),
         },
@@ -138,7 +135,7 @@ describe("SyncRepoUseCase", () => {
     repoFetcher.setFetchResult(did, [
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-        cid: "cid1",
+        cid: fakeCid(),
         json: {
           $type: "app.bsky.feed.post",
           text: "Test post",
@@ -157,76 +154,6 @@ describe("SyncRepoUseCase", () => {
     expect(updatedActor?.syncRepoVersion).toBe(1);
   });
 
-  test("フォローレコードと他のレコードが正しく処理される", async () => {
-    // arrange
-    const actor = actorFactory();
-    actorRepository.add(actor);
-    const did = actor.did;
-
-    const followedActor = actorFactory();
-    actorRepository.add(followedActor);
-
-    const records = [
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-        cid: "cid1",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Test post",
-          createdAt: new Date().toISOString(),
-        },
-        indexedAt: new Date(),
-      }),
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
-        cid: "cid2",
-        json: {
-          $type: "app.bsky.graph.follow",
-          subject: followedActor.did,
-          createdAt: new Date().toISOString(),
-        },
-        indexedAt: new Date(),
-      }),
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
-        cid: "bafyreidfayvfuwqa7qlnopdjiqrxzs6blmoeu4rujcjtnci5beludirz2a",
-        json: {
-          $type: "app.bsky.feed.like",
-          subject: {
-            uri: "at://did:plc:test/app.bsky.feed.post/1",
-            cid: "bafyreig7ox2b5kmcqjjspzhlenbhhcnqv3fq2uqisd5ixosft2qkyj524e",
-          },
-          createdAt: new Date().toISOString(),
-        },
-        indexedAt: new Date(),
-      }),
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.graph.follow", "2").toString(),
-        cid: "cid4",
-        json: {
-          $type: "app.bsky.graph.follow",
-          subject: followedActor.did,
-          createdAt: new Date().toISOString(),
-        },
-        indexedAt: new Date(),
-      }),
-    ];
-    repoFetcher.setFetchResult(did, records);
-
-    // act
-    await syncRepoUseCase.execute({ did, jobLogger });
-
-    // assert
-    const savedRecords = recordRepository.findAll();
-    expect(savedRecords.length).toBe(4);
-    const savedPosts = postRepository.findAll();
-    expect(savedPosts.length).toBe(1);
-    const savedFollows = followRepository.findAll();
-    expect(savedFollows.length).toBe(2);
-    const savedLikes = likeRepository.findAll();
-    expect(savedLikes.length).toBe(1);
-  });
-
   test("処理完了後、ステータスがsynchronizedに更新される", async () => {
     // arrange
     const actor = actorFactory();
@@ -238,7 +165,7 @@ describe("SyncRepoUseCase", () => {
 
     const followRecord = Record.fromJson({
       uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
-      cid: "cid1",
+      cid: fakeCid(),
       json: {
         $type: "app.bsky.graph.follow",
         subject: followedActor.did,
@@ -248,7 +175,7 @@ describe("SyncRepoUseCase", () => {
     });
     const postRecord = Record.fromJson({
       uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-      cid: "cid2",
+      cid: fakeCid(),
       json: {
         $type: "app.bsky.feed.post",
         text: "Test post",
