@@ -7,7 +7,7 @@ import { createInjector } from "typed-inject";
 import { describe, expect, test, vi } from "vitest";
 import { mock, mockDeep } from "vitest-mock-extended";
 
-import type { JobLogger } from "../../shared/job.js";
+import type { JobLogger } from "../../../shared/job.js";
 import { RepoFetcher } from "./repo-fetcher.js";
 
 const mockClient = mockDeep<AtpBaseClient>();

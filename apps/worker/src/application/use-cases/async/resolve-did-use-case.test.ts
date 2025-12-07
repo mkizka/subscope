@@ -1,28 +1,25 @@
 import { asDid } from "@atproto/did";
-import type { IDidResolver } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory } from "@repo/common/test";
+import { asHandle } from "@repo/common/utils";
 import { describe, expect, test } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { ResolveDidUseCase } from "./resolve-did-use-case.js";
 
 describe("ResolveDidUseCase", () => {
-  const mockDidResolver = mock<IDidResolver>();
-  const { testInjector, ctx } = testSetup;
+  const actorRepository = testInjector.resolve("actorRepository");
+  const didResolver = testInjector.resolve("didResolver");
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
-  const resolveDidUseCase = testInjector
-    .provideValue("didResolver", mockDidResolver)
-    .provideClass("actorRepository", ActorRepository)
-    .injectClass(ResolveDidUseCase);
+  const resolveDidUseCase = testInjector.injectClass(ResolveDidUseCase);
 
   test("既存のactorが存在しない場合、新規actorを作成する", async () => {
     // arrange
     const did = asDid("did:plc:new-actor");
-    const handle = "newactor.test";
-    mockDidResolver.resolve.mockResolvedValue({
+    const handle = asHandle("newactor.test");
+    didResolver.setResolveResult(did, {
       handle,
       signingKey: "test-key",
       pds: new URL("https://example.com"),
@@ -32,42 +29,35 @@ describe("ResolveDidUseCase", () => {
     await resolveDidUseCase.execute(did);
 
     // assert
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did));
-    expect(actors.length).toBe(1);
-    expect(actors[0]?.did).toBe(did);
-    expect(actors[0]?.handle).toBe(handle);
+    const actor = await actorRepository.findByDid({ ctx, did });
+    expect(actor).not.toBeNull();
+    expect(actor?.did).toBe(did);
+    expect(actor?.handle).toBe(handle);
   });
 
   test("既存のactorが存在する場合、ハンドルを更新する", async () => {
     // arrange
-    const oldHandle = "oldhandle.test";
-    const newHandle = "newhandle.test";
+    const oldHandle = asHandle("oldhandle.test");
+    const newHandle = asHandle("newhandle.test");
+    const actor = actorFactory({ handle: oldHandle });
+    actorRepository.add(actor);
 
-    const actor = await actorFactory(ctx.db)
-      .props({
-        handle: () => oldHandle,
-      })
-      .create();
-
-    mockDidResolver.resolve.mockResolvedValue({
+    didResolver.setResolveResult(actor.did, {
       handle: newHandle,
       signingKey: "test-key",
       pds: new URL("https://example.com"),
     });
 
     // act
-    await resolveDidUseCase.execute(asDid(actor.did));
+    await resolveDidUseCase.execute(actor.did);
 
     // assert
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, actor.did));
-    expect(actors.length).toBe(1);
-    expect(actors[0]?.did).toBe(actor.did);
-    expect(actors[0]?.handle).toBe(newHandle);
+    const updatedActor = await actorRepository.findByDid({
+      ctx,
+      did: actor.did,
+    });
+    expect(updatedActor).not.toBeNull();
+    expect(updatedActor?.did).toBe(actor.did);
+    expect(updatedActor?.handle).toBe(newHandle);
   });
 });

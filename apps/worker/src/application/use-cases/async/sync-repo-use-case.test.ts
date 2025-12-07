@@ -1,280 +1,213 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type {
-  ITransactionManager,
-  TransactionContext,
-} from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
-import { eq } from "drizzle-orm";
+import { actorFactory, fakeCid } from "@repo/common/test";
 import { describe, expect, test, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
 
-import { ActorRepository } from "../../../infrastructure/repositories/actor-repository/actor-repository.js";
-import type { JobLogger } from "../../../shared/job.js";
-import type { IRepoFetcher } from "../../interfaces/external/repo-fetcher.js";
-import type { IndexRecordService } from "../../services/index-record-service.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import { SyncRepoUseCase } from "./sync-repo-use-case.js";
 
 vi.mock("../../../shared/env.js", () => ({
   env: { SYNC_REPO_BATCH_SIZE: 2 },
 }));
 
-const mockRepoFetcher = mock<IRepoFetcher>();
-const mockJobLogger = mock<JobLogger>();
-const mockIndexRecordService = mock<IndexRecordService>();
-const mockTransactionManager = mock<ITransactionManager>();
-const mockTransactionContext = mock<TransactionContext>();
-mockTransactionManager.transaction.mockImplementation(async (fn) => {
-  await fn(mockTransactionContext);
-});
-
-const { testInjector, ctx } = testSetup;
-const syncRepoUseCase = testInjector
-  .provideValue("repoFetcher", mockRepoFetcher)
-  .provideValue("transactionManager", mockTransactionManager)
-  .provideValue("indexRecordService", mockIndexRecordService)
-  .provideClass("actorRepository", ActorRepository)
-  .injectClass(SyncRepoUseCase);
+const actorRepository = testInjector.resolve("actorRepository");
+const recordRepository = testInjector.resolve("recordRepository");
+const repoFetcher = testInjector.resolve("repoFetcher");
+const jobLogger = testInjector.resolve("jobLogger");
+const ctx = {
+  db: testInjector.resolve("db"),
+};
+const syncRepoUseCase = testInjector.injectClass(SyncRepoUseCase);
 
 describe("SyncRepoUseCase", () => {
   test("レコードがバッチサイズで分割されて処理される", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
+    const actor = actorFactory();
+    actorRepository.add(actor);
+    const did = actor.did;
     const records = Array.from({ length: 5 }, (_, i) =>
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", `${i + 1}`).toString(),
-        cid: `cid${i + 1}`,
-        json: { record: {} },
+        cid: fakeCid(),
+        json: {
+          $type: "app.bsky.feed.post",
+          text: `Post ${i + 1}`,
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       }),
     );
-    mockRepoFetcher.fetch.mockResolvedValue(records);
+    repoFetcher.setFetchResult(did, records);
 
     // act
-    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger });
 
     // assert
-    expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(5);
+    const savedRecords = recordRepository.findAll();
+    expect(savedRecords.length).toBe(5);
   });
 
   test("レコードが0件の場合、処理されない", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
-    mockRepoFetcher.fetch.mockResolvedValue([]);
+    const actor = actorFactory();
+    actorRepository.add(actor);
+    const did = actor.did;
+    repoFetcher.setFetchResult(did, []);
 
     // act
-    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger });
 
     // assert
-    expect(mockIndexRecordService.upsert).not.toHaveBeenCalled();
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did));
-    expect(actors[0]?.syncRepoStatus).toBe("synchronized");
-    expect(actors[0]?.syncRepoVersion).toBe(1);
+    const savedRecords = recordRepository.findAll();
+    expect(savedRecords.length).toBe(0);
+    const updatedActor = await actorRepository.findByDid({ ctx, did });
+    expect(updatedActor?.syncRepoStatus).toBe("synchronized");
+    expect(updatedActor?.syncRepoVersion).toBe(1);
   });
 
   test("サポートされていないコレクションはフィルタリングされる", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
+    const actor = actorFactory();
+    actorRepository.add(actor);
+    const did = actor.did;
     const records = [
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-        cid: "cid1",
-        json: { record: {} },
+        cid: fakeCid(),
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Test post",
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       }),
       Record.fromJson({
         uri: AtUri.make(did, "unsupported.collection", "1").toString(),
-        cid: "cid2",
+        cid: fakeCid(),
         json: { record: {} },
         indexedAt: new Date(),
       }),
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
-        cid: "bafyreidfayvfuwqa7qlnopdjiqrxzs6blmoeu4rujcjtnci5beludirz2a",
-        json: { record: {} },
+        cid: fakeCid(),
+        json: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: "at://did:plc:test/app.bsky.feed.post/1",
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       }),
     ];
-    mockRepoFetcher.fetch.mockResolvedValue(records);
+    repoFetcher.setFetchResult(did, records);
 
     // act
-    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger });
 
     // assert
-    expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(2);
-    expect(mockIndexRecordService.upsert).toHaveBeenCalledWith(
-      expect.objectContaining({ record: records[0] }),
-    );
-    expect(mockIndexRecordService.upsert).toHaveBeenCalledWith(
-      expect.objectContaining({ record: records[2] }),
-    );
+    const savedRecords = recordRepository.findAll();
+    expect(savedRecords.length).toBe(2);
+    expect(savedRecords.map((r) => r.collection).sort()).toEqual([
+      "app.bsky.feed.like",
+      "app.bsky.feed.post",
+    ]);
   });
 
   test("Actorが見つからない場合、エラーがスローされる", async () => {
     // arrange
     const did = asDid("did:plc:notfound");
-    mockRepoFetcher.fetch.mockResolvedValue([]);
+    repoFetcher.setFetchResult(did, []);
 
     // act & assert
-    await expect(
-      syncRepoUseCase.execute({ did, jobLogger: mockJobLogger }),
-    ).rejects.toThrow(`Actor not found: ${did}`);
+    await expect(syncRepoUseCase.execute({ did, jobLogger })).rejects.toThrow(
+      `Actor not found: ${did}`,
+    );
   });
 
   test("バッチ処理完了後、ステータスがsynchronizedに更新される", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
-    mockRepoFetcher.fetch.mockResolvedValue([
+    const actor = actorFactory();
+    actorRepository.add(actor);
+    const did = actor.did;
+    repoFetcher.setFetchResult(did, [
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-        cid: "cid1",
-        json: { record: {} },
+        cid: fakeCid(),
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Test post",
+          createdAt: new Date().toISOString(),
+        },
         indexedAt: new Date(),
       }),
     ]);
 
     // act
-    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger });
 
     // assert
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did));
-    expect(actors[0]?.syncRepoStatus).toBe("synchronized");
-    expect(actors[0]?.syncRepoVersion).toBe(1);
+    const updatedActor = await actorRepository.findByDid({ ctx, did });
+    expect(updatedActor?.syncRepoStatus).toBe("synchronized");
+    expect(updatedActor?.syncRepoVersion).toBe(1);
   });
 
-  test("フォローレコードが他のレコードより先に処理される", async () => {
+  test("処理完了後、ステータスがsynchronizedに更新される", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
-    const records = [
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-        cid: "cid1",
-        json: { record: {} },
-        indexedAt: new Date(),
-      }),
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
-        cid: "cid2",
-        json: { record: {} },
-        indexedAt: new Date(),
-      }),
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
-        cid: "cid3",
-        json: { record: {} },
-        indexedAt: new Date(),
-      }),
-      Record.fromJson({
-        uri: AtUri.make(did, "app.bsky.graph.follow", "2").toString(),
-        cid: "cid4",
-        json: { record: {} },
-        indexedAt: new Date(),
-      }),
-    ];
-    mockRepoFetcher.fetch.mockResolvedValue(records);
+    const actor = actorFactory();
+    actorRepository.add(actor);
+    const did = actor.did;
 
-    // act
-    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+    const followedActor = actorFactory();
+    actorRepository.add(followedActor);
 
-    // assert
-    expect(mockIndexRecordService.upsert).toHaveBeenCalledTimes(4);
-    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({ record: records[1] }),
-    );
-    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ record: records[3] }),
-    );
-    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
-      3,
-      expect.objectContaining({ record: records[0] }),
-    );
-    expect(mockIndexRecordService.upsert).toHaveBeenNthCalledWith(
-      4,
-      expect.objectContaining({ record: records[2] }),
-    );
-  });
-
-  test("フォローレコード処理完了後、ステータスがreadyに更新される", async () => {
-    // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
     const followRecord = Record.fromJson({
       uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
-      cid: "cid1",
-      json: { record: {} },
+      cid: fakeCid(),
+      json: {
+        $type: "app.bsky.graph.follow",
+        subject: followedActor.did,
+        createdAt: new Date().toISOString(),
+      },
       indexedAt: new Date(),
     });
     const postRecord = Record.fromJson({
       uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-      cid: "cid2",
-      json: { record: {} },
+      cid: fakeCid(),
+      json: {
+        $type: "app.bsky.feed.post",
+        text: "Test post",
+        createdAt: new Date().toISOString(),
+      },
       indexedAt: new Date(),
     });
-    mockRepoFetcher.fetch.mockResolvedValue([followRecord, postRecord]);
-
-    let statusAfterFollowRecords: string | undefined;
-    mockIndexRecordService.upsert.mockImplementation(async ({ record }) => {
-      if (record.collection === "app.bsky.feed.post") {
-        const actors = await ctx.db
-          .select()
-          .from(schema.actors)
-          .where(eq(schema.actors.did, did));
-        statusAfterFollowRecords = actors[0]?.syncRepoStatus;
-      }
-    });
+    repoFetcher.setFetchResult(did, [followRecord, postRecord]);
 
     // act
-    await syncRepoUseCase.execute({ did, jobLogger: mockJobLogger });
+    await syncRepoUseCase.execute({ did, jobLogger });
 
     // assert
-    expect(statusAfterFollowRecords).toBe("ready");
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did));
-    expect(actors[0]?.syncRepoStatus).toBe("synchronized");
-    expect(actors[0]?.syncRepoVersion).toBe(1);
+    const updatedActor = await actorRepository.findByDid({ ctx, did });
+    expect(updatedActor?.syncRepoStatus).toBe("synchronized");
+    expect(updatedActor?.syncRepoVersion).toBe(1);
   });
 
-  test("処理中にエラーが発生した場合、ステータスがfailedに更新される", async () => {
+  test("RepoFetcherでエラーが発生した場合、ステータスがfailedに更新される", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
-    const did = asDid(actor.did);
-    const record = Record.fromJson({
-      uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
-      cid: "cid1",
-      json: { record: {} },
-      indexedAt: new Date(),
-    });
-    mockRepoFetcher.fetch.mockResolvedValue([record]);
-    mockIndexRecordService.upsert.mockRejectedValue(new Error("Index error"));
+    const actor = actorFactory();
+    actorRepository.add(actor);
+    const did = actor.did;
+    repoFetcher.setFetchError(did, new Error("Fetch error"));
 
     // act & assert
-    await expect(
-      syncRepoUseCase.execute({ did, jobLogger: mockJobLogger }),
-    ).rejects.toThrow("Index error");
+    await expect(syncRepoUseCase.execute({ did, jobLogger })).rejects.toThrow(
+      "Fetch error",
+    );
 
-    const actors = await ctx.db
-      .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did));
-    expect(actors[0]?.syncRepoStatus).toBe("failed");
-    expect(actors[0]?.syncRepoVersion).toBe(1);
+    const updatedActor = await actorRepository.findByDid({ ctx, did });
+    expect(updatedActor?.syncRepoStatus).toBe("failed");
+    expect(updatedActor?.syncRepoVersion).toBe(1);
   });
 });

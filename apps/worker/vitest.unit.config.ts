@@ -18,6 +18,8 @@ export default mergeConfig(
         "./src/application/use-cases/commit/index-commit-use-case.test.ts",
         "./src/application/use-cases/account/handle-account-use-case.test.ts",
         "./src/application/use-cases/identity/upsert-identity-use-case.test.ts",
+        "./src/application/use-cases/async/resolve-did-use-case.test.ts",
+        "./src/application/use-cases/async/sync-repo-use-case.test.ts",
       ],
     },
   }),
