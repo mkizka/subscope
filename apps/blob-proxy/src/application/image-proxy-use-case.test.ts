@@ -1,14 +1,14 @@
 import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
 import { DidResolutionError } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { testSetup } from "@repo/test-utils";
-import { eq, or } from "drizzle-orm";
+import { LoggerManager } from "@repo/common/infrastructure";
+import { createInjector } from "typed-inject";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
+import { CacheMetadata } from "../domain/cache-metadata.js";
 import { ImageBlob } from "../domain/image-blob.js";
 import { ImageProxyRequest } from "../domain/image-proxy-request.js";
-import { CacheMetadataRepository } from "../infrastructure/cache-metadata-repository.js";
+import { InMemoryCacheMetadataRepository } from "../infrastructure/cache-metadata-repository.in-memory.js";
 import { ImageProxyUseCase } from "./image-proxy-use-case.js";
 import type { IBlobFetcher } from "./interfaces/blob-fetcher.js";
 import { BlobFetchFailedError } from "./interfaces/blob-fetcher.js";
@@ -24,36 +24,42 @@ describe("ImageProxyUseCase", () => {
   const mockImageResizer = mock<IImageResizer>();
   const mockMetricReporter = mock<IMetricReporter>();
 
-  const { testInjector, ctx } = testSetup;
+  const testInjector = createInjector()
+    .provideValue("loggerManager", new LoggerManager("info"))
+    .provideValue("didResolver", mockDidResolver)
+    .provideValue("blobFetcher", mockBlobFetcher)
+    .provideValue("imageCacheStorage", mockImageCacheStorage)
+    .provideValue("imageResizer", mockImageResizer)
+    .provideValue("metricReporter", mockMetricReporter)
+    .provideClass("cacheMetadataRepository", InMemoryCacheMetadataRepository)
+    .provideClass("fetchBlobService", FetchBlobService)
+    .provideClass("imageCacheService", ImageCacheService);
+
+  const imageProxyUseCase = testInjector.injectClass(ImageProxyUseCase);
+  const cacheMetadataRepo = testInjector.resolve("cacheMetadataRepository");
 
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
+    cacheMetadataRepo.clear();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  const imageProxyUseCase = testInjector
-    .provideValue("didResolver", mockDidResolver)
-    .provideValue("blobFetcher", mockBlobFetcher)
-    .provideValue("imageCacheStorage", mockImageCacheStorage)
-    .provideValue("imageResizer", mockImageResizer)
-    .provideValue("metricReporter", mockMetricReporter)
-    .provideClass("cacheMetadataRepository", CacheMetadataRepository)
-    .provideClass("fetchBlobService", FetchBlobService)
-    .provideClass("imageCacheService", ImageCacheService)
-    .injectClass(ImageProxyUseCase);
-
   test("キャッシュがヒットした場合、キャッシュされた画像を返してヒットメトリクスを記録する", async () => {
     // arrange
     const cachedData = new Uint8Array([1, 2, 3]);
 
-    await ctx.db.insert(schema.imageBlobCache).values({
-      cacheKey: "avatar/did:plc:example123/bafkreiabc123",
-      expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
-    });
+    await cacheMetadataRepo.save(
+      new CacheMetadata({
+        cacheKey: "avatar/did:plc:example123/bafkreiabc123",
+        status: "success",
+        imageBlob: null,
+        expiredAt: new Date("2024-01-08T00:00:00.000Z"),
+      }),
+    );
 
     mockImageCacheStorage.read.mockResolvedValueOnce(cachedData);
 
@@ -121,19 +127,14 @@ describe("ImageProxyUseCase", () => {
       }),
     });
 
-    const savedCache = await ctx.db
-      .select()
-      .from(schema.imageBlobCache)
-      .where(
-        eq(
-          schema.imageBlobCache.cacheKey,
-          "feed_thumbnail/did:plc:example123/bafkreiabc456",
-        ),
-      );
-    expect(savedCache).toHaveLength(1);
-    expect(savedCache[0]).toMatchObject({
+    const savedCache = await cacheMetadataRepo.get(
+      "feed_thumbnail/did:plc:example123/bafkreiabc456",
+    );
+    expect(savedCache).not.toBeNull();
+    expect(savedCache).toMatchObject({
       cacheKey: "feed_thumbnail/did:plc:example123/bafkreiabc456",
-      expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
+      status: "success",
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"),
     });
 
     expect(mockImageCacheStorage.save).toHaveBeenCalledWith(
@@ -174,32 +175,26 @@ describe("ImageProxyUseCase", () => {
     );
 
     // assert
-    const savedCaches = await ctx.db
-      .select()
-      .from(schema.imageBlobCache)
-      .where(
-        or(
-          eq(
-            schema.imageBlobCache.cacheKey,
-            "avatar/did:plc:example789/bafkreidef789",
-          ),
-          eq(
-            schema.imageBlobCache.cacheKey,
-            "avatar_thumbnail/did:plc:example789/bafkreidef789",
-          ),
-        ),
-      );
-    expect(savedCaches).toHaveLength(2);
-    expect(savedCaches).toMatchObject([
-      {
-        cacheKey: "avatar/did:plc:example789/bafkreidef789",
-        expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
-      },
-      {
-        cacheKey: "avatar_thumbnail/did:plc:example789/bafkreidef789",
-        expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
-      },
-    ]);
+    const cache1 = await cacheMetadataRepo.get(
+      "avatar/did:plc:example789/bafkreidef789",
+    );
+    const cache2 = await cacheMetadataRepo.get(
+      "avatar_thumbnail/did:plc:example789/bafkreidef789",
+    );
+
+    expect(cache1).not.toBeNull();
+    expect(cache1).toMatchObject({
+      cacheKey: "avatar/did:plc:example789/bafkreidef789",
+      status: "success",
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"),
+    });
+
+    expect(cache2).not.toBeNull();
+    expect(cache2).toMatchObject({
+      cacheKey: "avatar_thumbnail/did:plc:example789/bafkreidef789",
+      status: "success",
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"),
+    });
 
     expect(mockImageCacheStorage.save).toHaveBeenCalledTimes(2);
   });
@@ -286,19 +281,14 @@ describe("ImageProxyUseCase", () => {
       ),
     ).rejects.toThrow("Cache write failed");
 
-    const savedCache = await ctx.db
-      .select()
-      .from(schema.imageBlobCache)
-      .where(
-        eq(
-          schema.imageBlobCache.cacheKey,
-          "avatar/did:plc:example777/bafkreiabc777",
-        ),
-      );
-    expect(savedCache).toHaveLength(1);
-    expect(savedCache[0]).toMatchObject({
+    const savedCache = await cacheMetadataRepo.get(
+      "avatar/did:plc:example777/bafkreiabc777",
+    );
+    expect(savedCache).not.toBeNull();
+    expect(savedCache).toMatchObject({
       cacheKey: "avatar/did:plc:example777/bafkreiabc777",
-      expiredAt: new Date("2024-01-08T00:00:00.000Z"), // 成功キャッシュは1週間後
+      status: "success",
+      expiredAt: new Date("2024-01-08T00:00:00.000Z"),
     });
 
     expect(mockImageCacheStorage.save).toHaveBeenCalled();
@@ -306,11 +296,14 @@ describe("ImageProxyUseCase", () => {
 
   test("ネガティブキャッシュがヒットした場合、nullを返してヒットメトリクスを記録する", async () => {
     // arrange
-    await ctx.db.insert(schema.imageBlobCache).values({
-      cacheKey: "avatar/did:plc:example555/bafkreiabc555",
-      expiredAt: new Date("2024-01-01T00:05:00.000Z"), // 失敗キャッシュは5分後
-      status: "failed",
-    });
+    await cacheMetadataRepo.save(
+      new CacheMetadata({
+        cacheKey: "avatar/did:plc:example555/bafkreiabc555",
+        status: "failed",
+        imageBlob: null,
+        expiredAt: new Date("2024-01-01T00:05:00.000Z"),
+      }),
+    );
 
     // act
     const result = await imageProxyUseCase.execute(
@@ -365,20 +358,14 @@ describe("ImageProxyUseCase", () => {
     expect(mockImageResizer.resize).not.toHaveBeenCalled();
     expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
 
-    const savedCache = await ctx.db
-      .select()
-      .from(schema.imageBlobCache)
-      .where(
-        eq(
-          schema.imageBlobCache.cacheKey,
-          "banner/did:plc:example999/bafkreiabc999",
-        ),
-      );
-    expect(savedCache).toHaveLength(1);
-    expect(savedCache[0]).toMatchObject({
+    const savedCache = await cacheMetadataRepo.get(
+      "banner/did:plc:example999/bafkreiabc999",
+    );
+    expect(savedCache).not.toBeNull();
+    expect(savedCache).toMatchObject({
       cacheKey: "banner/did:plc:example999/bafkreiabc999",
       status: "failed",
-      expiredAt: new Date("2024-01-01T00:05:00.000Z"), // 失敗キャッシュは5分後
+      expiredAt: new Date("2024-01-01T00:05:00.000Z"),
     });
   });
 
@@ -410,20 +397,14 @@ describe("ImageProxyUseCase", () => {
     expect(mockImageResizer.resize).not.toHaveBeenCalled();
     expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
 
-    const savedCache = await ctx.db
-      .select()
-      .from(schema.imageBlobCache)
-      .where(
-        eq(
-          schema.imageBlobCache.cacheKey,
-          "feed_fullsize/did:plc:example888/bafkreiabc888",
-        ),
-      );
-    expect(savedCache).toHaveLength(1);
-    expect(savedCache[0]).toMatchObject({
+    const savedCache = await cacheMetadataRepo.get(
+      "feed_fullsize/did:plc:example888/bafkreiabc888",
+    );
+    expect(savedCache).not.toBeNull();
+    expect(savedCache).toMatchObject({
       cacheKey: "feed_fullsize/did:plc:example888/bafkreiabc888",
       status: "failed",
-      expiredAt: new Date("2024-01-01T00:05:00.000Z"), // 失敗キャッシュは5分後
+      expiredAt: new Date("2024-01-01T00:05:00.000Z"),
     });
   });
 });
