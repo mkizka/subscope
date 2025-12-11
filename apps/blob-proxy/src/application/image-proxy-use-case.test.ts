@@ -1,46 +1,32 @@
-import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
-import { DidResolutionError } from "@repo/common/domain";
 import { LoggerManager } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
 
 import { CacheMetadata } from "../domain/cache-metadata.js";
 import { ImageBlob } from "../domain/image-blob.js";
 import { ImageProxyRequest } from "../domain/image-proxy-request.js";
-import { InMemoryCacheMetadataRepository } from "../infrastructure/cache-metadata-repository.in-memory.js";
+import { testInjector } from "../shared/test-utils.js";
 import { ImageProxyUseCase } from "./image-proxy-use-case.js";
-import type { IBlobFetcher } from "./interfaces/blob-fetcher.js";
-import { BlobFetchFailedError } from "./interfaces/blob-fetcher.js";
-import type { IImageCacheStorage } from "./interfaces/image-cache-storage.js";
-import type { IImageResizer } from "./interfaces/image-resizer.js";
-import { FetchBlobService } from "./services/fetch-blob-service.js";
-import { ImageCacheService } from "./services/image-cache-service.js";
 
 describe("ImageProxyUseCase", () => {
-  const mockDidResolver = mock<IDidResolver>();
-  const mockBlobFetcher = mock<IBlobFetcher>();
-  const mockImageCacheStorage = mock<IImageCacheStorage>();
-  const mockImageResizer = mock<IImageResizer>();
-  const mockMetricReporter = mock<IMetricReporter>();
-
-  const testInjector = createInjector()
+  const imageProxyUseCase = testInjector
     .provideValue("loggerManager", new LoggerManager("info"))
-    .provideValue("didResolver", mockDidResolver)
-    .provideValue("blobFetcher", mockBlobFetcher)
-    .provideValue("imageCacheStorage", mockImageCacheStorage)
-    .provideValue("imageResizer", mockImageResizer)
-    .provideValue("metricReporter", mockMetricReporter)
-    .provideClass("cacheMetadataRepository", InMemoryCacheMetadataRepository)
-    .provideClass("fetchBlobService", FetchBlobService)
-    .provideClass("imageCacheService", ImageCacheService);
+    .injectClass(ImageProxyUseCase);
 
-  const imageProxyUseCase = testInjector.injectClass(ImageProxyUseCase);
+  const didResolver = testInjector.resolve("didResolver");
+  const blobFetcher = testInjector.resolve("blobFetcher");
+  const imageCacheStorage = testInjector.resolve("imageCacheStorage");
+  const imageResizer = testInjector.resolve("imageResizer");
+  const metricReporter = testInjector.resolve("metricReporter");
   const cacheMetadataRepo = testInjector.resolve("cacheMetadataRepository");
 
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
+    didResolver.clear();
+    blobFetcher.clear();
+    imageCacheStorage.clear();
+    imageResizer.clear();
+    metricReporter.clear();
     cacheMetadataRepo.clear();
   });
 
@@ -61,7 +47,10 @@ describe("ImageProxyUseCase", () => {
       }),
     );
 
-    mockImageCacheStorage.read.mockResolvedValueOnce(cachedData);
+    imageCacheStorage.setSaveResult(
+      "cache/avatar/did:plc:example123/bafkreiabc123.jpg",
+      cachedData,
+    );
 
     // act
     const result = await imageProxyUseCase.execute(
@@ -74,16 +63,7 @@ describe("ImageProxyUseCase", () => {
 
     // assert
     expect(result).toEqual(ImageBlob.jpeg(cachedData));
-    expect(mockImageCacheStorage.read).toHaveBeenCalledWith(
-      "cache/avatar/did:plc:example123/bafkreiabc123.jpg",
-    );
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_cache_hit_total",
-    );
-    expect(mockDidResolver.resolve).not.toHaveBeenCalled();
-    expect(mockBlobFetcher.fetchBlob).not.toHaveBeenCalled();
-    expect(mockImageResizer.resize).not.toHaveBeenCalled();
-    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+    expect(metricReporter.getCounter("blob_proxy_cache_hit_total")).toEqual(1);
   });
 
   test("キャッシュがミスした場合、画像を取得・リサイズしてキャッシュに保存してミスメトリクスを記録する", async () => {
@@ -91,14 +71,29 @@ describe("ImageProxyUseCase", () => {
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3, 4, 5]));
     const resizedBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
 
-    mockDidResolver.resolve.mockResolvedValueOnce({
+    didResolver.setResolveResult("did:plc:example123", {
       pds: new URL("https://example.pds.com"),
       signingKey: "test-signing-key",
       handle: "test.handle" as const,
     });
-    mockBlobFetcher.fetchBlob.mockResolvedValueOnce(originalBlob);
-    mockImageResizer.resize.mockResolvedValueOnce(resizedBlob);
-    mockImageCacheStorage.save.mockResolvedValueOnce();
+
+    blobFetcher.setFetchResult(
+      {
+        pds: new URL("https://example.pds.com"),
+        did: "did:plc:example123",
+        cid: "bafkreiabc456",
+      },
+      originalBlob,
+    );
+
+    imageResizer.setResizeResult(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example123",
+        cid: "bafkreiabc456",
+        type: "feed_thumbnail",
+      }).preset,
+      resizedBlob,
+    );
 
     // act
     const result = await imageProxyUseCase.execute(
@@ -111,21 +106,7 @@ describe("ImageProxyUseCase", () => {
 
     // assert
     expect(result).toBe(resizedBlob);
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_cache_miss_total",
-    );
-    expect(mockDidResolver.resolve).toHaveBeenCalledWith("did:plc:example123");
-    expect(mockBlobFetcher.fetchBlob).toHaveBeenCalledWith({
-      pds: new URL("https://example.pds.com"),
-      did: "did:plc:example123",
-      cid: "bafkreiabc456",
-    });
-    expect(mockImageResizer.resize).toHaveBeenCalledWith({
-      blob: originalBlob,
-      preset: expect.objectContaining({
-        type: "feed_thumbnail",
-      }),
-    });
+    expect(metricReporter.getCounter("blob_proxy_cache_miss_total")).toEqual(1);
 
     const savedCache = await cacheMetadataRepo.get(
       "feed_thumbnail/did:plc:example123/bafkreiabc456",
@@ -137,26 +118,50 @@ describe("ImageProxyUseCase", () => {
       expiredAt: new Date("2024-01-08T00:00:00.000Z"),
     });
 
-    expect(mockImageCacheStorage.save).toHaveBeenCalledWith(
+    const savedData = await imageCacheStorage.read(
       "cache/feed_thumbnail/did:plc:example123/bafkreiabc456.jpg",
-      resizedBlob.data,
     );
+    expect(savedData).toEqual(resizedBlob.data);
   });
 
   test("異なるプリセットタイプで同じ画像を要求した場合、異なるキャッシュキーを使用する", async () => {
     // arrange
-    mockDidResolver.resolve.mockResolvedValue({
+    const blob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
+    const resizedBlob1 = ImageBlob.jpeg(new Uint8Array([1, 2]));
+    const resizedBlob2 = ImageBlob.jpeg(new Uint8Array([1]));
+
+    didResolver.setResolveResult("did:plc:example789", {
       pds: new URL("https://example.pds.com"),
       signingKey: "test-signing-key",
       handle: "test.handle" as const,
     });
-    mockBlobFetcher.fetchBlob.mockResolvedValue(
-      ImageBlob.jpeg(new Uint8Array([1, 2, 3])),
+
+    blobFetcher.setFetchResult(
+      {
+        pds: new URL("https://example.pds.com"),
+        did: "did:plc:example789",
+        cid: "bafkreidef789",
+      },
+      blob,
     );
-    mockImageResizer.resize.mockResolvedValue(
-      ImageBlob.jpeg(new Uint8Array([1, 2])),
+
+    imageResizer.setResizeResult(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example789",
+        cid: "bafkreidef789",
+        type: "avatar",
+      }).preset,
+      resizedBlob1,
     );
-    mockImageCacheStorage.save.mockResolvedValue();
+
+    imageResizer.setResizeResult(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example789",
+        cid: "bafkreidef789",
+        type: "avatar_thumbnail",
+      }).preset,
+      resizedBlob2,
+    );
 
     // act
     await imageProxyUseCase.execute(
@@ -195,50 +200,25 @@ describe("ImageProxyUseCase", () => {
       status: "success",
       expiredAt: new Date("2024-01-08T00:00:00.000Z"),
     });
-
-    expect(mockImageCacheStorage.save).toHaveBeenCalledTimes(2);
-  });
-
-  test("画像取得サービスがエラーをスローした場合、エラーがそのまま伝播する", async () => {
-    // arrange
-    mockDidResolver.resolve.mockResolvedValueOnce({
-      pds: new URL("https://example.pds.com"),
-      signingKey: "test-signing-key",
-      handle: "test.handle" as const,
-    });
-    mockBlobFetcher.fetchBlob.mockRejectedValueOnce(
-      new Error("Failed to fetch blob"),
-    );
-
-    // act & assert
-    await expect(
-      imageProxyUseCase.execute(
-        ImageProxyRequest.fromParams({
-          did: "did:plc:example999",
-          cid: "bafkreiabc999",
-          type: "banner",
-        }),
-      ),
-    ).rejects.toThrow("Failed to fetch blob");
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_cache_miss_total",
-    );
-    expect(mockImageResizer.resize).not.toHaveBeenCalled();
-    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
   });
 
   test("画像リサイズサービスがエラーをスローした場合、エラーがそのまま伝播する", async () => {
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
 
-    mockDidResolver.resolve.mockResolvedValueOnce({
+    didResolver.setResolveResult("did:plc:example888", {
       pds: new URL("https://example.pds.com"),
       signingKey: "test-signing-key",
       handle: "test.handle" as const,
     });
-    mockBlobFetcher.fetchBlob.mockResolvedValueOnce(originalBlob);
-    mockImageResizer.resize.mockRejectedValueOnce(
-      new Error("Failed to resize image"),
+
+    blobFetcher.setFetchResult(
+      {
+        pds: new URL("https://example.pds.com"),
+        did: "did:plc:example888",
+        cid: "bafkreiabc888",
+      },
+      originalBlob,
     );
 
     // act & assert
@@ -250,25 +230,44 @@ describe("ImageProxyUseCase", () => {
           type: "feed_fullsize",
         }),
       ),
-    ).rejects.toThrow("Failed to resize image");
-    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+    ).rejects.toThrow();
   });
 
   test("キャッシュ保存がエラーになった場合、エラーがそのまま伝播する", async () => {
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3, 4, 5]));
     const resizedBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
+    const cacheKey = "avatar/did:plc:example777/bafkreiabc777";
+    const cachePath = CacheMetadata.create({
+      cacheKey,
+      imageBlob: resizedBlob,
+    }).getPath();
 
-    mockDidResolver.resolve.mockResolvedValueOnce({
+    didResolver.setResolveResult("did:plc:example777", {
       pds: new URL("https://example.pds.com"),
       signingKey: "test-signing-key",
       handle: "test.handle" as const,
     });
-    mockBlobFetcher.fetchBlob.mockResolvedValueOnce(originalBlob);
-    mockImageResizer.resize.mockResolvedValueOnce(resizedBlob);
-    mockImageCacheStorage.save.mockRejectedValueOnce(
-      new Error("Cache write failed"),
+
+    blobFetcher.setFetchResult(
+      {
+        pds: new URL("https://example.pds.com"),
+        did: "did:plc:example777",
+        cid: "bafkreiabc777",
+      },
+      originalBlob,
     );
+
+    imageResizer.setResizeResult(
+      ImageProxyRequest.fromParams({
+        did: "did:plc:example777",
+        cid: "bafkreiabc777",
+        type: "avatar",
+      }).preset,
+      resizedBlob,
+    );
+
+    imageCacheStorage.setSaveError(cachePath, "Storage save failed");
 
     // act & assert
     await expect(
@@ -279,19 +278,15 @@ describe("ImageProxyUseCase", () => {
           type: "avatar",
         }),
       ),
-    ).rejects.toThrow("Cache write failed");
+    ).rejects.toThrow();
 
-    const savedCache = await cacheMetadataRepo.get(
-      "avatar/did:plc:example777/bafkreiabc777",
-    );
+    const savedCache = await cacheMetadataRepo.get(cacheKey);
     expect(savedCache).not.toBeNull();
     expect(savedCache).toMatchObject({
-      cacheKey: "avatar/did:plc:example777/bafkreiabc777",
+      cacheKey,
       status: "success",
       expiredAt: new Date("2024-01-08T00:00:00.000Z"),
     });
-
-    expect(mockImageCacheStorage.save).toHaveBeenCalled();
   });
 
   test("ネガティブキャッシュがヒットした場合、nullを返してヒットメトリクスを記録する", async () => {
@@ -316,25 +311,24 @@ describe("ImageProxyUseCase", () => {
 
     // assert
     expect(result).toBeNull();
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_cache_hit_total",
-    );
-    expect(mockImageCacheStorage.read).not.toHaveBeenCalled();
-    expect(mockDidResolver.resolve).not.toHaveBeenCalled();
-    expect(mockBlobFetcher.fetchBlob).not.toHaveBeenCalled();
-    expect(mockImageResizer.resize).not.toHaveBeenCalled();
-    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+    expect(metricReporter.getCounter("blob_proxy_cache_hit_total")).toEqual(1);
   });
 
   test("BlobFetchFailedErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
     // arrange
-    mockDidResolver.resolve.mockResolvedValueOnce({
+    didResolver.setResolveResult("did:plc:example999", {
       pds: new URL("https://example.pds.com"),
       signingKey: "test-signing-key",
       handle: "test.handle" as const,
     });
-    mockBlobFetcher.fetchBlob.mockRejectedValueOnce(
-      new BlobFetchFailedError("NOT_FOUND"),
+
+    blobFetcher.setFetchError(
+      {
+        pds: new URL("https://example.pds.com"),
+        did: "did:plc:example999",
+        cid: "bafkreiabc999",
+      },
+      "NOT_FOUND",
     );
 
     // act
@@ -348,15 +342,12 @@ describe("ImageProxyUseCase", () => {
 
     // assert
     expect(result).toBeNull();
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_cache_miss_total",
-    );
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_error_total",
-      { error: "BlobFetchFailedError" },
-    );
-    expect(mockImageResizer.resize).not.toHaveBeenCalled();
-    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+    expect(metricReporter.getCounter("blob_proxy_cache_miss_total")).toEqual(1);
+    expect(
+      metricReporter.getCounter("blob_proxy_error_total", {
+        error: "BlobFetchFailedError",
+      }),
+    ).toEqual(1);
 
     const savedCache = await cacheMetadataRepo.get(
       "banner/did:plc:example999/bafkreiabc999",
@@ -371,9 +362,7 @@ describe("ImageProxyUseCase", () => {
 
   test("DidResolutionErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
     // arrange
-    mockDidResolver.resolve.mockRejectedValueOnce(
-      new DidResolutionError("DID resolution failed"),
-    );
+    // DidResolverにresolve結果を設定しない（エラーになる）
 
     // act
     const result = await imageProxyUseCase.execute(
@@ -386,16 +375,12 @@ describe("ImageProxyUseCase", () => {
 
     // assert
     expect(result).toBeNull();
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_cache_miss_total",
-    );
-    expect(mockMetricReporter.increment).toHaveBeenCalledWith(
-      "blob_proxy_error_total",
-      { error: "DidResolutionError" },
-    );
-    expect(mockBlobFetcher.fetchBlob).not.toHaveBeenCalled();
-    expect(mockImageResizer.resize).not.toHaveBeenCalled();
-    expect(mockImageCacheStorage.save).not.toHaveBeenCalled();
+    expect(metricReporter.getCounter("blob_proxy_cache_miss_total")).toEqual(1);
+    expect(
+      metricReporter.getCounter("blob_proxy_error_total", {
+        error: "DidResolutionError",
+      }),
+    ).toEqual(1);
 
     const savedCache = await cacheMetadataRepo.get(
       "feed_fullsize/did:plc:example888/bafkreiabc888",

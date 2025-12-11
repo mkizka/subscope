@@ -6,10 +6,13 @@ export default defineConfig({
       "apps/*",
       "!apps/appview",
       "!apps/worker",
+      "!apps/blob-proxy",
       "apps/appview/vitest.unit.config.ts",
       "apps/appview/vitest.integration.config.ts",
       "apps/worker/vitest.unit.config.ts",
       "apps/worker/vitest.integration.config.ts",
+      "apps/blob-proxy/vitest.unit.config.ts",
+      "apps/blob-proxy/vitest.integration.config.ts",
       "packages/*",
     ],
     coverage: {
