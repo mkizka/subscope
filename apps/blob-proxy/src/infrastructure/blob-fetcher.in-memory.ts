@@ -29,19 +29,19 @@ export class InMemoryBlobFetcher implements IBlobFetcher {
     this.results.clear();
   }
 
-  fetchBlob(params: FetchParams): Promise<ImageBlob> {
+  async fetchBlob(params: FetchParams): Promise<ImageBlob> {
     const key = this.getKey(params);
     const result = this.results.get(key);
 
     if (!result) {
-      return Promise.reject(new Error(`No fetch result set for ${key}`));
+      throw new Error(`No fetch result set for ${key}`);
     }
 
     if ("error" in result) {
-      return Promise.reject(new BlobFetchFailedError(result.error));
+      throw new BlobFetchFailedError(result.error);
     }
 
-    return Promise.resolve(result.blob);
+    return result.blob;
   }
 
   private getKey(params: FetchParams): string {

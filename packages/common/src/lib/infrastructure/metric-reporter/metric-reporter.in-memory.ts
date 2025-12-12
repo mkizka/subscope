@@ -30,14 +30,14 @@ export class InMemoryMetricReporter implements IMetricReporter {
     this.timeDelay = timeUs;
   }
 
-  getMetrics(): Promise<string> {
+  async getMetrics(): Promise<string> {
     const lines: string[] = [];
     for (const [key, value] of this.counters.entries()) {
       lines.push(`${key} ${value}`);
     }
     lines.push(`connection_state ${this.connectionState}`);
     lines.push(`time_delay ${this.timeDelay}`);
-    return Promise.resolve(lines.join("\n"));
+    return lines.join("\n");
   }
 
   getCounter(key: CounterKey, labels?: LabelsValue): number {

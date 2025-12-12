@@ -17,26 +17,24 @@ export class InMemoryImageCacheStorage implements IImageCacheStorage {
     this.storage.clear();
   }
 
-  save(filePath: string, data: Uint8Array): Promise<void> {
+  async save(filePath: string, data: Uint8Array): Promise<void> {
     const result = this.storage.get(filePath);
     if (result && "error" in result) {
-      return Promise.reject(new Error(result.error));
+      throw new Error(result.error);
     }
 
     this.storage.set(filePath, { data });
-    return Promise.resolve();
   }
 
-  read(filePath: string): Promise<Uint8Array | null> {
+  async read(filePath: string): Promise<Uint8Array | null> {
     const result = this.storage.get(filePath);
     if (!result || "error" in result) {
-      return Promise.resolve(null);
+      return null;
     }
-    return Promise.resolve(result.data);
+    return result.data;
   }
 
-  remove(filePath: string): Promise<void> {
+  async remove(filePath: string): Promise<void> {
     this.storage.delete(filePath);
-    return Promise.resolve();
   }
 }
