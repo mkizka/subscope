@@ -10,39 +10,38 @@ type FetchParams = {
   cid: string;
 };
 
+type FetchResult = { blob: ImageBlob } | { error: string };
+
 export class InMemoryBlobFetcher implements IBlobFetcher {
-  private results: Map<string, ImageBlob> = new Map();
-  private errors: Map<string, string> = new Map();
+  private results: Map<string, FetchResult> = new Map();
 
   setFetchResult(params: FetchParams, blob: ImageBlob): void {
     const key = this.getKey(params);
-    this.results.set(key, blob);
+    this.results.set(key, { blob });
   }
 
   setFetchError(params: FetchParams, errorName: string): void {
     const key = this.getKey(params);
-    this.errors.set(key, errorName);
+    this.results.set(key, { error: errorName });
   }
 
   clear(): void {
     this.results.clear();
-    this.errors.clear();
   }
 
   fetchBlob(params: FetchParams): Promise<ImageBlob> {
     const key = this.getKey(params);
-
-    const error = this.errors.get(key);
-    if (error) {
-      return Promise.reject(new BlobFetchFailedError(error));
-    }
-
     const result = this.results.get(key);
+
     if (!result) {
       return Promise.reject(new Error(`No fetch result set for ${key}`));
     }
 
-    return Promise.resolve(result);
+    if ("error" in result) {
+      return Promise.reject(new BlobFetchFailedError(result.error));
+    }
+
+    return Promise.resolve(result.blob);
   }
 
   private getKey(params: FetchParams): string {

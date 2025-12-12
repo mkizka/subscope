@@ -1,4 +1,3 @@
-import { LoggerManager } from "@repo/common/infrastructure";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { CacheMetadata } from "../domain/cache-metadata.js";
@@ -8,9 +7,7 @@ import { testInjector } from "../shared/test-utils.js";
 import { ImageProxyUseCase } from "./image-proxy-use-case.js";
 
 describe("ImageProxyUseCase", () => {
-  const imageProxyUseCase = testInjector
-    .provideValue("loggerManager", new LoggerManager("info"))
-    .injectClass(ImageProxyUseCase);
+  const imageProxyUseCase = testInjector.injectClass(ImageProxyUseCase);
 
   const didResolver = testInjector.resolve("didResolver");
   const blobFetcher = testInjector.resolve("blobFetcher");

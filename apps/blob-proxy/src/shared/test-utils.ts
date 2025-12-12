@@ -1,5 +1,8 @@
-import { InMemoryDidResolver } from "@repo/common/infrastructure";
-import { InMemoryMetricReporter } from "@repo/common/infrastructure";
+import {
+  InMemoryDidResolver,
+  InMemoryLoggerManager,
+  InMemoryMetricReporter,
+} from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 import { beforeEach } from "vitest";
 
@@ -16,6 +19,7 @@ export const testInjector = createInjector()
   .provideClass("imageCacheStorage", InMemoryImageCacheStorage)
   .provideClass("imageResizer", InMemoryImageResizer)
   .provideClass("metricReporter", InMemoryMetricReporter)
+  .provideClass("loggerManager", InMemoryLoggerManager)
   .provideClass("cacheMetadataRepository", InMemoryCacheMetadataRepository)
   .provideClass("fetchBlobService", FetchBlobService)
   .provideClass("imageCacheService", ImageCacheService);
@@ -27,6 +31,7 @@ export const setupFiles = () => {
     testInjector.resolve("imageCacheStorage").clear();
     testInjector.resolve("imageResizer").clear();
     testInjector.resolve("metricReporter").clear();
+    testInjector.resolve("loggerManager").clear();
     testInjector.resolve("cacheMetadataRepository").clear();
   });
 };

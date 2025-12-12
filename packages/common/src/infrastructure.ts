@@ -3,6 +3,7 @@ export * from "./lib/infrastructure/did-resolver/did-resolver.in-memory.js";
 export * from "./lib/infrastructure/did-resolver/did-resolver.js";
 export * from "./lib/infrastructure/job-queue/job-queue.js";
 export * from "./lib/infrastructure/logger.js";
+export * from "./lib/infrastructure/logger/logger-manager.in-memory.js";
 export * from "./lib/infrastructure/metric.js";
 export * from "./lib/infrastructure/metric-reporter/metric-reporter.in-memory.js";
 export * from "./lib/infrastructure/redis-did-cache.js";
