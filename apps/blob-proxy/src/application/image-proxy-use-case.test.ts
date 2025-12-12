@@ -19,12 +19,6 @@ describe("ImageProxyUseCase", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
-    didResolver.clear();
-    blobFetcher.clear();
-    imageCacheStorage.clear();
-    imageResizer.clear();
-    metricReporter.clear();
-    cacheMetadataRepo.clear();
   });
 
   afterEach(() => {
