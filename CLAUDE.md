@@ -57,20 +57,24 @@ packagesディレクトリ(共通パッケージ)
 
 ## 開発コマンド
 
-以下のコマンドを使用します。
+以下のコマンドを使用します。コードの変更後は**必ず**pnpm allを実行して全ての項目をチェックしてください。
 
 ```bash
-pnpm install   # 依存パッケージのインストールと`@repo/client`パッケージのコード生成
-pnpm typecheck # 全パッケージの型チェック
-pnpm lint      # 全コードのlintとフォーマットチェック
-pnpm format    # コードフォーマットとlint問題の自動修正
-pnpm test      # vitestを実行
+pnpm install  # 依存パッケージのインストールと`@repo/client`パッケージのコード生成
+pnpm all      # 型チェック、フォーマット、全テストを実行
+pnpm all:unit # 型チェック、フォーマット、unitテストを実行(Dockerが使えない環境向け)
 ```
 
 特定パッケージだけを対象にしたい場合は、コマンドの後ろに`--filter`オプションを付与してください。
 
 ```bash
 pnpm typecheck --filter @repo/appview
+```
+
+特定のテストだけを対象にしたい場合は、allコマンドの後ろにテストファイル名を付与してください。
+
+```bash
+pnpm all post-indexer
 ```
 
 ## メモリ
