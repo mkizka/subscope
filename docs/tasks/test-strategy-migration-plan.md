@@ -63,7 +63,7 @@
 
 ### Phase 13: blob-proxy
 
-- [ ] **Phase 13-A**: blob-proxyの移行
+- [x] **Phase 13-A**: blob-proxyの移行
 - [ ] **Phase 13-B**: blob-proxyのVitest設定を単体テスト/統合テストに分割
 
 ---
