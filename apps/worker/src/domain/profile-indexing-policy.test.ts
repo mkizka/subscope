@@ -1,51 +1,31 @@
-import { Profile, Record } from "@repo/common/domain";
-import {
-  actorFactory,
-  followFactory,
-  recordFactory,
-  testSetup,
-} from "@repo/test-utils";
+import { Profile } from "@repo/common/domain";
+import { recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { PostgresIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
+import { testInjector } from "../shared/test-utils.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
 
 describe("ProfileIndexingPolicy", () => {
-  const { testInjector, ctx } = testSetup;
+  const profileIndexingPolicy = testInjector.injectClass(ProfileIndexingPolicy);
 
-  const profileIndexingPolicy = testInjector
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorChecker", TrackedActorChecker)
-    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
-    .injectClass(ProfileIndexingPolicy);
+  const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
   describe("shouldIndex", () => {
     test("プロフィール作成者がsubscriberの場合は保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
-        .create();
+      const subscriberDid = "did:plc:subscriber123";
 
-      const profileJson = {
-        $type: "app.bsky.actor.profile",
-        displayName: "Test User",
-        description: "Test description",
-        createdAt: new Date().toISOString(),
-      };
-      const profileRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.actor.profile",
-      )
-        .vars({ actor: () => subscriberActor })
-        .props({ json: () => profileJson })
-        .create();
-      const record = Record.fromJson({
-        uri: profileRecord.uri,
-        cid: profileRecord.cid,
-        json: profileJson,
-        indexedAt: new Date(),
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
+
+      const record = recordFactory({
+        uri: `at://${subscriberDid}/app.bsky.actor.profile/self`,
+        json: {
+          $type: "app.bsky.actor.profile",
+          displayName: "Test User",
+          description: "Test description",
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
@@ -59,26 +39,16 @@ describe("ProfileIndexingPolicy", () => {
 
     test("プロフィール作成者がsubscriberでない場合は保存すべきでない", async () => {
       // arrange
-      const unrelatedActor = await actorFactory(ctx.db).create();
+      const unrelatedDid = "did:plc:unrelated123";
 
-      const profileJson = {
-        $type: "app.bsky.actor.profile",
-        displayName: "Unrelated User",
-        description: "Unrelated description",
-        createdAt: new Date().toISOString(),
-      };
-      const profileRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.actor.profile",
-      )
-        .vars({ actor: () => unrelatedActor })
-        .props({ json: () => profileJson })
-        .create();
-      const record = Record.fromJson({
-        uri: profileRecord.uri,
-        cid: profileRecord.cid,
-        json: profileJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${unrelatedDid}/app.bsky.actor.profile/self`,
+        json: {
+          $type: "app.bsky.actor.profile",
+          displayName: "Unrelated User",
+          description: "Unrelated description",
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
@@ -92,39 +62,21 @@ describe("ProfileIndexingPolicy", () => {
 
     test("プロフィール作成者が追跡アクター(サブスクライバーまたはサブスクライバーのフォロイー)の場合は保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
-        .create();
+      const subscriberDid = "did:plc:subscriber123";
+      const followeeDid = "did:plc:followee456";
 
-      const followeeActor = await actorFactory(ctx.db).create();
-      await followFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.graph.follow")
-              .vars({ actor: () => subscriberActor })
-              .create(),
-          followee: () => followeeActor,
-        })
-        .create();
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
+      await indexTargetRepo.addTrackedActor(followeeDid);
 
-      const profileJson = {
-        $type: "app.bsky.actor.profile",
-        displayName: "Followee User",
-        description: "Followee description",
-        createdAt: new Date().toISOString(),
-      };
-      const profileRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.actor.profile",
-      )
-        .vars({ actor: () => followeeActor })
-        .props({ json: () => profileJson })
-        .create();
-      const record = Record.fromJson({
-        uri: profileRecord.uri,
-        cid: profileRecord.cid,
-        json: profileJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${followeeDid}/app.bsky.actor.profile/self`,
+        json: {
+          $type: "app.bsky.actor.profile",
+          displayName: "Followee User",
+          description: "Followee description",
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act

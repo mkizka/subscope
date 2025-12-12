@@ -7,7 +7,7 @@ export default mergeConfig(
   defineProject({
     test: {
       name: "blob-proxy:unit",
-      include: ["./src/{application,domain,presentation}/**/*.test.ts"],
+      include: ["src/{application,domain,presentation}/**/*.test.ts"],
     },
   }),
 );

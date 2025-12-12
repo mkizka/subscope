@@ -19,7 +19,7 @@
     "prepare": "husky",
     "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
-    "test:unit": "vitest run --project worker:unit --project appview:unit --project blob-proxy:unit",
+    "test:unit": "vitest run --project *:unit",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {

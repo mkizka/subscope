@@ -1,54 +1,34 @@
-import { Generator, Record } from "@repo/common/domain";
-import {
-  actorFactory,
-  followFactory,
-  recordFactory,
-  subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
+import { Generator } from "@repo/common/domain";
+import { recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { PostgresIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
+import { testInjector } from "../shared/test-utils.js";
 import { GeneratorIndexingPolicy } from "./generator-indexing-policy.js";
 
 describe("GeneratorIndexingPolicy", () => {
-  const { testInjector, ctx } = testSetup;
+  const generatorIndexingPolicy = testInjector.injectClass(
+    GeneratorIndexingPolicy,
+  );
 
-  const generatorIndexingPolicy = testInjector
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorChecker", TrackedActorChecker)
-    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
-    .injectClass(GeneratorIndexingPolicy);
+  const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
   describe("shouldIndex", () => {
     test("subscriberが作成したgeneratorは保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
-        .create();
+      const subscriberDid = "did:plc:subscriber123";
 
-      const generatorJson = {
-        $type: "app.bsky.feed.generator",
-        did: "did:web:example.com",
-        displayName: "Test Generator",
-        description: "A test feed generator",
-        createdAt: new Date().toISOString(),
-      };
-      const generatorRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.feed.generator",
-      )
-        .vars({ actor: () => subscriberActor })
-        .props({ json: () => generatorJson })
-        .create();
-      const record = Record.fromJson({
-        uri: generatorRecord.uri,
-        cid: generatorRecord.cid,
-        json: generatorJson,
-        indexedAt: new Date(),
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
+
+      const record = recordFactory({
+        uri: `at://${subscriberDid}/app.bsky.feed.generator/myfeed`,
+        json: {
+          $type: "app.bsky.feed.generator",
+          did: "did:web:example.com",
+          displayName: "Test Generator",
+          description: "A test feed generator",
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
@@ -62,42 +42,22 @@ describe("GeneratorIndexingPolicy", () => {
 
     test("追跡アクター(subscriberのフォロイー)が作成したgeneratorは保存すべき", async () => {
       // arrange
-      const subscriberActor = await actorFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
-        .create();
+      const subscriberDid = "did:plc:subscriber123";
+      const followeeDid = "did:plc:followee456";
 
-      const followedActor = await actorFactory(ctx.db).create();
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
+      await indexTargetRepo.addTrackedActor(followeeDid);
 
-      await followFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.graph.follow")
-              .vars({ actor: () => subscriberActor })
-              .create(),
-          followee: () => followedActor,
-        })
-        .create();
-
-      const generatorJson = {
-        $type: "app.bsky.feed.generator",
-        did: "did:web:example.com",
-        displayName: "Followed Generator",
-        description: "A generator by followed user",
-        createdAt: new Date().toISOString(),
-      };
-      const generatorRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.feed.generator",
-      )
-        .vars({ actor: () => followedActor })
-        .props({ json: () => generatorJson })
-        .create();
-      const record = Record.fromJson({
-        uri: generatorRecord.uri,
-        cid: generatorRecord.cid,
-        json: generatorJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${followeeDid}/app.bsky.feed.generator/myfeed`,
+        json: {
+          $type: "app.bsky.feed.generator",
+          did: "did:web:example.com",
+          displayName: "Followed Generator",
+          description: "A generator by followed user",
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
@@ -111,27 +71,17 @@ describe("GeneratorIndexingPolicy", () => {
 
     test("subscriberでもフォローされているユーザーでもない場合は保存すべきでない", async () => {
       // arrange
-      const unrelatedActor = await actorFactory(ctx.db).create();
+      const unrelatedDid = "did:plc:unrelated123";
 
-      const generatorJson = {
-        $type: "app.bsky.feed.generator",
-        did: "did:web:example.com",
-        displayName: "Unrelated Generator",
-        description: "A generator by unrelated user",
-        createdAt: new Date().toISOString(),
-      };
-      const generatorRecord = await recordFactory(
-        ctx.db,
-        "app.bsky.feed.generator",
-      )
-        .vars({ actor: () => unrelatedActor })
-        .props({ json: () => generatorJson })
-        .create();
-      const record = Record.fromJson({
-        uri: generatorRecord.uri,
-        cid: generatorRecord.cid,
-        json: generatorJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${unrelatedDid}/app.bsky.feed.generator/myfeed`,
+        json: {
+          $type: "app.bsky.feed.generator",
+          did: "did:web:example.com",
+          displayName: "Unrelated Generator",
+          description: "A generator by unrelated user",
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act

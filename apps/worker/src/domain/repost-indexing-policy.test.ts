@@ -1,53 +1,34 @@
-import { Record, Repost } from "@repo/common/domain";
-import {
-  actorFactory,
-  followFactory,
-  postFactory,
-  recordFactory,
-  subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
+import { Repost } from "@repo/common/domain";
+import { fakeCid, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { PostgresIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { TrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
+import { testInjector } from "../shared/test-utils.js";
 import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
 
 describe("RepostIndexingPolicy", () => {
-  const { testInjector, ctx } = testSetup;
+  const repostIndexingPolicy = testInjector.injectClass(RepostIndexingPolicy);
 
-  const repostIndexingPolicy = testInjector
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .provideClass("trackedActorChecker", TrackedActorChecker)
-    .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
-    .injectClass(RepostIndexingPolicy);
+  const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
   describe("shouldIndex", () => {
     test("repost者がsubscriberの場合は保存すべき", async () => {
       // arrange
-      const [reposterActor, authorActor] = await actorFactory(
-        ctx.db,
-      ).createList(2);
+      const reposterDid = "did:plc:reposter123";
+      const authorDid = "did:plc:author456";
 
-      // repost者をsubscriberとして登録
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => reposterActor })
-        .create();
+      await indexTargetRepo.addSubscriber(reposterDid);
+      await indexTargetRepo.addTrackedActor(reposterDid);
 
-      const repostJson = {
-        $type: "app.bsky.feed.repost",
-        subject: {
-          uri: `at://${authorActor.did}/app.bsky.feed.post/456`,
-          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+      const record = recordFactory({
+        uri: `at://${reposterDid}/app.bsky.feed.repost/123`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: `at://${authorDid}/app.bsky.feed.post/456`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: `at://${reposterActor.did}/app.bsky.feed.repost/123`,
-        cid: "repost123",
-        json: repostJson,
-        indexedAt: new Date(),
       });
 
       // act
@@ -61,40 +42,24 @@ describe("RepostIndexingPolicy", () => {
 
     test("repost者のフォロワーがsubscriberの場合は保存すべき", async () => {
       // arrange
-      const [reposterActor, followerActor, authorActor] = await actorFactory(
-        ctx.db,
-      ).createList(3);
+      const reposterDid = "did:plc:reposter123";
+      const subscriberDid = "did:plc:subscriber456";
+      const authorDid = "did:plc:author789";
 
-      // フォロワーをsubscriberとして登録
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => followerActor })
-        .create();
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
+      await indexTargetRepo.addTrackedActor(reposterDid);
 
-      // フォローレコード作成
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => followerActor })
-        .props({
-          uri: () => `at://${followerActor.did}/app.bsky.graph.follow/987`,
-          cid: () => "follow987",
-        })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => followRecord, followee: () => reposterActor })
-        .create();
-
-      const repostJson = {
-        $type: "app.bsky.feed.repost",
-        subject: {
-          uri: `at://${authorActor.did}/app.bsky.feed.post/654`,
-          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+      const record = recordFactory({
+        uri: `at://${reposterDid}/app.bsky.feed.repost/321`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: `at://${authorDid}/app.bsky.feed.post/654`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: `at://${reposterActor.did}/app.bsky.feed.repost/321`,
-        cid: "repost321",
-        json: repostJson,
-        indexedAt: new Date(),
       });
 
       // act
@@ -108,38 +73,22 @@ describe("RepostIndexingPolicy", () => {
 
     test("subscribersの投稿へのリポストは保存すべき", async () => {
       // arrange
-      const reposterActor = await actorFactory(ctx.db).create();
+      const reposterDid = "did:plc:reposter123";
+      const subscriberDid = "did:plc:subscriber456";
 
-      const subscriberActor = await actorFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
-        .create();
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
 
-      const subscriberPost = await postFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.feed.post")
-              .vars({ actor: () => subscriberActor })
-              .create(),
-        })
-        .props({
-          text: () => "subscriber post",
-        })
-        .create();
-
-      const repostJson = {
-        $type: "app.bsky.feed.repost",
-        subject: {
-          uri: subscriberPost.uri,
-          cid: subscriberPost.cid,
+      const record = recordFactory({
+        uri: `at://${reposterDid}/app.bsky.feed.repost/789`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: `at://${subscriberDid}/app.bsky.feed.post/post123`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
-        cid: "repost789",
-        json: repostJson,
-        indexedAt: new Date(),
       });
 
       // act
@@ -153,23 +102,19 @@ describe("RepostIndexingPolicy", () => {
 
     test("repost者もフォロワーもsubscriberでない場合は保存すべきでない", async () => {
       // arrange
-      const [reposterActor, authorActor] = await actorFactory(
-        ctx.db,
-      ).createList(2);
+      const reposterDid = "did:plc:reposter123";
+      const authorDid = "did:plc:author456";
 
-      const repostJson = {
-        $type: "app.bsky.feed.repost",
-        subject: {
-          uri: `at://${authorActor.did}/app.bsky.feed.post/999`,
-          cid: "bafkreihwsnuregfeqh263vgdathcprnbvatyat6h6mu7ipjhhodcdbyhoy",
+      const record = recordFactory({
+        uri: `at://${reposterDid}/app.bsky.feed.repost/888`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: `at://${authorDid}/app.bsky.feed.post/999`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: `at://${reposterActor.did}/app.bsky.feed.repost/888`,
-        cid: "repost888",
-        json: repostJson,
-        indexedAt: new Date(),
       });
 
       // act
@@ -183,49 +128,24 @@ describe("RepostIndexingPolicy", () => {
 
     test("追跡アクターの投稿へのリポストは保存すべき", async () => {
       // arrange
-      const reposterActor = await actorFactory(ctx.db).create();
+      const reposterDid = "did:plc:reposter123";
+      const subscriberDid = "did:plc:subscriber456";
+      const followeeDid = "did:plc:followee789";
 
-      const subscriberActor = await actorFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
-        .create();
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
+      await indexTargetRepo.addTrackedActor(followeeDid);
 
-      const followeeActor = await actorFactory(ctx.db).create();
-      await followFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.graph.follow")
-              .vars({ actor: () => subscriberActor })
-              .create(),
-          followee: () => followeeActor,
-        })
-        .create();
-
-      const followeePost = await postFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.feed.post")
-              .vars({ actor: () => followeeActor })
-              .create(),
-        })
-        .props({
-          text: () => "followee post",
-        })
-        .create();
-
-      const repostJson = {
-        $type: "app.bsky.feed.repost",
-        subject: {
-          uri: followeePost.uri,
-          cid: followeePost.cid,
+      const record = recordFactory({
+        uri: `at://${reposterDid}/app.bsky.feed.repost/789`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: `at://${followeeDid}/app.bsky.feed.post/post123`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: `at://${reposterActor.did}/app.bsky.feed.repost/789`,
-        cid: "repost789",
-        json: repostJson,
-        indexedAt: new Date(),
       });
 
       // act
@@ -239,39 +159,23 @@ describe("RepostIndexingPolicy", () => {
 
     test("subscribersがフォローしていないユーザーの投稿へのリポストは保存すべきでない", async () => {
       // arrange
-      const reposterActor = await actorFactory(ctx.db).create();
+      const reposterDid = "did:plc:reposter123";
+      const subscriberDid = "did:plc:subscriber456";
+      const nonFolloweeDid = "did:plc:nonfollowee789";
 
-      const subscriberActor = await actorFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriberActor })
-        .create();
+      await indexTargetRepo.addSubscriber(subscriberDid);
+      await indexTargetRepo.addTrackedActor(subscriberDid);
 
-      const nonFolloweeActor = await actorFactory(ctx.db).create();
-      const nonFolloweePost = await postFactory(ctx.db)
-        .vars({
-          record: () =>
-            recordFactory(ctx.db, "app.bsky.feed.post")
-              .vars({ actor: () => nonFolloweeActor })
-              .create(),
-        })
-        .props({
-          text: () => "non-followee post",
-        })
-        .create();
-
-      const repostJson = {
-        $type: "app.bsky.feed.repost",
-        subject: {
-          uri: nonFolloweePost.uri,
-          cid: nonFolloweePost.cid,
+      const record = recordFactory({
+        uri: `at://${reposterDid}/app.bsky.feed.repost/999`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: {
+            uri: `at://${nonFolloweeDid}/app.bsky.feed.post/post123`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
         },
-        createdAt: new Date().toISOString(),
-      };
-      const record = Record.fromJson({
-        uri: `at://${reposterActor.did}/app.bsky.feed.repost/999`,
-        cid: "repost999",
-        json: repostJson,
-        indexedAt: new Date(),
       });
 
       // act

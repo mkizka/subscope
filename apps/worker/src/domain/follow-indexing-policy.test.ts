@@ -1,48 +1,35 @@
-import { Follow, Record } from "@repo/common/domain";
-import {
-  actorFactory,
-  recordFactory,
-  subscriptionFactory,
-  testSetup,
-} from "@repo/test-utils";
+import { Follow } from "@repo/common/domain";
+import { recordFactory, subscriptionFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { testInjector } from "../shared/test-utils.js";
 import { FollowIndexingPolicy } from "./follow-indexing-policy.js";
 
 describe("FollowIndexingPolicy", () => {
-  const { testInjector, ctx } = testSetup;
+  const followIndexingPolicy = testInjector.injectClass(FollowIndexingPolicy);
 
-  const followIndexingPolicy = testInjector
-    .provideClass("subscriptionRepository", SubscriptionRepository)
-    .injectClass(FollowIndexingPolicy);
+  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
+
+  const ctx = {
+    db: testInjector.resolve("db"),
+  };
 
   describe("shouldIndex", () => {
     test("フォロワーがsubscriberの場合は保存すべき", async () => {
       // arrange
-      const [followerActor, followeeActor] = await actorFactory(
-        ctx.db,
-      ).createList(2);
+      const followerDid = "did:plc:follower123";
+      const followeeDid = "did:plc:followee456";
 
-      // フォロワーをsubscriberとして登録
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => followerActor })
-        .create();
+      const subscription = subscriptionFactory({ actorDid: followerDid });
+      subscriptionRepo.add(subscription);
 
-      const followJson = {
-        $type: "app.bsky.graph.follow",
-        subject: followeeActor.did,
-        createdAt: new Date().toISOString(),
-      };
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => followerActor })
-        .props({ json: () => followJson })
-        .create();
-      const record = Record.fromJson({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
-        json: followJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${followerDid}/app.bsky.graph.follow/followrkey123`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followeeDid,
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
@@ -57,29 +44,19 @@ describe("FollowIndexingPolicy", () => {
 
     test("フォロイーがsubscriberの場合は保存すべき", async () => {
       // arrange
-      const [followerActor, followeeActor] = await actorFactory(
-        ctx.db,
-      ).createList(2);
+      const followerDid = "did:plc:follower123";
+      const followeeDid = "did:plc:followee456";
 
-      // フォロイーをsubscriberとして登録
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => followeeActor })
-        .create();
+      const subscription = subscriptionFactory({ actorDid: followeeDid });
+      subscriptionRepo.add(subscription);
 
-      const followJson = {
-        $type: "app.bsky.graph.follow",
-        subject: followeeActor.did,
-        createdAt: new Date().toISOString(),
-      };
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => followerActor })
-        .props({ json: () => followJson })
-        .create();
-      const record = Record.fromJson({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
-        json: followJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${followerDid}/app.bsky.graph.follow/followrkey123`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followeeDid,
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
@@ -94,24 +71,16 @@ describe("FollowIndexingPolicy", () => {
 
     test("フォロワーもフォロイーもsubscriberでない場合は保存すべきでない", async () => {
       // arrange
-      const [followerActor, followeeActor] = await actorFactory(
-        ctx.db,
-      ).createList(2);
+      const followerDid = "did:plc:follower123";
+      const followeeDid = "did:plc:followee456";
 
-      const followJson = {
-        $type: "app.bsky.graph.follow",
-        subject: followeeActor.did,
-        createdAt: new Date().toISOString(),
-      };
-      const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => followerActor })
-        .props({ json: () => followJson })
-        .create();
-      const record = Record.fromJson({
-        uri: followRecord.uri,
-        cid: followRecord.cid,
-        json: followJson,
-        indexedAt: new Date(),
+      const record = recordFactory({
+        uri: `at://${followerDid}/app.bsky.graph.follow/followrkey123`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followeeDid,
+          createdAt: new Date().toISOString(),
+        },
       });
 
       // act
