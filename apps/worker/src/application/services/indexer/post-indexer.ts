@@ -6,7 +6,7 @@ import {
   PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 
-import type { PostIndexingPolicy } from "../../../domain/post-indexing-policy.js";
+import type { PostIndexingPolicy } from "../../../domain/indexing-policy/post-indexing-policy.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";

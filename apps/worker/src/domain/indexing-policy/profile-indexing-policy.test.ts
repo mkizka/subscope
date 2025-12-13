@@ -2,7 +2,7 @@ import { Profile } from "@repo/common/domain";
 import { recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { ProfileIndexingPolicy } from "./profile-indexing-policy.js";
 
 describe("ProfileIndexingPolicy", () => {

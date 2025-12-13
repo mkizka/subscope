@@ -1,7 +1,7 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
-import type { FollowIndexingPolicy } from "../../../domain/follow-indexing-policy.js";
+import type { FollowIndexingPolicy } from "../../../domain/indexing-policy/follow-indexing-policy.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";

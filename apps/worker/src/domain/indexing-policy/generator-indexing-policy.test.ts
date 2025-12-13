@@ -2,7 +2,7 @@ import { Generator } from "@repo/common/domain";
 import { recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { GeneratorIndexingPolicy } from "./generator-indexing-policy.js";
 
 describe("GeneratorIndexingPolicy", () => {

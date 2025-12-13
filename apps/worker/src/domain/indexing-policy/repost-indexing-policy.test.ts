@@ -2,7 +2,7 @@ import { Repost } from "@repo/common/domain";
 import { fakeCid, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { RepostIndexingPolicy } from "./repost-indexing-policy.js";
 
 describe("RepostIndexingPolicy", () => {

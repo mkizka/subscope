@@ -1,7 +1,7 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { Generator } from "@repo/common/domain";
 
-import type { GeneratorIndexingPolicy } from "../../../domain/generator-indexing-policy.js";
+import type { GeneratorIndexingPolicy } from "../../../domain/indexing-policy/generator-indexing-policy.js";
 import type { IGeneratorRepository } from "../../interfaces/repositories/generator-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 

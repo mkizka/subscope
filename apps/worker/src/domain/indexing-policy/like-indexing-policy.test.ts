@@ -2,7 +2,7 @@ import { Like } from "@repo/common/domain";
 import { fakeCid, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { LikeIndexingPolicy } from "./like-indexing-policy.js";
 
 describe("LikeIndexingPolicy", () => {

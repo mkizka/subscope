@@ -2,7 +2,7 @@ import { Follow } from "@repo/common/domain";
 import { recordFactory, subscriptionFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../shared/test-utils.js";
 import { FollowIndexingPolicy } from "./follow-indexing-policy.js";
 
 describe("FollowIndexingPolicy", () => {

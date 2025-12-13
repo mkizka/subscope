@@ -1,7 +1,7 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { FeedItem, Repost } from "@repo/common/domain";
 
-import type { RepostIndexingPolicy } from "../../../domain/repost-indexing-policy.js";
+import type { RepostIndexingPolicy } from "../../../domain/indexing-policy/repost-indexing-policy.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
