@@ -56,11 +56,11 @@ apps/worker/src/infrastructure/cache/
 - [x] `apps/worker/src/domain/index-target/index-target-query.ts` - 読み取り専用インターフェース作成（workerでのみ使用のため）
 - [x] `apps/worker/src/domain/index-target/index-target-cache.ts` - 書き込み操作インターフェース作成（継承なし）
 
-### Phase 2: キャッシュ実装
+### Phase 2: キャッシュ実装 ✅
 
-- [ ] `pnpm add ioredis --filter @repo/worker` - 依存追加
-- [ ] `apps/worker/src/infrastructure/cache/index-target-cache.impl.ts` - Redis実装
-- [ ] `apps/worker/src/infrastructure/cache/index-target-cache.in-memory.ts` - テスト用InMemory実装
+- [x] `pnpm add ioredis --filter @repo/worker` - 依存追加
+- [x] `apps/worker/src/infrastructure/cache/index-target-cache.impl.ts` - Redis実装
+- [x] `apps/worker/src/infrastructure/cache/index-target-cache.in-memory.ts` - テスト用InMemory実装
 
 ### Phase 3: キャッシュウォーマー・同期
 
