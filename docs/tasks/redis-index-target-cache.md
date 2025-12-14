@@ -78,10 +78,10 @@ apps/worker/src/infrastructure/
 - [x] `apps/worker/src/infrastructure/repositories/index-target-repository/index-target-repository.ts` - Postgres実装
 - [x] `apps/worker/src/infrastructure/repositories/index-target-repository/index-target-repository.in-memory.ts` - テスト用InMemory実装
 
-### Phase 4: ユースケース・サービス作成
+### Phase 4: ユースケース・サービス作成 ✅
 
-- [ ] `apps/worker/src/application/use-cases/cache/warm-up-index-target-cache-use-case.ts` - ウォームアップユースケース
-- [ ] `apps/worker/src/application/services/cache/index-target-cache-sync-service.ts` - 同期サービス
+- [x] `apps/worker/src/application/use-cases/cache/warm-up-index-target-cache-use-case.ts` - ウォームアップユースケース
+- [x] `apps/worker/src/application/services/cache/index-target-cache-sync-service.ts` - 同期サービス
 
 ### Phase 5: IndexingPolicy修正
 

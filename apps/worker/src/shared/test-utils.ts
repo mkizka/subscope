@@ -31,6 +31,7 @@ import { InMemoryActorStatsRepository } from "../infrastructure/repositories/act
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
+import { InMemoryIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/index-target-repository.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/repositories/like-repository/like-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/repositories/post-repository/post-repository.in-memory.js";
@@ -42,6 +43,8 @@ import { InMemorySubscriptionRepository } from "../infrastructure/repositories/s
 import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
 import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 
+const sharedIndexTargetCache = new InMemoryIndexTargetCache();
+
 export const testInjector = createInjector()
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .provideValue("db", {} as never)
@@ -50,7 +53,10 @@ export const testInjector = createInjector()
   .provideClass("feedItemRepository", InMemoryFeedItemRepository)
   .provideClass("followRepository", InMemoryFollowRepository)
   .provideClass("generatorRepository", InMemoryGeneratorRepository)
-  .provideClass("indexTargetRepository", InMemoryIndexTargetCache)
+  .provideValue("indexTargetCache", sharedIndexTargetCache)
+  .provideValue("indexTargetQuery", sharedIndexTargetCache)
+  .provideValue("indexTargetRepository", sharedIndexTargetCache)
+  .provideClass("indexTargetDataRepository", InMemoryIndexTargetRepository)
   .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
   .provideClass("likeRepository", InMemoryLikeRepository)
   .provideClass("postRepository", InMemoryPostRepository)
@@ -91,7 +97,9 @@ export const setupFiles = () => {
     testInjector.resolve("feedItemRepository").clear();
     testInjector.resolve("followRepository").clear();
     testInjector.resolve("generatorRepository").clear();
+    await testInjector.resolve("indexTargetCache").clear();
     await testInjector.resolve("indexTargetRepository").clear();
+    testInjector.resolve("indexTargetDataRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("likeRepository").clear();
     testInjector.resolve("postRepository").clear();
