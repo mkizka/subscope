@@ -1,4 +1,5 @@
 import type {
+  CommitEventDto,
   IJobQueue,
   ILoggerManager,
   IMetricReporter,
@@ -26,10 +27,34 @@ export class HandleCommitUseCase {
       collection: event.commit.collection,
     });
     this.metricReporter.setTimeDelayGauge(event.time_us);
+
+    const dto: CommitEventDto =
+      event.commit.operation === "delete"
+        ? {
+            did: event.did,
+            time_us: event.time_us,
+            commit: {
+              operation: event.commit.operation,
+              collection: event.commit.collection,
+              rkey: event.commit.rkey,
+            },
+          }
+        : {
+            did: event.did,
+            time_us: event.time_us,
+            commit: {
+              operation: event.commit.operation,
+              collection: event.commit.collection,
+              rkey: event.commit.rkey,
+              record: event.commit.record,
+              cid: event.commit.cid,
+            },
+          };
+
     await this.jobQueue.add({
-      queueName: event.kind,
+      queueName: "commit",
       jobName: `at://${event.did}/${event.commit.collection}/${event.commit.rkey}`,
-      data: event,
+      data: dto,
     });
   }
 }

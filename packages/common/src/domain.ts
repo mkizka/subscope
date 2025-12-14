@@ -1,4 +1,5 @@
 export * from "./lib/domain/actor/actor.js";
+export * from "./lib/domain/dtos/event.js";
 export * from "./lib/domain/feed-item/feed-item.js";
 export * from "./lib/domain/follow/follow.js";
 export * from "./lib/domain/generator/generator.js";

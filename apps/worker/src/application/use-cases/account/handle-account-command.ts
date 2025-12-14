@@ -1,6 +1,6 @@
-import type { AccountEvent } from "@skyware/jetstream";
+import type { AccountEventDto } from "@repo/common/domain";
 
-export function handleAccountCommandFactory(event: AccountEvent) {
+export function handleAccountCommandFactory(event: AccountEventDto) {
   return {
     did: event.account.did,
     status: event.account.status,

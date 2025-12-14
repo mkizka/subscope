@@ -1,4 +1,5 @@
 import type {
+  IdentityEventDto,
   IJobQueue,
   ILoggerManager,
   IMetricReporter,
@@ -25,10 +26,18 @@ export class HandleIdentityUseCase {
       change_handle: event.identity.handle ? "true" : "false",
     });
     this.metricReporter.setTimeDelayGauge(event.time_us);
+
+    const dto: IdentityEventDto = {
+      time_us: event.time_us,
+      identity: {
+        did: event.identity.did,
+        handle: event.identity.handle,
+      },
+    };
     await this.jobQueue.add({
-      queueName: event.kind,
+      queueName: "identity",
       jobName: `at://${event.identity.handle ?? event.did}`,
-      data: event,
+      data: dto,
     });
   }
 }

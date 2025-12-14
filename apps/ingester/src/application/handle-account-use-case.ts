@@ -1,4 +1,5 @@
 import type {
+  AccountEventDto,
   IJobQueue,
   ILoggerManager,
   IMetricReporter,
@@ -23,10 +24,20 @@ export class HandleAccountUseCase {
     this.logger.debug({ did: event.account.did }, "account event received");
     this.metricReporter.increment("ingester_events_account_total");
     this.metricReporter.setTimeDelayGauge(event.time_us);
+
+    const dto: AccountEventDto = {
+      time_us: event.time_us,
+      account: {
+        did: event.account.did,
+        active: event.account.active,
+        status: event.account.status,
+      },
+    };
+
     await this.jobQueue.add({
-      queueName: event.kind,
+      queueName: "account",
       jobName: `at://${event.account.did}`,
-      data: event,
+      data: dto,
     });
   }
 }

@@ -1,11 +1,9 @@
-import { asDid } from "@atproto/did";
-import { asHandle } from "@repo/common/utils";
-import type { IdentityEvent } from "@skyware/jetstream";
+import type { IdentityEventDto } from "@repo/common/domain";
 
-export const upsertIdentityCommandFactory = (event: IdentityEvent) => {
+export const upsertIdentityCommandFactory = (event: IdentityEventDto) => {
   return {
-    did: asDid(event.identity.did),
-    handle: event.identity.handle ? asHandle(event.identity.handle) : undefined,
+    did: event.identity.did,
+    handle: event.identity.handle,
     indexedAt: new Date(event.time_us / 1000),
   };
 };

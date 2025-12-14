@@ -1,7 +1,6 @@
 import { AtUri } from "@atproto/syntax";
+import type { CommitEventDto } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
-import type { SupportedCollection } from "@repo/common/utils";
-import type { CommitEvent } from "@skyware/jetstream";
 
 import type { JobLogger } from "../../../shared/job.js";
 
@@ -9,7 +8,7 @@ export const indexCommitCommandFactory = ({
   event,
   jobLogger,
 }: {
-  event: CommitEvent<SupportedCollection>;
+  event: CommitEventDto;
   jobLogger: JobLogger;
 }) => {
   const uri = AtUri.make(event.did, event.commit.collection, event.commit.rkey);
