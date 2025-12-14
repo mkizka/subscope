@@ -24,6 +24,7 @@ import { LikeIndexingPolicy } from "../domain/indexing-policy/like-indexing-poli
 import { PostIndexingPolicy } from "../domain/indexing-policy/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "../domain/indexing-policy/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "../domain/indexing-policy/repost-indexing-policy.js";
+import { InMemoryIndexTargetCache } from "../infrastructure/cache/index-target-cache.in-memory.js";
 import { InMemoryRepoFetcher } from "../infrastructure/fetchers/repo-fetcher/repo-fetcher.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
@@ -42,6 +43,8 @@ import { InMemorySubscriptionRepository } from "../infrastructure/repositories/s
 import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
 import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 
+const sharedIndexTargetCache = new InMemoryIndexTargetCache();
+
 export const testInjector = createInjector()
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .provideValue("db", {} as never)
@@ -50,7 +53,10 @@ export const testInjector = createInjector()
   .provideClass("feedItemRepository", InMemoryFeedItemRepository)
   .provideClass("followRepository", InMemoryFollowRepository)
   .provideClass("generatorRepository", InMemoryGeneratorRepository)
-  .provideClass("indexTargetRepository", InMemoryIndexTargetRepository)
+  .provideValue("indexTargetCache", sharedIndexTargetCache)
+  .provideValue("indexTargetQuery", sharedIndexTargetCache)
+  .provideValue("indexTargetRepository", sharedIndexTargetCache)
+  .provideClass("indexTargetDataRepository", InMemoryIndexTargetRepository)
   .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
   .provideClass("likeRepository", InMemoryLikeRepository)
   .provideClass("postRepository", InMemoryPostRepository)
@@ -85,13 +91,15 @@ export const testInjector = createInjector()
   .provideClass("indexRecordService", IndexRecordService);
 
 export const setupFiles = () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     testInjector.resolve("actorRepository").clear();
     testInjector.resolve("actorStatsRepository").clear();
     testInjector.resolve("feedItemRepository").clear();
     testInjector.resolve("followRepository").clear();
     testInjector.resolve("generatorRepository").clear();
-    testInjector.resolve("indexTargetRepository").clear();
+    await testInjector.resolve("indexTargetCache").clear();
+    await testInjector.resolve("indexTargetRepository").clear();
+    testInjector.resolve("indexTargetDataRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("likeRepository").clear();
     testInjector.resolve("postRepository").clear();
