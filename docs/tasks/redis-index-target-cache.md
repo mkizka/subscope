@@ -72,11 +72,11 @@ apps/worker/src/infrastructure/
 - [x] `apps/worker/src/infrastructure/cache/index-target-cache.impl.ts` - Redis実装
 - [x] `apps/worker/src/infrastructure/cache/index-target-cache.in-memory.ts` - テスト用InMemory実装
 
-### Phase 3: リポジトリ作成
+### Phase 3: リポジトリ作成 ✅
 
-- [ ] `apps/worker/src/application/interfaces/repositories/index-target-repository.ts` - リポジトリインターフェース作成
-- [ ] `apps/worker/src/infrastructure/repositories/index-target-repository/index-target-repository.ts` - Postgres実装
-- [ ] `apps/worker/src/infrastructure/repositories/index-target-repository/index-target-repository.in-memory.ts` - テスト用InMemory実装
+- [x] `apps/worker/src/application/interfaces/repositories/index-target-repository.ts` - リポジトリインターフェース作成
+- [x] `apps/worker/src/infrastructure/repositories/index-target-repository/index-target-repository.ts` - Postgres実装
+- [x] `apps/worker/src/infrastructure/repositories/index-target-repository/index-target-repository.in-memory.ts` - テスト用InMemory実装
 
 ### Phase 4: ユースケース・サービス作成
 

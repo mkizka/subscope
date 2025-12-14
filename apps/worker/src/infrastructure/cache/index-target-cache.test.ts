@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import {
   RedisContainer,
   type StartedRedisContainer,
@@ -5,7 +6,7 @@ import {
 import { Redis } from "ioredis";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-import { IndexTargetCache } from "./index-target-cache.ts";
+import { IndexTargetCache } from "./index-target-cache.js";
 
 describe("IndexTargetCache", () => {
   let redisContainer: StartedRedisContainer;
@@ -65,7 +66,7 @@ describe("IndexTargetCache", () => {
 
     test("サブスクライバーが1人も存在しない場合、falseを返す", async () => {
       // arrange
-      const dids = ["did:plc:test1", "did:plc:test2"];
+      const dids = ["did:plc:test1", "did:plc:test2"].map(asDid);
 
       // act
       const result = await cache.hasSubscriber(dids);
@@ -124,7 +125,7 @@ describe("IndexTargetCache", () => {
 
     test("追跡アクターが1人も存在しない場合、falseを返す", async () => {
       // arrange
-      const dids = ["did:plc:tracked1", "did:plc:tracked2"];
+      const dids = ["did:plc:tracked1", "did:plc:tracked2"].map(asDid);
 
       // act
       const result = await cache.hasTrackedActor(dids);
@@ -145,7 +146,9 @@ describe("IndexTargetCache", () => {
   describe("bulkAddSubscribers", () => {
     test("複数のサブスクライバーを一括追加できる", async () => {
       // arrange
-      const dids = ["did:plc:bulk1", "did:plc:bulk2", "did:plc:bulk3"];
+      const dids = ["did:plc:bulk1", "did:plc:bulk2", "did:plc:bulk3"].map(
+        asDid,
+      );
 
       // act
       await cache.bulkAddSubscribers(dids);
@@ -165,7 +168,9 @@ describe("IndexTargetCache", () => {
   describe("bulkAddTrackedActors", () => {
     test("複数の追跡アクターを一括追加できる", async () => {
       // arrange
-      const dids = ["did:plc:bulk1", "did:plc:bulk2", "did:plc:bulk3"];
+      const dids = ["did:plc:bulk1", "did:plc:bulk2", "did:plc:bulk3"].map(
+        asDid,
+      );
 
       // act
       await cache.bulkAddTrackedActors(dids);

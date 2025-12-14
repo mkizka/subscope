@@ -24,13 +24,13 @@ import { LikeIndexingPolicy } from "../domain/indexing-policy/like-indexing-poli
 import { PostIndexingPolicy } from "../domain/indexing-policy/post-indexing-policy.js";
 import { ProfileIndexingPolicy } from "../domain/indexing-policy/profile-indexing-policy.js";
 import { RepostIndexingPolicy } from "../domain/indexing-policy/repost-indexing-policy.js";
+import { InMemoryIndexTargetCache } from "../infrastructure/cache/index-target-cache.in-memory.js";
 import { InMemoryRepoFetcher } from "../infrastructure/fetchers/repo-fetcher/repo-fetcher.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
-import { InMemoryIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/index-target-repository.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/repositories/like-repository/like-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/repositories/post-repository/post-repository.in-memory.js";
@@ -50,7 +50,7 @@ export const testInjector = createInjector()
   .provideClass("feedItemRepository", InMemoryFeedItemRepository)
   .provideClass("followRepository", InMemoryFollowRepository)
   .provideClass("generatorRepository", InMemoryGeneratorRepository)
-  .provideClass("indexTargetRepository", InMemoryIndexTargetRepository)
+  .provideClass("indexTargetRepository", InMemoryIndexTargetCache)
   .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
   .provideClass("likeRepository", InMemoryLikeRepository)
   .provideClass("postRepository", InMemoryPostRepository)
@@ -85,13 +85,13 @@ export const testInjector = createInjector()
   .provideClass("indexRecordService", IndexRecordService);
 
 export const setupFiles = () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     testInjector.resolve("actorRepository").clear();
     testInjector.resolve("actorStatsRepository").clear();
     testInjector.resolve("feedItemRepository").clear();
     testInjector.resolve("followRepository").clear();
     testInjector.resolve("generatorRepository").clear();
-    testInjector.resolve("indexTargetRepository").clear();
+    await testInjector.resolve("indexTargetRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("likeRepository").clear();
     testInjector.resolve("postRepository").clear();
