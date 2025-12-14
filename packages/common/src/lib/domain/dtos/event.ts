@@ -7,7 +7,6 @@ type CreateOrUpdateCommitEventDto<
   RecordType extends string = SupportedCollection,
 > = {
   did: Did;
-  time_us: number;
   commit: {
     operation: "create" | "update";
     collection: RecordType;
@@ -19,7 +18,6 @@ type CreateOrUpdateCommitEventDto<
 
 type DeleteCommitEventDto<RecordType extends string = SupportedCollection> = {
   did: Did;
-  time_us: number;
   commit: {
     operation: "delete";
     collection: RecordType;
@@ -31,19 +29,11 @@ export type CommitEventDto<RecordType extends string = SupportedCollection> =
   | CreateOrUpdateCommitEventDto<RecordType>
   | DeleteCommitEventDto<RecordType>;
 
-export interface AccountEventDto {
-  time_us: number;
-  account: {
-    did: Did;
-    active: boolean;
-    status?: string;
-  };
-}
-
 export interface IdentityEventDto {
-  time_us: number;
   identity: {
     did: Did;
     handle?: Handle;
+    active: boolean;
+    status?: string;
   };
 }

@@ -1,11 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { Queue } from "bullmq";
 
-import type {
-  AccountEventDto,
-  CommitEventDto,
-  IdentityEventDto,
-} from "../dtos/event.js";
+import type { CommitEventDto, IdentityEventDto } from "../dtos/event.js";
 
 type FetchRecordData = {
   uri: string;
@@ -25,7 +21,6 @@ type AggregateActorStatsData = {
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
-  account: AccountEventDto;
   identity: IdentityEventDto;
   commit: CommitEventDto;
   syncRepo: Did;

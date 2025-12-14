@@ -2,8 +2,6 @@ import type { JobData } from "@repo/common/domain";
 import type { BackoffStrategy, Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
-import { handleAccountCommandFactory } from "../application/use-cases/account/handle-account-command.js";
-import type { HandleAccountUseCase } from "../application/use-cases/account/handle-account-use-case.js";
 import { aggregateActorStatsCommandFactory } from "../application/use-cases/async/aggregate-actor-stats-command.js";
 import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { aggregatePostStatsCommandFactory } from "../application/use-cases/async/aggregate-post-stats-command.js";
@@ -66,7 +64,6 @@ export class SyncWorker {
     syncRepoUseCase: SyncRepoUseCase,
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
-    handleAccountUseCase: HandleAccountUseCase,
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
   ) {
@@ -74,10 +71,6 @@ export class SyncWorker {
       createWorker("identity", async (job) => {
         const command = upsertIdentityCommandFactory(job.data);
         await upsertIdentityUseCase.execute(command);
-      }),
-      createWorker("account", async (job) => {
-        const command = handleAccountCommandFactory(job.data);
-        await handleAccountUseCase.execute(command);
       }),
       createWorker(
         "commit",
@@ -148,7 +141,6 @@ export class SyncWorker {
     "syncRepoUseCase",
     "resolveDidUseCase",
     "fetchRecordUseCase",
-    "handleAccountUseCase",
     "aggregatePostStatsUseCase",
     "aggregateActorStatsUseCase",
   ] as const;
