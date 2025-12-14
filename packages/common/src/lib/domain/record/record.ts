@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import { jsonToLex, lexToJson } from "@atproto/lexicon";
+import { jsonToLex } from "@atproto/lexicon";
 import { ValidationError } from "@atproto/lexicon";
 import { AtUri } from "@atproto/syntax";
 import { lexicons } from "@repo/client/server";
@@ -32,17 +32,32 @@ export class Record {
     this.indexedAt = params.indexedAt ?? new Date();
   }
 
-  static fromLex(params: Omit<RecordParams, "json">) {
+  static create(params: {
+    uri: AtUri | string;
+    cid: string;
+    json: unknown;
+  }): Record {
     return new Record({
-      ...params,
-      json: lexToJson(params.lex),
+      uri: params.uri,
+      cid: params.cid,
+      lex: jsonToLex(params.json),
+      json: params.json,
+      indexedAt: new Date(),
     });
   }
 
-  static fromJson(params: Omit<RecordParams, "lex">) {
+  static reconstruct(params: {
+    uri: AtUri | string;
+    cid: string;
+    json: unknown;
+    indexedAt: Date;
+  }): Record {
     return new Record({
-      ...params,
+      uri: params.uri,
+      cid: params.cid,
       lex: jsonToLex(params.json),
+      json: params.json,
+      indexedAt: params.indexedAt,
     });
   }
 

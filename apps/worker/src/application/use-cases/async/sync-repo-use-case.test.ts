@@ -27,7 +27,7 @@ describe("SyncRepoUseCase", () => {
     actorRepository.add(actor);
     const did = actor.did;
     const records = Array.from({ length: 5 }, (_, i) =>
-      Record.fromJson({
+      Record.create({
         uri: AtUri.make(did, "app.bsky.feed.post", `${i + 1}`).toString(),
         cid: fakeCid(),
         json: {
@@ -71,7 +71,7 @@ describe("SyncRepoUseCase", () => {
     actorRepository.add(actor);
     const did = actor.did;
     const records = [
-      Record.fromJson({
+      Record.create({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
         cid: fakeCid(),
         json: {
@@ -80,12 +80,12 @@ describe("SyncRepoUseCase", () => {
           createdAt: new Date().toISOString(),
         },
       }),
-      Record.fromJson({
+      Record.create({
         uri: AtUri.make(did, "unsupported.collection", "1").toString(),
         cid: fakeCid(),
         json: { record: {} },
       }),
-      Record.fromJson({
+      Record.create({
         uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
         cid: fakeCid(),
         json: {
@@ -129,7 +129,7 @@ describe("SyncRepoUseCase", () => {
     actorRepository.add(actor);
     const did = actor.did;
     repoFetcher.setFetchResult(did, [
-      Record.fromJson({
+      Record.create({
         uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
         cid: fakeCid(),
         json: {
@@ -158,7 +158,7 @@ describe("SyncRepoUseCase", () => {
     const followedActor = actorFactory();
     actorRepository.add(followedActor);
 
-    const followRecord = Record.fromJson({
+    const followRecord = Record.create({
       uri: AtUri.make(did, "app.bsky.graph.follow", "1").toString(),
       cid: fakeCid(),
       json: {
@@ -167,7 +167,7 @@ describe("SyncRepoUseCase", () => {
         createdAt: new Date().toISOString(),
       },
     });
-    const postRecord = Record.fromJson({
+    const postRecord = Record.create({
       uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
       cid: fakeCid(),
       json: {

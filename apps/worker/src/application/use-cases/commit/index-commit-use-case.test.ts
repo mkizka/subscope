@@ -34,7 +34,7 @@ describe("IndexCommitUseCase", () => {
       await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
@@ -82,7 +82,7 @@ describe("IndexCommitUseCase", () => {
       await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
@@ -130,7 +130,7 @@ describe("IndexCommitUseCase", () => {
       await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
@@ -163,7 +163,7 @@ describe("IndexCommitUseCase", () => {
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/unsupported.collection/123");
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {

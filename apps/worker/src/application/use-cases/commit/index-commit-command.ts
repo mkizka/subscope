@@ -25,7 +25,7 @@ export const indexCommitCommandFactory = ({
     commit: {
       operation: event.commit.operation,
       uri,
-      record: Record.fromJson({
+      record: Record.create({
         uri,
         cid: event.commit.cid,
         json: event.commit.record,

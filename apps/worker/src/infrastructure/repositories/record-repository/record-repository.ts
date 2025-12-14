@@ -24,7 +24,7 @@ export class RecordRepository implements IRecordRepository {
       return null;
     }
 
-    return Record.fromJson({
+    return Record.reconstruct({
       uri,
       cid: row.cid,
       json: row.json,

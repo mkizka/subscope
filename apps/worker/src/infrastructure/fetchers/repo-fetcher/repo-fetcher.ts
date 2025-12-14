@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import { lexToJson } from "@atproto/lexicon";
 import { cborToLexRecord, verifyRepoCar } from "@atproto/repo";
 import { AtUri } from "@atproto/syntax";
 import { AtpBaseClient } from "@repo/client/api";
@@ -40,11 +41,11 @@ export class RepoFetcher implements IRepoFetcher {
     this.timer.start();
     const records = creates.map((create) => {
       const cbor = required(commit.newBlocks.get(create.cid));
-      const record = cborToLexRecord(cbor);
-      return Record.fromLex({
+      const lex = cborToLexRecord(cbor);
+      return Record.create({
         uri: AtUri.make(did, create.collection, create.rkey),
         cid: String(create.cid),
-        lex: record,
+        json: lexToJson(lex),
       });
     });
     await jobLogger.log(`レコード変換: ${this.timer.end()} ms`);

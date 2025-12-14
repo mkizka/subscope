@@ -9,11 +9,11 @@ export type RecordFactoryParams = {
 };
 
 export function recordFactory(params?: Partial<RecordFactoryParams>): Record {
-  return Record.fromJson({
+  return Record.reconstruct({
     uri:
       params?.uri ?? fakeAtUri({ collection: "app.bsky.feed.post" }).toString(),
     cid: params?.cid ?? fakeCid(),
     json: params?.json ?? {},
-    indexedAt: params?.indexedAt,
+    indexedAt: params?.indexedAt ?? new Date(),
   });
 }
