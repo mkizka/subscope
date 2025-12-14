@@ -11,12 +11,10 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3002),
-  JETSTREAM_URL: z.url().default(
-    match({
-      prod: "wss://jetstream1.us-west.bsky.network/subscribe",
-      dev: "ws://localhost:6008/subscribe",
-    }),
-  ),
+  TAP_URL: match({
+    prod: z.url(),
+    dev: z.url().default("ws://localhost:2480/channel"),
+  }),
   MODERATION_URL: z.url().default(
     match({
       prod: "wss://mod.bsky.app",
