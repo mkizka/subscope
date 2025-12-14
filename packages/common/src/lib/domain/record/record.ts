@@ -9,18 +9,12 @@ import type {
   SupportedCollectionMap,
 } from "../../utils/collection.js";
 
-type BaseRecordParams = {
+type RecordParams = {
   uri: AtUri | string;
   cid: string;
-  indexedAt: Date;
-};
-
-type LexRecordParams = BaseRecordParams & {
   lex: unknown;
-};
-
-type JsonRecordParams = BaseRecordParams & {
   json: unknown;
+  indexedAt?: Date;
 };
 
 export class Record {
@@ -30,22 +24,22 @@ export class Record {
   private readonly lex;
   readonly indexedAt;
 
-  private constructor(params: LexRecordParams & JsonRecordParams) {
+  private constructor(params: RecordParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
     this.json = params.json;
     this.lex = params.lex;
-    this.indexedAt = params.indexedAt;
+    this.indexedAt = params.indexedAt ?? new Date();
   }
 
-  static fromLex(params: LexRecordParams) {
+  static fromLex(params: Omit<RecordParams, "json">) {
     return new Record({
       ...params,
       json: lexToJson(params.lex),
     });
   }
 
-  static fromJson(params: JsonRecordParams) {
+  static fromJson(params: Omit<RecordParams, "lex">) {
     return new Record({
       ...params,
       lex: jsonToLex(params.json),

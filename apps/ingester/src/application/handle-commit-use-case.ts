@@ -32,7 +32,6 @@ export class HandleCommitUseCase {
       event.commit.operation === "delete"
         ? {
             did: event.did,
-            time_us: event.time_us,
             commit: {
               operation: event.commit.operation,
               collection: event.commit.collection,
@@ -41,7 +40,6 @@ export class HandleCommitUseCase {
           }
         : {
             did: event.did,
-            time_us: event.time_us,
             commit: {
               operation: event.commit.operation,
               collection: event.commit.collection,

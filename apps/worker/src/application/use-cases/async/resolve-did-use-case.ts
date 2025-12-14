@@ -19,7 +19,7 @@ export class ResolveDidUseCase {
       ctx: { db: this.db },
       did,
     });
-    const actor = existingActor ?? Actor.create({ did, indexedAt: new Date() });
+    const actor = existingActor ?? Actor.create({ did });
 
     actor.updateHandle(handle);
 

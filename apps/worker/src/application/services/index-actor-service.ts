@@ -26,15 +26,13 @@ export class IndexActorService {
     ctx,
     did,
     handle,
-    indexedAt,
   }: {
     ctx: TransactionContext;
     did: Did;
     handle?: Handle;
-    indexedAt: Date;
   }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
-    const actor = existingActor ?? Actor.create({ did, indexedAt });
+    const actor = existingActor ?? Actor.create({ did });
 
     if (handle) {
       actor.updateHandle(handle);

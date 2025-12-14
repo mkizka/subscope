@@ -26,7 +26,6 @@ export class HandleAccountUseCase {
     this.metricReporter.setTimeDelayGauge(event.time_us);
 
     const dto: AccountEventDto = {
-      time_us: event.time_us,
       account: {
         did: event.account.did,
         active: event.account.active,

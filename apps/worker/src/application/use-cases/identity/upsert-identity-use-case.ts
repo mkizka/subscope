@@ -28,7 +28,6 @@ export class UpsertIdentityUseCase {
       ctx,
       did: command.did,
       handle: command.handle,
-      indexedAt: command.indexedAt,
     });
   }
 

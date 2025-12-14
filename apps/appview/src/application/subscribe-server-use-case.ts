@@ -78,7 +78,6 @@ export class SubscribeServerUseCase {
       if (!existingActor) {
         const actor = Actor.create({
           did: actorDid,
-          indexedAt: new Date(),
         });
         await this.actorRepository.upsert({ ctx, actor });
       }

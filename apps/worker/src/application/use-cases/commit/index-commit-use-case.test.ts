@@ -42,7 +42,6 @@ describe("IndexCommitUseCase", () => {
           text: "Hello world",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,
@@ -91,7 +90,6 @@ describe("IndexCommitUseCase", () => {
           text: "To be deleted",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
       const createCommand: IndexCommitCommand = {
         commit: { operation: "create" as const, uri, record },
@@ -139,7 +137,6 @@ describe("IndexCommitUseCase", () => {
           $type: "app.bsky.feed.post",
           // createdAtがないため、バリデーションエラーになる想定
         },
-        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,
@@ -173,7 +170,6 @@ describe("IndexCommitUseCase", () => {
           $type: "unsupported.collection",
           text: "Hello world",
         },
-        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,

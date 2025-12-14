@@ -28,7 +28,6 @@ export class HandleIdentityUseCase {
     this.metricReporter.setTimeDelayGauge(event.time_us);
 
     const dto: IdentityEventDto = {
-      time_us: event.time_us,
       identity: {
         did: event.identity.did,
         handle: event.identity.handle,

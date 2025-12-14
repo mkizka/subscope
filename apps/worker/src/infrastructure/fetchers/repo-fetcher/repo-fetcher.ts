@@ -45,7 +45,6 @@ export class RepoFetcher implements IRepoFetcher {
         uri: AtUri.make(did, create.collection, create.rkey),
         cid: String(create.cid),
         lex: record,
-        indexedAt: new Date(),
       });
     });
     await jobLogger.log(`レコード変換: ${this.timer.end()} ms`);

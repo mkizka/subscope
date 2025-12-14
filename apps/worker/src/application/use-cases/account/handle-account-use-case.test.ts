@@ -24,7 +24,6 @@ describe("HandleAccountUseCase", () => {
       did: asDid(actor.did),
       status: "deleted",
       active: false,
-      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     };
 
     // act
@@ -44,7 +43,6 @@ describe("HandleAccountUseCase", () => {
       did: asDid(actor.did),
       status: "deactivated",
       active: false,
-      indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     };
 
     // act

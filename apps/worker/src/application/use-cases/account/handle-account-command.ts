@@ -5,7 +5,6 @@ export function handleAccountCommandFactory(event: AccountEventDto) {
     did: event.account.did,
     status: event.account.status,
     active: event.account.active,
-    indexedAt: new Date(event.time_us / 1000),
   };
 }
 

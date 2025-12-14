@@ -36,7 +36,6 @@ describe("IndexRecordService", () => {
           $type: "unsupported.collection",
           text: "Hello",
         },
-        indexedAt: new Date(),
       });
 
       // act & assert
@@ -54,7 +53,6 @@ describe("IndexRecordService", () => {
           $type: "app.bsky.feed.post",
           text: "Hello\u0000World",
         },
-        indexedAt: new Date(),
       });
 
       // act
@@ -76,7 +74,6 @@ describe("IndexRecordService", () => {
           text: "Hello World",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
 
       // act
@@ -109,7 +106,6 @@ describe("IndexRecordService", () => {
           subject: followingActor.did,
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
 
       // act

@@ -33,17 +33,13 @@ export class Actor {
     this.indexedAt = params.indexedAt;
   }
 
-  static create(params: {
-    did: string;
-    handle?: string | null;
-    indexedAt: Date;
-  }): Actor {
+  static create(params: { did: string; handle?: string | null }): Actor {
     return new Actor({
       did: params.did,
       handle: params.handle ?? null,
       syncRepoStatus: "dirty",
       syncRepoVersion: null,
-      indexedAt: params.indexedAt,
+      indexedAt: new Date(),
     });
   }
 

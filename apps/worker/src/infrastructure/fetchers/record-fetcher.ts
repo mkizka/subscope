@@ -25,7 +25,6 @@ export class RecordFetcher implements IRecordFetcher {
       uri: response.data.uri,
       cid: required(response.data.cid),
       lex: response.data.value,
-      indexedAt: new Date(),
     });
     return record;
   }

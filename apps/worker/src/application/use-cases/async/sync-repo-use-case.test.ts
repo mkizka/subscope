@@ -35,7 +35,6 @@ describe("SyncRepoUseCase", () => {
           text: `Post ${i + 1}`,
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       }),
     );
     repoFetcher.setFetchResult(did, records);
@@ -80,13 +79,11 @@ describe("SyncRepoUseCase", () => {
           text: "Test post",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       }),
       Record.fromJson({
         uri: AtUri.make(did, "unsupported.collection", "1").toString(),
         cid: fakeCid(),
         json: { record: {} },
-        indexedAt: new Date(),
       }),
       Record.fromJson({
         uri: AtUri.make(did, "app.bsky.feed.like", "1").toString(),
@@ -99,7 +96,6 @@ describe("SyncRepoUseCase", () => {
           },
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       }),
     ];
     repoFetcher.setFetchResult(did, records);
@@ -141,7 +137,6 @@ describe("SyncRepoUseCase", () => {
           text: "Test post",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       }),
     ]);
 
@@ -171,7 +166,6 @@ describe("SyncRepoUseCase", () => {
         subject: followedActor.did,
         createdAt: new Date().toISOString(),
       },
-      indexedAt: new Date(),
     });
     const postRecord = Record.fromJson({
       uri: AtUri.make(did, "app.bsky.feed.post", "1").toString(),
@@ -181,7 +175,6 @@ describe("SyncRepoUseCase", () => {
         text: "Test post",
         createdAt: new Date().toISOString(),
       },
-      indexedAt: new Date(),
     });
     repoFetcher.setFetchResult(did, [followRecord, postRecord]);
 

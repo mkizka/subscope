@@ -26,7 +26,6 @@ describe("UpsertIdentityUseCase", () => {
     const command: UpsertIdentityCommand = {
       did: "did:plc:nohandle",
       handle: undefined,
-      indexedAt: new Date(),
     };
 
     // act
@@ -52,7 +51,6 @@ describe("UpsertIdentityUseCase", () => {
     const command: UpsertIdentityCommand = {
       did: actor.did,
       handle: "identity-subscriber.bsky.social",
-      indexedAt: new Date(),
     };
 
     // act
@@ -87,7 +85,6 @@ describe("UpsertIdentityUseCase", () => {
     const command: UpsertIdentityCommand = {
       did: followedActor.did,
       handle: "identity-followed.bsky.social",
-      indexedAt: new Date(),
     };
 
     // act
@@ -104,7 +101,6 @@ describe("UpsertIdentityUseCase", () => {
     const command: UpsertIdentityCommand = {
       did: "did:plc:identity-unrelated",
       handle: "identity-unrelated.bsky.social",
-      indexedAt: new Date(),
     };
 
     // act
