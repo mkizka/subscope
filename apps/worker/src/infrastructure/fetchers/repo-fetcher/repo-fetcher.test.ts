@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { AtpBaseClient } from "@repo/client/api";
+import { required } from "@repo/common/utils";
 import { describe, expect, test, vi } from "vitest";
 import { mockDeep } from "vitest-mock-extended";
 
@@ -46,6 +47,13 @@ describe("RepoFetcher", () => {
     const records = await repoFetcher.fetch(did, jobLogger);
 
     // assert
-    expect(records.length).toBeGreaterThan(0);
+    expect(records).not.toHaveLength(0);
+    const firstPost = records.find(
+      (r) => r.collection === "app.bsky.feed.post",
+    );
+    // lexToJsonが呼ばれていることの確認
+    expect(() =>
+      required(firstPost).validate("app.bsky.feed.post"),
+    ).not.toThrow();
   });
 });

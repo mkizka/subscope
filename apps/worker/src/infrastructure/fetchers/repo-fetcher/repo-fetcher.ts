@@ -11,6 +11,11 @@ import type { IRepoFetcher } from "../../../application/interfaces/external/repo
 import type { JobLogger } from "../../../shared/job.js";
 import { Timer } from "../../../shared/timer.js";
 
+const cborToJson = (cbor: Uint8Array) => {
+  const lex = cborToLexRecord(cbor);
+  return lexToJson(lex);
+};
+
 export class RepoFetcher implements IRepoFetcher {
   private timer = new Timer();
 
@@ -41,11 +46,10 @@ export class RepoFetcher implements IRepoFetcher {
     this.timer.start();
     const records = creates.map((create) => {
       const cbor = required(commit.newBlocks.get(create.cid));
-      const lex = cborToLexRecord(cbor);
       return Record.create({
         uri: AtUri.make(did, create.collection, create.rkey),
         cid: String(create.cid),
-        json: lexToJson(lex),
+        json: cborToJson(cbor),
       });
     });
     await jobLogger.log(`レコード変換: ${this.timer.end()} ms`);
