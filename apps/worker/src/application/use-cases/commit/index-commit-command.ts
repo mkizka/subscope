@@ -29,7 +29,7 @@ export const indexCommitCommandFactory = ({
         uri,
         cid: event.commit.cid,
         json: event.commit.record,
-        indexedAt: new Date(event.time_us / 1000),
+        indexedAt: new Date(),
       }),
     },
     jobLogger,
