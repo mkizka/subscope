@@ -47,8 +47,6 @@ export class TapIngester {
         identity: {
           did: asDid(event.did),
           handle: event.handle ? asHandle(event.handle) : undefined,
-          active: event.isActive,
-          status: event.status,
         },
       };
       await this.handleIdentityUseCase.execute(identityDto);
