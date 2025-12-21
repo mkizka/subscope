@@ -6,22 +6,11 @@ import type {
   IdentityEventDto,
   ILoggerManager,
 } from "@repo/common/domain";
-import {
-  asHandle,
-  required,
-  SUPPORTED_COLLECTIONS,
-  type SupportedCollection,
-} from "@repo/common/utils";
+import { asHandle, isSupportedCollection, required } from "@repo/common/utils";
 
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
 import { env } from "../shared/env.js";
-
-function isSupportedCollection(
-  collection: string,
-): collection is SupportedCollection {
-  return SUPPORTED_COLLECTIONS.some((c) => c === collection);
-}
 
 export class TapIngester {
   private readonly tap;
