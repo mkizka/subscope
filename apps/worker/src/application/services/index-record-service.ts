@@ -63,7 +63,6 @@ export class IndexRecordService {
     ctx,
     record,
     jobLogger,
-    force = false,
     depth,
   }: {
     ctx: TransactionContext;
@@ -81,17 +80,6 @@ export class IndexRecordService {
     }
 
     const indexer = this.indexers[record.collection];
-    if (!force) {
-      const shouldIndex = await indexer.shouldIndex({
-        ctx,
-        record,
-      });
-      if (!shouldIndex) {
-        await jobLogger.log("Record does not match storage rules, skipping");
-        return;
-      }
-    }
-
     await this.indexActorService.upsert({
       ctx,
       did: record.actorDid,
