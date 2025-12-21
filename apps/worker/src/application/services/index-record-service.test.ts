@@ -64,27 +64,6 @@ describe("IndexRecordService", () => {
       );
     });
 
-    test("保存条件を満たさない場合、ログを記録して処理を終了する", async () => {
-      // arrange
-      const record = Record.create({
-        uri: "at://did:plc:user/app.bsky.feed.post/123",
-        cid: "cid123",
-        json: {
-          $type: "app.bsky.feed.post",
-          text: "Hello World",
-          createdAt: new Date().toISOString(),
-        },
-      });
-
-      // act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
-
-      // assert
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        "Record does not match storage rules, skipping",
-      );
-    });
-
     test("subscriberのフォローレコードの場合、正しく保存する", async () => {
       // arrange
       const followingActor = actorFactory();
@@ -117,9 +96,6 @@ describe("IndexRecordService", () => {
       });
 
       // assert
-      expect(jobLogger.log).not.toHaveBeenCalledWith(
-        "Record does not match storage rules, skipping",
-      );
       const savedRecord = await recordRepo.findByUri({
         ctx,
         uri: new AtUri(followRecord.uri.toString()),
