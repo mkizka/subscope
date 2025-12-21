@@ -34,7 +34,7 @@ describe("IndexCommitUseCase", () => {
       await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
@@ -42,7 +42,6 @@ describe("IndexCommitUseCase", () => {
           text: "Hello world",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,
@@ -83,7 +82,7 @@ describe("IndexCommitUseCase", () => {
       await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
@@ -91,7 +90,6 @@ describe("IndexCommitUseCase", () => {
           text: "To be deleted",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
       const createCommand: IndexCommitCommand = {
         commit: { operation: "create" as const, uri, record },
@@ -132,14 +130,13 @@ describe("IndexCommitUseCase", () => {
       await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
           $type: "app.bsky.feed.post",
           // createdAtがないため、バリデーションエラーになる想定
         },
-        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,
@@ -166,14 +163,13 @@ describe("IndexCommitUseCase", () => {
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/unsupported.collection/123");
-      const record = Record.fromJson({
+      const record = Record.create({
         uri,
         cid: "cid123",
         json: {
           $type: "unsupported.collection",
           text: "Hello world",
         },
-        indexedAt: new Date(),
       });
       const commit = {
         operation: "create" as const,

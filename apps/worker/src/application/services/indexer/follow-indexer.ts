@@ -26,7 +26,6 @@ export class FollowIndexer implements ICollectionIndexer {
     await this.indexActorService.upsert({
       ctx,
       did: follow.subjectDid,
-      indexedAt: record.indexedAt,
     });
     await this.followRepository.upsert({ ctx, follow });
   }

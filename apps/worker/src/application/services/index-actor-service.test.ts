@@ -27,7 +27,6 @@ describe("IndexActorService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -62,7 +61,6 @@ describe("IndexActorService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -94,7 +92,6 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -124,7 +121,6 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: existingHandle,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -155,7 +151,6 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -178,7 +173,6 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: newDid,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -213,7 +207,6 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: existingDidNoHandle,
-        indexedAt: new Date(),
       });
 
       // assert
@@ -246,7 +239,6 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: existingDid,
-        indexedAt: new Date(),
       });
 
       // assert

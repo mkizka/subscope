@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import { lexToJson } from "@atproto/lexicon";
 import { cborToLexRecord, verifyRepoCar } from "@atproto/repo";
 import { AtUri } from "@atproto/syntax";
 import { AtpBaseClient } from "@repo/client/api";
@@ -9,6 +10,11 @@ import { required } from "@repo/common/utils";
 import type { IRepoFetcher } from "../../../application/interfaces/external/repo-fetcher.js";
 import type { JobLogger } from "../../../shared/job.js";
 import { Timer } from "../../../shared/timer.js";
+
+const cborToJson = (cbor: Uint8Array) => {
+  const lex = cborToLexRecord(cbor);
+  return lexToJson(lex);
+};
 
 export class RepoFetcher implements IRepoFetcher {
   private timer = new Timer();
@@ -40,12 +46,10 @@ export class RepoFetcher implements IRepoFetcher {
     this.timer.start();
     const records = creates.map((create) => {
       const cbor = required(commit.newBlocks.get(create.cid));
-      const record = cborToLexRecord(cbor);
-      return Record.fromLex({
+      return Record.create({
         uri: AtUri.make(did, create.collection, create.rkey),
         cid: String(create.cid),
-        lex: record,
-        indexedAt: new Date(),
+        json: cborToJson(cbor),
       });
     });
     await jobLogger.log(`レコード変換: ${this.timer.end()} ms`);

@@ -29,14 +29,13 @@ describe("IndexRecordService", () => {
   describe("upsert", () => {
     test("サポートされていないコレクションの場合、エラーを投げる", async () => {
       // arrange
-      const record = Record.fromJson({
+      const record = Record.create({
         uri: "at://did:plc:user/unsupported.collection/123",
         cid: "cid123",
         json: {
           $type: "unsupported.collection",
           text: "Hello",
         },
-        indexedAt: new Date(),
       });
 
       // act & assert
@@ -47,14 +46,13 @@ describe("IndexRecordService", () => {
 
     test("無効なレコード（null文字を含む）の場合、ログを記録して処理を終了する", async () => {
       // arrange
-      const record = Record.fromJson({
+      const record = Record.create({
         uri: "at://did:plc:user/app.bsky.feed.post/123",
         cid: "cid123",
         json: {
           $type: "app.bsky.feed.post",
           text: "Hello\u0000World",
         },
-        indexedAt: new Date(),
       });
 
       // act
@@ -68,7 +66,7 @@ describe("IndexRecordService", () => {
 
     test("保存条件を満たさない場合、ログを記録して処理を終了する", async () => {
       // arrange
-      const record = Record.fromJson({
+      const record = Record.create({
         uri: "at://did:plc:user/app.bsky.feed.post/123",
         cid: "cid123",
         json: {
@@ -76,7 +74,6 @@ describe("IndexRecordService", () => {
           text: "Hello World",
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
 
       // act
@@ -101,7 +98,7 @@ describe("IndexRecordService", () => {
       });
       subscriptionRepo.add(subscription);
 
-      const followRecord = Record.fromJson({
+      const followRecord = Record.create({
         uri: `at://${followerActor.did}/app.bsky.graph.follow/456`,
         cid: "follow-cid",
         json: {
@@ -109,7 +106,6 @@ describe("IndexRecordService", () => {
           subject: followingActor.did,
           createdAt: new Date().toISOString(),
         },
-        indexedAt: new Date(),
       });
 
       // act

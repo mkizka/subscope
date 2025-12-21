@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { lexToJson } from "@atproto/lexicon";
 import type { AtUri } from "@atproto/syntax";
 import { RecordNotFoundError } from "@repo/client/api";
 import { AtpBaseClient } from "@repo/client/api";
@@ -21,11 +22,10 @@ export class RecordFetcher implements IRecordFetcher {
 
   async fetch(uri: AtUri): Promise<Record> {
     const response = await this.getRecord(uri);
-    const record = Record.fromLex({
+    const record = Record.create({
       uri: response.data.uri,
       cid: required(response.data.cid),
-      lex: response.data.value,
-      indexedAt: new Date(),
+      json: lexToJson(response.data.value),
     });
     return record;
   }

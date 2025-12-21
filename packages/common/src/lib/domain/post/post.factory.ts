@@ -42,7 +42,6 @@ export function postFactory(params?: Partial<PostParams>) {
       text: post.text,
       createdAt: post.createdAt.toISOString(),
     },
-    indexedAt: post.indexedAt,
   });
 
   return { post, record };

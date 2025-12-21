@@ -29,11 +29,17 @@ export type CommitEventDto<RecordType extends string = SupportedCollection> =
   | CreateOrUpdateCommitEventDto<RecordType>
   | DeleteCommitEventDto<RecordType>;
 
+export interface AccountEventDto {
+  account: {
+    did: Did;
+    active: boolean;
+    status?: string;
+  };
+}
+
 export interface IdentityEventDto {
   identity: {
     did: Did;
     handle?: Handle;
-    active: boolean;
-    status?: string;
   };
 }

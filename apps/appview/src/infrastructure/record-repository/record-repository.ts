@@ -17,7 +17,7 @@ export class RecordRepository implements IRecordRepository {
       .from(schema.records)
       .where(inArray(schema.records.uri, stringUris));
     return records.map((record) =>
-      Record.fromJson({
+      Record.reconstruct({
         uri: record.uri,
         cid: record.cid,
         json: record.json,
