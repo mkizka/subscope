@@ -6,6 +6,7 @@ import {
   LoggerManager,
   MetricReporter,
   RedisDidCache,
+  TapClient,
   TransactionManager,
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
@@ -63,8 +64,10 @@ createInjector()
   .provideValue("logLevel", env.LOG_LEVEL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("plcUrl", env.PLC_URL)
+  .provideValue("tapUrl", env.TAP_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
+  .provideClass("tapClient", TapClient)
   .provideFactory("connectionPool", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("transactionManager", TransactionManager)

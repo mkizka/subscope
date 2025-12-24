@@ -1,6 +1,7 @@
 import {
   InMemoryDidResolver,
   InMemoryJobQueue,
+  InMemoryTapClient,
   InMemoryTransactionManager,
 } from "@repo/common/test";
 import { createInjector } from "typed-inject";
@@ -61,6 +62,7 @@ export const testInjector = createInjector()
   .provideClass("subscriptionRepository", InMemorySubscriptionRepository)
   .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
+  .provideClass("tapClient", InMemoryTapClient)
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("didResolver", InMemoryDidResolver)
   .provideClass("jobLogger", InMemoryJobLogger)
@@ -100,6 +102,7 @@ export const setupFiles = () => {
     testInjector.resolve("recordRepository").clear();
     testInjector.resolve("repostRepository").clear();
     testInjector.resolve("subscriptionRepository").clear();
+    testInjector.resolve("tapClient").clear();
     testInjector.resolve("jobQueue").clear();
     testInjector.resolve("didResolver").clear();
     testInjector.resolve("jobLogger").clear();

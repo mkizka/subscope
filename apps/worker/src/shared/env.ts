@@ -27,6 +27,10 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("redis://localhost:6379"),
   }),
+  TAP_URL: match({
+    prod: z.url(),
+    dev: z.url().default("http://localhost:2480"),
+  }),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
   SYNC_REPO_BATCH_SIZE: z.coerce.number().default(1000),
   AGGREGATE_STATS_DELAY_SECONDS: z.coerce.number().default(10),

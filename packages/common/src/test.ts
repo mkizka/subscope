@@ -12,5 +12,6 @@ export * from "./lib/domain/repost/repost.factory.js";
 export * from "./lib/domain/subscription.factory.js";
 export * from "./lib/infrastructure/did-resolver/did-resolver.in-memory.js";
 export * from "./lib/infrastructure/job-queue/job-queue.in-memory.js";
+export * from "./lib/infrastructure/tap-client/tap-client.in-memory.js";
 export * from "./lib/infrastructure/transaction/transaction.in-memory.js";
 export * from "./lib/utils/fake.js";

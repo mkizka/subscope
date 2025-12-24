@@ -91,24 +91,28 @@ Jetstreamから@atproto/tapへの移行に伴う実装タスク
 
 **注意**: ~~Tap登録失敗時でもサブスクライバー作成は成功とする（後で手動リトライ可能）~~ → エラーハンドリング不要の設計に変更
 
-## 3. フォロー作成時にフォロイーのDIDをTapに登録
+## 3. フォロー作成時にフォロワーがサブスクライバーの場合のみフォロイーのDIDをTapに登録
 
 **目的**: サブスクライバーが新しくフォローした際に、フォロイーのDIDをTapに登録する
 
 **実装場所**:
 
-- `apps/worker/src/application/indexers/follow-indexer.ts` またはフォロー処理関連のコード
-- テスト: 対応するテストファイル
+- `apps/worker/src/application/services/indexer/follow-indexer.ts`
+- テスト: `apps/worker/src/application/services/indexer/follow-indexer.test.ts`
 
 **タスク**:
 
-- [ ] フォローレコードインデックス処理にTap登録を追加
-  - [ ] 新規フォロー作成時、フォロイーのDID（`record.subject`）をTapに登録
-  - [ ] 重複登録を避ける仕組み（Tapが重複を許容するか確認が必要）
-- [ ] フォローインデックス処理のテストケースを更新
-  - [ ] フォロー作成時にTap登録が呼ばれることを検証
+- [x] フォローレコードインデックス処理にTap登録を追加
+  - [x] FollowIndexerにTapClientとISubscriptionRepositoryを依存性として追加
+  - [x] 新規フォロー作成時、フォロワー（`follow.actorDid`）がサブスクライバーかどうかをチェック
+  - [x] サブスクライバーの場合のみフォロイーのDID（`follow.subjectDid`）をTapに登録
+- [x] フォローインデックス処理のテストケースを更新
+  - [x] フォロワーがサブスクライバーの場合、フォロイーのDIDがTapに登録されることを検証
+  - [x] フォロワーがサブスクライバーでない場合、TapにDIDが登録されないことを検証
+- [x] worker環境変数にTAP_URLを追加
+- [x] DIコンテナにTapClientを登録
 
-**検討事項**: Tapが重複登録をどう扱うか確認する（冪等性の保証があるか）
+**注意**: フォロー「される側」(followee)ではなく、フォロー「する側」(follower)がサブスクライバーかどうかを判定する
 
 ## 4. バックフィル処理からフォロー発見時にTapに登録
 

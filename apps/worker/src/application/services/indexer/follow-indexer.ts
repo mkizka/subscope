@@ -1,8 +1,13 @@
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type {
+  ITapClient,
+  Record,
+  TransactionContext,
+} from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
 import type { FollowIndexingPolicy } from "../../../domain/indexing-policy/follow-indexing-policy.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
+import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
@@ -13,12 +18,16 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly followIndexingPolicy: FollowIndexingPolicy,
     private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
     private readonly indexActorService: IndexActorService,
+    private readonly tapClient: ITapClient,
+    private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
   static inject = [
     "followRepository",
     "followIndexingPolicy",
     "aggregateActorStatsScheduler",
     "indexActorService",
+    "tapClient",
+    "subscriptionRepository",
   ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
@@ -28,6 +37,14 @@ export class FollowIndexer implements ICollectionIndexer {
       did: follow.subjectDid,
     });
     await this.followRepository.upsert({ ctx, follow });
+
+    const isFollowerSubscriber = await this.subscriptionRepository.isSubscriber(
+      ctx,
+      follow.actorDid,
+    );
+    if (isFollowerSubscriber) {
+      await this.tapClient.addRepo(follow.subjectDid);
+    }
   }
 
   async shouldIndex({
