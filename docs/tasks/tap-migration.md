@@ -161,93 +161,131 @@ Jetstreamから@atproto/tapへの移行に伴う実装タスク
 
 Tapから送信される全イベント（commit, identity）を無条件でインデックスするようになりました。フィルタリングの責務は完全にTap側に移譲されました。
 
-## 6. 手動バックフィル処理を削除
+## 6A. 手動バックフィル処理のコードを削除
 
-**目的**: Tapの自動バックフィル機能があるため、手動バックフィル処理を削除する
+**状態**: ✅ 完了
 
-**実装場所**:
-
-- バックフィル関連のコード（PDS直接アクセス処理）
-- バックフィルジョブ定義
-
-**タスク**:
-
-- [ ] 既存のPDS直接アクセスによるバックフィル処理を調査
-  - [ ] どの部分がTapの自動バックフィルで置き換え可能か確認
-  - [ ] 削除できる処理と残すべき処理を判断
-- [ ] 不要になったバックフィル処理を削除または無効化
-  - [ ] PDS直接フェッチ処理
-  - [ ] 手動バックフィルジョブ
-  - [ ] バックフィル関連のキュー定義
-- [ ] Tapのバックフィル完了を待つ仕組みを検討（必要な場合）
-- [ ] バックフィル関連のテストを更新
-
-**注意**:
-
-- プロフィール取得など、Tapでカバーされない処理は残す必要がある
-- 段階的に削除し、動作確認しながら進める
-
-## 7. 既存のテストケースの更新
-
-**目的**: 削除・変更したコードに対応するテストケースを更新する
+**目的**: Tapの自動バックフィル機能があるため、PDS直接アクセスによる手動バックフィル処理を削除する
 
 **実装場所**:
 
-- 各インデクサーのテストファイル
-- バックフィル関連のテストファイル
+- `apps/appview/src/application/service/scheduler/sync-repo-scheduler.ts`
+- `apps/worker/src/application/use-cases/async/sync-repo-use-case.ts`
+- `apps/worker/src/infrastructure/fetchers/repo-fetcher/`
 
-**タスク**:
+**完了した作業**:
 
-- [ ] インデックスポリシー関連のテストを削除
-  - [ ] 「追跡アカウントのみ保存」などの条件テスト
-  - [ ] 「サブスクライバーへのリプライのみ保存」などの条件テスト
-  - [ ] 「追跡アカウントの投稿へのいいね/リポストのみ保存」などの条件テスト
-- [ ] バックフィル関連のテストを更新
-  - [ ] 手動バックフィル処理のテスト削除
-  - [ ] Tapバックフィル前提のテストに変更
+- [x] SubscribeServerUseCaseからSyncRepoScheduler呼び出しを削除
+  - [x] `apps/appview/src/application/subscribe-server-use-case.ts`
+    - import削除
+    - constructorからsyncRepoScheduler削除
+    - injectからsyncRepoScheduler削除
+    - `syncRepoScheduler.schedule()`呼び出し削除
+  - [x] テストファイルも更新 (`subscribe-server-use-case.test.ts`)
+- [x] DIコンテナから削除
+  - [x] `apps/appview/src/appview.ts` - SyncRepoScheduler登録削除
+  - [x] `apps/worker/src/worker.ts` - SyncRepoUseCase, RepoFetcher登録削除
+  - [x] `apps/worker/src/presentation/worker.ts` - SyncWorkerからsyncRepoワーカー削除
+  - [x] `apps/worker/src/shared/test-utils.ts` - InMemoryRepoFetcher登録削除
+- [x] ファイル削除
+  - [x] `apps/appview/src/application/service/scheduler/sync-repo-scheduler.ts`
+  - [x] `apps/worker/src/application/use-cases/async/sync-repo-use-case.ts`
+  - [x] `apps/worker/src/application/use-cases/async/sync-repo-use-case.test.ts`
+  - [x] `apps/worker/src/infrastructure/fetchers/repo-fetcher/`（ディレクトリ全体）
+  - [x] `apps/worker/src/application/interfaces/external/repo-fetcher.ts`
+- [x] 動作確認
+  - [x] 型チェックが通ることを確認
+  - [x] 全190個のunitテストが成功
 
-**テストの書き方**: [docs/dev/testing.md](../dev/testing.md)を参照
+**結果**:
 
-## 8. 新機能のテストケースを追加
+手動バックフィル処理を完全に削除し、Tapの自動バックフィル機能に移行しました。サブスクライバー登録時にはTapへのDID登録のみを行い、レコードの取得はTapが自動的に行うようになりました。
 
-**目的**: Tap統合機能の動作を保証するテストを追加する
+## 6B. ActorエンティティからsyncRepo関連を削除
+
+**目的**: 手動バックフィル処理の状態管理が不要になったため、ActorエンティティからsyncRepo関連のプロパティとメソッドを削除する
 
 **実装場所**:
 
-- TapClientのテスト
-- 各ユースケースのテスト
+- `packages/common/src/lib/domain/actor/actor.ts`
+- `packages/common/src/lib/domain/actor/actor.factory.ts`
 
 **タスク**:
 
-- [ ] Tap登録機能のテスト（TapClient）
-  - [ ] repos/add呼び出しの成功ケース
-  - [ ] 重複登録のケース（冪等性確認）
-  - [ ] エラーハンドリングのケース
-  - [ ] リトライ処理のケース
-- [ ] フォロー作成時のTap登録テスト
-  - [ ] 新規フォロー時にTapに登録されることを検証
-  - [ ] Tap登録失敗時でもフォロー処理は成功することを検証
-- [ ] 全イベント処理のテスト
-  - [ ] Tapから送信される様々なイベントが全て処理されることを検証
-  - [ ] 条件によって拒否されるイベントがないことを検証
+- [ ] Actorエンティティから削除
+  - [ ] `packages/common/src/lib/domain/actor/actor.ts`
+    - SyncRepoStatus型削除
+    - ActorParams内のsyncRepoStatus, syncRepoVersion削除
+    - Actor.\_syncRepoStatus, \_syncRepoVersion削除
+    - getter: syncRepoStatus(), syncRepoVersion()削除
+    - メソッド: startSyncRepo(), markSyncRepoReady(), completeSyncRepo(), failSyncRepo()削除
+  - [ ] `packages/common/src/lib/domain/actor/actor.factory.ts`
+    - syncRepoStatus, syncRepoVersionパラメータ削除
+- [ ] リポジトリ実装から削除
+  - [ ] `apps/appview/src/infrastructure/actor-repository/actor-repository.ts`
+  - [ ] `apps/worker/src/infrastructure/repositories/actor-repository/actor-repository.ts`
+- [ ] DBスキーマから削除
+  - [ ] `packages/db/src/schema.ts`
+    - syncRepoStatus列挙型定義削除
+    - actors.syncRepoStatusカラム削除
+    - actors.syncRepoVersionカラム削除
+- [ ] テストファイル更新
+  - [ ] `apps/appview/src/infrastructure/actor-repository/actor-repository.test.ts`
+  - [ ] `packages/test-utils/src/factory.ts`
+- [ ] 動作確認
+  - [ ] 型チェックが通ることを確認
 
-**テストケース名の例**:
+## 6C. GetSubscriptionStatusからsyncRepoStatusを削除
 
-- 「サブスクライバー登録時、そのDIDがTapに登録される」
-- 「フォロー作成時、フォロイーのDIDがTapに登録される」
-- 「Tap登録失敗時、エラーログが記録されるが処理は継続する」
+**目的**: API仕様からsyncRepoStatusフィールドを削除する（破壊的変更）
+
+**実装場所**:
+
+- `packages/client/lexicons/me/subsco/sync/getSubscriptionStatus.json`
+- `apps/appview/src/application/get-subscription-status-use-case.ts`
+
+**タスク**:
+
+- [ ] Lexicon定義を更新
+  - [ ] `packages/client/lexicons/me/subsco/sync/getSubscriptionStatus.json`
+    - subscribed定義からsyncRepoStatusフィールド削除
+  - [ ] `pnpm install` を実行してクライアントコード再生成
+- [ ] GetSubscriptionStatusUseCaseを更新
+  - [ ] `apps/appview/src/application/get-subscription-status-use-case.ts`
+    - 返り値からsyncRepoStatus削除
+- [ ] テストファイル更新
+  - [ ] `apps/appview/src/application/get-subscription-status-use-case.test.ts`
+  - [ ] `apps/appview/src/application/subscribe-server-use-case.test.ts`
+- [ ] 動作確認
+  - [ ] `pnpm all` で全テストを実行
+  - [ ] すべてのテストが成功することを確認
+
+## 7. テストケースの更新と追加
+
+**状態**: ✅ タスク1-5で完了済み
+
+タスク1-5の実装時に以下のテストが既に追加・更新されています:
+
+**追加済みのテスト**:
+
+- ✅ TapClient機能のテスト (タスク1)
+- ✅ サブスクライバー登録時のTap登録テスト (タスク2)
+- ✅ フォロー作成時のTap登録テスト (タスク3)
+- ✅ インデックスポリシー削除に伴うテスト更新 (タスク5)
+
+**残作業**: タスク6完了時に削除される手動バックフィル関連のテスト更新のみ（タスク6.3に含む）
 
 ## 実装の順序
 
-推奨される実装順序：
-
-1. タスク1: TapClient実装（他のタスクの基盤） ✅
+1. タスク1: TapClient実装 ✅
 2. タスク2: サブスクライバー登録時のTap登録 ✅
 3. タスク3: フォロー作成時のTap登録 ✅
 4. ~~タスク4: バックフィル時のTap登録~~ ❌ 不要（タスク3で実現済み）
 5. タスク5: インデックスポリシー削除 ✅
-6. タスク6: 手動バックフィル削除
-7. タスク7, 8: テスト更新
+6. タスク6A: 手動バックフィル処理のコードを削除 ⏳ 次
+7. タスク6B: ActorエンティティからsyncRepo関連を削除
+8. タスク6C: GetSubscriptionStatusからsyncRepoStatusを削除
+9. タスク7: テストケースの更新 ✅ (各タスクに含まれる)
 
 ## 注意事項
 

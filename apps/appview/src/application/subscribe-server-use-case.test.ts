@@ -1,15 +1,12 @@
 import { asDid } from "@atproto/did";
-import type { IJobQueue } from "@repo/common/domain";
 import {
   actorFactory,
   inviteCodeFactory,
   subscriptionFactory,
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
 
 import { testInjector } from "../shared/test-utils.js";
-import { SyncRepoScheduler } from "./service/scheduler/sync-repo-scheduler.js";
 import {
   AlreadySubscribedError,
   InvalidInviteCodeError,
@@ -19,12 +16,9 @@ import {
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
-  const mockJobQueue = mock<IJobQueue>();
-
-  const subscribeServerUseCase = testInjector
-    .provideValue("jobQueue", mockJobQueue)
-    .provideClass("syncRepoScheduler", SyncRepoScheduler)
-    .injectClass(SubscribeServerUseCase);
+  const subscribeServerUseCase = testInjector.injectClass(
+    SubscribeServerUseCase,
+  );
 
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
@@ -34,7 +28,6 @@ describe("SubscribeServerUseCase", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(now);
-    mockJobQueue.add.mockReset();
   });
 
   test("有効な招待コードの場合、サブスクリプションを作成して招待コードの使用時間を更新する", async () => {
@@ -60,11 +53,6 @@ describe("SubscribeServerUseCase", () => {
     });
     const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).toEqual(now);
-    expect(mockJobQueue.add).toHaveBeenCalledWith({
-      queueName: "syncRepo",
-      jobName: `at://${actor.did}`,
-      data: asDid(actor.did),
-    });
     expect(tapClient.getRegisteredDids()).toContain(asDid(actor.did));
   });
 

@@ -9,7 +9,6 @@ import {
 import type { IActorRepository } from "./interfaces/actor-repository.js";
 import type { IInviteCodeRepository } from "./interfaces/invite-code-repository.js";
 import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
-import type { SyncRepoScheduler } from "./service/scheduler/sync-repo-scheduler.js";
 
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {
@@ -36,7 +35,6 @@ export class SubscribeServerUseCase {
     private readonly actorRepository: IActorRepository,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly syncRepoScheduler: SyncRepoScheduler,
     private readonly tapClient: ITapClient,
   ) {}
   static inject = [
@@ -44,7 +42,6 @@ export class SubscribeServerUseCase {
     "actorRepository",
     "inviteCodeRepository",
     "subscriptionRepository",
-    "syncRepoScheduler",
     "tapClient",
   ] as const;
 
@@ -90,8 +87,6 @@ export class SubscribeServerUseCase {
       inviteCode.markAsUsed();
       await this.inviteCodeRepository.upsert({ ctx, inviteCode });
     });
-
-    await this.syncRepoScheduler.schedule(actorDid);
 
     await this.tapClient.addRepo(actorDid);
   }

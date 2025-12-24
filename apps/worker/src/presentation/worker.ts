@@ -8,7 +8,6 @@ import { aggregatePostStatsCommandFactory } from "../application/use-cases/async
 import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
-import type { SyncRepoUseCase } from "../application/use-cases/async/sync-repo-use-case.js";
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
@@ -61,7 +60,6 @@ export class SyncWorker {
   constructor(
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
-    syncRepoUseCase: SyncRepoUseCase,
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
@@ -85,12 +83,6 @@ export class SyncWorker {
           concurrency: env.COMMIT_WORKER_CONCURRENCY,
         },
       ),
-      createWorker("syncRepo", async (job) => {
-        await syncRepoUseCase.execute({
-          did: job.data,
-          jobLogger: createJobLogger(job),
-        });
-      }),
       createWorker(
         "resolveDid",
         async (job) => {
@@ -138,7 +130,6 @@ export class SyncWorker {
   static inject = [
     "upsertIdentityUseCase",
     "indexCommitUseCase",
-    "syncRepoUseCase",
     "resolveDidUseCase",
     "fetchRecordUseCase",
     "aggregatePostStatsUseCase",

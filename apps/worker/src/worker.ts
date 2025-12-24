@@ -27,11 +27,9 @@ import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggreg
 import { AggregatePostStatsUseCase } from "./application/use-cases/async/aggregate-post-stats-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
 import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use-case.js";
-import { SyncRepoUseCase } from "./application/use-cases/async/sync-repo-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
 import { RecordFetcher } from "./infrastructure/fetchers/record-fetcher.js";
-import { RepoFetcher } from "./infrastructure/fetchers/repo-fetcher/repo-fetcher.js";
 import { ActorRepository } from "./infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "./infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FeedItemRepository } from "./infrastructure/repositories/feed-item-repository/feed-item-repository.js";
@@ -69,7 +67,6 @@ createInjector()
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
   .provideClass("jobQueue", JobQueue)
-  .provideClass("repoFetcher", RepoFetcher)
   .provideClass("recordFetcher", RecordFetcher)
   .provideClass("actorRepository", ActorRepository)
   .provideClass("inviteCodeRepository", InviteCodeRepository)
@@ -104,7 +101,6 @@ createInjector()
   .provideClass("indexCommitUseCase", IndexCommitUseCase)
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("fetchRecordUseCase", FetchRecordUseCase)
-  .provideClass("syncRepoUseCase", SyncRepoUseCase)
   .provideClass("aggregatePostStatsUseCase", AggregatePostStatsUseCase)
   .provideClass("aggregateActorStatsUseCase", AggregateActorStatsUseCase)
   .provideClass("syncWorker", SyncWorker)
