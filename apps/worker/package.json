@@ -36,7 +36,6 @@
   "devDependencies": {
     "@mkizka/eslint-config": "7.2.0",
     "@repo/test-utils": "workspace:*",
-    "@skyware/jetstream": "0.2.5",
     "@tsconfig/node-lts": "24.0.0",
     "@types/express": "5.0.6",
     "@types/node": "24.10.1",

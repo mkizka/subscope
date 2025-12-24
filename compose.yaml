@@ -1,5 +1,6 @@
 volumes:
   db_data:
+  tap_data:
 
 services:
   db:
@@ -14,11 +15,11 @@ services:
     image: redis:7
     ports:
       - 6379:6379
-  jetstream:
-    image: ghcr.io/bluesky-social/jetstream:sha-ea96859
-    restart: always
-    network_mode: host
+  tap:
+    image: ghcr.io/bluesky-social/indigo/tap:0.1
     environment:
-      - JETSTREAM_WS_URL=ws://localhost:2583/xrpc/com.atproto.sync.subscribeRepos
-      - JETSTREAM_WORKER_COUNT=1
-      - JETSTREAM_LIVENESS_TTL=10m
+      - TAP_DATABASE_URL=sqlite:///data/tap.db
+    volumes:
+      - tap_data:/data
+    ports:
+      - 2480:2480

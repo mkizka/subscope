@@ -22,7 +22,6 @@ import { AggregateActorStatsScheduler } from "./application/services/scheduler/a
 import { AggregatePostStatsScheduler } from "./application/services/scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
-import { HandleAccountUseCase } from "./application/use-cases/account/handle-account-use-case.js";
 import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "./application/use-cases/async/aggregate-post-stats-use-case.js";
 import { FetchRecordUseCase } from "./application/use-cases/async/fetch-record-use-case.js";
@@ -115,7 +114,6 @@ createInjector()
   .provideClass("resolveDidUseCase", ResolveDidUseCase)
   .provideClass("fetchRecordUseCase", FetchRecordUseCase)
   .provideClass("syncRepoUseCase", SyncRepoUseCase)
-  .provideClass("handleAccountUseCase", HandleAccountUseCase)
   .provideClass("aggregatePostStatsUseCase", AggregatePostStatsUseCase)
   .provideClass("aggregateActorStatsUseCase", AggregateActorStatsUseCase)
   .provideClass("syncWorker", SyncWorker)

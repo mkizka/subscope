@@ -13,11 +13,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atproto/did": "0.2.3",
+    "@atproto/tap": "0.0.2",
     "@atproto/xrpc-server": "0.10.2",
     "@keyv/redis": "5.1.4",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
-    "@skyware/jetstream": "0.2.5",
     "express": "5.2.1",
     "keyv": "5.5.5",
     "tsx": "4.21.0",

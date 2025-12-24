@@ -5,14 +5,13 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { HandleAccountUseCase } from "./application/handle-account-use-case.js";
 import { HandleCommitUseCase } from "./application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "./application/handle-identity-use-case.js";
 import { RedisCursorRepository } from "./infrastructure/redis-cursor-repository.js";
-import { JetstreamIngester } from "./presentation/jetstream.js";
 import { LabelIngester } from "./presentation/label.js";
 import { metricsRouterFactory } from "./presentation/routes/metrics.js";
 import { IngesterServer } from "./presentation/server.js";
+import { TapIngester } from "./presentation/tap.js";
 import { env } from "./shared/env.js";
 
 createInjector()
@@ -25,12 +24,11 @@ createInjector()
   .provideClass("metricReporter", MetricReporter)
   .provideClass("cursorRepository", RedisCursorRepository)
   // application
-  .provideClass("handleAccountUseCase", HandleAccountUseCase)
   .provideClass("handleIdentityUseCase", HandleIdentityUseCase)
   .provideClass("handleCommitUseCase", HandleCommitUseCase)
   // presentation
   .provideFactory("metricsRouter", metricsRouterFactory)
-  .provideClass("jetstreamIngester", JetstreamIngester)
+  .provideClass("tapIngester", TapIngester)
   .provideClass("labelIngester", LabelIngester)
   .injectClass(IngesterServer)
   .start();
