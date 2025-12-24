@@ -15,17 +15,12 @@
     },
     "subscribed": {
       "type": "object",
-      "required": ["isSubscriber", "syncRepoStatus"],
+      "required": ["isSubscriber"],
       "properties": {
         "isSubscriber": {
           "type": "boolean",
           "const": true,
           "description": "The user is a subscriber"
-        },
-        "syncRepoStatus": {
-          "type": "string",
-          "enum": ["dirty", "in-process", "ready", "synchronized", "failed"],
-          "description": "Current repository sync status"
         }
       }
     },

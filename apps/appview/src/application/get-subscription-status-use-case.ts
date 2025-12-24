@@ -29,7 +29,6 @@ export class GetSubscriptionStatusUseCase {
     return {
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true as const,
-      syncRepoStatus: "synchronized",
     };
   }
 }

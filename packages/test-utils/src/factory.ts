@@ -29,9 +29,6 @@ export const actorFactory = (db: Database) =>
         props: {
           did: () => fakeDid(),
           handle: () => fakeHandle() as string | null,
-          syncRepoStatus: () =>
-            "dirty" as "dirty" | "in-process" | "synchronized",
-          syncRepoVersion: () => null,
           indexedAt: () => faker.date.recent(),
         },
         vars: {},

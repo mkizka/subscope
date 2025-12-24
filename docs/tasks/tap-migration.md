@@ -243,11 +243,9 @@ Tapから送信される全イベント（commit, identity）を無条件でイ�
 
 ActorエンティティからsyncRepo関連のプロパティとメソッドを完全に削除しました。手動バックフィル処理の状態管理は不要になり、Actorエンティティはシンプルになりました。
 
-**注意**:
-
-- get-subscription-status-use-case.tsは一時的にsyncRepoStatusを固定値"synchronized"にしています。完全な対応はタスク6Cで行います。
-
 ## 6C. GetSubscriptionStatusからsyncRepoStatusを削除
+
+**状態**: ✅ 完了
 
 **目的**: API仕様からsyncRepoStatusフィールドを削除する（破壊的変更）
 
@@ -256,21 +254,25 @@ ActorエンティティからsyncRepo関連のプロパティとメソッドを�
 - `packages/client/lexicons/me/subsco/sync/getSubscriptionStatus.json`
 - `apps/appview/src/application/get-subscription-status-use-case.ts`
 
-**タスク**:
+**完了した作業**:
 
-- [ ] Lexicon定義を更新
-  - [ ] `packages/client/lexicons/me/subsco/sync/getSubscriptionStatus.json`
+- [x] Lexicon定義を更新
+  - [x] `packages/client/lexicons/me/subsco/sync/getSubscriptionStatus.json`
     - subscribed定義からsyncRepoStatusフィールド削除
-  - [ ] `pnpm install` を実行してクライアントコード再生成
-- [ ] GetSubscriptionStatusUseCaseを更新
-  - [ ] `apps/appview/src/application/get-subscription-status-use-case.ts`
+  - [x] `pnpm install` を実行してクライアントコード再生成
+- [x] GetSubscriptionStatusUseCaseを更新
+  - [x] `apps/appview/src/application/get-subscription-status-use-case.ts`
     - 返り値からsyncRepoStatus削除
-- [ ] テストファイル更新
-  - [ ] `apps/appview/src/application/get-subscription-status-use-case.test.ts`
-  - [ ] `apps/appview/src/application/subscribe-server-use-case.test.ts`
-- [ ] 動作確認
-  - [ ] `pnpm all` で全テストを実行
-  - [ ] すべてのテストが成功することを確認
+- [x] テストファイル更新
+  - [x] `apps/appview/src/application/get-subscription-status-use-case.test.ts`
+  - [x] `packages/test-utils/src/factory.ts` (actorFactoryからsyncRepoStatus/syncRepoVersion削除)
+- [x] 動作確認
+  - [x] `pnpm all` で全テストを実行
+  - [x] すべての341個のテストが成功することを確認
+
+**結果**:
+
+API仕様から`syncRepoStatus`フィールドを完全に削除しました。`me.subsco.sync.getSubscriptionStatus#subscribed`レスポンスは`isSubscriber`フィールドのみを返すようになり、手動バックフィル処理の状態管理に関連するフィールドは完全に削除されました。
 
 ## 7. テストケースの更新と追加
 
@@ -296,7 +298,7 @@ ActorエンティティからsyncRepo関連のプロパティとメソッドを�
 5. タスク5: インデックスポリシー削除 ✅
 6. タスク6A: 手動バックフィル処理のコードを削除 ✅
 7. タスク6B: ActorエンティティからsyncRepo関連を削除 ✅
-8. タスク6C: GetSubscriptionStatusからsyncRepoStatusを削除 ⏳ 次
+8. タスク6C: GetSubscriptionStatusからsyncRepoStatusを削除 ✅
 9. タスク7: テストケースの更新 ✅ (各タスクに含まれる)
 
 ## 注意事項

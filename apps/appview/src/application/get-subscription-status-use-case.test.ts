@@ -45,7 +45,6 @@ describe("GetSubscriptionStatusUseCase", () => {
     expect(result).toEqual({
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true,
-      syncRepoStatus: "synchronized",
     });
   });
 });
