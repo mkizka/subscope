@@ -13,7 +13,7 @@ const schema = z.object({
   PORT: z.coerce.number().default(3002),
   TAP_URL: match({
     prod: z.url(),
-    dev: z.url().default("ws://localhost:2480/channel"),
+    dev: z.url().default("http://localhost:2480"),
   }),
   MODERATION_URL: z.url().default(
     match({
