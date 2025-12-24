@@ -7,5 +7,6 @@ export * from "./lib/infrastructure/logger/logger-manager.in-memory.js";
 export * from "./lib/infrastructure/metric.js";
 export * from "./lib/infrastructure/metric-reporter/metric-reporter.in-memory.js";
 export * from "./lib/infrastructure/redis-did-cache.js";
+export * from "./lib/infrastructure/tap-client/tap-client.in-memory.js";
 export * from "./lib/infrastructure/tap-client/tap-client.js";
 export * from "./lib/infrastructure/transaction/transaction.js";

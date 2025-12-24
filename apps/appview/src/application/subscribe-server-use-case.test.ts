@@ -29,6 +29,7 @@ describe("SubscribeServerUseCase", () => {
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
   const actorRepo = testInjector.resolve("actorRepository");
+  const tapClient = testInjector.resolve("tapClient");
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -64,6 +65,7 @@ describe("SubscribeServerUseCase", () => {
       jobName: `at://${actor.did}`,
       data: asDid(actor.did),
     });
+    expect(tapClient.getRegisteredDids()).toContain(asDid(actor.did));
   });
 
   test("招待コードが提供されない場合、InvalidInviteCodeErrorをthrowする", async () => {
@@ -189,5 +191,6 @@ describe("SubscribeServerUseCase", () => {
       inviteCode: inviteCode.code,
       createdAt: now,
     });
+    expect(tapClient.getRegisteredDids()).toContain(did);
   });
 });

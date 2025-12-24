@@ -1,3 +1,4 @@
+import { InMemoryTapClient } from "@repo/common/infrastructure";
 import { InMemoryTransactionManager } from "@repo/common/test";
 import { createInjector } from "typed-inject";
 import { beforeEach } from "vitest";
@@ -57,6 +58,7 @@ export const testInjector = createInjector()
   .provideClass("handleResolver", InMemoryHandleResolver)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("assetUrlBuilder", InMemoryAssetUrlBuilder)
+  .provideClass("tapClient", InMemoryTapClient)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("profileViewService", ProfileViewService)
@@ -92,5 +94,6 @@ export const setupFiles = () => {
     testInjector.resolve("subscriptionRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("handleResolver").clear();
+    testInjector.resolve("tapClient").clear();
   });
 };

@@ -1,16 +1,14 @@
 import { asDid } from "@atproto/did";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { LoggerManager } from "../logger.js";
 import { TapClient } from "./tap-client.js";
 
 describe("TapClient", () => {
   const tapUrl = "https://tap.example.com";
-  const loggerManager = new LoggerManager("info");
   let tapClient: TapClient;
 
   beforeEach(() => {
-    tapClient = new TapClient(tapUrl, loggerManager);
+    tapClient = new TapClient(tapUrl);
   });
 
   describe("addRepo", () => {

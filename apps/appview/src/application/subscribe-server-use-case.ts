@@ -1,6 +1,7 @@
 import type { Did } from "@atproto/did";
 import {
   Actor,
+  type ITapClient,
   type ITransactionManager,
   Subscription,
 } from "@repo/common/domain";
@@ -36,6 +37,7 @@ export class SubscribeServerUseCase {
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly syncRepoScheduler: SyncRepoScheduler,
+    private readonly tapClient: ITapClient,
   ) {}
   static inject = [
     "transactionManager",
@@ -43,6 +45,7 @@ export class SubscribeServerUseCase {
     "inviteCodeRepository",
     "subscriptionRepository",
     "syncRepoScheduler",
+    "tapClient",
   ] as const;
 
   async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
@@ -89,5 +92,7 @@ export class SubscribeServerUseCase {
     });
 
     await this.syncRepoScheduler.schedule(actorDid);
+
+    await this.tapClient.addRepo(actorDid);
   }
 }
