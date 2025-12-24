@@ -1,5 +1,4 @@
 import type { Did } from "@atproto/did";
-import { required } from "@repo/common/utils";
 
 import type { IActorRepository } from "./interfaces/actor-repository.js";
 import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
@@ -27,12 +26,10 @@ export class GetSubscriptionStatusUseCase {
       };
     }
 
-    const actor = await this.actorRepository.findByDid(params.actorDid);
-
     return {
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
       isSubscriber: true as const,
-      syncRepoStatus: required(actor).syncRepoStatus,
+      syncRepoStatus: "synchronized",
     };
   }
 }

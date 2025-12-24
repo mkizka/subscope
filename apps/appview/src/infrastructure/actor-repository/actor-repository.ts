@@ -17,8 +17,6 @@ export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
-      syncRepoStatus: actor.syncRepoStatus,
-      syncRepoVersion: actor.syncRepoVersion,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
@@ -38,8 +36,6 @@ export class ActorRepository implements IActorRepository {
       .select({
         did: schema.actors.did,
         handle: schema.actors.handle,
-        syncRepoStatus: schema.actors.syncRepoStatus,
-        syncRepoVersion: schema.actors.syncRepoVersion,
         indexedAt: schema.actors.indexedAt,
       })
       .from(schema.actors)
@@ -53,8 +49,6 @@ export class ActorRepository implements IActorRepository {
     return Actor.reconstruct({
       did: asDid(row.did),
       handle: row.handle,
-      syncRepoStatus: row.syncRepoStatus,
-      syncRepoVersion: row.syncRepoVersion,
       indexedAt: row.indexedAt,
     });
   }

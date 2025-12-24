@@ -168,8 +168,6 @@ describe("SubscribeServerUseCase", () => {
     expect(savedActor).toMatchObject({
       did,
       handle: null,
-      syncRepoStatus: "dirty",
-      syncRepoVersion: null,
       indexedAt: now,
     });
 

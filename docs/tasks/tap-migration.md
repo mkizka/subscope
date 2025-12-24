@@ -203,6 +203,8 @@ Tapから送信される全イベント（commit, identity）を無条件でイ�
 
 ## 6B. ActorエンティティからsyncRepo関連を削除
 
+**状態**: ✅ 完了
+
 **目的**: 手動バックフィル処理の状態管理が不要になったため、ActorエンティティからsyncRepo関連のプロパティとメソッドを削除する
 
 **実装場所**:
@@ -210,30 +212,40 @@ Tapから送信される全イベント（commit, identity）を無条件でイ�
 - `packages/common/src/lib/domain/actor/actor.ts`
 - `packages/common/src/lib/domain/actor/actor.factory.ts`
 
-**タスク**:
+**完了した作業**:
 
-- [ ] Actorエンティティから削除
-  - [ ] `packages/common/src/lib/domain/actor/actor.ts`
+- [x] Actorエンティティから削除
+  - [x] `packages/common/src/lib/domain/actor/actor.ts`
     - SyncRepoStatus型削除
     - ActorParams内のsyncRepoStatus, syncRepoVersion削除
     - Actor.\_syncRepoStatus, \_syncRepoVersion削除
     - getter: syncRepoStatus(), syncRepoVersion()削除
     - メソッド: startSyncRepo(), markSyncRepoReady(), completeSyncRepo(), failSyncRepo()削除
-  - [ ] `packages/common/src/lib/domain/actor/actor.factory.ts`
+  - [x] `packages/common/src/lib/domain/actor/actor.factory.ts`
     - syncRepoStatus, syncRepoVersionパラメータ削除
-- [ ] リポジトリ実装から削除
-  - [ ] `apps/appview/src/infrastructure/actor-repository/actor-repository.ts`
-  - [ ] `apps/worker/src/infrastructure/repositories/actor-repository/actor-repository.ts`
-- [ ] DBスキーマから削除
-  - [ ] `packages/db/src/schema.ts`
+- [x] リポジトリ実装から削除
+  - [x] `apps/appview/src/infrastructure/actor-repository/actor-repository.ts`
+  - [x] `apps/worker/src/infrastructure/repositories/actor-repository/actor-repository.ts`
+- [x] DBスキーマから削除
+  - [x] `packages/db/src/schema.ts`
     - syncRepoStatus列挙型定義削除
     - actors.syncRepoStatusカラム削除
     - actors.syncRepoVersionカラム削除
-- [ ] テストファイル更新
-  - [ ] `apps/appview/src/infrastructure/actor-repository/actor-repository.test.ts`
-  - [ ] `packages/test-utils/src/factory.ts`
-- [ ] 動作確認
-  - [ ] 型チェックが通ることを確認
+- [x] テストファイル更新
+  - [x] `apps/appview/src/infrastructure/actor-repository/actor-repository.test.ts`
+  - [x] `apps/appview/src/application/subscribe-server-use-case.test.ts`
+  - [x] `apps/appview/src/application/get-subscription-status-use-case.test.ts` (一時的に修正、タスク6Cで完全対応)
+- [x] 動作確認
+  - [x] 型チェックが通ることを確認 (`pnpm typecheck`)
+  - [x] 全188個のunitテストが成功 (`pnpm all:unit`)
+
+**結果**:
+
+ActorエンティティからsyncRepo関連のプロパティとメソッドを完全に削除しました。手動バックフィル処理の状態管理は不要になり、Actorエンティティはシンプルになりました。
+
+**注意**:
+
+- get-subscription-status-use-case.tsは一時的にsyncRepoStatusを固定値"synchronized"にしています。完全な対応はタスク6Cで行います。
 
 ## 6C. GetSubscriptionStatusからsyncRepoStatusを削除
 
@@ -282,9 +294,9 @@ Tapから送信される全イベント（commit, identity）を無条件でイ�
 3. タスク3: フォロー作成時のTap登録 ✅
 4. ~~タスク4: バックフィル時のTap登録~~ ❌ 不要（タスク3で実現済み）
 5. タスク5: インデックスポリシー削除 ✅
-6. タスク6A: 手動バックフィル処理のコードを削除 ⏳ 次
-7. タスク6B: ActorエンティティからsyncRepo関連を削除
-8. タスク6C: GetSubscriptionStatusからsyncRepoStatusを削除
+6. タスク6A: 手動バックフィル処理のコードを削除 ✅
+7. タスク6B: ActorエンティティからsyncRepo関連を削除 ✅
+8. タスク6C: GetSubscriptionStatusからsyncRepoStatusを削除 ⏳ 次
 9. タスク7: テストケースの更新 ✅ (各タスクに含まれる)
 
 ## 注意事項

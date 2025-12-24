@@ -33,8 +33,6 @@ describe("ActorRepository", () => {
       expect(result).toMatchObject({
         did: actor.did,
         handle: actor.handle,
-        syncRepoStatus: actor.syncRepoStatus,
-        syncRepoVersion: actor.syncRepoVersion,
       });
     });
   });
@@ -46,8 +44,6 @@ describe("ActorRepository", () => {
       const newActor = Actor.reconstruct({
         did: did,
         handle: "newactor.test",
-        syncRepoStatus: "dirty",
-        syncRepoVersion: null,
         indexedAt: new Date(),
       });
 
@@ -59,8 +55,6 @@ describe("ActorRepository", () => {
       expect(result).toMatchObject({
         did: newActor.did,
         handle: newActor.handle,
-        syncRepoStatus: newActor.syncRepoStatus,
-        syncRepoVersion: newActor.syncRepoVersion,
       });
     });
 
@@ -71,8 +65,6 @@ describe("ActorRepository", () => {
       const updatedActor = Actor.reconstruct({
         did: actor.did,
         handle: "updated.test",
-        syncRepoStatus: "synchronized",
-        syncRepoVersion: 1,
         indexedAt: new Date(),
       });
 
@@ -84,8 +76,6 @@ describe("ActorRepository", () => {
       expect(result).toMatchObject({
         did: updatedActor.did,
         handle: updatedActor.handle,
-        syncRepoStatus: updatedActor.syncRepoStatus,
-        syncRepoVersion: updatedActor.syncRepoVersion,
       });
     });
   });

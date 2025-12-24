@@ -11,23 +11,11 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-const syncRepoStatus = [
-  "dirty",
-  "in-process",
-  "ready",
-  "synchronized",
-  "failed",
-] as const;
-
 export const actors = pgTable(
   "actors",
   {
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
-    syncRepoStatus: varchar({ length: 20, enum: syncRepoStatus })
-      .notNull()
-      .default("dirty"),
-    syncRepoVersion: integer(),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("handle_idx").on(table.handle)],
