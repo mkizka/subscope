@@ -3,11 +3,22 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { TapClient } from "./tap-client.js";
 
+const mockAddRepos = vi.fn();
+
+vi.mock("@atproto/tap", () => ({
+  Tap: vi.fn(function () {
+    return {
+      addRepos: mockAddRepos,
+    };
+  }),
+}));
+
 describe("TapClient", () => {
   const tapUrl = "https://tap.example.com";
   let tapClient: TapClient;
 
   beforeEach(() => {
+    mockAddRepos.mockResolvedValue(undefined);
     tapClient = new TapClient(tapUrl);
   });
 
@@ -15,52 +26,30 @@ describe("TapClient", () => {
     test("成功した場合、didをTapに登録する", async () => {
       // arrange
       const did = asDid("did:plc:test123");
-      const mockFetch = vi.fn().mockResolvedValue({
-        ok: true,
-        text: () => Promise.resolve(""),
-      });
-      global.fetch = mockFetch;
 
       // act
       await tapClient.addRepo(did);
 
       // assert
-      expect(mockFetch).toHaveBeenCalledWith(
-        "https://tap.example.com/repos/add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ did }),
-        },
-      );
+      expect(mockAddRepos).toHaveBeenCalledWith([did]);
     });
 
     test("ネットワークエラーの場合、エラーをスローする", async () => {
       // arrange
       const did = asDid("did:plc:test123");
-      const mockFetch = vi.fn().mockRejectedValue(new Error("Network error"));
-      global.fetch = mockFetch;
+      mockAddRepos.mockRejectedValue(new Error("Network error"));
 
       // act & assert
       await expect(tapClient.addRepo(did)).rejects.toThrow("Network error");
     });
 
-    test("HTTPエラーレスポンスの場合、エラーをスローする", async () => {
+    test("APIエラーの場合、エラーをスローする", async () => {
       // arrange
       const did = asDid("did:plc:test123");
-      const mockFetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve("Internal Server Error"),
-      });
-      global.fetch = mockFetch;
+      mockAddRepos.mockRejectedValue(new Error("API error"));
 
       // act & assert
-      await expect(tapClient.addRepo(did)).rejects.toThrow(
-        "Failed to add repo to Tap: 500 Internal Server Error",
-      );
+      await expect(tapClient.addRepo(did)).rejects.toThrow("API error");
     });
   });
 });
