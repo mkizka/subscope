@@ -8,7 +8,7 @@
   "scripts": {
     "_prettier": "prettier --ignore-path .prettier --ignore-path .gitignore",
     "all": "turbo run typecheck format && vitest run",
-    "all:unit": "turbo run typecheck format && pnpm test:unit",
+    "all:unit": "turbo run typecheck format && pnpm test:unit run",
     "build": "turbo run build",
     "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
@@ -19,7 +19,7 @@
     "prepare": "husky",
     "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
-    "test:unit": "vitest run --project *:unit",
+    "test:unit": "vitest --project *:unit",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
