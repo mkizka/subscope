@@ -114,50 +114,52 @@ Jetstreamから@atproto/tapへの移行に伴う実装タスク
 
 **注意**: フォロー「される側」(followee)ではなく、フォロー「する側」(follower)がサブスクライバーかどうかを判定する
 
-## 4. バックフィル処理からフォロー発見時にTapに登録
+## 4. ~~バックフィル処理からフォロー発見時にTapに登録~~ (不要)
 
-**目的**: サブスクライバーのバックフィル時にフォローレコードを発見したら、フォロイーをTapに登録する
+**状態**: ❌ 不要 - タスク3で実現済み
 
-**実装場所**:
+**理由**:
 
-- バックフィル処理関連のコード（workerまたはappview）
-- テスト: 対応するテストファイル
+このタスクはタスク3の実装により既に実現されています:
 
-**タスク**:
+1. サブスクライバー登録時、`SyncRepoUseCase`がスケジュールされる ([subscribe-server-use-case.ts:94](../../apps/appview/src/application/subscribe-server-use-case.ts#L94))
+2. `SyncRepoUseCase`がPDSから全レコードを取得し、フォローレコードを処理 ([sync-repo-use-case.ts:72-88](../../apps/worker/src/application/use-cases/async/sync-repo-use-case.ts#L72-L88))
+3. フォローレコード処理時、`FollowIndexer.upsert`が呼ばれ、タスク3の実装により自動的にフォロイーのDIDがTapに登録される ([follow-indexer.ts:41-47](../../apps/worker/src/application/services/indexer/follow-indexer.ts#L41-L47))
 
-- [ ] バックフィル処理にTap登録を追加
-  - [ ] フォローレコード発見時、フォロイーのDIDをTapに登録
-  - [ ] バッチ処理での効率的な登録方法を検討（並列実行、まとめて登録など）
-- [ ] バックフィル処理のテストケースを更新
-
-**注意**: Tapの自動バックフィルがあるため、この処理自体が不要になる可能性がある（タスク6と関連）
+つまり、バックフィル処理(SyncRepoUseCase)がフォローレコードを発見した際、既存の`FollowIndexer`の実装によって自動的にTap登録が行われるため、追加実装は不要です。
 
 ## 5. レコードインデックスポリシーの条件分岐を削除
 
 **目的**: Tapがフィルタリングを行うため、AppView側の条件分岐を削除し、全イベントを処理する
 
-**実装場所**:
+**状態**: ✅ 完了
 
-- `apps/ingester/src/application/handle-commit-use-case.ts`
-- `apps/worker/src/application/indexers/` 配下の各インデクサー
-- 関連するユーティリティ関数
+**実装内容**:
 
-**タスク**:
+調査の結果、以下が判明しました:
 
-- [ ] ingester/workerのレコード保存条件チェックを削除
-  - [ ] 「追跡アカウントか」のチェックロジックを削除
-  - [ ] 「サブスクライバーへのリプライか」などの条件分岐を削除
-  - [ ] 「追跡アカウントの投稿へのいいね/リポスト」などの条件を削除
-- [ ] Tapから送信される全イベントを無条件でインデックスするように変更
-- [ ] 関連するテストケースを更新
-  - [ ] 条件分岐関連のテストを削除
-  - [ ] 全イベント処理のテストに置き換え
+- ingesterは既に全イベントをジョブキューに送信（条件分岐なし）
+- workerのcommitイベント処理は既に全レコードを無条件でインデックス
+- workerのidentityイベント処理のみ条件分岐が存在
 
-**探すべきコード**:
+**完了した作業**:
 
-- `isTrackedActor`のような関数
-- `isReplyToSubscriber`のような条件チェック
-- リプライ、いいね、リポストの保存条件ロジック
+- [x] UpsertIdentityUseCaseの条件分岐を削除
+  - [x] `shouldIndexActor`メソッドと`isTrackedActor`チェックを削除
+  - [x] 全identityイベントを無条件でインデックス
+  - [x] テストを新仕様に合わせて更新
+- [x] 全IndexingPolicyクラスとテストを削除
+  - [x] `apps/worker/src/domain/indexing-policy/`ディレクトリ全体を削除
+  - [x] PostIndexingPolicy, LikeIndexingPolicy, RepostIndexingPolicy等を削除
+- [x] ICollectionIndexerインターフェースから`shouldIndex`メソッドを削除
+- [x] 各Indexerから`shouldIndex`メソッドとIndexingPolicy依存を削除
+  - [x] PostIndexer, LikeIndexer, RepostIndexer, GeneratorIndexer, ProfileIndexer, FollowIndexer
+- [x] DIコンテナ(worker.ts, test-utils.ts)からIndexingPolicyを削除
+- [x] 全197個のunit testが成功
+
+**結果**:
+
+Tapから送信される全イベント（commit, identity）を無条件でインデックスするようになりました。フィルタリングの責務は完全にTap側に移譲されました。
 
 ## 6. 手動バックフィル処理を削除
 
@@ -239,11 +241,11 @@ Jetstreamから@atproto/tapへの移行に伴う実装タスク
 
 推奨される実装順序：
 
-1. タスク1: TapClient実装（他のタスクの基盤）
-2. タスク2: サブスクライバー登録時のTap登録
-3. タスク3: フォロー作成時のTap登録
-4. タスク4: バックフィル時のTap登録
-5. タスク5: インデックスポリシー削除
+1. タスク1: TapClient実装（他のタスクの基盤） ✅
+2. タスク2: サブスクライバー登録時のTap登録 ✅
+3. タスク3: フォロー作成時のTap登録 ✅
+4. ~~タスク4: バックフィル時のTap登録~~ ❌ 不要（タスク3で実現済み）
+5. タスク5: インデックスポリシー削除 ✅
 6. タスク6: 手動バックフィル削除
 7. タスク7, 8: テスト更新
 

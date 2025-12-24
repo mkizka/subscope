@@ -19,12 +19,6 @@ import { AggregateActorStatsScheduler } from "../application/services/scheduler/
 import { AggregatePostStatsScheduler } from "../application/services/scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "../application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "../application/services/scheduler/resolve-did-scheduler.js";
-import { FollowIndexingPolicy } from "../domain/indexing-policy/follow-indexing-policy.js";
-import { GeneratorIndexingPolicy } from "../domain/indexing-policy/generator-indexing-policy.js";
-import { LikeIndexingPolicy } from "../domain/indexing-policy/like-indexing-policy.js";
-import { PostIndexingPolicy } from "../domain/indexing-policy/post-indexing-policy.js";
-import { ProfileIndexingPolicy } from "../domain/indexing-policy/profile-indexing-policy.js";
-import { RepostIndexingPolicy } from "../domain/indexing-policy/repost-indexing-policy.js";
 import { InMemoryRepoFetcher } from "../infrastructure/fetchers/repo-fetcher/repo-fetcher.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
@@ -69,12 +63,6 @@ export const testInjector = createInjector()
   .provideClass("repoFetcher", InMemoryRepoFetcher)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
-  .provideClass("followIndexingPolicy", FollowIndexingPolicy)
-  .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
-  .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
-  .provideClass("postIndexingPolicy", PostIndexingPolicy)
-  .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
-  .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("indexActorService", IndexActorService)

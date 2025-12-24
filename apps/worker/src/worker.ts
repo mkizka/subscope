@@ -30,12 +30,6 @@ import { ResolveDidUseCase } from "./application/use-cases/async/resolve-did-use
 import { SyncRepoUseCase } from "./application/use-cases/async/sync-repo-use-case.js";
 import { IndexCommitUseCase } from "./application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "./application/use-cases/identity/upsert-identity-use-case.js";
-import { FollowIndexingPolicy } from "./domain/indexing-policy/follow-indexing-policy.js";
-import { GeneratorIndexingPolicy } from "./domain/indexing-policy/generator-indexing-policy.js";
-import { LikeIndexingPolicy } from "./domain/indexing-policy/like-indexing-policy.js";
-import { PostIndexingPolicy } from "./domain/indexing-policy/post-indexing-policy.js";
-import { ProfileIndexingPolicy } from "./domain/indexing-policy/profile-indexing-policy.js";
-import { RepostIndexingPolicy } from "./domain/indexing-policy/repost-indexing-policy.js";
 import { RecordFetcher } from "./infrastructure/fetchers/record-fetcher.js";
 import { RepoFetcher } from "./infrastructure/fetchers/repo-fetcher/repo-fetcher.js";
 import { ActorRepository } from "./infrastructure/repositories/actor-repository/actor-repository.js";
@@ -97,12 +91,6 @@ createInjector()
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
-  .provideClass("postIndexingPolicy", PostIndexingPolicy)
-  .provideClass("likeIndexingPolicy", LikeIndexingPolicy)
-  .provideClass("followIndexingPolicy", FollowIndexingPolicy)
-  .provideClass("generatorIndexingPolicy", GeneratorIndexingPolicy)
-  .provideClass("profileIndexingPolicy", ProfileIndexingPolicy)
-  .provideClass("repostIndexingPolicy", RepostIndexingPolicy)
   .provideClass("profileIndexer", ProfileIndexer)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)

@@ -1,7 +1,6 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 import { FeedItem, Repost } from "@repo/common/domain";
 
-import type { RepostIndexingPolicy } from "../../../domain/indexing-policy/repost-indexing-policy.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
@@ -12,7 +11,6 @@ import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.j
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
-    private readonly repostIndexingPolicy: RepostIndexingPolicy,
     private readonly aggregatePostStatsScheduler: AggregatePostStatsScheduler,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postRepository: IPostRepository,
@@ -20,7 +18,6 @@ export class RepostIndexer implements ICollectionIndexer {
   ) {}
   static inject = [
     "repostRepository",
-    "repostIndexingPolicy",
     "aggregatePostStatsScheduler",
     "feedItemRepository",
     "postRepository",
@@ -49,16 +46,6 @@ export class RepostIndexer implements ICollectionIndexer {
     if (!subjectExists) {
       await this.fetchRecordScheduler.schedule(repost.subjectUri, depth);
     }
-  }
-
-  async shouldIndex({
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }): Promise<boolean> {
-    const repost = Repost.from(record);
-    return await this.repostIndexingPolicy.shouldIndex(repost);
   }
 
   async afterAction({ record }: { record: Record }): Promise<void> {

@@ -6,7 +6,6 @@ import {
   PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 
-import type { PostIndexingPolicy } from "../../../domain/indexing-policy/post-indexing-policy.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
@@ -17,7 +16,6 @@ import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.j
 export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
-    private readonly postIndexingPolicy: PostIndexingPolicy,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
     private readonly aggregatePostStatsScheduler: AggregatePostStatsScheduler,
@@ -25,7 +23,6 @@ export class PostIndexer implements ICollectionIndexer {
   ) {}
   static inject = [
     "postRepository",
-    "postIndexingPolicy",
     "feedItemRepository",
     "fetchRecordScheduler",
     "aggregatePostStatsScheduler",
@@ -54,16 +51,6 @@ export class PostIndexer implements ICollectionIndexer {
         await this.fetchRecordScheduler.schedule(embedUri, depth);
       }
     }
-  }
-
-  async shouldIndex({
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }): Promise<boolean> {
-    const post = Post.from(record);
-    return await this.postIndexingPolicy.shouldIndex(post);
   }
 
   async afterAction({

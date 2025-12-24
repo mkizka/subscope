@@ -10,13 +10,6 @@ export interface ICollectionIndexer {
     record: Record;
     depth: number;
   }) => Promise<void>;
-  shouldIndex: ({
-    ctx,
-    record,
-  }: {
-    ctx: TransactionContext;
-    record: Record;
-  }) => Promise<boolean>;
   afterAction?: ({
     ctx,
     record,
