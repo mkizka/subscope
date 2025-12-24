@@ -8,6 +8,7 @@ export * from "./lib/domain/interfaces/index-target-repository.js";
 export * from "./lib/domain/interfaces/job-queue.js";
 export * from "./lib/domain/interfaces/logger.js";
 export * from "./lib/domain/interfaces/metric.js";
+export * from "./lib/domain/interfaces/tap-client.js";
 export * from "./lib/domain/interfaces/transaction.js";
 export * from "./lib/domain/invite-code.js";
 export * from "./lib/domain/like/like.js";
