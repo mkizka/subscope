@@ -7,7 +7,6 @@ import type {
   ILoggerManager,
 } from "@repo/common/domain";
 import { asHandle, isSupportedCollection, required } from "@repo/common/utils";
-import { setTimeout as sleep } from "timers/promises";
 
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
@@ -81,22 +80,10 @@ export class TapIngester {
   }
 
   async start() {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    while (true) {
-      const channel = this.tap.channel(this.indexer);
-      this.logger.info(`Tap connection starting at ${env.TAP_URL}`);
+    const channel = this.tap.channel(this.indexer);
 
-      try {
-        await channel.start();
-        this.logger.warn("Tap connection ended cleanly");
-      } catch (error) {
-        this.logger.error(error, "Tap connection failed, will restart");
-      } finally {
-        await channel.destroy();
-      }
+    this.logger.info(`Tap connection starting at ${env.TAP_URL}`);
 
-      this.logger.info("Restarting tap connection in 5 seconds...");
-      await sleep(5000);
-    }
+    await channel.start();
   }
 }
