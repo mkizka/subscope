@@ -23,3 +23,8 @@ scrape_configs:
     static_configs:
       - targets:
           - blob-proxy.railway.internal:8080
+
+  - job_name: tap
+    static_configs:
+      - targets:
+          - tap.railway.internal:9090
