@@ -8,6 +8,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -373,3 +374,13 @@ export const actorStatsRelations = relations(actorStats, ({ one }) => ({
     references: [actors.did],
   }),
 }));
+
+export const outbox = pgTable("outbox", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  eventType: text("event_type").notNull(),
+  payload: jsonb("payload").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  processedAt: timestamp("processed_at", { withTimezone: true }),
+});
