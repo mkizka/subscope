@@ -36,22 +36,19 @@ describe("IndexActorService", () => {
         handle: testHandle,
       });
 
-      expect(jobQueue.getJobs()).not.toContainEqual(
+      expect(jobQueue.getJobs()).toContainEqual(
         expect.objectContaining({
-          queueName: "syncRepo",
+          queueName: "fetchRecord",
+          jobName: `at://${testDid}/app.bsky.actor.profile/self`,
+          data: {
+            uri: `at://${testDid}/app.bsky.actor.profile/self`,
+            depth: 0,
+          },
         }),
       );
-      expect(jobQueue.getJobs()).toContainEqual({
-        queueName: "fetchRecord",
-        jobName: `at://${testDid}/app.bsky.actor.profile/self`,
-        data: {
-          uri: `at://${testDid}/app.bsky.actor.profile/self`,
-          depth: 0,
-        },
-      });
     });
 
-    test("handle指定あり、既存actorなしの場合は、syncRepoジョブを追加しない", async () => {
+    test("handle指定あり、既存actorなしの場合は、fetchRecordジョブでプロファイルを取得する", async () => {
       // arrange
       const testDid = asDid("did:plc:new-no-syncrepo");
       const testHandle = asHandle("new-no-syncrepo.bsky.social");
@@ -70,9 +67,14 @@ describe("IndexActorService", () => {
         handle: testHandle,
       });
 
-      expect(jobQueue.getJobs()).not.toContainEqual(
+      expect(jobQueue.getJobs()).toContainEqual(
         expect.objectContaining({
-          queueName: "syncRepo",
+          queueName: "fetchRecord",
+          jobName: `at://${testDid}/app.bsky.actor.profile/self`,
+          data: {
+            uri: `at://${testDid}/app.bsky.actor.profile/self`,
+            depth: 0,
+          },
         }),
       );
     });
@@ -99,11 +101,6 @@ describe("IndexActorService", () => {
       expect(actor).toMatchObject({
         handle: newHandle,
       });
-      expect(jobQueue.getJobs()).not.toContainEqual(
-        expect.objectContaining({
-          queueName: "syncRepo",
-        }),
-      );
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
@@ -128,11 +125,6 @@ describe("IndexActorService", () => {
       expect(actor).toMatchObject({
         handle: existingHandle,
       });
-      expect(jobQueue.getJobs()).not.toContainEqual(
-        expect.objectContaining({
-          queueName: "syncRepo",
-        }),
-      );
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
@@ -158,11 +150,6 @@ describe("IndexActorService", () => {
       expect(actor).toMatchObject({
         handle: newHandle,
       });
-      expect(jobQueue.getJobs()).not.toContainEqual(
-        expect.objectContaining({
-          queueName: "syncRepo",
-        }),
-      );
     });
 
     test("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
@@ -182,14 +169,11 @@ describe("IndexActorService", () => {
         handle: null,
       });
 
-      expect(jobQueue.getJobs()).toContainEqual({
-        queueName: "resolveDid",
-        jobName: `at://${newDid}`,
-        data: newDid,
-      });
-      expect(jobQueue.getJobs()).not.toContainEqual(
+      expect(jobQueue.getJobs()).toContainEqual(
         expect.objectContaining({
-          queueName: "syncRepo",
+          queueName: "resolveDid",
+          jobName: `at://${newDid}`,
+          data: newDid,
         }),
       );
     });
@@ -218,11 +202,13 @@ describe("IndexActorService", () => {
         handle: null,
       });
 
-      expect(jobQueue.getJobs()).toContainEqual({
-        queueName: "resolveDid",
-        jobName: `at://${existingDidNoHandle}`,
-        data: existingDidNoHandle,
-      });
+      expect(jobQueue.getJobs()).toContainEqual(
+        expect.objectContaining({
+          queueName: "resolveDid",
+          jobName: `at://${existingDidNoHandle}`,
+          data: existingDidNoHandle,
+        }),
+      );
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleありの場合は、何もしない", async () => {
@@ -246,11 +232,6 @@ describe("IndexActorService", () => {
       expect(actor).toMatchObject({
         handle: existingHandle,
       });
-      expect(jobQueue.getJobs()).not.toContainEqual(
-        expect.objectContaining({
-          queueName: "syncRepo",
-        }),
-      );
     });
   });
 });

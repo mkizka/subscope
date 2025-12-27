@@ -23,7 +23,6 @@ export type JobData = {
   fetchRecord: FetchRecordData;
   identity: IdentityEventDto;
   commit: CommitEventDto;
-  syncRepo: Did;
   aggregatePostStats: AggregatePostStatsData;
   aggregateActorStats: AggregateActorStatsData;
 };

@@ -43,7 +43,6 @@ export class JobQueue implements IJobQueue {
       fetchRecord: new Queue("fetchRecord", queueOptions(withRetry)),
       identity: new Queue("identity", queueOptions(withRetry)),
       commit: new Queue("commit", queueOptions(withRetry)),
-      syncRepo: new Queue("syncRepo", queueOptions()),
       aggregatePostStats: new Queue(
         "aggregatePostStats",
         queueOptions(withRetry),
