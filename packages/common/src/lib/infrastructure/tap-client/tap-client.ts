@@ -1,13 +1,13 @@
-import { TapClient as AtcuteTapClient } from "@atcute/tap";
 import type { Did } from "@atproto/did";
+import { Tap } from "@atproto/tap";
 
 import type { ITapClient } from "../../domain/interfaces/tap-client.js";
 
 export class TapClient implements ITapClient {
-  private tap: AtcuteTapClient;
+  private tap: Tap;
 
   constructor(tapUrl: string) {
-    this.tap = new AtcuteTapClient({ url: tapUrl });
+    this.tap = new Tap(tapUrl);
   }
   static inject = ["tapUrl"] as const;
 
