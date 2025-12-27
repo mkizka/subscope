@@ -5,8 +5,8 @@ import { TapClient } from "./tap-client.js";
 
 const mockAddRepos = vi.fn();
 
-vi.mock("@atproto/tap", () => ({
-  Tap: vi.fn(function () {
+vi.mock("@atcute/tap", () => ({
+  TapClient: vi.fn(function () {
     return {
       addRepos: mockAddRepos,
     };

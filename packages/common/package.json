@@ -17,11 +17,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atcute/tap": "0.1.1",
     "@atproto/did": "0.2.3",
     "@atproto/identity": "0.4.10",
     "@atproto/lexicon": "0.5.2",
     "@atproto/syntax": "0.4.2",
-    "@atproto/tap": "0.0.2",
     "@keyv/redis": "5.1.4",
     "@repo/client": "workspace:*",
     "@repo/db": "workspace:*",
