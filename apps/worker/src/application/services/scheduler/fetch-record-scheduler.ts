@@ -14,6 +14,9 @@ export class FetchRecordScheduler {
         uri: uriString,
         depth,
       },
+      options: {
+        jobId: uriString,
+      },
     });
   }
 }
