@@ -106,7 +106,7 @@ export class SyncWorker {
         },
         {
           limiter: {
-            max: 4, // PDSの負荷を抑えるためにrpsを制限
+            max: 10, // PDSの負荷を抑えるためにrpsを制限
             duration: 1000,
           },
         },
