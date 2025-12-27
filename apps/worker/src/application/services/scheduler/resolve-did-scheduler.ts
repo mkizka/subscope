@@ -6,10 +6,14 @@ export class ResolveDidScheduler {
   static inject = ["jobQueue"] as const;
 
   async schedule(did: Did): Promise<void> {
+    const jobName = `at://${did}`;
     await this.jobQueue.add({
       queueName: "resolveDid",
-      jobName: `at://${did}`,
+      jobName,
       data: did,
+      options: {
+        jobId: jobName,
+      },
     });
   }
 }
