@@ -59,6 +59,7 @@ export class TapIngester {
     if (event.action === "delete") {
       return {
         did: asDid(event.did),
+        live: event.live,
         commit: {
           operation: event.action,
           collection: event.collection,
@@ -75,6 +76,7 @@ export class TapIngester {
     }
     return {
       did: asDid(event.did),
+      live: event.live,
       commit: {
         operation: event.action,
         collection: event.collection,

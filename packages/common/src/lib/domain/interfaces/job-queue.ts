@@ -34,6 +34,7 @@ export type JobState = "inProgress" | "completed" | "failed";
 type JobOptions = {
   jobId?: string;
   delay?: number;
+  priority?: number;
 };
 
 export interface IJobQueue {

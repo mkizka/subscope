@@ -67,6 +67,7 @@ export class JobQueue implements IJobQueue {
     options?: {
       jobId?: string;
       delay?: number;
+      priority?: number;
     };
   }) {
     await this.queues[queueName].add(jobName, data, {

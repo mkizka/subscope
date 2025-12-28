@@ -7,6 +7,7 @@ type CreateOrUpdateCommitEventDto<
   RecordType extends string = SupportedCollection,
 > = {
   did: Did;
+  live: boolean;
   commit: {
     operation: "create" | "update";
     collection: RecordType;
@@ -18,6 +19,7 @@ type CreateOrUpdateCommitEventDto<
 
 type DeleteCommitEventDto<RecordType extends string = SupportedCollection> = {
   did: Did;
+  live: boolean;
   commit: {
     operation: "delete";
     collection: RecordType;
