@@ -65,25 +65,24 @@ export class TapIngester {
           rkey: event.rkey,
         },
       };
-    } else {
-      if (event.record === undefined || event.cid === undefined) {
-        this.logger.warn(
-          { event },
-          "RecordEvent missing record or cid for non-delete action",
-        );
-        return null;
-      }
-      return {
-        did: asDid(event.did),
-        commit: {
-          operation: event.action,
-          collection: event.collection,
-          rkey: event.rkey,
-          record: event.record,
-          cid: event.cid,
-        },
-      };
     }
+    if (event.record === undefined || event.cid === undefined) {
+      this.logger.warn(
+        { event },
+        "RecordEvent missing record or cid for non-delete action",
+      );
+      return null;
+    }
+    return {
+      did: asDid(event.did),
+      commit: {
+        operation: event.action,
+        collection: event.collection,
+        rkey: event.rkey,
+        record: event.record,
+        cid: event.cid,
+      },
+    };
   }
 
   async start() {
