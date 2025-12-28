@@ -35,7 +35,6 @@ import { ActorStatsRepository } from "./infrastructure/repositories/actor-stats-
 import { FeedItemRepository } from "./infrastructure/repositories/feed-item-repository/feed-item-repository.js";
 import { FollowRepository } from "./infrastructure/repositories/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "./infrastructure/repositories/generator-repository/generator-repository.js";
-import { PostgresIndexTargetRepository } from "./infrastructure/repositories/index-target-repository/postgres-index-target-repository.js";
 import { InviteCodeRepository } from "./infrastructure/repositories/invite-code-repository/invite-code-repository.js";
 import { LikeRepository } from "./infrastructure/repositories/like-repository/like-repository.js";
 import { PostRepository } from "./infrastructure/repositories/post-repository/post-repository.js";
@@ -79,7 +78,6 @@ createInjector()
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
   .provideClass("resolveDidScheduler", ResolveDidScheduler)

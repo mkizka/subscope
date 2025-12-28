@@ -117,9 +117,6 @@ const record = recordFactory({
 ```typescript
 // HandleResolver
 handleResolver.add("example.com", "did:plc:resolved123");
-
-// IndexTargetRepository
-await indexTargetRepo.addSubscriber(subscriberDid);
 ```
 
 ## ctxオブジェクトの使用

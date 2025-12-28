@@ -24,7 +24,6 @@ import { InMemoryActorStatsRepository } from "../infrastructure/repositories/act
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
-import { InMemoryIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/index-target-repository.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/repositories/like-repository/like-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/repositories/post-repository/post-repository.in-memory.js";
@@ -43,7 +42,6 @@ export const testInjector = createInjector()
   .provideClass("feedItemRepository", InMemoryFeedItemRepository)
   .provideClass("followRepository", InMemoryFollowRepository)
   .provideClass("generatorRepository", InMemoryGeneratorRepository)
-  .provideClass("indexTargetRepository", InMemoryIndexTargetRepository)
   .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
   .provideClass("likeRepository", InMemoryLikeRepository)
   .provideClass("postRepository", InMemoryPostRepository)
@@ -77,7 +75,6 @@ export const setupFiles = () => {
     testInjector.resolve("feedItemRepository").clear();
     testInjector.resolve("followRepository").clear();
     testInjector.resolve("generatorRepository").clear();
-    testInjector.resolve("indexTargetRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("likeRepository").clear();
     testInjector.resolve("postRepository").clear();
