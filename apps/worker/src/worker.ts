@@ -44,7 +44,6 @@ import { ProfileRepository } from "./infrastructure/repositories/profile-reposit
 import { RecordRepository } from "./infrastructure/repositories/record-repository/record-repository.js";
 import { RepostRepository } from "./infrastructure/repositories/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "./infrastructure/repositories/subscription-repository/subscription-repository.js";
-import { TrackedActorChecker } from "./infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
@@ -80,7 +79,6 @@ createInjector()
   .provideClass("postStatsRepository", PostStatsRepository)
   .provideClass("repostRepository", RepostRepository)
   .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideClass("trackedActorChecker", TrackedActorChecker)
   .provideClass("indexTargetRepository", PostgresIndexTargetRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)

@@ -120,7 +120,6 @@ handleResolver.add("example.com", "did:plc:resolved123");
 
 // IndexTargetRepository
 await indexTargetRepo.addSubscriber(subscriberDid);
-await indexTargetRepo.addTrackedActor(followeeDid);
 ```
 
 ## ctxオブジェクトの使用

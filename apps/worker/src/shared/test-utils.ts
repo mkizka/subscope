@@ -33,7 +33,6 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
-import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
 import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 
 export const testInjector = createInjector()
@@ -53,7 +52,6 @@ export const testInjector = createInjector()
   .provideClass("recordRepository", InMemoryRecordRepository)
   .provideClass("repostRepository", InMemoryRepostRepository)
   .provideClass("subscriptionRepository", InMemorySubscriptionRepository)
-  .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("tapClient", InMemoryTapClient)
   .provideClass("jobQueue", InMemoryJobQueue)
