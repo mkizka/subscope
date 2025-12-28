@@ -39,6 +39,7 @@ import { GetInviteCodesUseCase } from "./application/use-cases/admin/get-invite-
 import { GetSubscribersUseCase } from "./application/use-cases/admin/get-subscribers-use-case.js";
 import { GetActorLikesUseCase } from "./application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./application/use-cases/feed/get-author-feed-use-case.js";
+import { GetFeedGeneratorsUseCase } from "./application/use-cases/feed/get-feed-generators-use-case.js";
 import { GetLikesUseCase } from "./application/use-cases/feed/get-likes-use-case.js";
 import { GetPostThreadUseCase } from "./application/use-cases/feed/get-post-thread-use-case.js";
 import { GetPostsUseCase } from "./application/use-cases/feed/get-posts-use-case.js";
@@ -75,6 +76,7 @@ import { SearchActors } from "./presentation/routes/app/bsky/actor/searchActors.
 import { SearchActorsTypeahead } from "./presentation/routes/app/bsky/actor/searchActorsTypeahead.js";
 import { GetActorLikes } from "./presentation/routes/app/bsky/feed/getActorLikes.js";
 import { GetAuthorFeed } from "./presentation/routes/app/bsky/feed/getAuthorFeed.js";
+import { GetFeedGenerators } from "./presentation/routes/app/bsky/feed/getFeedGenerators.js";
 import { GetLikes } from "./presentation/routes/app/bsky/feed/getLikes.js";
 import { GetPosts } from "./presentation/routes/app/bsky/feed/getPosts.js";
 import { GetPostThread } from "./presentation/routes/app/bsky/feed/getPostThread.js";
@@ -159,6 +161,7 @@ createInjector()
   .provideClass("searchPostsUseCase", SearchPostsUseCase)
   .provideClass("getActorLikesUseCase", GetActorLikesUseCase)
   .provideClass("getAuthorFeedUseCase", GetAuthorFeedUseCase)
+  .provideClass("getFeedGeneratorsUseCase", GetFeedGeneratorsUseCase)
   .provideClass("getLikesUseCase", GetLikesUseCase)
   .provideClass("getRepostedByUseCase", GetRepostedByUseCase)
   .provideClass("getFollowsUseCase", GetFollowsUseCase)
@@ -181,6 +184,7 @@ createInjector()
   .provideClass("searchPosts", SearchPosts)
   .provideClass("getActorLikes", GetActorLikes)
   .provideClass("getAuthorFeed", GetAuthorFeed)
+  .provideClass("getFeedGenerators", GetFeedGenerators)
   .provideClass("getLikes", GetLikes)
   .provideClass("getRepostedBy", GetRepostedBy)
   .provideClass("getFollows", GetFollows)

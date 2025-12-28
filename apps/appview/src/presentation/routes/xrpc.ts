@@ -7,6 +7,7 @@ import type { SearchActors } from "./app/bsky/actor/searchActors.js";
 import type { SearchActorsTypeahead } from "./app/bsky/actor/searchActorsTypeahead.js";
 import type { GetActorLikes } from "./app/bsky/feed/getActorLikes.js";
 import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
+import type { GetFeedGenerators } from "./app/bsky/feed/getFeedGenerators.js";
 import type { GetLikes } from "./app/bsky/feed/getLikes.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
@@ -33,6 +34,7 @@ export class XRPCRouter {
     searchActorsTypeahead: SearchActorsTypeahead,
     getActorLikes: GetActorLikes,
     getAuthorFeed: GetAuthorFeed,
+    getFeedGenerators: GetFeedGenerators,
     getLikes: GetLikes,
     getPosts: GetPosts,
     getPostThread: GetPostThread,
@@ -56,6 +58,7 @@ export class XRPCRouter {
       searchActorsTypeahead,
       getActorLikes,
       getAuthorFeed,
+      getFeedGenerators,
       getLikes,
       getPosts,
       getPostThread,
@@ -80,6 +83,7 @@ export class XRPCRouter {
     "searchActorsTypeahead",
     "getActorLikes",
     "getAuthorFeed",
+    "getFeedGenerators",
     "getLikes",
     "getPosts",
     "getPostThread",
