@@ -24,7 +24,6 @@ import { InMemoryActorStatsRepository } from "../infrastructure/repositories/act
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
-import { InMemoryIndexTargetRepository } from "../infrastructure/repositories/index-target-repository/index-target-repository.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/repositories/like-repository/like-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/repositories/post-repository/post-repository.in-memory.js";
@@ -33,7 +32,6 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
-import { InMemoryTrackedActorChecker } from "../infrastructure/repositories/tracked-actor-checker/tracked-actor-checker.in-memory.js";
 import { InMemoryJobLogger } from "./job-logger.in-memory.js";
 
 export const testInjector = createInjector()
@@ -44,7 +42,6 @@ export const testInjector = createInjector()
   .provideClass("feedItemRepository", InMemoryFeedItemRepository)
   .provideClass("followRepository", InMemoryFollowRepository)
   .provideClass("generatorRepository", InMemoryGeneratorRepository)
-  .provideClass("indexTargetRepository", InMemoryIndexTargetRepository)
   .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
   .provideClass("likeRepository", InMemoryLikeRepository)
   .provideClass("postRepository", InMemoryPostRepository)
@@ -53,7 +50,6 @@ export const testInjector = createInjector()
   .provideClass("recordRepository", InMemoryRecordRepository)
   .provideClass("repostRepository", InMemoryRepostRepository)
   .provideClass("subscriptionRepository", InMemorySubscriptionRepository)
-  .provideClass("trackedActorChecker", InMemoryTrackedActorChecker)
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("tapClient", InMemoryTapClient)
   .provideClass("jobQueue", InMemoryJobQueue)
@@ -79,7 +75,6 @@ export const setupFiles = () => {
     testInjector.resolve("feedItemRepository").clear();
     testInjector.resolve("followRepository").clear();
     testInjector.resolve("generatorRepository").clear();
-    testInjector.resolve("indexTargetRepository").clear();
     testInjector.resolve("inviteCodeRepository").clear();
     testInjector.resolve("likeRepository").clear();
     testInjector.resolve("postRepository").clear();

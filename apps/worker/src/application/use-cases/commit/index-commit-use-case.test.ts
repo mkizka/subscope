@@ -14,7 +14,6 @@ describe("IndexCommitUseCase", () => {
   const recordRepo = testInjector.resolve("recordRepository");
   const postRepo = testInjector.resolve("postRepository");
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const indexTargetRepo = testInjector.resolve("indexTargetRepository");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -30,8 +29,6 @@ describe("IndexCommitUseCase", () => {
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
       subscriptionRepo.add(subscription);
-      await indexTargetRepo.addSubscriber(actor.did);
-      await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -78,8 +75,6 @@ describe("IndexCommitUseCase", () => {
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
       subscriptionRepo.add(subscription);
-      await indexTargetRepo.addSubscriber(actor.did);
-      await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -126,8 +121,6 @@ describe("IndexCommitUseCase", () => {
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
       subscriptionRepo.add(subscription);
-      await indexTargetRepo.addSubscriber(actor.did);
-      await indexTargetRepo.addTrackedActor(actor.did);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
