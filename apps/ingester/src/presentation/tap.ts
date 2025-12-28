@@ -6,7 +6,7 @@ import type {
   IdentityEventDto,
   ILoggerManager,
 } from "@repo/common/domain";
-import { asHandle, isSupportedCollection, required } from "@repo/common/utils";
+import { asHandle, isSupportedCollection } from "@repo/common/utils";
 
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
@@ -66,14 +66,21 @@ export class TapIngester {
         },
       };
     } else {
+      if (event.record === undefined || event.cid === undefined) {
+        this.logger.warn(
+          { event },
+          "RecordEvent missing record or cid for non-delete action",
+        );
+        return null;
+      }
       return {
         did: asDid(event.did),
         commit: {
           operation: event.action,
           collection: event.collection,
           rkey: event.rkey,
-          record: required(event.record),
-          cid: required(event.cid),
+          record: event.record,
+          cid: event.cid,
         },
       };
     }
