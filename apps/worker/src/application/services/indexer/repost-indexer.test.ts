@@ -42,7 +42,11 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.upsert({ ctx, record, depth: 0 });
+      await repostIndexer.upsert({
+        ctx,
+        record,
+        indexingCtx: { depth: 0, live: false },
+      });
 
       // assert
       const repost = repostRepo.findByUri(record.uri);
@@ -69,6 +73,11 @@ describe("RepostIndexer", () => {
           data: {
             uri: subjectUri,
             depth: 0,
+            live: false,
+          },
+          options: {
+            jobId: subjectUri,
+            priority: 2,
           },
         },
       ]);

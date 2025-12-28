@@ -40,7 +40,12 @@ describe("IndexRecordService", () => {
 
       // act & assert
       await expect(
-        indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 }),
+        indexRecordService.upsert({
+          ctx,
+          record,
+          jobLogger,
+          indexingCtx: { depth: 0, live: false },
+        }),
       ).rejects.toThrow("Unsupported collection: unsupported.collection");
     });
 
@@ -56,7 +61,12 @@ describe("IndexRecordService", () => {
       });
 
       // act
-      await indexRecordService.upsert({ ctx, record, jobLogger, depth: 0 });
+      await indexRecordService.upsert({
+        ctx,
+        record,
+        jobLogger,
+        indexingCtx: { depth: 0, live: false },
+      });
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -92,7 +102,7 @@ describe("IndexRecordService", () => {
         ctx,
         record: followRecord,
         jobLogger,
-        depth: 0,
+        indexingCtx: { depth: 0, live: false },
       });
 
       // assert

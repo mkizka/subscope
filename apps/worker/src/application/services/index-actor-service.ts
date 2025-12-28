@@ -50,7 +50,10 @@ export class IndexActorService {
     });
     if (!profileExists) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-      await this.fetchRecordScheduler.schedule(profileUri, 0);
+      await this.fetchRecordScheduler.schedule(profileUri, {
+        depth: 0,
+        live: false,
+      });
     }
   }
 

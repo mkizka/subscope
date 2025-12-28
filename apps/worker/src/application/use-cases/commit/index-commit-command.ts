@@ -18,6 +18,7 @@ export const indexCommitCommandFactory = ({
         operation: event.commit.operation,
         uri,
       },
+      live: event.live,
       jobLogger,
     };
   }
@@ -31,6 +32,7 @@ export const indexCommitCommandFactory = ({
         json: event.commit.record,
       }),
     },
+    live: event.live,
     jobLogger,
   };
 };

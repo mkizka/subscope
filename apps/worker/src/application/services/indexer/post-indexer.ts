@@ -8,7 +8,10 @@ import {
 
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type {
+  ICollectionIndexer,
+  IndexingContext,
+} from "../../interfaces/services/index-collection-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
@@ -32,11 +35,11 @@ export class PostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    depth,
+    indexingCtx,
   }: {
     ctx: TransactionContext;
     record: Record;
-    depth: number;
+    indexingCtx: IndexingContext;
   }) {
     const post = Post.from(record);
     await this.postRepository.upsert({ ctx, post });
@@ -48,7 +51,7 @@ export class PostIndexer implements ICollectionIndexer {
     if (embedUri) {
       const embedExists = await this.postRepository.exists(ctx, embedUri);
       if (!embedExists) {
-        await this.fetchRecordScheduler.schedule(embedUri, depth);
+        await this.fetchRecordScheduler.schedule(embedUri, indexingCtx);
       }
     }
   }

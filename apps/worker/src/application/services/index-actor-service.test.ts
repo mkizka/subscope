@@ -43,6 +43,11 @@ describe("IndexActorService", () => {
           data: {
             uri: `at://${testDid}/app.bsky.actor.profile/self`,
             depth: 0,
+            live: false,
+          },
+          options: {
+            jobId: `at://${testDid}/app.bsky.actor.profile/self`,
+            priority: 2,
           },
         }),
       );
@@ -74,6 +79,11 @@ describe("IndexActorService", () => {
           data: {
             uri: `at://${testDid}/app.bsky.actor.profile/self`,
             depth: 0,
+            live: false,
+          },
+          options: {
+            jobId: `at://${testDid}/app.bsky.actor.profile/self`,
+            priority: 2,
           },
         }),
       );

@@ -1,14 +1,19 @@
 import type { Record, TransactionContext } from "@repo/common/domain";
 
+export type IndexingContext = {
+  live: boolean;
+  depth: number;
+};
+
 export interface ICollectionIndexer {
   upsert: ({
     ctx,
     record,
-    depth,
+    indexingCtx,
   }: {
     ctx: TransactionContext;
     record: Record;
-    depth: number;
+    indexingCtx: IndexingContext;
   }) => Promise<void>;
   afterAction?: ({
     ctx,
