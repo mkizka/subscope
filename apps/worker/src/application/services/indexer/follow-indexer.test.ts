@@ -109,7 +109,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({ ctx, record });
 
       // act
-      await followIndexer.afterAction({ ctx, record });
+      await followIndexer.afterAction({ ctx, record, action: "upsert" });
 
       // assert
       const jobs = jobQueue.findByQueueName("aggregateActorStats");
@@ -129,6 +129,114 @@ describe("FollowIndexer", () => {
           },
         },
       ]);
+    });
+
+    test("フォロー削除時、フォロワーがサブスクライバーで他のサブスクライバーからフォローされていない場合、Tapから削除される", async () => {
+      // arrange
+      const follower = actorFactory();
+      const followee = actorFactory();
+      const subscription = subscriptionFactory({ actorDid: follower.did });
+      subscriptionRepo.add(subscription);
+
+      const record = recordFactory({
+        uri: `at://${follower.did}/app.bsky.graph.follow/followrkey_delete1`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followee.did,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      await followIndexer.upsert({ ctx, record });
+      followRepo.deleteByUri(record.uri);
+
+      // act
+      await followIndexer.afterAction({ ctx, record, action: "delete" });
+
+      // assert
+      const registeredDids = tapClient.getRegisteredDids();
+      expect(registeredDids).not.toContain(followee.did);
+    });
+
+    test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
+      // arrange
+      const follower1 = actorFactory();
+      const follower2 = actorFactory();
+      const followee = actorFactory();
+      const subscription1 = subscriptionFactory({ actorDid: follower1.did });
+      const subscription2 = subscriptionFactory({ actorDid: follower2.did });
+      subscriptionRepo.add(subscription1);
+      subscriptionRepo.add(subscription2);
+
+      const record1 = recordFactory({
+        uri: `at://${follower1.did}/app.bsky.graph.follow/followrkey_delete2a`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followee.did,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      const record2 = recordFactory({
+        uri: `at://${follower2.did}/app.bsky.graph.follow/followrkey_delete2b`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followee.did,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      await followIndexer.upsert({ ctx, record: record1 });
+      await followIndexer.upsert({ ctx, record: record2 });
+      followRepo.deleteByUri(record1.uri);
+
+      // act
+      await followIndexer.afterAction({
+        ctx,
+        record: record1,
+        action: "delete",
+      });
+
+      // assert
+      const registeredDids = tapClient.getRegisteredDids();
+      expect(registeredDids).toContain(followee.did);
+    });
+
+    test("フォロー削除時、フォロワーがサブスクライバーでない場合、Tap削除処理は実行されない", async () => {
+      // arrange
+      const subscriber = actorFactory();
+      const nonSubscriber = actorFactory();
+      const followee = actorFactory();
+      const subscription = subscriptionFactory({ actorDid: subscriber.did });
+      subscriptionRepo.add(subscription);
+
+      const subscriberRecord = recordFactory({
+        uri: `at://${subscriber.did}/app.bsky.graph.follow/followrkey_delete3a`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followee.did,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      const nonSubscriberRecord = recordFactory({
+        uri: `at://${nonSubscriber.did}/app.bsky.graph.follow/followrkey_delete3b`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followee.did,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      await followIndexer.upsert({ ctx, record: subscriberRecord });
+      await followIndexer.upsert({ ctx, record: nonSubscriberRecord });
+      followRepo.deleteByUri(nonSubscriberRecord.uri);
+
+      // act
+      await followIndexer.afterAction({
+        ctx,
+        record: nonSubscriberRecord,
+        action: "delete",
+      });
+
+      // assert
+      const registeredDids = tapClient.getRegisteredDids();
+      expect(registeredDids).toContain(followee.did);
     });
   });
 });

@@ -14,4 +14,8 @@ export class TapClient implements ITapClient {
   async addRepo(did: Did): Promise<void> {
     await this.tap.addRepos([did]);
   }
+
+  async removeRepo(did: Did): Promise<void> {
+    await this.tap.removeRepos([did]);
+  }
 }

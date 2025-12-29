@@ -45,10 +45,13 @@ export class FollowIndexer implements ICollectionIndexer {
   }
 
   async afterAction({
+    ctx,
     record,
+    action,
   }: {
     ctx: TransactionContext;
     record: Record;
+    action: "upsert" | "delete";
   }): Promise<void> {
     const follow = Follow.from(record);
     await this.aggregateActorStatsScheduler.schedule(
@@ -59,5 +62,20 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.subjectDid,
       "followers",
     );
+
+    if (action === "delete") {
+      const isFollowerSubscriber =
+        await this.subscriptionRepository.isSubscriber(ctx, follow.actorDid);
+      if (!isFollowerSubscriber) return;
+
+      const isStillFollowed =
+        await this.followRepository.isFollowedByAnySubscriber({
+          ctx,
+          subjectDid: follow.subjectDid,
+        });
+      if (isStillFollowed) return;
+
+      await this.tapClient.removeRepo(follow.subjectDid);
+    }
   }
 }
