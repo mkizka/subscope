@@ -9,6 +9,10 @@ export class InMemoryTapClient implements ITapClient {
     this.registeredDids.add(did);
   }
 
+  async removeRepo(did: Did): Promise<void> {
+    this.registeredDids.delete(did);
+  }
+
   getRegisteredDids(): Did[] {
     return Array.from(this.registeredDids);
   }

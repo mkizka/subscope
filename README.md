@@ -2,39 +2,37 @@
 
 <img src="./icon.png" width="128">
 
-> [!WARNING]  
-> このプロジェクトは開発中です。あらゆる機能が今後破壊的に変更される可能性があります。  
-> いずれの機能も正常に動作することを保証していません。
+> [!WARNING]
+> This project is under development. All features are subject to breaking changes.
+> There is no guarantee that any feature will work correctly.
 
-保存するデータを限定することで小規模なBluesky互換AppViewを実装する試み
+An attempt to implement a small-scale Bluesky-compatible AppView by limiting the data to be stored.
 
 Subscribe & Scoped AppView = Subscope
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/3u7GrK?referralCode=mveF9L)
+## Concept
 
-## アイデア
+Similar to ActivityPub implementations, Subscope only stores data from registered accounts and the accounts they follow. This is achieved using [Tap](https://github.com/bluesky-social/indigo/tree/main/cmd/tap).
 
-ActivityPub実装のようにフォローしているアカウントやその関連データのみを保存することでストレージ容量を節約します。
+The goal is to enable self-hosting on a typical VPS with around 4 cores / 4GB RAM / 100GB storage.
 
-4Core/4GB/100GB程度の一般的なVPSでのセルフホスティングを可能するのが目標です。
+## System Architecture
 
-## システム構成
+Server implementations are located under the apps directory.
 
-appsディレクトリ以下に各サーバー実装があります。
+- admin ... Dashboard for managing invite codes and subscribers
+- appview ... XRPC API for clients
+- ingester ... Receives Jetstream events and adds jobs
+- worker ... Worker that processes Tap events
+- blob-proxy ... Proxy for blobs stored on PDS
 
-- admin ... 招待コードやサブスクライバーを管理する画面
-- appview ... クライアント向けXRPC API
-- ingester ... Jetstreamイベントを受信してジョブ追加
-- worker ... Jetstreamイベントを処理するワーカー
-- blob-proxy ... PDSに保存されたBlobのプロキシ
+## Deployment
 
-## デプロイ方法
+WIP
 
-[docs/user/deploy.md](docs/user/deploy.md) を参照してください。
+## Development
 
-## 開発方法
-
-Node.js, Dockerが必要です。以下コマンドで開発サーバーを起動できます。
+Node.js and Docker are required. Run the following commands to start the development server.
 
 ```
 cp packages/db/.env.example packages/db/.env
@@ -43,11 +41,11 @@ pnpm i
 pnpm dev
 ```
 
-以下のサーバーが起動します。adminのみOAuth認証のために以下のようにアクセスする必要があります。
+The following servers will start. Note that admin must be accessed via the URL below for OAuth authentication to work.
 
 - admin ... http://admin.localhost:3000
 - appview ... http://localhost:3001
 - ingester ... http://localhost:3002
 - worker ... http://localhost:3003
 - blob-proxy ... http://localhost:3004
-- 開発用PDS ... http://localhost:2583
+- Development PDS ... http://localhost:2583
