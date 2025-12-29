@@ -47,7 +47,7 @@ describe("IndexActorService", () => {
           },
           options: {
             jobId: `at://${testDid}/app.bsky.actor.profile/self`,
-            priority: 2,
+            priority: 1,
           },
         }),
       );
@@ -83,7 +83,7 @@ describe("IndexActorService", () => {
           },
           options: {
             jobId: `at://${testDid}/app.bsky.actor.profile/self`,
-            priority: 2,
+            priority: 1,
           },
         }),
       );

@@ -19,7 +19,7 @@ export class FetchRecordScheduler {
       },
       options: {
         jobId: uriString,
-        priority: indexingCtx.live ? 1 : 2,
+        priority: indexingCtx.live ? undefined : 1,
       },
     });
   }

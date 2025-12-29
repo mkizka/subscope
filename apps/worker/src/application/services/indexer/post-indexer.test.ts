@@ -95,7 +95,7 @@ describe("PostIndexer", () => {
           },
           options: {
             jobId: embedUri,
-            priority: 2,
+            priority: 1,
           },
         },
       ]);

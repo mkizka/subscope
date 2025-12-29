@@ -77,7 +77,7 @@ describe("RepostIndexer", () => {
           },
           options: {
             jobId: subjectUri,
-            priority: 2,
+            priority: 1,
           },
         },
       ]);

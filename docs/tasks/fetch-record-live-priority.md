@@ -66,7 +66,7 @@ type FetchRecordData = {
 
 - フェーズ1で`schedule(uri, depth, live)`に変更済み
 - フェーズ2で`schedule(uri, indexingCtx)`に変更
-- `priority`を設定（`indexingCtx.live ? 1 : 2`）
+- `priority`を設定（`indexingCtx.live ? undefined : 1`）
 
 ### 4. IndexRecordService.upsert()を修正
 
