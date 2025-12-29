@@ -29,9 +29,7 @@ export class HandleCommitUseCase {
       queueName: "commit",
       jobName: `at://${dto.did}/${dto.commit.collection}/${dto.commit.rkey}`,
       data: dto,
-      options: {
-        priority: dto.live ? 1 : 2,
-      },
+      options: { priority: dto.live ? undefined : 1 },
     });
   }
 }
