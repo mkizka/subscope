@@ -10,8 +10,6 @@ An attempt to implement a small-scale Bluesky-compatible AppView by limiting the
 
 Subscribe & Scoped AppView = Subscope
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/3u7GrK?referralCode=mveF9L)
-
 ## Concept
 
 Similar to ActivityPub implementations, Subscope only stores data from registered accounts and the accounts they follow. This is achieved using [Tap](https://github.com/bluesky-social/indigo/tree/main/cmd/tap).
@@ -30,7 +28,7 @@ Server implementations are located under the apps directory.
 
 ## Deployment
 
-See [docs/user/deploy.md](docs/user/deploy.md) for details (Japanese only).
+WIP
 
 ## Development
 
