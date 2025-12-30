@@ -27,6 +27,7 @@ describe("IndexActorService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -63,6 +64,7 @@ describe("IndexActorService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -104,6 +106,7 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -128,6 +131,7 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: existingHandle,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -153,6 +157,7 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -170,6 +175,7 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: newDid,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -201,6 +207,7 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: existingDidNoHandle,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -235,6 +242,7 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: existingDid,
+        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
