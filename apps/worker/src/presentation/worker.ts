@@ -2,11 +2,13 @@ import type { JobData } from "@repo/common/domain";
 import type { BackoffStrategy, Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
+import type { AddTapRepoUseCase } from "../application/use-cases/async/add-tap-repo-use-case.js";
 import { aggregateActorStatsCommandFactory } from "../application/use-cases/async/aggregate-actor-stats-command.js";
 import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { aggregatePostStatsCommandFactory } from "../application/use-cases/async/aggregate-post-stats-command.js";
 import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
+import type { RemoveTapRepoUseCase } from "../application/use-cases/async/remove-tap-repo-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
@@ -64,6 +66,8 @@ export class SyncWorker {
     fetchRecordUseCase: FetchRecordUseCase,
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
+    addTapRepoUseCase: AddTapRepoUseCase,
+    removeTapRepoUseCase: RemoveTapRepoUseCase,
   ) {
     this.workers = [
       createWorker("identity", async (job) => {
@@ -125,6 +129,12 @@ export class SyncWorker {
         });
         await aggregateActorStatsUseCase.execute(command);
       }),
+      createWorker("addTapRepo", async (job) => {
+        await addTapRepoUseCase.execute(job.data);
+      }),
+      createWorker("removeTapRepo", async (job) => {
+        await removeTapRepoUseCase.execute(job.data);
+      }),
     ];
   }
   static inject = [
@@ -134,6 +144,8 @@ export class SyncWorker {
     "fetchRecordUseCase",
     "aggregatePostStatsUseCase",
     "aggregateActorStatsUseCase",
+    "addTapRepoUseCase",
+    "removeTapRepoUseCase",
   ] as const;
 
   async start() {

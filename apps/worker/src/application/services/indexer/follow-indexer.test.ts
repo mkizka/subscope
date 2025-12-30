@@ -13,7 +13,6 @@ describe("FollowIndexer", () => {
 
   const followRepo = testInjector.resolve("followRepository");
   const jobQueue = testInjector.resolve("jobQueue");
-  const tapClient = testInjector.resolve("tapClient");
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
 
   const ctx = {
@@ -67,8 +66,10 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({ ctx, record });
 
       // assert
-      const registeredDids = tapClient.getRegisteredDids();
-      expect(registeredDids).toContain(followee.did);
+      const addTapRepoJobs = jobQueue.findByQueueName("addTapRepo");
+      expect(addTapRepoJobs).toContainEqual(
+        expect.objectContaining({ data: followee.did }),
+      );
     });
 
     test("フォロワーがサブスクライバーでない場合、TapにDIDが登録されない", async () => {
@@ -88,8 +89,10 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({ ctx, record });
 
       // assert
-      const registeredDids = tapClient.getRegisteredDids();
-      expect(registeredDids).not.toContain(followee.did);
+      const addTapRepoJobs = jobQueue.findByQueueName("addTapRepo");
+      expect(addTapRepoJobs).not.toContainEqual(
+        expect.objectContaining({ data: followee.did }),
+      );
     });
   });
 
@@ -153,8 +156,10 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record, action: "delete" });
 
       // assert
-      const registeredDids = tapClient.getRegisteredDids();
-      expect(registeredDids).not.toContain(followee.did);
+      const removeTapRepoJobs = jobQueue.findByQueueName("removeTapRepo");
+      expect(removeTapRepoJobs).toContainEqual(
+        expect.objectContaining({ data: followee.did }),
+      );
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
@@ -195,8 +200,10 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const registeredDids = tapClient.getRegisteredDids();
-      expect(registeredDids).toContain(followee.did);
+      const removeTapRepoJobs = jobQueue.findByQueueName("removeTapRepo");
+      expect(removeTapRepoJobs).not.toContainEqual(
+        expect.objectContaining({ data: followee.did }),
+      );
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーでない場合、Tap削除処理は実行されない", async () => {
@@ -235,8 +242,10 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const registeredDids = tapClient.getRegisteredDids();
-      expect(registeredDids).toContain(followee.did);
+      const removeTapRepoJobs = jobQueue.findByQueueName("removeTapRepo");
+      expect(removeTapRepoJobs).not.toContainEqual(
+        expect.objectContaining({ data: followee.did }),
+      );
     });
   });
 });

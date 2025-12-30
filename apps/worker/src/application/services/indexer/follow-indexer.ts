@@ -1,5 +1,5 @@
 import type {
-  ITapClient,
+  IJobQueue,
   Record,
   TransactionContext,
 } from "@repo/common/domain";
@@ -16,14 +16,14 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly followRepository: IFollowRepository,
     private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
     private readonly indexActorService: IndexActorService,
-    private readonly tapClient: ITapClient,
+    private readonly jobQueue: IJobQueue,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
   static inject = [
     "followRepository",
     "aggregateActorStatsScheduler",
     "indexActorService",
-    "tapClient",
+    "jobQueue",
     "subscriptionRepository",
   ] as const;
 
@@ -40,7 +40,11 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.actorDid,
     );
     if (isFollowerSubscriber) {
-      await this.tapClient.addRepo(follow.subjectDid);
+      await this.jobQueue.add({
+        queueName: "addTapRepo",
+        jobName: "addTapRepo",
+        data: follow.subjectDid,
+      });
     }
   }
 
@@ -75,7 +79,11 @@ export class FollowIndexer implements ICollectionIndexer {
         });
       if (isStillFollowed) return;
 
-      await this.tapClient.removeRepo(follow.subjectDid);
+      await this.jobQueue.add({
+        queueName: "removeTapRepo",
+        jobName: "removeTapRepo",
+        data: follow.subjectDid,
+      });
     }
   }
 }
