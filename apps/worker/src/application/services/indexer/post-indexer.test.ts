@@ -33,7 +33,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -79,7 +80,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -117,7 +119,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -141,7 +144,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -170,7 +174,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -229,7 +234,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -285,7 +291,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
@@ -332,7 +339,8 @@ describe("PostIndexer", () => {
       await postIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 

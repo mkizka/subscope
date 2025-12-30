@@ -4,10 +4,7 @@ import { FeedItem, Repost } from "@repo/common/domain";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
-import type {
-  ICollectionIndexer,
-  IndexingContext,
-} from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
@@ -30,11 +27,13 @@ export class RepostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    indexingCtx,
+    live,
+    depth,
   }: {
     ctx: TransactionContext;
     record: Record;
-    indexingCtx: IndexingContext;
+    live: boolean;
+    depth: number;
   }) {
     const repost = Repost.from(record);
     await this.repostRepository.upsert({ ctx, repost });
@@ -47,7 +46,10 @@ export class RepostIndexer implements ICollectionIndexer {
       repost.subjectUri,
     );
     if (!subjectExists) {
-      await this.fetchRecordScheduler.schedule(repost.subjectUri, indexingCtx);
+      await this.fetchRecordScheduler.schedule(repost.subjectUri, {
+        live,
+        depth,
+      });
     }
   }
 

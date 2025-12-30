@@ -217,8 +217,163 @@ IndexRecordService.upsert() (再帰)
 - `apps/worker/src/application/use-cases/async/fetch-record-use-case.ts`
 - `apps/worker/src/application/use-cases/commit/index-commit-use-case.test.ts`
 
+### フェーズ5: IndexingContextのリファクタリング
+
+`IndexingContext`を削除し、`live`と`depth`を個別の引数に分割する。これにより、責務の漏れを防ぐ。
+
+#### フェーズ5-1: IndexActorServiceからdepthを除去
+
+`IndexActorService`は`depth`を必要としないため、`live`のみを受け取るように変更。
+
+- [x] `IndexActorService.upsert()`の引数を`indexingCtx`から`live: boolean`に変更
+- [x] `IndexActorService`内で`fetchRecordScheduler.schedule()`に`{ live, depth: 0 }`を渡す
+- [x] 呼び出し側（`FollowIndexer`, `IndexRecordService`, `UpsertIdentityUseCase`）を修正
+- [x] 関連テストを修正
+- [x] `pnpm all`で検証
+
+**変更ファイル:**
+
+- `apps/worker/src/application/services/index-actor-service.ts`
+- `apps/worker/src/application/services/indexer/follow-indexer.ts`
+- `apps/worker/src/application/services/index-record-service.ts`
+- `apps/worker/src/application/use-cases/identity/upsert-identity-use-case.ts`
+- `apps/worker/src/application/services/index-actor-service.test.ts`
+
+**変更例:**
+
+```typescript
+// IndexActorService
+async upsert({
+  ctx,
+  did,
+  handle,
+  live,
+}: {
+  ctx: TransactionContext;
+  did: Did;
+  handle?: Handle;
+  live: boolean;
+}) {
+  // ...
+  await this.fetchRecordScheduler.schedule(profileUri, { live, depth: 0 });
+}
+
+// FollowIndexer
+await this.indexActorService.upsert({
+  ctx,
+  did: follow.subjectDid,
+  live: indexingCtx.live,
+});
+```
+
+#### フェーズ5-2: ICollectionIndexerでIndexingContextを分割
+
+`ICollectionIndexer`インターフェースで`indexingCtx`を`live`と`depth`に分割。
+
+- [x] `ICollectionIndexer.upsert()`の引数を`indexingCtx`から`live: boolean, depth: number`に変更
+- [x] `IndexingContext`型を削除
+- [x] 全Indexer実装を修正
+- [x] `IndexRecordService`と`FetchRecordUseCase`を修正
+- [x] 関連テストを修正
+- [x] `pnpm all`で検証
+
+**変更ファイル:**
+
+- `apps/worker/src/application/interfaces/services/index-collection-service.ts`
+- `apps/worker/src/application/services/indexer/post-indexer.ts`
+- `apps/worker/src/application/services/indexer/repost-indexer.ts`
+- `apps/worker/src/application/services/indexer/like-indexer.ts`
+- `apps/worker/src/application/services/indexer/follow-indexer.ts`
+- `apps/worker/src/application/services/indexer/profile-indexer.ts`
+- `apps/worker/src/application/services/indexer/generator-indexer.ts`
+- `apps/worker/src/application/services/index-record-service.ts`
+- `apps/worker/src/application/use-cases/async/fetch-record-use-case.ts`
+- `apps/worker/src/application/services/indexer/post-indexer.test.ts`
+- `apps/worker/src/application/services/indexer/repost-indexer.test.ts`
+- `apps/worker/src/application/services/indexer/like-indexer.test.ts`
+- `apps/worker/src/application/services/indexer/follow-indexer.test.ts`
+- `apps/worker/src/application/services/indexer/profile-indexer.test.ts`
+
+**変更例:**
+
+```typescript
+// ICollectionIndexer
+export interface ICollectionIndexer {
+  upsert: ({
+    ctx,
+    record,
+    live,
+    depth,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+    live: boolean;
+    depth: number;
+  }) => Promise<void>;
+}
+
+// PostIndexer
+async upsert({
+  ctx,
+  record,
+  live,
+  depth,
+}: {
+  ctx: TransactionContext;
+  record: Record;
+  live: boolean;
+  depth: number;
+}) {
+  const post = Post.from(record);
+  await this.postRepository.upsert({ ctx, post });
+  if (depth < 2) {
+    await this.fetchRecordScheduler.schedule(post.replyParentUri, {
+      live,
+      depth: depth + 1,
+    });
+  }
+}
+```
+
+#### フェーズ5-3: FetchRecordSchedulerの引数を分割（任意）
+
+`FetchRecordScheduler.schedule()`も`indexingCtx`から`live`と`depth`に分割することで、一貫性を保つ。
+
+- [x] `FetchRecordScheduler.schedule()`の引数を`indexingCtx`から`live: boolean, depth: number`に変更
+- [x] 呼び出し側（全Indexer、IndexActorService）を修正
+- [x] 関連テストを修正
+- [x] `pnpm all`で検証
+
+**変更ファイル:**
+
+- `apps/worker/src/application/services/scheduler/fetch-record-scheduler.ts`
+- `apps/worker/src/application/services/indexer/post-indexer.ts`
+- `apps/worker/src/application/services/indexer/repost-indexer.ts`
+- `apps/worker/src/application/services/index-actor-service.ts`
+
+**変更例:**
+
+```typescript
+// FetchRecordScheduler
+async schedule(uri: string, live: boolean, depth: number): Promise<void> {
+  await this.jobQueue.add({
+    queueName: "fetchRecord",
+    jobName: uri,
+    data: { uri, live, depth },
+    options: {
+      jobId: uri,
+      priority: live ? undefined : 1,
+    },
+  });
+}
+
+// PostIndexer
+await this.fetchRecordScheduler.schedule(post.replyParentUri, live, depth + 1);
+```
+
 ## 注意事項
 
 - `afterAction`は`fetchRecordScheduler`を呼ばないため、`indexingCtx`を渡す必要なし
-- BullMQのpriority値は小さいほど優先度が高い（`live: true` → `priority: 1`）
+- BullMQのpriority値は小さいほど優先度が高い（`live: true` → `priority: undefined`（デフォルト/高優先度）、`live: false` → `priority: 1`（低優先度））
 - 既存の`CommitEventDto.live`は実装済み（ingesterで設定済み）
+- フェーズ5のリファクタリングにより、`depth`が必要ない層（`IndexActorService`など）に`depth`が漏れることを防ぐ

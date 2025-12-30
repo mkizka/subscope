@@ -38,7 +38,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
 
       // assert
@@ -71,7 +71,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
 
       // assert
@@ -96,7 +96,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
 
       // assert
@@ -121,7 +121,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
 
       // act
@@ -165,7 +165,7 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
       followRepo.deleteByUri(record.uri);
 
@@ -206,12 +206,12 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record: record1,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
       await followIndexer.upsert({
         ctx,
         record: record2,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
       followRepo.deleteByUri(record1.uri);
 
@@ -254,12 +254,12 @@ describe("FollowIndexer", () => {
       await followIndexer.upsert({
         ctx,
         record: subscriberRecord,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
       await followIndexer.upsert({
         ctx,
         record: nonSubscriberRecord,
-        indexingCtx: { live: false, depth: 0 },
+        live: false,
       });
       followRepo.deleteByUri(nonSubscriberRecord.uri);
 

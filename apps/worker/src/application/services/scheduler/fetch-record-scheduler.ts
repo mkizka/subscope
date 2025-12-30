@@ -1,25 +1,26 @@
 import type { AtUri } from "@atproto/syntax";
 import type { IJobQueue } from "@repo/common/domain";
 
-import type { IndexingContext } from "../../interfaces/services/index-collection-service.js";
-
 export class FetchRecordScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
   static inject = ["jobQueue"] as const;
 
-  async schedule(uri: AtUri, indexingCtx: IndexingContext): Promise<void> {
+  async schedule(
+    uri: AtUri,
+    { live, depth }: { live: boolean; depth: number },
+  ): Promise<void> {
     const uriString = uri.toString();
     await this.jobQueue.add({
       queueName: "fetchRecord",
       jobName: uriString,
       data: {
         uri: uriString,
-        depth: indexingCtx.depth,
-        live: indexingCtx.live,
+        depth,
+        live,
       },
       options: {
         jobId: uriString,
-        priority: indexingCtx.live ? undefined : 1,
+        priority: live ? undefined : 1,
       },
     });
   }

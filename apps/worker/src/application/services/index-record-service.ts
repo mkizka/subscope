@@ -8,10 +8,7 @@ import {
 
 import type { JobLogger } from "../../shared/job.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
-import type {
-  ICollectionIndexer,
-  IndexingContext,
-} from "../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
@@ -66,13 +63,15 @@ export class IndexRecordService {
     ctx,
     record,
     jobLogger,
-    indexingCtx,
+    live,
+    depth,
   }: {
     ctx: TransactionContext;
     record: Record;
     jobLogger: JobLogger;
     force?: boolean;
-    indexingCtx: IndexingContext;
+    live: boolean;
+    depth: number;
   }): Promise<void> {
     if (!isSupportedCollection(record.collection)) {
       throw new Error(`Unsupported collection: ${record.collection}`);
@@ -86,11 +85,11 @@ export class IndexRecordService {
     await this.indexActorService.upsert({
       ctx,
       did: record.actorDid,
-      indexingCtx,
+      live,
     });
     await this.recordRepository.upsert({ ctx, record });
 
-    await indexer.upsert({ ctx, record, indexingCtx });
+    await indexer.upsert({ ctx, record, live, depth });
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
   }
 

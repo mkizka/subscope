@@ -44,7 +44,8 @@ describe("IndexRecordService", () => {
           ctx,
           record,
           jobLogger,
-          indexingCtx: { depth: 0, live: false },
+          live: false,
+          depth: 0,
         }),
       ).rejects.toThrow("Unsupported collection: unsupported.collection");
     });
@@ -65,7 +66,8 @@ describe("IndexRecordService", () => {
         ctx,
         record,
         jobLogger,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert
@@ -102,7 +104,8 @@ describe("IndexRecordService", () => {
         ctx,
         record: followRecord,
         jobLogger,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert

@@ -36,7 +36,6 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
       });
 
       // assert
@@ -69,7 +68,6 @@ describe("LikeIndexer", () => {
       await likeIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { live: false, depth: 0 },
       });
 
       // act

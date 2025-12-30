@@ -45,7 +45,8 @@ describe("RepostIndexer", () => {
       await repostIndexer.upsert({
         ctx,
         record,
-        indexingCtx: { depth: 0, live: false },
+        live: false,
+        depth: 0,
       });
 
       // assert

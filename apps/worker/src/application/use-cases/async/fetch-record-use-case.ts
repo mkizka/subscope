@@ -76,10 +76,8 @@ export class FetchRecordUseCase {
         jobLogger,
         // サブスクライバーでない、いいねしたアカウントのプロフィールなどルール外のレコードもインデックスする
         force: true,
-        indexingCtx: {
-          depth: depth + 1,
-          live,
-        },
+        live,
+        depth: depth + 1,
       });
     });
   }

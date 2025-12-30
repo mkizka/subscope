@@ -19,7 +19,7 @@ export class UpsertIdentityUseCase {
       ctx,
       did: command.did,
       handle: command.handle,
-      indexingCtx: { live: true, depth: 0 },
+      live: true,
     });
   }
 }

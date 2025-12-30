@@ -7,10 +7,7 @@ import { Follow } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
-import type {
-  ICollectionIndexer,
-  IndexingContext,
-} from "../../interfaces/services/index-collection-service.js";
+import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 
@@ -33,17 +30,17 @@ export class FollowIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
-    indexingCtx,
+    live,
   }: {
     ctx: TransactionContext;
     record: Record;
-    indexingCtx: IndexingContext;
+    live: boolean;
   }) {
     const follow = Follow.from(record);
     await this.indexActorService.upsert({
       ctx,
       did: follow.subjectDid,
-      indexingCtx,
+      live,
     });
     await this.followRepository.upsert({ ctx, follow });
 

@@ -38,10 +38,8 @@ export class IndexCommitUseCase {
             ctx,
             record: commit.record,
             jobLogger,
-            indexingCtx: {
-              depth: 0,
-              live,
-            },
+            live,
+            depth: 0,
           });
           break;
         }
