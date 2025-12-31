@@ -8,16 +8,18 @@ export class TapScheduler {
   async scheduleAddRepo(did: Did): Promise<void> {
     await this.jobQueue.add({
       queueName: "addTapRepo",
-      jobName: "addTapRepo",
+      jobName: did,
       data: did,
+      options: { jobId: did },
     });
   }
 
   async scheduleRemoveRepo(did: Did): Promise<void> {
     await this.jobQueue.add({
       queueName: "removeTapRepo",
-      jobName: "removeTapRepo",
+      jobName: did,
       data: did,
+      options: { jobId: did },
     });
   }
 }
