@@ -33,7 +33,10 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({ ctx, record });
+      await likeIndexer.upsert({
+        ctx,
+        record,
+      });
 
       // assert
       const like = likeRepo.findByUri(record.uri);
@@ -62,7 +65,10 @@ describe("LikeIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await likeIndexer.upsert({ ctx, record });
+      await likeIndexer.upsert({
+        ctx,
+        record,
+      });
 
       // act
       await likeIndexer.afterAction({ record });

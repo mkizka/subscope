@@ -32,10 +32,12 @@ export class PostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
+    live,
     depth,
   }: {
     ctx: TransactionContext;
     record: Record;
+    live: boolean;
     depth: number;
   }) {
     const post = Post.from(record);
@@ -48,7 +50,7 @@ export class PostIndexer implements ICollectionIndexer {
     if (embedUri) {
       const embedExists = await this.postRepository.exists(ctx, embedUri);
       if (!embedExists) {
-        await this.fetchRecordScheduler.schedule(embedUri, depth);
+        await this.fetchRecordScheduler.schedule(embedUri, { live, depth });
       }
     }
   }

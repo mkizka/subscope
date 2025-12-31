@@ -21,8 +21,8 @@ main() {
   # 3. このリポジトリのdocker composeを起動
   echo "[dev.sh] Starting docker containers..."
   docker compose up -d
-  # 5432=Postgres, 6379=Redis, 6008=Jetstream
-  pnpm wait-on tcp:5432 tcp:6379 tcp:6008
+  # 5432=Postgres, 6379=Redis, 2480=Tap
+  pnpm wait-on tcp:5432 tcp:6379 tcp:2480
 
   # 4. dockerコンテナのPostgresにマイグレーション
   echo "[dev.sh] Migrating database..."

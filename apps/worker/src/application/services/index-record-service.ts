@@ -63,12 +63,14 @@ export class IndexRecordService {
     ctx,
     record,
     jobLogger,
+    live,
     depth,
   }: {
     ctx: TransactionContext;
     record: Record;
     jobLogger: JobLogger;
     force?: boolean;
+    live: boolean;
     depth: number;
   }): Promise<void> {
     if (!isSupportedCollection(record.collection)) {
@@ -83,10 +85,11 @@ export class IndexRecordService {
     await this.indexActorService.upsert({
       ctx,
       did: record.actorDid,
+      live,
     });
     await this.recordRepository.upsert({ ctx, record });
 
-    await indexer.upsert({ ctx, record, depth });
+    await indexer.upsert({ ctx, record, live, depth });
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
   }
 

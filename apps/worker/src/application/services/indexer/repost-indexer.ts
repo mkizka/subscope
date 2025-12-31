@@ -27,10 +27,12 @@ export class RepostIndexer implements ICollectionIndexer {
   async upsert({
     ctx,
     record,
+    live,
     depth,
   }: {
     ctx: TransactionContext;
     record: Record;
+    live: boolean;
     depth: number;
   }) {
     const repost = Repost.from(record);
@@ -44,7 +46,10 @@ export class RepostIndexer implements ICollectionIndexer {
       repost.subjectUri,
     );
     if (!subjectExists) {
-      await this.fetchRecordScheduler.schedule(repost.subjectUri, depth);
+      await this.fetchRecordScheduler.schedule(repost.subjectUri, {
+        live,
+        depth,
+      });
     }
   }
 

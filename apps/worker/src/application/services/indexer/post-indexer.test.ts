@@ -30,7 +30,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
 
       // assert
       const post = postRepo.findByUri(record.uri);
@@ -72,7 +77,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
 
       // assert
       const jobs = jobQueue.findByQueueName("fetchRecord");
@@ -83,6 +93,11 @@ describe("PostIndexer", () => {
           data: {
             uri: embedUri,
             depth: 0,
+            live: false,
+          },
+          options: {
+            jobId: embedUri,
+            priority: 1,
           },
         },
       ]);
@@ -101,7 +116,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
 
       // assert
       const jobs = jobQueue.findByQueueName("fetchRecord");
@@ -121,7 +141,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
 
       // assert
       const post = postRepo.findByUri(record.uri);
@@ -146,7 +171,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
@@ -201,7 +231,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
@@ -253,7 +288,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
@@ -296,7 +336,12 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await postIndexer.upsert({ ctx, record, depth: 0 });
+      await postIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+        depth: 0,
+      });
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert

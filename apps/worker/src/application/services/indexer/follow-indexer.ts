@@ -27,11 +27,20 @@ export class FollowIndexer implements ICollectionIndexer {
     "subscriptionRepository",
   ] as const;
 
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+  async upsert({
+    ctx,
+    record,
+    live,
+  }: {
+    ctx: TransactionContext;
+    record: Record;
+    live: boolean;
+  }) {
     const follow = Follow.from(record);
     await this.indexActorService.upsert({
       ctx,
       did: follow.subjectDid,
+      live,
     });
     await this.followRepository.upsert({ ctx, follow });
 

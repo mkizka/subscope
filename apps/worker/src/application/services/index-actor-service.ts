@@ -26,10 +26,12 @@ export class IndexActorService {
     ctx,
     did,
     handle,
+    live,
   }: {
     ctx: TransactionContext;
     did: Did;
     handle?: Handle;
+    live: boolean;
   }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
     const actor = existingActor ?? Actor.create({ did });
@@ -50,7 +52,7 @@ export class IndexActorService {
     });
     if (!profileExists) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-      await this.fetchRecordScheduler.schedule(profileUri, 0);
+      await this.fetchRecordScheduler.schedule(profileUri, { live, depth: 0 });
     }
   }
 

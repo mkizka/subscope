@@ -29,7 +29,7 @@ export class IndexCommitUseCase {
     }
   }
 
-  async doIndexCommit({ commit, jobLogger }: IndexCommitCommand) {
+  async doIndexCommit({ commit, live, jobLogger }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
       switch (commit.operation) {
         case "create":
@@ -38,8 +38,7 @@ export class IndexCommitUseCase {
             ctx,
             record: commit.record,
             jobLogger,
-            // この呼び出しからfetchRecordジョブが再帰的に呼ばれる場合があるので、
-            // depthを0から開始してfetchRecordジョブで+1する
+            live,
             depth: 0,
           });
           break;

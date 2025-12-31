@@ -27,6 +27,7 @@ describe("IndexActorService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
+        live: false,
       });
 
       // assert
@@ -43,6 +44,11 @@ describe("IndexActorService", () => {
           data: {
             uri: `at://${testDid}/app.bsky.actor.profile/self`,
             depth: 0,
+            live: false,
+          },
+          options: {
+            jobId: `at://${testDid}/app.bsky.actor.profile/self`,
+            priority: 1,
           },
         }),
       );
@@ -58,6 +64,7 @@ describe("IndexActorService", () => {
         ctx,
         did: testDid,
         handle: testHandle,
+        live: false,
       });
 
       // assert
@@ -74,6 +81,11 @@ describe("IndexActorService", () => {
           data: {
             uri: `at://${testDid}/app.bsky.actor.profile/self`,
             depth: 0,
+            live: false,
+          },
+          options: {
+            jobId: `at://${testDid}/app.bsky.actor.profile/self`,
+            priority: 1,
           },
         }),
       );
@@ -94,6 +106,7 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
+        live: false,
       });
 
       // assert
@@ -118,6 +131,7 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: existingHandle,
+        live: false,
       });
 
       // assert
@@ -143,6 +157,7 @@ describe("IndexActorService", () => {
         ctx,
         did: existingDid,
         handle: newHandle,
+        live: false,
       });
 
       // assert
@@ -160,6 +175,7 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: newDid,
+        live: false,
       });
 
       // assert
@@ -191,6 +207,7 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: existingDidNoHandle,
+        live: false,
       });
 
       // assert
@@ -225,6 +242,7 @@ describe("IndexActorService", () => {
       await indexActorService.upsert({
         ctx,
         did: existingDid,
+        live: false,
       });
 
       // assert

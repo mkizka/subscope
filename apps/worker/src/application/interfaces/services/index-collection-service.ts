@@ -4,10 +4,12 @@ export interface ICollectionIndexer {
   upsert: ({
     ctx,
     record,
+    live,
     depth,
   }: {
     ctx: TransactionContext;
     record: Record;
+    live: boolean;
     depth: number;
   }) => Promise<void>;
   afterAction?: ({

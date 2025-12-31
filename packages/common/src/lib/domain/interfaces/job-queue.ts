@@ -6,6 +6,7 @@ import type { CommitEventDto, IdentityEventDto } from "../dtos/event.js";
 type FetchRecordData = {
   uri: string;
   depth: number;
+  live: boolean;
 };
 
 type AggregatePostStatsData = {

@@ -101,6 +101,7 @@ export class SyncWorker {
           await fetchRecordUseCase.execute({
             uri: job.data.uri,
             depth: job.data.depth,
+            live: job.data.live,
             jobLogger: createJobLogger(job),
           });
         },

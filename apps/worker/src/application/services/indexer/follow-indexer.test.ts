@@ -35,7 +35,11 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({ ctx, record });
+      await followIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+      });
 
       // assert
       const follow = followRepo.findByUri(record.uri);
@@ -64,7 +68,11 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({ ctx, record });
+      await followIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+      });
 
       // assert
       const registeredDids = tapClient.getRegisteredDids();
@@ -85,7 +93,11 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({ ctx, record });
+      await followIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+      });
 
       // assert
       const registeredDids = tapClient.getRegisteredDids();
@@ -106,7 +118,11 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({ ctx, record });
+      await followIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+      });
 
       // act
       await followIndexer.afterAction({ ctx, record, action: "upsert" });
@@ -146,7 +162,11 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({ ctx, record });
+      await followIndexer.upsert({
+        ctx,
+        record,
+        live: false,
+      });
       followRepo.deleteByUri(record.uri);
 
       // act
@@ -183,8 +203,16 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({ ctx, record: record1 });
-      await followIndexer.upsert({ ctx, record: record2 });
+      await followIndexer.upsert({
+        ctx,
+        record: record1,
+        live: false,
+      });
+      await followIndexer.upsert({
+        ctx,
+        record: record2,
+        live: false,
+      });
       followRepo.deleteByUri(record1.uri);
 
       // act
@@ -223,8 +251,16 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({ ctx, record: subscriberRecord });
-      await followIndexer.upsert({ ctx, record: nonSubscriberRecord });
+      await followIndexer.upsert({
+        ctx,
+        record: subscriberRecord,
+        live: false,
+      });
+      await followIndexer.upsert({
+        ctx,
+        record: nonSubscriberRecord,
+        live: false,
+      });
       followRepo.deleteByUri(nonSubscriberRecord.uri);
 
       // act
