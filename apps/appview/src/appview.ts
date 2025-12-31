@@ -6,7 +6,6 @@ import {
   LoggerManager,
   MetricReporter,
   RedisDidCache,
-  TapClient,
   TransactionManager,
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
@@ -29,6 +28,7 @@ import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
+import { TapScheduler } from "./application/service/tap-scheduler.js";
 import { SubscribeServerUseCase } from "./application/subscribe-server-use-case.js";
 import { UnsubscribeServerUseCase } from "./application/unsubscribe-server-use-case.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
@@ -102,7 +102,6 @@ createInjector()
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("publicUrl", env.PUBLIC_URL)
-  .provideValue("tapUrl", env.TAP_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideFactory("connectionPool", connectionPoolFactory)
@@ -129,7 +128,7 @@ createInjector()
   .provideClass("tokenVerifier", TokenVerifier)
   .provideClass("jobQueue", JobQueue)
   .provideClass("assetUrlBuilder", AssetUrlBuilder)
-  .provideClass("tapClient", TapClient)
+  .provideClass("tapScheduler", TapScheduler)
   // application
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)

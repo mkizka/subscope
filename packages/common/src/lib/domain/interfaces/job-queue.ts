@@ -26,6 +26,8 @@ export type JobData = {
   commit: CommitEventDto;
   aggregatePostStats: AggregatePostStatsData;
   aggregateActorStats: AggregateActorStatsData;
+  addTapRepo: Did;
+  removeTapRepo: Did;
 };
 
 export type QueueName = keyof JobData;

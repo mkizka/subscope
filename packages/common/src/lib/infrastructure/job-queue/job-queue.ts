@@ -51,6 +51,8 @@ export class JobQueue implements IJobQueue {
         "aggregateActorStats",
         queueOptions(withRetry),
       ),
+      addTapRepo: new Queue("addTapRepo", queueOptions(withRetry)),
+      removeTapRepo: new Queue("removeTapRepo", queueOptions(withRetry)),
     };
   }
   static inject = ["redisUrl"] as const;

@@ -23,7 +23,7 @@ describe("SubscribeServerUseCase", () => {
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
   const actorRepo = testInjector.resolve("actorRepository");
-  const tapClient = testInjector.resolve("tapClient");
+  const jobQueue = testInjector.resolve("jobQueue");
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -53,7 +53,9 @@ describe("SubscribeServerUseCase", () => {
     });
     const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).toEqual(now);
-    expect(tapClient.getRegisteredDids()).toContain(asDid(actor.did));
+    expect(jobQueue.findByQueueName("addTapRepo")).toContainEqual(
+      expect.objectContaining({ data: asDid(actor.did) }),
+    );
   });
 
   test("招待コードが提供されない場合、InvalidInviteCodeErrorをthrowする", async () => {
@@ -177,6 +179,8 @@ describe("SubscribeServerUseCase", () => {
       inviteCode: inviteCode.code,
       createdAt: now,
     });
-    expect(tapClient.getRegisteredDids()).toContain(did);
+    expect(jobQueue.findByQueueName("addTapRepo")).toContainEqual(
+      expect.objectContaining({ data: did }),
+    );
   });
 });
