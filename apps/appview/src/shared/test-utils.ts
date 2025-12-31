@@ -22,6 +22,7 @@ import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
+import { TapScheduler } from "../application/service/tap-scheduler.js";
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
@@ -61,6 +62,7 @@ export const testInjector = createInjector()
   .provideClass("transactionManager", InMemoryTransactionManager)
   .provideClass("assetUrlBuilder", InMemoryAssetUrlBuilder)
   .provideClass("jobQueue", InMemoryJobQueue)
+  .provideClass("tapScheduler", TapScheduler)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("profileViewService", ProfileViewService)

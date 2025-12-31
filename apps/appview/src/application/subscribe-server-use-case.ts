@@ -1,7 +1,6 @@
 import type { Did } from "@atproto/did";
 import {
   Actor,
-  type IJobQueue,
   type ITransactionManager,
   Subscription,
 } from "@repo/common/domain";
@@ -9,6 +8,7 @@ import {
 import type { IActorRepository } from "./interfaces/actor-repository.js";
 import type { IInviteCodeRepository } from "./interfaces/invite-code-repository.js";
 import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
+import type { TapScheduler } from "./service/tap-scheduler.js";
 
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {
@@ -35,14 +35,14 @@ export class SubscribeServerUseCase {
     private readonly actorRepository: IActorRepository,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly jobQueue: IJobQueue,
+    private readonly tapScheduler: TapScheduler,
   ) {}
   static inject = [
     "transactionManager",
     "actorRepository",
     "inviteCodeRepository",
     "subscriptionRepository",
-    "jobQueue",
+    "tapScheduler",
   ] as const;
 
   async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
@@ -88,10 +88,6 @@ export class SubscribeServerUseCase {
       await this.inviteCodeRepository.upsert({ ctx, inviteCode });
     });
 
-    await this.jobQueue.add({
-      queueName: "addTapRepo",
-      jobName: "addTapRepo",
-      data: actorDid,
-    });
+    await this.tapScheduler.scheduleAddRepo(actorDid);
   }
 }

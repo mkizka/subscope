@@ -23,6 +23,7 @@ import { AggregateActorStatsScheduler } from "./application/services/scheduler/a
 import { AggregatePostStatsScheduler } from "./application/services/scheduler/aggregate-post-stats-scheduler.js";
 import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
 import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
+import { TapScheduler } from "./application/services/scheduler/tap-scheduler.js";
 import { AddTapRepoUseCase } from "./application/use-cases/async/add-tap-repo-use-case.js";
 import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "./application/use-cases/async/aggregate-post-stats-use-case.js";
@@ -86,6 +87,7 @@ createInjector()
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
+  .provideClass("tapScheduler", TapScheduler)
   .provideClass("profileIndexer", ProfileIndexer)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)

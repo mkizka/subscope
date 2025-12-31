@@ -1,8 +1,4 @@
-import type {
-  IJobQueue,
-  Record,
-  TransactionContext,
-} from "@repo/common/domain";
+import type { Record, TransactionContext } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
@@ -10,20 +6,21 @@ import type { ISubscriptionRepository } from "../../interfaces/repositories/subs
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
+import type { TapScheduler } from "../scheduler/tap-scheduler.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
     private readonly indexActorService: IndexActorService,
-    private readonly jobQueue: IJobQueue,
+    private readonly tapScheduler: TapScheduler,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
   static inject = [
     "followRepository",
     "aggregateActorStatsScheduler",
     "indexActorService",
-    "jobQueue",
+    "tapScheduler",
     "subscriptionRepository",
   ] as const;
 
@@ -40,11 +37,7 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.actorDid,
     );
     if (isFollowerSubscriber) {
-      await this.jobQueue.add({
-        queueName: "addTapRepo",
-        jobName: "addTapRepo",
-        data: follow.subjectDid,
-      });
+      await this.tapScheduler.scheduleAddRepo(follow.subjectDid);
     }
   }
 
@@ -79,11 +72,7 @@ export class FollowIndexer implements ICollectionIndexer {
         });
       if (isStillFollowed) return;
 
-      await this.jobQueue.add({
-        queueName: "removeTapRepo",
-        jobName: "removeTapRepo",
-        data: follow.subjectDid,
-      });
+      await this.tapScheduler.scheduleRemoveRepo(follow.subjectDid);
     }
   }
 }
