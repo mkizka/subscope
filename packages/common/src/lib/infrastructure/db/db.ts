@@ -3,7 +3,7 @@ import type { Logger as BaseDrizzleLogger } from "drizzle-orm/logger";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-import type { ILoggerManager, Logger } from "../domain/interfaces/logger.js";
+import type { ILoggerManager, Logger } from "../../domain/interfaces/logger.js";
 
 export const connectionPoolFactory = (databaseUrl: string) => {
   return new Pool({

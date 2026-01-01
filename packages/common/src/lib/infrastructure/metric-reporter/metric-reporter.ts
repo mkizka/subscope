@@ -6,7 +6,7 @@ import type {
   GaugeKey,
   IMetricReporter,
   LabelsValue,
-} from "../domain/interfaces/metric.js";
+} from "../../domain/interfaces/metric.js";
 
 const connectionStates = {
   opened: 1,

@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 
-import { fakeDate } from "../utils/fake.js";
+import { fakeDate } from "../../utils/fake.js";
 import { InviteCode } from "./invite-code.js";
 
 export function inviteCodeFactory(params?: {
