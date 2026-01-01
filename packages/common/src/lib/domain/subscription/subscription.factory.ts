@@ -1,4 +1,4 @@
-import { fakeDate, fakeDid } from "../utils/fake.js";
+import { fakeDate, fakeDid } from "../../utils/fake.js";
 import { Subscription } from "./subscription.js";
 
 export function subscriptionFactory(params?: {

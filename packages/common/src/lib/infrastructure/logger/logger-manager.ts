@@ -1,6 +1,9 @@
 import { pino } from "pino";
 
-import type { ILoggerManager, LogLevel } from "../domain/interfaces/logger.js";
+import type {
+  ILoggerManager,
+  LogLevel,
+} from "../../domain/interfaces/logger.js";
 
 export class LoggerManager implements ILoggerManager {
   private readonly rootLogger;
