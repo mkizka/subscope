@@ -1,19 +1,26 @@
 {
-  "name": "subscope",
-  "private": true,
+  "name": "@repo/subscope",
   "version": "0.0.0",
   "type": "module",
+  "private": true,
   "scripts": {
-    "dev": "vite",
+    "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
+    "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "dev": "vite",
+    "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
+    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "preact": "^10.27.2"
   },
   "devDependencies": {
+    "@mkizka/eslint-config": "7.2.0",
     "@preact/preset-vite": "^2.10.2",
     "@types/node": "^24.10.1",
+    "eslint": "9.39.1",
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.2.5"
   },
