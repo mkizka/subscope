@@ -43,5 +43,10 @@
     "typescript": "5.9.3",
     "vitest": "4.0.15",
     "vitest-mock-extended": "3.1.0"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-pkg"
+    ]
   }
 }

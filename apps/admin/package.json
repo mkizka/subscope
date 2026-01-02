@@ -72,5 +72,10 @@
     "vite": "^7.2.6",
     "vite-tsconfig-paths": "^5.1.4",
     "wait-on": "9.0.3"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-pkg"
+    ]
   }
 }

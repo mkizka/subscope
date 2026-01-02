@@ -28,5 +28,10 @@
     "@types/pg": "8.15.6",
     "eslint": "9.39.1"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-pkg"
+    ]
+  }
 }

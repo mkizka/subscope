@@ -34,5 +34,10 @@
     "eslint": "9.39.1",
     "typescript": "5.9.3"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-pkg"
+    ]
+  }
 }
