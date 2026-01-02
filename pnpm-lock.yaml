@@ -702,6 +702,9 @@ importers:
 
   packages/db:
     dependencies:
+      dotenv:
+        specifier: 17.2.3
+        version: 17.2.3
       drizzle-kit:
         specifier: 0.31.8
         version: 0.31.8
@@ -724,9 +727,6 @@ importers:
       '@types/pg':
         specifier: 8.15.6
         version: 8.15.6
-      dotenv:
-        specifier: 17.2.3
-        version: 17.2.3
       eslint:
         specifier: 9.39.1
         version: 9.39.1(jiti@2.6.1)

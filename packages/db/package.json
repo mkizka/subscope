@@ -16,6 +16,7 @@
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check"
   },
   "dependencies": {
+    "dotenv": "17.2.3",
     "drizzle-kit": "0.31.8",
     "drizzle-orm": "0.45.0",
     "pg": "8.16.3"
@@ -25,7 +26,6 @@
     "@tsconfig/node-lts": "24.0.0",
     "@types/node": "24.10.1",
     "@types/pg": "8.15.6",
-    "dotenv": "17.2.3",
     "eslint": "9.39.1"
   },
   "sideEffects": false
