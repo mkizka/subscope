@@ -495,6 +495,9 @@ importers:
       preact:
         specifier: ^10.27.2
         version: 10.28.1
+      preact-iso:
+        specifier: 2.11.1
+        version: 2.11.1(preact-render-to-string@6.6.5(preact@10.28.1))(preact@10.28.1)
     devDependencies:
       '@mkizka/eslint-config':
         specifier: 7.2.0
@@ -1226,6 +1229,7 @@ packages:
   '@dword-design/defu@1.0.3':
     resolution: {integrity: sha512-QEM8a6CPIrMvudnuNDwr3IxWJ0dcMKG9tgxt3zuPk/NmXV0ejk4qxQJ1PfquJwRzu59UsqNpUAACMG485VMIUA==}
     engines: {node: '>=18'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@dword-design/eslint-plugin-import-alias@6.0.3':
     resolution: {integrity: sha512-nLe1+w36hWGpspZ/gOMQDw4m2/ZP6fzDY7Zns2o+6pQm44REW6TwojV8wAdyDfLoLMGb9hOvVJ8i9tVgSitAzQ==}
@@ -6169,6 +6173,17 @@ packages:
   postgres@3.4.7:
     resolution: {integrity: sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==}
     engines: {node: '>=12'}
+
+  preact-iso@2.11.1:
+    resolution: {integrity: sha512-rLy0RmzP/hrDjnFdnEblxFgKtzUj4njkHrpGJBGS7S4QuYw1zv0lA38qsWpeAAB10JAz/hF2CsHrLen9ufCtbw==}
+    peerDependencies:
+      preact: '>=10 || >= 11.0.0-0'
+      preact-render-to-string: '>=6.4.0'
+
+  preact-render-to-string@6.6.5:
+    resolution: {integrity: sha512-O6MHzYNIKYaiSX3bOw0gGZfEbOmlIDtDfWwN1JJdc/T3ihzRT6tGGSEWE088dWrEDGa1u7101q+6fzQnO9XCPA==}
+    peerDependencies:
+      preact: '>=10 || >= 11.0.0-0'
 
   preact@10.28.1:
     resolution: {integrity: sha512-u1/ixq/lVQI0CakKNvLDEcW5zfCjUQfZdK9qqWuIJtsezuyG6pk9TWj75GMuI/EzRSZB/VAE43sNWWZfiy8psw==}
@@ -13460,6 +13475,15 @@ snapshots:
 
   postgres@3.4.7:
     optional: true
+
+  preact-iso@2.11.1(preact-render-to-string@6.6.5(preact@10.28.1))(preact@10.28.1):
+    dependencies:
+      preact: 10.28.1
+      preact-render-to-string: 6.6.5(preact@10.28.1)
+
+  preact-render-to-string@6.6.5(preact@10.28.1):
+    dependencies:
+      preact: 10.28.1
 
   preact@10.28.1: {}
 
