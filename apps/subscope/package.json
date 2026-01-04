@@ -7,17 +7,23 @@
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "tsc -b && vite build",
-    "dev": "NODE_ENV=development tsx watch ./src/server/server.ts",
+    "dev": "NODE_ENV=development tsx watch ./src/server/subscope.ts",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "preview": "vite preview",
-    "start": "NODE_ENV=production tsx ./src/server/server.ts",
+    "start": "NODE_ENV=production tsx ./src/server/subscope.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@bull-board/api": "^6.15.0",
+    "@bull-board/express": "^6.15.0",
+    "@repo/common": "workspace:*",
     "express": "5.2.1",
     "preact": "^10.27.2",
-    "preact-iso": "2.11.1"
+    "preact-iso": "2.11.1",
+    "typed-inject": "^5.0.0",
+    "zod": "4.1.13",
+    "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
     "@mkizka/eslint-config": "7.2.0",
