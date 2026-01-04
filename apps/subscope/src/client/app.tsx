@@ -6,21 +6,8 @@ import {
   Router,
 } from "preact-iso";
 
-const Foo = lazy(() => import("./pages/foo.tsx").then((mod) => mod.Foo));
-const Bar = lazy(() => import("./pages/bar.tsx").then((mod) => mod.Bar));
-
-export function Home() {
-  return (
-    <div>
-      <h1>Home Page</h1>
-      <nav>
-        <a href="/foo">Go to Foo</a>
-        <br />
-        <a href="/bar">Go to Bar</a>
-      </nav>
-    </div>
-  );
-}
+const Home = lazy(() => import("./pages/index.tsx").then((mod) => mod.Home));
+const Admin = lazy(() => import("./pages/admin.tsx").then((mod) => mod.Admin));
 
 export function NotFound() {
   return <div>404 Not Found</div>;
@@ -32,8 +19,7 @@ export function App() {
       <ErrorBoundary>
         <Router>
           <Route path="/" component={Home} />
-          <Route path="/foo" component={Foo} />
-          <Route path="/bar" component={Bar} />
+          <Route path="/admin" component={Admin} />
           <Route default component={NotFound} />
         </Router>
       </ErrorBoundary>
