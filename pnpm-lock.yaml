@@ -593,8 +593,8 @@ importers:
         specifier: 0.5.2
         version: 0.5.2
       '@atproto/oauth-client':
-        specifier: 0.5.10
-        version: 0.5.10
+        specifier: 0.5.12
+        version: 0.5.12
       '@atproto/xrpc':
         specifier: 0.7.6
         version: 0.7.6
@@ -899,14 +899,8 @@ packages:
     resolution: {integrity: sha512-qcY3w5XpOFcpD2aRVLqBBSKOy0FXAEpGwDjfd7Q2ldRmDLcpDS0XLrhpnIjG9yR6BJW9C/fkwmIVZylvR5nI0A==}
     engines: {node: '>=18.7.0'}
 
-  '@atproto/oauth-client@0.5.10':
-    resolution: {integrity: sha512-2mdJFyYbaOw3e/1KMBOQ2/J9p+MfWW8kE6FKdExWrJ7JPJpTJw2ZF2EmdGHCVeXw386dQgXbLkr+w4vbgSqfMQ==}
-
   '@atproto/oauth-client@0.5.12':
     resolution: {integrity: sha512-Noc+NQs4lCw1XnrF96zrZ1sMuAzxWCKdgfoMIEQA0lIuNWd1Td6t7TACo6yxIdEHlqBmLDAQFs8iDArVH4v6gg==}
-
-  '@atproto/oauth-types@0.5.2':
-    resolution: {integrity: sha512-9DCDvtvCanTwAaU5UakYDO0hzcOITS3RutK5zfLytE5Y9unj0REmTDdN8Xd8YCfUJl7T/9pYpf04Uyq7bFTASg==}
 
   '@atproto/oauth-types@0.6.0':
     resolution: {integrity: sha512-MiDttF9r0O5CiClBeLcn+QrFd64bVrbmuZ/I0yJn8/Gt2CLAZ5GZHLUi4hq5s+cYjUZtZTLYtI9oqFDwCQmvUA==}
@@ -7920,22 +7914,6 @@ snapshots:
       '@atproto/oauth-client': 0.5.12
       '@atproto/oauth-types': 0.6.0
 
-  '@atproto/oauth-client@0.5.10':
-    dependencies:
-      '@atproto-labs/did-resolver': 0.2.4
-      '@atproto-labs/fetch': 0.2.3
-      '@atproto-labs/handle-resolver': 0.3.4
-      '@atproto-labs/identity-resolver': 0.3.4
-      '@atproto-labs/simple-store': 0.3.0
-      '@atproto-labs/simple-store-memory': 0.1.4
-      '@atproto/did': 0.2.3
-      '@atproto/jwk': 0.6.0
-      '@atproto/oauth-types': 0.5.2
-      '@atproto/xrpc': 0.7.6
-      core-js: 3.47.0
-      multiformats: 9.9.0
-      zod: 3.25.76
-
   '@atproto/oauth-client@0.5.12':
     dependencies:
       '@atproto-labs/did-resolver': 0.2.4
@@ -7950,12 +7928,6 @@ snapshots:
       '@atproto/xrpc': 0.7.7
       core-js: 3.47.0
       multiformats: 9.9.0
-      zod: 3.25.76
-
-  '@atproto/oauth-types@0.5.2':
-    dependencies:
-      '@atproto/did': 0.2.3
-      '@atproto/jwk': 0.6.0
       zod: 3.25.76
 
   '@atproto/oauth-types@0.6.0':
