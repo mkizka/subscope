@@ -15,10 +15,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atproto/jwk-jose": "^0.1.11",
+    "@atproto/oauth-client-node": "^0.3.12",
     "@bull-board/api": "^6.15.0",
     "@bull-board/express": "^6.15.0",
+    "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
+    "@repo/db": "workspace:*",
+    "drizzle-orm": "0.45.0",
     "express": "5.2.1",
+    "iron-session": "^8.0.4",
     "preact": "^10.27.2",
     "preact-iso": "2.11.1",
     "typed-inject": "^5.0.0",
