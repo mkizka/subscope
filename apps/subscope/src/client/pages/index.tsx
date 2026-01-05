@@ -7,7 +7,11 @@ export function Home() {
           <a href="/login">Login</a>
         </li>
         <li>
-          <form action="/oauth/logout" method="POST" style={{ display: "inline" }}>
+          <form
+            action="/oauth/logout"
+            method="POST"
+            style={{ display: "inline" }}
+          >
             <button type="submit">Logout</button>
           </form>
         </li>

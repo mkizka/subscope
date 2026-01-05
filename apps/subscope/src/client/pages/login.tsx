@@ -6,7 +6,11 @@ export function Login() {
         <div>
           <label>
             Handle:
-            <input type="text" name="identifier" placeholder="you.bsky.social" />
+            <input
+              type="text"
+              name="identifier"
+              placeholder="you.bsky.social"
+            />
           </label>
         </div>
         <button type="submit">Login with Bluesky</button>
