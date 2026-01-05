@@ -7,7 +7,9 @@ export function Home() {
           <a href="/admin">Go to Admin</a>
         </li>
         <li>
-          <a href="/dashboard" target="_blank">Go to Dashboard</a>
+          <a href="/dashboard" target="_blank">
+            Go to Dashboard
+          </a>
         </li>
       </ul>
     </div>
