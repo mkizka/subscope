@@ -19,6 +19,7 @@ export class StateStore implements NodeSavedStateStore {
       .where(eq(schema.authState.key, key))
       .limit(1);
     if (result === undefined) return;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return JSON.parse(result.state);
   }
 
@@ -49,6 +50,7 @@ export class SessionStore implements NodeSavedSessionStore {
       .where(eq(schema.authSession.key, key))
       .limit(1);
     if (result === undefined) return;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return JSON.parse(result.session);
   }
 

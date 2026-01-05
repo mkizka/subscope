@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 import express from "express";
 
 import { env } from "../shared/env.js";
-import { clientRouter } from "./client.js";
+import { clientRouter } from "./routes/client.js";
 
 export class SubscopeServer {
   private app;

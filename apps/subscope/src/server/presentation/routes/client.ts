@@ -2,7 +2,7 @@ import express from "express";
 import { Router } from "express";
 import path from "path";
 
-import { env } from "../shared/env";
+import { env } from "../../shared/env";
 
 const router = Router();
 

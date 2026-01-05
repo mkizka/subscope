@@ -9,9 +9,9 @@ import { createInjector } from "typed-inject";
 import { oauthClientFactory } from "./infrastructure/oauth/client";
 import { OAuthSession } from "./infrastructure/oauth/session";
 import { SessionStore, StateStore } from "./infrastructure/oauth/storage";
-import { dashboardRouterFactory } from "./presentation/dashboard";
-import { authMiddlewareFactory } from "./presentation/middleware/auth";
-import { oauthRouterFactory } from "./presentation/oauth";
+import { authMiddlewareFactory } from "./presentation/middlewares/auth";
+import { dashboardRouterFactory } from "./presentation/routes/dashboard";
+import { oauthRouterFactory } from "./presentation/routes/oauth";
 import { SubscopeServer } from "./presentation/server";
 import { env } from "./shared/env";
 
