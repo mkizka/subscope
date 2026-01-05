@@ -17,7 +17,7 @@
     "@atproto/did": "0.2.3",
     "@atproto/identity": "0.4.10",
     "@atproto/syntax": "0.4.2",
-    "@atproto/xrpc-server": "0.10.2",
+    "@atproto/xrpc-server": "0.10.6",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",

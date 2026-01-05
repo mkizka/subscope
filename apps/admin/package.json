@@ -20,9 +20,9 @@
   "dependencies": {
     "@atproto/did": "0.2.3",
     "@atproto/jwk-jose": "^0.1.11",
-    "@atproto/oauth-client-node": "^0.3.12",
+    "@atproto/oauth-client-node": "^0.3.14",
     "@atproto/syntax": "0.4.2",
-    "@atproto/xrpc": "0.7.6",
+    "@atproto/xrpc": "0.7.7",
     "@bull-board/api": "^6.15.0",
     "@bull-board/express": "^6.15.0",
     "@conform-to/react": "1.14.1",

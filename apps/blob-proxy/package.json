@@ -16,7 +16,7 @@
   "dependencies": {
     "@atproto/did": "0.2.3",
     "@atproto/identity": "0.4.10",
-    "@atproto/xrpc": "0.7.6",
+    "@atproto/xrpc": "0.7.7",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",

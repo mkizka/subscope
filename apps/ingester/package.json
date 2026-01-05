@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@atproto/did": "0.2.3",
-    "@atproto/tap": "0.0.2",
-    "@atproto/xrpc-server": "0.10.2",
+    "@atproto/tap": "0.0.3",
+    "@atproto/xrpc-server": "0.10.6",
     "@keyv/redis": "5.1.4",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",

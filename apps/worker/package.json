@@ -16,8 +16,8 @@
   "dependencies": {
     "@atproto/did": "0.2.3",
     "@atproto/identity": "0.4.10",
-    "@atproto/lexicon": "0.5.2",
-    "@atproto/repo": "0.8.11",
+    "@atproto/lexicon": "0.6.0",
+    "@atproto/repo": "0.8.12",
     "@atproto/syntax": "0.4.2",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
