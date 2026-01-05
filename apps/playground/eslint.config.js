@@ -1,3 +1,3 @@
-import { configs } from "@mkizka/eslint-config";
+import { mkizka } from "@mkizka/eslint-config";
 
-export default [...configs.typescript(), ...configs.react()];
+export default mkizka;

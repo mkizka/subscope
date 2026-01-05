@@ -34,7 +34,7 @@
     "zod-validation-error": "5.0.0"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "7.2.0",
+    "@mkizka/eslint-config": "8.0.0",
     "@repo/test-utils": "workspace:*",
     "@tsconfig/node-lts": "24.0.0",
     "@types/express": "5.0.6",
