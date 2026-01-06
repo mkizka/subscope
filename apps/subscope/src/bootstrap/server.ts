@@ -9,7 +9,7 @@ export class SubscopeServer {
 
   constructor(
     dashboardRouter: express.Router,
-    loginRouter: express.Router,
+    oauthRouter: express.Router,
     authMiddleware: RequestHandler,
   ) {
     const app = express();
@@ -17,13 +17,13 @@ export class SubscopeServer {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
-    app.use("/oauth", loginRouter);
+    app.use("/oauth", oauthRouter);
     app.use("/dashboard", authMiddleware, dashboardRouter);
     app.use(clientRouter);
 
     this.app = app;
   }
-  static inject = ["dashboardRouter", "loginRouter", "authMiddleware"] as const;
+  static inject = ["dashboardRouter", "oauthRouter", "authMiddleware"] as const;
 
   start() {
     this.app.listen(env.PORT, () => {

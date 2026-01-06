@@ -4,7 +4,7 @@ import { Router } from "express";
 
 import type { OAuthSession } from "../infrastructure/session";
 
-export const loginRouterFactory = (
+export const oauthRouterFactory = (
   oauthClient: NodeOAuthClient,
   oauthSession: OAuthSession,
   loggerManager: ILoggerManager,
@@ -58,7 +58,7 @@ export const loginRouterFactory = (
 
   return router;
 };
-loginRouterFactory.inject = [
+oauthRouterFactory.inject = [
   "oauthClient",
   "oauthSession",
   "loggerManager",
