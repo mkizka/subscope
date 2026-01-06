@@ -12,7 +12,7 @@
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "preview": "vite preview",
     "start": "NODE_ENV=production tsx ./src/subscope.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
     "@atproto/jwk-jose": "^0.1.11",

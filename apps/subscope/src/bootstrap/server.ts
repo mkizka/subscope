@@ -2,15 +2,15 @@ import type { RequestHandler } from "express";
 import express from "express";
 
 import { env } from "../shared/env.js";
-import { clientRouter } from "./client.js";
 
 export class SubscopeServer {
   private app;
 
   constructor(
+    authMiddleware: RequestHandler,
     dashboardRouter: express.Router,
     oauthRouter: express.Router,
-    authMiddleware: RequestHandler,
+    clientRouter: express.Router,
   ) {
     const app = express();
 
@@ -23,7 +23,12 @@ export class SubscopeServer {
 
     this.app = app;
   }
-  static inject = ["dashboardRouter", "oauthRouter", "authMiddleware"] as const;
+  static inject = [
+    "authMiddleware",
+    "dashboardRouter",
+    "oauthRouter",
+    "clientRouter",
+  ] as const;
 
   start() {
     this.app.listen(env.PORT, () => {
