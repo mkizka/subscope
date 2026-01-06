@@ -7,11 +7,11 @@
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "tsc -b && vite build",
-    "dev": "NODE_ENV=development tsx watch ./src/server/subscope.ts",
+    "dev": "NODE_ENV=development tsx watch ./src/subscope.ts",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "preview": "vite preview",
-    "start": "NODE_ENV=production tsx ./src/server/subscope.ts",
+    "start": "NODE_ENV=production tsx ./src/subscope.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

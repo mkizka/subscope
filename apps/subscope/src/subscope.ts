@@ -6,13 +6,16 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { oauthClientFactory } from "./infrastructure/oauth/client";
-import { OAuthSession } from "./infrastructure/oauth/session";
-import { SessionStore, StateStore } from "./infrastructure/oauth/storage";
-import { authMiddlewareFactory } from "./presentation/middlewares/auth";
-import { dashboardRouterFactory } from "./presentation/routes/dashboard";
-import { oauthRouterFactory } from "./presentation/routes/oauth";
-import { SubscopeServer } from "./presentation/server";
+import { dashboardRouterFactory } from "./bootstrap/dashboard";
+import { SubscopeServer } from "./bootstrap/server";
+import { oauthClientFactory } from "./features/login/infrastructure/client";
+import { OAuthSession } from "./features/login/infrastructure/session";
+import {
+  SessionStore,
+  StateStore,
+} from "./features/login/infrastructure/storage";
+import { authMiddlewareFactory } from "./features/login/presentation/middleware";
+import { loginRouterFactory } from "./features/login/presentation/router";
 import { env } from "./shared/env";
 
 createInjector()
@@ -29,6 +32,6 @@ createInjector()
   .provideClass("oauthSession", OAuthSession)
   .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("dashboardRouter", dashboardRouterFactory)
-  .provideFactory("oauthRouter", oauthRouterFactory)
+  .provideFactory("loginRouter", loginRouterFactory)
   .injectClass(SubscopeServer)
   .start();
