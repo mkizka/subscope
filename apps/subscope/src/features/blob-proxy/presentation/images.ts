@@ -2,8 +2,8 @@ import type { IMetricReporter } from "@repo/common/domain";
 import type { Router } from "express";
 import { Router as expressRouter } from "express";
 
-import type { ImageProxyUseCase } from "../../application/image-proxy-use-case.js";
-import { ImageProxyRequest } from "../../domain/image-proxy-request.js";
+import type { ImageProxyUseCase } from "../application/image-proxy-use-case.js";
+import { ImageProxyRequest } from "../domain/image-proxy-request.js";
 
 export function imagesRouterFactory(
   imageProxyUseCase: ImageProxyUseCase,

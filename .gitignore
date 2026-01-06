@@ -11,9 +11,6 @@ node-compile-cache/
 # turbo
 .turbo/
 
-# claude
-.claude/settings.local.json
-
 # serena mcp
 .serena/
 
@@ -27,5 +24,9 @@ coverage/
 .react-router/
 build/
 
+# storybook
 *storybook.log
 storybook-static
+
+# subscope
+cache/

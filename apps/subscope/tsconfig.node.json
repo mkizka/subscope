@@ -22,6 +22,6 @@
     "noUncheckedSideEffectImports": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["vite.config.ts", "src/**/*.ts"],
+  "include": ["vite.*.ts", "vitest.*.ts", "src/**/*.ts"],
   "exclude": ["src/client"]
 }

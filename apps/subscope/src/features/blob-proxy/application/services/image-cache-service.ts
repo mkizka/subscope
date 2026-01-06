@@ -4,11 +4,16 @@ import type { ICacheMetadataRepository } from "../interfaces/cache-metadata-repo
 import type { IImageCacheStorage } from "../interfaces/image-cache-storage.js";
 
 export class ImageCacheService {
-  static inject = ["cacheMetadataRepository", "imageCacheStorage"] as const;
+  static inject = [
+    "cacheMetadataRepository",
+    "imageCacheStorage",
+    "blobCacheDir",
+  ] as const;
 
   constructor(
     private cacheMetadataRepository: ICacheMetadataRepository,
     private imageCacheStorage: IImageCacheStorage,
+    private blobCacheDir: string,
   ) {}
 
   async get(cacheKey: string): Promise<CacheMetadata | null> {
@@ -27,7 +32,9 @@ export class ImageCacheService {
       });
     }
 
-    const data = await this.imageCacheStorage.read(cacheEntry.getPath());
+    const data = await this.imageCacheStorage.read(
+      cacheEntry.getPath(this.blobCacheDir),
+    );
     if (!data) {
       // ファイルが存在しない場合はキャッシュエントリを削除
       await this.cacheMetadataRepository.delete(cacheKey);
@@ -47,7 +54,7 @@ export class ImageCacheService {
 
     if (cacheMetadata.imageBlob) {
       await this.imageCacheStorage.save(
-        cacheMetadata.getPath(),
+        cacheMetadata.getPath(this.blobCacheDir),
         cacheMetadata.imageBlob.data,
       );
     }
@@ -55,7 +62,9 @@ export class ImageCacheService {
 
   async delete(cacheMetadata: CacheMetadata): Promise<void> {
     if (cacheMetadata.status === "success") {
-      await this.imageCacheStorage.remove(cacheMetadata.getPath());
+      await this.imageCacheStorage.remove(
+        cacheMetadata.getPath(this.blobCacheDir),
+      );
     }
     await this.cacheMetadataRepository.delete(cacheMetadata.cacheKey);
   }

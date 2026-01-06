@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import express from "express";
 
+import type { CacheCleanupScheduler } from "../features/blob-proxy/application/services/cache-cleanup-scheduler.js";
 import { env } from "../shared/env.js";
 
 export class SubscopeServer {
@@ -11,6 +12,8 @@ export class SubscopeServer {
     dashboardRouter: express.Router,
     oauthRouter: express.Router,
     clientRouter: express.Router,
+    blobProxyRouter: express.Router,
+    private readonly cacheCleanupScheduler: CacheCleanupScheduler,
   ) {
     const app = express();
 
@@ -19,6 +22,7 @@ export class SubscopeServer {
 
     app.use("/oauth", oauthRouter);
     app.use("/dashboard", authMiddleware, dashboardRouter);
+    app.use("/images", blobProxyRouter);
     app.use(clientRouter);
 
     this.app = app;
@@ -28,12 +32,15 @@ export class SubscopeServer {
     "dashboardRouter",
     "oauthRouter",
     "clientRouter",
+    "blobProxyRouter",
+    "cacheCleanupScheduler",
   ] as const;
 
   start() {
     this.app.listen(env.PORT, () => {
       // eslint-disable-next-line no-console
       console.log(`Subscope server running at http://localhost:${env.PORT}`);
+      this.cacheCleanupScheduler.start();
     });
   }
 }

@@ -1,6 +1,5 @@
 import path from "path";
 
-import { env } from "../shared/env.js";
 import type { ImageBlob } from "./image-blob.js";
 
 const SUCCESS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 1週間
@@ -24,8 +23,8 @@ export class CacheMetadata {
     this.expiredAt = params.expiredAt;
   }
 
-  getPath(): string {
-    return path.join(env.BLOB_CACHE_DIR, `${this.cacheKey}.jpg`);
+  getPath(blobCacheDir: string): string {
+    return path.join(blobCacheDir, `${this.cacheKey}.jpg`);
   }
 
   static create(params: {

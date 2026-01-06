@@ -2,9 +2,10 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "watchPatterns": [
-      "/apps/blob-proxy/**/*",
+      "/apps/subscope/**/*",
       "/packages/client/**/*",
       "/packages/common/**/*",
+      "/packages/db/**/*",
       "pnpm-lock.yaml",
       "Dockerfile"
     ]

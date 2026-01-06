@@ -47,6 +47,12 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default("did:web:localhost%3A3001#bsky_appview"),
   }),
+  BLOB_CACHE_DIR: match({
+    prod: z.string(),
+    dev: z.string().default("./cache"),
+  }),
+  CACHE_CLEANUP_CRON: z.string().default("* * * * *"), // 1分間隔
+  CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
 });
 
 export const env = (() => {

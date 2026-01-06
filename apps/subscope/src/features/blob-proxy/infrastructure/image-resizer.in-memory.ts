@@ -14,20 +14,19 @@ export class InMemoryImageResizer implements IImageResizer {
     this.results.clear();
   }
 
-  async resize(params: {
-    blob: ImageBlob;
-    preset: ImagePreset;
-  }): Promise<ImageBlob> {
+  resize(params: { blob: ImageBlob; preset: ImagePreset }): Promise<ImageBlob> {
     const key = this.getKey(params.preset);
     const result = this.results.get(key);
 
     if (!result) {
-      throw new Error(
-        `No resize result set for preset type: ${params.preset.type}`,
+      return Promise.reject(
+        new Error(
+          `No resize result set for preset type: ${params.preset.type}`,
+        ),
       );
     }
 
-    return result;
+    return Promise.resolve(result);
   }
 
   private getKey(preset: ImagePreset): string {

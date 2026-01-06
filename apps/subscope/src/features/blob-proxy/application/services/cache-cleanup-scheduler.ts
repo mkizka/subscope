@@ -1,6 +1,5 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 
-import { env } from "../../shared/env.js";
 import type { ITaskScheduler } from "../interfaces/task-scheduler.js";
 import type { CacheCleanupService } from "./cache-cleanup-service.js";
 
@@ -11,6 +10,8 @@ export class CacheCleanupScheduler {
     loggerManager: ILoggerManager,
     private readonly taskScheduler: ITaskScheduler,
     private readonly cacheCleanupService: CacheCleanupService,
+    private readonly cacheCleanupCron: string,
+    private readonly cacheCleanupTimezone: string,
   ) {
     this.logger = loggerManager.createLogger("CacheCleanupScheduler");
   }
@@ -19,17 +20,19 @@ export class CacheCleanupScheduler {
     "loggerManager",
     "taskScheduler",
     "cacheCleanupService",
+    "cacheCleanupCron",
+    "cacheCleanupTimezone",
   ] as const;
 
   start(): void {
     this.taskScheduler.start(
-      env.CACHE_CLEANUP_CRON,
+      this.cacheCleanupCron,
       () => this.performCleanup(),
-      { timezone: env.CACHE_CLEANUP_TIMEZONE },
+      { timezone: this.cacheCleanupTimezone },
     );
 
     this.logger.info(
-      `Cache scheduling started with cron expression '${env.CACHE_CLEANUP_CRON}' (${env.CACHE_CLEANUP_TIMEZONE}), TTL: success=1week, failed=5minutes`,
+      `Cache scheduling started with cron expression '${this.cacheCleanupCron}' (${this.cacheCleanupTimezone}), TTL: success=1week, failed=5minutes`,
     );
   }
 

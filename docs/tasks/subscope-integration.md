@@ -51,7 +51,8 @@ apps/subscope/src/
 │   └── main.tsx
 │
 ├── shared/
-│   └── env.ts                   # 統合環境変数
+│   ├── env.ts                   # 統合環境変数
+│   └── test-utils.ts            # テスト用DIコンテナ
 │
 └── subscope.ts                  # エントリーポイント (各routerを統合)
 ```
@@ -87,3 +88,10 @@ xrpc ───────────────→ @repo/common/domain (共�
 | `apps/blob-proxy/src/`                      | `features/blob-proxy/`           |
 | `apps/admin/app/server/oauth/`              | `features/oauth/infrastructure/` |
 | `apps/admin/app/server/routes/dashboard.ts` | `features/dashboard/`            |
+
+## テスト方針
+
+- テスト用DIコンテナは `shared/test-utils.ts` に配置
+- 各featureのInMemory実装を登録し、`testInjector` としてexport
+- `vitest.unit.setup.ts` で `setupFiles()` を呼び出し、各テスト前にInMemory実装をクリア
+- テストファイルは `testInjector` をimportしてUseCaseやServiceをインジェクト

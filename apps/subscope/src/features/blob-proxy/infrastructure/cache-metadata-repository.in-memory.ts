@@ -8,22 +8,26 @@ export class InMemoryCacheMetadataRepository implements ICacheMetadataRepository
     this.cache.clear();
   }
 
-  async get(key: string): Promise<CacheMetadata | null> {
-    return this.cache.get(key) ?? null;
+  get(key: string): Promise<CacheMetadata | null> {
+    return Promise.resolve(this.cache.get(key) ?? null);
   }
 
-  async save(cacheMetadata: CacheMetadata): Promise<void> {
+  save(cacheMetadata: CacheMetadata): Promise<void> {
     this.cache.set(cacheMetadata.cacheKey, cacheMetadata);
+    return Promise.resolve();
   }
 
-  async delete(key: string): Promise<void> {
+  delete(key: string): Promise<void> {
     this.cache.delete(key);
+    return Promise.resolve();
   }
 
-  async findExpired(): Promise<CacheMetadata[]> {
+  findExpired(): Promise<CacheMetadata[]> {
     const now = new Date();
-    return Array.from(this.cache.values()).filter(
-      (metadata) => metadata.expiredAt < now,
+    return Promise.resolve(
+      Array.from(this.cache.values()).filter(
+        (metadata) => metadata.expiredAt < now,
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
+import { env } from "../../shared/env.js";
 import { ImageProxyUseCase } from "./application/image-proxy-use-case.js";
 import { CacheCleanupScheduler } from "./application/services/cache-cleanup-scheduler.js";
 import { CacheCleanupService } from "./application/services/cache-cleanup-service.js";
@@ -18,16 +19,17 @@ import { CacheMetadataRepository } from "./infrastructure/cache-metadata-reposit
 import { CronTaskScheduler } from "./infrastructure/cron-task-scheduler.js";
 import { ImageDiskStorage } from "./infrastructure/image-disk-storage.js";
 import { ImageResizer } from "./infrastructure/image-resizer.js";
-import { imagesRouterFactory } from "./presentation/routes/images.js";
-import { BlobProxyServer } from "./presentation/server.js";
-import { env } from "./shared/env.js";
+import { imagesRouterFactory } from "./presentation/images.js";
 
-createInjector()
+const blobProxyInjector = createInjector()
   // envs
   .provideValue("logLevel", env.LOG_LEVEL)
-  .provideValue("plcUrl", env.PLC_URL)
+  .provideValue("plcUrl", env.ATPROTO_PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("databaseUrl", env.DATABASE_URL)
+  .provideValue("blobCacheDir", env.BLOB_CACHE_DIR)
+  .provideValue("cacheCleanupCron", env.CACHE_CLEANUP_CRON)
+  .provideValue("cacheCleanupTimezone", env.CACHE_CLEANUP_TIMEZONE)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideClass("metricReporter", MetricReporter)
@@ -46,8 +48,10 @@ createInjector()
   .provideClass("cacheCleanupService", CacheCleanupService)
   .provideClass("cacheCleanupScheduler", CacheCleanupScheduler)
   // use case
-  .provideClass("imageProxyUseCase", ImageProxyUseCase)
-  // presentation
-  .provideFactory("imagesRouter", imagesRouterFactory)
-  .injectClass(BlobProxyServer)
-  .start();
+  .provideClass("imageProxyUseCase", ImageProxyUseCase);
+
+export const blobProxyRouter =
+  blobProxyInjector.injectFunction(imagesRouterFactory);
+export const cacheCleanupScheduler = blobProxyInjector.resolve(
+  "cacheCleanupScheduler",
+);

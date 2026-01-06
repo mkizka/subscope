@@ -6,8 +6,8 @@ export default mergeConfig(
   sharedConfig,
   defineProject({
     test: {
-      name: "blob-proxy:unit",
-      include: ["src/{application,domain,presentation}/**/*.test.ts"],
+      name: "subscope:unit",
+      include: ["src/features/**/*.test.ts"],
     },
   }),
 );
