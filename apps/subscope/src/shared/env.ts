@@ -25,10 +25,12 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default("http://subscope.localhost:3005"),
   }),
+  // openssl rand -base64 33
   COOKIE_SECRET: match({
-    prod: z.string().min(32),
-    dev: z.string().default("dev-cookie-secret-must-be-32-chars"),
+    prod: z.string(),
+    dev: z.string().default("dev-cookie-secret"),
   }),
+  // openssl ecparam -name prime256v1 -genkey | openssl pkcs8 -topk8 -nocrypt | openssl base64 -A
   PRIVATE_KEY_ES256_B64: match({
     prod: z.string(),
     dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
