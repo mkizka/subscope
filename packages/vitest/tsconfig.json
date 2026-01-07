@@ -1,0 +1,7 @@
+{
+  "extends": ["@tsconfig/node-lts/tsconfig"],
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["**/*.ts"]
+}

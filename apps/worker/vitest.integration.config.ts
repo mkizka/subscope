@@ -1,9 +1,8 @@
+import { integrationConfig } from "@repo/vitest";
 import { defineProject, mergeConfig } from "vitest/config";
 
-import sharedConfig from "../../vitest.integration.shared.js";
-
 export default mergeConfig(
-  sharedConfig,
+  integrationConfig,
   defineProject({
     test: {
       name: "worker:integration",
