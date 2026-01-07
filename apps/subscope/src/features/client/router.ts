@@ -7,7 +7,7 @@ import { env } from "../../shared/env";
 const router = Router();
 
 if (env.NODE_ENV === "production") {
-  const distPath = path.resolve(import.meta.dirname, "../../dist");
+  const distPath = path.resolve(import.meta.dirname, "../../../dist");
   router.use(express.static(distPath));
   router.get("*all", (_req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
