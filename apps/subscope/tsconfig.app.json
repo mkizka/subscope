@@ -30,5 +30,5 @@
     "noUncheckedSideEffectImports": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src/client"]
+  "include": ["src/client", ".storybook/**/*.ts"]
 }

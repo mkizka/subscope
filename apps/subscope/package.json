@@ -7,11 +7,13 @@
     "_eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint",
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "tsc -b && vite build",
+    "build-storybook": "storybook build",
     "dev": "NODE_ENV=development tsx watch ./src/subscope.ts",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "preview": "vite preview",
     "start": "NODE_ENV=production tsx ./src/subscope.ts",
+    "storybook": "storybook dev -p 6006",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
@@ -41,10 +43,13 @@
     "@preact/preset-vite": "^2.10.2",
     "@repo/test-utils": "workspace:*",
     "@repo/vitest": "workspace:*",
+    "@storybook/preact-vite": "^10.1.11",
     "@types/express": "5.0.6",
     "@types/node": "^24.10.1",
     "@types/node-cron": "3.0.11",
     "eslint": "9.39.1",
+    "eslint-plugin-storybook": "^10.1.11",
+    "storybook": "^10.1.11",
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.2.5",
     "vitest": "4.0.15"
