@@ -20,11 +20,9 @@ The goal is to enable self-hosting on a typical VPS with around 4 cores / 4GB RA
 
 Server implementations are located under the apps directory.
 
-- admin ... Dashboard for managing invite codes and subscribers
-- appview ... XRPC API for clients
+- subscope ... Main server providing client, XRPC API, admin dashboard, and blob proxy
 - ingester ... Receives Jetstream events and adds jobs
 - worker ... Worker that processes Tap events
-- blob-proxy ... Proxy for blobs stored on PDS
 
 ## Deployment
 
@@ -41,11 +39,9 @@ pnpm i
 pnpm dev
 ```
 
-The following servers will start. Note that admin must be accessed via the URL below for OAuth authentication to work.
+The following servers will start. Note that subscope must be accessed via the URL below for OAuth authentication to work.
 
-- admin ... http://admin.localhost:3000
-- appview ... http://localhost:3001
-- ingester ... http://localhost:3002
-- worker ... http://localhost:3003
-- blob-proxy ... http://localhost:3004
+- subscope ... http://subscope.localhost:3000
+- ingester ... http://localhost:3001
+- worker ... http://localhost:3002
 - Development PDS ... http://localhost:2583

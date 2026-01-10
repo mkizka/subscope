@@ -4,21 +4,24 @@
 
 ## プロジェクトのコンセプト
 
-システムは選択的データ保存アプローチに従い、「サブスクライバー」（サブスクリプションレコードを作成したユーザー）とそのフォローグラフのレコードのみを保存してデータベースサイズを最小化します。
+AT Protocolを使用したBluesky互換Appviewです。サブスクライバー(サーバー登録ユーザー)とそのフォロイーのレコードのみをTap経由で保存することで、ストレージ容量を最小限に抑えることを目的としています。
 
 ## アーキテクチャ
 
 ### 概要
 
-AppViewの各機能を複数アプリケーションに分割したmonorepoです。
+Appviewの各機能を複数アプリケーションに分割したmonorepoです。
 
 appsディレクトリ(アプリケーション)
 
-- `@repo/appview` - XRPCを実装したAPIサーバー
-- `@repo/ingester` - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送信
-- `@repo/worker` - BullMQを使用してレコードをデータベースにインデックスするワーカー
-- `@repo/blob-proxy` - PDSの画像をキャッシュして配信するプロキシサーバー
-- `@repo/admin` - 招待コードの発行などを行うAppView管理者向け管理画面
+- `@repo/ingester`
+  - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送信
+- `@repo/worker`
+  - BullMQを使用してレコードをデータベースにインデックスするワーカー
+- `@repo/subscope`
+  - クライアント・XRPC API・管理画面・画像プロキシを提供するメインサーバー
+  - express + Preactで実装されたSPA
+  - デザインはMaterial 3 Expressiveに準拠する
 
 packagesディレクトリ(共通パッケージ)
 
