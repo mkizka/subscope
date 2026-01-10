@@ -1,3 +1,4 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   ErrorBoundary,
   lazy,
@@ -5,6 +6,8 @@ import {
   Route,
   Router,
 } from "preact-iso";
+
+import { queryClient } from "./lib/trpc.js";
 
 const Home = lazy(() => import("./pages/index.tsx").then((mod) => mod.Home));
 const AdminDashboard = lazy(() =>
@@ -21,16 +24,18 @@ export function NotFound() {
 
 export function App() {
   return (
-    <LocationProvider>
-      <ErrorBoundary>
-        <Router>
-          <Route path="/" component={Home} />
-          <Route path="/admin" component={AdminDashboard} />
-          <Route path="/admin/invite-codes" component={AdminInviteCodes} />
-          <Route path="/login" component={Login} />
-          <Route default component={NotFound} />
-        </Router>
-      </ErrorBoundary>
-    </LocationProvider>
+    <QueryClientProvider client={queryClient}>
+      <LocationProvider>
+        <ErrorBoundary>
+          <Router>
+            <Route path="/" component={Home} />
+            <Route path="/admin" component={AdminDashboard} />
+            <Route path="/admin/invite-codes" component={AdminInviteCodes} />
+            <Route path="/login" component={Login} />
+            <Route default component={NotFound} />
+          </Router>
+        </ErrorBoundary>
+      </LocationProvider>
+    </QueryClientProvider>
   );
 }
