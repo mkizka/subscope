@@ -7,7 +7,12 @@ import {
 } from "preact-iso";
 
 const Home = lazy(() => import("./pages/index.tsx").then((mod) => mod.Home));
-const Admin = lazy(() => import("./pages/admin.tsx").then((mod) => mod.Admin));
+const AdminDashboard = lazy(() =>
+  import("./pages/admin/dashboard.tsx").then((mod) => mod.AdminDashboard),
+);
+const AdminInviteCodes = lazy(() =>
+  import("./pages/admin/invite-codes.tsx").then((mod) => mod.AdminInviteCodes),
+);
 const Login = lazy(() => import("./pages/login.tsx").then((mod) => mod.Login));
 
 export function NotFound() {
@@ -20,7 +25,8 @@ export function App() {
       <ErrorBoundary>
         <Router>
           <Route path="/" component={Home} />
-          <Route path="/admin" component={Admin} />
+          <Route path="/admin" component={AdminDashboard} />
+          <Route path="/admin/invite-codes" component={AdminInviteCodes} />
           <Route path="/login" component={Login} />
           <Route default component={NotFound} />
         </Router>
