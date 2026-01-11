@@ -15,7 +15,7 @@ export type InviteCode = {
   code: string;
   createdAt: string;
   usedBy: string | null;
-  status: "未使用" | "使用済み";
+  status: string;
 };
 
 type InviteCodesPresenterProps = {
@@ -41,7 +41,7 @@ function InviteCodeItem({
           <code className="text-sm font-mono font-semibold text-on-surface">
             {invite.code}
           </code>
-          <Badge variant={invite.status === "未使用" ? "default" : "secondary"}>
+          <Badge variant={invite.usedBy ? "default" : "secondary"}>
             {invite.status}
           </Badge>
         </div>

@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "preact/hooks";
 
 import { trpc } from "../../../lib/trpc.js";
-import type { InviteCode } from "./presenter.js";
 import { InviteCodesPresenter } from "./presenter.js";
 
 export function InviteCodesContainer() {
@@ -11,16 +10,6 @@ export function InviteCodesContainer() {
   const { data, isLoading, error } = useQuery(
     trpc.inviteCodes.list.queryOptions({ limit: 20 }),
   );
-
-  const inviteCodes: InviteCode[] =
-    data?.data.codes.map((code) => ({
-      id: code.code,
-      code: code.code,
-      createdAt: code.createdAt.split("T")[0] ?? "",
-      usedBy: code.usedBy?.handle ?? code.usedBy?.did ?? null,
-      status:
-        code.usedAt !== undefined ? ("使用済み" as const) : ("未使用" as const),
-    })) ?? [];
 
   const handleGenerateInviteCode = () => {
     // TODO: 招待コード生成APIを呼び出す
@@ -46,7 +35,7 @@ export function InviteCodesContainer() {
 
   return (
     <InviteCodesPresenter
-      inviteCodes={inviteCodes}
+      inviteCodes={data?.codes ?? []}
       copiedCode={copiedCode}
       onGenerateInviteCode={handleGenerateInviteCode}
       onCopyToClipboard={handleCopyToClipboard}
