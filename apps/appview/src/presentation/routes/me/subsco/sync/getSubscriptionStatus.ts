@@ -1,6 +1,6 @@
 import type { Server } from "@repo/client/server";
 
-import type { GetSubscriptionStatusUseCase } from "../../../../../application/get-subscription-status-use-case.js";
+import type { GetSubscriptionStatusUseCase } from "../../../../../application/use-cases/sync/get-subscription-status-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
 
 export class GetSubscriptionStatus {

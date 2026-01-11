@@ -5,10 +5,10 @@ import {
   Subscription,
 } from "@repo/common/domain";
 
-import type { IActorRepository } from "./interfaces/actor-repository.js";
-import type { IInviteCodeRepository } from "./interfaces/invite-code-repository.js";
-import type { ISubscriptionRepository } from "./interfaces/subscription-repository.js";
-import type { TapScheduler } from "./service/tap-scheduler.js";
+import type { IActorRepository } from "../../interfaces/actor-repository.js";
+import type { IInviteCodeRepository } from "../../interfaces/invite-code-repository.js";
+import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
+import type { TapScheduler } from "../../service/tap-scheduler.js";
 
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {

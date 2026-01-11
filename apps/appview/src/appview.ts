@@ -10,7 +10,6 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { GetSubscriptionStatusUseCase } from "./application/get-subscription-status-use-case.js";
 import { ProfileViewBuilder } from "./application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./application/service/actor/profile-view-service.js";
 import { InviteCodeService } from "./application/service/admin/invite-code-service.js";
@@ -29,8 +28,6 @@ import { LikeService } from "./application/service/graph/like-service.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { TapScheduler } from "./application/service/tap-scheduler.js";
-import { SubscribeServerUseCase } from "./application/subscribe-server-use-case.js";
-import { UnsubscribeServerUseCase } from "./application/unsubscribe-server-use-case.js";
 import { GetProfilesUseCase } from "./application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "./application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./application/use-cases/actor/search-actors-use-case.js";
@@ -48,6 +45,9 @@ import { GetTimelineUseCase } from "./application/use-cases/feed/get-timeline-us
 import { SearchPostsUseCase } from "./application/use-cases/feed/search-posts-use-case.js";
 import { GetFollowersUseCase } from "./application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "./application/use-cases/graph/get-follows-use-case.js";
+import { GetSubscriptionStatusUseCase } from "./application/use-cases/sync/get-subscription-status-use-case.js";
+import { SubscribeServerUseCase } from "./application/use-cases/sync/subscribe-server-use-case.js";
+import { UnsubscribeServerUseCase } from "./application/use-cases/sync/unsubscribe-server-use-case.js";
 import { AtUriService } from "./domain/service/at-uri-service.js";
 import { ActorRepository } from "./infrastructure/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "./infrastructure/actor-stats-repository/actor-stats-repository.js";

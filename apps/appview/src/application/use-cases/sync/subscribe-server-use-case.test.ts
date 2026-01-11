@@ -6,7 +6,7 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import {
   AlreadySubscribedError,
   InvalidInviteCodeError,

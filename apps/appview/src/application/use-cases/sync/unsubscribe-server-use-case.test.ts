@@ -6,7 +6,7 @@ import {
 } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../shared/test-utils.js";
+import { testInjector } from "../../../shared/test-utils.js";
 import {
   NotSubscribedError,
   UnsubscribeServerUseCase,

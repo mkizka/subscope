@@ -5,7 +5,7 @@ import type { Server } from "@repo/client/server";
 import {
   NotSubscribedError,
   type UnsubscribeServerUseCase,
-} from "../../../../../application/unsubscribe-server-use-case.js";
+} from "../../../../../application/use-cases/sync/unsubscribe-server-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
 
 export class UnsubscribeServer {
