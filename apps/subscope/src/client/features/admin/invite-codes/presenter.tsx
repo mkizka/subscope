@@ -21,6 +21,8 @@ export type InviteCode = {
 type InviteCodesPresenterProps = {
   inviteCodes: InviteCode[];
   copiedCode: string | null;
+  isLoading: boolean;
+  error: { message: string } | null;
   onGenerateInviteCode: () => void;
   onCopyToClipboard: (code: string) => void;
 };
@@ -67,9 +69,51 @@ function InviteCodeItem({
   );
 }
 
+function InviteCodeList({
+  inviteCodes,
+  copiedCode,
+  isLoading,
+  error,
+  onCopyToClipboard,
+}: Pick<
+  InviteCodesPresenterProps,
+  "inviteCodes" | "copiedCode" | "isLoading" | "error" | "onCopyToClipboard"
+>) {
+  if (isLoading) {
+    return <div className="text-on-surface-variant">読み込み中...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-error">エラーが発生しました: {error.message}</div>
+    );
+  }
+
+  if (inviteCodes.length === 0) {
+    return (
+      <div className="text-on-surface-variant">招待コードがありません。</div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {inviteCodes.map((invite) => (
+        <InviteCodeItem
+          key={invite.id}
+          invite={invite}
+          copiedCode={copiedCode}
+          onCopyToClipboard={onCopyToClipboard}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function InviteCodesPresenter({
   inviteCodes,
   copiedCode,
+  isLoading,
+  error,
   onGenerateInviteCode,
   onCopyToClipboard,
 }: InviteCodesPresenterProps) {
@@ -96,16 +140,13 @@ export function InviteCodesPresenter({
           <CardDescription>発行された招待コードの管理</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {inviteCodes.map((invite) => (
-              <InviteCodeItem
-                key={invite.id}
-                invite={invite}
-                copiedCode={copiedCode}
-                onCopyToClipboard={onCopyToClipboard}
-              />
-            ))}
-          </div>
+          <InviteCodeList
+            inviteCodes={inviteCodes}
+            copiedCode={copiedCode}
+            isLoading={isLoading}
+            error={error}
+            onCopyToClipboard={onCopyToClipboard}
+          />
         </CardContent>
       </Card>
     </div>

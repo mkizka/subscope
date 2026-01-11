@@ -31,22 +31,12 @@ export function InviteCodesContainer() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  if (isLoading) {
-    return <div className="p-4 text-on-surface-variant">読み込み中...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="p-4 text-error">
-        エラーが発生しました: {error.message}
-      </div>
-    );
-  }
-
   return (
     <InviteCodesPresenter
       inviteCodes={data?.codes ?? []}
       copiedCode={copiedCode}
+      isLoading={isLoading}
+      error={error}
       onGenerateInviteCode={handleGenerateInviteCode}
       onCopyToClipboard={handleCopyToClipboard}
     />
