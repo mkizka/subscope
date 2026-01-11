@@ -38,6 +38,7 @@ export class ActorRepository implements IActorRepository {
     return ActorDomain.reconstruct({
       did: asDid(row.did),
       handle: row.handle || null,
+      isAdmin: row.isAdmin,
       indexedAt: row.indexedAt,
     });
   }

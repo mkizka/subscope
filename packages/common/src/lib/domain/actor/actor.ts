@@ -6,17 +6,20 @@ import { asHandle } from "../../utils/handle.js";
 export type ActorParams = {
   did: string;
   handle: string | null;
+  isAdmin: boolean;
   indexedAt: Date;
 };
 
 export class Actor {
   readonly did: Did;
   private _handle: Handle | null = null;
+  readonly isAdmin: boolean;
   readonly indexedAt: Date;
 
   private constructor(params: ActorParams) {
     this.did = asDid(params.did);
     this._handle = params.handle ? asHandle(params.handle) : null;
+    this.isAdmin = params.isAdmin;
     this.indexedAt = params.indexedAt;
   }
 
@@ -24,6 +27,7 @@ export class Actor {
     return new Actor({
       did: params.did,
       handle: params.handle ?? null,
+      isAdmin: false,
       indexedAt: new Date(),
     });
   }

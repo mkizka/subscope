@@ -5,6 +5,7 @@ export function actorFactory(params?: Partial<ActorParams>): Actor {
   return Actor.reconstruct({
     did: params?.did ?? fakeDid(),
     handle: params?.handle !== undefined ? params.handle : fakeHandle(),
+    isAdmin: params?.isAdmin ?? false,
     indexedAt: params?.indexedAt ?? fakeDate(),
   });
 }

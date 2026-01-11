@@ -113,6 +113,13 @@
       "when": 1766592674852,
       "tag": "0015_remove-sync_repo_status",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1768147256716,
+      "tag": "0016_add-actor-is_admin",
+      "breakpoints": true
     }
   ]
 }

@@ -36,6 +36,7 @@ export class ActorRepository implements IActorRepository {
       .select({
         did: schema.actors.did,
         handle: schema.actors.handle,
+        isAdmin: schema.actors.isAdmin,
         indexedAt: schema.actors.indexedAt,
       })
       .from(schema.actors)
@@ -49,6 +50,7 @@ export class ActorRepository implements IActorRepository {
     return Actor.reconstruct({
       did: asDid(row.did),
       handle: row.handle,
+      isAdmin: row.isAdmin,
       indexedAt: row.indexedAt,
     });
   }

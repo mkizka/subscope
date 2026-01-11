@@ -1,6 +1,6 @@
 import { AuthRequiredError } from "@atproto/xrpc-server";
 
-import { env } from "../../shared/env.js";
+import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
 import type { AuthVerifierMiddleware } from "./auth-verifier-middleware.js";
 
 type MaybeHeaders = {
@@ -13,18 +13,20 @@ type MaybeRequest = {
 };
 
 export class AdminMiddleware {
-  constructor(private readonly authVerifier: AuthVerifierMiddleware) {}
-  static inject = ["authVerifierMiddleware"] as const;
+  constructor(
+    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
+    private readonly actorRepository: IActorRepository,
+  ) {}
+  static inject = ["authVerifierMiddleware", "actorRepository"] as const;
 
   async requireAdmin(request: MaybeRequest) {
-    const authResult = await this.authVerifier.loginRequired(request);
+    const authResult = await this.authVerifierMiddleware.loginRequired(request);
 
-    if (
-      // ローカル開発環境での動作確認に使用するalice.testなどのアカウントはDIDが未確定なので、
-      // ADMIN_DIDとの一致をチェックしない
-      env.NODE_ENV === "production" &&
-      authResult.credentials.did !== env.ADMIN_DID
-    ) {
+    const actor = await this.actorRepository.findByDid(
+      authResult.credentials.did,
+    );
+    // TODO: lexiconに定義したエラーを返す
+    if (!actor?.isAdmin) {
       throw new AuthRequiredError("Admin access required");
     }
 

@@ -44,6 +44,7 @@ describe("ActorRepository", () => {
       const newActor = Actor.reconstruct({
         did: did,
         handle: "newactor.test",
+        isAdmin: false,
         indexedAt: new Date(),
       });
 
@@ -65,6 +66,7 @@ describe("ActorRepository", () => {
       const updatedActor = Actor.reconstruct({
         did: actor.did,
         handle: "updated.test",
+        isAdmin: false,
         indexedAt: new Date(),
       });
 
