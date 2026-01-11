@@ -43,7 +43,9 @@ type SidebarNavProps = {
 
 export function SidebarNav({ children, className }: SidebarNavProps) {
   return (
-    <nav className={cn("flex-1 space-y-1 w-full", className)}>{children}</nav>
+    <nav className={cn("flex flex-col gap-2 w-full", className)}>
+      {children}
+    </nav>
   );
 }
 

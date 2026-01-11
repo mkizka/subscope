@@ -1,4 +1,4 @@
-import { Cloud, Home, KeyRound } from "lucide-preact";
+import { Cloud, Home, KeyRound, ListTodo } from "lucide-preact";
 import type { ComponentChildren } from "preact";
 import { useLocation } from "preact-iso";
 
@@ -42,6 +42,11 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
               active={url.startsWith("/admin/invite-codes")}
             >
               招待コード
+            </SidebarNavItem>
+          </a>
+          <a href="/dashboard" target="_blank" className="no-underline">
+            <SidebarNavItem icon={<ListTodo className="h-5 w-5" />}>
+              Bull Dashboard
             </SidebarNavItem>
           </a>
         </SidebarNav>
