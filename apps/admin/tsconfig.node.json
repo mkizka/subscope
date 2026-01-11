@@ -1,8 +1,0 @@
-{
-  "extends": ["@tsconfig/node-lts/tsconfig"],
-  "compilerOptions": {
-    "composite": true,
-    "noUncheckedIndexedAccess": true
-  },
-  "include": ["./node/**/*.ts", "vite.config.ts", "react-router.config.ts"]
-}
