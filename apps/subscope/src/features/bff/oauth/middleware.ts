@@ -1,6 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 
-import type { OAuthSession } from "../infrastructure/session";
+import type { OAuthSession } from "./session.js";
 
 export const authMiddlewareFactory = (
   oauthSession: OAuthSession,

@@ -3,7 +3,7 @@ import { SubscoAgent } from "@repo/client/api";
 import type { Request, Response } from "express";
 import { getIronSession } from "iron-session";
 
-import { env } from "../../../shared/env";
+import { env } from "../../../shared/env.js";
 
 type SessionData = {
   did?: string;

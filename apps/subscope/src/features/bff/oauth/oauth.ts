@@ -2,7 +2,7 @@ import type { NodeOAuthClient } from "@atproto/oauth-client-node";
 import type { ILoggerManager } from "@repo/common/domain";
 import { Router } from "express";
 
-import type { OAuthSession } from "../infrastructure/session";
+import type { OAuthSession } from "./session.js";
 
 export const oauthRouterFactory = (
   oauthClient: NodeOAuthClient,
