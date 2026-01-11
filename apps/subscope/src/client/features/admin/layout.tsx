@@ -24,8 +24,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
     <div className="flex h-screen bg-surface-container">
       <Sidebar>
         <SidebarHeader>
-          <Cloud className="h-7 w-7 text-primary" />
-          <span className="text-xl font-medium text-on-surface">Sky Admin</span>
+          <Cloud className="h-12 w-12 text-primary" />
         </SidebarHeader>
 
         <SidebarNav>

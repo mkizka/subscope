@@ -28,7 +28,9 @@ type SidebarHeaderProps = {
 
 export function SidebarHeader({ children, className }: SidebarHeaderProps) {
   return (
-    <div className={cn("mb-8 flex items-center gap-3 px-2", className)}>
+    <div
+      className={cn("mb-8 flex justify-center items-center gap-3", className)}
+    >
       {children}
     </div>
   );
