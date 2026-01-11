@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "preact/hooks";
 
-import { trpc } from "../../../lib/trpc.js";
+import { queryClient, trpc } from "../../../lib/trpc.js";
 import { InviteCodesPresenter } from "./presenter.js";
 
 export function InviteCodesContainer() {
@@ -11,8 +11,18 @@ export function InviteCodesContainer() {
     trpc.inviteCodes.list.queryOptions({ limit: 20 }),
   );
 
+  const createMutation = useMutation(
+    trpc.inviteCodes.create.mutationOptions({
+      onSuccess: () => {
+        void queryClient.invalidateQueries({
+          queryKey: trpc.inviteCodes.list.queryKey(),
+        });
+      },
+    }),
+  );
+
   const handleGenerateInviteCode = () => {
-    // TODO: 招待コード生成APIを呼び出す
+    createMutation.mutate();
   };
 
   const handleCopyToClipboard = (code: string) => {

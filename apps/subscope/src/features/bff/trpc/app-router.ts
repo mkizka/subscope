@@ -4,6 +4,13 @@ import { authedProcedure, router } from "./trpc.js";
 
 export const appRouter = router({
   inviteCodes: router({
+    create: authedProcedure.mutation(async ({ ctx }) => {
+      const response = await ctx.agent.me.subsco.admin.createInviteCode();
+      return {
+        code: response.data.code,
+        expiresAt: response.data.expiresAt,
+      };
+    }),
     list: authedProcedure
       .input(
         z.object({
