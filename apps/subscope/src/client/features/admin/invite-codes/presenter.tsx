@@ -1,3 +1,5 @@
+import { Check, Copy, KeyRound } from "lucide-preact";
+
 import { Badge } from "../../../components/badge";
 import { Button } from "../../../components/button";
 import {
@@ -7,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/card";
-import { CheckIcon, CopyIcon, KeyIcon } from "../../../components/icons";
 
 export type InviteCode = {
   id: string;
@@ -56,9 +57,9 @@ function InviteCodeItem({
           onClick={() => onCopyToClipboard(invite.code)}
         >
           {copiedCode === invite.code ? (
-            <CheckIcon className="h-4 w-4 text-primary" />
+            <Check className="h-4 w-4 text-primary" />
           ) : (
-            <CopyIcon className="h-4 w-4" />
+            <Copy className="h-4 w-4" />
           )}
         </Button>
       )}
@@ -83,7 +84,7 @@ export function InviteCodesPresenter({
         </CardHeader>
         <CardContent>
           <Button onClick={onGenerateInviteCode} className="w-full sm:w-auto">
-            <KeyIcon className="h-4 w-4 mr-2" />
+            <KeyRound className="h-4 w-4 mr-2" />
             招待コードを発行
           </Button>
         </CardContent>

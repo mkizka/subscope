@@ -1,8 +1,8 @@
+import { Cloud, Home, KeyRound } from "lucide-preact";
 import type { ComponentChildren } from "preact";
 import { useLocation } from "preact-iso";
 
 import { Avatar, AvatarFallback } from "../../components/avatar";
-import { CloudIcon, HomeIcon, KeyIcon } from "../../components/icons";
 import {
   Sidebar,
   SidebarFooter,
@@ -24,14 +24,14 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
     <div className="flex h-screen bg-surface-container">
       <Sidebar>
         <SidebarHeader>
-          <CloudIcon className="h-7 w-7 text-primary" />
+          <Cloud className="h-7 w-7 text-primary" />
           <span className="text-xl font-medium text-on-surface">Sky Admin</span>
         </SidebarHeader>
 
         <SidebarNav>
           <a href="/admin" className="no-underline">
             <SidebarNavItem
-              icon={<HomeIcon className="h-5 w-5" />}
+              icon={<Home className="h-5 w-5" />}
               active={url === "/admin" || url === "/admin/"}
             >
               ダッシュボード
@@ -39,7 +39,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
           </a>
           <a href="/admin/invite-codes" className="no-underline">
             <SidebarNavItem
-              icon={<KeyIcon className="h-5 w-5" />}
+              icon={<KeyRound className="h-5 w-5" />}
               active={url.startsWith("/admin/invite-codes")}
             >
               招待コード
@@ -56,7 +56,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
               "transition-all duration-200 no-underline",
             )}
           >
-            <HomeIcon className="h-5 w-5" />
+            <Home className="h-5 w-5" />
             <span className="font-normal">クライアントに戻る</span>
           </a>
         </SidebarFooter>

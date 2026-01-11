@@ -464,6 +464,9 @@ importers:
       iron-session:
         specifier: ^8.0.4
         version: 8.0.4
+      lucide-preact:
+        specifier: 0.562.0
+        version: 0.562.0(preact@10.28.1)
       node-cron:
         specifier: 4.2.1
         version: 4.2.1
@@ -5880,6 +5883,11 @@ packages:
   lru.min@1.1.3:
     resolution: {integrity: sha512-Lkk/vx6ak3rYkRR0Nhu4lFUT2VDnQSxBe8Hbl7f36358p6ow8Bnvr8lrLt98H8J1aGxfhbX4Fs5tYg2+FTwr5Q==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
+
+  lucide-preact@0.562.0:
+    resolution: {integrity: sha512-1LOH/QVkxZ0zMspMPcVAbEfmwKHM3llG8ikA8j2M7GaMKRHZLn32PohXnvmsqDMhrCBsBc9pt1ybPCUYteywtQ==}
+    peerDependencies:
+      preact: ^10.27.2
 
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
@@ -13517,6 +13525,10 @@ snapshots:
 
   lru.min@1.1.3:
     optional: true
+
+  lucide-preact@0.562.0(preact@10.28.1):
+    dependencies:
+      preact: 10.28.1
 
   luxon@3.7.2: {}
 

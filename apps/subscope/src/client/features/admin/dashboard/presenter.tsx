@@ -1,3 +1,5 @@
+import { KeyRound } from "lucide-preact";
+
 import {
   Card,
   CardContent,
@@ -5,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/card";
-import { KeyIcon } from "../../../components/icons";
 
 export type DashboardStats = {
   totalUsers: number;
@@ -69,7 +70,7 @@ export function DashboardPresenter({ stats }: DashboardPresenterProps) {
             href="/admin/invite-codes"
             className="flex w-full items-center justify-start gap-3 h-10 px-4 rounded-full border-2 border-outline bg-transparent text-primary hover:bg-primary-container transition-all duration-200 ease-out no-underline"
           >
-            <KeyIcon className="h-4 w-4" />
+            <KeyRound className="h-4 w-4" />
             新しい招待コードを発行
           </a>
         </CardContent>
