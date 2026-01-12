@@ -1,4 +1,5 @@
 import { createServer } from "@repo/client/server";
+import type { Router } from "express";
 
 import type { GetPreferences } from "./app/bsky/actor/getPreferences.js";
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
@@ -23,88 +24,82 @@ import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStat
 import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
-export class XRPCRouter {
-  private readonly handlers;
+export const xrpcRouterFactory = (
+  getPreferences: GetPreferences,
+  getProfile: GetProfile,
+  getProfiles: GetProfiles,
+  searchActors: SearchActors,
+  searchActorsTypeahead: SearchActorsTypeahead,
+  getActorLikes: GetActorLikes,
+  getAuthorFeed: GetAuthorFeed,
+  getFeedGenerators: GetFeedGenerators,
+  getLikes: GetLikes,
+  getPosts: GetPosts,
+  getPostThread: GetPostThread,
+  getRepostedBy: GetRepostedBy,
+  getTimeline: GetTimeline,
+  searchPosts: SearchPosts,
+  getFollows: GetFollows,
+  getFollowers: GetFollowers,
+  createInviteCode: CreateInviteCode,
+  getInviteCodes: GetInviteCodes,
+  getSubscribers: GetSubscribers,
+  getSubscriptionStatus: GetSubscriptionStatus,
+  subscribeServer: SubscribeServer,
+  unsubscribeServer: UnsubscribeServer,
+): Router => {
+  const handlers = [
+    getPreferences,
+    getProfile,
+    getProfiles,
+    searchActors,
+    searchActorsTypeahead,
+    getActorLikes,
+    getAuthorFeed,
+    getFeedGenerators,
+    getLikes,
+    getPosts,
+    getPostThread,
+    getRepostedBy,
+    getTimeline,
+    searchPosts,
+    getFollows,
+    getFollowers,
+    createInviteCode,
+    getInviteCodes,
+    getSubscribers,
+    getSubscriptionStatus,
+    subscribeServer,
+    unsubscribeServer,
+  ];
 
-  constructor(
-    getPreferences: GetPreferences,
-    getProfile: GetProfile,
-    getProfiles: GetProfiles,
-    searchActors: SearchActors,
-    searchActorsTypeahead: SearchActorsTypeahead,
-    getActorLikes: GetActorLikes,
-    getAuthorFeed: GetAuthorFeed,
-    getFeedGenerators: GetFeedGenerators,
-    getLikes: GetLikes,
-    getPosts: GetPosts,
-    getPostThread: GetPostThread,
-    getRepostedBy: GetRepostedBy,
-    getTimeline: GetTimeline,
-    searchPosts: SearchPosts,
-    getFollows: GetFollows,
-    getFollowers: GetFollowers,
-    createInviteCode: CreateInviteCode,
-    getInviteCodes: GetInviteCodes,
-    getSubscribers: GetSubscribers,
-    getSubscriptionStatus: GetSubscriptionStatus,
-    subscribeServer: SubscribeServer,
-    unsubscribeServer: UnsubscribeServer,
-  ) {
-    this.handlers = [
-      getPreferences,
-      getProfile,
-      getProfiles,
-      searchActors,
-      searchActorsTypeahead,
-      getActorLikes,
-      getAuthorFeed,
-      getFeedGenerators,
-      getLikes,
-      getPosts,
-      getPostThread,
-      getRepostedBy,
-      getTimeline,
-      searchPosts,
-      getFollows,
-      getFollowers,
-      createInviteCode,
-      getInviteCodes,
-      getSubscribers,
-      getSubscriptionStatus,
-      subscribeServer,
-      unsubscribeServer,
-    ];
+  const server = createServer();
+  for (const handler of handlers) {
+    handler.handle(server);
   }
-  static inject = [
-    "getPreferences",
-    "getProfile",
-    "getProfiles",
-    "searchActors",
-    "searchActorsTypeahead",
-    "getActorLikes",
-    "getAuthorFeed",
-    "getFeedGenerators",
-    "getLikes",
-    "getPosts",
-    "getPostThread",
-    "getRepostedBy",
-    "getTimeline",
-    "searchPosts",
-    "getFollows",
-    "getFollowers",
-    "createInviteCode",
-    "getInviteCodes",
-    "getSubscribers",
-    "getSubscriptionStatus",
-    "subscribeServer",
-    "unsubscribeServer",
-  ] as const;
-
-  create() {
-    const server = createServer();
-    for (const handler of this.handlers) {
-      handler.handle(server);
-    }
-    return server.xrpc.router;
-  }
-}
+  return server.xrpc.router;
+};
+xrpcRouterFactory.inject = [
+  "getPreferences",
+  "getProfile",
+  "getProfiles",
+  "searchActors",
+  "searchActorsTypeahead",
+  "getActorLikes",
+  "getAuthorFeed",
+  "getFeedGenerators",
+  "getLikes",
+  "getPosts",
+  "getPostThread",
+  "getRepostedBy",
+  "getTimeline",
+  "searchPosts",
+  "getFollows",
+  "getFollowers",
+  "createInviteCode",
+  "getInviteCodes",
+  "getSubscribers",
+  "getSubscriptionStatus",
+  "subscribeServer",
+  "unsubscribeServer",
+] as const;
