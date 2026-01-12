@@ -10,7 +10,7 @@ const schema = z.object({
   LOG_LEVEL: z
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
-  PORT: z.coerce.number().default(3002),
+  PORT: z.coerce.number().default(3001),
   TAP_URL: match({
     prod: z.url(),
     dev: z.url().default("http://localhost:2480"),

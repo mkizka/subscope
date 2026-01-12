@@ -16,7 +16,7 @@ const DEVELOPMENT_COOKIE_SECRET =
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]),
-  PORT: z.coerce.number().default(3005),
+  PORT: z.coerce.number().default(3000),
   LOG_LEVEL: z
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
@@ -26,11 +26,11 @@ const schema = z.object({
   }),
   PUBLIC_URL: match({
     prod: z.string(),
-    dev: z.string().default("http://subscope.localhost:3005"),
+    dev: z.string().default("http://subscope.localhost:3000"),
   }),
   SERVICE_DID: match({
     prod: z.string(),
-    dev: z.string().default("did:web:subscope.localhost%3A3005"),
+    dev: z.string().default("did:web:subscope.localhost%3A3000"),
   }),
   // openssl rand -base64 33
   COOKIE_SECRET: match({
