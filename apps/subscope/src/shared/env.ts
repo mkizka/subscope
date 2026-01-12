@@ -30,7 +30,7 @@ const schema = z.object({
   }),
   SERVICE_DID: match({
     prod: z.string(),
-    dev: z.string().default("did:web:subscope.localhost%3A3000"),
+    dev: z.string().default("did:web:localhost%3A3000"),
   }),
   // openssl rand -base64 33
   COOKIE_SECRET: match({
