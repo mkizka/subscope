@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
 import { CacheMetadata } from "../domain/cache-metadata.js";
 import { ImageBlob } from "../domain/image-blob.js";
 import { ImageProxyRequest } from "../domain/image-proxy-request.js";
+import { testInjector } from "../test-utils.js";
 import { ImageProxyUseCase } from "./image-proxy-use-case.js";
 
 describe("ImageProxyUseCase", () => {

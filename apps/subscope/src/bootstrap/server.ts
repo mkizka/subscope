@@ -14,6 +14,9 @@ export class SubscopeServer {
     clientRouter: express.Router,
     blobProxyRouter: express.Router,
     trpcRouter: express.Router,
+    xrpcRouter: express.Router,
+    healthRouter: express.Router,
+    wellKnownRouter: express.Router,
     private readonly cacheCleanupScheduler: CacheCleanupScheduler,
   ) {
     const app = express();
@@ -25,6 +28,9 @@ export class SubscopeServer {
     app.use("/dashboard", authMiddleware, dashboardRouter);
     app.use("/images", blobProxyRouter);
     app.use("/trpc", trpcRouter);
+    app.use(xrpcRouter);
+    app.use(healthRouter);
+    app.use(wellKnownRouter);
     app.use(clientRouter);
 
     this.app = app;
@@ -36,6 +42,9 @@ export class SubscopeServer {
     "clientRouter",
     "blobProxyRouter",
     "trpcRouter",
+    "xrpcRouter",
+    "healthRouter",
+    "wellKnownRouter",
     "cacheCleanupScheduler",
   ] as const;
 
