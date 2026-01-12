@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { z } from "zod";
@@ -21,7 +21,19 @@ const getHTTPStatusCodeFromError = (error: unknown): number | null => {
   return null;
 };
 
+const handleUnauthorizedError = (error: Error) => {
+  if (error instanceof TRPCClientError) {
+    const statusCode = getHTTPStatusCodeFromError(error);
+    if (statusCode === 401) {
+      window.location.href = "/login";
+    }
+  }
+};
+
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: handleUnauthorizedError,
+  }),
   defaultOptions: {
     queries: {
       retry: (failureCount, error) => {
