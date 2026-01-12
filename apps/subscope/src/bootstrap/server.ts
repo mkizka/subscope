@@ -1,3 +1,5 @@
+import type { ILoggerManager } from "@repo/common/domain";
+import { loggingMiddleware } from "@repo/common/utils";
 import type { RequestHandler } from "express";
 import express from "express";
 
@@ -5,9 +7,11 @@ import type { CacheCleanupScheduler } from "../features/blob-proxy/application/s
 import { env } from "../shared/env.js";
 
 export class SubscopeServer {
-  private app;
+  private readonly logger;
+  private readonly app;
 
   constructor(
+    loggerManager: ILoggerManager,
     authMiddleware: RequestHandler,
     dashboardRouter: express.Router,
     oauthRouter: express.Router,
@@ -19,7 +23,9 @@ export class SubscopeServer {
     wellKnownRouter: express.Router,
     private readonly cacheCleanupScheduler: CacheCleanupScheduler,
   ) {
+    const logger = loggerManager.createLogger("SubscopeServer");
     const app = express();
+    app.use(loggingMiddleware(logger));
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -33,9 +39,11 @@ export class SubscopeServer {
     app.use(wellKnownRouter);
     app.use(clientRouter);
 
+    this.logger = logger;
     this.app = app;
   }
   static inject = [
+    "loggerManager",
     "authMiddleware",
     "dashboardRouter",
     "oauthRouter",
@@ -50,8 +58,9 @@ export class SubscopeServer {
 
   start() {
     this.app.listen(env.PORT, () => {
-      // eslint-disable-next-line no-console
-      console.log(`Subscope server running at http://localhost:${env.PORT}`);
+      this.logger.info(
+        `Subscope server running at http://localhost:${env.PORT}`,
+      );
       this.cacheCleanupScheduler.start();
     });
   }
