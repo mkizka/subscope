@@ -12,6 +12,11 @@ import {
 } from "./features/blob-proxy/router.js";
 import { clientRouter } from "./features/client/router.js";
 import { dashboardRouter } from "./features/dashboard/router.js";
+import {
+  healthRouter,
+  wellKnownRouter,
+  xrpcRouter,
+} from "./features/xrpc/router.js";
 
 createInjector()
   .provideValue("authMiddleware", authMiddleware)
@@ -20,6 +25,9 @@ createInjector()
   .provideValue("clientRouter", clientRouter)
   .provideValue("blobProxyRouter", blobProxyRouter)
   .provideValue("trpcRouter", trpcRouter)
+  .provideValue("xrpcRouter", xrpcRouter)
+  .provideValue("healthRouter", healthRouter)
+  .provideValue("wellKnownRouter", wellKnownRouter)
   .provideValue("cacheCleanupScheduler", cacheCleanupScheduler)
   .injectClass(SubscopeServer)
   .start();

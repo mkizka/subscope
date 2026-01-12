@@ -216,9 +216,15 @@ importers:
       '@atproto/oauth-client-node':
         specifier: ^0.3.12
         version: 0.3.14
+      '@atproto/syntax':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/xrpc':
         specifier: 0.7.6
         version: 0.7.6
+      '@atproto/xrpc-server':
+        specifier: 0.10.2
+        version: 0.10.2
       '@bull-board/api':
         specifier: ^6.15.0
         version: 6.16.2(@bull-board/ui@6.16.2)
@@ -6250,7 +6256,7 @@ snapshots:
       multiformats: 9.9.0
       tslib: 2.8.1
       uint8arrays: 3.0.0
-      unicode-segmenter: 0.14.1
+      unicode-segmenter: 0.14.5
 
   '@atproto/lex-data@0.0.3':
     dependencies:
@@ -6360,7 +6366,7 @@ snapshots:
 
   '@atproto/ws-client@0.0.3':
     dependencies:
-      '@atproto/common': 0.5.2
+      '@atproto/common': 0.5.3
       ws: 8.18.3
     transitivePeerDependencies:
       - bufferutil
@@ -6376,7 +6382,7 @@ snapshots:
 
   '@atproto/xrpc-server@0.10.2':
     dependencies:
-      '@atproto/common': 0.5.2
+      '@atproto/common': 0.5.3
       '@atproto/crypto': 0.4.5
       '@atproto/lex-cbor': 0.0.2
       '@atproto/lex-data': 0.0.2
