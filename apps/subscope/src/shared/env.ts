@@ -52,10 +52,6 @@ const schema = z.object({
       .url()
       .default("postgresql://postgres:password@localhost:5432/postgres"),
   }),
-  ATPROTO_PROXY: match({
-    prod: z.string(),
-    dev: z.string().default("did:web:localhost%3A3001#bsky_appview"),
-  }),
   BLOB_CACHE_DIR: match({
     prod: z.string(),
     dev: z.string().default("./cache"),

@@ -52,7 +52,7 @@ export class OAuthSession {
     }
     return new SubscoAgent({
       oauthSession,
-      atprotoProxy: env.ATPROTO_PROXY,
+      atprotoProxy: `${env.SERVICE_DID}#bsky_appview`,
     });
   }
 
