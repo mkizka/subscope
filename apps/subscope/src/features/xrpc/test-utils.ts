@@ -42,7 +42,7 @@ import { InMemoryRepostRepository } from "./infrastructure/repost-repository/rep
 import { InMemorySubscriptionRepository } from "./infrastructure/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTimelineRepository } from "./infrastructure/timeline-repository/timeline-repository.in-memory.js";
 
-const xrpcTestInjector = createInjector()
+export const testInjector = createInjector()
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .provideValue("db", {} as never)
   .provideValue("publicUrl", "https://example.com")
@@ -85,25 +85,23 @@ const xrpcTestInjector = createInjector()
   .provideClass("subscriptionService", SubscriptionService)
   .provideClass("inviteCodeService", InviteCodeService);
 
-export { xrpcTestInjector as testInjector };
-
 export const setupXrpcFiles = () => {
   beforeEach(() => {
-    xrpcTestInjector.resolve("authorFeedRepository").clear();
-    xrpcTestInjector.resolve("postRepository").clear();
-    xrpcTestInjector.resolve("postStatsRepository").clear();
-    xrpcTestInjector.resolve("profileRepository").clear();
-    xrpcTestInjector.resolve("followRepository").clear();
-    xrpcTestInjector.resolve("actorStatsRepository").clear();
-    xrpcTestInjector.resolve("recordRepository").clear();
-    xrpcTestInjector.resolve("repostRepository").clear();
-    xrpcTestInjector.resolve("likeRepository").clear();
-    xrpcTestInjector.resolve("generatorRepository").clear();
-    xrpcTestInjector.resolve("timelineRepository").clear();
-    xrpcTestInjector.resolve("actorRepository").clear();
-    xrpcTestInjector.resolve("subscriptionRepository").clear();
-    xrpcTestInjector.resolve("inviteCodeRepository").clear();
-    xrpcTestInjector.resolve("handleResolver").clear();
-    xrpcTestInjector.resolve("jobQueue").clear();
+    testInjector.resolve("authorFeedRepository").clear();
+    testInjector.resolve("postRepository").clear();
+    testInjector.resolve("postStatsRepository").clear();
+    testInjector.resolve("profileRepository").clear();
+    testInjector.resolve("followRepository").clear();
+    testInjector.resolve("actorStatsRepository").clear();
+    testInjector.resolve("recordRepository").clear();
+    testInjector.resolve("repostRepository").clear();
+    testInjector.resolve("likeRepository").clear();
+    testInjector.resolve("generatorRepository").clear();
+    testInjector.resolve("timelineRepository").clear();
+    testInjector.resolve("actorRepository").clear();
+    testInjector.resolve("subscriptionRepository").clear();
+    testInjector.resolve("inviteCodeRepository").clear();
+    testInjector.resolve("handleResolver").clear();
+    testInjector.resolve("jobQueue").clear();
   });
 };

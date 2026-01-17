@@ -13,7 +13,7 @@ const trpcClientSchema = z.object({
   }),
 });
 
-const getHTTPStatusCodeFromError = (error: unknown): number | null => {
+export const getHTTPStatusCodeFromError = (error: unknown): number | null => {
   const parsed = trpcClientSchema.safeParse(error);
   if (parsed.success) {
     return parsed.data.data.httpStatus;
