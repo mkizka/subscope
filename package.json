@@ -17,6 +17,7 @@
     "get-docs": "./scripts/get-docs.sh",
     "lint": "pnpm -s _prettier . --check && turbo run lint",
     "prepare": "husky",
+    "storybook": "pnpm --filter @repo/subscope storybook",
     "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
     "test:unit": "vitest --project *:unit",
