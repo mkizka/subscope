@@ -3,6 +3,17 @@ import { z } from "zod";
 import { authedProcedure, router } from "./trpc.js";
 
 export const appRouter = router({
+  admin: router({
+    verifyAccess: authedProcedure.query(async ({ ctx }) => {
+      const response = await ctx.agent.me.subsco.admin.verifyAccess();
+      return {
+        status: response.data.status,
+      };
+    }),
+    register: authedProcedure.mutation(async ({ ctx }) => {
+      await ctx.agent.me.subsco.admin.registerAdmin();
+    }),
+  }),
   inviteCodes: router({
     create: authedProcedure.mutation(async ({ ctx }) => {
       const response = await ctx.agent.me.subsco.admin.createInviteCode();
