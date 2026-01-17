@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.registerAdmin",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Register the first admin user during initial setup.",
+      "errors": [
+        {
+          "name": "AdminAlreadyExists"
+        },
+        {
+          "name": "ActorNotFound"
+        }
+      ]
+    }
+  }
+}

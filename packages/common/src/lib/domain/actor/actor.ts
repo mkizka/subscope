@@ -13,13 +13,13 @@ export type ActorParams = {
 export class Actor {
   readonly did: Did;
   private _handle: Handle | null = null;
-  readonly isAdmin: boolean;
+  private _isAdmin: boolean;
   readonly indexedAt: Date;
 
   private constructor(params: ActorParams) {
     this.did = asDid(params.did);
     this._handle = params.handle ? asHandle(params.handle) : null;
-    this.isAdmin = params.isAdmin;
+    this._isAdmin = params.isAdmin;
     this.indexedAt = params.indexedAt;
   }
 
@@ -40,7 +40,15 @@ export class Actor {
     return this._handle;
   }
 
+  get isAdmin(): boolean {
+    return this._isAdmin;
+  }
+
   updateHandle(handle: string | null): void {
     this._handle = handle ? asHandle(handle) : null;
+  }
+
+  promoteToAdmin(): void {
+    this._isAdmin = true;
   }
 }
