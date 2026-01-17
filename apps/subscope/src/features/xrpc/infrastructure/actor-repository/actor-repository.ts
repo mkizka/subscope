@@ -17,6 +17,7 @@ export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
+      isAdmin: actor.isAdmin,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)

@@ -30,9 +30,11 @@ describe("ActorRepository", () => {
       const result = await actorRepository.findByDid(asDid(actor.did));
 
       // assert
-      expect(result).toMatchObject({
+      expect(result).toEqual({
         did: actor.did,
         handle: actor.handle,
+        isAdmin: actor.isAdmin,
+        indexedAt: actor.indexedAt,
       });
     });
   });
@@ -53,9 +55,11 @@ describe("ActorRepository", () => {
 
       // assert
       const result = await actorRepository.findByDid(did);
-      expect(result).toMatchObject({
+      expect(result).toEqual({
         did: newActor.did,
         handle: newActor.handle,
+        isAdmin: newActor.isAdmin,
+        indexedAt: newActor.indexedAt,
       });
     });
 
@@ -75,9 +79,11 @@ describe("ActorRepository", () => {
 
       // assert
       const result = await actorRepository.findByDid(asDid(actor.did));
-      expect(result).toMatchObject({
+      expect(result).toEqual({
         did: updatedActor.did,
         handle: updatedActor.handle,
+        isAdmin: updatedActor.isAdmin,
+        indexedAt: updatedActor.indexedAt,
       });
     });
   });
