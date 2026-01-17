@@ -16,7 +16,7 @@ describe("IndexActorService", () => {
     const did = "did:plc:newactor";
 
     // act
-    const actor = await indexActorService.upsertActor({
+    const actor = await indexActorService.upsert({
       ctx: { db },
       did,
     });
@@ -47,7 +47,7 @@ describe("IndexActorService", () => {
     actorRepo.add(existingActor);
 
     // act
-    const actor = await indexActorService.upsertActor({
+    const actor = await indexActorService.upsert({
       ctx: { db },
       did: existingActor.did,
     });
@@ -63,7 +63,7 @@ describe("IndexActorService", () => {
     actorRepo.add(existingActor);
 
     // act
-    await indexActorService.upsertActor({
+    await indexActorService.upsert({
       ctx: { db },
       did: existingActor.did,
     });

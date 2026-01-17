@@ -29,7 +29,7 @@ export class RegisterAdminUseCase {
       throw new AdminAlreadyExistsError("Admin already exists");
     }
 
-    const actor = await this.indexActorService.upsertActor({
+    const actor = await this.indexActorService.upsert({
       ctx: { db: this.db },
       did: params.requesterDid,
     });

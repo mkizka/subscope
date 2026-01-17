@@ -21,6 +21,7 @@ import { RepostService } from "./application/service/feed/repost-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
+import { FetchRecordScheduler } from "./application/service/scheduler/fetch-record-scheduler.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { TapScheduler } from "./application/service/tap-scheduler.js";
@@ -64,6 +65,7 @@ const xrpcTestInjector = createInjector()
   .provideClass("assetUrlBuilder", InMemoryAssetUrlBuilder)
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("tapScheduler", TapScheduler)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)

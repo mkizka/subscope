@@ -1,21 +1,18 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import {
-  Actor,
-  type IJobQueue,
-  type TransactionContext,
-} from "@repo/common/domain";
+import { Actor, type TransactionContext } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../interfaces/actor-repository.js";
+import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class IndexActorService {
   constructor(
     private readonly actorRepository: IActorRepository,
-    private readonly jobQueue: IJobQueue,
+    private readonly fetchRecordScheduler: FetchRecordScheduler,
   ) {}
-  static inject = ["actorRepository", "jobQueue"] as const;
+  static inject = ["actorRepository", "fetchRecordScheduler"] as const;
 
-  async upsertActor({
+  async upsert({
     ctx,
     did,
   }: {
@@ -29,18 +26,9 @@ export class IndexActorService {
 
     if (!existingActor) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-      await this.jobQueue.add({
-        queueName: "fetchRecord",
-        jobName: profileUri.toString(),
-        data: {
-          uri: profileUri.toString(),
-          depth: 0,
-          live: false,
-        },
-        options: {
-          jobId: profileUri.toString(),
-          priority: 1,
-        },
+      await this.fetchRecordScheduler.schedule(profileUri, {
+        live: false,
+        depth: 0,
       });
     }
 
