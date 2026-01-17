@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient } from "@repo/common/domain";
+import { Actor, type DatabaseClient } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../interfaces/actor-repository.js";
 
@@ -7,13 +7,6 @@ export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "AdminAlreadyExists";
-  }
-}
-
-export class ActorNotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ActorNotFound";
   }
 }
 
@@ -34,9 +27,9 @@ export class RegisterAdminUseCase {
       throw new AdminAlreadyExistsError("Admin already exists");
     }
 
-    const actor = await this.actorRepository.findByDid(params.requesterDid);
+    let actor = await this.actorRepository.findByDid(params.requesterDid);
     if (!actor) {
-      throw new ActorNotFoundError("Actor not found");
+      actor = Actor.create({ did: params.requesterDid });
     }
 
     actor.promoteToAdmin();

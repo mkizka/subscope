@@ -2,7 +2,6 @@ import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { Server } from "@repo/client/server";
 
 import {
-  ActorNotFoundError,
   AdminAlreadyExistsError,
   type RegisterAdminUseCase,
 } from "../../../../../application/use-cases/admin/register-admin-use-case.js";
@@ -24,10 +23,7 @@ export class RegisterAdmin {
             requesterDid: auth.credentials.did,
           });
         } catch (error) {
-          if (
-            error instanceof AdminAlreadyExistsError ||
-            error instanceof ActorNotFoundError
-          ) {
+          if (error instanceof AdminAlreadyExistsError) {
             throw new InvalidRequestError(error.message, error.name);
           }
           throw error;
