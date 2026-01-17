@@ -5,7 +5,6 @@ import {
 import { createInjector } from "typed-inject";
 import { beforeEach } from "vitest";
 
-import { IndexActorService } from "./application/service/actor/index-actor-service.js";
 import { ProfileViewBuilder } from "./application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./application/service/actor/profile-view-service.js";
 import { InviteCodeService } from "./application/service/admin/invite-code-service.js";
@@ -64,7 +63,6 @@ const xrpcTestInjector = createInjector()
   .provideClass("assetUrlBuilder", InMemoryAssetUrlBuilder)
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("tapScheduler", TapScheduler)
-  .provideClass("indexActorService", IndexActorService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("profileViewService", ProfileViewService)
