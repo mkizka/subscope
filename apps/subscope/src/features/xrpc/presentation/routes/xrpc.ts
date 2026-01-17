@@ -20,6 +20,7 @@ import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
+import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
 import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
@@ -44,6 +45,7 @@ export const xrpcRouterFactory = (
   createInviteCode: CreateInviteCode,
   getInviteCodes: GetInviteCodes,
   getSubscribers: GetSubscribers,
+  verifyAccess: VerifyAccess,
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
   unsubscribeServer: UnsubscribeServer,
@@ -68,6 +70,7 @@ export const xrpcRouterFactory = (
     createInviteCode,
     getInviteCodes,
     getSubscribers,
+    verifyAccess,
     getSubscriptionStatus,
     subscribeServer,
     unsubscribeServer,
@@ -99,6 +102,7 @@ xrpcRouterFactory.inject = [
   "createInviteCode",
   "getInviteCodes",
   "getSubscribers",
+  "verifyAccess",
   "getSubscriptionStatus",
   "subscribeServer",
   "unsubscribeServer",

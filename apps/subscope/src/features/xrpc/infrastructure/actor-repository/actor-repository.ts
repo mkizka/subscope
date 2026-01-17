@@ -54,4 +54,13 @@ export class ActorRepository implements IActorRepository {
       indexedAt: row.indexedAt,
     });
   }
+
+  async hasAnyAdmin(): Promise<boolean> {
+    const rows = await this.db
+      .select({ did: schema.actors.did })
+      .from(schema.actors)
+      .where(eq(schema.actors.isAdmin, true))
+      .limit(1);
+    return rows.length > 0;
+  }
 }

@@ -54,6 +54,7 @@ import { SearchActorsUseCase } from "./features/xrpc/application/use-cases/actor
 import { CreateInviteCodeUseCase } from "./features/xrpc/application/use-cases/admin/create-invite-code-use-case.js";
 import { GetInviteCodesUseCase } from "./features/xrpc/application/use-cases/admin/get-invite-codes-use-case.js";
 import { GetSubscribersUseCase } from "./features/xrpc/application/use-cases/admin/get-subscribers-use-case.js";
+import { VerifyAccessUseCase } from "./features/xrpc/application/use-cases/admin/verify-access-use-case.js";
 import { GetActorLikesUseCase } from "./features/xrpc/application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "./features/xrpc/application/use-cases/feed/get-author-feed-use-case.js";
 import { GetFeedGeneratorsUseCase } from "./features/xrpc/application/use-cases/feed/get-feed-generators-use-case.js";
@@ -109,6 +110,7 @@ import { healthRouter } from "./features/xrpc/presentation/routes/health.js";
 import { CreateInviteCode } from "./features/xrpc/presentation/routes/me/subsco/admin/createInviteCode.js";
 import { GetInviteCodes } from "./features/xrpc/presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GetSubscribers } from "./features/xrpc/presentation/routes/me/subsco/admin/getSubscribers.js";
+import { VerifyAccess } from "./features/xrpc/presentation/routes/me/subsco/admin/verifyAccess.js";
 import { GetSubscriptionStatus } from "./features/xrpc/presentation/routes/me/subsco/sync/getSubscriptionStatus.js";
 import { SubscribeServer } from "./features/xrpc/presentation/routes/me/subsco/sync/subscribeServer.js";
 import { UnsubscribeServer } from "./features/xrpc/presentation/routes/me/subsco/sync/unsubscribeServer.js";
@@ -206,6 +208,7 @@ createInjector()
   .provideClass("createInviteCodeUseCase", CreateInviteCodeUseCase)
   .provideClass("getInviteCodesUseCase", GetInviteCodesUseCase)
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
+  .provideClass("verifyAccessUseCase", VerifyAccessUseCase)
   .provideClass("getSubscriptionStatusUseCase", GetSubscriptionStatusUseCase)
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   .provideClass("unsubscribeServerUseCase", UnsubscribeServerUseCase)
@@ -235,6 +238,7 @@ createInjector()
   .provideClass("createInviteCode", CreateInviteCode)
   .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("getSubscribers", GetSubscribers)
+  .provideClass("verifyAccess", VerifyAccess)
   .provideClass("getSubscriptionStatus", GetSubscriptionStatus)
   .provideClass("subscribeServer", SubscribeServer)
   .provideClass("unsubscribeServer", UnsubscribeServer)

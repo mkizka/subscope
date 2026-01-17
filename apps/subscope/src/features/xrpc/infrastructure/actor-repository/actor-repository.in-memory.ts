@@ -22,4 +22,13 @@ export class InMemoryActorRepository implements IActorRepository {
     this.actors.set(params.actor.did, params.actor);
     return Promise.resolve();
   }
+
+  hasAnyAdmin(): Promise<boolean> {
+    for (const actor of this.actors.values()) {
+      if (actor.isAdmin) {
+        return Promise.resolve(true);
+      }
+    }
+    return Promise.resolve(false);
+  }
 }
