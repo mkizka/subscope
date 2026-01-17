@@ -5,9 +5,6 @@ import { AtpBaseClient } from "./generated/api/index.js";
 export * from "./generated/api/index.js";
 export { RecordNotFoundError } from "./generated/api/types/com/atproto/repo/getRecord.js";
 
-// TODO: playgroundを消したら消す
-export { AtpBaseClient };
-
 export class SubscoAgent extends AtpBaseClient {
   private oauthSession;
 
