@@ -12,7 +12,7 @@ describe("CreateAdminService", () => {
   const jobQueue = testInjector.resolve("jobQueue");
   const db = testInjector.resolve("db");
 
-  test("actorが存在しない場合、新規作成して管理者に昇格しfetchRecordジョブをスケジュールする", async () => {
+  test("actorが存在しない場合、新規作成して管理者に昇格しジョブをスケジュールする", async () => {
     // arrange
     const did = "did:plc:newactor";
 
@@ -35,19 +35,23 @@ describe("CreateAdminService", () => {
 
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
     const jobs = jobQueue.getJobs();
-    expect(jobs).toHaveLength(1);
+    expect(jobs).toHaveLength(2);
     expect(jobs[0]).toMatchObject({
+      queueName: "resolveDid",
+      data: did,
+    });
+    expect(jobs[1]).toMatchObject({
       queueName: "fetchRecord",
       jobName: profileUri.toString(),
       data: {
         uri: profileUri.toString(),
         depth: 0,
-        live: false,
+        live: true,
       },
     });
   });
 
-  test("actorが既に存在する場合、既存のactorを管理者に昇格する", async () => {
+  test("actorが既に存在する場合、新規actorで上書きして管理者に昇格する", async () => {
     // arrange
     const existingActor = actorFactory({ handle: "existing.test" });
     actorRepo.add(existingActor);
@@ -63,13 +67,26 @@ describe("CreateAdminService", () => {
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did: existingActor.did,
-        handle: "existing.test",
+        handle: null,
         isAdmin: true,
         indexedAt: expect.any(Date),
       }),
     );
 
+    const profileUri = AtUri.make(
+      existingActor.did,
+      "app.bsky.actor.profile",
+      "self",
+    );
     const jobs = jobQueue.getJobs();
-    expect(jobs).toHaveLength(0);
+    expect(jobs).toHaveLength(2);
+    expect(jobs[0]).toMatchObject({
+      queueName: "resolveDid",
+      data: existingActor.did,
+    });
+    expect(jobs[1]).toMatchObject({
+      queueName: "fetchRecord",
+      jobName: profileUri.toString(),
+    });
   });
 });

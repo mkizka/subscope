@@ -22,6 +22,7 @@ import { TimelineService } from "./application/service/feed/timeline-service.js"
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
 import { FetchRecordScheduler } from "./application/service/scheduler/fetch-record-scheduler.js";
+import { ResolveDidScheduler } from "./application/service/scheduler/resolve-did-scheduler.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { TapScheduler } from "./application/service/tap-scheduler.js";
@@ -66,6 +67,7 @@ export const testInjector = createInjector()
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("tapScheduler", TapScheduler)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("resolveDidScheduler", ResolveDidScheduler)
   .provideClass("createAdminService", CreateAdminService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
