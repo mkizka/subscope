@@ -3,7 +3,6 @@ import { describe, expect, test } from "vitest";
 
 import { testInjector } from "../../../test-utils.js";
 import {
-  ActorNotFoundError,
   AdminAlreadyExistsError,
   RegisterAdminUseCase,
 } from "./register-admin-use-case.js";
@@ -43,15 +42,18 @@ describe("RegisterAdminUseCase", () => {
     ).rejects.toThrow(AdminAlreadyExistsError);
   });
 
-  test("リクエストユーザーが存在しない場合、ActorNotFoundErrorをスローする", async () => {
+  test("リクエストユーザーが存在しない場合、新規作成して管理者に昇格する", async () => {
     // arrange
     const nonExistentDid = "did:plc:nonexistent";
 
-    // act & assert
-    await expect(
-      registerAdminUseCase.execute({
-        requesterDid: nonExistentDid,
-      }),
-    ).rejects.toThrow(ActorNotFoundError);
+    // act
+    await registerAdminUseCase.execute({
+      requesterDid: nonExistentDid,
+    });
+
+    // assert
+    const createdActor = await actorRepo.findByDid(nonExistentDid);
+    expect(createdActor).not.toBeNull();
+    expect(createdActor?.isAdmin).toBe(true);
   });
 });

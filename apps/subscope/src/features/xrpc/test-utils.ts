@@ -7,6 +7,7 @@ import { beforeEach } from "vitest";
 
 import { ProfileViewBuilder } from "./application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./application/service/actor/profile-view-service.js";
+import { CreateAdminService } from "./application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "./application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "./application/service/admin/subscription-service.js";
 import { ActorLikesService } from "./application/service/feed/actor-likes-service.js";
@@ -20,6 +21,7 @@ import { RepostService } from "./application/service/feed/repost-service.js";
 import { TimelineService } from "./application/service/feed/timeline-service.js";
 import { FollowService } from "./application/service/graph/follow-service.js";
 import { LikeService } from "./application/service/graph/like-service.js";
+import { FetchRecordScheduler } from "./application/service/scheduler/fetch-record-scheduler.js";
 import { PostSearchService } from "./application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./application/service/search/profile-search-service.js";
 import { TapScheduler } from "./application/service/tap-scheduler.js";
@@ -63,6 +65,8 @@ export const testInjector = createInjector()
   .provideClass("assetUrlBuilder", InMemoryAssetUrlBuilder)
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("tapScheduler", TapScheduler)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("createAdminService", CreateAdminService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("postEmbedViewBuilder", PostEmbedViewBuilder)
   .provideClass("profileViewService", ProfileViewService)

@@ -32,6 +32,7 @@ import { clientRouter } from "./features/client/router.js";
 import { dashboardRouterFactory } from "./features/dashboard/dashboard.js";
 import { ProfileViewBuilder } from "./features/xrpc/application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./features/xrpc/application/service/actor/profile-view-service.js";
+import { CreateAdminService } from "./features/xrpc/application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "./features/xrpc/application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "./features/xrpc/application/service/admin/subscription-service.js";
 import { ActorLikesService } from "./features/xrpc/application/service/feed/actor-likes-service.js";
@@ -45,6 +46,7 @@ import { RepostService } from "./features/xrpc/application/service/feed/repost-s
 import { TimelineService } from "./features/xrpc/application/service/feed/timeline-service.js";
 import { FollowService } from "./features/xrpc/application/service/graph/follow-service.js";
 import { LikeService } from "./features/xrpc/application/service/graph/like-service.js";
+import { FetchRecordScheduler } from "./features/xrpc/application/service/scheduler/fetch-record-scheduler.js";
 import { PostSearchService } from "./features/xrpc/application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./features/xrpc/application/service/search/profile-search-service.js";
 import { TapScheduler } from "./features/xrpc/application/service/tap-scheduler.js";
@@ -172,6 +174,8 @@ createInjector()
   .provideClass("cacheCleanupService", CacheCleanupService)
   .provideClass("cacheCleanupScheduler", CacheCleanupScheduler)
   .provideClass("imageProxyUseCase", ImageProxyUseCase)
+  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("createAdminService", CreateAdminService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)
