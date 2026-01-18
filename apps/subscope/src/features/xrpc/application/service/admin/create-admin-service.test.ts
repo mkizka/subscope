@@ -1,31 +1,37 @@
 import { AtUri } from "@atproto/syntax";
+import { Actor } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
 import { testInjector } from "../../../test-utils.js";
-import { IndexActorService } from "./index-actor-service.js";
+import { CreateAdminService } from "./create-admin-service.js";
 
-describe("IndexActorService", () => {
-  const indexActorService = testInjector.injectClass(IndexActorService);
+describe("CreateAdminService", () => {
+  const createAdminService = testInjector.injectClass(CreateAdminService);
   const actorRepo = testInjector.resolve("actorRepository");
   const jobQueue = testInjector.resolve("jobQueue");
   const db = testInjector.resolve("db");
 
-  test("actorが存在しない場合、新規作成してfetchRecordジョブをスケジュールする", async () => {
+  test("actorが存在しない場合、新規作成して管理者に昇格しfetchRecordジョブをスケジュールする", async () => {
     // arrange
     const did = "did:plc:newactor";
 
     // act
-    const actor = await indexActorService.upsert({
+    await createAdminService.execute({
       ctx: { db },
       did,
     });
 
     // assert
-    expect(actor.did).toBe(did);
     const savedActor = await actorRepo.findByDid(did);
-    expect(savedActor).not.toBeNull();
-    expect(savedActor?.did).toBe(did);
+    expect(savedActor).toEqual(
+      Actor.reconstruct({
+        did,
+        handle: null,
+        isAdmin: true,
+        indexedAt: expect.any(Date),
+      }),
+    );
 
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
     const jobs = jobQueue.getJobs();
@@ -41,34 +47,28 @@ describe("IndexActorService", () => {
     });
   });
 
-  test("actorが既に存在する場合、既存のactorを返す", async () => {
+  test("actorが既に存在する場合、既存のactorを管理者に昇格する", async () => {
     // arrange
     const existingActor = actorFactory({ handle: "existing.test" });
     actorRepo.add(existingActor);
 
     // act
-    const actor = await indexActorService.upsert({
+    await createAdminService.execute({
       ctx: { db },
       did: existingActor.did,
     });
 
     // assert
-    expect(actor.did).toBe(existingActor.did);
-    expect(actor.handle).toBe(existingActor.handle);
-  });
+    const savedActor = await actorRepo.findByDid(existingActor.did);
+    expect(savedActor).toEqual(
+      Actor.reconstruct({
+        did: existingActor.did,
+        handle: "existing.test",
+        isAdmin: true,
+        indexedAt: expect.any(Date),
+      }),
+    );
 
-  test("actorが既に存在する場合、fetchRecordジョブをスケジュールしない", async () => {
-    // arrange
-    const existingActor = actorFactory();
-    actorRepo.add(existingActor);
-
-    // act
-    await indexActorService.upsert({
-      ctx: { db },
-      did: existingActor.did,
-    });
-
-    // assert
     const jobs = jobQueue.getJobs();
     expect(jobs).toHaveLength(0);
   });

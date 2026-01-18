@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../interfaces/actor-repository.js";
-import type { IndexActorService } from "../../service/actor/index-actor-service.js";
+import type { CreateAdminService } from "../../service/admin/create-admin-service.js";
 
 export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {
@@ -19,9 +19,9 @@ export class RegisterAdminUseCase {
   constructor(
     private readonly db: DatabaseClient,
     private readonly actorRepository: IActorRepository,
-    private readonly indexActorService: IndexActorService,
+    private readonly createAdminService: CreateAdminService,
   ) {}
-  static inject = ["db", "actorRepository", "indexActorService"] as const;
+  static inject = ["db", "actorRepository", "createAdminService"] as const;
 
   async execute(params: RegisterAdminParams): Promise<void> {
     const hasAnyAdmin = await this.actorRepository.hasAnyAdmin();
@@ -29,12 +29,9 @@ export class RegisterAdminUseCase {
       throw new AdminAlreadyExistsError("Admin already exists");
     }
 
-    const actor = await this.indexActorService.upsert({
+    await this.createAdminService.execute({
       ctx: { db: this.db },
       did: params.requesterDid,
     });
-
-    actor.promoteToAdmin();
-    await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
   }
 }

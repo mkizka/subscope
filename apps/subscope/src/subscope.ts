@@ -30,9 +30,9 @@ import { ImageResizer } from "./features/blob-proxy/infrastructure/image-resizer
 import { imagesRouterFactory } from "./features/blob-proxy/presentation/images.js";
 import { clientRouter } from "./features/client/router.js";
 import { dashboardRouterFactory } from "./features/dashboard/dashboard.js";
-import { IndexActorService } from "./features/xrpc/application/service/actor/index-actor-service.js";
 import { ProfileViewBuilder } from "./features/xrpc/application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./features/xrpc/application/service/actor/profile-view-service.js";
+import { CreateAdminService } from "./features/xrpc/application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "./features/xrpc/application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "./features/xrpc/application/service/admin/subscription-service.js";
 import { ActorLikesService } from "./features/xrpc/application/service/feed/actor-likes-service.js";
@@ -175,7 +175,7 @@ createInjector()
   .provideClass("cacheCleanupScheduler", CacheCleanupScheduler)
   .provideClass("imageProxyUseCase", ImageProxyUseCase)
   .provideClass("fetchRecordScheduler", FetchRecordScheduler)
-  .provideClass("indexActorService", IndexActorService)
+  .provideClass("createAdminService", CreateAdminService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
   .provideClass("profileSearchService", ProfileSearchService)
   .provideClass("profileViewService", ProfileViewService)

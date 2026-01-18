@@ -5,24 +5,22 @@ import { Actor, type TransactionContext } from "@repo/common/domain";
 import type { IActorRepository } from "../../interfaces/actor-repository.js";
 import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
-export class IndexActorService {
+export class CreateAdminService {
   constructor(
     private readonly actorRepository: IActorRepository,
     private readonly fetchRecordScheduler: FetchRecordScheduler,
   ) {}
   static inject = ["actorRepository", "fetchRecordScheduler"] as const;
 
-  async upsert({
+  async execute({
     ctx,
     did,
   }: {
     ctx: TransactionContext;
     did: Did;
-  }): Promise<Actor> {
+  }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid(did);
     const actor = existingActor ?? Actor.create({ did });
-
-    await this.actorRepository.upsert({ ctx, actor });
 
     if (!existingActor) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
@@ -32,6 +30,7 @@ export class IndexActorService {
       });
     }
 
-    return actor;
+    actor.promoteToAdmin();
+    await this.actorRepository.upsert({ ctx, actor });
   }
 }
