@@ -6,9 +6,8 @@ import { describe, expect, test } from "vitest";
 import { ActorRepository } from "./actor-repository.js";
 
 describe("ActorRepository", () => {
-  const { testInjector, ctx } = testSetup;
-
-  const actorRepository = testInjector.injectClass(ActorRepository);
+  const { ctx } = testSetup;
+  const actorRepository = new ActorRepository();
 
   describe("findByDid", () => {
     test("アクターが存在しない場合、nullを返す", async () => {
@@ -16,7 +15,7 @@ describe("ActorRepository", () => {
       const did = asDid("did:plc:xxx");
 
       // act
-      const result = await actorRepository.findByDid(did);
+      const result = await actorRepository.findByDid({ ctx, did });
 
       // assert
       expect(result).toBeNull();
@@ -27,7 +26,10 @@ describe("ActorRepository", () => {
       const actor = await actorFactory(ctx.db).create();
 
       // act
-      const result = await actorRepository.findByDid(asDid(actor.did));
+      const result = await actorRepository.findByDid({
+        ctx,
+        did: asDid(actor.did),
+      });
 
       // assert
       const expected = Actor.reconstruct({
@@ -55,7 +57,7 @@ describe("ActorRepository", () => {
       await actorRepository.upsert({ ctx, actor: newActor });
 
       // assert
-      const result = await actorRepository.findByDid(did);
+      const result = await actorRepository.findByDid({ ctx, did });
       expect(result).toEqual(newActor);
     });
 
@@ -74,8 +76,55 @@ describe("ActorRepository", () => {
       await actorRepository.upsert({ ctx, actor: updatedActor });
 
       // assert
-      const result = await actorRepository.findByDid(asDid(actor.did));
+      const result = await actorRepository.findByDid({
+        ctx,
+        did: asDid(actor.did),
+      });
       expect(result).toEqual(updatedActor);
+    });
+  });
+
+  describe("exists", () => {
+    test("アクターが存在しない場合、falseを返す", async () => {
+      // arrange
+      const did = asDid("did:plc:notexist");
+
+      // act
+      const result = await actorRepository.exists({ ctx, did });
+
+      // assert
+      expect(result).toBe(false);
+    });
+
+    test("アクターが存在する場合、trueを返す", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+
+      // act
+      const result = await actorRepository.exists({
+        ctx,
+        did: asDid(actor.did),
+      });
+
+      // assert
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("delete", () => {
+    test("アクターを削除する", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+
+      // act
+      await actorRepository.delete({ ctx, did: asDid(actor.did) });
+
+      // assert
+      const result = await actorRepository.findByDid({
+        ctx,
+        did: asDid(actor.did),
+      });
+      expect(result).toBeNull();
     });
   });
 });
