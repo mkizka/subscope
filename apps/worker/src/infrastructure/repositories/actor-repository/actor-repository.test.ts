@@ -69,7 +69,7 @@ describe("ActorRepository", () => {
         did: actor.did,
         handle: "updated.test",
         isAdmin: false,
-        indexedAt: new Date(),
+        indexedAt: actor.indexedAt,
       });
 
       // act
