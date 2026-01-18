@@ -30,12 +30,13 @@ describe("ActorRepository", () => {
       const result = await actorRepository.findByDid(asDid(actor.did));
 
       // assert
-      expect(result).toEqual({
+      const expected = Actor.reconstruct({
         did: actor.did,
         handle: actor.handle,
         isAdmin: actor.isAdmin,
         indexedAt: actor.indexedAt,
       });
+      expect(result).toEqual(expected);
     });
   });
 
@@ -55,12 +56,7 @@ describe("ActorRepository", () => {
 
       // assert
       const result = await actorRepository.findByDid(did);
-      expect(result).toEqual({
-        did: newActor.did,
-        handle: newActor.handle,
-        isAdmin: newActor.isAdmin,
-        indexedAt: newActor.indexedAt,
-      });
+      expect(result).toEqual(newActor);
     });
 
     test("既存アクターの場合、アクターを更新する", async () => {
@@ -79,12 +75,7 @@ describe("ActorRepository", () => {
 
       // assert
       const result = await actorRepository.findByDid(asDid(actor.did));
-      expect(result).toEqual({
-        did: updatedActor.did,
-        handle: updatedActor.handle,
-        isAdmin: updatedActor.isAdmin,
-        indexedAt: updatedActor.indexedAt,
-      });
+      expect(result).toEqual(updatedActor);
     });
   });
 });
