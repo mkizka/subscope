@@ -23,7 +23,7 @@ describe("SubscribeServerUseCase", () => {
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
   const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
   const actorRepo = testInjector.resolve("actorRepository");
-  const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -53,8 +53,8 @@ describe("SubscribeServerUseCase", () => {
     });
     const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).toEqual(now);
-    expect(jobQueue.findByQueueName("addTapRepo")).toContainEqual(
-      expect.objectContaining({ data: asDid(actor.did) }),
+    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+      expect.objectContaining({ did: asDid(actor.did) }),
     );
   });
 
@@ -179,8 +179,8 @@ describe("SubscribeServerUseCase", () => {
       inviteCode: inviteCode.code,
       createdAt: now,
     });
-    expect(jobQueue.findByQueueName("addTapRepo")).toContainEqual(
-      expect.objectContaining({ data: did }),
+    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+      expect.objectContaining({ did }),
     );
   });
 });

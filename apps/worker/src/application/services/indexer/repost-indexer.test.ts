@@ -16,7 +16,6 @@ describe("RepostIndexer", () => {
   const repostRepo = testInjector.resolve("repostRepository");
   const feedItemRepo = testInjector.resolve("feedItemRepository");
   const postRepo = testInjector.resolve("postRepository");
-  const jobQueue = testInjector.resolve("jobQueue");
   const jobScheduler = testInjector.resolve("jobScheduler");
 
   const ctx = {
@@ -98,16 +97,13 @@ describe("RepostIndexer", () => {
       await repostIndexer.afterAction({ record });
 
       // assert
-      const jobs = jobQueue.findByQueueName("aggregatePostStats");
-      expect(jobs).toMatchObject([
-        {
-          queueName: "aggregatePostStats",
-          data: {
-            uri: post.uri.toString(),
-            type: "repost",
-          },
-        },
-      ]);
+      const jobs = jobScheduler.getAggregatePostStatsJobs();
+      expect(jobs).toContainEqual(
+        expect.objectContaining({
+          uri: post.uri,
+          type: "repost",
+        }),
+      );
     });
   });
 });

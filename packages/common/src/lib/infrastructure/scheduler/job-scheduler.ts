@@ -1,15 +1,10 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { IJobQueue } from "../../domain/interfaces/job-queue.js";
+import type { IJobQueue, JobData } from "../../domain/interfaces/job-queue.js";
+import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
 
-export interface IJobScheduler {
-  scheduleFetchRecord: (
-    uri: AtUri,
-    options: { live: boolean; depth: number },
-  ) => Promise<void>;
-  scheduleResolveDid: (did: Did) => Promise<void>;
-}
+const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
 
 export class JobScheduler implements IJobScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
@@ -43,6 +38,61 @@ export class JobScheduler implements IJobScheduler {
       data: did,
       options: {
         jobId: jobName,
+      },
+    });
+  }
+
+  async scheduleAddTapRepo(did: Did): Promise<void> {
+    await this.jobQueue.add({
+      queueName: "addTapRepo",
+      jobName: did,
+      data: did,
+      options: { jobId: did },
+    });
+  }
+
+  async scheduleRemoveTapRepo(did: Did): Promise<void> {
+    await this.jobQueue.add({
+      queueName: "removeTapRepo",
+      jobName: did,
+      data: did,
+      options: { jobId: did },
+    });
+  }
+
+  async scheduleAggregatePostStats(
+    uri: AtUri,
+    type: JobData["aggregatePostStats"]["type"],
+  ): Promise<void> {
+    const postUri = uri.toString();
+    await this.jobQueue.add({
+      queueName: "aggregatePostStats",
+      jobName: postUri,
+      data: {
+        uri: postUri,
+        type,
+      },
+      options: {
+        jobId: `${type}__${postUri}`,
+        delay: AGGREGATE_STATS_DELAY_MS,
+      },
+    });
+  }
+
+  async scheduleAggregateActorStats(
+    did: Did,
+    type: JobData["aggregateActorStats"]["type"],
+  ): Promise<void> {
+    await this.jobQueue.add({
+      queueName: "aggregateActorStats",
+      jobName: did,
+      data: {
+        did,
+        type,
+      },
+      options: {
+        jobId: `${type}__${did}`,
+        delay: AGGREGATE_STATS_DELAY_MS,
       },
     });
   }

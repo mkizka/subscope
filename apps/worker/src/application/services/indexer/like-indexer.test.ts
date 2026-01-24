@@ -9,7 +9,7 @@ describe("LikeIndexer", () => {
   const likeIndexer = testInjector.injectClass(LikeIndexer);
 
   const likeRepo = testInjector.resolve("likeRepository");
-  const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -74,16 +74,13 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ record });
 
       // assert
-      const jobs = jobQueue.findByQueueName("aggregatePostStats");
-      expect(jobs).toMatchObject([
-        {
-          queueName: "aggregatePostStats",
-          data: {
-            uri: postUri,
-            type: "like",
-          },
-        },
-      ]);
+      const jobs = jobScheduler.getAggregatePostStatsJobs();
+      expect(jobs).toContainEqual(
+        expect.objectContaining({
+          uri: new AtUri(postUri),
+          type: "like",
+        }),
+      );
     });
 
     test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
@@ -106,16 +103,13 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ record });
 
       // assert
-      const jobs = jobQueue.findByQueueName("aggregatePostStats");
-      expect(jobs).toMatchObject([
-        {
-          queueName: "aggregatePostStats",
-          data: {
-            uri: postUri,
-            type: "like",
-          },
-        },
-      ]);
+      const jobs = jobScheduler.getAggregatePostStatsJobs();
+      expect(jobs).toContainEqual(
+        expect.objectContaining({
+          uri: new AtUri(postUri),
+          type: "like",
+        }),
+      );
     });
 
     test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", async () => {
@@ -139,16 +133,13 @@ describe("LikeIndexer", () => {
       await likeIndexer.afterAction({ record });
 
       // assert
-      const jobs = jobQueue.findByQueueName("aggregatePostStats");
-      expect(jobs).toMatchObject([
-        {
-          queueName: "aggregatePostStats",
-          data: {
-            uri: nonExistentPostUri,
-            type: "like",
-          },
-        },
-      ]);
+      const jobs = jobScheduler.getAggregatePostStatsJobs();
+      expect(jobs).toContainEqual(
+        expect.objectContaining({
+          uri: new AtUri(nonExistentPostUri),
+          type: "like",
+        }),
+      );
     });
   });
 });

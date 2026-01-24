@@ -1,24 +1,24 @@
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type {
+  IJobScheduler,
+  Record,
+  TransactionContext,
+} from "@repo/common/domain";
 import { FeedItem, Repost } from "@repo/common/domain";
-import type { IJobScheduler } from "@repo/common/infrastructure";
 
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
-    private readonly aggregatePostStatsScheduler: AggregatePostStatsScheduler,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postRepository: IPostRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
   static inject = [
     "repostRepository",
-    "aggregatePostStatsScheduler",
     "feedItemRepository",
     "postRepository",
     "jobScheduler",
@@ -55,7 +55,7 @@ export class RepostIndexer implements ICollectionIndexer {
 
   async afterAction({ record }: { record: Record }): Promise<void> {
     const repost = Repost.from(record);
-    await this.aggregatePostStatsScheduler.schedule(
+    await this.jobScheduler.scheduleAggregatePostStats(
       repost.subjectUri,
       "repost",
     );

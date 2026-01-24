@@ -20,9 +20,6 @@ import { LikeIndexer } from "./application/services/indexer/like-indexer.js";
 import { PostIndexer } from "./application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "./application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
-import { AggregateActorStatsScheduler } from "./application/services/scheduler/aggregate-actor-stats-scheduler.js";
-import { AggregatePostStatsScheduler } from "./application/services/scheduler/aggregate-post-stats-scheduler.js";
-import { TapScheduler } from "./application/services/scheduler/tap-scheduler.js";
 import { AddTapRepoUseCase } from "./application/use-cases/async/add-tap-repo-use-case.js";
 import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "./application/use-cases/async/aggregate-post-stats-use-case.js";
@@ -83,9 +80,6 @@ createInjector()
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
   .provideClass("jobScheduler", JobScheduler)
-  .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
-  .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
-  .provideClass("tapScheduler", TapScheduler)
   .provideClass("profileIndexer", ProfileIndexer)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("indexActorService", IndexActorService)

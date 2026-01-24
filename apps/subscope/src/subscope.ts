@@ -49,7 +49,6 @@ import { FollowService } from "./features/xrpc/application/service/graph/follow-
 import { LikeService } from "./features/xrpc/application/service/graph/like-service.js";
 import { PostSearchService } from "./features/xrpc/application/service/search/post-search-service.js";
 import { ProfileSearchService } from "./features/xrpc/application/service/search/profile-search-service.js";
-import { TapScheduler } from "./features/xrpc/application/service/tap-scheduler.js";
 import { GetProfilesUseCase } from "./features/xrpc/application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "./features/xrpc/application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./features/xrpc/application/use-cases/actor/search-actors-use-case.js";
@@ -167,7 +166,6 @@ createInjector()
   .provideClass("subscriptionRepository", SubscriptionRepository)
   .provideClass("tokenVerifier", TokenVerifier)
   .provideClass("assetUrlBuilder", AssetUrlBuilder)
-  .provideClass("tapScheduler", TapScheduler)
   // application
   .provideClass("fetchBlobService", FetchBlobService)
   .provideClass("imageCacheService", ImageCacheService)

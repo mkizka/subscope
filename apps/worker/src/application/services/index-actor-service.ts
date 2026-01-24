@@ -1,7 +1,10 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import { Actor, type TransactionContext } from "@repo/common/domain";
-import type { IJobScheduler } from "@repo/common/infrastructure";
+import {
+  Actor,
+  type IJobScheduler,
+  type TransactionContext,
+} from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 
 import type { IActorRepository } from "../interfaces/repositories/actor-repository.js";

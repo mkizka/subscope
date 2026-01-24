@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { InMemoryJobQueue } from "../job-queue/job-queue.in-memory.js";
 import { JobScheduler } from "./job-scheduler.js";
 
+const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
+
 describe("JobScheduler", () => {
   const jobQueue = new InMemoryJobQueue();
   const jobScheduler = new JobScheduler(jobQueue);
@@ -80,6 +82,102 @@ describe("JobScheduler", () => {
         data: did,
         options: {
           jobId: `at://${did}`,
+        },
+      });
+    });
+  });
+
+  describe("scheduleAddTapRepo", () => {
+    test("addTapRepoジョブをスケジュールする", async () => {
+      // arrange
+      const did = "did:plc:test";
+
+      // act
+      await jobScheduler.scheduleAddTapRepo(did);
+
+      // assert
+      const jobs = jobQueue.getJobs();
+      expect(jobs).toHaveLength(1);
+      expect(jobs[0]).toMatchObject({
+        queueName: "addTapRepo",
+        jobName: did,
+        data: did,
+        options: {
+          jobId: did,
+        },
+      });
+    });
+  });
+
+  describe("scheduleRemoveTapRepo", () => {
+    test("removeTapRepoジョブをスケジュールする", async () => {
+      // arrange
+      const did = "did:plc:test";
+
+      // act
+      await jobScheduler.scheduleRemoveTapRepo(did);
+
+      // assert
+      const jobs = jobQueue.getJobs();
+      expect(jobs).toHaveLength(1);
+      expect(jobs[0]).toMatchObject({
+        queueName: "removeTapRepo",
+        jobName: did,
+        data: did,
+        options: {
+          jobId: did,
+        },
+      });
+    });
+  });
+
+  describe("scheduleAggregatePostStats", () => {
+    test("aggregatePostStatsジョブをスケジュールする", async () => {
+      // arrange
+      const uri = AtUri.make("did:plc:test", "app.bsky.feed.post", "test-rkey");
+
+      // act
+      await jobScheduler.scheduleAggregatePostStats(uri, "reply");
+
+      // assert
+      const jobs = jobQueue.getJobs();
+      expect(jobs).toHaveLength(1);
+      expect(jobs[0]).toMatchObject({
+        queueName: "aggregatePostStats",
+        jobName: uri.toString(),
+        data: {
+          uri: uri.toString(),
+          type: "reply",
+        },
+        options: {
+          jobId: `reply__${uri.toString()}`,
+          delay: AGGREGATE_STATS_DELAY_MS,
+        },
+      });
+    });
+  });
+
+  describe("scheduleAggregateActorStats", () => {
+    test("aggregateActorStatsジョブをスケジュールする", async () => {
+      // arrange
+      const did = "did:plc:test";
+
+      // act
+      await jobScheduler.scheduleAggregateActorStats(did, "posts");
+
+      // assert
+      const jobs = jobQueue.getJobs();
+      expect(jobs).toHaveLength(1);
+      expect(jobs[0]).toMatchObject({
+        queueName: "aggregateActorStats",
+        jobName: did,
+        data: {
+          did,
+          type: "posts",
+        },
+        options: {
+          jobId: `posts__${did}`,
+          delay: AGGREGATE_STATS_DELAY_MS,
         },
       });
     });

@@ -16,9 +16,6 @@ import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
 import { PostIndexer } from "../application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
-import { AggregateActorStatsScheduler } from "../application/services/scheduler/aggregate-actor-stats-scheduler.js";
-import { AggregatePostStatsScheduler } from "../application/services/scheduler/aggregate-post-stats-scheduler.js";
-import { TapScheduler } from "../application/services/scheduler/tap-scheduler.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
@@ -55,10 +52,7 @@ export const testInjector = createInjector()
   .provideClass("jobQueue", InMemoryJobQueue)
   .provideClass("didResolver", InMemoryDidResolver)
   .provideClass("jobLogger", InMemoryJobLogger)
-  .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
-  .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("jobScheduler", InMemoryJobScheduler)
-  .provideClass("tapScheduler", TapScheduler)
   .provideClass("indexActorService", IndexActorService)
   .provideClass("postIndexer", PostIndexer)
   .provideClass("profileIndexer", ProfileIndexer)

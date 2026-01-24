@@ -12,7 +12,7 @@ describe("FollowIndexer", () => {
   const followIndexer = testInjector.injectClass(FollowIndexer);
 
   const followRepo = testInjector.resolve("followRepository");
-  const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
   const subscriptionRepo = testInjector.resolve("subscriptionRepository");
 
   const ctx = {
@@ -74,9 +74,9 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const addTapRepoJobs = jobQueue.findByQueueName("addTapRepo");
+      const addTapRepoJobs = jobScheduler.getAddTapRepoJobs();
       expect(addTapRepoJobs).toContainEqual(
-        expect.objectContaining({ data: followee.did }),
+        expect.objectContaining({ did: followee.did }),
       );
     });
 
@@ -101,9 +101,9 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const addTapRepoJobs = jobQueue.findByQueueName("addTapRepo");
+      const addTapRepoJobs = jobScheduler.getAddTapRepoJobs();
       expect(addTapRepoJobs).not.toContainEqual(
-        expect.objectContaining({ data: followee.did }),
+        expect.objectContaining({ did: followee.did }),
       );
     });
   });
@@ -131,23 +131,19 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record, action: "upsert" });
 
       // assert
-      const jobs = jobQueue.findByQueueName("aggregateActorStats");
-      expect(jobs).toMatchObject([
-        {
-          queueName: "aggregateActorStats",
-          data: {
-            did: follower.did,
-            type: "follows",
-          },
-        },
-        {
-          queueName: "aggregateActorStats",
-          data: {
-            did: followee.did,
-            type: "followers",
-          },
-        },
-      ]);
+      const jobs = jobScheduler.getAggregateActorStatsJobs();
+      expect(jobs).toContainEqual(
+        expect.objectContaining({
+          did: follower.did,
+          type: "follows",
+        }),
+      );
+      expect(jobs).toContainEqual(
+        expect.objectContaining({
+          did: followee.did,
+          type: "followers",
+        }),
+      );
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーで他のサブスクライバーからフォローされていない場合、Tapから削除される", async () => {
@@ -176,9 +172,9 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record, action: "delete" });
 
       // assert
-      const removeTapRepoJobs = jobQueue.findByQueueName("removeTapRepo");
+      const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
       expect(removeTapRepoJobs).toContainEqual(
-        expect.objectContaining({ data: followee.did }),
+        expect.objectContaining({ did: followee.did }),
       );
     });
 
@@ -228,9 +224,9 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const removeTapRepoJobs = jobQueue.findByQueueName("removeTapRepo");
+      const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
       expect(removeTapRepoJobs).not.toContainEqual(
-        expect.objectContaining({ data: followee.did }),
+        expect.objectContaining({ did: followee.did }),
       );
     });
 
@@ -278,9 +274,9 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const removeTapRepoJobs = jobQueue.findByQueueName("removeTapRepo");
+      const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
       expect(removeTapRepoJobs).not.toContainEqual(
-        expect.objectContaining({ data: followee.did }),
+        expect.objectContaining({ did: followee.did }),
       );
     });
   });

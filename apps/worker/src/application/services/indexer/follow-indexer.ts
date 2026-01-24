@@ -1,26 +1,26 @@
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type {
+  IJobScheduler,
+  Record,
+  TransactionContext,
+} from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
-import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
-import type { TapScheduler } from "../scheduler/tap-scheduler.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
-    private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
+    private readonly jobScheduler: IJobScheduler,
     private readonly indexActorService: IndexActorService,
-    private readonly tapScheduler: TapScheduler,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
   static inject = [
     "followRepository",
-    "aggregateActorStatsScheduler",
+    "jobScheduler",
     "indexActorService",
-    "tapScheduler",
     "subscriptionRepository",
   ] as const;
 
@@ -46,7 +46,7 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.actorDid,
     );
     if (isFollowerSubscriber) {
-      await this.tapScheduler.scheduleAddRepo(follow.subjectDid);
+      await this.jobScheduler.scheduleAddTapRepo(follow.subjectDid);
     }
   }
 
@@ -60,11 +60,11 @@ export class FollowIndexer implements ICollectionIndexer {
     action: "upsert" | "delete";
   }): Promise<void> {
     const follow = Follow.from(record);
-    await this.aggregateActorStatsScheduler.schedule(
+    await this.jobScheduler.scheduleAggregateActorStats(
       follow.actorDid,
       "follows",
     );
-    await this.aggregateActorStatsScheduler.schedule(
+    await this.jobScheduler.scheduleAggregateActorStats(
       follow.subjectDid,
       "followers",
     );
@@ -81,7 +81,7 @@ export class FollowIndexer implements ICollectionIndexer {
         });
       if (isStillFollowed) return;
 
-      await this.tapScheduler.scheduleRemoveRepo(follow.subjectDid);
+      await this.jobScheduler.scheduleRemoveTapRepo(follow.subjectDid);
     }
   }
 }
