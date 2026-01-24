@@ -7,6 +7,8 @@ export * from "./lib/infrastructure/logger/logger-manager.in-memory.js";
 export * from "./lib/infrastructure/logger/logger-manager.js";
 export * from "./lib/infrastructure/metric-reporter/metric-reporter.in-memory.js";
 export * from "./lib/infrastructure/metric-reporter/metric-reporter.js";
+export * from "./lib/infrastructure/scheduler/job-scheduler.in-memory.js";
+export * from "./lib/infrastructure/scheduler/job-scheduler.js";
 export * from "./lib/infrastructure/tap-client/tap-client.in-memory.js";
 export * from "./lib/infrastructure/tap-client/tap-client.js";
 export * from "./lib/infrastructure/transaction/transaction.js";

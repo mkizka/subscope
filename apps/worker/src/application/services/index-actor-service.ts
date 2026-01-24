@@ -1,25 +1,22 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import { Actor, type TransactionContext } from "@repo/common/domain";
+import type { IJobScheduler } from "@repo/common/infrastructure";
 import type { Handle } from "@repo/common/utils";
 
 import type { IActorRepository } from "../interfaces/repositories/actor-repository.js";
 import type { IProfileRepository } from "../interfaces/repositories/profile-repository.js";
-import type { FetchRecordScheduler } from "./scheduler/fetch-record-scheduler.js";
-import type { ResolveDidScheduler } from "./scheduler/resolve-did-scheduler.js";
 
 export class IndexActorService {
   constructor(
     private readonly actorRepository: IActorRepository,
     private readonly profileRepository: IProfileRepository,
-    private readonly fetchRecordScheduler: FetchRecordScheduler,
-    private readonly resolveDidScheduler: ResolveDidScheduler,
+    private readonly jobScheduler: IJobScheduler,
   ) {}
   static inject = [
     "actorRepository",
     "profileRepository",
-    "fetchRecordScheduler",
-    "resolveDidScheduler",
+    "jobScheduler",
   ] as const;
 
   async upsert({
@@ -43,7 +40,7 @@ export class IndexActorService {
     await this.actorRepository.upsert({ ctx, actor });
 
     if (!actor.handle) {
-      await this.resolveDidScheduler.schedule(did);
+      await this.jobScheduler.scheduleResolveDid(did);
     }
 
     const profileExists = await this.profileRepository.exists({
@@ -52,7 +49,10 @@ export class IndexActorService {
     });
     if (!profileExists) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-      await this.fetchRecordScheduler.schedule(profileUri, { live, depth: 0 });
+      await this.jobScheduler.scheduleFetchRecord(profileUri, {
+        live,
+        depth: 0,
+      });
     }
   }
 

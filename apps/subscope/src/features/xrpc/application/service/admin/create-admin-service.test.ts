@@ -9,7 +9,7 @@ import { CreateAdminService } from "./create-admin-service.js";
 describe("CreateAdminService", () => {
   const createAdminService = testInjector.injectClass(CreateAdminService);
   const actorRepo = testInjector.resolve("actorRepository");
-  const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
   const db = testInjector.resolve("db");
 
   test("actorが存在しない場合、新規作成して管理者に昇格しジョブをスケジュールする", async () => {
@@ -34,21 +34,16 @@ describe("CreateAdminService", () => {
     );
 
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-    const jobs = jobQueue.getJobs();
-    expect(jobs).toHaveLength(2);
-    expect(jobs[0]).toMatchObject({
-      queueName: "resolveDid",
-      data: did,
-    });
-    expect(jobs[1]).toMatchObject({
-      queueName: "fetchRecord",
-      jobName: profileUri.toString(),
-      data: {
-        uri: profileUri.toString(),
+    expect(jobScheduler.getResolveDidJobs()).toContainEqual(
+      expect.objectContaining({ did }),
+    );
+    expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
+      expect.objectContaining({
+        uri: profileUri,
         depth: 0,
         live: true,
-      },
-    });
+      }),
+    );
   });
 
   test("actorが既に存在する場合、新規actorで上書きして管理者に昇格する", async () => {
@@ -78,15 +73,13 @@ describe("CreateAdminService", () => {
       "app.bsky.actor.profile",
       "self",
     );
-    const jobs = jobQueue.getJobs();
-    expect(jobs).toHaveLength(2);
-    expect(jobs[0]).toMatchObject({
-      queueName: "resolveDid",
-      data: existingActor.did,
-    });
-    expect(jobs[1]).toMatchObject({
-      queueName: "fetchRecord",
-      jobName: profileUri.toString(),
-    });
+    expect(jobScheduler.getResolveDidJobs()).toContainEqual(
+      expect.objectContaining({ did: existingActor.did }),
+    );
+    expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
+      expect.objectContaining({
+        uri: profileUri,
+      }),
+    );
   });
 });

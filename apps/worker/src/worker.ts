@@ -3,6 +3,7 @@ import {
   databaseFactory,
   DidResolver,
   JobQueue,
+  JobScheduler,
   LoggerManager,
   MetricReporter,
   RedisDidCache,
@@ -21,8 +22,6 @@ import { ProfileIndexer } from "./application/services/indexer/profile-indexer.j
 import { RepostIndexer } from "./application/services/indexer/repost-indexer.js";
 import { AggregateActorStatsScheduler } from "./application/services/scheduler/aggregate-actor-stats-scheduler.js";
 import { AggregatePostStatsScheduler } from "./application/services/scheduler/aggregate-post-stats-scheduler.js";
-import { FetchRecordScheduler } from "./application/services/scheduler/fetch-record-scheduler.js";
-import { ResolveDidScheduler } from "./application/services/scheduler/resolve-did-scheduler.js";
 import { TapScheduler } from "./application/services/scheduler/tap-scheduler.js";
 import { AddTapRepoUseCase } from "./application/use-cases/async/add-tap-repo-use-case.js";
 import { AggregateActorStatsUseCase } from "./application/use-cases/async/aggregate-actor-stats-use-case.js";
@@ -83,8 +82,7 @@ createInjector()
   .provideClass("subscriptionRepository", SubscriptionRepository)
   .provideClass("feedItemRepository", FeedItemRepository)
   // application(service)
-  .provideClass("resolveDidScheduler", ResolveDidScheduler)
-  .provideClass("fetchRecordScheduler", FetchRecordScheduler)
+  .provideClass("jobScheduler", JobScheduler)
   .provideClass("aggregatePostStatsScheduler", AggregatePostStatsScheduler)
   .provideClass("aggregateActorStatsScheduler", AggregateActorStatsScheduler)
   .provideClass("tapScheduler", TapScheduler)

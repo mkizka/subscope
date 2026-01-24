@@ -1,3 +1,4 @@
+import { AtUri } from "@atproto/syntax";
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -11,6 +12,7 @@ describe("PostIndexer", () => {
   const postRepo = testInjector.resolve("postRepository");
   const feedItemRepo = testInjector.resolve("feedItemRepository");
   const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -85,20 +87,11 @@ describe("PostIndexer", () => {
       });
 
       // assert
-      const jobs = jobQueue.findByQueueName("fetchRecord");
-      expect(jobs).toMatchObject([
+      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
         {
-          queueName: "fetchRecord",
-          jobName: embedUri,
-          data: {
-            uri: embedUri,
-            depth: 0,
-            live: false,
-          },
-          options: {
-            jobId: embedUri,
-            priority: 1,
-          },
+          uri: new AtUri(embedUri),
+          depth: 0,
+          live: false,
         },
       ]);
     });
@@ -124,8 +117,7 @@ describe("PostIndexer", () => {
       });
 
       // assert
-      const jobs = jobQueue.findByQueueName("fetchRecord");
-      expect(jobs).toEqual([]);
+      expect(jobScheduler.getFetchRecordJobs()).toEqual([]);
     });
 
     test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {

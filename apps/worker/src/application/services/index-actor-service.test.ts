@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { AtUri } from "@atproto/syntax";
 import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { describe, expect, test } from "vitest";
@@ -10,7 +11,7 @@ describe("IndexActorService", () => {
   const indexActorService = testInjector.injectClass(IndexActorService);
 
   const actorRepo = testInjector.resolve("actorRepository");
-  const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -37,56 +38,12 @@ describe("IndexActorService", () => {
         handle: testHandle,
       });
 
-      expect(jobQueue.getJobs()).toContainEqual(
+      const profileUri = AtUri.make(testDid, "app.bsky.actor.profile", "self");
+      expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
         expect.objectContaining({
-          queueName: "fetchRecord",
-          jobName: `at://${testDid}/app.bsky.actor.profile/self`,
-          data: {
-            uri: `at://${testDid}/app.bsky.actor.profile/self`,
-            depth: 0,
-            live: false,
-          },
-          options: {
-            jobId: `at://${testDid}/app.bsky.actor.profile/self`,
-            priority: 1,
-          },
-        }),
-      );
-    });
-
-    test("handle指定あり、既存actorなしの場合は、fetchRecordジョブでプロファイルを取得する", async () => {
-      // arrange
-      const testDid = asDid("did:plc:new-no-syncrepo");
-      const testHandle = asHandle("new-no-syncrepo.bsky.social");
-
-      // act
-      await indexActorService.upsert({
-        ctx,
-        did: testDid,
-        handle: testHandle,
-        live: false,
-      });
-
-      // assert
-      const actor = await actorRepo.findByDid({ ctx, did: testDid });
-      expect(actor).toMatchObject({
-        did: testDid,
-        handle: testHandle,
-      });
-
-      expect(jobQueue.getJobs()).toContainEqual(
-        expect.objectContaining({
-          queueName: "fetchRecord",
-          jobName: `at://${testDid}/app.bsky.actor.profile/self`,
-          data: {
-            uri: `at://${testDid}/app.bsky.actor.profile/self`,
-            depth: 0,
-            live: false,
-          },
-          options: {
-            jobId: `at://${testDid}/app.bsky.actor.profile/self`,
-            priority: 1,
-          },
+          uri: profileUri,
+          depth: 0,
+          live: false,
         }),
       );
     });
@@ -185,11 +142,9 @@ describe("IndexActorService", () => {
         handle: null,
       });
 
-      expect(jobQueue.getJobs()).toContainEqual(
+      expect(jobScheduler.getResolveDidJobs()).toContainEqual(
         expect.objectContaining({
-          queueName: "resolveDid",
-          jobName: `at://${newDid}`,
-          data: newDid,
+          did: newDid,
         }),
       );
     });
@@ -219,11 +174,9 @@ describe("IndexActorService", () => {
         handle: null,
       });
 
-      expect(jobQueue.getJobs()).toContainEqual(
+      expect(jobScheduler.getResolveDidJobs()).toContainEqual(
         expect.objectContaining({
-          queueName: "resolveDid",
-          jobName: `at://${existingDidNoHandle}`,
-          data: existingDidNoHandle,
+          did: existingDidNoHandle,
         }),
       );
     });

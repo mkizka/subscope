@@ -17,6 +17,7 @@ describe("RepostIndexer", () => {
   const feedItemRepo = testInjector.resolve("feedItemRepository");
   const postRepo = testInjector.resolve("postRepository");
   const jobQueue = testInjector.resolve("jobQueue");
+  const jobScheduler = testInjector.resolve("jobScheduler");
 
   const ctx = {
     db: testInjector.resolve("db"),
@@ -66,20 +67,11 @@ describe("RepostIndexer", () => {
         subjectUri: subjectUri,
       });
 
-      const jobs = jobQueue.findByQueueName("fetchRecord");
-      expect(jobs).toMatchObject([
+      expect(jobScheduler.getFetchRecordJobs()).toMatchObject([
         {
-          queueName: "fetchRecord",
-          jobName: subjectUri,
-          data: {
-            uri: subjectUri,
-            depth: 0,
-            live: false,
-          },
-          options: {
-            jobId: subjectUri,
-            priority: 1,
-          },
+          uri: new AtUri(subjectUri),
+          depth: 0,
+          live: false,
         },
       ]);
     });

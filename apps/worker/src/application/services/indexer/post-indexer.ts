@@ -5,26 +5,26 @@ import {
   PostEmbedRecord,
   PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
+import type { IJobScheduler } from "@repo/common/infrastructure";
 
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { AggregateActorStatsScheduler } from "../scheduler/aggregate-actor-stats-scheduler.js";
 import type { AggregatePostStatsScheduler } from "../scheduler/aggregate-post-stats-scheduler.js";
-import type { FetchRecordScheduler } from "../scheduler/fetch-record-scheduler.js";
 
 export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly fetchRecordScheduler: FetchRecordScheduler,
+    private readonly jobScheduler: IJobScheduler,
     private readonly aggregatePostStatsScheduler: AggregatePostStatsScheduler,
     private readonly aggregateActorStatsScheduler: AggregateActorStatsScheduler,
   ) {}
   static inject = [
     "postRepository",
     "feedItemRepository",
-    "fetchRecordScheduler",
+    "jobScheduler",
     "aggregatePostStatsScheduler",
     "aggregateActorStatsScheduler",
   ] as const;
@@ -50,7 +50,7 @@ export class PostIndexer implements ICollectionIndexer {
     if (embedUri) {
       const embedExists = await this.postRepository.exists(ctx, embedUri);
       if (!embedExists) {
-        await this.fetchRecordScheduler.schedule(embedUri, { live, depth });
+        await this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth });
       }
     }
   }
