@@ -15,12 +15,7 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("http://localhost:2480"),
   }),
-  MODERATION_URL: z.url().default(
-    match({
-      prod: "wss://mod.bsky.app",
-      dev: "ws://localhost:2587",
-    }),
-  ),
+  MODERATION_URL: z.url().default("wss://mod.bsky.app"),
   DISABLE_INGESTER: z.stringbool().default(false),
   REDIS_URL: match({
     prod: z.url(),

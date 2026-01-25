@@ -4,31 +4,20 @@ set -euo pipefail
 cleanup() {
   echo "[dev.sh] Cleaning up..."
   docker compose down
-  echo "[dev.sh] Killing port 2583..."
-  pnpm kill-port 2583
 }
 
 main() {
-  # 1. atprotoリポジトリをダウンロードしてビルド
-  pnpm --filter @repo/dev-env setup-dev-env
-
-  # 2. atprotoリポジトリでmake run-dev-envを実行
-  DEV_ENV_LOG=dev-env/run-dev-env.log
-  rm -f $DEV_ENV_LOG
-  pnpm --filter @repo/dev-env run-dev-env > $DEV_ENV_LOG 2>&1 &
-  pnpm wait-on http://localhost:2583/xrpc/_health
-
-  # 3. このリポジトリのdocker composeを起動
+  # 1. docker composeを起動
   echo "[dev.sh] Starting docker containers..."
   docker compose up -d
   # 5432=Postgres, 6379=Redis, 2480=Tap
   pnpm wait-on tcp:5432 tcp:6379 tcp:2480
 
-  # 4. dockerコンテナのPostgresにマイグレーション
+  # 2. dockerコンテナのPostgresにマイグレーション
   echo "[dev.sh] Migrating database..."
   pnpm -s db:migrate
 
-  # 5. このリポジトリの開発環境を起動
+  # 3. 開発環境を起動
   echo "[dev.sh] Ready to start development environment."
   pnpm turbo run dev --ui tui
 }

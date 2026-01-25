@@ -353,12 +353,6 @@ importers:
         specifier: 3.1.0
         version: 3.1.0(typescript@5.9.3)(vitest@4.0.15(@opentelemetry/api@1.9.0)(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2))
 
-  dev-env:
-    devDependencies:
-      giget:
-        specifier: 2.0.0
-        version: 2.0.0
-
   packages/client:
     dependencies:
       '@atproto/api':
