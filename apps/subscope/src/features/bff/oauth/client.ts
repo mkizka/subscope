@@ -1,9 +1,10 @@
 import { JoseKey } from "@atproto/jwk-jose";
 import type {
-  NodeOAuthClientOptions,
   NodeSavedSessionStore,
   NodeSavedStateStore,
+  OAuthClientMetadataInput,
 } from "@atproto/oauth-client-node";
+import { atprotoLoopbackClientMetadata } from "@atproto/oauth-client-node";
 import { NodeOAuthClient } from "@atproto/oauth-client-node";
 
 import { env, isProduction } from "../../../shared/env.js";
@@ -15,47 +16,37 @@ export const oauthClientFactory = (
   oauthStateStore: NodeSavedStateStore,
   oauthSessionStore: NodeSavedSessionStore,
 ) => {
-  const baseUrl = isProduction
-    ? env.PUBLIC_URL
-    : `http://127.0.0.1:${env.PORT}`;
-  const redirectUri = `${baseUrl}/oauth/callback`;
   const scope = "atproto transition:generic";
 
-  const oauthClientOptions: NodeOAuthClientOptions = {
-    clientMetadata: {
-      client_name: "Subscope",
-      client_id: `${env.PUBLIC_URL}/oauth/client-metadata.json`,
-      client_uri: baseUrl,
-      jwks_uri: `${baseUrl}/oauth/jwks.json`,
-      redirect_uris: [redirectUri],
-      scope,
-      grant_types: ["authorization_code", "refresh_token"],
-      response_types: ["code"],
-      application_type: "web",
-      token_endpoint_auth_method: "private_key_jwt",
-      token_endpoint_auth_signing_alg: "ES256",
-      dpop_bound_access_tokens: true,
-    },
-    keyset: [joseKey],
+  const clientMetadata: OAuthClientMetadataInput = isProduction
+    ? {
+        client_name: "Subscope",
+        client_id: `${env.PUBLIC_URL}/oauth/client-metadata.json`,
+        client_uri: env.PUBLIC_URL,
+        jwks_uri: `${env.PUBLIC_URL}/oauth/jwks.json`,
+        redirect_uris: [`${env.PUBLIC_URL}/oauth/callback`],
+        scope,
+        grant_types: ["authorization_code", "refresh_token"],
+        response_types: ["code"],
+        application_type: "web",
+        token_endpoint_auth_method: "private_key_jwt",
+        token_endpoint_auth_signing_alg: "ES256",
+        dpop_bound_access_tokens: true,
+      }
+    : atprotoLoopbackClientMetadata(
+        `http://localhost?${new URLSearchParams([
+          ["redirect_uri", `http://127.0.0.1:${env.PORT}/oauth/callback`],
+          ["scope", scope],
+        ]).toString()}`,
+      );
+  const keyset = isProduction ? [joseKey] : undefined;
+
+  return new NodeOAuthClient({
+    clientMetadata: clientMetadata,
+    keyset,
     plcDirectoryUrl: env.ATPROTO_PLC_URL,
     stateStore: oauthStateStore,
     sessionStore: oauthSessionStore,
-  };
-
-  if (!isProduction) {
-    // https://atproto.com/ja/specs/oauth#localhost-client-development
-    const localClientId = new URL("http://localhost");
-    localClientId.searchParams.set("redirect_uri", redirectUri);
-    localClientId.searchParams.set("scope", scope);
-
-    oauthClientOptions.clientMetadata = {
-      ...oauthClientOptions.clientMetadata,
-      client_id: localClientId.toString(),
-    };
-    oauthClientOptions.handleResolver = "http://localhost:2583";
-    oauthClientOptions.allowHttp = true;
-  }
-
-  return new NodeOAuthClient(oauthClientOptions);
+  });
 };
 oauthClientFactory.inject = ["oauthStateStore", "oauthSessionStore"] as const;
