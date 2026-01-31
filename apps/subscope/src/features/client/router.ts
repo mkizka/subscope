@@ -1,23 +1,34 @@
+import { createRequestHandler } from "@react-router/express";
 import express from "express";
 import { Router } from "express";
-import path from "path";
 
 import { env } from "../../shared/env";
 
 const router = Router();
 
 if (env.NODE_ENV === "production") {
-  const distPath = path.resolve(import.meta.dirname, "../../../dist");
-  router.use(express.static(distPath));
-  router.get("*all", (_req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-  });
+  router.use(express.static("build/client"));
+  router.use(
+    createRequestHandler({
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      build: await import("../../../build/server/index.js"),
+    }),
+  );
 } else {
-  const { createServer: createViteServer } = await import("vite");
-  const vite = await createViteServer({
-    server: { middlewareMode: true },
-  });
-  router.use(vite.middlewares);
+  const viteDevServer = await import("vite").then((vite) =>
+    vite.createServer({
+      server: { middlewareMode: true },
+    }),
+  );
+  router.use(viteDevServer.middlewares);
+  router.use(
+    createRequestHandler({
+      // @ts-expect-error
+      build: () =>
+        viteDevServer.ssrLoadModule("virtual:react-router/server-build"),
+    }),
+  );
 }
 
 export { router as clientRouter };
