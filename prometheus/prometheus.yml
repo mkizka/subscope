@@ -2,10 +2,10 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: appview
+  - job_name: subscope
     static_configs:
       - targets:
-          - appview.railway.internal:8080
+          - subscope.railway.internal:8080
 
   - job_name: ingester
     static_configs:
@@ -18,11 +18,6 @@ scrape_configs:
           - worker.railway.internal
         type: AAAA
         port: 8080
-
-  - job_name: blob-proxy
-    static_configs:
-      - targets:
-          - blob-proxy.railway.internal:8080
 
   - job_name: tap
     static_configs:
