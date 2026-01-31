@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "start": "NODE_ENV=production tsx ./src/subscope.ts",
     "storybook": "storybook dev -p 6006",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
     "@atproto/did": "0.2.3",

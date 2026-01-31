@@ -49,7 +49,10 @@ export class ProfileViewService {
     );
   }
 
-  async findProfileViewDetailed(dids: Did[], viewerDid?: Did | null) {
+  async findProfileViewDetailed(
+    dids: Did[],
+    viewerDid?: Did | null,
+  ): Promise<$Typed<AppBskyActorDefs.ProfileViewDetailed>[]> {
     const profiles = await this.profileRepository.findManyDetailed(dids);
     const viewerStatesMap = await this.findViewerStates(profiles, viewerDid);
     const statsMap = await this.actorStatsRepository.findStats(dids);

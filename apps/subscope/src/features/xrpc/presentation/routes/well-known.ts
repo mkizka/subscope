@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { env } from "../../../../shared/env.js";
 
-const wellKnownRouter = Router();
+const wellKnownRouter: Router = Router();
 
 wellKnownRouter.get("/.well-known/did.json", (_req, res) => {
   res.json({

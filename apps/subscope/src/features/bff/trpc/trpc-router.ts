@@ -5,7 +5,7 @@ import type { OAuthSession } from "../oauth/session.js";
 import { appRouter } from "./app-router.js";
 import { createContextFactory } from "./context.js";
 
-export function trpcRouterFactory(oauthSession: OAuthSession) {
+export function trpcRouterFactory(oauthSession: OAuthSession): Router {
   const createContext = createContextFactory(oauthSession);
 
   const router = Router();

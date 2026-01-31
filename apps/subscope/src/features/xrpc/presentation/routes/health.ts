@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { env } from "../../../../shared/env.js";
 
-const healthRouter = Router();
+const healthRouter: Router = Router();
 
 const keyof = <T extends Record<string, unknown>, K extends keyof T>(
   obj: T,

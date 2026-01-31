@@ -4,7 +4,7 @@ import { Router } from "express";
 
 import { env } from "../../shared/env";
 
-const router = Router();
+const router: Router = Router();
 
 if (env.NODE_ENV === "production") {
   router.use(express.static("build/client"));
