@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 import type { Route } from "./+types/_index";
 
 export function meta() {
@@ -19,6 +21,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <div>
       <h1>home</h1>
       <p>Your DID: {did ?? "not logged in"}</p>
+      <Button>Button</Button>
     </div>
   );
 }
