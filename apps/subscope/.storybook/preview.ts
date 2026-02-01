@@ -2,10 +2,6 @@ import "@/app/app.css";
 
 import type { Preview } from "@storybook/react-vite";
 
-const preview: Preview = {
-  parameters: {
-    layout: "fullscreen",
-  },
-};
+const preview: Preview = {};
 
 export default preview;
