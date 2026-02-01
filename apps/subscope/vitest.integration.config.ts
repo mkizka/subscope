@@ -6,7 +6,7 @@ export default mergeConfig(
   defineProject({
     test: {
       name: "subscope:integration",
-      include: ["src/**/infrastructure/**/*.test.ts"],
+      include: ["server/**/infrastructure/**/*.test.ts"],
     },
   }),
 );

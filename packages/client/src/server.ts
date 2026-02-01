@@ -23,4 +23,5 @@ export * as AppBskyGraphFollow from "./generated/server/types/app/bsky/graph/fol
 export * as AppBskyGraphGetFollowers from "./generated/server/types/app/bsky/graph/getFollowers.js";
 export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows.js";
 export * as MeSubscoAdminGetInviteCodes from "./generated/server/types/me/subsco/admin/getInviteCodes.js";
+export * as MeSubscoAdminGetSubscribers from "./generated/server/types/me/subsco/admin/getSubscribers.js";
 export { $Typed } from "./generated/server/util.js";
