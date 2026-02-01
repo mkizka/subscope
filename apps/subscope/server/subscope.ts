@@ -23,7 +23,7 @@ import { CronTaskScheduler } from "./features/blob-proxy/infrastructure/cron-tas
 import { ImageDiskStorage } from "./features/blob-proxy/infrastructure/image-disk-storage.js";
 import { ImageResizer } from "./features/blob-proxy/infrastructure/image-resizer.js";
 import { imagesRouterFactory } from "./features/blob-proxy/presentation/images.js";
-import { clientRouter } from "./features/client/router.js";
+import { clientRouterFactory } from "./features/client/router.js";
 import { dashboardRouterFactory } from "./features/dashboard/dashboard.js";
 import { oauthClientFactory } from "./features/oauth/client.js";
 import { authMiddlewareFactory } from "./features/oauth/middleware.js";
@@ -120,7 +120,7 @@ import { wellKnownRouter } from "./features/xrpc/presentation/routes/well-known.
 import { xrpcRouterFactory } from "./features/xrpc/presentation/routes/xrpc.js";
 import { env } from "./shared/env.js";
 
-createInjector()
+const server = createInjector()
   // envs
   .provideValue("logLevel", env.LOG_LEVEL)
   .provideValue("plcUrl", env.ATPROTO_PLC_URL)
@@ -220,7 +220,7 @@ createInjector()
   .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("oauthRouter", oauthRouterFactory)
   .provideFactory("blobProxyRouter", imagesRouterFactory)
-  .provideValue("clientRouter", clientRouter)
+  .provideFactory("clientRouter", clientRouterFactory)
   .provideFactory("dashboardRouter", dashboardRouterFactory)
   .provideClass("getPreferences", GetPreferences)
   .provideClass("getProfile", GetProfile)
@@ -250,5 +250,7 @@ createInjector()
   .provideValue("healthRouter", healthRouter)
   .provideValue("wellKnownRouter", wellKnownRouter)
   // bootstrap
-  .injectClass(SubscopeServer)
-  .start();
+  .injectClass(SubscopeServer);
+
+await server.init();
+server.start();

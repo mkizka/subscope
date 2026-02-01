@@ -9,17 +9,18 @@ import { env } from "../shared/env.js";
 export class SubscopeServer {
   private readonly logger;
   private readonly app;
+  private _initialized = false;
 
   constructor(
     loggerManager: ILoggerManager,
     authMiddleware: RequestHandler,
     dashboardRouter: express.Router,
     oauthRouter: express.Router,
-    clientRouter: express.Router,
     blobProxyRouter: express.Router,
     xrpcRouter: express.Router,
     healthRouter: express.Router,
     wellKnownRouter: express.Router,
+    private readonly clientRouter: Promise<express.Router>,
     private readonly cacheCleanupScheduler: CacheCleanupScheduler,
   ) {
     const logger = loggerManager.createLogger("SubscopeServer");
@@ -35,7 +36,6 @@ export class SubscopeServer {
     app.use(xrpcRouter);
     app.use(healthRouter);
     app.use(wellKnownRouter);
-    app.use(clientRouter);
 
     this.logger = logger;
     this.app = app;
@@ -45,13 +45,19 @@ export class SubscopeServer {
     "authMiddleware",
     "dashboardRouter",
     "oauthRouter",
-    "clientRouter",
     "blobProxyRouter",
     "xrpcRouter",
     "healthRouter",
     "wellKnownRouter",
+    "clientRouter",
     "cacheCleanupScheduler",
   ] as const;
+
+  async init() {
+    if (this._initialized) return;
+    this._initialized = true;
+    this.app.use(await this.clientRouter);
+  }
 
   start() {
     this.app.listen(env.PORT, () => {

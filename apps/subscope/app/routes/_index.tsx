@@ -1,3 +1,5 @@
+import type { Route } from "./+types/_index";
+
 export function meta() {
   return [
     { title: "New React Router App" },
@@ -5,6 +7,18 @@ export function meta() {
   ];
 }
 
-export default function Home() {
-  return <p>home</p>;
+export const loader = ({ context }: Route.LoaderArgs) => {
+  return {
+    did: context.auth?.userDid || null,
+  };
+};
+
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { did } = loaderData;
+  return (
+    <div>
+      <h1>home</h1>
+      <p>Your DID: {did ?? "not logged in"}</p>
+    </div>
+  );
 }
