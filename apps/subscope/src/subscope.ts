@@ -17,7 +17,6 @@ import { authMiddlewareFactory } from "./features/bff/oauth/middleware.js";
 import { oauthRouterFactory } from "./features/bff/oauth/oauth.js";
 import { OAuthSession } from "./features/bff/oauth/session.js";
 import { SessionStore, StateStore } from "./features/bff/oauth/storage.js";
-import { trpcRouterFactory } from "./features/bff/trpc/trpc-router.js";
 import { ImageProxyUseCase } from "./features/blob-proxy/application/image-proxy-use-case.js";
 import { CacheCleanupScheduler } from "./features/blob-proxy/application/services/cache-cleanup-scheduler.js";
 import { CacheCleanupService } from "./features/blob-proxy/application/services/cache-cleanup-service.js";
@@ -220,7 +219,6 @@ createInjector()
   // presentation
   .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("oauthRouter", oauthRouterFactory)
-  .provideFactory("trpcRouter", trpcRouterFactory)
   .provideFactory("blobProxyRouter", imagesRouterFactory)
   .provideValue("clientRouter", clientRouter)
   .provideFactory("dashboardRouter", dashboardRouterFactory)

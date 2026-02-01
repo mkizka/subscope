@@ -17,7 +17,6 @@ export class SubscopeServer {
     oauthRouter: express.Router,
     clientRouter: express.Router,
     blobProxyRouter: express.Router,
-    trpcRouter: express.Router,
     xrpcRouter: express.Router,
     healthRouter: express.Router,
     wellKnownRouter: express.Router,
@@ -33,7 +32,6 @@ export class SubscopeServer {
     app.use("/oauth", oauthRouter);
     app.use("/dashboard", authMiddleware, dashboardRouter);
     app.use("/images", blobProxyRouter);
-    app.use("/trpc", trpcRouter);
     app.use(xrpcRouter);
     app.use(healthRouter);
     app.use(wellKnownRouter);
@@ -49,7 +47,6 @@ export class SubscopeServer {
     "oauthRouter",
     "clientRouter",
     "blobProxyRouter",
-    "trpcRouter",
     "xrpcRouter",
     "healthRouter",
     "wellKnownRouter",
