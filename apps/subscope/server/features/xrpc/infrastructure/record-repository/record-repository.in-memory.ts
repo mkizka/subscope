@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { Record } from "@repo/common/domain";
 
-import type { IRecordRepository } from "../../application/interfaces/record-repository.js";
+import type { IRecordRepository } from "@/server/features/xrpc/application/interfaces/record-repository.js";
 
 export class InMemoryRecordRepository implements IRecordRepository {
   private records: Map<string, Record> = new Map();

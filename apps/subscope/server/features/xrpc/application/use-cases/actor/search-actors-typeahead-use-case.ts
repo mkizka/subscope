@@ -1,8 +1,8 @@
 import { type Did } from "@atproto/did";
 import type { AppBskyActorSearchActorsTypeahead } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import type { ProfileSearchService } from "../../service/search/profile-search-service.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+import type { ProfileSearchService } from "@/server/features/xrpc/application/service/search/profile-search-service.js";
 
 type SearchActorsTypeaheadParams = {
   query: string | undefined;

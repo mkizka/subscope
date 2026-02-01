@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { Subscription, TransactionContext } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../application/interfaces/subscription-repository.js";
+import type { ISubscriptionRepository } from "@/server/features/xrpc/application/interfaces/subscription-repository.js";
 
 export class InMemorySubscriptionRepository implements ISubscriptionRepository {
   private subscriptions: Map<string, Subscription> = new Map();

@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 
-import type { GeneratorViewService } from "../../service/feed/generator-view-service.js";
+import type { GeneratorViewService } from "@/server/features/xrpc/application/service/feed/generator-view-service.js";
 
 export class GetFeedGeneratorsUseCase {
   constructor(private readonly generatorViewService: GeneratorViewService) {}

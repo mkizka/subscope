@@ -1,6 +1,6 @@
 import type { Server } from "@repo/client/server";
 
-import type { GetLikesUseCase } from "../../../../../application/use-cases/feed/get-likes-use-case.js";
+import type { GetLikesUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-likes-use-case.js";
 
 export class GetLikes {
   constructor(private getLikesUseCase: GetLikesUseCase) {}

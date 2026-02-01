@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 
-import type { VerifyAccessUseCase } from "../../../../../application/use-cases/admin/verify-access-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+import type { VerifyAccessUseCase } from "@/server/features/xrpc/application/use-cases/admin/verify-access-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
 
 export class VerifyAccess {
   constructor(

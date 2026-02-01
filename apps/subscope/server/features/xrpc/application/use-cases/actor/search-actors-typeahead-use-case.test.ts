@@ -1,7 +1,8 @@
 import { actorFactory, profileDetailedFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { SearchActorsTypeaheadUseCase } from "./search-actors-typeahead-use-case.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {

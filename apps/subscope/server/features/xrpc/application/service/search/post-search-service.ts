@@ -1,7 +1,10 @@
 import type { Post } from "@repo/common/domain";
 
-import type { IPostRepository } from "../../interfaces/post-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { IPostRepository } from "@/server/features/xrpc/application/interfaces/post-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class PostSearchService {
   constructor(private readonly postRepository: IPostRepository) {}

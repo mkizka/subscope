@@ -1,5 +1,5 @@
-import type { ImageBlob } from "../../domain/image-blob.js";
-import type { ImagePreset } from "../../domain/image-preset.js";
+import type { ImageBlob } from "@/server/features/blob-proxy/domain/image-blob.js";
+import type { ImagePreset } from "@/server/features/blob-proxy/domain/image-preset.js";
 
 export interface IImageResizer {
   resize: (params: {

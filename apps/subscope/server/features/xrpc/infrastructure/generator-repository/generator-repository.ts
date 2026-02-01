@@ -4,7 +4,7 @@ import { Generator } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
 
-import type { IGeneratorRepository } from "../../application/interfaces/generator-repository.js";
+import type { IGeneratorRepository } from "@/server/features/xrpc/application/interfaces/generator-repository.js";
 
 export class GeneratorRepository implements IGeneratorRepository {
   constructor(private readonly db: DatabaseClient) {}

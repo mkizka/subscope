@@ -1,10 +1,10 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 
-import type { IAssetUrlBuilder } from "../../interfaces/asset-url-builder.js";
-import type { IGeneratorRepository } from "../../interfaces/generator-repository.js";
-import { toMapByDid } from "../../utils/map.js";
-import type { ProfileViewService } from "../actor/profile-view-service.js";
+import type { IAssetUrlBuilder } from "@/server/features/xrpc/application/interfaces/asset-url-builder.js";
+import type { IGeneratorRepository } from "@/server/features/xrpc/application/interfaces/generator-repository.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+import { toMapByDid } from "@/server/features/xrpc/application/utils/map.js";
 
 export class GeneratorViewService {
   constructor(

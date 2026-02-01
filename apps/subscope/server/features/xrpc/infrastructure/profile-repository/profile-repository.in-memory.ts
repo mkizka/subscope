@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
+import type { IProfileRepository } from "@/server/features/xrpc/application/interfaces/profile-repository.js";
 
 export class InMemoryProfileRepository implements IProfileRepository {
   private profiles: Map<Did, ProfileDetailed> = new Map();

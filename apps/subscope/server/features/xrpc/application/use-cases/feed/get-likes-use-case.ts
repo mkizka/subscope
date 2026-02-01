@@ -1,8 +1,8 @@
 import type { AppBskyFeedGetLikes } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import type { LikeService } from "../../service/graph/like-service.js";
-import { toMapByDid } from "../../utils/map.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+import type { LikeService } from "@/server/features/xrpc/application/service/graph/like-service.js";
+import { toMapByDid } from "@/server/features/xrpc/application/utils/map.js";
 
 export class GetLikesUseCase {
   constructor(

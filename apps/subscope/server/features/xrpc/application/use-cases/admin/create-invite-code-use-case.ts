@@ -1,7 +1,7 @@
 import type { DatabaseClient } from "@repo/common/domain";
 import { InviteCode } from "@repo/common/domain";
 
-import type { IInviteCodeRepository } from "../../interfaces/invite-code-repository.js";
+import type { IInviteCodeRepository } from "@/server/features/xrpc/application/interfaces/invite-code-repository.js";
 
 export class CreateInviteCodeUseCase {
   constructor(

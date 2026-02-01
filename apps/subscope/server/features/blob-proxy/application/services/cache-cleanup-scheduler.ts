@@ -1,6 +1,7 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 
-import type { ITaskScheduler } from "../interfaces/task-scheduler.js";
+import type { ITaskScheduler } from "@/server/features/blob-proxy/application/interfaces/task-scheduler.js";
+
 import type { CacheCleanupService } from "./cache-cleanup-service.js";
 
 export class CacheCleanupScheduler {

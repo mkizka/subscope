@@ -1,6 +1,6 @@
 import type { Server } from "@repo/client/server";
 
-import type { SearchPostsUseCase } from "../../../../../application/use-cases/feed/search-posts-use-case.js";
+import type { SearchPostsUseCase } from "@/server/features/xrpc/application/use-cases/feed/search-posts-use-case.js";
 
 export class SearchPosts {
   constructor(private searchPostsUseCase: SearchPostsUseCase) {}

@@ -7,7 +7,7 @@ import type {
 import { atprotoLoopbackClientMetadata } from "@atproto/oauth-client-node";
 import { NodeOAuthClient } from "@atproto/oauth-client-node";
 
-import { env, isProduction } from "../../shared/env.js";
+import { env, isProduction } from "@/server/shared/env.js";
 
 const privateKey = Buffer.from(env.PRIVATE_KEY_ES256_B64, "base64").toString();
 const joseKey = await JoseKey.fromImportable(privateKey, "key1");

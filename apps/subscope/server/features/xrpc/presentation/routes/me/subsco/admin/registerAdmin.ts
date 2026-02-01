@@ -4,8 +4,8 @@ import type { Server } from "@repo/client/server";
 import {
   AdminAlreadyExistsError,
   type RegisterAdminUseCase,
-} from "../../../../../application/use-cases/admin/register-admin-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+} from "@/server/features/xrpc/application/use-cases/admin/register-admin-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
 
 export class RegisterAdmin {
   constructor(

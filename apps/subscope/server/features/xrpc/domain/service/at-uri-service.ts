@@ -2,8 +2,8 @@ import { isDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import { isHandle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../../application/interfaces/handle-resolver.js";
-import { ResolvedAtUri } from "../models/at-uri.js";
+import type { IHandleResolver } from "@/server/features/xrpc/application/interfaces/handle-resolver.js";
+import { ResolvedAtUri } from "@/server/features/xrpc/domain/models/at-uri.js";
 
 export class AtUriService {
   constructor(private readonly handleResolver: IHandleResolver) {}

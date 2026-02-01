@@ -2,8 +2,8 @@ import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq, lt } from "drizzle-orm";
 
-import type { ICacheMetadataRepository } from "../application/interfaces/cache-metadata-repository.js";
-import { CacheMetadata } from "../domain/cache-metadata.js";
+import type { ICacheMetadataRepository } from "@/server/features/blob-proxy/application/interfaces/cache-metadata-repository.js";
+import { CacheMetadata } from "@/server/features/blob-proxy/domain/cache-metadata.js";
 
 export class CacheMetadataRepository implements ICacheMetadataRepository {
   constructor(private readonly db: DatabaseClient) {}

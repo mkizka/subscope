@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { env } from "../../../../shared/env.js";
+import { env } from "@/server/shared/env.js";
 
 const healthRouter: Router = Router();
 

@@ -3,7 +3,7 @@ import type { AtUri } from "@atproto/syntax";
 import type {
   IPostStatsRepository,
   PostStats,
-} from "../../application/interfaces/post-stats-repository.js";
+} from "@/server/features/xrpc/application/interfaces/post-stats-repository.js";
 
 export class InMemoryPostStatsRepository implements IPostStatsRepository {
   private stats: Map<string, PostStats> = new Map();

@@ -1,5 +1,5 @@
-import type { ICacheMetadataRepository } from "../application/interfaces/cache-metadata-repository.js";
-import type { CacheMetadata } from "../domain/cache-metadata.js";
+import type { ICacheMetadataRepository } from "@/server/features/blob-proxy/application/interfaces/cache-metadata-repository.js";
+import type { CacheMetadata } from "@/server/features/blob-proxy/domain/cache-metadata.js";
 
 export class InMemoryCacheMetadataRepository implements ICacheMetadataRepository {
   private cache: Map<string, CacheMetadata> = new Map();

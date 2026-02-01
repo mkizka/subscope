@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { Repost } from "@repo/common/domain";
 
-import type { IRepostRepository } from "../../application/interfaces/repost-repository.js";
+import type { IRepostRepository } from "@/server/features/xrpc/application/interfaces/repost-repository.js";
 
 export class InMemoryRepostRepository implements IRepostRepository {
   private reposts: Map<string, Repost> = new Map();

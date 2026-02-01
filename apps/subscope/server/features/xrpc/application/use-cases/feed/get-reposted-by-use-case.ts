@@ -1,8 +1,8 @@
 import type { AppBskyFeedGetRepostedBy } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import type { RepostService } from "../../service/feed/repost-service.js";
-import { toMapByDid } from "../../utils/map.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+import type { RepostService } from "@/server/features/xrpc/application/service/feed/repost-service.js";
+import { toMapByDid } from "@/server/features/xrpc/application/utils/map.js";
 
 export class GetRepostedByUseCase {
   constructor(

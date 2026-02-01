@@ -2,8 +2,8 @@ import type { Did } from "@atproto/did";
 import type { InviteCode, TransactionContext } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 
-import type { InviteCodeDto } from "../../application/dto/invite-code-with-handle.js";
-import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
+import type { InviteCodeDto } from "@/server/features/xrpc/application/dto/invite-code-with-handle.js";
+import type { IInviteCodeRepository } from "@/server/features/xrpc/application/interfaces/invite-code-repository.js";
 
 type UsedByInfo = {
   did: Did;

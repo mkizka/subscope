@@ -10,7 +10,7 @@ import {
 import { schema } from "@repo/db";
 import { and, desc, eq, ilike, inArray, isNull, lt } from "drizzle-orm";
 
-import type { IPostRepository } from "../../application/interfaces/post-repository.js";
+import type { IPostRepository } from "@/server/features/xrpc/application/interfaces/post-repository.js";
 
 const getStrongRef = (uri: string | null, cid: string | null) => {
   if (uri === null || cid === null) {

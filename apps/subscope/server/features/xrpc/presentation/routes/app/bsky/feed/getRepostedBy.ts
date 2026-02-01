@@ -1,6 +1,6 @@
 import type { Server } from "@repo/client/server";
 
-import type { GetRepostedByUseCase } from "../../../../../application/use-cases/feed/get-reposted-by-use-case.js";
+import type { GetRepostedByUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-reposted-by-use-case.js";
 
 export class GetRepostedBy {
   constructor(private getRepostedByUseCase: GetRepostedByUseCase) {}

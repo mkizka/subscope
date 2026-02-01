@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { FeedItem } from "@repo/common/domain";
 
-import type { ITimelineRepository } from "../../application/interfaces/timeline-repository.js";
+import type { ITimelineRepository } from "@/server/features/xrpc/application/interfaces/timeline-repository.js";
 
 export class InMemoryTimelineRepository implements ITimelineRepository {
   private feedItems: Map<string, FeedItem> = new Map();

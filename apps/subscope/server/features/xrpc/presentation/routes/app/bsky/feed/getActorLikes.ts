@@ -2,9 +2,9 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { GetActorLikesUseCase } from "../../../../../application/use-cases/feed/get-actor-likes-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
-import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
+import type { GetActorLikesUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-actor-likes-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
+import type { HandleMiddleware } from "@/server/features/xrpc/presentation/middleware/handle-middleware.js";
 
 export class GetActorLikes {
   constructor(

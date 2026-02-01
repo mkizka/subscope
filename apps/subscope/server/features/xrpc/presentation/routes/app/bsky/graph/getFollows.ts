@@ -2,8 +2,8 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { GetFollowsUseCase } from "../../../../../application/use-cases/graph/get-follows-use-case.js";
-import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
+import type { GetFollowsUseCase } from "@/server/features/xrpc/application/use-cases/graph/get-follows-use-case.js";
+import type { HandleMiddleware } from "@/server/features/xrpc/presentation/middleware/handle-middleware.js";
 
 export class GetFollows {
   constructor(

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
 
 describe("CreateInviteCodeUseCase", () => {

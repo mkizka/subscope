@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
 
 export class GetProfilesUseCase {
   constructor(private readonly profileViewService: ProfileViewService) {}

@@ -4,7 +4,7 @@ import * as cron from "node-cron";
 import type {
   ITaskScheduler,
   ScheduleOptions,
-} from "../application/interfaces/task-scheduler.js";
+} from "@/server/features/blob-proxy/application/interfaces/task-scheduler.js";
 
 export class CronTaskScheduler implements ITaskScheduler {
   private readonly logger: Logger;

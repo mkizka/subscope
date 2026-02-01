@@ -5,7 +5,8 @@ import {
 } from "@repo/common/test";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { GetSubscribersUseCase } from "./get-subscribers-use-case.js";
 
 describe("GetSubscribersUseCase", () => {

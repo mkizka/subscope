@@ -1,4 +1,4 @@
-import type { IImageCacheStorage } from "../application/interfaces/image-cache-storage.js";
+import type { IImageCacheStorage } from "@/server/features/blob-proxy/application/interfaces/image-cache-storage.js";
 
 type SaveResult = { data: Uint8Array } | { error: string };
 

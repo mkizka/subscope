@@ -1,9 +1,9 @@
 import { AtUri } from "@atproto/syntax";
 import type { Server } from "@repo/client/server";
 
-import type { GetPostThreadUseCase } from "../../../../../application/use-cases/feed/get-post-thread-use-case.js";
-import type { AtUriService } from "../../../../../domain/service/at-uri-service.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+import type { GetPostThreadUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-post-thread-use-case.js";
+import type { AtUriService } from "@/server/features/xrpc/domain/service/at-uri-service.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
 
 export class GetPostThread {
   constructor(

@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { AppBskyFeedGetActorLikes } from "@repo/client/server";
 
-import type { ActorLikesService } from "../../service/feed/actor-likes-service.js";
-import type { FeedProcessor } from "../../service/feed/feed-processor.js";
+import type { ActorLikesService } from "@/server/features/xrpc/application/service/feed/actor-likes-service.js";
+import type { FeedProcessor } from "@/server/features/xrpc/application/service/feed/feed-processor.js";
 
 export class GetActorLikesUseCase {
   constructor(

@@ -1,8 +1,8 @@
 import sharp from "sharp";
 
-import type { IImageResizer } from "../application/interfaces/image-resizer.js";
-import { ImageBlob } from "../domain/image-blob.js";
-import type { ImagePreset } from "../domain/image-preset.js";
+import type { IImageResizer } from "@/server/features/blob-proxy/application/interfaces/image-resizer.js";
+import { ImageBlob } from "@/server/features/blob-proxy/domain/image-blob.js";
+import type { ImagePreset } from "@/server/features/blob-proxy/domain/image-preset.js";
 
 sharp.concurrency(1);
 sharp.cache(false);

@@ -1,8 +1,8 @@
 import { asDid } from "@atproto/did";
 import type { MeSubscoAdminGetSubscribers } from "@repo/client/server";
 
-import type { ProfileViewService } from "../../service/actor/profile-view-service.js";
-import type { SubscriptionService } from "../../service/admin/subscription-service.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+import type { SubscriptionService } from "@/server/features/xrpc/application/service/admin/subscription-service.js";
 
 type GetSubscribersParams = {
   limit: number;

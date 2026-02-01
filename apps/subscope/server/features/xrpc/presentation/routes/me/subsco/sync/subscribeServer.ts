@@ -6,8 +6,8 @@ import {
   AlreadySubscribedError,
   InvalidInviteCodeError,
   type SubscribeServerUseCase,
-} from "../../../../../application/use-cases/sync/subscribe-server-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+} from "@/server/features/xrpc/application/use-cases/sync/subscribe-server-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
 
 export class SubscribeServer {
   constructor(

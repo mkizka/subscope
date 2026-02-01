@@ -1,8 +1,11 @@
 import type { Did } from "@atproto/did";
 import type { FeedItem } from "@repo/common/domain";
 
-import type { ITimelineRepository } from "../../interfaces/timeline-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { ITimelineRepository } from "@/server/features/xrpc/application/interfaces/timeline-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class TimelineService {
   constructor(private readonly timelineRepository: ITimelineRepository) {}

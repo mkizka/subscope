@@ -1,4 +1,4 @@
-import type { CacheMetadata } from "../../domain/cache-metadata.js";
+import type { CacheMetadata } from "@/server/features/blob-proxy/domain/cache-metadata.js";
 
 export interface ICacheMetadataRepository {
   get: (key: string) => Promise<CacheMetadata | null>;

@@ -7,10 +7,10 @@ import type {
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
 
-import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import type { IPostRepository } from "../../interfaces/post-repository.js";
-import type { PostViewService } from "../../service/feed/post-view-service.js";
-import { toMapByUri } from "../../utils/map.js";
+import type { IPostRepository } from "@/server/features/xrpc/application/interfaces/post-repository.js";
+import type { PostViewService } from "@/server/features/xrpc/application/service/feed/post-view-service.js";
+import { toMapByUri } from "@/server/features/xrpc/application/utils/map.js";
+import type { ResolvedAtUri } from "@/server/features/xrpc/domain/models/at-uri.js";
 
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;

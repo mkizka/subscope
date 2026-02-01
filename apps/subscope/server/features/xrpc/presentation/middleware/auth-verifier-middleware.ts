@@ -3,7 +3,7 @@ import type { IncomingMessage } from "node:http";
 import { type Did } from "@atproto/did";
 import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
 
-import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
+import type { ITokenVerifier } from "@/server/features/xrpc/application/interfaces/token-verifier.js";
 
 type MaybeHeaders = {
   [key: string]: string | string[] | undefined;

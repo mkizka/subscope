@@ -1,6 +1,6 @@
 import type { MeSubscoAdminGetInviteCodes } from "@repo/client/server";
 
-import type { InviteCodeService } from "../../service/admin/invite-code-service.js";
+import type { InviteCodeService } from "@/server/features/xrpc/application/service/admin/invite-code-service.js";
 
 export class GetInviteCodesUseCase {
   constructor(private readonly inviteCodeService: InviteCodeService) {}

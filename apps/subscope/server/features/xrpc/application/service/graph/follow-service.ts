@@ -1,8 +1,11 @@
 import type { Did } from "@atproto/did";
 import type { Follow } from "@repo/common/domain";
 
-import type { IFollowRepository } from "../../interfaces/follow-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { IFollowRepository } from "@/server/features/xrpc/application/interfaces/follow-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class FollowService {
   constructor(private readonly followRepository: IFollowRepository) {}

@@ -1,6 +1,6 @@
 import type { FeedItem } from "@repo/common/domain";
 
-import type { IAuthorFeedRepository } from "../../application/interfaces/author-feed-repository.js";
+import type { IAuthorFeedRepository } from "@/server/features/xrpc/application/interfaces/author-feed-repository.js";
 
 type FeedItemWithMeta = {
   feedItem: FeedItem;

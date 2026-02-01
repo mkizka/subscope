@@ -3,7 +3,7 @@ import { type DatabaseClient, FeedItem } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, exists, lt, sql } from "drizzle-orm";
 
-import type { ITimelineRepository } from "../../application/interfaces/timeline-repository.js";
+import type { ITimelineRepository } from "@/server/features/xrpc/application/interfaces/timeline-repository.js";
 
 export class TimelineRepository implements ITimelineRepository {
   constructor(private readonly db: DatabaseClient) {}

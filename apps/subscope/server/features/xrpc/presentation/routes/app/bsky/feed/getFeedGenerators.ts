@@ -1,7 +1,7 @@
 import { AtUri } from "@atproto/syntax";
 import type { Server } from "@repo/client/server";
 
-import type { GetFeedGeneratorsUseCase } from "../../../../../application/use-cases/feed/get-feed-generators-use-case.js";
+import type { GetFeedGeneratorsUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-feed-generators-use-case.js";
 
 export class GetFeedGenerators {
   constructor(

@@ -3,9 +3,10 @@ import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
-import type { IActorStatsRepository } from "../../interfaces/actor-stats-repository.js";
-import type { IFollowRepository } from "../../interfaces/follow-repository.js";
-import type { IProfileRepository } from "../../interfaces/profile-repository.js";
+import type { IActorStatsRepository } from "@/server/features/xrpc/application/interfaces/actor-stats-repository.js";
+import type { IFollowRepository } from "@/server/features/xrpc/application/interfaces/follow-repository.js";
+import type { IProfileRepository } from "@/server/features/xrpc/application/interfaces/profile-repository.js";
+
 import type { ProfileViewBuilder } from "./profile-view-builder.js";
 
 export class ProfileViewService {

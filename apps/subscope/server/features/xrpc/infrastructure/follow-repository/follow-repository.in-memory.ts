@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { Follow } from "@repo/common/domain";
 
-import type { IFollowRepository } from "../../application/interfaces/follow-repository.js";
+import type { IFollowRepository } from "@/server/features/xrpc/application/interfaces/follow-repository.js";
 
 export class InMemoryFollowRepository implements IFollowRepository {
   private follows: Follow[] = [];

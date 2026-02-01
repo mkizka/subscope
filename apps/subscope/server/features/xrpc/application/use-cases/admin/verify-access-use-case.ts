@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 
-import type { IActorRepository } from "../../interfaces/actor-repository.js";
+import type { IActorRepository } from "@/server/features/xrpc/application/interfaces/actor-repository.js";
 
 type VerifyAccessParams = {
   requesterDid: Did;

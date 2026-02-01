@@ -1,7 +1,10 @@
 import type { Repost } from "@repo/common/domain";
 
-import type { IRepostRepository } from "../../interfaces/repost-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { IRepostRepository } from "@/server/features/xrpc/application/interfaces/repost-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class RepostService {
   constructor(private readonly repostRepository: IRepostRepository) {}

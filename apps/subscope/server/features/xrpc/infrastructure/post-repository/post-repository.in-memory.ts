@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { Post } from "@repo/common/domain";
 
-import type { IPostRepository } from "../../application/interfaces/post-repository.js";
+import type { IPostRepository } from "@/server/features/xrpc/application/interfaces/post-repository.js";
 
 export class InMemoryPostRepository implements IPostRepository {
   private posts: Map<string, Post> = new Map();

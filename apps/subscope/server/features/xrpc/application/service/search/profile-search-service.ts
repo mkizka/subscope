@@ -1,7 +1,10 @@
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import type { IProfileRepository } from "../../interfaces/profile-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { IProfileRepository } from "@/server/features/xrpc/application/interfaces/profile-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class ProfileSearchService {
   constructor(private readonly profileRepository: IProfileRepository) {}

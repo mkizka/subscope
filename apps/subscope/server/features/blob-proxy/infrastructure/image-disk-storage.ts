@@ -3,7 +3,7 @@ import * as path from "node:path";
 
 import type { ILoggerManager } from "@repo/common/domain";
 
-import type { IImageCacheStorage } from "../application/interfaces/image-cache-storage.js";
+import type { IImageCacheStorage } from "@/server/features/blob-proxy/application/interfaces/image-cache-storage.js";
 
 function isFileNotFoundError(error: unknown): boolean {
   return error instanceof Error && "code" in error && error.code === "ENOENT";

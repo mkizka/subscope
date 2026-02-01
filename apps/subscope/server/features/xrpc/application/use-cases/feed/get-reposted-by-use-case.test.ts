@@ -6,7 +6,8 @@ import {
 } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
 
 describe("GetRepostedByUseCase", () => {

@@ -1,4 +1,4 @@
-import type { IAssetUrlBuilder } from "../../application/interfaces/asset-url-builder.js";
+import type { IAssetUrlBuilder } from "@/server/features/xrpc/application/interfaces/asset-url-builder.js";
 
 export class AssetUrlBuilder implements IAssetUrlBuilder {
   constructor(private readonly publicUrl: string) {}

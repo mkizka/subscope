@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 
-import type { IBlobFetcher } from "../application/interfaces/blob-fetcher.js";
-import { BlobFetchFailedError } from "../application/interfaces/blob-fetcher.js";
-import type { ImageBlob } from "../domain/image-blob.js";
+import type { IBlobFetcher } from "@/server/features/blob-proxy/application/interfaces/blob-fetcher.js";
+import { BlobFetchFailedError } from "@/server/features/blob-proxy/application/interfaces/blob-fetcher.js";
+import type { ImageBlob } from "@/server/features/blob-proxy/domain/image-blob.js";
 
 type FetchParams = {
   pds: URL;

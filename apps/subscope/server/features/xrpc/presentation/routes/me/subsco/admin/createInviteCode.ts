@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 
-import type { CreateInviteCodeUseCase } from "../../../../../application/use-cases/admin/create-invite-code-use-case.js";
-import type { AdminMiddleware } from "../../../../middleware/admin-middleware.js";
+import type { CreateInviteCodeUseCase } from "@/server/features/xrpc/application/use-cases/admin/create-invite-code-use-case.js";
+import type { AdminMiddleware } from "@/server/features/xrpc/presentation/middleware/admin-middleware.js";
 
 export class CreateInviteCode {
   constructor(

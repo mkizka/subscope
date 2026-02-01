@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 
-import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
+import type { ISubscriptionRepository } from "@/server/features/xrpc/application/interfaces/subscription-repository.js";
 
 export class NotSubscribedError extends Error {
   constructor(message: string) {

@@ -1,4 +1,5 @@
-import type { ICacheMetadataRepository } from "../interfaces/cache-metadata-repository.js";
+import type { ICacheMetadataRepository } from "@/server/features/blob-proxy/application/interfaces/cache-metadata-repository.js";
+
 import type { ImageCacheService } from "./image-cache-service.js";
 
 export class CacheCleanupService {

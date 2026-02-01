@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { Like } from "@repo/common/domain";
 
-import type { ILikeRepository } from "../../application/interfaces/like-repository.js";
+import type { ILikeRepository } from "@/server/features/xrpc/application/interfaces/like-repository.js";
 
 export class InMemoryLikeRepository implements ILikeRepository {
   private likes: Map<string, Like> = new Map();

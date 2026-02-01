@@ -1,8 +1,9 @@
 import { AtUri } from "@atproto/syntax";
 import { describe, expect, test } from "vitest";
 
-import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
-import { testInjector } from "../../test-utils.js";
+import { HandleResolutionError } from "@/server/features/xrpc/application/interfaces/handle-resolver.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { AtUriService } from "./at-uri-service.js";
 
 describe("AtUriService", () => {

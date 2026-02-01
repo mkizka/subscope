@@ -2,7 +2,8 @@ import { AtUri } from "@atproto/syntax";
 import { generatorFactory, profileDetailedFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { GetFeedGeneratorsUseCase } from "./get-feed-generators-use-case.js";
 
 describe("GetFeedGeneratorsUseCase", () => {

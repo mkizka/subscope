@@ -4,7 +4,7 @@ import type { Handle } from "@repo/common/utils";
 import {
   HandleResolutionError,
   type IHandleResolver,
-} from "../../application/interfaces/handle-resolver.js";
+} from "@/server/features/xrpc/application/interfaces/handle-resolver.js";
 
 export class InMemoryHandleResolver implements IHandleResolver {
   private handleToDid: Map<Handle, Did> = new Map();

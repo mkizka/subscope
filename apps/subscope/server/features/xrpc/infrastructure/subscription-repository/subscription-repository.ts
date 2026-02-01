@@ -7,7 +7,7 @@ import {
 import { schema } from "@repo/db";
 import { eq, lt } from "drizzle-orm";
 
-import type { ISubscriptionRepository } from "../../application/interfaces/subscription-repository.js";
+import type { ISubscriptionRepository } from "@/server/features/xrpc/application/interfaces/subscription-repository.js";
 
 export class SubscriptionRepository implements ISubscriptionRepository {
   constructor(private readonly db: DatabaseClient) {}

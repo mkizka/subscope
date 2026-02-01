@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { AppBskyFeedGetTimeline } from "@repo/client/server";
 
-import type { FeedProcessor } from "../../service/feed/feed-processor.js";
-import type { TimelineService } from "../../service/feed/timeline-service.js";
+import type { FeedProcessor } from "@/server/features/xrpc/application/service/feed/feed-processor.js";
+import type { TimelineService } from "@/server/features/xrpc/application/service/feed/timeline-service.js";
 
 type GetTimelineParams = {
   limit: number;

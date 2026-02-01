@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 
-import type { GetTimelineUseCase } from "../../../../../application/use-cases/feed/get-timeline-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+import type { GetTimelineUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-timeline-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
 
 export class GetTimeline {
   constructor(

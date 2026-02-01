@@ -1,7 +1,7 @@
-import { CacheMetadata } from "../../domain/cache-metadata.js";
-import { ImageBlob } from "../../domain/image-blob.js";
-import type { ICacheMetadataRepository } from "../interfaces/cache-metadata-repository.js";
-import type { IImageCacheStorage } from "../interfaces/image-cache-storage.js";
+import type { ICacheMetadataRepository } from "@/server/features/blob-proxy/application/interfaces/cache-metadata-repository.js";
+import type { IImageCacheStorage } from "@/server/features/blob-proxy/application/interfaces/image-cache-storage.js";
+import { CacheMetadata } from "@/server/features/blob-proxy/domain/cache-metadata.js";
+import { ImageBlob } from "@/server/features/blob-proxy/domain/image-blob.js";
 
 export class ImageCacheService {
   static inject = [

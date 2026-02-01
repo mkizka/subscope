@@ -6,7 +6,7 @@ import {
   type TransactionContext,
 } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../interfaces/actor-repository.js";
+import type { IActorRepository } from "@/server/features/xrpc/application/interfaces/actor-repository.js";
 
 export class CreateAdminService {
   constructor(

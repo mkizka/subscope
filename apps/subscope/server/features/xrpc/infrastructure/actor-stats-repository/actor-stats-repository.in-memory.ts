@@ -1,7 +1,7 @@
 import type {
   ActorStats,
   IActorStatsRepository,
-} from "../../application/interfaces/actor-stats-repository.js";
+} from "@/server/features/xrpc/application/interfaces/actor-stats-repository.js";
 
 export class InMemoryActorStatsRepository implements IActorStatsRepository {
   private stats: Map<string, ActorStats> = new Map();

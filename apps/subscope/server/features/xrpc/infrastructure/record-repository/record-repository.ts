@@ -4,7 +4,7 @@ import { Record } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
 
-import type { IRecordRepository } from "../../application/interfaces/record-repository.js";
+import type { IRecordRepository } from "@/server/features/xrpc/application/interfaces/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
   constructor(private readonly db: DatabaseClient) {}

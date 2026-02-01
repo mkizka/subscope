@@ -1,4 +1,4 @@
-import "../app/app.css";
+import "@/app/app.css";
 
 import type { Preview } from "@storybook/react-vite";
 

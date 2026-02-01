@@ -1,6 +1,6 @@
 import type { Server } from "@repo/client/server";
 
-import type { GetSubscribersUseCase } from "../../../../../application/use-cases/admin/get-subscribers-use-case.js";
+import type { GetSubscribersUseCase } from "@/server/features/xrpc/application/use-cases/admin/get-subscribers-use-case.js";
 
 export class GetSubscribers {
   constructor(private getSubscribersUseCase: GetSubscribersUseCase) {}

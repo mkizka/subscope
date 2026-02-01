@@ -1,7 +1,7 @@
 import { AtUri } from "@atproto/syntax";
 import type { Server } from "@repo/client/server";
 
-import type { GetPostsUseCase } from "../../../../../application/use-cases/feed/get-posts-use-case.js";
+import type { GetPostsUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-posts-use-case.js";
 
 export class GetPosts {
   constructor(private readonly getPostsUseCase: GetPostsUseCase) {}

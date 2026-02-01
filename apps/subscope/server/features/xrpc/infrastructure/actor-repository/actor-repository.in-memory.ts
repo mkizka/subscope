@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { Actor, TransactionContext } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
+import type { IActorRepository } from "@/server/features/xrpc/application/interfaces/actor-repository.js";
 
 export class InMemoryActorRepository implements IActorRepository {
   private actors: Map<Did, Actor> = new Map();

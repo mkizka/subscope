@@ -5,9 +5,10 @@ import {
 } from "@repo/common/test";
 import { describe, expect, test, vi } from "vitest";
 
-import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import { testInjector } from "../../../test-utils.js";
-import type { PostStats } from "../../interfaces/post-stats-repository.js";
+import type { PostStats } from "@/server/features/xrpc/application/interfaces/post-stats-repository.js";
+import { ResolvedAtUri } from "@/server/features/xrpc/domain/models/at-uri.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
 
 describe("GetPostThreadUseCase", () => {

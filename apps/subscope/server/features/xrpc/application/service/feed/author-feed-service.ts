@@ -1,7 +1,10 @@
 import type { FeedItem } from "@repo/common/domain";
 
-import type { IAuthorFeedRepository } from "../../interfaces/author-feed-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { IAuthorFeedRepository } from "@/server/features/xrpc/application/interfaces/author-feed-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class AuthorFeedService {
   constructor(private readonly authorFeedRepository: IAuthorFeedRepository) {}

@@ -3,8 +3,8 @@ import type { SubscoAgent } from "@repo/client/api";
 import express from "express";
 import { Router } from "express";
 
-import { env } from "../../shared/env";
-import type { OAuthSession } from "../oauth/session";
+import type { OAuthSession } from "@/server/features/oauth/session";
+import { env } from "@/server/shared/env";
 
 type AppLoadContextAuth = {
   userDid: string;

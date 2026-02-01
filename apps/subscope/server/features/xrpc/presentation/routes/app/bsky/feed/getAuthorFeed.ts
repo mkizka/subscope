@@ -2,9 +2,9 @@ import { isDid } from "@atproto/did";
 import type { Server } from "@repo/client/server";
 import { isHandle } from "@repo/common/utils";
 
-import type { GetAuthorFeedUseCase } from "../../../../../application/use-cases/feed/get-author-feed-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
-import type { HandleMiddleware } from "../../../../middleware/handle-middleware.js";
+import type { GetAuthorFeedUseCase } from "@/server/features/xrpc/application/use-cases/feed/get-author-feed-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
+import type { HandleMiddleware } from "@/server/features/xrpc/presentation/middleware/handle-middleware.js";
 
 export class GetAuthorFeed {
   constructor(

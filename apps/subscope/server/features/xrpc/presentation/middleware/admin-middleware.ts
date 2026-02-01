@@ -1,6 +1,7 @@
 import { AuthRequiredError } from "@atproto/xrpc-server";
 
-import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
+import type { IActorRepository } from "@/server/features/xrpc/application/interfaces/actor-repository.js";
+
 import type { AuthVerifierMiddleware } from "./auth-verifier-middleware.js";
 
 type MaybeHeaders = {

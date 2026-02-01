@@ -5,8 +5,8 @@ import { AtpBaseClient } from "@repo/client/api";
 import {
   BlobFetchFailedError,
   type IBlobFetcher,
-} from "../application/interfaces/blob-fetcher.js";
-import { ImageBlob } from "../domain/image-blob.js";
+} from "@/server/features/blob-proxy/application/interfaces/blob-fetcher.js";
+import { ImageBlob } from "@/server/features/blob-proxy/domain/image-blob.js";
 
 export class BlobFetcher implements IBlobFetcher {
   async fetchBlob(params: {

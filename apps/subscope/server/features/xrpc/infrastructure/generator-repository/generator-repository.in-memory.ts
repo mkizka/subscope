@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { Generator } from "@repo/common/domain";
 
-import type { IGeneratorRepository } from "../../application/interfaces/generator-repository.js";
+import type { IGeneratorRepository } from "@/server/features/xrpc/application/interfaces/generator-repository.js";
 
 export class InMemoryGeneratorRepository implements IGeneratorRepository {
   private generators: Map<string, Generator> = new Map();

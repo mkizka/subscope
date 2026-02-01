@@ -1,7 +1,7 @@
 import type { Server } from "@repo/client/server";
 
-import type { SearchActorsUseCase } from "../../../../../application/use-cases/actor/search-actors-use-case.js";
-import type { AuthVerifierMiddleware } from "../../../../middleware/auth-verifier-middleware.js";
+import type { SearchActorsUseCase } from "@/server/features/xrpc/application/use-cases/actor/search-actors-use-case.js";
+import type { AuthVerifierMiddleware } from "@/server/features/xrpc/presentation/middleware/auth-verifier-middleware.js";
 
 export class SearchActors {
   constructor(

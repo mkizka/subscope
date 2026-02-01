@@ -8,8 +8,9 @@ import {
 } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
-import type { PostStats } from "../../interfaces/post-stats-repository.js";
+import type { PostStats } from "@/server/features/xrpc/application/interfaces/post-stats-repository.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
 
 describe("GetAuthorFeedUseCase", () => {

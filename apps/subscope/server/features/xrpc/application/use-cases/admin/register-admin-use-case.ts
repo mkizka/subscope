@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../interfaces/actor-repository.js";
-import type { CreateAdminService } from "../../service/admin/create-admin-service.js";
+import type { IActorRepository } from "@/server/features/xrpc/application/interfaces/actor-repository.js";
+import type { CreateAdminService } from "@/server/features/xrpc/application/service/admin/create-admin-service.js";
 
 export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {

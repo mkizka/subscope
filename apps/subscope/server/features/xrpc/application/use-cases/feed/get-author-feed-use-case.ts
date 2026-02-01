@@ -1,8 +1,8 @@
 import { type Did } from "@atproto/did";
 import type { AppBskyFeedGetAuthorFeed } from "@repo/client/server";
 
-import type { AuthorFeedService } from "../../service/feed/author-feed-service.js";
-import type { FeedProcessor } from "../../service/feed/feed-processor.js";
+import type { AuthorFeedService } from "@/server/features/xrpc/application/service/feed/author-feed-service.js";
+import type { FeedProcessor } from "@/server/features/xrpc/application/service/feed/feed-processor.js";
 
 type Filter = AppBskyFeedGetAuthorFeed.QueryParams["filter"];
 

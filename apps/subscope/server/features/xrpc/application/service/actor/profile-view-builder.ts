@@ -3,7 +3,7 @@ import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import type { IAssetUrlBuilder } from "../../interfaces/asset-url-builder.js";
+import type { IAssetUrlBuilder } from "@/server/features/xrpc/application/interfaces/asset-url-builder.js";
 
 export class ProfileViewBuilder {
   constructor(private readonly assetUrlBuilder: IAssetUrlBuilder) {}

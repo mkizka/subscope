@@ -1,7 +1,10 @@
 import type { Like } from "@repo/common/domain";
 
-import type { ILikeRepository } from "../../interfaces/like-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { ILikeRepository } from "@/server/features/xrpc/application/interfaces/like-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class LikeService {
   constructor(private readonly likeRepository: ILikeRepository) {}

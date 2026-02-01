@@ -6,8 +6,9 @@ import {
 } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
-import type { ActorStats } from "../../interfaces/actor-stats-repository.js";
+import type { ActorStats } from "@/server/features/xrpc/application/interfaces/actor-stats-repository.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { ProfileViewService } from "./profile-view-service.js";
 
 describe("ProfileViewService", () => {

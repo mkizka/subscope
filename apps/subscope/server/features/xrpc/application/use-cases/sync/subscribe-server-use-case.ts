@@ -6,9 +6,9 @@ import {
   Subscription,
 } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../interfaces/actor-repository.js";
-import type { IInviteCodeRepository } from "../../interfaces/invite-code-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
+import type { IActorRepository } from "@/server/features/xrpc/application/interfaces/actor-repository.js";
+import type { IInviteCodeRepository } from "@/server/features/xrpc/application/interfaces/invite-code-repository.js";
+import type { ISubscriptionRepository } from "@/server/features/xrpc/application/interfaces/subscription-repository.js";
 
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {

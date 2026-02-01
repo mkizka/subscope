@@ -6,7 +6,11 @@ import type {
 } from "@repo/client/server";
 import type { Post } from "@repo/common/domain";
 
-import { toMapByDid, toMapBySubjectUri, toMapByUri } from "../../utils/map.js";
+import {
+  toMapByDid,
+  toMapBySubjectUri,
+  toMapByUri,
+} from "@/server/features/xrpc/application/utils/map.js";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -21,12 +25,13 @@ function asObject(value: unknown): Record<string, unknown> {
 
 import type { Did } from "@atproto/did";
 
-import type { ILikeRepository } from "../../interfaces/like-repository.js";
-import type { IPostRepository } from "../../interfaces/post-repository.js";
-import type { IPostStatsRepository } from "../../interfaces/post-stats-repository.js";
-import type { IRecordRepository } from "../../interfaces/record-repository.js";
-import type { IRepostRepository } from "../../interfaces/repost-repository.js";
-import type { ProfileViewService } from "../actor/profile-view-service.js";
+import type { ILikeRepository } from "@/server/features/xrpc/application/interfaces/like-repository.js";
+import type { IPostRepository } from "@/server/features/xrpc/application/interfaces/post-repository.js";
+import type { IPostStatsRepository } from "@/server/features/xrpc/application/interfaces/post-stats-repository.js";
+import type { IRecordRepository } from "@/server/features/xrpc/application/interfaces/record-repository.js";
+import type { IRepostRepository } from "@/server/features/xrpc/application/interfaces/repost-repository.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+
 import type { GeneratorViewService } from "./generator-view-service.js";
 import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 
 import type { Route } from "./+types/_index";
 

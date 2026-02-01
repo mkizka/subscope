@@ -1,7 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 
-import type { PostViewService } from "../../service/feed/post-view-service.js";
+import type { PostViewService } from "@/server/features/xrpc/application/service/feed/post-view-service.js";
 
 export class GetPostsUseCase {
   constructor(private readonly postViewService: PostViewService) {}

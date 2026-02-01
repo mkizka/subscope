@@ -7,7 +7,8 @@ import {
 } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { FeedProcessor } from "./feed-processor.js";
 
 describe("FeedProcessor", () => {

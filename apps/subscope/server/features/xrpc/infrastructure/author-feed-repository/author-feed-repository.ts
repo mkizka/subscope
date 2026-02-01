@@ -3,7 +3,7 @@ import { type DatabaseClient, FeedItem } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
 
-import type { IAuthorFeedRepository } from "../../application/interfaces/author-feed-repository.js";
+import type { IAuthorFeedRepository } from "@/server/features/xrpc/application/interfaces/author-feed-repository.js";
 
 export class AuthorFeedRepository implements IAuthorFeedRepository {
   constructor(private readonly db: DatabaseClient) {}

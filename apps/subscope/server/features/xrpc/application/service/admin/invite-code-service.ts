@@ -1,6 +1,9 @@
-import type { InviteCodeDto } from "../../dto/invite-code-with-handle.js";
-import type { IInviteCodeRepository } from "../../interfaces/invite-code-repository.js";
-import { createCursorPaginator, type Page } from "../../utils/pagination.js";
+import type { InviteCodeDto } from "@/server/features/xrpc/application/dto/invite-code-with-handle.js";
+import type { IInviteCodeRepository } from "@/server/features/xrpc/application/interfaces/invite-code-repository.js";
+import {
+  createCursorPaginator,
+  type Page,
+} from "@/server/features/xrpc/application/utils/pagination.js";
 
 export class InviteCodeService {
   constructor(private readonly inviteCodeRepository: IInviteCodeRepository) {}

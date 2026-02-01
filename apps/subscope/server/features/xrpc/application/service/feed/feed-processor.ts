@@ -3,10 +3,14 @@ import { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
 import type { FeedItem } from "@repo/common/domain";
 
-import type { IPostRepository } from "../../interfaces/post-repository.js";
-import type { IRepostRepository } from "../../interfaces/repost-repository.js";
-import { toMapByDid, toMapByUri } from "../../utils/map.js";
-import type { ProfileViewService } from "../actor/profile-view-service.js";
+import type { IPostRepository } from "@/server/features/xrpc/application/interfaces/post-repository.js";
+import type { IRepostRepository } from "@/server/features/xrpc/application/interfaces/repost-repository.js";
+import type { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
+import {
+  toMapByDid,
+  toMapByUri,
+} from "@/server/features/xrpc/application/utils/map.js";
+
 import type { PostViewService } from "./post-view-service.js";
 import type { ReplyRefService } from "./reply-ref-service.js";
 

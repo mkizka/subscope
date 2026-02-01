@@ -3,8 +3,8 @@ import { loggingMiddleware } from "@repo/common/utils";
 import type { RequestHandler } from "express";
 import express from "express";
 
-import type { CacheCleanupScheduler } from "../features/blob-proxy/application/services/cache-cleanup-scheduler.js";
-import { env } from "../shared/env.js";
+import type { CacheCleanupScheduler } from "@/server/features/blob-proxy/application/services/cache-cleanup-scheduler.js";
+import { env } from "@/server/shared/env.js";
 
 export class SubscopeServer {
   private readonly logger;

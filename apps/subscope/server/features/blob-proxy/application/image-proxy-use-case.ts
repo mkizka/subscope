@@ -1,8 +1,9 @@
 import { DidResolutionError, type IMetricReporter } from "@repo/common/domain";
 
-import { CacheMetadata } from "../domain/cache-metadata.js";
-import type { ImageBlob } from "../domain/image-blob.js";
-import type { ImageProxyRequest } from "../domain/image-proxy-request.js";
+import { CacheMetadata } from "@/server/features/blob-proxy/domain/cache-metadata.js";
+import type { ImageBlob } from "@/server/features/blob-proxy/domain/image-blob.js";
+import type { ImageProxyRequest } from "@/server/features/blob-proxy/domain/image-proxy-request.js";
+
 import { BlobFetchFailedError } from "./interfaces/blob-fetcher.js";
 import type { IImageResizer } from "./interfaces/image-resizer.js";
 import type { FetchBlobService } from "./services/fetch-blob-service.js";

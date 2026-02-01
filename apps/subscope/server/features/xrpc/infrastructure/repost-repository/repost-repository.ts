@@ -4,7 +4,7 @@ import { Repost } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
-import type { IRepostRepository } from "../../application/interfaces/repost-repository.js";
+import type { IRepostRepository } from "@/server/features/xrpc/application/interfaces/repost-repository.js";
 
 export class RepostRepository implements IRepostRepository {
   constructor(private readonly db: DatabaseClient) {}

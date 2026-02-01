@@ -3,7 +3,8 @@ import { Actor } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../test-utils.js";
+import { testInjector } from "@/server/features/xrpc/test-utils.js";
+
 import { CreateAdminService } from "./create-admin-service.js";
 
 describe("CreateAdminService", () => {

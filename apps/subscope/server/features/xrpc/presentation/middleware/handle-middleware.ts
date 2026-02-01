@@ -2,7 +2,7 @@ import { type Did, isDid } from "@atproto/did";
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { type Handle, isHandle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../../application/interfaces/handle-resolver.js";
+import type { IHandleResolver } from "@/server/features/xrpc/application/interfaces/handle-resolver.js";
 
 export class HandleMiddleware {
   private readonly logger: Logger;
