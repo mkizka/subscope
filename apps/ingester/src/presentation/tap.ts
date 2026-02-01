@@ -6,7 +6,7 @@ import type {
   IdentityEventDto,
   ILoggerManager,
 } from "@repo/common/domain";
-import { asHandle, isSupportedCollection } from "@repo/common/utils";
+import { isSupportedCollection } from "@repo/common/utils";
 
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
@@ -34,8 +34,8 @@ export class TapIngester {
     this.indexer.identity(async (event) => {
       const identityDto: IdentityEventDto = {
         identity: {
-          did: asDid(event.did),
-          handle: event.handle ? asHandle(event.handle) : undefined,
+          did: event.did,
+          handle: event.handle,
         },
       };
       await this.handleIdentityUseCase.execute(identityDto);
