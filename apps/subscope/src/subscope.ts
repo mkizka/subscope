@@ -12,11 +12,6 @@ import {
 import { createInjector } from "typed-inject";
 
 import { SubscopeServer } from "./bootstrap/server.js";
-import { oauthClientFactory } from "./features/bff/oauth/client.js";
-import { authMiddlewareFactory } from "./features/bff/oauth/middleware.js";
-import { oauthRouterFactory } from "./features/bff/oauth/oauth.js";
-import { OAuthSession } from "./features/bff/oauth/session.js";
-import { SessionStore, StateStore } from "./features/bff/oauth/storage.js";
 import { ImageProxyUseCase } from "./features/blob-proxy/application/image-proxy-use-case.js";
 import { CacheCleanupScheduler } from "./features/blob-proxy/application/services/cache-cleanup-scheduler.js";
 import { CacheCleanupService } from "./features/blob-proxy/application/services/cache-cleanup-service.js";
@@ -30,6 +25,11 @@ import { ImageResizer } from "./features/blob-proxy/infrastructure/image-resizer
 import { imagesRouterFactory } from "./features/blob-proxy/presentation/images.js";
 import { clientRouter } from "./features/client/router.js";
 import { dashboardRouterFactory } from "./features/dashboard/dashboard.js";
+import { oauthClientFactory } from "./features/oauth/client.js";
+import { authMiddlewareFactory } from "./features/oauth/middleware.js";
+import { oauthRouterFactory } from "./features/oauth/oauth.js";
+import { OAuthSession } from "./features/oauth/session.js";
+import { SessionStore, StateStore } from "./features/oauth/storage.js";
 import { ProfileViewBuilder } from "./features/xrpc/application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "./features/xrpc/application/service/actor/profile-view-service.js";
 import { CreateAdminService } from "./features/xrpc/application/service/admin/create-admin-service.js";
