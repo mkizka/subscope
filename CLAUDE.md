@@ -20,8 +20,8 @@ appsディレクトリ(アプリケーション)
   - BullMQを使用してレコードをデータベースにインデックスするワーカー
 - `@repo/subscope`
   - クライアント・XRPC API・管理画面・画像プロキシを提供するメインサーバー
-  - express + Preactで実装されたSPA
-  - デザインはMaterial 3 Expressiveに準拠する
+  - express + react-routerで実装
+  - デザインはshadcn/uiを使用
 
 packagesディレクトリ(共通パッケージ)
 
