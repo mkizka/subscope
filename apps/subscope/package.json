@@ -8,11 +8,11 @@
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "react-router build",
     "build-storybook": "storybook build",
-    "dev": "NODE_ENV=development tsx watch ./src/subscope.ts | pino-pretty",
+    "dev": "NODE_ENV=development tsx watch ./server/subscope.ts | pino-pretty",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
     "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "preview": "vite preview",
-    "start": "NODE_ENV=production tsx ./src/subscope.ts",
+    "start": "NODE_ENV=production tsx ./server/subscope.ts",
     "storybook": "storybook dev -p 6006",
     "typecheck": "react-router typegen && tsc -b"
   },
