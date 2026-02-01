@@ -1,7 +1,9 @@
 import { unitConfig } from "@repo/vitest";
 import { defineProject, mergeConfig } from "vitest/config";
 
-export default mergeConfig(
+import viteConfig from "./vite.config.js";
+
+const vitestConfig = mergeConfig(
   unitConfig,
   defineProject({
     test: {
@@ -13,3 +15,5 @@ export default mergeConfig(
     },
   }),
 );
+
+export default mergeConfig(viteConfig, vitestConfig);
