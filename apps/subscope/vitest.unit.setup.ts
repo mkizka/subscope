@@ -1,3 +1,3 @@
-import { setupFiles } from "./src/shared/test-utils.js";
+import { setupFiles } from "./server/shared/test-utils.js";
 
 setupFiles();
