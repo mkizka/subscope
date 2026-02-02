@@ -121,7 +121,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply font-sans bg-background text-foreground flex min-h-screen items-center justify-center p-4;
+    @apply font-sans bg-background text-foreground h-svh;
   }
   html {
     @apply font-sans;

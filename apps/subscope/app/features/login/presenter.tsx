@@ -24,7 +24,7 @@ type Props = {
 
 export function LoginPresenter({ formProps, inputProps, fields }: Props) {
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Subscopeにログイン</CardTitle>
       </CardHeader>

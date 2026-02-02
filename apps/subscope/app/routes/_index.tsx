@@ -1,4 +1,7 @@
+import { Link } from "react-router";
+
 import { Button } from "@/app/components/button";
+import { AppLayout } from "@/app/components/layout";
 
 import type { Route } from "./+types/_index";
 
@@ -18,10 +21,10 @@ export const loader = ({ context }: Route.LoaderArgs) => {
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { did } = loaderData;
   return (
-    <div>
+    <AppLayout>
       <h1>home</h1>
       <p>Your DID: {did ?? "not logged in"}</p>
-      <Button>Button</Button>
-    </div>
+      <Button nativeButton={false} render={<Link to="/login">ログイン</Link>} />
+    </AppLayout>
   );
 }
