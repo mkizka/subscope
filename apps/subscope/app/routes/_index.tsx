@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
-import { Button } from "@/app/components/button";
 import { AppLayout } from "@/app/components/layout";
+import { Button } from "@/app/components/ui/button";
 
 import type { Route } from "./+types/_index";
 

@@ -1,15 +1,15 @@
 import { AtSign } from "lucide-react";
 import type { ComponentProps } from "react";
 
-import { Button } from "@/app/components/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/app/components/card";
-import { Field, FieldError, FieldLabel } from "@/app/components/field";
-import { Input } from "@/app/components/input";
+} from "@/app/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/app/components/ui/field";
+import { Input } from "@/app/components/ui/input";
 
 type Props = {
   formProps: ComponentProps<"form">;
