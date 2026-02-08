@@ -1,5 +1,6 @@
 import { JoseKey } from "@atproto/jwk-jose";
 import type {
+  NodeOAuthClientOptions,
   NodeSavedSessionStore,
   NodeSavedStateStore,
   OAuthClientMetadataInput,
@@ -39,14 +40,20 @@ export const oauthClientFactory = (
           ["scope", scope],
         ]).toString()}`,
       );
-  const keyset = isProduction ? [joseKey] : undefined;
 
-  return new NodeOAuthClient({
+  const nodeOAuthClientOptions: NodeOAuthClientOptions = {
     clientMetadata: clientMetadata,
-    keyset,
     plcDirectoryUrl: env.ATPROTO_PLC_URL,
     stateStore: oauthStateStore,
     sessionStore: oauthSessionStore,
-  });
+  };
+  if (isProduction) {
+    nodeOAuthClientOptions.keyset = [joseKey];
+  } else {
+    nodeOAuthClientOptions.handleResolver = "http://localhost:2584"; // ローカルPDSのbsky Appview
+    nodeOAuthClientOptions.allowHttp = true;
+  }
+
+  return new NodeOAuthClient(nodeOAuthClientOptions);
 };
 oauthClientFactory.inject = ["oauthStateStore", "oauthSessionStore"] as const;
