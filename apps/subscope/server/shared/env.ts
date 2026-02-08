@@ -42,7 +42,10 @@ const schema = z.object({
     prod: z.string(),
     dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
   }),
-  ATPROTO_PLC_URL: z.url().default("https://plc.directory"),
+  ATPROTO_PLC_URL: match({
+    prod: z.url().default("https://plc.directory"),
+    dev: z.url().default("http://localhost:2582"),
+  }),
   DATABASE_URL: match({
     prod: z.url(),
     dev: z

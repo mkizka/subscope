@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - dev-env
 patchedDependencies:
   "@factory-js/factory": patches/@factory-js__factory.patch
   "@atproto/lex-cli": patches/@atproto__lex-cli.patch
