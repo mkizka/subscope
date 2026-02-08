@@ -38,7 +38,12 @@ export function LoginPresenter({ formProps, inputProps, fields }: Props) {
           <Field>
             <FieldLabel htmlFor={fields.identifier.id}>ハンドル</FieldLabel>
             <div className="relative flex items-center">
-              <AtSign className="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+              <AtSign
+                className="
+                  pointer-events-none absolute left-3 size-4
+                  text-muted-foreground
+                "
+              />
               <Input
                 className="pl-9"
                 placeholder="example.bsky.social"
