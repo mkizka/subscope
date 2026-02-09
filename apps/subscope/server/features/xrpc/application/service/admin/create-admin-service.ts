@@ -22,11 +22,14 @@ export class CreateAdminService {
     ctx: TransactionContext;
     did: Did;
   }): Promise<void> {
-    const actor = Actor.create({ did });
+    const existingActor = await this.actorRepository.findByDid(did);
+    const actor = existingActor ?? Actor.create({ did });
     actor.promoteToAdmin();
     await this.actorRepository.upsert({ ctx, actor });
 
-    await this.jobScheduler.scheduleResolveDid(did);
+    if (!actor.handle) {
+      await this.jobScheduler.scheduleResolveDid(did);
+    }
 
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
     await this.jobScheduler.scheduleFetchRecord(profileUri, {

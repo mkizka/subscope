@@ -47,9 +47,9 @@ describe("CreateAdminService", () => {
     );
   });
 
-  test("actorが既に存在する場合、新規actorで上書きして管理者に昇格する", async () => {
+  test("actorが既に存在する場合、そのactorを管理者に昇格する", async () => {
     // arrange
-    const existingActor = actorFactory({ handle: "existing.test" });
+    const existingActor = actorFactory();
     actorRepo.add(existingActor);
 
     // act
@@ -63,7 +63,7 @@ describe("CreateAdminService", () => {
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did: existingActor.did,
-        handle: null,
+        handle: existingActor.handle,
         isAdmin: true,
         indexedAt: expect.any(Date),
       }),
@@ -74,9 +74,7 @@ describe("CreateAdminService", () => {
       "app.bsky.actor.profile",
       "self",
     );
-    expect(jobScheduler.getResolveDidJobs()).toContainEqual(
-      expect.objectContaining({ did: existingActor.did }),
-    );
+    expect(jobScheduler.getResolveDidJobs()).toHaveLength(0);
     expect(jobScheduler.getFetchRecordJobs()).toContainEqual(
       expect.objectContaining({
         uri: profileUri,
