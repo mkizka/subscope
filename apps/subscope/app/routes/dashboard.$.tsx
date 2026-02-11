@@ -1,7 +1,7 @@
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
-import { ReactRouterAdapter } from "@repo/bull-board-react-router";
 import type { IJobQueue } from "@repo/common/domain";
+import { ReactRouterAdapter } from "bull-board-react-router";
 
 import type { Route } from "./+types/dashboard.$";
 

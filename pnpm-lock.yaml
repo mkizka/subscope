@@ -164,9 +164,6 @@ importers:
       '@react-router/node':
         specifier: 7.13.0
         version: 7.13.0(react-router@7.13.0(patch_hash=bb73d2e4321cb1a1624e74ab32ad0fa153a5ee153f945a2ec15e771098e60c0a)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)
-      '@repo/bull-board-react-router':
-        specifier: workspace:*
-        version: link:../../packages/bull-board-react-router
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -182,6 +179,9 @@ importers:
       '@tanstack/react-query':
         specifier: 5.90.20
         version: 5.90.20(react@19.2.4)
+      bull-board-react-router:
+        specifier: 1.0.0
+        version: 1.0.0(@bull-board/ui@6.16.4)
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -403,43 +403,6 @@ importers:
       giget:
         specifier: 2.0.0
         version: 2.0.0
-
-  packages/bull-board-react-router:
-    dependencies:
-      '@bull-board/api':
-        specifier: 6.16.4
-        version: 6.16.4(@bull-board/ui@6.16.4)
-      ejs:
-        specifier: 3.1.10
-        version: 3.1.10
-      mime:
-        specifier: ^4.1.0
-        version: 4.1.0
-      urlpattern-polyfill:
-        specifier: 10.1.0
-        version: 10.1.0
-    devDependencies:
-      '@mkizka/eslint-config':
-        specifier: 8.0.0
-        version: 8.0.0(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      '@repo/vitest':
-        specifier: workspace:*
-        version: link:../vitest
-      '@tsconfig/node-lts':
-        specifier: 24.0.0
-        version: 24.0.0
-      '@types/ejs':
-        specifier: 3.1.5
-        version: 3.1.5
-      '@types/node':
-        specifier: 25.1.0
-        version: 25.1.0
-      eslint:
-        specifier: 9.39.2
-        version: 9.39.2(jiti@2.6.1)
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
 
   packages/client:
     dependencies:
@@ -2435,9 +2398,6 @@ packages:
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
 
-  '@types/ejs@3.1.5':
-    resolution: {integrity: sha512-nv+GSx77ZtXiJzwKdsASqi+YQ5Z7vwHsTP0JY2SiQgjGckkBRKZnk8nIM+7oUZ1VCtuTz0+By4qVR7fqzp/Dfg==}
-
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -2912,6 +2872,9 @@ packages:
   buildcheck@0.0.7:
     resolution: {integrity: sha512-lHblz4ahamxpTmnsk+MNTRWsjYKv965MwOrSJyeD588rR3Jcu7swE+0wN5F+PbL5cjgu/9ObkhfzEPuofEMwLA==}
     engines: {node: '>=10.0.0'}
+
+  bull-board-react-router@1.0.0:
+    resolution: {integrity: sha512-/uQlf7xwPdmXxn87gm3B2ogy8/OzgFuTBfCYTdNhHu/uzOApnNu1qvhxb6kHpd2p1fW5OqAFu9pd9cPTmWOSSg==}
 
   bullmq@5.67.2:
     resolution: {integrity: sha512-3KYqNqQptKcgksACO1li4YW9/jxEh6XWa1lUg4OFrHa80Pf0C7H9zeb6ssbQQDfQab/K3QCXopbZ40vrvcyrLw==}
@@ -8102,8 +8065,6 @@ snapshots:
 
   '@types/doctrine@0.0.9': {}
 
-  '@types/ejs@3.1.5': {}
-
   '@types/estree@1.0.8': {}
 
   '@types/express-serve-static-core@5.1.1':
@@ -8703,6 +8664,15 @@ snapshots:
 
   buildcheck@0.0.7:
     optional: true
+
+  bull-board-react-router@1.0.0(@bull-board/ui@6.16.4):
+    dependencies:
+      '@bull-board/api': 6.16.4(@bull-board/ui@6.16.4)
+      ejs: 3.1.10
+      mime: 4.1.0
+      urlpattern-polyfill: 10.1.0
+    transitivePeerDependencies:
+      - '@bull-board/ui'
 
   bullmq@5.67.2:
     dependencies:
