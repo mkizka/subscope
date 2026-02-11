@@ -11,19 +11,23 @@ type AppLoadContextAuth = {
   agent: SubscoAgent;
 };
 
+type DashboardHandler = (request: Request) => Promise<Response>;
+
 declare module "react-router" {
   interface AppLoadContext {
     auth: AppLoadContextAuth | null;
+    dashboardHandler: DashboardHandler;
   }
 }
 
 const getLoadContext =
-  (oauthSession: OAuthSession) =>
+  (oauthSession: OAuthSession, dashboardHandler: DashboardHandler) =>
   async (
     req: express.Request,
     res: express.Response,
   ): Promise<{
     auth: AppLoadContextAuth | null;
+    dashboardHandler: DashboardHandler;
   }> => {
     const agent = await oauthSession.getAgent(req, res);
     if (agent) {
@@ -32,13 +36,15 @@ const getLoadContext =
           userDid: agent.did,
           agent,
         },
+        dashboardHandler,
       };
     }
-    return { auth: null };
+    return { auth: null, dashboardHandler };
   };
 
 export const clientRouterFactory = async (
   oauthSession: OAuthSession,
+  dashboardHandler: DashboardHandler,
 ): Promise<Router> => {
   const router: Router = Router();
 
@@ -48,7 +54,7 @@ export const clientRouterFactory = async (
       createRequestHandler({
         // @ts-expect-error
         build: () => import("../../../build/server/index.js"),
-        getLoadContext: getLoadContext(oauthSession),
+        getLoadContext: getLoadContext(oauthSession, dashboardHandler),
       }),
     );
   } else {
@@ -63,11 +69,11 @@ export const clientRouterFactory = async (
         // @ts-expect-error
         build: () =>
           viteDevServer.ssrLoadModule("virtual:react-router/server-build"),
-        getLoadContext: getLoadContext(oauthSession),
+        getLoadContext: getLoadContext(oauthSession, dashboardHandler),
       }),
     );
   }
 
   return router;
 };
-clientRouterFactory.inject = ["oauthSession"] as const;
+clientRouterFactory.inject = ["oauthSession", "dashboardHandler"] as const;

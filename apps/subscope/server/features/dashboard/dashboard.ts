@@ -1,13 +1,10 @@
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
-import { ExpressAdapter } from "@bull-board/express";
+import { ReactRouterAdapter } from "@repo/bull-board-react-router";
 import type { IJobQueue } from "@repo/common/domain";
-import { Router } from "express";
 
-export const dashboardRouterFactory = (jobQueue: IJobQueue): Router => {
-  const dashboardRouter = Router();
-
-  const serverAdapter = new ExpressAdapter();
+export const createDashboardHandler = (jobQueue: IJobQueue) => {
+  const serverAdapter = new ReactRouterAdapter();
   serverAdapter.setBasePath("/dashboard");
 
   createBullBoard({
@@ -15,7 +12,6 @@ export const dashboardRouterFactory = (jobQueue: IJobQueue): Router => {
     serverAdapter,
   });
 
-  dashboardRouter.use(serverAdapter.getRouter());
-  return dashboardRouter;
+  return (request: Request) => serverAdapter.handleRequest(request);
 };
-dashboardRouterFactory.inject = ["jobQueue"] as const;
+createDashboardHandler.inject = ["jobQueue"] as const;

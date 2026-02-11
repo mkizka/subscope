@@ -146,9 +146,6 @@ importers:
       '@bull-board/api':
         specifier: 6.16.4
         version: 6.16.4(@bull-board/ui@6.16.4)
-      '@bull-board/express':
-        specifier: 6.16.4
-        version: 6.16.4
       '@conform-to/react':
         specifier: 1.16.0
         version: 1.16.0(react@19.2.4)
@@ -167,6 +164,9 @@ importers:
       '@react-router/node':
         specifier: 7.13.0
         version: 7.13.0(react-router@7.13.0(patch_hash=bb73d2e4321cb1a1624e74ab32ad0fa153a5ee153f945a2ec15e771098e60c0a)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)
+      '@repo/bull-board-react-router':
+        specifier: workspace:*
+        version: link:../../packages/bull-board-react-router
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -403,6 +403,43 @@ importers:
       giget:
         specifier: 2.0.0
         version: 2.0.0
+
+  packages/bull-board-react-router:
+    dependencies:
+      '@bull-board/api':
+        specifier: 6.16.4
+        version: 6.16.4(@bull-board/ui@6.16.4)
+      ejs:
+        specifier: 3.1.10
+        version: 3.1.10
+      mime:
+        specifier: ^4.1.0
+        version: 4.1.0
+      urlpattern-polyfill:
+        specifier: 10.1.0
+        version: 10.1.0
+    devDependencies:
+      '@mkizka/eslint-config':
+        specifier: 8.0.0
+        version: 8.0.0(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      '@repo/vitest':
+        specifier: workspace:*
+        version: link:../vitest
+      '@tsconfig/node-lts':
+        specifier: 24.0.0
+        version: 24.0.0
+      '@types/ejs':
+        specifier: 3.1.5
+        version: 3.1.5
+      '@types/node':
+        specifier: 25.1.0
+        version: 25.1.0
+      eslint:
+        specifier: 9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
   packages/client:
     dependencies:
@@ -923,9 +960,6 @@ packages:
     resolution: {integrity: sha512-fn4O+QbA3mRj0rEE41mvwbvtiiv0UYgnxQ9ErWb9n74EwIC/yZbiyxQ+Gh/ehU9u7B0PuaNyR0IOG/h3DGo1Mg==}
     peerDependencies:
       '@bull-board/ui': 6.16.4
-
-  '@bull-board/express@6.16.4':
-    resolution: {integrity: sha512-znKZGrqBtHh3iU73TvJherEY1OforQ10hcLMGer1ktRTD+5BxyLedIlhdZIxJsn+ComQQcmEySbqJSF2b78UOA==}
 
   '@bull-board/ui@6.16.4':
     resolution: {integrity: sha512-5Yv+4g0rDvBBq2RxaUewSEwD8ywvqCX6lKlzPM5Aaf0+4cxGoENQRZNcBaAIKX4+fAzAbdVB4VGP4NUgtx5LVg==}
@@ -2400,6 +2434,9 @@ packages:
 
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
+
+  '@types/ejs@3.1.5':
+    resolution: {integrity: sha512-nv+GSx77ZtXiJzwKdsASqi+YQ5Z7vwHsTP0JY2SiQgjGckkBRKZnk8nIM+7oUZ1VCtuTz0+By4qVR7fqzp/Dfg==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -4627,6 +4664,11 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
+  mime@4.1.0:
+    resolution: {integrity: sha512-X5ju04+cAzsojXKes0B/S4tcYtFAJ6tTMuSPBEn9CPGlrWr8Fiw7qYeLT0XyH80HSoAoqWCaz+MWKh22P7G1cw==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
@@ -6005,6 +6047,9 @@ packages:
     resolution: {integrity: sha512-yIQdxJpgkPamPPAPuGdS7Q548rLhny42tg8d4vyTNzFqvOnwqrgHXvgehT09U7fwrzxi3RxCiXjoNUNnNOlQ8A==}
     engines: {node: '>=6.0.0'}
 
+  urlpattern-polyfill@10.1.0:
+    resolution: {integrity: sha512-IGjKp/o0NL3Bso1PymYURCJxMPNAf/ILOpendP9f5B6e1rTJgdgiOvgfoT8VxCAdY+Wisb9uhGaJJf3yZ2V9nw==}
+
   use-sync-external-store@1.6.0:
     resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
     peerDependencies:
@@ -6820,15 +6865,6 @@ snapshots:
     dependencies:
       '@bull-board/ui': 6.16.4
       redis-info: 3.1.0
-
-  '@bull-board/express@6.16.4':
-    dependencies:
-      '@bull-board/api': 6.16.4(@bull-board/ui@6.16.4)
-      '@bull-board/ui': 6.16.4
-      ejs: 3.1.10
-      express: 5.2.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@bull-board/ui@6.16.4':
     dependencies:
@@ -8065,6 +8101,8 @@ snapshots:
       '@types/ssh2': 1.15.5
 
   '@types/doctrine@0.0.9': {}
+
+  '@types/ejs@3.1.5': {}
 
   '@types/estree@1.0.8': {}
 
@@ -10480,6 +10518,8 @@ snapshots:
 
   mime@1.6.0: {}
 
+  mime@4.1.0: {}
+
   mimic-fn@2.1.0: {}
 
   mimic-function@5.0.1: {}
@@ -12125,6 +12165,8 @@ snapshots:
       punycode: 2.3.1
 
   url-value-parser@2.2.0: {}
+
+  urlpattern-polyfill@10.1.0: {}
 
   use-sync-external-store@1.6.0(react@19.2.4):
     dependencies:

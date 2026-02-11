@@ -24,7 +24,7 @@ import { ImageDiskStorage } from "./features/blob-proxy/infrastructure/image-dis
 import { ImageResizer } from "./features/blob-proxy/infrastructure/image-resizer.js";
 import { imagesRouterFactory } from "./features/blob-proxy/presentation/images.js";
 import { clientRouterFactory } from "./features/client/router.js";
-import { dashboardRouterFactory } from "./features/dashboard/dashboard.js";
+import { createDashboardHandler } from "./features/dashboard/dashboard.js";
 import { oauthClientFactory } from "./features/oauth/client.js";
 import { authMiddlewareFactory } from "./features/oauth/middleware.js";
 import { oauthRouterFactory } from "./features/oauth/oauth.js";
@@ -220,8 +220,8 @@ const server = createInjector()
   .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("oauthRouter", oauthRouterFactory)
   .provideFactory("blobProxyRouter", imagesRouterFactory)
+  .provideFactory("dashboardHandler", createDashboardHandler)
   .provideFactory("clientRouter", clientRouterFactory)
-  .provideFactory("dashboardRouter", dashboardRouterFactory)
   .provideClass("getPreferences", GetPreferences)
   .provideClass("getProfile", GetProfile)
   .provideClass("getProfiles", GetProfiles)

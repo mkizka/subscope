@@ -14,7 +14,6 @@ export class SubscopeServer {
   constructor(
     loggerManager: ILoggerManager,
     authMiddleware: RequestHandler,
-    dashboardRouter: express.Router,
     oauthRouter: express.Router,
     blobProxyRouter: express.Router,
     xrpcRouter: express.Router,
@@ -27,7 +26,6 @@ export class SubscopeServer {
     const app = express();
 
     app.use(loggingMiddleware(logger));
-    app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
     // 開発環境でのOAuthログイン時 http://127.0.0.1/oauth/callback にリダイレクトされるので、
@@ -41,7 +39,6 @@ export class SubscopeServer {
     });
 
     app.use("/oauth", oauthRouter);
-    app.use("/dashboard", authMiddleware, dashboardRouter);
     app.use("/images", blobProxyRouter);
     app.use(xrpcRouter);
     app.use(healthRouter);
@@ -53,7 +50,6 @@ export class SubscopeServer {
   static inject = [
     "loggerManager",
     "authMiddleware",
-    "dashboardRouter",
     "oauthRouter",
     "blobProxyRouter",
     "xrpcRouter",
