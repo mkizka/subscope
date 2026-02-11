@@ -150,6 +150,14 @@ describe("ReactRouterAdapter", () => {
     test("パストラバーサルを含むリクエストの場合、静的ファイルディレクトリ外は読み取られない", async () => {
       // arrange
       // URL parserが".."を正規化するため、handleStaticには到達せずエントリーポイントとして処理される
+      const entryRoute: AppViewRoute = {
+        method: "get",
+        route: "/",
+        handler: () => ({ name: "index.ejs", params: {} }),
+      };
+      adapter.setEntryRoute(entryRoute);
+      adapter.setViewsPath("/views");
+      vi.mocked(ejs.renderFile).mockResolvedValue("<html></html>");
       const request = new Request(
         "http://localhost/dashboard/static/../../etc/passwd",
       );
@@ -390,7 +398,7 @@ describe("ReactRouterAdapter", () => {
   });
 
   describe("queuesが未設定の場合", () => {
-    test("APIルートにリクエストした場合、500エラーを返す", async () => {
+    test("APIルートにリクエストした場合、エラーをスローする", async () => {
       // arrange
       const adapterWithoutQueues = new ReactRouterAdapter();
       adapterWithoutQueues.setBasePath("/dashboard");
@@ -403,13 +411,10 @@ describe("ReactRouterAdapter", () => {
       adapterWithoutQueues.setApiRoutes([apiRoute]);
       const request = new Request("http://localhost/dashboard/api/queues");
 
-      // act
-      const response = await adapterWithoutQueues.handleRequest(request);
-
-      // assert
-      expect(response.status).toBe(500);
-      const body = await response.json();
-      expect(body).toEqual({ error: "Queues not configured" });
+      // act & assert
+      await expect(
+        adapterWithoutQueues.handleRequest(request),
+      ).rejects.toThrow("Please call 'setQueues' before using 'handleRequest'");
     });
   });
 
@@ -518,15 +523,14 @@ describe("ReactRouterAdapter", () => {
       });
     });
 
-    test("エントリーポイントが未設定の場合、404を返す", async () => {
+    test("エントリーポイントが未設定の場合、エラーをスローする", async () => {
       // arrange
       const request = new Request("http://localhost/dashboard/");
 
-      // act
-      const response = await adapter.handleRequest(request);
-
-      // assert
-      expect(response.status).toBe(404);
+      // act & assert
+      await expect(adapter.handleRequest(request)).rejects.toThrow(
+        "Please call 'setEntryRoute' before using 'handleRequest'",
+      );
     });
   });
 

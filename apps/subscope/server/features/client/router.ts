@@ -1,5 +1,6 @@
 import { createRequestHandler } from "@react-router/express";
 import type { SubscoAgent } from "@repo/client/api";
+import type { IJobQueue } from "@repo/common/domain";
 import express from "express";
 import { Router } from "express";
 
@@ -11,23 +12,25 @@ type AppLoadContextAuth = {
   agent: SubscoAgent;
 };
 
-type DashboardHandler = (request: Request) => Promise<Response>;
+type AppLoadContextInjected = {
+  jobQueue: IJobQueue;
+};
 
 declare module "react-router" {
   interface AppLoadContext {
     auth: AppLoadContextAuth | null;
-    dashboardHandler: DashboardHandler;
+    injected: AppLoadContextInjected;
   }
 }
 
 const getLoadContext =
-  (oauthSession: OAuthSession, dashboardHandler: DashboardHandler) =>
+  (oauthSession: OAuthSession, jobQueue: IJobQueue) =>
   async (
     req: express.Request,
     res: express.Response,
   ): Promise<{
     auth: AppLoadContextAuth | null;
-    dashboardHandler: DashboardHandler;
+    injected: AppLoadContextInjected;
   }> => {
     const agent = await oauthSession.getAgent(req, res);
     if (agent) {
@@ -36,15 +39,17 @@ const getLoadContext =
           userDid: agent.did,
           agent,
         },
-        dashboardHandler,
+        injected: {
+          jobQueue,
+        },
       };
     }
-    return { auth: null, dashboardHandler };
+    return { auth: null, injected: { jobQueue } };
   };
 
 export const clientRouterFactory = async (
   oauthSession: OAuthSession,
-  dashboardHandler: DashboardHandler,
+  jobQueue: IJobQueue,
 ): Promise<Router> => {
   const router: Router = Router();
 
@@ -54,7 +59,7 @@ export const clientRouterFactory = async (
       createRequestHandler({
         // @ts-expect-error
         build: () => import("../../../build/server/index.js"),
-        getLoadContext: getLoadContext(oauthSession, dashboardHandler),
+        getLoadContext: getLoadContext(oauthSession, jobQueue),
       }),
     );
   } else {
@@ -69,11 +74,11 @@ export const clientRouterFactory = async (
         // @ts-expect-error
         build: () =>
           viteDevServer.ssrLoadModule("virtual:react-router/server-build"),
-        getLoadContext: getLoadContext(oauthSession, dashboardHandler),
+        getLoadContext: getLoadContext(oauthSession, jobQueue),
       }),
     );
   }
 
   return router;
 };
-clientRouterFactory.inject = ["oauthSession", "dashboardHandler"] as const;
+clientRouterFactory.inject = ["oauthSession", "jobQueue"] as const;
