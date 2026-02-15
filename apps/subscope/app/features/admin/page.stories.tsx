@@ -11,7 +11,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const meta: Meta<typeof AdminPage> = {
+const meta = {
   title: "pages/admin",
   component: AdminPage,
   decorators: [
@@ -24,7 +24,7 @@ const meta: Meta<typeof AdminPage> = {
   parameters: {
     layout: "fullscreen",
   },
-};
+} satisfies Meta<typeof AdminPage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

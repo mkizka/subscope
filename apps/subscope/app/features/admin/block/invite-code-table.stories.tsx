@@ -3,7 +3,7 @@ import { fn } from "storybook/test";
 
 import { InviteCodeTable } from "./invite-code-table";
 
-const meta: Meta<typeof InviteCodeTable> = {
+const meta = {
   title: "features/Admin/InviteCodeTable",
   component: InviteCodeTable,
   args: {
@@ -12,10 +12,9 @@ const meta: Meta<typeof InviteCodeTable> = {
     onDeleteCode: fn(),
     deletingCode: null,
   },
-};
+} satisfies Meta<typeof InviteCodeTable>;
 
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
