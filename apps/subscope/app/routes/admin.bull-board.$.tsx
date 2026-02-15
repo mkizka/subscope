@@ -3,11 +3,11 @@ import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import type { IJobQueue } from "@repo/common/domain";
 import { ReactRouterAdapter } from "bull-board-react-router";
 
-import type { Route } from "./+types/dashboard.$";
+import type { Route } from "./+types/admin.bull-board.$";
 
 const handler = (request: Request, jobQueue: IJobQueue) => {
   const serverAdapter = new ReactRouterAdapter();
-  serverAdapter.setBasePath("/dashboard");
+  serverAdapter.setBasePath("/admin/bull-board");
 
   createBullBoard({
     queues: jobQueue.getQueues().map((queue) => new BullMQAdapter(queue)),

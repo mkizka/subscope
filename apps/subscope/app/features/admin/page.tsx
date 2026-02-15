@@ -1,13 +1,13 @@
 import { SidebarInset, SidebarProvider } from "@/app/components/ui/sidebar";
 
-import { AdminSidebar } from "./block/admin-sidebar";
+import { AdminSidebarContainer } from "./block/admin-sidebar-container";
 import { InviteCodeTableContainer } from "./block/invite-code-table-container";
 import { AdminHeader } from "./parts/admin-header";
 
 export function AdminPage() {
   return (
     <SidebarProvider>
-      <AdminSidebar />
+      <AdminSidebarContainer />
       <SidebarInset>
         <AdminHeader />
         <div className="flex justify-center p-4">

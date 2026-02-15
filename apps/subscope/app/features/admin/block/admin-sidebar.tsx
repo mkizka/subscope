@@ -1,4 +1,4 @@
-import { TicketIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -11,9 +11,18 @@ import {
 } from "@/app/components/ui/sidebar";
 import { SidebarNavItem } from "@/app/features/admin/parts/sidebar-nav-item";
 
-const menuItems = [{ title: "招待コード", icon: TicketIcon, href: "/admin" }];
+type MenuItem = {
+  title: string;
+  icon: LucideIcon;
+  href: string;
+};
 
-export function AdminSidebar() {
+type Props = {
+  menuItems: MenuItem[];
+  currentPath: string;
+};
+
+export function AdminSidebar({ menuItems, currentPath }: Props) {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -25,7 +34,11 @@ export function AdminSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarNavItem key={item.title} isActive {...item} />
+                <SidebarNavItem
+                  key={item.title}
+                  isActive={currentPath === item.href}
+                  {...item}
+                />
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
