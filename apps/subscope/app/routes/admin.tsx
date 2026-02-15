@@ -1,4 +1,6 @@
 import { ResponseType, XRPCError } from "@atproto/xrpc";
+// eslint-disable-next-line unused-imports/no-unused-imports
+import type { MeSubscoAdminGetInviteCodes as _ } from "@repo/client/api";
 import { redirect } from "react-router";
 
 import { AdminPage } from "@/app/features/admin/page";
@@ -11,45 +13,35 @@ export function meta() {
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   if (!context.auth) {
-    return redirect("/login");
+    throw redirect("/login");
   }
+  const { agent } = context.auth;
+
   try {
-    const accessResponse =
-      await context.auth.agent.me.subsco.admin.verifyAccess();
+    const accessResponse = await agent.me.subsco.admin.verifyAccess();
     if (accessResponse.data.status !== "authorized") {
-      return redirect("/");
+      throw redirect("/");
     }
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await context.auth.agent.me.subsco.admin.getInviteCodes({
-      limit: 50,
+    const response = await agent.me.subsco.admin.getInviteCodes({
+      limit: 10,
       cursor,
     });
-    return {
-      codes: response.data.codes.map((code) => ({
-        code: code.code,
-        expiresAt: code.expiresAt,
-        createdAt: code.createdAt,
-        usedAt: code.usedAt,
-        usedBy: code.usedBy
-          ? { did: code.usedBy.did, handle: code.usedBy.handle }
-          : undefined,
-      })),
-      nextCursor: response.data.cursor,
-    };
+    return response.data;
   } catch (e) {
     if (
       e instanceof XRPCError &&
       (e.status === ResponseType.AuthenticationRequired ||
         e.status === ResponseType.Forbidden)
     ) {
-      return redirect("/");
+      throw redirect("/");
     }
     throw e;
   }
 };
 
 export default function Admin({ loaderData }: Route.ComponentProps) {
-  const { codes, nextCursor } = loaderData;
-  return <AdminPage codes={codes} nextCursor={nextCursor} />;
+  const { codes, cursor } = loaderData;
+  return <AdminPage codes={codes} nextCursor={cursor} />;
 }
