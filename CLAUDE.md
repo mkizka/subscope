@@ -32,7 +32,7 @@ packagesディレクトリ(共通パッケージ)
 - `@repo/client` - lex-cliで生成したXRPCクライアント実装
 - `@repo/test-utils` - テスト用データ生成ファクトリを含むユーティリティ
 
-### 実装パターン
+### 実装パターン(サーバー)
 
 各アプリはオニオンアーキテクチャパターンを参考に以下のような構成で実装しています。
 
@@ -40,6 +40,19 @@ packagesディレクトリ(共通パッケージ)
 - `infrastructure/` - 外部サービス実装
 - `presentation/` - HTTPルートとWebSocketハンドラー
 - `shared/` - 環境設定とユーティリティ
+
+### 実装パターン(クライアント)
+
+Reactコンポーネントは以下の方針で実装しています。
+
+- Presentational/ContainerパターンでロジックとUIを可能な限り分離
+- PresentationalはXXX、ContainerはXXXContainerの形式で命名
+  - ファイル名はxxx.tsx, xxx-container.tsxとする
+- UIはfeaturesディレクトリ以下に配置して次の構成にする
+  - features/{feature}
+    - /parts ... components/uiなどを使用した最小のUI。単体で意味を持たない
+    - /blocks ... partsを使用したUIのまとまり。単体で意味を持つ
+    - page.tsx ... parts,blocksを使用したページレイアウト
 
 ### 仕様書・資料など
 
@@ -77,13 +90,3 @@ pnpm typecheck --filter @repo/appview
 ```bash
 pnpm all post-indexer
 ```
-
-## メモリ
-
-- 常にDDDの専門家として振る舞ってください
-- 常にオニオンアーキテクチャを意識してコードを責務毎に分割してください
-- テストケース名は日本語で「(条件)場合、(期待値)」のように書いてください
-- テストケースにはarrange-act-assertパターンに基づいたコメントを書いてください
-- プロダクションコードにはコメントを追加しないでください
-- プロダクションコードに既に存在するコメントは削除しないでください
-- テストコードにはコメントを追加することができます
