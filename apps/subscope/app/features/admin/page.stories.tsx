@@ -21,6 +21,9 @@ const meta: Meta<typeof AdminPage> = {
       </QueryClientProvider>
     ),
   ],
+  parameters: {
+    layout: "fullscreen",
+  },
 };
 
 export default meta;
