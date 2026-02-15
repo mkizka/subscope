@@ -51,6 +51,7 @@ import { GetProfilesUseCase } from "./features/xrpc/application/use-cases/actor/
 import { SearchActorsTypeaheadUseCase } from "./features/xrpc/application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "./features/xrpc/application/use-cases/actor/search-actors-use-case.js";
 import { CreateInviteCodeUseCase } from "./features/xrpc/application/use-cases/admin/create-invite-code-use-case.js";
+import { DeleteInviteCodeUseCase } from "./features/xrpc/application/use-cases/admin/delete-invite-code-use-case.js";
 import { GetInviteCodesUseCase } from "./features/xrpc/application/use-cases/admin/get-invite-codes-use-case.js";
 import { GetSubscribersUseCase } from "./features/xrpc/application/use-cases/admin/get-subscribers-use-case.js";
 import { RegisterAdminUseCase } from "./features/xrpc/application/use-cases/admin/register-admin-use-case.js";
@@ -108,6 +109,7 @@ import { GetFollowers } from "./features/xrpc/presentation/routes/app/bsky/graph
 import { GetFollows } from "./features/xrpc/presentation/routes/app/bsky/graph/getFollows.js";
 import { healthRouter } from "./features/xrpc/presentation/routes/health.js";
 import { CreateInviteCode } from "./features/xrpc/presentation/routes/me/subsco/admin/createInviteCode.js";
+import { DeleteInviteCode } from "./features/xrpc/presentation/routes/me/subsco/admin/deleteInviteCode.js";
 import { GetInviteCodes } from "./features/xrpc/presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GetSubscribers } from "./features/xrpc/presentation/routes/me/subsco/admin/getSubscribers.js";
 import { RegisterAdmin } from "./features/xrpc/presentation/routes/me/subsco/admin/registerAdmin.js";
@@ -208,6 +210,7 @@ const server = createInjector()
   .provideClass("getFollowsUseCase", GetFollowsUseCase)
   .provideClass("getFollowersUseCase", GetFollowersUseCase)
   .provideClass("createInviteCodeUseCase", CreateInviteCodeUseCase)
+  .provideClass("deleteInviteCodeUseCase", DeleteInviteCodeUseCase)
   .provideClass("getInviteCodesUseCase", GetInviteCodesUseCase)
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
   .provideClass("registerAdminUseCase", RegisterAdminUseCase)
@@ -237,6 +240,7 @@ const server = createInjector()
   .provideClass("getFollows", GetFollows)
   .provideClass("getFollowers", GetFollowers)
   .provideClass("createInviteCode", CreateInviteCode)
+  .provideClass("deleteInviteCode", DeleteInviteCode)
   .provideClass("getInviteCodes", GetInviteCodes)
   .provideClass("getSubscribers", GetSubscribers)
   .provideClass("registerAdmin", RegisterAdmin)

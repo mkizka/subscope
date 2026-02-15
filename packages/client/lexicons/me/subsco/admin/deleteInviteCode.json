@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.deleteInviteCode",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete an invitation code",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The invitation code to delete"
+            }
+          },
+          "required": ["code"]
+        }
+      },
+      "errors": [
+        {
+          "name": "AdminRequired"
+        },
+        {
+          "name": "InviteCodeNotFound"
+        },
+        {
+          "name": "InviteCodeAlreadyUsed"
+        }
+      ]
+    }
+  }
+}

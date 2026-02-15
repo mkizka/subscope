@@ -7,6 +7,7 @@ export interface IInviteCodeRepository {
     inviteCode: InviteCode;
     ctx: TransactionContext;
   }) => Promise<void>;
+  delete: (params: { code: string; ctx: TransactionContext }) => Promise<void>;
   findAll: (params: {
     limit: number;
     cursor?: string;

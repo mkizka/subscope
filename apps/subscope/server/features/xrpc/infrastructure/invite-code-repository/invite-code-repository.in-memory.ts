@@ -51,6 +51,11 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     return Promise.resolve();
   }
 
+  delete(_params: { code: string; ctx: TransactionContext }): Promise<void> {
+    this.inviteCodes.delete(_params.code);
+    return Promise.resolve();
+  }
+
   findAll(params: {
     limit: number;
     cursor?: string;

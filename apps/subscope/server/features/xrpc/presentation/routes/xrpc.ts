@@ -18,6 +18,7 @@ import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
+import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
@@ -44,6 +45,7 @@ export const xrpcRouterFactory = (
   getFollows: GetFollows,
   getFollowers: GetFollowers,
   createInviteCode: CreateInviteCode,
+  deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
   getSubscribers: GetSubscribers,
   registerAdmin: RegisterAdmin,
@@ -70,6 +72,7 @@ export const xrpcRouterFactory = (
     getFollows,
     getFollowers,
     createInviteCode,
+    deleteInviteCode,
     getInviteCodes,
     getSubscribers,
     registerAdmin,
@@ -103,6 +106,7 @@ xrpcRouterFactory.inject = [
   "getFollows",
   "getFollowers",
   "createInviteCode",
+  "deleteInviteCode",
   "getInviteCodes",
   "getSubscribers",
   "registerAdmin",

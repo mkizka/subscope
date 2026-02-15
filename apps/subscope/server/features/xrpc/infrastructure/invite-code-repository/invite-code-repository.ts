@@ -40,6 +40,18 @@ export class InviteCodeRepository implements IInviteCodeRepository {
       });
   }
 
+  async delete({
+    code,
+    ctx,
+  }: {
+    code: string;
+    ctx: TransactionContext;
+  }): Promise<void> {
+    await ctx.db
+      .delete(schema.inviteCodes)
+      .where(eq(schema.inviteCodes.code, code));
+  }
+
   async findAll(params: {
     limit: number;
     cursor?: string;
