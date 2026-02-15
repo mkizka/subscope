@@ -1,9 +1,8 @@
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 // eslint-disable-next-line unused-imports/no-unused-imports
-import type { MeSubscoAdminGetInviteCodes as _ } from "@repo/client/api";
-// eslint-disable-next-line unused-imports/no-unused-imports
-import type { MeSubscoAdminCreateInviteCode as _2 } from "@repo/client/api";
+import type * as _ from "@repo/client/api";
 import { data, redirect } from "react-router";
+import { z } from "zod";
 
 import type { Route } from "./+types/admin.api.invite-codes";
 
@@ -33,11 +32,30 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   }
 };
 
-export const action = async ({ context }: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   if (!context.auth) {
     throw redirect("/login");
   }
   const { agent } = context.auth;
+
+  if (request.method === "DELETE") {
+    try {
+      const { code } = z
+        .object({ code: z.string() })
+        .parse(await request.json());
+      await agent.me.subsco.admin.deleteInviteCode({ code });
+      return data({ success: true });
+    } catch (e) {
+      if (
+        e instanceof XRPCError &&
+        (e.status === ResponseType.AuthenticationRequired ||
+          e.status === ResponseType.Forbidden)
+      ) {
+        throw data({ error: "Unauthorized" }, { status: 403 });
+      }
+      throw e;
+    }
+  }
 
   try {
     const response = await agent.me.subsco.admin.createInviteCode({

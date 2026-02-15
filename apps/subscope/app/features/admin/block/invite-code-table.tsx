@@ -1,3 +1,5 @@
+import { LoaderCircleIcon, XIcon } from "lucide-react";
+
 import { Button } from "@/app/components/ui/button";
 import {
   Card,
@@ -40,7 +42,17 @@ type Props = {
   hasNextPage?: boolean;
   onCreateCode: () => void;
   isCreating: boolean;
+  onDeleteCode: (code: string) => void;
+  deletingCode: string | null;
 };
+
+function isDeletable(code: InviteCode) {
+  return !code.usedAt;
+}
+
+function isExpired(code: InviteCode) {
+  return new Date(code.expiresAt) < new Date();
+}
 
 export function InviteCodeTable({
   codes,
@@ -50,6 +62,8 @@ export function InviteCodeTable({
   hasNextPage,
   onCreateCode,
   isCreating,
+  onDeleteCode,
+  deletingCode,
 }: Props) {
   return (
     <>
@@ -69,19 +83,20 @@ export function InviteCodeTable({
                 <TableHead>使用者</TableHead>
                 <TableHead>有効期限</TableHead>
                 <TableHead>作成日</TableHead>
+                <TableHead>削除</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {!isLoading && codes.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-8 text-center">
+                  <TableCell colSpan={6} className="py-8 text-center">
                     招待コードはまだありません
                   </TableCell>
                 </TableRow>
               )}
               {isLoading && (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-8 text-center">
+                  <TableCell colSpan={6} className="py-8 text-center">
                     読み込み中...
                   </TableCell>
                 </TableRow>
@@ -100,6 +115,29 @@ export function InviteCodeTable({
                   </TableCell>
                   <TableCell>{formatDate(code.expiresAt)}</TableCell>
                   <TableCell>{formatDate(code.createdAt)}</TableCell>
+                  <TableCell>
+                    {isDeletable(code) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (
+                            isExpired(code) ||
+                            window.confirm(`${code.code} を削除しますか？`)
+                          ) {
+                            onDeleteCode(code.code);
+                          }
+                        }}
+                        disabled={deletingCode === code.code}
+                      >
+                        {deletingCode === code.code ? (
+                          <LoaderCircleIcon className="animate-spin" />
+                        ) : (
+                          <XIcon className="text-destructive" />
+                        )}
+                      </Button>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

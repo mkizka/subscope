@@ -39,6 +39,17 @@ async function createInviteCode(): Promise<void> {
   }
 }
 
+async function deleteInviteCode(code: string): Promise<void> {
+  const response = await fetch("/admin/api/invite-codes", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) {
+    throw new Error("招待コードの削除に失敗しました");
+  }
+}
+
 export function InviteCodeTableContainer() {
   const queryClient = useQueryClient();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -58,6 +69,13 @@ export function InviteCodeTableContainer() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: deleteInviteCode,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["inviteCodes"] });
+    },
+  });
+
   return (
     <InviteCodeTable
       codes={data ?? []}
@@ -67,6 +85,8 @@ export function InviteCodeTableContainer() {
       hasNextPage={hasNextPage}
       onCreateCode={() => createMutation.mutate()}
       isCreating={createMutation.isPending}
+      onDeleteCode={(code) => deleteMutation.mutate(code)}
+      deletingCode={deleteMutation.isPending ? deleteMutation.variables : null}
     />
   );
 }

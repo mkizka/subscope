@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { InviteCodeTable } from "./invite-code-table";
 
@@ -6,8 +7,10 @@ const meta: Meta<typeof InviteCodeTable> = {
   title: "features/Admin/InviteCodeTable",
   component: InviteCodeTable,
   args: {
-    onCreateCode: () => {},
+    onCreateCode: fn(),
     isCreating: false,
+    onDeleteCode: fn(),
+    deletingCode: null,
   },
 };
 
@@ -62,6 +65,26 @@ export const Loading: Story = {
   args: {
     codes: [],
     isLoading: true,
+  },
+};
+
+export const Deleting: Story = {
+  args: {
+    codes: [
+      {
+        code: "abc-123-def",
+        expiresAt: "2099-12-31T23:59:59.000Z",
+        createdAt: "2025-01-01T00:00:00.000Z",
+      },
+      {
+        code: "ghi-456-jkl",
+        expiresAt: "2099-12-31T23:59:59.000Z",
+        createdAt: "2025-01-10T00:00:00.000Z",
+        usedAt: "2025-01-15T10:00:00.000Z",
+        usedBy: { did: "did:plc:example123", handle: "alice.bsky.social" },
+      },
+    ],
+    deletingCode: "abc-123-def",
   },
 };
 
