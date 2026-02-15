@@ -62,8 +62,6 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
   - docs/dev/identity-event-handling.md
-- XRPCエンドポイント実装ガイド
-  - docs/dev/xrpc-implementation.md
 - `@atproto`各種ライブラリやAT Protocol仕様について知りたい時の資料
   - docs/repomix/atproto-repomix-output.xml
 - `factory-js/factory`ライブラリについて知りたい時の資料

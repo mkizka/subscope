@@ -1,66 +1,55 @@
-# XRPC Endpoint Implementation Guide
+# XRPC実装 詳細ガイド
 
-このドキュメントは、新しいXRPCエンドポイント（Query/Procedure）を実装する際の手順を記載しています。
+## 目次
 
-## 概要
+1. [Lexicon定義の配置](#1-lexicon定義の配置)
+2. [Repository拡張](#2-repository拡張)
+3. [UseCase作成](#3-usecase作成)
+4. [ルートハンドラー作成](#4-ルートハンドラー作成)
+5. [DIコンテナ登録](#5-diコンテナ登録)
+6. [型の互換性確保](#6-型の互換性確保)
+7. [テスト実装](#7-テスト実装)
+8. [トラブルシューティング](#8-トラブルシューティング)
 
-AT ProtocolのXRPCエンドポイントを追加する場合、Lexicon定義からクライアントコード生成、ルートハンドラー実装まで一連の手順が必要です。
+## 1. Lexicon定義の配置
 
-## 実装手順
+### 1.1 postinstall.shの更新
 
-### 1. Lexicon定義の配置
-
-#### 1.1 postinstall.shの更新
-
-新しいLexiconファイルをクライアントパッケージにコピーするため、postinstall.shに追加します。
-
-**ファイル:** `/packages/client/scripts/postinstall.sh`
+`packages/client/scripts/postinstall.sh` の `paths` 配列にファイルパスを追加：
 
 ```bash
-# 例：app.bsky.graph.getFollowsを追加する場合
 paths=(
   # ... 既存のパス
-  "app/bsky/graph/follow.json"
   "app/bsky/graph/getFollows.json" # 新しく追加
-  # ...
 )
 ```
 
-この一覧にファイルパスを追加することで、bluesky-social/atprotoリポジトリのlexiconディレクトリからファイルがコピーされ、クライアントコード生成に利用できるようになります。
+### 1.2 クライアントコード生成
 
-#### 1.2 Lexiconファイルの配置とクライアントコード生成
+`pnpm install` を実行。以下が自動で行われる：
 
-`pnpm install`を実行すると以下が自動的に行われます：
+- bluesky-social/atprotoリポジトリからlexicon定義を取得
+- `packages/client/lexicons` にコピー
+- `@atproto/lex-cli` でクライアントコード生成
 
-- AT Protocol公式リポジトリ（bluesky-social/atproto）からlexicon定義ファイルを取得
-- 取得したファイルを`/packages/client/lexicons`ディレクトリにコピー
-- `@atproto/lex-cli`を使用してクライアントコードを自動生成
+### 1.3 型エクスポート（必要に応じて）
 
-#### 1.3 クライアントパッケージの型エクスポート設定（必要に応じて）
-
-新しいレコードタイプやレスポンスタイプを他のパッケージで使用する場合は、packages/client/src/server.tsでエクスポートする必要があります。
-
-**ファイル:** `/packages/client/src/server.ts`
+`packages/client/src/server.ts` に追加：
 
 ```typescript
-// 例：app.bsky.graph.getFollowsのレスポンスタイプをエクスポートする場合
 export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows";
 ```
 
-**注意**: これは型定義のエクスポートのみです。XRPCエンドポイント自体は自動生成される`/packages/client/src/generated/server/index.ts`で処理されるため、手動での追加は不要です。
+**注意**: これは型定義のエクスポートのみ。XRPCエンドポイント自体は自動生成される `packages/client/src/generated/server/index.ts` で処理されるため、手動での追加は不要。
 
-### 2. AppView実装（Queryエンドポイントの場合）
+## 2. Repository拡張
 
-#### 2.1 Repositoryの拡張（必要に応じて）
+### インターフェース
 
-既存のRepositoryに新しいメソッドが必要な場合：
-
-**インターフェース:** `/apps/appview/src/application/interfaces/{entity}-repository.ts`
+`apps/subscope/src/application/interfaces/{entity}-repository.ts`:
 
 ```typescript
 export interface I{Entity}Repository {
-  // 既存のメソッド...
-
   find{Entities}: (params: {
     db: DatabaseClient;
     actorDid: Did;
@@ -70,7 +59,9 @@ export interface I{Entity}Repository {
 }
 ```
 
-**実装:** `/apps/appview/src/infrastructure/{entity}-repository.ts`
+### 実装
+
+`apps/subscope/src/infrastructure/{entity}-repository.ts`:
 
 ```typescript
 async find{Entities}(params: {
@@ -96,9 +87,9 @@ async find{Entities}(params: {
 }
 ```
 
-#### 2.2 UseCaseの作成
+## 3. UseCase作成
 
-**ファイル:** `/apps/appview/src/application/{endpoint-name}-use-case.ts`
+`apps/subscope/src/application/{endpoint-name}-use-case.ts`:
 
 ```typescript
 import { asDid } from "@atproto/did";
@@ -123,7 +114,6 @@ export class {EndpointName}UseCase {
   async execute(params: {EndpointName}Params) {
     // DIDまたはハンドルの解決
     let actorDid: ReturnType<typeof asDid>;
-
     if (params.actor.startsWith("did:")) {
       actorDid = asDid(params.actor);
     } else {
@@ -135,7 +125,7 @@ export class {EndpointName}UseCase {
       actorDid = did;
     }
 
-    // データ取得とカーソルペジネーション
+    // limit + 1件取得してカーソルペジネーション判定
     const results = await this.{entity}Repository.find{Entities}({
       db: params.db,
       actorDid,
@@ -145,23 +135,21 @@ export class {EndpointName}UseCase {
 
     const hasMore = results.length > params.limit;
     const finalResults = hasMore ? results.slice(0, params.limit) : results;
-
     const cursor = hasMore && results.length > params.limit
       ? results[params.limit - 1]?.createdAt.toISOString()
       : undefined;
 
-    // Lexiconに合わせた形式で返す
     return {
       cursor,
-      // 必要なデータ変換
+      // Lexiconに合わせた形式でデータ変換
     };
   }
 }
 ```
 
-#### 2.3 ルートハンドラーの作成
+## 4. ルートハンドラー作成
 
-**ファイル:** `/apps/appview/src/presentation/routes/app/bsky/{category}/{endpointName}.ts`
+`apps/subscope/src/presentation/routes/app/bsky/{category}/{endpointName}.ts`:
 
 ```typescript
 import { isDid } from "@atproto/did";
@@ -179,12 +167,8 @@ export class {EndpointName} {
   handle(server: Server) {
     server.app.bsky.{category}.{endpointName}({
       handler: async ({ params }) => {
-        // パラメータバリデーション
         if (!isDid(params.actor) && !isHandle(params.actor)) {
-          return {
-            status: 400,
-            message: "Invalid actor",
-          };
+          return { status: 400, message: "Invalid actor" };
         }
 
         const result = await this.{endpointName}UseCase.execute({
@@ -194,41 +178,35 @@ export class {EndpointName} {
           cursor: params.cursor,
         });
 
-        return {
-          encoding: "application/json",
-          body: result,
-        };
+        return { encoding: "application/json", body: result };
       },
     });
   }
 }
 ```
 
-#### 2.4 DIコンテナへの登録
+## 5. DIコンテナ登録
 
-**ファイル:** `/apps/appview/src/appview.ts`
+### appview.tsへの登録
+
+`apps/subscope/src/appview.ts`:
 
 ```typescript
-// インポートを追加
 import { {EndpointName}UseCase } from "./application/{endpoint-name}-use-case.js";
 import { {EndpointName} } from "./presentation/routes/app/bsky/{category}/{endpointName}.js";
 
 createInjector()
-  // ... 既存の登録
-
   // application
   .provideClass("{endpointName}UseCase", {EndpointName}UseCase)
-
   // presentation
   .provideClass("{endpointName}", {EndpointName})
-
-  // ... 残りの設定
 ```
 
-**ファイル:** `/apps/appview/src/presentation/routes/xrpc.ts`
+### XRPCルーターへの登録
+
+`apps/subscope/src/presentation/routes/xrpc.ts`:
 
 ```typescript
-// インポートを追加
 import type { {EndpointName} } from "./app/bsky/{category}/{endpointName}.js";
 
 export class XRPCRouter {
@@ -248,11 +226,9 @@ export class XRPCRouter {
 }
 ```
 
-### 3. 型の互換性確保
+## 6. 型の互換性確保
 
-#### 3.1 ProfileView vs ProfileViewDetailed
-
-Lexiconが`ProfileView`を期待する場合、既存の`ProfileViewDetailed`を返すメソッドとは別に新しいメソッドを作成する必要があります。
+Lexiconが `ProfileView` を期待する場合、`ProfileViewDetailed` を返すメソッドとは別に作成：
 
 ```typescript
 // ProfileViewServiceに追加
@@ -267,9 +243,9 @@ async findProfileView(handleOrDids: HandleOrDid[]): Promise<AppBskyActorDefs.Pro
 }
 ```
 
-### 4. テストの実装
+## 7. テスト実装
 
-**ファイル:** `/apps/appview/src/application/{endpoint-name}-use-case.test.ts`
+`apps/subscope/src/application/{endpoint-name}-use-case.test.ts`:
 
 ```typescript
 import { setupTestDatabase } from "@repo/test-utils/setup";
@@ -300,49 +276,22 @@ describe("{EndpointName}UseCase", () => {
 });
 ```
 
-### 5. 最終確認
-
-#### 5.1 型チェックとフォーマット
-
-```bash
-# 型チェック
-pnpm typecheck
-
-# フォーマットとlint
-pnpm format
-```
-
-#### 5.2 実装リストの更新
-
-`/docs/tasks.md`を更新して、実装済みのエンドポイントにチェックを入れます。
-
-## トラブルシューティング
+## 8. トラブルシューティング
 
 ### クライアントコードが生成されない
 
-1. `pnpm build --force`でキャッシュをクリアして再ビルド
-2. postinstall.shにパスが正しく追加されているか確認
-3. `pnpm install`を再実行
+- `pnpm build --force` でキャッシュクリア後再ビルド
+- `postinstall.sh` のパスを確認
+- `pnpm install` を再実行
 
 ### 型エラーが発生する
 
-1. Lexicon定義と実装の型が一致しているか確認
-2. 必要に応じて新しいメソッドを作成（ProfileView vs ProfileViewDetailedなど）
-3. DIコンテナへの登録漏れがないか確認
+- Lexicon定義と実装の型が一致しているか確認
+- ProfileView vs ProfileViewDetailed など型の違いに注意
+- DIコンテナの登録漏れを確認
 
 ### ESLintエラー
 
-1. `params.limit ?? 50`を`params.limit || 50`に変更
-2. 冗長な型定義を削除（`Handle | string`→`string`）
-3. ファイル末尾に改行を追加
-
-## 実装例
-
-実際の実装例として`app.bsky.graph.getFollows`の場合：
-
-- UseCase: `/apps/appview/src/application/get-follows-use-case.ts`
-- Repository: `/apps/appview/src/infrastructure/follow-repository.ts`
-- Route: `/apps/appview/src/presentation/routes/app/bsky/graph/getFollows.ts`
-- Test: `/apps/appview/src/application/get-follows-use-case.test.ts`
-
-このガイドを参考に、任意のXRPCエンドポイントを実装できます。
+- `params.limit ?? 50` → `params.limit || 50` に変更
+- 冗長な型定義を削除（`Handle | string` → `string`）
+- ファイル末尾に改行を追加
