@@ -41,7 +41,14 @@ export const Empty: Story = {
   },
 };
 
-export const WithNextPage: Story = {
+export const Loading: Story = {
+  args: {
+    codes: [],
+    isLoading: true,
+  },
+};
+
+export const LoadingMore: Story = {
   args: {
     codes: [
       {
@@ -50,6 +57,6 @@ export const WithNextPage: Story = {
         createdAt: "2025-01-01T00:00:00.000Z",
       },
     ],
-    nextCursor: "cursor-abc123",
+    isFetchingNextPage: true,
   },
 };

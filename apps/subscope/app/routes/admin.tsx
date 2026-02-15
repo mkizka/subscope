@@ -1,6 +1,4 @@
 import { ResponseType, XRPCError } from "@atproto/xrpc";
-// eslint-disable-next-line unused-imports/no-unused-imports
-import type { MeSubscoAdminGetInviteCodes as _ } from "@repo/client/api";
 import { redirect } from "react-router";
 
 import { AdminPage } from "@/app/features/admin/page";
@@ -11,7 +9,7 @@ export function meta() {
   return [{ title: "管理画面 - subscope" }];
 }
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
+export const loader = async ({ context }: Route.LoaderArgs) => {
   if (!context.auth) {
     throw redirect("/login");
   }
@@ -22,13 +20,6 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
     if (accessResponse.data.status !== "authorized") {
       throw redirect("/");
     }
-    const url = new URL(request.url);
-    const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.me.subsco.admin.getInviteCodes({
-      limit: 10,
-      cursor,
-    });
-    return response.data;
   } catch (e) {
     if (
       e instanceof XRPCError &&
@@ -41,7 +32,6 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   }
 };
 
-export default function Admin({ loaderData }: Route.ComponentProps) {
-  const { codes, cursor } = loaderData;
-  return <AdminPage codes={codes} nextCursor={cursor} />;
+export default function Admin() {
+  return <AdminPage />;
 }

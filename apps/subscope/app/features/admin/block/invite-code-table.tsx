@@ -1,6 +1,3 @@
-import { Link } from "react-router";
-
-import { Button } from "@/app/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,19 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/table";
+import { InfiniteScrollTrigger } from "@/app/features/admin/parts/infinite-scroll-trigger";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 
-type InviteCode = {
+export type InviteCode = {
   code: string;
   expiresAt: string;
   createdAt: string;
   usedAt?: string;
   usedBy?: { did: string; handle?: string };
-};
-
-type Props = {
-  codes: InviteCode[];
-  nextCursor?: string;
 };
 
 function formatDate(dateString: string) {
@@ -38,7 +31,21 @@ function formatDate(dateString: string) {
   });
 }
 
-export function InviteCodeTable({ codes, nextCursor }: Props) {
+type Props = {
+  codes: InviteCode[];
+  isLoading?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
+  hasNextPage?: boolean;
+};
+
+export function InviteCodeTable({
+  codes,
+  isLoading,
+  isFetchingNextPage,
+  onLoadMore,
+  hasNextPage,
+}: Props) {
   return (
     <>
       <Card>
@@ -57,10 +64,17 @@ export function InviteCodeTable({ codes, nextCursor }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {codes.length === 0 && (
+              {!isLoading && codes.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="py-8 text-center">
                     招待コードはまだありません
+                  </TableCell>
+                </TableRow>
+              )}
+              {isLoading && (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-8 text-center">
+                    読み込み中...
                   </TableCell>
                 </TableRow>
               )}
@@ -84,18 +98,16 @@ export function InviteCodeTable({ codes, nextCursor }: Props) {
           </Table>
         </CardContent>
       </Card>
-      {nextCursor && (
-        <div className="mt-4 flex justify-center">
-          <Button
-            variant="outline"
-            nativeButton={false}
-            render={
-              <Link to={`/admin?cursor=${encodeURIComponent(nextCursor)}`} />
-            }
-          >
-            次のページ
-          </Button>
-        </div>
+      {isFetchingNextPage && (
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          読み込み中...
+        </p>
+      )}
+      {onLoadMore && (
+        <InfiniteScrollTrigger
+          onIntersect={onLoadMore}
+          enabled={hasNextPage && !isFetchingNextPage}
+        />
       )}
     </>
   );
