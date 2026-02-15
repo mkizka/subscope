@@ -5,7 +5,12 @@ import eslintPluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import storybook from "eslint-plugin-storybook";
 
 export default defineConfig(
-  mkizka,
+  {
+    extends: mkizka,
+    rules: {
+      "@typescript-eslint/only-throw-error": "off",
+    },
+  },
   importAlias.configs.recommended,
   storybook.configs["flat/recommended"],
   {
