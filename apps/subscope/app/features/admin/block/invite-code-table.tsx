@@ -59,7 +59,7 @@ export function InviteCodeTable({ codes, nextCursor }: Props) {
             <TableBody>
               {codes.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={5} className="py-8 text-center">
                     招待コードはまだありません
                   </TableCell>
                 </TableRow>
@@ -85,7 +85,7 @@ export function InviteCodeTable({ codes, nextCursor }: Props) {
         </CardContent>
       </Card>
       {nextCursor && (
-        <div className="flex justify-center mt-4">
+        <div className="mt-4 flex justify-center">
           <Button
             variant="outline"
             nativeButton={false}
