@@ -1,6 +1,9 @@
 import type { NodeOAuthClient } from "@atproto/oauth-client-node";
+import { SubscoAgent } from "@repo/client/api";
 import type { ILoggerManager } from "@repo/common/domain";
 import { Router } from "express";
+
+import { env } from "@/server/shared/env.js";
 
 import type { OAuthSession } from "./session.js";
 
@@ -44,6 +47,16 @@ export const oauthRouterFactory = (
         new URL(req.url, `http://${req.headers.host}`).searchParams,
       );
       await oauthSession.saveUserDid(req, res, session.did);
+
+      const agent = new SubscoAgent({
+        oauthSession: session,
+        atprotoProxy: `${env.SERVICE_DID}#bsky_appview`,
+      });
+      const { data } = await agent.me.subsco.admin.verifyAccess();
+      if (data.status === "needsSetup") {
+        await agent.me.subsco.admin.registerAdmin();
+      }
+
       res.redirect("/");
     } catch (error) {
       logger.error(error, "OAuthコールバックに失敗しました");
