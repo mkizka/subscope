@@ -1,3 +1,4 @@
+import { Button } from "@/app/components/ui/button";
 import {
   Card,
   CardContent,
@@ -37,6 +38,8 @@ type Props = {
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  onCreateCode: () => void;
+  isCreating: boolean;
 };
 
 export function InviteCodeTable({
@@ -45,12 +48,17 @@ export function InviteCodeTable({
   isFetchingNextPage,
   onLoadMore,
   hasNextPage,
+  onCreateCode,
+  isCreating,
 }: Props) {
   return (
     <>
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-2xl font-bold">招待コード一覧</CardTitle>
+          <Button onClick={onCreateCode} disabled={isCreating}>
+            {isCreating ? "作成中..." : "新規作成"}
+          </Button>
         </CardHeader>
         <CardContent className="p-0">
           <Table>

@@ -1,4 +1,8 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { InviteCodeTable } from "./invite-code-table";
 
@@ -26,7 +30,17 @@ async function fetchInviteCodes(cursor?: string): Promise<InviteCodesResponse> {
   return response.json() as Promise<InviteCodesResponse>;
 }
 
+async function createInviteCode(): Promise<void> {
+  const response = await fetch("/admin/api/invite-codes", {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error("招待コードの作成に失敗しました");
+  }
+}
+
 export function InviteCodeTableContainer() {
+  const queryClient = useQueryClient();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
       queryKey: ["inviteCodes"],
@@ -37,6 +51,13 @@ export function InviteCodeTableContainer() {
       select: (data) => data.pages.flatMap((page) => page.codes),
     });
 
+  const createMutation = useMutation({
+    mutationFn: createInviteCode,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["inviteCodes"] });
+    },
+  });
+
   return (
     <InviteCodeTable
       codes={data ?? []}
@@ -44,6 +65,8 @@ export function InviteCodeTableContainer() {
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={fetchNextPage}
       hasNextPage={hasNextPage}
+      onCreateCode={() => createMutation.mutate()}
+      isCreating={createMutation.isPending}
     />
   );
 }
