@@ -1,5 +1,3 @@
-import { createRequestHandler } from "@react-router/express";
-import type { SubscoAgent } from "@repo/client/api";
 import type { IJobQueue } from "@repo/common/domain";
 import express from "express";
 import { Router } from "express";
@@ -7,45 +5,11 @@ import { Router } from "express";
 import type { OAuthSession } from "@/server/features/oauth/session";
 import { env } from "@/server/shared/env";
 
-type AppLoadContextAuth = {
-  userDid: string;
-  agent: SubscoAgent;
+import { createHandler } from "./handler";
+
+type HandlerModule = {
+  createHandler: typeof createHandler;
 };
-
-type AppLoadContextInjected = {
-  jobQueue: IJobQueue;
-};
-
-declare module "react-router" {
-  interface AppLoadContext {
-    auth: AppLoadContextAuth | null;
-    injected: AppLoadContextInjected;
-  }
-}
-
-const getLoadContext =
-  (oauthSession: OAuthSession, jobQueue: IJobQueue) =>
-  async (
-    req: express.Request,
-    res: express.Response,
-  ): Promise<{
-    auth: AppLoadContextAuth | null;
-    injected: AppLoadContextInjected;
-  }> => {
-    const agent = await oauthSession.getAgent(req, res);
-    if (agent) {
-      return {
-        auth: {
-          userDid: agent.did,
-          agent,
-        },
-        injected: {
-          jobQueue,
-        },
-      };
-    }
-    return { auth: null, injected: { jobQueue } };
-  };
 
 export const clientRouterFactory = async (
   oauthSession: OAuthSession,
@@ -55,13 +19,7 @@ export const clientRouterFactory = async (
 
   if (env.NODE_ENV === "production") {
     router.use(express.static("build/client"));
-    router.use(
-      createRequestHandler({
-        // @ts-expect-error
-        build: () => import("../../../build/server/index.js"),
-        getLoadContext: getLoadContext(oauthSession, jobQueue),
-      }),
-    );
+    router.use(createHandler(oauthSession, jobQueue));
   } else {
     const viteDevServer = await import("vite").then((vite) =>
       vite.createServer({
@@ -69,14 +27,21 @@ export const clientRouterFactory = async (
       }),
     );
     router.use(viteDevServer.middlewares);
-    router.use(
-      createRequestHandler({
-        // @ts-expect-error
-        build: () =>
-          viteDevServer.ssrLoadModule("virtual:react-router/server-build"),
-        getLoadContext: getLoadContext(oauthSession, jobQueue),
-      }),
-    );
+    router.use(async (req, res, next) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        const module = (await viteDevServer.ssrLoadModule(
+          "./server/features/client/handler.ts",
+        )) as HandlerModule;
+        const handler = module.createHandler(oauthSession, jobQueue);
+        return await handler(req, res, next);
+      } catch (error) {
+        if (typeof error === "object" && error instanceof Error) {
+          viteDevServer.ssrFixStacktrace(error);
+        }
+        next(error);
+      }
+    });
   }
 
   return router;

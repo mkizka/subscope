@@ -2,6 +2,7 @@ import { Link } from "react-router";
 
 import { AppLayout } from "@/app/components/layout";
 import { Button } from "@/app/components/ui/button";
+import { expressContext } from "@/app/context/express";
 
 import type { Route } from "./+types/_index";
 
@@ -13,8 +14,9 @@ export function meta() {
 }
 
 export const loader = ({ context }: Route.LoaderArgs) => {
+  const server = context.get(expressContext);
   return {
-    did: context.auth?.userDid || null,
+    did: server.agent?.did,
   };
 };
 

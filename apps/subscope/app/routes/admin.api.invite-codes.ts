@@ -1,16 +1,18 @@
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 // eslint-disable-next-line unused-imports/no-unused-imports
 import type * as _ from "@repo/client/api";
-import { data, redirect } from "react-router";
+import { data } from "react-router";
 import { z } from "zod";
+
+import { agentContext } from "@/app/context/agent";
+import { adminRequiredMiddleware } from "@/app/middlewares/auth";
 
 import type { Route } from "./+types/admin.api.invite-codes";
 
+export const middleware: Route.MiddlewareFunction[] = [adminRequiredMiddleware];
+
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  if (!context.auth) {
-    throw redirect("/login");
-  }
-  const { agent } = context.auth;
+  const agent = context.get(agentContext);
 
   try {
     const url = new URL(request.url);
@@ -33,10 +35,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  if (!context.auth) {
-    throw redirect("/login");
-  }
-  const { agent } = context.auth;
+  const agent = context.get(agentContext);
 
   if (request.method === "DELETE") {
     try {
