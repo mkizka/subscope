@@ -15,6 +15,7 @@ type MenuItem = {
   title: string;
   icon: LucideIcon;
   href: string;
+  reload?: boolean;
 };
 
 type Props = {

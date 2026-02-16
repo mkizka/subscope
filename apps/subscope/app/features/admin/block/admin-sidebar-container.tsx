@@ -5,7 +5,12 @@ import { AdminSidebar } from "./admin-sidebar";
 
 const menuItems = [
   { title: "招待コード", icon: TicketIcon, href: "/admin" },
-  { title: "Bull Board", icon: LayoutDashboardIcon, href: "/admin/bull-board" },
+  {
+    title: "Bull Board",
+    icon: LayoutDashboardIcon,
+    href: "/admin/bull-board",
+    reload: true,
+  },
 ];
 
 export function AdminSidebarContainer() {

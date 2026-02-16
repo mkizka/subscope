@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { Link } from "react-router";
 
 import {
   SidebarMenuButton,
@@ -10,12 +11,22 @@ type Props = {
   href: string;
   icon: LucideIcon;
   isActive: boolean;
+  reload?: boolean;
 };
 
-export function SidebarNavItem({ title, href, icon: Icon, isActive }: Props) {
+export function SidebarNavItem({
+  title,
+  href,
+  icon: Icon,
+  isActive,
+  reload,
+}: Props) {
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton isActive={isActive} render={<a href={href} />}>
+      <SidebarMenuButton
+        isActive={isActive}
+        render={<Link to={href} reloadDocument={reload} />}
+      >
         <Icon />
         <span>{title}</span>
       </SidebarMenuButton>
