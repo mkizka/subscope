@@ -2,7 +2,7 @@ import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { redirect } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
-import { AdminPage } from "@/app/features/admin/page";
+import { AdminPage } from "@/app/features/admin/pages/admin";
 import { adminRequiredMiddleware } from "@/app/middlewares/auth";
 
 import type { Route } from "./+types/admin";

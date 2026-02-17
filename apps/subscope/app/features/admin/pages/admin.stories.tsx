@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { AdminPage } from "./page";
+import { AdminPage } from "./admin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
