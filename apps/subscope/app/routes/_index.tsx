@@ -1,32 +1,15 @@
-import { Link } from "react-router";
-
-import { AppLayout } from "@/app/components/layout";
-import { Button } from "@/app/components/ui/button";
-import { expressContext } from "@/app/context/express";
-
-import type { Route } from "./+types/_index";
+import { HomePage } from "@/app/features/home/pages/home";
 
 export function meta() {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Subscope - 省ストレージなBluesky互換Appview" },
+    {
+      name: "description",
+      content: "Tapを利用して省ストレージを目指したBluesky互換のAppview",
+    },
   ];
 }
 
-export const loader = ({ context }: Route.LoaderArgs) => {
-  const server = context.get(expressContext);
-  return {
-    did: server.agent?.did,
-  };
-};
-
-export default function Home({ loaderData }: Route.ComponentProps) {
-  const { did } = loaderData;
-  return (
-    <AppLayout>
-      <h1>home</h1>
-      <p>Your DID: {did ?? "not logged in"}</p>
-      <Button nativeButton={false} render={<Link to="/login">ログイン</Link>} />
-    </AppLayout>
-  );
+export default function Home() {
+  return <HomePage />;
 }
