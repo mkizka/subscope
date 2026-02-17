@@ -1,4 +1,5 @@
 import "@/app/app.css";
+import "./preview.css";
 
 import type { Preview } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";

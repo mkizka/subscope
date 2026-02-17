@@ -52,7 +52,7 @@ Reactコンポーネントは以下の方針で実装しています。
   - features/{feature}
     - /parts ... components/uiなどを使用した最小のUI。単体で意味を持たない
     - /blocks ... partsを使用したUIのまとまり。単体で意味を持つ
-    - page.tsx ... parts,blocksを使用したページレイアウト
+    - /pages ... parts,blocksを使用したページレイアウト
 
 ### 仕様書・資料など
 
