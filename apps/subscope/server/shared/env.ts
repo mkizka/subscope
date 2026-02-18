@@ -14,51 +14,48 @@ const DEVELOPMENT_PRIVATE_KEY =
 const DEVELOPMENT_COOKIE_SECRET =
   "9k+IXwNgwmTlwte3xCOm+iy1qhUkKku7+wUpveFPe9y2";
 
-const schema = z.object({
-  NODE_ENV: z.enum(["development", "production", "test"]),
-  PORT: z.coerce.number().default(3000),
-  LOG_LEVEL: z
-    .enum(["debug", "info", "warn", "error"])
-    .default(match({ prod: "info", dev: "debug" })),
-  REDIS_URL: match({
-    prod: z.url(),
-    dev: z.url().default("redis://localhost:6379"),
-  }),
-  PUBLIC_URL: match({
-    prod: z.string(),
-    dev: z.string().default("http://subscope.localhost:3000"),
-  }),
-  SERVICE_DID: match({
-    prod: z.string(),
-    dev: z.string().default("did:web:localhost%3A3000"),
-  }),
-  // openssl rand -base64 33
-  COOKIE_SECRET: match({
-    prod: z.string().min(32),
-    dev: z.string().min(32).default(DEVELOPMENT_COOKIE_SECRET),
-  }),
-  // openssl ecparam -name prime256v1 -genkey | openssl pkcs8 -topk8 -nocrypt | openssl base64 -A
-  PRIVATE_KEY_ES256_B64: match({
-    prod: z.string(),
-    dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
-  }),
-  ATPROTO_PLC_URL: match({
-    prod: z.url().default("https://plc.directory"),
-    dev: z.url().default("http://localhost:2582"),
-  }),
-  DATABASE_URL: match({
-    prod: z.url(),
-    dev: z
-      .url()
-      .default("postgresql://postgres:password@localhost:5432/postgres"),
-  }),
-  BLOB_CACHE_DIR: match({
-    prod: z.string(),
-    dev: z.string().default("./cache"),
-  }),
-  CACHE_CLEANUP_CRON: z.string().default("* * * * *"), // 1分間隔
-  CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
-});
+const schema = z
+  .object({
+    NODE_ENV: z.enum(["development", "production", "test"]),
+    PORT: z.coerce.number().default(3000),
+    LOG_LEVEL: z
+      .enum(["debug", "info", "warn", "error"])
+      .default(match({ prod: "info", dev: "debug" })),
+    REDIS_URL: match({
+      prod: z.url(),
+      dev: z.url().default("redis://localhost:6379"),
+    }),
+    PUBLIC_URL: z.string(),
+    SERVICE_DID: z.string().optional(),
+    // openssl rand -base64 33
+    COOKIE_SECRET: match({
+      prod: z.string().min(32),
+      dev: z.string().min(32).default(DEVELOPMENT_COOKIE_SECRET),
+    }),
+    // openssl ecparam -name prime256v1 -genkey | openssl pkcs8 -topk8 -nocrypt | openssl base64 -A
+    PRIVATE_KEY_ES256_B64: match({
+      prod: z.string(),
+      dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
+    }),
+    ATPROTO_PLC_URL: z.string().default("https://plc.directory"),
+    DATABASE_URL: match({
+      prod: z.url(),
+      dev: z
+        .url()
+        .default("postgresql://postgres:password@localhost:5432/postgres"),
+    }),
+    BLOB_CACHE_DIR: match({
+      prod: z.string(),
+      dev: z.string().default("./cache"),
+    }),
+    CACHE_CLEANUP_CRON: z.string().default("* * * * *"), // 1分間隔
+    CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
+  })
+  .transform((val) => ({
+    ...val,
+    SERVICE_DID:
+      val.SERVICE_DID ?? `did:web:${new URL(val.PUBLIC_URL).hostname}`,
+  }));
 
 export const env = (() => {
   try {

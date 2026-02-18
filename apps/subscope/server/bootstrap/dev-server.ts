@@ -29,5 +29,5 @@ app.use(async (req, res, next) => {
 });
 
 app.listen(env.PORT, () => {
-  console.log(`Development server is running at http://localhost:${env.PORT}`);
+  console.log(`Development server is running at ${env.PUBLIC_URL}`);
 });
