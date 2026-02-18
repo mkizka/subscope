@@ -24,7 +24,6 @@ import { ImageResizer } from "@/server/features/blob-proxy/infrastructure/image-
 import { imagesRouterFactory } from "@/server/features/blob-proxy/presentation/images.js";
 import { clientRouterFactory } from "@/server/features/client/router.js";
 import { oauthClientFactory } from "@/server/features/oauth/client.js";
-import { authMiddlewareFactory } from "@/server/features/oauth/middleware.js";
 import { oauthRouterFactory } from "@/server/features/oauth/oauth.js";
 import { OAuthSession } from "@/server/features/oauth/session.js";
 import { SessionStore, StateStore } from "@/server/features/oauth/storage.js";
@@ -220,7 +219,6 @@ const server = createInjector()
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   .provideClass("unsubscribeServerUseCase", UnsubscribeServerUseCase)
   // presentation
-  .provideFactory("authMiddleware", authMiddlewareFactory)
   .provideFactory("oauthRouter", oauthRouterFactory)
   .provideFactory("blobProxyRouter", imagesRouterFactory)
   .provideFactory("clientRouter", clientRouterFactory)
