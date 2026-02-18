@@ -23,7 +23,6 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       rollupOptions: isSsrBuild
         ? {
             input: "./server/bootstrap/server.ts",
-            external: [/^@atproto\//, /^@atproto-labs\//],
           }
         : undefined,
     },

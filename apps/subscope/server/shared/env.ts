@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { fromError } from "zod-validation-error";
+import { z } from "zodV4";
 
 export const isProduction =
   process.env.NODE_ENV === "production" && !process.env.E2E;

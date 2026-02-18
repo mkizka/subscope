@@ -2,7 +2,7 @@ import { ResponseType, XRPCError } from "@atproto/xrpc";
 // eslint-disable-next-line unused-imports/no-unused-imports
 import type * as _ from "@repo/client/api";
 import { data } from "react-router";
-import { z } from "zod";
+import { z } from "zodV4";
 
 import { agentContext } from "@/app/context/agent";
 import { adminRequiredMiddleware } from "@/app/middlewares/auth";

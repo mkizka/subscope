@@ -1,7 +1,7 @@
 import { isValidHandle } from "@atproto/syntax";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
-import { z } from "zod";
+import { z } from "zodV4";
 
 import { LoginPresenter } from "./presenter";
 
