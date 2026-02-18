@@ -25,16 +25,6 @@ export class SubscopeServer {
     app.use(loggingMiddleware(logger));
     app.use(express.urlencoded({ extended: true }));
 
-    // 開発環境でのOAuthログイン時 http://127.0.0.1/oauth/callback にリダイレクトされるので、
-    // そこからさらにPUBLIC_URLにリダイレクトさせる
-    app.use((req, res, next) => {
-      if (env.NODE_ENV === "development" && req.hostname === "127.0.0.1") {
-        res.redirect(new URL(req.originalUrl, env.PUBLIC_URL).toString());
-      } else {
-        next();
-      }
-    });
-
     app.use("/oauth", oauthRouter);
     app.use("/images", blobProxyRouter);
     app.use(xrpcRouter);
