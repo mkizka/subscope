@@ -39,9 +39,8 @@ pnpm i
 pnpm dev
 ```
 
-The following servers will start. Note that subscope must be accessed via the URL below for OAuth authentication to work.
+The following servers will start.
 
-- subscope ... http://subscope.localhost:3000
+- subscope ... http://localhost:3000
 - ingester ... http://localhost:3001
 - worker ... http://localhost:3002
-- Development PDS ... http://localhost:2583
