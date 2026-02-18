@@ -9,7 +9,10 @@ const isStorybook = process.argv[1]?.includes("storybook");
 export default defineConfig(({ isSsrBuild }) => ({
   build: {
     rollupOptions: isSsrBuild
-      ? { input: "./server/bootstrap/server.ts" }
+      ? {
+          input: "./server/bootstrap/server.ts",
+          external: [/^@atproto\//, /^@atproto-labs\//],
+        }
       : undefined,
   },
   plugins: [tailwindcss(), !isStorybook && reactRouter(), tsconfigPaths()],
