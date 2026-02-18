@@ -12,6 +12,7 @@ export const loginRequiredMiddleware = ({
   if (!server.agent) {
     throw redirect("/login");
   }
+  context.set(agentContext, server.agent);
 };
 
 export const adminRequiredMiddleware = async ({
