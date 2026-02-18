@@ -10,7 +10,7 @@ type Props = {
 
 export function ErrorPage({ title, details, status, stack }: Props) {
   return (
-    <AppLayout>
+    <AppLayout verticalCenter>
       <ErrorCard
         title={title}
         details={details}

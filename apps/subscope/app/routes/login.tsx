@@ -3,7 +3,7 @@ import { LoginContainer } from "@/app/features/login/container";
 
 export default function Login() {
   return (
-    <AppLayout>
+    <AppLayout verticalCenter>
       <LoginContainer />
     </AppLayout>
   );
