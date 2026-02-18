@@ -6,6 +6,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 // https://v2.remix.run/docs/guides/vite
 const isStorybook = process.argv[1]?.includes("storybook");
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
+  build: {
+    rollupOptions: isSsrBuild
+      ? { input: "./server/bootstrap/server.ts" }
+      : undefined,
+  },
   plugins: [tailwindcss(), !isStorybook && reactRouter(), tsconfigPaths()],
-});
+}));

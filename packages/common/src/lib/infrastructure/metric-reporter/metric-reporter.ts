@@ -29,6 +29,7 @@ export class MetricReporter implements IMetricReporter {
   private readonly gauges: GaugeMap;
 
   constructor() {
+    client.register.clear();
     this.counters = {
       resolve_did_request_total: new client.Counter({
         name: "resolve_did_request_total",

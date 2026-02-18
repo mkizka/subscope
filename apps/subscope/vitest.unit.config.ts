@@ -1,11 +1,11 @@
 import { unitConfig } from "@repo/vitest";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { defineProject, mergeConfig } from "vitest/config";
-
-import viteConfig from "./vite.config.js";
 
 const vitestConfig = mergeConfig(
   unitConfig,
   defineProject({
+    plugins: [tsconfigPaths()],
     test: {
       name: "subscope:unit",
       include: [
@@ -16,4 +16,4 @@ const vitestConfig = mergeConfig(
   }),
 );
 
-export default mergeConfig(viteConfig, vitestConfig);
+export default vitestConfig;
