@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { Did } from "@atproto/did";
 import type { AppBskyFeedGetTimeline } from "@repo/client/server";
 
@@ -24,16 +25,26 @@ export class GetTimelineUseCase {
     algorithm: _, // TODO: アルゴリズムごとに実装を追加
     cursor,
   }: GetTimelineParams): Promise<AppBskyFeedGetTimeline.OutputSchema> {
+    console.time("[getTimeline] total");
+
+    console.time("[getTimeline] findFeedItemsWithPagination");
     const page = await this.timelineService.findFeedItemsWithPagination({
       viewerDid,
       limit,
       cursor: cursor ? new Date(cursor) : undefined,
     });
+    console.timeEnd("[getTimeline] findFeedItemsWithPagination");
+    console.debug(`[getTimeline] feedItems: ${page.items.length} items`);
 
+    console.time("[getTimeline] processFeedItems");
     const feed = await this.feedProcessor.processFeedItems(
       page.items,
       viewerDid,
     );
+    console.timeEnd("[getTimeline] processFeedItems");
+    console.debug(`[getTimeline] feed: ${feed.length} posts`);
+
+    console.timeEnd("[getTimeline] total");
 
     return {
       feed,

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
@@ -49,19 +50,33 @@ export class FeedProcessor {
     }
 
     const postAtUris = Array.from(postUris).map((uri) => new AtUri(uri));
+
+    console.time("[processFeedItems] findPostView");
     const postViewMap = await this.postViewService
       .findPostView(postAtUris, viewerDid)
       .then(toMapByUri);
+    console.timeEnd("[processFeedItems] findPostView");
+    console.debug(`[processFeedItems] postUris: ${postAtUris.length}`);
 
+    console.time("[processFeedItems] findByUris+findProfileViewBasic");
     const [repostMap, reposterMap] = await Promise.all([
       this.repostRepository.findByUris(Array.from(repostUris)).then(toMapByUri),
       this.profileViewService
         .findProfileViewBasic(Array.from(reposterDids))
         .then(toMapByDid),
     ]);
+    console.timeEnd("[processFeedItems] findByUris+findProfileViewBasic");
+    console.debug(
+      `[processFeedItems] reposts: ${repostUris.size}, reposters: ${reposterDids.size}`,
+    );
 
+    console.time("[processFeedItems] findByUris(posts)");
     const posts = await this.postRepository.findByUris(postAtUris);
+    console.timeEnd("[processFeedItems] findByUris(posts)");
+
+    console.time("[processFeedItems] replyRefService.findMap");
     const replyRefMap = await this.replyRefService.findMap(posts);
+    console.timeEnd("[processFeedItems] replyRefService.findMap");
 
     return feedItems
       .map((item) => {
