@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { data } from "react-router";
 
@@ -15,12 +14,10 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    console.time("[api.timeline] getTimeline");
     const response = await agent.app.bsky.feed.getTimeline({
       limit: 20,
       cursor,
     });
-    console.timeEnd("[api.timeline] getTimeline");
     return data(response.data);
   } catch (e) {
     if (
