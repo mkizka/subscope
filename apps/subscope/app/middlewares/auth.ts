@@ -10,7 +10,7 @@ export const loginRequiredMiddleware = ({
 }) => {
   const server = context.get(expressContext);
   if (!server.agent) {
-    throw redirect("/login");
+    throw redirect("/");
   }
   context.set(agentContext, server.agent);
 };
@@ -22,7 +22,7 @@ export const adminRequiredMiddleware = async ({
 }) => {
   const server = context.get(expressContext);
   if (!server.agent) {
-    throw redirect("/login");
+    throw redirect("/");
   }
   const response = await server.agent.me.subsco.admin.verifyAccess();
   if (response.data.status !== "authorized") {
