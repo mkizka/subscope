@@ -66,10 +66,17 @@ export function HomePage() {
         </div>
 
         <div className="flex flex-col items-center gap-3">
-          <Button
-            nativeButton={false}
-            render={<Link to="/login">ログイン</Link>}
-          />
+          <div className="flex gap-3">
+            <Button
+              nativeButton={false}
+              render={<Link to="/register">アカウント登録</Link>}
+            />
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link to="/login">ログイン</Link>}
+            />
+          </div>
           <p className="text-center text-sm text-muted-foreground">
             注意：AT Protocolについてある程度分かっている人向けです
           </p>

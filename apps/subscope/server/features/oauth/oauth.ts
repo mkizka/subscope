@@ -57,7 +57,7 @@ export const oauthRouterFactory = (
         await agent.me.subsco.admin.registerAdmin();
       }
 
-      res.redirect("/");
+      res.redirect("/register");
     } catch (error) {
       logger.error(error, "OAuthコールバックに失敗しました");
       res.redirect("/login?error=callback_failed");
