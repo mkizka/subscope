@@ -48,9 +48,7 @@ export class SubscopeServer {
 
   start() {
     this.app.listen(env.PORT, () => {
-      this.logger.info(
-        `Subscope server running at http://localhost:${env.PORT}`,
-      );
+      this.logger.info(`Production server running at ${env.PUBLIC_URL}`);
       this.cacheCleanupScheduler.start();
     });
   }
