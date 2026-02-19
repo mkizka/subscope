@@ -11,7 +11,6 @@
       "Skill(testing)"
     ],
     "deny": [
-      "Bash(cd:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(yarn:*)",
