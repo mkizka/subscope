@@ -17,6 +17,13 @@ const meta = {
       },
     },
   },
+  decorators: [
+    (Story) => (
+      <div className="w-full max-w-sm">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof LoginPresenter>;
 
 export default meta;

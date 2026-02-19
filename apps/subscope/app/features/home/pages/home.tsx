@@ -1,5 +1,3 @@
-import { Link } from "react-router";
-
 import { AppLayout } from "@/app/components/layout";
 import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
@@ -9,7 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
 import { Separator } from "@/app/components/ui/separator";
+import { LoginContainer } from "@/app/features/login/container";
 
 export function HomePage() {
   return (
@@ -66,10 +72,15 @@ export function HomePage() {
         </div>
 
         <div className="flex flex-col items-center gap-3">
-          <Button
-            nativeButton={false}
-            render={<Link to="/login">ログイン</Link>}
-          />
+          <Dialog>
+            <DialogTrigger render={<Button>ログイン</Button>} />
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Subscopeにログイン</DialogTitle>
+              </DialogHeader>
+              <LoginContainer />
+            </DialogContent>
+          </Dialog>
           <p className="text-center text-sm text-muted-foreground">
             注意：AT Protocolについてある程度分かっている人向けです
           </p>
