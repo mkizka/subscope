@@ -23,9 +23,8 @@ export class SubscopeServer {
     const app = express();
 
     app.use(loggingMiddleware(logger));
-    app.use(express.urlencoded({ extended: true }));
 
-    app.use("/oauth", oauthRouter);
+    app.use("/oauth", express.urlencoded({ extended: true }), oauthRouter);
     app.use("/images", blobProxyRouter);
     app.use(xrpcRouter);
     app.use(healthRouter);
