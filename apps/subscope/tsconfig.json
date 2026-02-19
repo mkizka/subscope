@@ -16,7 +16,9 @@
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "zod": ["./node_modules/zodV4"],
+      "zod/*": ["./node_modules/zodV4/*"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,
