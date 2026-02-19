@@ -29,15 +29,15 @@ export function InviteCodeForm({
   return (
     <form method="POST" className="flex flex-col gap-4" {...formProps}>
       {error && (
-        <div className="
-          rounded-lg bg-destructive/10 p-3 text-sm text-destructive
-        ">
+        <div
+          className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
+        >
           {error}
         </div>
       )}
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium">2. 招待コードを入力</p>
-        <div className="pl-4">
+        <div className="flex flex-col gap-2 pl-4">
           <Input
             disabled={!isLoggedIn}
             placeholder="subsco-me-abcde"
