@@ -1,33 +1,39 @@
 /* eslint-disable no-console */
+import http from "node:http";
+
 import express from "express";
+import * as vite from "vite";
 
 import { env } from "@/server/shared/env";
 
 import type { SubscopeServer } from "./subscope";
 
 const app = express();
+const server = http.createServer(app);
 
-const viteDevServer = await import("vite").then((vite) =>
-  vite.createServer({
-    server: { middlewareMode: true },
-  }),
-);
-app.use(viteDevServer.middlewares);
+const viteServer = await vite.createServer({
+  server: {
+    middlewareMode: { server },
+    hmr: { server },
+  },
+});
+
+app.use(viteServer.middlewares);
 app.use(async (req, res, next) => {
   try {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const { server } = (await viteDevServer.ssrLoadModule(
+    const { server } = (await viteServer.ssrLoadModule(
       "./server/bootstrap/server.ts",
     )) as { server: SubscopeServer };
     return await server.app(req, res, next);
   } catch (error) {
-    if (typeof error === "object" && error instanceof Error) {
-      viteDevServer.ssrFixStacktrace(error);
+    if (error instanceof Error) {
+      viteServer.ssrFixStacktrace(error);
     }
     next(error);
   }
 });
 
-app.listen(env.PORT, () => {
+server.listen(env.PORT, () => {
   console.log(`Development server is running at ${env.PUBLIC_URL}`);
 });
