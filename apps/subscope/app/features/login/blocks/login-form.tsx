@@ -41,9 +41,11 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
         </div>
         <FieldError errors={fields.identifier.errors} />
       </Field>
-      <Button type="submit" className="w-full">
-        ログイン
-      </Button>
+      <div className="flex justify-center">
+        <Button type="submit" className="w-fit">
+          ログイン
+        </Button>
+      </div>
     </form>
   );
 }

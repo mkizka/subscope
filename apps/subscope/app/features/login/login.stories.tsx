@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { LoginPresenter } from "./presenter";
+import { LoginPresenter } from "./login";
 
 const meta = {
   title: "features/Login",

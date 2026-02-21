@@ -17,7 +17,7 @@ import {
 } from "@/app/components/ui/dialog";
 import { FieldError } from "@/app/components/ui/field";
 import { Input } from "@/app/components/ui/input";
-import { LoginFormContainer } from "@/app/features/login/parts/login-form-container";
+import { LoginFormContainer } from "@/app/features/login/blocks/login-form-container";
 
 type Props = {
   isLoggedIn: boolean;
