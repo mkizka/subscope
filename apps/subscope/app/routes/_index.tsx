@@ -1,3 +1,4 @@
+import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { data } from "react-router";
 
 import { expressContext } from "@/app/context/express";
@@ -16,13 +17,20 @@ export function meta() {
   ];
 }
 
-export const loader = ({ context }: Route.LoaderArgs) => {
+export const loader = async ({ context }: Route.LoaderArgs) => {
   const server = context.get(expressContext);
-  return data({ isLoggedIn: server.agent !== null });
+  if (!server.agent) {
+    return data({ isSubscriber: false });
+  }
+  const response = await server.agent.me.subsco.sync.getSubscriptionStatus();
+  const isSubscriber = MeSubscoSyncGetSubscriptionStatus.isSubscribed(
+    response.data,
+  );
+  return data({ isSubscriber });
 };
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  if (loaderData.isLoggedIn) {
+  if (loaderData.isSubscriber) {
     return <TimelinePage />;
   }
   return <HomePage />;
