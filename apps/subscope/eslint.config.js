@@ -18,6 +18,7 @@ export default defineConfig(
     settings: {
       "better-tailwindcss": {
         entryPoint: "app/app.css",
+        strictness: "loose",
       },
     },
   },

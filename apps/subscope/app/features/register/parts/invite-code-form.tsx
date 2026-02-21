@@ -29,9 +29,7 @@ export function InviteCodeForm({
   return (
     <form method="POST" className="flex flex-col gap-4" {...formProps}>
       {error && (
-        <div
-          className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
-        >
+        <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
