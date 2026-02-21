@@ -57,9 +57,9 @@ export function HomePage() {
 
           <Card size="sm">
             <CardHeader>
-              <CardTitle>使い方</CardTitle>
+              <CardTitle>始め方</CardTitle>
               <CardDescription>
-                下のボタンからログインして案内に従ってください。
+                下のボタンからatprotoアカウントを登録、またはログインできます。アカウント登録には招待コードが必要です。
               </CardDescription>
             </CardHeader>
           </Card>
