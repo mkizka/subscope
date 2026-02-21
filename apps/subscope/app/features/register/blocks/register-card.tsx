@@ -1,12 +1,10 @@
 import { CheckCircle2Icon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { Link } from "react-router";
 
 import { Button } from "@/app/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/app/components/ui/card";
@@ -45,19 +43,6 @@ export function RegisterCard({
     <Card className="w-full gap-4">
       <CardHeader>
         <CardTitle tag="h1">アカウント登録</CardTitle>
-        <CardDescription>
-          サービスを利用するにはアカウントの登録と招待コードが必要です。すでに登録済みの方は
-          <Link
-            to="/login"
-            className="
-              underline underline-offset-4
-              hover:text-foreground
-            "
-          >
-            ログイン
-          </Link>
-          へ
-        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
