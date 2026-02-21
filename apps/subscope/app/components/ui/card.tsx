@@ -48,9 +48,13 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+function CardTitle({
+  className,
+  tag: Tag = "div",
+  ...props
+}: React.ComponentProps<"div"> & { tag?: React.ElementType }) {
   return (
-    <div
+    <Tag
       data-slot="card-title"
       className={cn("text-lg font-semibold tracking-tight", className)}
       {...props}

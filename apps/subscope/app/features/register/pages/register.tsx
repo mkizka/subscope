@@ -7,6 +7,7 @@ type Props = {
   isLoggedIn: boolean;
   activeSubmit?: boolean;
   formProps: ComponentProps<"form">;
+  formErrors?: string[];
   inputProps: ComponentProps<"input">;
   fields: {
     inviteCode: {
@@ -14,16 +15,15 @@ type Props = {
       errors?: string[];
     };
   };
-  error?: string;
 };
 
 export function RegisterPage({
   isLoggedIn,
   activeSubmit,
   formProps,
+  formErrors,
   inputProps,
   fields,
-  error,
 }: Props) {
   return (
     <AppLayout verticalCenter>
@@ -31,9 +31,9 @@ export function RegisterPage({
         isLoggedIn={isLoggedIn}
         activeSubmit={activeSubmit}
         formProps={formProps}
+        formErrors={formErrors}
         inputProps={inputProps}
         fields={fields}
-        error={error}
       />
     </AppLayout>
   );

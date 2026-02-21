@@ -38,9 +38,9 @@ export function RegisterContainer({ isLoggedIn }: Props) {
       isLoggedIn={isLoggedIn}
       activeSubmit={isLoggedIn && form.dirty && form.valid}
       formProps={getFormProps(form)}
+      formErrors={form.errors}
       inputProps={getInputProps(fields.inviteCode, { type: "text" })}
       fields={fields}
-      error={form.errors?.[0]}
     />
   );
 }

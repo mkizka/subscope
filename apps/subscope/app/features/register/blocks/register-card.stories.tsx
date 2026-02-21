@@ -46,7 +46,7 @@ export const ActiveSubmit: Story = {
 export const WithError: Story = {
   args: {
     isLoggedIn: true,
-    error: "招待コードが無効または期限切れです",
+    formErrors: ["招待コードが無効または期限切れです"],
   },
 };
 
