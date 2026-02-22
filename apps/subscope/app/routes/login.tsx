@@ -2,16 +2,16 @@ import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { redirect } from "react-router";
 
 import { AppLayout } from "@/app/components/layout";
-import { expressContext } from "@/app/context/express";
 import { LoginContainer } from "@/app/features/login/login-container";
+import { getAgent } from "@/app/lib/oauth/session.server";
 
 import type { Route } from "./+types/login";
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const server = context.get(expressContext);
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const agent = await getAgent(request);
 
-  if (server.agent) {
-    const response = await server.agent.me.subsco.sync.getSubscriptionStatus();
+  if (agent) {
+    const response = await agent.me.subsco.sync.getSubscriptionStatus();
     if (!MeSubscoSyncGetSubscriptionStatus.isSubscribed(response.data)) {
       throw redirect("/register");
     }

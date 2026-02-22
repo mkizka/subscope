@@ -1,9 +1,9 @@
 import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { data } from "react-router";
 
-import { expressContext } from "@/app/context/express";
 import { HomePage } from "@/app/features/home/pages/home";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
+import { getAgent } from "@/app/lib/oauth/session.server";
 
 import type { Route } from "./+types/_index";
 
@@ -17,12 +17,13 @@ export function meta() {
   ];
 }
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const server = context.get(expressContext);
-  if (!server.agent) {
+// TODO: エラーハンドリング追加
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const agent = await getAgent(request);
+  if (!agent) {
     return data({ isSubscriber: false });
   }
-  const response = await server.agent.me.subsco.sync.getSubscriptionStatus();
+  const response = await agent.me.subsco.sync.getSubscriptionStatus();
   const isSubscriber = MeSubscoSyncGetSubscriptionStatus.isSubscribed(
     response.data,
   );

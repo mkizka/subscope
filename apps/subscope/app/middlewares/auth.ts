@@ -1,32 +1,36 @@
 import { data, redirect, type RouterContextProvider } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
-import { expressContext } from "@/app/context/express";
+import { getAgent } from "@/app/lib/oauth/session.server";
 
-export const loginRequiredMiddleware = ({
+export const loginRequiredMiddleware = async ({
+  request,
   context,
 }: {
+  request: Request;
   context: Readonly<RouterContextProvider>;
 }) => {
-  const server = context.get(expressContext);
-  if (!server.agent) {
+  const agent = await getAgent(request);
+  if (!agent) {
     throw redirect("/login");
   }
-  context.set(agentContext, server.agent);
+  context.set(agentContext, agent);
 };
 
 export const adminRequiredMiddleware = async ({
+  request,
   context,
 }: {
+  request: Request;
   context: Readonly<RouterContextProvider>;
 }) => {
-  const server = context.get(expressContext);
-  if (!server.agent) {
+  const agent = await getAgent(request);
+  if (!agent) {
     throw redirect("/login");
   }
-  const response = await server.agent.me.subsco.admin.verifyAccess();
+  const response = await agent.me.subsco.admin.verifyAccess();
   if (response.data.status !== "authorized") {
     throw data("ログイン中のアカウントが管理者ではありません", { status: 403 });
   }
-  context.set(agentContext, server.agent);
+  context.set(agentContext, agent);
 };

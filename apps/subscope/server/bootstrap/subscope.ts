@@ -11,7 +11,6 @@ export class SubscopeServer {
 
   constructor(
     loggerManager: ILoggerManager,
-    oauthRouter: express.Router,
     blobProxyRouter: express.Router,
     xrpcRouter: express.Router,
     healthRouter: express.Router,
@@ -24,7 +23,6 @@ export class SubscopeServer {
 
     app.use(loggingMiddleware(logger));
 
-    app.use("/oauth", express.urlencoded({ extended: true }), oauthRouter);
     app.use("/images", blobProxyRouter);
     app.use(xrpcRouter);
     app.use(healthRouter);
@@ -36,7 +34,6 @@ export class SubscopeServer {
   }
   static inject = [
     "loggerManager",
-    "oauthRouter",
     "blobProxyRouter",
     "xrpcRouter",
     "healthRouter",

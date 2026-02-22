@@ -4,16 +4,14 @@ import type {
   NodeSavedState,
   NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
-import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-export class StateStore implements NodeSavedStateStore {
-  constructor(private db: DatabaseClient) {}
-  static inject = ["db"] as const;
+import { db } from "./db.server.js";
 
+class StateStore implements NodeSavedStateStore {
   async get(key: string): Promise<NodeSavedState | undefined> {
-    const [result] = await this.db
+    const [result] = await db
       .select()
       .from(schema.authState)
       .where(eq(schema.authState.key, key))
@@ -25,7 +23,7 @@ export class StateStore implements NodeSavedStateStore {
 
   async set(key: string, val: NodeSavedState) {
     const state = JSON.stringify(val);
-    await this.db
+    await db
       .insert(schema.authState)
       .values({ key, state })
       .onConflictDoUpdate({
@@ -35,16 +33,13 @@ export class StateStore implements NodeSavedStateStore {
   }
 
   async del(key: string) {
-    await this.db.delete(schema.authState).where(eq(schema.authState.key, key));
+    await db.delete(schema.authState).where(eq(schema.authState.key, key));
   }
 }
 
-export class SessionStore implements NodeSavedSessionStore {
-  constructor(private db: DatabaseClient) {}
-  static inject = ["db"] as const;
-
+class SessionStore implements NodeSavedSessionStore {
   async get(key: string): Promise<NodeSavedSession | undefined> {
-    const [result] = await this.db
+    const [result] = await db
       .select()
       .from(schema.authSession)
       .where(eq(schema.authSession.key, key))
@@ -56,7 +51,7 @@ export class SessionStore implements NodeSavedSessionStore {
 
   async set(key: string, val: NodeSavedSession) {
     const session = JSON.stringify(val);
-    await this.db
+    await db
       .insert(schema.authSession)
       .values({ key, session })
       .onConflictDoUpdate({
@@ -66,8 +61,9 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async del(key: string) {
-    await this.db
-      .delete(schema.authSession)
-      .where(eq(schema.authSession.key, key));
+    await db.delete(schema.authSession).where(eq(schema.authSession.key, key));
   }
 }
+
+export const stateStore = new StateStore();
+export const sessionStore = new SessionStore();

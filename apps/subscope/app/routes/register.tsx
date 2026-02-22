@@ -3,11 +3,11 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { data, redirect } from "react-router";
 
-import { expressContext } from "@/app/context/express";
 import {
   RegisterContainer,
   registerSchema,
 } from "@/app/features/register/pages/register-container";
+import { getAgent } from "@/app/lib/oauth/session.server";
 
 import type { Route } from "./+types/register";
 
@@ -15,22 +15,22 @@ export function meta() {
   return [{ title: "アカウント登録 - Subscope" }];
 }
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
-  const server = context.get(expressContext);
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const agent = await getAgent(request);
 
-  if (server.agent) {
-    const response = await server.agent.me.subsco.sync.getSubscriptionStatus();
+  if (agent) {
+    const response = await agent.me.subsco.sync.getSubscriptionStatus();
     if (MeSubscoSyncGetSubscriptionStatus.isSubscribed(response.data)) {
       throw redirect("/");
     }
   }
 
-  return data({ isLoggedIn: server.agent !== null });
+  return data({ isLoggedIn: agent !== null });
 };
 
-export const action = async ({ request, context }: Route.ActionArgs) => {
-  const server = context.get(expressContext);
-  if (!server.agent) {
+export const action = async ({ request }: Route.ActionArgs) => {
+  const agent = await getAgent(request);
+  if (!agent) {
     throw redirect("/register");
   }
 
@@ -41,7 +41,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   try {
-    await server.agent.me.subsco.sync.subscribeServer({
+    await agent.me.subsco.sync.subscribeServer({
       inviteCode: submission.value.inviteCode,
     });
     return redirect("/");

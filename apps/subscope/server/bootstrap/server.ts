@@ -23,10 +23,6 @@ import { ImageDiskStorage } from "@/server/features/blob-proxy/infrastructure/im
 import { ImageResizer } from "@/server/features/blob-proxy/infrastructure/image-resizer.js";
 import { imagesRouterFactory } from "@/server/features/blob-proxy/presentation/images.js";
 import { clientRouterFactory } from "@/server/features/client/router.js";
-import { oauthClientFactory } from "@/server/features/oauth/client.js";
-import { oauthRouterFactory } from "@/server/features/oauth/oauth.js";
-import { OAuthSession } from "@/server/features/oauth/session.js";
-import { SessionStore, StateStore } from "@/server/features/oauth/storage.js";
 import { ProfileViewBuilder } from "@/server/features/xrpc/application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
 import { CreateAdminService } from "@/server/features/xrpc/application/service/admin/create-admin-service.js";
@@ -137,10 +133,6 @@ const server = createInjector()
   .provideFactory("connectionPool", connectionPoolFactory)
   .provideFactory("db", databaseFactory)
   .provideClass("transactionManager", TransactionManager)
-  .provideClass("oauthStateStore", StateStore)
-  .provideClass("oauthSessionStore", SessionStore)
-  .provideFactory("oauthClient", oauthClientFactory)
-  .provideClass("oauthSession", OAuthSession)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
   .provideClass("imageCacheStorage", ImageDiskStorage)
@@ -219,7 +211,6 @@ const server = createInjector()
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   .provideClass("unsubscribeServerUseCase", UnsubscribeServerUseCase)
   // presentation
-  .provideFactory("oauthRouter", oauthRouterFactory)
   .provideFactory("blobProxyRouter", imagesRouterFactory)
   .provideFactory("clientRouter", clientRouterFactory)
   .provideClass("getPreferences", GetPreferences)
