@@ -1,5 +1,6 @@
 import { redirect } from "react-router";
 
+import { expressContext } from "@/app/context/express";
 import { oauthClient } from "@/app/lib/oauth/client.server";
 import {
   commitSession,
@@ -9,29 +10,43 @@ import {
 
 import type { Route } from "./+types/oauth.callback";
 
-// TODO: エラー箇所事に処理を分岐させる
-// TODO: loggerを受け取るようにする
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
+  const { injected } = context.get(expressContext);
+  const logger = injected.loggerManager.createLogger("oauth.callback");
+
+  let oauthSession;
   try {
     const url = new URL(request.url);
-    const { session } = await oauthClient.callback(url.searchParams);
-    const cookieSession = await getSession(request);
-    cookieSession.set("did", session.did);
+    const callbackResult = await oauthClient.callback(url.searchParams);
+    oauthSession = callbackResult.session;
+  } catch (e) {
+    logger.error(e, "OAuth callback failed");
+    return redirect("/?error=oauth_callback_failed");
+  }
 
-    const agent = createAgent(session);
-    const { data } = await agent.me.subsco.admin.verifyAccess();
-    if (data.status === "needsSetup") {
+  const agent = createAgent(oauthSession);
+  let response;
+  try {
+    response = await agent.me.subsco.admin.verifyAccess();
+  } catch (e) {
+    logger.error(e, "Admin access verification failed");
+    return redirect("/?error=admin_verification_failed");
+  }
+
+  try {
+    if (response.data.status === "needsSetup") {
       await agent.me.subsco.admin.registerAdmin();
     }
-
-    return redirect("/register", {
-      headers: {
-        "Set-Cookie": await commitSession(cookieSession),
-      },
-    });
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error("OAuth callback error:", e);
-    return redirect("/login?error=callback_failed");
+    logger.error(e, "Admin registration failed");
+    return redirect("/?error=admin_registration_failed");
   }
+
+  const cookieSession = await getSession(request);
+  cookieSession.set("did", oauthSession.did);
+  return redirect("/register", {
+    headers: {
+      "Set-Cookie": await commitSession(cookieSession),
+    },
+  });
 };
