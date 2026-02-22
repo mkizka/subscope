@@ -1,12 +1,13 @@
 import { AtSign } from "lucide-react";
 import type { ComponentProps } from "react";
+import { Form } from "react-router";
 
 import { Button } from "@/app/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/app/components/ui/field";
 import { Input } from "@/app/components/ui/input";
 
 type Props = {
-  formProps: ComponentProps<"form">;
+  formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
   fields: {
     identifier: {
@@ -18,7 +19,7 @@ type Props = {
 
 export function LoginForm({ formProps, inputProps, fields }: Props) {
   return (
-    <form
+    <Form
       action="/oauth/login"
       method="POST"
       className="flex flex-col gap-4"
@@ -46,6 +47,6 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
           ログイン
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }

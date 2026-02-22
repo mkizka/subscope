@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react";
+import type { Form } from "react-router";
 import { Link } from "react-router";
 
 import {
@@ -11,7 +12,7 @@ import {
 import { LoginForm } from "./blocks/login-form";
 
 type Props = {
-  formProps: ComponentProps<"form">;
+  formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
   fields: {
     identifier: {

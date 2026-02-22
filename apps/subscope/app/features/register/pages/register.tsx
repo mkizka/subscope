@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react";
+import type { Form } from "react-router";
 
 import { AppLayout } from "@/app/components/layout";
 import { RegisterCard } from "@/app/features/register/blocks/register-card";
@@ -6,7 +7,7 @@ import { RegisterCard } from "@/app/features/register/blocks/register-card";
 type Props = {
   isLoggedIn: boolean;
   activeSubmit?: boolean;
-  formProps: ComponentProps<"form">;
+  formProps: ComponentProps<typeof Form>;
   formErrors?: string[];
   inputProps: ComponentProps<"input">;
   fields: {

@@ -1,5 +1,6 @@
 import { CheckCircle2Icon } from "lucide-react";
 import type { ComponentProps } from "react";
+import { Form } from "react-router";
 
 import { Button } from "@/app/components/ui/button";
 import {
@@ -20,7 +21,7 @@ import { LoginFormContainer } from "@/app/features/login/blocks/login-form-conta
 type Props = {
   isLoggedIn: boolean;
   activeSubmit?: boolean;
-  formProps: ComponentProps<"form">;
+  formProps: ComponentProps<typeof Form>;
   formErrors?: string[];
   inputProps: ComponentProps<"input">;
   fields: {
@@ -65,7 +66,7 @@ export function RegisterCard({
             )}
           </div>
         </div>
-        <form method="POST" className="flex flex-col gap-4" {...formProps}>
+        <Form method="post" className="flex flex-col gap-4" {...formProps}>
           <div className="flex flex-col gap-2">
             <h2 className="font-medium">2. 招待コードを入力</h2>
             <div className="flex flex-col gap-2 pl-4">
@@ -82,7 +83,7 @@ export function RegisterCard({
               登録する
             </Button>
           </div>
-        </form>
+        </Form>
       </CardContent>
     </Card>
   );
