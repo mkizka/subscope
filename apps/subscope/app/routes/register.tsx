@@ -3,6 +3,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { data, redirect } from "react-router";
 
+import { HydrateFallbackElement } from "@/app/components/hydrate-fallback";
 import { expressContext } from "@/app/context/express";
 import {
   RegisterContainer,
@@ -67,6 +68,10 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     );
   }
 };
+
+export function HydrateFallback() {
+  return <HydrateFallbackElement />;
+}
 
 export default function Register({ loaderData }: Route.ComponentProps) {
   return <RegisterContainer isLoggedIn={loaderData.isLoggedIn} />;

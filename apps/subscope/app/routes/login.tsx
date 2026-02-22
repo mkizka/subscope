@@ -1,6 +1,7 @@
 import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { redirect } from "react-router";
 
+import { HydrateFallbackElement } from "@/app/components/hydrate-fallback";
 import { AppLayout } from "@/app/components/layout";
 import { expressContext } from "@/app/context/express";
 import { LoginContainer } from "@/app/features/login/login-container";
@@ -17,6 +18,10 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
     }
   }
 };
+
+export function HydrateFallback() {
+  return <HydrateFallbackElement />;
+}
 
 export default function Login() {
   return (

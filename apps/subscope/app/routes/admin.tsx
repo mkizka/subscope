@@ -1,6 +1,7 @@
 import { ResponseType, XRPCError } from "@atproto/xrpc";
 import { redirect } from "react-router";
 
+import { HydrateFallbackElement } from "@/app/components/hydrate-fallback";
 import { agentContext } from "@/app/context/agent";
 import { AdminPage } from "@/app/features/admin/pages/admin";
 import { adminRequiredMiddleware } from "@/app/middlewares/auth";
@@ -32,6 +33,10 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
     throw e;
   }
 };
+
+export function HydrateFallback() {
+  return <HydrateFallbackElement />;
+}
 
 export default function Admin() {
   return <AdminPage />;

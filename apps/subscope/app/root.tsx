@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import type { Route } from "./+types/root";
+import { HydrateFallbackElement } from "./components/hydrate-fallback";
 import { ErrorPageContainer } from "./features/error/pages/error-container";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,10 @@ export default function App() {
       <Outlet />
     </QueryClientProvider>
   );
+}
+
+export function HydrateFallback() {
+  return <HydrateFallbackElement />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

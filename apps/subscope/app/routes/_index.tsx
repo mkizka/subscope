@@ -1,6 +1,7 @@
 import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { data } from "react-router";
 
+import { HydrateFallbackElement } from "@/app/components/hydrate-fallback";
 import { expressContext } from "@/app/context/express";
 import { HomePage } from "@/app/features/home/pages/home";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
@@ -28,6 +29,10 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
   );
   return data({ isSubscriber });
 };
+
+export function HydrateFallback() {
+  return <HydrateFallbackElement />;
+}
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   if (loaderData.isSubscriber) {
