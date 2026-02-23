@@ -75,11 +75,20 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     subscription: Subscription;
     ctx: TransactionContext;
   }): Promise<void> {
-    await ctx.db.insert(schema.subscriptions).values({
-      actorDid: subscription.actorDid,
-      inviteCode: subscription.inviteCode,
-      createdAt: subscription.createdAt,
-    });
+    await ctx.db
+      .insert(schema.subscriptions)
+      .values({
+        actorDid: subscription.actorDid,
+        inviteCode: subscription.inviteCode,
+        createdAt: subscription.createdAt,
+      })
+      .onConflictDoUpdate({
+        target: schema.subscriptions.actorDid,
+        set: {
+          inviteCode: subscription.inviteCode,
+          createdAt: subscription.createdAt,
+        },
+      });
   }
 
   async delete(actorDid: Did): Promise<void> {
