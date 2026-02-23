@@ -19,11 +19,11 @@ async function fetchTimeline(cursor?: string): Promise<TimelineResponse> {
   return response.json() as Promise<TimelineResponse>;
 }
 
-const asString = (value: unknown, defaultValue: string): string => {
+const maybeString = (value: unknown): string | undefined => {
   if (typeof value === "string") {
     return value;
   }
-  return defaultValue;
+  return undefined;
 };
 
 function toTimelinePost({
@@ -43,11 +43,11 @@ function toTimelinePost({
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
-    text: asString(post.record.text, ""),
+    text: maybeString(post.record.text),
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
-    indexedAt: post.indexedAt,
+    createdAt: maybeString(post.record.createdAt),
     reasonRepost,
   };
 }

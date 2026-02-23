@@ -18,7 +18,7 @@ export const Default: Story = {
     replyCount: 3,
     repostCount: 5,
     likeCount: 12,
-    indexedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
   },
 };
 
@@ -30,7 +30,7 @@ export const WithRepost: Story = {
     replyCount: 1,
     repostCount: 10,
     likeCount: 25,
-    indexedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     reasonRepost: {
       byDisplayName: "Alice",
       byHandle: "alice.bsky.social",
@@ -45,7 +45,7 @@ export const NoDisplayName: Story = {
     replyCount: 0,
     repostCount: 0,
     likeCount: 1,
-    indexedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
   },
 };
 
@@ -57,6 +57,6 @@ export const LongText: Story = {
     replyCount: 7,
     repostCount: 15,
     likeCount: 42,
-    indexedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
   },
 };

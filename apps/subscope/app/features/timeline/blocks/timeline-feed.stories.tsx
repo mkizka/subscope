@@ -16,7 +16,7 @@ const meta = {
         replyCount: 3,
         repostCount: 5,
         likeCount: 12,
-        indexedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
       },
       {
         uri: "at://did:plc:example2/app.bsky.feed.post/2",
@@ -26,7 +26,7 @@ const meta = {
         replyCount: 1,
         repostCount: 10,
         likeCount: 25,
-        indexedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
         reasonRepost: {
           byDisplayName: "Charlie",
           byHandle: "charlie.bsky.social",
@@ -39,7 +39,7 @@ const meta = {
         replyCount: 0,
         repostCount: 0,
         likeCount: 1,
-        indexedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
       },
     ],
     isLoading: false,

@@ -1,14 +1,14 @@
 import { HeartIcon, MessageCircleIcon, RepeatIcon } from "lucide-react";
 
-type Props = {
+export type PostCardProps = {
   authorAvatar?: string;
   authorDisplayName?: string;
   authorHandle: string;
-  text: string;
+  text?: string;
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
-  indexedAt: string;
+  createdAt?: string;
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
@@ -38,9 +38,9 @@ export function PostCard({
   replyCount,
   repostCount,
   likeCount,
-  indexedAt,
+  createdAt,
   reasonRepost,
-}: Props) {
+}: PostCardProps) {
   return (
     <div className="border-b border-border/40 px-4 py-3">
       {reasonRepost && (
@@ -77,7 +77,7 @@ export function PostCard({
               @{authorHandle}
             </span>
             <span className="shrink-0 text-xs text-muted-foreground">
-              · {formatRelativeTime(indexedAt)}
+              · {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
             </span>
           </div>
           <p className="mt-1 text-sm wrap-break-word whitespace-pre-wrap">

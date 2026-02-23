@@ -1,21 +1,12 @@
 import { InfiniteScrollTrigger } from "@/app/features/admin/parts/infinite-scroll-trigger";
-import { PostCard } from "@/app/features/timeline/parts/post-card";
+import {
+  PostCard,
+  type PostCardProps,
+} from "@/app/features/timeline/parts/post-card";
 import { PostCardSkeleton } from "@/app/features/timeline/parts/post-card-skeleton";
 
-export type TimelinePost = {
+export type TimelinePost = PostCardProps & {
   uri: string;
-  authorAvatar?: string;
-  authorDisplayName?: string;
-  authorHandle: string;
-  text: string;
-  replyCount?: number;
-  repostCount?: number;
-  likeCount?: number;
-  indexedAt: string;
-  reasonRepost?: {
-    byDisplayName?: string;
-    byHandle: string;
-  };
 };
 
 type Props = {
