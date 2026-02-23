@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { AdminPage } from "./admin";
+import { InviteCodeTableContainer } from "@/app/features/admin/blocks/invite-code-table-container";
+
+import { AdminLayout } from "./admin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,7 +15,7 @@ const queryClient = new QueryClient({
 
 const meta = {
   title: "pages/admin",
-  component: AdminPage,
+  component: AdminLayout,
   decorators: [
     (Story) => (
       <QueryClientProvider client={queryClient}>
@@ -24,9 +26,13 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
-} satisfies Meta<typeof AdminPage>;
+} satisfies Meta<typeof AdminLayout>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const InviteCode: Story = {
+  args: {
+    children: <InviteCodeTableContainer />,
+  },
+};
