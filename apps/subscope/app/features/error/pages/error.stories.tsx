@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ErrorPage } from "./error";
 
 const meta = {
-  title: "features/Error",
+  title: "pages/error",
   component: ErrorPage,
   parameters: {
     layout: "fullscreen",
@@ -16,33 +16,28 @@ type Story = StoryObj<typeof meta>;
 
 export const NotFound: Story = {
   args: {
-    title: "ページが見つかりません",
-    details: "お探しのページは存在しないか、移動した可能性があります。",
-    status: 404,
+    error: {
+      status: 404,
+      statusText: "Not Found",
+      data: null,
+      internal: false,
+    },
   },
 };
 
 export const ServerError: Story = {
   args: {
-    title: "ページを表示できませんでした",
-    details: "予期しないエラーが発生しました。",
-    status: 500,
+    error: {
+      status: 500,
+      statusText: "Internal Server Error",
+      data: null,
+      internal: false,
+    },
   },
 };
 
 export const UnknownError: Story = {
   args: {
-    title: "エラーが発生しました",
-    details: "予期しないエラーが発生しました。",
-  },
-};
-
-export const WithStack: Story = {
-  args: {
-    title: "エラーが発生しました",
-    details: "Something went wrong",
-    stack: `Error: Something went wrong
-    at Module.func (/app/routes/example.tsx:10:11)
-    at async Object.loader (/app/routes/example.tsx:5:3)`,
+    error: "unknown error",
   },
 };

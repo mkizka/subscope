@@ -3,7 +3,7 @@ import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
 import { z } from "zodV4";
 
-import { LoginPresenter } from "./login";
+import { LoginPage } from "./login";
 
 export const LoginContainer = () => {
   const schema = z.object({
@@ -26,7 +26,7 @@ export const LoginContainer = () => {
   });
 
   return (
-    <LoginPresenter
+    <LoginPage
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.identifier, { type: "text" })}
       fields={fields}

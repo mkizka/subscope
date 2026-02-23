@@ -1,8 +1,7 @@
 import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
 import { redirect } from "react-router";
 
-import { AppLayout } from "@/app/components/layout";
-import { LoginContainer } from "@/app/features/login/login-container";
+import { LoginContainer } from "@/app/features/login/pages/login-container";
 import { getAgent } from "@/app/lib/oauth/session.server";
 
 import type { Route } from "./+types/login";
@@ -19,9 +18,5 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 };
 
 export default function Login() {
-  return (
-    <AppLayout verticalCenter>
-      <LoginContainer />
-    </AppLayout>
-  );
+  return <LoginContainer />;
 }

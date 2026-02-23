@@ -6,7 +6,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import type { Route } from "./+types/root";
 import { NavigationOverlay } from "./components/navigation-overlay";
-import { ErrorPageContainer } from "./features/error/pages/error-container";
+import { ErrorPage } from "./features/error/pages/error";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -43,5 +43,5 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  return <ErrorPageContainer error={error} />;
+  return <ErrorPage error={error} />;
 }

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { LoginPresenter } from "./login";
+import { LoginPage } from "./login";
 
 const meta = {
-  title: "features/Login",
-  component: LoginPresenter,
+  title: "pages/login",
+  component: LoginPage,
   args: {
     formProps: {},
     inputProps: {
@@ -17,7 +17,7 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof LoginPresenter>;
+} satisfies Meta<typeof LoginPage>;
 
 export default meta;
 
