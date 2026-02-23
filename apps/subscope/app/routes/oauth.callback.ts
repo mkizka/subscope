@@ -36,7 +36,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     if (!response.data.initialized) {
       await agent.me.subsco.admin.registerAdmin();
-      await agent.me.subsco.sync.subscribeServer();
+      await agent.me.subsco.sync.subscribeServer({});
     }
   } catch (e) {
     logger.error(e, "Admin registration or server subscription failed");
