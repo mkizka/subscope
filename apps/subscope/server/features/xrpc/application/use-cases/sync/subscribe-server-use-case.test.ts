@@ -184,4 +184,28 @@ describe("SubscribeServerUseCase", () => {
       expect.objectContaining({ did }),
     );
   });
+
+  test("管理者の場合、招待コードなしでサブスクリプションを作成する", async () => {
+    // arrange
+    const admin = actorFactory({ isAdmin: true });
+    actorRepo.add(admin);
+
+    // act
+    await subscribeServerUseCase.execute({
+      actorDid: asDid(admin.did),
+    });
+
+    // assert
+    const savedSubscription = await subscriptionRepo.findFirst(
+      asDid(admin.did),
+    );
+    expect(savedSubscription).toMatchObject({
+      actorDid: admin.did,
+      inviteCode: null,
+      createdAt: now,
+    });
+    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+      expect.objectContaining({ did: asDid(admin.did) }),
+    );
+  });
 });

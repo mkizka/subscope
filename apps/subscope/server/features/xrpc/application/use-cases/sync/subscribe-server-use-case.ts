@@ -1,4 +1,5 @@
 import type { Did } from "@atproto/did";
+import type { InviteCode } from "@repo/common/domain";
 import {
   Actor,
   type IJobScheduler,
@@ -45,19 +46,20 @@ export class SubscribeServerUseCase {
     "jobScheduler",
   ] as const;
 
-  async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
-    // 将来的には設定から招待コード不要にも出来るようにする
+  private async validateInviteCode(
+    code: string | undefined,
+    isAdmin: boolean = false,
+  ): Promise<InviteCode | null> {
+    if (isAdmin) {
+      return null;
+    }
     if (!code) {
+      // 将来的には設定から招待コード不要にも出来るようにする
       throw new InvalidInviteCodeError("Invite code is required");
     }
 
-    const existingSubscription =
-      await this.subscriptionRepository.findFirst(actorDid);
-    if (existingSubscription) {
-      throw new AlreadySubscribedError("Already subscribed to this server");
-    }
-
     const inviteCode = await this.inviteCodeRepository.findFirst(code);
+
     if (!inviteCode) {
       throw new InvalidInviteCodeError("Invalid invite code");
     }
@@ -66,15 +68,23 @@ export class SubscribeServerUseCase {
         "Invite code has expired or already been used",
       );
     }
+    return inviteCode;
+  }
 
-    const subscription = new Subscription({
-      actorDid,
-      inviteCode: code,
-      createdAt: new Date(),
-    });
+  async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
+    const existingSubscription =
+      await this.subscriptionRepository.findFirst(actorDid);
+    if (existingSubscription) {
+      throw new AlreadySubscribedError("Already subscribed to this server");
+    }
+
+    const existingActor = await this.actorRepository.findByDid(actorDid);
+    const inviteCode = await this.validateInviteCode(
+      code,
+      existingActor?.isAdmin,
+    );
 
     await this.transactionManager.transaction(async (ctx) => {
-      const existingActor = await this.actorRepository.findByDid(actorDid);
       if (!existingActor) {
         const actor = Actor.create({
           did: actorDid,
@@ -82,10 +92,17 @@ export class SubscribeServerUseCase {
         await this.actorRepository.upsert({ ctx, actor });
       }
 
+      const subscription = new Subscription({
+        actorDid,
+        inviteCode: code,
+        createdAt: new Date(),
+      });
       await this.subscriptionRepository.save({ ctx, subscription });
 
-      inviteCode.markAsUsed();
-      await this.inviteCodeRepository.upsert({ ctx, inviteCode });
+      if (inviteCode) {
+        inviteCode.markAsUsed();
+        await this.inviteCodeRepository.upsert({ ctx, inviteCode });
+      }
     });
 
     await this.jobScheduler.scheduleAddTapRepo(actorDid);
