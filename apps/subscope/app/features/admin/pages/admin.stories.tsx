@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { InviteCodeTableContainer } from "@/app/features/admin/blocks/invite-code-table-container";
+import { SubscriberTableContainer } from "@/app/features/admin/blocks/subscriber-table-container";
 
 import { AdminLayout } from "./admin";
 
@@ -34,5 +35,11 @@ type Story = StoryObj<typeof meta>;
 export const InviteCode: Story = {
   args: {
     children: <InviteCodeTableContainer />,
+  },
+};
+
+export const Subscribers: Story = {
+  args: {
+    children: <SubscriberTableContainer />,
   },
 };
