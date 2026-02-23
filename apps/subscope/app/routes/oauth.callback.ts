@@ -27,18 +27,18 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const agent = createAgent(oauthSession);
   let response;
   try {
-    response = await agent.me.subsco.admin.verifyAccess();
-  } catch (e) {
-    logger.error(e, "Admin access verification failed");
-    return redirect("/?error=admin_verification_failed");
+    response = await agent.me.subsco.server.getSetupStatus();
+  } catch {
+    logger.error("Failed to check server setup status");
+    return redirect("/?error=setup_status_check_failed");
   }
 
   try {
-    if (response.data.status === "needsSetup") {
+    if (!response.data.initialized) {
       await agent.me.subsco.admin.registerAdmin();
     }
   } catch (e) {
-    logger.error(e, "Admin registration failed");
+    logger.error(e, "Admin setup check or registration failed");
     return redirect("/?error=admin_registration_failed");
   }
 

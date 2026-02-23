@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.server.getSetupStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the server's initial setup status. Returns whether admin registration has been completed.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["initialized"],
+          "properties": {
+            "initialized": {
+              "type": "boolean",
+              "description": "Whether the server has been initialized (an admin has been registered)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

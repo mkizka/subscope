@@ -61,6 +61,7 @@ import { GetTimelineUseCase } from "@/server/features/xrpc/application/use-cases
 import { SearchPostsUseCase } from "@/server/features/xrpc/application/use-cases/feed/search-posts-use-case.js";
 import { GetFollowersUseCase } from "@/server/features/xrpc/application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "@/server/features/xrpc/application/use-cases/graph/get-follows-use-case.js";
+import { GetSetupStatusUseCase } from "@/server/features/xrpc/application/use-cases/server/get-setup-status-use-case.js";
 import { GetSubscriptionStatusUseCase } from "@/server/features/xrpc/application/use-cases/sync/get-subscription-status-use-case.js";
 import { SubscribeServerUseCase } from "@/server/features/xrpc/application/use-cases/sync/subscribe-server-use-case.js";
 import { UnsubscribeServerUseCase } from "@/server/features/xrpc/application/use-cases/sync/unsubscribe-server-use-case.js";
@@ -108,6 +109,7 @@ import { GetInviteCodes } from "@/server/features/xrpc/presentation/routes/me/su
 import { GetSubscribers } from "@/server/features/xrpc/presentation/routes/me/subsco/admin/getSubscribers.js";
 import { RegisterAdmin } from "@/server/features/xrpc/presentation/routes/me/subsco/admin/registerAdmin.js";
 import { VerifyAccess } from "@/server/features/xrpc/presentation/routes/me/subsco/admin/verifyAccess.js";
+import { GetSetupStatus } from "@/server/features/xrpc/presentation/routes/me/subsco/server/getSetupStatus.js";
 import { GetSubscriptionStatus } from "@/server/features/xrpc/presentation/routes/me/subsco/sync/getSubscriptionStatus.js";
 import { SubscribeServer } from "@/server/features/xrpc/presentation/routes/me/subsco/sync/subscribeServer.js";
 import { UnsubscribeServer } from "@/server/features/xrpc/presentation/routes/me/subsco/sync/unsubscribeServer.js";
@@ -207,6 +209,7 @@ const server = createInjector()
   .provideClass("getSubscribersUseCase", GetSubscribersUseCase)
   .provideClass("registerAdminUseCase", RegisterAdminUseCase)
   .provideClass("verifyAccessUseCase", VerifyAccessUseCase)
+  .provideClass("getSetupStatusUseCase", GetSetupStatusUseCase)
   .provideClass("getSubscriptionStatusUseCase", GetSubscriptionStatusUseCase)
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   .provideClass("unsubscribeServerUseCase", UnsubscribeServerUseCase)
@@ -235,6 +238,7 @@ const server = createInjector()
   .provideClass("getSubscribers", GetSubscribers)
   .provideClass("registerAdmin", RegisterAdmin)
   .provideClass("verifyAccess", VerifyAccess)
+  .provideClass("getSetupStatus", GetSetupStatus)
   .provideClass("getSubscriptionStatus", GetSubscriptionStatus)
   .provideClass("subscribeServer", SubscribeServer)
   .provideClass("unsubscribeServer", UnsubscribeServer)
