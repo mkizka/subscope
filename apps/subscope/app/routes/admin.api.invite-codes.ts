@@ -5,11 +5,8 @@ import { data } from "react-router";
 import { z } from "zodV4";
 
 import { agentContext } from "@/app/context/agent";
-import { adminRequiredMiddleware } from "@/app/middlewares/auth";
 
 import type { Route } from "./+types/admin.api.invite-codes";
-
-export const middleware: Route.MiddlewareFunction[] = [adminRequiredMiddleware];
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);

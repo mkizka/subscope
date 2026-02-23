@@ -4,11 +4,8 @@ import type { IJobQueue } from "@repo/common/domain";
 import { ReactRouterAdapter } from "bull-board-react-router";
 
 import { expressContext } from "@/app/context/express";
-import { adminRequiredMiddleware } from "@/app/middlewares/auth";
 
 import type { Route } from "./+types/admin.bull-board.$";
-
-export const middleware: Route.MiddlewareFunction[] = [adminRequiredMiddleware];
 
 const handler = (request: Request, jobQueue: IJobQueue) => {
   const serverAdapter = new ReactRouterAdapter();
