@@ -1,10 +1,14 @@
-import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
+import {
+  AtpBaseClient,
+  MeSubscoSyncGetSubscriptionStatus,
+} from "@repo/client/api";
 import { data } from "react-router";
 
 import { expressContext } from "@/app/context/express";
 import { HomePage } from "@/app/features/home/pages/home";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
 import { getAgent } from "@/app/lib/oauth/session.server";
+import { env } from "@/server/shared/env";
 
 import type { Route } from "./+types/_index";
 
@@ -22,28 +26,45 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const { injected } = context.get(expressContext);
   const logger = injected.loggerManager.createLogger("_index");
 
-  const agent = await getAgent(request);
-  if (!agent) {
-    return data({ isSubscriber: false });
+  const client = new AtpBaseClient({ service: env.PUBLIC_URL });
+  let setupStatus;
+  try {
+    const response = await client.me.subsco.server.getSetupStatus();
+    setupStatus = response.data;
+  } catch (e) {
+    logger.error(e, "Failed to get setup status");
+    throw data("セットアップ状態の取得に失敗しました", { status: 500 });
   }
 
-  let response;
+  if (!setupStatus.initialized) {
+    return data({ state: "setup" });
+  }
+
+  const agent = await getAgent(request);
+  if (!agent) {
+    return data({ state: "home" });
+  }
+
+  let subscriptionResponse;
   try {
-    response = await agent.me.subsco.sync.getSubscriptionStatus();
+    subscriptionResponse = await agent.me.subsco.sync.getSubscriptionStatus();
   } catch (e) {
     logger.error(e, "Failed to get subscription status");
     throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
   }
 
   const isSubscriber = MeSubscoSyncGetSubscriptionStatus.isSubscribed(
-    response.data,
+    subscriptionResponse.data,
   );
-  return data({ isSubscriber });
+  return data({ state: isSubscriber ? "timeline" : "home" });
 };
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  if (loaderData.isSubscriber) {
+  if (loaderData.state === "setup") {
+    return <HomePage variant="setup" />;
+  }
+  if (loaderData.state === "timeline") {
     return <TimelinePage />;
   }
-  return <HomePage />;
+  return <HomePage variant="home" />;
 }
