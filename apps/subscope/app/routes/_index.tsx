@@ -37,12 +37,12 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   }
 
   if (!setupStatus.initialized) {
-    return data({ state: "setup" });
+    return data({ state: "setup" as const });
   }
 
   const agent = await getAgent(request);
   if (!agent) {
-    return data({ state: "home" });
+    return data({ state: "home" as const });
   }
 
   let subscriptionResponse;
@@ -56,7 +56,13 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const isSubscriber = MeSubscoSyncGetSubscriptionStatus.isSubscribed(
     subscriptionResponse.data,
   );
-  return data({ state: isSubscriber ? "timeline" : "home" });
+  if (!isSubscriber) {
+    return data({ state: "home" as const });
+  }
+  return data({
+    state: "timeline" as const,
+    atprotoProxy: `${env.SERVICE_DID}#bsky_appview`,
+  });
 };
 
 export default function Home({ loaderData }: Route.ComponentProps) {
@@ -64,7 +70,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     return <HomePage variant="setup" />;
   }
   if (loaderData.state === "timeline") {
-    return <TimelinePage />;
+    return <TimelinePage atprotoProxy={loaderData.atprotoProxy} />;
   }
   return <HomePage variant="home" />;
 }

@@ -15,7 +15,7 @@ export const AppLayout = ({ children, header, verticalCenter }: Props) => {
       <div className="flex flex-1 justify-center">
         <div
           className={cn(
-            "flex w-full max-w-lg flex-col items-center px-2",
+            "flex w-full max-w-lg flex-col",
             verticalCenter && "justify-center",
           )}
         >

@@ -25,8 +25,8 @@ type Props = {
 export function LoginPage({ formProps, inputProps, fields }: Props) {
   return (
     <AppLayout verticalCenter>
-      <div className="flex w-full flex-col gap-4">
-        <Card className="w-full">
+      <div className="flex flex-col gap-4">
+        <Card>
           <CardHeader>
             <CardTitle>atprotoでログイン</CardTitle>
           </CardHeader>

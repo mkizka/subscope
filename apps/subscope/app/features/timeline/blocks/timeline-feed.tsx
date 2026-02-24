@@ -25,7 +25,7 @@ export function TimelineFeed({
   onLoadMore,
 }: Props) {
   return (
-    <div>
+    <section>
       {isLoading &&
         Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)}
       {!isLoading && posts.length === 0 && (
@@ -41,6 +41,6 @@ export function TimelineFeed({
         onIntersect={onLoadMore}
         enabled={hasNextPage && !isFetchingNextPage}
       />
-    </div>
+    </section>
   );
 }
