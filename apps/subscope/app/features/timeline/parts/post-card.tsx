@@ -70,29 +70,27 @@ export function PostCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-1">
-            <span className="truncate text-sm font-semibold">
+            <span className="truncate font-semibold">
               {authorDisplayName ?? authorHandle}
             </span>
-            <span className="truncate text-xs text-muted-foreground">
+            <span className="truncate text-muted-foreground">
               @{authorHandle}
             </span>
-            <span className="shrink-0 text-xs text-muted-foreground">
+            <span className="shrink-0 text-muted-foreground">
               · {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
             </span>
           </div>
-          <p className="mt-1 text-sm wrap-break-word whitespace-pre-wrap">
-            {text}
-          </p>
+          <p className="mt-1 wrap-break-word whitespace-pre-wrap">{text}</p>
           <div className="mt-2 flex gap-6 text-muted-foreground">
-            <span className="flex items-center gap-1 text-xs">
+            <span className="flex items-center gap-1 text-sm">
               <MessageCircleIcon className="size-4" />
               {replyCount ?? 0}
             </span>
-            <span className="flex items-center gap-1 text-xs">
+            <span className="flex items-center gap-1 text-sm">
               <RepeatIcon className="size-4" />
               {repostCount ?? 0}
             </span>
-            <span className="flex items-center gap-1 text-xs">
+            <span className="flex items-center gap-1 text-sm">
               <HeartIcon className="size-4" />
               {likeCount ?? 0}
             </span>
