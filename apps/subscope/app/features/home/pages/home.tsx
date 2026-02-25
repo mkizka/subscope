@@ -1,4 +1,4 @@
-import { AppLayout } from "@/app/components/layout";
+import { AppLayout } from "@/app/components/app-layout";
 import { Badge } from "@/app/components/ui/badge";
 import { Separator } from "@/app/components/ui/separator";
 import { HomeContent } from "@/app/features/home/parts/home-content";

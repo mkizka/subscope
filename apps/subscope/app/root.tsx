@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import type { Route } from "./+types/root";
-import { NavigationOverlay } from "./components/navigation-overlay";
+import { NavigationOverlayContainer } from "./components/navigation-overlay-container";
 import { ErrorPage } from "./features/error/pages/error";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -36,7 +36,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavigationOverlay />
+      <NavigationOverlayContainer />
       <Outlet />
     </QueryClientProvider>
   );

@@ -1,6 +1,6 @@
 import { isRouteErrorResponse } from "react-router";
 
-import { AppLayout } from "@/app/components/layout";
+import { AppLayout } from "@/app/components/app-layout";
 import { ErrorCard } from "@/app/features/error/blocks/error-card";
 
 type Props = {

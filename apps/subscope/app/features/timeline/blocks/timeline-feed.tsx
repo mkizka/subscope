@@ -1,4 +1,4 @@
-import { InfiniteScrollTrigger } from "@/app/features/admin/parts/infinite-scroll-trigger";
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import {
   PostCard,
   type PostCardProps,

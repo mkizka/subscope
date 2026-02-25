@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import type { Form } from "react-router";
 import { Link } from "react-router";
 
-import { AppLayout } from "@/app/components/layout";
+import { AppLayout } from "@/app/components/app-layout";
 import {
   Card,
   CardContent,

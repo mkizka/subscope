@@ -1,5 +1,6 @@
 import { LoaderCircleIcon, XIcon } from "lucide-react";
 
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { Button } from "@/app/components/ui/button";
 import {
   Card,
@@ -15,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/table";
-import { InfiniteScrollTrigger } from "@/app/features/admin/parts/infinite-scroll-trigger";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 
 export type InviteCode = {

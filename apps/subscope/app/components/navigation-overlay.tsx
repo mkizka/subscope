@@ -1,14 +1,6 @@
-import { useNavigation } from "react-router";
-
 import { Spinner } from "./ui/spinner";
 
 export function NavigationOverlay() {
-  const navigation = useNavigation();
-
-  if (navigation.state === "idle") {
-    return null;
-  }
-
   return (
     <div
       className="

@@ -1,4 +1,4 @@
-import { AppLayout } from "@/app/components/layout";
+import { AppLayout } from "@/app/components/app-layout";
 import { TimelineFeedContainer } from "@/app/features/timeline/blocks/timeline-feed-container";
 import { TimelineHeaderContainer } from "@/app/features/timeline/blocks/timeline-header-container";
 import { WelcomeSectionContainer } from "@/app/features/timeline/blocks/welcome-section-container";

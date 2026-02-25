@@ -1,3 +1,4 @@
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import {
   Card,
   CardContent,
@@ -12,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/table";
-import { InfiniteScrollTrigger } from "@/app/features/admin/parts/infinite-scroll-trigger";
 
 export type Subscriber = {
   did: string;
