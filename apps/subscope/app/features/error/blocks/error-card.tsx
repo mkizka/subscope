@@ -64,7 +64,7 @@ export function ErrorCard({ title, details, status, stack }: Props) {
         )}
       </CardContent>
       <CardFooter className="justify-end">
-        <Button variant="outline" render={<a href="/" />}>
+        <Button variant="outline" render={<a href="/" />} nativeButton={false}>
           <HomeIcon />
           ホームに戻る
         </Button>
