@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@atproto/did": "0.3.0",
-    "@atproto/tap": "0.2.2",
-    "@atproto/xrpc-server": "0.10.11",
+    "@atproto/tap": "0.2.13",
+    "@atproto/xrpc-server": "0.10.20",
     "@keyv/redis": "5.1.6",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",
@@ -23,18 +23,18 @@
     "keyv": "5.6.0",
     "tsx": "4.21.0",
     "typed-inject": "5.0.0",
-    "ws": "8.19.0",
+    "ws": "8.20.0",
     "zod": "4.3.6",
     "zod-validation-error": "5.0.0"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "8.0.0",
+    "@mkizka/eslint-config": "10.0.0",
     "@tsconfig/node-lts": "24.0.0",
     "@types/express": "5.0.6",
-    "@types/node": "25.1.0",
+    "@types/node": "25.6.0",
     "@types/ws": "8.18.1",
-    "eslint": "9.39.2",
+    "eslint": "10.2.1",
     "pino-pretty": "13.1.3",
-    "typescript": "5.9.3"
+    "typescript": "6.0.3"
   }
 }

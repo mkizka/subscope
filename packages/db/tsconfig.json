@@ -1,6 +1,7 @@
 {
   "extends": ["@tsconfig/node-lts/tsconfig"],
   "compilerOptions": {
+    "types": ["node"],
     "outDir": "dist",
     "sourceMap": true,
     "noUncheckedIndexedAccess": true

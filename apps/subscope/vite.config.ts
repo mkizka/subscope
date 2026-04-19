@@ -1,7 +1,6 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 // https://v2.remix.run/docs/guides/vite
 const isStorybook = process.argv[1]?.includes("storybook");
@@ -19,6 +18,9 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     server: {
       allowedHosts,
     },
+    resolve: {
+      tsconfigPaths: true,
+    },
     build: {
       rollupOptions: isSsrBuild
         ? {
@@ -26,6 +28,6 @@ export default defineConfig(({ mode, isSsrBuild }) => {
           }
         : undefined,
     },
-    plugins: [tailwindcss(), !isStorybook && reactRouter(), tsconfigPaths()],
+    plugins: [tailwindcss(), !isStorybook && reactRouter()],
   };
 });

@@ -1,11 +1,12 @@
 import { unitConfig } from "@repo/vitest";
-import tsconfigPaths from "vite-tsconfig-paths";
 import { defineProject, mergeConfig } from "vitest/config";
 
 const vitestConfig = mergeConfig(
   unitConfig,
   defineProject({
-    plugins: [tsconfigPaths()],
+    resolve: {
+      tsconfigPaths: true,
+    },
     test: {
       name: "subscope:unit",
       include: [

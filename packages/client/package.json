@@ -19,26 +19,26 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
-    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "postinstall": "./scripts/postinstall.sh",
+    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/api": "0.18.20",
-    "@atproto/lexicon": "0.6.1",
-    "@atproto/oauth-client": "0.5.14",
+    "@atproto/api": "0.19.9",
+    "@atproto/lexicon": "0.6.2",
+    "@atproto/oauth-client": "0.6.0",
     "@atproto/xrpc": "0.7.7",
-    "@atproto/xrpc-server": "0.10.11",
+    "@atproto/xrpc-server": "0.10.20",
     "multiformats": "13.4.2"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.9.8",
-    "@mkizka/eslint-config": "8.0.0",
+    "@atproto/lex-cli": "0.9.9",
+    "@mkizka/eslint-config": "10.0.0",
     "@tsconfig/node-lts": "24.0.0",
     "@types/express": "5.0.6",
-    "eslint": "9.39.2",
-    "giget": "3.1.1",
-    "typescript": "5.9.3"
+    "eslint": "10.2.1",
+    "giget": "3.2.0",
+    "typescript": "6.0.3"
   },
   "sideEffects": false
 }

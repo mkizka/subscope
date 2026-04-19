@@ -50,7 +50,7 @@ export function ErrorCard({ title, details, status, stack }: Props) {
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 h-7 w-7 text-muted-foreground"
+              className="absolute top-2 right-2 size-7 text-muted-foreground"
               onClick={handleCopy}
               aria-label="スタックトレースをコピー"
             >
