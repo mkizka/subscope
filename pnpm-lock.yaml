@@ -145,7 +145,7 @@ importers:
         version: 1.4.0(@date-fns/tz@1.4.1)(@types/react@19.2.14)(date-fns@4.1.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@bull-board/api':
         specifier: 7.0.0
-        version: 7.0.0(@bull-board/ui@6.16.4)
+        version: 7.0.0(@bull-board/ui@7.0.0)
       '@conform-to/react':
         specifier: 1.19.0
         version: 1.19.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -180,8 +180,8 @@ importers:
         specifier: 5.99.1
         version: 5.99.1(react@19.2.5)
       bull-board-react-router:
-        specifier: 1.1.0
-        version: 1.1.0(@bull-board/ui@6.16.4)
+        specifier: 1.1.1
+        version: 1.1.1
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -908,18 +908,13 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bull-board/api@6.16.4':
-    resolution: {integrity: sha512-fn4O+QbA3mRj0rEE41mvwbvtiiv0UYgnxQ9ErWb9n74EwIC/yZbiyxQ+Gh/ehU9u7B0PuaNyR0IOG/h3DGo1Mg==}
-    peerDependencies:
-      '@bull-board/ui': 6.16.4
-
   '@bull-board/api@7.0.0':
     resolution: {integrity: sha512-ISNspLHVmUWUSq/eLw+wd1FuBBUnqpLbYP2xUNmehpfKhS+NoZWMbBvqjUYVeE/HLfUkRcR1edzMKpl5n9zlSw==}
     peerDependencies:
       '@bull-board/ui': 7.0.0
 
-  '@bull-board/ui@6.16.4':
-    resolution: {integrity: sha512-5Yv+4g0rDvBBq2RxaUewSEwD8ywvqCX6lKlzPM5Aaf0+4cxGoENQRZNcBaAIKX4+fAzAbdVB4VGP4NUgtx5LVg==}
+  '@bull-board/ui@7.0.0':
+    resolution: {integrity: sha512-AnKeklpDn0iMFgu4ukDU6uTNmw4oudl07G4k2Fh95SknKDrXSiWRV0N1TGUawMqyfG1Yi5P/W/8d7raBq/Uw6w==}
 
   '@clack/core@0.5.0':
     resolution: {integrity: sha512-p3y0FIOwaYRUPRcMO7+dlmLh8PSRcrjuTndsiA0WAFbWES0mLZlrjVoBRZ9DzkPFJZG6KGkJmoEAY0ZcVWTkow==}
@@ -3049,8 +3044,8 @@ packages:
     resolution: {integrity: sha512-lHblz4ahamxpTmnsk+MNTRWsjYKv965MwOrSJyeD588rR3Jcu7swE+0wN5F+PbL5cjgu/9ObkhfzEPuofEMwLA==}
     engines: {node: '>=10.0.0'}
 
-  bull-board-react-router@1.1.0:
-    resolution: {integrity: sha512-SNr4RgXTzGFZk0HP3ya1ASRm2XQDurr7y5JfBiZV9Gc6ItwjtRau4e6G4qPPdsq3j3pI4DofEYkrtxp6qH+0TQ==}
+  bull-board-react-router@1.1.1:
+    resolution: {integrity: sha512-nMiBZ+Vr2UiHHp9WlxKSUrMyfc3j1JLx3qGJUzCOZexRAN0B6A5Gn2b0qOI1zsqMC2kHS3bNO/1FbhpJenJFpA==}
 
   bullmq@5.74.1:
     resolution: {integrity: sha512-GfJEos2zoOGM9xqkB7VZouwwFuejKFqm667cBcmbBekJXKqqXWk4QYP3Uy2pzgUwCbg1cR7GgGmGczM7fnhWSA==}
@@ -6671,19 +6666,14 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bull-board/api@6.16.4(@bull-board/ui@6.16.4)':
+  '@bull-board/api@7.0.0(@bull-board/ui@7.0.0)':
     dependencies:
-      '@bull-board/ui': 6.16.4
+      '@bull-board/ui': 7.0.0
       redis-info: 3.1.0
 
-  '@bull-board/api@7.0.0(@bull-board/ui@6.16.4)':
+  '@bull-board/ui@7.0.0':
     dependencies:
-      '@bull-board/ui': 6.16.4
-      redis-info: 3.1.0
-
-  '@bull-board/ui@6.16.4':
-    dependencies:
-      '@bull-board/api': 6.16.4(@bull-board/ui@6.16.4)
+      '@bull-board/api': 7.0.0(@bull-board/ui@7.0.0)
 
   '@clack/core@0.5.0':
     dependencies:
@@ -8642,14 +8632,13 @@ snapshots:
   buildcheck@0.0.7:
     optional: true
 
-  bull-board-react-router@1.1.0(@bull-board/ui@6.16.4):
+  bull-board-react-router@1.1.1:
     dependencies:
-      '@bull-board/api': 7.0.0(@bull-board/ui@6.16.4)
+      '@bull-board/api': 7.0.0(@bull-board/ui@7.0.0)
+      '@bull-board/ui': 7.0.0
       ejs: 5.0.2
       mime: 4.1.0
       urlpattern-polyfill: 10.1.0
-    transitivePeerDependencies:
-      - '@bull-board/ui'
 
   bullmq@5.74.1:
     dependencies:
