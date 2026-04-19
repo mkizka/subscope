@@ -18,7 +18,7 @@ export function HomePage({ variant }: Props) {
             <Badge variant="secondary">Alpha</Badge>
           </div>
           <p className="text-muted-foreground">
-            誰でもセルフホストできるBluesky互換Appview
+            誰でもセルフホストできるBluesky互換AppView
           </p>
         </div>
         <Separator />

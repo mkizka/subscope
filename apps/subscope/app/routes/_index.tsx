@@ -14,10 +14,10 @@ import type { Route } from "./+types/_index";
 
 export function meta() {
   return [
-    { title: "Subscope - 省ストレージなBluesky互換Appview" },
+    { title: "Subscope - 省ストレージなBluesky互換AppView" },
     {
       name: "description",
-      content: "Tapを利用して省ストレージを目指したBluesky互換のAppview",
+      content: "Tapを利用して省ストレージを目指したBluesky互換のAppView",
     },
   ];
 }

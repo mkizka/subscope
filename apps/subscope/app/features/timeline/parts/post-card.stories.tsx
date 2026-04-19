@@ -53,7 +53,7 @@ export const LongText: Story = {
   args: {
     authorHandle: "dave.bsky.social",
     authorDisplayName: "Dave",
-    text: "これは非常に長いテキストの投稿です。AT Protocolは分散型のソーシャルネットワーキングプロトコルで、ユーザーが自身のデータを管理できることを目指しています。Blueskyはこのプロトコルを使用した最初のアプリケーションです。Subscopeは省ストレージを目指した互換Appviewの実装です。",
+    text: "これは非常に長いテキストの投稿です。AT Protocolは分散型のソーシャルネットワーキングプロトコルで、ユーザーが自身のデータを管理できることを目指しています。Blueskyはこのプロトコルを使用した最初のアプリケーションです。Subscopeは省ストレージを目指した互換AppViewの実装です。",
     replyCount: 7,
     repostCount: 15,
     likeCount: 42,

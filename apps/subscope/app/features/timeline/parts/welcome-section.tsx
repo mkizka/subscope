@@ -24,7 +24,7 @@ export function WelcomeSection({ atprotoProxy }: Props) {
       <div className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">使い方</h2>
         <p className="text-muted-foreground">
-          以下の文字列をコピーして、お使いのBlueskyクライアントのAppview設定に貼り付けてください。
+          以下の文字列をコピーして、お使いのBlueskyクライアントのAppView設定に貼り付けてください。
         </p>
         <div className="flex items-center gap-2">
           <code

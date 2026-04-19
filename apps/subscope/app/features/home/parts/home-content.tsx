@@ -9,7 +9,7 @@ export function HomeContent() {
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">これはなに</h2>
           <p className="text-muted-foreground">
-            Bluesky互換のAppview実装です。フォロータイムラインを見られるくらいの最小限のXRPCが実装されています。
+            Bluesky互換のAppView実装です。フォロータイムラインを見られるくらいの最小限のXRPCが実装されています。
           </p>
         </div>
         <div className="flex flex-col gap-2">
