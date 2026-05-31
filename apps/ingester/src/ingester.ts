@@ -1,9 +1,9 @@
+import { createRegistry } from "@gyaku/di";
 import {
   JobQueue,
   LoggerManager,
   MetricReporter,
 } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
 
 import { HandleCommitUseCase } from "./application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "./application/handle-identity-use-case.js";
@@ -14,21 +14,52 @@ import { IngesterServer } from "./presentation/server.js";
 import { TapIngester } from "./presentation/tap.js";
 import { env } from "./shared/env.js";
 
-createInjector()
-  // envs
-  .provideValue("logLevel", env.LOG_LEVEL)
-  .provideValue("redisUrl", env.REDIS_URL)
-  // infrastructure
-  .provideClass("loggerManager", LoggerManager)
-  .provideClass("jobQueue", JobQueue)
-  .provideClass("metricReporter", MetricReporter)
-  .provideClass("cursorRepository", RedisCursorRepository)
-  // application
-  .provideClass("handleIdentityUseCase", HandleIdentityUseCase)
-  .provideClass("handleCommitUseCase", HandleCommitUseCase)
-  // presentation
-  .provideFactory("metricsRouter", metricsRouterFactory)
-  .provideClass("tapIngester", TapIngester)
-  .provideClass("labelIngester", LabelIngester)
-  .injectClass(IngesterServer)
-  .start();
+const registry = createRegistry()
+  .value("logLevel", env.LOG_LEVEL)
+  .value("redisUrl", env.REDIS_URL)
+  .service(
+    "loggerManager",
+    ["logLevel"],
+    ({ logLevel }) => new LoggerManager(logLevel),
+  )
+  .service("jobQueue", ["redisUrl"], ({ redisUrl }) => new JobQueue(redisUrl))
+  .service("metricReporter", () => new MetricReporter())
+  .service(
+    "cursorRepository",
+    ["redisUrl"],
+    (deps) => new RedisCursorRepository(deps),
+  )
+  .service(
+    "handleIdentityUseCase",
+    ["loggerManager", "metricReporter", "jobQueue"],
+    (deps) => new HandleIdentityUseCase(deps),
+  )
+  .service(
+    "handleCommitUseCase",
+    ["loggerManager", "metricReporter", "jobQueue"],
+    (deps) => new HandleCommitUseCase(deps),
+  )
+  .service(
+    "metricsRouter",
+    ["jobQueue", "metricReporter"],
+    ({ jobQueue, metricReporter }) =>
+      metricsRouterFactory(jobQueue, metricReporter),
+  )
+  .service(
+    "tapIngester",
+    ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase"],
+    (deps) => new TapIngester(deps),
+  )
+  .service(
+    "labelIngester",
+    ["metricReporter"],
+    (deps) => new LabelIngester(deps),
+  )
+  .service(
+    "ingesterServer",
+    ["loggerManager", "metricsRouter", "tapIngester", "labelIngester"],
+    (deps) => new IngesterServer(deps),
+  );
+
+await using services = await registry.resolve();
+services.ingesterServer.start();

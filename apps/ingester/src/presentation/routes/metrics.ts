@@ -17,4 +17,3 @@ export const metricsRouterFactory = (
   });
   return metricsRouter;
 };
-metricsRouterFactory.inject = ["jobQueue", "metricReporter"] as const;

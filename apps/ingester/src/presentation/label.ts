@@ -6,8 +6,10 @@ import { env } from "../shared/env.js";
 
 export class LabelIngester {
   private readonly subscription;
+  private readonly metricReporter: IMetricReporter;
 
-  constructor(private readonly metricReporter: IMetricReporter) {
+  constructor({ metricReporter }: { metricReporter: IMetricReporter }) {
+    this.metricReporter = metricReporter;
     this.subscription = new Subscription({
       service: env.MODERATION_URL,
       method: "com.atproto.label.subscribeLabels",
@@ -24,7 +26,6 @@ export class LabelIngester {
       },
     });
   }
-  static inject = ["metricReporter"] as const;
 
   async start() {
     for await (const message of this.subscription) {

@@ -64,6 +64,9 @@ importers:
       '@atproto/xrpc-server':
         specifier: 0.10.20
         version: 0.10.20
+      '@gyaku/di':
+        specifier: 3.0.0
+        version: 3.0.0
       '@keyv/redis':
         specifier: 5.1.6
         version: 5.1.6(@opentelemetry/api@1.9.1)(keyv@5.6.0)
@@ -82,9 +85,6 @@ importers:
       tsx:
         specifier: 4.21.0
         version: 4.21.0
-      typed-inject:
-        specifier: 5.0.0
-        version: 5.0.0
       ws:
         specifier: 8.20.0
         version: 8.20.0
@@ -1562,6 +1562,10 @@ packages:
     resolution: {integrity: sha512-rc1hOQtjIWGxcxpb9aHAfLpIctjEnsDehj0DAiVfBlmT84uvR0uUtN2hEi/ecvWVjXUGf5qPF4qEgiLOx1YIMQ==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@gyaku/di@3.0.0':
+    resolution: {integrity: sha512-yk29EcpbeKowdCHqQIrGRR+xwThLgrMKEYmv3nWgJEexHhmFBlSCjtJlVOiIMMWgMJXYBfwQieQcuoc0xsdJ/g==}
+    engines: {node: '>=24'}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -7160,6 +7164,8 @@ snapshots:
       long: 5.3.2
       protobufjs: 7.5.5
       yargs: 17.7.2
+
+  '@gyaku/di@3.0.0': {}
 
   '@hapi/address@5.1.1':
     dependencies:

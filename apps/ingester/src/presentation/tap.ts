@@ -16,12 +16,20 @@ export class TapIngester {
   private readonly tap;
   private readonly indexer;
   private readonly logger;
+  private readonly handleCommitUseCase: HandleCommitUseCase;
+  private readonly handleIdentityUseCase: HandleIdentityUseCase;
 
-  constructor(
-    loggerManager: ILoggerManager,
-    private readonly handleCommitUseCase: HandleCommitUseCase,
-    private readonly handleIdentityUseCase: HandleIdentityUseCase,
-  ) {
+  constructor({
+    loggerManager,
+    handleCommitUseCase,
+    handleIdentityUseCase,
+  }: {
+    loggerManager: ILoggerManager;
+    handleCommitUseCase: HandleCommitUseCase;
+    handleIdentityUseCase: HandleIdentityUseCase;
+  }) {
+    this.handleCommitUseCase = handleCommitUseCase;
+    this.handleIdentityUseCase = handleIdentityUseCase;
     this.logger = loggerManager.createLogger("TapIngester");
     this.tap = new Tap(env.TAP_URL);
     this.indexer = new SimpleIndexer();
@@ -45,12 +53,6 @@ export class TapIngester {
       this.logger.error(error, "Tap error occurred");
     });
   }
-
-  static inject = [
-    "loggerManager",
-    "handleCommitUseCase",
-    "handleIdentityUseCase",
-  ] as const;
 
   private recordEventToDto(event: RecordEvent): CommitEventDto | null {
     if (!isSupportedCollection(event.collection)) {

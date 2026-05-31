@@ -11,25 +11,28 @@ import type { TapIngester } from "./tap.js";
 export class IngesterServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
+  private readonly tapIngester: TapIngester;
+  private readonly labelIngester: LabelIngester;
 
-  constructor(
-    loggerManager: ILoggerManager,
-    metricsRouter: Router,
-    private readonly tapIngester: TapIngester,
-    private readonly labelIngester: LabelIngester,
-  ) {
+  constructor({
+    loggerManager,
+    metricsRouter,
+    tapIngester,
+    labelIngester,
+  }: {
+    loggerManager: ILoggerManager;
+    metricsRouter: Router;
+    tapIngester: TapIngester;
+    labelIngester: LabelIngester;
+  }) {
+    this.tapIngester = tapIngester;
+    this.labelIngester = labelIngester;
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
     this.app.use(loggingMiddleware(this.logger));
     this.app.use(healthRouter);
     this.app.use(metricsRouter);
   }
-  static inject = [
-    "loggerManager",
-    "metricsRouter",
-    "tapIngester",
-    "labelIngester",
-  ] as const;
 
   start() {
     this.app.listen(env.PORT, () => {

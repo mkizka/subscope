@@ -7,14 +7,22 @@ import type {
 
 export class HandleIdentityUseCase {
   private readonly logger;
-  constructor(
-    loggerManager: ILoggerManager,
-    private readonly metricReporter: IMetricReporter,
-    private readonly jobQueue: IJobQueue,
-  ) {
+  private readonly metricReporter: IMetricReporter;
+  private readonly jobQueue: IJobQueue;
+
+  constructor({
+    loggerManager,
+    metricReporter,
+    jobQueue,
+  }: {
+    loggerManager: ILoggerManager;
+    metricReporter: IMetricReporter;
+    jobQueue: IJobQueue;
+  }) {
+    this.metricReporter = metricReporter;
+    this.jobQueue = jobQueue;
     this.logger = loggerManager.createLogger("HandleIdentityUseCase");
   }
-  static inject = ["loggerManager", "metricReporter", "jobQueue"] as const;
 
   async execute(dto: IdentityEventDto) {
     this.logger.debug({ did: dto.identity.did }, "identity event received");
