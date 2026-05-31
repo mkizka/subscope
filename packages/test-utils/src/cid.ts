@@ -7,7 +7,6 @@ export async function randomCid() {
   crypto.getRandomValues(randomData);
 
   const hash = await sha256.digest(randomData);
-  // eslint-disable-next-line @typescript-eslint/no-deprecated -- @atproto/lex-dataへの移行はATProtoのCommonJS対応後
   const cid = CID.create(1, raw.code, hash);
 
   return cid.toString();

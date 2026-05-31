@@ -24,17 +24,17 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.4",
+    "@vitest/coverage-v8": "4.1.7",
     "husky": "9.1.7",
     "kill-port": "2.0.1",
-    "lint-staged": "16.4.0",
+    "lint-staged": "17.0.7",
     "prettier": "3.8.3",
     "prettier-plugin-pkg": "0.22.1",
     "prettier-plugin-sh": "0.18.1",
-    "repomix": "1.13.1",
-    "turbo": "2.9.6",
-    "vitest": "4.1.4",
-    "wait-on": "9.0.5"
+    "repomix": "1.14.1",
+    "turbo": "2.9.16",
+    "vitest": "4.1.7",
+    "wait-on": "9.0.10"
   },
   "lint-staged": {
     "*": "pnpm -s _prettier --ignore-unknown --write"

@@ -24,19 +24,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/api": "0.19.9",
-    "@atproto/lexicon": "0.6.2",
-    "@atproto/oauth-client": "0.6.0",
-    "@atproto/xrpc": "0.7.7",
-    "@atproto/xrpc-server": "0.10.20",
-    "multiformats": "13.4.2"
+    "@atproto/api": "0.20.7",
+    "@atproto/lexicon": "0.7.1",
+    "@atproto/oauth-client": "0.7.2",
+    "@atproto/xrpc": "0.8.0",
+    "@atproto/xrpc-server": "0.11.1",
+    "multiformats": "14.0.0"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.9.9",
+    "@atproto/lex-cli": "0.10.0",
     "@mkizka/eslint-config": "10.0.0",
     "@tsconfig/node-lts": "24.0.0",
     "@types/express": "5.0.6",
-    "eslint": "10.2.1",
+    "eslint": "10.4.1",
     "giget": "3.2.0",
     "typescript": "6.0.3"
   },
