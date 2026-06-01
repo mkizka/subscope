@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 
-import { expressContext } from "@/app/context/express";
+import { loggerManager } from "@/app/lib/logger.server";
 import { oauthClient } from "@/app/lib/oauth/client.server";
 import {
   commitSession,
@@ -10,9 +10,8 @@ import {
 
 import type { Route } from "./+types/oauth.callback";
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const { injected } = context.get(expressContext);
-  const logger = injected.loggerManager.createLogger("oauth.callback");
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const logger = loggerManager.createLogger("oauth.callback");
 
   let oauthSession;
   try {

@@ -4,11 +4,11 @@ import {
 } from "@repo/client/api";
 import { data } from "react-router";
 
-import { expressContext } from "@/app/context/express";
 import { HomePage } from "@/app/features/home/pages/home";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
+import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
-import { env } from "@/server/shared/env";
+import { env } from "@/app/shared/env";
 
 import type { Route } from "./+types/_index";
 
@@ -22,9 +22,8 @@ export function meta() {
   ];
 }
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const { injected } = context.get(expressContext);
-  const logger = injected.loggerManager.createLogger("_index");
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const logger = loggerManager.createLogger("_index");
 
   const client = new AtpBaseClient({ service: env.PUBLIC_URL });
   let setupStatus;

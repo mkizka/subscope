@@ -5,7 +5,7 @@ import { defineConfig, loadEnv } from "vite";
 // https://v2.remix.run/docs/guides/vite
 const isStorybook = process.argv[1]?.includes("storybook");
 
-export default defineConfig(({ mode, isSsrBuild }) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
 
   const allowedHosts: string[] = [];
@@ -16,17 +16,11 @@ export default defineConfig(({ mode, isSsrBuild }) => {
 
   return {
     server: {
+      port: env.PORT ? Number(env.PORT) : 3000,
       allowedHosts,
     },
     resolve: {
       tsconfigPaths: true,
-    },
-    build: {
-      rollupOptions: isSsrBuild
-        ? {
-            input: "./server/bootstrap/server.ts",
-          }
-        : undefined,
     },
     plugins: [tailwindcss(), !isStorybook && reactRouter()],
   };

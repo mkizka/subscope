@@ -1,7 +1,7 @@
 import { JoseKey } from "@atproto/jwk-jose";
 import { NodeOAuthClient } from "@atproto/oauth-client-node";
 
-import { env } from "@/server/shared/env.js";
+import { env } from "@/app/shared/env.js";
 
 import { sessionStore, stateStore } from "./storage.server.js";
 

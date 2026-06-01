@@ -2,7 +2,7 @@ import type { OAuthSession } from "@atproto/oauth-client-node";
 import { SubscoAgent } from "@repo/client/api";
 import { createCookieSessionStorage } from "react-router";
 
-import { env } from "@/server/shared/env.js";
+import { env } from "@/app/shared/env.js";
 
 import { oauthClient } from "./client.server.js";
 
