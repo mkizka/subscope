@@ -11,17 +11,6 @@ import {
 } from "@repo/common/infrastructure";
 import { createInjector } from "typed-inject";
 
-import { ImageProxyUseCase } from "@/server/features/blob-proxy/application/image-proxy-use-case.js";
-import { CacheCleanupScheduler } from "@/server/features/blob-proxy/application/services/cache-cleanup-scheduler.js";
-import { CacheCleanupService } from "@/server/features/blob-proxy/application/services/cache-cleanup-service.js";
-import { FetchBlobService } from "@/server/features/blob-proxy/application/services/fetch-blob-service.js";
-import { ImageCacheService } from "@/server/features/blob-proxy/application/services/image-cache-service.js";
-import { BlobFetcher } from "@/server/features/blob-proxy/infrastructure/blob-fetcher.js";
-import { CacheMetadataRepository } from "@/server/features/blob-proxy/infrastructure/cache-metadata-repository.js";
-import { CronTaskScheduler } from "@/server/features/blob-proxy/infrastructure/cron-task-scheduler.js";
-import { ImageDiskStorage } from "@/server/features/blob-proxy/infrastructure/image-disk-storage.js";
-import { ImageResizer } from "@/server/features/blob-proxy/infrastructure/image-resizer.js";
-import { imagesRouterFactory } from "@/server/features/blob-proxy/presentation/images.js";
 import { clientRouterFactory } from "@/server/features/client/router.js";
 import { ProfileViewBuilder } from "@/server/features/xrpc/application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "@/server/features/xrpc/application/service/actor/profile-view-service.js";
@@ -125,9 +114,6 @@ const server = createInjector()
   .provideValue("plcUrl", env.ATPROTO_PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("databaseUrl", env.DATABASE_URL)
-  .provideValue("blobCacheDir", env.BLOB_CACHE_DIR)
-  .provideValue("cacheCleanupCron", env.CACHE_CLEANUP_CRON)
-  .provideValue("cacheCleanupTimezone", env.CACHE_CLEANUP_TIMEZONE)
   .provideValue("publicUrl", env.PUBLIC_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
@@ -137,11 +123,6 @@ const server = createInjector()
   .provideClass("transactionManager", TransactionManager)
   .provideClass("didCache", RedisDidCache)
   .provideClass("didResolver", DidResolver)
-  .provideClass("imageCacheStorage", ImageDiskStorage)
-  .provideClass("cacheMetadataRepository", CacheMetadataRepository)
-  .provideClass("blobFetcher", BlobFetcher)
-  .provideClass("imageResizer", ImageResizer)
-  .provideClass("taskScheduler", CronTaskScheduler)
   .provideClass("jobQueue", JobQueue)
   .provideClass("profileRepository", ProfileRepository)
   .provideClass("actorRepository", ActorRepository)
@@ -161,11 +142,6 @@ const server = createInjector()
   .provideClass("tokenVerifier", TokenVerifier)
   .provideClass("assetUrlBuilder", AssetUrlBuilder)
   // application
-  .provideClass("fetchBlobService", FetchBlobService)
-  .provideClass("imageCacheService", ImageCacheService)
-  .provideClass("cacheCleanupService", CacheCleanupService)
-  .provideClass("cacheCleanupScheduler", CacheCleanupScheduler)
-  .provideClass("imageProxyUseCase", ImageProxyUseCase)
   .provideClass("jobScheduler", JobScheduler)
   .provideClass("createAdminService", CreateAdminService)
   .provideClass("profileViewBuilder", ProfileViewBuilder)
@@ -214,7 +190,6 @@ const server = createInjector()
   .provideClass("subscribeServerUseCase", SubscribeServerUseCase)
   .provideClass("unsubscribeServerUseCase", UnsubscribeServerUseCase)
   // presentation
-  .provideFactory("blobProxyRouter", imagesRouterFactory)
   .provideFactory("clientRouter", clientRouterFactory)
   .provideClass("getPreferences", GetPreferences)
   .provideClass("getProfile", GetProfile)

@@ -2,7 +2,6 @@ import type { ILoggerManager } from "@repo/common/domain";
 import { loggingMiddleware } from "@repo/common/utils";
 import express from "express";
 
-import type { CacheCleanupScheduler } from "@/server/features/blob-proxy/application/services/cache-cleanup-scheduler.js";
 import { env } from "@/server/shared/env.js";
 
 export class SubscopeServer {
@@ -11,19 +10,16 @@ export class SubscopeServer {
 
   constructor(
     loggerManager: ILoggerManager,
-    blobProxyRouter: express.Router,
     xrpcRouter: express.Router,
     healthRouter: express.Router,
     wellKnownRouter: express.Router,
     clientRouter: express.Router,
-    private readonly cacheCleanupScheduler: CacheCleanupScheduler,
   ) {
     const logger = loggerManager.createLogger("SubscopeServer");
     const app = express();
 
     app.use(loggingMiddleware(logger));
 
-    app.use("/images", blobProxyRouter);
     app.use(xrpcRouter);
     app.use(healthRouter);
     app.use(wellKnownRouter);
@@ -34,18 +30,15 @@ export class SubscopeServer {
   }
   static inject = [
     "loggerManager",
-    "blobProxyRouter",
     "xrpcRouter",
     "healthRouter",
     "wellKnownRouter",
     "clientRouter",
-    "cacheCleanupScheduler",
   ] as const;
 
   start() {
     this.app.listen(env.PORT, () => {
       this.logger.info(`Production server running at ${env.PUBLIC_URL}`);
-      this.cacheCleanupScheduler.start();
     });
   }
 }

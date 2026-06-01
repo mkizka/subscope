@@ -44,12 +44,6 @@ const schema = z
         .url()
         .default("postgresql://postgres:password@localhost:5432/postgres"),
     }),
-    BLOB_CACHE_DIR: match({
-      prod: z.string(),
-      dev: z.string().default("./cache"),
-    }),
-    CACHE_CLEANUP_CRON: z.string().default("* * * * *"), // 1分間隔
-    CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
   })
   .transform((val) => ({
     ...val,

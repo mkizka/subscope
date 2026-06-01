@@ -20,9 +20,10 @@ The goal is to enable self-hosting on a typical VPS with around 4 cores / 4GB RA
 
 Server implementations are located under the apps directory.
 
-- subscope ... Main server providing client, XRPC API, admin dashboard, and blob proxy
+- subscope ... Main server providing client, XRPC API, and admin dashboard
 - ingester ... Receives Jetstream events and adds jobs
 - worker ... Worker that processes Tap events
+- blob-proxy ... Image proxy that fetches blobs from PDSes, resizes them, and serves cached results
 
 ## Deployment
 
@@ -44,3 +45,4 @@ The following servers will start.
 - subscope ... http://localhost:3000
 - ingester ... http://localhost:3001
 - worker ... http://localhost:3002
+- blob-proxy ... http://localhost:3003

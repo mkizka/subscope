@@ -19,9 +19,12 @@ appsディレクトリ(アプリケーション)
 - `@repo/worker`
   - BullMQを使用してレコードをデータベースにインデックスするワーカー
 - `@repo/subscope`
-  - クライアント・XRPC API・管理画面・画像プロキシを提供するメインサーバー
+  - クライアント・XRPC API・管理画面を提供するメインサーバー
   - express + react-routerで実装
   - デザインはshadcn/uiを使用
+- `@repo/blob-proxy`
+  - 画像プロキシ(リサイズ・キャッシュ)を提供するサーバー
+  - `/images/:type/:did/:cid.jpg` でリクエストを受け、PDSから取得した画像をリサイズして返す
 
 packagesディレクトリ(共通パッケージ)
 
