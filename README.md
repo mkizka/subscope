@@ -20,7 +20,8 @@ The goal is to enable self-hosting on a typical VPS with around 4 cores / 4GB RA
 
 Server implementations are located under the apps directory.
 
-- subscope ... Main server providing client, XRPC API, and admin dashboard
+- subscope ... Main server providing client and admin dashboard
+- appview ... AppView server that exposes the XRPC API and serves the `did:web` document
 - ingester ... Receives Jetstream events and adds jobs
 - worker ... Worker that processes Tap events
 - blob-proxy ... Image proxy that fetches blobs from PDSes, resizes them, and serves cached results
@@ -46,3 +47,4 @@ The following servers will start.
 - ingester ... http://localhost:3001
 - worker ... http://localhost:3002
 - blob-proxy ... http://localhost:3003
+- appview ... http://localhost:3004

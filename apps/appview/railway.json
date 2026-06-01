@@ -1,0 +1,26 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "watchPatterns": [
+      "/apps/appview/**/*",
+      "/packages/client/**/*",
+      "/packages/common/**/*",
+      "/packages/db/**/*",
+      "pnpm-lock.yaml",
+      "Dockerfile"
+    ]
+  },
+  "deploy": {
+    "preDeployCommand": "pnpm db:migrate",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 60,
+    "restartPolicyType": "ALWAYS",
+    "restartPolicyMaxRetries": 3,
+    "limitOverride": {
+      "containers": {
+        "cpu": 2,
+        "memoryBytes": 1000000000
+      }
+    }
+  }
+}
