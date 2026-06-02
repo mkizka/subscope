@@ -13,7 +13,10 @@ const schema = z
       .default(match({ prod: "info", dev: "debug" })),
     PORT: z.coerce.number().default(3004),
     PLC_URL: z.url().default("https://plc.directory"),
-    PUBLIC_URL: z.string(),
+    PUBLIC_URL: match({
+      prod: z.url(),
+      dev: z.url().default("http://localhost:3004"),
+    }),
     SERVICE_DID: z.string().optional(),
     DATABASE_URL: match({
       prod: z.url(),
