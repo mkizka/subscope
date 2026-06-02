@@ -1,4 +1,4 @@
-FROM node:22.20.0-slim AS base
+FROM node:24.16.0-slim AS base
 ARG BUILD_TARGET
 ENV BUILD_PACKAGE=@repo/${BUILD_TARGET}
 RUN npm i -g turbo@^2 corepack@latest
