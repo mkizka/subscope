@@ -27,7 +27,6 @@ const schema = z.object({
     dev: z.url().default("http://localhost:2480"),
   }),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
-  SYNC_REPO_BATCH_SIZE: z.coerce.number().default(1000),
 });
 
 export const env = (() => {
