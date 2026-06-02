@@ -26,7 +26,8 @@ const schema = z
       dev: z.url().default("redis://localhost:6379"),
     }),
     PUBLIC_URL: z.string(),
-    SERVICE_DID: z.string().optional(),
+    APPVIEW_URL: z.url(),
+    APPVIEW_DID: z.string().optional(),
     // openssl rand -base64 33
     COOKIE_SECRET: match({
       prod: z.string().min(32),
@@ -47,8 +48,8 @@ const schema = z
   })
   .transform((val) => ({
     ...val,
-    SERVICE_DID:
-      val.SERVICE_DID ?? `did:web:${new URL(val.PUBLIC_URL).hostname}`,
+    APPVIEW_DID:
+      val.APPVIEW_DID ?? `did:web:${new URL(val.APPVIEW_URL).hostname}`,
   }));
 
 export const env = (() => {

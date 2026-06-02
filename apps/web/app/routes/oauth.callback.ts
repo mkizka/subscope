@@ -27,8 +27,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   let response;
   try {
     response = await agent.me.subsco.server.getSetupStatus();
-  } catch {
-    logger.error("Failed to check server setup status");
+  } catch (e) {
+    logger.error(e, "Failed to check server setup status");
     return redirect("/?error=setup_status_check_failed");
   }
 

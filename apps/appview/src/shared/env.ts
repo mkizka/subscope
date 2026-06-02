@@ -11,12 +11,9 @@ const schema = z
     LOG_LEVEL: z
       .enum(["debug", "info", "warn", "error"])
       .default(match({ prod: "info", dev: "debug" })),
-    PORT: z.coerce.number().default(3004),
+    PORT: z.coerce.number().default(3001),
     PLC_URL: z.url().default("https://plc.directory"),
-    PUBLIC_URL: match({
-      prod: z.url(),
-      dev: z.url().default("http://localhost:3004"),
-    }),
+    PUBLIC_URL: z.url(),
     SERVICE_DID: z.string().optional(),
     DATABASE_URL: match({
       prod: z.url(),

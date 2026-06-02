@@ -44,7 +44,7 @@ pnpm dev
 The following servers will start.
 
 - subscope ... http://localhost:3000
-- ingester ... http://localhost:3001
+- appview ... http://localhost:3001
 - worker ... http://localhost:3002
 - blob-proxy ... http://localhost:3003
-- appview ... http://localhost:3004
+- ingester ... http://localhost:3004

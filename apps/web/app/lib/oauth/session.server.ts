@@ -38,7 +38,7 @@ export const getSession = (request: Request) => {
 export const createAgent = (oauthSession: OAuthSession) => {
   return new SubscoAgent({
     oauthSession,
-    atprotoProxy: `${env.SERVICE_DID}#bsky_appview`,
+    atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
   });
 };
 

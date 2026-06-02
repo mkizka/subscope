@@ -25,7 +25,7 @@ export function meta() {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const logger = loggerManager.createLogger("_index");
 
-  const client = new AtpBaseClient({ service: env.PUBLIC_URL });
+  const client = new AtpBaseClient({ service: env.APPVIEW_URL });
   let setupStatus;
   try {
     const response = await client.me.subsco.server.getSetupStatus();
@@ -60,7 +60,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
   return data({
     state: "timeline" as const,
-    atprotoProxy: `${env.SERVICE_DID}#bsky_appview`,
+    atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
   });
 };
 
