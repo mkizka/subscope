@@ -2,7 +2,7 @@
 
 ## 概要
 
-- apps/subscope に実装
+- apps/web に実装
 - `/admin` でアクセス
 
 ## 機能

@@ -263,7 +263,7 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
-  apps/subscope:
+  apps/web:
     dependencies:
       '@atproto/jwk-jose':
         specifier: 0.2.0
