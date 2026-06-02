@@ -14,6 +14,7 @@ const schema = z
     PORT: z.coerce.number().default(3001),
     PLC_URL: z.url().default("https://plc.directory"),
     PUBLIC_URL: z.url(),
+    BLOB_PROXY_URL: z.url(),
     SERVICE_DID: z.string().optional(),
     DATABASE_URL: match({
       prod: z.url(),

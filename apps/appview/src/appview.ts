@@ -111,6 +111,7 @@ createInjector()
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("databaseUrl", env.DATABASE_URL)
   .provideValue("publicUrl", env.PUBLIC_URL)
+  .provideValue("blobProxyUrl", env.BLOB_PROXY_URL)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideClass("metricReporter", MetricReporter)

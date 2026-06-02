@@ -45,6 +45,6 @@ The following servers will start.
 
 - subscope ... http://localhost:3000
 - appview ... http://localhost:3001
-- worker ... http://localhost:3002
-- blob-proxy ... http://localhost:3003
+- blob-proxy ... http://localhost:3002
+- worker ... http://localhost:3003
 - ingester ... http://localhost:3004
