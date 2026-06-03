@@ -35,8 +35,12 @@ export class IngesterServer {
     this.app.listen(env.PORT, () => {
       this.logger.info(`Ingester server listening on port ${env.PORT}`);
       if (!env.DISABLE_INGESTER) {
-        void this.tapIngester.start();
-        void this.labelIngester.start();
+        this.tapIngester.start().catch((err: unknown) => {
+          this.logger.error({ err }, "Tap ingester threw");
+        });
+        this.labelIngester.start().catch((err: unknown) => {
+          this.logger.error({ err }, "Label ingester threw");
+        });
       }
     });
   }
