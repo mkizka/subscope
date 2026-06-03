@@ -1,0 +1,15 @@
+diff --git a/dist/channel.js b/dist/channel.js
+index dffaffe3d511ab1b770e9a002905d596c12a047a..6d52b5beac2735bc21ada02503935e146ea9539d 100644
+--- a/dist/channel.js
++++ b/dist/channel.js
+@@ -48,7 +48,9 @@ export class TapChannel {
+             id,
+             defer,
+         });
+-        await defer.complete;
++        // subscope patch: 切断中に `await defer.complete` するとconsumerが固まり
++        // 再接続に到達できずデッドロックする。待たずにバッファだけして返し、
++        // ackは再接続時のflushBufferedAcksで送る(未ack分はtapが再送)。
+     }
+     async flushBufferedAcks() {
+         while (this.bufferedAcks.length > 0) {

@@ -6,6 +6,7 @@ settings:
 
 patchedDependencies:
   '@atproto/lex-cli': 6e1a3864d8fdc73a0badfecd0cb5b512346a2d3c0cdd2b4d785be6916a3e61db
+  '@atproto/tap@0.3.0': b4b67cc5969eccf26d9d474fc1ffcffa24eec48c751296e0191a1c1695f72d28
   '@factory-js/factory': 29084f476bd94e8cdbfc6bac28f952cd7eb61e8991bc9548961dde23b1ba8162
   react-router: bb73d2e4321cb1a1624e74ab32ad0fa153a5ee153f945a2ec15e771098e60c0a
 
@@ -203,7 +204,7 @@ importers:
         version: 0.5.0
       '@atproto/tap':
         specifier: 0.3.0
-        version: 0.3.0
+        version: 0.3.0(patch_hash=b4b67cc5969eccf26d9d474fc1ffcffa24eec48c751296e0191a1c1695f72d28)
       '@atproto/xrpc-server':
         specifier: 0.11.1
         version: 0.11.1
@@ -558,7 +559,7 @@ importers:
         version: 0.6.1
       '@atproto/tap':
         specifier: 0.3.0
-        version: 0.3.0
+        version: 0.3.0(patch_hash=b4b67cc5969eccf26d9d474fc1ffcffa24eec48c751296e0191a1c1695f72d28)
       '@keyv/redis':
         specifier: 5.1.6
         version: 5.1.6(@opentelemetry/api@1.9.1)(keyv@5.6.0)
@@ -6993,7 +6994,7 @@ snapshots:
       iso-datestring-validator: 2.2.2
       tslib: 2.8.1
 
-  '@atproto/tap@0.3.0':
+  '@atproto/tap@0.3.0(patch_hash=b4b67cc5969eccf26d9d474fc1ffcffa24eec48c751296e0191a1c1695f72d28)':
     dependencies:
       '@atproto/common': 0.6.1
       '@atproto/lex': 0.1.3

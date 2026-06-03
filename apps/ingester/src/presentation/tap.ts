@@ -88,7 +88,11 @@ export class TapIngester {
   }
 
   async start() {
-    const channel = this.tap.channel(this.indexer);
+    const channel = this.tap.channel(this.indexer, {
+      // 初回同期で大量のイベントが流れる間は処理が追いつかずsocketが一時停止し、
+      // pongを読めず既定(10s)のheartbeatが健全な接続を誤ってterminateするため間隔を伸ばす
+      heartbeatIntervalMs: 60_000,
+    });
 
     this.logger.info(`Tap connection starting at ${env.TAP_URL}`);
 
