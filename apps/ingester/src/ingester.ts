@@ -1,9 +1,10 @@
+import { createRegistry } from "@gyaku/di";
 import {
   JobQueue,
   LoggerManager,
   MetricReporter,
 } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
+import { ac } from "@repo/common/utils";
 
 import { HandleCommitUseCase } from "./application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "./application/handle-identity-use-case.js";
@@ -14,21 +15,24 @@ import { IngesterServer } from "./presentation/server.js";
 import { TapIngester } from "./presentation/tap.js";
 import { env } from "./shared/env.js";
 
-createInjector()
+// prettier-ignore
+const services = await createRegistry()
   // envs
-  .provideValue("logLevel", env.LOG_LEVEL)
-  .provideValue("redisUrl", env.REDIS_URL)
+  .value("logLevel", env.LOG_LEVEL)
+  .value("redisUrl", env.REDIS_URL)
   // infrastructure
-  .provideClass("loggerManager", LoggerManager)
-  .provideClass("jobQueue", JobQueue)
-  .provideClass("metricReporter", MetricReporter)
-  .provideClass("cursorRepository", RedisCursorRepository)
+  .service("loggerManager", ["logLevel"], ac(LoggerManager))
+  .service("jobQueue", ["redisUrl"], ac(JobQueue))
+  .service("metricReporter", () => new MetricReporter())
+  .service("cursorRepository", ["redisUrl"], ac(RedisCursorRepository))
   // application
-  .provideClass("handleIdentityUseCase", HandleIdentityUseCase)
-  .provideClass("handleCommitUseCase", HandleCommitUseCase)
+  .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], ac(HandleIdentityUseCase))
+  .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], ac(HandleCommitUseCase))
   // presentation
-  .provideFactory("metricsRouter", metricsRouterFactory)
-  .provideClass("tapIngester", TapIngester)
-  .provideClass("labelIngester", LabelIngester)
-  .injectClass(IngesterServer)
-  .start();
+  .service("metricsRouter", ["jobQueue", "metricReporter"], ({ jobQueue, metricReporter }) => metricsRouterFactory(jobQueue, metricReporter))
+  .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase"], ac(TapIngester))
+  .service("labelIngester", ["metricReporter"], ac(LabelIngester))
+  .service("ingesterServer", ["loggerManager", "metricsRouter", "tapIngester", "labelIngester"], ac(IngesterServer))
+  .resolve();
+
+services.ingesterServer.start();

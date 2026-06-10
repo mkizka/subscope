@@ -1,21 +1,20 @@
 import { asDid } from "@atproto/did";
 import { actorFactory, subscriptionFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetSubscriptionStatusUseCase } from "./get-subscription-status-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscriptionStatusUseCase", () => {
-  const getSubscriptionStatusUseCase = testInjector.injectClass(
-    GetSubscriptionStatusUseCase,
-  );
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const actorRepo = testInjector.resolve("actorRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("サブスクリプションが存在しない場合、notSubscribedを返す", async () => {
+    const { getSubscriptionStatusUseCase, actorRepository } = services;
     // arrange
     const actor = actorFactory();
-    actorRepo.add(actor);
+    actorRepository.add(actor);
 
     // act
     const result = await getSubscriptionStatusUseCase.execute({
@@ -30,11 +29,16 @@ describe("GetSubscriptionStatusUseCase", () => {
   });
 
   test("サブスクリプションが存在する場合、subscribedを返す", async () => {
+    const {
+      getSubscriptionStatusUseCase,
+      subscriptionRepository,
+      actorRepository,
+    } = services;
     // arrange
     const actor = actorFactory();
-    actorRepo.add(actor);
+    actorRepository.add(actor);
     const subscription = subscriptionFactory({ actorDid: actor.did });
-    subscriptionRepo.add(subscription);
+    subscriptionRepository.add(subscription);
 
     // act
     const result = await getSubscriptionStatusUseCase.execute({

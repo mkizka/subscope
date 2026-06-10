@@ -22,6 +22,7 @@
     "@atproto/lexicon": "0.7.1",
     "@atproto/syntax": "0.6.1",
     "@atproto/tap": "0.3.0",
+    "@gyaku/di": "^3.3.0",
     "@keyv/redis": "5.1.6",
     "@repo/client": "workspace:*",
     "@repo/db": "workspace:*",

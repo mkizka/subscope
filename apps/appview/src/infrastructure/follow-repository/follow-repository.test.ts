@@ -11,9 +11,9 @@ import { describe, expect, test } from "vitest";
 import { FollowRepository } from "./follow-repository.js";
 
 describe("FollowRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const followRepository = testInjector.injectClass(FollowRepository);
+  const followRepository = new FollowRepository(ctx.db);
 
   describe("findFollows", () => {
     test("フォローがない場合、空の配列を返す", async () => {

@@ -5,25 +5,26 @@ import {
   postFactory,
   recordFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { RepostIndexer } from "./repost-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("RepostIndexer", () => {
-  const repostIndexer = testInjector.injectClass(RepostIndexer);
-
-  const repostRepo = testInjector.resolve("repostRepository");
-  const feedItemRepo = testInjector.resolve("feedItemRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   describe("upsert", () => {
     test("リポストレコードを正しく保存する", async () => {
+      const {
+        repostIndexer,
+        repostRepository,
+        feedItemRepository,
+        jobScheduler,
+        db,
+      } = services;
+      const ctx = { db };
       // arrange
       const reposter = actorFactory();
       const author = actorFactory();
@@ -50,7 +51,7 @@ describe("RepostIndexer", () => {
       });
 
       // assert
-      const repost = repostRepo.findByUri(record.uri);
+      const repost = repostRepository.findByUri(record.uri);
       expect(repost).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -58,7 +59,7 @@ describe("RepostIndexer", () => {
         subjectUri: new AtUri(subjectUri),
       });
 
-      const feedItem = feedItemRepo.findByUri(record.uri);
+      const feedItem = feedItemRepository.findByUri(record.uri);
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "repost",
@@ -78,9 +79,10 @@ describe("RepostIndexer", () => {
 
   describe("afterAction", () => {
     test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
+      const { repostIndexer, postRepository, jobScheduler } = services;
       // arrange
       const { post } = postFactory();
-      postRepo.add(post);
+      postRepository.add(post);
 
       const record = recordFactory({
         json: {

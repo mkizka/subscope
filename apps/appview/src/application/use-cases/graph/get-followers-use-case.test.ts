@@ -4,18 +4,19 @@ import {
   followFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetFollowersUseCase } from "./get-followers-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFollowersUseCase", () => {
-  const getFollowersUseCase = testInjector.injectClass(GetFollowersUseCase);
-
-  const followRepo = testInjector.resolve("followRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("actorをフォローしているユーザーがいる場合、フォロワーの情報を返す", async () => {
+    const { getFollowersUseCase, followRepository, profileRepository } =
+      services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -23,7 +24,7 @@ describe("GetFollowersUseCase", () => {
       displayName: "Actor User",
       handle: "actor.test",
     });
-    profileRepo.add(actorProfile);
+    profileRepository.add(actorProfile);
 
     const follower = actorFactory();
     const followerProfile = profileDetailedFactory({
@@ -31,13 +32,13 @@ describe("GetFollowersUseCase", () => {
       displayName: "Follower User",
       handle: "follower.test",
     });
-    profileRepo.add(followerProfile);
+    profileRepository.add(followerProfile);
 
     const follow = followFactory({
       actorDid: follower.did,
       subjectDid: actor.did,
     });
-    followRepo.add(follow);
+    followRepository.add(follow);
 
     // act
     const result = await getFollowersUseCase.execute({
@@ -65,6 +66,7 @@ describe("GetFollowersUseCase", () => {
   });
 
   test("actorをフォローしているユーザーがいない場合、空のfollowersを返す", async () => {
+    const { getFollowersUseCase, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -72,7 +74,7 @@ describe("GetFollowersUseCase", () => {
       displayName: "Actor User",
       handle: "actor.test",
     });
-    profileRepo.add(actorProfile);
+    profileRepository.add(actorProfile);
 
     // act
     const result = await getFollowersUseCase.execute({
@@ -93,13 +95,15 @@ describe("GetFollowersUseCase", () => {
   });
 
   test("limitパラメータで指定した件数より多くのフォロワーがいる場合、指定件数のフォロワーとcursorを返す", async () => {
+    const { getFollowersUseCase, followRepository, profileRepository } =
+      services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
       actorDid: actor.did,
       displayName: "Actor User",
     });
-    profileRepo.add(actorProfile);
+    profileRepository.add(actorProfile);
 
     const followers = [actorFactory(), actorFactory(), actorFactory()];
 
@@ -107,13 +111,13 @@ describe("GetFollowersUseCase", () => {
       const followerProfile = profileDetailedFactory({
         actorDid: follower.did,
       });
-      profileRepo.add(followerProfile);
+      profileRepository.add(followerProfile);
 
       const follow = followFactory({
         actorDid: follower.did,
         subjectDid: actor.did,
       });
-      followRepo.add(follow);
+      followRepository.add(follow);
     }
 
     // act
@@ -128,13 +132,15 @@ describe("GetFollowersUseCase", () => {
   });
 
   test("cursorを使用して2回目のリクエストを行った場合、次のページのフォロワーを重複なく返す", async () => {
+    const { getFollowersUseCase, followRepository, profileRepository } =
+      services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
       actorDid: actor.did,
       displayName: "Actor User",
     });
-    profileRepo.add(actorProfile);
+    profileRepository.add(actorProfile);
 
     const baseTime = new Date("2024-01-01T00:00:00.000Z");
 
@@ -149,7 +155,7 @@ describe("GetFollowersUseCase", () => {
       const followerProfile = profileDetailedFactory({
         actorDid: follower.did,
       });
-      profileRepo.add(followerProfile);
+      profileRepository.add(followerProfile);
 
       const follow = followFactory({
         actorDid: follower.did,
@@ -157,7 +163,7 @@ describe("GetFollowersUseCase", () => {
         createdAt: new Date(baseTime.getTime() + (i + 1) * 1000),
         indexedAt: new Date(baseTime.getTime() + (i + 1) * 1100),
       });
-      followRepo.add(follow);
+      followRepository.add(follow);
     });
 
     // act - 最初のページを取得
@@ -209,6 +215,8 @@ describe("GetFollowersUseCase", () => {
   });
 
   test("フォロワーが複数いる場合、sortAtの降順で返す", async () => {
+    const { getFollowersUseCase, followRepository, profileRepository } =
+      services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -216,7 +224,7 @@ describe("GetFollowersUseCase", () => {
       displayName: "Actor User",
       handle: "actor.test",
     });
-    profileRepo.add(actorProfile);
+    profileRepository.add(actorProfile);
 
     const baseTime = new Date("2024-01-01T00:00:00.000Z");
 
@@ -226,14 +234,14 @@ describe("GetFollowersUseCase", () => {
       displayName: "Follower 1",
       handle: "follower1.test",
     });
-    profileRepo.add(follower1Profile);
+    profileRepository.add(follower1Profile);
     const follow1 = followFactory({
       actorDid: follower1.did,
       subjectDid: actor.did,
       createdAt: new Date(baseTime.getTime() + 1000),
       indexedAt: new Date(baseTime.getTime() + 1100),
     });
-    followRepo.add(follow1);
+    followRepository.add(follow1);
 
     const follower2 = actorFactory();
     const follower2Profile = profileDetailedFactory({
@@ -241,14 +249,14 @@ describe("GetFollowersUseCase", () => {
       displayName: "Follower 2",
       handle: "follower2.test",
     });
-    profileRepo.add(follower2Profile);
+    profileRepository.add(follower2Profile);
     const follow2 = followFactory({
       actorDid: follower2.did,
       subjectDid: actor.did,
       createdAt: new Date(baseTime.getTime() + 2000),
       indexedAt: new Date(baseTime.getTime() + 2100),
     });
-    followRepo.add(follow2);
+    followRepository.add(follow2);
 
     const follower3 = actorFactory();
     const follower3Profile = profileDetailedFactory({
@@ -256,14 +264,14 @@ describe("GetFollowersUseCase", () => {
       displayName: "Follower 3",
       handle: "follower3.test",
     });
-    profileRepo.add(follower3Profile);
+    profileRepository.add(follower3Profile);
     const follow3 = followFactory({
       actorDid: follower3.did,
       subjectDid: actor.did,
       createdAt: new Date(baseTime.getTime() + 3000),
       indexedAt: new Date(baseTime.getTime() + 3100),
     });
-    followRepo.add(follow3);
+    followRepository.add(follow3);
 
     // act
     const result = await getFollowersUseCase.execute({

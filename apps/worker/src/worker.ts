@@ -1,3 +1,4 @@
+import { createRegistry } from "@gyaku/di";
 import {
   connectionPoolFactory,
   databaseFactory,
@@ -10,7 +11,7 @@ import {
   TapClient,
   TransactionManager,
 } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
+import { ac } from "@repo/common/utils";
 
 import { IndexActorService } from "./application/services/index-actor-service.js";
 import { IndexRecordService } from "./application/services/index-record-service.js";
@@ -46,58 +47,60 @@ import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
 
-createInjector()
+// prettier-ignore
+const services = await createRegistry()
   // envs
-  .provideValue("databaseUrl", env.DATABASE_URL)
-  .provideValue("redisUrl", env.REDIS_URL)
-  .provideValue("logLevel", env.LOG_LEVEL)
-  .provideValue("redisUrl", env.REDIS_URL)
-  .provideValue("plcUrl", env.PLC_URL)
-  .provideValue("tapUrl", env.TAP_URL)
+  .value("databaseUrl", env.DATABASE_URL)
+  .value("redisUrl", env.REDIS_URL)
+  .value("logLevel", env.LOG_LEVEL)
+  .value("plcUrl", env.PLC_URL)
+  .value("tapUrl", env.TAP_URL)
   // infrastructure
-  .provideClass("loggerManager", LoggerManager)
-  .provideClass("tapClient", TapClient)
-  .provideFactory("connectionPool", connectionPoolFactory)
-  .provideFactory("db", databaseFactory)
-  .provideClass("transactionManager", TransactionManager)
-  .provideClass("metricReporter", MetricReporter)
-  .provideClass("didCache", RedisDidCache)
-  .provideClass("didResolver", DidResolver)
-  .provideClass("jobQueue", JobQueue)
-  .provideClass("recordFetcher", RecordFetcher)
-  .provideClass("actorRepository", ActorRepository)
-  .provideClass("inviteCodeRepository", InviteCodeRepository)
-  .provideClass("actorStatsRepository", ActorStatsRepository)
-  .provideClass("profileRepository", ProfileRepository)
-  .provideClass("postRepository", PostRepository)
-  .provideClass("recordRepository", RecordRepository)
-  .provideClass("followRepository", FollowRepository)
-  .provideClass("generatorRepository", GeneratorRepository)
-  .provideClass("likeRepository", LikeRepository)
-  .provideClass("postStatsRepository", PostStatsRepository)
-  .provideClass("repostRepository", RepostRepository)
-  .provideClass("subscriptionRepository", SubscriptionRepository)
-  .provideClass("feedItemRepository", FeedItemRepository)
+  .service("loggerManager", ["logLevel"], ac(LoggerManager))
+  .service("tapClient", ["tapUrl"], ac(TapClient))
+  .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
+  .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+  .service("transactionManager", ["db"], ac(TransactionManager))
+  .service("metricReporter", () => new MetricReporter())
+  .service("didCache", ["redisUrl", "metricReporter"], ac(RedisDidCache))
+  .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], ac(DidResolver))
+  .service("jobQueue", ["redisUrl"], ac(JobQueue))
+  .service("recordFetcher", ["didResolver", "metricReporter"], ac(RecordFetcher))
+  .service("actorRepository", ["db"], ac(ActorRepository))
+  .service("inviteCodeRepository", ["db"], ac(InviteCodeRepository))
+  .service("actorStatsRepository", ["db"], ac(ActorStatsRepository))
+  .service("profileRepository", ["db"], ac(ProfileRepository))
+  .service("postRepository", ["db"], ac(PostRepository))
+  .service("recordRepository", ["db"], ac(RecordRepository))
+  .service("followRepository", ["db"], ac(FollowRepository))
+  .service("generatorRepository", ["db"], ac(GeneratorRepository))
+  .service("likeRepository", ["db"], ac(LikeRepository))
+  .service("postStatsRepository", ["db"], ac(PostStatsRepository))
+  .service("repostRepository", ["db"], ac(RepostRepository))
+  .service("subscriptionRepository", ["db"], ac(SubscriptionRepository))
+  .service("feedItemRepository", ["db"], ac(FeedItemRepository))
   // application(service)
-  .provideClass("jobScheduler", JobScheduler)
-  .provideClass("profileIndexer", ProfileIndexer)
-  .provideClass("postIndexer", PostIndexer)
-  .provideClass("indexActorService", IndexActorService)
-  .provideClass("followIndexer", FollowIndexer)
-  .provideClass("generatorIndexer", GeneratorIndexer)
-  .provideClass("likeIndexer", LikeIndexer)
-  .provideClass("repostIndexer", RepostIndexer)
-  .provideClass("indexRecordService", IndexRecordService)
+  .service("jobScheduler", ["jobQueue"], ac(JobScheduler))
+  .service("profileIndexer", ["profileRepository"], ac(ProfileIndexer))
+  .service("postIndexer", ["postRepository", "feedItemRepository", "jobScheduler"], ac(PostIndexer))
+  .service("indexActorService", ["actorRepository", "profileRepository", "jobScheduler"], ac(IndexActorService))
+  .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionRepository"], ac(FollowIndexer))
+  .service("generatorIndexer", ["generatorRepository"], ac(GeneratorIndexer))
+  .service("likeIndexer", ["likeRepository", "jobScheduler"], ac(LikeIndexer))
+  .service("repostIndexer", ["repostRepository", "feedItemRepository", "postRepository", "jobScheduler"], ac(RepostIndexer))
+  .service("indexRecordService", ["recordRepository", "indexActorService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer"], ac(IndexRecordService))
   // application(use-case)
-  .provideClass("upsertIdentityUseCase", UpsertIdentityUseCase)
-  .provideClass("indexCommitUseCase", IndexCommitUseCase)
-  .provideClass("resolveDidUseCase", ResolveDidUseCase)
-  .provideClass("fetchRecordUseCase", FetchRecordUseCase)
-  .provideClass("aggregatePostStatsUseCase", AggregatePostStatsUseCase)
-  .provideClass("aggregateActorStatsUseCase", AggregateActorStatsUseCase)
-  .provideClass("addTapRepoUseCase", AddTapRepoUseCase)
-  .provideClass("removeTapRepoUseCase", RemoveTapRepoUseCase)
-  .provideClass("syncWorker", SyncWorker)
+  .service("upsertIdentityUseCase", ["db", "indexActorService"], ac(UpsertIdentityUseCase))
+  .service("indexCommitUseCase", ["transactionManager", "indexRecordService"], ac(IndexCommitUseCase))
+  .service("resolveDidUseCase", ["didResolver", "actorRepository", "db"], ac(ResolveDidUseCase))
+  .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], ac(FetchRecordUseCase))
+  .service("aggregatePostStatsUseCase", ["postStatsRepository", "postRepository", "db"], ac(AggregatePostStatsUseCase))
+  .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], ac(AggregateActorStatsUseCase))
+  .service("addTapRepoUseCase", ["tapClient"], ac(AddTapRepoUseCase))
+  .service("removeTapRepoUseCase", ["tapClient"], ac(RemoveTapRepoUseCase))
+  .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "addTapRepoUseCase", "removeTapRepoUseCase"], ac(SyncWorker))
   // presentation
-  .injectClass(WorkerServer)
-  .start();
+  .service("workerServer", ["loggerManager", "syncWorker"], ac(WorkerServer))
+  .resolve();
+
+services.workerServer.start();

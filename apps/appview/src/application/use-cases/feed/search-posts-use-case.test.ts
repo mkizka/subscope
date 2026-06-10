@@ -3,21 +3,19 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { SearchPostsUseCase } from "./search-posts-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchPostsUseCase", () => {
-  const searchPostsUseCase = testInjector.injectClass(SearchPostsUseCase);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
+    const { searchPostsUseCase } = services;
     // act
     const result = await searchPostsUseCase.execute({
       q: "",
@@ -32,6 +30,7 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("空白文字のみの検索クエリの場合、空の結果を返す", async () => {
+    const { searchPostsUseCase } = services;
     // act
     const result = await searchPostsUseCase.execute({
       q: "   ",
@@ -46,6 +45,13 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("検索クエリに一致する投稿がある場合、該当する投稿を返す", async () => {
+    const {
+      searchPostsUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -53,14 +59,14 @@ describe("SearchPostsUseCase", () => {
       actorDid: actor.did,
       displayName: "Test User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: actor.did,
       text: "これはテスト投稿です",
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -68,7 +74,7 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     // act
     const result = await searchPostsUseCase.execute({
@@ -93,6 +99,13 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("検索クエリに一致する投稿がない場合、空の配列を返す", async () => {
+    const {
+      searchPostsUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -100,14 +113,14 @@ describe("SearchPostsUseCase", () => {
       actorDid: actor.did,
       displayName: "No Match User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: actor.did,
       text: "これは関係ない投稿です",
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -115,7 +128,7 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     // act
     const result = await searchPostsUseCase.execute({
@@ -131,6 +144,13 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("limitパラメータが指定された場合、指定した件数で結果を制限する", async () => {
+    const {
+      searchPostsUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -138,15 +158,15 @@ describe("SearchPostsUseCase", () => {
       actorDid: actor.did,
       displayName: "Limit Test User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post: firstPost, record: firstRecord } = postFactory({
       actorDid: actor.did,
       text: "最初のリミット検証投稿です",
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    postRepo.add(firstPost);
-    recordRepo.add(firstRecord);
+    postRepository.add(firstPost);
+    recordRepository.add(firstRecord);
 
     const firstPostStats: PostStats = {
       likeCount: 0,
@@ -154,15 +174,15 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(firstPost.uri.toString(), firstPostStats);
+    postStatsRepository.add(firstPost.uri.toString(), firstPostStats);
 
     const { post: secondPost, record: secondRecord } = postFactory({
       actorDid: actor.did,
       text: "二番目のリミット検証投稿です",
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    postRepo.add(secondPost);
-    recordRepo.add(secondRecord);
+    postRepository.add(secondPost);
+    recordRepository.add(secondRecord);
 
     const secondPostStats: PostStats = {
       likeCount: 0,
@@ -170,7 +190,7 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(secondPost.uri.toString(), secondPostStats);
+    postStatsRepository.add(secondPost.uri.toString(), secondPostStats);
 
     // act
     const result = await searchPostsUseCase.execute({
@@ -190,6 +210,13 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("cursorパラメータが指定された場合、ページネーションで次のページを返す", async () => {
+    const {
+      searchPostsUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -197,15 +224,15 @@ describe("SearchPostsUseCase", () => {
       actorDid: actor.did,
       displayName: "Pagination Test User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post: firstPost, record: firstRecord } = postFactory({
       actorDid: actor.did,
       text: "最初のページネーション検証投稿です",
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    postRepo.add(firstPost);
-    recordRepo.add(firstRecord);
+    postRepository.add(firstPost);
+    recordRepository.add(firstRecord);
 
     const firstPostStats: PostStats = {
       likeCount: 0,
@@ -213,15 +240,15 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(firstPost.uri.toString(), firstPostStats);
+    postStatsRepository.add(firstPost.uri.toString(), firstPostStats);
 
     const { post: secondPost, record: secondRecord } = postFactory({
       actorDid: actor.did,
       text: "二番目のページネーション検証投稿です",
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    postRepo.add(secondPost);
-    recordRepo.add(secondRecord);
+    postRepository.add(secondPost);
+    recordRepository.add(secondRecord);
 
     const secondPostStats: PostStats = {
       likeCount: 0,
@@ -229,7 +256,7 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(secondPost.uri.toString(), secondPostStats);
+    postStatsRepository.add(secondPost.uri.toString(), secondPostStats);
 
     // act - 最初のページ
     const firstPage = await searchPostsUseCase.execute({
@@ -267,6 +294,13 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("リプライ投稿がある場合、リプライを除外して元投稿のみを返す", async () => {
+    const {
+      searchPostsUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -274,14 +308,14 @@ describe("SearchPostsUseCase", () => {
       actorDid: actor.did,
       displayName: "Reply Test User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post: originalPost, record: originalRecord } = postFactory({
       actorDid: actor.did,
       text: "元投稿のリプライ検証内容です",
     });
-    postRepo.add(originalPost);
-    recordRepo.add(originalRecord);
+    postRepository.add(originalPost);
+    recordRepository.add(originalRecord);
 
     const originalPostStats: PostStats = {
       likeCount: 0,
@@ -289,7 +323,7 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(originalPost.uri.toString(), originalPostStats);
+    postStatsRepository.add(originalPost.uri.toString(), originalPostStats);
 
     const { post: replyPost, record: replyRecord } = postFactory({
       actorDid: actor.did,
@@ -297,8 +331,8 @@ describe("SearchPostsUseCase", () => {
       replyParent: { uri: originalPost.uri, cid: originalPost.cid },
       replyRoot: { uri: originalPost.uri, cid: originalPost.cid },
     });
-    postRepo.add(replyPost);
-    recordRepo.add(replyRecord);
+    postRepository.add(replyPost);
+    recordRepository.add(replyRecord);
 
     const replyPostStats: PostStats = {
       likeCount: 0,
@@ -306,7 +340,7 @@ describe("SearchPostsUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(replyPost.uri.toString(), replyPostStats);
+    postStatsRepository.add(replyPost.uri.toString(), replyPostStats);
 
     // act
     const result = await searchPostsUseCase.execute({

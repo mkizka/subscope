@@ -11,9 +11,9 @@ import { describe, expect, test } from "vitest";
 import { LikeRepository } from "./like-repository.js";
 
 describe("LikeRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const likeRepository = testInjector.injectClass(LikeRepository);
+  const likeRepository = new LikeRepository(ctx.db);
 
   describe("findMany", () => {
     test("指定された投稿へのいいねがない場合、空の配列を返す", async () => {

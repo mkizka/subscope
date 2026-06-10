@@ -15,23 +15,24 @@ import {
   recordFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { PostViewService } from "./post-view-service.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostViewService", () => {
-  const postViewService = testInjector.injectClass(PostViewService);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const generatorRepo = testInjector.resolve("generatorRepository");
-  const likeRepo = testInjector.resolve("likeRepository");
-  const repostRepo = testInjector.resolve("repostRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   describe("findPostView", () => {
     test("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const actor = actorFactory({ handle: "test.bsky.social" });
       const profile = profileDetailedFactory({
@@ -39,7 +40,7 @@ describe("PostViewService", () => {
         displayName: "Test User",
         handle: "test.bsky.social",
       });
-      profileRepo.add(profile);
+      profileRepository.add(profile);
 
       const { post, record } = postFactory({
         actorDid: actor.did,
@@ -47,8 +48,8 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(post);
-      recordRepo.add(record);
+      postRepository.add(post);
+      recordRepository.add(record);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -81,6 +82,12 @@ describe("PostViewService", () => {
     });
 
     test("プロフィールの表示名がnullの場合、表示名なしでプロフィールビューを返す", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const actor = actorFactory({ handle: "noProfile.bsky.social" });
       const profile = profileDetailedFactory({
@@ -89,14 +96,14 @@ describe("PostViewService", () => {
         handle: "noProfile.bsky.social",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      profileRepo.add(profile);
+      profileRepository.add(profile);
 
       const { post, record } = postFactory({
         actorDid: actor.did,
         text: "Test post",
       });
-      postRepo.add(post);
-      recordRepo.add(record);
+      postRepository.add(post);
+      recordRepository.add(record);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -115,13 +122,19 @@ describe("PostViewService", () => {
     });
 
     test("画像埋め込みを含む投稿の場合、画像ビューを含む投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const actor = actorFactory({ handle: "imageuser.bsky.social" });
       const profile = profileDetailedFactory({
         actorDid: actor.did,
         displayName: "Image User",
       });
-      profileRepo.add(profile);
+      profileRepository.add(profile);
 
       const imageCid =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
@@ -166,8 +179,8 @@ describe("PostViewService", () => {
         indexedAt: record.indexedAt,
       });
 
-      postRepo.add(post);
-      recordRepo.add(recordWithEmbed);
+      postRepository.add(post);
+      recordRepository.add(recordWithEmbed);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -191,13 +204,19 @@ describe("PostViewService", () => {
     });
 
     test("外部リンク埋め込みを含む投稿の場合、外部リンクビューを含む投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const actor = actorFactory({ handle: "linkuser.bsky.social" });
       const profile = profileDetailedFactory({
         actorDid: actor.did,
         displayName: "Link User",
       });
-      profileRepo.add(profile);
+      profileRepository.add(profile);
 
       const thumbCid =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
@@ -241,8 +260,8 @@ describe("PostViewService", () => {
         indexedAt: record.indexedAt,
       });
 
-      postRepo.add(post);
-      recordRepo.add(recordWithEmbed);
+      postRepository.add(post);
+      recordRepository.add(recordWithEmbed);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -265,36 +284,42 @@ describe("PostViewService", () => {
     });
 
     test("複数のURIを指定した場合、対応する複数の投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const actor1 = actorFactory({ handle: "user1.bsky.social" });
       const profile1 = profileDetailedFactory({
         actorDid: actor1.did,
         displayName: "User 1",
       });
-      profileRepo.add(profile1);
+      profileRepository.add(profile1);
 
       const actor2 = actorFactory({ handle: "user2.bsky.social" });
       const profile2 = profileDetailedFactory({
         actorDid: actor2.did,
         displayName: "User 2",
       });
-      profileRepo.add(profile2);
+      profileRepository.add(profile2);
 
       const { post: post1, record: record1 } = postFactory({
         actorDid: actor1.did,
         text: "First post",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(post1);
-      recordRepo.add(record1);
+      postRepository.add(post1);
+      recordRepository.add(record1);
 
       const { post: post2, record: record2 } = postFactory({
         actorDid: actor2.did,
         text: "Second post",
         createdAt: new Date("2024-01-01T01:00:00.000Z"),
       });
-      postRepo.add(post2);
-      recordRepo.add(record2);
+      postRepository.add(post2);
+      recordRepository.add(record2);
 
       const postUri1 = new AtUri(post1.uri.toString());
       const postUri2 = new AtUri(post2.uri.toString());
@@ -311,21 +336,27 @@ describe("PostViewService", () => {
     });
 
     test("存在しない投稿URIが含まれている場合、そのURIは結果に含まれない", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const actor = actorFactory({ handle: "exists.bsky.social" });
       const profile = profileDetailedFactory({
         actorDid: actor.did,
         displayName: "Existing User",
       });
-      profileRepo.add(profile);
+      profileRepository.add(profile);
 
       const { post, record } = postFactory({
         actorDid: actor.did,
         text: "Existing post",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(post);
-      recordRepo.add(record);
+      postRepository.add(post);
+      recordRepository.add(record);
 
       const existingUri = new AtUri(post.uri.toString());
       const nonExistentUri = AtUri.make(
@@ -348,6 +379,12 @@ describe("PostViewService", () => {
     });
 
     test("投稿の埋め込み(app.bsky.embed.record)を含む投稿の場合、埋め込み投稿ビューを含む投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
       const embeddedProfile = profileDetailedFactory({
@@ -355,7 +392,7 @@ describe("PostViewService", () => {
         handle: embeddedAuthor.handle,
         displayName: "Embedded Author",
       });
-      profileRepo.add(embeddedProfile);
+      profileRepository.add(embeddedProfile);
 
       const { post: embeddedPost, record: embeddedRecord } = postFactory({
         actorDid: embeddedAuthor.did,
@@ -363,8 +400,8 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(embeddedPost);
-      recordRepo.add(embeddedRecord);
+      postRepository.add(embeddedPost);
+      recordRepository.add(embeddedRecord);
 
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
@@ -372,7 +409,7 @@ describe("PostViewService", () => {
         handle: quotingAuthor.handle,
         displayName: "Quoting Author",
       });
-      profileRepo.add(quotingProfile);
+      profileRepository.add(quotingProfile);
 
       const { post: quotingPost, record: quotingRecord } = postFactory({
         actorDid: quotingAuthor.did,
@@ -403,8 +440,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepo.add(quotingPost);
-      recordRepo.add(quotingRecordWithEmbed);
+      postRepository.add(quotingPost);
+      recordRepository.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -468,13 +505,19 @@ describe("PostViewService", () => {
     });
 
     test("投稿の埋め込み(app.bsky.embed.record)の埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
         actorDid: quotingAuthor.did,
         displayName: "Quoting Author",
       });
-      profileRepo.add(quotingProfile);
+      profileRepository.add(quotingProfile);
 
       const notFoundUri = AtUri.make(
         "did:plc:notfound",
@@ -510,8 +553,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepo.add(quotingPost);
-      recordRepo.add(quotingRecordWithEmbed);
+      postRepository.add(quotingPost);
+      recordRepository.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -536,6 +579,13 @@ describe("PostViewService", () => {
     });
 
     test("フィードジェネレーターの埋め込み(app.bsky.embed.record)の場合、ジェネレータービューを含む投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+        generatorRepository,
+      } = services;
       // arrange
       const generatorActor = actorFactory({ handle: "generator.bsky.social" });
       const generatorProfile = profileDetailedFactory({
@@ -543,7 +593,7 @@ describe("PostViewService", () => {
         handle: generatorActor.handle,
         displayName: "Generator Creator",
       });
-      profileRepo.add(generatorProfile);
+      profileRepository.add(generatorProfile);
 
       const generator = generatorFactory({
         actorDid: generatorActor.did,
@@ -552,7 +602,7 @@ describe("PostViewService", () => {
         description: "A custom algorithmic feed",
         avatarCid: "bafyreiavatarcid123",
       });
-      generatorRepo.add(generator);
+      generatorRepository.add(generator);
 
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
@@ -560,7 +610,7 @@ describe("PostViewService", () => {
         handle: quotingAuthor.handle,
         displayName: "Quoting Author",
       });
-      profileRepo.add(quotingProfile);
+      profileRepository.add(quotingProfile);
 
       const { post: quotingPost, record: quotingRecord } = postFactory({
         actorDid: quotingAuthor.did,
@@ -591,8 +641,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepo.add(quotingPost);
-      recordRepo.add(quotingRecordWithEmbed);
+      postRepository.add(quotingPost);
+      recordRepository.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -651,13 +701,19 @@ describe("PostViewService", () => {
     });
 
     test("フィードジェネレーターの埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
         actorDid: quotingAuthor.did,
         displayName: "Quoting Author",
       });
-      profileRepo.add(quotingProfile);
+      profileRepository.add(quotingProfile);
 
       const notFoundGeneratorUri = AtUri.make(
         "did:plc:notfound",
@@ -693,8 +749,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepo.add(quotingPost);
-      recordRepo.add(quotingRecordWithEmbed);
+      postRepository.add(quotingPost);
+      recordRepository.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -719,6 +775,12 @@ describe("PostViewService", () => {
     });
 
     test("embedがapp.bsky.embed.recordWithMedia#viewの場合、画像と投稿の両方を含む埋め込みビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
       const embeddedProfile = profileDetailedFactory({
@@ -726,7 +788,7 @@ describe("PostViewService", () => {
         handle: embeddedAuthor.handle,
         displayName: "Embedded Author",
       });
-      profileRepo.add(embeddedProfile);
+      profileRepository.add(embeddedProfile);
 
       const { post: embeddedPost, record: embeddedRecord } = postFactory({
         actorDid: embeddedAuthor.did,
@@ -734,8 +796,8 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(embeddedPost);
-      recordRepo.add(embeddedRecord);
+      postRepository.add(embeddedPost);
+      recordRepository.add(embeddedRecord);
 
       const mainAuthor = actorFactory({ handle: "main.bsky.social" });
       const mainProfile = profileDetailedFactory({
@@ -743,7 +805,7 @@ describe("PostViewService", () => {
         handle: mainAuthor.handle,
         displayName: "Main Author",
       });
-      profileRepo.add(mainProfile);
+      profileRepository.add(mainProfile);
 
       const imageCid1 =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
@@ -820,8 +882,8 @@ describe("PostViewService", () => {
         indexedAt: mainRecord.indexedAt,
       });
 
-      postRepo.add(mainPost);
-      recordRepo.add(mainRecordWithEmbed);
+      postRepository.add(mainPost);
+      recordRepository.add(mainRecordWithEmbed);
 
       const mainPostUri = new AtUri(mainPost.uri.toString());
 
@@ -931,13 +993,19 @@ describe("PostViewService", () => {
     });
 
     test("埋め込みの埋め込み（A→B→C）の場合、3階層すべての投稿ビューを取得できる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const authorC = actorFactory({ handle: "authorc.bsky.social" });
       const profileC = profileDetailedFactory({
         actorDid: authorC.did,
         displayName: "Author C",
       });
-      profileRepo.add(profileC);
+      profileRepository.add(profileC);
 
       const { post: postC, record: recordC } = postFactory({
         actorDid: authorC.did,
@@ -945,15 +1013,15 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(postC);
-      recordRepo.add(recordC);
+      postRepository.add(postC);
+      recordRepository.add(recordC);
 
       const authorB = actorFactory({ handle: "authorb.bsky.social" });
       const profileB = profileDetailedFactory({
         actorDid: authorB.did,
         displayName: "Author B",
       });
-      profileRepo.add(profileB);
+      profileRepository.add(profileB);
 
       const { post: postB, record: recordB } = postFactory({
         actorDid: authorB.did,
@@ -984,15 +1052,15 @@ describe("PostViewService", () => {
         indexedAt: recordB.indexedAt,
       });
 
-      postRepo.add(postB);
-      recordRepo.add(recordBWithEmbed);
+      postRepository.add(postB);
+      recordRepository.add(recordBWithEmbed);
 
       const authorA = actorFactory({ handle: "authora.bsky.social" });
       const profileA = profileDetailedFactory({
         actorDid: authorA.did,
         displayName: "Author A",
       });
-      profileRepo.add(profileA);
+      profileRepository.add(profileA);
 
       const { post: postA, record: recordA } = postFactory({
         actorDid: authorA.did,
@@ -1023,8 +1091,8 @@ describe("PostViewService", () => {
         indexedAt: recordA.indexedAt,
       });
 
-      postRepo.add(postA);
-      recordRepo.add(recordAWithEmbed);
+      postRepository.add(postA);
+      recordRepository.add(recordAWithEmbed);
 
       const postAUri = new AtUri(postA.uri.toString());
 
@@ -1074,13 +1142,19 @@ describe("PostViewService", () => {
     });
 
     test("埋め込みの深度が最大2階層に制限されることを確認（A→B→C→Dのパターン）", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+      } = services;
       // arrange
       const authorD = actorFactory({ handle: "authord.bsky.social" });
       const profileD = profileDetailedFactory({
         actorDid: authorD.did,
         displayName: "Author D",
       });
-      profileRepo.add(profileD);
+      profileRepository.add(profileD);
 
       const { post: postD, record: recordD } = postFactory({
         actorDid: authorD.did,
@@ -1088,15 +1162,15 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(postD);
-      recordRepo.add(recordD);
+      postRepository.add(postD);
+      recordRepository.add(recordD);
 
       const authorC = actorFactory({ handle: "authorc.bsky.social" });
       const profileC = profileDetailedFactory({
         actorDid: authorC.did,
         displayName: "Author C",
       });
-      profileRepo.add(profileC);
+      profileRepository.add(profileC);
 
       const { post: postC, record: recordC } = postFactory({
         actorDid: authorC.did,
@@ -1127,15 +1201,15 @@ describe("PostViewService", () => {
         indexedAt: recordC.indexedAt,
       });
 
-      postRepo.add(postC);
-      recordRepo.add(recordCWithEmbed);
+      postRepository.add(postC);
+      recordRepository.add(recordCWithEmbed);
 
       const authorB = actorFactory({ handle: "authorb.bsky.social" });
       const profileB = profileDetailedFactory({
         actorDid: authorB.did,
         displayName: "Author B",
       });
-      profileRepo.add(profileB);
+      profileRepository.add(profileB);
 
       const { post: postB, record: recordB } = postFactory({
         actorDid: authorB.did,
@@ -1166,15 +1240,15 @@ describe("PostViewService", () => {
         indexedAt: recordB.indexedAt,
       });
 
-      postRepo.add(postB);
-      recordRepo.add(recordBWithEmbed);
+      postRepository.add(postB);
+      recordRepository.add(recordBWithEmbed);
 
       const authorA = actorFactory({ handle: "authora.bsky.social" });
       const profileA = profileDetailedFactory({
         actorDid: authorA.did,
         displayName: "Author A",
       });
-      profileRepo.add(profileA);
+      profileRepository.add(profileA);
 
       const { post: postA, record: recordA } = postFactory({
         actorDid: authorA.did,
@@ -1205,8 +1279,8 @@ describe("PostViewService", () => {
         indexedAt: recordA.indexedAt,
       });
 
-      postRepo.add(postA);
-      recordRepo.add(recordAWithEmbed);
+      postRepository.add(postA);
+      recordRepository.add(recordAWithEmbed);
 
       const postAUri = new AtUri(postA.uri.toString());
 
@@ -1256,35 +1330,43 @@ describe("PostViewService", () => {
     });
 
     test("閲覧者が投稿をいいねとリポストしている場合、viewerにそれぞれのURIが含まれる", async () => {
+      const {
+        postViewService,
+        postRepository,
+        recordRepository,
+        profileRepository,
+        likeRepository,
+        repostRepository,
+      } = services;
       // arrange
       const viewer = actorFactory();
       const viewerProfile = profileDetailedFactory({
         actorDid: viewer.did,
         displayName: "Viewer",
       });
-      profileRepo.add(viewerProfile);
+      profileRepository.add(viewerProfile);
 
       const author1 = actorFactory();
       const profile1 = profileDetailedFactory({
         actorDid: author1.did,
         displayName: "Author 1",
       });
-      profileRepo.add(profile1);
+      profileRepository.add(profile1);
 
       const author2 = actorFactory();
       const profile2 = profileDetailedFactory({
         actorDid: author2.did,
         displayName: "Author 2",
       });
-      profileRepo.add(profile2);
+      profileRepository.add(profile2);
 
       const { post: post1, record: record1 } = postFactory({
         actorDid: author1.did,
         text: "Post 1",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepo.add(post1);
-      recordRepo.add(record1);
+      postRepository.add(post1);
+      recordRepository.add(record1);
 
       const like1 = likeFactory({
         actorDid: viewer.did,
@@ -1292,15 +1374,15 @@ describe("PostViewService", () => {
         subjectCid: post1.cid,
         createdAt: new Date("2024-01-01T01:00:00.000Z"),
       });
-      likeRepo.add(like1);
+      likeRepository.add(like1);
 
       const { post: post2, record: record2 } = postFactory({
         actorDid: author2.did,
         text: "Post 2",
         createdAt: new Date("2024-01-01T02:00:00.000Z"),
       });
-      postRepo.add(post2);
-      recordRepo.add(record2);
+      postRepository.add(post2);
+      recordRepository.add(record2);
 
       const repost2 = repostFactory({
         actorDid: viewer.did,
@@ -1308,7 +1390,7 @@ describe("PostViewService", () => {
         subjectCid: post2.cid,
         createdAt: new Date("2024-01-01T03:00:00.000Z"),
       });
-      repostRepo.add(repost2);
+      repostRepository.add(repost2);
 
       const postUri1 = new AtUri(post1.uri.toString());
       const postUri2 = new AtUri(post2.uri.toString());

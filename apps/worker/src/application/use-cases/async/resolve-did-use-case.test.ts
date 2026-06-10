@@ -1,21 +1,19 @@
 import { asDid } from "@atproto/did";
 import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { ResolveDidUseCase } from "./resolve-did-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ResolveDidUseCase", () => {
-  const actorRepository = testInjector.resolve("actorRepository");
-  const didResolver = testInjector.resolve("didResolver");
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
-
-  const resolveDidUseCase = testInjector.injectClass(ResolveDidUseCase);
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("既存のactorが存在しない場合、新規actorを作成する", async () => {
+    const { resolveDidUseCase, actorRepository, didResolver, db } = services;
+    const ctx = { db };
     // arrange
     const did = asDid("did:plc:new-actor");
     const handle = asHandle("newactor.test");
@@ -36,6 +34,8 @@ describe("ResolveDidUseCase", () => {
   });
 
   test("既存のactorが存在する場合、ハンドルを更新する", async () => {
+    const { resolveDidUseCase, actorRepository, didResolver, db } = services;
+    const ctx = { db };
     // arrange
     const oldHandle = asHandle("oldhandle.test");
     const newHandle = asHandle("newhandle.test");

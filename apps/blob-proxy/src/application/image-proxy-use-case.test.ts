@@ -3,20 +3,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { CacheMetadata } from "../domain/cache-metadata.js";
 import { ImageBlob } from "../domain/image-blob.js";
 import { ImageProxyRequest } from "../domain/image-proxy-request.js";
-import { testInjector } from "../test-utils.js";
-import { ImageProxyUseCase } from "./image-proxy-use-case.js";
+import { testRegistry, type TestServices } from "../test-utils.js";
 
 describe("ImageProxyUseCase", () => {
-  const imageProxyUseCase = testInjector.injectClass(ImageProxyUseCase);
-
-  const didResolver = testInjector.resolve("didResolver");
-  const blobFetcher = testInjector.resolve("blobFetcher");
-  const imageCacheStorage = testInjector.resolve("imageCacheStorage");
-  const imageResizer = testInjector.resolve("imageResizer");
-  const metricReporter = testInjector.resolve("metricReporter");
-  const cacheMetadataRepo = testInjector.resolve("cacheMetadataRepository");
-
-  beforeEach(() => {
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
   });
@@ -26,10 +18,16 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("キャッシュがヒットした場合、キャッシュされた画像を返してヒットメトリクスを記録する", async () => {
+    const {
+      imageProxyUseCase,
+      imageCacheStorage,
+      metricReporter,
+      cacheMetadataRepository,
+    } = services;
     // arrange
     const cachedData = new Uint8Array([1, 2, 3]);
 
-    await cacheMetadataRepo.save(
+    await cacheMetadataRepository.save(
       new CacheMetadata({
         cacheKey: "avatar/did:plc:example123/bafkreiabc123",
         status: "success",
@@ -58,6 +56,15 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("キャッシュがミスした場合、画像を取得・リサイズしてキャッシュに保存してミスメトリクスを記録する", async () => {
+    const {
+      imageProxyUseCase,
+      didResolver,
+      blobFetcher,
+      imageCacheStorage,
+      imageResizer,
+      metricReporter,
+      cacheMetadataRepository,
+    } = services;
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3, 4, 5]));
     const resizedBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
@@ -99,7 +106,7 @@ describe("ImageProxyUseCase", () => {
     expect(result).toBe(resizedBlob);
     expect(metricReporter.getCounter("blob_proxy_cache_miss_total")).toEqual(1);
 
-    const savedCache = await cacheMetadataRepo.get(
+    const savedCache = await cacheMetadataRepository.get(
       "feed_thumbnail/did:plc:example123/bafkreiabc456",
     );
     expect(savedCache).not.toBeNull();
@@ -116,6 +123,13 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("異なるプリセットタイプで同じ画像を要求した場合、異なるキャッシュキーを使用する", async () => {
+    const {
+      imageProxyUseCase,
+      didResolver,
+      blobFetcher,
+      imageResizer,
+      cacheMetadataRepository,
+    } = services;
     // arrange
     const blob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
     const resizedBlob1 = ImageBlob.jpeg(new Uint8Array([1, 2]));
@@ -171,10 +185,10 @@ describe("ImageProxyUseCase", () => {
     );
 
     // assert
-    const cache1 = await cacheMetadataRepo.get(
+    const cache1 = await cacheMetadataRepository.get(
       "avatar/did:plc:example789/bafkreidef789",
     );
-    const cache2 = await cacheMetadataRepo.get(
+    const cache2 = await cacheMetadataRepository.get(
       "avatar_thumbnail/did:plc:example789/bafkreidef789",
     );
 
@@ -194,6 +208,7 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("画像リサイズサービスがエラーをスローした場合、エラーがそのまま伝播する", async () => {
+    const { imageProxyUseCase, didResolver, blobFetcher } = services;
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
 
@@ -225,6 +240,14 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("キャッシュ保存がエラーになった場合、エラーがそのまま伝播する", async () => {
+    const {
+      imageProxyUseCase,
+      didResolver,
+      blobFetcher,
+      imageCacheStorage,
+      imageResizer,
+      cacheMetadataRepository,
+    } = services;
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3, 4, 5]));
     const resizedBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
@@ -271,7 +294,7 @@ describe("ImageProxyUseCase", () => {
       ),
     ).rejects.toThrow();
 
-    const savedCache = await cacheMetadataRepo.get(cacheKey);
+    const savedCache = await cacheMetadataRepository.get(cacheKey);
     expect(savedCache).not.toBeNull();
     expect(savedCache).toMatchObject({
       cacheKey,
@@ -281,8 +304,10 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("ネガティブキャッシュがヒットした場合、nullを返してヒットメトリクスを記録する", async () => {
+    const { imageProxyUseCase, metricReporter, cacheMetadataRepository } =
+      services;
     // arrange
-    await cacheMetadataRepo.save(
+    await cacheMetadataRepository.save(
       new CacheMetadata({
         cacheKey: "avatar/did:plc:example555/bafkreiabc555",
         status: "failed",
@@ -306,6 +331,13 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("BlobFetchFailedErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
+    const {
+      imageProxyUseCase,
+      didResolver,
+      blobFetcher,
+      metricReporter,
+      cacheMetadataRepository,
+    } = services;
     // arrange
     didResolver.setResolveResult("did:plc:example999", {
       pds: new URL("https://example.pds.com"),
@@ -340,7 +372,7 @@ describe("ImageProxyUseCase", () => {
       }),
     ).toEqual(1);
 
-    const savedCache = await cacheMetadataRepo.get(
+    const savedCache = await cacheMetadataRepository.get(
       "banner/did:plc:example999/bafkreiabc999",
     );
     expect(savedCache).not.toBeNull();
@@ -352,6 +384,8 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("DidResolutionErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
+    const { imageProxyUseCase, metricReporter, cacheMetadataRepository } =
+      services;
     // arrange
     // DidResolverにresolve結果を設定しない（エラーになる）
 
@@ -373,7 +407,7 @@ describe("ImageProxyUseCase", () => {
       }),
     ).toEqual(1);
 
-    const savedCache = await cacheMetadataRepo.get(
+    const savedCache = await cacheMetadataRepository.get(
       "feed_fullsize/did:plc:example888/bafkreiabc888",
     );
     expect(savedCache).not.toBeNull();

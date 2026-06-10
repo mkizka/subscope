@@ -2,29 +2,29 @@ import { asDid } from "@atproto/did";
 import { actorFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import {
-  AdminAlreadyExistsError,
-  RegisterAdminUseCase,
-} from "./register-admin-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import { AdminAlreadyExistsError } from "./register-admin-use-case.js";
 
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("RegisterAdminUseCase", () => {
-  const registerAdminUseCase = testInjector.injectClass(RegisterAdminUseCase);
-  const actorRepo = testInjector.resolve("actorRepository");
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  beforeEach(() => {
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
     vi.useFakeTimers();
     vi.setSystemTime(now);
   });
 
   test("管理者が存在しない場合、リクエストユーザーを管理者に昇格しサブスクリプションも作成する", async () => {
+    const {
+      registerAdminUseCase,
+      actorRepository,
+      subscriptionRepository,
+      jobScheduler,
+    } = services;
     // arrange
     const requester = actorFactory({ isAdmin: false });
-    actorRepo.add(requester);
+    actorRepository.add(requester);
 
     // act
     await registerAdminUseCase.execute({
@@ -32,9 +32,11 @@ describe("RegisterAdminUseCase", () => {
     });
 
     // assert
-    const updatedActor = await actorRepo.findByDid(requester.did);
+    const updatedActor = await actorRepository.findByDid(requester.did);
     expect(updatedActor?.isAdmin).toBe(true);
-    const subscription = await subscriptionRepo.findFirst(asDid(requester.did));
+    const subscription = await subscriptionRepository.findFirst(
+      asDid(requester.did),
+    );
     expect(subscription).toMatchObject({
       actorDid: requester.did,
       createdAt: now,
@@ -45,12 +47,13 @@ describe("RegisterAdminUseCase", () => {
   });
 
   test("管理者が既に存在する場合、AdminAlreadyExistsErrorをスローする", async () => {
+    const { registerAdminUseCase, actorRepository } = services;
     // arrange
     const admin = actorFactory({ isAdmin: true });
-    actorRepo.add(admin);
+    actorRepository.add(admin);
 
     const requester = actorFactory({ isAdmin: false });
-    actorRepo.add(requester);
+    actorRepository.add(requester);
 
     // act & assert
     await expect(
@@ -61,6 +64,7 @@ describe("RegisterAdminUseCase", () => {
   });
 
   test("リクエストユーザーが存在しない場合、新規作成して管理者に昇格する", async () => {
+    const { registerAdminUseCase, actorRepository } = services;
     // arrange
     const nonExistentDid = "did:plc:nonexistent";
 
@@ -70,7 +74,7 @@ describe("RegisterAdminUseCase", () => {
     });
 
     // assert
-    const createdActor = await actorRepo.findByDid(nonExistentDid);
+    const createdActor = await actorRepository.findByDid(nonExistentDid);
     expect(createdActor).not.toBeNull();
     expect(createdActor?.isAdmin).toBe(true);
   });

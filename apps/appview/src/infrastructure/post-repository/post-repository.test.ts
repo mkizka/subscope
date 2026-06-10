@@ -10,9 +10,9 @@ import { describe, expect, test } from "vitest";
 import { PostRepository } from "./post-repository.js";
 
 describe("PostRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const postRepository = testInjector.injectClass(PostRepository);
+  const postRepository = new PostRepository(ctx.db);
 
   describe("findByUri", () => {
     test("投稿が存在しない場合、nullを返す", async () => {

@@ -1,22 +1,19 @@
 import { AtUri } from "@atproto/syntax";
 import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { LikeIndexer } from "./like-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("LikeIndexer", () => {
-  const likeIndexer = testInjector.injectClass(LikeIndexer);
-
-  const likeRepo = testInjector.resolve("likeRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   describe("upsert", () => {
     test("いいねレコードを正しく保存する", async () => {
+      const { likeIndexer, likeRepository, db } = services;
+      const ctx = { db };
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
@@ -39,7 +36,7 @@ describe("LikeIndexer", () => {
       });
 
       // assert
-      const like = likeRepo.findByUri(record.uri);
+      const like = likeRepository.findByUri(record.uri);
       expect(like).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -51,6 +48,8 @@ describe("LikeIndexer", () => {
 
   describe("afterAction", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
+      const { likeIndexer, jobScheduler, db } = services;
+      const ctx = { db };
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
@@ -84,6 +83,7 @@ describe("LikeIndexer", () => {
     });
 
     test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
+      const { likeIndexer, jobScheduler } = services;
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey789";
@@ -113,6 +113,7 @@ describe("LikeIndexer", () => {
     });
 
     test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", async () => {
+      const { likeIndexer, jobScheduler } = services;
       // arrange
       const liker = actorFactory();
       const nonExistentPostUri =

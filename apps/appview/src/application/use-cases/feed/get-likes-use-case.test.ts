@@ -4,18 +4,18 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetLikesUseCase } from "./get-likes-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetLikesUseCase", () => {
-  const getLikesUseCase = testInjector.injectClass(GetLikesUseCase);
-
-  const likeRepo = testInjector.resolve("likeRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
+    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
     const likerActor = actorFactory();
@@ -24,7 +24,7 @@ describe("GetLikesUseCase", () => {
       actorDid: likerActor.did,
       displayName: "Liker User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post } = postFactory({
       actorDid: targetActor.did,
@@ -35,7 +35,7 @@ describe("GetLikesUseCase", () => {
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepo.add(like);
+    likeRepository.add(like);
 
     // act
     const result = await getLikesUseCase.execute({
@@ -59,6 +59,7 @@ describe("GetLikesUseCase", () => {
   });
 
   test("投稿にいいねが付いていない場合、空のlikesを返す", async () => {
+    const { getLikesUseCase } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -80,6 +81,7 @@ describe("GetLikesUseCase", () => {
   });
 
   test("limitパラメータが指定された場合、指定した件数分のいいねを返しカーソルを含む", async () => {
+    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
     const { post } = postFactory({
@@ -92,14 +94,14 @@ describe("GetLikesUseCase", () => {
       const profile = profileDetailedFactory({
         actorDid: likerActor.did,
       });
-      profileRepo.add(profile);
+      profileRepository.add(profile);
 
       const like = likeFactory({
         actorDid: likerActor.did,
         subjectUri: post.uri.toString(),
         subjectCid: post.cid,
       });
-      likeRepo.add(like);
+      likeRepository.add(like);
     }
 
     // act
@@ -114,6 +116,7 @@ describe("GetLikesUseCase", () => {
   });
 
   test("カーソルを指定した場合、ページネーションが動作する", async () => {
+    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -126,21 +129,21 @@ describe("GetLikesUseCase", () => {
       actorDid: firstLiker.did,
       displayName: "First Liker",
     });
-    profileRepo.add(firstProfile);
+    profileRepository.add(firstProfile);
 
     const secondLiker = actorFactory();
     const secondProfile = profileDetailedFactory({
       actorDid: secondLiker.did,
       displayName: "Second Liker",
     });
-    profileRepo.add(secondProfile);
+    profileRepository.add(secondProfile);
 
     const thirdLiker = actorFactory();
     const thirdProfile = profileDetailedFactory({
       actorDid: thirdLiker.did,
       displayName: "Third Liker",
     });
-    profileRepo.add(thirdProfile);
+    profileRepository.add(thirdProfile);
 
     const firstLike = likeFactory({
       actorDid: firstLiker.did,
@@ -149,7 +152,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    likeRepo.add(firstLike);
+    likeRepository.add(firstLike);
 
     const secondLike = likeFactory({
       actorDid: secondLiker.did,
@@ -158,7 +161,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepo.add(secondLike);
+    likeRepository.add(secondLike);
 
     const thirdLike = likeFactory({
       actorDid: thirdLiker.did,
@@ -167,7 +170,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T03:00:00.000Z"),
       indexedAt: new Date("2024-01-01T03:00:00.000Z"),
     });
-    likeRepo.add(thirdLike);
+    likeRepository.add(thirdLike);
 
     // act - 最初のページ（limit=2）
     const firstPage = await getLikesUseCase.execute({
@@ -213,6 +216,7 @@ describe("GetLikesUseCase", () => {
   });
 
   test("limitパラメータが0または1の場合、指定した件数のいいねを返す", async () => {
+    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
     const likerActor = actorFactory();
@@ -221,7 +225,7 @@ describe("GetLikesUseCase", () => {
       actorDid: likerActor.did,
       displayName: "Liker User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post } = postFactory({
       actorDid: targetActor.did,
@@ -232,7 +236,7 @@ describe("GetLikesUseCase", () => {
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepo.add(like);
+    likeRepository.add(like);
 
     // act - limit=0
     const zeroLimitResult = await getLikesUseCase.execute({
@@ -264,6 +268,7 @@ describe("GetLikesUseCase", () => {
   });
 
   test("cidパラメータが指定された場合、レスポンスにcidを含む", async () => {
+    const { getLikesUseCase } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -287,6 +292,7 @@ describe("GetLikesUseCase", () => {
   });
 
   test("複数のいいねがある場合、sortAt（createdAtとindexedAtの早い方）の降順でソートされて返す", async () => {
+    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -299,21 +305,21 @@ describe("GetLikesUseCase", () => {
       actorDid: earlyLiker.did,
       displayName: "Early Liker",
     });
-    profileRepo.add(earlyProfile);
+    profileRepository.add(earlyProfile);
 
     const latestLiker = actorFactory();
     const latestProfile = profileDetailedFactory({
       actorDid: latestLiker.did,
       displayName: "Latest Liker",
     });
-    profileRepo.add(latestProfile);
+    profileRepository.add(latestProfile);
 
     const middleLiker = actorFactory();
     const middleProfile = profileDetailedFactory({
       actorDid: middleLiker.did,
       displayName: "Middle Liker",
     });
-    profileRepo.add(middleProfile);
+    profileRepository.add(middleProfile);
 
     const earlyLike = likeFactory({
       actorDid: earlyLiker.did,
@@ -322,7 +328,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:30:00.000Z"),
     });
-    likeRepo.add(earlyLike);
+    likeRepository.add(earlyLike);
 
     const latestLike = likeFactory({
       actorDid: latestLiker.did,
@@ -331,7 +337,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T03:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:30:00.000Z"),
     });
-    likeRepo.add(latestLike);
+    likeRepository.add(latestLike);
 
     const middleLike = likeFactory({
       actorDid: middleLiker.did,
@@ -340,7 +346,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepo.add(middleLike);
+    likeRepository.add(middleLike);
 
     // act
     const result = await getLikesUseCase.execute({

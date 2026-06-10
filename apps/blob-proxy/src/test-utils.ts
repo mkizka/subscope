@@ -1,11 +1,12 @@
+import { createRegistry } from "@gyaku/di";
 import {
   InMemoryDidResolver,
   InMemoryLoggerManager,
   InMemoryMetricReporter,
 } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
-import { beforeEach } from "vitest";
+import { ac } from "@repo/common/utils";
 
+import { ImageProxyUseCase } from "./application/image-proxy-use-case.js";
 import { FetchBlobService } from "./application/services/fetch-blob-service.js";
 import { ImageCacheService } from "./application/services/image-cache-service.js";
 import { InMemoryBlobFetcher } from "./infrastructure/blob-fetcher.in-memory.js";
@@ -13,26 +14,18 @@ import { InMemoryCacheMetadataRepository } from "./infrastructure/cache-metadata
 import { InMemoryImageCacheStorage } from "./infrastructure/image-cache-storage.in-memory.js";
 import { InMemoryImageResizer } from "./infrastructure/image-resizer.in-memory.js";
 
-export const testInjector = createInjector()
-  .provideClass("didResolver", InMemoryDidResolver)
-  .provideClass("blobFetcher", InMemoryBlobFetcher)
-  .provideClass("imageCacheStorage", InMemoryImageCacheStorage)
-  .provideClass("imageResizer", InMemoryImageResizer)
-  .provideClass("metricReporter", InMemoryMetricReporter)
-  .provideClass("loggerManager", InMemoryLoggerManager)
-  .provideClass("cacheMetadataRepository", InMemoryCacheMetadataRepository)
-  .provideValue("blobCacheDir", "cache")
-  .provideClass("fetchBlobService", FetchBlobService)
-  .provideClass("imageCacheService", ImageCacheService);
+// prettier-ignore
+export const testRegistry = createRegistry()
+  .service("didResolver", () => new InMemoryDidResolver())
+  .service("blobFetcher", () => new InMemoryBlobFetcher())
+  .service("imageCacheStorage", () => new InMemoryImageCacheStorage())
+  .service("imageResizer", () => new InMemoryImageResizer())
+  .service("metricReporter", () => new InMemoryMetricReporter())
+  .service("loggerManager", () => new InMemoryLoggerManager())
+  .service("cacheMetadataRepository", () => new InMemoryCacheMetadataRepository())
+  .value("blobCacheDir", "cache")
+  .service("fetchBlobService", ["didResolver", "blobFetcher"], ac(FetchBlobService))
+  .service("imageCacheService", ["cacheMetadataRepository", "imageCacheStorage", "blobCacheDir"], ac(ImageCacheService))
+  .service("imageProxyUseCase", ["fetchBlobService", "imageResizer", "imageCacheService", "metricReporter"], ac(ImageProxyUseCase), );
 
-export const setupFiles = () => {
-  beforeEach(() => {
-    testInjector.resolve("didResolver").clear();
-    testInjector.resolve("blobFetcher").clear();
-    testInjector.resolve("imageCacheStorage").clear();
-    testInjector.resolve("imageResizer").clear();
-    testInjector.resolve("metricReporter").clear();
-    testInjector.resolve("loggerManager").clear();
-    testInjector.resolve("cacheMetadataRepository").clear();
-  });
-};
+export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;

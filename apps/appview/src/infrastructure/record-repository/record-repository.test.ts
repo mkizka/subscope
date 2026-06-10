@@ -5,9 +5,9 @@ import { describe, expect, test } from "vitest";
 import { RecordRepository } from "./record-repository.js";
 
 describe("RecordRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const recordRepository = testInjector.injectClass(RecordRepository);
+  const recordRepository = new RecordRepository(ctx.db);
 
   describe("findByUris", () => {
     test("空の配列が指定された場合、空の配列を返す", async () => {

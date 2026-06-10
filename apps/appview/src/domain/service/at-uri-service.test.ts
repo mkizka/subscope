@@ -1,16 +1,18 @@
 import { AtUri } from "@atproto/syntax";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
-import { testInjector } from "../../shared/test-utils.js";
-import { AtUriService } from "./at-uri-service.js";
+import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("AtUriService", () => {
-  const atUriService = testInjector.injectClass(AtUriService);
-  const handleResolver = testInjector.resolve("handleResolver");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   describe("resolveHostname", () => {
     test("DIDが含まれるURIの場合、そのまま返す", async () => {
+      const { atUriService } = services;
       // arrange
       const uri = new AtUri(
         "at://did:plc:example123/app.bsky.feed.post/abc123",
@@ -26,6 +28,7 @@ describe("AtUriService", () => {
     });
 
     test("handleが含まれるURIの場合、DIDに変換して返す", async () => {
+      const { atUriService, handleResolver } = services;
       // arrange
       handleResolver.add("example.com", "did:plc:resolved123");
       const uri = new AtUri("at://example.com/app.bsky.feed.post/xyz789");
@@ -40,6 +43,7 @@ describe("AtUriService", () => {
     });
 
     test("handleが解決できない場合、HandleResolutionErrorをスローする", async () => {
+      const { atUriService } = services;
       // arrange
       const uri = new AtUri("at://notfound.example/app.bsky.feed.post/abc123");
 

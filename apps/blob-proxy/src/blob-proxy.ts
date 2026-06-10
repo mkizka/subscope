@@ -1,3 +1,4 @@
+import { createRegistry } from "@gyaku/di";
 import {
   connectionPoolFactory,
   databaseFactory,
@@ -6,7 +7,7 @@ import {
   MetricReporter,
   RedisDidCache,
 } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
+import { ac } from "@repo/common/utils";
 
 import { ImageProxyUseCase } from "./application/image-proxy-use-case.js";
 import { CacheCleanupScheduler } from "./application/services/cache-cleanup-scheduler.js";
@@ -22,34 +23,37 @@ import { imagesRouterFactory } from "./presentation/images.js";
 import { BlobProxyServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
-createInjector()
+// prettier-ignore
+const services = await createRegistry()
   // envs
-  .provideValue("logLevel", env.LOG_LEVEL)
-  .provideValue("plcUrl", env.PLC_URL)
-  .provideValue("redisUrl", env.REDIS_URL)
-  .provideValue("databaseUrl", env.DATABASE_URL)
-  .provideValue("blobCacheDir", env.BLOB_CACHE_DIR)
-  .provideValue("cacheCleanupCron", env.CACHE_CLEANUP_CRON)
-  .provideValue("cacheCleanupTimezone", env.CACHE_CLEANUP_TIMEZONE)
+  .value("logLevel", env.LOG_LEVEL)
+  .value("plcUrl", env.PLC_URL)
+  .value("redisUrl", env.REDIS_URL)
+  .value("databaseUrl", env.DATABASE_URL)
+  .value("blobCacheDir", env.BLOB_CACHE_DIR)
+  .value("cacheCleanupCron", env.CACHE_CLEANUP_CRON)
+  .value("cacheCleanupTimezone", env.CACHE_CLEANUP_TIMEZONE)
   // infrastructure
-  .provideClass("loggerManager", LoggerManager)
-  .provideClass("metricReporter", MetricReporter)
-  .provideFactory("connectionPool", connectionPoolFactory)
-  .provideFactory("db", databaseFactory)
-  .provideClass("didCache", RedisDidCache)
-  .provideClass("didResolver", DidResolver)
-  .provideClass("imageCacheStorage", ImageDiskStorage)
-  .provideClass("cacheMetadataRepository", CacheMetadataRepository)
-  .provideClass("blobFetcher", BlobFetcher)
-  .provideClass("imageResizer", ImageResizer)
-  .provideClass("taskScheduler", CronTaskScheduler)
+  .service("loggerManager", ["logLevel"], ac(LoggerManager))
+  .service("metricReporter", () => new MetricReporter())
+  .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
+  .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+  .service("didCache", ["redisUrl", "metricReporter"], ac(RedisDidCache))
+  .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], ac(DidResolver))
+  .service("imageCacheStorage", ["loggerManager"], ac(ImageDiskStorage))
+  .service("cacheMetadataRepository", ["db"], ac(CacheMetadataRepository))
+  .service("blobFetcher", ["didResolver"], ac(BlobFetcher))
+  .service("imageResizer", () => new ImageResizer())
+  .service("taskScheduler", ["loggerManager"], ac(CronTaskScheduler))
   // application
-  .provideClass("fetchBlobService", FetchBlobService)
-  .provideClass("imageCacheService", ImageCacheService)
-  .provideClass("cacheCleanupService", CacheCleanupService)
-  .provideClass("cacheCleanupScheduler", CacheCleanupScheduler)
-  .provideClass("imageProxyUseCase", ImageProxyUseCase)
+  .service("fetchBlobService", ["didResolver", "blobFetcher"], ac(FetchBlobService))
+  .service("imageCacheService", ["cacheMetadataRepository", "imageCacheStorage", "blobCacheDir"], ac(ImageCacheService))
+  .service("cacheCleanupService", ["cacheMetadataRepository", "imageCacheService"], ac(CacheCleanupService))
+  .service("cacheCleanupScheduler", ["loggerManager", "taskScheduler", "cacheCleanupService", "cacheCleanupCron", "cacheCleanupTimezone"], ac(CacheCleanupScheduler))
+  .service("imageProxyUseCase", ["fetchBlobService", "imageResizer", "imageCacheService", "metricReporter"], ac(ImageProxyUseCase))
   // presentation
-  .provideFactory("imagesRouter", imagesRouterFactory)
-  .injectClass(BlobProxyServer)
-  .start();
+  .service("imagesRouter", ["imageProxyUseCase", "metricReporter"], ({ imageProxyUseCase, metricReporter }) => imagesRouterFactory(imageProxyUseCase, metricReporter))
+  .service("blobProxyServer", ["loggerManager", "imagesRouter", "cacheCleanupScheduler"], ac(BlobProxyServer))
+  .resolve();
+
+services.blobProxyServer.start();

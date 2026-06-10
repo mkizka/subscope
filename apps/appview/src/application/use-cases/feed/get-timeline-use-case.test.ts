@@ -5,22 +5,19 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetTimelineUseCase } from "./get-timeline-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetTimelineUseCase", () => {
-  const getTimelineUseCase = testInjector.injectClass(GetTimelineUseCase);
-
-  const timelineRepo = testInjector.resolve("timelineRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
+    const { getTimelineUseCase } = services;
     // arrange
     const viewer = actorFactory();
 
@@ -38,6 +35,14 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("フォローしているユーザーが投稿している場合、そのユーザーの投稿を返す", async () => {
+    const {
+      getTimelineUseCase,
+      timelineRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -46,17 +51,17 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Followed User",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
-    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post, record } = postFactory({
       actorDid: author.did,
       text: "Hello from followed user",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 5,
@@ -64,10 +69,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 3,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     const feedItem = FeedItem.fromPost(post);
-    timelineRepo.addFeedItem(feedItem);
+    timelineRepository.addFeedItem(feedItem);
 
     // act
     const result = await getTimelineUseCase.execute({
@@ -99,6 +104,14 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("自分自身の投稿もタイムラインに含まれる", async () => {
+    const {
+      getTimelineUseCase,
+      timelineRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const viewer = actorFactory();
 
@@ -106,15 +119,15 @@ describe("GetTimelineUseCase", () => {
       actorDid: viewer.did,
       displayName: "Viewer User",
     });
-    profileRepo.add(viewerProfile);
+    profileRepository.add(viewerProfile);
 
     const { post, record } = postFactory({
       actorDid: viewer.did,
       text: "My own post",
       createdAt: new Date("2024-01-02T00:00:00Z"),
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -122,10 +135,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     const feedItem = FeedItem.fromPost(post);
-    timelineRepo.addFeedItem(feedItem);
+    timelineRepository.addFeedItem(feedItem);
 
     // act
     const result = await getTimelineUseCase.execute({
@@ -154,6 +167,14 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("カーソルが指定された場合、カーソル以前の投稿のみを返す", async () => {
+    const {
+      getTimelineUseCase,
+      timelineRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -162,17 +183,17 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
-    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post: olderPost, record: olderRecord } = postFactory({
       actorDid: author.did,
       text: "Older post",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    postRepo.add(olderPost);
-    recordRepo.add(olderRecord);
+    postRepository.add(olderPost);
+    recordRepository.add(olderRecord);
 
     const olderPostStats: PostStats = {
       likeCount: 0,
@@ -180,18 +201,18 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(olderPost.uri.toString(), olderPostStats);
+    postStatsRepository.add(olderPost.uri.toString(), olderPostStats);
 
     const olderFeedItem = FeedItem.fromPost(olderPost);
-    timelineRepo.addFeedItem(olderFeedItem);
+    timelineRepository.addFeedItem(olderFeedItem);
 
     const { post: newerPost, record: newerRecord } = postFactory({
       actorDid: author.did,
       text: "Newer post",
       createdAt: new Date("2024-01-03T00:00:00Z"),
     });
-    postRepo.add(newerPost);
-    recordRepo.add(newerRecord);
+    postRepository.add(newerPost);
+    recordRepository.add(newerRecord);
 
     const newerPostStats: PostStats = {
       likeCount: 0,
@@ -199,10 +220,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(newerPost.uri.toString(), newerPostStats);
+    postStatsRepository.add(newerPost.uri.toString(), newerPostStats);
 
     const newerFeedItem = FeedItem.fromPost(newerPost);
-    timelineRepo.addFeedItem(newerFeedItem);
+    timelineRepository.addFeedItem(newerFeedItem);
 
     // act
     const result = await getTimelineUseCase.execute({
@@ -228,6 +249,14 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("limitパラメータが0または1の場合、指定した件数の投稿を返す", async () => {
+    const {
+      getTimelineUseCase,
+      timelineRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -236,16 +265,16 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
-    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post, record } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-04T00:00:00Z"),
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -253,10 +282,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     const feedItem = FeedItem.fromPost(post);
-    timelineRepo.addFeedItem(feedItem);
+    timelineRepository.addFeedItem(feedItem);
 
     // act - limit=0
     const zeroLimitResult = await getTimelineUseCase.execute({
@@ -290,6 +319,14 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("複数の投稿がある場合、新しい順に並べて返す", async () => {
+    const {
+      getTimelineUseCase,
+      timelineRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -298,17 +335,17 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
-    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post: post1, record: record1 } = postFactory({
       actorDid: author.did,
       text: "First post",
       createdAt: new Date("2024-01-05T00:00:00Z"),
     });
-    postRepo.add(post1);
-    recordRepo.add(record1);
+    postRepository.add(post1);
+    recordRepository.add(record1);
 
     const post1Stats: PostStats = {
       likeCount: 0,
@@ -316,18 +353,18 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post1.uri.toString(), post1Stats);
+    postStatsRepository.add(post1.uri.toString(), post1Stats);
 
     const feedItem1 = FeedItem.fromPost(post1);
-    timelineRepo.addFeedItem(feedItem1);
+    timelineRepository.addFeedItem(feedItem1);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author.did,
       text: "Second post",
       createdAt: new Date("2024-01-06T00:00:00Z"),
     });
-    postRepo.add(post2);
-    recordRepo.add(record2);
+    postRepository.add(post2);
+    recordRepository.add(record2);
 
     const post2Stats: PostStats = {
       likeCount: 0,
@@ -335,10 +372,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post2.uri.toString(), post2Stats);
+    postStatsRepository.add(post2.uri.toString(), post2Stats);
 
     const feedItem2 = FeedItem.fromPost(post2);
-    timelineRepo.addFeedItem(feedItem2);
+    timelineRepository.addFeedItem(feedItem2);
 
     // act
     const result = await getTimelineUseCase.execute({

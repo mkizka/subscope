@@ -1,17 +1,19 @@
 import { actorFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { VerifyAccessUseCase } from "./verify-access-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("VerifyAccessUseCase", () => {
-  const verifyAccessUseCase = testInjector.injectClass(VerifyAccessUseCase);
-  const actorRepo = testInjector.resolve("actorRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("リクエストユーザーが管理者の場合、authorizedを返す", async () => {
+    const { verifyAccessUseCase, actorRepository } = services;
     // arrange
     const admin = actorFactory({ isAdmin: true });
-    actorRepo.add(admin);
+    actorRepository.add(admin);
 
     // act
     const result = await verifyAccessUseCase.execute({
@@ -23,9 +25,10 @@ describe("VerifyAccessUseCase", () => {
   });
 
   test("リクエストユーザーが管理者でない場合、unauthorizedを返す", async () => {
+    const { verifyAccessUseCase, actorRepository } = services;
     // arrange
     const normalUser = actorFactory({ isAdmin: false });
-    actorRepo.add(normalUser);
+    actorRepository.add(normalUser);
 
     // act
     const result = await verifyAccessUseCase.execute({

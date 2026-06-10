@@ -11,11 +11,9 @@ import { describe, expect, test } from "vitest";
 import { SubscriptionRepository } from "./subscription-repository.js";
 
 describe("SubscriptionRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const subscriptionRepository = testInjector.injectClass(
-    SubscriptionRepository,
-  );
+  const subscriptionRepository = new SubscriptionRepository(ctx.db);
 
   describe("findMany", () => {
     test("サブスクリプションが存在しない場合、空の配列を返す", async () => {

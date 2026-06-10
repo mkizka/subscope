@@ -6,9 +6,9 @@ import { describe, expect, test } from "vitest";
 import { ActorRepository } from "./actor-repository.js";
 
 describe("ActorRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const actorRepository = testInjector.injectClass(ActorRepository);
+  const actorRepository = new ActorRepository(ctx.db);
 
   describe("findByDid", () => {
     test("アクターが存在しない場合、nullを返す", async () => {

@@ -10,9 +10,9 @@ import { describe, expect, test } from "vitest";
 import { ProfileRepository } from "./profile-repository.js";
 
 describe("ProfileRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const profileRepository = testInjector.injectClass(ProfileRepository);
+  const profileRepository = new ProfileRepository(ctx.db);
 
   describe("findManyDetailed", () => {
     test("空の配列が指定された場合、空の配列を返す", async () => {

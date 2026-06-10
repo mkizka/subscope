@@ -3,25 +3,23 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetPostThreadUseCase", () => {
-  const getPostThreadUseCase = testInjector.injectClass(GetPostThreadUseCase);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-
-  const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-  const spyFindReplies = vi.spyOn(postRepo, "findReplies");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
+    const { getPostThreadUseCase, postRepository } = services;
+    const spyFindByUri = vi.spyOn(postRepository, "findByUri");
+    const spyFindReplies = vi.spyOn(postRepository, "findReplies");
+
     // act
     const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(
@@ -44,6 +42,16 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
+    const {
+      getPostThreadUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
+    const spyFindByUri = vi.spyOn(postRepository, "findByUri");
+    const spyFindReplies = vi.spyOn(postRepository, "findReplies");
+
     // arrange
     const actor = actorFactory();
 
@@ -51,13 +59,13 @@ describe("GetPostThreadUseCase", () => {
       actorDid: actor.did,
       displayName: "Single User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: actor.did,
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -65,7 +73,7 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     // act
     const result = await getPostThreadUseCase.execute({
@@ -93,19 +101,29 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
+    const {
+      getPostThreadUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
+    const spyFindByUri = vi.spyOn(postRepository, "findByUri");
+    const spyFindReplies = vi.spyOn(postRepository, "findReplies");
+
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootActor.did,
       displayName: "Root User",
     });
-    profileRepo.add(rootProfile);
+    profileRepository.add(rootProfile);
 
     const { post: rootPost, record: rootRecord } = postFactory({
       actorDid: rootActor.did,
     });
-    postRepo.add(rootPost);
-    recordRepo.add(rootRecord);
+    postRepository.add(rootPost);
+    recordRepository.add(rootRecord);
 
     const rootPostStats: PostStats = {
       likeCount: 0,
@@ -113,22 +131,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(rootPost.uri.toString(), rootPostStats);
+    postStatsRepository.add(rootPost.uri.toString(), rootPostStats);
 
     const parentActor = actorFactory();
     const parentProfile = profileDetailedFactory({
       actorDid: parentActor.did,
       displayName: "Parent User",
     });
-    profileRepo.add(parentProfile);
+    profileRepository.add(parentProfile);
 
     const { post: parentPost, record: parentRecord } = postFactory({
       actorDid: parentActor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: rootPost.uri, cid: rootPost.cid },
     });
-    postRepo.add(parentPost);
-    recordRepo.add(parentRecord);
+    postRepository.add(parentPost);
+    recordRepository.add(parentRecord);
 
     const parentPostStats: PostStats = {
       likeCount: 0,
@@ -136,22 +154,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(parentPost.uri.toString(), parentPostStats);
+    postStatsRepository.add(parentPost.uri.toString(), parentPostStats);
 
     const targetActor = actorFactory();
     const targetProfile = profileDetailedFactory({
       actorDid: targetActor.did,
       displayName: "Target User",
     });
-    profileRepo.add(targetProfile);
+    profileRepository.add(targetProfile);
 
     const { post: targetPost, record: targetRecord } = postFactory({
       actorDid: targetActor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: parentPost.uri, cid: parentPost.cid },
     });
-    postRepo.add(targetPost);
-    recordRepo.add(targetRecord);
+    postRepository.add(targetPost);
+    recordRepository.add(targetRecord);
 
     const targetPostStats: PostStats = {
       likeCount: 0,
@@ -159,7 +177,7 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(targetPost.uri.toString(), targetPostStats);
+    postStatsRepository.add(targetPost.uri.toString(), targetPostStats);
 
     // act
     const result = await getPostThreadUseCase.execute({
@@ -203,19 +221,29 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
+    const {
+      getPostThreadUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
+    const spyFindByUri = vi.spyOn(postRepository, "findByUri");
+    const spyFindReplies = vi.spyOn(postRepository, "findReplies");
+
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootActor.did,
       displayName: "Root User",
     });
-    profileRepo.add(rootProfile);
+    profileRepository.add(rootProfile);
 
     const { post: rootPost, record: rootRecord } = postFactory({
       actorDid: rootActor.did,
     });
-    postRepo.add(rootPost);
-    recordRepo.add(rootRecord);
+    postRepository.add(rootPost);
+    recordRepository.add(rootRecord);
 
     const rootPostStats: PostStats = {
       likeCount: 0,
@@ -223,22 +251,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(rootPost.uri.toString(), rootPostStats);
+    postStatsRepository.add(rootPost.uri.toString(), rootPostStats);
 
     const replyActor = actorFactory();
     const replyProfile = profileDetailedFactory({
       actorDid: replyActor.did,
       displayName: "Reply User",
     });
-    profileRepo.add(replyProfile);
+    profileRepository.add(replyProfile);
 
     const { post: replyPost, record: replyRecord } = postFactory({
       actorDid: replyActor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: rootPost.uri, cid: rootPost.cid },
     });
-    postRepo.add(replyPost);
-    recordRepo.add(replyRecord);
+    postRepository.add(replyPost);
+    recordRepository.add(replyRecord);
 
     const replyPostStats: PostStats = {
       likeCount: 0,
@@ -246,22 +274,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(replyPost.uri.toString(), replyPostStats);
+    postStatsRepository.add(replyPost.uri.toString(), replyPostStats);
 
     const grandchildActor = actorFactory();
     const grandchildProfile = profileDetailedFactory({
       actorDid: grandchildActor.did,
       displayName: "Grandchild User",
     });
-    profileRepo.add(grandchildProfile);
+    profileRepository.add(grandchildProfile);
 
     const { post: grandchildPost, record: grandchildRecord } = postFactory({
       actorDid: grandchildActor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: replyPost.uri, cid: replyPost.cid },
     });
-    postRepo.add(grandchildPost);
-    recordRepo.add(grandchildRecord);
+    postRepository.add(grandchildPost);
+    recordRepository.add(grandchildRecord);
 
     const grandchildPostStats: PostStats = {
       likeCount: 0,
@@ -269,7 +297,7 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(grandchildPost.uri.toString(), grandchildPostStats);
+    postStatsRepository.add(grandchildPost.uri.toString(), grandchildPostStats);
 
     // act
     const result = await getPostThreadUseCase.execute({
@@ -318,19 +346,29 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("depthより大きい深さのリプライは取得しない", async () => {
+    const {
+      getPostThreadUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
+    const spyFindByUri = vi.spyOn(postRepository, "findByUri");
+    const spyFindReplies = vi.spyOn(postRepository, "findReplies");
+
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
       actorDid: rootActor.did,
       displayName: "Root User",
     });
-    profileRepo.add(rootProfile);
+    profileRepository.add(rootProfile);
 
     const { post: rootPost, record: rootRecord } = postFactory({
       actorDid: rootActor.did,
     });
-    postRepo.add(rootPost);
-    recordRepo.add(rootRecord);
+    postRepository.add(rootPost);
+    recordRepository.add(rootRecord);
 
     const rootPostStats: PostStats = {
       likeCount: 0,
@@ -338,22 +376,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(rootPost.uri.toString(), rootPostStats);
+    postStatsRepository.add(rootPost.uri.toString(), rootPostStats);
 
     const level1Actor = actorFactory();
     const level1Profile = profileDetailedFactory({
       actorDid: level1Actor.did,
       displayName: "Level 1 User",
     });
-    profileRepo.add(level1Profile);
+    profileRepository.add(level1Profile);
 
     const { post: level1Post, record: level1Record } = postFactory({
       actorDid: level1Actor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: rootPost.uri, cid: rootPost.cid },
     });
-    postRepo.add(level1Post);
-    recordRepo.add(level1Record);
+    postRepository.add(level1Post);
+    recordRepository.add(level1Record);
 
     const level1PostStats: PostStats = {
       likeCount: 0,
@@ -361,22 +399,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(level1Post.uri.toString(), level1PostStats);
+    postStatsRepository.add(level1Post.uri.toString(), level1PostStats);
 
     const level2Actor = actorFactory();
     const level2Profile = profileDetailedFactory({
       actorDid: level2Actor.did,
       displayName: "Level 2 User",
     });
-    profileRepo.add(level2Profile);
+    profileRepository.add(level2Profile);
 
     const { post: level2Post, record: level2Record } = postFactory({
       actorDid: level2Actor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: level1Post.uri, cid: level1Post.cid },
     });
-    postRepo.add(level2Post);
-    recordRepo.add(level2Record);
+    postRepository.add(level2Post);
+    recordRepository.add(level2Record);
 
     const level2PostStats: PostStats = {
       likeCount: 0,
@@ -384,22 +422,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(level2Post.uri.toString(), level2PostStats);
+    postStatsRepository.add(level2Post.uri.toString(), level2PostStats);
 
     const level3Actor = actorFactory();
     const level3Profile = profileDetailedFactory({
       actorDid: level3Actor.did,
       displayName: "Level 3 User",
     });
-    profileRepo.add(level3Profile);
+    profileRepository.add(level3Profile);
 
     const { post: level3Post, record: level3Record } = postFactory({
       actorDid: level3Actor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: level2Post.uri, cid: level2Post.cid },
     });
-    postRepo.add(level3Post);
-    recordRepo.add(level3Record);
+    postRepository.add(level3Post);
+    recordRepository.add(level3Record);
 
     const level3PostStats: PostStats = {
       likeCount: 0,
@@ -407,7 +445,7 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(level3Post.uri.toString(), level3PostStats);
+    postStatsRepository.add(level3Post.uri.toString(), level3PostStats);
 
     // act - depth=2で実行（Level 3は取得されないはず）
     const result = await getPostThreadUseCase.execute({
@@ -457,19 +495,29 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
+    const {
+      getPostThreadUseCase,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
+    const spyFindByUri = vi.spyOn(postRepository, "findByUri");
+    const spyFindReplies = vi.spyOn(postRepository, "findReplies");
+
     // arrange
     const level0Actor = actorFactory();
     const level0Profile = profileDetailedFactory({
       actorDid: level0Actor.did,
       displayName: "Level 0 User",
     });
-    profileRepo.add(level0Profile);
+    profileRepository.add(level0Profile);
 
     const { post: level0Post, record: level0Record } = postFactory({
       actorDid: level0Actor.did,
     });
-    postRepo.add(level0Post);
-    recordRepo.add(level0Record);
+    postRepository.add(level0Post);
+    recordRepository.add(level0Record);
 
     const level0PostStats: PostStats = {
       likeCount: 0,
@@ -477,22 +525,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(level0Post.uri.toString(), level0PostStats);
+    postStatsRepository.add(level0Post.uri.toString(), level0PostStats);
 
     const level1Actor = actorFactory();
     const level1Profile = profileDetailedFactory({
       actorDid: level1Actor.did,
       displayName: "Level 1 User",
     });
-    profileRepo.add(level1Profile);
+    profileRepository.add(level1Profile);
 
     const { post: level1Post, record: level1Record } = postFactory({
       actorDid: level1Actor.did,
       replyRoot: { uri: level0Post.uri, cid: level0Post.cid },
       replyParent: { uri: level0Post.uri, cid: level0Post.cid },
     });
-    postRepo.add(level1Post);
-    recordRepo.add(level1Record);
+    postRepository.add(level1Post);
+    recordRepository.add(level1Record);
 
     const level1PostStats: PostStats = {
       likeCount: 0,
@@ -500,22 +548,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(level1Post.uri.toString(), level1PostStats);
+    postStatsRepository.add(level1Post.uri.toString(), level1PostStats);
 
     const level2Actor = actorFactory();
     const level2Profile = profileDetailedFactory({
       actorDid: level2Actor.did,
       displayName: "Level 2 User",
     });
-    profileRepo.add(level2Profile);
+    profileRepository.add(level2Profile);
 
     const { post: level2Post, record: level2Record } = postFactory({
       actorDid: level2Actor.did,
       replyRoot: { uri: level0Post.uri, cid: level0Post.cid },
       replyParent: { uri: level1Post.uri, cid: level1Post.cid },
     });
-    postRepo.add(level2Post);
-    recordRepo.add(level2Record);
+    postRepository.add(level2Post);
+    recordRepository.add(level2Record);
 
     const level2PostStats: PostStats = {
       likeCount: 0,
@@ -523,22 +571,22 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(level2Post.uri.toString(), level2PostStats);
+    postStatsRepository.add(level2Post.uri.toString(), level2PostStats);
 
     const targetActor = actorFactory();
     const targetProfile = profileDetailedFactory({
       actorDid: targetActor.did,
       displayName: "Target User",
     });
-    profileRepo.add(targetProfile);
+    profileRepository.add(targetProfile);
 
     const { post: targetPost, record: targetRecord } = postFactory({
       actorDid: targetActor.did,
       replyRoot: { uri: level0Post.uri, cid: level0Post.cid },
       replyParent: { uri: level2Post.uri, cid: level2Post.cid },
     });
-    postRepo.add(targetPost);
-    recordRepo.add(targetRecord);
+    postRepository.add(targetPost);
+    recordRepository.add(targetRecord);
 
     const targetPostStats: PostStats = {
       likeCount: 0,
@@ -546,7 +594,7 @@ describe("GetPostThreadUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(targetPost.uri.toString(), targetPostStats);
+    postStatsRepository.add(targetPost.uri.toString(), targetPostStats);
 
     // act - parentHeight=2で実行（Level 0は取得されないはず）
     const result = await getPostThreadUseCase.execute({

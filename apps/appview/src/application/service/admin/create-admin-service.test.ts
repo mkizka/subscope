@@ -1,18 +1,18 @@
 import { AtUri } from "@atproto/syntax";
 import { Actor } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { CreateAdminService } from "./create-admin-service.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateAdminService", () => {
-  const createAdminService = testInjector.injectClass(CreateAdminService);
-  const actorRepo = testInjector.resolve("actorRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-  const db = testInjector.resolve("db");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("actorが存在しない場合、新規作成して管理者に昇格しジョブをスケジュールする", async () => {
+    const { createAdminService, actorRepository, jobScheduler, db } = services;
     // arrange
     const did = "did:plc:newactor";
 
@@ -23,7 +23,7 @@ describe("CreateAdminService", () => {
     });
 
     // assert
-    const savedActor = await actorRepo.findByDid(did);
+    const savedActor = await actorRepository.findByDid(did);
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did,
@@ -47,9 +47,10 @@ describe("CreateAdminService", () => {
   });
 
   test("actorが既に存在する場合、そのactorを管理者に昇格する", async () => {
+    const { createAdminService, actorRepository, jobScheduler, db } = services;
     // arrange
     const existingActor = actorFactory();
-    actorRepo.add(existingActor);
+    actorRepository.add(existingActor);
 
     // act
     await createAdminService.execute({
@@ -58,7 +59,7 @@ describe("CreateAdminService", () => {
     });
 
     // assert
-    const savedActor = await actorRepo.findByDid(existingActor.did);
+    const savedActor = await actorRepository.findByDid(existingActor.did);
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did: existingActor.did,

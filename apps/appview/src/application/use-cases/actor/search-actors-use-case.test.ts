@@ -1,16 +1,16 @@
 import { actorFactory, profileDetailedFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { SearchActorsUseCase } from "./search-actors-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsUseCase", () => {
-  const searchActorsUseCase = testInjector.injectClass(SearchActorsUseCase);
-
-  const profileRepo = testInjector.resolve("profileRepository");
-  const actorStatsRepo = testInjector.resolve("actorStatsRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
+    const { searchActorsUseCase } = services;
     // act
     const result = await searchActorsUseCase.execute({
       query: "",
@@ -25,6 +25,7 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("空白文字のみの検索クエリの場合、空の結果を返す", async () => {
+    const { searchActorsUseCase } = services;
     // act
     const result = await searchActorsUseCase.execute({
       query: "   ",
@@ -39,6 +40,7 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("検索クエリがundefinedの場合、空の結果を返す", async () => {
+    const { searchActorsUseCase } = services;
     // act
     const result = await searchActorsUseCase.execute({
       query: undefined,
@@ -53,6 +55,8 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("displayNameに検索クエリが含まれるアクターがある場合、そのアクターを返す", async () => {
+    const { searchActorsUseCase, profileRepository, actorStatsRepository } =
+      services;
     // arrange
     const matchActor = actorFactory();
     const matchProfile = profileDetailedFactory({
@@ -60,8 +64,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "Test User 検索対象",
       handle: "match.test",
     });
-    profileRepo.add(matchProfile);
-    actorStatsRepo.add(matchActor.did, {
+    profileRepository.add(matchProfile);
+    actorStatsRepository.add(matchActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -73,8 +77,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "Different Name",
       handle: "nomatch.test",
     });
-    profileRepo.add(noMatchProfile);
-    actorStatsRepo.add(noMatchActor.did, {
+    profileRepository.add(noMatchProfile);
+    actorStatsRepository.add(noMatchActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -100,14 +104,16 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("検索クエリに一致するアクターがない場合、空の配列を返す", async () => {
+    const { searchActorsUseCase, profileRepository, actorStatsRepository } =
+      services;
     // arrange
     const actor = actorFactory();
     const profile = profileDetailedFactory({
       actorDid: actor.did,
       displayName: "No Match User",
     });
-    profileRepo.add(profile);
-    actorStatsRepo.add(actor.did, {
+    profileRepository.add(profile);
+    actorStatsRepository.add(actor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -127,14 +133,16 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("limitパラメータが指定された場合、指定した件数で結果を制限する", async () => {
+    const { searchActorsUseCase, profileRepository, actorStatsRepository } =
+      services;
     // arrange
     const actor1 = actorFactory();
     const profile1 = profileDetailedFactory({
       actorDid: actor1.did,
       displayName: "Limit Test User 1",
     });
-    profileRepo.add(profile1);
-    actorStatsRepo.add(actor1.did, {
+    profileRepository.add(profile1);
+    actorStatsRepository.add(actor1.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -145,8 +153,8 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor2.did,
       displayName: "Limit Test User 2",
     });
-    profileRepo.add(profile2);
-    actorStatsRepo.add(actor2.did, {
+    profileRepository.add(profile2);
+    actorStatsRepository.add(actor2.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -164,6 +172,8 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("cursorパラメータが指定された場合、ページネーションで次のページを返す", async () => {
+    const { searchActorsUseCase, profileRepository, actorStatsRepository } =
+      services;
     // arrange
     const actor1 = actorFactory();
     const profile1 = profileDetailedFactory({
@@ -172,8 +182,8 @@ describe("SearchActorsUseCase", () => {
       handle: "user1.test",
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    profileRepo.add(profile1);
-    actorStatsRepo.add(actor1.did, {
+    profileRepository.add(profile1);
+    actorStatsRepository.add(actor1.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -186,8 +196,8 @@ describe("SearchActorsUseCase", () => {
       handle: "user2.test",
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    profileRepo.add(profile2);
-    actorStatsRepo.add(actor2.did, {
+    profileRepository.add(profile2);
+    actorStatsRepository.add(actor2.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -233,6 +243,8 @@ describe("SearchActorsUseCase", () => {
   });
 
   test("displayNameまたはhandleのいずれかに検索クエリが含まれる場合、該当するアクターを返す", async () => {
+    const { searchActorsUseCase, profileRepository, actorStatsRepository } =
+      services;
     // arrange
     const displayNameActor = actorFactory();
     const displayNameProfile = profileDetailedFactory({
@@ -240,8 +252,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "テスト User",
       handle: "different.handle.com",
     });
-    profileRepo.add(displayNameProfile);
-    actorStatsRepo.add(displayNameActor.did, {
+    profileRepository.add(displayNameProfile);
+    actorStatsRepository.add(displayNameActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -253,8 +265,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "Different Name",
       handle: "testhandle.example.com",
     });
-    profileRepo.add(handleProfile);
-    actorStatsRepo.add(handleActor.did, {
+    profileRepository.add(handleProfile);
+    actorStatsRepository.add(handleActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,

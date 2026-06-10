@@ -6,23 +6,26 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetAuthorFeedUseCase", () => {
-  const getAuthorFeedUseCase = testInjector.injectClass(GetAuthorFeedUseCase);
-
-  const authorFeedRepo = testInjector.resolve("authorFeedRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const repostRepo = testInjector.resolve("repostRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("posts_with_repliesフィルターで投稿がある場合、投稿とリプライを含むフィードを返す", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const author = actorFactory();
 
@@ -30,15 +33,15 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Author User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
       text: "Original post",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 5,
@@ -46,10 +49,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 3,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepository.add(postFeedItem, false);
 
     const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
@@ -58,8 +61,8 @@ describe("GetAuthorFeedUseCase", () => {
       replyParent: { uri: post.uri, cid: post.cid },
       createdAt: new Date("2024-01-02T00:00:00Z"),
     });
-    postRepo.add(reply);
-    recordRepo.add(replyRecord);
+    postRepository.add(reply);
+    recordRepository.add(replyRecord);
 
     const replyStats: PostStats = {
       likeCount: 0,
@@ -67,10 +70,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(reply.uri.toString(), replyStats);
+    postStatsRepository.add(reply.uri.toString(), replyStats);
 
     const replyFeedItem = FeedItem.fromPost(reply);
-    authorFeedRepo.add(replyFeedItem, true);
+    authorFeedRepository.add(replyFeedItem, true);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -120,6 +123,14 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("posts_no_repliesフィルターの場合、リプライを除いた投稿のみを返す", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const author = actorFactory();
 
@@ -127,15 +138,15 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "No Reply Author",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
       text: "Regular post",
       createdAt: new Date("2024-01-03T00:00:00Z"),
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -143,10 +154,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepository.add(postFeedItem, false);
 
     const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
@@ -154,11 +165,11 @@ describe("GetAuthorFeedUseCase", () => {
       replyParent: { uri: post.uri, cid: post.cid },
       createdAt: new Date("2024-01-04T00:00:00Z"),
     });
-    postRepo.add(reply);
-    recordRepo.add(replyRecord);
+    postRepository.add(reply);
+    recordRepository.add(replyRecord);
 
     const replyFeedItem = FeedItem.fromPost(reply);
-    authorFeedRepo.add(replyFeedItem, true);
+    authorFeedRepository.add(replyFeedItem, true);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -190,6 +201,15 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("リポスト投稿がある場合、reasonを含むフィードアイテムを返す", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+      repostRepository,
+    } = services;
     // arrange
     const author = actorFactory();
     const originalAuthor = actorFactory();
@@ -198,21 +218,21 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Reposter",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
     const originalProfile = profileDetailedFactory({
       actorDid: originalAuthor.did,
       displayName: "Original Author",
     });
-    profileRepo.add(originalProfile);
+    profileRepository.add(originalProfile);
 
     const { post: originalPost, record: originalRecord } = postFactory({
       actorDid: originalAuthor.did,
       text: "Original post to be reposted",
       createdAt: new Date("2024-01-05T00:00:00Z"),
     });
-    postRepo.add(originalPost);
-    recordRepo.add(originalRecord);
+    postRepository.add(originalPost);
+    recordRepository.add(originalRecord);
 
     const originalPostStats: PostStats = {
       likeCount: 0,
@@ -220,7 +240,7 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(originalPost.uri.toString(), originalPostStats);
+    postStatsRepository.add(originalPost.uri.toString(), originalPostStats);
 
     const repost = repostFactory({
       actorDid: author.did,
@@ -228,10 +248,10 @@ describe("GetAuthorFeedUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-06T00:00:00Z"),
     });
-    repostRepo.add(repost);
+    repostRepository.add(repost);
 
     const repostFeedItem = FeedItem.fromRepost(repost);
-    authorFeedRepo.add(repostFeedItem, false);
+    authorFeedRepository.add(repostFeedItem, false);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -270,6 +290,14 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("viewerDidが指定された場合、viewer情報が含まれる", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const author = actorFactory();
     const viewer = actorFactory();
@@ -278,19 +306,19 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
     const viewerProfile = profileDetailedFactory({
       actorDid: viewer.did,
       displayName: "Viewer",
     });
-    profileRepo.add(viewerProfile);
+    profileRepository.add(viewerProfile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -298,10 +326,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post.uri.toString(), postStats);
+    postStatsRepository.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepository.add(postFeedItem, false);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -331,6 +359,14 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("カーソルが指定された場合、指定日時より前の投稿のみを返す", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const author = actorFactory();
 
@@ -338,15 +374,15 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Cursor Test Author",
     });
-    profileRepo.add(authorProfile);
+    profileRepository.add(authorProfile);
 
     const { post: olderPost, record: olderRecord } = postFactory({
       actorDid: author.did,
       text: "Older post",
       createdAt: new Date("2024-01-08T00:00:00Z"),
     });
-    postRepo.add(olderPost);
-    recordRepo.add(olderRecord);
+    postRepository.add(olderPost);
+    recordRepository.add(olderRecord);
 
     const olderPostStats: PostStats = {
       likeCount: 0,
@@ -354,17 +390,17 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(olderPost.uri.toString(), olderPostStats);
+    postStatsRepository.add(olderPost.uri.toString(), olderPostStats);
 
     const olderPostFeedItem = FeedItem.fromPost(olderPost);
-    authorFeedRepo.add(olderPostFeedItem, false);
+    authorFeedRepository.add(olderPostFeedItem, false);
 
     const { post: newerPost, record: newerRecord } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-10T00:00:00Z"),
     });
-    postRepo.add(newerPost);
-    recordRepo.add(newerRecord);
+    postRepository.add(newerPost);
+    recordRepository.add(newerRecord);
 
     const newerPostStats: PostStats = {
       likeCount: 0,
@@ -372,10 +408,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(newerPost.uri.toString(), newerPostStats);
+    postStatsRepository.add(newerPost.uri.toString(), newerPostStats);
 
     const newerPostFeedItem = FeedItem.fromPost(newerPost);
-    authorFeedRepo.add(newerPostFeedItem, false);
+    authorFeedRepository.add(newerPostFeedItem, false);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -403,6 +439,7 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("サポートされていないフィルターの場合、空のフィードを返す", async () => {
+    const { getAuthorFeedUseCase } = services;
     // arrange
     const author = actorFactory();
 
@@ -422,6 +459,13 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("limitが0の場合、空のフィードを返す", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const author = actorFactory();
 
@@ -429,16 +473,16 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Zero Limit Author",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepository.add(postFeedItem, false);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -455,6 +499,14 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("limitが1の場合、1件のみ返す", async () => {
+    const {
+      getAuthorFeedUseCase,
+      authorFeedRepository,
+      postRepository,
+      postStatsRepository,
+      profileRepository,
+      recordRepository,
+    } = services;
     // arrange
     const author = actorFactory();
 
@@ -462,14 +514,14 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Limit Test Author",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post: post1, record: record1 } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-11T00:00:00Z"),
     });
-    postRepo.add(post1);
-    recordRepo.add(record1);
+    postRepository.add(post1);
+    recordRepository.add(record1);
 
     const post1Stats: PostStats = {
       likeCount: 0,
@@ -477,18 +529,18 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post1.uri.toString(), post1Stats);
+    postStatsRepository.add(post1.uri.toString(), post1Stats);
 
     const post1FeedItem = FeedItem.fromPost(post1);
-    authorFeedRepo.add(post1FeedItem, false);
+    authorFeedRepository.add(post1FeedItem, false);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author.did,
       text: "Post 2",
       createdAt: new Date("2024-01-12T00:00:00Z"),
     });
-    postRepo.add(post2);
-    recordRepo.add(record2);
+    postRepository.add(post2);
+    recordRepository.add(record2);
 
     const post2Stats: PostStats = {
       likeCount: 0,
@@ -496,10 +548,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepo.add(post2.uri.toString(), post2Stats);
+    postStatsRepository.add(post2.uri.toString(), post2Stats);
 
     const post2FeedItem = FeedItem.fromPost(post2);
-    authorFeedRepo.add(post2FeedItem, false);
+    authorFeedRepository.add(post2FeedItem, false);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -526,6 +578,7 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("投稿がない場合、空のフィードを返す", async () => {
+    const { getAuthorFeedUseCase, profileRepository } = services;
     // arrange
     const author = actorFactory();
 
@@ -533,7 +586,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "No Posts User",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     // act
     const result = await getAuthorFeedUseCase.execute({

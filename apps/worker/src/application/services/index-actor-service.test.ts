@@ -2,23 +2,20 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../shared/test-utils.js";
-import { IndexActorService } from "./index-actor-service.js";
+import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("IndexActorService", () => {
-  const indexActorService = testInjector.injectClass(IndexActorService);
-
-  const actorRepo = testInjector.resolve("actorRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   describe("upsert", () => {
     test("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
+      const { indexActorService, actorRepository, jobScheduler, db } = services;
+      const ctx = { db };
       // arrange
       const testDid = asDid("did:plc:new-with-handle");
       const testHandle = asHandle("new-with-handle.bsky.social");
@@ -32,7 +29,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: testDid });
+      const actor = await actorRepository.findByDid({ ctx, did: testDid });
       expect(actor).toMatchObject({
         did: testDid,
         handle: testHandle,
@@ -49,6 +46,8 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
+      const { indexActorService, actorRepository, db } = services;
+      const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:no-handle-to-handle");
       const newHandle = asHandle("new-handle.bsky.social");
@@ -56,7 +55,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: null,
       });
-      actorRepo.add(existingActor);
+      actorRepository.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -67,13 +66,15 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: newHandle,
       });
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
+      const { indexActorService, actorRepository, db } = services;
+      const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:same-handle");
       const existingHandle = asHandle("same-handle.bsky.social");
@@ -81,7 +82,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: existingHandle,
       });
-      actorRepo.add(existingActor);
+      actorRepository.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -92,13 +93,15 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: existingHandle,
       });
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
+      const { indexActorService, actorRepository, db } = services;
+      const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:changed-handle");
       const oldHandle = asHandle("old-handle.bsky.social");
@@ -107,7 +110,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: oldHandle,
       });
-      actorRepo.add(existingActor);
+      actorRepository.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -118,13 +121,15 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: newHandle,
       });
     });
 
     test("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
+      const { indexActorService, actorRepository, jobScheduler, db } = services;
+      const ctx = { db };
       // arrange
       const newDid = asDid("did:plc:new-no-handle");
 
@@ -136,7 +141,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: newDid });
+      const actor = await actorRepository.findByDid({ ctx, did: newDid });
       expect(actor).toMatchObject({
         did: newDid,
         handle: null,
@@ -150,13 +155,15 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
+      const { indexActorService, actorRepository, jobScheduler, db } = services;
+      const ctx = { db };
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
       const existingActor = actorFactory({
         did: existingDidNoHandle,
         handle: null,
       });
-      actorRepo.add(existingActor);
+      actorRepository.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -166,7 +173,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({
+      const actor = await actorRepository.findByDid({
         ctx,
         did: existingDidNoHandle,
       });
@@ -182,6 +189,8 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleありの場合は、何もしない", async () => {
+      const { indexActorService, actorRepository, db } = services;
+      const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:existing-with-handle");
       const existingHandle = asHandle("existing-with-handle.bsky.social");
@@ -189,7 +198,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: existingHandle,
       });
-      actorRepo.add(existingActor);
+      actorRepository.add(existingActor);
 
       // act
       await indexActorService.upsert({
@@ -199,7 +208,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: existingHandle,
       });

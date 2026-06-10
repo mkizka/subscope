@@ -5,20 +5,23 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { FeedProcessor } from "./feed-processor.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FeedProcessor", () => {
-  const feedProcessor = testInjector.injectClass(FeedProcessor);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const repostRepo = testInjector.resolve("repostRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("投稿のみの場合、FeedViewPostのリストを返す", async () => {
+    const {
+      feedProcessor,
+      postRepository,
+      recordRepository,
+      profileRepository,
+    } = services;
     // arrange
     const author = actorFactory();
     const profile = profileDetailedFactory({
@@ -26,13 +29,13 @@ describe("FeedProcessor", () => {
       handle: author.handle,
       displayName: "Post Author",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
     });
-    postRepo.add(post);
-    recordRepo.add(record);
+    postRepository.add(post);
+    recordRepository.add(record);
 
     const feedItem = FeedItem.fromPost(post);
 
@@ -61,6 +64,13 @@ describe("FeedProcessor", () => {
   });
 
   test("リポストの場合、reasonを含むFeedViewPostを返す", async () => {
+    const {
+      feedProcessor,
+      postRepository,
+      recordRepository,
+      profileRepository,
+      repostRepository,
+    } = services;
     // arrange
     const originalAuthor = actorFactory();
     const originalProfile = profileDetailedFactory({
@@ -68,7 +78,7 @@ describe("FeedProcessor", () => {
       handle: originalAuthor.handle,
       displayName: "Original Author",
     });
-    profileRepo.add(originalProfile);
+    profileRepository.add(originalProfile);
 
     const reposter = actorFactory();
     const reposterProfile = profileDetailedFactory({
@@ -76,13 +86,13 @@ describe("FeedProcessor", () => {
       handle: reposter.handle,
       displayName: "Reposter",
     });
-    profileRepo.add(reposterProfile);
+    profileRepository.add(reposterProfile);
 
     const { post: originalPost, record: originalRecord } = postFactory({
       actorDid: originalAuthor.did,
     });
-    postRepo.add(originalPost);
-    recordRepo.add(originalRecord);
+    postRepository.add(originalPost);
+    recordRepository.add(originalRecord);
 
     const repost = repostFactory({
       actorDid: reposter.did,
@@ -91,7 +101,7 @@ describe("FeedProcessor", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(repost);
+    repostRepository.add(repost);
 
     const feedItem = FeedItem.fromRepost(repost);
 
@@ -125,6 +135,12 @@ describe("FeedProcessor", () => {
   });
 
   test("リプライ投稿の場合、replyを含むFeedViewPostを返す", async () => {
+    const {
+      feedProcessor,
+      postRepository,
+      recordRepository,
+      profileRepository,
+    } = services;
     // arrange
     const rootAuthor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -132,7 +148,7 @@ describe("FeedProcessor", () => {
       handle: rootAuthor.handle,
       displayName: "Root Author",
     });
-    profileRepo.add(rootProfile);
+    profileRepository.add(rootProfile);
 
     const replyAuthor = actorFactory();
     const replyProfile = profileDetailedFactory({
@@ -140,21 +156,21 @@ describe("FeedProcessor", () => {
       handle: replyAuthor.handle,
       displayName: "Reply Author",
     });
-    profileRepo.add(replyProfile);
+    profileRepository.add(replyProfile);
 
     const { post: rootPost, record: rootRecord } = postFactory({
       actorDid: rootAuthor.did,
     });
-    postRepo.add(rootPost);
-    recordRepo.add(rootRecord);
+    postRepository.add(rootPost);
+    recordRepository.add(rootRecord);
 
     const { post: replyPost, record: replyRecord } = postFactory({
       actorDid: replyAuthor.did,
       replyRoot: { uri: rootPost.uri, cid: rootPost.cid },
       replyParent: { uri: rootPost.uri, cid: rootPost.cid },
     });
-    postRepo.add(replyPost);
-    recordRepo.add(replyRecord);
+    postRepository.add(replyPost);
+    recordRepository.add(replyRecord);
 
     const feedItem = FeedItem.fromPost(replyPost);
 
@@ -195,6 +211,13 @@ describe("FeedProcessor", () => {
   });
 
   test("複数の投稿とリポストが混在する場合、正しい順序で返す", async () => {
+    const {
+      feedProcessor,
+      postRepository,
+      recordRepository,
+      profileRepository,
+      repostRepository,
+    } = services;
     // arrange
     const author1 = actorFactory();
     const profile1 = profileDetailedFactory({
@@ -202,7 +225,7 @@ describe("FeedProcessor", () => {
       handle: author1.handle,
       displayName: "Author 1",
     });
-    profileRepo.add(profile1);
+    profileRepository.add(profile1);
 
     const author2 = actorFactory();
     const profile2 = profileDetailedFactory({
@@ -210,7 +233,7 @@ describe("FeedProcessor", () => {
       handle: author2.handle,
       displayName: "Author 2",
     });
-    profileRepo.add(profile2);
+    profileRepository.add(profile2);
 
     const reposter = actorFactory();
     const reposterProfile = profileDetailedFactory({
@@ -218,19 +241,19 @@ describe("FeedProcessor", () => {
       handle: reposter.handle,
       displayName: "Reposter",
     });
-    profileRepo.add(reposterProfile);
+    profileRepository.add(reposterProfile);
 
     const { post: post1, record: record1 } = postFactory({
       actorDid: author1.did,
     });
-    postRepo.add(post1);
-    recordRepo.add(record1);
+    postRepository.add(post1);
+    recordRepository.add(record1);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author2.did,
     });
-    postRepo.add(post2);
-    recordRepo.add(record2);
+    postRepository.add(post2);
+    recordRepository.add(record2);
 
     const repost = repostFactory({
       actorDid: reposter.did,
@@ -238,7 +261,7 @@ describe("FeedProcessor", () => {
       subjectCid: post2.cid,
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(repost);
+    repostRepository.add(repost);
 
     const feedItem1 = FeedItem.fromPost(post1);
     const feedItem2 = FeedItem.fromRepost(repost);
@@ -263,6 +286,7 @@ describe("FeedProcessor", () => {
   });
 
   test("PostViewが見つからない場合、その項目をスキップする", async () => {
+    const { feedProcessor } = services;
     // arrange
     const author = actorFactory();
     const { post } = postFactory({

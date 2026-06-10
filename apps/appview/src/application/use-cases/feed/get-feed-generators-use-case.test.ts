@@ -1,31 +1,30 @@
 import { AtUri } from "@atproto/syntax";
 import { generatorFactory, profileDetailedFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetFeedGeneratorsUseCase } from "./get-feed-generators-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFeedGeneratorsUseCase", () => {
-  const getFeedGeneratorsUseCase = testInjector.injectClass(
-    GetFeedGeneratorsUseCase,
-  );
-
-  const generatorRepo = testInjector.resolve("generatorRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("指定したURIのフィードジェネレーターが存在する場合、GeneratorViewを返す", async () => {
+    const { getFeedGeneratorsUseCase, generatorRepository, profileRepository } =
+      services;
     // arrange
     const generator = generatorFactory({
       displayName: "Test Feed Generator",
       description: "A test feed generator",
     });
-    generatorRepo.add(generator);
+    generatorRepository.add(generator);
 
     const profile = profileDetailedFactory({
       actorDid: generator.actorDid,
       displayName: "Generator Creator",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     // act
     const result = await getFeedGeneratorsUseCase.execute([generator.uri]);
@@ -47,26 +46,28 @@ describe("GetFeedGeneratorsUseCase", () => {
   });
 
   test("複数のフィードジェネレーターを指定した場合、リクエスト順に返す", async () => {
+    const { getFeedGeneratorsUseCase, generatorRepository, profileRepository } =
+      services;
     // arrange
     const generator1 = generatorFactory({
       displayName: "First Generator",
     });
-    generatorRepo.add(generator1);
+    generatorRepository.add(generator1);
 
     const profile1 = profileDetailedFactory({
       actorDid: generator1.actorDid,
     });
-    profileRepo.add(profile1);
+    profileRepository.add(profile1);
 
     const generator2 = generatorFactory({
       displayName: "Second Generator",
     });
-    generatorRepo.add(generator2);
+    generatorRepository.add(generator2);
 
     const profile2 = profileDetailedFactory({
       actorDid: generator2.actorDid,
     });
-    profileRepo.add(profile2);
+    profileRepository.add(profile2);
 
     // act
     const result = await getFeedGeneratorsUseCase.execute([
@@ -85,6 +86,7 @@ describe("GetFeedGeneratorsUseCase", () => {
   });
 
   test("指定したURIのフィードジェネレーターが存在しない場合、空の配列を返す", async () => {
+    const { getFeedGeneratorsUseCase } = services;
     // arrange
     const nonExistentUri = new AtUri(
       "at://did:plc:nonexistent/app.bsky.feed.generator/test",
@@ -98,6 +100,7 @@ describe("GetFeedGeneratorsUseCase", () => {
   });
 
   test("空のURI配列を渡した場合、空の配列を返す", async () => {
+    const { getFeedGeneratorsUseCase } = services;
     // arrange & act
     const result = await getFeedGeneratorsUseCase.execute([]);
 
@@ -106,16 +109,18 @@ describe("GetFeedGeneratorsUseCase", () => {
   });
 
   test("一部のフィードジェネレーターのみ存在する場合、存在するもののみ返す", async () => {
+    const { getFeedGeneratorsUseCase, generatorRepository, profileRepository } =
+      services;
     // arrange
     const generator = generatorFactory({
       displayName: "Existing Generator",
     });
-    generatorRepo.add(generator);
+    generatorRepository.add(generator);
 
     const profile = profileDetailedFactory({
       actorDid: generator.actorDid,
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const nonExistentUri = new AtUri(
       "at://did:plc:nonexistent/app.bsky.feed.generator/test",

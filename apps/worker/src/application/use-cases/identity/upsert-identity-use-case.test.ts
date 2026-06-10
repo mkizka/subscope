@@ -1,20 +1,18 @@
 import { actorFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
-import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 
 describe("UpsertIdentityUseCase", () => {
-  const upsertIdentityUseCase = testInjector.injectClass(UpsertIdentityUseCase);
-
-  const actorRepo = testInjector.resolve("actorRepository");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("ハンドルがない場合は何もしない", async () => {
+    const { upsertIdentityUseCase, actorRepository, db } = services;
+    const ctx = { db };
     // arrange
     const command: UpsertIdentityCommand = {
       did: "did:plc:nohandle",
@@ -25,16 +23,21 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    const foundActor = await actorRepository.findByDid({
+      ctx,
+      did: command.did,
+    });
     expect(foundActor).toBeNull();
   });
 
   test("ハンドルがある場合はactorを保存する", async () => {
+    const { upsertIdentityUseCase, actorRepository, db } = services;
+    const ctx = { db };
     // arrange
     const actor = actorFactory({
       handle: "old-handle.bsky.social",
     });
-    actorRepo.add(actor);
+    actorRepository.add(actor);
 
     const command: UpsertIdentityCommand = {
       did: actor.did,
@@ -45,7 +48,10 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    const foundActor = await actorRepository.findByDid({
+      ctx,
+      did: command.did,
+    });
     expect(foundActor).not.toBeNull();
     expect(foundActor?.handle).toBe(command.handle);
   });

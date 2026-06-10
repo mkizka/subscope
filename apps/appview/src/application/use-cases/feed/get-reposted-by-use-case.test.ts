@@ -4,18 +4,18 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetRepostedByUseCase", () => {
-  const getRepostedByUseCase = testInjector.injectClass(GetRepostedByUseCase);
-
-  const repostRepo = testInjector.resolve("repostRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let services: TestServices;
+  beforeEach(async () => {
+    services = await testRegistry.resolve();
+  });
 
   test("リポストがない場合、空のrepostedByを返す", async () => {
+    const { getRepostedByUseCase } = services;
     // arrange
     const actor = actorFactory();
     const { post } = postFactory({
@@ -36,6 +36,8 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("リポストがある場合、リポストしたユーザーのプロフィールを返す", async () => {
+    const { getRepostedByUseCase, repostRepository, profileRepository } =
+      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -47,14 +49,14 @@ describe("GetRepostedByUseCase", () => {
       actorDid: repostActor.did,
       displayName: "Reposter",
     });
-    profileRepo.add(profile);
+    profileRepository.add(profile);
 
     const repost = repostFactory({
       actorDid: repostActor.did,
       subjectUri: originalPost.uri.toString(),
       subjectCid: originalPost.cid,
     });
-    repostRepo.add(repost);
+    repostRepository.add(repost);
 
     // act
     const result = await getRepostedByUseCase.execute({
@@ -76,6 +78,8 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("複数のリポストがある場合、時系列の降順で返す", async () => {
+    const { getRepostedByUseCase, repostRepository, profileRepository } =
+      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -87,7 +91,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: firstReposter.did,
       displayName: "First Reposter",
     });
-    profileRepo.add(firstProfile);
+    profileRepository.add(firstProfile);
 
     const firstRepost = repostFactory({
       actorDid: firstReposter.did,
@@ -95,14 +99,14 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(firstRepost);
+    repostRepository.add(firstRepost);
 
     const secondReposter = actorFactory();
     const secondProfile = profileDetailedFactory({
       actorDid: secondReposter.did,
       displayName: "Second Reposter",
     });
-    profileRepo.add(secondProfile);
+    profileRepository.add(secondProfile);
 
     const secondRepost = repostFactory({
       actorDid: secondReposter.did,
@@ -110,7 +114,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(secondRepost);
+    repostRepository.add(secondRepost);
 
     // act
     const result = await getRepostedByUseCase.execute({
@@ -137,6 +141,8 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("limitパラメータによる制限が正しく動作する", async () => {
+    const { getRepostedByUseCase, repostRepository, profileRepository } =
+      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -148,7 +154,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: firstReposter.did,
       displayName: "First Reposter",
     });
-    profileRepo.add(firstProfile);
+    profileRepository.add(firstProfile);
 
     const firstRepost = repostFactory({
       actorDid: firstReposter.did,
@@ -156,14 +162,14 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(firstRepost);
+    repostRepository.add(firstRepost);
 
     const secondReposter = actorFactory();
     const secondProfile = profileDetailedFactory({
       actorDid: secondReposter.did,
       displayName: "Second Reposter",
     });
-    profileRepo.add(secondProfile);
+    profileRepository.add(secondProfile);
 
     const secondRepost = repostFactory({
       actorDid: secondReposter.did,
@@ -171,7 +177,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(secondRepost);
+    repostRepository.add(secondRepost);
 
     // act
     const result = await getRepostedByUseCase.execute({
@@ -194,6 +200,8 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("cursorパラメータによるページネーションが正しく動作する", async () => {
+    const { getRepostedByUseCase, repostRepository, profileRepository } =
+      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -205,7 +213,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: firstReposter.did,
       displayName: "First Reposter",
     });
-    profileRepo.add(firstProfile);
+    profileRepository.add(firstProfile);
 
     const firstRepost = repostFactory({
       actorDid: firstReposter.did,
@@ -213,14 +221,14 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(firstRepost);
+    repostRepository.add(firstRepost);
 
     const secondReposter = actorFactory();
     const secondProfile = profileDetailedFactory({
       actorDid: secondReposter.did,
       displayName: "Second Reposter",
     });
-    profileRepo.add(secondProfile);
+    profileRepository.add(secondProfile);
 
     const secondRepost = repostFactory({
       actorDid: secondReposter.did,
@@ -228,7 +236,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(secondRepost);
+    repostRepository.add(secondRepost);
 
     // act - 最初のページ
     const firstPage = await getRepostedByUseCase.execute({
