@@ -4,15 +4,17 @@ import type { Router } from "express";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
-import { env } from "../shared/env.js";
-import { healthRouter } from "./routes/health.js";
-import { wellKnownRouter } from "./routes/well-known.js";
-
 export class AppViewServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
 
-  constructor(loggerManager: ILoggerManager, xrpcRouter: Router) {
+  constructor(
+    loggerManager: ILoggerManager,
+    xrpcRouter: Router,
+    healthRouter: Router,
+    wellKnownRouter: Router,
+    private readonly port: number,
+  ) {
     this.logger = loggerManager.createLogger("AppViewServer");
     this.app = express();
     this.app.use(loggingMiddleware(this.logger));
@@ -21,11 +23,17 @@ export class AppViewServer {
     this.app.use(wellKnownRouter);
     this.app.use(xrpcRouter);
   }
-  static inject = ["loggerManager", "xrpcRouter"] as const;
+  static inject = [
+    "loggerManager",
+    "xrpcRouter",
+    "healthRouter",
+    "wellKnownRouter",
+    "port",
+  ] as const;
 
   start() {
-    this.app.listen(env.PORT, () => {
-      this.logger.info(`AppView server listening on port ${env.PORT}`);
+    this.app.listen(this.port, () => {
+      this.logger.info(`AppView server listening on port ${this.port}`);
     });
   }
 }

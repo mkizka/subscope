@@ -1,6 +1,6 @@
-import type { CacheResult, DidCache, DidDocument } from "@atproto/identity";
+import type { CacheResult, DidDocument } from "@atproto/identity";
 import KeyvRedis, { type RedisClientOptions } from "@keyv/redis";
-import type { IMetricReporter } from "@repo/common/domain";
+import type { IDidCache, IMetricReporter } from "@repo/common/domain";
 import Keyv from "keyv";
 
 type CacheVal = {
@@ -11,7 +11,7 @@ type CacheVal = {
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
-export class RedisDidCache implements DidCache {
+export class RedisDidCache implements IDidCache {
   private readonly cache: Keyv<CacheVal>;
   private readonly maxTTL = DAY;
   private readonly staleTTL = HOUR;
