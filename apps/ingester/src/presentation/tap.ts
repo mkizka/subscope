@@ -10,7 +10,6 @@ import { isSupportedCollection } from "@repo/common/utils";
 
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
-import { env } from "../shared/env.js";
 
 export class TapIngester {
   private readonly tap;
@@ -21,9 +20,10 @@ export class TapIngester {
     loggerManager: ILoggerManager,
     private readonly handleCommitUseCase: HandleCommitUseCase,
     private readonly handleIdentityUseCase: HandleIdentityUseCase,
+    private readonly tapUrl: string,
   ) {
     this.logger = loggerManager.createLogger("TapIngester");
-    this.tap = new Tap(env.TAP_URL);
+    this.tap = new Tap(tapUrl);
     this.indexer = new SimpleIndexer();
 
     this.indexer.record(async (event) => {
@@ -50,6 +50,7 @@ export class TapIngester {
     "loggerManager",
     "handleCommitUseCase",
     "handleIdentityUseCase",
+    "tapUrl",
   ] as const;
 
   private recordEventToDto(event: RecordEvent): CommitEventDto | null {
@@ -94,7 +95,7 @@ export class TapIngester {
       heartbeatIntervalMs: 60_000,
     });
 
-    this.logger.info(`Tap connection starting at ${env.TAP_URL}`);
+    this.logger.info(`Tap connection starting at ${this.tapUrl}`);
 
     await channel.start();
   }

@@ -23,6 +23,8 @@ const schema = z.object({
   }),
 });
 
+export type Env = z.infer<typeof schema>;
+
 export const env = (() => {
   try {
     return schema.parse(process.env);
