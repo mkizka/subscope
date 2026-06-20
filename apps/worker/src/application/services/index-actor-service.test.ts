@@ -7,21 +7,27 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("IndexActorService", () => {
-  let services: TestServices;
+  let sut: TestServices["indexActorService"];
+  let actorRepository: TestServices["actorRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.indexActorService;
+    actorRepository = services.actorRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
   });
 
   describe("upsert", () => {
     test("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
-      const { indexActorService, actorRepository, jobScheduler, db } = services;
       const ctx = { db };
       // arrange
       const testDid = asDid("did:plc:new-with-handle");
       const testHandle = asHandle("new-with-handle.bsky.social");
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: testDid,
         handle: testHandle,
@@ -46,7 +52,6 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
-      const { indexActorService, actorRepository, db } = services;
       const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:no-handle-to-handle");
@@ -58,7 +63,7 @@ describe("IndexActorService", () => {
       actorRepository.add(existingActor);
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: existingDid,
         handle: newHandle,
@@ -73,7 +78,6 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
-      const { indexActorService, actorRepository, db } = services;
       const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:same-handle");
@@ -85,7 +89,7 @@ describe("IndexActorService", () => {
       actorRepository.add(existingActor);
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: existingDid,
         handle: existingHandle,
@@ -100,7 +104,6 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
-      const { indexActorService, actorRepository, db } = services;
       const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:changed-handle");
@@ -113,7 +116,7 @@ describe("IndexActorService", () => {
       actorRepository.add(existingActor);
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: existingDid,
         handle: newHandle,
@@ -128,13 +131,12 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
-      const { indexActorService, actorRepository, jobScheduler, db } = services;
       const ctx = { db };
       // arrange
       const newDid = asDid("did:plc:new-no-handle");
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: newDid,
         live: false,
@@ -155,7 +157,6 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
-      const { indexActorService, actorRepository, jobScheduler, db } = services;
       const ctx = { db };
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
@@ -166,7 +167,7 @@ describe("IndexActorService", () => {
       actorRepository.add(existingActor);
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: existingDidNoHandle,
         live: false,
@@ -189,7 +190,6 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleありの場合は、何もしない", async () => {
-      const { indexActorService, actorRepository, db } = services;
       const ctx = { db };
       // arrange
       const existingDid = asDid("did:plc:existing-with-handle");
@@ -201,7 +201,7 @@ describe("IndexActorService", () => {
       actorRepository.add(existingActor);
 
       // act
-      await indexActorService.upsert({
+      await sut.upsert({
         ctx,
         did: existingDid,
         live: false,

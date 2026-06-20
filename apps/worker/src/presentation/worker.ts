@@ -14,7 +14,6 @@ import { indexCommitCommandFactory } from "../application/use-cases/commit/index
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
-import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
 const SECONDS = 1000;
@@ -42,12 +41,13 @@ const backoffStrategy: BackoffStrategy = (attemptsMade) => {
 const createWorker = <T extends keyof JobData>(
   name: T,
   process: Processor<JobData[T], void>,
+  redisUrl: string,
   options?: Omit<WorkerOptions, "connection" | "autorun">,
 ) => {
   return new Worker<JobData[T]>(name, process, {
     autorun: false,
     connection: {
-      url: env.REDIS_URL,
+      url: redisUrl,
     },
     settings: {
       backoffStrategy,
@@ -68,12 +68,18 @@ export class SyncWorker {
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
     addTapRepoUseCase: AddTapRepoUseCase,
     removeTapRepoUseCase: RemoveTapRepoUseCase,
+    redisUrl: string,
+    commitWorkerConcurrency: number,
   ) {
     this.workers = [
-      createWorker("identity", async (job) => {
-        const command = upsertIdentityCommandFactory(job.data);
-        await upsertIdentityUseCase.execute(command);
-      }),
+      createWorker(
+        "identity",
+        async (job) => {
+          const command = upsertIdentityCommandFactory(job.data);
+          await upsertIdentityUseCase.execute(command);
+        },
+        redisUrl,
+      ),
       createWorker(
         "commit",
         async (job) => {
@@ -83,8 +89,9 @@ export class SyncWorker {
           });
           await indexCommitUseCase.execute(command);
         },
+        redisUrl,
         {
-          concurrency: env.COMMIT_WORKER_CONCURRENCY,
+          concurrency: commitWorkerConcurrency,
         },
       ),
       createWorker(
@@ -92,6 +99,7 @@ export class SyncWorker {
         async (job) => {
           await resolveDidUseCase.execute(job.data);
         },
+        redisUrl,
         {
           limiter: {
             max: 4, // plc.directoryの負荷を抑えるためにrpsを制限
@@ -109,6 +117,7 @@ export class SyncWorker {
             jobLogger: createJobLogger(job),
           });
         },
+        redisUrl,
         {
           limiter: {
             max: 10, // PDSの負荷を抑えるためにrpsを制限
@@ -116,26 +125,42 @@ export class SyncWorker {
           },
         },
       ),
-      createWorker("aggregatePostStats", async (job) => {
-        const command = aggregatePostStatsCommandFactory({
-          data: job.data,
-          jobLogger: createJobLogger(job),
-        });
-        await aggregatePostStatsUseCase.execute(command);
-      }),
-      createWorker("aggregateActorStats", async (job) => {
-        const command = aggregateActorStatsCommandFactory({
-          data: job.data,
-          jobLogger: createJobLogger(job),
-        });
-        await aggregateActorStatsUseCase.execute(command);
-      }),
-      createWorker("addTapRepo", async (job) => {
-        await addTapRepoUseCase.execute(job.data);
-      }),
-      createWorker("removeTapRepo", async (job) => {
-        await removeTapRepoUseCase.execute(job.data);
-      }),
+      createWorker(
+        "aggregatePostStats",
+        async (job) => {
+          const command = aggregatePostStatsCommandFactory({
+            data: job.data,
+            jobLogger: createJobLogger(job),
+          });
+          await aggregatePostStatsUseCase.execute(command);
+        },
+        redisUrl,
+      ),
+      createWorker(
+        "aggregateActorStats",
+        async (job) => {
+          const command = aggregateActorStatsCommandFactory({
+            data: job.data,
+            jobLogger: createJobLogger(job),
+          });
+          await aggregateActorStatsUseCase.execute(command);
+        },
+        redisUrl,
+      ),
+      createWorker(
+        "addTapRepo",
+        async (job) => {
+          await addTapRepoUseCase.execute(job.data);
+        },
+        redisUrl,
+      ),
+      createWorker(
+        "removeTapRepo",
+        async (job) => {
+          await removeTapRepoUseCase.execute(job.data);
+        },
+        redisUrl,
+      ),
     ];
   }
   static inject = [
@@ -147,6 +172,8 @@ export class SyncWorker {
     "aggregateActorStatsUseCase",
     "addTapRepoUseCase",
     "removeTapRepoUseCase",
+    "redisUrl",
+    "commitWorkerConcurrency",
   ] as const;
 
   async start() {

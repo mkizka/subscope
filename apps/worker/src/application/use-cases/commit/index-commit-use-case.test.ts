@@ -7,21 +7,26 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 describe("IndexCommitUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["indexCommitUseCase"];
+  let actorRepository: TestServices["actorRepository"];
+  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let postRepository: TestServices["postRepository"];
+  let recordRepository: TestServices["recordRepository"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.indexCommitUseCase;
+    actorRepository = services.actorRepository;
+    subscriptionRepository = services.subscriptionRepository;
+    postRepository = services.postRepository;
+    recordRepository = services.recordRepository;
+    db = services.db;
   });
 
   const jobLogger = { log: vi.fn() };
 
   describe("create/updateオペレーション", () => {
     test("有効なpost作成オペレーションの場合、レコードがインデックスされる", async () => {
-      const {
-        indexCommitUseCase,
-        actorRepository,
-        subscriptionRepository,
-        postRepository,
-      } = services;
       // arrange
       const actor = actorFactory();
       actorRepository.add(actor);
@@ -47,7 +52,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
 
       // act
-      await indexCommitUseCase.execute(command);
+      await sut.execute(command);
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -68,13 +73,6 @@ describe("IndexCommitUseCase", () => {
 
   describe("deleteオペレーション", () => {
     test("削除オペレーションの場合、レコードを削除する", async () => {
-      const {
-        indexCommitUseCase,
-        actorRepository,
-        subscriptionRepository,
-        recordRepository,
-        db,
-      } = services;
       const ctx = { db };
       // arrange
       const actor = actorFactory();
@@ -98,7 +96,7 @@ describe("IndexCommitUseCase", () => {
         live: true,
         jobLogger,
       };
-      await indexCommitUseCase.execute(createCommand);
+      await sut.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
         commit: { operation: "delete" as const, uri },
@@ -107,7 +105,7 @@ describe("IndexCommitUseCase", () => {
       };
 
       // act
-      await indexCommitUseCase.execute(deleteCommand);
+      await sut.execute(deleteCommand);
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -124,8 +122,6 @@ describe("IndexCommitUseCase", () => {
 
   describe("RecordValidationError", () => {
     test("RecordValidationErrorが発生した場合、エラーメッセージをログに記録して正常終了する", async () => {
-      const { indexCommitUseCase, actorRepository, subscriptionRepository } =
-        services;
       // arrange
       const actor = actorFactory();
       actorRepository.add(actor);
@@ -150,7 +146,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
 
       // act
-      await indexCommitUseCase.execute(command);
+      await sut.execute(command);
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -165,7 +161,6 @@ describe("IndexCommitUseCase", () => {
     });
 
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
-      const { indexCommitUseCase } = services;
       // arrange
       const uri = new AtUri("at://did:plc:example/unsupported.collection/123");
       const record = Record.create({
@@ -184,7 +179,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
 
       // act & assert
-      await expect(indexCommitUseCase.execute(command)).rejects.toThrow(
+      await expect(sut.execute(command)).rejects.toThrow(
         "Unsupported collection: unsupported.collection",
       );
     });

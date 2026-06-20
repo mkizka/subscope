@@ -6,13 +6,19 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ResolveDidUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["resolveDidUseCase"];
+  let actorRepository: TestServices["actorRepository"];
+  let didResolver: TestServices["didResolver"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.resolveDidUseCase;
+    actorRepository = services.actorRepository;
+    didResolver = services.didResolver;
+    db = services.db;
   });
 
   test("既存のactorが存在しない場合、新規actorを作成する", async () => {
-    const { resolveDidUseCase, actorRepository, didResolver, db } = services;
     const ctx = { db };
     // arrange
     const did = asDid("did:plc:new-actor");
@@ -24,7 +30,7 @@ describe("ResolveDidUseCase", () => {
     });
 
     // act
-    await resolveDidUseCase.execute(did);
+    await sut.execute(did);
 
     // assert
     const actor = await actorRepository.findByDid({ ctx, did });
@@ -34,7 +40,6 @@ describe("ResolveDidUseCase", () => {
   });
 
   test("既存のactorが存在する場合、ハンドルを更新する", async () => {
-    const { resolveDidUseCase, actorRepository, didResolver, db } = services;
     const ctx = { db };
     // arrange
     const oldHandle = asHandle("oldhandle.test");
@@ -49,7 +54,7 @@ describe("ResolveDidUseCase", () => {
     });
 
     // act
-    await resolveDidUseCase.execute(actor.did);
+    await sut.execute(actor.did);
 
     // assert
     const updatedActor = await actorRepository.findByDid({

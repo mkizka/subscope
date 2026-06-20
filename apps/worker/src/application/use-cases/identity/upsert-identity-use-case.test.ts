@@ -5,13 +5,17 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 describe("UpsertIdentityUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["upsertIdentityUseCase"];
+  let actorRepository: TestServices["actorRepository"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.upsertIdentityUseCase;
+    actorRepository = services.actorRepository;
+    db = services.db;
   });
 
   test("ハンドルがない場合は何もしない", async () => {
-    const { upsertIdentityUseCase, actorRepository, db } = services;
     const ctx = { db };
     // arrange
     const command: UpsertIdentityCommand = {
@@ -20,7 +24,7 @@ describe("UpsertIdentityUseCase", () => {
     };
 
     // act
-    await upsertIdentityUseCase.execute(command);
+    await sut.execute(command);
 
     // assert
     const foundActor = await actorRepository.findByDid({
@@ -31,7 +35,6 @@ describe("UpsertIdentityUseCase", () => {
   });
 
   test("ハンドルがある場合はactorを保存する", async () => {
-    const { upsertIdentityUseCase, actorRepository, db } = services;
     const ctx = { db };
     // arrange
     const actor = actorFactory({
@@ -45,7 +48,7 @@ describe("UpsertIdentityUseCase", () => {
     };
 
     // act
-    await upsertIdentityUseCase.execute(command);
+    await sut.execute(command);
 
     // assert
     const foundActor = await actorRepository.findByDid({

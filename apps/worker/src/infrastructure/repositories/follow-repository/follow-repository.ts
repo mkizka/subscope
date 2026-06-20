@@ -1,6 +1,6 @@
 import type { Follow, TransactionContext } from "@repo/common/domain";
 import { type FollowInsert, schema } from "@repo/db";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
@@ -26,23 +26,18 @@ export class FollowRepository implements IFollowRepository {
       });
   }
 
-  async isFollowedByAnySubscriber({
+  async findFollowerDids({
     ctx,
     subjectDid,
   }: {
     ctx: TransactionContext;
     subjectDid: string;
-  }): Promise<boolean> {
+  }): Promise<string[]> {
     const result = await ctx.db
       .select({ actorDid: schema.follows.actorDid })
       .from(schema.follows)
-      .innerJoin(
-        schema.subscriptions,
-        eq(schema.follows.actorDid, schema.subscriptions.actorDid),
-      )
-      .where(and(eq(schema.follows.subjectDid, subjectDid)))
-      .limit(1);
+      .where(eq(schema.follows.subjectDid, subjectDid));
 
-    return result.length > 0;
+    return result.map((row) => row.actorDid);
   }
 }

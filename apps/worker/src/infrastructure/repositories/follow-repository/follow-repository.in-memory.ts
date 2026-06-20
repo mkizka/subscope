@@ -2,16 +2,9 @@ import type { AtUri } from "@atproto/syntax";
 import type { Follow, TransactionContext } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
-import type { InMemorySubscriptionRepository } from "../subscription-repository/subscription-repository.in-memory.js";
 
 export class InMemoryFollowRepository implements IFollowRepository {
   private follows: Map<string, Follow> = new Map();
-  private subscriptionRepository: InMemorySubscriptionRepository | null = null;
-
-  constructor(subscriptionRepository: InMemorySubscriptionRepository) {
-    this.subscriptionRepository = subscriptionRepository;
-  }
-  static inject = ["subscriptionRepository"] as const;
 
   add(follow: Follow): void {
     this.follows.set(follow.uri.toString(), follow);
@@ -40,28 +33,14 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.set(params.follow.uri.toString(), params.follow);
   }
 
-  async isFollowedByAnySubscriber({
-    ctx,
+  async findFollowerDids({
     subjectDid,
   }: {
     ctx: TransactionContext;
     subjectDid: string;
-  }): Promise<boolean> {
-    if (!this.subscriptionRepository) {
-      return false;
-    }
-
-    for (const follow of this.follows.values()) {
-      if (follow.subjectDid === subjectDid) {
-        const isSubscriber = await this.subscriptionRepository.isSubscriber(
-          ctx,
-          follow.actorDid,
-        );
-        if (isSubscriber) {
-          return true;
-        }
-      }
-    }
-    return false;
+  }): Promise<string[]> {
+    return Array.from(this.follows.values())
+      .filter((follow) => follow.subjectDid === subjectDid)
+      .map((follow) => follow.actorDid);
   }
 }

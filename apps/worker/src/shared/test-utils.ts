@@ -1,6 +1,6 @@
-import { createRegistry } from "@gyaku/di";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
+  InMemoryDidCache,
   InMemoryDidResolver,
   InMemoryJobQueue,
   InMemoryTapClient,
@@ -8,18 +8,6 @@ import {
 } from "@repo/common/test";
 import { ac } from "@repo/common/utils";
 
-import { IndexActorService } from "../application/services/index-actor-service.js";
-import { IndexRecordService } from "../application/services/index-record-service.js";
-import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
-import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
-import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
-import { PostIndexer } from "../application/services/indexer/post-indexer.js";
-import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
-import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
-import { AddTapRepoUseCase } from "../application/use-cases/async/add-tap-repo-use-case.js";
-import { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
-import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
-import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
@@ -33,44 +21,42 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
-import { InMemoryJobLogger } from "./job-logger.in-memory.js";
+import type { Env } from "./env.js";
+import { createWorkerRegistry } from "./registry.js";
+
+const testEnv = {
+  NODE_ENV: "test",
+  LOG_LEVEL: "error",
+  PORT: 3003,
+  PLC_URL: "https://plc.directory",
+  DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres",
+  REDIS_URL: "redis://localhost:6379",
+  TAP_URL: "http://localhost:2480",
+  COMMIT_WORKER_CONCURRENCY: 128,
+} satisfies Env;
 
 // prettier-ignore
-export const testRegistry = createRegistry()
+export const testRegistry = createWorkerRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  .value("db", {} as never)
-  .service("actorRepository", () => new InMemoryActorRepository())
-  .service("actorStatsRepository", () => new InMemoryActorStatsRepository())
-  .service("feedItemRepository", () => new InMemoryFeedItemRepository())
-  // subscriptionRepository must come before followRepository (InMemoryFollowRepository depends on it)
-  .service("subscriptionRepository", () => new InMemorySubscriptionRepository())
-  .service("followRepository", ["subscriptionRepository"], ac(InMemoryFollowRepository))
-  .service("generatorRepository", () => new InMemoryGeneratorRepository())
-  .service("inviteCodeRepository", () => new InMemoryInviteCodeRepository())
-  .service("likeRepository", () => new InMemoryLikeRepository())
-  .service("postRepository", () => new InMemoryPostRepository())
-  .service("postStatsRepository", () => new InMemoryPostStatsRepository())
-  .service("profileRepository", () => new InMemoryProfileRepository())
-  .service("recordRepository", () => new InMemoryRecordRepository())
-  .service("repostRepository", () => new InMemoryRepostRepository())
-  .service("transactionManager", () => new InMemoryTransactionManager())
-  .service("tapClient", () => new InMemoryTapClient())
-  .service("jobQueue", () => new InMemoryJobQueue())
-  .service("didResolver", () => new InMemoryDidResolver())
-  .service("jobLogger", () => new InMemoryJobLogger())
-  .service("jobScheduler", ["jobQueue"], ac(InMemoryJobScheduler))
-  .service("indexActorService", ["actorRepository", "profileRepository", "jobScheduler"], ac(IndexActorService))
-  .service("postIndexer", ["postRepository", "feedItemRepository", "jobScheduler"], ac(PostIndexer))
-  .service("profileIndexer", ["profileRepository"], ac(ProfileIndexer))
-  .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionRepository"], ac(FollowIndexer))
-  .service("generatorIndexer", ["generatorRepository"], ac(GeneratorIndexer))
-  .service("likeIndexer", ["likeRepository", "jobScheduler"], ac(LikeIndexer))
-  .service("repostIndexer", ["repostRepository", "feedItemRepository", "postRepository", "jobScheduler"], ac(RepostIndexer))
-  .service("indexRecordService", ["recordRepository", "indexActorService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer"], ac(IndexRecordService))
-  // use-cases
-  .service("upsertIdentityUseCase", ["db", "indexActorService"], ac(UpsertIdentityUseCase))
-  .service("indexCommitUseCase", ["transactionManager", "indexRecordService"], ac(IndexCommitUseCase))
-  .service("resolveDidUseCase", ["didResolver", "actorRepository", "db"], ac(ResolveDidUseCase))
-  .service("addTapRepoUseCase", ["tapClient"], ac(AddTapRepoUseCase));
+  .replaceValue("db", {} as never)
+  .replaceService("actorRepository", ac(InMemoryActorRepository))
+  .replaceService("actorStatsRepository", ac(InMemoryActorStatsRepository))
+  .replaceService("feedItemRepository", ac(InMemoryFeedItemRepository))
+  .replaceService("followRepository", ac(InMemoryFollowRepository))
+  .replaceService("generatorRepository", ac(InMemoryGeneratorRepository))
+  .replaceService("inviteCodeRepository", ac(InMemoryInviteCodeRepository))
+  .replaceService("likeRepository", ac(InMemoryLikeRepository))
+  .replaceService("postRepository", ac(InMemoryPostRepository))
+  .replaceService("postStatsRepository", ac(InMemoryPostStatsRepository))
+  .replaceService("profileRepository", ac(InMemoryProfileRepository))
+  .replaceService("recordRepository", ac(InMemoryRecordRepository))
+  .replaceService("repostRepository", ac(InMemoryRepostRepository))
+  .replaceService("subscriptionRepository", ac(InMemorySubscriptionRepository))
+  .replaceService("transactionManager", ac(InMemoryTransactionManager))
+  .replaceService("tapClient", ac(InMemoryTapClient))
+  .replaceService("jobQueue", ac(InMemoryJobQueue))
+  .replaceService("didCache", ac(InMemoryDidCache))
+  .replaceService("didResolver", ac(InMemoryDidResolver))
+  .replaceService("jobScheduler", ac(InMemoryJobScheduler));
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;

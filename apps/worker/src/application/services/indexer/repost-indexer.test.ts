@@ -10,20 +10,24 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("RepostIndexer", () => {
-  let services: TestServices;
+  let sut: TestServices["repostIndexer"];
+  let repostRepository: TestServices["repostRepository"];
+  let feedItemRepository: TestServices["feedItemRepository"];
+  let postRepository: TestServices["postRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.repostIndexer;
+    repostRepository = services.repostRepository;
+    feedItemRepository = services.feedItemRepository;
+    postRepository = services.postRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
   });
 
   describe("upsert", () => {
     test("リポストレコードを正しく保存する", async () => {
-      const {
-        repostIndexer,
-        repostRepository,
-        feedItemRepository,
-        jobScheduler,
-        db,
-      } = services;
       const ctx = { db };
       // arrange
       const reposter = actorFactory();
@@ -43,7 +47,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.upsert({
+      await sut.upsert({
         ctx,
         record,
         live: false,
@@ -79,7 +83,6 @@ describe("RepostIndexer", () => {
 
   describe("afterAction", () => {
     test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
-      const { repostIndexer, postRepository, jobScheduler } = services;
       // arrange
       const { post } = postFactory();
       postRepository.add(post);
@@ -96,7 +99,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.afterAction({ record });
+      await sut.afterAction({ record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();

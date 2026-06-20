@@ -28,4 +28,11 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
   ): Promise<boolean> {
     return this.subscriptions.has(actorDid);
   }
+
+  async existsSubscriberIn(
+    _ctx: TransactionContext,
+    actorDids: string[],
+  ): Promise<boolean> {
+    return actorDids.some((actorDid) => this.subscriptions.has(actorDid));
+  }
 }

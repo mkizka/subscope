@@ -4,14 +4,18 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileIndexer", () => {
-  let services: TestServices;
+  let sut: TestServices["profileIndexer"];
+  let profileRepository: TestServices["profileRepository"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.profileIndexer;
+    profileRepository = services.profileRepository;
+    db = services.db;
   });
 
   describe("upsert", () => {
     test("プロフィールレコードを正しく保存する", async () => {
-      const { profileIndexer, profileRepository, db } = services;
       const ctx = { db };
       // arrange
       const actor = actorFactory();
@@ -44,7 +48,7 @@ describe("ProfileIndexer", () => {
       });
 
       // act
-      await profileIndexer.upsert({ ctx, record });
+      await sut.upsert({ ctx, record });
 
       // assert
       const profile = profileRepository.findByUri(record.uri);

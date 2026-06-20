@@ -2,7 +2,6 @@ import {
   actorFactory,
   followFactory,
   recordFactory,
-  subscriptionFactory,
   testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -14,18 +13,14 @@ describe("FollowRepository", () => {
 
   const followRepository = new FollowRepository();
 
-  describe("isFollowedByAnySubscriber", () => {
-    test("サブスクライバーからフォローされている場合、trueを返す", async () => {
+  describe("findFollowerDids", () => {
+    test("subjectをフォローしている人のactorDid一覧を返す", async () => {
       // arrange
-      const subscriber = await actorFactory(ctx.db).create();
+      const follower = await actorFactory(ctx.db).create();
       const followee = await actorFactory(ctx.db).create();
 
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriber })
-        .create();
-
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => subscriber })
+        .vars({ actor: () => follower })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -35,66 +30,37 @@ describe("FollowRepository", () => {
         .create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await followRepository.findFollowerDids({
         ctx,
         subjectDid: followee.did,
       });
 
       // assert
-      expect(result).toBe(true);
+      expect(result).toEqual([follower.did]);
     });
 
-    test("サブスクライバー以外からのみフォローされている場合、falseを返す", async () => {
-      // arrange
-      const nonSubscriber = await actorFactory(ctx.db).create();
-      const followee = await actorFactory(ctx.db).create();
-
-      const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => nonSubscriber })
-        .create();
-      await followFactory(ctx.db)
-        .vars({
-          record: () => record,
-          followee: () => followee,
-        })
-        .create();
-
-      // act
-      const result = await followRepository.isFollowedByAnySubscriber({
-        ctx,
-        subjectDid: followee.did,
-      });
-
-      // assert
-      expect(result).toBe(false);
-    });
-
-    test("誰からもフォローされていない場合、falseを返す", async () => {
+    test("誰からもフォローされていない場合、空配列を返す", async () => {
       // arrange
       const followee = await actorFactory(ctx.db).create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await followRepository.findFollowerDids({
         ctx,
         subjectDid: followee.did,
       });
 
       // assert
-      expect(result).toBe(false);
+      expect(result).toEqual([]);
     });
 
-    test("複数のフォロワーがいて、一人がサブスクライバーの場合、trueを返す", async () => {
+    test("複数のフォロワーがいる場合、全員のactorDidを返す", async () => {
       // arrange
-      const subscriber = await actorFactory(ctx.db).create();
-      const nonSubscriber = await actorFactory(ctx.db).create();
+      const follower1 = await actorFactory(ctx.db).create();
+      const follower2 = await actorFactory(ctx.db).create();
       const followee = await actorFactory(ctx.db).create();
-
-      await subscriptionFactory(ctx.db)
-        .vars({ actor: () => subscriber })
-        .create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => subscriber })
+        .vars({ actor: () => follower1 })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -104,7 +70,7 @@ describe("FollowRepository", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => nonSubscriber })
+        .vars({ actor: () => follower2 })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -114,13 +80,16 @@ describe("FollowRepository", () => {
         .create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await followRepository.findFollowerDids({
         ctx,
         subjectDid: followee.did,
       });
 
       // assert
-      expect(result).toBe(true);
+      expect(result).toHaveLength(2);
+      expect(result).toEqual(
+        expect.arrayContaining([follower1.did, follower2.did]),
+      );
     });
   });
 });

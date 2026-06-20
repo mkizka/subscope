@@ -8,14 +8,22 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FollowIndexer", () => {
-  let services: TestServices;
+  let sut: TestServices["followIndexer"];
+  let followRepository: TestServices["followRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.followIndexer;
+    followRepository = services.followRepository;
+    jobScheduler = services.jobScheduler;
+    subscriptionRepository = services.subscriptionRepository;
+    db = services.db;
   });
 
   describe("upsert", () => {
     test("フォローレコードを正しく保存する", async () => {
-      const { followIndexer, followRepository, db } = services;
       const ctx = { db };
       // arrange
       const follower = actorFactory();
@@ -30,7 +38,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record,
         live: false,
@@ -47,8 +55,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロワーがサブスクライバーの場合、フォロイーのDIDがTapに登録される", async () => {
-      const { followIndexer, jobScheduler, subscriptionRepository, db } =
-        services;
       const ctx = { db };
       // arrange
       const follower = actorFactory();
@@ -66,7 +72,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record,
         live: false,
@@ -80,7 +86,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロワーがサブスクライバーでない場合、TapにDIDが登録されない", async () => {
-      const { followIndexer, jobScheduler, db } = services;
       const ctx = { db };
       // arrange
       const follower = actorFactory();
@@ -95,7 +100,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record,
         live: false,
@@ -111,7 +116,6 @@ describe("FollowIndexer", () => {
 
   describe("afterAction", () => {
     test("フォロー作成時にfollows/followers集計ジョブがスケジュールされる", async () => {
-      const { followIndexer, jobScheduler, db } = services;
       const ctx = { db };
       // arrange
       const follower = actorFactory();
@@ -124,14 +128,14 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record,
         live: false,
       });
 
       // act
-      await followIndexer.afterAction({ ctx, record, action: "upsert" });
+      await sut.afterAction({ ctx, record, action: "upsert" });
 
       // assert
       const jobs = jobScheduler.getAggregateActorStatsJobs();
@@ -150,13 +154,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーで他のサブスクライバーからフォローされていない場合、Tapから削除される", async () => {
-      const {
-        followIndexer,
-        followRepository,
-        jobScheduler,
-        subscriptionRepository,
-        db,
-      } = services;
       const ctx = { db };
       // arrange
       const follower = actorFactory();
@@ -172,7 +169,7 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record,
         live: false,
@@ -180,7 +177,7 @@ describe("FollowIndexer", () => {
       followRepository.deleteByUri(record.uri);
 
       // act
-      await followIndexer.afterAction({ ctx, record, action: "delete" });
+      await sut.afterAction({ ctx, record, action: "delete" });
 
       // assert
       const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
@@ -190,13 +187,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
-      const {
-        followIndexer,
-        followRepository,
-        jobScheduler,
-        subscriptionRepository,
-        db,
-      } = services;
       const ctx = { db };
       // arrange
       const follower1 = actorFactory();
@@ -223,12 +213,12 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record: record1,
         live: false,
       });
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record: record2,
         live: false,
@@ -236,7 +226,7 @@ describe("FollowIndexer", () => {
       followRepository.deleteByUri(record1.uri);
 
       // act
-      await followIndexer.afterAction({
+      await sut.afterAction({
         ctx,
         record: record1,
         action: "delete",
@@ -250,13 +240,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーでない場合、Tap削除処理は実行されない", async () => {
-      const {
-        followIndexer,
-        followRepository,
-        jobScheduler,
-        subscriptionRepository,
-        db,
-      } = services;
       const ctx = { db };
       // arrange
       const subscriber = actorFactory();
@@ -281,12 +264,12 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record: subscriberRecord,
         live: false,
       });
-      await followIndexer.upsert({
+      await sut.upsert({
         ctx,
         record: nonSubscriberRecord,
         live: false,
@@ -294,7 +277,7 @@ describe("FollowIndexer", () => {
       followRepository.deleteByUri(nonSubscriberRecord.uri);
 
       // act
-      await followIndexer.afterAction({
+      await sut.afterAction({
         ctx,
         record: nonSubscriberRecord,
         action: "delete",
