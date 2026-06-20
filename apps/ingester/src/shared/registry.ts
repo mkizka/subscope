@@ -7,7 +7,6 @@ import {
 
 import { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
-import { RedisCursorRepository } from "../infrastructure/redis-cursor-repository.js";
 import { LabelIngester } from "../presentation/label.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { metricsRouterFactory } from "../presentation/routes/metrics.js";
@@ -30,7 +29,6 @@ export const createIngesterRegistry = (env: Env) =>
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("jobQueue", ["redisUrl"], asClassArgs(JobQueue))
     .service("metricReporter", () => new MetricReporter())
-    .service("cursorRepository", ["redisUrl"], asClassArgs(RedisCursorRepository))
     // application
     .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleIdentityUseCase))
     .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleCommitUseCase))
