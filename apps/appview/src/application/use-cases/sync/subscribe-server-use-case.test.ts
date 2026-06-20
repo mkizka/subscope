@@ -15,14 +15,14 @@ import {
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
-  let sut: TestServices["subscribeServerUseCase"];
+  let subscribeServerUseCase: TestServices["subscribeServerUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let inviteCodeRepo: TestServices["inviteCodeRepository"];
   let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.subscribeServerUseCase;
+    subscribeServerUseCase = services.subscribeServerUseCase;
     subscriptionRepo = services.subscriptionRepository;
     inviteCodeRepo = services.inviteCodeRepository;
     actorRepo = services.actorRepository;
@@ -39,7 +39,7 @@ describe("SubscribeServerUseCase", () => {
     inviteCodeRepo.add(inviteCode);
 
     // act
-    await sut.execute({
+    await subscribeServerUseCase.execute({
       code: inviteCode.code,
       actorDid: asDid(actor.did),
     });
@@ -66,7 +66,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      subscribeServerUseCase.execute({
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(new InvalidInviteCodeError("Invite code is required"));
@@ -86,7 +86,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      subscribeServerUseCase.execute({
         code: "test-code",
         actorDid: asDid(actor.did),
       }),
@@ -102,7 +102,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      subscribeServerUseCase.execute({
         code: "invalid-code",
         actorDid: asDid(actor.did),
       }),
@@ -120,7 +120,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      subscribeServerUseCase.execute({
         code: expiredInviteCode.code,
         actorDid: asDid(actor.did),
       }),
@@ -143,7 +143,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      subscribeServerUseCase.execute({
         code: inviteCode.code,
         actorDid: asDid(actor.did),
       }),
@@ -161,7 +161,7 @@ describe("SubscribeServerUseCase", () => {
     inviteCodeRepo.add(inviteCode);
 
     // act
-    await sut.execute({
+    await subscribeServerUseCase.execute({
       code: inviteCode.code,
       actorDid: did,
     });
@@ -191,7 +191,7 @@ describe("SubscribeServerUseCase", () => {
     actorRepo.add(admin);
 
     // act
-    await sut.execute({
+    await subscribeServerUseCase.execute({
       actorDid: asDid(admin.did),
     });
 

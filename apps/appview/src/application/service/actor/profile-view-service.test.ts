@@ -10,13 +10,13 @@ import type { ActorStats } from "../../../application/interfaces/actor-stats-rep
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileViewService", () => {
-  let sut: TestServices["profileViewService"];
+  let profileViewService: TestServices["profileViewService"];
   let profileRepo: TestServices["profileRepository"];
   let actorStatsRepo: TestServices["actorStatsRepository"];
   let followRepo: TestServices["followRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.profileViewService;
+    profileViewService = services.profileViewService;
     profileRepo = services.profileRepository;
     actorStatsRepo = services.actorStatsRepository;
     followRepo = services.followRepository;
@@ -34,7 +34,9 @@ describe("ProfileViewService", () => {
       profileRepo.add(profile);
 
       // act
-      const results = await sut.findProfileViewBasic([asDid(actor.did)]);
+      const results = await profileViewService.findProfileViewBasic([
+        asDid(actor.did),
+      ]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -51,7 +53,9 @@ describe("ProfileViewService", () => {
       const nonExistentDid = "did:plc:nonexistent";
 
       // act
-      const results = await sut.findProfileViewBasic([nonExistentDid]);
+      const results = await profileViewService.findProfileViewBasic([
+        nonExistentDid,
+      ]);
 
       // assert
       expect(results).toEqual([]);
@@ -77,7 +81,9 @@ describe("ProfileViewService", () => {
       actorStatsRepo.add(actor.did, actorStats);
 
       // act
-      const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
+      const results = await profileViewService.findProfileViewDetailed([
+        asDid(actor.did),
+      ]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -104,7 +110,9 @@ describe("ProfileViewService", () => {
       profileRepo.add(profile);
 
       // act
-      const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
+      const results = await profileViewService.findProfileViewDetailed([
+        asDid(actor.did),
+      ]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -151,7 +159,7 @@ describe("ProfileViewService", () => {
       actorStatsRepo.add(actor2.did, actorStats2);
 
       // act
-      const results = await sut.findProfileViewDetailed([
+      const results = await profileViewService.findProfileViewDetailed([
         asDid(actor1.did),
         asDid(actor2.did),
       ]);
@@ -181,7 +189,9 @@ describe("ProfileViewService", () => {
       const nonExistentDid = "did:plc:nonexistent";
 
       // act
-      const results = await sut.findProfileViewDetailed([nonExistentDid]);
+      const results = await profileViewService.findProfileViewDetailed([
+        nonExistentDid,
+      ]);
 
       // assert
       expect(results).toEqual([]);
@@ -197,7 +207,9 @@ describe("ProfileViewService", () => {
       profileRepo.add(profile);
 
       // act
-      const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
+      const results = await profileViewService.findProfileViewDetailed([
+        asDid(actor.did),
+      ]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -222,7 +234,7 @@ describe("ProfileViewService", () => {
       profileRepo.add(targetProfile);
 
       // act
-      const results = await sut.findProfileViewDetailed(
+      const results = await profileViewService.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -258,7 +270,7 @@ describe("ProfileViewService", () => {
       followRepo.add(follow);
 
       // act
-      const results = await sut.findProfileViewDetailed(
+      const results = await profileViewService.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -294,7 +306,7 @@ describe("ProfileViewService", () => {
       followRepo.add(follow);
 
       // act
-      const results = await sut.findProfileViewDetailed(
+      const results = await profileViewService.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -336,7 +348,7 @@ describe("ProfileViewService", () => {
       followRepo.add(followedByFollow);
 
       // act
-      const results = await sut.findProfileViewDetailed(
+      const results = await profileViewService.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -386,7 +398,7 @@ describe("ProfileViewService", () => {
       followRepo.add(follow2);
 
       // act
-      const results = await sut.findProfileViewDetailed(
+      const results = await profileViewService.findProfileViewDetailed(
         [asDid(target1Actor.did), asDid(target2Actor.did)],
         asDid(viewerActor.did),
       );

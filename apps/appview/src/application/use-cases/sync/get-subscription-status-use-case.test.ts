@@ -5,12 +5,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscriptionStatusUseCase", () => {
-  let sut: TestServices["getSubscriptionStatusUseCase"];
+  let getSubscriptionStatusUseCase: TestServices["getSubscriptionStatusUseCase"];
   let actorRepo: TestServices["actorRepository"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getSubscriptionStatusUseCase;
+    getSubscriptionStatusUseCase = services.getSubscriptionStatusUseCase;
     actorRepo = services.actorRepository;
     subscriptionRepo = services.subscriptionRepository;
   });
@@ -21,7 +21,7 @@ describe("GetSubscriptionStatusUseCase", () => {
     actorRepo.add(actor);
 
     // act
-    const result = await sut.execute({
+    const result = await getSubscriptionStatusUseCase.execute({
       actorDid: asDid(actor.did),
     });
 
@@ -40,7 +40,7 @@ describe("GetSubscriptionStatusUseCase", () => {
     subscriptionRepo.add(subscription);
 
     // act
-    const result = await sut.execute({
+    const result = await getSubscriptionStatusUseCase.execute({
       actorDid: asDid(actor.did),
     });
 

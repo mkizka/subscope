@@ -7,7 +7,7 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 describe("IndexCommitUseCase", () => {
-  let sut: TestServices["indexCommitUseCase"];
+  let indexCommitUseCase: TestServices["indexCommitUseCase"];
   let actorRepo: TestServices["actorRepository"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let postRepo: TestServices["postRepository"];
@@ -15,7 +15,7 @@ describe("IndexCommitUseCase", () => {
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.indexCommitUseCase;
+    indexCommitUseCase = services.indexCommitUseCase;
     actorRepo = services.actorRepository;
     subscriptionRepo = services.subscriptionRepository;
     postRepo = services.postRepository;
@@ -52,7 +52,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
 
       // act
-      await sut.execute(command);
+      await indexCommitUseCase.execute(command);
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -96,7 +96,7 @@ describe("IndexCommitUseCase", () => {
         live: true,
         jobLogger,
       };
-      await sut.execute(createCommand);
+      await indexCommitUseCase.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
         commit: { operation: "delete" as const, uri },
@@ -105,7 +105,7 @@ describe("IndexCommitUseCase", () => {
       };
 
       // act
-      await sut.execute(deleteCommand);
+      await indexCommitUseCase.execute(deleteCommand);
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -146,7 +146,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
 
       // act
-      await sut.execute(command);
+      await indexCommitUseCase.execute(command);
 
       // assert
       expect(jobLogger.log).toHaveBeenCalledWith(
@@ -179,7 +179,7 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
 
       // act & assert
-      await expect(sut.execute(command)).rejects.toThrow(
+      await expect(indexCommitUseCase.execute(command)).rejects.toThrow(
         "Unsupported collection: unsupported.collection",
       );
     });

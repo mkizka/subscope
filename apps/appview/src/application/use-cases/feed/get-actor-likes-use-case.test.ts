@@ -11,7 +11,7 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetActorLikesUseCase", () => {
-  let sut: TestServices["getActorLikesUseCase"];
+  let getActorLikesUseCase: TestServices["getActorLikesUseCase"];
   let likeRepo: TestServices["likeRepository"];
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsRepository"];
@@ -19,7 +19,7 @@ describe("GetActorLikesUseCase", () => {
   let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getActorLikesUseCase;
+    getActorLikesUseCase = services.getActorLikesUseCase;
     likeRepo = services.likeRepository;
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsRepository;
@@ -60,7 +60,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepo.add(like);
 
     // act
-    const result = await sut.execute({
+    const result = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -91,7 +91,7 @@ describe("GetActorLikesUseCase", () => {
     const actor = actorFactory();
 
     // act
-    const result = await sut.execute({
+    const result = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -139,7 +139,7 @@ describe("GetActorLikesUseCase", () => {
     }
 
     // act
-    const result = await sut.execute({
+    const result = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -230,7 +230,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepo.add(thirdLike);
 
     // act - 最初のページ（limit=2）
-    const firstPage = await sut.execute({
+    const firstPage = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -246,7 +246,7 @@ describe("GetActorLikesUseCase", () => {
     expect(firstPage.cursor).toBeDefined();
 
     // act - 次のページ
-    const secondPage = await sut.execute({
+    const secondPage = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
       cursor: firstPage.cursor ? new Date(firstPage.cursor) : undefined,
@@ -293,7 +293,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepo.add(like);
 
     // act - limit=0
-    const zeroLimitResult = await sut.execute({
+    const zeroLimitResult = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 0,
     });
@@ -304,7 +304,7 @@ describe("GetActorLikesUseCase", () => {
     });
 
     // act - limit=1
-    const oneLimitResult = await sut.execute({
+    const oneLimitResult = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 1,
     });
@@ -360,7 +360,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepo.add(existingLike);
 
     // act
-    const result = await sut.execute({
+    const result = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -415,7 +415,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepo.add(viewerLike);
 
     // act
-    const result = await sut.execute({
+    const result = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
       viewerDid: asDid(viewerActor.did),
@@ -526,7 +526,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepo.add(middleLike);
 
     // act
-    const result = await sut.execute({
+    const result = await getActorLikesUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });

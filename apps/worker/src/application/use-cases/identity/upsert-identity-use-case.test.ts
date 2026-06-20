@@ -5,12 +5,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 describe("UpsertIdentityUseCase", () => {
-  let sut: TestServices["upsertIdentityUseCase"];
+  let upsertIdentityUseCase: TestServices["upsertIdentityUseCase"];
   let actorRepo: TestServices["actorRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.upsertIdentityUseCase;
+    upsertIdentityUseCase = services.upsertIdentityUseCase;
     actorRepo = services.actorRepository;
     db = services.db;
   });
@@ -24,7 +24,7 @@ describe("UpsertIdentityUseCase", () => {
     };
 
     // act
-    await sut.execute(command);
+    await upsertIdentityUseCase.execute(command);
 
     // assert
     const foundActor = await actorRepo.findByDid({
@@ -48,7 +48,7 @@ describe("UpsertIdentityUseCase", () => {
     };
 
     // act
-    await sut.execute(command);
+    await upsertIdentityUseCase.execute(command);
 
     // assert
     const foundActor = await actorRepo.findByDid({

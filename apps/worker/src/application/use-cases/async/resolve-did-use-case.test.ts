@@ -6,13 +6,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ResolveDidUseCase", () => {
-  let sut: TestServices["resolveDidUseCase"];
+  let resolveDidUseCase: TestServices["resolveDidUseCase"];
   let actorRepository: TestServices["actorRepository"];
   let didResolver: TestServices["didResolver"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.resolveDidUseCase;
+    resolveDidUseCase = services.resolveDidUseCase;
     actorRepository = services.actorRepository;
     didResolver = services.didResolver;
     db = services.db;
@@ -30,7 +30,7 @@ describe("ResolveDidUseCase", () => {
     });
 
     // act
-    await sut.execute(did);
+    await resolveDidUseCase.execute(did);
 
     // assert
     const actor = await actorRepository.findByDid({ ctx, did });
@@ -54,7 +54,7 @@ describe("ResolveDidUseCase", () => {
     });
 
     // act
-    await sut.execute(actor.did);
+    await resolveDidUseCase.execute(actor.did);
 
     // assert
     const updatedActor = await actorRepository.findByDid({

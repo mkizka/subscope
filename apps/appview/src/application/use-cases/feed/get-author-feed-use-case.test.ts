@@ -12,7 +12,7 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetAuthorFeedUseCase", () => {
-  let sut: TestServices["getAuthorFeedUseCase"];
+  let getAuthorFeedUseCase: TestServices["getAuthorFeedUseCase"];
   let authorFeedRepo: TestServices["authorFeedRepository"];
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsRepository"];
@@ -21,7 +21,7 @@ describe("GetAuthorFeedUseCase", () => {
   let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getAuthorFeedUseCase;
+    getAuthorFeedUseCase = services.getAuthorFeedUseCase;
     authorFeedRepo = services.authorFeedRepository;
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsRepository;
@@ -81,7 +81,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(replyFeedItem, true);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -169,7 +169,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(replyFeedItem, true);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_no_replies",
@@ -242,7 +242,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(repostFeedItem, false);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -312,7 +312,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(postFeedItem, false);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -386,7 +386,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(newerPostFeedItem, false);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -415,7 +415,7 @@ describe("GetAuthorFeedUseCase", () => {
     const author = actorFactory();
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_media",
@@ -449,7 +449,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(postFeedItem, false);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 0,
       filter: "posts_with_replies",
@@ -510,7 +510,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepo.add(post2FeedItem, false);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 1,
       filter: "posts_with_replies",
@@ -544,7 +544,7 @@ describe("GetAuthorFeedUseCase", () => {
     profileRepo.add(profile);
 
     // act
-    const result = await sut.execute({
+    const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",

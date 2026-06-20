@@ -20,7 +20,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostViewService", () => {
-  let sut: TestServices["postViewService"];
+  let postViewService: TestServices["postViewService"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let profileRepo: TestServices["profileRepository"];
@@ -29,7 +29,7 @@ describe("PostViewService", () => {
   let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.postViewService;
+    postViewService = services.postViewService;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     profileRepo = services.profileRepository;
@@ -61,7 +61,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await sut.findPostView([postUri]);
+      const result = await postViewService.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -109,7 +109,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await sut.findPostView([postUri]);
+      const result = await postViewService.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -180,7 +180,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await sut.findPostView([postUri]);
+      const result = await postViewService.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -255,7 +255,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await sut.findPostView([postUri]);
+      const result = await postViewService.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -308,7 +308,7 @@ describe("PostViewService", () => {
       const postUri2 = new AtUri(post2.uri.toString());
 
       // act
-      const result = await sut.findPostView([postUri1, postUri2]);
+      const result = await postViewService.findPostView([postUri1, postUri2]);
 
       // assert
       expect(result).toHaveLength(2);
@@ -343,7 +343,10 @@ describe("PostViewService", () => {
       );
 
       // act
-      const result = await sut.findPostView([existingUri, nonExistentUri]);
+      const result = await postViewService.findPostView([
+        existingUri,
+        nonExistentUri,
+      ]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -414,7 +417,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await sut.findPostView([quotingPostUri]);
+      const result = await postViewService.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -521,7 +524,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await sut.findPostView([quotingPostUri]);
+      const result = await postViewService.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -602,7 +605,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await sut.findPostView([quotingPostUri]);
+      const result = await postViewService.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -704,7 +707,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await sut.findPostView([quotingPostUri]);
+      const result = await postViewService.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -831,7 +834,7 @@ describe("PostViewService", () => {
       const mainPostUri = new AtUri(mainPost.uri.toString());
 
       // act
-      const result = await sut.findPostView([mainPostUri]);
+      const result = await postViewService.findPostView([mainPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -1034,7 +1037,7 @@ describe("PostViewService", () => {
       const postAUri = new AtUri(postA.uri.toString());
 
       // act
-      const result = await sut.findPostView([postAUri]);
+      const result = await postViewService.findPostView([postAUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -1216,7 +1219,7 @@ describe("PostViewService", () => {
       const postAUri = new AtUri(postA.uri.toString());
 
       // act
-      const result = await sut.findPostView([postAUri]);
+      const result = await postViewService.findPostView([postAUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -1319,7 +1322,7 @@ describe("PostViewService", () => {
       const postUri2 = new AtUri(post2.uri.toString());
 
       // act
-      const result = await sut.findPostView(
+      const result = await postViewService.findPostView(
         [postUri1, postUri2],
         asDid(viewer.did),
       );

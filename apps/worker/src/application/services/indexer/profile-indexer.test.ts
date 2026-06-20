@@ -4,12 +4,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileIndexer", () => {
-  let sut: TestServices["profileIndexer"];
+  let profileIndexer: TestServices["profileIndexer"];
   let profileRepo: TestServices["profileRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.profileIndexer;
+    profileIndexer = services.profileIndexer;
     profileRepo = services.profileRepository;
     db = services.db;
   });
@@ -48,7 +48,7 @@ describe("ProfileIndexer", () => {
       });
 
       // act
-      await sut.upsert({ ctx, record });
+      await profileIndexer.upsert({ ctx, record });
 
       // assert
       const profile = profileRepo.findByUri(record.uri);

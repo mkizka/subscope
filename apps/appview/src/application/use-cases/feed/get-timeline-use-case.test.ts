@@ -11,7 +11,7 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetTimelineUseCase", () => {
-  let sut: TestServices["getTimelineUseCase"];
+  let getTimelineUseCase: TestServices["getTimelineUseCase"];
   let timelineRepo: TestServices["timelineRepository"];
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsRepository"];
@@ -19,7 +19,7 @@ describe("GetTimelineUseCase", () => {
   let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getTimelineUseCase;
+    getTimelineUseCase = services.getTimelineUseCase;
     timelineRepo = services.timelineRepository;
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsRepository;
@@ -32,7 +32,7 @@ describe("GetTimelineUseCase", () => {
     const viewer = actorFactory();
 
     // act
-    const result = await sut.execute({
+    const result = await getTimelineUseCase.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });
@@ -77,7 +77,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepo.addFeedItem(feedItem);
 
     // act
-    const result = await sut.execute({
+    const result = await getTimelineUseCase.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });
@@ -135,7 +135,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepo.addFeedItem(feedItem);
 
     // act
-    const result = await sut.execute({
+    const result = await getTimelineUseCase.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });
@@ -212,7 +212,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepo.addFeedItem(newerFeedItem);
 
     // act
-    const result = await sut.execute({
+    const result = await getTimelineUseCase.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
       cursor: "2024-01-02T00:00:00.000Z",
@@ -266,7 +266,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepo.addFeedItem(feedItem);
 
     // act - limit=0
-    const zeroLimitResult = await sut.execute({
+    const zeroLimitResult = await getTimelineUseCase.execute({
       limit: 0,
       viewerDid: asDid(viewer.did),
     });
@@ -277,7 +277,7 @@ describe("GetTimelineUseCase", () => {
     });
 
     // act - limit=1
-    const oneLimitResult = await sut.execute({
+    const oneLimitResult = await getTimelineUseCase.execute({
       limit: 1,
       viewerDid: asDid(viewer.did),
     });
@@ -348,7 +348,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepo.addFeedItem(feedItem2);
 
     // act
-    const result = await sut.execute({
+    const result = await getTimelineUseCase.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });

@@ -8,12 +8,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscribersUseCase", () => {
-  let sut: TestServices["getSubscribersUseCase"];
+  let getSubscribersUseCase: TestServices["getSubscribersUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getSubscribersUseCase;
+    getSubscribersUseCase = services.getSubscribersUseCase;
     subscriptionRepo = services.subscriptionRepository;
     profileRepo = services.profileRepository;
     vi.useFakeTimers();
@@ -51,7 +51,7 @@ describe("GetSubscribersUseCase", () => {
     subscriptionRepo.add(subscription2);
 
     // act
-    const result = await sut.execute({
+    const result = await getSubscribersUseCase.execute({
       limit: 50,
     });
 
@@ -78,7 +78,7 @@ describe("GetSubscribersUseCase", () => {
     // データを作成しない
 
     // act
-    const result = await sut.execute({
+    const result = await getSubscribersUseCase.execute({
       limit: 50,
     });
 
@@ -108,7 +108,7 @@ describe("GetSubscribersUseCase", () => {
     }
 
     // act
-    const result = await sut.execute({
+    const result = await getSubscribersUseCase.execute({
       limit: 2,
     });
 
@@ -172,7 +172,7 @@ describe("GetSubscribersUseCase", () => {
     );
 
     // act - 最初のページ
-    const firstPage = await sut.execute({
+    const firstPage = await getSubscribersUseCase.execute({
       limit: 2,
     });
 
@@ -192,7 +192,7 @@ describe("GetSubscribersUseCase", () => {
     });
 
     // act - 次のページ
-    const secondPage = await sut.execute({
+    const secondPage = await getSubscribersUseCase.execute({
       limit: 2,
       cursor: firstPage.cursor,
     });

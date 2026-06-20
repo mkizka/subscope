@@ -4,19 +4,19 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsUseCase", () => {
-  let sut: TestServices["searchActorsUseCase"];
+  let searchActorsUseCase: TestServices["searchActorsUseCase"];
   let profileRepo: TestServices["profileRepository"];
   let actorStatsRepo: TestServices["actorStatsRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.searchActorsUseCase;
+    searchActorsUseCase = services.searchActorsUseCase;
     profileRepo = services.profileRepository;
     actorStatsRepo = services.actorStatsRepository;
   });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
     // act
-    const result = await sut.execute({
+    const result = await searchActorsUseCase.execute({
       query: "",
       limit: 10,
     });
@@ -30,7 +30,7 @@ describe("SearchActorsUseCase", () => {
 
   test("空白文字のみの検索クエリの場合、空の結果を返す", async () => {
     // act
-    const result = await sut.execute({
+    const result = await searchActorsUseCase.execute({
       query: "   ",
       limit: 10,
     });
@@ -44,7 +44,7 @@ describe("SearchActorsUseCase", () => {
 
   test("検索クエリがundefinedの場合、空の結果を返す", async () => {
     // act
-    const result = await sut.execute({
+    const result = await searchActorsUseCase.execute({
       query: undefined,
       limit: 10,
     });
@@ -85,7 +85,7 @@ describe("SearchActorsUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await searchActorsUseCase.execute({
       query: "検索対象",
       limit: 10,
     });
@@ -118,7 +118,7 @@ describe("SearchActorsUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await searchActorsUseCase.execute({
       query: "存在しないキーワード",
       limit: 10,
     });
@@ -157,7 +157,7 @@ describe("SearchActorsUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await searchActorsUseCase.execute({
       query: "Limit Test",
       limit: 1,
     });
@@ -198,13 +198,13 @@ describe("SearchActorsUseCase", () => {
     });
 
     // act - 最初のページ
-    const firstPage = await sut.execute({
+    const firstPage = await searchActorsUseCase.execute({
       query: "ActorPaginationTest",
       limit: 1,
     });
 
     // act - 次のページ
-    const secondPage = await sut.execute({
+    const secondPage = await searchActorsUseCase.execute({
       query: "ActorPaginationTest",
       limit: 1,
       cursor: firstPage.cursor,
@@ -265,13 +265,13 @@ describe("SearchActorsUseCase", () => {
     });
 
     // act - displayNameで検索
-    const displayNameResult = await sut.execute({
+    const displayNameResult = await searchActorsUseCase.execute({
       query: "テスト",
       limit: 10,
     });
 
     // act - handleで検索
-    const handleResult = await sut.execute({
+    const handleResult = await searchActorsUseCase.execute({
       query: "testhandle",
       limit: 10,
     });

@@ -6,14 +6,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostIndexer", () => {
-  let sut: TestServices["postIndexer"];
+  let postIndexer: TestServices["postIndexer"];
   let postRepo: TestServices["postRepository"];
   let feedItemRepo: TestServices["feedItemRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.postIndexer;
+    postIndexer = services.postIndexer;
     postRepo = services.postRepository;
     feedItemRepo = services.feedItemRepository;
     jobScheduler = services.jobScheduler;
@@ -35,7 +35,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -83,7 +83,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -114,7 +114,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -139,7 +139,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -170,13 +170,13 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
         depth: 0,
       });
-      await sut.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
@@ -223,13 +223,13 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
         depth: 0,
       });
-      await sut.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
@@ -273,13 +273,13 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
         depth: 0,
       });
-      await sut.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const postStatsJobs = jobScheduler.getAggregatePostStatsJobs();
@@ -318,13 +318,13 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await postIndexer.upsert({
         ctx,
         record,
         live: false,
         depth: 0,
       });
-      await sut.afterAction({ action: "upsert", ctx, record });
+      await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
       const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
@@ -357,7 +357,7 @@ describe("PostIndexer", () => {
       });
 
       // act
-      await sut.afterAction({ action: "delete", ctx, record });
+      await postIndexer.afterAction({ action: "delete", ctx, record });
 
       // assert
       const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();

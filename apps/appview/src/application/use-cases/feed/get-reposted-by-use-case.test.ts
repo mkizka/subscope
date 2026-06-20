@@ -9,12 +9,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetRepostedByUseCase", () => {
-  let sut: TestServices["getRepostedByUseCase"];
+  let getRepostedByUseCase: TestServices["getRepostedByUseCase"];
   let repostRepo: TestServices["repostRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getRepostedByUseCase;
+    getRepostedByUseCase = services.getRepostedByUseCase;
     repostRepo = services.repostRepository;
     profileRepo = services.profileRepository;
   });
@@ -27,7 +27,7 @@ describe("GetRepostedByUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await getRepostedByUseCase.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
@@ -61,7 +61,7 @@ describe("GetRepostedByUseCase", () => {
     repostRepo.add(repost);
 
     // act
-    const result = await sut.execute({
+    const result = await getRepostedByUseCase.execute({
       uri: originalPost.uri.toString(),
       limit: 50,
     });
@@ -117,7 +117,7 @@ describe("GetRepostedByUseCase", () => {
     repostRepo.add(secondRepost);
 
     // act
-    const result = await sut.execute({
+    const result = await getRepostedByUseCase.execute({
       uri: originalPost.uri.toString(),
       limit: 50,
     });
@@ -178,7 +178,7 @@ describe("GetRepostedByUseCase", () => {
     repostRepo.add(secondRepost);
 
     // act
-    const result = await sut.execute({
+    const result = await getRepostedByUseCase.execute({
       uri: originalPost.uri.toString(),
       limit: 1,
     });
@@ -235,13 +235,13 @@ describe("GetRepostedByUseCase", () => {
     repostRepo.add(secondRepost);
 
     // act - 最初のページ
-    const firstPage = await sut.execute({
+    const firstPage = await getRepostedByUseCase.execute({
       uri: originalPost.uri.toString(),
       limit: 1,
     });
 
     // act - 次のページ
-    const secondPage = await sut.execute({
+    const secondPage = await getRepostedByUseCase.execute({
       uri: originalPost.uri.toString(),
       limit: 1,
       cursor: firstPage.cursor,

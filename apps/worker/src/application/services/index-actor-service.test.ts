@@ -7,13 +7,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("IndexActorService", () => {
-  let sut: TestServices["indexActorService"];
+  let indexActorService: TestServices["indexActorService"];
   let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.indexActorService;
+    indexActorService = services.indexActorService;
     actorRepo = services.actorRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
@@ -27,7 +27,7 @@ describe("IndexActorService", () => {
       const testHandle = asHandle("new-with-handle.bsky.social");
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: testDid,
         handle: testHandle,
@@ -63,7 +63,7 @@ describe("IndexActorService", () => {
       actorRepo.add(existingActor);
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: existingDid,
         handle: newHandle,
@@ -89,7 +89,7 @@ describe("IndexActorService", () => {
       actorRepo.add(existingActor);
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: existingDid,
         handle: existingHandle,
@@ -116,7 +116,7 @@ describe("IndexActorService", () => {
       actorRepo.add(existingActor);
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: existingDid,
         handle: newHandle,
@@ -136,7 +136,7 @@ describe("IndexActorService", () => {
       const newDid = asDid("did:plc:new-no-handle");
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: newDid,
         live: false,
@@ -167,7 +167,7 @@ describe("IndexActorService", () => {
       actorRepo.add(existingActor);
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: existingDidNoHandle,
         live: false,
@@ -201,7 +201,7 @@ describe("IndexActorService", () => {
       actorRepo.add(existingActor);
 
       // act
-      await sut.upsert({
+      await indexActorService.upsert({
         ctx,
         did: existingDid,
         live: false,

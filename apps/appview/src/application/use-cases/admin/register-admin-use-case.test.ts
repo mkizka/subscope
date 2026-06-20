@@ -8,13 +8,13 @@ import { AdminAlreadyExistsError } from "./register-admin-use-case.js";
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("RegisterAdminUseCase", () => {
-  let sut: TestServices["registerAdminUseCase"];
+  let registerAdminUseCase: TestServices["registerAdminUseCase"];
   let actorRepo: TestServices["actorRepository"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.registerAdminUseCase;
+    registerAdminUseCase = services.registerAdminUseCase;
     actorRepo = services.actorRepository;
     subscriptionRepo = services.subscriptionRepository;
     jobScheduler = services.jobScheduler;
@@ -28,7 +28,7 @@ describe("RegisterAdminUseCase", () => {
     actorRepo.add(requester);
 
     // act
-    await sut.execute({
+    await registerAdminUseCase.execute({
       requesterDid: requester.did,
     });
 
@@ -55,7 +55,7 @@ describe("RegisterAdminUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      registerAdminUseCase.execute({
         requesterDid: requester.did,
       }),
     ).rejects.toThrow(AdminAlreadyExistsError);
@@ -66,7 +66,7 @@ describe("RegisterAdminUseCase", () => {
     const nonExistentDid = "did:plc:nonexistent";
 
     // act
-    await sut.execute({
+    await registerAdminUseCase.execute({
       requesterDid: nonExistentDid,
     });
 

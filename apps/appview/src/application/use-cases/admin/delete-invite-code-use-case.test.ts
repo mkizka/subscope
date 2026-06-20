@@ -4,11 +4,11 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("DeleteInviteCodeUseCase", () => {
-  let sut: TestServices["deleteInviteCodeUseCase"];
+  let useCase: TestServices["deleteInviteCodeUseCase"];
   let inviteCodeRepository: TestServices["inviteCodeRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.deleteInviteCodeUseCase;
+    useCase = services.deleteInviteCodeUseCase;
     inviteCodeRepository = services.inviteCodeRepository;
   });
 
@@ -18,7 +18,7 @@ describe("DeleteInviteCodeUseCase", () => {
     inviteCodeRepository.add(inviteCode);
 
     // act
-    await sut.execute({ code: "test-abc12" });
+    await useCase.execute({ code: "test-abc12" });
 
     // assert
     const result = await inviteCodeRepository.findFirst("test-abc12");
@@ -27,7 +27,7 @@ describe("DeleteInviteCodeUseCase", () => {
 
   test("存在しない招待コードの場合、エラーを返す", async () => {
     // act & assert
-    await expect(sut.execute({ code: "nonexistent-code" })).rejects.toThrow(
+    await expect(useCase.execute({ code: "nonexistent-code" })).rejects.toThrow(
       "Invite code not found",
     );
   });
@@ -41,7 +41,7 @@ describe("DeleteInviteCodeUseCase", () => {
     inviteCodeRepository.add(inviteCode);
 
     // act & assert
-    await expect(sut.execute({ code: "test-used1" })).rejects.toThrow(
+    await expect(useCase.execute({ code: "test-used1" })).rejects.toThrow(
       "Invite code already used",
     );
   });

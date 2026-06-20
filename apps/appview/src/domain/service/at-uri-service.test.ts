@@ -5,11 +5,11 @@ import { HandleResolutionError } from "../../application/interfaces/handle-resol
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("AtUriService", () => {
-  let sut: TestServices["atUriService"];
+  let atUriService: TestServices["atUriService"];
   let handleResolver: TestServices["handleResolver"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.atUriService;
+    atUriService = services.atUriService;
     handleResolver = services.handleResolver;
   });
 
@@ -21,7 +21,7 @@ describe("AtUriService", () => {
       );
 
       // act
-      const result = await sut.resolveHostname(uri);
+      const result = await atUriService.resolveHostname(uri);
 
       // assert
       expect(result.toString()).toBe(
@@ -35,7 +35,7 @@ describe("AtUriService", () => {
       const uri = new AtUri("at://example.com/app.bsky.feed.post/xyz789");
 
       // act
-      const result = await sut.resolveHostname(uri);
+      const result = await atUriService.resolveHostname(uri);
 
       // assert
       expect(result.toString()).toBe(
@@ -48,10 +48,10 @@ describe("AtUriService", () => {
       const uri = new AtUri("at://notfound.example/app.bsky.feed.post/abc123");
 
       // act & assert
-      await expect(sut.resolveHostname(uri)).rejects.toThrow(
+      await expect(atUriService.resolveHostname(uri)).rejects.toThrow(
         HandleResolutionError,
       );
-      await expect(sut.resolveHostname(uri)).rejects.toThrow(
+      await expect(atUriService.resolveHostname(uri)).rejects.toThrow(
         "Failed to resolve handle: notfound.example",
       );
     });

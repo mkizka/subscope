@@ -10,13 +10,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ReplyRefService", () => {
-  let sut: TestServices["replyRefService"];
+  let replyRefService: TestServices["replyRefService"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.replyRefService;
+    replyRefService = services.replyRefService;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     profileRepo = services.profileRepository;
@@ -40,7 +40,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await sut.findMap(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result).toEqual(new Map());
@@ -90,7 +90,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await sut.findMap(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({
@@ -166,7 +166,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await sut.findMap(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(reply1Uri.toString())).toMatchObject({
@@ -213,7 +213,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await sut.findMap(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({
@@ -293,7 +293,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await sut.findMap(posts);
+    const result = await replyRefService.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({

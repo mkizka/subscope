@@ -10,13 +10,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import { NotSubscribedError } from "./unsubscribe-server-use-case.js";
 
 describe("UnsubscribeServerUseCase", () => {
-  let sut: TestServices["unsubscribeServerUseCase"];
+  let unsubscribeServerUseCase: TestServices["unsubscribeServerUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let inviteCodeRepo: TestServices["inviteCodeRepository"];
   let actorRepo: TestServices["actorRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.unsubscribeServerUseCase;
+    unsubscribeServerUseCase = services.unsubscribeServerUseCase;
     subscriptionRepo = services.subscriptionRepository;
     inviteCodeRepo = services.inviteCodeRepository;
     actorRepo = services.actorRepository;
@@ -37,7 +37,7 @@ describe("UnsubscribeServerUseCase", () => {
     subscriptionRepo.add(subscription);
 
     // act
-    await sut.execute({
+    await unsubscribeServerUseCase.execute({
       actorDid: asDid(actor.did),
     });
 
@@ -55,7 +55,7 @@ describe("UnsubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute({
+      unsubscribeServerUseCase.execute({
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(new NotSubscribedError("Not subscribed to this server"));

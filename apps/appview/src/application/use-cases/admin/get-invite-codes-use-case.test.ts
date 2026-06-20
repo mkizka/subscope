@@ -6,11 +6,11 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetInviteCodesUseCase", () => {
-  let sut: TestServices["getInviteCodesUseCase"];
+  let getInviteCodesUseCase: TestServices["getInviteCodesUseCase"];
   let inviteCodeRepo: TestServices["inviteCodeRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getInviteCodesUseCase;
+    getInviteCodesUseCase = services.getInviteCodesUseCase;
     inviteCodeRepo = services.inviteCodeRepository;
   });
 
@@ -29,7 +29,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepo.add(inviteCode2);
 
     // act
-    const result = await sut.execute({
+    const result = await getInviteCodesUseCase.execute({
       limit: 50,
     });
 
@@ -72,7 +72,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepo.add(inviteCode3);
 
     // act
-    const result = await sut.execute({
+    const result = await getInviteCodesUseCase.execute({
       limit: 2,
     });
 
@@ -115,7 +115,7 @@ describe("GetInviteCodesUseCase", () => {
     );
 
     // act
-    const result = await sut.execute({
+    const result = await getInviteCodesUseCase.execute({
       limit: 50,
       cursor: inviteCode2.createdAt.toISOString(),
     });
@@ -155,7 +155,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepo.add(inviteCode4);
 
     // act - 1ページ目
-    const page1 = await sut.execute({
+    const page1 = await getInviteCodesUseCase.execute({
       limit: 2,
     });
 
@@ -181,7 +181,7 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // act - 2ページ目
-    const page2 = await sut.execute({
+    const page2 = await getInviteCodesUseCase.execute({
       limit: 2,
       cursor: page1.cursor,
     });
@@ -222,7 +222,7 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await getInviteCodesUseCase.execute({
       limit: 50,
     });
 
@@ -254,7 +254,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepo.add(inviteCode);
 
     // act
-    const result = await sut.execute({
+    const result = await getInviteCodesUseCase.execute({
       limit: 50,
     });
 

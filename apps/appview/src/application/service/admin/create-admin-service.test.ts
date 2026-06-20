@@ -6,13 +6,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateAdminService", () => {
-  let sut: TestServices["createAdminService"];
+  let createAdminService: TestServices["createAdminService"];
   let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.createAdminService;
+    createAdminService = services.createAdminService;
     actorRepo = services.actorRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
@@ -23,7 +23,7 @@ describe("CreateAdminService", () => {
     const did = "did:plc:newactor";
 
     // act
-    await sut.execute({
+    await createAdminService.execute({
       ctx: { db },
       did,
     });
@@ -58,7 +58,7 @@ describe("CreateAdminService", () => {
     actorRepo.add(existingActor);
 
     // act
-    await sut.execute({
+    await createAdminService.execute({
       ctx: { db },
       did: existingActor.did,
     });

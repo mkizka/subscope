@@ -10,14 +10,14 @@ import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetPostThreadUseCase", () => {
-  let sut: TestServices["getPostThreadUseCase"];
+  let getPostThreadUseCase: TestServices["getPostThreadUseCase"];
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsRepository"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getPostThreadUseCase;
+    getPostThreadUseCase = services.getPostThreadUseCase;
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsRepository;
     profileRepo = services.profileRepository;
@@ -29,7 +29,7 @@ describe("GetPostThreadUseCase", () => {
     const spyFindReplies = vi.spyOn(postRepo, "findReplies");
 
     // act
-    const result = await sut.execute({
+    const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(
         "at://did:plc:notexist/app.bsky.feed.post/notexist",
       ),
@@ -77,7 +77,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepo.add(post.uri.toString(), postStats);
 
     // act
-    const result = await sut.execute({
+    const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(post.uri),
       depth: 6,
       parentHeight: 80,
@@ -174,7 +174,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepo.add(targetPost.uri.toString(), targetPostStats);
 
     // act
-    const result = await sut.execute({
+    const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(targetPost.uri),
       depth: 6,
       parentHeight: 10,
@@ -287,7 +287,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepo.add(grandchildPost.uri.toString(), grandchildPostStats);
 
     // act
-    const result = await sut.execute({
+    const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(rootPost.uri),
       depth: 6,
       parentHeight: 80,
@@ -428,7 +428,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepo.add(level3Post.uri.toString(), level3PostStats);
 
     // act - depth=2で実行（Level 3は取得されないはず）
-    const result = await sut.execute({
+    const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(rootPost.uri),
       depth: 2,
       parentHeight: 80,
@@ -570,7 +570,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepo.add(targetPost.uri.toString(), targetPostStats);
 
     // act - parentHeight=2で実行（Level 0は取得されないはず）
-    const result = await sut.execute({
+    const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(targetPost.uri),
       depth: 6,
       parentHeight: 2,

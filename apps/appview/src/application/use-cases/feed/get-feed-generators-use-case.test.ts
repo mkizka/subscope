@@ -5,12 +5,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFeedGeneratorsUseCase", () => {
-  let sut: TestServices["getFeedGeneratorsUseCase"];
+  let getFeedGeneratorsUseCase: TestServices["getFeedGeneratorsUseCase"];
   let generatorRepo: TestServices["generatorRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getFeedGeneratorsUseCase;
+    getFeedGeneratorsUseCase = services.getFeedGeneratorsUseCase;
     generatorRepo = services.generatorRepository;
     profileRepo = services.profileRepository;
   });
@@ -30,7 +30,7 @@ describe("GetFeedGeneratorsUseCase", () => {
     profileRepo.add(profile);
 
     // act
-    const result = await sut.execute([generator.uri]);
+    const result = await getFeedGeneratorsUseCase.execute([generator.uri]);
 
     // assert
     expect(result).toHaveLength(1);
@@ -71,7 +71,10 @@ describe("GetFeedGeneratorsUseCase", () => {
     profileRepo.add(profile2);
 
     // act
-    const result = await sut.execute([generator2.uri, generator1.uri]);
+    const result = await getFeedGeneratorsUseCase.execute([
+      generator2.uri,
+      generator1.uri,
+    ]);
 
     // assert
     expect(result).toHaveLength(2);
@@ -90,7 +93,7 @@ describe("GetFeedGeneratorsUseCase", () => {
     );
 
     // act
-    const result = await sut.execute([nonExistentUri]);
+    const result = await getFeedGeneratorsUseCase.execute([nonExistentUri]);
 
     // assert
     expect(result).toHaveLength(0);
@@ -98,7 +101,7 @@ describe("GetFeedGeneratorsUseCase", () => {
 
   test("空のURI配列を渡した場合、空の配列を返す", async () => {
     // arrange & act
-    const result = await sut.execute([]);
+    const result = await getFeedGeneratorsUseCase.execute([]);
 
     // assert
     expect(result).toHaveLength(0);
@@ -121,7 +124,10 @@ describe("GetFeedGeneratorsUseCase", () => {
     );
 
     // act
-    const result = await sut.execute([generator.uri, nonExistentUri]);
+    const result = await getFeedGeneratorsUseCase.execute([
+      generator.uri,
+      nonExistentUri,
+    ]);
 
     // assert
     expect(result).toHaveLength(1);

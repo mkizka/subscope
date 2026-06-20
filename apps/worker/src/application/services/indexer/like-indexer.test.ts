@@ -5,13 +5,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("LikeIndexer", () => {
-  let sut: TestServices["likeIndexer"];
+  let likeIndexer: TestServices["likeIndexer"];
   let likeRepo: TestServices["likeRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.likeIndexer;
+    likeIndexer = services.likeIndexer;
     likeRepo = services.likeRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
@@ -36,7 +36,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await likeIndexer.upsert({
         ctx,
         record,
       });
@@ -69,13 +69,13 @@ describe("LikeIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await sut.upsert({
+      await likeIndexer.upsert({
         ctx,
         record,
       });
 
       // act
-      await sut.afterAction({ record });
+      await likeIndexer.afterAction({ record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();
@@ -104,7 +104,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await sut.afterAction({ record });
+      await likeIndexer.afterAction({ record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();
@@ -134,7 +134,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await sut.afterAction({ record });
+      await likeIndexer.afterAction({ record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();

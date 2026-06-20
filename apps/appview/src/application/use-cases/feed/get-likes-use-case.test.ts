@@ -9,12 +9,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetLikesUseCase", () => {
-  let sut: TestServices["getLikesUseCase"];
+  let getLikesUseCase: TestServices["getLikesUseCase"];
   let likeRepo: TestServices["likeRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getLikesUseCase;
+    getLikesUseCase = services.getLikesUseCase;
     likeRepo = services.likeRepository;
     profileRepo = services.profileRepository;
   });
@@ -42,7 +42,7 @@ describe("GetLikesUseCase", () => {
     likeRepo.add(like);
 
     // act
-    const result = await sut.execute({
+    const result = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
@@ -71,7 +71,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
@@ -107,7 +107,7 @@ describe("GetLikesUseCase", () => {
     }
 
     // act
-    const result = await sut.execute({
+    const result = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 2,
     });
@@ -174,7 +174,7 @@ describe("GetLikesUseCase", () => {
     likeRepo.add(thirdLike);
 
     // act - 最初のページ（limit=2）
-    const firstPage = await sut.execute({
+    const firstPage = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 2,
     });
@@ -197,7 +197,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act - 次のページ
-    const secondPage = await sut.execute({
+    const secondPage = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 2,
       cursor: firstPage.cursor,
@@ -239,7 +239,7 @@ describe("GetLikesUseCase", () => {
     likeRepo.add(like);
 
     // act - limit=0
-    const zeroLimitResult = await sut.execute({
+    const zeroLimitResult = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 0,
     });
@@ -250,7 +250,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act - limit=1
-    const oneLimitResult = await sut.execute({
+    const oneLimitResult = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 1,
     });
@@ -276,7 +276,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act
-    const result = await sut.execute({
+    const result = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       cid: post.cid,
       limit: 50,
@@ -347,7 +347,7 @@ describe("GetLikesUseCase", () => {
     likeRepo.add(middleLike);
 
     // act
-    const result = await sut.execute({
+    const result = await getLikesUseCase.execute({
       uri: post.uri.toString(),
       limit: 50,
     });

@@ -10,14 +10,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FeedProcessor", () => {
-  let sut: TestServices["feedProcessor"];
+  let feedProcessor: TestServices["feedProcessor"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let profileRepo: TestServices["profileRepository"];
   let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.feedProcessor;
+    feedProcessor = services.feedProcessor;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     profileRepo = services.profileRepository;
@@ -43,7 +43,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromPost(post);
 
     // act
-    const result = await sut.processFeedItems([feedItem]);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
@@ -102,7 +102,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromRepost(repost);
 
     // act
-    const result = await sut.processFeedItems([feedItem]);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
@@ -165,7 +165,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromPost(replyPost);
 
     // act
-    const result = await sut.processFeedItems([feedItem]);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
@@ -250,7 +250,7 @@ describe("FeedProcessor", () => {
     const feedItem2 = FeedItem.fromRepost(repost);
 
     // act
-    const result = await sut.processFeedItems([feedItem1, feedItem2]);
+    const result = await feedProcessor.processFeedItems([feedItem1, feedItem2]);
 
     // assert
     expect(result).toHaveLength(2);
@@ -278,7 +278,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromPost(post);
 
     // act
-    const result = await sut.processFeedItems([feedItem]);
+    const result = await feedProcessor.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([]);

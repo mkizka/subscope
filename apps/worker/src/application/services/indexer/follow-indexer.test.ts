@@ -8,14 +8,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FollowIndexer", () => {
-  let sut: TestServices["followIndexer"];
+  let followIndexer: TestServices["followIndexer"];
   let followRepo: TestServices["followRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.followIndexer;
+    followIndexer = services.followIndexer;
     followRepo = services.followRepository;
     jobScheduler = services.jobScheduler;
     subscriptionRepo = services.subscriptionRepository;
@@ -38,7 +38,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -72,7 +72,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -100,7 +100,7 @@ describe("FollowIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -128,14 +128,14 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record,
         live: false,
       });
 
       // act
-      await sut.afterAction({ ctx, record, action: "upsert" });
+      await followIndexer.afterAction({ ctx, record, action: "upsert" });
 
       // assert
       const jobs = jobScheduler.getAggregateActorStatsJobs();
@@ -169,7 +169,7 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -177,7 +177,7 @@ describe("FollowIndexer", () => {
       followRepo.deleteByUri(record.uri);
 
       // act
-      await sut.afterAction({ ctx, record, action: "delete" });
+      await followIndexer.afterAction({ ctx, record, action: "delete" });
 
       // assert
       const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
@@ -213,12 +213,12 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record: record1,
         live: false,
       });
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record: record2,
         live: false,
@@ -226,7 +226,7 @@ describe("FollowIndexer", () => {
       followRepo.deleteByUri(record1.uri);
 
       // act
-      await sut.afterAction({
+      await followIndexer.afterAction({
         ctx,
         record: record1,
         action: "delete",
@@ -264,12 +264,12 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record: subscriberRecord,
         live: false,
       });
-      await sut.upsert({
+      await followIndexer.upsert({
         ctx,
         record: nonSubscriberRecord,
         live: false,
@@ -277,7 +277,7 @@ describe("FollowIndexer", () => {
       followRepo.deleteByUri(nonSubscriberRecord.uri);
 
       // act
-      await sut.afterAction({
+      await followIndexer.afterAction({
         ctx,
         record: nonSubscriberRecord,
         action: "delete",

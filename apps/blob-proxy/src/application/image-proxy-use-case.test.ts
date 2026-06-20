@@ -6,7 +6,7 @@ import { ImageProxyRequest } from "../domain/image-proxy-request.js";
 import { testRegistry, type TestServices } from "../test-utils.js";
 
 describe("ImageProxyUseCase", () => {
-  let sut: TestServices["imageProxyUseCase"];
+  let imageProxyUseCase: TestServices["imageProxyUseCase"];
   let didResolver: TestServices["didResolver"];
   let blobFetcher: TestServices["blobFetcher"];
   let imageCacheStorage: TestServices["imageCacheStorage"];
@@ -15,7 +15,7 @@ describe("ImageProxyUseCase", () => {
   let cacheMetadataRepo: TestServices["cacheMetadataRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.imageProxyUseCase;
+    imageProxyUseCase = services.imageProxyUseCase;
     didResolver = services.didResolver;
     blobFetcher = services.blobFetcher;
     imageCacheStorage = services.imageCacheStorage;
@@ -49,7 +49,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await sut.execute(
+    const result = await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example123",
         cid: "bafkreiabc123",
@@ -92,7 +92,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await sut.execute(
+    const result = await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example123",
         cid: "bafkreiabc456",
@@ -160,14 +160,14 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    await sut.execute(
+    await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example789",
         cid: "bafkreidef789",
         type: "avatar",
       }),
     );
-    await sut.execute(
+    await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example789",
         cid: "bafkreidef789",
@@ -219,7 +219,7 @@ describe("ImageProxyUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute(
+      imageProxyUseCase.execute(
         ImageProxyRequest.fromParams({
           did: "did:plc:example888",
           cid: "bafkreiabc888",
@@ -267,7 +267,7 @@ describe("ImageProxyUseCase", () => {
 
     // act & assert
     await expect(
-      sut.execute(
+      imageProxyUseCase.execute(
         ImageProxyRequest.fromParams({
           did: "did:plc:example777",
           cid: "bafkreiabc777",
@@ -297,7 +297,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await sut.execute(
+    const result = await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example555",
         cid: "bafkreiabc555",
@@ -328,7 +328,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await sut.execute(
+    const result = await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example999",
         cid: "bafkreiabc999",
@@ -361,7 +361,7 @@ describe("ImageProxyUseCase", () => {
     // DidResolverにresolve結果を設定しない（エラーになる）
 
     // act
-    const result = await sut.execute(
+    const result = await imageProxyUseCase.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example888",
         cid: "bafkreiabc888",

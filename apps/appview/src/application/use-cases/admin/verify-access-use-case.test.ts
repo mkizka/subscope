@@ -4,11 +4,11 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("VerifyAccessUseCase", () => {
-  let sut: TestServices["verifyAccessUseCase"];
+  let verifyAccessUseCase: TestServices["verifyAccessUseCase"];
   let actorRepo: TestServices["actorRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.verifyAccessUseCase;
+    verifyAccessUseCase = services.verifyAccessUseCase;
     actorRepo = services.actorRepository;
   });
 
@@ -18,7 +18,7 @@ describe("VerifyAccessUseCase", () => {
     actorRepo.add(admin);
 
     // act
-    const result = await sut.execute({
+    const result = await verifyAccessUseCase.execute({
       requesterDid: admin.did,
     });
 
@@ -32,7 +32,7 @@ describe("VerifyAccessUseCase", () => {
     actorRepo.add(normalUser);
 
     // act
-    const result = await sut.execute({
+    const result = await verifyAccessUseCase.execute({
       requesterDid: normalUser.did,
     });
 

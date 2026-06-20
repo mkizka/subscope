@@ -9,12 +9,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFollowersUseCase", () => {
-  let sut: TestServices["getFollowersUseCase"];
+  let getFollowersUseCase: TestServices["getFollowersUseCase"];
   let followRepo: TestServices["followRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getFollowersUseCase;
+    getFollowersUseCase = services.getFollowersUseCase;
     followRepo = services.followRepository;
     profileRepo = services.profileRepository;
   });
@@ -44,7 +44,7 @@ describe("GetFollowersUseCase", () => {
     followRepo.add(follow);
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowersUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -79,7 +79,7 @@ describe("GetFollowersUseCase", () => {
     profileRepo.add(actorProfile);
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowersUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -121,7 +121,7 @@ describe("GetFollowersUseCase", () => {
     }
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowersUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -165,7 +165,7 @@ describe("GetFollowersUseCase", () => {
     });
 
     // act - 最初のページを取得
-    const firstPageResult = await sut.execute({
+    const firstPageResult = await getFollowersUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -188,7 +188,7 @@ describe("GetFollowersUseCase", () => {
     });
 
     // act - 2ページ目を取得
-    const secondPageResult = await sut.execute({
+    const secondPageResult = await getFollowersUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
       cursor: firstPageResult.cursor,
@@ -270,7 +270,7 @@ describe("GetFollowersUseCase", () => {
     followRepo.add(follow3);
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowersUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });

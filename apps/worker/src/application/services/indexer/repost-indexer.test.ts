@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("RepostIndexer", () => {
-  let sut: TestServices["repostIndexer"];
+  let repostIndexer: TestServices["repostIndexer"];
   let repostRepo: TestServices["repostRepository"];
   let feedItemRepo: TestServices["feedItemRepository"];
   let postRepo: TestServices["postRepository"];
@@ -18,7 +18,7 @@ describe("RepostIndexer", () => {
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.repostIndexer;
+    repostIndexer = services.repostIndexer;
     repostRepo = services.repostRepository;
     feedItemRepo = services.feedItemRepository;
     postRepo = services.postRepository;
@@ -47,7 +47,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await sut.upsert({
+      await repostIndexer.upsert({
         ctx,
         record,
         live: false,
@@ -99,7 +99,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await sut.afterAction({ record });
+      await repostIndexer.afterAction({ record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();

@@ -9,12 +9,12 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFollowsUseCase", () => {
-  let sut: TestServices["getFollowsUseCase"];
+  let getFollowsUseCase: TestServices["getFollowsUseCase"];
   let followRepo: TestServices["followRepository"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
-    sut = services.getFollowsUseCase;
+    getFollowsUseCase = services.getFollowsUseCase;
     followRepo = services.followRepository;
     profileRepo = services.profileRepository;
   });
@@ -44,7 +44,7 @@ describe("GetFollowsUseCase", () => {
     followRepo.add(follow);
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowsUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -79,7 +79,7 @@ describe("GetFollowsUseCase", () => {
     profileRepo.add(actorProfile);
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowsUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -121,7 +121,7 @@ describe("GetFollowsUseCase", () => {
     }
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowsUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -204,7 +204,7 @@ describe("GetFollowsUseCase", () => {
     followRepo.add(follow4);
 
     // act - 最初のページを取得
-    const firstPageResult = await sut.execute({
+    const firstPageResult = await getFollowsUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -234,7 +234,7 @@ describe("GetFollowsUseCase", () => {
     });
 
     // act - 2ページ目を取得
-    const secondPageResult = await sut.execute({
+    const secondPageResult = await getFollowsUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 2,
       cursor: firstPageResult.cursor,
@@ -323,7 +323,7 @@ describe("GetFollowsUseCase", () => {
     followRepo.add(follow3);
 
     // act
-    const result = await sut.execute({
+    const result = await getFollowsUseCase.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
