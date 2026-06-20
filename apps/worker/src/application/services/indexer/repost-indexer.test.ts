@@ -11,17 +11,17 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("RepostIndexer", () => {
   let sut: TestServices["repostIndexer"];
-  let repostRepository: TestServices["repostRepository"];
-  let feedItemRepository: TestServices["feedItemRepository"];
-  let postRepository: TestServices["postRepository"];
+  let repostRepo: TestServices["repostRepository"];
+  let feedItemRepo: TestServices["feedItemRepository"];
+  let postRepo: TestServices["postRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.repostIndexer;
-    repostRepository = services.repostRepository;
-    feedItemRepository = services.feedItemRepository;
-    postRepository = services.postRepository;
+    repostRepo = services.repostRepository;
+    feedItemRepo = services.feedItemRepository;
+    postRepo = services.postRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
   });
@@ -55,7 +55,7 @@ describe("RepostIndexer", () => {
       });
 
       // assert
-      const repost = repostRepository.findByUri(record.uri);
+      const repost = repostRepo.findByUri(record.uri);
       expect(repost).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -63,7 +63,7 @@ describe("RepostIndexer", () => {
         subjectUri: new AtUri(subjectUri),
       });
 
-      const feedItem = feedItemRepository.findByUri(record.uri);
+      const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "repost",
@@ -85,7 +85,7 @@ describe("RepostIndexer", () => {
     test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
       // arrange
       const { post } = postFactory();
-      postRepository.add(post);
+      postRepo.add(post);
 
       const record = recordFactory({
         json: {

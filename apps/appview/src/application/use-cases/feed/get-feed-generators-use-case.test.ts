@@ -6,13 +6,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFeedGeneratorsUseCase", () => {
   let sut: TestServices["getFeedGeneratorsUseCase"];
-  let generatorRepository: TestServices["generatorRepository"];
-  let profileRepository: TestServices["profileRepository"];
+  let generatorRepo: TestServices["generatorRepository"];
+  let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getFeedGeneratorsUseCase;
-    generatorRepository = services.generatorRepository;
-    profileRepository = services.profileRepository;
+    generatorRepo = services.generatorRepository;
+    profileRepo = services.profileRepository;
   });
 
   test("指定したURIのフィードジェネレーターが存在する場合、GeneratorViewを返す", async () => {
@@ -21,13 +21,13 @@ describe("GetFeedGeneratorsUseCase", () => {
       displayName: "Test Feed Generator",
       description: "A test feed generator",
     });
-    generatorRepository.add(generator);
+    generatorRepo.add(generator);
 
     const profile = profileDetailedFactory({
       actorDid: generator.actorDid,
       displayName: "Generator Creator",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     // act
     const result = await sut.execute([generator.uri]);
@@ -53,22 +53,22 @@ describe("GetFeedGeneratorsUseCase", () => {
     const generator1 = generatorFactory({
       displayName: "First Generator",
     });
-    generatorRepository.add(generator1);
+    generatorRepo.add(generator1);
 
     const profile1 = profileDetailedFactory({
       actorDid: generator1.actorDid,
     });
-    profileRepository.add(profile1);
+    profileRepo.add(profile1);
 
     const generator2 = generatorFactory({
       displayName: "Second Generator",
     });
-    generatorRepository.add(generator2);
+    generatorRepo.add(generator2);
 
     const profile2 = profileDetailedFactory({
       actorDid: generator2.actorDid,
     });
-    profileRepository.add(profile2);
+    profileRepo.add(profile2);
 
     // act
     const result = await sut.execute([generator2.uri, generator1.uri]);
@@ -109,12 +109,12 @@ describe("GetFeedGeneratorsUseCase", () => {
     const generator = generatorFactory({
       displayName: "Existing Generator",
     });
-    generatorRepository.add(generator);
+    generatorRepo.add(generator);
 
     const profile = profileDetailedFactory({
       actorDid: generator.actorDid,
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const nonExistentUri = new AtUri(
       "at://did:plc:nonexistent/app.bsky.feed.generator/test",

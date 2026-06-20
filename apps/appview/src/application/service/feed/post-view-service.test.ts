@@ -21,21 +21,21 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostViewService", () => {
   let sut: TestServices["postViewService"];
-  let postRepository: TestServices["postRepository"];
-  let recordRepository: TestServices["recordRepository"];
-  let profileRepository: TestServices["profileRepository"];
-  let generatorRepository: TestServices["generatorRepository"];
-  let likeRepository: TestServices["likeRepository"];
-  let repostRepository: TestServices["repostRepository"];
+  let postRepo: TestServices["postRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let generatorRepo: TestServices["generatorRepository"];
+  let likeRepo: TestServices["likeRepository"];
+  let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.postViewService;
-    postRepository = services.postRepository;
-    recordRepository = services.recordRepository;
-    profileRepository = services.profileRepository;
-    generatorRepository = services.generatorRepository;
-    likeRepository = services.likeRepository;
-    repostRepository = services.repostRepository;
+    postRepo = services.postRepository;
+    recordRepo = services.recordRepository;
+    profileRepo = services.profileRepository;
+    generatorRepo = services.generatorRepository;
+    likeRepo = services.likeRepository;
+    repostRepo = services.repostRepository;
   });
 
   describe("findPostView", () => {
@@ -47,7 +47,7 @@ describe("PostViewService", () => {
         displayName: "Test User",
         handle: "test.bsky.social",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       const { post, record } = postFactory({
         actorDid: actor.did,
@@ -55,8 +55,8 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(post);
-      recordRepository.add(record);
+      postRepo.add(post);
+      recordRepo.add(record);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -97,14 +97,14 @@ describe("PostViewService", () => {
         handle: "noProfile.bsky.social",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       const { post, record } = postFactory({
         actorDid: actor.did,
         text: "Test post",
       });
-      postRepository.add(post);
-      recordRepository.add(record);
+      postRepo.add(post);
+      recordRepo.add(record);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -129,7 +129,7 @@ describe("PostViewService", () => {
         actorDid: actor.did,
         displayName: "Image User",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       const imageCid =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
@@ -174,8 +174,8 @@ describe("PostViewService", () => {
         indexedAt: record.indexedAt,
       });
 
-      postRepository.add(post);
-      recordRepository.add(recordWithEmbed);
+      postRepo.add(post);
+      recordRepo.add(recordWithEmbed);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -205,7 +205,7 @@ describe("PostViewService", () => {
         actorDid: actor.did,
         displayName: "Link User",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       const thumbCid =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
@@ -249,8 +249,8 @@ describe("PostViewService", () => {
         indexedAt: record.indexedAt,
       });
 
-      postRepository.add(post);
-      recordRepository.add(recordWithEmbed);
+      postRepo.add(post);
+      recordRepo.add(recordWithEmbed);
 
       const postUri = new AtUri(post.uri.toString());
 
@@ -279,30 +279,30 @@ describe("PostViewService", () => {
         actorDid: actor1.did,
         displayName: "User 1",
       });
-      profileRepository.add(profile1);
+      profileRepo.add(profile1);
 
       const actor2 = actorFactory({ handle: "user2.bsky.social" });
       const profile2 = profileDetailedFactory({
         actorDid: actor2.did,
         displayName: "User 2",
       });
-      profileRepository.add(profile2);
+      profileRepo.add(profile2);
 
       const { post: post1, record: record1 } = postFactory({
         actorDid: actor1.did,
         text: "First post",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(post1);
-      recordRepository.add(record1);
+      postRepo.add(post1);
+      recordRepo.add(record1);
 
       const { post: post2, record: record2 } = postFactory({
         actorDid: actor2.did,
         text: "Second post",
         createdAt: new Date("2024-01-01T01:00:00.000Z"),
       });
-      postRepository.add(post2);
-      recordRepository.add(record2);
+      postRepo.add(post2);
+      recordRepo.add(record2);
 
       const postUri1 = new AtUri(post1.uri.toString());
       const postUri2 = new AtUri(post2.uri.toString());
@@ -325,15 +325,15 @@ describe("PostViewService", () => {
         actorDid: actor.did,
         displayName: "Existing User",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       const { post, record } = postFactory({
         actorDid: actor.did,
         text: "Existing post",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(post);
-      recordRepository.add(record);
+      postRepo.add(post);
+      recordRepo.add(record);
 
       const existingUri = new AtUri(post.uri.toString());
       const nonExistentUri = AtUri.make(
@@ -360,7 +360,7 @@ describe("PostViewService", () => {
         handle: embeddedAuthor.handle,
         displayName: "Embedded Author",
       });
-      profileRepository.add(embeddedProfile);
+      profileRepo.add(embeddedProfile);
 
       const { post: embeddedPost, record: embeddedRecord } = postFactory({
         actorDid: embeddedAuthor.did,
@@ -368,8 +368,8 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(embeddedPost);
-      recordRepository.add(embeddedRecord);
+      postRepo.add(embeddedPost);
+      recordRepo.add(embeddedRecord);
 
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
@@ -377,7 +377,7 @@ describe("PostViewService", () => {
         handle: quotingAuthor.handle,
         displayName: "Quoting Author",
       });
-      profileRepository.add(quotingProfile);
+      profileRepo.add(quotingProfile);
 
       const { post: quotingPost, record: quotingRecord } = postFactory({
         actorDid: quotingAuthor.did,
@@ -408,8 +408,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepository.add(quotingPost);
-      recordRepository.add(quotingRecordWithEmbed);
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -479,7 +479,7 @@ describe("PostViewService", () => {
         actorDid: quotingAuthor.did,
         displayName: "Quoting Author",
       });
-      profileRepository.add(quotingProfile);
+      profileRepo.add(quotingProfile);
 
       const notFoundUri = AtUri.make(
         "did:plc:notfound",
@@ -515,8 +515,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepository.add(quotingPost);
-      recordRepository.add(quotingRecordWithEmbed);
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -548,7 +548,7 @@ describe("PostViewService", () => {
         handle: generatorActor.handle,
         displayName: "Generator Creator",
       });
-      profileRepository.add(generatorProfile);
+      profileRepo.add(generatorProfile);
 
       const generator = generatorFactory({
         actorDid: generatorActor.did,
@@ -557,7 +557,7 @@ describe("PostViewService", () => {
         description: "A custom algorithmic feed",
         avatarCid: "bafyreiavatarcid123",
       });
-      generatorRepository.add(generator);
+      generatorRepo.add(generator);
 
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
@@ -565,7 +565,7 @@ describe("PostViewService", () => {
         handle: quotingAuthor.handle,
         displayName: "Quoting Author",
       });
-      profileRepository.add(quotingProfile);
+      profileRepo.add(quotingProfile);
 
       const { post: quotingPost, record: quotingRecord } = postFactory({
         actorDid: quotingAuthor.did,
@@ -596,8 +596,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepository.add(quotingPost);
-      recordRepository.add(quotingRecordWithEmbed);
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -662,7 +662,7 @@ describe("PostViewService", () => {
         actorDid: quotingAuthor.did,
         displayName: "Quoting Author",
       });
-      profileRepository.add(quotingProfile);
+      profileRepo.add(quotingProfile);
 
       const notFoundGeneratorUri = AtUri.make(
         "did:plc:notfound",
@@ -698,8 +698,8 @@ describe("PostViewService", () => {
         indexedAt: quotingRecord.indexedAt,
       });
 
-      postRepository.add(quotingPost);
-      recordRepository.add(quotingRecordWithEmbed);
+      postRepo.add(quotingPost);
+      recordRepo.add(quotingRecordWithEmbed);
 
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
@@ -731,7 +731,7 @@ describe("PostViewService", () => {
         handle: embeddedAuthor.handle,
         displayName: "Embedded Author",
       });
-      profileRepository.add(embeddedProfile);
+      profileRepo.add(embeddedProfile);
 
       const { post: embeddedPost, record: embeddedRecord } = postFactory({
         actorDid: embeddedAuthor.did,
@@ -739,8 +739,8 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(embeddedPost);
-      recordRepository.add(embeddedRecord);
+      postRepo.add(embeddedPost);
+      recordRepo.add(embeddedRecord);
 
       const mainAuthor = actorFactory({ handle: "main.bsky.social" });
       const mainProfile = profileDetailedFactory({
@@ -748,7 +748,7 @@ describe("PostViewService", () => {
         handle: mainAuthor.handle,
         displayName: "Main Author",
       });
-      profileRepository.add(mainProfile);
+      profileRepo.add(mainProfile);
 
       const imageCid1 =
         "bafyreicv4fgoiinirjwcddwglcws5rujyqvdj4kz6w5typufhfztfb3ghe";
@@ -825,8 +825,8 @@ describe("PostViewService", () => {
         indexedAt: mainRecord.indexedAt,
       });
 
-      postRepository.add(mainPost);
-      recordRepository.add(mainRecordWithEmbed);
+      postRepo.add(mainPost);
+      recordRepo.add(mainRecordWithEmbed);
 
       const mainPostUri = new AtUri(mainPost.uri.toString());
 
@@ -942,7 +942,7 @@ describe("PostViewService", () => {
         actorDid: authorC.did,
         displayName: "Author C",
       });
-      profileRepository.add(profileC);
+      profileRepo.add(profileC);
 
       const { post: postC, record: recordC } = postFactory({
         actorDid: authorC.did,
@@ -950,15 +950,15 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(postC);
-      recordRepository.add(recordC);
+      postRepo.add(postC);
+      recordRepo.add(recordC);
 
       const authorB = actorFactory({ handle: "authorb.bsky.social" });
       const profileB = profileDetailedFactory({
         actorDid: authorB.did,
         displayName: "Author B",
       });
-      profileRepository.add(profileB);
+      profileRepo.add(profileB);
 
       const { post: postB, record: recordB } = postFactory({
         actorDid: authorB.did,
@@ -989,15 +989,15 @@ describe("PostViewService", () => {
         indexedAt: recordB.indexedAt,
       });
 
-      postRepository.add(postB);
-      recordRepository.add(recordBWithEmbed);
+      postRepo.add(postB);
+      recordRepo.add(recordBWithEmbed);
 
       const authorA = actorFactory({ handle: "authora.bsky.social" });
       const profileA = profileDetailedFactory({
         actorDid: authorA.did,
         displayName: "Author A",
       });
-      profileRepository.add(profileA);
+      profileRepo.add(profileA);
 
       const { post: postA, record: recordA } = postFactory({
         actorDid: authorA.did,
@@ -1028,8 +1028,8 @@ describe("PostViewService", () => {
         indexedAt: recordA.indexedAt,
       });
 
-      postRepository.add(postA);
-      recordRepository.add(recordAWithEmbed);
+      postRepo.add(postA);
+      recordRepo.add(recordAWithEmbed);
 
       const postAUri = new AtUri(postA.uri.toString());
 
@@ -1085,7 +1085,7 @@ describe("PostViewService", () => {
         actorDid: authorD.did,
         displayName: "Author D",
       });
-      profileRepository.add(profileD);
+      profileRepo.add(profileD);
 
       const { post: postD, record: recordD } = postFactory({
         actorDid: authorD.did,
@@ -1093,15 +1093,15 @@ describe("PostViewService", () => {
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
         indexedAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(postD);
-      recordRepository.add(recordD);
+      postRepo.add(postD);
+      recordRepo.add(recordD);
 
       const authorC = actorFactory({ handle: "authorc.bsky.social" });
       const profileC = profileDetailedFactory({
         actorDid: authorC.did,
         displayName: "Author C",
       });
-      profileRepository.add(profileC);
+      profileRepo.add(profileC);
 
       const { post: postC, record: recordC } = postFactory({
         actorDid: authorC.did,
@@ -1132,15 +1132,15 @@ describe("PostViewService", () => {
         indexedAt: recordC.indexedAt,
       });
 
-      postRepository.add(postC);
-      recordRepository.add(recordCWithEmbed);
+      postRepo.add(postC);
+      recordRepo.add(recordCWithEmbed);
 
       const authorB = actorFactory({ handle: "authorb.bsky.social" });
       const profileB = profileDetailedFactory({
         actorDid: authorB.did,
         displayName: "Author B",
       });
-      profileRepository.add(profileB);
+      profileRepo.add(profileB);
 
       const { post: postB, record: recordB } = postFactory({
         actorDid: authorB.did,
@@ -1171,15 +1171,15 @@ describe("PostViewService", () => {
         indexedAt: recordB.indexedAt,
       });
 
-      postRepository.add(postB);
-      recordRepository.add(recordBWithEmbed);
+      postRepo.add(postB);
+      recordRepo.add(recordBWithEmbed);
 
       const authorA = actorFactory({ handle: "authora.bsky.social" });
       const profileA = profileDetailedFactory({
         actorDid: authorA.did,
         displayName: "Author A",
       });
-      profileRepository.add(profileA);
+      profileRepo.add(profileA);
 
       const { post: postA, record: recordA } = postFactory({
         actorDid: authorA.did,
@@ -1210,8 +1210,8 @@ describe("PostViewService", () => {
         indexedAt: recordA.indexedAt,
       });
 
-      postRepository.add(postA);
-      recordRepository.add(recordAWithEmbed);
+      postRepo.add(postA);
+      recordRepo.add(recordAWithEmbed);
 
       const postAUri = new AtUri(postA.uri.toString());
 
@@ -1267,29 +1267,29 @@ describe("PostViewService", () => {
         actorDid: viewer.did,
         displayName: "Viewer",
       });
-      profileRepository.add(viewerProfile);
+      profileRepo.add(viewerProfile);
 
       const author1 = actorFactory();
       const profile1 = profileDetailedFactory({
         actorDid: author1.did,
         displayName: "Author 1",
       });
-      profileRepository.add(profile1);
+      profileRepo.add(profile1);
 
       const author2 = actorFactory();
       const profile2 = profileDetailedFactory({
         actorDid: author2.did,
         displayName: "Author 2",
       });
-      profileRepository.add(profile2);
+      profileRepo.add(profile2);
 
       const { post: post1, record: record1 } = postFactory({
         actorDid: author1.did,
         text: "Post 1",
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       });
-      postRepository.add(post1);
-      recordRepository.add(record1);
+      postRepo.add(post1);
+      recordRepo.add(record1);
 
       const like1 = likeFactory({
         actorDid: viewer.did,
@@ -1297,15 +1297,15 @@ describe("PostViewService", () => {
         subjectCid: post1.cid,
         createdAt: new Date("2024-01-01T01:00:00.000Z"),
       });
-      likeRepository.add(like1);
+      likeRepo.add(like1);
 
       const { post: post2, record: record2 } = postFactory({
         actorDid: author2.did,
         text: "Post 2",
         createdAt: new Date("2024-01-01T02:00:00.000Z"),
       });
-      postRepository.add(post2);
-      recordRepository.add(record2);
+      postRepo.add(post2);
+      recordRepo.add(record2);
 
       const repost2 = repostFactory({
         actorDid: viewer.did,
@@ -1313,7 +1313,7 @@ describe("PostViewService", () => {
         subjectCid: post2.cid,
         createdAt: new Date("2024-01-01T03:00:00.000Z"),
       });
-      repostRepository.add(repost2);
+      repostRepo.add(repost2);
 
       const postUri1 = new AtUri(post1.uri.toString());
       const postUri2 = new AtUri(post2.uri.toString());

@@ -7,11 +7,11 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetInviteCodesUseCase", () => {
   let sut: TestServices["getInviteCodesUseCase"];
-  let inviteCodeRepository: TestServices["inviteCodeRepository"];
+  let inviteCodeRepo: TestServices["inviteCodeRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getInviteCodesUseCase;
-    inviteCodeRepository = services.inviteCodeRepository;
+    inviteCodeRepo = services.inviteCodeRepository;
   });
 
   test("招待コードが存在する場合、招待コード一覧を返す", async () => {
@@ -20,13 +20,13 @@ describe("GetInviteCodesUseCase", () => {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
       expiresAt: new Date("2024-01-08T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode1);
+    inviteCodeRepo.add(inviteCode1);
 
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
       expiresAt: new Date("2024-01-09T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode2);
+    inviteCodeRepo.add(inviteCode2);
 
     // act
     const result = await sut.execute({
@@ -57,7 +57,7 @@ describe("GetInviteCodesUseCase", () => {
 
   test("limitを指定した場合、指定した件数の招待コードを返す", async () => {
     // arrange
-    inviteCodeRepository.add(
+    inviteCodeRepo.add(
       inviteCodeFactory({
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       }),
@@ -65,11 +65,11 @@ describe("GetInviteCodesUseCase", () => {
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode2);
+    inviteCodeRepo.add(inviteCode2);
     const inviteCode3 = inviteCodeFactory({
       createdAt: new Date("2024-01-03T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode3);
+    inviteCodeRepo.add(inviteCode3);
 
     // act
     const result = await sut.execute({
@@ -103,12 +103,12 @@ describe("GetInviteCodesUseCase", () => {
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode1);
+    inviteCodeRepo.add(inviteCode1);
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode2);
-    inviteCodeRepository.add(
+    inviteCodeRepo.add(inviteCode2);
+    inviteCodeRepo.add(
       inviteCodeFactory({
         createdAt: new Date("2024-01-03T00:00:00.000Z"),
       }),
@@ -140,19 +140,19 @@ describe("GetInviteCodesUseCase", () => {
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode1);
+    inviteCodeRepo.add(inviteCode1);
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode2);
+    inviteCodeRepo.add(inviteCode2);
     const inviteCode3 = inviteCodeFactory({
       createdAt: new Date("2024-01-03T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode3);
+    inviteCodeRepo.add(inviteCode3);
     const inviteCode4 = inviteCodeFactory({
       createdAt: new Date("2024-01-04T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode4);
+    inviteCodeRepo.add(inviteCode4);
 
     // act - 1ページ目
     const page1 = await sut.execute({
@@ -216,7 +216,7 @@ describe("GetInviteCodesUseCase", () => {
       expiresAt: new Date("2024-01-08T00:00:00.000Z"),
       usedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode, {
+    inviteCodeRepo.add(inviteCode, {
       did: asDid(actor.did),
       handle: asHandle(actor.handle),
     });
@@ -251,7 +251,7 @@ describe("GetInviteCodesUseCase", () => {
       expiresAt: new Date("2024-01-08T00:00:00.000Z"),
       usedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepository.add(inviteCode);
+    inviteCodeRepo.add(inviteCode);
 
     // act
     const result = await sut.execute({

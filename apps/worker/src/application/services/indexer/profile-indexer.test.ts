@@ -5,12 +5,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileIndexer", () => {
   let sut: TestServices["profileIndexer"];
-  let profileRepository: TestServices["profileRepository"];
+  let profileRepo: TestServices["profileRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.profileIndexer;
-    profileRepository = services.profileRepository;
+    profileRepo = services.profileRepository;
     db = services.db;
   });
 
@@ -51,7 +51,7 @@ describe("ProfileIndexer", () => {
       await sut.upsert({ ctx, record });
 
       // assert
-      const profile = profileRepository.findByUri(record.uri);
+      const profile = profileRepo.findByUri(record.uri);
       expect(profile).toMatchObject({
         uri: record.uri,
         cid: record.cid,

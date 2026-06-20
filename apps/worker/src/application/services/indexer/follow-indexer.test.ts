@@ -9,16 +9,16 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FollowIndexer", () => {
   let sut: TestServices["followIndexer"];
-  let followRepository: TestServices["followRepository"];
+  let followRepo: TestServices["followRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.followIndexer;
-    followRepository = services.followRepository;
+    followRepo = services.followRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionRepository = services.subscriptionRepository;
+    subscriptionRepo = services.subscriptionRepository;
     db = services.db;
   });
 
@@ -45,7 +45,7 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const follow = followRepository.findByUri(record.uri);
+      const follow = followRepo.findByUri(record.uri);
       expect(follow).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -60,7 +60,7 @@ describe("FollowIndexer", () => {
       const follower = actorFactory();
       const followee = actorFactory();
       const subscription = subscriptionFactory({ actorDid: follower.did });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
 
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey456`,
@@ -159,7 +159,7 @@ describe("FollowIndexer", () => {
       const follower = actorFactory();
       const followee = actorFactory();
       const subscription = subscriptionFactory({ actorDid: follower.did });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
 
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey_delete1`,
@@ -174,7 +174,7 @@ describe("FollowIndexer", () => {
         record,
         live: false,
       });
-      followRepository.deleteByUri(record.uri);
+      followRepo.deleteByUri(record.uri);
 
       // act
       await sut.afterAction({ ctx, record, action: "delete" });
@@ -194,8 +194,8 @@ describe("FollowIndexer", () => {
       const followee = actorFactory();
       const subscription1 = subscriptionFactory({ actorDid: follower1.did });
       const subscription2 = subscriptionFactory({ actorDid: follower2.did });
-      subscriptionRepository.add(subscription1);
-      subscriptionRepository.add(subscription2);
+      subscriptionRepo.add(subscription1);
+      subscriptionRepo.add(subscription2);
 
       const record1 = recordFactory({
         uri: `at://${follower1.did}/app.bsky.graph.follow/followrkey_delete2a`,
@@ -223,7 +223,7 @@ describe("FollowIndexer", () => {
         record: record2,
         live: false,
       });
-      followRepository.deleteByUri(record1.uri);
+      followRepo.deleteByUri(record1.uri);
 
       // act
       await sut.afterAction({
@@ -246,7 +246,7 @@ describe("FollowIndexer", () => {
       const nonSubscriber = actorFactory();
       const followee = actorFactory();
       const subscription = subscriptionFactory({ actorDid: subscriber.did });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
 
       const subscriberRecord = recordFactory({
         uri: `at://${subscriber.did}/app.bsky.graph.follow/followrkey_delete3a`,
@@ -274,7 +274,7 @@ describe("FollowIndexer", () => {
         record: nonSubscriberRecord,
         live: false,
       });
-      followRepository.deleteByUri(nonSubscriberRecord.uri);
+      followRepo.deleteByUri(nonSubscriberRecord.uri);
 
       // act
       await sut.afterAction({

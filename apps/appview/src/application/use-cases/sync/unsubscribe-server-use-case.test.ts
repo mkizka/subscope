@@ -11,30 +11,30 @@ import { NotSubscribedError } from "./unsubscribe-server-use-case.js";
 
 describe("UnsubscribeServerUseCase", () => {
   let sut: TestServices["unsubscribeServerUseCase"];
-  let subscriptionRepository: TestServices["subscriptionRepository"];
-  let inviteCodeRepository: TestServices["inviteCodeRepository"];
-  let actorRepository: TestServices["actorRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  let actorRepo: TestServices["actorRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.unsubscribeServerUseCase;
-    subscriptionRepository = services.subscriptionRepository;
-    inviteCodeRepository = services.inviteCodeRepository;
-    actorRepository = services.actorRepository;
+    subscriptionRepo = services.subscriptionRepository;
+    inviteCodeRepo = services.inviteCodeRepository;
+    actorRepo = services.actorRepository;
   });
 
   test("サブスクリプションが存在する場合、削除するが招待コードは使用済みのまま", async () => {
     // arrange
     const actor = actorFactory();
-    actorRepository.add(actor);
+    actorRepo.add(actor);
     const inviteCode = inviteCodeFactory({
       usedAt: new Date("2025-01-01"),
     });
-    inviteCodeRepository.add(inviteCode);
+    inviteCodeRepo.add(inviteCode);
     const subscription = subscriptionFactory({
       actorDid: actor.did,
       inviteCode: inviteCode.code,
     });
-    subscriptionRepository.add(subscription);
+    subscriptionRepo.add(subscription);
 
     // act
     await sut.execute({
@@ -42,18 +42,16 @@ describe("UnsubscribeServerUseCase", () => {
     });
 
     // assert
-    const result = await subscriptionRepository.findFirst(asDid(actor.did));
+    const result = await subscriptionRepo.findFirst(asDid(actor.did));
     expect(result).toBeNull();
-    const updatedInviteCode = await inviteCodeRepository.findFirst(
-      inviteCode.code,
-    );
+    const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).not.toBeNull();
   });
 
   test("サブスクリプションが存在しない場合、NotSubscribedErrorをthrowする", async () => {
     // arrange
     const actor = actorFactory();
-    actorRepository.add(actor);
+    actorRepo.add(actor);
 
     // act & assert
     await expect(

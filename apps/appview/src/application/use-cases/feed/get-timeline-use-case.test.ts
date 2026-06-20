@@ -12,19 +12,19 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetTimelineUseCase", () => {
   let sut: TestServices["getTimelineUseCase"];
-  let timelineRepository: TestServices["timelineRepository"];
-  let postRepository: TestServices["postRepository"];
-  let postStatsRepository: TestServices["postStatsRepository"];
-  let profileRepository: TestServices["profileRepository"];
-  let recordRepository: TestServices["recordRepository"];
+  let timelineRepo: TestServices["timelineRepository"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getTimelineUseCase;
-    timelineRepository = services.timelineRepository;
-    postRepository = services.postRepository;
-    postStatsRepository = services.postStatsRepository;
-    profileRepository = services.profileRepository;
-    recordRepository = services.recordRepository;
+    timelineRepo = services.timelineRepository;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
   });
 
   test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
@@ -53,17 +53,17 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Followed User",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
-    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post, record } = postFactory({
       actorDid: author.did,
       text: "Hello from followed user",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 5,
@@ -71,10 +71,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 3,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const feedItem = FeedItem.fromPost(post);
-    timelineRepository.addFeedItem(feedItem);
+    timelineRepo.addFeedItem(feedItem);
 
     // act
     const result = await sut.execute({
@@ -113,15 +113,15 @@ describe("GetTimelineUseCase", () => {
       actorDid: viewer.did,
       displayName: "Viewer User",
     });
-    profileRepository.add(viewerProfile);
+    profileRepo.add(viewerProfile);
 
     const { post, record } = postFactory({
       actorDid: viewer.did,
       text: "My own post",
       createdAt: new Date("2024-01-02T00:00:00Z"),
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -129,10 +129,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const feedItem = FeedItem.fromPost(post);
-    timelineRepository.addFeedItem(feedItem);
+    timelineRepo.addFeedItem(feedItem);
 
     // act
     const result = await sut.execute({
@@ -169,17 +169,17 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
-    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post: olderPost, record: olderRecord } = postFactory({
       actorDid: author.did,
       text: "Older post",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    postRepository.add(olderPost);
-    recordRepository.add(olderRecord);
+    postRepo.add(olderPost);
+    recordRepo.add(olderRecord);
 
     const olderPostStats: PostStats = {
       likeCount: 0,
@@ -187,18 +187,18 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(olderPost.uri.toString(), olderPostStats);
+    postStatsRepo.add(olderPost.uri.toString(), olderPostStats);
 
     const olderFeedItem = FeedItem.fromPost(olderPost);
-    timelineRepository.addFeedItem(olderFeedItem);
+    timelineRepo.addFeedItem(olderFeedItem);
 
     const { post: newerPost, record: newerRecord } = postFactory({
       actorDid: author.did,
       text: "Newer post",
       createdAt: new Date("2024-01-03T00:00:00Z"),
     });
-    postRepository.add(newerPost);
-    recordRepository.add(newerRecord);
+    postRepo.add(newerPost);
+    recordRepo.add(newerRecord);
 
     const newerPostStats: PostStats = {
       likeCount: 0,
@@ -206,10 +206,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(newerPost.uri.toString(), newerPostStats);
+    postStatsRepo.add(newerPost.uri.toString(), newerPostStats);
 
     const newerFeedItem = FeedItem.fromPost(newerPost);
-    timelineRepository.addFeedItem(newerFeedItem);
+    timelineRepo.addFeedItem(newerFeedItem);
 
     // act
     const result = await sut.execute({
@@ -243,16 +243,16 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
-    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post, record } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-04T00:00:00Z"),
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -260,10 +260,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const feedItem = FeedItem.fromPost(post);
-    timelineRepository.addFeedItem(feedItem);
+    timelineRepo.addFeedItem(feedItem);
 
     // act - limit=0
     const zeroLimitResult = await sut.execute({
@@ -305,17 +305,17 @@ describe("GetTimelineUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
-    timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
+    timelineRepo.addFollow(asDid(viewer.did), asDid(author.did));
 
     const { post: post1, record: record1 } = postFactory({
       actorDid: author.did,
       text: "First post",
       createdAt: new Date("2024-01-05T00:00:00Z"),
     });
-    postRepository.add(post1);
-    recordRepository.add(record1);
+    postRepo.add(post1);
+    recordRepo.add(record1);
 
     const post1Stats: PostStats = {
       likeCount: 0,
@@ -323,18 +323,18 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post1.uri.toString(), post1Stats);
+    postStatsRepo.add(post1.uri.toString(), post1Stats);
 
     const feedItem1 = FeedItem.fromPost(post1);
-    timelineRepository.addFeedItem(feedItem1);
+    timelineRepo.addFeedItem(feedItem1);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author.did,
       text: "Second post",
       createdAt: new Date("2024-01-06T00:00:00Z"),
     });
-    postRepository.add(post2);
-    recordRepository.add(record2);
+    postRepo.add(post2);
+    recordRepo.add(record2);
 
     const post2Stats: PostStats = {
       likeCount: 0,
@@ -342,10 +342,10 @@ describe("GetTimelineUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post2.uri.toString(), post2Stats);
+    postStatsRepo.add(post2.uri.toString(), post2Stats);
 
     const feedItem2 = FeedItem.fromPost(post2);
-    timelineRepository.addFeedItem(feedItem2);
+    timelineRepo.addFeedItem(feedItem2);
 
     // act
     const result = await sut.execute({

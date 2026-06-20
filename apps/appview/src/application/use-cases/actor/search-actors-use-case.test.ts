@@ -5,13 +5,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsUseCase", () => {
   let sut: TestServices["searchActorsUseCase"];
-  let profileRepository: TestServices["profileRepository"];
-  let actorStatsRepository: TestServices["actorStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let actorStatsRepo: TestServices["actorStatsRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.searchActorsUseCase;
-    profileRepository = services.profileRepository;
-    actorStatsRepository = services.actorStatsRepository;
+    profileRepo = services.profileRepository;
+    actorStatsRepo = services.actorStatsRepository;
   });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
@@ -64,8 +64,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "Test User 検索対象",
       handle: "match.test",
     });
-    profileRepository.add(matchProfile);
-    actorStatsRepository.add(matchActor.did, {
+    profileRepo.add(matchProfile);
+    actorStatsRepo.add(matchActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -77,8 +77,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "Different Name",
       handle: "nomatch.test",
     });
-    profileRepository.add(noMatchProfile);
-    actorStatsRepository.add(noMatchActor.did, {
+    profileRepo.add(noMatchProfile);
+    actorStatsRepo.add(noMatchActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -110,8 +110,8 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor.did,
       displayName: "No Match User",
     });
-    profileRepository.add(profile);
-    actorStatsRepository.add(actor.did, {
+    profileRepo.add(profile);
+    actorStatsRepo.add(actor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -137,8 +137,8 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor1.did,
       displayName: "Limit Test User 1",
     });
-    profileRepository.add(profile1);
-    actorStatsRepository.add(actor1.did, {
+    profileRepo.add(profile1);
+    actorStatsRepo.add(actor1.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -149,8 +149,8 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor2.did,
       displayName: "Limit Test User 2",
     });
-    profileRepository.add(profile2);
-    actorStatsRepository.add(actor2.did, {
+    profileRepo.add(profile2);
+    actorStatsRepo.add(actor2.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -176,8 +176,8 @@ describe("SearchActorsUseCase", () => {
       handle: "user1.test",
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    profileRepository.add(profile1);
-    actorStatsRepository.add(actor1.did, {
+    profileRepo.add(profile1);
+    actorStatsRepo.add(actor1.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -190,8 +190,8 @@ describe("SearchActorsUseCase", () => {
       handle: "user2.test",
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    profileRepository.add(profile2);
-    actorStatsRepository.add(actor2.did, {
+    profileRepo.add(profile2);
+    actorStatsRepo.add(actor2.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -244,8 +244,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "テスト User",
       handle: "different.handle.com",
     });
-    profileRepository.add(displayNameProfile);
-    actorStatsRepository.add(displayNameActor.did, {
+    profileRepo.add(displayNameProfile);
+    actorStatsRepo.add(displayNameActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -257,8 +257,8 @@ describe("SearchActorsUseCase", () => {
       displayName: "Different Name",
       handle: "testhandle.example.com",
     });
-    profileRepository.add(handleProfile);
-    actorStatsRepository.add(handleActor.did, {
+    profileRepo.add(handleProfile);
+    actorStatsRepo.add(handleActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,

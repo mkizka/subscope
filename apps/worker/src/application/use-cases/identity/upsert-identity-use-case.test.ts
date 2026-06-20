@@ -6,12 +6,12 @@ import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 describe("UpsertIdentityUseCase", () => {
   let sut: TestServices["upsertIdentityUseCase"];
-  let actorRepository: TestServices["actorRepository"];
+  let actorRepo: TestServices["actorRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.upsertIdentityUseCase;
-    actorRepository = services.actorRepository;
+    actorRepo = services.actorRepository;
     db = services.db;
   });
 
@@ -27,7 +27,7 @@ describe("UpsertIdentityUseCase", () => {
     await sut.execute(command);
 
     // assert
-    const foundActor = await actorRepository.findByDid({
+    const foundActor = await actorRepo.findByDid({
       ctx,
       did: command.did,
     });
@@ -40,7 +40,7 @@ describe("UpsertIdentityUseCase", () => {
     const actor = actorFactory({
       handle: "old-handle.bsky.social",
     });
-    actorRepository.add(actor);
+    actorRepo.add(actor);
 
     const command: UpsertIdentityCommand = {
       did: actor.did,
@@ -51,7 +51,7 @@ describe("UpsertIdentityUseCase", () => {
     await sut.execute(command);
 
     // assert
-    const foundActor = await actorRepository.findByDid({
+    const foundActor = await actorRepo.findByDid({
       ctx,
       did: command.did,
     });

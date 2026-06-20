@@ -6,13 +6,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("LikeIndexer", () => {
   let sut: TestServices["likeIndexer"];
-  let likeRepository: TestServices["likeRepository"];
+  let likeRepo: TestServices["likeRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.likeIndexer;
-    likeRepository = services.likeRepository;
+    likeRepo = services.likeRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
   });
@@ -42,7 +42,7 @@ describe("LikeIndexer", () => {
       });
 
       // assert
-      const like = likeRepository.findByUri(record.uri);
+      const like = likeRepo.findByUri(record.uri);
       expect(like).toMatchObject({
         uri: record.uri,
         cid: record.cid,

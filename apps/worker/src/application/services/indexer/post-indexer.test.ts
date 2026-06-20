@@ -7,15 +7,15 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostIndexer", () => {
   let sut: TestServices["postIndexer"];
-  let postRepository: TestServices["postRepository"];
-  let feedItemRepository: TestServices["feedItemRepository"];
+  let postRepo: TestServices["postRepository"];
+  let feedItemRepo: TestServices["feedItemRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.postIndexer;
-    postRepository = services.postRepository;
-    feedItemRepository = services.feedItemRepository;
+    postRepo = services.postRepository;
+    feedItemRepo = services.feedItemRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
   });
@@ -43,7 +43,7 @@ describe("PostIndexer", () => {
       });
 
       // assert
-      const post = postRepository.findByUri(record.uri);
+      const post = postRepo.findByUri(record.uri);
       expect(post).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -51,7 +51,7 @@ describe("PostIndexer", () => {
         text: "test post",
       });
 
-      const feedItem = feedItemRepository.findByUri(record.uri);
+      const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "post",
@@ -147,10 +147,10 @@ describe("PostIndexer", () => {
       });
 
       // assert
-      const post = postRepository.findByUri(record.uri);
+      const post = postRepo.findByUri(record.uri);
       expect(post?.createdAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
 
-      const feedItem = feedItemRepository.findByUri(record.uri);
+      const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem?.sortAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
     });
   });

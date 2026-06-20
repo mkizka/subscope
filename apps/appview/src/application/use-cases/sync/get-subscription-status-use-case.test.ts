@@ -6,19 +6,19 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscriptionStatusUseCase", () => {
   let sut: TestServices["getSubscriptionStatusUseCase"];
-  let actorRepository: TestServices["actorRepository"];
-  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let actorRepo: TestServices["actorRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getSubscriptionStatusUseCase;
-    actorRepository = services.actorRepository;
-    subscriptionRepository = services.subscriptionRepository;
+    actorRepo = services.actorRepository;
+    subscriptionRepo = services.subscriptionRepository;
   });
 
   test("サブスクリプションが存在しない場合、notSubscribedを返す", async () => {
     // arrange
     const actor = actorFactory();
-    actorRepository.add(actor);
+    actorRepo.add(actor);
 
     // act
     const result = await sut.execute({
@@ -35,9 +35,9 @@ describe("GetSubscriptionStatusUseCase", () => {
   test("サブスクリプションが存在する場合、subscribedを返す", async () => {
     // arrange
     const actor = actorFactory();
-    actorRepository.add(actor);
+    actorRepo.add(actor);
     const subscription = subscriptionFactory({ actorDid: actor.did });
-    subscriptionRepository.add(subscription);
+    subscriptionRepo.add(subscription);
 
     // act
     const result = await sut.execute({

@@ -9,14 +9,14 @@ const now = new Date("2025-01-01T00:00:00Z");
 
 describe("RegisterAdminUseCase", () => {
   let sut: TestServices["registerAdminUseCase"];
-  let actorRepository: TestServices["actorRepository"];
-  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let actorRepo: TestServices["actorRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.registerAdminUseCase;
-    actorRepository = services.actorRepository;
-    subscriptionRepository = services.subscriptionRepository;
+    actorRepo = services.actorRepository;
+    subscriptionRepo = services.subscriptionRepository;
     jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
     vi.setSystemTime(now);
@@ -25,7 +25,7 @@ describe("RegisterAdminUseCase", () => {
   test("管理者が存在しない場合、リクエストユーザーを管理者に昇格しサブスクリプションも作成する", async () => {
     // arrange
     const requester = actorFactory({ isAdmin: false });
-    actorRepository.add(requester);
+    actorRepo.add(requester);
 
     // act
     await sut.execute({
@@ -33,11 +33,9 @@ describe("RegisterAdminUseCase", () => {
     });
 
     // assert
-    const updatedActor = await actorRepository.findByDid(requester.did);
+    const updatedActor = await actorRepo.findByDid(requester.did);
     expect(updatedActor?.isAdmin).toBe(true);
-    const subscription = await subscriptionRepository.findFirst(
-      asDid(requester.did),
-    );
+    const subscription = await subscriptionRepo.findFirst(asDid(requester.did));
     expect(subscription).toMatchObject({
       actorDid: requester.did,
       createdAt: now,
@@ -50,10 +48,10 @@ describe("RegisterAdminUseCase", () => {
   test("管理者が既に存在する場合、AdminAlreadyExistsErrorをスローする", async () => {
     // arrange
     const admin = actorFactory({ isAdmin: true });
-    actorRepository.add(admin);
+    actorRepo.add(admin);
 
     const requester = actorFactory({ isAdmin: false });
-    actorRepository.add(requester);
+    actorRepo.add(requester);
 
     // act & assert
     await expect(
@@ -73,7 +71,7 @@ describe("RegisterAdminUseCase", () => {
     });
 
     // assert
-    const createdActor = await actorRepository.findByDid(nonExistentDid);
+    const createdActor = await actorRepo.findByDid(nonExistentDid);
     expect(createdActor).not.toBeNull();
     expect(createdActor?.isAdmin).toBe(true);
   });

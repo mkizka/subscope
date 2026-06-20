@@ -9,13 +9,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscribersUseCase", () => {
   let sut: TestServices["getSubscribersUseCase"];
-  let subscriptionRepository: TestServices["subscriptionRepository"];
-  let profileRepository: TestServices["profileRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getSubscribersUseCase;
-    subscriptionRepository = services.subscriptionRepository;
-    profileRepository = services.profileRepository;
+    subscriptionRepo = services.subscriptionRepository;
+    profileRepo = services.profileRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00Z"));
   });
@@ -31,24 +31,24 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor1.did,
       displayName: "Subscriber One",
     });
-    profileRepository.add(profile1);
+    profileRepo.add(profile1);
     const subscription1 = subscriptionFactory({
       actorDid: actor1.did,
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    subscriptionRepository.add(subscription1);
+    subscriptionRepo.add(subscription1);
 
     const actor2 = actorFactory();
     const profile2 = profileDetailedFactory({
       actorDid: actor2.did,
       displayName: "Subscriber Two",
     });
-    profileRepository.add(profile2);
+    profileRepo.add(profile2);
     const subscription2 = subscriptionFactory({
       actorDid: actor2.did,
       createdAt: new Date("2024-01-01T00:00:01Z"),
     });
-    subscriptionRepository.add(subscription2);
+    subscriptionRepo.add(subscription2);
 
     // act
     const result = await sut.execute({
@@ -98,12 +98,12 @@ describe("GetSubscribersUseCase", () => {
         actorDid: actor.did,
         displayName: `Test User ${index}`,
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
       const subscription = subscriptionFactory({
         actorDid: actor.did,
         createdAt: new Date(`2024-01-01T00:00:0${index}Z`),
       });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
       actors.push({ actor, displayName: `Test User ${index}` });
     }
 
@@ -137,8 +137,8 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor1.did,
       displayName: "First",
     });
-    profileRepository.add(profile1);
-    subscriptionRepository.add(
+    profileRepo.add(profile1);
+    subscriptionRepo.add(
       subscriptionFactory({
         actorDid: actor1.did,
         createdAt: new Date("2024-01-01T00:00:02Z"),
@@ -150,8 +150,8 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor2.did,
       displayName: "Second",
     });
-    profileRepository.add(profile2);
-    subscriptionRepository.add(
+    profileRepo.add(profile2);
+    subscriptionRepo.add(
       subscriptionFactory({
         actorDid: actor2.did,
         createdAt: new Date("2024-01-01T00:00:01Z"),
@@ -163,8 +163,8 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor3.did,
       displayName: "Third",
     });
-    profileRepository.add(profile3);
-    subscriptionRepository.add(
+    profileRepo.add(profile3);
+    subscriptionRepo.add(
       subscriptionFactory({
         actorDid: actor3.did,
         createdAt: new Date("2024-01-01T00:00:00Z"),

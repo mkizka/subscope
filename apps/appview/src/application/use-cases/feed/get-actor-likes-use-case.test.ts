@@ -12,19 +12,19 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetActorLikesUseCase", () => {
   let sut: TestServices["getActorLikesUseCase"];
-  let likeRepository: TestServices["likeRepository"];
-  let postRepository: TestServices["postRepository"];
-  let postStatsRepository: TestServices["postStatsRepository"];
-  let profileRepository: TestServices["profileRepository"];
-  let recordRepository: TestServices["recordRepository"];
+  let likeRepo: TestServices["likeRepository"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getActorLikesUseCase;
-    likeRepository = services.likeRepository;
-    postRepository = services.postRepository;
-    postStatsRepository = services.postStatsRepository;
-    profileRepository = services.profileRepository;
-    recordRepository = services.recordRepository;
+    likeRepo = services.likeRepository;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
   });
 
   test("actorがいいねした投稿がある場合、投稿情報を含むフィードを返す", async () => {
@@ -36,13 +36,13 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 1,
@@ -50,14 +50,14 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 3,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const like = likeFactory({
       actorDid: actor.did,
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepository.add(like);
+    likeRepo.add(like);
 
     // act
     const result = await sut.execute({
@@ -112,15 +112,15 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     // 3つの投稿といいねを作成
     for (let i = 0; i < 3; i++) {
       const { post, record } = postFactory({
         actorDid: postAuthor.did,
       });
-      postRepository.add(post);
-      recordRepository.add(record);
+      postRepo.add(post);
+      recordRepo.add(record);
 
       const postStats: PostStats = {
         likeCount: 0,
@@ -128,14 +128,14 @@ describe("GetActorLikesUseCase", () => {
         replyCount: 0,
         quoteCount: 0,
       };
-      postStatsRepository.add(post.uri.toString(), postStats);
+      postStatsRepo.add(post.uri.toString(), postStats);
 
       const like = likeFactory({
         actorDid: actor.did,
         subjectUri: post.uri.toString(),
         subjectCid: post.cid,
       });
-      likeRepository.add(like);
+      likeRepo.add(like);
     }
 
     // act
@@ -158,13 +158,13 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post: firstPost, record: firstRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(firstPost);
-    recordRepository.add(firstRecord);
+    postRepo.add(firstPost);
+    recordRepo.add(firstRecord);
 
     const firstPostStats: PostStats = {
       likeCount: 0,
@@ -172,13 +172,13 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(firstPost.uri.toString(), firstPostStats);
+    postStatsRepo.add(firstPost.uri.toString(), firstPostStats);
 
     const { post: secondPost, record: secondRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(secondPost);
-    recordRepository.add(secondRecord);
+    postRepo.add(secondPost);
+    recordRepo.add(secondRecord);
 
     const secondPostStats: PostStats = {
       likeCount: 0,
@@ -186,13 +186,13 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(secondPost.uri.toString(), secondPostStats);
+    postStatsRepo.add(secondPost.uri.toString(), secondPostStats);
 
     const { post: thirdPost, record: thirdRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(thirdPost);
-    recordRepository.add(thirdRecord);
+    postRepo.add(thirdPost);
+    recordRepo.add(thirdRecord);
 
     const thirdPostStats: PostStats = {
       likeCount: 0,
@@ -200,7 +200,7 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(thirdPost.uri.toString(), thirdPostStats);
+    postStatsRepo.add(thirdPost.uri.toString(), thirdPostStats);
 
     const firstLike = likeFactory({
       actorDid: actor.did,
@@ -209,7 +209,7 @@ describe("GetActorLikesUseCase", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    likeRepository.add(firstLike);
+    likeRepo.add(firstLike);
 
     const secondLike = likeFactory({
       actorDid: actor.did,
@@ -218,7 +218,7 @@ describe("GetActorLikesUseCase", () => {
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepository.add(secondLike);
+    likeRepo.add(secondLike);
 
     const thirdLike = likeFactory({
       actorDid: actor.did,
@@ -227,7 +227,7 @@ describe("GetActorLikesUseCase", () => {
       createdAt: new Date("2024-01-01T03:00:00.000Z"),
       indexedAt: new Date("2024-01-01T03:00:00.000Z"),
     });
-    likeRepository.add(thirdLike);
+    likeRepo.add(thirdLike);
 
     // act - 最初のページ（limit=2）
     const firstPage = await sut.execute({
@@ -269,13 +269,13 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -283,14 +283,14 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const like = likeFactory({
       actorDid: actor.did,
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepository.add(like);
+    likeRepo.add(like);
 
     // act - limit=0
     const zeroLimitResult = await sut.execute({
@@ -325,13 +325,13 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post: existingPost, record: existingRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(existingPost);
-    recordRepository.add(existingRecord);
+    postRepo.add(existingPost);
+    recordRepo.add(existingRecord);
 
     const existingPostStats: PostStats = {
       likeCount: 0,
@@ -339,7 +339,7 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(existingPost.uri.toString(), existingPostStats);
+    postStatsRepo.add(existingPost.uri.toString(), existingPostStats);
 
     // 存在しない投稿へのいいね
     const deletedLike = likeFactory({
@@ -348,7 +348,7 @@ describe("GetActorLikesUseCase", () => {
       subjectCid: "bafy2bzacec123...",
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepository.add(deletedLike);
+    likeRepo.add(deletedLike);
 
     // 存在する投稿へのいいね
     const existingLike = likeFactory({
@@ -357,7 +357,7 @@ describe("GetActorLikesUseCase", () => {
       subjectCid: existingPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    likeRepository.add(existingLike);
+    likeRepo.add(existingLike);
 
     // act
     const result = await sut.execute({
@@ -382,13 +382,13 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 2,
@@ -396,7 +396,7 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     // actorのいいね
     const actorLike = likeFactory({
@@ -404,7 +404,7 @@ describe("GetActorLikesUseCase", () => {
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepository.add(actorLike);
+    likeRepo.add(actorLike);
 
     // viewerのいいね
     const viewerLike = likeFactory({
@@ -412,7 +412,7 @@ describe("GetActorLikesUseCase", () => {
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepository.add(viewerLike);
+    likeRepo.add(viewerLike);
 
     // act
     const result = await sut.execute({
@@ -454,13 +454,13 @@ describe("GetActorLikesUseCase", () => {
       actorDid: postAuthor.did,
       displayName: "Post Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post: earlyPost, record: earlyRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(earlyPost);
-    recordRepository.add(earlyRecord);
+    postRepo.add(earlyPost);
+    recordRepo.add(earlyRecord);
 
     const earlyPostStats: PostStats = {
       likeCount: 0,
@@ -468,13 +468,13 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(earlyPost.uri.toString(), earlyPostStats);
+    postStatsRepo.add(earlyPost.uri.toString(), earlyPostStats);
 
     const { post: latestPost, record: latestRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(latestPost);
-    recordRepository.add(latestRecord);
+    postRepo.add(latestPost);
+    recordRepo.add(latestRecord);
 
     const latestPostStats: PostStats = {
       likeCount: 0,
@@ -482,13 +482,13 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(latestPost.uri.toString(), latestPostStats);
+    postStatsRepo.add(latestPost.uri.toString(), latestPostStats);
 
     const { post: middlePost, record: middleRecord } = postFactory({
       actorDid: postAuthor.did,
     });
-    postRepository.add(middlePost);
-    recordRepository.add(middleRecord);
+    postRepo.add(middlePost);
+    recordRepo.add(middleRecord);
 
     const middlePostStats: PostStats = {
       likeCount: 0,
@@ -496,7 +496,7 @@ describe("GetActorLikesUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(middlePost.uri.toString(), middlePostStats);
+    postStatsRepo.add(middlePost.uri.toString(), middlePostStats);
 
     const earlyLike = likeFactory({
       actorDid: actor.did,
@@ -505,7 +505,7 @@ describe("GetActorLikesUseCase", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:30:00.000Z"),
     });
-    likeRepository.add(earlyLike);
+    likeRepo.add(earlyLike);
 
     const latestLike = likeFactory({
       actorDid: actor.did,
@@ -514,7 +514,7 @@ describe("GetActorLikesUseCase", () => {
       createdAt: new Date("2024-01-01T03:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:30:00.000Z"),
     });
-    likeRepository.add(latestLike);
+    likeRepo.add(latestLike);
 
     const middleLike = likeFactory({
       actorDid: actor.did,
@@ -523,7 +523,7 @@ describe("GetActorLikesUseCase", () => {
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepository.add(middleLike);
+    likeRepo.add(middleLike);
 
     // act
     const result = await sut.execute({

@@ -7,13 +7,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateAdminService", () => {
   let sut: TestServices["createAdminService"];
-  let actorRepository: TestServices["actorRepository"];
+  let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.createAdminService;
-    actorRepository = services.actorRepository;
+    actorRepo = services.actorRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
   });
@@ -29,7 +29,7 @@ describe("CreateAdminService", () => {
     });
 
     // assert
-    const savedActor = await actorRepository.findByDid(did);
+    const savedActor = await actorRepo.findByDid(did);
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did,
@@ -55,7 +55,7 @@ describe("CreateAdminService", () => {
   test("actorが既に存在する場合、そのactorを管理者に昇格する", async () => {
     // arrange
     const existingActor = actorFactory();
-    actorRepository.add(existingActor);
+    actorRepo.add(existingActor);
 
     // act
     await sut.execute({
@@ -64,7 +64,7 @@ describe("CreateAdminService", () => {
     });
 
     // assert
-    const savedActor = await actorRepository.findByDid(existingActor.did);
+    const savedActor = await actorRepo.findByDid(existingActor.did);
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did: existingActor.did,

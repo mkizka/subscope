@@ -8,18 +8,18 @@ import type { IndexCommitCommand } from "./index-commit-command.js";
 
 describe("IndexCommitUseCase", () => {
   let sut: TestServices["indexCommitUseCase"];
-  let actorRepository: TestServices["actorRepository"];
-  let subscriptionRepository: TestServices["subscriptionRepository"];
-  let postRepository: TestServices["postRepository"];
-  let recordRepository: TestServices["recordRepository"];
+  let actorRepo: TestServices["actorRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let postRepo: TestServices["postRepository"];
+  let recordRepo: TestServices["recordRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.indexCommitUseCase;
-    actorRepository = services.actorRepository;
-    subscriptionRepository = services.subscriptionRepository;
-    postRepository = services.postRepository;
-    recordRepository = services.recordRepository;
+    actorRepo = services.actorRepository;
+    subscriptionRepo = services.subscriptionRepository;
+    postRepo = services.postRepository;
+    recordRepo = services.recordRepository;
     db = services.db;
   });
 
@@ -29,10 +29,10 @@ describe("IndexCommitUseCase", () => {
     test("有効なpost作成オペレーションの場合、レコードがインデックスされる", async () => {
       // arrange
       const actor = actorFactory();
-      actorRepository.add(actor);
+      actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -62,7 +62,7 @@ describe("IndexCommitUseCase", () => {
         "Indexing completed successfully.",
       );
 
-      const savedPost = postRepository.findByUri(uri);
+      const savedPost = postRepo.findByUri(uri);
       expect(savedPost).not.toBeNull();
       expect(savedPost?.uri.toString()).toBe(uri.toString());
       expect(savedPost?.cid).toBe("cid123");
@@ -76,10 +76,10 @@ describe("IndexCommitUseCase", () => {
       const ctx = { db };
       // arrange
       const actor = actorFactory();
-      actorRepository.add(actor);
+      actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -115,7 +115,7 @@ describe("IndexCommitUseCase", () => {
         "Indexing completed successfully.",
       );
 
-      const deletedRecord = await recordRepository.findByUri({ ctx, uri });
+      const deletedRecord = await recordRepo.findByUri({ ctx, uri });
       expect(deletedRecord).toBeNull();
     });
   });
@@ -124,10 +124,10 @@ describe("IndexCommitUseCase", () => {
     test("RecordValidationErrorが発生した場合、エラーメッセージをログに記録して正常終了する", async () => {
       // arrange
       const actor = actorFactory();
-      actorRepository.add(actor);
+      actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepository.add(subscription);
+      subscriptionRepo.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({

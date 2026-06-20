@@ -13,21 +13,21 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetAuthorFeedUseCase", () => {
   let sut: TestServices["getAuthorFeedUseCase"];
-  let authorFeedRepository: TestServices["authorFeedRepository"];
-  let postRepository: TestServices["postRepository"];
-  let postStatsRepository: TestServices["postStatsRepository"];
-  let profileRepository: TestServices["profileRepository"];
-  let recordRepository: TestServices["recordRepository"];
-  let repostRepository: TestServices["repostRepository"];
+  let authorFeedRepo: TestServices["authorFeedRepository"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.getAuthorFeedUseCase;
-    authorFeedRepository = services.authorFeedRepository;
-    postRepository = services.postRepository;
-    postStatsRepository = services.postStatsRepository;
-    profileRepository = services.profileRepository;
-    recordRepository = services.recordRepository;
-    repostRepository = services.repostRepository;
+    authorFeedRepo = services.authorFeedRepository;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
+    repostRepo = services.repostRepository;
   });
 
   test("posts_with_repliesフィルターで投稿がある場合、投稿とリプライを含むフィードを返す", async () => {
@@ -38,15 +38,15 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Author User",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
       text: "Original post",
       createdAt: new Date("2024-01-01T00:00:00Z"),
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 5,
@@ -54,10 +54,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 3,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepository.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem, false);
 
     const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
@@ -66,8 +66,8 @@ describe("GetAuthorFeedUseCase", () => {
       replyParent: { uri: post.uri, cid: post.cid },
       createdAt: new Date("2024-01-02T00:00:00Z"),
     });
-    postRepository.add(reply);
-    recordRepository.add(replyRecord);
+    postRepo.add(reply);
+    recordRepo.add(replyRecord);
 
     const replyStats: PostStats = {
       likeCount: 0,
@@ -75,10 +75,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(reply.uri.toString(), replyStats);
+    postStatsRepo.add(reply.uri.toString(), replyStats);
 
     const replyFeedItem = FeedItem.fromPost(reply);
-    authorFeedRepository.add(replyFeedItem, true);
+    authorFeedRepo.add(replyFeedItem, true);
 
     // act
     const result = await sut.execute({
@@ -135,15 +135,15 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "No Reply Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
       text: "Regular post",
       createdAt: new Date("2024-01-03T00:00:00Z"),
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -151,10 +151,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepository.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem, false);
 
     const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
@@ -162,11 +162,11 @@ describe("GetAuthorFeedUseCase", () => {
       replyParent: { uri: post.uri, cid: post.cid },
       createdAt: new Date("2024-01-04T00:00:00Z"),
     });
-    postRepository.add(reply);
-    recordRepository.add(replyRecord);
+    postRepo.add(reply);
+    recordRepo.add(replyRecord);
 
     const replyFeedItem = FeedItem.fromPost(reply);
-    authorFeedRepository.add(replyFeedItem, true);
+    authorFeedRepo.add(replyFeedItem, true);
 
     // act
     const result = await sut.execute({
@@ -206,21 +206,21 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Reposter",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
     const originalProfile = profileDetailedFactory({
       actorDid: originalAuthor.did,
       displayName: "Original Author",
     });
-    profileRepository.add(originalProfile);
+    profileRepo.add(originalProfile);
 
     const { post: originalPost, record: originalRecord } = postFactory({
       actorDid: originalAuthor.did,
       text: "Original post to be reposted",
       createdAt: new Date("2024-01-05T00:00:00Z"),
     });
-    postRepository.add(originalPost);
-    recordRepository.add(originalRecord);
+    postRepo.add(originalPost);
+    recordRepo.add(originalRecord);
 
     const originalPostStats: PostStats = {
       likeCount: 0,
@@ -228,7 +228,7 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(originalPost.uri.toString(), originalPostStats);
+    postStatsRepo.add(originalPost.uri.toString(), originalPostStats);
 
     const repost = repostFactory({
       actorDid: author.did,
@@ -236,10 +236,10 @@ describe("GetAuthorFeedUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-06T00:00:00Z"),
     });
-    repostRepository.add(repost);
+    repostRepo.add(repost);
 
     const repostFeedItem = FeedItem.fromRepost(repost);
-    authorFeedRepository.add(repostFeedItem, false);
+    authorFeedRepo.add(repostFeedItem, false);
 
     // act
     const result = await sut.execute({
@@ -286,19 +286,19 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Author",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
     const viewerProfile = profileDetailedFactory({
       actorDid: viewer.did,
       displayName: "Viewer",
     });
-    profileRepository.add(viewerProfile);
+    profileRepo.add(viewerProfile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postStats: PostStats = {
       likeCount: 0,
@@ -306,10 +306,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post.uri.toString(), postStats);
+    postStatsRepo.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepository.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem, false);
 
     // act
     const result = await sut.execute({
@@ -346,15 +346,15 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Cursor Test Author",
     });
-    profileRepository.add(authorProfile);
+    profileRepo.add(authorProfile);
 
     const { post: olderPost, record: olderRecord } = postFactory({
       actorDid: author.did,
       text: "Older post",
       createdAt: new Date("2024-01-08T00:00:00Z"),
     });
-    postRepository.add(olderPost);
-    recordRepository.add(olderRecord);
+    postRepo.add(olderPost);
+    recordRepo.add(olderRecord);
 
     const olderPostStats: PostStats = {
       likeCount: 0,
@@ -362,17 +362,17 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(olderPost.uri.toString(), olderPostStats);
+    postStatsRepo.add(olderPost.uri.toString(), olderPostStats);
 
     const olderPostFeedItem = FeedItem.fromPost(olderPost);
-    authorFeedRepository.add(olderPostFeedItem, false);
+    authorFeedRepo.add(olderPostFeedItem, false);
 
     const { post: newerPost, record: newerRecord } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-10T00:00:00Z"),
     });
-    postRepository.add(newerPost);
-    recordRepository.add(newerRecord);
+    postRepo.add(newerPost);
+    recordRepo.add(newerRecord);
 
     const newerPostStats: PostStats = {
       likeCount: 0,
@@ -380,10 +380,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(newerPost.uri.toString(), newerPostStats);
+    postStatsRepo.add(newerPost.uri.toString(), newerPostStats);
 
     const newerPostFeedItem = FeedItem.fromPost(newerPost);
-    authorFeedRepository.add(newerPostFeedItem, false);
+    authorFeedRepo.add(newerPostFeedItem, false);
 
     // act
     const result = await sut.execute({
@@ -437,16 +437,16 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Zero Limit Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post, record } = postFactory({
       actorDid: author.did,
     });
-    postRepository.add(post);
-    recordRepository.add(record);
+    postRepo.add(post);
+    recordRepo.add(record);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepository.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem, false);
 
     // act
     const result = await sut.execute({
@@ -470,14 +470,14 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "Limit Test Author",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     const { post: post1, record: record1 } = postFactory({
       actorDid: author.did,
       createdAt: new Date("2024-01-11T00:00:00Z"),
     });
-    postRepository.add(post1);
-    recordRepository.add(record1);
+    postRepo.add(post1);
+    recordRepo.add(record1);
 
     const post1Stats: PostStats = {
       likeCount: 0,
@@ -485,18 +485,18 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post1.uri.toString(), post1Stats);
+    postStatsRepo.add(post1.uri.toString(), post1Stats);
 
     const post1FeedItem = FeedItem.fromPost(post1);
-    authorFeedRepository.add(post1FeedItem, false);
+    authorFeedRepo.add(post1FeedItem, false);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author.did,
       text: "Post 2",
       createdAt: new Date("2024-01-12T00:00:00Z"),
     });
-    postRepository.add(post2);
-    recordRepository.add(record2);
+    postRepo.add(post2);
+    recordRepo.add(record2);
 
     const post2Stats: PostStats = {
       likeCount: 0,
@@ -504,10 +504,10 @@ describe("GetAuthorFeedUseCase", () => {
       replyCount: 0,
       quoteCount: 0,
     };
-    postStatsRepository.add(post2.uri.toString(), post2Stats);
+    postStatsRepo.add(post2.uri.toString(), post2Stats);
 
     const post2FeedItem = FeedItem.fromPost(post2);
-    authorFeedRepository.add(post2FeedItem, false);
+    authorFeedRepo.add(post2FeedItem, false);
 
     // act
     const result = await sut.execute({
@@ -541,7 +541,7 @@ describe("GetAuthorFeedUseCase", () => {
       actorDid: author.did,
       displayName: "No Posts User",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     // act
     const result = await sut.execute({

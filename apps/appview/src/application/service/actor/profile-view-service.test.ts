@@ -11,15 +11,15 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileViewService", () => {
   let sut: TestServices["profileViewService"];
-  let profileRepository: TestServices["profileRepository"];
-  let actorStatsRepository: TestServices["actorStatsRepository"];
-  let followRepository: TestServices["followRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let actorStatsRepo: TestServices["actorStatsRepository"];
+  let followRepo: TestServices["followRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.profileViewService;
-    profileRepository = services.profileRepository;
-    actorStatsRepository = services.actorStatsRepository;
-    followRepository = services.followRepository;
+    profileRepo = services.profileRepository;
+    actorStatsRepo = services.actorStatsRepository;
+    followRepo = services.followRepository;
   });
 
   describe("findProfileViewBasic", () => {
@@ -31,7 +31,7 @@ describe("ProfileViewService", () => {
         handle: actor.handle,
         displayName: "Test User",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       // act
       const results = await sut.findProfileViewBasic([asDid(actor.did)]);
@@ -67,14 +67,14 @@ describe("ProfileViewService", () => {
         handle: actor.handle,
         displayName: "Test User",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       const actorStats: ActorStats = {
         followsCount: 10,
         followersCount: 20,
         postsCount: 30,
       };
-      actorStatsRepository.add(actor.did, actorStats);
+      actorStatsRepo.add(actor.did, actorStats);
 
       // act
       const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
@@ -101,7 +101,7 @@ describe("ProfileViewService", () => {
         handle: actor.handle,
         displayName: "Test User Without Stats",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       // act
       const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
@@ -127,28 +127,28 @@ describe("ProfileViewService", () => {
         actorDid: actor1.did,
         displayName: "User 1",
       });
-      profileRepository.add(profile1);
+      profileRepo.add(profile1);
 
       const actorStats1: ActorStats = {
         followsCount: 5,
         followersCount: 10,
         postsCount: 15,
       };
-      actorStatsRepository.add(actor1.did, actorStats1);
+      actorStatsRepo.add(actor1.did, actorStats1);
 
       const actor2 = actorFactory();
       const profile2 = profileDetailedFactory({
         actorDid: actor2.did,
         displayName: "User 2",
       });
-      profileRepository.add(profile2);
+      profileRepo.add(profile2);
 
       const actorStats2: ActorStats = {
         followsCount: 20,
         followersCount: 25,
         postsCount: 30,
       };
-      actorStatsRepository.add(actor2.did, actorStats2);
+      actorStatsRepo.add(actor2.did, actorStats2);
 
       // act
       const results = await sut.findProfileViewDetailed([
@@ -194,7 +194,7 @@ describe("ProfileViewService", () => {
         actorDid: actor.did,
         displayName: "Test User",
       });
-      profileRepository.add(profile);
+      profileRepo.add(profile);
 
       // act
       const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
@@ -219,7 +219,7 @@ describe("ProfileViewService", () => {
         actorDid: targetActor.did,
         displayName: "Target User",
       });
-      profileRepository.add(targetProfile);
+      profileRepo.add(targetProfile);
 
       // act
       const results = await sut.findProfileViewDetailed(
@@ -249,13 +249,13 @@ describe("ProfileViewService", () => {
         actorDid: targetActor.did,
         displayName: "Target User",
       });
-      profileRepository.add(targetProfile);
+      profileRepo.add(targetProfile);
 
       const follow = followFactory({
         actorDid: viewerActor.did,
         subjectDid: targetActor.did,
       });
-      followRepository.add(follow);
+      followRepo.add(follow);
 
       // act
       const results = await sut.findProfileViewDetailed(
@@ -285,13 +285,13 @@ describe("ProfileViewService", () => {
         actorDid: targetActor.did,
         displayName: "Target User",
       });
-      profileRepository.add(targetProfile);
+      profileRepo.add(targetProfile);
 
       const follow = followFactory({
         actorDid: targetActor.did,
         subjectDid: viewerActor.did,
       });
-      followRepository.add(follow);
+      followRepo.add(follow);
 
       // act
       const results = await sut.findProfileViewDetailed(
@@ -321,19 +321,19 @@ describe("ProfileViewService", () => {
         actorDid: targetActor.did,
         displayName: "Target User",
       });
-      profileRepository.add(targetProfile);
+      profileRepo.add(targetProfile);
 
       const followingFollow = followFactory({
         actorDid: viewerActor.did,
         subjectDid: targetActor.did,
       });
-      followRepository.add(followingFollow);
+      followRepo.add(followingFollow);
 
       const followedByFollow = followFactory({
         actorDid: targetActor.did,
         subjectDid: viewerActor.did,
       });
-      followRepository.add(followedByFollow);
+      followRepo.add(followedByFollow);
 
       // act
       const results = await sut.findProfileViewDetailed(
@@ -365,25 +365,25 @@ describe("ProfileViewService", () => {
         actorDid: target1Actor.did,
         displayName: "Target 1",
       });
-      profileRepository.add(target1Profile);
+      profileRepo.add(target1Profile);
 
       const target2Profile = profileDetailedFactory({
         actorDid: target2Actor.did,
         displayName: "Target 2",
       });
-      profileRepository.add(target2Profile);
+      profileRepo.add(target2Profile);
 
       const follow1 = followFactory({
         actorDid: viewerActor.did,
         subjectDid: target1Actor.did,
       });
-      followRepository.add(follow1);
+      followRepo.add(follow1);
 
       const follow2 = followFactory({
         actorDid: target2Actor.did,
         subjectDid: viewerActor.did,
       });
-      followRepository.add(follow2);
+      followRepo.add(follow2);
 
       // act
       const results = await sut.findProfileViewDetailed(

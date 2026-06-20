@@ -8,13 +8,13 @@ import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("IndexActorService", () => {
   let sut: TestServices["indexActorService"];
-  let actorRepository: TestServices["actorRepository"];
+  let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.indexActorService;
-    actorRepository = services.actorRepository;
+    actorRepo = services.actorRepository;
     jobScheduler = services.jobScheduler;
     db = services.db;
   });
@@ -35,7 +35,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({ ctx, did: testDid });
+      const actor = await actorRepo.findByDid({ ctx, did: testDid });
       expect(actor).toMatchObject({
         did: testDid,
         handle: testHandle,
@@ -60,7 +60,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: null,
       });
-      actorRepository.add(existingActor);
+      actorRepo.add(existingActor);
 
       // act
       await sut.upsert({
@@ -71,7 +71,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: newHandle,
       });
@@ -86,7 +86,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: existingHandle,
       });
-      actorRepository.add(existingActor);
+      actorRepo.add(existingActor);
 
       // act
       await sut.upsert({
@@ -97,7 +97,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: existingHandle,
       });
@@ -113,7 +113,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: oldHandle,
       });
-      actorRepository.add(existingActor);
+      actorRepo.add(existingActor);
 
       // act
       await sut.upsert({
@@ -124,7 +124,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: newHandle,
       });
@@ -143,7 +143,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({ ctx, did: newDid });
+      const actor = await actorRepo.findByDid({ ctx, did: newDid });
       expect(actor).toMatchObject({
         did: newDid,
         handle: null,
@@ -164,7 +164,7 @@ describe("IndexActorService", () => {
         did: existingDidNoHandle,
         handle: null,
       });
-      actorRepository.add(existingActor);
+      actorRepo.add(existingActor);
 
       // act
       await sut.upsert({
@@ -174,7 +174,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({
+      const actor = await actorRepo.findByDid({
         ctx,
         did: existingDidNoHandle,
       });
@@ -198,7 +198,7 @@ describe("IndexActorService", () => {
         did: existingDid,
         handle: existingHandle,
       });
-      actorRepository.add(existingActor);
+      actorRepo.add(existingActor);
 
       // act
       await sut.upsert({
@@ -208,7 +208,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepository.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: existingHandle,
       });

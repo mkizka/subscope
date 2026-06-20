@@ -5,11 +5,11 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {
   let sut: TestServices["searchActorsTypeaheadUseCase"];
-  let profileRepository: TestServices["profileRepository"];
+  let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     sut = services.searchActorsTypeaheadUseCase;
-    profileRepository = services.profileRepository;
+    profileRepo = services.profileRepository;
   });
 
   test("クエリが空の場合、空のactors配列を返す", async () => {
@@ -59,7 +59,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: "Unique Test User",
       handle: actor.handle ?? "unique.test",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     // act
     const result = await sut.execute({
@@ -85,7 +85,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: "User",
       handle: "searchablehandle.test",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     // act
     const result = await sut.execute({
@@ -116,7 +116,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: `UniqueLimit${uniqueId}User1`,
       indexedAt: new Date("2024-01-03T00:00:00.000Z"),
     });
-    profileRepository.add(profile1);
+    profileRepo.add(profile1);
 
     const actor2 = actorFactory();
     const profile2 = profileDetailedFactory({
@@ -124,7 +124,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: `UniqueLimit${uniqueId}User2`,
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    profileRepository.add(profile2);
+    profileRepo.add(profile2);
 
     const actor3 = actorFactory();
     const profile3 = profileDetailedFactory({
@@ -132,7 +132,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: `UniqueLimit${uniqueId}User3`,
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    profileRepository.add(profile3);
+    profileRepo.add(profile3);
 
     // act
     const result = await sut.execute({
@@ -162,7 +162,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
       actorDid: actor.did,
       displayName: "Test User",
     });
-    profileRepository.add(profile);
+    profileRepo.add(profile);
 
     // act
     const result = await sut.execute({
