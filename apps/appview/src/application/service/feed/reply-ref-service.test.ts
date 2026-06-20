@@ -10,13 +10,19 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ReplyRefService", () => {
-  let services: TestServices;
+  let sut: TestServices["replyRefService"];
+  let postRepository: TestServices["postRepository"];
+  let recordRepository: TestServices["recordRepository"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.replyRefService;
+    postRepository = services.postRepository;
+    recordRepository = services.recordRepository;
+    profileRepository = services.profileRepository;
   });
 
   test("リプライがない投稿のみの場合、空のMapを返す", async () => {
-    const { replyRefService } = services;
     // arrange
     const posts = [
       new Post({
@@ -34,19 +40,13 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.findMap(posts);
+    const result = await sut.findMap(posts);
 
     // assert
     expect(result).toEqual(new Map());
   });
 
   test("リプライがある場合、reply情報を含むMapを返す", async () => {
-    const {
-      replyRefService,
-      postRepository,
-      recordRepository,
-      profileRepository,
-    } = services;
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -90,7 +90,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.findMap(posts);
+    const result = await sut.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({
@@ -105,12 +105,6 @@ describe("ReplyRefService", () => {
   });
 
   test("複数のリプライがある場合、すべてのreply情報を含むMapを返す", async () => {
-    const {
-      replyRefService,
-      postRepository,
-      recordRepository,
-      profileRepository,
-    } = services;
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -172,7 +166,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.findMap(posts);
+    const result = await sut.findMap(posts);
 
     // assert
     expect(result.get(reply1Uri.toString())).toMatchObject({
@@ -196,7 +190,6 @@ describe("ReplyRefService", () => {
   });
 
   test("PostViewが見つからない場合、NotFoundPostを含むreply情報を返す", async () => {
-    const { replyRefService } = services;
     // arrange
     const rootUri = new AtUri("at://did:plc:notfound/app.bsky.feed.post/root");
     const parentUri = new AtUri(
@@ -220,7 +213,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.findMap(posts);
+    const result = await sut.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({
@@ -239,12 +232,6 @@ describe("ReplyRefService", () => {
   });
 
   test("リプライとノーマル投稿が混在している場合、リプライのみを処理する", async () => {
-    const {
-      replyRefService,
-      postRepository,
-      recordRepository,
-      profileRepository,
-    } = services;
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -306,7 +293,7 @@ describe("ReplyRefService", () => {
     ];
 
     // act
-    const result = await replyRefService.findMap(posts);
+    const result = await sut.findMap(posts);
 
     // assert
     expect(result.get(replyUri.toString())).toMatchObject({

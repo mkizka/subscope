@@ -5,19 +5,23 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscriptionStatusUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getSubscriptionStatusUseCase"];
+  let actorRepository: TestServices["actorRepository"];
+  let subscriptionRepository: TestServices["subscriptionRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getSubscriptionStatusUseCase;
+    actorRepository = services.actorRepository;
+    subscriptionRepository = services.subscriptionRepository;
   });
 
   test("サブスクリプションが存在しない場合、notSubscribedを返す", async () => {
-    const { getSubscriptionStatusUseCase, actorRepository } = services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
 
     // act
-    const result = await getSubscriptionStatusUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
     });
 
@@ -29,11 +33,6 @@ describe("GetSubscriptionStatusUseCase", () => {
   });
 
   test("サブスクリプションが存在する場合、subscribedを返す", async () => {
-    const {
-      getSubscriptionStatusUseCase,
-      subscriptionRepository,
-      actorRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
@@ -41,7 +40,7 @@ describe("GetSubscriptionStatusUseCase", () => {
     subscriptionRepository.add(subscription);
 
     // act
-    const result = await getSubscriptionStatusUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
     });
 

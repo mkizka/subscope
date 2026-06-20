@@ -15,21 +15,23 @@ import {
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["subscribeServerUseCase"];
+  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let inviteCodeRepository: TestServices["inviteCodeRepository"];
+  let actorRepository: TestServices["actorRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.subscribeServerUseCase;
+    subscriptionRepository = services.subscriptionRepository;
+    inviteCodeRepository = services.inviteCodeRepository;
+    actorRepository = services.actorRepository;
+    jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
     vi.setSystemTime(now);
   });
 
   test("有効な招待コードの場合、サブスクリプションを作成して招待コードの使用時間を更新する", async () => {
-    const {
-      subscribeServerUseCase,
-      subscriptionRepository,
-      inviteCodeRepository,
-      actorRepository,
-      jobScheduler,
-    } = services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
@@ -37,7 +39,7 @@ describe("SubscribeServerUseCase", () => {
     inviteCodeRepository.add(inviteCode);
 
     // act
-    await subscribeServerUseCase.execute({
+    await sut.execute({
       code: inviteCode.code,
       actorDid: asDid(actor.did),
     });
@@ -60,26 +62,19 @@ describe("SubscribeServerUseCase", () => {
   });
 
   test("招待コードが提供されない場合、InvalidInviteCodeErrorをthrowする", async () => {
-    const { subscribeServerUseCase, actorRepository } = services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
 
     // act & assert
     await expect(
-      subscribeServerUseCase.execute({
+      sut.execute({
         actorDid: asDid(actor.did),
       }),
     ).rejects.toThrow(new InvalidInviteCodeError("Invite code is required"));
   });
 
   test("すでにサブスクライブ済みの場合、AlreadySubscribedErrorをthrowする", async () => {
-    const {
-      subscribeServerUseCase,
-      subscriptionRepository,
-      inviteCodeRepository,
-      actorRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
@@ -93,7 +88,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      subscribeServerUseCase.execute({
+      sut.execute({
         code: "test-code",
         actorDid: asDid(actor.did),
       }),
@@ -103,14 +98,13 @@ describe("SubscribeServerUseCase", () => {
   });
 
   test("招待コードが存在しない場合、InvalidInviteCodeErrorをthrowする", async () => {
-    const { subscribeServerUseCase, actorRepository } = services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
 
     // act & assert
     await expect(
-      subscribeServerUseCase.execute({
+      sut.execute({
         code: "invalid-code",
         actorDid: asDid(actor.did),
       }),
@@ -118,8 +112,6 @@ describe("SubscribeServerUseCase", () => {
   });
 
   test("招待コードが期限切れの場合、InvalidInviteCodeErrorをthrowする", async () => {
-    const { subscribeServerUseCase, inviteCodeRepository, actorRepository } =
-      services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
@@ -130,7 +122,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      subscribeServerUseCase.execute({
+      sut.execute({
         code: expiredInviteCode.code,
         actorDid: asDid(actor.did),
       }),
@@ -142,8 +134,6 @@ describe("SubscribeServerUseCase", () => {
   });
 
   test("招待コードがすでに使用されている場合、InvalidInviteCodeErrorをthrowする", async () => {
-    const { subscribeServerUseCase, inviteCodeRepository, actorRepository } =
-      services;
     // arrange
     const actor = actorFactory();
     actorRepository.add(actor);
@@ -155,7 +145,7 @@ describe("SubscribeServerUseCase", () => {
 
     // act & assert
     await expect(
-      subscribeServerUseCase.execute({
+      sut.execute({
         code: inviteCode.code,
         actorDid: asDid(actor.did),
       }),
@@ -167,20 +157,13 @@ describe("SubscribeServerUseCase", () => {
   });
 
   test("Actorが存在しない場合、Actorを作成してサブスクリプションを作成する", async () => {
-    const {
-      subscribeServerUseCase,
-      subscriptionRepository,
-      inviteCodeRepository,
-      actorRepository,
-      jobScheduler,
-    } = services;
     // arrange
     const did = asDid("did:plc:test123456789abcdefghijk");
     const inviteCode = inviteCodeFactory({ expiresAt: now });
     inviteCodeRepository.add(inviteCode);
 
     // act
-    await subscribeServerUseCase.execute({
+    await sut.execute({
       code: inviteCode.code,
       actorDid: did,
     });
@@ -205,18 +188,12 @@ describe("SubscribeServerUseCase", () => {
   });
 
   test("管理者の場合、招待コードなしでサブスクリプションを作成する", async () => {
-    const {
-      subscribeServerUseCase,
-      subscriptionRepository,
-      actorRepository,
-      jobScheduler,
-    } = services;
     // arrange
     const admin = actorFactory({ isAdmin: true });
     actorRepository.add(admin);
 
     // act
-    await subscribeServerUseCase.execute({
+    await sut.execute({
       actorDid: asDid(admin.did),
     });
 

@@ -4,28 +4,29 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSetupStatusUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getSetupStatusUseCase"];
+  let actorRepository: TestServices["actorRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getSetupStatusUseCase;
+    actorRepository = services.actorRepository;
   });
 
   test("管理者が存在しない場合、initializedがfalseを返す", async () => {
-    const { getSetupStatusUseCase } = services;
     // act
-    const result = await getSetupStatusUseCase.execute();
+    const result = await sut.execute();
 
     // assert
     expect(result.initialized).toBe(false);
   });
 
   test("管理者が存在する場合、initializedがtrueを返す", async () => {
-    const { getSetupStatusUseCase, actorRepository } = services;
     // arrange
     const admin = actorFactory({ isAdmin: true });
     actorRepository.add(admin);
 
     // act
-    const result = await getSetupStatusUseCase.execute();
+    const result = await sut.execute();
 
     // assert
     expect(result.initialized).toBe(true);

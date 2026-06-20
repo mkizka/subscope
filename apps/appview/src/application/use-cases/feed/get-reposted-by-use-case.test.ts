@@ -9,13 +9,17 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetRepostedByUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getRepostedByUseCase"];
+  let repostRepository: TestServices["repostRepository"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getRepostedByUseCase;
+    repostRepository = services.repostRepository;
+    profileRepository = services.profileRepository;
   });
 
   test("リポストがない場合、空のrepostedByを返す", async () => {
-    const { getRepostedByUseCase } = services;
     // arrange
     const actor = actorFactory();
     const { post } = postFactory({
@@ -23,7 +27,7 @@ describe("GetRepostedByUseCase", () => {
     });
 
     // act
-    const result = await getRepostedByUseCase.execute({
+    const result = await sut.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
@@ -36,8 +40,6 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("リポストがある場合、リポストしたユーザーのプロフィールを返す", async () => {
-    const { getRepostedByUseCase, repostRepository, profileRepository } =
-      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -59,7 +61,7 @@ describe("GetRepostedByUseCase", () => {
     repostRepository.add(repost);
 
     // act
-    const result = await getRepostedByUseCase.execute({
+    const result = await sut.execute({
       uri: originalPost.uri.toString(),
       limit: 50,
     });
@@ -78,8 +80,6 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("複数のリポストがある場合、時系列の降順で返す", async () => {
-    const { getRepostedByUseCase, repostRepository, profileRepository } =
-      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -117,7 +117,7 @@ describe("GetRepostedByUseCase", () => {
     repostRepository.add(secondRepost);
 
     // act
-    const result = await getRepostedByUseCase.execute({
+    const result = await sut.execute({
       uri: originalPost.uri.toString(),
       limit: 50,
     });
@@ -141,8 +141,6 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("limitパラメータによる制限が正しく動作する", async () => {
-    const { getRepostedByUseCase, repostRepository, profileRepository } =
-      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -180,7 +178,7 @@ describe("GetRepostedByUseCase", () => {
     repostRepository.add(secondRepost);
 
     // act
-    const result = await getRepostedByUseCase.execute({
+    const result = await sut.execute({
       uri: originalPost.uri.toString(),
       limit: 1,
     });
@@ -200,8 +198,6 @@ describe("GetRepostedByUseCase", () => {
   });
 
   test("cursorパラメータによるページネーションが正しく動作する", async () => {
-    const { getRepostedByUseCase, repostRepository, profileRepository } =
-      services;
     // arrange
     const originalActor = actorFactory();
     const { post: originalPost } = postFactory({
@@ -239,13 +235,13 @@ describe("GetRepostedByUseCase", () => {
     repostRepository.add(secondRepost);
 
     // act - 最初のページ
-    const firstPage = await getRepostedByUseCase.execute({
+    const firstPage = await sut.execute({
       uri: originalPost.uri.toString(),
       limit: 1,
     });
 
     // act - 次のページ
-    const secondPage = await getRepostedByUseCase.execute({
+    const secondPage = await sut.execute({
       uri: originalPost.uri.toString(),
       limit: 1,
       cursor: firstPage.cursor,

@@ -4,15 +4,17 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["searchActorsTypeaheadUseCase"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.searchActorsTypeaheadUseCase;
+    profileRepository = services.profileRepository;
   });
 
   test("クエリが空の場合、空のactors配列を返す", async () => {
-    const { searchActorsTypeaheadUseCase } = services;
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: "",
       limit: 10,
     });
@@ -24,9 +26,8 @@ describe("SearchActorsTypeaheadUseCase", () => {
   });
 
   test("クエリがundefinedの場合、空のactors配列を返す", async () => {
-    const { searchActorsTypeaheadUseCase } = services;
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: undefined,
       limit: 10,
     });
@@ -38,9 +39,8 @@ describe("SearchActorsTypeaheadUseCase", () => {
   });
 
   test("クエリがスペースのみの場合、空のactors配列を返す", async () => {
-    const { searchActorsTypeaheadUseCase } = services;
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: "   ",
       limit: 10,
     });
@@ -52,7 +52,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
   });
 
   test("表示名で検索した場合、該当するactorのProfileViewBasicを返す", async () => {
-    const { searchActorsTypeaheadUseCase, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const profile = profileDetailedFactory({
@@ -63,7 +62,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
     profileRepository.add(profile);
 
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: "Unique Test",
       limit: 10,
     });
@@ -79,7 +78,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
   });
 
   test("ハンドルで検索した場合、該当するactorのProfileViewBasicを返す", async () => {
-    const { searchActorsTypeaheadUseCase, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const profile = profileDetailedFactory({
@@ -90,7 +88,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
     profileRepository.add(profile);
 
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: "searchablehandle",
       limit: 10,
     });
@@ -109,7 +107,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
   });
 
   test("limit数を超えるactorが存在する場合、指定されたlimit数のactorを返す", async () => {
-    const { searchActorsTypeaheadUseCase, profileRepository } = services;
     // arrange
     const uniqueId = Date.now();
 
@@ -138,7 +135,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
     profileRepository.add(profile3);
 
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: `UniqueLimit${uniqueId}`,
       limit: 2,
     });
@@ -159,7 +156,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
   });
 
   test("該当するactorが存在しない場合、空のactors配列を返す", async () => {
-    const { searchActorsTypeaheadUseCase, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const profile = profileDetailedFactory({
@@ -169,7 +165,7 @@ describe("SearchActorsTypeaheadUseCase", () => {
     profileRepository.add(profile);
 
     // act
-    const result = await searchActorsTypeaheadUseCase.execute({
+    const result = await sut.execute({
       query: "NotFound",
       limit: 10,
     });

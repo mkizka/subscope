@@ -10,18 +10,26 @@ import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetPostThreadUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getPostThreadUseCase"];
+  let postRepository: TestServices["postRepository"];
+  let postStatsRepository: TestServices["postStatsRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let recordRepository: TestServices["recordRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getPostThreadUseCase;
+    postRepository = services.postRepository;
+    postStatsRepository = services.postStatsRepository;
+    profileRepository = services.profileRepository;
+    recordRepository = services.recordRepository;
   });
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
-    const { getPostThreadUseCase, postRepository } = services;
     const spyFindByUri = vi.spyOn(postRepository, "findByUri");
     const spyFindReplies = vi.spyOn(postRepository, "findReplies");
 
     // act
-    const result = await getPostThreadUseCase.execute({
+    const result = await sut.execute({
       uri: new ResolvedAtUri(
         "at://did:plc:notexist/app.bsky.feed.post/notexist",
       ),
@@ -42,13 +50,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
-    const {
-      getPostThreadUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     const spyFindByUri = vi.spyOn(postRepository, "findByUri");
     const spyFindReplies = vi.spyOn(postRepository, "findReplies");
 
@@ -76,7 +77,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepository.add(post.uri.toString(), postStats);
 
     // act
-    const result = await getPostThreadUseCase.execute({
+    const result = await sut.execute({
       uri: new ResolvedAtUri(post.uri),
       depth: 6,
       parentHeight: 80,
@@ -101,13 +102,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
-    const {
-      getPostThreadUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     const spyFindByUri = vi.spyOn(postRepository, "findByUri");
     const spyFindReplies = vi.spyOn(postRepository, "findReplies");
 
@@ -180,7 +174,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepository.add(targetPost.uri.toString(), targetPostStats);
 
     // act
-    const result = await getPostThreadUseCase.execute({
+    const result = await sut.execute({
       uri: new ResolvedAtUri(targetPost.uri),
       depth: 6,
       parentHeight: 10,
@@ -221,13 +215,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
-    const {
-      getPostThreadUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     const spyFindByUri = vi.spyOn(postRepository, "findByUri");
     const spyFindReplies = vi.spyOn(postRepository, "findReplies");
 
@@ -300,7 +287,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepository.add(grandchildPost.uri.toString(), grandchildPostStats);
 
     // act
-    const result = await getPostThreadUseCase.execute({
+    const result = await sut.execute({
       uri: new ResolvedAtUri(rootPost.uri),
       depth: 6,
       parentHeight: 80,
@@ -346,13 +333,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("depthより大きい深さのリプライは取得しない", async () => {
-    const {
-      getPostThreadUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     const spyFindByUri = vi.spyOn(postRepository, "findByUri");
     const spyFindReplies = vi.spyOn(postRepository, "findReplies");
 
@@ -448,7 +428,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepository.add(level3Post.uri.toString(), level3PostStats);
 
     // act - depth=2で実行（Level 3は取得されないはず）
-    const result = await getPostThreadUseCase.execute({
+    const result = await sut.execute({
       uri: new ResolvedAtUri(rootPost.uri),
       depth: 2,
       parentHeight: 80,
@@ -495,13 +475,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
-    const {
-      getPostThreadUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     const spyFindByUri = vi.spyOn(postRepository, "findByUri");
     const spyFindReplies = vi.spyOn(postRepository, "findReplies");
 
@@ -597,7 +570,7 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepository.add(targetPost.uri.toString(), targetPostStats);
 
     // act - parentHeight=2で実行（Level 0は取得されないはず）
-    const result = await getPostThreadUseCase.execute({
+    const result = await sut.execute({
       uri: new ResolvedAtUri(targetPost.uri),
       depth: 6,
       parentHeight: 2,

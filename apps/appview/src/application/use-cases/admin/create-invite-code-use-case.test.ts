@@ -3,18 +3,18 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["createInviteCodeUseCase"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.createInviteCodeUseCase;
   });
 
   test("有効期限が適切に指定されている場合、招待コードと有効期限を返す", async () => {
-    const { createInviteCodeUseCase } = services;
     // arrange
     const daysToExpire = 7;
 
     // act
-    const result = await createInviteCodeUseCase.execute({ daysToExpire });
+    const result = await sut.execute({ daysToExpire });
 
     // assert
     expect(result.code).toMatch(/^example-com-[a-z0-9]{5}$/);
@@ -32,9 +32,8 @@ describe("CreateInviteCodeUseCase", () => {
   });
 
   test("境界値の場合、最小と最大の有効期限が正しく設定される", async () => {
-    const { createInviteCodeUseCase } = services;
     // arrange & act - 最小値1日
-    const result1 = await createInviteCodeUseCase.execute({ daysToExpire: 1 });
+    const result1 = await sut.execute({ daysToExpire: 1 });
 
     // assert
     const expiresAt1 = new Date(result1.expiresAt);
@@ -45,7 +44,7 @@ describe("CreateInviteCodeUseCase", () => {
     expect(diffInDays1).toBe(1);
 
     // arrange & act - 最大値365日
-    const result365 = await createInviteCodeUseCase.execute({
+    const result365 = await sut.execute({
       daysToExpire: 365,
     });
 
@@ -59,10 +58,9 @@ describe("CreateInviteCodeUseCase", () => {
   });
 
   test("同じ有効期限でくり返し呼ばれた場合、異なる招待コードを返す", async () => {
-    const { createInviteCodeUseCase } = services;
     // arrange & act
-    const result1 = await createInviteCodeUseCase.execute({ daysToExpire: 30 });
-    const result2 = await createInviteCodeUseCase.execute({ daysToExpire: 30 });
+    const result1 = await sut.execute({ daysToExpire: 30 });
+    const result2 = await sut.execute({ daysToExpire: 30 });
 
     // assert
     expect(result1.code).not.toBe(result2.code);

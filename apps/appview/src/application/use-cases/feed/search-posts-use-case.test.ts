@@ -9,15 +9,23 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchPostsUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["searchPostsUseCase"];
+  let postRepository: TestServices["postRepository"];
+  let postStatsRepository: TestServices["postStatsRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let recordRepository: TestServices["recordRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.searchPostsUseCase;
+    postRepository = services.postRepository;
+    postStatsRepository = services.postStatsRepository;
+    profileRepository = services.profileRepository;
+    recordRepository = services.recordRepository;
   });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
-    const { searchPostsUseCase } = services;
     // act
-    const result = await searchPostsUseCase.execute({
+    const result = await sut.execute({
       q: "",
       limit: 10,
     });
@@ -30,9 +38,8 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("空白文字のみの検索クエリの場合、空の結果を返す", async () => {
-    const { searchPostsUseCase } = services;
     // act
-    const result = await searchPostsUseCase.execute({
+    const result = await sut.execute({
       q: "   ",
       limit: 10,
     });
@@ -45,13 +52,6 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("検索クエリに一致する投稿がある場合、該当する投稿を返す", async () => {
-    const {
-      searchPostsUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -77,7 +77,7 @@ describe("SearchPostsUseCase", () => {
     postStatsRepository.add(post.uri.toString(), postStats);
 
     // act
-    const result = await searchPostsUseCase.execute({
+    const result = await sut.execute({
       q: "テスト",
       limit: 10,
     });
@@ -99,13 +99,6 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("検索クエリに一致する投稿がない場合、空の配列を返す", async () => {
-    const {
-      searchPostsUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -131,7 +124,7 @@ describe("SearchPostsUseCase", () => {
     postStatsRepository.add(post.uri.toString(), postStats);
 
     // act
-    const result = await searchPostsUseCase.execute({
+    const result = await sut.execute({
       q: "存在しないキーワード",
       limit: 10,
     });
@@ -144,13 +137,6 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("limitパラメータが指定された場合、指定した件数で結果を制限する", async () => {
-    const {
-      searchPostsUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -193,7 +179,7 @@ describe("SearchPostsUseCase", () => {
     postStatsRepository.add(secondPost.uri.toString(), secondPostStats);
 
     // act
-    const result = await searchPostsUseCase.execute({
+    const result = await sut.execute({
       q: "リミット検証",
       limit: 1,
     });
@@ -210,13 +196,6 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("cursorパラメータが指定された場合、ページネーションで次のページを返す", async () => {
-    const {
-      searchPostsUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -259,13 +238,13 @@ describe("SearchPostsUseCase", () => {
     postStatsRepository.add(secondPost.uri.toString(), secondPostStats);
 
     // act - 最初のページ
-    const firstPage = await searchPostsUseCase.execute({
+    const firstPage = await sut.execute({
       q: "ページネーション検証",
       limit: 1,
     });
 
     // act - 次のページ
-    const secondPage = await searchPostsUseCase.execute({
+    const secondPage = await sut.execute({
       q: "ページネーション検証",
       limit: 1,
       cursor: firstPage.cursor,
@@ -294,13 +273,6 @@ describe("SearchPostsUseCase", () => {
   });
 
   test("リプライ投稿がある場合、リプライを除外して元投稿のみを返す", async () => {
-    const {
-      searchPostsUseCase,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
 
@@ -343,7 +315,7 @@ describe("SearchPostsUseCase", () => {
     postStatsRepository.add(replyPost.uri.toString(), replyPostStats);
 
     // act
-    const result = await searchPostsUseCase.execute({
+    const result = await sut.execute({
       q: "リプライ検証内容",
       limit: 10,
     });

@@ -8,26 +8,27 @@ import { AdminAlreadyExistsError } from "./register-admin-use-case.js";
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("RegisterAdminUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["registerAdminUseCase"];
+  let actorRepository: TestServices["actorRepository"];
+  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.registerAdminUseCase;
+    actorRepository = services.actorRepository;
+    subscriptionRepository = services.subscriptionRepository;
+    jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
     vi.setSystemTime(now);
   });
 
   test("管理者が存在しない場合、リクエストユーザーを管理者に昇格しサブスクリプションも作成する", async () => {
-    const {
-      registerAdminUseCase,
-      actorRepository,
-      subscriptionRepository,
-      jobScheduler,
-    } = services;
     // arrange
     const requester = actorFactory({ isAdmin: false });
     actorRepository.add(requester);
 
     // act
-    await registerAdminUseCase.execute({
+    await sut.execute({
       requesterDid: requester.did,
     });
 
@@ -47,7 +48,6 @@ describe("RegisterAdminUseCase", () => {
   });
 
   test("管理者が既に存在する場合、AdminAlreadyExistsErrorをスローする", async () => {
-    const { registerAdminUseCase, actorRepository } = services;
     // arrange
     const admin = actorFactory({ isAdmin: true });
     actorRepository.add(admin);
@@ -57,19 +57,18 @@ describe("RegisterAdminUseCase", () => {
 
     // act & assert
     await expect(
-      registerAdminUseCase.execute({
+      sut.execute({
         requesterDid: requester.did,
       }),
     ).rejects.toThrow(AdminAlreadyExistsError);
   });
 
   test("リクエストユーザーが存在しない場合、新規作成して管理者に昇格する", async () => {
-    const { registerAdminUseCase, actorRepository } = services;
     // arrange
     const nonExistentDid = "did:plc:nonexistent";
 
     // act
-    await registerAdminUseCase.execute({
+    await sut.execute({
       requesterDid: nonExistentDid,
     });
 

@@ -5,14 +5,17 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFeedGeneratorsUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getFeedGeneratorsUseCase"];
+  let generatorRepository: TestServices["generatorRepository"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getFeedGeneratorsUseCase;
+    generatorRepository = services.generatorRepository;
+    profileRepository = services.profileRepository;
   });
 
   test("指定したURIのフィードジェネレーターが存在する場合、GeneratorViewを返す", async () => {
-    const { getFeedGeneratorsUseCase, generatorRepository, profileRepository } =
-      services;
     // arrange
     const generator = generatorFactory({
       displayName: "Test Feed Generator",
@@ -27,7 +30,7 @@ describe("GetFeedGeneratorsUseCase", () => {
     profileRepository.add(profile);
 
     // act
-    const result = await getFeedGeneratorsUseCase.execute([generator.uri]);
+    const result = await sut.execute([generator.uri]);
 
     // assert
     expect(result).toHaveLength(1);
@@ -46,8 +49,6 @@ describe("GetFeedGeneratorsUseCase", () => {
   });
 
   test("複数のフィードジェネレーターを指定した場合、リクエスト順に返す", async () => {
-    const { getFeedGeneratorsUseCase, generatorRepository, profileRepository } =
-      services;
     // arrange
     const generator1 = generatorFactory({
       displayName: "First Generator",
@@ -70,10 +71,7 @@ describe("GetFeedGeneratorsUseCase", () => {
     profileRepository.add(profile2);
 
     // act
-    const result = await getFeedGeneratorsUseCase.execute([
-      generator2.uri,
-      generator1.uri,
-    ]);
+    const result = await sut.execute([generator2.uri, generator1.uri]);
 
     // assert
     expect(result).toHaveLength(2);
@@ -86,31 +84,27 @@ describe("GetFeedGeneratorsUseCase", () => {
   });
 
   test("指定したURIのフィードジェネレーターが存在しない場合、空の配列を返す", async () => {
-    const { getFeedGeneratorsUseCase } = services;
     // arrange
     const nonExistentUri = new AtUri(
       "at://did:plc:nonexistent/app.bsky.feed.generator/test",
     );
 
     // act
-    const result = await getFeedGeneratorsUseCase.execute([nonExistentUri]);
+    const result = await sut.execute([nonExistentUri]);
 
     // assert
     expect(result).toHaveLength(0);
   });
 
   test("空のURI配列を渡した場合、空の配列を返す", async () => {
-    const { getFeedGeneratorsUseCase } = services;
     // arrange & act
-    const result = await getFeedGeneratorsUseCase.execute([]);
+    const result = await sut.execute([]);
 
     // assert
     expect(result).toHaveLength(0);
   });
 
   test("一部のフィードジェネレーターのみ存在する場合、存在するもののみ返す", async () => {
-    const { getFeedGeneratorsUseCase, generatorRepository, profileRepository } =
-      services;
     // arrange
     const generator = generatorFactory({
       displayName: "Existing Generator",
@@ -127,10 +121,7 @@ describe("GetFeedGeneratorsUseCase", () => {
     );
 
     // act
-    const result = await getFeedGeneratorsUseCase.execute([
-      generator.uri,
-      nonExistentUri,
-    ]);
+    const result = await sut.execute([generator.uri, nonExistentUri]);
 
     // assert
     expect(result).toHaveLength(1);

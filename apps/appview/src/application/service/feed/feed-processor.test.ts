@@ -10,18 +10,21 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FeedProcessor", () => {
-  let services: TestServices;
+  let sut: TestServices["feedProcessor"];
+  let postRepository: TestServices["postRepository"];
+  let recordRepository: TestServices["recordRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let repostRepository: TestServices["repostRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.feedProcessor;
+    postRepository = services.postRepository;
+    recordRepository = services.recordRepository;
+    profileRepository = services.profileRepository;
+    repostRepository = services.repostRepository;
   });
 
   test("投稿のみの場合、FeedViewPostのリストを返す", async () => {
-    const {
-      feedProcessor,
-      postRepository,
-      recordRepository,
-      profileRepository,
-    } = services;
     // arrange
     const author = actorFactory();
     const profile = profileDetailedFactory({
@@ -40,7 +43,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromPost(post);
 
     // act
-    const result = await feedProcessor.processFeedItems([feedItem]);
+    const result = await sut.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
@@ -64,13 +67,6 @@ describe("FeedProcessor", () => {
   });
 
   test("リポストの場合、reasonを含むFeedViewPostを返す", async () => {
-    const {
-      feedProcessor,
-      postRepository,
-      recordRepository,
-      profileRepository,
-      repostRepository,
-    } = services;
     // arrange
     const originalAuthor = actorFactory();
     const originalProfile = profileDetailedFactory({
@@ -106,7 +102,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromRepost(repost);
 
     // act
-    const result = await feedProcessor.processFeedItems([feedItem]);
+    const result = await sut.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
@@ -135,12 +131,6 @@ describe("FeedProcessor", () => {
   });
 
   test("リプライ投稿の場合、replyを含むFeedViewPostを返す", async () => {
-    const {
-      feedProcessor,
-      postRepository,
-      recordRepository,
-      profileRepository,
-    } = services;
     // arrange
     const rootAuthor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -175,7 +165,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromPost(replyPost);
 
     // act
-    const result = await feedProcessor.processFeedItems([feedItem]);
+    const result = await sut.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([
@@ -211,13 +201,6 @@ describe("FeedProcessor", () => {
   });
 
   test("複数の投稿とリポストが混在する場合、正しい順序で返す", async () => {
-    const {
-      feedProcessor,
-      postRepository,
-      recordRepository,
-      profileRepository,
-      repostRepository,
-    } = services;
     // arrange
     const author1 = actorFactory();
     const profile1 = profileDetailedFactory({
@@ -267,7 +250,7 @@ describe("FeedProcessor", () => {
     const feedItem2 = FeedItem.fromRepost(repost);
 
     // act
-    const result = await feedProcessor.processFeedItems([feedItem1, feedItem2]);
+    const result = await sut.processFeedItems([feedItem1, feedItem2]);
 
     // assert
     expect(result).toHaveLength(2);
@@ -286,7 +269,6 @@ describe("FeedProcessor", () => {
   });
 
   test("PostViewが見つからない場合、その項目をスキップする", async () => {
-    const { feedProcessor } = services;
     // arrange
     const author = actorFactory();
     const { post } = postFactory({
@@ -296,7 +278,7 @@ describe("FeedProcessor", () => {
     const feedItem = FeedItem.fromPost(post);
 
     // act
-    const result = await feedProcessor.processFeedItems([feedItem]);
+    const result = await sut.processFeedItems([feedItem]);
 
     // assert
     expect(result).toMatchObject([]);

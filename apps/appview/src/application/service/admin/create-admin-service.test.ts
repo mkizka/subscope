@@ -6,18 +6,24 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateAdminService", () => {
-  let services: TestServices;
+  let sut: TestServices["createAdminService"];
+  let actorRepository: TestServices["actorRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.createAdminService;
+    actorRepository = services.actorRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
   });
 
   test("actorが存在しない場合、新規作成して管理者に昇格しジョブをスケジュールする", async () => {
-    const { createAdminService, actorRepository, jobScheduler, db } = services;
     // arrange
     const did = "did:plc:newactor";
 
     // act
-    await createAdminService.execute({
+    await sut.execute({
       ctx: { db },
       did,
     });
@@ -47,13 +53,12 @@ describe("CreateAdminService", () => {
   });
 
   test("actorが既に存在する場合、そのactorを管理者に昇格する", async () => {
-    const { createAdminService, actorRepository, jobScheduler, db } = services;
     // arrange
     const existingActor = actorFactory();
     actorRepository.add(existingActor);
 
     // act
-    await createAdminService.execute({
+    await sut.execute({
       ctx: { db },
       did: existingActor.did,
     });

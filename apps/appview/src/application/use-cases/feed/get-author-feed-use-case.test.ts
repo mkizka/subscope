@@ -12,20 +12,25 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetAuthorFeedUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getAuthorFeedUseCase"];
+  let authorFeedRepository: TestServices["authorFeedRepository"];
+  let postRepository: TestServices["postRepository"];
+  let postStatsRepository: TestServices["postStatsRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let recordRepository: TestServices["recordRepository"];
+  let repostRepository: TestServices["repostRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getAuthorFeedUseCase;
+    authorFeedRepository = services.authorFeedRepository;
+    postRepository = services.postRepository;
+    postStatsRepository = services.postStatsRepository;
+    profileRepository = services.profileRepository;
+    recordRepository = services.recordRepository;
+    repostRepository = services.repostRepository;
   });
 
   test("posts_with_repliesフィルターで投稿がある場合、投稿とリプライを含むフィードを返す", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const author = actorFactory();
 
@@ -76,7 +81,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(replyFeedItem, true);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -123,14 +128,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("posts_no_repliesフィルターの場合、リプライを除いた投稿のみを返す", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const author = actorFactory();
 
@@ -172,7 +169,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(replyFeedItem, true);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_no_replies",
@@ -201,15 +198,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("リポスト投稿がある場合、reasonを含むフィードアイテムを返す", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-      repostRepository,
-    } = services;
     // arrange
     const author = actorFactory();
     const originalAuthor = actorFactory();
@@ -254,7 +242,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(repostFeedItem, false);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -290,14 +278,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("viewerDidが指定された場合、viewer情報が含まれる", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const author = actorFactory();
     const viewer = actorFactory();
@@ -332,7 +312,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(postFeedItem, false);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -359,14 +339,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("カーソルが指定された場合、指定日時より前の投稿のみを返す", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const author = actorFactory();
 
@@ -414,7 +386,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(newerPostFeedItem, false);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",
@@ -439,12 +411,11 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("サポートされていないフィルターの場合、空のフィードを返す", async () => {
-    const { getAuthorFeedUseCase } = services;
     // arrange
     const author = actorFactory();
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_media",
@@ -459,13 +430,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("limitが0の場合、空のフィードを返す", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const author = actorFactory();
 
@@ -485,7 +449,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(postFeedItem, false);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 0,
       filter: "posts_with_replies",
@@ -499,14 +463,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("limitが1の場合、1件のみ返す", async () => {
-    const {
-      getAuthorFeedUseCase,
-      authorFeedRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const author = actorFactory();
 
@@ -554,7 +510,7 @@ describe("GetAuthorFeedUseCase", () => {
     authorFeedRepository.add(post2FeedItem, false);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 1,
       filter: "posts_with_replies",
@@ -578,7 +534,6 @@ describe("GetAuthorFeedUseCase", () => {
   });
 
   test("投稿がない場合、空のフィードを返す", async () => {
-    const { getAuthorFeedUseCase, profileRepository } = services;
     // arrange
     const author = actorFactory();
 
@@ -589,7 +544,7 @@ describe("GetAuthorFeedUseCase", () => {
     profileRepository.add(profile);
 
     // act
-    const result = await getAuthorFeedUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(author.did),
       limit: 50,
       filter: "posts_with_replies",

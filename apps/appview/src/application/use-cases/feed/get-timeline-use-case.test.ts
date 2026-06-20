@@ -11,18 +11,28 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetTimelineUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getTimelineUseCase"];
+  let timelineRepository: TestServices["timelineRepository"];
+  let postRepository: TestServices["postRepository"];
+  let postStatsRepository: TestServices["postStatsRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let recordRepository: TestServices["recordRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getTimelineUseCase;
+    timelineRepository = services.timelineRepository;
+    postRepository = services.postRepository;
+    postStatsRepository = services.postStatsRepository;
+    profileRepository = services.profileRepository;
+    recordRepository = services.recordRepository;
   });
 
   test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
-    const { getTimelineUseCase } = services;
     // arrange
     const viewer = actorFactory();
 
     // act
-    const result = await getTimelineUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });
@@ -35,14 +45,6 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("フォローしているユーザーが投稿している場合、そのユーザーの投稿を返す", async () => {
-    const {
-      getTimelineUseCase,
-      timelineRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -75,7 +77,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepository.addFeedItem(feedItem);
 
     // act
-    const result = await getTimelineUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });
@@ -104,14 +106,6 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("自分自身の投稿もタイムラインに含まれる", async () => {
-    const {
-      getTimelineUseCase,
-      timelineRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const viewer = actorFactory();
 
@@ -141,7 +135,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepository.addFeedItem(feedItem);
 
     // act
-    const result = await getTimelineUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });
@@ -167,14 +161,6 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("カーソルが指定された場合、カーソル以前の投稿のみを返す", async () => {
-    const {
-      getTimelineUseCase,
-      timelineRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -226,7 +212,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepository.addFeedItem(newerFeedItem);
 
     // act
-    const result = await getTimelineUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
       cursor: "2024-01-02T00:00:00.000Z",
@@ -249,14 +235,6 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("limitパラメータが0または1の場合、指定した件数の投稿を返す", async () => {
-    const {
-      getTimelineUseCase,
-      timelineRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -288,7 +266,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepository.addFeedItem(feedItem);
 
     // act - limit=0
-    const zeroLimitResult = await getTimelineUseCase.execute({
+    const zeroLimitResult = await sut.execute({
       limit: 0,
       viewerDid: asDid(viewer.did),
     });
@@ -299,7 +277,7 @@ describe("GetTimelineUseCase", () => {
     });
 
     // act - limit=1
-    const oneLimitResult = await getTimelineUseCase.execute({
+    const oneLimitResult = await sut.execute({
       limit: 1,
       viewerDid: asDid(viewer.did),
     });
@@ -319,14 +297,6 @@ describe("GetTimelineUseCase", () => {
   });
 
   test("複数の投稿がある場合、新しい順に並べて返す", async () => {
-    const {
-      getTimelineUseCase,
-      timelineRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const viewer = actorFactory();
     const author = actorFactory();
@@ -378,7 +348,7 @@ describe("GetTimelineUseCase", () => {
     timelineRepository.addFeedItem(feedItem2);
 
     // act
-    const result = await getTimelineUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
       viewerDid: asDid(viewer.did),
     });

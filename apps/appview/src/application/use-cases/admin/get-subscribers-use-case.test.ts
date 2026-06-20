@@ -8,9 +8,14 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscribersUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getSubscribersUseCase"];
+  let subscriptionRepository: TestServices["subscriptionRepository"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getSubscribersUseCase;
+    subscriptionRepository = services.subscriptionRepository;
+    profileRepository = services.profileRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00Z"));
   });
@@ -20,8 +25,6 @@ describe("GetSubscribersUseCase", () => {
   });
 
   test("subscriberが存在する場合、ProfileViewの配列を返す", async () => {
-    const { getSubscribersUseCase, subscriptionRepository, profileRepository } =
-      services;
     // arrange
     const actor1 = actorFactory();
     const profile1 = profileDetailedFactory({
@@ -48,7 +51,7 @@ describe("GetSubscribersUseCase", () => {
     subscriptionRepository.add(subscription2);
 
     // act
-    const result = await getSubscribersUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
     });
 
@@ -71,12 +74,11 @@ describe("GetSubscribersUseCase", () => {
   });
 
   test("subscriberが存在しない場合、空の配列を返す", async () => {
-    const { getSubscribersUseCase } = services;
     // arrange
     // データを作成しない
 
     // act
-    const result = await getSubscribersUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
     });
 
@@ -88,8 +90,6 @@ describe("GetSubscribersUseCase", () => {
   });
 
   test("limitを超えるsubscriberが存在する場合、cursorを返す", async () => {
-    const { getSubscribersUseCase, subscriptionRepository, profileRepository } =
-      services;
     // arrange
     const actors: Array<{ actor: { did: string }; displayName: string }> = [];
     for (let index = 0; index < 3; index++) {
@@ -108,7 +108,7 @@ describe("GetSubscribersUseCase", () => {
     }
 
     // act
-    const result = await getSubscribersUseCase.execute({
+    const result = await sut.execute({
       limit: 2,
     });
 
@@ -131,8 +131,6 @@ describe("GetSubscribersUseCase", () => {
   });
 
   test("cursorが指定された場合、その続きから返す", async () => {
-    const { getSubscribersUseCase, subscriptionRepository, profileRepository } =
-      services;
     // arrange
     const actor1 = actorFactory();
     const profile1 = profileDetailedFactory({
@@ -174,7 +172,7 @@ describe("GetSubscribersUseCase", () => {
     );
 
     // act - 最初のページ
-    const firstPage = await getSubscribersUseCase.execute({
+    const firstPage = await sut.execute({
       limit: 2,
     });
 
@@ -194,7 +192,7 @@ describe("GetSubscribersUseCase", () => {
     });
 
     // act - 次のページ
-    const secondPage = await getSubscribersUseCase.execute({
+    const secondPage = await sut.execute({
       limit: 2,
       cursor: firstPage.cursor,
     });

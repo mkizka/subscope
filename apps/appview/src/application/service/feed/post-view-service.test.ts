@@ -20,19 +20,26 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostViewService", () => {
-  let services: TestServices;
+  let sut: TestServices["postViewService"];
+  let postRepository: TestServices["postRepository"];
+  let recordRepository: TestServices["recordRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let generatorRepository: TestServices["generatorRepository"];
+  let likeRepository: TestServices["likeRepository"];
+  let repostRepository: TestServices["repostRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.postViewService;
+    postRepository = services.postRepository;
+    recordRepository = services.recordRepository;
+    profileRepository = services.profileRepository;
+    generatorRepository = services.generatorRepository;
+    likeRepository = services.likeRepository;
+    repostRepository = services.repostRepository;
   });
 
   describe("findPostView", () => {
     test("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const actor = actorFactory({ handle: "test.bsky.social" });
       const profile = profileDetailedFactory({
@@ -54,7 +61,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postUri]);
+      const result = await sut.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -82,12 +89,6 @@ describe("PostViewService", () => {
     });
 
     test("プロフィールの表示名がnullの場合、表示名なしでプロフィールビューを返す", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const actor = actorFactory({ handle: "noProfile.bsky.social" });
       const profile = profileDetailedFactory({
@@ -108,7 +109,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postUri]);
+      const result = await sut.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -122,12 +123,6 @@ describe("PostViewService", () => {
     });
 
     test("画像埋め込みを含む投稿の場合、画像ビューを含む投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const actor = actorFactory({ handle: "imageuser.bsky.social" });
       const profile = profileDetailedFactory({
@@ -185,7 +180,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postUri]);
+      const result = await sut.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -204,12 +199,6 @@ describe("PostViewService", () => {
     });
 
     test("外部リンク埋め込みを含む投稿の場合、外部リンクビューを含む投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const actor = actorFactory({ handle: "linkuser.bsky.social" });
       const profile = profileDetailedFactory({
@@ -266,7 +255,7 @@ describe("PostViewService", () => {
       const postUri = new AtUri(post.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postUri]);
+      const result = await sut.findPostView([postUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -284,12 +273,6 @@ describe("PostViewService", () => {
     });
 
     test("複数のURIを指定した場合、対応する複数の投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const actor1 = actorFactory({ handle: "user1.bsky.social" });
       const profile1 = profileDetailedFactory({
@@ -325,7 +308,7 @@ describe("PostViewService", () => {
       const postUri2 = new AtUri(post2.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postUri1, postUri2]);
+      const result = await sut.findPostView([postUri1, postUri2]);
 
       // assert
       expect(result).toHaveLength(2);
@@ -336,12 +319,6 @@ describe("PostViewService", () => {
     });
 
     test("存在しない投稿URIが含まれている場合、そのURIは結果に含まれない", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const actor = actorFactory({ handle: "exists.bsky.social" });
       const profile = profileDetailedFactory({
@@ -366,10 +343,7 @@ describe("PostViewService", () => {
       );
 
       // act
-      const result = await postViewService.findPostView([
-        existingUri,
-        nonExistentUri,
-      ]);
+      const result = await sut.findPostView([existingUri, nonExistentUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -379,12 +353,6 @@ describe("PostViewService", () => {
     });
 
     test("投稿の埋め込み(app.bsky.embed.record)を含む投稿の場合、埋め込み投稿ビューを含む投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
       const embeddedProfile = profileDetailedFactory({
@@ -446,7 +414,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([quotingPostUri]);
+      const result = await sut.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -505,12 +473,6 @@ describe("PostViewService", () => {
     });
 
     test("投稿の埋め込み(app.bsky.embed.record)の埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
@@ -559,7 +521,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([quotingPostUri]);
+      const result = await sut.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -579,13 +541,6 @@ describe("PostViewService", () => {
     });
 
     test("フィードジェネレーターの埋め込み(app.bsky.embed.record)の場合、ジェネレータービューを含む投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-        generatorRepository,
-      } = services;
       // arrange
       const generatorActor = actorFactory({ handle: "generator.bsky.social" });
       const generatorProfile = profileDetailedFactory({
@@ -647,7 +602,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([quotingPostUri]);
+      const result = await sut.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -701,12 +656,6 @@ describe("PostViewService", () => {
     });
 
     test("フィードジェネレーターの埋め込み先が存在しない場合、viewNotFoundを含む投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const quotingAuthor = actorFactory({ handle: "quoting.bsky.social" });
       const quotingProfile = profileDetailedFactory({
@@ -755,7 +704,7 @@ describe("PostViewService", () => {
       const quotingPostUri = new AtUri(quotingPost.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([quotingPostUri]);
+      const result = await sut.findPostView([quotingPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -775,12 +724,6 @@ describe("PostViewService", () => {
     });
 
     test("embedがapp.bsky.embed.recordWithMedia#viewの場合、画像と投稿の両方を含む埋め込みビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const embeddedAuthor = actorFactory({ handle: "embedded.bsky.social" });
       const embeddedProfile = profileDetailedFactory({
@@ -888,7 +831,7 @@ describe("PostViewService", () => {
       const mainPostUri = new AtUri(mainPost.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([mainPostUri]);
+      const result = await sut.findPostView([mainPostUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -993,12 +936,6 @@ describe("PostViewService", () => {
     });
 
     test("埋め込みの埋め込み（A→B→C）の場合、3階層すべての投稿ビューを取得できる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const authorC = actorFactory({ handle: "authorc.bsky.social" });
       const profileC = profileDetailedFactory({
@@ -1097,7 +1034,7 @@ describe("PostViewService", () => {
       const postAUri = new AtUri(postA.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postAUri]);
+      const result = await sut.findPostView([postAUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -1142,12 +1079,6 @@ describe("PostViewService", () => {
     });
 
     test("埋め込みの深度が最大2階層に制限されることを確認（A→B→C→Dのパターン）", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-      } = services;
       // arrange
       const authorD = actorFactory({ handle: "authord.bsky.social" });
       const profileD = profileDetailedFactory({
@@ -1285,7 +1216,7 @@ describe("PostViewService", () => {
       const postAUri = new AtUri(postA.uri.toString());
 
       // act
-      const result = await postViewService.findPostView([postAUri]);
+      const result = await sut.findPostView([postAUri]);
 
       // assert
       expect(result).toHaveLength(1);
@@ -1330,14 +1261,6 @@ describe("PostViewService", () => {
     });
 
     test("閲覧者が投稿をいいねとリポストしている場合、viewerにそれぞれのURIが含まれる", async () => {
-      const {
-        postViewService,
-        postRepository,
-        recordRepository,
-        profileRepository,
-        likeRepository,
-        repostRepository,
-      } = services;
       // arrange
       const viewer = actorFactory();
       const viewerProfile = profileDetailedFactory({
@@ -1396,7 +1319,7 @@ describe("PostViewService", () => {
       const postUri2 = new AtUri(post2.uri.toString());
 
       // act
-      const result = await postViewService.findPostView(
+      const result = await sut.findPostView(
         [postUri1, postUri2],
         asDid(viewer.did),
       );

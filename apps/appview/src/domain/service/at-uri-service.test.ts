@@ -5,21 +5,23 @@ import { HandleResolutionError } from "../../application/interfaces/handle-resol
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("AtUriService", () => {
-  let services: TestServices;
+  let sut: TestServices["atUriService"];
+  let handleResolver: TestServices["handleResolver"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.atUriService;
+    handleResolver = services.handleResolver;
   });
 
   describe("resolveHostname", () => {
     test("DIDが含まれるURIの場合、そのまま返す", async () => {
-      const { atUriService } = services;
       // arrange
       const uri = new AtUri(
         "at://did:plc:example123/app.bsky.feed.post/abc123",
       );
 
       // act
-      const result = await atUriService.resolveHostname(uri);
+      const result = await sut.resolveHostname(uri);
 
       // assert
       expect(result.toString()).toBe(
@@ -28,13 +30,12 @@ describe("AtUriService", () => {
     });
 
     test("handleが含まれるURIの場合、DIDに変換して返す", async () => {
-      const { atUriService, handleResolver } = services;
       // arrange
       handleResolver.add("example.com", "did:plc:resolved123");
       const uri = new AtUri("at://example.com/app.bsky.feed.post/xyz789");
 
       // act
-      const result = await atUriService.resolveHostname(uri);
+      const result = await sut.resolveHostname(uri);
 
       // assert
       expect(result.toString()).toBe(
@@ -43,15 +44,14 @@ describe("AtUriService", () => {
     });
 
     test("handleが解決できない場合、HandleResolutionErrorをスローする", async () => {
-      const { atUriService } = services;
       // arrange
       const uri = new AtUri("at://notfound.example/app.bsky.feed.post/abc123");
 
       // act & assert
-      await expect(atUriService.resolveHostname(uri)).rejects.toThrow(
+      await expect(sut.resolveHostname(uri)).rejects.toThrow(
         HandleResolutionError,
       );
-      await expect(atUriService.resolveHostname(uri)).rejects.toThrow(
+      await expect(sut.resolveHostname(uri)).rejects.toThrow(
         "Failed to resolve handle: notfound.example",
       );
     });

@@ -11,20 +11,23 @@ import type { PostStats } from "../../../application/interfaces/post-stats-repos
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetActorLikesUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getActorLikesUseCase"];
+  let likeRepository: TestServices["likeRepository"];
+  let postRepository: TestServices["postRepository"];
+  let postStatsRepository: TestServices["postStatsRepository"];
+  let profileRepository: TestServices["profileRepository"];
+  let recordRepository: TestServices["recordRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getActorLikesUseCase;
+    likeRepository = services.likeRepository;
+    postRepository = services.postRepository;
+    postStatsRepository = services.postStatsRepository;
+    profileRepository = services.profileRepository;
+    recordRepository = services.recordRepository;
   });
 
   test("actorがいいねした投稿がある場合、投稿情報を含むフィードを返す", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const postAuthor = actorFactory();
@@ -57,7 +60,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepository.add(like);
 
     // act
-    const result = await getActorLikesUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -84,12 +87,11 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("actorがいいねした投稿がない場合、空のフィードを返す", async () => {
-    const { getActorLikesUseCase } = services;
     // arrange
     const actor = actorFactory();
 
     // act
-    const result = await getActorLikesUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -102,14 +104,6 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("limitパラメータが指定された場合、指定した件数分のフィードを返しカーソルを含む", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const postAuthor = actorFactory();
@@ -145,7 +139,7 @@ describe("GetActorLikesUseCase", () => {
     }
 
     // act
-    const result = await getActorLikesUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -156,14 +150,6 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("カーソルを指定した場合、ページネーションが動作する", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const postAuthor = actorFactory();
@@ -244,7 +230,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepository.add(thirdLike);
 
     // act - 最初のページ（limit=2）
-    const firstPage = await getActorLikesUseCase.execute({
+    const firstPage = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -260,7 +246,7 @@ describe("GetActorLikesUseCase", () => {
     expect(firstPage.cursor).toBeDefined();
 
     // act - 次のページ
-    const secondPage = await getActorLikesUseCase.execute({
+    const secondPage = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 2,
       cursor: firstPage.cursor ? new Date(firstPage.cursor) : undefined,
@@ -275,14 +261,6 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("limitパラメータが0または1の場合、指定した件数のフィードを返す", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const postAuthor = actorFactory();
@@ -315,7 +293,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepository.add(like);
 
     // act - limit=0
-    const zeroLimitResult = await getActorLikesUseCase.execute({
+    const zeroLimitResult = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 0,
     });
@@ -326,7 +304,7 @@ describe("GetActorLikesUseCase", () => {
     });
 
     // act - limit=1
-    const oneLimitResult = await getActorLikesUseCase.execute({
+    const oneLimitResult = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 1,
     });
@@ -339,14 +317,6 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("いいね先の投稿が削除されている場合、その投稿は結果に含まれない", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const postAuthor = actorFactory();
@@ -390,7 +360,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepository.add(existingLike);
 
     // act
-    const result = await getActorLikesUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -403,14 +373,6 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("viewerDidが指定された場合、viewer情報を含むフィードを返す", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const viewerActor = actorFactory();
@@ -453,7 +415,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepository.add(viewerLike);
 
     // act
-    const result = await getActorLikesUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
       viewerDid: asDid(viewerActor.did),
@@ -484,14 +446,6 @@ describe("GetActorLikesUseCase", () => {
   });
 
   test("複数のいいねがある場合、sortAt（createdAtとindexedAtの早い方）の降順でソートされて返す", async () => {
-    const {
-      getActorLikesUseCase,
-      likeRepository,
-      postRepository,
-      postStatsRepository,
-      profileRepository,
-      recordRepository,
-    } = services;
     // arrange
     const actor = actorFactory();
     const postAuthor = actorFactory();
@@ -572,7 +526,7 @@ describe("GetActorLikesUseCase", () => {
     likeRepository.add(middleLike);
 
     // act
-    const result = await getActorLikesUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });

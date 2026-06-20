@@ -6,13 +6,15 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetInviteCodesUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getInviteCodesUseCase"];
+  let inviteCodeRepository: TestServices["inviteCodeRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getInviteCodesUseCase;
+    inviteCodeRepository = services.inviteCodeRepository;
   });
 
   test("招待コードが存在する場合、招待コード一覧を返す", async () => {
-    const { getInviteCodesUseCase, inviteCodeRepository } = services;
     // arrange
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -27,7 +29,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepository.add(inviteCode2);
 
     // act
-    const result = await getInviteCodesUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
     });
 
@@ -54,7 +56,6 @@ describe("GetInviteCodesUseCase", () => {
   });
 
   test("limitを指定した場合、指定した件数の招待コードを返す", async () => {
-    const { getInviteCodesUseCase, inviteCodeRepository } = services;
     // arrange
     inviteCodeRepository.add(
       inviteCodeFactory({
@@ -71,7 +72,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepository.add(inviteCode3);
 
     // act
-    const result = await getInviteCodesUseCase.execute({
+    const result = await sut.execute({
       limit: 2,
     });
 
@@ -98,7 +99,6 @@ describe("GetInviteCodesUseCase", () => {
   });
 
   test("cursorを指定した場合、cursorより古い招待コードを返す", async () => {
-    const { getInviteCodesUseCase, inviteCodeRepository } = services;
     // arrange
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -115,7 +115,7 @@ describe("GetInviteCodesUseCase", () => {
     );
 
     // act
-    const result = await getInviteCodesUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
       cursor: inviteCode2.createdAt.toISOString(),
     });
@@ -136,7 +136,6 @@ describe("GetInviteCodesUseCase", () => {
   });
 
   test("複数ページのデータがある場合、ページネーションが正しく動作する", async () => {
-    const { getInviteCodesUseCase, inviteCodeRepository } = services;
     // arrange
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -156,7 +155,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepository.add(inviteCode4);
 
     // act - 1ページ目
-    const page1 = await getInviteCodesUseCase.execute({
+    const page1 = await sut.execute({
       limit: 2,
     });
 
@@ -182,7 +181,7 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // act - 2ページ目
-    const page2 = await getInviteCodesUseCase.execute({
+    const page2 = await sut.execute({
       limit: 2,
       cursor: page1.cursor,
     });
@@ -210,7 +209,6 @@ describe("GetInviteCodesUseCase", () => {
   });
 
   test("使用済み招待コードの場合、使用情報を返す", async () => {
-    const { getInviteCodesUseCase, inviteCodeRepository } = services;
     // arrange
     const actor = actorFactory();
     const inviteCode = inviteCodeFactory({
@@ -224,7 +222,7 @@ describe("GetInviteCodesUseCase", () => {
     });
 
     // act
-    const result = await getInviteCodesUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
     });
 
@@ -247,7 +245,6 @@ describe("GetInviteCodesUseCase", () => {
   });
 
   test("使用済み招待コードでActorが削除されている場合、usedByはnullになる", async () => {
-    const { getInviteCodesUseCase, inviteCodeRepository } = services;
     // arrange
     const inviteCode = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
@@ -257,7 +254,7 @@ describe("GetInviteCodesUseCase", () => {
     inviteCodeRepository.add(inviteCode);
 
     // act
-    const result = await getInviteCodesUseCase.execute({
+    const result = await sut.execute({
       limit: 50,
     });
 

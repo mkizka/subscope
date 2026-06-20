@@ -10,14 +10,20 @@ import type { ActorStats } from "../../../application/interfaces/actor-stats-rep
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileViewService", () => {
-  let services: TestServices;
+  let sut: TestServices["profileViewService"];
+  let profileRepository: TestServices["profileRepository"];
+  let actorStatsRepository: TestServices["actorStatsRepository"];
+  let followRepository: TestServices["followRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.profileViewService;
+    profileRepository = services.profileRepository;
+    actorStatsRepository = services.actorStatsRepository;
+    followRepository = services.followRepository;
   });
 
   describe("findProfileViewBasic", () => {
     test("プロフィールが存在する場合、ProfileViewBasicを返す", async () => {
-      const { profileViewService, profileRepository } = services;
       // arrange
       const actor = actorFactory();
       const profile = profileDetailedFactory({
@@ -28,9 +34,7 @@ describe("ProfileViewService", () => {
       profileRepository.add(profile);
 
       // act
-      const results = await profileViewService.findProfileViewBasic([
-        asDid(actor.did),
-      ]);
+      const results = await sut.findProfileViewBasic([asDid(actor.did)]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -43,14 +47,11 @@ describe("ProfileViewService", () => {
     });
 
     test("プロフィールが存在しない場合、空の配列を返す", async () => {
-      const { profileViewService } = services;
       // arrange
       const nonExistentDid = "did:plc:nonexistent";
 
       // act
-      const results = await profileViewService.findProfileViewBasic([
-        nonExistentDid,
-      ]);
+      const results = await sut.findProfileViewBasic([nonExistentDid]);
 
       // assert
       expect(results).toEqual([]);
@@ -59,8 +60,6 @@ describe("ProfileViewService", () => {
 
   describe("findProfileViewDetailed", () => {
     test("プロフィールと統計情報が存在する場合、統計情報を含むProfileViewDetailedを返す", async () => {
-      const { profileViewService, profileRepository, actorStatsRepository } =
-        services;
       // arrange
       const actor = actorFactory();
       const profile = profileDetailedFactory({
@@ -78,9 +77,7 @@ describe("ProfileViewService", () => {
       actorStatsRepository.add(actor.did, actorStats);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed([
-        asDid(actor.did),
-      ]);
+      const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -97,7 +94,6 @@ describe("ProfileViewService", () => {
     });
 
     test("プロフィールは存在するが統計情報が存在しない場合、統計情報を0として返す", async () => {
-      const { profileViewService, profileRepository } = services;
       // arrange
       const actor = actorFactory();
       const profile = profileDetailedFactory({
@@ -108,9 +104,7 @@ describe("ProfileViewService", () => {
       profileRepository.add(profile);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed([
-        asDid(actor.did),
-      ]);
+      const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -127,8 +121,6 @@ describe("ProfileViewService", () => {
     });
 
     test("複数のプロフィールに対して正しい統計情報を関連付ける", async () => {
-      const { profileViewService, profileRepository, actorStatsRepository } =
-        services;
       // arrange
       const actor1 = actorFactory();
       const profile1 = profileDetailedFactory({
@@ -159,7 +151,7 @@ describe("ProfileViewService", () => {
       actorStatsRepository.add(actor2.did, actorStats2);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed([
+      const results = await sut.findProfileViewDetailed([
         asDid(actor1.did),
         asDid(actor2.did),
       ]);
@@ -185,21 +177,17 @@ describe("ProfileViewService", () => {
     });
 
     test("プロフィールが存在しない場合、空の配列を返す", async () => {
-      const { profileViewService } = services;
       // arrange
       const nonExistentDid = "did:plc:nonexistent";
 
       // act
-      const results = await profileViewService.findProfileViewDetailed([
-        nonExistentDid,
-      ]);
+      const results = await sut.findProfileViewDetailed([nonExistentDid]);
 
       // assert
       expect(results).toEqual([]);
     });
 
     test("viewerDidが指定されない場合、空のviewerStateを含むProfileViewDetailedを返す", async () => {
-      const { profileViewService, profileRepository } = services;
       // arrange
       const actor = actorFactory();
       const profile = profileDetailedFactory({
@@ -209,9 +197,7 @@ describe("ProfileViewService", () => {
       profileRepository.add(profile);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed([
-        asDid(actor.did),
-      ]);
+      const results = await sut.findProfileViewDetailed([asDid(actor.did)]);
 
       // assert
       expect(results).toHaveLength(1);
@@ -226,7 +212,6 @@ describe("ProfileViewService", () => {
     });
 
     test("viewerDidが指定され、フォロー関係がない場合、空のviewerStateを含むProfileViewDetailedを返す", async () => {
-      const { profileViewService, profileRepository } = services;
       // arrange
       const viewerActor = actorFactory();
       const targetActor = actorFactory();
@@ -237,7 +222,7 @@ describe("ProfileViewService", () => {
       profileRepository.add(targetProfile);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed(
+      const results = await sut.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -257,8 +242,6 @@ describe("ProfileViewService", () => {
     });
 
     test("viewerDidが指定され、viewerがtargetをフォローしている場合、followingが設定されたviewerStateを返す", async () => {
-      const { profileViewService, profileRepository, followRepository } =
-        services;
       // arrange
       const viewerActor = actorFactory();
       const targetActor = actorFactory();
@@ -275,7 +258,7 @@ describe("ProfileViewService", () => {
       followRepository.add(follow);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed(
+      const results = await sut.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -295,8 +278,6 @@ describe("ProfileViewService", () => {
     });
 
     test("viewerDidが指定され、targetがviewerをフォローしている場合、followedByが設定されたviewerStateを返す", async () => {
-      const { profileViewService, profileRepository, followRepository } =
-        services;
       // arrange
       const viewerActor = actorFactory();
       const targetActor = actorFactory();
@@ -313,7 +294,7 @@ describe("ProfileViewService", () => {
       followRepository.add(follow);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed(
+      const results = await sut.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -333,8 +314,6 @@ describe("ProfileViewService", () => {
     });
 
     test("viewerDidが指定され、相互フォローの場合、followingとfollowedByの両方が設定されたviewerStateを返す", async () => {
-      const { profileViewService, profileRepository, followRepository } =
-        services;
       // arrange
       const viewerActor = actorFactory();
       const targetActor = actorFactory();
@@ -357,7 +336,7 @@ describe("ProfileViewService", () => {
       followRepository.add(followedByFollow);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed(
+      const results = await sut.findProfileViewDetailed(
         [asDid(targetActor.did)],
         asDid(viewerActor.did),
       );
@@ -377,8 +356,6 @@ describe("ProfileViewService", () => {
     });
 
     test("viewerDidが指定され、複数のプロフィールに対して正しいviewerStateを関連付ける", async () => {
-      const { profileViewService, profileRepository, followRepository } =
-        services;
       // arrange
       const viewerActor = actorFactory();
       const target1Actor = actorFactory();
@@ -409,7 +386,7 @@ describe("ProfileViewService", () => {
       followRepository.add(follow2);
 
       // act
-      const results = await profileViewService.findProfileViewDetailed(
+      const results = await sut.findProfileViewDetailed(
         [asDid(target1Actor.did), asDid(target2Actor.did)],
         asDid(viewerActor.did),
       );

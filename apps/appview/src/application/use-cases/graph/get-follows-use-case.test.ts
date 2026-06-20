@@ -9,13 +9,17 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFollowsUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getFollowsUseCase"];
+  let followRepository: TestServices["followRepository"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getFollowsUseCase;
+    followRepository = services.followRepository;
+    profileRepository = services.profileRepository;
   });
 
   test("actorがフォローしているユーザーがいる場合、フォローしているユーザーの情報を返す", async () => {
-    const { getFollowsUseCase, followRepository, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -40,7 +44,7 @@ describe("GetFollowsUseCase", () => {
     followRepository.add(follow);
 
     // act
-    const result = await getFollowsUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -65,7 +69,6 @@ describe("GetFollowsUseCase", () => {
   });
 
   test("actorがフォローしているユーザーがいない場合、空のfollowsを返す", async () => {
-    const { getFollowsUseCase, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -76,7 +79,7 @@ describe("GetFollowsUseCase", () => {
     profileRepository.add(actorProfile);
 
     // act
-    const result = await getFollowsUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });
@@ -94,7 +97,6 @@ describe("GetFollowsUseCase", () => {
   });
 
   test("limitパラメータで指定した件数より多くのフォローがいる場合、指定件数のフォローとcursorを返す", async () => {
-    const { getFollowsUseCase, followRepository, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -119,7 +121,7 @@ describe("GetFollowsUseCase", () => {
     }
 
     // act
-    const result = await getFollowsUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -130,7 +132,6 @@ describe("GetFollowsUseCase", () => {
   });
 
   test("cursorを使用して2回目のリクエストを行った場合、次のページのフォローを重複なく返す", async () => {
-    const { getFollowsUseCase, followRepository, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -203,7 +204,7 @@ describe("GetFollowsUseCase", () => {
     followRepository.add(follow4);
 
     // act - 最初のページを取得
-    const firstPageResult = await getFollowsUseCase.execute({
+    const firstPageResult = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 2,
     });
@@ -233,7 +234,7 @@ describe("GetFollowsUseCase", () => {
     });
 
     // act - 2ページ目を取得
-    const secondPageResult = await getFollowsUseCase.execute({
+    const secondPageResult = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 2,
       cursor: firstPageResult.cursor,
@@ -265,7 +266,6 @@ describe("GetFollowsUseCase", () => {
   });
 
   test("フォローが複数いる場合、sortAtの降順で返す", async () => {
-    const { getFollowsUseCase, followRepository, profileRepository } = services;
     // arrange
     const actor = actorFactory();
     const actorProfile = profileDetailedFactory({
@@ -323,7 +323,7 @@ describe("GetFollowsUseCase", () => {
     followRepository.add(follow3);
 
     // act
-    const result = await getFollowsUseCase.execute({
+    const result = await sut.execute({
       actorDid: asDid(actor.did),
       limit: 50,
     });

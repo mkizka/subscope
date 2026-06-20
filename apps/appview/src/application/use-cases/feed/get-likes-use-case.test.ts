@@ -9,13 +9,17 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetLikesUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["getLikesUseCase"];
+  let likeRepository: TestServices["likeRepository"];
+  let profileRepository: TestServices["profileRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.getLikesUseCase;
+    likeRepository = services.likeRepository;
+    profileRepository = services.profileRepository;
   });
 
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
-    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
     const likerActor = actorFactory();
@@ -38,7 +42,7 @@ describe("GetLikesUseCase", () => {
     likeRepository.add(like);
 
     // act
-    const result = await getLikesUseCase.execute({
+    const result = await sut.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
@@ -59,7 +63,6 @@ describe("GetLikesUseCase", () => {
   });
 
   test("投稿にいいねが付いていない場合、空のlikesを返す", async () => {
-    const { getLikesUseCase } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -68,7 +71,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act
-    const result = await getLikesUseCase.execute({
+    const result = await sut.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
@@ -81,7 +84,6 @@ describe("GetLikesUseCase", () => {
   });
 
   test("limitパラメータが指定された場合、指定した件数分のいいねを返しカーソルを含む", async () => {
-    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
     const { post } = postFactory({
@@ -105,7 +107,7 @@ describe("GetLikesUseCase", () => {
     }
 
     // act
-    const result = await getLikesUseCase.execute({
+    const result = await sut.execute({
       uri: post.uri.toString(),
       limit: 2,
     });
@@ -116,7 +118,6 @@ describe("GetLikesUseCase", () => {
   });
 
   test("カーソルを指定した場合、ページネーションが動作する", async () => {
-    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -173,7 +174,7 @@ describe("GetLikesUseCase", () => {
     likeRepository.add(thirdLike);
 
     // act - 最初のページ（limit=2）
-    const firstPage = await getLikesUseCase.execute({
+    const firstPage = await sut.execute({
       uri: post.uri.toString(),
       limit: 2,
     });
@@ -196,7 +197,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act - 次のページ
-    const secondPage = await getLikesUseCase.execute({
+    const secondPage = await sut.execute({
       uri: post.uri.toString(),
       limit: 2,
       cursor: firstPage.cursor,
@@ -216,7 +217,6 @@ describe("GetLikesUseCase", () => {
   });
 
   test("limitパラメータが0または1の場合、指定した件数のいいねを返す", async () => {
-    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
     const likerActor = actorFactory();
@@ -239,7 +239,7 @@ describe("GetLikesUseCase", () => {
     likeRepository.add(like);
 
     // act - limit=0
-    const zeroLimitResult = await getLikesUseCase.execute({
+    const zeroLimitResult = await sut.execute({
       uri: post.uri.toString(),
       limit: 0,
     });
@@ -250,7 +250,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act - limit=1
-    const oneLimitResult = await getLikesUseCase.execute({
+    const oneLimitResult = await sut.execute({
       uri: post.uri.toString(),
       limit: 1,
     });
@@ -268,7 +268,6 @@ describe("GetLikesUseCase", () => {
   });
 
   test("cidパラメータが指定された場合、レスポンスにcidを含む", async () => {
-    const { getLikesUseCase } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -277,7 +276,7 @@ describe("GetLikesUseCase", () => {
     });
 
     // act
-    const result = await getLikesUseCase.execute({
+    const result = await sut.execute({
       uri: post.uri.toString(),
       cid: post.cid,
       limit: 50,
@@ -292,7 +291,6 @@ describe("GetLikesUseCase", () => {
   });
 
   test("複数のいいねがある場合、sortAt（createdAtとindexedAtの早い方）の降順でソートされて返す", async () => {
-    const { getLikesUseCase, likeRepository, profileRepository } = services;
     // arrange
     const targetActor = actorFactory();
 
@@ -349,7 +347,7 @@ describe("GetLikesUseCase", () => {
     likeRepository.add(middleLike);
 
     // act
-    const result = await getLikesUseCase.execute({
+    const result = await sut.execute({
       uri: post.uri.toString(),
       limit: 50,
     });
