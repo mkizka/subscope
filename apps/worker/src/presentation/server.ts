@@ -2,11 +2,10 @@ import type { Server } from "node:http";
 
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { loggingMiddleware } from "@repo/common/utils";
+import type { Router } from "express";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
-import { env } from "../shared/env.js";
-import { healthRouter } from "./routes/health.js";
 import type { SyncWorker } from "./worker.js";
 
 export class WorkerServer {
@@ -16,6 +15,8 @@ export class WorkerServer {
 
   constructor(
     loggerManager: ILoggerManager,
+    private readonly port: number,
+    healthRouter: Router,
     private readonly syncWorker: SyncWorker,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
@@ -24,11 +25,16 @@ export class WorkerServer {
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(healthRouter);
   }
-  static inject = ["loggerManager", "syncWorker"] as const;
+  static inject = [
+    "loggerManager",
+    "port",
+    "healthRouter",
+    "syncWorker",
+  ] as const;
 
   start() {
-    this.server = this.app.listen(env.PORT, async () => {
-      this.logger.info(`Worker server listening on port ${env.PORT}`);
+    this.server = this.app.listen(this.port, async () => {
+      this.logger.info(`Worker server listening on port ${this.port}`);
       await this.syncWorker.start();
     });
 

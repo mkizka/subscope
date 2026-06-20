@@ -2,14 +2,15 @@ import { Subscription } from "@atproto/xrpc-server";
 import { ComAtprotoLabelSubscribeLabels } from "@repo/client/api";
 import type { IMetricReporter } from "@repo/common/domain";
 
-import { env } from "../shared/env.js";
-
 export class LabelIngester {
   private readonly subscription;
 
-  constructor(private readonly metricReporter: IMetricReporter) {
+  constructor(
+    private readonly metricReporter: IMetricReporter,
+    moderationUrl: string,
+  ) {
     this.subscription = new Subscription({
-      service: env.MODERATION_URL,
+      service: moderationUrl,
       method: "com.atproto.label.subscribeLabels",
       validate: (obj: unknown) => {
         const parsedInfo = ComAtprotoLabelSubscribeLabels.validateInfo(obj);
@@ -24,7 +25,7 @@ export class LabelIngester {
       },
     });
   }
-  static inject = ["metricReporter"] as const;
+  static inject = ["metricReporter", "moderationUrl"] as const;
 
   async start() {
     for await (const message of this.subscription) {

@@ -1,25 +1,21 @@
 import { Router } from "express";
 
-import { env } from "../../shared/env.js";
-
-const healthRouter = Router();
-
-const keyof = <T extends Record<string, unknown>, K extends keyof T>(
-  obj: T,
-  keys: K[],
+export const healthRouterFactory = (
+  nodeEnv: string,
+  logLevel: string,
+  port: number,
 ) => {
-  return keys.reduce<Pick<T, K>>((acc, key) => {
-    acc[key] = obj[key];
-    return acc;
-    // @ts-expect-error
-  }, {});
-};
-
-healthRouter.get("/health", (_, res) => {
-  res.json({
-    status: "ok",
-    env: keyof(env, ["NODE_ENV", "LOG_LEVEL", "PORT"]),
+  const healthRouter = Router();
+  healthRouter.get("/health", (_, res) => {
+    res.json({
+      status: "ok",
+      env: {
+        NODE_ENV: nodeEnv,
+        LOG_LEVEL: logLevel,
+        PORT: port,
+      },
+    });
   });
-});
-
-export { healthRouter };
+  return healthRouter;
+};
+healthRouterFactory.inject = ["nodeEnv", "logLevel", "port"] as const;

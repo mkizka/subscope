@@ -3,9 +3,7 @@ import { loggingMiddleware } from "@repo/common/utils";
 import type { Router } from "express";
 import express from "express";
 
-import { env } from "../shared/env.js";
 import type { LabelIngester } from "./label.js";
-import { healthRouter } from "./routes/health.js";
 import type { TapIngester } from "./tap.js";
 
 export class IngesterServer {
@@ -14,7 +12,10 @@ export class IngesterServer {
 
   constructor(
     loggerManager: ILoggerManager,
+    private readonly port: number,
+    private readonly disableIngester: boolean,
     metricsRouter: Router,
+    healthRouter: Router,
     private readonly tapIngester: TapIngester,
     private readonly labelIngester: LabelIngester,
   ) {
@@ -26,15 +27,18 @@ export class IngesterServer {
   }
   static inject = [
     "loggerManager",
+    "port",
+    "disableIngester",
     "metricsRouter",
+    "healthRouter",
     "tapIngester",
     "labelIngester",
   ] as const;
 
   start() {
-    this.app.listen(env.PORT, () => {
-      this.logger.info(`Ingester server listening on port ${env.PORT}`);
-      if (!env.DISABLE_INGESTER) {
+    this.app.listen(this.port, () => {
+      this.logger.info(`Ingester server listening on port ${this.port}`);
+      if (!this.disableIngester) {
         this.tapIngester.start().catch((err: unknown) => {
           this.logger.error({ err }, "Tap ingester threw");
         });

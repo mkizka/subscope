@@ -14,7 +14,6 @@ import { indexCommitCommandFactory } from "../application/use-cases/commit/index
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
-import { env } from "../shared/env.js";
 import { createJobLogger } from "../shared/job.js";
 
 const SECONDS = 1000;
@@ -39,27 +38,12 @@ const backoffStrategy: BackoffStrategy = (attemptsMade) => {
   return delay;
 };
 
-const createWorker = <T extends keyof JobData>(
-  name: T,
-  process: Processor<JobData[T], void>,
-  options?: Omit<WorkerOptions, "connection" | "autorun">,
-) => {
-  return new Worker<JobData[T]>(name, process, {
-    autorun: false,
-    connection: {
-      url: env.REDIS_URL,
-    },
-    settings: {
-      backoffStrategy,
-    },
-    ...options,
-  });
-};
-
 export class SyncWorker {
   private readonly workers: Worker[];
 
   constructor(
+    redisUrl: string,
+    commitWorkerConcurrency: number,
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
     resolveDidUseCase: ResolveDidUseCase,
@@ -69,6 +53,23 @@ export class SyncWorker {
     addTapRepoUseCase: AddTapRepoUseCase,
     removeTapRepoUseCase: RemoveTapRepoUseCase,
   ) {
+    const createWorker = <T extends keyof JobData>(
+      name: T,
+      process: Processor<JobData[T], void>,
+      options?: Omit<WorkerOptions, "connection" | "autorun">,
+    ) => {
+      return new Worker<JobData[T]>(name, process, {
+        autorun: false,
+        connection: {
+          url: redisUrl,
+        },
+        settings: {
+          backoffStrategy,
+        },
+        ...options,
+      });
+    };
+
     this.workers = [
       createWorker("identity", async (job) => {
         const command = upsertIdentityCommandFactory(job.data);
@@ -84,7 +85,7 @@ export class SyncWorker {
           await indexCommitUseCase.execute(command);
         },
         {
-          concurrency: env.COMMIT_WORKER_CONCURRENCY,
+          concurrency: commitWorkerConcurrency,
         },
       ),
       createWorker(
@@ -139,6 +140,8 @@ export class SyncWorker {
     ];
   }
   static inject = [
+    "redisUrl",
+    "commitWorkerConcurrency",
     "upsertIdentityUseCase",
     "indexCommitUseCase",
     "resolveDidUseCase",

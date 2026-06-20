@@ -90,6 +90,7 @@ import { GetTimeline } from "./presentation/routes/app/bsky/feed/getTimeline.js"
 import { SearchPosts } from "./presentation/routes/app/bsky/feed/searchPosts.js";
 import { GetFollowers } from "./presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "./presentation/routes/app/bsky/graph/getFollows.js";
+import { healthRouterFactory } from "./presentation/routes/health.js";
 import { CreateInviteCode } from "./presentation/routes/me/subsco/admin/createInviteCode.js";
 import { DeleteInviteCode } from "./presentation/routes/me/subsco/admin/deleteInviteCode.js";
 import { GetInviteCodes } from "./presentation/routes/me/subsco/admin/getInviteCodes.js";
@@ -100,18 +101,22 @@ import { GetSetupStatus } from "./presentation/routes/me/subsco/server/getSetupS
 import { GetSubscriptionStatus } from "./presentation/routes/me/subsco/sync/getSubscriptionStatus.js";
 import { SubscribeServer } from "./presentation/routes/me/subsco/sync/subscribeServer.js";
 import { UnsubscribeServer } from "./presentation/routes/me/subsco/sync/unsubscribeServer.js";
+import { wellKnownRouterFactory } from "./presentation/routes/well-known.js";
 import { xrpcRouterFactory } from "./presentation/routes/xrpc.js";
 import { AppViewServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
 createInjector()
   // envs
+  .provideValue("nodeEnv", env.NODE_ENV)
   .provideValue("logLevel", env.LOG_LEVEL)
+  .provideValue("port", env.PORT)
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("databaseUrl", env.DATABASE_URL)
   .provideValue("publicUrl", env.PUBLIC_URL)
   .provideValue("blobProxyUrl", env.BLOB_PROXY_URL)
+  .provideValue("serviceDid", env.SERVICE_DID)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideClass("metricReporter", MetricReporter)
@@ -213,6 +218,8 @@ createInjector()
   .provideClass("getSubscriptionStatus", GetSubscriptionStatus)
   .provideClass("subscribeServer", SubscribeServer)
   .provideClass("unsubscribeServer", UnsubscribeServer)
+  .provideFactory("healthRouter", healthRouterFactory)
+  .provideFactory("wellKnownRouter", wellKnownRouterFactory)
   .provideFactory("xrpcRouter", xrpcRouterFactory)
   // bootstrap
   .injectClass(AppViewServer)
