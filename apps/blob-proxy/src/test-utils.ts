@@ -1,10 +1,10 @@
+import { asClassArgs } from "@gyaku/di";
 import {
   InMemoryDidResolver,
   InMemoryLoggerManager,
   InMemoryMetricReporter,
 } from "@repo/common/infrastructure";
 import { InMemoryDidCache } from "@repo/common/test";
-import { ac } from "@repo/common/utils";
 
 import { InMemoryBlobFetcher } from "./infrastructure/blob-fetcher.in-memory.js";
 import { InMemoryCacheMetadataRepository } from "./infrastructure/cache-metadata-repository.in-memory.js";
@@ -33,13 +33,13 @@ export const testRegistry = createBlobProxyRegistry(testEnv)
   // beforeEachで複数回resolveすると二重登録エラーになる。テストでは使わないので差し替える。
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("blobProxyServer", {} as never)
-  .replaceService("loggerManager", ac(InMemoryLoggerManager))
-  .replaceService("metricReporter", ac(InMemoryMetricReporter))
-  .replaceService("didCache", ac(InMemoryDidCache))
-  .replaceService("didResolver", ac(InMemoryDidResolver))
-  .replaceService("imageCacheStorage", ac(InMemoryImageCacheStorage))
-  .replaceService("cacheMetadataRepository", ac(InMemoryCacheMetadataRepository))
-  .replaceService("blobFetcher", ac(InMemoryBlobFetcher))
-  .replaceService("imageResizer", ac(InMemoryImageResizer));
+  .replaceService("loggerManager", asClassArgs(InMemoryLoggerManager))
+  .replaceService("metricReporter", asClassArgs(InMemoryMetricReporter))
+  .replaceService("didCache", asClassArgs(InMemoryDidCache))
+  .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
+  .replaceService("imageCacheStorage", asClassArgs(InMemoryImageCacheStorage))
+  .replaceService("cacheMetadataRepository", asClassArgs(InMemoryCacheMetadataRepository))
+  .replaceService("blobFetcher", asClassArgs(InMemoryBlobFetcher))
+  .replaceService("imageResizer", asClassArgs(InMemoryImageResizer));
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;

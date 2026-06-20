@@ -1,3 +1,4 @@
+import { asClassArgs } from "@gyaku/di";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -6,7 +7,6 @@ import {
   InMemoryTapClient,
   InMemoryTransactionManager,
 } from "@repo/common/test";
-import { ac } from "@repo/common/utils";
 
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
@@ -39,24 +39,24 @@ const testEnv = {
 export const testRegistry = createWorkerRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
-  .replaceService("actorRepository", ac(InMemoryActorRepository))
-  .replaceService("actorStatsRepository", ac(InMemoryActorStatsRepository))
-  .replaceService("feedItemRepository", ac(InMemoryFeedItemRepository))
-  .replaceService("followRepository", ac(InMemoryFollowRepository))
-  .replaceService("generatorRepository", ac(InMemoryGeneratorRepository))
-  .replaceService("inviteCodeRepository", ac(InMemoryInviteCodeRepository))
-  .replaceService("likeRepository", ac(InMemoryLikeRepository))
-  .replaceService("postRepository", ac(InMemoryPostRepository))
-  .replaceService("postStatsRepository", ac(InMemoryPostStatsRepository))
-  .replaceService("profileRepository", ac(InMemoryProfileRepository))
-  .replaceService("recordRepository", ac(InMemoryRecordRepository))
-  .replaceService("repostRepository", ac(InMemoryRepostRepository))
-  .replaceService("subscriptionRepository", ac(InMemorySubscriptionRepository))
-  .replaceService("transactionManager", ac(InMemoryTransactionManager))
-  .replaceService("tapClient", ac(InMemoryTapClient))
-  .replaceService("jobQueue", ac(InMemoryJobQueue))
-  .replaceService("didCache", ac(InMemoryDidCache))
-  .replaceService("didResolver", ac(InMemoryDidResolver))
-  .replaceService("jobScheduler", ac(InMemoryJobScheduler));
+  .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
+  .replaceService("actorStatsRepository", asClassArgs(InMemoryActorStatsRepository))
+  .replaceService("feedItemRepository", asClassArgs(InMemoryFeedItemRepository))
+  .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
+  .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))
+  .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
+  .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
+  .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
+  .replaceService("postStatsRepository", asClassArgs(InMemoryPostStatsRepository))
+  .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
+  .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
+  .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
+  .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
+  .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
+  .replaceService("tapClient", asClassArgs(InMemoryTapClient))
+  .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))
+  .replaceService("didCache", asClassArgs(InMemoryDidCache))
+  .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
+  .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler));
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;

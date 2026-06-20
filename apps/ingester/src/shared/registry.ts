@@ -1,10 +1,9 @@
-import { createRegistry } from "@gyaku/di";
+import { asClassArgs, createRegistry } from "@gyaku/di";
 import {
   JobQueue,
   LoggerManager,
   MetricReporter,
 } from "@repo/common/infrastructure";
-import { ac } from "@repo/common/utils";
 
 import { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
@@ -28,16 +27,16 @@ export const createIngesterRegistry = (env: Env) =>
     .value("disableIngester", env.DISABLE_INGESTER)
     .value("tapUrl", env.TAP_URL)
     // infrastructure
-    .service("loggerManager", ["logLevel"], ac(LoggerManager))
-    .service("jobQueue", ["redisUrl"], ac(JobQueue))
+    .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
+    .service("jobQueue", ["redisUrl"], asClassArgs(JobQueue))
     .service("metricReporter", () => new MetricReporter())
-    .service("cursorRepository", ["redisUrl"], ac(RedisCursorRepository))
+    .service("cursorRepository", ["redisUrl"], asClassArgs(RedisCursorRepository))
     // application
-    .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], ac(HandleIdentityUseCase))
-    .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], ac(HandleCommitUseCase))
+    .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleIdentityUseCase))
+    .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleCommitUseCase))
     // presentation
     .service("metricsRouter", ["jobQueue", "metricReporter"], ({ jobQueue, metricReporter }) => metricsRouterFactory(jobQueue, metricReporter))
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
-    .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], ac(TapIngester))
-    .service("labelIngester", ["metricReporter", "moderationUrl"], ac(LabelIngester))
-    .service("ingesterServer", ["loggerManager", "metricsRouter", "healthRouter", "tapIngester", "labelIngester", "port", "disableIngester"], ac(IngesterServer));
+    .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], asClassArgs(TapIngester))
+    .service("labelIngester", ["metricReporter", "moderationUrl"], asClassArgs(LabelIngester))
+    .service("ingesterServer", ["loggerManager", "metricsRouter", "healthRouter", "tapIngester", "labelIngester", "port", "disableIngester"], asClassArgs(IngesterServer));

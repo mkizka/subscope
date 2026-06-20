@@ -1,11 +1,10 @@
-import { createRegistry } from "@gyaku/di";
+import { asClassArgs, createRegistry } from "@gyaku/di";
 import {
   connectionPoolFactory,
   databaseFactory,
   LoggerManager,
   TransactionManager,
 } from "@repo/common/infrastructure";
-import { ac } from "@repo/common/utils";
 import { inject } from "vitest";
 
 declare module "vitest" {
@@ -18,10 +17,10 @@ declare module "vitest" {
 const testRegistry = createRegistry()
   .value("logLevel", "error" as const)
   .value("databaseUrl", inject("databaseUrl"))
-  .service("loggerManager", ["logLevel"], ac(LoggerManager))
+  .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
   .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
   .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
-  .service("transactionManager", ["db"], ac(TransactionManager));
+  .service("transactionManager", ["db"], asClassArgs(TransactionManager));
 
 const services = await testRegistry.resolve();
 

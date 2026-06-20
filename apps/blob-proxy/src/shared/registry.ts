@@ -1,4 +1,4 @@
-import { createRegistry } from "@gyaku/di";
+import { asClassArgs, createRegistry } from "@gyaku/di";
 import type {
   IDidCache,
   IDidResolver,
@@ -13,7 +13,6 @@ import {
   MetricReporter,
   RedisDidCache,
 } from "@repo/common/infrastructure";
-import { ac } from "@repo/common/utils";
 
 import { ImageProxyUseCase } from "../application/image-proxy-use-case.js";
 import type { IBlobFetcher } from "../application/interfaces/blob-fetcher.js";
@@ -48,24 +47,24 @@ export const createBlobProxyRegistry = (env: Env) =>
     .value("cacheCleanupTimezone", env.CACHE_CLEANUP_TIMEZONE)
     .value("port", env.PORT)
     // infrastructure
-    .service("loggerManager", ["logLevel"], ac<ILoggerManager>(LoggerManager))
-    .service("metricReporter", ac<IMetricReporter>(MetricReporter))
+    .service("loggerManager", ["logLevel"], asClassArgs<ILoggerManager>(LoggerManager))
+    .service("metricReporter", asClassArgs<IMetricReporter>(MetricReporter))
     .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
     .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
-    .service("didCache", ["redisUrl", "metricReporter"], ac<IDidCache>(RedisDidCache))
-    .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], ac<IDidResolver>(DidResolver))
-    .service("imageCacheStorage", ["loggerManager"], ac<IImageCacheStorage>(ImageDiskStorage))
-    .service("cacheMetadataRepository", ["db"], ac<ICacheMetadataRepository>(CacheMetadataRepository))
-    .service("blobFetcher", ["didResolver"], ac<IBlobFetcher>(BlobFetcher))
-    .service("imageResizer", ac<IImageResizer>(ImageResizer))
-    .service("taskScheduler", ["loggerManager"], ac(CronTaskScheduler))
+    .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>(RedisDidCache))
+    .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>(DidResolver))
+    .service("imageCacheStorage", ["loggerManager"], asClassArgs<IImageCacheStorage>(ImageDiskStorage))
+    .service("cacheMetadataRepository", ["db"], asClassArgs<ICacheMetadataRepository>(CacheMetadataRepository))
+    .service("blobFetcher", ["didResolver"], asClassArgs<IBlobFetcher>(BlobFetcher))
+    .service("imageResizer", asClassArgs<IImageResizer>(ImageResizer))
+    .service("taskScheduler", ["loggerManager"], asClassArgs(CronTaskScheduler))
     // application
-    .service("fetchBlobService", ["didResolver", "blobFetcher"], ac(FetchBlobService))
-    .service("imageCacheService", ["cacheMetadataRepository", "imageCacheStorage", "blobCacheDir"], ac(ImageCacheService))
-    .service("cacheCleanupService", ["cacheMetadataRepository", "imageCacheService"], ac(CacheCleanupService))
-    .service("cacheCleanupScheduler", ["loggerManager", "taskScheduler", "cacheCleanupService", "cacheCleanupCron", "cacheCleanupTimezone"], ac(CacheCleanupScheduler))
-    .service("imageProxyUseCase", ["fetchBlobService", "imageResizer", "imageCacheService", "metricReporter"], ac(ImageProxyUseCase))
+    .service("fetchBlobService", ["didResolver", "blobFetcher"], asClassArgs(FetchBlobService))
+    .service("imageCacheService", ["cacheMetadataRepository", "imageCacheStorage", "blobCacheDir"], asClassArgs(ImageCacheService))
+    .service("cacheCleanupService", ["cacheMetadataRepository", "imageCacheService"], asClassArgs(CacheCleanupService))
+    .service("cacheCleanupScheduler", ["loggerManager", "taskScheduler", "cacheCleanupService", "cacheCleanupCron", "cacheCleanupTimezone"], asClassArgs(CacheCleanupScheduler))
+    .service("imageProxyUseCase", ["fetchBlobService", "imageResizer", "imageCacheService", "metricReporter"], asClassArgs(ImageProxyUseCase))
     // presentation
     .service("imagesRouter", ["imageProxyUseCase", "metricReporter"], ({ imageProxyUseCase, metricReporter }) => imagesRouterFactory(imageProxyUseCase, metricReporter))
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
-    .service("blobProxyServer", ["loggerManager", "imagesRouter", "cacheCleanupScheduler", "healthRouter", "port"], ac(BlobProxyServer));
+    .service("blobProxyServer", ["loggerManager", "imagesRouter", "cacheCleanupScheduler", "healthRouter", "port"], asClassArgs(BlobProxyServer));

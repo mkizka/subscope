@@ -17,4 +17,3 @@ patchedDependencies:
   "@atproto/lex-cli": patches/@atproto__lex-cli.patch
   react-router: patches/react-router.patch
   "@atproto/tap@0.3.0": patches/@atproto__tap@0.3.0.patch
-  "@gyaku/di@3.3.0": patches/@gyaku__di@3.3.0.patch
