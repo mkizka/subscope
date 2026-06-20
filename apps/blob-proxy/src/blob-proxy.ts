@@ -19,11 +19,14 @@ import { CronTaskScheduler } from "./infrastructure/cron-task-scheduler.js";
 import { ImageDiskStorage } from "./infrastructure/image-disk-storage.js";
 import { ImageResizer } from "./infrastructure/image-resizer.js";
 import { imagesRouterFactory } from "./presentation/images.js";
+import { healthRouterFactory } from "./presentation/routes/health.js";
 import { BlobProxyServer } from "./presentation/server.js";
 import { env } from "./shared/env.js";
 
 createInjector()
   // envs
+  .provideValue("nodeEnv", env.NODE_ENV)
+  .provideValue("port", env.PORT)
   .provideValue("logLevel", env.LOG_LEVEL)
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("redisUrl", env.REDIS_URL)
@@ -51,5 +54,6 @@ createInjector()
   .provideClass("imageProxyUseCase", ImageProxyUseCase)
   // presentation
   .provideFactory("imagesRouter", imagesRouterFactory)
+  .provideFactory("healthRouter", healthRouterFactory)
   .injectClass(BlobProxyServer)
   .start();

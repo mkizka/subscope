@@ -42,18 +42,21 @@ import { ProfileRepository } from "./infrastructure/repositories/profile-reposit
 import { RecordRepository } from "./infrastructure/repositories/record-repository/record-repository.js";
 import { RepostRepository } from "./infrastructure/repositories/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "./infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { healthRouterFactory } from "./presentation/routes/health.js";
 import { WorkerServer } from "./presentation/server.js";
 import { SyncWorker } from "./presentation/worker.js";
 import { env } from "./shared/env.js";
 
 createInjector()
   // envs
+  .provideValue("nodeEnv", env.NODE_ENV)
+  .provideValue("port", env.PORT)
   .provideValue("databaseUrl", env.DATABASE_URL)
   .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("logLevel", env.LOG_LEVEL)
-  .provideValue("redisUrl", env.REDIS_URL)
   .provideValue("plcUrl", env.PLC_URL)
   .provideValue("tapUrl", env.TAP_URL)
+  .provideValue("commitWorkerConcurrency", env.COMMIT_WORKER_CONCURRENCY)
   // infrastructure
   .provideClass("loggerManager", LoggerManager)
   .provideClass("tapClient", TapClient)
@@ -99,5 +102,6 @@ createInjector()
   .provideClass("removeTapRepoUseCase", RemoveTapRepoUseCase)
   .provideClass("syncWorker", SyncWorker)
   // presentation
+  .provideFactory("healthRouter", healthRouterFactory)
   .injectClass(WorkerServer)
   .start();

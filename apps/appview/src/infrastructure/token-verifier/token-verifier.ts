@@ -3,11 +3,13 @@ import { verifyJwt } from "@atproto/xrpc-server";
 import type { IDidResolver } from "@repo/common/domain";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
-import { env } from "../../shared/env.js";
 
 export class TokenVerifier implements ITokenVerifier {
-  constructor(private readonly didResolver: IDidResolver) {}
-  static inject = ["didResolver"] as const;
+  constructor(
+    private readonly didResolver: IDidResolver,
+    private readonly serviceDid: string,
+  ) {}
+  static inject = ["didResolver", "serviceDid"] as const;
 
   async verify(params: { token: string; nsid: string }) {
     const getSigninKey = async (did: string) => {
@@ -16,7 +18,7 @@ export class TokenVerifier implements ITokenVerifier {
     };
     const payload = await verifyJwt(
       params.token,
-      env.SERVICE_DID, // TODO: 引数から受け取る
+      this.serviceDid,
       params.nsid,
       getSigninKey,
     );
