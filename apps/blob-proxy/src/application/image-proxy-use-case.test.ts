@@ -6,9 +6,22 @@ import { ImageProxyRequest } from "../domain/image-proxy-request.js";
 import { testRegistry, type TestServices } from "../test-utils.js";
 
 describe("ImageProxyUseCase", () => {
-  let services: TestServices;
+  let sut: TestServices["imageProxyUseCase"];
+  let didResolver: TestServices["didResolver"];
+  let blobFetcher: TestServices["blobFetcher"];
+  let imageCacheStorage: TestServices["imageCacheStorage"];
+  let imageResizer: TestServices["imageResizer"];
+  let metricReporter: TestServices["metricReporter"];
+  let cacheMetadataRepository: TestServices["cacheMetadataRepository"];
   beforeEach(async () => {
-    services = await testRegistry.resolve();
+    const services = await testRegistry.resolve();
+    sut = services.imageProxyUseCase;
+    didResolver = services.didResolver;
+    blobFetcher = services.blobFetcher;
+    imageCacheStorage = services.imageCacheStorage;
+    imageResizer = services.imageResizer;
+    metricReporter = services.metricReporter;
+    cacheMetadataRepository = services.cacheMetadataRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
   });
@@ -18,12 +31,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("キャッシュがヒットした場合、キャッシュされた画像を返してヒットメトリクスを記録する", async () => {
-    const {
-      imageProxyUseCase,
-      imageCacheStorage,
-      metricReporter,
-      cacheMetadataRepository,
-    } = services;
     // arrange
     const cachedData = new Uint8Array([1, 2, 3]);
 
@@ -42,7 +49,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await imageProxyUseCase.execute(
+    const result = await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example123",
         cid: "bafkreiabc123",
@@ -56,15 +63,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("キャッシュがミスした場合、画像を取得・リサイズしてキャッシュに保存してミスメトリクスを記録する", async () => {
-    const {
-      imageProxyUseCase,
-      didResolver,
-      blobFetcher,
-      imageCacheStorage,
-      imageResizer,
-      metricReporter,
-      cacheMetadataRepository,
-    } = services;
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3, 4, 5]));
     const resizedBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
@@ -94,7 +92,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await imageProxyUseCase.execute(
+    const result = await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example123",
         cid: "bafkreiabc456",
@@ -123,13 +121,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("異なるプリセットタイプで同じ画像を要求した場合、異なるキャッシュキーを使用する", async () => {
-    const {
-      imageProxyUseCase,
-      didResolver,
-      blobFetcher,
-      imageResizer,
-      cacheMetadataRepository,
-    } = services;
     // arrange
     const blob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
     const resizedBlob1 = ImageBlob.jpeg(new Uint8Array([1, 2]));
@@ -169,14 +160,14 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    await imageProxyUseCase.execute(
+    await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example789",
         cid: "bafkreidef789",
         type: "avatar",
       }),
     );
-    await imageProxyUseCase.execute(
+    await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example789",
         cid: "bafkreidef789",
@@ -208,7 +199,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("画像リサイズサービスがエラーをスローした場合、エラーがそのまま伝播する", async () => {
-    const { imageProxyUseCase, didResolver, blobFetcher } = services;
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
 
@@ -229,7 +219,7 @@ describe("ImageProxyUseCase", () => {
 
     // act & assert
     await expect(
-      imageProxyUseCase.execute(
+      sut.execute(
         ImageProxyRequest.fromParams({
           did: "did:plc:example888",
           cid: "bafkreiabc888",
@@ -240,14 +230,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("キャッシュ保存がエラーになった場合、エラーがそのまま伝播する", async () => {
-    const {
-      imageProxyUseCase,
-      didResolver,
-      blobFetcher,
-      imageCacheStorage,
-      imageResizer,
-      cacheMetadataRepository,
-    } = services;
     // arrange
     const originalBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3, 4, 5]));
     const resizedBlob = ImageBlob.jpeg(new Uint8Array([1, 2, 3]));
@@ -285,7 +267,7 @@ describe("ImageProxyUseCase", () => {
 
     // act & assert
     await expect(
-      imageProxyUseCase.execute(
+      sut.execute(
         ImageProxyRequest.fromParams({
           did: "did:plc:example777",
           cid: "bafkreiabc777",
@@ -304,8 +286,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("ネガティブキャッシュがヒットした場合、nullを返してヒットメトリクスを記録する", async () => {
-    const { imageProxyUseCase, metricReporter, cacheMetadataRepository } =
-      services;
     // arrange
     await cacheMetadataRepository.save(
       new CacheMetadata({
@@ -317,7 +297,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await imageProxyUseCase.execute(
+    const result = await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example555",
         cid: "bafkreiabc555",
@@ -331,13 +311,6 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("BlobFetchFailedErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
-    const {
-      imageProxyUseCase,
-      didResolver,
-      blobFetcher,
-      metricReporter,
-      cacheMetadataRepository,
-    } = services;
     // arrange
     didResolver.setResolveResult("did:plc:example999", {
       pds: new URL("https://example.pds.com"),
@@ -355,7 +328,7 @@ describe("ImageProxyUseCase", () => {
     );
 
     // act
-    const result = await imageProxyUseCase.execute(
+    const result = await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example999",
         cid: "bafkreiabc999",
@@ -384,13 +357,11 @@ describe("ImageProxyUseCase", () => {
   });
 
   test("DidResolutionErrorが発生した場合、ネガティブキャッシュを保存してnullを返す", async () => {
-    const { imageProxyUseCase, metricReporter, cacheMetadataRepository } =
-      services;
     // arrange
     // DidResolverにresolve結果を設定しない（エラーになる）
 
     // act
-    const result = await imageProxyUseCase.execute(
+    const result = await sut.execute(
       ImageProxyRequest.fromParams({
         did: "did:plc:example888",
         cid: "bafkreiabc888",

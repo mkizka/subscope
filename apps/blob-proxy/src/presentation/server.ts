@@ -5,8 +5,6 @@ import express from "express";
 import promBundle from "express-prom-bundle";
 
 import type { CacheCleanupScheduler } from "../application/services/cache-cleanup-scheduler.js";
-import { env } from "../shared/env.js";
-import { healthRouter } from "./routes/health.js";
 
 export class BlobProxyServer {
   private readonly app: express.Express;
@@ -16,6 +14,8 @@ export class BlobProxyServer {
     loggerManager: ILoggerManager,
     imagesRouter: Router,
     private readonly cacheCleanupScheduler: CacheCleanupScheduler,
+    healthRouter: Router,
+    private readonly port: number,
   ) {
     this.logger = loggerManager.createLogger("BlobProxyServer");
     this.app = express();
@@ -28,11 +28,13 @@ export class BlobProxyServer {
     "loggerManager",
     "imagesRouter",
     "cacheCleanupScheduler",
+    "healthRouter",
+    "port",
   ] as const;
 
   start() {
-    this.app.listen(env.PORT, () => {
-      this.logger.info(`Blob proxy server listening on port ${env.PORT}`);
+    this.app.listen(this.port, () => {
+      this.logger.info(`Blob proxy server listening on port ${this.port}`);
       this.cacheCleanupScheduler.start();
     });
   }
