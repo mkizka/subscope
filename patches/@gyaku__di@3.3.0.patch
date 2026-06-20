@@ -1,0 +1,59 @@
+diff --git a/dist/class.d.ts b/dist/class.d.ts
+index 3bbca3a682d632e1333b6338e86c7a565b570644..b814a1fe247b783be2f6550ba023da8816cee70c 100644
+--- a/dist/class.d.ts
++++ b/dist/class.d.ts
+@@ -1,5 +1,13 @@
++type ClassFactory<Instance> = {
++    <Deps extends object>(Ctor: new (deps: Deps) => Instance): (deps: Deps) => Instance;
++    (Ctor: new (...args: never[]) => Instance, options: {
++        positional: true;
++    }): (deps?: Record<string, unknown>) => Instance;
++};
+ export declare function asClass<Deps extends object, Instance>(Ctor: new (deps: Deps) => Instance): (deps: Deps) => Instance;
+ export declare function asClass<Instance>(Ctor: new (...args: never[]) => Instance, options: {
+     positional: true;
+-}): (deps: Record<string, unknown>) => Instance;
++}): (deps?: Record<string, unknown>) => Instance;
++export declare function asClass<Instance>(): ClassFactory<Instance>;
++export {};
+ //# sourceMappingURL=class.d.ts.map
+\ No newline at end of file
+diff --git a/dist/class.d.ts.map b/dist/class.d.ts.map
+index ed16a485380ffab1743d17bd53c12c481ea62ae8..595e5a7fc8cde4632a103a3338cedc0bfe36312f 100644
+--- a/dist/class.d.ts.map
++++ b/dist/class.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"class.d.ts","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAAA,wBAAgB,OAAO,CAAC,IAAI,SAAS,MAAM,EAAE,QAAQ,EACnD,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,GACjC,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;AAE5B,wBAAgB,OAAO,CAAC,QAAQ,EAC9B,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,KAAK,EAAE,KAAK,QAAQ,EACxC,OAAO,EAAE;IAAE,UAAU,EAAE,IAAI,CAAA;CAAE,GAC5B,CAAC,IAAI,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAAK,QAAQ,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"class.d.ts","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAWA,KAAK,YAAY,CAAC,QAAQ,IAAI;IAC5B,CAAC,IAAI,SAAS,MAAM,EAClB,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,GACjC,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;IAC5B,CACE,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,KAAK,EAAE,KAAK,QAAQ,EACxC,OAAO,EAAE;QAAE,UAAU,EAAE,IAAI,CAAA;KAAE,GAC5B,CAAC,IAAI,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAAK,QAAQ,CAAC;CACjD,CAAC;AAEF,wBAAgB,OAAO,CAAC,IAAI,SAAS,MAAM,EAAE,QAAQ,EACnD,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,GACjC,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;AAE5B,wBAAgB,OAAO,CAAC,QAAQ,EAC9B,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,KAAK,EAAE,KAAK,QAAQ,EACxC,OAAO,EAAE;IAAE,UAAU,EAAE,IAAI,CAAA;CAAE,GAC5B,CAAC,IAAI,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAAK,QAAQ,CAAC;AAEhD,wBAAgB,OAAO,CAAC,QAAQ,KAAK,YAAY,CAAC,QAAQ,CAAC,CAAC"}
+\ No newline at end of file
+diff --git a/dist/class.js b/dist/class.js
+index f8c8fa47b54e8161958a3759a11f7b03e97a072c..29ea5463211ce97c5afc0faea2041ffc1e7fc8f9 100644
+--- a/dist/class.js
++++ b/dist/class.js
+@@ -1,8 +1,14 @@
+-export function asClass(Ctor, options) {
++function makeClassFactory(Ctor, options) {
+     return (deps) => {
+-        const args = options?.positional ? Object.values(deps) : [deps];
++        const args = options?.positional ? Object.values(deps ?? {}) : [deps];
+         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- `args` is aligned with the constructor parameters by the caller's deps declaration.
+         return new Ctor(...args);
+     };
+ }
++export function asClass(Ctor, options) {
++    if (Ctor === undefined) {
++        return makeClassFactory;
++    }
++    return makeClassFactory(Ctor, options);
++}
+ //# sourceMappingURL=class.js.map
+\ No newline at end of file
+diff --git a/dist/class.js.map b/dist/class.js.map
+index 13393ae300ff5f6b8e92b41327b78309c4f17b5a..f3986e196d655632fa006d4cddfc2552ea39ad03 100644
+--- a/dist/class.js.map
++++ b/dist/class.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"class.js","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AASA,MAAM,UAAU,OAAO,CACrB,IAAuC,EACvC,OAAkC;IAElC,OAAO,CAAC,IAAI,EAAE,EAAE;QACd,MAAM,IAAI,GAAG,OAAO,EAAE,UAAU,CAAC,CAAC,CAAC,MAAM,CAAC,MAAM,CAAC,IAAI,CAAC,CAAC,CAAC,CAAC,CAAC,IAAI,CAAC,CAAC;QAChE,gKAAgK;QAChK,OAAO,IAAI,IAAI,CAAC,GAAI,IAAgB,CAAC,CAAC;IACxC,CAAC,CAAC;AACJ,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"class.js","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAAA,SAAS,gBAAgB,CACvB,IAAuC,EACvC,OAAkC;IAElC,OAAO,CAAC,IAAI,EAAE,EAAE;QACd,MAAM,IAAI,GAAG,OAAO,EAAE,UAAU,CAAC,CAAC,CAAC,MAAM,CAAC,MAAM,CAAC,IAAI,IAAI,EAAE,CAAC,CAAC,CAAC,CAAC,CAAC,IAAI,CAAC,CAAC;QACtE,gKAAgK;QAChK,OAAO,IAAI,IAAI,CAAC,GAAI,IAAgB,CAAC,CAAC;IACxC,CAAC,CAAC;AACJ,CAAC;AAuBD,MAAM,UAAU,OAAO,CACrB,IAAwC,EACxC,OAAkC;IAElC,IAAI,IAAI,KAAK,SAAS,EAAE,CAAC;QACvB,OAAO,gBAAgB,CAAC;IAC1B,CAAC;IACD,OAAO,gBAAgB,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC;AACzC,CAAC"}

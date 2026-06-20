@@ -5,6 +5,7 @@ import {
   InMemoryJobQueue,
   InMemoryTransactionManager,
 } from "@repo/common/test";
+import { ac } from "@repo/common/utils";
 
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
@@ -42,27 +43,27 @@ const testEnv = {
 export const testRegistry = createAppRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
-  .replaceService("profileRepository", () => new InMemoryProfileRepository())
-  .replaceService("actorRepository", () => new InMemoryActorRepository())
-  .replaceService("actorStatsRepository", () => new InMemoryActorStatsRepository())
-  .replaceService("handleResolver", () => new InMemoryHandleResolver())
-  .replaceService("recordRepository", () => new InMemoryRecordRepository())
-  .replaceService("postRepository", () => new InMemoryPostRepository())
-  .replaceService("postStatsRepository", () => new InMemoryPostStatsRepository())
-  .replaceService("timelineRepository", () => new InMemoryTimelineRepository())
-  .replaceService("authorFeedRepository", () => new InMemoryAuthorFeedRepository())
-  .replaceService("likeRepository", () => new InMemoryLikeRepository())
-  .replaceService("repostRepository", () => new InMemoryRepostRepository())
-  .replaceService("followRepository", () => new InMemoryFollowRepository())
-  .replaceService("generatorRepository", () => new InMemoryGeneratorRepository())
-  .replaceService("inviteCodeRepository", () => new InMemoryInviteCodeRepository())
-  .replaceService("subscriptionRepository", () => new InMemorySubscriptionRepository())
-  .replaceService("transactionManager", () => new InMemoryTransactionManager())
-  .replaceService("assetUrlBuilder", () => new InMemoryAssetUrlBuilder())
-  .replaceService("jobQueue", () => new InMemoryJobQueue())
-  .replaceService("jobScheduler", () => new InMemoryJobScheduler())
-  .replaceService("didCache", () => new InMemoryDidCache())
-  .replaceService("didResolver", () => new InMemoryDidResolver())
-  .replaceService("tokenVerifier", () => new InMemoryTokenVerifier());
+  .replaceService("profileRepository", ac(InMemoryProfileRepository))
+  .replaceService("actorRepository", ac(InMemoryActorRepository))
+  .replaceService("actorStatsRepository", ac(InMemoryActorStatsRepository))
+  .replaceService("handleResolver", ac(InMemoryHandleResolver))
+  .replaceService("recordRepository", ac(InMemoryRecordRepository))
+  .replaceService("postRepository", ac(InMemoryPostRepository))
+  .replaceService("postStatsRepository", ac(InMemoryPostStatsRepository))
+  .replaceService("timelineRepository", ac(InMemoryTimelineRepository))
+  .replaceService("authorFeedRepository", ac(InMemoryAuthorFeedRepository))
+  .replaceService("likeRepository", ac(InMemoryLikeRepository))
+  .replaceService("repostRepository", ac(InMemoryRepostRepository))
+  .replaceService("followRepository", ac(InMemoryFollowRepository))
+  .replaceService("generatorRepository", ac(InMemoryGeneratorRepository))
+  .replaceService("inviteCodeRepository", ac(InMemoryInviteCodeRepository))
+  .replaceService("subscriptionRepository", ac(InMemorySubscriptionRepository))
+  .replaceService("transactionManager", ac(InMemoryTransactionManager))
+  .replaceService("assetUrlBuilder", ac(InMemoryAssetUrlBuilder))
+  .replaceService("jobQueue", ac(InMemoryJobQueue))
+  .replaceService("jobScheduler", ac(InMemoryJobScheduler))
+  .replaceService("didCache", ac(InMemoryDidCache))
+  .replaceService("didResolver", ac(InMemoryDidResolver))
+  .replaceService("tokenVerifier", ac(InMemoryTokenVerifier));
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;
