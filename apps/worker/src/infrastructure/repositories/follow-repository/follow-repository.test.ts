@@ -15,7 +15,7 @@ describe("FollowRepository", () => {
   const followRepository = new FollowRepository();
 
   describe("isFollowedByAnySubscriber", () => {
-    test("フォロワーがサブスクライバーの場合、trueを返す", async () => {
+    test("サブスクライバーからフォローされている場合、trueを返す", async () => {
       // arrange
       const subscriber = await actorFactory(ctx.db).create();
       const followee = await actorFactory(ctx.db).create();
@@ -23,11 +23,15 @@ describe("FollowRepository", () => {
       await subscriptionFactory(ctx.db)
         .vars({ actor: () => subscriber })
         .create();
+
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => subscriber })
         .create();
       await followFactory(ctx.db)
-        .vars({ record: () => record, followee: () => followee })
+        .vars({
+          record: () => record,
+          followee: () => followee,
+        })
         .create();
 
       // act
@@ -40,7 +44,7 @@ describe("FollowRepository", () => {
       expect(result).toBe(true);
     });
 
-    test("フォロワーがサブスクライバーでない場合、falseを返す", async () => {
+    test("サブスクライバー以外からのみフォローされている場合、falseを返す", async () => {
       // arrange
       const nonSubscriber = await actorFactory(ctx.db).create();
       const followee = await actorFactory(ctx.db).create();
@@ -49,7 +53,10 @@ describe("FollowRepository", () => {
         .vars({ actor: () => nonSubscriber })
         .create();
       await followFactory(ctx.db)
-        .vars({ record: () => record, followee: () => followee })
+        .vars({
+          record: () => record,
+          followee: () => followee,
+        })
         .create();
 
       // act
@@ -76,7 +83,7 @@ describe("FollowRepository", () => {
       expect(result).toBe(false);
     });
 
-    test("複数フォロワーのうち1人がサブスクライバーの場合、trueを返す", async () => {
+    test("複数のフォロワーがいて、一人がサブスクライバーの場合、trueを返す", async () => {
       // arrange
       const subscriber = await actorFactory(ctx.db).create();
       const nonSubscriber = await actorFactory(ctx.db).create();
@@ -85,17 +92,25 @@ describe("FollowRepository", () => {
       await subscriptionFactory(ctx.db)
         .vars({ actor: () => subscriber })
         .create();
+
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => subscriber })
         .create();
+      await followFactory(ctx.db)
+        .vars({
+          record: () => record1,
+          followee: () => followee,
+        })
+        .create();
+
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => nonSubscriber })
         .create();
       await followFactory(ctx.db)
-        .vars({ record: () => record1, followee: () => followee })
-        .create();
-      await followFactory(ctx.db)
-        .vars({ record: () => record2, followee: () => followee })
+        .vars({
+          record: () => record2,
+          followee: () => followee,
+        })
         .create();
 
       // act

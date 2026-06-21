@@ -1,6 +1,6 @@
 import type { Follow, TransactionContext } from "@repo/common/domain";
 import { type FollowInsert, schema } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
@@ -40,7 +40,7 @@ export class FollowRepository implements IFollowRepository {
         schema.subscriptions,
         eq(schema.follows.actorDid, schema.subscriptions.actorDid),
       )
-      .where(eq(schema.follows.subjectDid, subjectDid))
+      .where(and(eq(schema.follows.subjectDid, subjectDid)))
       .limit(1);
 
     return result.length > 0;
