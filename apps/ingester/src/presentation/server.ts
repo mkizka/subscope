@@ -12,6 +12,8 @@ export class IngesterServer {
 
   constructor(
     loggerManager: ILoggerManager,
+    private readonly port: number,
+    private readonly disableIngester: boolean,
     metricsRouter: Router,
     healthRouter: Router,
     private readonly tapIngester: TapIngester,
@@ -27,6 +29,8 @@ export class IngesterServer {
   }
   static inject = [
     "loggerManager",
+    "port",
+    "disableIngester",
     "metricsRouter",
     "healthRouter",
     "tapIngester",

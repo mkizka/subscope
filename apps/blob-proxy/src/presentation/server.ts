@@ -12,7 +12,9 @@ export class BlobProxyServer {
 
   constructor(
     loggerManager: ILoggerManager,
+    private readonly port: number,
     imagesRouter: Router,
+    healthRouter: Router,
     private readonly cacheCleanupScheduler: CacheCleanupScheduler,
     healthRouter: Router,
     private readonly port: number,
@@ -26,7 +28,9 @@ export class BlobProxyServer {
   }
   static inject = [
     "loggerManager",
+    "port",
     "imagesRouter",
+    "healthRouter",
     "cacheCleanupScheduler",
     "healthRouter",
     "port",
