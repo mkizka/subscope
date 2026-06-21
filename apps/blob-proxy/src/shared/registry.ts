@@ -47,16 +47,16 @@ export const createBlobProxyRegistry = (env: Env) =>
     .value("cacheCleanupTimezone", env.CACHE_CLEANUP_TIMEZONE)
     .value("port", env.PORT)
     // infrastructure
-    .service("loggerManager", ["logLevel"], asClassArgs<ILoggerManager>(LoggerManager))
-    .service("metricReporter", asClassArgs<IMetricReporter>(MetricReporter))
+    .service("loggerManager", ["logLevel"], asClassArgs<ILoggerManager>()(LoggerManager))
+    .service("metricReporter", asClassArgs<IMetricReporter>()(MetricReporter))
     .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
     .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
-    .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>(RedisDidCache))
-    .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>(DidResolver))
-    .service("imageCacheStorage", ["loggerManager"], asClassArgs<IImageCacheStorage>(ImageDiskStorage))
-    .service("cacheMetadataRepository", ["db"], asClassArgs<ICacheMetadataRepository>(CacheMetadataRepository))
-    .service("blobFetcher", ["didResolver"], asClassArgs<IBlobFetcher>(BlobFetcher))
-    .service("imageResizer", asClassArgs<IImageResizer>(ImageResizer))
+    .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
+    .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
+    .service("imageCacheStorage", ["loggerManager"], asClassArgs<IImageCacheStorage>()(ImageDiskStorage))
+    .service("cacheMetadataRepository", ["db"], asClassArgs<ICacheMetadataRepository>()(CacheMetadataRepository))
+    .service("blobFetcher", asClassArgs<IBlobFetcher>()(BlobFetcher))
+    .service("imageResizer", asClassArgs<IImageResizer>()(ImageResizer))
     .service("taskScheduler", ["loggerManager"], asClassArgs(CronTaskScheduler))
     // application
     .service("fetchBlobService", ["didResolver", "blobFetcher"], asClassArgs(FetchBlobService))
@@ -67,4 +67,4 @@ export const createBlobProxyRegistry = (env: Env) =>
     // presentation
     .service("imagesRouter", ["imageProxyUseCase", "metricReporter"], ({ imageProxyUseCase, metricReporter }) => imagesRouterFactory(imageProxyUseCase, metricReporter))
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
-    .service("blobProxyServer", ["loggerManager", "imagesRouter", "cacheCleanupScheduler", "healthRouter", "port"], asClassArgs(BlobProxyServer));
+    .service("blobProxyServer", ["loggerManager", "port", "imagesRouter", "healthRouter", "cacheCleanupScheduler"], asClassArgs(BlobProxyServer));

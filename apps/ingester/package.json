@@ -16,7 +16,7 @@
     "@atproto/did": "0.5.0",
     "@atproto/tap": "0.3.0",
     "@atproto/xrpc-server": "0.11.1",
-    "@gyaku/di": "3.4.0",
+    "@gyaku/di": "3.4.2",
     "@keyv/redis": "5.1.6",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",

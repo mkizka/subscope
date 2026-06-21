@@ -37,4 +37,4 @@ export const createIngesterRegistry = (env: Env) =>
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
     .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], asClassArgs(TapIngester))
     .service("labelIngester", ["metricReporter", "moderationUrl"], asClassArgs(LabelIngester))
-    .service("ingesterServer", ["loggerManager", "metricsRouter", "healthRouter", "tapIngester", "labelIngester", "port", "disableIngester"], asClassArgs(IngesterServer));
+    .service("ingesterServer", ["loggerManager", "port", "disableIngester", "metricsRouter", "healthRouter", "tapIngester", "labelIngester"], asClassArgs(IngesterServer));
