@@ -13,6 +13,7 @@ describe("FollowIndexer", () => {
   let jobScheduler: TestServices["jobScheduler"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     followIndexer = services.followIndexer;
@@ -20,6 +21,7 @@ describe("FollowIndexer", () => {
     jobScheduler = services.jobScheduler;
     subscriptionRepo = services.subscriptionRepository;
     db = services.db;
+    ctx = { db };
   });
 
   afterEach(() => {
@@ -28,7 +30,6 @@ describe("FollowIndexer", () => {
 
   describe("upsert", () => {
     test("フォローレコードを正しく保存する", async () => {
-      const ctx = { db };
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -59,7 +60,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロワーがサブスクライバーの場合、フォロイーのDIDがTapに登録される", async () => {
-      const ctx = { db };
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -90,7 +90,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロワーがサブスクライバーでない場合、TapにDIDが登録されない", async () => {
-      const ctx = { db };
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -120,7 +119,6 @@ describe("FollowIndexer", () => {
 
   describe("afterAction", () => {
     test("フォロー作成時にfollows/followers集計ジョブがスケジュールされる", async () => {
-      const ctx = { db };
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -158,7 +156,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーで他のサブスクライバーからフォローされていない場合、Tapから削除される", async () => {
-      const ctx = { db };
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -191,7 +188,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
-      const ctx = { db };
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -227,7 +223,6 @@ describe("FollowIndexer", () => {
     });
 
     test("フォロー削除時、フォロワーがサブスクライバーでない場合、Tap削除処理は実行されない", async () => {
-      const ctx = { db };
       // arrange
       const subscriber = actorFactory();
       const nonSubscriber = actorFactory();

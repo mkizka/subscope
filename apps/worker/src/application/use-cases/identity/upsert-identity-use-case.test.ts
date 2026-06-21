@@ -8,15 +8,16 @@ describe("UpsertIdentityUseCase", () => {
   let upsertIdentityUseCase: TestServices["upsertIdentityUseCase"];
   let actorRepo: TestServices["actorRepository"];
   let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     upsertIdentityUseCase = services.upsertIdentityUseCase;
     actorRepo = services.actorRepository;
     db = services.db;
+    ctx = { db };
   });
 
   test("ハンドルがない場合は何もしない", async () => {
-    const ctx = { db };
     // arrange
     const command: UpsertIdentityCommand = {
       did: "did:plc:nohandle",
@@ -35,7 +36,6 @@ describe("UpsertIdentityUseCase", () => {
   });
 
   test("ハンドルがある場合はactorを保存する", async () => {
-    const ctx = { db };
     // arrange
     const actor = actorFactory({
       handle: "old-handle.bsky.social",

@@ -86,7 +86,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
     .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>(TransactionManager))
-    .service("metricReporter", () => new MetricReporter())
+    .service("metricReporter", asClassArgs(MetricReporter))
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>(JobQueue))

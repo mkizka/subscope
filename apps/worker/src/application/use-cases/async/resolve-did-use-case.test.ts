@@ -10,16 +10,17 @@ describe("ResolveDidUseCase", () => {
   let actorRepository: TestServices["actorRepository"];
   let didResolver: TestServices["didResolver"];
   let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     resolveDidUseCase = services.resolveDidUseCase;
     actorRepository = services.actorRepository;
     didResolver = services.didResolver;
     db = services.db;
+    ctx = { db };
   });
 
   test("既存のactorが存在しない場合、新規actorを作成する", async () => {
-    const ctx = { db };
     // arrange
     const did = asDid("did:plc:new-actor");
     const handle = asHandle("newactor.test");
@@ -40,7 +41,6 @@ describe("ResolveDidUseCase", () => {
   });
 
   test("既存のactorが存在する場合、ハンドルを更新する", async () => {
-    const ctx = { db };
     // arrange
     const oldHandle = asHandle("oldhandle.test");
     const newHandle = asHandle("newhandle.test");

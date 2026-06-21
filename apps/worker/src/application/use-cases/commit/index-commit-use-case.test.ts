@@ -13,6 +13,7 @@ describe("IndexCommitUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     indexCommitUseCase = services.indexCommitUseCase;
@@ -21,6 +22,7 @@ describe("IndexCommitUseCase", () => {
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     db = services.db;
+    ctx = { db };
   });
 
   const jobLogger = { log: vi.fn() };
@@ -73,7 +75,6 @@ describe("IndexCommitUseCase", () => {
 
   describe("deleteオペレーション", () => {
     test("削除オペレーションの場合、レコードを削除する", async () => {
-      const ctx = { db };
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);

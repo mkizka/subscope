@@ -3,7 +3,14 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  beforeEach,
+  describe,
+  expect,
+  type MockInstance,
+  test,
+  vi,
+} from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
@@ -15,6 +22,8 @@ describe("GetPostThreadUseCase", () => {
   let postStatsRepo: TestServices["postStatsRepository"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
+  let spyFindByUri: MockInstance;
+  let spyFindReplies: MockInstance;
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getPostThreadUseCase = services.getPostThreadUseCase;
@@ -22,12 +31,11 @@ describe("GetPostThreadUseCase", () => {
     postStatsRepo = services.postStatsRepository;
     profileRepo = services.profileRepository;
     recordRepo = services.recordRepository;
+    spyFindByUri = vi.spyOn(postRepo, "findByUri");
+    spyFindReplies = vi.spyOn(postRepo, "findReplies");
   });
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
-    const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-    const spyFindReplies = vi.spyOn(postRepo, "findReplies");
-
     // act
     const result = await getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(
@@ -50,9 +58,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("親投稿も子投稿もない単一投稿の場合、parentとrepliesが空のThreadViewPostを返す", async () => {
-    const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-    const spyFindReplies = vi.spyOn(postRepo, "findReplies");
-
     // arrange
     const actor = actorFactory();
 
@@ -102,9 +107,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("リプライ投稿の場合、親投稿の階層構造をparentに含むThreadViewPostを返す", async () => {
-    const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-    const spyFindReplies = vi.spyOn(postRepo, "findReplies");
-
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -215,9 +217,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("子投稿がある投稿の場合、子投稿の階層構造をrepliesに含むThreadViewPostを返す", async () => {
-    const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-    const spyFindReplies = vi.spyOn(postRepo, "findReplies");
-
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -333,9 +332,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("depthより大きい深さのリプライは取得しない", async () => {
-    const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-    const spyFindReplies = vi.spyOn(postRepo, "findReplies");
-
     // arrange
     const rootActor = actorFactory();
     const rootProfile = profileDetailedFactory({
@@ -475,9 +471,6 @@ describe("GetPostThreadUseCase", () => {
   });
 
   test("parentHeightより大きい高さの親投稿は取得しない", async () => {
-    const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-    const spyFindReplies = vi.spyOn(postRepo, "findReplies");
-
     // arrange
     const level0Actor = actorFactory();
     const level0Profile = profileDetailedFactory({
