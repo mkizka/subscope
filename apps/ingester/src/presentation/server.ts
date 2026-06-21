@@ -18,8 +18,6 @@ export class IngesterServer {
     healthRouter: Router,
     private readonly tapIngester: TapIngester,
     private readonly labelIngester: LabelIngester,
-    private readonly port: number,
-    private readonly disableIngester: boolean,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
@@ -35,8 +33,6 @@ export class IngesterServer {
     "healthRouter",
     "tapIngester",
     "labelIngester",
-    "port",
-    "disableIngester",
   ] as const;
 
   start() {

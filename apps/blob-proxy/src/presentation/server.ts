@@ -16,8 +16,6 @@ export class BlobProxyServer {
     imagesRouter: Router,
     healthRouter: Router,
     private readonly cacheCleanupScheduler: CacheCleanupScheduler,
-    healthRouter: Router,
-    private readonly port: number,
   ) {
     this.logger = loggerManager.createLogger("BlobProxyServer");
     this.app = express();
@@ -32,8 +30,6 @@ export class BlobProxyServer {
     "imagesRouter",
     "healthRouter",
     "cacheCleanupScheduler",
-    "healthRouter",
-    "port",
   ] as const;
 
   start() {
