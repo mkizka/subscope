@@ -8,41 +8,33 @@ describe("SubscriptionRepository", () => {
 
   const subscriptionRepository = new SubscriptionRepository();
 
-  describe("existsSubscriberIn", () => {
-    test("指定したactorDidの中にサブスクライバーがいる場合、trueを返す", async () => {
+  describe("isSubscriber", () => {
+    test("サブスクライバーの場合、trueを返す", async () => {
       // arrange
       const subscriber = await actorFactory(ctx.db).create();
-      const nonSubscriber = await actorFactory(ctx.db).create();
       await subscriptionFactory(ctx.db)
         .vars({ actor: () => subscriber })
         .create();
 
       // act
-      const result = await subscriptionRepository.existsSubscriberIn(ctx, [
+      const result = await subscriptionRepository.isSubscriber(
+        ctx,
         subscriber.did,
-        nonSubscriber.did,
-      ]);
+      );
 
       // assert
       expect(result).toBe(true);
     });
 
-    test("指定したactorDidにサブスクライバーがいない場合、falseを返す", async () => {
+    test("サブスクライバーでない場合、falseを返す", async () => {
       // arrange
       const nonSubscriber = await actorFactory(ctx.db).create();
 
       // act
-      const result = await subscriptionRepository.existsSubscriberIn(ctx, [
+      const result = await subscriptionRepository.isSubscriber(
+        ctx,
         nonSubscriber.did,
-      ]);
-
-      // assert
-      expect(result).toBe(false);
-    });
-
-    test("空配列の場合、falseを返す", async () => {
-      // act
-      const result = await subscriptionRepository.existsSubscriberIn(ctx, []);
+      );
 
       // assert
       expect(result).toBe(false);

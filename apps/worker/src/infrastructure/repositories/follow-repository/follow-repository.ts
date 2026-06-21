@@ -26,18 +26,23 @@ export class FollowRepository implements IFollowRepository {
       });
   }
 
-  async findFollowerDids({
+  async isFollowedByAnySubscriber({
     ctx,
     subjectDid,
   }: {
     ctx: TransactionContext;
     subjectDid: string;
-  }): Promise<string[]> {
+  }): Promise<boolean> {
     const result = await ctx.db
       .select({ actorDid: schema.follows.actorDid })
       .from(schema.follows)
-      .where(eq(schema.follows.subjectDid, subjectDid));
+      .innerJoin(
+        schema.subscriptions,
+        eq(schema.follows.actorDid, schema.subscriptions.actorDid),
+      )
+      .where(eq(schema.follows.subjectDid, subjectDid))
+      .limit(1);
 
-    return result.map((row) => row.actorDid);
+    return result.length > 0;
   }
 }

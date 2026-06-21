@@ -5,8 +5,8 @@ export interface IFollowRepository {
     ctx: TransactionContext;
     follow: Follow;
   }) => Promise<void>;
-  findFollowerDids: (params: {
+  isFollowedByAnySubscriber: (params: {
     ctx: TransactionContext;
     subjectDid: string;
-  }) => Promise<string[]>;
+  }) => Promise<boolean>;
 }

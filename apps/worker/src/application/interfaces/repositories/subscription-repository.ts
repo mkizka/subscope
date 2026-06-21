@@ -6,8 +6,4 @@ export interface ISubscriptionRepository {
     subscription: Subscription;
   }) => Promise<void>;
   isSubscriber: (ctx: TransactionContext, actorDid: string) => Promise<boolean>;
-  existsSubscriberIn: (
-    ctx: TransactionContext,
-    actorDids: string[],
-  ) => Promise<boolean>;
 }

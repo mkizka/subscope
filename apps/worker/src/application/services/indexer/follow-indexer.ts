@@ -74,12 +74,11 @@ export class FollowIndexer implements ICollectionIndexer {
         await this.subscriptionRepository.isSubscriber(ctx, follow.actorDid);
       if (!isFollowerSubscriber) return;
 
-      const followerDids = await this.followRepository.findFollowerDids({
-        ctx,
-        subjectDid: follow.subjectDid,
-      });
       const isStillFollowed =
-        await this.subscriptionRepository.existsSubscriberIn(ctx, followerDids);
+        await this.followRepository.isFollowedByAnySubscriber({
+          ctx,
+          subjectDid: follow.subjectDid,
+        });
       if (isStillFollowed) return;
 
       await this.jobScheduler.scheduleRemoveTapRepo(follow.subjectDid);

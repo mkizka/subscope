@@ -33,14 +33,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.set(params.follow.uri.toString(), params.follow);
   }
 
-  async findFollowerDids({
-    subjectDid,
-  }: {
+  async isFollowedByAnySubscriber(_params: {
     ctx: TransactionContext;
     subjectDid: string;
-  }): Promise<string[]> {
-    return Array.from(this.follows.values())
-      .filter((follow) => follow.subjectDid === subjectDid)
-      .map((follow) => follow.actorDid);
+  }): Promise<boolean> {
+    return false;
   }
 }
