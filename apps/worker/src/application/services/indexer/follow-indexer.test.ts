@@ -3,7 +3,7 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { testInjector } from "../../../shared/test-utils.js";
 import { FollowIndexer } from "./follow-indexer.js";
@@ -18,6 +18,10 @@ describe("FollowIndexer", () => {
   const ctx = {
     db: testInjector.resolve("db"),
   };
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   describe("upsert", () => {
     test("フォローレコードを正しく保存する", async () => {
@@ -180,24 +184,13 @@ describe("FollowIndexer", () => {
 
     test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
       // arrange
-      const follower1 = actorFactory();
-      const follower2 = actorFactory();
+      const follower = actorFactory();
       const followee = actorFactory();
-      const subscription1 = subscriptionFactory({ actorDid: follower1.did });
-      const subscription2 = subscriptionFactory({ actorDid: follower2.did });
-      subscriptionRepo.add(subscription1);
-      subscriptionRepo.add(subscription2);
+      const subscription = subscriptionFactory({ actorDid: follower.did });
+      subscriptionRepo.add(subscription);
 
-      const record1 = recordFactory({
-        uri: `at://${follower1.did}/app.bsky.graph.follow/followrkey_delete2a`,
-        json: {
-          $type: "app.bsky.graph.follow",
-          subject: followee.did,
-          createdAt: new Date().toISOString(),
-        },
-      });
-      const record2 = recordFactory({
-        uri: `at://${follower2.did}/app.bsky.graph.follow/followrkey_delete2b`,
+      const record = recordFactory({
+        uri: `at://${follower.did}/app.bsky.graph.follow/followrkey_delete2`,
         json: {
           $type: "app.bsky.graph.follow",
           subject: followee.did,
@@ -206,22 +199,16 @@ describe("FollowIndexer", () => {
       });
       await followIndexer.upsert({
         ctx,
-        record: record1,
+        record,
         live: false,
       });
-      await followIndexer.upsert({
-        ctx,
-        record: record2,
-        live: false,
-      });
-      followRepo.deleteByUri(record1.uri);
+      followRepo.deleteByUri(record.uri);
+
+      // 他のサブスクライバーからフォローされている状態を固定する
+      vi.spyOn(followRepo, "isFollowedByAnySubscriber").mockResolvedValue(true);
 
       // act
-      await followIndexer.afterAction({
-        ctx,
-        record: record1,
-        action: "delete",
-      });
+      await followIndexer.afterAction({ ctx, record, action: "delete" });
 
       // assert
       const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
