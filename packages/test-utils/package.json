@@ -18,7 +18,7 @@
     "@atproto/syntax": "0.6.1",
     "@factory-js/factory": "0.4.2",
     "@faker-js/faker": "10.4.0",
-    "@gyaku/di": "3.4.2",
+    "@gyaku/di": "3.5.0",
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
     "@testcontainers/postgresql": "12.0.1",
