@@ -5,20 +5,27 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetActorLikesUseCase } from "./get-actor-likes-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetActorLikesUseCase", () => {
-  const getActorLikesUseCase = testInjector.injectClass(GetActorLikesUseCase);
-
-  const likeRepo = testInjector.resolve("likeRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
+  let getActorLikesUseCase: TestServices["getActorLikesUseCase"];
+  let likeRepo: TestServices["likeRepository"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getActorLikesUseCase = services.getActorLikesUseCase;
+    likeRepo = services.likeRepository;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
+  });
 
   test("actorがいいねした投稿がある場合、投稿情報を含むフィードを返す", async () => {
     // arrange

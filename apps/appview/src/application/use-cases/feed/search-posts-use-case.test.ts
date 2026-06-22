@@ -3,19 +3,25 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { SearchPostsUseCase } from "./search-posts-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchPostsUseCase", () => {
-  const searchPostsUseCase = testInjector.injectClass(SearchPostsUseCase);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
+  let searchPostsUseCase: TestServices["searchPostsUseCase"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    searchPostsUseCase = services.searchPostsUseCase;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
+  });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
     // act

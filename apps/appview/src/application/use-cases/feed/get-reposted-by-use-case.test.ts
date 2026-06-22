@@ -4,16 +4,20 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetRepostedByUseCase } from "./get-reposted-by-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetRepostedByUseCase", () => {
-  const getRepostedByUseCase = testInjector.injectClass(GetRepostedByUseCase);
-
-  const repostRepo = testInjector.resolve("repostRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let getRepostedByUseCase: TestServices["getRepostedByUseCase"];
+  let repostRepo: TestServices["repostRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getRepostedByUseCase = services.getRepostedByUseCase;
+    repostRepo = services.repostRepository;
+    profileRepo = services.profileRepository;
+  });
 
   test("リポストがない場合、空のrepostedByを返す", async () => {
     // arrange

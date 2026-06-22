@@ -5,25 +5,30 @@ import {
   postFactory,
   recordFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { RepostIndexer } from "./repost-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("RepostIndexer", () => {
-  const repostIndexer = testInjector.injectClass(RepostIndexer);
-
-  const repostRepo = testInjector.resolve("repostRepository");
-  const feedItemRepo = testInjector.resolve("feedItemRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let repostIndexer: TestServices["repostIndexer"];
+  let repostRepo: TestServices["repostRepository"];
+  let feedItemRepo: TestServices["feedItemRepository"];
+  let postRepo: TestServices["postRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    repostIndexer = services.repostIndexer;
+    repostRepo = services.repostRepository;
+    feedItemRepo = services.feedItemRepository;
+    postRepo = services.postRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
+  });
 
   describe("upsert", () => {
     test("リポストレコードを正しく保存する", async () => {
+      const ctx = { db };
       // arrange
       const reposter = actorFactory();
       const author = actorFactory();

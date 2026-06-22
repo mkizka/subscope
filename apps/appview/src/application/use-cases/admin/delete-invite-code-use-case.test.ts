@@ -1,12 +1,16 @@
 import { inviteCodeFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { DeleteInviteCodeUseCase } from "./delete-invite-code-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("DeleteInviteCodeUseCase", () => {
-  const useCase = testInjector.injectClass(DeleteInviteCodeUseCase);
-  const inviteCodeRepository = testInjector.resolve("inviteCodeRepository");
+  let useCase: TestServices["deleteInviteCodeUseCase"];
+  let inviteCodeRepository: TestServices["inviteCodeRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    useCase = services.deleteInviteCodeUseCase;
+    inviteCodeRepository = services.inviteCodeRepository;
+  });
 
   test("未使用の招待コードの場合、削除できる", async () => {
     // arrange

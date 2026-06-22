@@ -4,16 +4,20 @@ import {
   followFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetFollowsUseCase } from "./get-follows-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFollowsUseCase", () => {
-  const getFollowsUseCase = testInjector.injectClass(GetFollowsUseCase);
-
-  const followRepo = testInjector.resolve("followRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let getFollowsUseCase: TestServices["getFollowsUseCase"];
+  let followRepo: TestServices["followRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getFollowsUseCase = services.getFollowsUseCase;
+    followRepo = services.followRepository;
+    profileRepo = services.profileRepository;
+  });
 
   test("actorがフォローしているユーザーがいる場合、フォローしているユーザーの情報を返す", async () => {
     // arrange

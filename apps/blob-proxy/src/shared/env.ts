@@ -30,6 +30,8 @@ const schema = z.object({
   CACHE_CLEANUP_TIMEZONE: z.string().default("Asia/Tokyo"),
 });
 
+export type Env = z.infer<typeof schema>;
+
 export const env = (() => {
   try {
     return schema.parse(process.env);

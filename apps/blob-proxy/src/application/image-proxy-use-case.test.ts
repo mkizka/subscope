@@ -3,20 +3,25 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { CacheMetadata } from "../domain/cache-metadata.js";
 import { ImageBlob } from "../domain/image-blob.js";
 import { ImageProxyRequest } from "../domain/image-proxy-request.js";
-import { testInjector } from "../test-utils.js";
-import { ImageProxyUseCase } from "./image-proxy-use-case.js";
+import { testRegistry, type TestServices } from "../test-utils.js";
 
 describe("ImageProxyUseCase", () => {
-  const imageProxyUseCase = testInjector.injectClass(ImageProxyUseCase);
-
-  const didResolver = testInjector.resolve("didResolver");
-  const blobFetcher = testInjector.resolve("blobFetcher");
-  const imageCacheStorage = testInjector.resolve("imageCacheStorage");
-  const imageResizer = testInjector.resolve("imageResizer");
-  const metricReporter = testInjector.resolve("metricReporter");
-  const cacheMetadataRepo = testInjector.resolve("cacheMetadataRepository");
-
-  beforeEach(() => {
+  let imageProxyUseCase: TestServices["imageProxyUseCase"];
+  let didResolver: TestServices["didResolver"];
+  let blobFetcher: TestServices["blobFetcher"];
+  let imageCacheStorage: TestServices["imageCacheStorage"];
+  let imageResizer: TestServices["imageResizer"];
+  let metricReporter: TestServices["metricReporter"];
+  let cacheMetadataRepo: TestServices["cacheMetadataRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    imageProxyUseCase = services.imageProxyUseCase;
+    didResolver = services.didResolver;
+    blobFetcher = services.blobFetcher;
+    imageCacheStorage = services.imageCacheStorage;
+    imageResizer = services.imageResizer;
+    metricReporter = services.metricReporter;
+    cacheMetadataRepo = services.cacheMetadataRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
   });

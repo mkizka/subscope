@@ -1,23 +1,29 @@
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
 import { actorFactory, subscriptionFactory } from "@repo/common/test";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
-import { IndexCommitUseCase } from "./index-commit-use-case.js";
 
 describe("IndexCommitUseCase", () => {
-  const indexCommitUseCase = testInjector.injectClass(IndexCommitUseCase);
-
-  const actorRepo = testInjector.resolve("actorRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let indexCommitUseCase: TestServices["indexCommitUseCase"];
+  let actorRepo: TestServices["actorRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let postRepo: TestServices["postRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    indexCommitUseCase = services.indexCommitUseCase;
+    actorRepo = services.actorRepository;
+    subscriptionRepo = services.subscriptionRepository;
+    postRepo = services.postRepository;
+    recordRepo = services.recordRepository;
+    db = services.db;
+    ctx = { db };
+  });
 
   const jobLogger = { log: vi.fn() };
 

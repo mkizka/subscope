@@ -2,21 +2,22 @@ import { asDid } from "@atproto/did";
 import { actorFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import {
-  AdminAlreadyExistsError,
-  RegisterAdminUseCase,
-} from "./register-admin-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import { AdminAlreadyExistsError } from "./register-admin-use-case.js";
 
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("RegisterAdminUseCase", () => {
-  const registerAdminUseCase = testInjector.injectClass(RegisterAdminUseCase);
-  const actorRepo = testInjector.resolve("actorRepository");
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  beforeEach(() => {
+  let registerAdminUseCase: TestServices["registerAdminUseCase"];
+  let actorRepo: TestServices["actorRepository"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    registerAdminUseCase = services.registerAdminUseCase;
+    actorRepo = services.actorRepository;
+    subscriptionRepo = services.subscriptionRepository;
+    jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
     vi.setSystemTime(now);
   });

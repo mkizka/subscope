@@ -6,26 +6,27 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import {
   AlreadySubscribedError,
   InvalidInviteCodeError,
-  SubscribeServerUseCase,
 } from "./subscribe-server-use-case.js";
 
 const now = new Date("2025-01-01T00:00:00Z");
 
 describe("SubscribeServerUseCase", () => {
-  const subscribeServerUseCase = testInjector.injectClass(
-    SubscribeServerUseCase,
-  );
-
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
-  const actorRepo = testInjector.resolve("actorRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  beforeEach(() => {
+  let subscribeServerUseCase: TestServices["subscribeServerUseCase"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  let actorRepo: TestServices["actorRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    subscribeServerUseCase = services.subscribeServerUseCase;
+    subscriptionRepo = services.subscriptionRepository;
+    inviteCodeRepo = services.inviteCodeRepository;
+    actorRepo = services.actorRepository;
+    jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
     vi.setSystemTime(now);
   });

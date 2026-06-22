@@ -1,10 +1,13 @@
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { CreateInviteCodeUseCase } from "./create-invite-code-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateInviteCodeUseCase", () => {
-  const useCase = testInjector.injectClass(CreateInviteCodeUseCase);
+  let useCase: TestServices["createInviteCodeUseCase"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    useCase = services.createInviteCodeUseCase;
+  });
 
   test("有効期限が適切に指定されている場合、招待コードと有効期限を返す", async () => {
     // arrange
@@ -41,7 +44,9 @@ describe("CreateInviteCodeUseCase", () => {
     expect(diffInDays1).toBe(1);
 
     // arrange & act - 最大値365日
-    const result365 = await useCase.execute({ daysToExpire: 365 });
+    const result365 = await useCase.execute({
+      daysToExpire: 365,
+    });
 
     // assert
     const expiresAt365 = new Date(result365.expiresAt);

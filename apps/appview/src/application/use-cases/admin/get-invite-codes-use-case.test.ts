@@ -1,14 +1,18 @@
 import { asDid } from "@atproto/did";
 import { actorFactory, inviteCodeFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetInviteCodesUseCase } from "./get-invite-codes-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetInviteCodesUseCase", () => {
-  const getInviteCodesUseCase = testInjector.injectClass(GetInviteCodesUseCase);
-  const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
+  let getInviteCodesUseCase: TestServices["getInviteCodesUseCase"];
+  let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getInviteCodesUseCase = services.getInviteCodesUseCase;
+    inviteCodeRepo = services.inviteCodeRepository;
+  });
 
   test("招待コードが存在する場合、招待コード一覧を返す", async () => {
     // arrange

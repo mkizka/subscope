@@ -1,18 +1,21 @@
 import { actorFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
-import { UpsertIdentityUseCase } from "./upsert-identity-use-case.js";
 
 describe("UpsertIdentityUseCase", () => {
-  const upsertIdentityUseCase = testInjector.injectClass(UpsertIdentityUseCase);
-
-  const actorRepo = testInjector.resolve("actorRepository");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let upsertIdentityUseCase: TestServices["upsertIdentityUseCase"];
+  let actorRepo: TestServices["actorRepository"];
+  let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    upsertIdentityUseCase = services.upsertIdentityUseCase;
+    actorRepo = services.actorRepository;
+    db = services.db;
+    ctx = { db };
+  });
 
   test("ハンドルがない場合は何もしない", async () => {
     // arrange
@@ -25,7 +28,10 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    const foundActor = await actorRepo.findByDid({
+      ctx,
+      did: command.did,
+    });
     expect(foundActor).toBeNull();
   });
 
@@ -45,7 +51,10 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: command.did });
+    const foundActor = await actorRepo.findByDid({
+      ctx,
+      did: command.did,
+    });
     expect(foundActor).not.toBeNull();
     expect(foundActor?.handle).toBe(command.handle);
   });

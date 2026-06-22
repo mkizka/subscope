@@ -1,10 +1,10 @@
+import { asClassArgs, createRegistry } from "@gyaku/di";
 import {
   connectionPoolFactory,
   databaseFactory,
   LoggerManager,
   TransactionManager,
 } from "@repo/common/infrastructure";
-import { createInjector } from "typed-inject";
 import { inject } from "vitest";
 
 declare module "vitest" {
@@ -13,17 +13,17 @@ declare module "vitest" {
   }
 }
 
-const testInjector = createInjector()
-  .provideValue("logLevel", "error" as const)
-  .provideValue("databaseUrl", inject("databaseUrl"))
-  .provideClass("loggerManager", LoggerManager)
-  .provideFactory("connectionPool", connectionPoolFactory)
-  .provideFactory("db", databaseFactory)
-  .provideClass("transactionManager", TransactionManager);
+// prettier-ignore
+const testRegistry = createRegistry()
+  .value("logLevel", "error" as const)
+  .value("databaseUrl", inject("databaseUrl"))
+  .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
+  .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
+  .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+  .service("transactionManager", ["db"], asClassArgs(TransactionManager));
 
-const db = testInjector.resolve("db");
+const services = await testRegistry.resolve();
 
 export const testSetup = {
-  testInjector,
-  ctx: { db },
+  ctx: { db: services.db },
 };

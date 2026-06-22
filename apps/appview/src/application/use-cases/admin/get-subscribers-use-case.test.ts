@@ -5,15 +5,17 @@ import {
 } from "@repo/common/test";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetSubscribersUseCase } from "./get-subscribers-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSubscribersUseCase", () => {
-  const getSubscribersUseCase = testInjector.injectClass(GetSubscribersUseCase);
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-
-  beforeEach(() => {
+  let getSubscribersUseCase: TestServices["getSubscribersUseCase"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getSubscribersUseCase = services.getSubscribersUseCase;
+    subscriptionRepo = services.subscriptionRepository;
+    profileRepo = services.profileRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00Z"));
   });

@@ -5,17 +5,22 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { ReplyRefService } from "./reply-ref-service.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ReplyRefService", () => {
-  const replyRefService = testInjector.injectClass(ReplyRefService);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let replyRefService: TestServices["replyRefService"];
+  let postRepo: TestServices["postRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    replyRefService = services.replyRefService;
+    postRepo = services.postRepository;
+    recordRepo = services.recordRepository;
+    profileRepo = services.profileRepository;
+  });
 
   test("リプライがない投稿のみの場合、空のMapを返す", async () => {
     // arrange

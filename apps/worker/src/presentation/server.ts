@@ -2,8 +2,7 @@ import type { Server } from "node:http";
 
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { loggingMiddleware } from "@repo/common/utils";
-import type { Router } from "express";
-import express from "express";
+import express, { type Router } from "express";
 import promBundle from "express-prom-bundle";
 
 import type { SyncWorker } from "./worker.js";
@@ -15,9 +14,9 @@ export class WorkerServer {
 
   constructor(
     loggerManager: ILoggerManager,
-    private readonly port: number,
-    healthRouter: Router,
     private readonly syncWorker: SyncWorker,
+    healthRouter: Router,
+    private readonly port: number,
   ) {
     this.logger = loggerManager.createLogger("WorkerServer");
     this.app = express();
@@ -27,9 +26,9 @@ export class WorkerServer {
   }
   static inject = [
     "loggerManager",
-    "port",
-    "healthRouter",
     "syncWorker",
+    "healthRouter",
+    "port",
   ] as const;
 
   start() {

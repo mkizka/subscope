@@ -4,9 +4,9 @@ import { describe, expect, test } from "vitest";
 import { ActorStatsRepository } from "./actor-stats-repository.js";
 
 describe("ActorStatsRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const actorStatsRepository = testInjector.injectClass(ActorStatsRepository);
+  const actorStatsRepository = new ActorStatsRepository(ctx.db);
 
   describe("findStats", () => {
     test("空の配列が指定された場合、空のMapを返す", async () => {

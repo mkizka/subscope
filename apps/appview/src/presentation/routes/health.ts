@@ -1,13 +1,20 @@
 import { Router } from "express";
 
-export const healthRouterFactory = (
-  nodeEnv: string,
-  logLevel: string,
-  port: number,
-  publicUrl: string,
-) => {
-  const healthRouter = Router();
-  healthRouter.get("/health", (_req, res) => {
+type HealthEnv = {
+  nodeEnv: string;
+  logLevel: string;
+  port: number;
+  publicUrl: string;
+};
+
+export const healthRouterFactory = ({
+  nodeEnv,
+  logLevel,
+  port,
+  publicUrl,
+}: HealthEnv): Router => {
+  const router = Router();
+  router.get("/health", (_req, res) => {
     res.json({
       status: "ok",
       env: {
@@ -18,11 +25,5 @@ export const healthRouterFactory = (
       },
     });
   });
-  return healthRouter;
+  return router;
 };
-healthRouterFactory.inject = [
-  "nodeEnv",
-  "logLevel",
-  "port",
-  "publicUrl",
-] as const;
