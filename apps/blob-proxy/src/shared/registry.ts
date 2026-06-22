@@ -1,4 +1,4 @@
-import { asClassArgs, createRegistry } from "@gyaku/di";
+import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import type {
   IDidCache,
   IDidResolver,
@@ -49,8 +49,8 @@ export const createBlobProxyRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs<ILoggerManager>()(LoggerManager))
     .service("metricReporter", asClassArgs<IMetricReporter>()(MetricReporter))
-    .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
-    .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+    .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+    .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("imageCacheStorage", ["loggerManager"], asClassArgs<IImageCacheStorage>()(ImageDiskStorage))
@@ -65,6 +65,6 @@ export const createBlobProxyRegistry = (env: Env) =>
     .service("cacheCleanupScheduler", ["loggerManager", "taskScheduler", "cacheCleanupService", "cacheCleanupCron", "cacheCleanupTimezone"], asClassArgs(CacheCleanupScheduler))
     .service("imageProxyUseCase", ["fetchBlobService", "imageResizer", "imageCacheService", "metricReporter"], asClassArgs(ImageProxyUseCase))
     // presentation
-    .service("imagesRouter", ["imageProxyUseCase", "metricReporter"], ({ imageProxyUseCase, metricReporter }) => imagesRouterFactory(imageProxyUseCase, metricReporter))
-    .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
+    .service("imagesRouter", ["imageProxyUseCase", "metricReporter"], asFunctionArgs(imagesRouterFactory))
+    .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("blobProxyServer", ["loggerManager", "port", "imagesRouter", "healthRouter", "cacheCleanupScheduler"], asClassArgs(BlobProxyServer));

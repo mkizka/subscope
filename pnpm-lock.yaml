@@ -8,6 +8,7 @@ patchedDependencies:
   '@atproto/lex-cli': 6e1a3864d8fdc73a0badfecd0cb5b512346a2d3c0cdd2b4d785be6916a3e61db
   '@atproto/tap@0.3.0': b4b67cc5969eccf26d9d474fc1ffcffa24eec48c751296e0191a1c1695f72d28
   '@factory-js/factory': 29084f476bd94e8cdbfc6bac28f952cd7eb61e8991bc9548961dde23b1ba8162
+  '@gyaku/di@3.4.2': c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca
   react-router: bb73d2e4321cb1a1624e74ab32ad0fa153a5ee153f945a2ec15e771098e60c0a
 
 importers:
@@ -61,7 +62,7 @@ importers:
         version: 0.11.1
       '@gyaku/di':
         specifier: 3.4.2
-        version: 3.4.2
+        version: 3.4.2(patch_hash=c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca)
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -131,7 +132,7 @@ importers:
         version: 0.8.0
       '@gyaku/di':
         specifier: 3.4.2
-        version: 3.4.2
+        version: 3.4.2(patch_hash=c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca)
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -210,7 +211,7 @@ importers:
         version: 0.11.1
       '@gyaku/di':
         specifier: 3.4.2
-        version: 3.4.2
+        version: 3.4.2(patch_hash=c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca)
       '@keyv/redis':
         specifier: 5.1.6
         version: 5.1.6(@opentelemetry/api@1.9.1)(keyv@5.6.0)
@@ -425,7 +426,7 @@ importers:
         version: 0.6.1
       '@gyaku/di':
         specifier: 3.4.2
-        version: 3.4.2
+        version: 3.4.2(patch_hash=c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca)
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -663,7 +664,7 @@ importers:
         version: 10.4.0
       '@gyaku/di':
         specifier: 3.4.2
-        version: 3.4.2
+        version: 3.4.2(patch_hash=c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca)
       '@repo/common':
         specifier: workspace:*
         version: link:../common
@@ -7834,7 +7835,7 @@ snapshots:
       protobufjs: 7.6.1
       yargs: 17.7.2
 
-  '@gyaku/di@3.4.2': {}
+  '@gyaku/di@3.4.2(patch_hash=c040120c206eb57ab316b1868e79934cb6ab9d0f18cf91fa0cf8d87ab0005aca)': {}
 
   '@hapi/address@5.1.1':
     dependencies:

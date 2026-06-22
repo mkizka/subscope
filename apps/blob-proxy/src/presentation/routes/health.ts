@@ -1,17 +1,21 @@
 import { Router } from "express";
 
 type HealthEnv = {
-  NODE_ENV: string;
-  LOG_LEVEL: string;
-  PORT: number;
+  nodeEnv: string;
+  logLevel: string;
+  port: number;
 };
 
-export const healthRouterFactory = (env: HealthEnv): Router => {
+export const healthRouterFactory = ({
+  nodeEnv,
+  logLevel,
+  port,
+}: HealthEnv): Router => {
   const router = Router();
   router.get("/health", (_, res) => {
     res.json({
       status: "ok",
-      env,
+      env: { NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port },
     });
   });
   return router;

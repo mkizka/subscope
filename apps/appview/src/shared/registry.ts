@@ -1,4 +1,4 @@
-import { asClassArgs, createRegistry } from "@gyaku/di";
+import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import type {
   IDidCache,
   IDidResolver,
@@ -146,8 +146,8 @@ export const createAppRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("metricReporter", asClassArgs(MetricReporter))
-    .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
-    .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+    .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+    .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
@@ -245,8 +245,8 @@ export const createAppRegistry = (env: Env) =>
     .service("getSubscriptionStatus", ["getSubscriptionStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetSubscriptionStatus))
     .service("subscribeServer", ["subscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(SubscribeServer))
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
-    .service("xrpcRouter", ["getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "createInviteCode", "deleteInviteCode", "getInviteCodes", "getSubscribers", "registerAdmin", "verifyAccess", "getSetupStatus", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer"], ({ getPreferences, getProfile, getProfiles, searchActors, searchActorsTypeahead, getActorLikes, getAuthorFeed, getFeedGenerators, getLikes, getPosts, getPostThread, getRepostedBy, getTimeline, searchPosts, getFollows, getFollowers, createInviteCode, deleteInviteCode, getInviteCodes, getSubscribers, registerAdmin, verifyAccess, getSetupStatus, getSubscriptionStatus, subscribeServer, unsubscribeServer, }) => xrpcRouterFactory(getPreferences, getProfile, getProfiles, searchActors, searchActorsTypeahead, getActorLikes, getAuthorFeed, getFeedGenerators, getLikes, getPosts, getPostThread, getRepostedBy, getTimeline, searchPosts, getFollows, getFollowers, createInviteCode, deleteInviteCode, getInviteCodes, getSubscribers, registerAdmin, verifyAccess, getSetupStatus, getSubscriptionStatus, subscribeServer, unsubscribeServer, ))
-    .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], ({ nodeEnv, logLevel, port, publicUrl }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port, PUBLIC_URL: publicUrl }))
-    .service("wellKnownRouter", ["serviceDid", "publicUrl"], ({ serviceDid, publicUrl }) => wellKnownRouterFactory(serviceDid, publicUrl))
+    .service("xrpcRouter", ["getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "createInviteCode", "deleteInviteCode", "getInviteCodes", "getSubscribers", "registerAdmin", "verifyAccess", "getSetupStatus", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer"], asFunctionArgs(xrpcRouterFactory))
+    .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
+    .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
     .service("appViewServer", ["loggerManager", "xrpcRouter", "healthRouter", "wellKnownRouter", "port"], asClassArgs(AppViewServer));

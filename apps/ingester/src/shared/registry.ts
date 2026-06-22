@@ -1,4 +1,4 @@
-import { asClassArgs, createRegistry } from "@gyaku/di";
+import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import {
   JobQueue,
   LoggerManager,
@@ -33,8 +33,8 @@ export const createIngesterRegistry = (env: Env) =>
     .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleIdentityUseCase))
     .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleCommitUseCase))
     // presentation
-    .service("metricsRouter", ["jobQueue", "metricReporter"], ({ jobQueue, metricReporter }) => metricsRouterFactory(jobQueue, metricReporter))
-    .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
+    .service("metricsRouter", ["jobQueue", "metricReporter"], asFunctionArgs(metricsRouterFactory))
+    .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], asClassArgs(TapIngester))
     .service("labelIngester", ["metricReporter", "moderationUrl"], asClassArgs(LabelIngester))
     .service("ingesterServer", ["loggerManager", "port", "disableIngester", "metricsRouter", "healthRouter", "tapIngester", "labelIngester"], asClassArgs(IngesterServer));

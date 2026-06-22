@@ -1,4 +1,4 @@
-import { asClassArgs, createRegistry } from "@gyaku/di";
+import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import type {
   IDidCache,
   IDidResolver,
@@ -83,8 +83,8 @@ export const createWorkerRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("tapClient", ["tapUrl"], asClassArgs<ITapClient>()(TapClient))
-    .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
-    .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+    .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+    .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
     .service("metricReporter", asClassArgs(MetricReporter))
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
@@ -125,5 +125,5 @@ export const createWorkerRegistry = (env: Env) =>
     .service("removeTapRepoUseCase", ["tapClient"], asClassArgs(RemoveTapRepoUseCase))
     .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "addTapRepoUseCase", "removeTapRepoUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
     // presentation
-    .service("healthRouter", ["nodeEnv", "logLevel", "port"], ({ nodeEnv, logLevel, port }) => healthRouterFactory({ NODE_ENV: nodeEnv, LOG_LEVEL: logLevel, PORT: port }))
+    .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("workerServer", ["loggerManager", "syncWorker", "healthRouter", "port"], asClassArgs(WorkerServer));
