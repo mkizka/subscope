@@ -182,8 +182,8 @@ describe("PostViewService", () => {
           images: [
             {
               alt: "Test image",
-              thumb: `http://test-blob-proxy.example.com/img/feed_thumbnail/plain/${actor.did}/${imageCid}`,
-              fullsize: `http://test-blob-proxy.example.com/img/feed_fullsize/plain/${actor.did}/${imageCid}`,
+              thumb: `http://test-image-proxy.example.com/img/feed_thumbnail/plain/${actor.did}/${imageCid}`,
+              fullsize: `http://test-image-proxy.example.com/img/feed_fullsize/plain/${actor.did}/${imageCid}`,
             },
           ],
         },
@@ -258,7 +258,7 @@ describe("PostViewService", () => {
             uri: "https://example.com",
             title: "Example Site",
             description: "An example website",
-            thumb: `http://test-blob-proxy.example.com/img/feed_thumbnail/plain/${actor.did}/${thumbCid}`,
+            thumb: `http://test-image-proxy.example.com/img/feed_thumbnail/plain/${actor.did}/${thumbCid}`,
           },
         },
       });
@@ -638,7 +638,7 @@ describe("PostViewService", () => {
             },
             displayName: "My Cool Feed",
             description: "A custom algorithmic feed",
-            avatar: `http://test-blob-proxy.example.com/img/avatar_thumbnail/plain/${generatorActor.did}/bafyreiavatarcid123`,
+            avatar: `http://test-image-proxy.example.com/img/avatar_thumbnail/plain/${generatorActor.did}/bafyreiavatarcid123`,
             indexedAt: generator.indexedAt.toISOString(),
           },
         },
@@ -911,13 +911,13 @@ describe("PostViewService", () => {
             images: [
               {
                 alt: "First image",
-                thumb: `http://test-blob-proxy.example.com/img/feed_thumbnail/plain/${mainAuthor.did}/${imageCid1}`,
-                fullsize: `http://test-blob-proxy.example.com/img/feed_fullsize/plain/${mainAuthor.did}/${imageCid1}`,
+                thumb: `http://test-image-proxy.example.com/img/feed_thumbnail/plain/${mainAuthor.did}/${imageCid1}`,
+                fullsize: `http://test-image-proxy.example.com/img/feed_fullsize/plain/${mainAuthor.did}/${imageCid1}`,
               },
               {
                 alt: "Second image",
-                thumb: `http://test-blob-proxy.example.com/img/feed_thumbnail/plain/${mainAuthor.did}/${imageCid2}`,
-                fullsize: `http://test-blob-proxy.example.com/img/feed_fullsize/plain/${mainAuthor.did}/${imageCid2}`,
+                thumb: `http://test-image-proxy.example.com/img/feed_thumbnail/plain/${mainAuthor.did}/${imageCid2}`,
+                fullsize: `http://test-image-proxy.example.com/img/feed_fullsize/plain/${mainAuthor.did}/${imageCid2}`,
               },
             ],
           },

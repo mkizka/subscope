@@ -3,7 +3,7 @@ import type { IAssetUrlBuilder } from "../../application/interfaces/asset-url-bu
 export class InMemoryAssetUrlBuilder implements IAssetUrlBuilder {
   static inject = [] as const;
 
-  private readonly baseUrl = "http://test-blob-proxy.example.com";
+  private readonly baseUrl = "http://test-image-proxy.example.com";
 
   getAvatarThumbnailUrl(actorDid: string, cid: string): string {
     return `${this.baseUrl}/img/avatar_thumbnail/plain/${actorDid}/${cid}`;

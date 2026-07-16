@@ -26,8 +26,6 @@ appsディレクトリ(アプリケーション)
   - XRPC APIを提供するAppViewサーバー
   - PDS経由のクライアントリクエストはここに `atproto-proxy` ヘッダで転送される
 
-画像プロキシは自前実装ではなく、[atblob](https://github.com/mkizka/atblob) をDockerコンテナとして利用しています。
-
 packagesディレクトリ(共通パッケージ)
 
 - `@repo/db` - Drizzle ORMデータベースの定義

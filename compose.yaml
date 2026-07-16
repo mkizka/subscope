@@ -27,7 +27,7 @@ services:
       - tap_data:/data
     ports:
       - 2480:2480
-  blob-proxy:
+  atblob:
     image: ghcr.io/mkizka/atblob:latest
     environment:
       - PORT=3002

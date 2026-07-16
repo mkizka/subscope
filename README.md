@@ -25,8 +25,6 @@ Server implementations are located under the apps directory.
 - ingester ... Receives Jetstream events and adds jobs
 - worker ... Worker that processes Tap events
 
-Image proxying uses [atblob](https://github.com/mkizka/atblob) as a Docker container.
-
 ## Deployment
 
 WIP
