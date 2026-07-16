@@ -14,7 +14,6 @@ jobs:
         target:
           - appview
           - admin
-          - blob-proxy
           - ingester
           - worker
     permissions:

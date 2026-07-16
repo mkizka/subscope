@@ -25,9 +25,8 @@ appsディレクトリ(アプリケーション)
 - `@repo/appview`
   - XRPC APIを提供するAppViewサーバー
   - PDS経由のクライアントリクエストはここに `atproto-proxy` ヘッダで転送される
-- `@repo/blob-proxy`
-  - 画像プロキシ(リサイズ・キャッシュ)を提供するサーバー
-  - `/images/:type/:did/:cid.jpg` でリクエストを受け、PDSから取得した画像をリサイズして返す
+
+画像プロキシは自前実装ではなく、外部の [atblob](https://github.com/mkizka/atblob) をDockerコンテナ(`ghcr.io/mkizka/atblob`)としてそのまま利用しています。`compose.yaml`の`blob-proxy`サービスを参照してください。`/img/:preset/plain/:did/:cid`(cdn.bsky.app互換)でリクエストを受け、PDSから取得した画像をリサイズして返します。
 
 packagesディレクトリ(共通パッケージ)
 

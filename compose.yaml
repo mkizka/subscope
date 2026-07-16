@@ -27,3 +27,13 @@ services:
       - tap_data:/data
     ports:
       - 2480:2480
+  blob-proxy:
+    image: ghcr.io/mkizka/atblob:latest
+    environment:
+      - PORT=3002
+      - DID_CACHE=redis
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    ports:
+      - 3002:3002
