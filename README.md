@@ -25,7 +25,7 @@ Server implementations are located under the apps directory.
 - ingester ... Receives Jetstream events and adds jobs
 - worker ... Worker that processes Tap events
 
-Image proxying is not implemented in-house; it uses [atblob](https://github.com/mkizka/atblob) (`ghcr.io/mkizka/atblob`) as a Docker container, defined as the `blob-proxy` service in `compose.yaml`.
+Image proxying uses [atblob](https://github.com/mkizka/atblob) as a Docker container.
 
 ## Deployment
 
@@ -48,5 +48,3 @@ The following servers will start.
 - appview ... http://localhost:3001
 - worker ... http://localhost:3003
 - ingester ... http://localhost:3004
-
-The `blob-proxy` (atblob) container from `compose.yaml` runs at http://localhost:3002.
