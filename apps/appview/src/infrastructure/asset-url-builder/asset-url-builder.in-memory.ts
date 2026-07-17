@@ -3,21 +3,21 @@ import type { IAssetUrlBuilder } from "../../application/interfaces/asset-url-bu
 export class InMemoryAssetUrlBuilder implements IAssetUrlBuilder {
   static inject = [] as const;
 
-  private readonly baseUrl = "http://test-blob-proxy.example.com";
+  private readonly baseUrl = "http://test-image-proxy.example.com";
 
   getAvatarThumbnailUrl(actorDid: string, cid: string): string {
-    return `${this.baseUrl}/images/avatar_thumbnail/${actorDid}/${cid}.jpg`;
+    return `${this.baseUrl}/img/avatar_thumbnail/plain/${actorDid}/${cid}`;
   }
 
   getBannerUrl(actorDid: string, cid: string): string {
-    return `${this.baseUrl}/images/banner/${actorDid}/${cid}.jpg`;
+    return `${this.baseUrl}/img/banner/plain/${actorDid}/${cid}`;
   }
 
   getFeedThumbnailUrl(actorDid: string, cid: string): string {
-    return `${this.baseUrl}/images/feed_thumbnail/${actorDid}/${cid}.jpg`;
+    return `${this.baseUrl}/img/feed_thumbnail/plain/${actorDid}/${cid}`;
   }
 
   getFeedFullsizeUrl(actorDid: string, cid: string): string {
-    return `${this.baseUrl}/images/feed_fullsize/${actorDid}/${cid}.jpg`;
+    return `${this.baseUrl}/img/feed_fullsize/plain/${actorDid}/${cid}`;
   }
 }

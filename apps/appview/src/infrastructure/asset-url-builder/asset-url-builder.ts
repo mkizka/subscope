@@ -6,18 +6,18 @@ export class AssetUrlBuilder implements IAssetUrlBuilder {
 
   // TODO: avatar,bunnerが使われていないので確認
   getAvatarThumbnailUrl(actorDid: string, cid: string): string {
-    return `${this.blobProxyUrl}/images/avatar_thumbnail/${actorDid}/${cid}.jpg`;
+    return `${this.blobProxyUrl}/img/avatar_thumbnail/plain/${actorDid}/${cid}`;
   }
 
   getBannerUrl(actorDid: string, cid: string): string {
-    return `${this.blobProxyUrl}/images/banner/${actorDid}/${cid}.jpg`;
+    return `${this.blobProxyUrl}/img/banner/plain/${actorDid}/${cid}`;
   }
 
   getFeedThumbnailUrl(actorDid: string, cid: string): string {
-    return `${this.blobProxyUrl}/images/feed_thumbnail/${actorDid}/${cid}.jpg`;
+    return `${this.blobProxyUrl}/img/feed_thumbnail/plain/${actorDid}/${cid}`;
   }
 
   getFeedFullsizeUrl(actorDid: string, cid: string): string {
-    return `${this.blobProxyUrl}/images/feed_fullsize/${actorDid}/${cid}.jpg`;
+    return `${this.blobProxyUrl}/img/feed_fullsize/plain/${actorDid}/${cid}`;
   }
 }

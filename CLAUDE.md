@@ -25,9 +25,6 @@ appsディレクトリ(アプリケーション)
 - `@repo/appview`
   - XRPC APIを提供するAppViewサーバー
   - PDS経由のクライアントリクエストはここに `atproto-proxy` ヘッダで転送される
-- `@repo/blob-proxy`
-  - 画像プロキシ(リサイズ・キャッシュ)を提供するサーバー
-  - `/images/:type/:did/:cid.jpg` でリクエストを受け、PDSから取得した画像をリサイズして返す
 
 packagesディレクトリ(共通パッケージ)
 

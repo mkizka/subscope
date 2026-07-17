@@ -1,9 +1,0 @@
-{
-  "extends": ["@tsconfig/node-lts/tsconfig"],
-  "compilerOptions": {
-    "outDir": "dist",
-    "sourceMap": true,
-    "noUncheckedIndexedAccess": true
-  },
-  "include": ["**/*.ts"]
-}

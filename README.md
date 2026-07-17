@@ -24,7 +24,6 @@ Server implementations are located under the apps directory.
 - appview ... AppView server that exposes the XRPC API and serves the `did:web` document
 - ingester ... Receives Jetstream events and adds jobs
 - worker ... Worker that processes Tap events
-- blob-proxy ... Image proxy that fetches blobs from PDSes, resizes them, and serves cached results
 
 ## Deployment
 
@@ -45,6 +44,5 @@ The following servers will start.
 
 - subscope ... http://localhost:3000
 - appview ... http://localhost:3001
-- blob-proxy ... http://localhost:3002
 - worker ... http://localhost:3003
 - ingester ... http://localhost:3004

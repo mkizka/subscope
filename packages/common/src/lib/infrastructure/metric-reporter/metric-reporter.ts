@@ -69,19 +69,6 @@ export class MetricReporter implements IMetricReporter {
         name: "ingester_labels_labels_total",
         help: "Total number of label messages processed by the ingester",
       }),
-      blob_proxy_cache_hit_total: new client.Counter({
-        name: "blob_proxy_cache_hit_total",
-        help: "Total number of blob cache hits",
-      }),
-      blob_proxy_cache_miss_total: new client.Counter({
-        name: "blob_proxy_cache_miss_total",
-        help: "Total number of blob cache misses",
-      }),
-      blob_proxy_error_total: new client.Counter({
-        name: "blob_proxy_error_total",
-        labelNames: ["error"],
-        help: "Total number of blob proxy errors",
-      }),
       fetch_record_request_total: new client.Counter({
         name: "fetch_record_request_total",
         help: "Total number of record fetch requests",
