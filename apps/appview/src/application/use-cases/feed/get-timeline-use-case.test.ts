@@ -5,20 +5,27 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetTimelineUseCase } from "./get-timeline-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetTimelineUseCase", () => {
-  const getTimelineUseCase = testInjector.injectClass(GetTimelineUseCase);
-
-  const timelineRepo = testInjector.resolve("timelineRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
+  let getTimelineUseCase: TestServices["getTimelineUseCase"];
+  let timelineRepo: TestServices["timelineRepository"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getTimelineUseCase = services.getTimelineUseCase;
+    timelineRepo = services.timelineRepository;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
+  });
 
   test("フォローしているユーザーがいない場合、空のタイムラインを返す", async () => {
     // arrange

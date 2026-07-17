@@ -10,10 +10,10 @@ export class AppViewServer {
 
   constructor(
     loggerManager: ILoggerManager,
-    private readonly port: number,
+    xrpcRouter: Router,
     healthRouter: Router,
     wellKnownRouter: Router,
-    xrpcRouter: Router,
+    private readonly port: number,
   ) {
     this.logger = loggerManager.createLogger("AppViewServer");
     this.app = express();
@@ -25,10 +25,10 @@ export class AppViewServer {
   }
   static inject = [
     "loggerManager",
-    "port",
+    "xrpcRouter",
     "healthRouter",
     "wellKnownRouter",
-    "xrpcRouter",
+    "port",
   ] as const;
 
   start() {

@@ -1,16 +1,22 @@
 import { AtUri } from "@atproto/syntax";
 import { Actor } from "@repo/common/domain";
 import { actorFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { CreateAdminService } from "./create-admin-service.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("CreateAdminService", () => {
-  const createAdminService = testInjector.injectClass(CreateAdminService);
-  const actorRepo = testInjector.resolve("actorRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-  const db = testInjector.resolve("db");
+  let createAdminService: TestServices["createAdminService"];
+  let actorRepo: TestServices["actorRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    createAdminService = services.createAdminService;
+    actorRepo = services.actorRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
+  });
 
   test("actorが存在しない場合、新規作成して管理者に昇格しジョブをスケジュールする", async () => {
     // arrange

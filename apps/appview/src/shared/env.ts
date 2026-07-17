@@ -40,3 +40,5 @@ export const env = (() => {
     throw fromError(e);
   }
 })();
+
+export type Env = typeof env;

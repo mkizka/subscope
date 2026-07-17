@@ -1,24 +1,28 @@
 import { AtUri } from "@atproto/syntax";
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { PostIndexer } from "./post-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostIndexer", () => {
-  const postIndexer = testInjector.injectClass(PostIndexer);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const feedItemRepo = testInjector.resolve("feedItemRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let postIndexer: TestServices["postIndexer"];
+  let postRepo: TestServices["postRepository"];
+  let feedItemRepo: TestServices["feedItemRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    postIndexer = services.postIndexer;
+    postRepo = services.postRepository;
+    feedItemRepo = services.feedItemRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
+  });
 
   describe("upsert", () => {
     test("投稿レコードを正しく保存する", async () => {
+      const ctx = { db };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -57,6 +61,7 @@ describe("PostIndexer", () => {
     });
 
     test("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
+      const ctx = { db };
       // arrange
       const author = actorFactory();
       const embedCid = await randomCid();
@@ -96,6 +101,7 @@ describe("PostIndexer", () => {
     });
 
     test("embedがない場合、fetchRecordジョブは追加されない", async () => {
+      const ctx = { db };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -120,6 +126,7 @@ describe("PostIndexer", () => {
     });
 
     test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {
+      const ctx = { db };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -150,6 +157,7 @@ describe("PostIndexer", () => {
 
   describe("afterAction", () => {
     test("投稿時にpost_statsとactorの投稿数の集計がスケジュールされる", async () => {
+      const ctx = { db };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -188,6 +196,7 @@ describe("PostIndexer", () => {
     });
 
     test("リプライの場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
+      const ctx = { db };
       // arrange
       const parentAuthor = actorFactory();
       const parentUri = `at://${parentAuthor.did}/app.bsky.feed.post/parentpost`;
@@ -240,6 +249,7 @@ describe("PostIndexer", () => {
     });
 
     test("引用投稿の場合、quote集計ジョブがスケジュールされる", async () => {
+      const ctx = { db };
       // arrange
       const quotedAuthor = actorFactory();
       const quotedUri = `at://${quotedAuthor.did}/app.bsky.feed.post/quotedpost`;
@@ -282,6 +292,7 @@ describe("PostIndexer", () => {
     });
 
     test("親投稿が存在しない場合でも親投稿に対する集計ジョブがスケジュールされる", async () => {
+      const ctx = { db };
       // arrange
       const replier = actorFactory();
       const nonExistentParentUri =
@@ -333,6 +344,7 @@ describe("PostIndexer", () => {
     });
 
     test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがactor_statsは更新する", async () => {
+      const ctx = { db };
       // arrange
       const author = actorFactory();
       const record = recordFactory({

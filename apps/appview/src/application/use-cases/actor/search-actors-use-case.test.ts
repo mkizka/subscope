@@ -1,14 +1,18 @@
 import { actorFactory, profileDetailedFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { SearchActorsUseCase } from "./search-actors-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsUseCase", () => {
-  const searchActorsUseCase = testInjector.injectClass(SearchActorsUseCase);
-
-  const profileRepo = testInjector.resolve("profileRepository");
-  const actorStatsRepo = testInjector.resolve("actorStatsRepository");
+  let searchActorsUseCase: TestServices["searchActorsUseCase"];
+  let profileRepo: TestServices["profileRepository"];
+  let actorStatsRepo: TestServices["actorStatsRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    searchActorsUseCase = services.searchActorsUseCase;
+    profileRepo = services.profileRepository;
+    actorStatsRepo = services.actorStatsRepository;
+  });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
     // act

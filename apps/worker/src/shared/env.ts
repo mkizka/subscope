@@ -29,6 +29,8 @@ const schema = z.object({
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
 });
 
+export type Env = z.infer<typeof schema>;
+
 export const env = (() => {
   try {
     return schema.parse(process.env);

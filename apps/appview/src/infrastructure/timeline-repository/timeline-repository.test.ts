@@ -14,9 +14,9 @@ import { describe, expect, test } from "vitest";
 import { TimelineRepository } from "./timeline-repository.js";
 
 describe("TimelineRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const timelineRepository = testInjector.injectClass(TimelineRepository);
+  const timelineRepository = new TimelineRepository(ctx.db);
 
   describe("findFeedItems", () => {
     test("フォロー中のアクターがいない場合、ビューアー自身の投稿のみ返す", async () => {

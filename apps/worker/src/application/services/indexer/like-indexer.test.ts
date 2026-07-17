@@ -1,22 +1,25 @@
 import { AtUri } from "@atproto/syntax";
 import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { LikeIndexer } from "./like-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("LikeIndexer", () => {
-  const likeIndexer = testInjector.injectClass(LikeIndexer);
-
-  const likeRepo = testInjector.resolve("likeRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let likeIndexer: TestServices["likeIndexer"];
+  let likeRepo: TestServices["likeRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let db: TestServices["db"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    likeIndexer = services.likeIndexer;
+    likeRepo = services.likeRepository;
+    jobScheduler = services.jobScheduler;
+    db = services.db;
+  });
 
   describe("upsert", () => {
     test("いいねレコードを正しく保存する", async () => {
+      const ctx = { db };
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
@@ -51,6 +54,7 @@ describe("LikeIndexer", () => {
 
   describe("afterAction", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
+      const ctx = { db };
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";

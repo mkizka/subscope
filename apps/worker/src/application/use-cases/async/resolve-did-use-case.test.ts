@@ -1,19 +1,24 @@
 import { asDid } from "@atproto/did";
 import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { ResolveDidUseCase } from "./resolve-did-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ResolveDidUseCase", () => {
-  const actorRepository = testInjector.resolve("actorRepository");
-  const didResolver = testInjector.resolve("didResolver");
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
-
-  const resolveDidUseCase = testInjector.injectClass(ResolveDidUseCase);
+  let resolveDidUseCase: TestServices["resolveDidUseCase"];
+  let actorRepository: TestServices["actorRepository"];
+  let didResolver: TestServices["didResolver"];
+  let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    resolveDidUseCase = services.resolveDidUseCase;
+    actorRepository = services.actorRepository;
+    didResolver = services.didResolver;
+    db = services.db;
+    ctx = { db };
+  });
 
   test("既存のactorが存在しない場合、新規actorを作成する", async () => {
     // arrange

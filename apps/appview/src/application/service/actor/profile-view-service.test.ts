@@ -4,18 +4,23 @@ import {
   followFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { ActorStats } from "../../../application/interfaces/actor-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { ProfileViewService } from "./profile-view-service.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileViewService", () => {
-  const profileViewService = testInjector.injectClass(ProfileViewService);
-
-  const profileRepo = testInjector.resolve("profileRepository");
-  const actorStatsRepo = testInjector.resolve("actorStatsRepository");
-  const followRepo = testInjector.resolve("followRepository");
+  let profileViewService: TestServices["profileViewService"];
+  let profileRepo: TestServices["profileRepository"];
+  let actorStatsRepo: TestServices["actorStatsRepository"];
+  let followRepo: TestServices["followRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    profileViewService = services.profileViewService;
+    profileRepo = services.profileRepository;
+    actorStatsRepo = services.actorStatsRepository;
+    followRepo = services.followRepository;
+  });
 
   describe("findProfileViewBasic", () => {
     test("プロフィールが存在する場合、ProfileViewBasicを返す", async () => {

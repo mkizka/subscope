@@ -10,9 +10,9 @@ import { describe, expect, test } from "vitest";
 import { InviteCodeRepository } from "./invite-code-repository.js";
 
 describe("InviteCodeRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const inviteCodeRepository = testInjector.injectClass(InviteCodeRepository);
+  const inviteCodeRepository = new InviteCodeRepository(ctx.db);
 
   describe("findAll", () => {
     test("招待コードが存在しない場合、空の配列を返す", async () => {

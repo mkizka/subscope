@@ -1,12 +1,16 @@
 import { actorFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetSetupStatusUseCase } from "./get-setup-status-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSetupStatusUseCase", () => {
-  const getSetupStatusUseCase = testInjector.injectClass(GetSetupStatusUseCase);
-  const actorRepo = testInjector.resolve("actorRepository");
+  let getSetupStatusUseCase: TestServices["getSetupStatusUseCase"];
+  let actorRepo: TestServices["actorRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getSetupStatusUseCase = services.getSetupStatusUseCase;
+    actorRepo = services.actorRepository;
+  });
 
   test("管理者が存在しない場合、initializedがfalseを返す", async () => {
     // act

@@ -10,9 +10,9 @@ import { describe, expect, test } from "vitest";
 import { RepostRepository } from "./repost-repository.js";
 
 describe("RepostRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const repostRepository = testInjector.injectClass(RepostRepository);
+  const repostRepository = new RepostRepository(ctx.db);
 
   describe("findRepostsByPost", () => {
     test("指定された投稿へのリポストがない場合、空の配列を返す", async () => {

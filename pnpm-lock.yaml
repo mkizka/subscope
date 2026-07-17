@@ -59,6 +59,9 @@ importers:
       '@atproto/xrpc-server':
         specifier: 0.11.1
         version: 0.11.1
+      '@gyaku/di':
+        specifier: 3.5.0
+        version: 3.5.0
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -80,9 +83,6 @@ importers:
       tsx:
         specifier: 4.22.3
         version: 4.22.3
-      typed-inject:
-        specifier: 5.0.0
-        version: 5.0.0
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -132,6 +132,9 @@ importers:
       '@atproto/xrpc-server':
         specifier: 0.11.1
         version: 0.11.1
+      '@gyaku/di':
+        specifier: 3.5.0
+        version: 3.5.0
       '@keyv/redis':
         specifier: 5.1.6
         version: 5.1.6(@opentelemetry/api@1.9.1)(keyv@5.6.0)
@@ -150,9 +153,6 @@ importers:
       tsx:
         specifier: 4.22.3
         version: 4.22.3
-      typed-inject:
-        specifier: 5.0.0
-        version: 5.0.0
       ws:
         specifier: 8.21.0
         version: 8.21.0
@@ -347,6 +347,9 @@ importers:
       '@atproto/syntax':
         specifier: 0.6.1
         version: 0.6.1
+      '@gyaku/di':
+        specifier: 3.5.0
+        version: 3.5.0
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -374,9 +377,6 @@ importers:
       tsx:
         specifier: 4.22.3
         version: 4.22.3
-      typed-inject:
-        specifier: 5.0.0
-        version: 5.0.0
       ws:
         specifier: 8.21.0
         version: 8.21.0
@@ -585,6 +585,9 @@ importers:
       '@faker-js/faker':
         specifier: 10.4.0
         version: 10.4.0
+      '@gyaku/di':
+        specifier: 3.5.0
+        version: 3.5.0
       '@repo/common':
         specifier: workspace:*
         version: link:../common
@@ -603,9 +606,6 @@ importers:
       multiformats:
         specifier: 14.0.0
         version: 14.0.0
-      typed-inject:
-        specifier: 5.0.0
-        version: 5.0.0
       vitest:
         specifier: 4.1.7
         version: 4.1.7(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7)(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@8.0.14(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.3)(yaml@2.9.0))
@@ -1779,6 +1779,10 @@ packages:
     resolution: {integrity: sha512-wtF6h+DY6M3YaDBPAmvuuA6jV8Sif9MjtOI5euKFWRgCDl5PeDpPsHR9u2l6St5ceY8AZgoNDww5+HvEsXFsGg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@gyaku/di@3.5.0':
+    resolution: {integrity: sha512-d8EWrT42RinT9p7eZD0/FC3EFnl0g26QXTp+U1HVNfNdKg6Lbc88cLTKhFdmYHb2E01iolfGcCM5Gtus8LdFRA==}
+    engines: {node: '>=24'}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -6100,10 +6104,6 @@ packages:
     resolution: {integrity: sha512-faYHw0anBbc/kWF3zFTEnxSFOAGUX9GFbOBthvDdLsIlEoWOFOtS0zgCiQYwIskL9iGXZL3kAXD8OoZ4GmMATA==}
     engines: {node: '>= 18'}
 
-  typed-inject@5.0.0:
-    resolution: {integrity: sha512-0Ql2ORqBORLMdAW89TQKZsb1PQkFGImFfVmncXWe7a+AA3+7dh7Se9exxZowH4kbnlvKEFkMxUYdHUpjYWFJaA==}
-    engines: {node: '>=18'}
-
   typescript-eslint@8.60.0:
     resolution: {integrity: sha512-9f65qWLZdAW9m1JaxBDUHcqRUfL8bkxxXL7XxEfI+F09q56PkBvIfCjLF3yInsDM/BBmwkqmCQdCZe/RYlIWEw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -7593,6 +7593,8 @@ snapshots:
       long: 5.3.2
       protobufjs: 7.6.1
       yargs: 17.7.2
+
+  '@gyaku/di@3.5.0': {}
 
   '@hapi/address@5.1.1':
     dependencies:
@@ -12052,8 +12054,6 @@ snapshots:
       content-type: 2.0.0
       media-typer: 1.1.0
       mime-types: 3.0.2
-
-  typed-inject@5.0.0: {}
 
   typescript-eslint@8.60.0(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3):
     dependencies:

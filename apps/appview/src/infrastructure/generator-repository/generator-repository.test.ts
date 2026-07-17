@@ -5,9 +5,9 @@ import { describe, expect, test } from "vitest";
 import { GeneratorRepository } from "./generator-repository.js";
 
 describe("GeneratorRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const generatorRepository = testInjector.injectClass(GeneratorRepository);
+  const generatorRepository = new GeneratorRepository(ctx.db);
 
   describe("findByUris", () => {
     test("空の配列が指定された場合、空の配列を返す", async () => {

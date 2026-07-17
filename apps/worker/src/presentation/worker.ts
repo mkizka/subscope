@@ -42,8 +42,6 @@ export class SyncWorker {
   private readonly workers: Worker[];
 
   constructor(
-    redisUrl: string,
-    commitWorkerConcurrency: number,
     upsertIdentityUseCase: UpsertIdentityUseCase,
     indexCommitUseCase: IndexCommitUseCase,
     resolveDidUseCase: ResolveDidUseCase,
@@ -52,6 +50,8 @@ export class SyncWorker {
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
     addTapRepoUseCase: AddTapRepoUseCase,
     removeTapRepoUseCase: RemoveTapRepoUseCase,
+    redisUrl: string,
+    commitWorkerConcurrency: number,
   ) {
     const createWorker = <T extends keyof JobData>(
       name: T,
@@ -69,7 +69,6 @@ export class SyncWorker {
         ...options,
       });
     };
-
     this.workers = [
       createWorker("identity", async (job) => {
         const command = upsertIdentityCommandFactory(job.data);
@@ -140,8 +139,6 @@ export class SyncWorker {
     ];
   }
   static inject = [
-    "redisUrl",
-    "commitWorkerConcurrency",
     "upsertIdentityUseCase",
     "indexCommitUseCase",
     "resolveDidUseCase",
@@ -150,6 +147,8 @@ export class SyncWorker {
     "aggregateActorStatsUseCase",
     "addTapRepoUseCase",
     "removeTapRepoUseCase",
+    "redisUrl",
+    "commitWorkerConcurrency",
   ] as const;
 
   async start() {

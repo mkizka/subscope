@@ -6,21 +6,29 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetAuthorFeedUseCase } from "./get-author-feed-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetAuthorFeedUseCase", () => {
-  const getAuthorFeedUseCase = testInjector.injectClass(GetAuthorFeedUseCase);
-
-  const authorFeedRepo = testInjector.resolve("authorFeedRepository");
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const repostRepo = testInjector.resolve("repostRepository");
+  let getAuthorFeedUseCase: TestServices["getAuthorFeedUseCase"];
+  let authorFeedRepo: TestServices["authorFeedRepository"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let repostRepo: TestServices["repostRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getAuthorFeedUseCase = services.getAuthorFeedUseCase;
+    authorFeedRepo = services.authorFeedRepository;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
+    repostRepo = services.repostRepository;
+  });
 
   test("posts_with_repliesフィルターで投稿がある場合、投稿とリプライを含むフィードを返す", async () => {
     // arrange

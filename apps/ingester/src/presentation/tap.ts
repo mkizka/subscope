@@ -18,12 +18,12 @@ export class TapIngester {
 
   constructor(
     loggerManager: ILoggerManager,
-    private readonly tapUrl: string,
     private readonly handleCommitUseCase: HandleCommitUseCase,
     private readonly handleIdentityUseCase: HandleIdentityUseCase,
+    private readonly tapUrl: string,
   ) {
     this.logger = loggerManager.createLogger("TapIngester");
-    this.tap = new Tap(this.tapUrl);
+    this.tap = new Tap(tapUrl);
     this.indexer = new SimpleIndexer();
 
     this.indexer.record(async (event) => {
@@ -48,9 +48,9 @@ export class TapIngester {
 
   static inject = [
     "loggerManager",
-    "tapUrl",
     "handleCommitUseCase",
     "handleIdentityUseCase",
+    "tapUrl",
   ] as const;
 
   private recordEventToDto(event: RecordEvent): CommitEventDto | null {

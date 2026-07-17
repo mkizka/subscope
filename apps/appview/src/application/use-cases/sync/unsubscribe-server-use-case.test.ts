@@ -4,21 +4,23 @@ import {
   inviteCodeFactory,
   subscriptionFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import {
-  NotSubscribedError,
-  UnsubscribeServerUseCase,
-} from "./unsubscribe-server-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import { NotSubscribedError } from "./unsubscribe-server-use-case.js";
 
 describe("UnsubscribeServerUseCase", () => {
-  const unsubscribeServerUseCase = testInjector.injectClass(
-    UnsubscribeServerUseCase,
-  );
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-  const inviteCodeRepo = testInjector.resolve("inviteCodeRepository");
-  const actorRepo = testInjector.resolve("actorRepository");
+  let unsubscribeServerUseCase: TestServices["unsubscribeServerUseCase"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  let actorRepo: TestServices["actorRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    unsubscribeServerUseCase = services.unsubscribeServerUseCase;
+    subscriptionRepo = services.subscriptionRepository;
+    inviteCodeRepo = services.inviteCodeRepository;
+    actorRepo = services.actorRepository;
+  });
 
   test("サブスクリプションが存在する場合、削除するが招待コードは使用済みのまま", async () => {
     // arrange

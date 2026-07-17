@@ -1,20 +1,22 @@
 import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { ProfileIndexer } from "./profile-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileIndexer", () => {
-  const profileIndexer = testInjector.injectClass(ProfileIndexer);
-
-  const profileRepo = testInjector.resolve("profileRepository");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let profileIndexer: TestServices["profileIndexer"];
+  let profileRepo: TestServices["profileRepository"];
+  let db: TestServices["db"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    profileIndexer = services.profileIndexer;
+    profileRepo = services.profileRepository;
+    db = services.db;
+  });
 
   describe("upsert", () => {
     test("プロフィールレコードを正しく保存する", async () => {
+      const ctx = { db };
       // arrange
       const actor = actorFactory();
       const avatarCid = fakeCid();

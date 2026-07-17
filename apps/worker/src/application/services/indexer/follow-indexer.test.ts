@@ -3,21 +3,26 @@ import {
   recordFactory,
   subscriptionFactory,
 } from "@repo/common/test";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { FollowIndexer } from "./follow-indexer.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FollowIndexer", () => {
-  const followIndexer = testInjector.injectClass(FollowIndexer);
-
-  const followRepo = testInjector.resolve("followRepository");
-  const jobScheduler = testInjector.resolve("jobScheduler");
-  const subscriptionRepo = testInjector.resolve("subscriptionRepository");
-
-  const ctx = {
-    db: testInjector.resolve("db"),
-  };
+  let followIndexer: TestServices["followIndexer"];
+  let followRepo: TestServices["followRepository"];
+  let jobScheduler: TestServices["jobScheduler"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let db: TestServices["db"];
+  let ctx: { db: TestServices["db"] };
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    followIndexer = services.followIndexer;
+    followRepo = services.followRepository;
+    jobScheduler = services.jobScheduler;
+    subscriptionRepo = services.subscriptionRepository;
+    db = services.db;
+    ctx = { db };
+  });
 
   afterEach(() => {
     vi.restoreAllMocks();

@@ -3,23 +3,37 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test, vi } from "vitest";
+import {
+  beforeEach,
+  describe,
+  expect,
+  type MockInstance,
+  test,
+  vi,
+} from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetPostThreadUseCase } from "./get-post-thread-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetPostThreadUseCase", () => {
-  const getPostThreadUseCase = testInjector.injectClass(GetPostThreadUseCase);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const postStatsRepo = testInjector.resolve("postStatsRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-
-  const spyFindByUri = vi.spyOn(postRepo, "findByUri");
-  const spyFindReplies = vi.spyOn(postRepo, "findReplies");
+  let getPostThreadUseCase: TestServices["getPostThreadUseCase"];
+  let postRepo: TestServices["postRepository"];
+  let postStatsRepo: TestServices["postStatsRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let spyFindByUri: MockInstance;
+  let spyFindReplies: MockInstance;
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getPostThreadUseCase = services.getPostThreadUseCase;
+    postRepo = services.postRepository;
+    postStatsRepo = services.postStatsRepository;
+    profileRepo = services.profileRepository;
+    recordRepo = services.recordRepository;
+    spyFindByUri = vi.spyOn(postRepo, "findByUri");
+    spyFindReplies = vi.spyOn(postRepo, "findReplies");
+  });
 
   test("投稿が見つからない場合はnotFoundPostを返す", async () => {
     // act

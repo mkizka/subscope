@@ -1,13 +1,17 @@
 import { AtUri } from "@atproto/syntax";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { HandleResolutionError } from "../../application/interfaces/handle-resolver.js";
-import { testInjector } from "../../shared/test-utils.js";
-import { AtUriService } from "./at-uri-service.js";
+import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("AtUriService", () => {
-  const atUriService = testInjector.injectClass(AtUriService);
-  const handleResolver = testInjector.resolve("handleResolver");
+  let atUriService: TestServices["atUriService"];
+  let handleResolver: TestServices["handleResolver"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    atUriService = services.atUriService;
+    handleResolver = services.handleResolver;
+  });
 
   describe("resolveHostname", () => {
     test("DIDが含まれるURIの場合、そのまま返す", async () => {

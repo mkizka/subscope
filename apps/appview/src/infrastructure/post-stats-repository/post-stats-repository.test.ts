@@ -5,9 +5,9 @@ import { describe, expect, test } from "vitest";
 import { PostStatsRepository } from "./post-stats-repository.js";
 
 describe("PostStatsRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const postStatsRepository = testInjector.injectClass(PostStatsRepository);
+  const postStatsRepository = new PostStatsRepository(ctx.db);
 
   describe("findStats", () => {
     test("空の配列が指定された場合、空のMapを返す", async () => {

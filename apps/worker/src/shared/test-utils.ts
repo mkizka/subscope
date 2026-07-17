@@ -1,21 +1,13 @@
+import { asClassArgs } from "@gyaku/di";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
+  InMemoryDidCache,
   InMemoryDidResolver,
   InMemoryJobQueue,
   InMemoryTapClient,
   InMemoryTransactionManager,
 } from "@repo/common/test";
-import { createInjector } from "typed-inject";
-import { beforeEach } from "vitest";
 
-import { IndexActorService } from "../application/services/index-actor-service.js";
-import { IndexRecordService } from "../application/services/index-record-service.js";
-import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
-import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
-import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
-import { PostIndexer } from "../application/services/indexer/post-indexer.js";
-import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
-import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
@@ -29,58 +21,42 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
-import { InMemoryJobLogger } from "./job-logger.in-memory.js";
+import type { Env } from "./env.js";
+import { createWorkerRegistry } from "./registry.js";
 
-export const testInjector = createInjector()
+const testEnv = {
+  NODE_ENV: "test",
+  LOG_LEVEL: "error",
+  PORT: 3003,
+  PLC_URL: "https://plc.directory",
+  DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres",
+  REDIS_URL: "redis://localhost:6379",
+  TAP_URL: "http://localhost:2480",
+  COMMIT_WORKER_CONCURRENCY: 128,
+} satisfies Env;
+
+// prettier-ignore
+export const testRegistry = createWorkerRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  .provideValue("db", {} as never)
-  .provideClass("actorRepository", InMemoryActorRepository)
-  .provideClass("actorStatsRepository", InMemoryActorStatsRepository)
-  .provideClass("feedItemRepository", InMemoryFeedItemRepository)
-  .provideClass("subscriptionRepository", InMemorySubscriptionRepository)
-  .provideClass("followRepository", InMemoryFollowRepository)
-  .provideClass("generatorRepository", InMemoryGeneratorRepository)
-  .provideClass("inviteCodeRepository", InMemoryInviteCodeRepository)
-  .provideClass("likeRepository", InMemoryLikeRepository)
-  .provideClass("postRepository", InMemoryPostRepository)
-  .provideClass("postStatsRepository", InMemoryPostStatsRepository)
-  .provideClass("profileRepository", InMemoryProfileRepository)
-  .provideClass("recordRepository", InMemoryRecordRepository)
-  .provideClass("repostRepository", InMemoryRepostRepository)
-  .provideClass("transactionManager", InMemoryTransactionManager)
-  .provideClass("tapClient", InMemoryTapClient)
-  .provideClass("jobQueue", InMemoryJobQueue)
-  .provideClass("didResolver", InMemoryDidResolver)
-  .provideClass("jobLogger", InMemoryJobLogger)
-  .provideClass("jobScheduler", InMemoryJobScheduler)
-  .provideClass("indexActorService", IndexActorService)
-  .provideClass("postIndexer", PostIndexer)
-  .provideClass("profileIndexer", ProfileIndexer)
-  .provideClass("followIndexer", FollowIndexer)
-  .provideClass("generatorIndexer", GeneratorIndexer)
-  .provideClass("likeIndexer", LikeIndexer)
-  .provideClass("repostIndexer", RepostIndexer)
-  .provideClass("indexRecordService", IndexRecordService);
+  .replaceValue("db", {} as never)
+  .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
+  .replaceService("actorStatsRepository", asClassArgs(InMemoryActorStatsRepository))
+  .replaceService("feedItemRepository", asClassArgs(InMemoryFeedItemRepository))
+  .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
+  .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))
+  .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
+  .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
+  .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
+  .replaceService("postStatsRepository", asClassArgs(InMemoryPostStatsRepository))
+  .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
+  .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
+  .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
+  .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
+  .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
+  .replaceService("tapClient", asClassArgs(InMemoryTapClient))
+  .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))
+  .replaceService("didCache", asClassArgs(InMemoryDidCache))
+  .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
+  .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler));
 
-export const setupFiles = () => {
-  beforeEach(() => {
-    testInjector.resolve("actorRepository").clear();
-    testInjector.resolve("actorStatsRepository").clear();
-    testInjector.resolve("feedItemRepository").clear();
-    testInjector.resolve("followRepository").clear();
-    testInjector.resolve("generatorRepository").clear();
-    testInjector.resolve("inviteCodeRepository").clear();
-    testInjector.resolve("likeRepository").clear();
-    testInjector.resolve("postRepository").clear();
-    testInjector.resolve("postStatsRepository").clear();
-    testInjector.resolve("profileRepository").clear();
-    testInjector.resolve("recordRepository").clear();
-    testInjector.resolve("repostRepository").clear();
-    testInjector.resolve("subscriptionRepository").clear();
-    testInjector.resolve("tapClient").clear();
-    testInjector.resolve("jobQueue").clear();
-    testInjector.resolve("jobScheduler").clear();
-    testInjector.resolve("didResolver").clear();
-    testInjector.resolve("jobLogger").clear();
-  });
-};
+export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;

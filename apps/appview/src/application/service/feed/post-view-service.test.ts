@@ -15,20 +15,28 @@ import {
   recordFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { PostViewService } from "./post-view-service.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("PostViewService", () => {
-  const postViewService = testInjector.injectClass(PostViewService);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const generatorRepo = testInjector.resolve("generatorRepository");
-  const likeRepo = testInjector.resolve("likeRepository");
-  const repostRepo = testInjector.resolve("repostRepository");
+  let postViewService: TestServices["postViewService"];
+  let postRepo: TestServices["postRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let generatorRepo: TestServices["generatorRepository"];
+  let likeRepo: TestServices["likeRepository"];
+  let repostRepo: TestServices["repostRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    postViewService = services.postViewService;
+    postRepo = services.postRepository;
+    recordRepo = services.recordRepository;
+    profileRepo = services.profileRepository;
+    generatorRepo = services.generatorRepository;
+    likeRepo = services.likeRepository;
+    repostRepo = services.repostRepository;
+  });
 
   describe("findPostView", () => {
     test("投稿とプロフィールが存在する場合、完全な投稿ビューを取得できる", async () => {

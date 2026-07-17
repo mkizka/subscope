@@ -5,18 +5,24 @@ import {
   profileDetailedFactory,
   repostFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { FeedProcessor } from "./feed-processor.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("FeedProcessor", () => {
-  const feedProcessor = testInjector.injectClass(FeedProcessor);
-
-  const postRepo = testInjector.resolve("postRepository");
-  const recordRepo = testInjector.resolve("recordRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
-  const repostRepo = testInjector.resolve("repostRepository");
+  let feedProcessor: TestServices["feedProcessor"];
+  let postRepo: TestServices["postRepository"];
+  let recordRepo: TestServices["recordRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  let repostRepo: TestServices["repostRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    feedProcessor = services.feedProcessor;
+    postRepo = services.postRepository;
+    recordRepo = services.recordRepository;
+    profileRepo = services.profileRepository;
+    repostRepo = services.repostRepository;
+  });
 
   test("投稿のみの場合、FeedViewPostのリストを返す", async () => {
     // arrange

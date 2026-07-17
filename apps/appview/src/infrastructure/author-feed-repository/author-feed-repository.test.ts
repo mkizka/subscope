@@ -12,9 +12,9 @@ import { describe, expect, test } from "vitest";
 import { AuthorFeedRepository } from "./author-feed-repository.js";
 
 describe("AuthorFeedRepository", () => {
-  const { testInjector, ctx } = testSetup;
+  const { ctx } = testSetup;
 
-  const authorFeedRepository = testInjector.injectClass(AuthorFeedRepository);
+  const authorFeedRepository = new AuthorFeedRepository(ctx.db);
 
   describe("findFeedItems", () => {
     test("指定されたアクターの投稿がない場合、空の配列を返す", async () => {

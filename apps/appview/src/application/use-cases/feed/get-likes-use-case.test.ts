@@ -4,16 +4,20 @@ import {
   postFactory,
   profileDetailedFactory,
 } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetLikesUseCase } from "./get-likes-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetLikesUseCase", () => {
-  const getLikesUseCase = testInjector.injectClass(GetLikesUseCase);
-
-  const likeRepo = testInjector.resolve("likeRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let getLikesUseCase: TestServices["getLikesUseCase"];
+  let likeRepo: TestServices["likeRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getLikesUseCase = services.getLikesUseCase;
+    likeRepo = services.likeRepository;
+    profileRepo = services.profileRepository;
+  });
 
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
     // arrange

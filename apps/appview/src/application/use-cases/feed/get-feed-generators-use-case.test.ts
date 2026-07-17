@@ -1,17 +1,19 @@
 import { AtUri } from "@atproto/syntax";
 import { generatorFactory, profileDetailedFactory } from "@repo/common/test";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
-import { testInjector } from "../../../shared/test-utils.js";
-import { GetFeedGeneratorsUseCase } from "./get-feed-generators-use-case.js";
+import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFeedGeneratorsUseCase", () => {
-  const getFeedGeneratorsUseCase = testInjector.injectClass(
-    GetFeedGeneratorsUseCase,
-  );
-
-  const generatorRepo = testInjector.resolve("generatorRepository");
-  const profileRepo = testInjector.resolve("profileRepository");
+  let getFeedGeneratorsUseCase: TestServices["getFeedGeneratorsUseCase"];
+  let generatorRepo: TestServices["generatorRepository"];
+  let profileRepo: TestServices["profileRepository"];
+  beforeEach(async () => {
+    const services = await testRegistry.resolve();
+    getFeedGeneratorsUseCase = services.getFeedGeneratorsUseCase;
+    generatorRepo = services.generatorRepository;
+    profileRepo = services.profileRepository;
+  });
 
   test("指定したURIのフィードジェネレーターが存在する場合、GeneratorViewを返す", async () => {
     // arrange
