@@ -1,0 +1,806 @@
+diff --git a/README.md b/README.md
+index 0024882bc2177915bdce889c555578e1834f8cb9..d2a1ac6c0196f4cee57d2d6b9e04f307050d5d45 100644
+--- a/README.md
++++ b/README.md
+@@ -45,6 +45,12 @@ services.greeter.say();
+ 
+ Runnable examples: [`examples/`](./examples).
+ 
++Using an AI coding agent? Install the [gyaku skill](https://github.com/mkizka/gyaku/tree/main/skills/gyaku) with [`npx skills`](https://github.com/vercel-labs/skills):
++
++```sh
++npx skills add mkizka/gyaku
++```
++
+ ## API
+ 
+ ### `createRegistry()`
+@@ -70,12 +76,18 @@ const registry = createRegistry()
+   .service("server", ["config", "logger"], createServer);
+ ```
+ 
+-### `.replaceService(key, factory)`
++### `.replaceService(key, factory)` / `.replaceService(key, deps, factory)`
+ 
+-Swaps a registered factory in place, keeping the original deps and return type.
++Swaps a registered factory in place, following the same rules as `.service` —
++deps can differ from the original registration. The replacement's return
++type must still satisfy the original contract.
+ 
+ ```ts
+-const testRegistry = productionRegistry.replaceService("db", createStubDb);
++const testRegistry = productionRegistry.replaceService(
++  "db",
++  ["config"], // can differ from the original "db" registration's deps
++  createStubDb,
++);
+ ```
+ 
+ ### `.replaceValue(key, instance)`
+@@ -90,9 +102,46 @@ const testRegistry = productionRegistry.replaceValue("db", stubDb);
+ 
+ Resolves the graph and returns `Promise<Services & AsyncDisposable>`; factories run in parallel, `await using` disposes in reverse along the graph, and any failure auto-disposes what was already created.
+ 
++### Errors
++
++All errors extend `GyakuError`.
++
++- `RegistryError` — invalid argument to `.service` / `.value` / `.replaceService` / `.replaceValue`.
++- `ResolveError` — `.resolve()` failed. `errors` mixes `ServiceFactoryError` and `ServiceDisposeError`.
++- `DisposeError` — `Symbol.asyncDispose` failed. `errors` is `ServiceDisposeError[]`.
++
++Each inner error has `.key` (the service that failed) and `.cause` (the original throw).
++
++```ts
++import { ResolveError, ServiceFactoryError } from "@gyaku/di";
++
++try {
++  await using services = await registry.resolve();
++} catch (error) {
++  if (error instanceof ResolveError) {
++    for (const e of error.errors) {
++      console.error(e.key, e.cause);
++    }
++  }
++}
++```
++
++### Notes
++
++- Re-registering a key throws; use `.replaceService` / `.replaceValue` to replace.
++- `then` is reserved (would make the services object look thenable).
++- Services object has a null prototype, so keys like `__proto__` are safe.
++
++## Migration helpers
++
++gyaku's first-class factory is a function taking a single deps object,
++`({ logger, db }) => ...`. These helpers adapt code that doesn't fit that
++shape — positional functions and classes — without rewriting it.
++
+ ### `asFunctionArgs(fn)`
+ 
+-Adapts a function that takes **positional** arguments into a service factory, spreading deps into the call in `deps` order. `deps` must list the parameters in order. Async functions work too — the resolved value is awaited.
++Wraps a function that takes **positional** arguments. `deps` lists those
++parameters in order.
+ 
+ ```ts
+ const createRepo = (logger: Logger, db: Db) => ({
+@@ -102,21 +151,23 @@ const createRepo = (logger: Logger, db: Db) => ({
+ createRegistry().service("repo", ["logger", "db"], asFunctionArgs(createRepo));
+ ```
+ 
+-### `asClass(Class)` / `asClassArgs(Class)`
++### `asClass(Class)`
+ 
+-Adapts a class constructor into a factory, so classes register without a `(deps) => new Foo(...)` wrapper. `asClass` takes a single deps object and stays fully type-safe.
++Wraps a class whose constructor takes a single deps object, so you skip the
++`(deps) => new Foo(deps)` wrapper. Fully type-safe.
+ 
+ ```ts
+ class Greeter {
+   constructor(private deps: { logger: Logger }) {}
+ }
+ 
+-createRegistry()
+-  .service("logger", () => new Logger())
+-  .service("greeter", ["logger"], asClass(Greeter));
++createRegistry().service("greeter", ["logger"], asClass(Greeter));
+ ```
+ 
+-`asClassArgs` spreads deps into a positional constructor in `deps` order. Only the instance type is inferred, so `deps` must list the constructor's parameters in order.
++### `asClassArgs(Class)`
++
++Like `asFunctionArgs`, but for a class with a **positional** constructor.
++`deps` lists the constructor parameters in order.
+ 
+ ```ts
+ class Greeter {
+@@ -126,9 +177,13 @@ class Greeter {
+ createRegistry().service("greeter", ["logger", "db"], asClassArgs(Greeter));
+ ```
+ 
+-With `asClass<Interface>()(Class)`, the registered type is pinned to `Interface` instead of the concrete class, while `deps` is still inferred from the constructor.
++### Pinning to an interface
+ 
+-This matters most for `.replaceService` / `.replaceValue`: a replacement must be assignable to the **originally registered type**. Pin a class to an interface and a test can swap in a stub that only has to satisfy that interface. Register the concrete class instead and the replacement would have to match the class down to its `#private` fields — usually impossible.
++`asClass<Interface>()(Class)` registers the service as `Interface` instead of
++the concrete class (`asClassArgs` supports the same form). This matters for
++`.replaceService` / `.replaceValue`: a replacement must match the registered
++type, and matching a concrete class down to its `#private` fields is usually
++impossible. Pin to an interface and a stub only has to satisfy that interface.
+ 
+ ```ts
+ interface UserRepository {
+@@ -142,9 +197,9 @@ class UserRepositoryImpl implements UserRepository {
+   }
+ }
+ 
+-const productionRegistry = createRegistry()
++const registry = createRegistry()
+   .service("db", createDb)
+-  // userRepository is pinned to UserRepository, not UserRepositoryImpl
++  // pinned to UserRepository, not UserRepositoryImpl
+   .service(
+     "userRepository",
+     ["db"],
+@@ -152,43 +207,11 @@ const productionRegistry = createRegistry()
+   );
+ 
+ // the stub only has to satisfy UserRepository
+-const testRegistry = productionRegistry.replaceValue("userRepository", {
++const testRegistry = registry.replaceValue("userRepository", {
+   find: async (id) => ({ id, name: "stub" }),
+ });
+ ```
+ 
+-It works with `asClassArgs` too: `asClassArgs<UserRepository>()(UserRepositoryImpl)`.
+-
+-### Errors
+-
+-All errors extend `GyakuError`.
+-
+-- `RegistryError` — invalid argument to `.service` / `.value` / `.replaceService` / `.replaceValue`.
+-- `ResolveError` — `.resolve()` failed. `errors` mixes `ServiceFactoryError` and `ServiceDisposeError`.
+-- `DisposeError` — `Symbol.asyncDispose` failed. `errors` is `ServiceDisposeError[]`.
+-
+-Each inner error has `.key` (the service that failed) and `.cause` (the original throw).
+-
+-```ts
+-import { ResolveError, ServiceFactoryError } from "@gyaku/di";
+-
+-try {
+-  await using services = await registry.resolve();
+-} catch (error) {
+-  if (error instanceof ResolveError) {
+-    for (const e of error.errors) {
+-      console.error(e.key, e.cause);
+-    }
+-  }
+-}
+-```
+-
+-### Notes
+-
+-- Re-registering a key throws; use `.replaceService` / `.replaceValue` to replace.
+-- `then` is reserved (would make the services object look thenable).
+-- Services object has a null prototype, so keys like `__proto__` are safe.
+-
+ ## License
+ 
+ MIT
+diff --git a/dist/class.d.ts b/dist/class.d.ts
+index b91d79a0363ac3be8d0efd505dc48e2b5552b93c..4e9cf8cd3a8db7075ac72b5f3d5c8e6a3ae8744e 100644
+--- a/dist/class.d.ts
++++ b/dist/class.d.ts
+@@ -9,16 +9,8 @@ export type PositionalFactory<Args extends readonly unknown[], Instance> = ((dep
+ export type NotPositionalFactory<T> = T & {
+     readonly [POSITIONAL_FACTORY_BRAND]?: never;
+ };
+-type AsClassOptions = {
+-    /** @deprecated Use {@link asClassArgs} instead. Will be removed in the next major version. */
+-    positional: true;
+-};
+-type ClassFactory<Instance> = {
+-    <Deps extends object>(Ctor: new (deps: Deps) => Instance): (deps: Deps) => Instance;
+-    (Ctor: new (...args: never[]) => Instance, options: AsClassOptions): (deps?: Record<string, unknown>) => Instance;
+-};
++type ClassFactory<Instance> = <Deps extends object>(Ctor: new (deps: Deps) => Instance) => (deps: Deps) => Instance;
+ export declare function asClass<Deps extends object, Instance>(Ctor: new (deps: Deps) => Instance): (deps: Deps) => Instance;
+-export declare function asClass<Instance>(Ctor: new (...args: never[]) => Instance, options: AsClassOptions): (deps?: Record<string, unknown>) => Instance;
+ export declare function asClass<Instance>(): ClassFactory<Instance>;
+ type ClassArgsFactory<Instance> = <Args extends readonly unknown[]>(Ctor: new (...args: Args) => Instance) => PositionalFactory<Args, Instance>;
+ export declare function asClassArgs<Args extends readonly unknown[], Instance>(Ctor: new (...args: Args) => Instance): PositionalFactory<Args, Instance>;
+diff --git a/dist/class.d.ts.map b/dist/class.d.ts.map
+index dda442eab577391aebae56c8d04d73300d922d5f..2745d32b4c99f2f154968c15eba5d63dc0c5c371 100644
+--- a/dist/class.d.ts.map
++++ b/dist/class.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"class.d.ts","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAAA,QAAA,MAAM,wBAAwB,EAAE,OAAO,MAAiB,CAAC;AAEzD,MAAM,MAAM,iBAAiB,CAAC,IAAI,SAAS,SAAS,OAAO,EAAE,EAAE,QAAQ,IAAI,CAAC,CAC1E,IAAI,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAC1B,QAAQ,CAAC,GAAG;IAMf,QAAQ,CAAC,CAAC,wBAAwB,CAAC,EAAE,SAAS;QAC5C,GAAG;aAAG,CAAC,IAAI,MAAM,IAAI,GAAG,CAAC,GAAG,EAAE,IAAI,CAAC,CAAC,CAAC,KAAK,IAAI;SAAE;KACjD,CAAC;CACH,CAAC;AAEF,MAAM,MAAM,oBAAoB,CAAC,CAAC,IAAI,CAAC,GAAG;IACxC,QAAQ,CAAC,CAAC,wBAAwB,CAAC,CAAC,EAAE,KAAK,CAAC;CAC7C,CAAC;AAgBF,KAAK,cAAc,GAAG;IACpB,8FAA8F;IAC9F,UAAU,EAAE,IAAI,CAAC;CAClB,CAAC;AAWF,KAAK,YAAY,CAAC,QAAQ,IAAI;IAC5B,CAAC,IAAI,SAAS,MAAM,EAClB,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,GACjC,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;IAC5B,CACE,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,KAAK,EAAE,KAAK,QAAQ,EACxC,OAAO,EAAE,cAAc,GACtB,CAAC,IAAI,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAAK,QAAQ,CAAC;CACjD,CAAC;AAEF,wBAAgB,OAAO,CAAC,IAAI,SAAS,MAAM,EAAE,QAAQ,EACnD,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,GACjC,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;AAE5B,wBAAgB,OAAO,CAAC,QAAQ,EAC9B,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,KAAK,EAAE,KAAK,QAAQ,EACxC,OAAO,EAAE,cAAc,GACtB,CAAC,IAAI,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAAK,QAAQ,CAAC;AAEhD,wBAAgB,OAAO,CAAC,QAAQ,KAAK,YAAY,CAAC,QAAQ,CAAC,CAAC;AAY5D,KAAK,gBAAgB,CAAC,QAAQ,IAAI,CAAC,IAAI,SAAS,SAAS,OAAO,EAAE,EAChE,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,IAAI,KAAK,QAAQ,KAClC,iBAAiB,CAAC,IAAI,EAAE,QAAQ,CAAC,CAAC;AAEvC,wBAAgB,WAAW,CAAC,IAAI,SAAS,SAAS,OAAO,EAAE,EAAE,QAAQ,EACnE,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,IAAI,KAAK,QAAQ,GACpC,iBAAiB,CAAC,IAAI,EAAE,QAAQ,CAAC,CAAC;AAErC,wBAAgB,WAAW,CAAC,QAAQ,KAAK,gBAAgB,CAAC,QAAQ,CAAC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"class.d.ts","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAAA,QAAA,MAAM,wBAAwB,EAAE,OAAO,MAAiB,CAAC;AAEzD,MAAM,MAAM,iBAAiB,CAAC,IAAI,SAAS,SAAS,OAAO,EAAE,EAAE,QAAQ,IAAI,CAAC,CAC1E,IAAI,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,KAC1B,QAAQ,CAAC,GAAG;IAMf,QAAQ,CAAC,CAAC,wBAAwB,CAAC,EAAE,SAAS;QAC5C,GAAG;aAAG,CAAC,IAAI,MAAM,IAAI,GAAG,CAAC,GAAG,EAAE,IAAI,CAAC,CAAC,CAAC,KAAK,IAAI;SAAE;KACjD,CAAC;CACH,CAAC;AAEF,MAAM,MAAM,oBAAoB,CAAC,CAAC,IAAI,CAAC,GAAG;IACxC,QAAQ,CAAC,CAAC,wBAAwB,CAAC,CAAC,EAAE,KAAK,CAAC;CAC7C,CAAC;AAgBF,KAAK,YAAY,CAAC,QAAQ,IAAI,CAAC,IAAI,SAAS,MAAM,EAChD,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,KAC/B,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;AAE9B,wBAAgB,OAAO,CAAC,IAAI,SAAS,MAAM,EAAE,QAAQ,EACnD,IAAI,EAAE,KAAK,IAAI,EAAE,IAAI,KAAK,QAAQ,GACjC,CAAC,IAAI,EAAE,IAAI,KAAK,QAAQ,CAAC;AAE5B,wBAAgB,OAAO,CAAC,QAAQ,KAAK,YAAY,CAAC,QAAQ,CAAC,CAAC;AAS5D,KAAK,gBAAgB,CAAC,QAAQ,IAAI,CAAC,IAAI,SAAS,SAAS,OAAO,EAAE,EAChE,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,IAAI,KAAK,QAAQ,KAClC,iBAAiB,CAAC,IAAI,EAAE,QAAQ,CAAC,CAAC;AAEvC,wBAAgB,WAAW,CAAC,IAAI,SAAS,SAAS,OAAO,EAAE,EAAE,QAAQ,EACnE,IAAI,EAAE,KAAK,GAAG,IAAI,EAAE,IAAI,KAAK,QAAQ,GACpC,iBAAiB,CAAC,IAAI,EAAE,QAAQ,CAAC,CAAC;AAErC,wBAAgB,WAAW,CAAC,QAAQ,KAAK,gBAAgB,CAAC,QAAQ,CAAC,CAAC"}
+\ No newline at end of file
+diff --git a/dist/class.js b/dist/class.js
+index 1b5bcd6cf2f49171402f6d1357e0563e950092c9..c863469b35192ad2016c4be5a084d9a45ca4347c 100644
+--- a/dist/class.js
++++ b/dist/class.js
+@@ -7,16 +7,11 @@ function makeClassFactoryWithArgs(Ctor) {
+     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- `args` is aligned with the constructor parameters by the caller's deps declaration.
+     return (deps) => new Ctor(...Object.values(deps ?? {}));
+ }
+-function makeClassFactory(Ctor, options) {
+-    return options
+-        ? makeClassFactoryWithArgs(Ctor)
+-        : makeClassFactoryWithObject(Ctor);
+-}
+-export function asClass(Ctor, options) {
++export function asClass(Ctor) {
+     if (Ctor === undefined) {
+-        return makeClassFactory;
++        return makeClassFactoryWithObject;
+     }
+-    return makeClassFactory(Ctor, options);
++    return makeClassFactoryWithObject(Ctor);
+ }
+ export function asClassArgs(Ctor) {
+     if (Ctor === undefined) {
+diff --git a/dist/class.js.map b/dist/class.js.map
+index c42d2a19937cae12a609f3029bb8d97966a6c32c..63bdf957c67bf324a13059a2be6555186bab3e48 100644
+--- a/dist/class.js.map
++++ b/dist/class.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"class.js","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAAA,MAAM,wBAAwB,GAAkB,MAAM,EAAE,CAAC;AAmBzD,SAAS,0BAA0B,CACjC,IAAuC;IAEvC,iJAAiJ;IACjJ,OAAO,CAAC,IAAI,EAAE,EAAE,CAAC,IAAI,IAAI,CAAC,IAAa,CAAC,CAAC;AAC3C,CAAC;AAED,SAAS,wBAAwB,CAC/B,IAAuC;IAEvC,gKAAgK;IAChK,OAAO,CAAC,IAAI,EAAE,EAAE,CAAC,IAAI,IAAI,CAAC,GAAI,MAAM,CAAC,MAAM,CAAC,IAAI,IAAI,EAAE,CAAa,CAAC,CAAC;AACvE,CAAC;AAOD,SAAS,gBAAgB,CACvB,IAAuC,EACvC,OAAwB;IAExB,OAAO,OAAO;QACZ,CAAC,CAAC,wBAAwB,CAAC,IAAI,CAAC;QAChC,CAAC,CAAC,0BAA0B,CAAC,IAAI,CAAC,CAAC;AACvC,CAAC;AAuBD,MAAM,UAAU,OAAO,CACrB,IAAwC,EACxC,OAAwB;IAExB,IAAI,IAAI,KAAK,SAAS,EAAE,CAAC;QACvB,OAAO,gBAAgB,CAAC;IAC1B,CAAC;IACD,OAAO,gBAAgB,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC;AACzC,CAAC;AAYD,MAAM,UAAU,WAAW,CAAC,IAAwC;IAClE,IAAI,IAAI,KAAK,SAAS,EAAE,CAAC;QACvB,OAAO,CACL,IAA8B,EACF,EAAE;YAC9B,mLAAmL;YACnL,OAAO,wBAAwB,CAAC,IAAI,CAA+B,CAAC;QACtE,CAAC,CAAC;IACJ,CAAC;IACD,OAAO,wBAAwB,CAAC,IAAI,CAAC,CAAC;AACxC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"class.js","sourceRoot":"","sources":["../src/class.ts"],"names":[],"mappings":"AAAA,MAAM,wBAAwB,GAAkB,MAAM,EAAE,CAAC;AAmBzD,SAAS,0BAA0B,CACjC,IAAuC;IAEvC,iJAAiJ;IACjJ,OAAO,CAAC,IAAI,EAAE,EAAE,CAAC,IAAI,IAAI,CAAC,IAAa,CAAC,CAAC;AAC3C,CAAC;AAED,SAAS,wBAAwB,CAC/B,IAAuC;IAEvC,gKAAgK;IAChK,OAAO,CAAC,IAAI,EAAE,EAAE,CAAC,IAAI,IAAI,CAAC,GAAI,MAAM,CAAC,MAAM,CAAC,IAAI,IAAI,EAAE,CAAa,CAAC,CAAC;AACvE,CAAC;AAYD,MAAM,UAAU,OAAO,CAAC,IAAwC;IAC9D,IAAI,IAAI,KAAK,SAAS,EAAE,CAAC;QACvB,OAAO,0BAA0B,CAAC;IACpC,CAAC;IACD,OAAO,0BAA0B,CAAC,IAAI,CAAC,CAAC;AAC1C,CAAC;AAYD,MAAM,UAAU,WAAW,CAAC,IAAwC;IAClE,IAAI,IAAI,KAAK,SAAS,EAAE,CAAC;QACvB,OAAO,CACL,IAA8B,EACF,EAAE;YAC9B,mLAAmL;YACnL,OAAO,wBAAwB,CAAC,IAAI,CAA+B,CAAC;QACtE,CAAC,CAAC;IACJ,CAAC;IACD,OAAO,wBAAwB,CAAC,IAAI,CAAC,CAAC;AACxC,CAAC"}
+\ No newline at end of file
+diff --git a/dist/registry.d.ts b/dist/registry.d.ts
+index 3ff073fccd638e7b6eba57839079325972ecc509..fbe00e5327cc88daca4502da9d7437d4839e8bf3 100644
+--- a/dist/registry.d.ts
++++ b/dist/registry.d.ts
+@@ -1,27 +1,32 @@
+ import type { NotPositionalFactory, PositionalFactory } from "./class.js";
+ type ServiceMapBase = Record<string, unknown>;
+ type RegisteredKey<ServiceMap extends ServiceMapBase> = Extract<keyof ServiceMap, string>;
+-type DepsMapBase = Record<string, readonly string[]>;
+ type ReplaceValue<ServiceMap extends ServiceMapBase, Key extends keyof ServiceMap, Result> = {
+     [K in keyof ServiceMap]: K extends Key ? Result : ServiceMap[K];
+ };
+ type UnregisteredKey<Key extends string, ServiceMap extends ServiceMapBase> = Key extends "then" ? never : Key extends keyof ServiceMap ? never : Key;
+-type ServiceRegistry<ServiceMap extends ServiceMapBase, DepsMap extends DepsMapBase, OriginalMap extends ServiceMapBase> = {
++type ScopeBase = Record<string, string>;
++type ServiceRegistry<ServiceMap extends ServiceMapBase, OriginalMap extends ServiceMapBase, Scope extends ScopeBase> = {
+     service: {
+-        <const Key extends string, Instance>(key: UnregisteredKey<Key, ServiceMap>, factory: PositionalFactory<[], Instance>): ServiceRegistry<ServiceMap & Record<Key, Awaited<Instance>>, DepsMap & Record<Key, readonly []>, OriginalMap & Record<Key, Awaited<Instance>>>;
+-        <const Key extends string, Result>(key: UnregisteredKey<Key, ServiceMap>, factory: () => Result): ServiceRegistry<ServiceMap & Record<Key, Awaited<Result>>, DepsMap & Record<Key, readonly []>, OriginalMap & Record<Key, Awaited<Result>>>;
++        <const Key extends string, Instance>(key: UnregisteredKey<Key, ServiceMap>, factory: PositionalFactory<[], Instance>): ServiceRegistry<ServiceMap & Record<Key, Awaited<Instance>>, OriginalMap & Record<Key, Awaited<Instance>>, Scope & Record<Key, RegisteredKey<ServiceMap>>>;
++        <const Key extends string, Result>(key: UnregisteredKey<Key, ServiceMap>, factory: () => Result): ServiceRegistry<ServiceMap & Record<Key, Awaited<Result>>, OriginalMap & Record<Key, Awaited<Result>>, Scope & Record<Key, RegisteredKey<ServiceMap>>>;
+         <const Key extends string, const Deps extends readonly RegisteredKey<ServiceMap>[], Instance>(key: UnregisteredKey<Key, ServiceMap>, dependencies: Deps, factory: PositionalFactory<{
+             [K in keyof Deps]: ServiceMap[Deps[K]];
+-        }, Instance>): ServiceRegistry<ServiceMap & Record<Key, Awaited<Instance>>, DepsMap & Record<Key, Deps>, OriginalMap & Record<Key, Awaited<Instance>>>;
+-        <const Key extends string, const Deps extends readonly RegisteredKey<ServiceMap>[], Result>(key: UnregisteredKey<Key, ServiceMap>, dependencies: Deps, factory: NotPositionalFactory<(deps: Pick<ServiceMap, Deps[number]>) => Result>): ServiceRegistry<ServiceMap & Record<Key, Awaited<Result>>, DepsMap & Record<Key, Deps>, OriginalMap & Record<Key, Awaited<Result>>>;
++        }, Instance>): ServiceRegistry<ServiceMap & Record<Key, Awaited<Instance>>, OriginalMap & Record<Key, Awaited<Instance>>, Scope & Record<Key, RegisteredKey<ServiceMap>>>;
++        <const Key extends string, const Deps extends readonly RegisteredKey<ServiceMap>[], Result>(key: UnregisteredKey<Key, ServiceMap>, dependencies: Deps, factory: NotPositionalFactory<(deps: Pick<ServiceMap, Deps[number]>) => Result>): ServiceRegistry<ServiceMap & Record<Key, Awaited<Result>>, OriginalMap & Record<Key, Awaited<Result>>, Scope & Record<Key, RegisteredKey<ServiceMap>>>;
+     };
+-    value: <const Key extends string, T>(key: UnregisteredKey<Key, ServiceMap>, instance: T) => ServiceRegistry<ServiceMap & Record<Key, T>, DepsMap & Record<Key, readonly []>, OriginalMap & Record<Key, T>>;
+-    replaceService: <const Key extends RegisteredKey<ServiceMap>, Result extends OriginalMap[Key]>(key: Key, factory: (deps: Pick<ServiceMap, DepsMap[Key][number]>) => Result | Promise<Result>) => ServiceRegistry<ReplaceValue<ServiceMap, Key, Result>, DepsMap, OriginalMap>;
+-    replaceValue: <const Key extends RegisteredKey<ServiceMap>, T extends OriginalMap[Key]>(key: Key, instance: T) => ServiceRegistry<ReplaceValue<ServiceMap, Key, T>, DepsMap, OriginalMap>;
+-    /** @deprecated Use {@link ServiceRegistry.replaceService} instead. Will be removed in the next major version. */
+-    override: ServiceRegistry<ServiceMap, DepsMap, OriginalMap>["replaceService"];
++    value: <const Key extends string, T>(key: UnregisteredKey<Key, ServiceMap>, instance: T) => ServiceRegistry<ServiceMap & Record<Key, T>, OriginalMap & Record<Key, T>, Scope & Record<Key, RegisteredKey<ServiceMap>>>;
++    replaceService: {
++        <const Key extends RegisteredKey<ServiceMap>, Instance extends OriginalMap[Key] | Promise<OriginalMap[Key]>>(key: Key, factory: PositionalFactory<[], Instance>): ServiceRegistry<ReplaceValue<ServiceMap, Key, Awaited<Instance>>, OriginalMap, Scope>;
++        <const Key extends RegisteredKey<ServiceMap>, Result extends OriginalMap[Key]>(key: Key, factory: () => Result | Promise<Result>): ServiceRegistry<ReplaceValue<ServiceMap, Key, Result>, OriginalMap, Scope>;
++        <const Key extends RegisteredKey<ServiceMap>, const Deps extends readonly Scope[Key][], Instance extends OriginalMap[Key] | Promise<OriginalMap[Key]>>(key: Key, dependencies: Deps, factory: PositionalFactory<{
++            [K in keyof Deps]: ServiceMap[Deps[K]];
++        }, Instance>): ServiceRegistry<ReplaceValue<ServiceMap, Key, Awaited<Instance>>, OriginalMap, Scope>;
++        <const Key extends RegisteredKey<ServiceMap>, const Deps extends readonly Scope[Key][], Result extends OriginalMap[Key]>(key: Key, dependencies: Deps, factory: NotPositionalFactory<(deps: Pick<ServiceMap, Deps[number]>) => Result | Promise<Result>>): ServiceRegistry<ReplaceValue<ServiceMap, Key, Result>, OriginalMap, Scope>;
++    };
++    replaceValue: <const Key extends RegisteredKey<ServiceMap>, T extends OriginalMap[Key]>(key: Key, instance: T) => ServiceRegistry<ReplaceValue<ServiceMap, Key, T>, OriginalMap, Scope>;
+     resolve: () => Promise<ServiceMap & AsyncDisposable>;
+ };
+-export declare const createRegistry: () => ServiceRegistry<Record<never, never>, Record<never, readonly []>, Record<never, never>>;
++export declare const createRegistry: () => ServiceRegistry<Record<never, never>, Record<never, never>, Record<never, never>>;
+ export {};
+ //# sourceMappingURL=registry.d.ts.map
+\ No newline at end of file
+diff --git a/dist/registry.d.ts.map b/dist/registry.d.ts.map
+index 9a0994e8aed233707bba2b98d65666977ca95d83..00992d0a50df154ff9da4bb6bcc044a069496d55 100644
+--- a/dist/registry.d.ts.map
++++ b/dist/registry.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"registry.d.ts","sourceRoot":"","sources":["../src/registry.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"registry.d.ts","sourceRoot":"","sources":["../src/registry.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/dist/registry.js b/dist/registry.js
+index 1bd67cde9ad55564b8809d8ddf0600964f5babeb..cb685939382c7b9a16c22b41707b9480e955670f 100644
+--- a/dist/registry.js
++++ b/dist/registry.js
+@@ -1,4 +1,21 @@
+ import { DisposeError, RegistryError, ResolveError, ServiceDisposeError, ServiceFactoryError, } from "./errors.js";
++const parseFactoryArgs = (key, factoryOrDeps, maybeFactory) => {
++    if (typeof factoryOrDeps === "function") {
++        return { dependencies: [], factory: factoryOrDeps };
++    }
++    if (typeof maybeFactory !== "function") {
++        throw new RegistryError(`Service "${key}" factory is required`);
++    }
++    return { dependencies: factoryOrDeps, factory: maybeFactory };
++};
++const validateDependencies = (definitions, key, dependencies) => {
++    const registered = new Set(definitions.map((d) => d.key));
++    for (const dep of dependencies) {
++        if (!registered.has(dep)) {
++            throw new RegistryError(`Service "${key}" depends on unregistered service "${dep}"`);
++        }
++    }
++};
+ const makeRegistry = (definitions) => {
+     const registry = {
+         service(key, factoryOrDeps, maybeServiceFactory) {
+@@ -8,46 +25,41 @@ const makeRegistry = (definitions) => {
+             if (definitions.some((d) => d.key === key)) {
+                 throw new RegistryError(`Service "${key}" is already registered`);
+             }
+-            let dependencies;
+-            let factory;
+-            if (typeof factoryOrDeps === "function") {
+-                dependencies = [];
+-                factory = factoryOrDeps;
+-            }
+-            else {
+-                if (typeof maybeServiceFactory !== "function") {
+-                    throw new RegistryError(`Service "${key}" factory is required`);
+-                }
+-                dependencies = factoryOrDeps;
+-                factory = maybeServiceFactory;
+-            }
+-            const registered = new Set(definitions.map((d) => d.key));
+-            for (const dep of dependencies) {
+-                if (!registered.has(dep)) {
+-                    throw new RegistryError(`Service "${key}" depends on unregistered service "${dep}"`);
+-                }
+-            }
++            const { dependencies, factory } = parseFactoryArgs(key, factoryOrDeps, maybeServiceFactory);
++            validateDependencies(definitions, key, dependencies);
+             return makeRegistry([...definitions, { key, dependencies, factory }]);
+         },
+         value(key, instance) {
+             return registry.service(key, () => instance);
+         },
+-        replaceService(key, factory) {
++        replaceService(key, factoryOrDeps, maybeFactory) {
+             const index = definitions.findIndex((d) => d.key === key);
+             if (index === -1) {
+                 throw new RegistryError(`Service "${key}" is not registered`);
+             }
++            const { dependencies, factory } = parseFactoryArgs(key, factoryOrDeps, maybeFactory);
++            for (const dep of dependencies) {
++                if (dep === key) {
++                    throw new RegistryError(`Service "${key}" cannot depend on itself`);
++                }
++            }
++            validateDependencies(definitions, key, dependencies);
++            // Mirrors .service(): a dep must already occupy an earlier slot than
++            // the service being replaced, so the dependency graph stays acyclic
++            // by construction instead of needing a cycle check.
++            for (const dep of dependencies) {
++                const depIndex = definitions.findIndex((d) => d.key === dep);
++                if (depIndex > index) {
++                    throw new RegistryError(`Service "${key}" cannot depend on "${dep}", which was registered after it`);
++                }
++            }
+             const next = [...definitions];
+-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- index was just verified to be a valid position in definitions.
+-            next[index] = { ...next[index], factory };
++            next[index] = { key, dependencies, factory };
+             return makeRegistry(next);
+         },
+         replaceValue(key, instance) {
+             return registry.replaceService(key, () => instance);
+         },
+-        override(key, factory) {
+-            return registry.replaceService(key, factory);
+-        },
+         async resolve() {
+             // Null-prototype so service keys like `__proto__` become regular own
+             // properties instead of triggering the prototype setter, and so they
+diff --git a/dist/registry.js.map b/dist/registry.js.map
+index e454bf93198916608f58c08674079d8e98289edb..4767b73832ee05c5e815cee793f926a37b2d722a 100644
+--- a/dist/registry.js.map
++++ b/dist/registry.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"registry.js","sourceRoot":"","sources":["../src/registry.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"registry.js","sourceRoot":"","sources":["../src/registry.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/src/class.ts b/src/class.ts
+index 9c038bfc5371cbe351b3ea338da62639f009cc82..039df5bd25573c36a34c4e8ffaeda49a5e0e00b0 100644
+--- a/src/class.ts
++++ b/src/class.ts
+@@ -31,49 +31,21 @@ function makeClassFactoryWithArgs(
+   return (deps) => new Ctor(...(Object.values(deps ?? {}) as never[]));
+ }
+ 
+-type AsClassOptions = {
+-  /** @deprecated Use {@link asClassArgs} instead. Will be removed in the next major version. */
+-  positional: true;
+-};
+-
+-function makeClassFactory(
+-  Ctor: new (...args: never[]) => unknown,
+-  options?: AsClassOptions,
+-): (deps?: Record<string, unknown>) => unknown {
+-  return options
+-    ? makeClassFactoryWithArgs(Ctor)
+-    : makeClassFactoryWithObject(Ctor);
+-}
+-
+-type ClassFactory<Instance> = {
+-  <Deps extends object>(
+-    Ctor: new (deps: Deps) => Instance,
+-  ): (deps: Deps) => Instance;
+-  (
+-    Ctor: new (...args: never[]) => Instance,
+-    options: AsClassOptions,
+-  ): (deps?: Record<string, unknown>) => Instance;
+-};
++type ClassFactory<Instance> = <Deps extends object>(
++  Ctor: new (deps: Deps) => Instance,
++) => (deps: Deps) => Instance;
+ 
+ export function asClass<Deps extends object, Instance>(
+   Ctor: new (deps: Deps) => Instance,
+ ): (deps: Deps) => Instance;
+ 
+-export function asClass<Instance>(
+-  Ctor: new (...args: never[]) => Instance,
+-  options: AsClassOptions,
+-): (deps?: Record<string, unknown>) => Instance;
+-
+ export function asClass<Instance>(): ClassFactory<Instance>;
+ 
+-export function asClass(
+-  Ctor?: new (...args: never[]) => unknown,
+-  options?: AsClassOptions,
+-): unknown {
++export function asClass(Ctor?: new (...args: never[]) => unknown): unknown {
+   if (Ctor === undefined) {
+-    return makeClassFactory;
++    return makeClassFactoryWithObject;
+   }
+-  return makeClassFactory(Ctor, options);
++  return makeClassFactoryWithObject(Ctor);
+ }
+ 
+ type ClassArgsFactory<Instance> = <Args extends readonly unknown[]>(
+diff --git a/src/registry.ts b/src/registry.ts
+index e6d66d9c72e8ebf18f3071be792c5124144ad6f3..9e64b58cb147aec7c9de64488253ebb23ab55e62 100644
+--- a/src/registry.ts
++++ b/src/registry.ts
+@@ -14,10 +14,6 @@ type RegisteredKey<ServiceMap extends ServiceMapBase> = Extract<
+   string
+ >;
+ 
+-// Kept independent of `ServiceMap` on purpose: a `DepsMapBase<ServiceMap>` form
+-// would be re-checked whenever `replaceService` rewrites `ServiceMap`, and fail.
+-type DepsMapBase = Record<string, readonly string[]>;
+-
+ type ReplaceValue<
+   ServiceMap extends ServiceMapBase,
+   Key extends keyof ServiceMap,
+@@ -41,32 +37,38 @@ type ServiceDefinition = {
+   factory: ServiceFactory;
+ };
+ 
++// Per key, the union of keys that already existed when that key was first
++// registered via `.service()`. Lets `replaceService`'s 3-arg form restrict
++// `Deps` to keys registered before the one being replaced, at compile time.
++type ScopeBase = Record<string, string>;
++
+ type ServiceRegistry<
+   ServiceMap extends ServiceMapBase,
+-  DepsMap extends DepsMapBase,
+   // Original registration type per key. `replaceService` judges replacements
+   // against this rather than the current `ServiceMap`, so a replacement is always
+   // checked against the original contract — keeping dependents safe and letting
+   // the same key be replaced repeatedly without each step narrowing the next.
+   OriginalMap extends ServiceMapBase,
++  Scope extends ScopeBase,
+ > = {
+   service: {
+-    // Before () => Result — ensures the PositionalFactory<[]> brand check fires first.
++    // Must stay first: a one-arg function is assignable to a zero-arg
++    // signature, so () => Result below would match a PositionalFactory too.
+     <const Key extends string, Instance>(
+       key: UnregisteredKey<Key, ServiceMap>,
+       factory: PositionalFactory<[], Instance>,
+     ): ServiceRegistry<
+       ServiceMap & Record<Key, Awaited<Instance>>,
+-      DepsMap & Record<Key, readonly []>,
+-      OriginalMap & Record<Key, Awaited<Instance>>
++      OriginalMap & Record<Key, Awaited<Instance>>,
++      Scope & Record<Key, RegisteredKey<ServiceMap>>
+     >;
+     <const Key extends string, Result>(
+       key: UnregisteredKey<Key, ServiceMap>,
+       factory: () => Result,
+     ): ServiceRegistry<
+       ServiceMap & Record<Key, Awaited<Result>>,
+-      DepsMap & Record<Key, readonly []>,
+-      OriginalMap & Record<Key, Awaited<Result>>
++      OriginalMap & Record<Key, Awaited<Result>>,
++      Scope & Record<Key, RegisteredKey<ServiceMap>>
+     >;
+     <
+       const Key extends string,
+@@ -81,8 +83,8 @@ type ServiceRegistry<
+       >,
+     ): ServiceRegistry<
+       ServiceMap & Record<Key, Awaited<Instance>>,
+-      DepsMap & Record<Key, Deps>,
+-      OriginalMap & Record<Key, Awaited<Instance>>
++      OriginalMap & Record<Key, Awaited<Instance>>,
++      Scope & Record<Key, RegisteredKey<ServiceMap>>
+     >;
+     <
+       const Key extends string,
+@@ -97,8 +99,8 @@ type ServiceRegistry<
+       >,
+     ): ServiceRegistry<
+       ServiceMap & Record<Key, Awaited<Result>>,
+-      DepsMap & Record<Key, Deps>,
+-      OriginalMap & Record<Key, Awaited<Result>>
++      OriginalMap & Record<Key, Awaited<Result>>,
++      Scope & Record<Key, RegisteredKey<ServiceMap>>
+     >;
+   };
+ 
+@@ -107,23 +109,68 @@ type ServiceRegistry<
+     instance: T,
+   ) => ServiceRegistry<
+     ServiceMap & Record<Key, T>,
+-    DepsMap & Record<Key, readonly []>,
+-    OriginalMap & Record<Key, T>
++    OriginalMap & Record<Key, T>,
++    Scope & Record<Key, RegisteredKey<ServiceMap>>
+   >;
+ 
+-  replaceService: <
+-    const Key extends RegisteredKey<ServiceMap>,
+-    Result extends OriginalMap[Key],
+-  >(
+-    key: Key,
+-    factory: (
+-      deps: Pick<ServiceMap, DepsMap[Key][number]>,
+-    ) => Result | Promise<Result>,
+-  ) => ServiceRegistry<
+-    ReplaceValue<ServiceMap, Key, Result>,
+-    DepsMap,
+-    OriginalMap
+-  >;
++  replaceService: {
++    // Must stay first: a one-arg function is assignable to a zero-arg
++    // signature, so () => Result below would match a PositionalFactory too.
++    <
++      const Key extends RegisteredKey<ServiceMap>,
++      Instance extends OriginalMap[Key] | Promise<OriginalMap[Key]>,
++    >(
++      key: Key,
++      factory: PositionalFactory<[], Instance>,
++    ): ServiceRegistry<
++      ReplaceValue<ServiceMap, Key, Awaited<Instance>>,
++      OriginalMap,
++      Scope
++    >;
++    <
++      const Key extends RegisteredKey<ServiceMap>,
++      Result extends OriginalMap[Key],
++    >(
++      key: Key,
++      factory: () => Result | Promise<Result>,
++    ): ServiceRegistry<
++      ReplaceValue<ServiceMap, Key, Result>,
++      OriginalMap,
++      Scope
++    >;
++    <
++      const Key extends RegisteredKey<ServiceMap>,
++      const Deps extends readonly Scope[Key][],
++      Instance extends OriginalMap[Key] | Promise<OriginalMap[Key]>,
++    >(
++      key: Key,
++      dependencies: Deps,
++      factory: PositionalFactory<
++        { [K in keyof Deps]: ServiceMap[Deps[K]] },
++        Instance
++      >,
++    ): ServiceRegistry<
++      ReplaceValue<ServiceMap, Key, Awaited<Instance>>,
++      OriginalMap,
++      Scope
++    >;
++    <
++      const Key extends RegisteredKey<ServiceMap>,
++      const Deps extends readonly Scope[Key][],
++      Result extends OriginalMap[Key],
++    >(
++      key: Key,
++      dependencies: Deps,
++      // Exclude PositionalFactory so it cannot fall through to this overload.
++      factory: NotPositionalFactory<
++        (deps: Pick<ServiceMap, Deps[number]>) => Result | Promise<Result>
++      >,
++    ): ServiceRegistry<
++      ReplaceValue<ServiceMap, Key, Result>,
++      OriginalMap,
++      Scope
++    >;
++  };
+ 
+   replaceValue: <
+     const Key extends RegisteredKey<ServiceMap>,
+@@ -131,21 +178,47 @@ type ServiceRegistry<
+   >(
+     key: Key,
+     instance: T,
+-  ) => ServiceRegistry<ReplaceValue<ServiceMap, Key, T>, DepsMap, OriginalMap>;
+-
+-  /** @deprecated Use {@link ServiceRegistry.replaceService} instead. Will be removed in the next major version. */
+-  override: ServiceRegistry<ServiceMap, DepsMap, OriginalMap>["replaceService"];
++  ) => ServiceRegistry<ReplaceValue<ServiceMap, Key, T>, OriginalMap, Scope>;
+ 
+   resolve: () => Promise<ServiceMap & AsyncDisposable>;
+ };
+ 
++const parseFactoryArgs = (
++  key: string,
++  factoryOrDeps: ServiceFactory | readonly string[],
++  maybeFactory: ServiceFactory | undefined,
++): { dependencies: readonly string[]; factory: ServiceFactory } => {
++  if (typeof factoryOrDeps === "function") {
++    return { dependencies: [], factory: factoryOrDeps };
++  }
++  if (typeof maybeFactory !== "function") {
++    throw new RegistryError(`Service "${key}" factory is required`);
++  }
++  return { dependencies: factoryOrDeps, factory: maybeFactory };
++};
++
++const validateDependencies = (
++  definitions: readonly ServiceDefinition[],
++  key: string,
++  dependencies: readonly string[],
++) => {
++  const registered = new Set(definitions.map((d) => d.key));
++  for (const dep of dependencies) {
++    if (!registered.has(dep)) {
++      throw new RegistryError(
++        `Service "${key}" depends on unregistered service "${dep}"`,
++      );
++    }
++  }
++};
++
+ const makeRegistry = <
+   ServiceMap extends ServiceMapBase,
+-  DepsMap extends DepsMapBase,
+   OriginalMap extends ServiceMapBase,
++  Scope extends ScopeBase,
+ >(
+   definitions: readonly ServiceDefinition[],
+-): ServiceRegistry<ServiceMap, DepsMap, OriginalMap> => {
++): ServiceRegistry<ServiceMap, OriginalMap, Scope> => {
+   const registry = {
+     service(
+       key: string,
+@@ -159,27 +232,13 @@ const makeRegistry = <
+         throw new RegistryError(`Service "${key}" is already registered`);
+       }
+ 
+-      let dependencies: readonly string[];
+-      let factory: ServiceFactory;
+-      if (typeof factoryOrDeps === "function") {
+-        dependencies = [];
+-        factory = factoryOrDeps;
+-      } else {
+-        if (typeof maybeServiceFactory !== "function") {
+-          throw new RegistryError(`Service "${key}" factory is required`);
+-        }
+-        dependencies = factoryOrDeps;
+-        factory = maybeServiceFactory;
+-      }
++      const { dependencies, factory } = parseFactoryArgs(
++        key,
++        factoryOrDeps,
++        maybeServiceFactory,
++      );
+ 
+-      const registered = new Set(definitions.map((d) => d.key));
+-      for (const dep of dependencies) {
+-        if (!registered.has(dep)) {
+-          throw new RegistryError(
+-            `Service "${key}" depends on unregistered service "${dep}"`,
+-          );
+-        }
+-      }
++      validateDependencies(definitions, key, dependencies);
+ 
+       return makeRegistry([...definitions, { key, dependencies, factory }]);
+     },
+@@ -188,15 +247,43 @@ const makeRegistry = <
+       return registry.service(key, () => instance);
+     },
+ 
+-    replaceService(key: string, factory: ServiceFactory) {
++    replaceService(
++      key: string,
++      factoryOrDeps: ServiceFactory | readonly string[],
++      maybeFactory?: ServiceFactory,
++    ) {
+       const index = definitions.findIndex((d) => d.key === key);
+       if (index === -1) {
+         throw new RegistryError(`Service "${key}" is not registered`);
+       }
+ 
++      const { dependencies, factory } = parseFactoryArgs(
++        key,
++        factoryOrDeps,
++        maybeFactory,
++      );
++
++      for (const dep of dependencies) {
++        if (dep === key) {
++          throw new RegistryError(`Service "${key}" cannot depend on itself`);
++        }
++      }
++      validateDependencies(definitions, key, dependencies);
++
++      // Mirrors .service(): a dep must already occupy an earlier slot than
++      // the service being replaced, so the dependency graph stays acyclic
++      // by construction instead of needing a cycle check.
++      for (const dep of dependencies) {
++        const depIndex = definitions.findIndex((d) => d.key === dep);
++        if (depIndex > index) {
++          throw new RegistryError(
++            `Service "${key}" cannot depend on "${dep}", which was registered after it`,
++          );
++        }
++      }
++
+       const next = [...definitions];
+-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- index was just verified to be a valid position in definitions.
+-      next[index] = { ...next[index]!, factory };
++      next[index] = { key, dependencies, factory };
+       return makeRegistry(next);
+     },
+ 
+@@ -204,10 +291,6 @@ const makeRegistry = <
+       return registry.replaceService(key, () => instance);
+     },
+ 
+-    override(key: string, factory: ServiceFactory) {
+-      return registry.replaceService(key, factory);
+-    },
+-
+     async resolve() {
+       // Null-prototype so service keys like `__proto__` become regular own
+       // properties instead of triggering the prototype setter, and so they
+@@ -262,16 +345,12 @@ const makeRegistry = <
+   };
+ 
+   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- The structural registry satisfies the overloaded ServiceRegistry type at runtime.
+-  return registry as unknown as ServiceRegistry<
+-    ServiceMap,
+-    DepsMap,
+-    OriginalMap
+-  >;
++  return registry as unknown as ServiceRegistry<ServiceMap, OriginalMap, Scope>;
+ };
+ 
+ export const createRegistry = (): ServiceRegistry<
+   Record<never, never>,
+-  Record<never, readonly []>,
++  Record<never, never>,
+   Record<never, never>
+ > => makeRegistry([]);
+ 
