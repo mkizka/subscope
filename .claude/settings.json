@@ -14,9 +14,7 @@
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(yarn:*)",
-      "Edit(*/generated/*)",
-      "Write(*/generated/*)",
-      "MultiEdit(*/generated/*)"
+      "Edit(*/generated/*)"
     ]
   }
 }
