@@ -60,8 +60,8 @@ importers:
         specifier: 0.11.1
         version: 0.11.1
       '@gyaku/di':
-        specifier: 3.5.0
-        version: 3.5.0
+        specifier: 4.0.0
+        version: 4.0.0
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -133,8 +133,8 @@ importers:
         specifier: 0.11.1
         version: 0.11.1
       '@gyaku/di':
-        specifier: 3.5.0
-        version: 3.5.0
+        specifier: 4.0.0
+        version: 4.0.0
       '@keyv/redis':
         specifier: 5.1.6
         version: 5.1.6(@opentelemetry/api@1.9.1)(keyv@5.6.0)
@@ -348,8 +348,8 @@ importers:
         specifier: 0.6.1
         version: 0.6.1
       '@gyaku/di':
-        specifier: 3.5.0
-        version: 3.5.0
+        specifier: 4.0.0
+        version: 4.0.0
       '@repo/client':
         specifier: workspace:*
         version: link:../../packages/client
@@ -586,8 +586,8 @@ importers:
         specifier: 10.4.0
         version: 10.4.0
       '@gyaku/di':
-        specifier: 3.5.0
-        version: 3.5.0
+        specifier: 4.0.0
+        version: 4.0.0
       '@repo/common':
         specifier: workspace:*
         version: link:../common
@@ -1780,8 +1780,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@gyaku/di@3.5.0':
-    resolution: {integrity: sha512-d8EWrT42RinT9p7eZD0/FC3EFnl0g26QXTp+U1HVNfNdKg6Lbc88cLTKhFdmYHb2E01iolfGcCM5Gtus8LdFRA==}
+  '@gyaku/di@4.0.0':
+    resolution: {integrity: sha512-7rlVctTHqvQzf9Ht8H0myHhGs0bt5/VfShblyLuuWvFekPI8IxVlfuuDIMouX6iLD8VB+ehu2aC0onPnAYINbg==}
     engines: {node: '>=24'}
 
   '@hapi/address@5.1.1':
@@ -7594,7 +7594,7 @@ snapshots:
       protobufjs: 7.6.1
       yargs: 17.7.2
 
-  '@gyaku/di@3.5.0': {}
+  '@gyaku/di@4.0.0': {}
 
   '@hapi/address@5.1.1':
     dependencies:
