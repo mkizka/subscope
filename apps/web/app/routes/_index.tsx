@@ -62,7 +62,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   return data({
     state: "timeline" as const,
     atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
-    posts: timeline.feed.map(toTimelinePost).reverse(),
+    posts: timeline.feed
+      .filter(({ post, reason }) => reason || !post.record.reply)
+      .map(toTimelinePost)
+      .reverse(),
   });
 };
 

@@ -1,4 +1,4 @@
-import { HeartIcon, MessageCircleIcon, RepeatIcon } from "lucide-react";
+import { RepeatIcon } from "lucide-react";
 
 export type PostCardProps = {
   authorAvatar?: string;
@@ -42,7 +42,7 @@ export function PostCard({
   reasonRepost,
 }: PostCardProps) {
   return (
-    <div className="border-b border-border/40 px-4 py-3">
+    <article className="border-b border-border/40 px-4 py-3">
       {reasonRepost && (
         <div
           className="
@@ -81,22 +81,24 @@ export function PostCard({
             </span>
           </div>
           <p className="mt-1 wrap-break-word whitespace-pre-wrap">{text}</p>
-          <div className="mt-2 flex gap-6 text-muted-foreground">
-            <span className="flex items-center gap-1 text-sm">
-              <MessageCircleIcon className="size-4" />
-              {replyCount ?? 0}
-            </span>
-            <span className="flex items-center gap-1 text-sm">
-              <RepeatIcon className="size-4" />
-              {repostCount ?? 0}
-            </span>
-            <span className="flex items-center gap-1 text-sm">
-              <HeartIcon className="size-4" />
-              {likeCount ?? 0}
-            </span>
+          <div
+            className="
+              mt-2 flex gap-2
+              empty:hidden
+            "
+          >
+            {!!replyCount && (
+              <span className="badge badge-sm">{replyCount}件の返信</span>
+            )}
+            {!!repostCount && (
+              <span className="badge badge-sm">{repostCount}件のリポスト</span>
+            )}
+            {!!likeCount && (
+              <span className="badge badge-sm">{likeCount}件のいいね</span>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
