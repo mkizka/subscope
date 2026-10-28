@@ -10,6 +10,15 @@ const createPosts = async (request: APIRequestContext, texts: string[]) => {
     { data: { identifier: "alice.test", password: "password" } },
   );
   const { did, accessJwt } = await session.json();
+  await request.post(`${PDS_URL}/xrpc/com.atproto.repo.putRecord`, {
+    headers: { Authorization: `Bearer ${accessJwt}` },
+    data: {
+      repo: did,
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: { displayName: "Alice" },
+    },
+  });
   for (const text of texts) {
     await request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
       headers: { Authorization: `Bearer ${accessJwt}` },
