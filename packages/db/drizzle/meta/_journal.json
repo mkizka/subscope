@@ -141,6 +141,13 @@
       "when": 1793197919795,
       "tag": "0019_create-list-items",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793208999604,
+      "tag": "0020_create-record-revs",
+      "breakpoints": true
     }
   ]
 }

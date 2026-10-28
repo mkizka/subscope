@@ -65,6 +65,7 @@ export class TapIngester {
           operation: event.action,
           collection: event.collection,
           rkey: event.rkey,
+          rev: event.rev,
         },
       };
     }
@@ -82,6 +83,7 @@ export class TapIngester {
         operation: event.action,
         collection: event.collection,
         rkey: event.rkey,
+        rev: event.rev,
         record: event.record,
         cid: event.cid,
       },

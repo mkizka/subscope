@@ -2,7 +2,7 @@ import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 import { type RecordInsert, schema } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 
 import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
 
@@ -55,5 +55,26 @@ export class RecordRepository implements IRecordRepository {
     await ctx.db
       .delete(schema.records)
       .where(eq(schema.records.uri, uri.toString()));
+  }
+
+  async claimRev({
+    ctx,
+    uri,
+    rev,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+    rev: string;
+  }) {
+    const rows = await ctx.db
+      .insert(schema.recordRevs)
+      .values({ uri: uri.toString(), rev })
+      .onConflictDoUpdate({
+        target: schema.recordRevs.uri,
+        set: { rev },
+        setWhere: lt(schema.recordRevs.rev, rev),
+      })
+      .returning({ uri: schema.recordRevs.uri });
+    return rows.length > 0;
   }
 }

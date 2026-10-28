@@ -49,6 +49,7 @@ describe("IndexCommitUseCase", () => {
       const commit = {
         operation: "create" as const,
         uri,
+        rev: "3aaaaaaaaaaaa",
         record,
       };
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
@@ -93,14 +94,19 @@ describe("IndexCommitUseCase", () => {
         },
       });
       const createCommand: IndexCommitCommand = {
-        commit: { operation: "create" as const, uri, record },
+        commit: {
+          operation: "create" as const,
+          uri,
+          rev: "3aaaaaaaaaaaa",
+          record,
+        },
         live: true,
         jobLogger,
       };
       await indexCommitUseCase.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
-        commit: { operation: "delete" as const, uri },
+        commit: { operation: "delete" as const, uri, rev: "3bbbbbbbbbbbb" },
         live: true,
         jobLogger,
       };
@@ -142,6 +148,7 @@ describe("IndexCommitUseCase", () => {
       const commit = {
         operation: "create" as const,
         uri,
+        rev: "3aaaaaaaaaaaa",
         record,
       };
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
@@ -175,6 +182,7 @@ describe("IndexCommitUseCase", () => {
       const commit = {
         operation: "create" as const,
         uri,
+        rev: "3aaaaaaaaaaaa",
         record,
       };
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
@@ -183,6 +191,71 @@ describe("IndexCommitUseCase", () => {
       await expect(indexCommitUseCase.execute(command)).rejects.toThrow(
         "Unsupported collection: unsupported.collection",
       );
+    });
+  });
+
+  describe("コミットの処理順序", () => {
+    const setup = (text: string) => {
+      const actor = actorFactory();
+      actorRepo.add(actor);
+      subscriptionRepo.add(subscriptionFactory({ actorDid: actor.did }));
+      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
+      return { uri, record: postRecord(uri, text) };
+    };
+    const postRecord = (uri: AtUri, text: string) =>
+      Record.create({
+        uri,
+        cid: `cid-${text}`,
+        json: {
+          $type: "app.bsky.feed.post",
+          text,
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+    test("recordIndexing-1: 削除済みのレコードに対して、削除より古いrevの作成コミットを処理してもレコードは復活しない", async () => {
+      // arrange
+      const { uri, record } = setup("old");
+      await indexCommitUseCase.execute({
+        commit: { operation: "delete", uri, rev: "3bbbbbbbbbbbb" },
+        live: true,
+        jobLogger,
+      });
+
+      // act
+      await indexCommitUseCase.execute({
+        commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+        live: true,
+        jobLogger,
+      });
+
+      // assert
+      expect(await recordRepo.findByUri({ ctx, uri })).toBeNull();
+    });
+
+    test("recordIndexing-2: 更新済みのレコードに対して、更新より古いrevのコミットを処理してもレコードは古い内容に戻らない", async () => {
+      // arrange
+      const { uri, record } = setup("old");
+      await indexCommitUseCase.execute({
+        commit: {
+          operation: "update",
+          uri,
+          rev: "3bbbbbbbbbbbb",
+          record: postRecord(uri, "new"),
+        },
+        live: true,
+        jobLogger,
+      });
+
+      // act
+      await indexCommitUseCase.execute({
+        commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+        live: true,
+        jobLogger,
+      });
+
+      // assert
+      expect(postRepo.findByUri(uri)?.text).toBe("new");
     });
   });
 });
