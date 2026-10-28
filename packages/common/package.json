@@ -19,7 +19,7 @@
   "dependencies": {
     "@atproto/did": "0.5.6",
     "@atproto/identity": "0.5.20",
-    "@atproto/lexicon": "0.7.17",
+    "@atproto/lex": "0.4.2",
     "@atproto/syntax": "0.7.7",
     "@atproto/tap": "0.4.16",
     "@keyv/redis": "6.1.0",

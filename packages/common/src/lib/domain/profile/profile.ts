@@ -1,4 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
+import { getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record/record.js";
@@ -44,8 +45,8 @@ export class Profile {
       uri: record.uri,
       cid: record.cid,
       actorDid: record.actorDid,
-      avatarCid: parsed.avatar?.ref.toString() ?? null,
-      bannerCid: parsed.banner?.ref.toString() ?? null,
+      avatarCid: getBlobCidString(parsed.avatar) ?? null,
+      bannerCid: getBlobCidString(parsed.banner) ?? null,
       description: parsed.description,
       displayName: parsed.displayName,
       createdAt: parsed.createdAt,
