@@ -20,9 +20,11 @@ export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/
 export * as AppBskyFeedLike from "./generated/server/types/app/bsky/feed/like.js";
 export * as AppBskyFeedPost from "./generated/server/types/app/bsky/feed/post.js";
 export * as AppBskyFeedRepost from "./generated/server/types/app/bsky/feed/repost.js";
+export * as AppBskyGraphDefs from "./generated/server/types/app/bsky/graph/defs.js";
 export * as AppBskyGraphFollow from "./generated/server/types/app/bsky/graph/follow.js";
 export * as AppBskyGraphGetFollowers from "./generated/server/types/app/bsky/graph/getFollowers.js";
 export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows.js";
+export * as AppBskyGraphGetLists from "./generated/server/types/app/bsky/graph/getLists.js";
 export * as AppBskyGraphList from "./generated/server/types/app/bsky/graph/list.js";
 export * as AppBskyGraphListitem from "./generated/server/types/app/bsky/graph/listitem.js";
 export * as AppBskyNotificationListNotifications from "./generated/server/types/app/bsky/notification/listNotifications.js";
