@@ -145,6 +145,18 @@ describe("lexRouter", () => {
     });
   });
 
+  test("getPostThreadは存在しない投稿に400エラーを返す", async () => {
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getPostThread?uri=at://did:plc:alice/app.bsky.feed.post/notfound`,
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "NotFound",
+      message: "Post not found: at://did:plc:alice/app.bsky.feed.post/notfound",
+    });
+  });
+
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {
     const res = await fetch(`${baseUrl}/app.bsky.actor.getProfile`);
 

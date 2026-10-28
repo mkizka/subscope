@@ -11,7 +11,6 @@ import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
 import type { GetFeedGenerators } from "./app/bsky/feed/getFeedGenerators.js";
 import type { GetLikes } from "./app/bsky/feed/getLikes.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
-import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
@@ -28,7 +27,6 @@ export const xrpcRouterFactory = (
   getFeedGenerators: GetFeedGenerators,
   getLikes: GetLikes,
   getPosts: GetPosts,
-  getPostThread: GetPostThread,
   getRepostedBy: GetRepostedBy,
   getTimeline: GetTimeline,
   searchPosts: SearchPosts,
@@ -45,7 +43,6 @@ export const xrpcRouterFactory = (
     getFeedGenerators,
     getLikes,
     getPosts,
-    getPostThread,
     getRepostedBy,
     getTimeline,
     searchPosts,
@@ -69,7 +66,6 @@ xrpcRouterFactory.inject = [
   "getFeedGenerators",
   "getLikes",
   "getPosts",
-  "getPostThread",
   "getRepostedBy",
   "getTimeline",
   "searchPosts",
