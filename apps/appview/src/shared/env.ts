@@ -13,8 +13,14 @@ const schema = z
       .default(match({ prod: "info", dev: "debug" })),
     PORT: z.coerce.number().default(3001),
     PLC_URL: z.url().default("https://plc.directory"),
-    PUBLIC_URL: z.url(),
-    BLOB_PROXY_URL: z.url(),
+    PUBLIC_URL: match({
+      prod: z.url(),
+      dev: z.url().default("http://localhost:3001"),
+    }),
+    BLOB_PROXY_URL: match({
+      prod: z.url(),
+      dev: z.url().default("http://localhost:3002"),
+    }),
     SERVICE_DID: z.string().optional(),
     DATABASE_URL: z.url(),
     REDIS_URL: z.url(),
@@ -22,7 +28,8 @@ const schema = z
   .transform((val) => ({
     ...val,
     SERVICE_DID:
-      val.SERVICE_DID ?? `did:web:${new URL(val.PUBLIC_URL).hostname}`,
+      val.SERVICE_DID ??
+      `did:web:${encodeURIComponent(new URL(val.PUBLIC_URL).host)}`,
   }));
 
 export const env = (() => {

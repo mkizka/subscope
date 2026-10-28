@@ -34,7 +34,12 @@ execSync("pnpm -s db:migrate", {
 
 const network = await TestNetworkNoAppView.create({
   plc: { port: PORTS.plc },
-  pds: { port: PORTS.pds, hostname: "localhost" },
+  pds: {
+    port: PORTS.pds,
+    hostname: "localhost",
+    bskyAppViewUrl: "http://localhost:3001",
+    bskyAppViewDid: "did:web:localhost%3A3001",
+  },
 });
 
 await network.pds.getAgent().createAccount({
@@ -74,6 +79,7 @@ const app = spawn(process.argv.slice(2).join(" "), {
     REDIS_URL,
     PLC_URL,
     ATPROTO_PLC_URL: PLC_URL,
+    ATPROTO_HANDLE_RESOLVER_URL: PDS_URL,
   },
 });
 
