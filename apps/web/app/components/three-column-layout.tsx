@@ -10,12 +10,18 @@ type Props = {
 
 export const ThreeColumnLayout = ({ children }: Props) => {
   return (
-    <div className="
-      drawer bg-base-100 text-base-content
-      lg:drawer-open
-    ">
+    <div
+      className="
+        drawer
+        lg:drawer-open
+      "
+    >
       <input id="side-nav-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex min-h-screen">
+      <div
+        className="
+          drawer-content flex min-h-screen bg-base-100 text-base-content
+        "
+      >
         <main className="min-w-0 flex-1">
           <header
             className="
