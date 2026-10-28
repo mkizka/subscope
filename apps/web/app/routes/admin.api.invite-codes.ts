@@ -1,5 +1,7 @@
 import { XrpcResponseError } from "@atproto/lex";
-import { me } from "@repo/client/lex";
+import createInviteCode from "@repo/client/lex/me/subsco/admin/createInviteCode";
+import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
+import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 import { data } from "react-router";
 import { z } from "zodV4";
 
@@ -13,7 +15,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.call(me.subsco.admin.getInviteCodes, {
+    const response = await agent.call(getInviteCodes, {
       limit: 20,
       cursor,
     });
@@ -37,7 +39,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       const { code } = z
         .object({ code: z.string() })
         .parse(await request.json());
-      await agent.call(me.subsco.admin.deleteInviteCode, { code });
+      await agent.call(deleteInviteCode, { code });
       return data({ success: true });
     } catch (e) {
       if (
@@ -51,7 +53,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   try {
-    const response = await agent.call(me.subsco.admin.createInviteCode, {
+    const response = await agent.call(createInviteCode, {
       daysToExpire: 7,
     });
     return data(response);

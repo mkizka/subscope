@@ -1,4 +1,4 @@
-import { app } from "@repo/client/lex";
+import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
@@ -10,7 +10,7 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
 export const loader = async ({ context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);
-  const profile = await agent.call(app.bsky.actor.getProfile, {
+  const profile = await agent.call(getProfile, {
     actor: agent.assertDid,
   });
   return data({

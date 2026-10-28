@@ -1,5 +1,8 @@
 import { Client } from "@atproto/lex";
-import { me } from "@repo/client/lex";
+import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
+import getSubscriptionStatus, {
+  subscribed,
+} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 import { data } from "react-router";
 
 import { HomePage } from "@/app/features/home/pages/home";
@@ -26,7 +29,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const client = new Client(env.APPVIEW_URL);
   let setupStatus;
   try {
-    setupStatus = await client.call(me.subsco.server.getSetupStatus);
+    setupStatus = await client.call(getSetupStatus);
   } catch (e) {
     logger.error(e, "Failed to get setup status");
     throw data("セットアップ状態の取得に失敗しました", { status: 500 });
@@ -43,19 +46,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   let subscriptionResponse;
   try {
-    subscriptionResponse = await agent.call(
-      me.subsco.sync.getSubscriptionStatus,
-    );
+    subscriptionResponse = await agent.call(getSubscriptionStatus);
   } catch (e) {
     logger.error(e, "Failed to get subscription status");
     throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
   }
 
-  if (
-    !me.subsco.sync.getSubscriptionStatus.subscribed.isTypeOf(
-      subscriptionResponse,
-    )
-  ) {
+  if (!subscribed.isTypeOf(subscriptionResponse)) {
     return data({ state: "home" as const });
   }
   return data({

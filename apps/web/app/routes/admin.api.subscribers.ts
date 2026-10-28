@@ -1,5 +1,5 @@
 import { XrpcResponseError } from "@atproto/lex";
-import { me } from "@repo/client/lex";
+import getSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
@@ -12,7 +12,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.call(me.subsco.admin.getSubscribers, {
+    const response = await agent.call(getSubscribers, {
       limit: 20,
       cursor,
     });

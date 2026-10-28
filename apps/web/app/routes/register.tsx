@@ -1,6 +1,9 @@
 import { XrpcResponseError } from "@atproto/lex";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { me } from "@repo/client/lex";
+import getSubscriptionStatus, {
+  subscribed,
+} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
 import { data, redirect } from "react-router";
 
 import {
@@ -19,8 +22,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const agent = await getAgent(request);
 
   if (agent) {
-    const response = await agent.call(me.subsco.sync.getSubscriptionStatus);
-    if (me.subsco.sync.getSubscriptionStatus.subscribed.isTypeOf(response)) {
+    const response = await agent.call(getSubscriptionStatus);
+    if (subscribed.isTypeOf(response)) {
       throw redirect("/");
     }
   }
@@ -41,7 +44,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
 
   try {
-    await agent.call(me.subsco.sync.subscribeServer, {
+    await agent.call(subscribeServer, {
       inviteCode: submission.value.inviteCode,
     });
     return redirect("/");

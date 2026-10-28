@@ -1,5 +1,5 @@
 import { XrpcResponseError } from "@atproto/lex";
-import { app } from "@repo/client/lex";
+import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
@@ -15,7 +15,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.call(app.bsky.feed.getTimeline, {
+    const response = await agent.call(getTimeline, {
       limit: 20,
       cursor,
     });

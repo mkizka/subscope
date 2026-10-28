@@ -1,4 +1,4 @@
-import { me } from "@repo/client/lex";
+import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 import { data, redirect, type RouterContextProvider } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
@@ -29,7 +29,7 @@ export const adminRequiredMiddleware = async ({
   if (!agent) {
     throw redirect("/login");
   }
-  const response = await agent.call(me.subsco.admin.verifyAccess);
+  const response = await agent.call(verifyAccess);
   if (response.status !== "authorized") {
     throw data("ログイン中のアカウントが管理者ではありません", { status: 403 });
   }
