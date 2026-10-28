@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     server: {
+      host: "127.0.0.1",
       port: env.PORT ? Number(env.PORT) : 3000,
       allowedHosts,
     },
