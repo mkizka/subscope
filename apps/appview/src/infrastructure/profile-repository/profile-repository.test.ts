@@ -137,6 +137,9 @@ describe("ProfileRepository", () => {
     test("検索クエリに一致するアクターがない場合、空の配列を返す", async () => {
       // arrange
       await actorFactory(ctx.db)
+        .props({
+          handle: () => "alice.test",
+        })
         .use((t) => t.withProfile({ displayName: "Alice" }))
         .create();
 

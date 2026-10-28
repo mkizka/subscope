@@ -18,9 +18,9 @@
     "_prettier": "prettier . --ignore-path ../../.gitignore --cache --log-level warn",
     "build": "tsc",
     "dev": "tsc --watch",
-    "format": "pnpm -s _eslint --fix && pnpm -s _prettier --ignore-unknown --write",
+    "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
     "postinstall": "./scripts/postinstall.sh",
-    "lint": "pnpm -s _eslint && pnpm -s _prettier --check",
+    "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
