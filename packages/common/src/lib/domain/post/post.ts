@@ -1,5 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
+import { app } from "@repo/client/lex";
 
 import type { Record } from "../record/record.js";
 import { PostEmbedExternal } from "./embed-external.js";
@@ -112,29 +113,16 @@ export class Post {
       if (!parsed.embed) {
         return null;
       }
-      if (
-        parsed.embed.$type === "app.bsky.embed.images" &&
-        "images" in parsed.embed
-      ) {
+      if (app.bsky.embed.images.$isTypeOf(parsed.embed)) {
         return PostEmbedImage.from(parsed.embed.images);
       }
-      if (
-        parsed.embed.$type === "app.bsky.embed.external" &&
-        "external" in parsed.embed
-      ) {
+      if (app.bsky.embed.external.$isTypeOf(parsed.embed)) {
         return PostEmbedExternal.from(parsed.embed.external);
       }
-      if (
-        parsed.embed.$type === "app.bsky.embed.record" &&
-        "record" in parsed.embed
-      ) {
+      if (app.bsky.embed.record.$isTypeOf(parsed.embed)) {
         return PostEmbedRecord.from(parsed.embed);
       }
-      if (
-        parsed.embed.$type === "app.bsky.embed.recordWithMedia" &&
-        "record" in parsed.embed &&
-        "media" in parsed.embed
-      ) {
+      if (app.bsky.embed.recordWithMedia.$isTypeOf(parsed.embed)) {
         return PostEmbedRecordWithMedia.from(parsed.embed);
       }
       return null;

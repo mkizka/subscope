@@ -648,9 +648,9 @@ importers:
       '@atproto/identity':
         specifier: 0.5.20
         version: 0.5.20
-      '@atproto/lexicon':
-        specifier: 0.7.17
-        version: 0.7.17
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
