@@ -14,15 +14,21 @@ test.describe("タイムライン", () => {
       { data: { identifier: "alice.test", password: "password" } },
     );
     const { did, accessJwt } = await session.json();
+    const createRecord = (collection: string, record: object, rkey?: string) =>
+      request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
+        headers: { Authorization: `Bearer ${accessJwt}` },
+        data: { repo: did, collection, rkey, record },
+      });
+    await createRecord(
+      "app.bsky.actor.profile",
+      { displayName: "Alice" },
+      "self",
+    );
     const texts = ["timeline-1: 古い投稿", "timeline-1: 新しい投稿"];
     for (const text of texts) {
-      await request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
-        headers: { Authorization: `Bearer ${accessJwt}` },
-        data: {
-          repo: did,
-          collection: "app.bsky.feed.post",
-          record: { text, createdAt: new Date().toISOString() },
-        },
+      await createRecord("app.bsky.feed.post", {
+        text,
+        createdAt: new Date().toISOString(),
       });
     }
 
