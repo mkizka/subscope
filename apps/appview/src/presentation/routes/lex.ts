@@ -7,7 +7,10 @@ import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
 import type { SearchActors } from "./app/bsky/actor/searchActors.js";
 import type { SearchActorsTypeahead } from "./app/bsky/actor/searchActorsTypeahead.js";
+import type { GetActorLikes } from "./app/bsky/feed/getActorLikes.js";
+import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
+import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
@@ -30,6 +33,9 @@ import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 export const lexRouterFactory = (
   getPostThread: GetPostThread,
   searchPosts: SearchPosts,
+  getActorLikes: GetActorLikes,
+  getAuthorFeed: GetAuthorFeed,
+  getTimeline: GetTimeline,
   getFollows: GetFollows,
   getFollowers: GetFollowers,
   getList: GetList,
@@ -56,6 +62,9 @@ export const lexRouterFactory = (
   const handlers = [
     getPostThread,
     searchPosts,
+    getActorLikes,
+    getAuthorFeed,
+    getTimeline,
     getFollows,
     getFollowers,
     getList,
@@ -99,6 +108,9 @@ export const lexRouterFactory = (
 lexRouterFactory.inject = [
   "getPostThread",
   "searchPosts",
+  "getActorLikes",
+  "getAuthorFeed",
+  "getTimeline",
   "getFollows",
   "getFollowers",
   "getList",
