@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import type { AppBskyEmbedRecord } from "@repo/client/server";
+import type { Main as EmbedRecord } from "@repo/client/lex/app/bsky/embed/record";
 
 type PostEmbedRecordParams = {
   uri: AtUri | string;
@@ -15,7 +15,7 @@ export class PostEmbedRecord {
     this.cid = params.cid;
   }
 
-  static from(record: AppBskyEmbedRecord.Main) {
+  static from(record: EmbedRecord) {
     return new PostEmbedRecord({
       uri: record.record.uri,
       cid: record.record.cid,

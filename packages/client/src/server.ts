@@ -24,6 +24,7 @@ export * as AppBskyGraphDefs from "./generated/server/types/app/bsky/graph/defs.
 export * as AppBskyGraphFollow from "./generated/server/types/app/bsky/graph/follow.js";
 export * as AppBskyGraphGetFollowers from "./generated/server/types/app/bsky/graph/getFollowers.js";
 export * as AppBskyGraphGetFollows from "./generated/server/types/app/bsky/graph/getFollows.js";
+export * as AppBskyGraphGetList from "./generated/server/types/app/bsky/graph/getList.js";
 export * as AppBskyGraphGetLists from "./generated/server/types/app/bsky/graph/getLists.js";
 export * as AppBskyGraphList from "./generated/server/types/app/bsky/graph/list.js";
 export * as AppBskyGraphListitem from "./generated/server/types/app/bsky/graph/listitem.js";

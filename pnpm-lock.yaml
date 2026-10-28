@@ -214,6 +214,9 @@ importers:
       '@atproto/did':
         specifier: 0.5.6
         version: 0.5.6
+      '@atproto/lex-server':
+        specifier: 0.2.0
+        version: 0.2.0
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
@@ -354,15 +357,15 @@ importers:
       '@atproto/jwk-jose':
         specifier: 0.2.4
         version: 0.2.4
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/oauth-client-node':
         specifier: 0.5.13
         version: 0.5.13
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
-      '@atproto/xrpc':
-        specifier: 0.8.16
-        version: 0.8.16
       '@base-ui/react':
         specifier: 1.9.0
         version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -445,6 +448,9 @@ importers:
       '@mkizka/eslint-config':
         specifier: 10.0.0
         version: 10.0.0(@typescript-eslint/eslint-plugin@8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      '@playwright/test':
+        specifier: 1.63.0
+        version: 1.63.0
       '@react-router/dev':
         specifier: 8.5.0
         version: 8.5.0(@react-router/serve@8.5.0(react-router@8.5.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(supports-color@7.2.0)(typescript@6.0.3))(react-router@8.5.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(supports-color@7.2.0)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
@@ -499,9 +505,9 @@ importers:
       '@atproto/identity':
         specifier: 0.5.20
         version: 0.5.20
-      '@atproto/lexicon':
-        specifier: 0.7.17
-        version: 0.7.17
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/repo':
         specifier: 0.11.1
         version: 0.11.1
@@ -593,6 +599,12 @@ importers:
       '@atproto/api':
         specifier: 0.29.5
         version: 0.29.5
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
+      '@atproto/lex-server':
+        specifier: 0.2.0
+        version: 0.2.0
       '@atproto/lexicon':
         specifier: 0.7.17
         version: 0.7.17
@@ -627,9 +639,6 @@ importers:
       eslint:
         specifier: 10.13.0
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
-      giget:
-        specifier: 3.3.1
-        version: 3.3.1
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -642,9 +651,9 @@ importers:
       '@atproto/identity':
         specifier: 0.5.20
         version: 0.5.20
-      '@atproto/lexicon':
-        specifier: 0.7.17
-        version: 0.7.17
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
@@ -987,6 +996,15 @@ packages:
   '@atproto/lex-schema@0.2.9':
     resolution: {integrity: sha512-RkY6c77VTWUior/D2UsfBG/bAba5fNMZhjxB0/V1nN4XIgOs8fIo2c42WdFtCelVzc06Dr5oO62FjqSWulfdpg==}
     engines: {node: '>=22'}
+
+  '@atproto/lex-server@0.2.0':
+    resolution: {integrity: sha512-H+bPc9O6SeBPWZXG3YX8C8KRcb1pP6Jw+dM46FAkK9ABT4nUZXQqbiqldK4sqlboRIvICCwqSrQKHQYWzfuRWg==}
+    engines: {node: '>=22'}
+
+  '@atproto/lex@0.4.2':
+    resolution: {integrity: sha512-5agIAaGJPgy+91r2WIbEE7jhWkSMVxdz6enRjwx79kTX3KeKDQXl+jyyZ1i/6Rj39r2AjBTY/JGuFs+VUI6+Xw==}
+    engines: {node: '>=22'}
+    hasBin: true
 
   '@atproto/lex@0.4.3':
     resolution: {integrity: sha512-FKoTZiHh00+qV9+suyDDvcjBtSkyldZuUeqss58a3AGI/YdtvGkwexMqzgnOrK17xBZ42O9i+HzobQAEV66Sfw==}
@@ -3095,6 +3113,11 @@ packages:
   '@pkgr/core@0.3.6':
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
+
+  '@playwright/test@1.63.0':
+    resolution: {integrity: sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -5336,10 +5359,6 @@ packages:
   get-tsconfig@4.14.3:
     resolution: {integrity: sha512-++QEw4DIY7WGoukz+/+A/8dGYPT9l9yIadnmSgZ8Rjr3YVSVDipQSO9CdnJo9ePqFqUUqh+wk9uIaoiAwsiPkA==}
 
-  giget@3.3.1:
-    resolution: {integrity: sha512-r+mvuDjrjMpsdw46Kmeydb8bdHm7wOKw8wNBtTndkjbPjgAp5oUJUxRE76wZFknxIPokfWvep2qSXK37aXE6zg==}
-    hasBin: true
-
   git-up@8.1.1:
     resolution: {integrity: sha512-FDenSF3fVqBYSaJoYy1KSc2wosx0gCvKP+c+PRBht7cAaiCeQlBtfBDX9vgnNOHmdePlSFITVcn4pFfcgNvx3g==}
 
@@ -6467,6 +6486,16 @@ packages:
   pkg-up@3.1.0:
     resolution: {integrity: sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==}
     engines: {node: '>=8'}
+
+  playwright-core@1.63.0:
+    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.63.0:
+    resolution: {integrity: sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   postcss-selector-parser@7.1.7:
     resolution: {integrity: sha512-wWBro/7hJ40ye6TPiXkUQoXKCw23xSsjriUvqd7Uls9Sso3oLiON1flc18cCdnjgCRXw4fBVqUJJeOdDTh3P3g==}
@@ -8042,6 +8071,34 @@ snapshots:
       '@atproto/syntax': 0.7.7
       '@standard-schema/spec': 1.1.0
       tslib: 2.8.1
+
+  '@atproto/lex-server@0.2.0':
+    dependencies:
+      '@atproto-labs/did-resolver': 0.3.11
+      '@atproto/crypto': 0.5.7
+      '@atproto/did': 0.5.6
+      '@atproto/lex-cbor': 0.1.7
+      '@atproto/lex-data': 0.1.8
+      '@atproto/lex-json': 0.1.7
+      '@atproto/lex-rpc': 0.0.1
+      '@atproto/lex-schema': 0.2.9
+      http-terminator: 3.2.0
+      tslib: 2.8.1
+      ws: 8.22.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@atproto/lex@0.4.2':
+    dependencies:
+      '@atproto/lex-builder': 0.1.18
+      '@atproto/lex-client': 0.4.0
+      '@atproto/lex-data': 0.1.8
+      '@atproto/lex-installer': 0.2.3
+      '@atproto/lex-json': 0.1.7
+      '@atproto/lex-schema': 0.2.9
+      tslib: 2.8.1
+      yargs: 18.2.0
 
   '@atproto/lex@0.4.3':
     dependencies:
@@ -10511,6 +10568,10 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
+  '@playwright/test@1.63.0':
+    dependencies:
+      playwright: 1.63.0
+
   '@protobufjs/aspromise@1.1.2': {}
 
   '@protobufjs/base64@1.1.2': {}
@@ -12824,8 +12885,6 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  giget@3.3.1: {}
-
   git-up@8.1.1:
     dependencies:
       is-ssh: 1.4.1
@@ -13859,6 +13918,12 @@ snapshots:
   pkg-up@3.1.0:
     dependencies:
       find-up: 3.0.0
+
+  playwright-core@1.63.0: {}
+
+  playwright@1.63.0:
+    dependencies:
+      playwright-core: 1.63.0
 
   postcss-selector-parser@7.1.7:
     dependencies:

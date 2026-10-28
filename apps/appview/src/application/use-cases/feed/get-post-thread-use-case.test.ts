@@ -1,3 +1,4 @@
+import { InvalidRequestError } from "@atproto/xrpc-server";
 import {
   actorFactory,
   postFactory,
@@ -35,9 +36,9 @@ describe("GetPostThreadUseCase", () => {
     spyFindReplies = vi.spyOn(postRepo, "findReplies");
   });
 
-  test("投稿が見つからない場合はnotFoundPostを返す", async () => {
+  test("投稿が見つからない場合はNotFoundエラーを投げる", async () => {
     // act
-    const result = await getPostThreadUseCase.execute({
+    const result = getPostThreadUseCase.execute({
       uri: new ResolvedAtUri(
         "at://did:plc:notexist/app.bsky.feed.post/notexist",
       ),
@@ -46,11 +47,12 @@ describe("GetPostThreadUseCase", () => {
     });
 
     // assert
-    expect(result.thread).toEqual({
-      $type: "app.bsky.feed.defs#notFoundPost",
-      uri: "at://did:plc:notexist/app.bsky.feed.post/notexist",
-      notFound: true,
-    });
+    await expect(result).rejects.toThrow(
+      new InvalidRequestError(
+        "Post not found: at://did:plc:notexist/app.bsky.feed.post/notexist",
+        "NotFound",
+      ),
+    );
     // ターゲット投稿の取得で1回のみ
     expect(spyFindByUri).toHaveBeenCalledTimes(1);
     // 投稿が見つからないのでリプライ取得は行われない

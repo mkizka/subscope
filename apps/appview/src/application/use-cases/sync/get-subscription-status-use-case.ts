@@ -20,13 +20,13 @@ export class GetSubscriptionStatusUseCase {
     if (!subscription) {
       return {
         $type: "me.subsco.sync.getSubscriptionStatus#notSubscribed",
-        isSubscriber: false as const,
-      };
+        isSubscriber: false,
+      } as const;
     }
 
     return {
       $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
-      isSubscriber: true as const,
-    };
+      isSubscriber: true,
+    } as const;
   }
 }

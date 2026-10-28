@@ -1,4 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
+import { getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 
 import type { Record } from "../record/record.js";
@@ -47,7 +48,7 @@ export class List {
       purpose: parsed.purpose,
       name: parsed.name,
       description: parsed.description,
-      avatarCid: parsed.avatar?.ref.toString(),
+      avatarCid: getBlobCidString(parsed.avatar),
       createdAt: new Date(parsed.createdAt),
       indexedAt: record.indexedAt,
     });

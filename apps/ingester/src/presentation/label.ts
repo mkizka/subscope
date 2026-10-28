@@ -1,5 +1,5 @@
 import { Subscription } from "@atproto/xrpc-server";
-import { ComAtprotoLabelSubscribeLabels } from "@repo/client/api";
+import * as subscribeLabels from "@repo/client/lex/com/atproto/label/subscribeLabels";
 import type { IMetricReporter } from "@repo/common/domain";
 
 export class LabelIngester {
@@ -11,27 +11,17 @@ export class LabelIngester {
   ) {
     this.subscription = new Subscription({
       service: moderationUrl,
-      method: "com.atproto.label.subscribeLabels",
-      validate: (obj: unknown) => {
-        const parsedInfo = ComAtprotoLabelSubscribeLabels.validateInfo(obj);
-        if (parsedInfo.success) {
-          return parsedInfo.value;
-        }
-        const parsedLabels = ComAtprotoLabelSubscribeLabels.validateLabels(obj);
-        if (parsedLabels.success) {
-          return parsedLabels.value;
-        }
-        return undefined;
-      },
+      method: subscribeLabels.$nsid,
+      validate: (obj: unknown) => subscribeLabels.$message.$ifMatches(obj),
     });
   }
   static inject = ["metricReporter", "moderationUrl"] as const;
 
   async start() {
     for await (const message of this.subscription) {
-      if (ComAtprotoLabelSubscribeLabels.isLabels(message)) {
+      if (subscribeLabels.labels.$isTypeOf(message)) {
         this.metricReporter.increment("ingester_labels_labels_total");
-      } else if (ComAtprotoLabelSubscribeLabels.isInfo(message)) {
+      } else if (subscribeLabels.info.$isTypeOf(message)) {
         this.metricReporter.increment("ingester_labels_info_total");
       }
     }

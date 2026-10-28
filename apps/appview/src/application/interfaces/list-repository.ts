@@ -1,5 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { List } from "@repo/common/domain";
+import type { AtUri } from "@atproto/syntax";
+import type { List, ListItem } from "@repo/common/domain";
 
 export interface IListRepository {
   findByActor: (params: {
@@ -8,4 +9,10 @@ export interface IListRepository {
     cursor?: string;
     purposes?: string[];
   }) => Promise<List[]>;
+  findByUri: (uri: AtUri) => Promise<List | null>;
+  findItems: (params: {
+    listUri: AtUri;
+    limit: number;
+    cursor?: string;
+  }) => Promise<ListItem[]>;
 }
