@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
 
 import { TimelineFeed } from "./timeline-feed";
 
@@ -42,10 +41,6 @@ const meta = {
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
       },
     ],
-    isLoading: false,
-    isFetchingNextPage: false,
-    hasNextPage: true,
-    onLoadMore: fn(),
   },
 } satisfies Meta<typeof TimelineFeed>;
 
@@ -54,22 +49,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Loading: Story = {
-  args: {
-    posts: [],
-    isLoading: true,
-  },
-};
-
 export const Empty: Story = {
   args: {
     posts: [],
-  },
-};
-
-export const LoadingMore: Story = {
-  args: {
-    isFetchingNextPage: true,
-    hasNextPage: true,
   },
 };
