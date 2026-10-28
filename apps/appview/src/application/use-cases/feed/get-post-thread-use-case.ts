@@ -1,5 +1,6 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
+import { InvalidRequestError } from "@atproto/xrpc-server";
 import type {
   $Typed,
   AppBskyFeedDefs,
@@ -14,7 +15,6 @@ import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
-type NotFoundPost = $Typed<AppBskyFeedDefs.NotFoundPost>;
 
 const MAX_REPLIES_PER_POST = 20;
 
@@ -36,7 +36,7 @@ export class GetPostThreadUseCase {
       params.uri.getValue(),
     );
     if (!targetPost) {
-      return { thread: this.notFoundPost(params.uri.getValue()) };
+      throw this.notFoundError(params.uri.getValue());
     }
 
     // 2. スレッド全体の構造を収集
@@ -55,7 +55,7 @@ export class GetPostThreadUseCase {
     // 4. ターゲット投稿のPostViewを確認
     const targetPostView = postViewMap.get(targetPost.uri.toString());
     if (!targetPostView) {
-      return { thread: this.notFoundPost(targetPost.uri) };
+      throw this.notFoundError(targetPost.uri);
     }
 
     // 5. スレッド構造を構築して返す
@@ -71,13 +71,11 @@ export class GetPostThreadUseCase {
     };
   }
 
-  private notFoundPost(uri: AtUri): NotFoundPost {
-    const result: NotFoundPost = {
-      $type: "app.bsky.feed.defs#notFoundPost",
-      uri: uri.toString(),
-      notFound: true,
-    };
-    return result;
+  private notFoundError(uri: AtUri): InvalidRequestError {
+    return new InvalidRequestError(
+      `Post not found: ${uri.toString()}`,
+      "NotFound",
+    );
   }
 
   private async collectThreadData(params: {
