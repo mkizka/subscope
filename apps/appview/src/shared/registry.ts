@@ -27,6 +27,7 @@ import type { IGeneratorRepository } from "../application/interfaces/generator-r
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
+import type { IListRepository } from "../application/interfaces/list-repository.js";
 import type { INotificationRepository } from "../application/interfaces/notification-repository.js";
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsRepository } from "../application/interfaces/post-stats-repository.js";
@@ -52,6 +53,7 @@ import { RepostService } from "../application/service/feed/repost-service.js";
 import { TimelineService } from "../application/service/feed/timeline-service.js";
 import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
+import { ListViewService } from "../application/service/graph/list-view-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
 import { GetProfilesUseCase } from "../application/use-cases/actor/get-profiles-use-case.js";
@@ -74,6 +76,7 @@ import { GetTimelineUseCase } from "../application/use-cases/feed/get-timeline-u
 import { SearchPostsUseCase } from "../application/use-cases/feed/search-posts-use-case.js";
 import { GetFollowersUseCase } from "../application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "../application/use-cases/graph/get-follows-use-case.js";
+import { GetListsUseCase } from "../application/use-cases/graph/get-lists-use-case.js";
 import { GetUnreadCountUseCase } from "../application/use-cases/notification/get-unread-count-use-case.js";
 import { ListNotificationsUseCase } from "../application/use-cases/notification/list-notifications-use-case.js";
 import { UpdateSeenUseCase } from "../application/use-cases/notification/update-seen-use-case.js";
@@ -91,6 +94,7 @@ import { GeneratorRepository } from "../infrastructure/generator-repository/gene
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
+import { ListRepository } from "../infrastructure/list-repository/list-repository.js";
 import { NotificationRepository } from "../infrastructure/notification-repository/notification-repository.js";
 import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsRepository } from "../infrastructure/post-stats-repository/post-stats-repository.js";
@@ -119,6 +123,7 @@ import { GetTimeline } from "../presentation/routes/app/bsky/feed/getTimeline.js
 import { SearchPosts } from "../presentation/routes/app/bsky/feed/searchPosts.js";
 import { GetFollowers } from "../presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "../presentation/routes/app/bsky/graph/getFollows.js";
+import { GetLists } from "../presentation/routes/app/bsky/graph/getLists.js";
 import { GetUnreadCount } from "../presentation/routes/app/bsky/notification/getUnreadCount.js";
 import { ListNotifications } from "../presentation/routes/app/bsky/notification/listNotifications.js";
 import { UpdateSeen } from "../presentation/routes/app/bsky/notification/updateSeen.js";
@@ -174,6 +179,7 @@ export const createAppRegistry = (env: Env) =>
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
     .service("generatorRepository", ["db"], asClassArgs<IGeneratorRepository>()(GeneratorRepository))
+    .service("listRepository", ["db"], asClassArgs<IListRepository>()(ListRepository))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("subscriptionRepository", ["db"], asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("tokenVerifier", ["didResolver", "serviceDid"], asClassArgs<ITokenVerifier>()(TokenVerifier))
@@ -187,6 +193,7 @@ export const createAppRegistry = (env: Env) =>
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("generatorViewService", ["generatorRepository", "profileViewService", "assetUrlBuilder"], asClassArgs(GeneratorViewService))
+    .service("listViewService", ["profileViewService", "assetUrlBuilder"], asClassArgs(ListViewService))
     .service("postEmbedViewBuilder", ["assetUrlBuilder"], asClassArgs(PostEmbedViewBuilder))
     .service("postViewService", ["postRepository", "postStatsRepository", "recordRepository", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository"], asClassArgs(PostViewService))
     .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
@@ -218,6 +225,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getRepostedByUseCase", ["repostService", "profileViewService"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowersUseCase))
+    .service("getListsUseCase", ["listRepository", "listViewService"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["db", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["db", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeService"], asClassArgs(GetInviteCodesUseCase))
@@ -249,6 +257,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getRepostedBy", ["getRepostedByUseCase"], asClassArgs(GetRepostedBy))
     .service("getFollows", ["getFollowsUseCase", "handleMiddleware"], asClassArgs(GetFollows))
     .service("getFollowers", ["getFollowersUseCase", "handleMiddleware"], asClassArgs(GetFollowers))
+    .service("getLists", ["getListsUseCase", "handleMiddleware"], asClassArgs(GetLists))
     .service("createInviteCode", ["createInviteCodeUseCase", "adminMiddleware"], asClassArgs(CreateInviteCode))
     .service("deleteInviteCode", ["deleteInviteCodeUseCase", "adminMiddleware"], asClassArgs(DeleteInviteCode))
     .service("getInviteCodes", ["getInviteCodesUseCase", "adminMiddleware"], asClassArgs(GetInviteCodes))
@@ -260,7 +269,7 @@ export const createAppRegistry = (env: Env) =>
     .service("subscribeServer", ["subscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(SubscribeServer))
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("xrpcRouter", ["getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "getUnreadCount", "listNotifications", "createInviteCode", "deleteInviteCode", "getInviteCodes", "getSubscribers", "registerAdmin", "verifyAccess", "getSetupStatus", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "updateSeen"], asFunctionArgs(xrpcRouterFactory))
+    .service("xrpcRouter", ["getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "getLists", "getUnreadCount", "listNotifications", "createInviteCode", "deleteInviteCode", "getInviteCodes", "getSubscribers", "registerAdmin", "verifyAccess", "getSetupStatus", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "updateSeen"], asFunctionArgs(xrpcRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
