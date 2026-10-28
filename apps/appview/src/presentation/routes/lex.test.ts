@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { once } from "node:events";
 
 import { asDid } from "@atproto/did";
+import { actorFactory } from "@repo/common/test";
 import express from "express";
 import {
   afterAll,
@@ -87,6 +88,30 @@ describe("lexRouter", () => {
 
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
+  });
+
+  test("管理者でない場合、admin APIは401エラーを返す", async () => {
+    const res = await fetch(`${baseUrl}/me.subsco.admin.getInviteCodes`, {
+      headers: auth,
+    });
+
+    expect(res.status).toBe(401);
+    expect(await res.json()).toMatchObject({
+      error: "AuthenticationRequired",
+      message: "Admin access required",
+    });
+  });
+
+  test("registerAdminのユースケースエラーはエラー名を持つ400エラーになる", async () => {
+    services.actorRepository.add(actorFactory({ isAdmin: true }));
+
+    const res = await fetch(`${baseUrl}/me.subsco.admin.registerAdmin`, {
+      method: "POST",
+      headers: auth,
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ error: "AdminAlreadyExists" });
   });
 
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {

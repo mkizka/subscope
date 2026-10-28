@@ -1,4 +1,5 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
 import type { VerifyAccessUseCase } from "../../../../../application/use-cases/admin/verify-access-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -10,18 +11,15 @@ export class VerifyAccess {
   ) {}
   static inject = ["verifyAccessUseCase", "authVerifierMiddleware"] as const;
 
-  handle(server: Server) {
-    server.me.subsco.admin.verifyAccess({
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
-      handler: async ({ auth }) => {
+  handle(router: LexRouter) {
+    router.add(verifyAccess, {
+      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      handler: async ({ credentials }) => {
         const result = await this.verifyAccessUseCase.execute({
-          requesterDid: auth.credentials.did,
+          requesterDid: credentials.did,
         });
 
-        return {
-          encoding: "application/json",
-          body: result,
-        };
+        return { body: result };
       },
     });
   }

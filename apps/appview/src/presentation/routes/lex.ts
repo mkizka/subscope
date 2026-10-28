@@ -2,6 +2,12 @@ import { LexRouter } from "@atproto/lex-server";
 import { toRequestListener } from "@atproto/lex-server/nodejs";
 import type { RequestHandler } from "express";
 
+import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
+import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
+import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
+import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
+import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
+import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
 import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
@@ -10,8 +16,24 @@ export const lexRouterFactory = (
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
   unsubscribeServer: UnsubscribeServer,
+  createInviteCode: CreateInviteCode,
+  deleteInviteCode: DeleteInviteCode,
+  getInviteCodes: GetInviteCodes,
+  registerAdmin: RegisterAdmin,
+  verifyAccess: VerifyAccess,
+  getSetupStatus: GetSetupStatus,
 ): RequestHandler => {
-  const handlers = [getSubscriptionStatus, subscribeServer, unsubscribeServer];
+  const handlers = [
+    getSubscriptionStatus,
+    subscribeServer,
+    unsubscribeServer,
+    createInviteCode,
+    deleteInviteCode,
+    getInviteCodes,
+    registerAdmin,
+    verifyAccess,
+    getSetupStatus,
+  ];
 
   const router = new LexRouter();
   for (const handler of handlers) {
@@ -33,4 +55,10 @@ lexRouterFactory.inject = [
   "getSubscriptionStatus",
   "subscribeServer",
   "unsubscribeServer",
+  "createInviteCode",
+  "deleteInviteCode",
+  "getInviteCodes",
+  "registerAdmin",
+  "verifyAccess",
+  "getSetupStatus",
 ] as const;
