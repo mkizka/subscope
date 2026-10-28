@@ -30,6 +30,8 @@
 
 カスタムフィードは扱わない。
 
+ログイン後の画面は `apps/web/app/components/three-column-layout.tsx` で3カラムに並べる。
+
 ## レイアウト（モバイル）
 
 - 中央のタイムラインを基本画面とする
