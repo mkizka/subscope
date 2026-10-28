@@ -13,7 +13,6 @@ import type { GetLikes } from "./app/bsky/feed/getLikes.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
-import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 
 export const xrpcRouterFactory = (
@@ -29,7 +28,6 @@ export const xrpcRouterFactory = (
   getPosts: GetPosts,
   getRepostedBy: GetRepostedBy,
   getTimeline: GetTimeline,
-  searchPosts: SearchPosts,
   getSubscribers: GetSubscribers,
 ): Router => {
   const handlers = [
@@ -45,7 +43,6 @@ export const xrpcRouterFactory = (
     getPosts,
     getRepostedBy,
     getTimeline,
-    searchPosts,
     getSubscribers,
   ];
 
@@ -68,6 +65,5 @@ xrpcRouterFactory.inject = [
   "getPosts",
   "getRepostedBy",
   "getTimeline",
-  "searchPosts",
   "getSubscribers",
 ] as const;
