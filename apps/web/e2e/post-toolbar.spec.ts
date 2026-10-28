@@ -23,18 +23,21 @@ for (const { id, name, collection } of cases) {
       { data: { identifier: "alice.test", password: "password" } },
     );
     const { did, accessJwt } = await session.json();
-    const text = `${id}: 投稿`;
-    const created = await request.post(
-      `${PDS_URL}/xrpc/com.atproto.repo.createRecord`,
-      {
+    const createRecord = (collection: string, record: object, rkey?: string) =>
+      request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
         headers: { Authorization: `Bearer ${accessJwt}` },
-        data: {
-          repo: did,
-          collection: "app.bsky.feed.post",
-          record: { text, createdAt: new Date().toISOString() },
-        },
-      },
+        data: { repo: did, collection, rkey, record },
+      });
+    await createRecord(
+      "app.bsky.actor.profile",
+      { displayName: "Alice" },
+      "self",
     );
+    const text = `${id}: 投稿`;
+    const created = await createRecord("app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
     const { uri }: { uri: string } = await created.json();
     const hasRecord = async () => {
       const res = await request.get(
