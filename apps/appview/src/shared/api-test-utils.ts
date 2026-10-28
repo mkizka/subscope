@@ -29,7 +29,10 @@ const apiTestRegistry = createAppRegistry(testEnv)
 
 export const setupApiTest = async () => {
   const services = await apiTestRegistry.resolve();
-  const server = express().use(services.xrpcRouter).listen(0);
+  const server = express()
+    .use(services.lexRouter)
+    .use(services.xrpcRouter)
+    .listen(0);
   await once(server, "listening");
   onTestFinished(() => {
     server.close();
