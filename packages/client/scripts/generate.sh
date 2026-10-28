@@ -40,6 +40,7 @@ paths=(
   "app/bsky/graph/follow.json"
   "app/bsky/graph/getFollows.json"
   "app/bsky/graph/getFollowers.json"
+  "app/bsky/graph/getList.json"
   "app/bsky/graph/getLists.json"
   "app/bsky/graph/list.json"
   "app/bsky/graph/listitem.json"
@@ -82,5 +83,5 @@ echo 'Starting client code generation...'
 LEX_CLI=./node_modules/@atproto/lex-cli/bin.js
 yes | node $LEX_CLI gen-api ./src/generated/api $LEXICONS &
 yes | node $LEX_CLI gen-server ./src/generated/server $LEXICONS &
-pnpm ts-lex build --out ./src/generated/lex --clear --index-file &
+pnpm ts-lex build --out ./src/generated/lex --clear &
 wait

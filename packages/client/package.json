@@ -8,9 +8,9 @@
       "import": "./dist/api.js",
       "types": "./dist/api.d.ts"
     },
-    "./lex": {
-      "import": "./dist/lex.js",
-      "types": "./dist/lex.d.ts"
+    "./lex/*": {
+      "import": "./dist/generated/lex/*.js",
+      "types": "./dist/generated/lex/*.d.ts"
     },
     "./lex/*": {
       "import": "./dist/generated/lex/*.js",
