@@ -13,4 +13,8 @@ export interface IInviteCodeRepository {
     cursor?: string;
   }) => Promise<InviteCodeDto[]>;
   findFirst: (code: string) => Promise<InviteCode | null>;
+  markAsUsed: (params: {
+    code: string;
+    ctx: TransactionContext;
+  }) => Promise<boolean>;
 }

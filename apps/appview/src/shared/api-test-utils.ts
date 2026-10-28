@@ -14,7 +14,6 @@ import { testSetup } from "@repo/test-utils";
 import express from "express";
 import { onTestFinished } from "vitest";
 
-import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import { createAppRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";
 
@@ -25,7 +24,7 @@ const apiTestRegistry = createAppRegistry(testEnv)
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
-  .replaceService("tokenVerifier", asClassArgs(InMemoryTokenVerifier));
+  .replaceValue("tokenVerifier", { verify: ({ token }: { token: string }) => Promise.resolve({ did: asDid(token) }) });
 
 export const setupApiTest = async () => {
   const services = await apiTestRegistry.resolve();
@@ -39,10 +38,10 @@ export const setupApiTest = async () => {
   });
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { port } = server.address() as AddressInfo;
-  const client = new AtpBaseClient(`http://localhost:${port}`);
-  const loginAs = (did: string) => {
-    services.tokenVerifier.setVerifyResult({ did: asDid(did) });
-    client.setHeader("authorization", "Bearer token");
+  const createClient = () => new AtpBaseClient(`http://localhost:${port}`);
+  const client = createClient();
+  const loginAs = (did: string, target = client) => {
+    target.setHeader("authorization", `Bearer ${did}`);
   };
-  return { client, loginAs };
+  return { client, createClient, loginAs };
 };

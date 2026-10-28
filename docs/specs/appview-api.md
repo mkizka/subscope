@@ -20,3 +20,9 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
+
+## me.subsco.sync.subscribeServer
+
+招待コードを使って閲覧者をサブスクライバーとして登録する。認証が必要。
+
+- subscribeServer-1: 同じ招待コードで同時に登録した場合、1件だけ成功し残りは400を返す

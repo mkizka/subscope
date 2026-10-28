@@ -89,4 +89,16 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     const stored = this.inviteCodes.get(code);
     return Promise.resolve(stored?.inviteCode ?? null);
   }
+
+  markAsUsed(params: {
+    code: string;
+    ctx: TransactionContext;
+  }): Promise<boolean> {
+    const inviteCode = this.inviteCodes.get(params.code)?.inviteCode;
+    if (!inviteCode?.canBeUsed()) {
+      return Promise.resolve(false);
+    }
+    inviteCode.markAsUsed();
+    return Promise.resolve(true);
+  }
 }
