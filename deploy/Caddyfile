@@ -1,0 +1,6 @@
+{$DOMAIN} {
+	@appview path /xrpc/* /.well-known/*
+	reverse_proxy @appview appview:8080
+	reverse_proxy /img/* atblob:8080
+	reverse_proxy web:8080
+}

@@ -1,0 +1,91 @@
+x-app: &app
+  restart: unless-stopped
+  environment: &env
+    NODE_ENV: production
+    DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?}@db:5432/postgres
+    REDIS_URL: redis://redis:6379
+    TAP_URL: http://tap:2480
+  depends_on:
+    redis:
+      condition: service_started
+    migrate:
+      condition: service_completed_successfully
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DOMAIN: ${DOMAIN:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 5s
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+  tap:
+    image: ghcr.io/bluesky-social/indigo/tap:0.1
+    restart: unless-stopped
+    environment:
+      TAP_DATABASE_URL: sqlite:///data/tap.db
+    volumes:
+      - tap_data:/data
+  atblob:
+    image: ghcr.io/mkizka/atblob:latest
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      DID_CACHE: redis
+      REDIS_URL: redis://redis:6379
+  migrate:
+    build: { context: .., args: { BUILD_TARGET: web } }
+    command: pnpm db:migrate
+    environment: *env
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    <<: *app
+    build: { context: .., args: { BUILD_TARGET: web } }
+    environment:
+      <<: *env
+      PUBLIC_URL: https://${DOMAIN}
+      APPVIEW_URL: http://appview:8080
+      APPVIEW_DID: did:web:${DOMAIN}
+      COOKIE_SECRET: ${COOKIE_SECRET:?}
+      PRIVATE_KEY_ES256_B64: ${PRIVATE_KEY_ES256_B64:?}
+  appview:
+    <<: *app
+    build: { context: .., args: { BUILD_TARGET: appview } }
+    environment:
+      <<: *env
+      PUBLIC_URL: https://${DOMAIN}
+      BLOB_PROXY_URL: https://${DOMAIN}
+  worker:
+    <<: *app
+    build: { context: .., args: { BUILD_TARGET: worker } }
+  ingester:
+    <<: *app
+    build: { context: .., args: { BUILD_TARGET: ingester } }
+
+volumes:
+  caddy_data:
+  db_data:
+  redis_data:
+  tap_data:

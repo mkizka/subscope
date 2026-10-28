@@ -27,6 +27,7 @@ import type { IFollowRepository } from "../application/interfaces/repositories/f
 import type { IGeneratorRepository } from "../application/interfaces/repositories/generator-repository.js";
 import type { IInviteCodeRepository } from "../application/interfaces/repositories/invite-code-repository.js";
 import type { ILikeRepository } from "../application/interfaces/repositories/like-repository.js";
+import type { INotificationRepository } from "../application/interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../application/interfaces/repositories/post-stats-repository.js";
 import type { IProfileRepository } from "../application/interfaces/repositories/profile-repository.js";
@@ -57,6 +58,7 @@ import { FollowRepository } from "../infrastructure/repositories/follow-reposito
 import { GeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.js";
 import { InviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.js";
 import { LikeRepository } from "../infrastructure/repositories/like-repository/like-repository.js";
+import { NotificationRepository } from "../infrastructure/repositories/notification-repository/notification-repository.js";
 import { PostRepository } from "../infrastructure/repositories/post-repository/post-repository.js";
 import { PostStatsRepository } from "../infrastructure/repositories/post-stats-repository/post-stats-repository.js";
 import { ProfileRepository } from "../infrastructure/repositories/profile-repository/profile-repository.js";
@@ -104,6 +106,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("repostRepository", asClassArgs<IRepostRepository>()(RepostRepository))
     .service("subscriptionRepository", asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("feedItemRepository", asClassArgs<IFeedItemRepository>()(FeedItemRepository))
+    .service("notificationRepository", asClassArgs<INotificationRepository>()(NotificationRepository))
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))

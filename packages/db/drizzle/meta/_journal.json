@@ -120,6 +120,13 @@
       "when": 1768147256716,
       "tag": "0016_add-actor-is_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793193760019,
+      "tag": "0017_add-notifications",
+      "breakpoints": true
     }
   ]
 }
