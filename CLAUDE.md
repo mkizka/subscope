@@ -15,12 +15,12 @@ AppViewの各機能を複数アプリケーションに分割したmonorepoで�
 appsディレクトリ(アプリケーション)
 
 - `@repo/ingester`
-  - Firehose(Jetstream)と接続し、送られてきたレコードの処理ジョブをキューに送信
+  - Tapと接続し、送られてきたイベントの処理ジョブをキューに送信
 - `@repo/worker`
   - BullMQを使用してレコードをデータベースにインデックスするワーカー
-- `@repo/subscope`
-  - クライアント・管理画面を提供するサーバー
-  - express + react-routerで実装
+- `@repo/web`
+  - Webクライアント・管理画面を提供するサーバー
+  - React Router(framework mode)で実装
   - デザインはdaisyUIを使用
 - `@repo/appview`
   - XRPC APIを提供するAppViewサーバー
@@ -65,10 +65,6 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
   - docs/dev/identity-event-handling.md
-- `@atproto`各種ライブラリやAT Protocol仕様について知りたい時の資料
-  - docs/repomix/atproto-repomix-output.xml
-- `factory-js/factory`ライブラリについて知りたい時の資料
-  - docs/repomix/factoryjs-repomix-output.xml
 
 ## 開発コマンド
 
