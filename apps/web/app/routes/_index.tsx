@@ -58,11 +58,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!subscribed.isTypeOf(subscriptionResponse)) {
     return data({ state: "home" as const });
   }
-  const timeline = await agent.call(getTimeline, { limit: 20 });
+  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
+  const timeline = await agent.call(getTimeline, { limit: 20, cursor });
   return data({
     state: "timeline" as const,
     atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
     posts: timeline.feed.map(toTimelinePost).reverse(),
+    cursor: timeline.cursor,
   });
 };
 
@@ -96,6 +98,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <TimelinePage
         atprotoProxy={loaderData.atprotoProxy}
         posts={loaderData.posts}
+        cursor={loaderData.cursor}
       />
     );
   }
