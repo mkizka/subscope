@@ -1,4 +1,5 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import { me } from "@repo/client/lex";
 
 import type { GetSubscriptionStatusUseCase } from "../../../../../application/use-cases/sync/get-subscription-status-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -13,16 +14,15 @@ export class GetSubscriptionStatus {
     "authVerifierMiddleware",
   ] as const;
 
-  handle(server: Server) {
-    server.me.subsco.sync.getSubscriptionStatus({
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
-      handler: async ({ auth }) => {
+  handle(router: LexRouter) {
+    router.add(me.subsco.sync.getSubscriptionStatus, {
+      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      handler: async ({ credentials }) => {
         const result = await this.getSubscriptionStatusUseCase.execute({
-          actorDid: auth.credentials.did,
+          actorDid: credentials.did,
         });
 
         return {
-          encoding: "application/json",
           body: result,
         };
       },
