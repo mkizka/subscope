@@ -11,18 +11,27 @@ import {
 } from "@repo/common/domain";
 
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
+import type {
+  INotificationRepository,
+  Notification,
+} from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
+import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
 export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
+    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly notificationRepository: INotificationRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
   static inject = [
     "postRepository",
     "feedItemRepository",
+    "subscriptionRepository",
+    "notificationRepository",
     "jobScheduler",
   ] as const;
 
@@ -43,6 +52,8 @@ export class PostIndexer implements ICollectionIndexer {
     const feedItem = FeedItem.fromPost(post);
     await this.feedItemRepository.upsert({ ctx, feedItem });
 
+    await this.createNotifications(ctx, record, post);
+
     const embedUri = post.getEmbedRecordUri();
     if (embedUri) {
       const embedExists = await this.postRepository.exists(ctx, embedUri);
@@ -50,6 +61,59 @@ export class PostIndexer implements ICollectionIndexer {
         await this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth });
       }
     }
+  }
+
+  private async createNotifications(
+    ctx: TransactionContext,
+    record: Record,
+    post: Post,
+  ) {
+    const quoteUri = post.getEmbedRecordUri();
+    const mentionDids = (record.validate("app.bsky.feed.post").facets ?? [])
+      .flatMap((facet) => facet.features)
+      .flatMap((feature) => ("did" in feature ? [feature.did] : []));
+    const candidates = [
+      post.replyParent && {
+        recipientDid: post.replyParent.uri.hostname,
+        reason: "reply" as const,
+        reasonSubject: post.replyParent.uri.toString(),
+      },
+      quoteUri?.collection === "app.bsky.feed.post" && {
+        recipientDid: quoteUri.hostname,
+        reason: "quote" as const,
+        reasonSubject: quoteUri.toString(),
+      },
+      ...mentionDids.map((did) => ({
+        recipientDid: did,
+        reason: "mention" as const,
+        reasonSubject: null,
+      })),
+    ];
+
+    const notifications = new Map<string, Notification>();
+    for (const candidate of candidates) {
+      if (
+        !candidate ||
+        candidate.recipientDid === post.actorDid ||
+        notifications.has(candidate.recipientDid) ||
+        !(await this.subscriptionRepository.isSubscriber(
+          ctx,
+          candidate.recipientDid,
+        ))
+      ) {
+        continue;
+      }
+      notifications.set(candidate.recipientDid, {
+        ...candidate,
+        recordUri: post.uri.toString(),
+        authorDid: post.actorDid,
+        sortAt: post.sortAt,
+      });
+    }
+    await this.notificationRepository.createMany({
+      ctx,
+      notifications: [...notifications.values()],
+    });
   }
 
   async afterAction({
