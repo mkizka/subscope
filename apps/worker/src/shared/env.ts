@@ -12,16 +12,8 @@ const schema = z.object({
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3003),
   PLC_URL: z.url().default("https://plc.directory"),
-  DATABASE_URL: match({
-    prod: z.url(),
-    dev: z
-      .url()
-      .default("postgresql://postgres:password@localhost:5432/postgres"),
-  }),
-  REDIS_URL: match({
-    prod: z.url(),
-    dev: z.url().default("redis://localhost:6379"),
-  }),
+  DATABASE_URL: z.url(),
+  REDIS_URL: z.url(),
   TAP_URL: match({
     prod: z.url(),
     dev: z.url().default("http://localhost:2480"),

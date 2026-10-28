@@ -17,10 +17,7 @@ const schema = z.object({
   }),
   MODERATION_URL: z.url().default("wss://mod.bsky.app"),
   DISABLE_INGESTER: z.stringbool().default(false),
-  REDIS_URL: match({
-    prod: z.url(),
-    dev: z.url().default("redis://localhost:6379"),
-  }),
+  REDIS_URL: z.url(),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -4,6 +4,7 @@ packages:
 minimumReleaseAgeExclude:
   - "@gyaku/di"
 allowBuilds:
+  better-sqlite3: true
   core-js: false
   cpu-features: false
   esbuild: false

@@ -34,7 +34,6 @@ WIP
 Node.js and Docker are required. Run the following commands to start the development server.
 
 ```
-cp packages/db/.env.example packages/db/.env
 corepack enable pnpm
 pnpm i
 pnpm dev
@@ -46,3 +45,5 @@ The following servers will start.
 - appview ... http://localhost:3001
 - worker ... http://localhost:3003
 - ingester ... http://localhost:3004
+
+A local PLC and PDS are also started with the test account `alice.test` / `password`.

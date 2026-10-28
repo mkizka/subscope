@@ -16,16 +16,8 @@ const schema = z
     PUBLIC_URL: z.url(),
     BLOB_PROXY_URL: z.url(),
     SERVICE_DID: z.string().optional(),
-    DATABASE_URL: match({
-      prod: z.url(),
-      dev: z
-        .url()
-        .default("postgresql://postgres:password@localhost:5432/postgres"),
-    }),
-    REDIS_URL: match({
-      prod: z.url(),
-      dev: z.url().default("redis://localhost:6379"),
-    }),
+    DATABASE_URL: z.url(),
+    REDIS_URL: z.url(),
   })
   .transform((val) => ({
     ...val,
