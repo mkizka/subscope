@@ -19,8 +19,11 @@ export function PostFormContainer() {
       error={
         fetcher.data && "error" in fetcher.data ? fetcher.data.error : undefined
       }
-      onSubmit={(text) =>
-        fetcher.submit({ text }, { method: "POST", action: "/?index" })
+      onSubmit={(text, allow) =>
+        fetcher.submit(
+          { text, ...(allow && { allow: allow.join(",") }) },
+          { method: "POST", action: "/?index" },
+        )
       }
     />
   );
