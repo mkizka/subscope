@@ -14,6 +14,7 @@ export * from "./lib/domain/interfaces/transaction.js";
 export * from "./lib/domain/invite-code/invite-code.js";
 export * from "./lib/domain/like/like.js";
 export * from "./lib/domain/list/list.js";
+export * from "./lib/domain/list-item/list-item.js";
 export * from "./lib/domain/post/embed-external.js";
 export * from "./lib/domain/post/embed-images.js";
 export * from "./lib/domain/post/embed-record.js";

@@ -42,6 +42,11 @@ export type ListInsert = Omit<
   "uri" | "indexedAt"
 >;
 
+export type ListItemInsert = Omit<
+  InferInsertModel<typeof schema.listItems>,
+  "uri" | "indexedAt"
+>;
+
 export type LikeInsert = Omit<
   InferInsertModel<typeof schema.likes>,
   "uri" | "indexedAt" | "sortAt"

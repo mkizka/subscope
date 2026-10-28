@@ -41,6 +41,7 @@ paths=(
   "app/bsky/graph/getFollows.json"
   "app/bsky/graph/getFollowers.json"
   "app/bsky/graph/list.json"
+  "app/bsky/graph/listitem.json"
   "app/bsky/labeler/defs.json"
   "app/bsky/notification/defs.json"
   "app/bsky/notification/getUnreadCount.json"
