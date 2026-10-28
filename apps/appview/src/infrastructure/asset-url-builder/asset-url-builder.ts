@@ -1,23 +1,25 @@
+import type { UriString } from "@atproto/syntax";
+
 import type { IAssetUrlBuilder } from "../../application/interfaces/asset-url-builder.js";
 
 export class AssetUrlBuilder implements IAssetUrlBuilder {
-  constructor(private readonly blobProxyUrl: string) {}
+  constructor(private readonly blobProxyUrl: UriString) {}
   static inject = ["blobProxyUrl"] as const;
 
   // TODO: avatar,bunnerが使われていないので確認
-  getAvatarThumbnailUrl(actorDid: string, cid: string): string {
+  getAvatarThumbnailUrl(actorDid: string, cid: string): UriString {
     return `${this.blobProxyUrl}/img/avatar_thumbnail/plain/${actorDid}/${cid}`;
   }
 
-  getBannerUrl(actorDid: string, cid: string): string {
+  getBannerUrl(actorDid: string, cid: string): UriString {
     return `${this.blobProxyUrl}/img/banner/plain/${actorDid}/${cid}`;
   }
 
-  getFeedThumbnailUrl(actorDid: string, cid: string): string {
+  getFeedThumbnailUrl(actorDid: string, cid: string): UriString {
     return `${this.blobProxyUrl}/img/feed_thumbnail/plain/${actorDid}/${cid}`;
   }
 
-  getFeedFullsizeUrl(actorDid: string, cid: string): string {
+  getFeedFullsizeUrl(actorDid: string, cid: string): UriString {
     return `${this.blobProxyUrl}/img/feed_fullsize/plain/${actorDid}/${cid}`;
   }
 }

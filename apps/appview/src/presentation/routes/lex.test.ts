@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { once } from "node:events";
 
 import { asDid } from "@atproto/did";
+import { actorFactory } from "@repo/common/test";
 import express from "express";
 import {
   afterAll,
@@ -89,25 +90,28 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
   });
 
-  test("getPreferencesは固定のフィード設定を返す", async () => {
-    const res = await fetch(`${baseUrl}/app.bsky.actor.getPreferences`);
-
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({
-      preferences: [
-        {
-          $type: "app.bsky.actor.defs#savedFeedsPrefV2",
-          items: [
-            {
-              id: "3ksog462gr22d",
-              type: "timeline",
-              value: "following",
-              pinned: true,
-            },
-          ],
-        },
-      ],
+  test("管理者でない場合、admin APIは401エラーを返す", async () => {
+    const res = await fetch(`${baseUrl}/me.subsco.admin.getInviteCodes`, {
+      headers: auth,
     });
+
+    expect(res.status).toBe(401);
+    expect(await res.json()).toMatchObject({
+      error: "AuthenticationRequired",
+      message: "Admin access required",
+    });
+  });
+
+  test("registerAdminのユースケースエラーはエラー名を持つ400エラーになる", async () => {
+    services.actorRepository.add(actorFactory({ isAdmin: true }));
+
+    const res = await fetch(`${baseUrl}/me.subsco.admin.registerAdmin`, {
+      method: "POST",
+      headers: auth,
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ error: "AdminAlreadyExists" });
   });
 
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {

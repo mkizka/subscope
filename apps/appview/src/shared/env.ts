@@ -1,3 +1,4 @@
+import { isValidUri } from "@atproto/syntax";
 import { z } from "zod";
 import { fromError } from "zod-validation-error";
 
@@ -20,7 +21,7 @@ const schema = z
     BLOB_PROXY_URL: match({
       prod: z.url(),
       dev: z.url().default("http://localhost:3002"),
-    }),
+    }).refine(isValidUri),
     SERVICE_DID: z.string().optional(),
     DATABASE_URL: z.url(),
     REDIS_URL: z.url(),
