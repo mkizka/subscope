@@ -26,7 +26,7 @@ describe("app.bsky.feed.getPosts", () => {
       })
       .create();
 
-  test("getPosts-1: 指定したURIの順に投稿を返し、存在しない投稿は除外する", async () => {
+  test("getPosts-1: 複数のURIを指定した場合、指定した順に投稿を返し、存在しない投稿は除外する", async () => {
     // arrange
     const { client } = await setupApiTest();
     const first = await createPost();

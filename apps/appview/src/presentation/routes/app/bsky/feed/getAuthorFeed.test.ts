@@ -41,4 +41,17 @@ describe("app.bsky.feed.getAuthorFeed", () => {
       { post: { uri: post.uri, author: { did: author.did } } },
     ]);
   });
+
+  test("getAuthorFeed-2: 解決できないハンドルを指定した場合、400を返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+
+    // act
+    const promise = client.app.bsky.feed.getAuthorFeed({
+      actor: "notfound.test",
+    });
+
+    // assert
+    await expect(promise).rejects.toMatchObject({ status: 400 });
+  });
 });
