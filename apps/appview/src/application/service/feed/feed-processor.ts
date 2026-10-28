@@ -1,6 +1,7 @@
 import type { Did } from "@atproto/did";
-import { AtUri } from "@atproto/syntax";
-import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
+import type { $Typed } from "@atproto/lex";
+import { AtUri, toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type { FeedItem } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
@@ -90,7 +91,7 @@ export class FeedProcessor {
               feedViewPost.reason = {
                 $type: "app.bsky.feed.defs#reasonRepost",
                 by: reposter,
-                indexedAt: repost.indexedAt.toISOString(),
+                indexedAt: toDatetimeString(repost.indexedAt),
               };
             }
           }
