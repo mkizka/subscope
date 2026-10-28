@@ -40,13 +40,13 @@ test.describe("タイムライン", () => {
     }).toPass();
   });
 
-  test("timeline-2: 開くと最新の投稿までスクロールし、上にスクロールすると古い投稿を読み込む", async ({
+  test("timeline-4: 開くと最新の投稿までスクロールし、上にスクロールすると表示位置を保ったまま古い投稿を読み込む", async ({
     page,
     request,
   }) => {
     const texts = Array.from(
       { length: 25 },
-      (_, i) => `timeline-2: 投稿${i + 1}`,
+      (_, i) => `timeline-4: 投稿${i + 1}`,
     );
     await createPosts(request, texts);
 
@@ -54,18 +54,19 @@ test.describe("タイムライン", () => {
 
     await expect(async () => {
       await page.reload();
-      await expect(page.getByText("timeline-2: 投稿25")).toBeInViewport({
+      await expect(page.getByText("timeline-4: 投稿25")).toBeInViewport({
         timeout: 1000,
       });
     }).toPass();
     await expect(
-      page.getByText("timeline-2: 投稿1", { exact: true }),
+      page.getByText("timeline-4: 投稿1", { exact: true }),
     ).toHaveCount(0);
 
     await page.evaluate(() => window.scrollTo(0, 0));
 
     await expect(
-      page.getByText("timeline-2: 投稿1", { exact: true }),
-    ).toBeVisible();
+      page.getByText("timeline-4: 投稿1", { exact: true }),
+    ).toBeAttached();
+    await expect(page.getByText("timeline-4: 投稿6")).toBeInViewport();
   });
 });
