@@ -27,6 +27,7 @@
     "@repo/db": "workspace:*",
     "bullmq": "6.5.0",
     "drizzle-orm": "0.45.4",
+    "ioredis": "5.11.1",
     "keyv": "6.1.0",
     "multiformats": "14.0.5",
     "pg": "8.23.1",
