@@ -21,7 +21,7 @@ appsディレクトリ(アプリケーション)
 - `@repo/subscope`
   - クライアント・管理画面を提供するサーバー
   - express + react-routerで実装
-  - デザインはshadcn/uiを使用
+  - デザインはdaisyUIを使用
 - `@repo/appview`
   - XRPC APIを提供するAppViewサーバー
   - PDS経由のクライアントリクエストはここに `atproto-proxy` ヘッダで転送される

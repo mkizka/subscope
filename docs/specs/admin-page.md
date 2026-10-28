@@ -14,7 +14,7 @@
 
 ### アクセス時の処理
 
-1. `/trpc/admin.verifyAccess` を呼び出す（BFFが `me.subsco.admin.verifyAccess` を呼び出す）
+1. loader で `me.subsco.admin.verifyAccess` を呼び出す
 2. レスポンスに応じて画面を出し分け
    - `status: "needsSetup"` → 管理者登録フォームを表示
    - `status: "authorized"` → 管理画面を表示
@@ -22,8 +22,8 @@
 
 ### 管理者登録後の処理
 
-1. `/trpc/admin.register` を呼び出す（BFFが `me.subsco.admin.registerAdmin` を呼び出す）
-2. 成功後、useQueryを再検証して管理画面を表示
+1. action で `me.subsco.admin.registerAdmin` を呼び出す
+2. 成功後、loader が再実行され管理画面を表示
 
 ## XRPC API
 
