@@ -1,5 +1,6 @@
-import type { AtUri } from "@atproto/syntax";
-import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
+import type { $Typed } from "@atproto/lex";
+import { type AtUri, toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 
 import type { IAssetUrlBuilder } from "../../../application/interfaces/asset-url-builder.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/generator-repository.js";
@@ -48,13 +49,13 @@ export class GeneratorViewService {
         creator,
         displayName: generator.displayName,
         description: generator.description,
-        avatar:
-          generator.avatarCid &&
-          this.assetUrlBuilder.getAvatarThumbnailUrl(
-            generator.actorDid,
-            generator.avatarCid,
-          ),
-        indexedAt: generator.indexedAt.toISOString(),
+        avatar: generator.avatarCid
+          ? this.assetUrlBuilder.getAvatarThumbnailUrl(
+              generator.actorDid,
+              generator.avatarCid,
+            )
+          : undefined,
+        indexedAt: toDatetimeString(generator.indexedAt),
       };
 
       generatorViewMap.set(generator.uri.toString(), generatorView);

@@ -90,6 +90,25 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
   });
 
+  test("getUnreadCountは未読数を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.notification.getUnreadCount`, {
+      headers: auth,
+    });
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ count: 0 });
+  });
+
+  test("updateSeenは200を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.notification.updateSeen`, {
+      method: "POST",
+      headers: { ...auth, "content-type": "application/json" },
+      body: JSON.stringify({ seenAt: new Date().toISOString() }),
+    });
+
+    expect(res.status).toBe(200);
+  });
+
   test("管理者でない場合、admin APIは401エラーを返す", async () => {
     const res = await fetch(`${baseUrl}/me.subsco.admin.getInviteCodes`, {
       headers: auth,
@@ -112,6 +131,30 @@ describe("lexRouter", () => {
 
     expect(res.status).toBe(400);
     expect(await res.json()).toMatchObject({ error: "AdminAlreadyExists" });
+  });
+
+  test("getListは存在しないリストに400エラーを返す", async () => {
+    const res = await fetch(
+      `${baseUrl}/app.bsky.graph.getList?list=at://did:plc:alice/app.bsky.graph.list/notfound`,
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "InvalidRequest",
+      message: "List not found",
+    });
+  });
+
+  test("getPostThreadは存在しない投稿に400エラーを返す", async () => {
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getPostThread?uri=at://did:plc:alice/app.bsky.feed.post/notfound`,
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "NotFound",
+      message: "Post not found: at://did:plc:alice/app.bsky.feed.post/notfound",
+    });
   });
 
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {

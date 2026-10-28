@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("ログイン", () => {
-  test("最初にログインしたアカウントが管理者として登録される", async ({
+  test("login-1: 最初にログインしたアカウントが管理者として登録される", async ({
     page,
   }) => {
     await page.goto("/login");
