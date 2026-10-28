@@ -100,9 +100,7 @@ import { fakeCid } from "@repo/common/test";
 const record = recordFactory({
   uri: "at://did:plc:test/app.bsky.feed.post/abc",
   cid: fakeCid(),
-  json: {
-    /* ... */
-  },
+  json: {/* ... */},
 });
 ```
 

@@ -24,20 +24,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/api": "0.20.7",
-    "@atproto/lexicon": "0.7.1",
-    "@atproto/oauth-client": "0.7.2",
-    "@atproto/xrpc": "0.8.0",
-    "@atproto/xrpc-server": "0.11.1",
-    "multiformats": "14.0.0"
+    "@atproto/api": "0.29.5",
+    "@atproto/lexicon": "0.7.17",
+    "@atproto/oauth-client": "0.9.0",
+    "@atproto/xrpc": "0.8.16",
+    "@atproto/xrpc-server": "0.13.6",
+    "multiformats": "14.0.5"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.10.0",
+    "@atproto/lex-cli": "0.10.16",
     "@mkizka/eslint-config": "10.0.0",
-    "@tsconfig/node-lts": "24.0.0",
+    "@tsconfig/node-lts": "24.0.1",
     "@types/express": "5.0.6",
-    "eslint": "10.4.1",
-    "giget": "3.2.0",
+    "@types/node": "26.6.5",
+    "eslint": "10.13.0",
+    "giget": "3.3.1",
     "typescript": "6.0.3"
   },
   "sideEffects": false
