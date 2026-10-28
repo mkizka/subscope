@@ -1,84 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ATPROTO_SHA=$(< .atproto-sha)
-DOWNLOAD_DIR="./node_modules/.cache/lexicons"
-LEXICONS_DIR="./lexicons"
+pnpm ts-lex install --ci
 
-paths=(
-  # app.bsky
-  "app/bsky/actor/defs.json"
-  "app/bsky/actor/getPreferences.json"
-  "app/bsky/actor/getProfile.json"
-  "app/bsky/actor/getProfiles.json"
-  "app/bsky/actor/profile.json"
-  "app/bsky/actor/searchActors.json"
-  "app/bsky/actor/searchActorsTypeahead.json"
-  "app/bsky/embed/defs.json"
-  "app/bsky/embed/external.json"
-  "app/bsky/embed/images.json"
-  "app/bsky/embed/record.json"
-  "app/bsky/embed/recordWithMedia.json"
-  "app/bsky/embed/video.json"
-  "app/bsky/feed/defs.json"
-  "app/bsky/feed/generator.json"
-  "app/bsky/feed/getActorLikes.json"
-  "app/bsky/feed/getAuthorFeed.json"
-  "app/bsky/feed/getFeedGenerators.json"
-  "app/bsky/feed/getLikes.json"
-  "app/bsky/feed/getPostThread.json"
-  "app/bsky/feed/getPosts.json"
-  "app/bsky/feed/getRepostedBy.json"
-  "app/bsky/feed/getTimeline.json"
-  "app/bsky/feed/like.json"
-  "app/bsky/feed/searchPosts.json"
-  "app/bsky/feed/post.json"
-  "app/bsky/feed/postgate.json"
-  "app/bsky/feed/repost.json"
-  "app/bsky/feed/threadgate.json"
-  "app/bsky/graph/defs.json"
-  "app/bsky/graph/follow.json"
-  "app/bsky/graph/getFollows.json"
-  "app/bsky/graph/getFollowers.json"
-  "app/bsky/graph/getList.json"
-  "app/bsky/graph/getLists.json"
-  "app/bsky/graph/list.json"
-  "app/bsky/graph/listitem.json"
-  "app/bsky/labeler/defs.json"
-  "app/bsky/notification/defs.json"
-  "app/bsky/notification/getUnreadCount.json"
-  "app/bsky/notification/listNotifications.json"
-  "app/bsky/notification/updateSeen.json"
-  "app/bsky/richtext/facet.json"
-
-  # com.atproto
-  "com/atproto/label/defs.json"
-  "com/atproto/label/subscribeLabels.json"
-  "com/atproto/moderation/defs.json"
-  "com/atproto/repo/createRecord.json"
-  "com/atproto/repo/defs.json"
-  "com/atproto/repo/deleteRecord.json"
-  "com/atproto/repo/getRecord.json"
-  "com/atproto/repo/putRecord.json"
-  "com/atproto/repo/listRecords.json"
-  "com/atproto/repo/strongRef.json"
-  "com/atproto/sync/getBlob.json"
-  "com/atproto/sync/getRepo.json"
-)
-
-rm -rf "$LEXICONS_DIR/com/atproto"
-rm -rf "$LEXICONS_DIR/app/bsky"
-
-pnpm giget "gh:bluesky-social/atproto/lexicons#$ATPROTO_SHA" $DOWNLOAD_DIR --force --preferOffline
-
-for path in ${paths[@]}; do
-  source_path="$DOWNLOAD_DIR/$path"
-  target_path="$LEXICONS_DIR/$path"
-  mkdir -p $(dirname $target_path)
-  cp -r $source_path $target_path
-done
-
-LEXICONS=$(find ./lexicons -name '*.json' -type f)
+LEX_CLI_LEXICONS_DIR=./node_modules/.cache/lex-cli-lexicons
+rm -rf $LEX_CLI_LEXICONS_DIR && mkdir -p $(dirname $LEX_CLI_LEXICONS_DIR)
+cp -rL ./lexicons $LEX_CLI_LEXICONS_DIR
+LEXICONS=$(find $LEX_CLI_LEXICONS_DIR -name '*.json' -type f)
+node -e 'const fs = require("node:fs"); for (const f of process.argv.slice(1)) { const { $type, ...doc } = JSON.parse(fs.readFileSync(f, "utf8")); fs.writeFileSync(f, JSON.stringify(doc)); }' $LEXICONS
 echo 'Starting client code generation...'
 LEX_CLI=./node_modules/@atproto/lex-cli/bin.js
 yes | node $LEX_CLI gen-api ./src/generated/api $LEXICONS &
