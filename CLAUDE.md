@@ -61,11 +61,19 @@ Reactコンポーネントは以下の方針で実装しています。
 
 - システム仕様
   - docs/specs 以下を参照
-  - 仕様駆動で開発する。仕様の追加・変更は docs/specs を先に更新し、各項目のIDをテスト名の先頭に書いてE2EテストまたはAPIテストと1対1で対応させる
 - Lexiconのインデックス実装追加ガイド
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
   - docs/dev/identity-event-handling.md
+
+## 開発の進め方(仕様駆動)
+
+機能の追加・変更は、必ず以下の順序で進めてください。
+
+1. docs/specs の仕様書に、IDを振った仕様項目を追加・変更する
+2. 各仕様項目を検証するAPIテスト(apps/appview)またはE2Eテスト(apps/web)を追加・変更する
+   - テスト名の先頭に仕様項目のIDを書き、仕様項目とテストを1対1で対応させる
+3. テストが通るように実装する
 
 ## 開発コマンド
 
