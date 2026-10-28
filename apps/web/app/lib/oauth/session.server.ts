@@ -2,6 +2,7 @@ import { Client } from "@atproto/lex";
 import type { OAuthSession } from "@atproto/oauth-client-node";
 import { createCookieSessionStorage } from "react-router";
 
+import { loggerManager } from "@/app/lib/logger.server.js";
 import { env } from "@/app/shared/env.js";
 
 import { oauthClient } from "./client.server.js";
@@ -49,7 +50,10 @@ export async function getAgent(request: Request): Promise<Client | null> {
   try {
     const oauthSession = await oauthClient.restore(session.data.did);
     return createAgent(oauthSession);
-  } catch {
+  } catch (e) {
+    loggerManager
+      .createLogger("getAgent")
+      .warn(e, "Failed to restore OAuth session");
     return null;
   }
 }
