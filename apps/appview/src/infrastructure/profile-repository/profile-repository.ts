@@ -2,7 +2,7 @@ import { type Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { ProfileDetailed } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, ilike, lt, or } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
 
 import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
 
@@ -15,27 +15,32 @@ export class ProfileRepository implements IProfileRepository {
   }
 
   async findManyDetailed(dids: Did[]) {
-    const profiles = await this.db.query.profiles.findMany({
-      where: (profiles, { inArray }) => inArray(profiles.actorDid, dids),
-      with: {
-        user: true,
-      },
-    });
+    const results = await this.db
+      .select({
+        profile: schema.profiles,
+        actor: schema.actors,
+      })
+      .from(schema.actors)
+      .leftJoin(
+        schema.profiles,
+        eq(schema.actors.did, schema.profiles.actorDid),
+      )
+      .where(inArray(schema.actors.did, dids));
 
     const profileMap = new Map(
-      profiles.map((profile) => [
-        profile.actorDid,
+      results.map(({ profile, actor }) => [
+        actor.did,
         new ProfileDetailed({
-          uri: profile.uri,
-          cid: profile.cid,
-          actorDid: profile.actorDid,
-          handle: profile.user.handle,
-          avatarCid: profile.avatarCid,
-          bannerCid: profile.bannerCid,
-          description: profile.description,
-          displayName: profile.displayName,
-          createdAt: profile.createdAt,
-          indexedAt: profile.indexedAt,
+          uri: profile?.uri ?? `at://${actor.did}/app.bsky.actor.profile/self`,
+          cid: profile?.cid ?? "",
+          actorDid: actor.did,
+          handle: actor.handle,
+          avatarCid: profile?.avatarCid,
+          bannerCid: profile?.bannerCid,
+          description: profile?.description,
+          displayName: profile?.displayName,
+          createdAt: profile?.createdAt,
+          indexedAt: profile?.indexedAt ?? actor.indexedAt,
         }),
       ]),
     );

@@ -61,4 +61,45 @@ describe("app.bsky.feed.getTimeline", () => {
       { post: { uri: post.uri, author: { did: followee.did } } },
     ]);
   });
+
+  test("getTimeline-3: 投稿者にプロフィールレコードがない場合も、その投稿をDIDとハンドルだけのauthorで返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const followee = await actorFactory(ctx.db).create();
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ actor: () => viewer })
+            .create(),
+        followee: () => followee,
+      })
+      .create();
+    const post = await postFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.post")
+            .vars({ actor: () => followee })
+            .create(),
+      })
+      .create();
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post })
+      .create();
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.app.bsky.feed.getTimeline();
+
+    // assert
+    expect(res.data.feed).toMatchObject([
+      {
+        post: {
+          uri: post.uri,
+          author: { did: followee.did, handle: followee.handle },
+        },
+      },
+    ]);
+  });
 });

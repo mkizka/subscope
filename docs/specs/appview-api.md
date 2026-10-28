@@ -13,6 +13,7 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getProfile-1: プロフィールがあるアクターを指定した場合、そのアクターのprofileViewDetailedを返す
 - getProfile-2: 存在しないアクターを指定した場合、400を返す
+- getProfile-3: プロフィールレコードがないアクターを指定した場合、DIDとハンドルだけのprofileViewDetailedを返す
 
 ## app.bsky.feed.getTimeline
 
@@ -20,3 +21,4 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
+- getTimeline-3: 投稿者にプロフィールレコードがない場合も、その投稿をDIDとハンドルだけのauthorで返す
