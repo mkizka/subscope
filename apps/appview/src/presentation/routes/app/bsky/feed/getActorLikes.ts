@@ -1,6 +1,5 @@
-import { isDid } from "@atproto/did";
-import type { Server } from "@repo/client/server";
-import { isHandle } from "@repo/common/utils";
+import type { LexRouter } from "@atproto/lex-server";
+import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 
 import type { GetActorLikesUseCase } from "../../../../../application/use-cases/feed/get-actor-likes-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -18,32 +17,22 @@ export class GetActorLikes {
     "authVerifierMiddleware",
   ] as const;
 
-  handle(server: Server) {
-    server.app.bsky.feed.getActorLikes({
-      handler: async ({ params, req }) => {
-        if (!isDid(params.actor) && !isHandle(params.actor)) {
-          return {
-            status: 400,
-            message: "Invalid actor",
-          };
-        }
+  handle(router: LexRouter) {
+    router.add(getActorLikes, {
+      auth: (ctx) => this.authVerifierMiddleware.lexOptionalAuth(ctx),
+      handler: async ({ params, credentials: viewerDid }) => {
+        const actorDid = await this.handleMiddleware.resolveHandleOrDid(
+          params.actor,
+        );
 
-        const [actorDid, viewerDid] = await Promise.all([
-          this.handleMiddleware.resolveHandleOrDid(params.actor),
-          this.authVerifierMiddleware.getViewerDid(req),
-        ]);
-
-        const result = await this.getActorLikesUseCase.execute({
+        const body = await this.getActorLikesUseCase.execute({
           actorDid,
           limit: params.limit,
           cursor: params.cursor ? new Date(params.cursor) : undefined,
-          viewerDid: viewerDid || undefined,
+          viewerDid: viewerDid ?? undefined,
         });
 
-        return {
-          encoding: "application/json",
-          body: result,
-        };
+        return { body };
       },
     });
   }

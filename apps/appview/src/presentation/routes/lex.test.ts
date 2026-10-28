@@ -186,7 +186,7 @@ describe("lexRouter", () => {
   });
 
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {
-    const res = await fetch(`${baseUrl}/app.bsky.feed.getTimeline`);
+    const res = await fetch(`${baseUrl}/app.bsky.feed.getLikes`);
 
     expect(res.status).toBe(418);
   });
