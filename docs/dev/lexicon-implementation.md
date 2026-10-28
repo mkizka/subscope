@@ -12,8 +12,8 @@ Tap → Ingester → BullMQ Queue → Worker(IndexCommitUseCase) → IndexRecord
 
 ### 1. Lexicon定義の取得
 
-1. `packages/client/scripts/postinstall.sh` の`paths`に対象のlexiconファイルパスを追加
-2. `pnpm install` を実行すると、bluesky-social/atprotoから定義を取得し`@repo/client`のコードを生成する
+1. `packages/client/scripts/generate.sh` の`paths`に対象のlexiconファイルパスを追加
+2. `pnpm build`や`pnpm typecheck`を実行すると、bluesky-social/atprotoから定義を取得し`@repo/client`のコードを生成する
 
 Lexicon定義ファイルは手動で作成しないでください。
 

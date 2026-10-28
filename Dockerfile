@@ -18,7 +18,6 @@ COPY --from=pruner /app/out/json/ .
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY --from=pruner /app/out/full/ .
-RUN pnpm --filter @repo/client postinstall
 RUN turbo build --filter=${BUILD_PACKAGE}
 # pnpm pruneはmonorepoでは完全には動作しないためinstall --prodを使用する
 # https://pnpm.io/ja/next/cli/prune

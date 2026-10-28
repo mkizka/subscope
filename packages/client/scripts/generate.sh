@@ -80,6 +80,8 @@ done
 
 LEXICONS=$(find ./lexicons -name '*.json' -type f)
 echo 'Starting client code generation...'
-yes | pnpm lex gen-api ./src/generated/api $LEXICONS &
-yes | pnpm lex gen-server ./src/generated/server $LEXICONS &
+LEX_CLI=./node_modules/@atproto/lex-cli/bin.js
+yes | node $LEX_CLI gen-api ./src/generated/api $LEXICONS &
+yes | node $LEX_CLI gen-server ./src/generated/server $LEXICONS &
+pnpm ts-lex build --out ./src/generated/lex --clear &
 wait
