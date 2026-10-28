@@ -12,12 +12,7 @@ export const xrpcRouterFactory = (
   getPosts: GetPosts,
   getRepostedBy: GetRepostedBy,
 ): Router => {
-  const handlers = [
-    getFeedGenerators,
-    getLikes,
-    getPosts,
-    getRepostedBy,
-  ];
+  const handlers = [getFeedGenerators, getLikes, getPosts, getRepostedBy];
 
   const server = createServer();
   for (const handler of handlers) {
