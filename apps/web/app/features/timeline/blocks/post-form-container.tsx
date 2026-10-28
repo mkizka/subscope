@@ -19,8 +19,12 @@ export function PostFormContainer() {
       error={
         fetcher.data && "error" in fetcher.data ? fetcher.data.error : undefined
       }
-      onSubmit={(text) =>
-        fetcher.submit({ text }, { method: "POST", action: "/?index" })
+      onSubmit={(formData) =>
+        fetcher.submit(formData, {
+          method: "POST",
+          action: "/?index",
+          encType: "multipart/form-data",
+        })
       }
     />
   );
