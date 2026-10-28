@@ -13,6 +13,7 @@ export * from "./lib/domain/interfaces/tap-client.js";
 export * from "./lib/domain/interfaces/transaction.js";
 export * from "./lib/domain/invite-code/invite-code.js";
 export * from "./lib/domain/like/like.js";
+export * from "./lib/domain/list/list.js";
 export * from "./lib/domain/post/embed-external.js";
 export * from "./lib/domain/post/embed-images.js";
 export * from "./lib/domain/post/embed-record.js";

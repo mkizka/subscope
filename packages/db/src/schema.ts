@@ -157,6 +157,22 @@ export const generators = pgTable("generators", {
   indexedAt: timestamp().notNull(),
 });
 
+export const lists = pgTable("lists", {
+  uri: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => records.uri, { onDelete: "cascade" }),
+  cid: varchar({ length: 256 }).notNull(),
+  actorDid: varchar({ length: 256 })
+    .notNull()
+    .references(() => actors.did, { onDelete: "cascade" }),
+  purpose: varchar({ length: 256 }).notNull(),
+  name: varchar({ length: 256 }).notNull(),
+  description: text(),
+  avatarCid: varchar({ length: 256 }),
+  createdAt: timestamp().notNull(),
+  indexedAt: timestamp().notNull(),
+});
+
 export const likes = pgTable(
   "likes",
   {

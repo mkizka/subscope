@@ -4,6 +4,7 @@ export * from "./lib/domain/follow/follow.factory.js";
 export * from "./lib/domain/generator/generator.factory.js";
 export * from "./lib/domain/invite-code/invite-code.factory.js";
 export * from "./lib/domain/like/like.factory.js";
+export * from "./lib/domain/list/list.factory.js";
 export * from "./lib/domain/post/post.factory.js";
 export * from "./lib/domain/profile/profile.factory.js";
 export * from "./lib/domain/profile/profile-detailed.factory.js";
