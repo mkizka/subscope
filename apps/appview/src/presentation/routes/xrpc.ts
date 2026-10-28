@@ -20,13 +20,7 @@ import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
-import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
-import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
-import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
-import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
-import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
-import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 
 export const xrpcRouterFactory = (
   getPreferences: GetPreferences,
@@ -48,13 +42,7 @@ export const xrpcRouterFactory = (
   getList: GetList,
   getLists: GetLists,
   listNotifications: ListNotifications,
-  createInviteCode: CreateInviteCode,
-  deleteInviteCode: DeleteInviteCode,
-  getInviteCodes: GetInviteCodes,
   getSubscribers: GetSubscribers,
-  registerAdmin: RegisterAdmin,
-  verifyAccess: VerifyAccess,
-  getSetupStatus: GetSetupStatus,
 ): Router => {
   const handlers = [
     getPreferences,
@@ -76,13 +64,7 @@ export const xrpcRouterFactory = (
     getList,
     getLists,
     listNotifications,
-    createInviteCode,
-    deleteInviteCode,
-    getInviteCodes,
     getSubscribers,
-    registerAdmin,
-    verifyAccess,
-    getSetupStatus,
   ];
 
   const server = createServer();
@@ -111,11 +93,5 @@ xrpcRouterFactory.inject = [
   "getList",
   "getLists",
   "listNotifications",
-  "createInviteCode",
-  "deleteInviteCode",
-  "getInviteCodes",
   "getSubscribers",
-  "registerAdmin",
-  "verifyAccess",
-  "getSetupStatus",
 ] as const;

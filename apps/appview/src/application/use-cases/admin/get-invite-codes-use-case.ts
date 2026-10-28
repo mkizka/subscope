@@ -1,4 +1,5 @@
-import type { MeSubscoAdminGetInviteCodes } from "@repo/client/server";
+import { toDatetimeString } from "@atproto/syntax";
+import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 
 import type { InviteCodeService } from "../../../application/service/admin/invite-code-service.js";
 
@@ -9,7 +10,7 @@ export class GetInviteCodesUseCase {
   async execute(params: {
     limit: number;
     cursor?: string;
-  }): Promise<MeSubscoAdminGetInviteCodes.OutputSchema> {
+  }): Promise<$OutputBody> {
     const paginationResult =
       await this.inviteCodeService.findInviteCodesWithPagination({
         cursor: params.cursor,
@@ -20,9 +21,9 @@ export class GetInviteCodesUseCase {
       cursor: paginationResult.cursor,
       codes: paginationResult.items.map((item) => ({
         code: item.code,
-        expiresAt: item.expiresAt.toISOString(),
-        createdAt: item.createdAt.toISOString(),
-        usedAt: item.usedAt?.toISOString(),
+        expiresAt: toDatetimeString(item.expiresAt),
+        createdAt: toDatetimeString(item.createdAt),
+        usedAt: item.usedAt ? toDatetimeString(item.usedAt) : undefined,
         usedBy: item.usedBy
           ? {
               did: item.usedBy.did,

@@ -1,5 +1,5 @@
-import { InvalidRequestError } from "@atproto/xrpc-server";
-import type { Server } from "@repo/client/server";
+import { type LexRouter, LexServerError } from "@atproto/lex-server";
+import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
 
 import {
   AdminAlreadyExistsError,
@@ -14,17 +14,21 @@ export class RegisterAdmin {
   ) {}
   static inject = ["registerAdminUseCase", "authVerifierMiddleware"] as const;
 
-  handle(server: Server): void {
-    server.me.subsco.admin.registerAdmin({
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
-      handler: async ({ auth }) => {
+  handle(router: LexRouter): void {
+    router.add(registerAdmin, {
+      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      handler: async ({ credentials }) => {
         try {
           await this.registerAdminUseCase.execute({
-            requesterDid: auth.credentials.did,
+            requesterDid: credentials.did,
           });
+          return {};
         } catch (error) {
           if (error instanceof AdminAlreadyExistsError) {
-            throw new InvalidRequestError(error.message, error.name);
+            throw new LexServerError(400, {
+              error: error.name,
+              message: error.message,
+            });
           }
           throw error;
         }
