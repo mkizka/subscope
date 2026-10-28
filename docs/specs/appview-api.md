@@ -157,3 +157,11 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getLists-1: リストを作成したアクターを指定した場合、そのリストのlistViewをlistsとして返す
 - getLists-2: purposesを指定した場合、指定した用途のリストのみを返す
+
+## me.subsco.admin.getSubscribers
+
+サブスクライバーのプロフィール一覧を返す。管理者のみ呼び出せる。
+
+- getSubscribers-1: 認証がない場合、401を返す
+- getSubscribers-2: 管理者でない場合、401を返す
+- getSubscribers-3: 管理者の場合、サブスクライバーをprofileViewとして返す
