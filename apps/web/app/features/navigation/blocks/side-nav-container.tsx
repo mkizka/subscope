@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { loader } from "@/app/routes/api.me";
 
-import { TimelineHeader } from "./timeline-header";
+import { SideNav } from "./side-nav";
 
 type MeResponse = Awaited<ReturnType<typeof loader>>["data"];
 
@@ -15,11 +15,11 @@ async function fetchMe(): Promise<MeResponse> {
   return response.json() as Promise<MeResponse>;
 }
 
-export function TimelineHeaderContainer() {
+export function SideNavContainer() {
   const { data } = useQuery({
     queryKey: ["me"],
     queryFn: fetchMe,
   });
 
-  return <TimelineHeader avatarUrl={data?.avatarUrl} handle={data?.handle} />;
+  return <SideNav avatarUrl={data?.avatarUrl} handle={data?.handle} />;
 }

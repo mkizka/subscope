@@ -3,6 +3,7 @@ import { toRequestListener } from "@atproto/lex-server/nodejs";
 import type { RequestHandler } from "express";
 
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
+import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
@@ -22,6 +23,7 @@ import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
 export const lexRouterFactory = (
   getPostThread: GetPostThread,
+  searchPosts: SearchPosts,
   getFollows: GetFollows,
   getFollowers: GetFollowers,
   getList: GetList,
@@ -41,6 +43,7 @@ export const lexRouterFactory = (
 ): RequestHandler => {
   const handlers = [
     getPostThread,
+    searchPosts,
     getFollows,
     getFollowers,
     getList,
@@ -77,6 +80,7 @@ export const lexRouterFactory = (
 };
 lexRouterFactory.inject = [
   "getPostThread",
+  "searchPosts",
   "getFollows",
   "getFollowers",
   "getList",
