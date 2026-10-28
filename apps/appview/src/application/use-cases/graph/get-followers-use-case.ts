@@ -1,5 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
-import type { AppBskyGraphGetFollowers } from "@repo/client/server";
+import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getFollowers";
 import { required } from "@repo/common/utils";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
@@ -16,7 +16,7 @@ export class GetFollowersUseCase {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }): Promise<AppBskyGraphGetFollowers.OutputSchema> {
+  }): Promise<$OutputBody> {
     const paginationResult =
       await this.followService.findFollowersWithPagination({
         actorDid: params.actorDid,

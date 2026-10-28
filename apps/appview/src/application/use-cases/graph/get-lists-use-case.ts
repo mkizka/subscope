@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AppBskyGraphGetLists } from "@repo/client/server";
+import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getLists";
 import type { List } from "@repo/common/domain";
 
 import type { IListRepository } from "../../../application/interfaces/list-repository.js";
@@ -18,7 +18,7 @@ export class GetListsUseCase {
     limit: number;
     cursor?: string;
     purposes?: string[];
-  }): Promise<AppBskyGraphGetLists.OutputSchema> {
+  }): Promise<$OutputBody> {
     const paginator = createCursorPaginator<List>({
       limit: params.limit,
       getCursor: (list) => list.createdAt.toISOString(),

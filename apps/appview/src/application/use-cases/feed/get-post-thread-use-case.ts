@@ -1,11 +1,8 @@
 import type { Did } from "@atproto/did";
+import type { $Typed } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import { InvalidRequestError } from "@atproto/xrpc-server";
-import type {
-  $Typed,
-  AppBskyFeedDefs,
-  AppBskyFeedGetPostThread,
-} from "@repo/client/server";
+import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
+import type * as AppBskyFeedGetPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 import type { Post } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
@@ -17,6 +14,13 @@ type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
 
 const MAX_REPLIES_PER_POST = 20;
+
+export class PostNotFoundError extends Error {
+  constructor(uri: AtUri) {
+    super(`Post not found: ${uri.toString()}`);
+    this.name = "NotFound";
+  }
+}
 
 export class GetPostThreadUseCase {
   constructor(
@@ -30,13 +34,13 @@ export class GetPostThreadUseCase {
     depth: number;
     parentHeight: number;
     viewerDid?: Did;
-  }): Promise<AppBskyFeedGetPostThread.OutputSchema> {
+  }): Promise<AppBskyFeedGetPostThread.$OutputBody> {
     // 1. ターゲット投稿を取得
     const targetPost = await this.postRepository.findByUri(
       params.uri.getValue(),
     );
     if (!targetPost) {
-      throw this.notFoundError(params.uri.getValue());
+      throw new PostNotFoundError(params.uri.getValue());
     }
 
     // 2. スレッド全体の構造を収集
@@ -55,7 +59,7 @@ export class GetPostThreadUseCase {
     // 4. ターゲット投稿のPostViewを確認
     const targetPostView = postViewMap.get(targetPost.uri.toString());
     if (!targetPostView) {
-      throw this.notFoundError(targetPost.uri);
+      throw new PostNotFoundError(targetPost.uri);
     }
 
     // 5. スレッド構造を構築して返す
@@ -69,13 +73,6 @@ export class GetPostThreadUseCase {
         replyTree: threadData.replyTree,
       }),
     };
-  }
-
-  private notFoundError(uri: AtUri): InvalidRequestError {
-    return new InvalidRequestError(
-      `Post not found: ${uri.toString()}`,
-      "NotFound",
-    );
   }
 
   private async collectThreadData(params: {

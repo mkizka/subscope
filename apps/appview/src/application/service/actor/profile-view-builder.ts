@@ -1,6 +1,7 @@
 import { type Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
-import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
+import { toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
 import type { ProfileDetailed } from "@repo/common/domain";
 
 import type { IAssetUrlBuilder } from "../../../application/interfaces/asset-url-builder.js";
@@ -11,8 +12,8 @@ export class ProfileViewBuilder {
 
   profileViewBasic(
     profile: ProfileDetailed,
-    viewerState: $Typed<AppBskyActorDefs.ViewerState>,
-  ): $Typed<AppBskyActorDefs.ProfileViewBasic> {
+    viewerState: AppBskyActorDefs.ViewerState,
+  ): AppBskyActorDefs.ProfileViewBasic {
     return {
       $type: "app.bsky.actor.defs#profileViewBasic",
       did: profile.actorDid,
@@ -20,31 +21,33 @@ export class ProfileViewBuilder {
       displayName: profile.displayName ?? undefined,
       avatar: this.getAvatarThumbnailUrl(profile),
       viewer: viewerState,
-      createdAt: profile.createdAt?.toISOString(),
+      createdAt: profile.createdAt
+        ? toDatetimeString(profile.createdAt)
+        : undefined,
     };
   }
 
   profileView(
     profile: ProfileDetailed,
-    viewerState: $Typed<AppBskyActorDefs.ViewerState>,
-  ): $Typed<AppBskyActorDefs.ProfileView> {
+    viewerState: AppBskyActorDefs.ViewerState,
+  ): AppBskyActorDefs.ProfileView {
     return {
       ...this.profileViewBasic(profile, viewerState),
-      $type: "app.bsky.actor.defs#profileView" as const,
+      $type: "app.bsky.actor.defs#profileView",
       description: profile.description ?? undefined,
-      indexedAt: profile.indexedAt.toISOString(),
+      indexedAt: toDatetimeString(profile.indexedAt),
     };
   }
 
   profileViewDetailed(
     profile: ProfileDetailed,
-    viewerState: $Typed<AppBskyActorDefs.ViewerState>,
+    viewerState: AppBskyActorDefs.ViewerState,
     stats?: {
       followsCount: number;
       followersCount: number;
       postsCount: number;
     },
-  ): $Typed<AppBskyActorDefs.ProfileViewDetailed> {
+  ): AppBskyActorDefs.ProfileViewDetailed {
     return {
       ...this.profileViewBasic(profile, viewerState),
       $type: "app.bsky.actor.defs#profileViewDetailed",
@@ -53,11 +56,11 @@ export class ProfileViewBuilder {
       followersCount: stats?.followersCount,
       followsCount: stats?.followsCount,
       postsCount: stats?.postsCount,
-      indexedAt: profile.indexedAt.toISOString(),
+      indexedAt: toDatetimeString(profile.indexedAt),
     };
   }
 
-  emptyViewerState(): $Typed<AppBskyActorDefs.ViewerState> {
+  emptyViewerState(): AppBskyActorDefs.ViewerState {
     return {
       $type: "app.bsky.actor.defs#viewerState",
     };
@@ -67,7 +70,7 @@ export class ProfileViewBuilder {
     actorDid: Did,
     followingMap: Map<Did, AtUri>,
     followedByMap: Map<Did, AtUri>,
-  ): $Typed<AppBskyActorDefs.ViewerState> {
+  ): AppBskyActorDefs.ViewerState {
     const following = followingMap.get(actorDid)?.toString();
     const followedBy = followedByMap.get(actorDid)?.toString();
 

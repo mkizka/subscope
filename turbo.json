@@ -2,25 +2,24 @@
   "$schema": "https://turbo.build/schema.json",
   "concurrency": "20",
   "tasks": {
+    "generate": {
+      "outputs": ["src/generated/**"]
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "src/generated/**"],
+      "dependsOn": ["^build", "generate"],
       "outputs": ["dist/**", "build/**", ".react-router/**"]
     },
     "typecheck": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "src/generated/**"]
+      "dependsOn": ["^build", "generate"]
     },
     "lint": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "src/generated/**"]
+      "dependsOn": ["^build", "generate"]
     },
     "format": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", "src/generated/**"]
+      "dependsOn": ["^build", "generate"]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "generate"],
       "cache": false,
       "persistent": true,
       "passThroughEnv": [

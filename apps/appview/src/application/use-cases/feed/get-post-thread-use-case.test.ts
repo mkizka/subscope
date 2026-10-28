@@ -1,4 +1,3 @@
-import { InvalidRequestError } from "@atproto/xrpc-server";
 import {
   actorFactory,
   postFactory,
@@ -14,6 +13,7 @@ import {
 } from "vitest";
 
 import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
+import { PostNotFoundError } from "../../../application/use-cases/feed/get-post-thread-use-case.js";
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
@@ -47,12 +47,7 @@ describe("GetPostThreadUseCase", () => {
     });
 
     // assert
-    await expect(result).rejects.toThrow(
-      new InvalidRequestError(
-        "Post not found: at://did:plc:notexist/app.bsky.feed.post/notexist",
-        "NotFound",
-      ),
-    );
+    await expect(result).rejects.toThrow(PostNotFoundError);
     // ターゲット投稿の取得で1回のみ
     expect(spyFindByUri).toHaveBeenCalledTimes(1);
     // 投稿が見つからないのでリプライ取得は行われない

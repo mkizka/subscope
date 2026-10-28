@@ -1,4 +1,5 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
 
 import type { UpdateSeenUseCase } from "../../../../../application/use-cases/notification/update-seen-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -10,14 +11,15 @@ export class UpdateSeen {
   ) {}
   static inject = ["updateSeenUseCase", "authVerifierMiddleware"] as const;
 
-  handle(server: Server) {
-    server.app.bsky.notification.updateSeen({
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
-      handler: async ({ auth, input }) => {
+  handle(router: LexRouter) {
+    router.add(updateSeen, {
+      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      handler: async ({ credentials, input }) => {
         await this.updateSeenUseCase.execute({
-          actorDid: auth.credentials.did,
+          actorDid: credentials.did,
           seenAt: new Date(input.body.seenAt),
         });
+        return {};
       },
     });
   }

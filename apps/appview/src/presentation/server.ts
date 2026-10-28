@@ -1,6 +1,6 @@
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { loggingMiddleware } from "@repo/common/utils";
-import type { Router } from "express";
+import type { RequestHandler, Router } from "express";
 import express from "express";
 import promBundle from "express-prom-bundle";
 
@@ -10,6 +10,7 @@ export class AppViewServer {
 
   constructor(
     loggerManager: ILoggerManager,
+    lexRouter: RequestHandler,
     xrpcRouter: Router,
     healthRouter: Router,
     wellKnownRouter: Router,
@@ -21,10 +22,12 @@ export class AppViewServer {
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
+    this.app.use(lexRouter);
     this.app.use(xrpcRouter);
   }
   static inject = [
     "loggerManager",
+    "lexRouter",
     "xrpcRouter",
     "healthRouter",
     "wellKnownRouter",

@@ -1,5 +1,5 @@
 import { type Did } from "@atproto/did";
-import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
+import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
 import type { ProfileDetailed } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
@@ -37,7 +37,7 @@ export class ProfileViewService {
   async findProfileView(
     dids: Did[],
     viewerDid?: Did | null,
-  ): Promise<$Typed<AppBskyActorDefs.ProfileView>[]> {
+  ): Promise<AppBskyActorDefs.ProfileView[]> {
     const profiles = await this.profileRepository.findManyDetailed(dids);
     const viewerStatesMap = await this.findViewerStates(profiles, viewerDid);
 
@@ -52,7 +52,7 @@ export class ProfileViewService {
   async findProfileViewDetailed(
     dids: Did[],
     viewerDid?: Did | null,
-  ): Promise<$Typed<AppBskyActorDefs.ProfileViewDetailed>[]> {
+  ): Promise<AppBskyActorDefs.ProfileViewDetailed[]> {
     const profiles = await this.profileRepository.findManyDetailed(dids);
     const viewerStatesMap = await this.findViewerStates(profiles, viewerDid);
     const statsMap = await this.actorStatsRepository.findStats(dids);
@@ -69,11 +69,8 @@ export class ProfileViewService {
   private async findViewerStates(
     profiles: ProfileDetailed[],
     viewerDid?: Did | null,
-  ): Promise<Map<Did, $Typed<AppBskyActorDefs.ViewerState>>> {
-    const viewerStatesMap = new Map<
-      Did,
-      $Typed<AppBskyActorDefs.ViewerState>
-    >();
+  ): Promise<Map<Did, AppBskyActorDefs.ViewerState>> {
+    const viewerStatesMap = new Map<Did, AppBskyActorDefs.ViewerState>();
 
     if (!viewerDid) {
       for (const profile of profiles) {

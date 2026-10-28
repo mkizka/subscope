@@ -1,6 +1,7 @@
 import type { IncomingMessage } from "node:http";
 
 import { type Did } from "@atproto/did";
+import { LexServerAuthError } from "@atproto/lex-server";
 import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
@@ -13,6 +14,11 @@ type MaybeRequest = {
   headers: MaybeHeaders;
   path: string;
 };
+
+const toMaybeRequest = (request: Request): MaybeRequest => ({
+  headers: Object.fromEntries(request.headers),
+  path: new URL(request.url).pathname,
+});
 
 export class AuthVerifierMiddleware {
   constructor(private readonly tokenVerifier: ITokenVerifier) {}
@@ -45,6 +51,22 @@ export class AuthVerifierMiddleware {
       credentials,
       artifacts: token,
     };
+  }
+
+  async lexLoginRequired({ request }: { request: Request }) {
+    try {
+      const { credentials } = await this.loginRequired(toMaybeRequest(request));
+      return credentials;
+    } catch (error) {
+      if (error instanceof AuthRequiredError) {
+        throw new LexServerAuthError("AuthenticationRequired", error.message);
+      }
+      throw error;
+    }
+  }
+
+  lexOptionalAuth({ request }: { request: Request }) {
+    return this.getViewerDid(toMaybeRequest(request));
   }
 
   async getViewerDid(request: MaybeRequest): Promise<Did | null> {

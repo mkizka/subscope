@@ -1,7 +1,8 @@
-import {
-  AtpBaseClient,
-  MeSubscoSyncGetSubscriptionStatus,
-} from "@repo/client/api";
+import { Client } from "@atproto/lex";
+import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
+import getSubscriptionStatus, {
+  subscribed,
+} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 import { data } from "react-router";
 
 import { HomePage } from "@/app/features/home/pages/home";
@@ -25,11 +26,10 @@ export function meta() {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const logger = loggerManager.createLogger("_index");
 
-  const client = new AtpBaseClient({ service: env.APPVIEW_URL });
+  const client = new Client(env.APPVIEW_URL);
   let setupStatus;
   try {
-    const response = await client.me.subsco.server.getSetupStatus();
-    setupStatus = response.data;
+    setupStatus = await client.call(getSetupStatus);
   } catch (e) {
     logger.error(e, "Failed to get setup status");
     throw data("セットアップ状態の取得に失敗しました", { status: 500 });
@@ -46,16 +46,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   let subscriptionResponse;
   try {
-    subscriptionResponse = await agent.me.subsco.sync.getSubscriptionStatus();
+    subscriptionResponse = await agent.call(getSubscriptionStatus);
   } catch (e) {
     logger.error(e, "Failed to get subscription status");
     throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
   }
 
-  const isSubscriber = MeSubscoSyncGetSubscriptionStatus.isSubscribed(
-    subscriptionResponse.data,
-  );
-  if (!isSubscriber) {
+  if (!subscribed.isTypeOf(subscriptionResponse)) {
     return data({ state: "home" as const });
   }
   return data({

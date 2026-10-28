@@ -1,4 +1,5 @@
-import type { AppBskyEmbedExternal } from "@repo/client/server";
+import { getBlobCidString } from "@atproto/lex";
+import type { External } from "@repo/client/lex/app/bsky/embed/external";
 
 export class PostEmbedExternal {
   constructor(
@@ -8,12 +9,12 @@ export class PostEmbedExternal {
     readonly thumbCid: string | null,
   ) {}
 
-  static from(external: AppBskyEmbedExternal.External) {
+  static from(external: External) {
     return new PostEmbedExternal(
       external.uri,
       external.title,
       external.description,
-      external.thumb ? external.thumb.ref.toString() : null,
+      getBlobCidString(external.thumb) ?? null,
     );
   }
 }

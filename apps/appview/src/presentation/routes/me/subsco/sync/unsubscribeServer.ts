@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
-import { InvalidRequestError } from "@atproto/xrpc-server";
-import type { Server } from "@repo/client/server";
+import { type LexRouter, LexServerError } from "@atproto/lex-server";
+import unsubscribeServer from "@repo/client/lex/me/subsco/sync/unsubscribeServer";
 
 import {
   NotSubscribedError,
@@ -18,17 +18,16 @@ export class UnsubscribeServer {
     "authVerifierMiddleware",
   ] as const;
 
-  handle(server: Server) {
-    server.me.subsco.sync.unsubscribeServer({
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
-      handler: async ({ auth }) => {
+  handle(router: LexRouter) {
+    router.add(unsubscribeServer, {
+      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      handler: async ({ credentials }) => {
         try {
           await this.unsubscribeServerUseCase.execute({
-            actorDid: asDid(auth.credentials.did),
+            actorDid: asDid(credentials.did),
           });
 
           return {
-            encoding: "application/json",
             body: {
               success: true,
               message: "Successfully unsubscribed from the server",
@@ -36,7 +35,10 @@ export class UnsubscribeServer {
           };
         } catch (error) {
           if (error instanceof NotSubscribedError) {
-            throw new InvalidRequestError(error.message, error.name);
+            throw new LexServerError(400, {
+              error: error.name,
+              message: error.message,
+            });
           }
           throw error;
         }

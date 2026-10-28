@@ -1,16 +1,7 @@
-import { AuthRequiredError } from "@atproto/xrpc-server";
+import { LexServerAuthError } from "@atproto/lex-server";
 
 import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
 import type { AuthVerifierMiddleware } from "./auth-verifier-middleware.js";
-
-type MaybeHeaders = {
-  [key: string]: string | string[] | undefined;
-};
-
-type MaybeRequest = {
-  headers: MaybeHeaders;
-  path: string;
-};
 
 export class AdminMiddleware {
   constructor(
@@ -19,17 +10,18 @@ export class AdminMiddleware {
   ) {}
   static inject = ["authVerifierMiddleware", "actorRepository"] as const;
 
-  async requireAdmin(request: MaybeRequest) {
-    const authResult = await this.authVerifierMiddleware.loginRequired(request);
+  async requireAdmin(ctx: { request: Request }) {
+    const credentials = await this.authVerifierMiddleware.lexLoginRequired(ctx);
 
-    const actor = await this.actorRepository.findByDid(
-      authResult.credentials.did,
-    );
+    const actor = await this.actorRepository.findByDid(credentials.did);
     // TODO: lexiconに定義したエラーを返す
     if (!actor?.isAdmin) {
-      throw new AuthRequiredError("Admin access required");
+      throw new LexServerAuthError(
+        "AuthenticationRequired",
+        "Admin access required",
+      );
     }
 
-    return authResult;
+    return credentials;
   }
 }
