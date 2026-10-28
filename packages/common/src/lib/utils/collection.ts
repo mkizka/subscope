@@ -5,6 +5,7 @@ import type {
   AppBskyFeedPost,
   AppBskyFeedRepost,
   AppBskyGraphFollow,
+  AppBskyGraphList,
 } from "@repo/client/server";
 
 export type SupportedCollectionMap = {
@@ -14,6 +15,7 @@ export type SupportedCollectionMap = {
   "app.bsky.feed.post": AppBskyFeedPost.Record;
   "app.bsky.feed.repost": AppBskyFeedRepost.Record;
   "app.bsky.graph.follow": AppBskyGraphFollow.Record;
+  "app.bsky.graph.list": AppBskyGraphList.Record;
 };
 
 export type SupportedCollection = keyof SupportedCollectionMap;
@@ -25,6 +27,7 @@ export const SUPPORTED_COLLECTIONS = [
   "app.bsky.feed.post",
   "app.bsky.feed.repost",
   "app.bsky.graph.follow",
+  "app.bsky.graph.list",
 ] as const satisfies SupportedCollection[];
 
 export const isSupportedCollection = (
