@@ -13,6 +13,7 @@ export * as AppBskyFeedGenerator from "./generated/server/types/app/bsky/feed/ge
 export * as AppBskyFeedGetActorLikes from "./generated/server/types/app/bsky/feed/getActorLikes.js";
 export * as AppBskyFeedGetAuthorFeed from "./generated/server/types/app/bsky/feed/getAuthorFeed.js";
 export * as AppBskyFeedGetLikes from "./generated/server/types/app/bsky/feed/getLikes.js";
+export * as AppBskyFeedGetListFeed from "./generated/server/types/app/bsky/feed/getListFeed.js";
 export * as AppBskyFeedGetPostThread from "./generated/server/types/app/bsky/feed/getPostThread.js";
 export * as AppBskyFeedGetRepostedBy from "./generated/server/types/app/bsky/feed/getRepostedBy.js";
 export * as AppBskyFeedGetTimeline from "./generated/server/types/app/bsky/feed/getTimeline.js";
