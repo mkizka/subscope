@@ -6,6 +6,7 @@ const meta = {
   title: "features/Timeline/TimelineFeed",
   component: TimelineFeed,
   args: {
+    onCompose: () => {},
     posts: [
       {
         uri: "at://did:plc:example1/app.bsky.feed.post/1",
@@ -54,6 +55,7 @@ export const Default: Story = {};
 
 export const Empty: Story = {
   args: {
+    onCompose: () => {},
     posts: [],
   },
 };

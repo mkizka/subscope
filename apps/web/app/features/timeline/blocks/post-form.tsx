@@ -8,15 +8,23 @@ export const countGraphemes = (text: string) =>
 type Props = {
   isSubmitting: boolean;
   error?: string;
+  context?: string;
+  onCancelContext?: () => void;
   onSubmit: (text: string) => void;
 };
 
-export function PostForm({ isSubmitting, error, onSubmit }: Props) {
+export function PostForm({
+  isSubmitting,
+  error,
+  context,
+  onCancelContext,
+  onSubmit,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState("");
   const length = countGraphemes(text);
 
-  if (!isOpen) {
+  if (!isOpen && !context) {
     return (
       <button
         type="button"
@@ -36,6 +44,18 @@ export function PostForm({ isSubmitting, error, onSubmit }: Props) {
         onSubmit(text);
       }}
     >
+      {context && (
+        <div className="flex items-center justify-between text-sm">
+          {context}
+          <button
+            type="button"
+            className="btn btn-ghost btn-xs"
+            onClick={onCancelContext}
+          >
+            やめる
+          </button>
+        </div>
+      )}
       <textarea
         aria-label="投稿内容"
         className="textarea w-full"

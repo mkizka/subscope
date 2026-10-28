@@ -1,8 +1,8 @@
 import { Client } from "@atproto/lex";
-import { currentDatetimeString } from "@atproto/syntax";
+import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
-import post from "@repo/client/lex/app/bsky/feed/post";
+import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import getSubscriptionStatus, {
   subscribed,
@@ -77,7 +77,17 @@ export const action = async ({ request }: Route.ActionArgs) => {
   if (!agent) {
     throw redirect("/login");
   }
-  const text = (await request.formData()).get("text");
+  const form = await request.formData();
+  const text = form.get("text");
+  const ref = (
+    uri: FormDataEntryValue | null,
+    cid: FormDataEntryValue | null,
+  ) =>
+    typeof uri === "string" && uri && typeof cid === "string" && cid
+      ? { uri: asAtUriString(uri), cid }
+      : undefined;
+  const subject = ref(form.get("uri"), form.get("cid"));
+  const root = ref(form.get("rootUri"), form.get("rootCid")) ?? subject;
   if (
     typeof text !== "string" ||
     text.trim() === "" ||
@@ -86,9 +96,17 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return data({ error: "投稿内容が不正です" }, { status: 400 });
   }
   try {
-    const { uri } = await agent.create(post, {
+    const { uri } = await agent.create(postRecord, {
       text,
       createdAt: currentDatetimeString(),
+      reply:
+        form.get("type") === "reply" && subject && root
+          ? { root, parent: subject }
+          : undefined,
+      embed:
+        form.get("type") === "quote" && subject
+          ? { $type: "app.bsky.embed.record", record: subject }
+          : undefined,
     });
     return data({ uri });
   } catch (e) {
@@ -106,6 +124,9 @@ function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
     cid: post.cid,
     viewerLike: post.viewer?.like,
     viewerRepost: post.viewer?.repost,
+    replyRoot: postRecord.matches(post.record)
+      ? post.record.reply?.root
+      : undefined,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
