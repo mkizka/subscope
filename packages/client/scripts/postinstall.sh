@@ -40,6 +40,7 @@ paths=(
   "app/bsky/graph/follow.json"
   "app/bsky/graph/getFollows.json"
   "app/bsky/graph/getFollowers.json"
+  "app/bsky/graph/getList.json"
   "app/bsky/graph/getLists.json"
   "app/bsky/graph/list.json"
   "app/bsky/graph/listitem.json"
