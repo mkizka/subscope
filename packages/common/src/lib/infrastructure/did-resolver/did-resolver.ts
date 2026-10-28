@@ -33,7 +33,9 @@ export class DidResolver implements IDidResolver {
     didCache: DidCache,
     private readonly metricReporter: IMetricReporter,
   ) {
-    this.resolver = new Resolver({ didCache, plcUrl }, metricReporter);
+    const fetch =
+      new URL(plcUrl).protocol === "http:" ? globalThis.fetch : undefined;
+    this.resolver = new Resolver({ didCache, plcUrl, fetch }, metricReporter);
     this.logger = loggerManager.createLogger("DidResolver");
   }
   static inject = [
