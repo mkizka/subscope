@@ -1,3 +1,4 @@
+import { me } from "@repo/client/lex";
 import { redirect } from "react-router";
 
 import { loggerManager } from "@/app/lib/logger.server";
@@ -26,15 +27,15 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const agent = createAgent(oauthSession);
   let response;
   try {
-    response = await agent.me.subsco.server.getSetupStatus();
+    response = await agent.call(me.subsco.server.getSetupStatus);
   } catch (e) {
     logger.error(e, "Failed to check server setup status");
     return redirect("/?error=setup_status_check_failed");
   }
 
   try {
-    if (!response.data.initialized) {
-      await agent.me.subsco.admin.registerAdmin();
+    if (!response.initialized) {
+      await agent.call(me.subsco.admin.registerAdmin);
     }
   } catch (e) {
     logger.error(e, "Admin registration failed");

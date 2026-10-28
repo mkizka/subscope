@@ -1,6 +1,5 @@
-import { ResponseType, XRPCError } from "@atproto/xrpc";
-// eslint-disable-next-line unused-imports/no-unused-imports
-import type * as _ from "@repo/client/api";
+import { XrpcResponseError } from "@atproto/lex";
+import { me } from "@repo/client/lex";
 import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
@@ -13,16 +12,15 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.me.subsco.admin.getSubscribers({
+    const response = await agent.call(me.subsco.admin.getSubscribers, {
       limit: 20,
       cursor,
     });
-    return data(response.data);
+    return data(response);
   } catch (e) {
     if (
-      e instanceof XRPCError &&
-      (e.status === ResponseType.AuthenticationRequired ||
-        e.status === ResponseType.Forbidden)
+      e instanceof XrpcResponseError &&
+      (e.status === 401 || e.status === 403)
     ) {
       throw data({ error: "Unauthorized" }, { status: 403 });
     }

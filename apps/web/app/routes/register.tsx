@@ -1,6 +1,6 @@
-import { XRPCError } from "@atproto/xrpc";
+import { XrpcResponseError } from "@atproto/lex";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { MeSubscoSyncGetSubscriptionStatus } from "@repo/client/api";
+import { me } from "@repo/client/lex";
 import { data, redirect } from "react-router";
 
 import {
@@ -19,8 +19,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const agent = await getAgent(request);
 
   if (agent) {
-    const response = await agent.me.subsco.sync.getSubscriptionStatus();
-    if (MeSubscoSyncGetSubscriptionStatus.isSubscribed(response.data)) {
+    const response = await agent.call(me.subsco.sync.getSubscriptionStatus);
+    if (me.subsco.sync.getSubscriptionStatus.subscribed.isTypeOf(response)) {
       throw redirect("/");
     }
   }
@@ -41,12 +41,12 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
 
   try {
-    await agent.me.subsco.sync.subscribeServer({
+    await agent.call(me.subsco.sync.subscribeServer, {
       inviteCode: submission.value.inviteCode,
     });
     return redirect("/");
   } catch (e) {
-    if (e instanceof XRPCError) {
+    if (e instanceof XrpcResponseError) {
       switch (e.error) {
         case "InvalidInviteCode":
           return data(

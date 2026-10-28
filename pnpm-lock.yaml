@@ -354,15 +354,15 @@ importers:
       '@atproto/jwk-jose':
         specifier: 0.2.4
         version: 0.2.4
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/oauth-client-node':
         specifier: 0.5.13
         version: 0.5.13
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
-      '@atproto/xrpc':
-        specifier: 0.8.16
-        version: 0.8.16
       '@base-ui/react':
         specifier: 1.9.0
         version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -502,9 +502,9 @@ importers:
       '@atproto/identity':
         specifier: 0.5.20
         version: 0.5.20
-      '@atproto/lexicon':
-        specifier: 0.7.17
-        version: 0.7.17
+      '@atproto/lex':
+        specifier: 0.4.2
+        version: 0.4.2
       '@atproto/repo':
         specifier: 0.11.1
         version: 0.11.1

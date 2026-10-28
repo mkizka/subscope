@@ -1,5 +1,5 @@
+import { Client } from "@atproto/lex";
 import type { OAuthSession } from "@atproto/oauth-client-node";
-import { SubscoAgent } from "@repo/client/api";
 import { createCookieSessionStorage } from "react-router";
 
 import { env } from "@/app/shared/env.js";
@@ -36,13 +36,12 @@ export const getSession = (request: Request) => {
 };
 
 export const createAgent = (oauthSession: OAuthSession) => {
-  return new SubscoAgent({
-    oauthSession,
-    atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
+  return new Client(oauthSession, {
+    service: `${env.APPVIEW_DID}#bsky_appview`,
   });
 };
 
-export async function getAgent(request: Request): Promise<SubscoAgent | null> {
+export async function getAgent(request: Request): Promise<Client | null> {
   const session = await getSession(request);
   if (!session.data.did) {
     return null;

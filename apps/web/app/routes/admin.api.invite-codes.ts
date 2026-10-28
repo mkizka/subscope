@@ -1,6 +1,5 @@
-import { ResponseType, XRPCError } from "@atproto/xrpc";
-// eslint-disable-next-line unused-imports/no-unused-imports
-import type * as _ from "@repo/client/api";
+import { XrpcResponseError } from "@atproto/lex";
+import { me } from "@repo/client/lex";
 import { data } from "react-router";
 import { z } from "zodV4";
 
@@ -14,16 +13,15 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.me.subsco.admin.getInviteCodes({
+    const response = await agent.call(me.subsco.admin.getInviteCodes, {
       limit: 20,
       cursor,
     });
-    return data(response.data);
+    return data(response);
   } catch (e) {
     if (
-      e instanceof XRPCError &&
-      (e.status === ResponseType.AuthenticationRequired ||
-        e.status === ResponseType.Forbidden)
+      e instanceof XrpcResponseError &&
+      (e.status === 401 || e.status === 403)
     ) {
       throw data({ error: "Unauthorized" }, { status: 403 });
     }
@@ -39,13 +37,12 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       const { code } = z
         .object({ code: z.string() })
         .parse(await request.json());
-      await agent.me.subsco.admin.deleteInviteCode({ code });
+      await agent.call(me.subsco.admin.deleteInviteCode, { code });
       return data({ success: true });
     } catch (e) {
       if (
-        e instanceof XRPCError &&
-        (e.status === ResponseType.AuthenticationRequired ||
-          e.status === ResponseType.Forbidden)
+        e instanceof XrpcResponseError &&
+        (e.status === 401 || e.status === 403)
       ) {
         throw data({ error: "Unauthorized" }, { status: 403 });
       }
@@ -54,15 +51,14 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 
   try {
-    const response = await agent.me.subsco.admin.createInviteCode({
+    const response = await agent.call(me.subsco.admin.createInviteCode, {
       daysToExpire: 7,
     });
-    return data(response.data);
+    return data(response);
   } catch (e) {
     if (
-      e instanceof XRPCError &&
-      (e.status === ResponseType.AuthenticationRequired ||
-        e.status === ResponseType.Forbidden)
+      e instanceof XrpcResponseError &&
+      (e.status === 401 || e.status === 403)
     ) {
       throw data({ error: "Unauthorized" }, { status: 403 });
     }
