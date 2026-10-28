@@ -63,6 +63,8 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
-  .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler));
+  .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  .replaceValue("syncWorker", {} as never);
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;
