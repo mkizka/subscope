@@ -90,6 +90,25 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
   });
 
+  test("getUnreadCountは未読数を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.notification.getUnreadCount`, {
+      headers: auth,
+    });
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ count: 0 });
+  });
+
+  test("updateSeenは200を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.notification.updateSeen`, {
+      method: "POST",
+      headers: { ...auth, "content-type": "application/json" },
+      body: JSON.stringify({ seenAt: new Date().toISOString() }),
+    });
+
+    expect(res.status).toBe(200);
+  });
+
   test("管理者でない場合、admin APIは401エラーを返す", async () => {
     const res = await fetch(`${baseUrl}/me.subsco.admin.getInviteCodes`, {
       headers: auth,
@@ -122,6 +141,26 @@ describe("lexRouter", () => {
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ uri, likes: [] });
+  });
+
+  test("getPostsは存在しない投稿を除いて返す", async () => {
+    const uri = "at://did:plc:bob/app.bsky.feed.post/123";
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getPosts?uris=${encodeURIComponent(uri)}`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ posts: [] });
+  });
+
+  test("getFeedGeneratorsは存在しないフィードを除いて返す", async () => {
+    const uri = "at://did:plc:bob/app.bsky.feed.generator/123";
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getFeedGenerators?feeds=${encodeURIComponent(uri)}`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ feeds: [] });
   });
 
   test("getRepostedByはパラメータが不正な場合400エラーを返す", async () => {

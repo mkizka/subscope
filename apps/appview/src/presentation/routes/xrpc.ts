@@ -8,8 +8,6 @@ import type { SearchActors } from "./app/bsky/actor/searchActors.js";
 import type { SearchActorsTypeahead } from "./app/bsky/actor/searchActorsTypeahead.js";
 import type { GetActorLikes } from "./app/bsky/feed/getActorLikes.js";
 import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
-import type { GetFeedGenerators } from "./app/bsky/feed/getFeedGenerators.js";
-import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
@@ -17,9 +15,7 @@ import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
-import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
-import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 
 export const xrpcRouterFactory = (
@@ -30,8 +26,6 @@ export const xrpcRouterFactory = (
   searchActorsTypeahead: SearchActorsTypeahead,
   getActorLikes: GetActorLikes,
   getAuthorFeed: GetAuthorFeed,
-  getFeedGenerators: GetFeedGenerators,
-  getPosts: GetPosts,
   getPostThread: GetPostThread,
   getTimeline: GetTimeline,
   searchPosts: SearchPosts,
@@ -39,10 +33,8 @@ export const xrpcRouterFactory = (
   getFollowers: GetFollowers,
   getList: GetList,
   getLists: GetLists,
-  getUnreadCount: GetUnreadCount,
   listNotifications: ListNotifications,
   getSubscribers: GetSubscribers,
-  updateSeen: UpdateSeen,
 ): Router => {
   const handlers = [
     getPreferences,
@@ -52,8 +44,6 @@ export const xrpcRouterFactory = (
     searchActorsTypeahead,
     getActorLikes,
     getAuthorFeed,
-    getFeedGenerators,
-    getPosts,
     getPostThread,
     getTimeline,
     searchPosts,
@@ -61,10 +51,8 @@ export const xrpcRouterFactory = (
     getFollowers,
     getList,
     getLists,
-    getUnreadCount,
     listNotifications,
     getSubscribers,
-    updateSeen,
   ];
 
   const server = createServer();
@@ -81,8 +69,6 @@ xrpcRouterFactory.inject = [
   "searchActorsTypeahead",
   "getActorLikes",
   "getAuthorFeed",
-  "getFeedGenerators",
-  "getPosts",
   "getPostThread",
   "getTimeline",
   "searchPosts",
@@ -90,8 +76,6 @@ xrpcRouterFactory.inject = [
   "getFollowers",
   "getList",
   "getLists",
-  "getUnreadCount",
   "listNotifications",
   "getSubscribers",
-  "updateSeen",
 ] as const;

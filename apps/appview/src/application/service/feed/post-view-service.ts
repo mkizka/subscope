@@ -1,9 +1,7 @@
-import { AtUri } from "@atproto/syntax";
-import type {
-  $Typed,
-  AppBskyEmbedRecord,
-  AppBskyFeedDefs,
-} from "@repo/client/server";
+import { type $Typed, isPlainObject, type LexMap } from "@atproto/lex";
+import { AtUri, toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyEmbedRecord from "@repo/client/lex/app/bsky/embed/record";
+import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type { Post } from "@repo/common/domain";
 
 import {
@@ -12,13 +10,10 @@ import {
   toMapByUri,
 } from "../../../application/utils/map.js";
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function asObject(value: unknown): Record<string, unknown> {
-  if (isObject(value)) {
-    return value;
+function asLexMap(value: unknown): LexMap {
+  if (isPlainObject(value)) {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return value as LexMap;
   }
   throw new Error("Value is not an object");
 }
@@ -132,13 +127,13 @@ export class PostViewService {
         uri: post.uri.toString(),
         cid: record.cid,
         author: profile,
-        value: asObject(record.json),
+        value: asLexMap(record.json),
         replyCount: stats?.replyCount ?? 0,
         repostCount: stats?.repostCount ?? 0,
         likeCount: stats?.likeCount ?? 0,
         quoteCount: stats?.quoteCount ?? 0,
         embeds,
-        indexedAt: post.indexedAt.toISOString(),
+        indexedAt: toDatetimeString(post.indexedAt),
       };
 
       viewRecordMap.set(post.uri.toString(), viewRecord);
@@ -210,7 +205,7 @@ export class PostViewService {
           uri: post.uri.toString(),
           cid: record.cid,
           author: profile,
-          record: asObject(record.json),
+          record: asLexMap(record.json),
           embed: this.postEmbedViewBuilder.embedView(post, embedMaps),
           replyCount: stats?.replyCount ?? 0,
           repostCount: stats?.repostCount ?? 0,
@@ -220,7 +215,7 @@ export class PostViewService {
             repost: viewerRepostMap?.get(post.uri.toString())?.uri.toString(),
             like: viewerLikeMap?.get(post.uri.toString())?.uri.toString(),
           },
-          indexedAt: post.indexedAt.toISOString(),
+          indexedAt: toDatetimeString(post.indexedAt),
         } as const;
       })
       .filter((postView) => postView !== null);

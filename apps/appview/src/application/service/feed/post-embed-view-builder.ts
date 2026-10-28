@@ -1,11 +1,10 @@
-import type {
-  $Typed,
-  AppBskyEmbedExternal,
-  AppBskyEmbedImages,
-  AppBskyEmbedRecord,
-  AppBskyEmbedRecordWithMedia,
-  AppBskyFeedDefs,
-} from "@repo/client/server";
+import type { $Typed } from "@atproto/lex";
+import type { UriString } from "@atproto/syntax";
+import type * as AppBskyEmbedExternal from "@repo/client/lex/app/bsky/embed/external";
+import type * as AppBskyEmbedImages from "@repo/client/lex/app/bsky/embed/images";
+import type * as AppBskyEmbedRecord from "@repo/client/lex/app/bsky/embed/record";
+import type * as AppBskyEmbedRecordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
+import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type { Post } from "@repo/common/domain";
 import {
   PostEmbedExternal,
@@ -49,7 +48,8 @@ export class PostEmbedViewBuilder {
     return {
       $type: "app.bsky.embed.external#view" as const,
       external: {
-        uri: embed.uri,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        uri: embed.uri as UriString,
         title: embed.title,
         description: embed.description,
         thumb: embed.thumbCid

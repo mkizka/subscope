@@ -6,7 +6,7 @@ export default mergeConfig(
   defineProject({
     test: {
       name: "appview:unit",
-      include: ["src/{application,domain,presentation}/**/*.test.ts"],
+      include: ["src/{application,domain}/**/*.test.ts"],
     },
   }),
 );

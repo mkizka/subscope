@@ -2,8 +2,12 @@ import { LexRouter } from "@atproto/lex-server";
 import { toRequestListener } from "@atproto/lex-server/nodejs";
 import type { RequestHandler } from "express";
 
+import type { GetFeedGenerators } from "./app/bsky/feed/getFeedGenerators.js";
 import type { GetLikes } from "./app/bsky/feed/getLikes.js";
+import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
+import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
+import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
@@ -15,6 +19,8 @@ import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
 export const lexRouterFactory = (
+  getUnreadCount: GetUnreadCount,
+  updateSeen: UpdateSeen,
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
   unsubscribeServer: UnsubscribeServer,
@@ -26,8 +32,12 @@ export const lexRouterFactory = (
   getSetupStatus: GetSetupStatus,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
+  getFeedGenerators: GetFeedGenerators,
+  getPosts: GetPosts,
 ): RequestHandler => {
   const handlers = [
+    getUnreadCount,
+    updateSeen,
     getSubscriptionStatus,
     subscribeServer,
     unsubscribeServer,
@@ -39,6 +49,8 @@ export const lexRouterFactory = (
     getSetupStatus,
     getLikes,
     getRepostedBy,
+    getFeedGenerators,
+    getPosts,
   ];
 
   const router = new LexRouter();
@@ -58,6 +70,8 @@ export const lexRouterFactory = (
   };
 };
 lexRouterFactory.inject = [
+  "getUnreadCount",
+  "updateSeen",
   "getSubscriptionStatus",
   "subscribeServer",
   "unsubscribeServer",
@@ -69,4 +83,6 @@ lexRouterFactory.inject = [
   "getSetupStatus",
   "getLikes",
   "getRepostedBy",
+  "getFeedGenerators",
+  "getPosts",
 ] as const;
