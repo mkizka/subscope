@@ -2,7 +2,12 @@ import { LexRouter } from "@atproto/lex-server";
 import { toRequestListener } from "@atproto/lex-server/nodejs";
 import type { RequestHandler } from "express";
 
+import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
+import type { GetFollows } from "./app/bsky/graph/getFollows.js";
+import type { GetList } from "./app/bsky/graph/getList.js";
+import type { GetLists } from "./app/bsky/graph/getLists.js";
 import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
+import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
@@ -15,7 +20,12 @@ import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
 export const lexRouterFactory = (
+  getFollows: GetFollows,
+  getFollowers: GetFollowers,
+  getList: GetList,
+  getLists: GetLists,
   getUnreadCount: GetUnreadCount,
+  listNotifications: ListNotifications,
   updateSeen: UpdateSeen,
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
@@ -28,7 +38,12 @@ export const lexRouterFactory = (
   getSetupStatus: GetSetupStatus,
 ): RequestHandler => {
   const handlers = [
+    getFollows,
+    getFollowers,
+    getList,
+    getLists,
     getUnreadCount,
+    listNotifications,
     updateSeen,
     getSubscriptionStatus,
     subscribeServer,
@@ -58,7 +73,12 @@ export const lexRouterFactory = (
   };
 };
 lexRouterFactory.inject = [
+  "getFollows",
+  "getFollowers",
+  "getList",
+  "getLists",
   "getUnreadCount",
+  "listNotifications",
   "updateSeen",
   "getSubscriptionStatus",
   "subscribeServer",

@@ -15,11 +15,6 @@ import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
-import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
-import type { GetFollows } from "./app/bsky/graph/getFollows.js";
-import type { GetList } from "./app/bsky/graph/getList.js";
-import type { GetLists } from "./app/bsky/graph/getLists.js";
-import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 
 export const xrpcRouterFactory = (
@@ -37,11 +32,6 @@ export const xrpcRouterFactory = (
   getRepostedBy: GetRepostedBy,
   getTimeline: GetTimeline,
   searchPosts: SearchPosts,
-  getFollows: GetFollows,
-  getFollowers: GetFollowers,
-  getList: GetList,
-  getLists: GetLists,
-  listNotifications: ListNotifications,
   getSubscribers: GetSubscribers,
 ): Router => {
   const handlers = [
@@ -59,11 +49,6 @@ export const xrpcRouterFactory = (
     getRepostedBy,
     getTimeline,
     searchPosts,
-    getFollows,
-    getFollowers,
-    getList,
-    getLists,
-    listNotifications,
     getSubscribers,
   ];
 
@@ -88,10 +73,5 @@ xrpcRouterFactory.inject = [
   "getRepostedBy",
   "getTimeline",
   "searchPosts",
-  "getFollows",
-  "getFollowers",
-  "getList",
-  "getLists",
-  "listNotifications",
   "getSubscribers",
 ] as const;

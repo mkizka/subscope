@@ -133,6 +133,18 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "AdminAlreadyExists" });
   });
 
+  test("getListは存在しないリストに400エラーを返す", async () => {
+    const res = await fetch(
+      `${baseUrl}/app.bsky.graph.getList?list=at://did:plc:alice/app.bsky.graph.list/notfound`,
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "InvalidRequest",
+      message: "List not found",
+    });
+  });
+
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {
     const res = await fetch(`${baseUrl}/app.bsky.actor.getProfile`);
 
