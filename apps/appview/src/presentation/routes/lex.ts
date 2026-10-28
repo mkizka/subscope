@@ -2,16 +2,23 @@ import { LexRouter } from "@atproto/lex-server";
 import { toRequestListener } from "@atproto/lex-server/nodejs";
 import type { RequestHandler } from "express";
 
+import type { GetPreferences } from "./app/bsky/actor/getPreferences.js";
 import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
 import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
 import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
 export const lexRouterFactory = (
+  getPreferences: GetPreferences,
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
   unsubscribeServer: UnsubscribeServer,
 ): RequestHandler => {
-  const handlers = [getSubscriptionStatus, subscribeServer, unsubscribeServer];
+  const handlers = [
+    getPreferences,
+    getSubscriptionStatus,
+    subscribeServer,
+    unsubscribeServer,
+  ];
 
   const router = new LexRouter();
   for (const handler of handlers) {
@@ -30,6 +37,7 @@ export const lexRouterFactory = (
   };
 };
 lexRouterFactory.inject = [
+  "getPreferences",
   "getSubscriptionStatus",
   "subscribeServer",
   "unsubscribeServer",

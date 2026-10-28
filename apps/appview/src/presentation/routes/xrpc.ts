@@ -1,7 +1,6 @@
 import { createServer } from "@repo/client/server";
 import type { Router } from "express";
 
-import type { GetPreferences } from "./app/bsky/actor/getPreferences.js";
 import type { GetProfile } from "./app/bsky/actor/getProfile.js";
 import type { GetProfiles } from "./app/bsky/actor/getProfiles.js";
 import type { SearchActors } from "./app/bsky/actor/searchActors.js";
@@ -31,7 +30,6 @@ import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 
 export const xrpcRouterFactory = (
-  getPreferences: GetPreferences,
   getProfile: GetProfile,
   getProfiles: GetProfiles,
   searchActors: SearchActors,
@@ -61,7 +59,6 @@ export const xrpcRouterFactory = (
   updateSeen: UpdateSeen,
 ): Router => {
   const handlers = [
-    getPreferences,
     getProfile,
     getProfiles,
     searchActors,
@@ -98,7 +95,6 @@ export const xrpcRouterFactory = (
   return server.xrpc.router;
 };
 xrpcRouterFactory.inject = [
-  "getPreferences",
   "getProfile",
   "getProfiles",
   "searchActors",

@@ -89,6 +89,27 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
   });
 
+  test("getPreferencesは固定のフィード設定を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.actor.getPreferences`);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      preferences: [
+        {
+          $type: "app.bsky.actor.defs#savedFeedsPrefV2",
+          items: [
+            {
+              id: "3ksog462gr22d",
+              type: "timeline",
+              value: "following",
+              pinned: true,
+            },
+          ],
+        },
+      ],
+    });
+  });
+
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {
     const res = await fetch(`${baseUrl}/app.bsky.actor.getProfile`);
 
