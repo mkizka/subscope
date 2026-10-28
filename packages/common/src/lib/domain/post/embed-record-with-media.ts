@@ -1,5 +1,7 @@
 import { AtUri } from "@atproto/syntax";
-import { app } from "@repo/client/lex";
+import external from "@repo/client/lex/app/bsky/embed/external";
+import images from "@repo/client/lex/app/bsky/embed/images";
+import type { Main as RecordWithMedia } from "@repo/client/lex/app/bsky/embed/recordWithMedia";
 
 import { PostEmbedExternal } from "./embed-external.js";
 import { PostEmbedImage } from "./embed-images.js";
@@ -22,12 +24,12 @@ export class PostEmbedRecordWithMedia {
     this.media = params.media;
   }
 
-  static from(embed: app.bsky.embed.recordWithMedia.Main) {
+  static from(embed: RecordWithMedia) {
     const media = (() => {
-      if (app.bsky.embed.images.$isTypeOf(embed.media)) {
+      if (images.isTypeOf(embed.media)) {
         return PostEmbedImage.from(embed.media.images);
       }
-      if (app.bsky.embed.external.$isTypeOf(embed.media)) {
+      if (external.isTypeOf(embed.media)) {
         return PostEmbedExternal.from(embed.media.external);
       }
       // TODO: app.bsky.embed.videoをサポートする

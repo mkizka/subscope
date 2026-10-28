@@ -1,5 +1,5 @@
 import { getBlobCidString } from "@atproto/lex";
-import type { app } from "@repo/client/lex";
+import type { Image } from "@repo/client/lex/app/bsky/embed/images";
 
 type AspectRatio = {
   width: number;
@@ -26,7 +26,7 @@ export class PostEmbedImage {
     this.aspectRatio = params.aspectRatio;
   }
 
-  static from(images: app.bsky.embed.images.Image[]) {
+  static from(images: Image[]) {
     return images.map((image, index) => {
       return new PostEmbedImage({
         cid: getBlobCidString(image.image),

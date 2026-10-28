@@ -64,7 +64,7 @@ export class Record {
   }
 
   validate<T extends SupportedCollection>(collection: T) {
-    const result = SUPPORTED_COLLECTION_SCHEMAS[collection].$safeParse(
+    const result = SUPPORTED_COLLECTION_SCHEMAS[collection].safeParse(
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       jsonToLex(this.json as JsonValue),
       { strict: false },

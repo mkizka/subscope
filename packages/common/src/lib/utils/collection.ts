@@ -1,15 +1,22 @@
 import type { InferOutput } from "@atproto/lex";
-import { app } from "@repo/client/lex";
+import profile from "@repo/client/lex/app/bsky/actor/profile";
+import generator from "@repo/client/lex/app/bsky/feed/generator";
+import like from "@repo/client/lex/app/bsky/feed/like";
+import post from "@repo/client/lex/app/bsky/feed/post";
+import repost from "@repo/client/lex/app/bsky/feed/repost";
+import follow from "@repo/client/lex/app/bsky/graph/follow";
+import list from "@repo/client/lex/app/bsky/graph/list";
+import listitem from "@repo/client/lex/app/bsky/graph/listitem";
 
 export const SUPPORTED_COLLECTION_SCHEMAS = {
-  "app.bsky.actor.profile": app.bsky.actor.profile.main,
-  "app.bsky.feed.generator": app.bsky.feed.generator.main,
-  "app.bsky.feed.like": app.bsky.feed.like.main,
-  "app.bsky.feed.post": app.bsky.feed.post.main,
-  "app.bsky.feed.repost": app.bsky.feed.repost.main,
-  "app.bsky.graph.follow": app.bsky.graph.follow.main,
-  "app.bsky.graph.list": app.bsky.graph.list.main,
-  "app.bsky.graph.listitem": app.bsky.graph.listitem.main,
+  "app.bsky.actor.profile": profile,
+  "app.bsky.feed.generator": generator,
+  "app.bsky.feed.like": like,
+  "app.bsky.feed.post": post,
+  "app.bsky.feed.repost": repost,
+  "app.bsky.graph.follow": follow,
+  "app.bsky.graph.list": list,
+  "app.bsky.graph.listitem": listitem,
 };
 
 type SupportedCollectionSchemas = typeof SUPPORTED_COLLECTION_SCHEMAS;
