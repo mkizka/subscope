@@ -14,11 +14,7 @@ interface ScheduledResolveDid {
   did: Did;
 }
 
-interface ScheduledAddTapRepo {
-  did: Did;
-}
-
-interface ScheduledRemoveTapRepo {
+interface ScheduledSyncTapRepo {
   did: Did;
 }
 
@@ -35,8 +31,7 @@ interface ScheduledAggregateActorStats {
 export class InMemoryJobScheduler implements IJobScheduler {
   private fetchRecordJobs: ScheduledFetchRecord[] = [];
   private resolveDidJobs: ScheduledResolveDid[] = [];
-  private addTapRepoJobs: ScheduledAddTapRepo[] = [];
-  private removeTapRepoJobs: ScheduledRemoveTapRepo[] = [];
+  private syncTapRepoJobs: ScheduledSyncTapRepo[] = [];
   private aggregatePostStatsJobs: ScheduledAggregatePostStats[] = [];
   private aggregateActorStatsJobs: ScheduledAggregateActorStats[] = [];
 
@@ -51,12 +46,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.resolveDidJobs.push({ did });
   }
 
-  async scheduleAddTapRepo(did: Did): Promise<void> {
-    this.addTapRepoJobs.push({ did });
-  }
-
-  async scheduleRemoveTapRepo(did: Did): Promise<void> {
-    this.removeTapRepoJobs.push({ did });
+  async scheduleSyncTapRepo(did: Did): Promise<void> {
+    this.syncTapRepoJobs.push({ did });
   }
 
   async scheduleAggregatePostStats(
@@ -81,12 +72,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     return this.resolveDidJobs;
   }
 
-  getAddTapRepoJobs(): readonly ScheduledAddTapRepo[] {
-    return this.addTapRepoJobs;
-  }
-
-  getRemoveTapRepoJobs(): readonly ScheduledRemoveTapRepo[] {
-    return this.removeTapRepoJobs;
+  getSyncTapRepoJobs(): readonly ScheduledSyncTapRepo[] {
+    return this.syncTapRepoJobs;
   }
 
   getAggregatePostStatsJobs(): readonly ScheduledAggregatePostStats[] {
@@ -100,8 +87,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
   clear(): void {
     this.fetchRecordJobs = [];
     this.resolveDidJobs = [];
-    this.addTapRepoJobs = [];
-    this.removeTapRepoJobs = [];
+    this.syncTapRepoJobs = [];
     this.aggregatePostStatsJobs = [];
     this.aggregateActorStatsJobs = [];
   }

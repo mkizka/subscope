@@ -61,7 +61,7 @@ describe("FollowIndexer", () => {
       });
     });
 
-    test("フォロワーがサブスクライバーの場合、フォロイーのDIDがTapに登録される", async () => {
+    test("syncTapRepo-4: フォロワーがサブスクライバーの場合、フォロイーのsyncTapRepoジョブを積む", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -85,13 +85,13 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const addTapRepoJobs = jobScheduler.getAddTapRepoJobs();
-      expect(addTapRepoJobs).toContainEqual(
+      const syncTapRepoJobs = jobScheduler.getSyncTapRepoJobs();
+      expect(syncTapRepoJobs).toContainEqual(
         expect.objectContaining({ did: followee.did }),
       );
     });
 
-    test("フォロワーがサブスクライバーでない場合、TapにDIDが登録されない", async () => {
+    test("フォロワーがサブスクライバーでない場合、syncTapRepoジョブを積まない", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -112,8 +112,8 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const addTapRepoJobs = jobScheduler.getAddTapRepoJobs();
-      expect(addTapRepoJobs).not.toContainEqual(
+      const syncTapRepoJobs = jobScheduler.getSyncTapRepoJobs();
+      expect(syncTapRepoJobs).not.toContainEqual(
         expect.objectContaining({ did: followee.did }),
       );
     });
@@ -186,7 +186,7 @@ describe("FollowIndexer", () => {
       );
     });
 
-    test("フォロー削除時、フォロワーがサブスクライバーで他のサブスクライバーからフォローされていない場合、Tapから削除される", async () => {
+    test("syncTapRepo-5: フォロワーがサブスクライバーのフォローが削除された場合、フォロイーのsyncTapRepoジョブを積む", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -212,19 +212,16 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record, action: "delete" });
 
       // assert
-      const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
-      expect(removeTapRepoJobs).toContainEqual(
+      const syncTapRepoJobs = jobScheduler.getSyncTapRepoJobs();
+      expect(syncTapRepoJobs).toContainEqual(
         expect.objectContaining({ did: followee.did }),
       );
     });
 
-    test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
+    test("フォロワーがサブスクライバーでないフォローが削除された場合、syncTapRepoジョブを積まない", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
-      const subscription = subscriptionFactory({ actorDid: follower.did });
-      subscriptionRepo.add(subscription);
-
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey_delete2`,
         json: {
@@ -233,72 +230,12 @@ describe("FollowIndexer", () => {
           createdAt: new Date().toISOString(),
         },
       });
-      await followIndexer.upsert({
-        ctx,
-        record,
-        live: false,
-      });
-      followRepo.deleteByUri(record.uri);
-
-      // 他のサブスクライバーからフォローされている状態を固定する
-      vi.spyOn(followRepo, "isFollowedByAnySubscriber").mockResolvedValue(true);
 
       // act
       await followIndexer.afterAction({ ctx, record, action: "delete" });
 
       // assert
-      const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
-      expect(removeTapRepoJobs).not.toContainEqual(
-        expect.objectContaining({ did: followee.did }),
-      );
-    });
-
-    test("フォロー削除時、フォロワーがサブスクライバーでない場合、Tap削除処理は実行されない", async () => {
-      // arrange
-      const subscriber = actorFactory();
-      const nonSubscriber = actorFactory();
-      const followee = actorFactory();
-      const subscription = subscriptionFactory({ actorDid: subscriber.did });
-      subscriptionRepo.add(subscription);
-
-      const subscriberRecord = recordFactory({
-        uri: `at://${subscriber.did}/app.bsky.graph.follow/followrkey_delete3a`,
-        json: {
-          $type: "app.bsky.graph.follow",
-          subject: followee.did,
-          createdAt: new Date().toISOString(),
-        },
-      });
-      const nonSubscriberRecord = recordFactory({
-        uri: `at://${nonSubscriber.did}/app.bsky.graph.follow/followrkey_delete3b`,
-        json: {
-          $type: "app.bsky.graph.follow",
-          subject: followee.did,
-          createdAt: new Date().toISOString(),
-        },
-      });
-      await followIndexer.upsert({
-        ctx,
-        record: subscriberRecord,
-        live: false,
-      });
-      await followIndexer.upsert({
-        ctx,
-        record: nonSubscriberRecord,
-        live: false,
-      });
-      followRepo.deleteByUri(nonSubscriberRecord.uri);
-
-      // act
-      await followIndexer.afterAction({
-        ctx,
-        record: nonSubscriberRecord,
-        action: "delete",
-      });
-
-      // assert
-      const removeTapRepoJobs = jobScheduler.getRemoveTapRepoJobs();
-      expect(removeTapRepoJobs).not.toContainEqual(
+      expect(jobScheduler.getSyncTapRepoJobs()).not.toContainEqual(
         expect.objectContaining({ did: followee.did }),
       );
     });

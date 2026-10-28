@@ -87,45 +87,23 @@ describe("JobScheduler", () => {
     });
   });
 
-  describe("scheduleAddTapRepo", () => {
-    test("addTapRepoジョブをスケジュールする", async () => {
+  describe("scheduleSyncTapRepo", () => {
+    test("syncTapRepoジョブを遅延付きでスケジュールする", async () => {
       // arrange
       const did = "did:plc:test";
 
       // act
-      await jobScheduler.scheduleAddTapRepo(did);
+      await jobScheduler.scheduleSyncTapRepo(did);
 
       // assert
       const jobs = jobQueue.getJobs();
       expect(jobs).toHaveLength(1);
       expect(jobs[0]).toMatchObject({
-        queueName: "addTapRepo",
+        queueName: "syncTapRepo",
         jobName: did,
         data: did,
         options: {
-          jobId: did,
-        },
-      });
-    });
-  });
-
-  describe("scheduleRemoveTapRepo", () => {
-    test("removeTapRepoジョブをスケジュールする", async () => {
-      // arrange
-      const did = "did:plc:test";
-
-      // act
-      await jobScheduler.scheduleRemoveTapRepo(did);
-
-      // assert
-      const jobs = jobQueue.getJobs();
-      expect(jobs).toHaveLength(1);
-      expect(jobs[0]).toMatchObject({
-        queueName: "removeTapRepo",
-        jobName: did,
-        data: did,
-        options: {
-          jobId: did,
+          delay: 10000,
         },
       });
     });
