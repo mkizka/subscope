@@ -174,6 +174,29 @@ export const lists = pgTable("lists", {
   indexedAt: timestamp().notNull(),
 });
 
+export const listItems = pgTable(
+  "list_items",
+  {
+    uri: varchar({ length: 256 })
+      .primaryKey()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }).notNull(),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did, { onDelete: "cascade" }),
+    listUri: varchar({ length: 256 }).notNull(),
+    subjectDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did, { onDelete: "cascade" }),
+    createdAt: timestamp().notNull(),
+    indexedAt: timestamp().notNull(),
+  },
+  (table) => [
+    index("list_items_list_uri_idx").on(table.listUri),
+    index("list_items_subject_did_idx").on(table.subjectDid),
+  ],
+);
+
 export const likes = pgTable(
   "likes",
   {
