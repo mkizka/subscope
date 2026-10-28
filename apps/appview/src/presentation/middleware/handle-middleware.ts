@@ -1,8 +1,12 @@
 import { type Did, isDid } from "@atproto/did";
+import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { type Handle, isHandle } from "@repo/common/utils";
 
-import type { IHandleResolver } from "../../application/interfaces/handle-resolver.js";
+import {
+  HandleResolutionError,
+  type IHandleResolver,
+} from "../../application/interfaces/handle-resolver.js";
 
 export class HandleMiddleware {
   private readonly logger: Logger;
@@ -19,7 +23,14 @@ export class HandleMiddleware {
     if (isDid(handleOrDid)) {
       return handleOrDid;
     }
-    return this.handleResolver.resolve(handleOrDid);
+    try {
+      return await this.handleResolver.resolve(handleOrDid);
+    } catch (error) {
+      if (error instanceof HandleResolutionError) {
+        throw new InvalidRequestError("Profile not found");
+      }
+      throw error;
+    }
   }
 
   async resolveHandleOrDids(handleOrDids: (Handle | Did)[]): Promise<Did[]> {
