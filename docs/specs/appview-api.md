@@ -20,3 +20,15 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
+
+## app.bsky.graph.getFollowers
+
+指定したアクターをフォローしているアクターを返す。認証は任意。
+
+- getFollowers-1: フォロワーがいるアクターを指定した場合、そのアクターをsubject、フォロワーのprofileViewをfollowersとして返す
+
+## app.bsky.graph.getFollows
+
+指定したアクターがフォローしているアクターを返す。認証は任意。
+
+- getFollows-1: フォローしているアクターを指定した場合、そのアクターをsubject、フォロー先のprofileViewをfollowsとして返す
