@@ -17,6 +17,7 @@ import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
+import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
 import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
@@ -49,6 +50,7 @@ export const xrpcRouterFactory = (
   searchPosts: SearchPosts,
   getFollows: GetFollows,
   getFollowers: GetFollowers,
+  getList: GetList,
   getLists: GetLists,
   getUnreadCount: GetUnreadCount,
   listNotifications: ListNotifications,
@@ -81,6 +83,7 @@ export const xrpcRouterFactory = (
     searchPosts,
     getFollows,
     getFollowers,
+    getList,
     getLists,
     getUnreadCount,
     listNotifications,
@@ -120,6 +123,7 @@ xrpcRouterFactory.inject = [
   "searchPosts",
   "getFollows",
   "getFollowers",
+  "getList",
   "getLists",
   "getUnreadCount",
   "listNotifications",
