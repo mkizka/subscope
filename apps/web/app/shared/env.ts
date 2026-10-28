@@ -21,10 +21,7 @@ const schema = z
     LOG_LEVEL: z
       .enum(["debug", "info", "warn", "error"])
       .default(match({ prod: "info", dev: "debug" })),
-    REDIS_URL: match({
-      prod: z.url(),
-      dev: z.url().default("redis://localhost:6379"),
-    }),
+    REDIS_URL: z.url(),
     PUBLIC_URL: z.string(),
     APPVIEW_URL: z.url(),
     APPVIEW_DID: z.string().optional(),
@@ -39,12 +36,7 @@ const schema = z
       dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
     }),
     ATPROTO_PLC_URL: z.string().default("https://plc.directory"),
-    DATABASE_URL: match({
-      prod: z.url(),
-      dev: z
-        .url()
-        .default("postgresql://postgres:password@localhost:5432/postgres"),
-    }),
+    DATABASE_URL: z.url(),
   })
   .transform((val) => ({
     ...val,
