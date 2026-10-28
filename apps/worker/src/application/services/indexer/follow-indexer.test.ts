@@ -12,6 +12,7 @@ describe("FollowIndexer", () => {
   let followRepo: TestServices["followRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
+  let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
@@ -20,6 +21,7 @@ describe("FollowIndexer", () => {
     followRepo = services.followRepository;
     jobScheduler = services.jobScheduler;
     subscriptionRepo = services.subscriptionRepository;
+    notificationRepo = services.notificationRepository;
     db = services.db;
     ctx = { db };
   });
@@ -114,6 +116,35 @@ describe("FollowIndexer", () => {
       expect(addTapRepoJobs).not.toContainEqual(
         expect.objectContaining({ did: followee.did }),
       );
+    });
+
+    test("フォロイーがサブスクライバーなら通知を作成する", async () => {
+      // arrange
+      const follower = actorFactory();
+      const followee = actorFactory();
+      subscriptionRepo.add(subscriptionFactory({ actorDid: followee.did }));
+      const record = recordFactory({
+        uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
+        json: {
+          $type: "app.bsky.graph.follow",
+          subject: followee.did,
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await followIndexer.upsert({ ctx, record, live: false });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject([
+        {
+          recordUri: record.uri.toString(),
+          recipientDid: followee.did,
+          authorDid: follower.did,
+          reason: "follow",
+          reasonSubject: null,
+        },
+      ]);
     });
   });
 
