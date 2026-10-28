@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
-import { InvalidRequestError } from "@atproto/xrpc-server";
-import type { Server } from "@repo/client/server";
+import { type LexRouter, LexServerError } from "@atproto/lex-server";
+import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
 
 import {
   AlreadySubscribedError,
@@ -16,18 +16,17 @@ export class SubscribeServer {
   ) {}
   static inject = ["subscribeServerUseCase", "authVerifierMiddleware"] as const;
 
-  handle(server: Server) {
-    server.me.subsco.sync.subscribeServer({
-      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx.req),
-      handler: async ({ input, auth }) => {
+  handle(router: LexRouter) {
+    router.add(subscribeServer, {
+      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      handler: async ({ input, credentials }) => {
         try {
           await this.subscribeServerUseCase.execute({
             code: input.body.inviteCode,
-            actorDid: asDid(auth.credentials.did),
+            actorDid: asDid(credentials.did),
           });
 
           return {
-            encoding: "application/json",
             body: {
               success: true,
               message: "Successfully subscribed to the server",
@@ -38,7 +37,10 @@ export class SubscribeServer {
             error instanceof InvalidInviteCodeError ||
             error instanceof AlreadySubscribedError
           ) {
-            throw new InvalidRequestError(error.message, error.name);
+            throw new LexServerError(400, {
+              error: error.name,
+              message: error.message,
+            });
           }
           throw error;
         }

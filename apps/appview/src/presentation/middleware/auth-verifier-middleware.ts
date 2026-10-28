@@ -1,6 +1,7 @@
 import type { IncomingMessage } from "node:http";
 
 import { type Did } from "@atproto/did";
+import { LexServerAuthError } from "@atproto/lex-server";
 import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
@@ -45,6 +46,21 @@ export class AuthVerifierMiddleware {
       credentials,
       artifacts: token,
     };
+  }
+
+  async lexLoginRequired({ request }: { request: Request }) {
+    try {
+      const { credentials } = await this.loginRequired({
+        headers: Object.fromEntries(request.headers),
+        path: new URL(request.url).pathname,
+      });
+      return credentials;
+    } catch (error) {
+      if (error instanceof AuthRequiredError) {
+        throw new LexServerAuthError("AuthenticationRequired", error.message);
+      }
+      throw error;
+    }
   }
 
   async getViewerDid(request: MaybeRequest): Promise<Did | null> {

@@ -29,9 +29,6 @@ import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
-import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
-import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
-import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
 
 export const xrpcRouterFactory = (
   getPreferences: GetPreferences,
@@ -61,9 +58,6 @@ export const xrpcRouterFactory = (
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
   getSetupStatus: GetSetupStatus,
-  getSubscriptionStatus: GetSubscriptionStatus,
-  subscribeServer: SubscribeServer,
-  unsubscribeServer: UnsubscribeServer,
   updateSeen: UpdateSeen,
 ): Router => {
   const handlers = [
@@ -94,9 +88,6 @@ export const xrpcRouterFactory = (
     registerAdmin,
     verifyAccess,
     getSetupStatus,
-    getSubscriptionStatus,
-    subscribeServer,
-    unsubscribeServer,
     updateSeen,
   ];
 
@@ -134,8 +125,5 @@ xrpcRouterFactory.inject = [
   "registerAdmin",
   "verifyAccess",
   "getSetupStatus",
-  "getSubscriptionStatus",
-  "subscribeServer",
-  "unsubscribeServer",
   "updateSeen",
 ] as const;

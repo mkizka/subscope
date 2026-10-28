@@ -214,6 +214,9 @@ importers:
       '@atproto/did':
         specifier: 0.5.6
         version: 0.5.6
+      '@atproto/lex-server':
+        specifier: 0.2.0
+        version: 0.2.0
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
