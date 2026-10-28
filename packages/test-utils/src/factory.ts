@@ -30,6 +30,7 @@ export const actorFactory = (db: Database) =>
           did: () => fakeDid(),
           handle: () => fakeHandle() as string | null,
           indexedAt: () => faker.date.recent(),
+          isAdmin: () => false,
         },
         vars: {},
       },
