@@ -12,8 +12,7 @@ export type CounterKey =
   | "fetch_record_error_total";
 
 export type GaugeKey =
-  | "ingester_events_time_delay"
-  | "ingester_websocket_connection_state";
+  "ingester_events_time_delay" | "ingester_websocket_connection_state";
 
 export type LabelsValue = Record<string, string | number>;
 

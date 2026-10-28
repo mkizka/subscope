@@ -28,8 +28,7 @@ type DeleteCommitEventDto<RecordType extends string = SupportedCollection> = {
 };
 
 export type CommitEventDto<RecordType extends string = SupportedCollection> =
-  | CreateOrUpdateCommitEventDto<RecordType>
-  | DeleteCommitEventDto<RecordType>;
+  CreateOrUpdateCommitEventDto<RecordType> | DeleteCommitEventDto<RecordType>;
 
 export interface AccountEventDto {
   account: {
