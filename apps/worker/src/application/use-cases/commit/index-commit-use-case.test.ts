@@ -257,5 +257,25 @@ describe("IndexCommitUseCase", () => {
       // assert
       expect(postRepo.findByUri(uri)?.text).toBe("new");
     });
+
+    test("revがないコミットの場合、revを比較せずに処理する", async () => {
+      // arrange
+      const { uri, record } = setup("old");
+      await indexCommitUseCase.execute({
+        commit: { operation: "delete", uri, rev: "3bbbbbbbbbbbb" },
+        live: true,
+        jobLogger,
+      });
+
+      // act
+      await indexCommitUseCase.execute({
+        commit: { operation: "create", uri, rev: undefined, record },
+        live: true,
+        jobLogger,
+      });
+
+      // assert
+      expect(await recordRepo.findByUri({ ctx, uri })).not.toBeNull();
+    });
   });
 });

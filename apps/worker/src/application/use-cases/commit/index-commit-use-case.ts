@@ -37,11 +37,13 @@ export class IndexCommitUseCase {
 
   async doIndexCommit({ commit, live, jobLogger }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      const claimed = await this.recordRepository.claimRev({
-        ctx,
-        uri: commit.uri,
-        rev: commit.rev,
-      });
+      const claimed =
+        commit.rev === undefined ||
+        (await this.recordRepository.claimRev({
+          ctx,
+          uri: commit.uri,
+          rev: commit.rev,
+        }));
       if (!claimed) {
         await jobLogger.log(`Skipping stale commit: rev ${commit.rev}`);
         return;
