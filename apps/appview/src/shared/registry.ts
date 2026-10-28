@@ -75,6 +75,7 @@ import { SearchPostsUseCase } from "../application/use-cases/feed/search-posts-u
 import { GetFollowersUseCase } from "../application/use-cases/graph/get-followers-use-case.js";
 import { GetFollowsUseCase } from "../application/use-cases/graph/get-follows-use-case.js";
 import { ListNotificationsUseCase } from "../application/use-cases/notification/list-notifications-use-case.js";
+import { UpdateSeenUseCase } from "../application/use-cases/notification/update-seen-use-case.js";
 import { GetSetupStatusUseCase } from "../application/use-cases/server/get-setup-status-use-case.js";
 import { GetSubscriptionStatusUseCase } from "../application/use-cases/sync/get-subscription-status-use-case.js";
 import { SubscribeServerUseCase } from "../application/use-cases/sync/subscribe-server-use-case.js";
@@ -118,6 +119,7 @@ import { SearchPosts } from "../presentation/routes/app/bsky/feed/searchPosts.js
 import { GetFollowers } from "../presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "../presentation/routes/app/bsky/graph/getFollows.js";
 import { ListNotifications } from "../presentation/routes/app/bsky/notification/listNotifications.js";
+import { UpdateSeen } from "../presentation/routes/app/bsky/notification/updateSeen.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { CreateInviteCode } from "../presentation/routes/me/subsco/admin/createInviteCode.js";
 import { DeleteInviteCode } from "../presentation/routes/me/subsco/admin/deleteInviteCode.js";
@@ -224,6 +226,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
     .service("unsubscribeServerUseCase", ["subscriptionRepository"], asClassArgs(UnsubscribeServerUseCase))
+    .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))
     .service("getProfile", ["getProfilesUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfile))
@@ -252,7 +255,8 @@ export const createAppRegistry = (env: Env) =>
     .service("getSubscriptionStatus", ["getSubscriptionStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetSubscriptionStatus))
     .service("subscribeServer", ["subscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(SubscribeServer))
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
-    .service("xrpcRouter", ["getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "listNotifications", "createInviteCode", "deleteInviteCode", "getInviteCodes", "getSubscribers", "registerAdmin", "verifyAccess", "getSetupStatus", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer"], asFunctionArgs(xrpcRouterFactory))
+    .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
+    .service("xrpcRouter", ["getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "listNotifications", "createInviteCode", "deleteInviteCode", "getInviteCodes", "getSubscribers", "registerAdmin", "verifyAccess", "getSetupStatus", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "updateSeen"], asFunctionArgs(xrpcRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
