@@ -145,8 +145,8 @@ describe("lexRouter", () => {
     });
   });
 
-  test("searchPostsは空のクエリに空の結果を返す", async () => {
-    const res = await fetch(`${baseUrl}/app.bsky.feed.searchPosts?q=`);
+  test("searchPostsは空白のみのクエリに空の結果を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.feed.searchPosts?q=%20`);
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ posts: [] });
