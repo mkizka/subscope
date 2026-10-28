@@ -22,4 +22,27 @@ PaaSプラットフォームである[Railway](https://railway.com/)にデプロ
 
 ## Docker Compose
 
-準備予定
+4コア / 4GB RAM / 100GB ストレージ程度のVPSを想定しています。DockerとDocker Composeをインストールし、ドメインのAレコードをVPSに向けておいてください。80/443番ポートを開放しておけば、CaddyがHTTPS証明書を自動で取得します。
+
+1. リポジトリをcloneして`deploy`ディレクトリに移動
+
+```bash
+git clone https://github.com/mkizka/subscope.git
+cd subscope/deploy
+```
+
+2. `.env.example`を`.env`にコピーし、コメントのコマンドで値を作成して入力
+
+```bash
+cp .env.example .env
+```
+
+3. 起動
+
+```bash
+docker compose up -d --build
+```
+
+`https://<DOMAIN>`で管理画面とクライアントが、同じドメインでAppView(`did:web:<DOMAIN>`)が公開されます。
+
+更新するときは`git pull`したあと、もう一度`docker compose up -d --build`を実行してください。
