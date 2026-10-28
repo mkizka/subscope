@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { Subscription, TransactionContext } from "@repo/common/domain";
+import { Subscription, type TransactionContext } from "@repo/common/domain";
 
 import type { ISubscriptionRepository } from "../../application/interfaces/subscription-repository.js";
 
@@ -49,6 +49,22 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     ctx: TransactionContext;
   }): Promise<void> {
     this.subscriptions.set(_params.subscription.actorDid, _params.subscription);
+    return Promise.resolve();
+  }
+
+  updateSeenAt(actorDid: Did, seenAt: Date): Promise<void> {
+    const subscription = this.subscriptions.get(actorDid);
+    if (subscription) {
+      this.subscriptions.set(
+        actorDid,
+        new Subscription({
+          actorDid: subscription.actorDid,
+          inviteCode: subscription.inviteCode,
+          seenAt,
+          createdAt: subscription.createdAt,
+        }),
+      );
+    }
     return Promise.resolve();
   }
 

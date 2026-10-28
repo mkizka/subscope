@@ -42,6 +42,8 @@ paths=(
   "app/bsky/graph/getFollowers.json"
   "app/bsky/labeler/defs.json"
   "app/bsky/notification/defs.json"
+  "app/bsky/notification/listNotifications.json"
+  "app/bsky/notification/updateSeen.json"
   "app/bsky/richtext/facet.json"
 
   # com.atproto

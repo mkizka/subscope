@@ -35,6 +35,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         new Subscription({
           actorDid: row.actorDid,
           inviteCode: row.inviteCode,
+          seenAt: row.seenAt,
           createdAt: row.createdAt,
         }),
     );
@@ -54,6 +55,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     return new Subscription({
       actorDid: row.actorDid,
       inviteCode: row.inviteCode,
+      seenAt: row.seenAt,
       createdAt: row.createdAt,
     });
   }
@@ -89,6 +91,13 @@ export class SubscriptionRepository implements ISubscriptionRepository {
           createdAt: subscription.createdAt,
         },
       });
+  }
+
+  async updateSeenAt(actorDid: Did, seenAt: Date): Promise<void> {
+    await this.db
+      .update(schema.subscriptions)
+      .set({ seenAt })
+      .where(eq(schema.subscriptions.actorDid, actorDid));
   }
 
   async delete(actorDid: Did): Promise<void> {
