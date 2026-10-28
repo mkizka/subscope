@@ -19,9 +19,7 @@ import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
-import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
-import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 
 export const xrpcRouterFactory = (
@@ -43,10 +41,8 @@ export const xrpcRouterFactory = (
   getFollowers: GetFollowers,
   getList: GetList,
   getLists: GetLists,
-  getUnreadCount: GetUnreadCount,
   listNotifications: ListNotifications,
   getSubscribers: GetSubscribers,
-  updateSeen: UpdateSeen,
 ): Router => {
   const handlers = [
     getPreferences,
@@ -67,10 +63,8 @@ export const xrpcRouterFactory = (
     getFollowers,
     getList,
     getLists,
-    getUnreadCount,
     listNotifications,
     getSubscribers,
-    updateSeen,
   ];
 
   const server = createServer();
@@ -98,8 +92,6 @@ xrpcRouterFactory.inject = [
   "getFollowers",
   "getList",
   "getLists",
-  "getUnreadCount",
   "listNotifications",
   "getSubscribers",
-  "updateSeen",
 ] as const;

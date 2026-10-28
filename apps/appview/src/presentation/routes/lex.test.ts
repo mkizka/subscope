@@ -90,6 +90,25 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
   });
 
+  test("getUnreadCountは未読数を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.notification.getUnreadCount`, {
+      headers: auth,
+    });
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ count: 0 });
+  });
+
+  test("updateSeenは200を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.notification.updateSeen`, {
+      method: "POST",
+      headers: { ...auth, "content-type": "application/json" },
+      body: JSON.stringify({ seenAt: new Date().toISOString() }),
+    });
+
+    expect(res.status).toBe(200);
+  });
+
   test("管理者でない場合、admin APIは401エラーを返す", async () => {
     const res = await fetch(`${baseUrl}/me.subsco.admin.getInviteCodes`, {
       headers: auth,
