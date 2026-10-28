@@ -26,4 +26,12 @@ export class InMemoryNotificationRepository implements INotificationRepository {
         .slice(0, params.limit),
     );
   }
+
+  countUnread(recipientDid: Did): Promise<number> {
+    return Promise.resolve(
+      this.items.filter(
+        (item) => item.recipientDid === recipientDid && !item.isRead,
+      ).length,
+    );
+  }
 }

@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull, lt, or } from "drizzle-orm";
 
 import type {
   INotificationRepository,
@@ -48,5 +48,26 @@ export class NotificationRepository implements INotificationRepository {
       ...row,
       isRead: seenAt !== null && row.sortAt <= seenAt,
     }));
+  }
+
+  async countUnread(recipientDid: Did): Promise<number> {
+    const { notifications, subscriptions } = schema;
+    const [row] = await this.db
+      .select({ count: count() })
+      .from(notifications)
+      .leftJoin(
+        subscriptions,
+        eq(subscriptions.actorDid, notifications.recipientDid),
+      )
+      .where(
+        and(
+          eq(notifications.recipientDid, recipientDid),
+          or(
+            isNull(subscriptions.seenAt),
+            gt(notifications.sortAt, subscriptions.seenAt),
+          ),
+        ),
+      );
+    return row?.count ?? 0;
   }
 }
