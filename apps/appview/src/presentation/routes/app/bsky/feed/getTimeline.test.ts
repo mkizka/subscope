@@ -1,18 +1,21 @@
-import { asDid } from "@atproto/did";
-import { FeedItem } from "@repo/common/domain";
 import {
   actorFactory,
+  followFactory,
   postFactory,
-  profileDetailedFactory,
-} from "@repo/common/test";
+  postFeedItemFactory,
+  recordFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { setupTestServer } from "../../../../../shared/test-utils.js";
+import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
 describe("app.bsky.feed.getTimeline", () => {
+  const { ctx } = testSetup;
+
   test("認証がない場合、401を返す", async () => {
     // arrange
-    const { client } = await setupTestServer();
+    const { client } = await setupApiTest();
 
     // act
     const promise = client.app.bsky.feed.getTimeline();
@@ -23,28 +26,39 @@ describe("app.bsky.feed.getTimeline", () => {
 
   test("フォロイーの投稿がある場合、feedViewPostとして返す", async () => {
     // arrange
-    const { services, client } = await setupTestServer();
-    const viewer = actorFactory();
-    const author = actorFactory();
-    services.tokenVerifier.setVerifyResult({ did: asDid(viewer.did) });
-    services.profileRepository.add(
-      profileDetailedFactory({ actorDid: author.did }),
-    );
-    services.timelineRepository.addFollow(asDid(viewer.did), asDid(author.did));
-    const { post, record } = postFactory({ actorDid: author.did });
-    services.postRepository.add(post);
-    services.recordRepository.add(record);
-    services.timelineRepository.addFeedItem(FeedItem.fromPost(post));
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const followee = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({}))
+      .create();
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ actor: () => viewer })
+            .create(),
+        followee: () => followee,
+      })
+      .create();
+    const post = await postFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.post")
+            .vars({ actor: () => followee })
+            .create(),
+      })
+      .create();
+    await postFeedItemFactory(ctx.db)
+      .vars({ post: () => post })
+      .create();
+    loginAs(viewer.did);
 
     // act
-    const res = await client.app.bsky.feed.getTimeline(
-      {},
-      { headers: { authorization: "Bearer token" } },
-    );
+    const res = await client.app.bsky.feed.getTimeline();
 
     // assert
     expect(res.data.feed).toMatchObject([
-      { post: { uri: post.uri.toString(), author: { did: author.did } } },
+      { post: { uri: post.uri, author: { did: followee.did } } },
     ]);
   });
 });

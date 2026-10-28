@@ -1,16 +1,17 @@
-import { actorFactory, profileDetailedFactory } from "@repo/common/test";
+import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { setupTestServer } from "../../../../../shared/test-utils.js";
+import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
 describe("app.bsky.actor.getProfile", () => {
+  const { ctx } = testSetup;
+
   test("プロフィールがある場合、profileViewDetailedを返す", async () => {
     // arrange
-    const { services, client } = await setupTestServer();
-    const actor = actorFactory();
-    services.profileRepository.add(
-      profileDetailedFactory({ actorDid: actor.did, displayName: "Alice" }),
-    );
+    const { client } = await setupApiTest();
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Alice" }))
+      .create();
 
     // act
     const res = await client.app.bsky.actor.getProfile({ actor: actor.did });
@@ -18,17 +19,18 @@ describe("app.bsky.actor.getProfile", () => {
     // assert
     expect(res.data).toMatchObject({
       did: actor.did,
+      handle: actor.handle,
       displayName: "Alice",
     });
   });
 
-  test("プロフィールがない場合、400を返す", async () => {
+  test("アクターが存在しない場合、400を返す", async () => {
     // arrange
-    const { client } = await setupTestServer();
+    const { client } = await setupApiTest();
 
     // act
     const promise = client.app.bsky.actor.getProfile({
-      actor: actorFactory().did,
+      actor: "did:plc:notfound",
     });
 
     // assert

@@ -1,8 +1,4 @@
-import { once } from "node:events";
-import type { AddressInfo } from "node:net";
-
 import { asClassArgs } from "@gyaku/di";
-import { AtpBaseClient } from "@repo/client/api";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -10,8 +6,6 @@ import {
   InMemoryJobQueue,
   InMemoryTransactionManager,
 } from "@repo/common/test";
-import express from "express";
-import { onTestFinished } from "vitest";
 
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
@@ -35,7 +29,7 @@ import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-ve
 import type { Env } from "./env.js";
 import { createAppRegistry } from "./registry.js";
 
-const testEnv = {
+export const testEnv = {
   NODE_ENV: "test",
   LOG_LEVEL: "error",
   PORT: 3001,
@@ -77,16 +71,3 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("tokenVerifier", asClassArgs(InMemoryTokenVerifier));
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;
-
-export const setupTestServer = async () => {
-  const services = await testRegistry.resolve();
-  const server = express().use(services.xrpcRouter).listen(0);
-  await once(server, "listening");
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const { port } = server.address() as AddressInfo;
-  const client = new AtpBaseClient(`http://localhost:${port}`);
-  onTestFinished(() => {
-    server.close();
-  });
-  return { services, client };
-};
