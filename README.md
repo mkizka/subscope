@@ -20,14 +20,14 @@ The goal is to enable self-hosting on a typical VPS with around 4 cores / 4GB RA
 
 Server implementations are located under the apps directory.
 
-- subscope ... Main server providing client and admin dashboard
+- web ... Web client and admin dashboard
 - appview ... AppView server that exposes the XRPC API and serves the `did:web` document
-- ingester ... Receives Jetstream events and adds jobs
-- worker ... Worker that processes Tap events
+- ingester ... Receives Tap events and adds jobs
+- worker ... Worker that indexes records into the database
 
 ## Deployment
 
-WIP
+See [docs/user/deploy.md](./docs/user/deploy.md).
 
 ## Development
 
@@ -42,7 +42,7 @@ pnpm dev
 
 The following servers will start.
 
-- subscope ... http://localhost:3000
+- web ... http://localhost:3000
 - appview ... http://localhost:3001
 - worker ... http://localhost:3003
 - ingester ... http://localhost:3004
