@@ -8,6 +8,10 @@
       "import": "./dist/api.js",
       "types": "./dist/api.d.ts"
     },
+    "./lex": {
+      "import": "./dist/lex.js",
+      "types": "./dist/lex.d.ts"
+    },
     "./server": {
       "import": "./dist/server.js",
       "types": "./dist/server.d.ts"
@@ -19,12 +23,14 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
-    "postinstall": "./scripts/postinstall.sh",
+    "generate": "./scripts/generate.sh",
     "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@atproto/api": "0.29.5",
+    "@atproto/lex": "0.4.2",
+    "@atproto/lex-server": "0.2.0",
     "@atproto/lexicon": "0.7.17",
     "@atproto/oauth-client": "0.9.0",
     "@atproto/xrpc": "0.8.16",
