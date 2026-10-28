@@ -21,7 +21,7 @@ describe("app.bsky.feed.getTimeline", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("フォロイーの投稿をfeedViewPostとして返す", async () => {
+  test("フォロイーの投稿がある場合、feedViewPostとして返す", async () => {
     // arrange
     const { services, client } = await setupTestServer();
     const viewer = actorFactory();
