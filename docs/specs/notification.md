@@ -26,7 +26,7 @@
   - レスポンスの `seenAt` はサブスクライバーの既読時刻を返す
   - `priority` は無視し、常に全件を返す
 - `app.bsky.notification.getUnreadCount`
-  - `seenAt` パラメータは無視し、`updateSeen` で保存した既読時刻より後の通知を数える
+  - `seenAt` パラメータがあればその時刻、なければ `updateSeen` で保存した既読時刻より後の通知を数える
   - `priority` は無視する
 - `app.bsky.notification.updateSeen`
   - サブスクライバーの既読時刻を更新する
