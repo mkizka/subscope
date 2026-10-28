@@ -1,5 +1,9 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, recordFactory } from "@repo/common/test";
+import {
+  actorFactory,
+  recordFactory,
+  subscriptionFactory,
+} from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -10,6 +14,8 @@ describe("PostIndexer", () => {
   let postRepo: TestServices["postRepository"];
   let feedItemRepo: TestServices["feedItemRepository"];
   let jobScheduler: TestServices["jobScheduler"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
@@ -17,6 +23,8 @@ describe("PostIndexer", () => {
     postRepo = services.postRepository;
     feedItemRepo = services.feedItemRepository;
     jobScheduler = services.jobScheduler;
+    subscriptionRepo = services.subscriptionRepository;
+    notificationRepo = services.notificationRepository;
     db = services.db;
   });
 
@@ -152,6 +160,63 @@ describe("PostIndexer", () => {
 
       const feedItem = feedItemRepo.findByUri(record.uri);
       expect(feedItem?.sortAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
+    });
+
+    test("サブスクライバー宛てのリプライ・引用・メンションの通知を作成する", async () => {
+      const ctx = { db };
+      // arrange
+      const author = actorFactory();
+      const replied = actorFactory();
+      const quoted = actorFactory();
+      const nonSubscriber = actorFactory();
+      subscriptionRepo.add(subscriptionFactory({ actorDid: replied.did }));
+      subscriptionRepo.add(subscriptionFactory({ actorDid: quoted.did }));
+      subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
+      const parentUri = `at://${replied.did}/app.bsky.feed.post/parent`;
+      const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
+      const cid = await randomCid();
+      const mention = (did: string) => ({
+        index: { byteStart: 0, byteEnd: 1 },
+        features: [{ $type: "app.bsky.richtext.facet#mention", did }],
+      });
+      const record = recordFactory({
+        uri: `at://${author.did}/app.bsky.feed.post/notify`,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "@",
+          reply: {
+            root: { uri: parentUri, cid },
+            parent: { uri: parentUri, cid },
+          },
+          embed: {
+            $type: "app.bsky.embed.record",
+            record: { uri: quotedUri, cid },
+          },
+          facets: [
+            mention(replied.did),
+            mention(nonSubscriber.did),
+            mention(author.did),
+          ],
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject([
+        {
+          recipientDid: replied.did,
+          reason: "reply",
+          reasonSubject: parentUri,
+        },
+        {
+          recipientDid: quoted.did,
+          reason: "quote",
+          reasonSubject: quotedUri,
+        },
+      ]);
     });
   });
 

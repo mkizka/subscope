@@ -21,12 +21,15 @@ const schema = z
     LOG_LEVEL: z
       .enum(["debug", "info", "warn", "error"])
       .default(match({ prod: "info", dev: "debug" })),
-    REDIS_URL: match({
+    REDIS_URL: z.url(),
+    PUBLIC_URL: match({
       prod: z.url(),
-      dev: z.url().default("redis://localhost:6379"),
+      dev: z.url().default("http://127.0.0.1:3000"),
     }),
-    PUBLIC_URL: z.string(),
-    APPVIEW_URL: z.url(),
+    APPVIEW_URL: match({
+      prod: z.url(),
+      dev: z.url().default("http://localhost:3001"),
+    }),
     APPVIEW_DID: z.string().optional(),
     // openssl rand -base64 33
     COOKIE_SECRET: match({
@@ -39,17 +42,14 @@ const schema = z
       dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
     }),
     ATPROTO_PLC_URL: z.string().default("https://plc.directory"),
-    DATABASE_URL: match({
-      prod: z.url(),
-      dev: z
-        .url()
-        .default("postgresql://postgres:password@localhost:5432/postgres"),
-    }),
+    ATPROTO_HANDLE_RESOLVER_URL: z.url().optional(),
+    DATABASE_URL: z.url(),
   })
   .transform((val) => ({
     ...val,
     APPVIEW_DID:
-      val.APPVIEW_DID ?? `did:web:${new URL(val.APPVIEW_URL).hostname}`,
+      val.APPVIEW_DID ??
+      `did:web:${encodeURIComponent(new URL(val.APPVIEW_URL).host)}`,
   }));
 
 export const env = (() => {

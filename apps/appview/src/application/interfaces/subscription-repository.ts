@@ -12,5 +12,6 @@ export interface ISubscriptionRepository {
     subscription: Subscription;
     ctx: TransactionContext;
   }) => Promise<void>;
+  updateSeenAt: (actorDid: Did, seenAt: Date) => Promise<void>;
   delete: (actorDid: Did) => Promise<void>;
 }

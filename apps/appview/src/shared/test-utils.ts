@@ -16,6 +16,7 @@ import { InMemoryGeneratorRepository } from "../infrastructure/generator-reposit
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-repository.in-memory.js";
+import { InMemoryNotificationRepository } from "../infrastructure/notification-repository/notification-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryPostStatsRepository } from "../infrastructure/post-stats-repository/post-stats-repository.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
@@ -48,6 +49,7 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("actorStatsRepository", asClassArgs(InMemoryActorStatsRepository))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
+  .replaceService("notificationRepository", asClassArgs(InMemoryNotificationRepository))
   .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
   .replaceService("postStatsRepository", asClassArgs(InMemoryPostStatsRepository))
   .replaceService("timelineRepository", asClassArgs(InMemoryTimelineRepository))

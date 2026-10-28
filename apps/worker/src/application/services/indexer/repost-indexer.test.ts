@@ -4,6 +4,7 @@ import {
   fakeCid,
   postFactory,
   recordFactory,
+  subscriptionFactory,
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -15,6 +16,8 @@ describe("RepostIndexer", () => {
   let feedItemRepo: TestServices["feedItemRepository"];
   let postRepo: TestServices["postRepository"];
   let jobScheduler: TestServices["jobScheduler"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
@@ -23,6 +26,8 @@ describe("RepostIndexer", () => {
     feedItemRepo = services.feedItemRepository;
     postRepo = services.postRepository;
     jobScheduler = services.jobScheduler;
+    subscriptionRepo = services.subscriptionRepository;
+    notificationRepo = services.notificationRepository;
     db = services.db;
   });
 
@@ -76,6 +81,41 @@ describe("RepostIndexer", () => {
           uri: new AtUri(subjectUri),
           depth: 0,
           live: false,
+        },
+      ]);
+    });
+
+    test("投稿者がサブスクライバーなら通知を作成する", async () => {
+      // arrange
+      const reposter = actorFactory();
+      const author = actorFactory();
+      subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
+      const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
+      const record = recordFactory({
+        uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,
+        json: {
+          $type: "app.bsky.feed.repost",
+          subject: { uri: subjectUri, cid: fakeCid() },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await repostIndexer.upsert({
+        ctx: { db },
+        record,
+        live: false,
+        depth: 0,
+      });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject([
+        {
+          recordUri: record.uri.toString(),
+          recipientDid: author.did,
+          authorDid: reposter.did,
+          reason: "repost",
+          reasonSubject: subjectUri,
         },
       ]);
     });

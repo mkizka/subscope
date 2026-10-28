@@ -12,29 +12,30 @@
     "build": "turbo run build",
     "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
-    "dev": "./scripts/dev.sh",
+    "dev": "node --import tsx ./dev-env/server.mts pnpm turbo run dev --ui tui",
     "format": "pnpm -s _prettier . --write && turbo run format",
     "get-docs": "./scripts/get-docs.sh",
     "lint": "pnpm -s _prettier . --check && turbo run lint",
     "prepare": "husky",
     "storybook": "pnpm --filter @repo/web storybook",
-    "studio": "pnpm --filter @repo/db dev",
     "test": "vitest",
     "test:unit": "vitest --project *:unit",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
+    "@atproto/dev-env": "0.6.24",
+    "@testcontainers/postgresql": "12.2.1",
     "@vitest/coverage-v8": "5.0.5",
     "husky": "9.1.7",
-    "kill-port": "2.0.1",
     "lint-staged": "17.6.0",
     "prettier": "3.9.10",
     "prettier-plugin-pkg": "0.22.1",
     "prettier-plugin-sh": "0.20.2",
     "repomix": "1.18.1",
+    "testcontainers": "12.2.1",
+    "tsx": "4.23.15",
     "turbo": "2.11.10",
-    "vitest": "5.0.5",
-    "wait-on": "9.5.1"
+    "vitest": "5.0.5"
   },
   "lint-staged": {
     "*": "pnpm -s _prettier --ignore-unknown --write"

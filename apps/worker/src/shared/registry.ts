@@ -28,6 +28,7 @@ import type { IGeneratorRepository } from "../application/interfaces/repositorie
 import type { IInviteCodeRepository } from "../application/interfaces/repositories/invite-code-repository.js";
 import type { ILikeRepository } from "../application/interfaces/repositories/like-repository.js";
 import type { IListRepository } from "../application/interfaces/repositories/list-repository.js";
+import type { INotificationRepository } from "../application/interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../application/interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../application/interfaces/repositories/post-stats-repository.js";
 import type { IProfileRepository } from "../application/interfaces/repositories/profile-repository.js";
@@ -60,6 +61,7 @@ import { GeneratorRepository } from "../infrastructure/repositories/generator-re
 import { InviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.js";
 import { LikeRepository } from "../infrastructure/repositories/like-repository/like-repository.js";
 import { ListRepository } from "../infrastructure/repositories/list-repository/list-repository.js";
+import { NotificationRepository } from "../infrastructure/repositories/notification-repository/notification-repository.js";
 import { PostRepository } from "../infrastructure/repositories/post-repository/post-repository.js";
 import { PostStatsRepository } from "../infrastructure/repositories/post-stats-repository/post-stats-repository.js";
 import { ProfileRepository } from "../infrastructure/repositories/profile-repository/profile-repository.js";
@@ -108,16 +110,17 @@ export const createWorkerRegistry = (env: Env) =>
     .service("repostRepository", asClassArgs<IRepostRepository>()(RepostRepository))
     .service("subscriptionRepository", asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("feedItemRepository", asClassArgs<IFeedItemRepository>()(FeedItemRepository))
+    .service("notificationRepository", asClassArgs<INotificationRepository>()(NotificationRepository))
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))
-    .service("postIndexer", ["postRepository", "feedItemRepository", "jobScheduler"], asClassArgs(PostIndexer))
+    .service("postIndexer", ["postRepository", "feedItemRepository", "subscriptionRepository", "notificationRepository", "jobScheduler"], asClassArgs(PostIndexer))
     .service("indexActorService", ["actorRepository", "profileRepository", "jobScheduler"], asClassArgs(IndexActorService))
-    .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionRepository"], asClassArgs(FollowIndexer))
+    .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionRepository", "notificationRepository"], asClassArgs(FollowIndexer))
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
-    .service("likeIndexer", ["likeRepository", "jobScheduler"], asClassArgs(LikeIndexer))
-    .service("repostIndexer", ["repostRepository", "feedItemRepository", "postRepository", "jobScheduler"], asClassArgs(RepostIndexer))
+    .service("likeIndexer", ["likeRepository", "jobScheduler", "subscriptionRepository", "notificationRepository"], asClassArgs(LikeIndexer))
+    .service("repostIndexer", ["repostRepository", "feedItemRepository", "postRepository", "jobScheduler", "subscriptionRepository", "notificationRepository"], asClassArgs(RepostIndexer))
     .service("indexRecordService", ["recordRepository", "indexActorService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("upsertIdentityUseCase", ["db", "indexActorService"], asClassArgs(UpsertIdentityUseCase))

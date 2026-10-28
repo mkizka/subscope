@@ -1,5 +1,10 @@
 import { AtUri } from "@atproto/syntax";
-import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
+import {
+  actorFactory,
+  fakeCid,
+  recordFactory,
+  subscriptionFactory,
+} from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -8,12 +13,16 @@ describe("LikeIndexer", () => {
   let likeIndexer: TestServices["likeIndexer"];
   let likeRepo: TestServices["likeRepository"];
   let jobScheduler: TestServices["jobScheduler"];
+  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     likeIndexer = services.likeIndexer;
     likeRepo = services.likeRepository;
     jobScheduler = services.jobScheduler;
+    subscriptionRepo = services.subscriptionRepository;
+    notificationRepo = services.notificationRepository;
     db = services.db;
   });
 
@@ -50,6 +59,38 @@ describe("LikeIndexer", () => {
         subjectUri: new AtUri(postUri),
       });
     });
+
+    test.each([
+      { isSubscriber: true, expected: 1 },
+      { isSubscriber: false, expected: 0 },
+    ])(
+      "投稿者がサブスクライバーなら通知を作成する(isSubscriber=$isSubscriber)",
+      async ({ isSubscriber, expected }) => {
+        // arrange
+        const liker = actorFactory();
+        const author = actorFactory();
+        if (isSubscriber) {
+          subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
+        }
+        const record = recordFactory({
+          uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
+          json: {
+            $type: "app.bsky.feed.like",
+            subject: {
+              uri: `at://${author.did}/app.bsky.feed.post/123`,
+              cid: fakeCid(),
+            },
+            createdAt: new Date().toISOString(),
+          },
+        });
+
+        // act
+        await likeIndexer.upsert({ ctx: { db }, record });
+
+        // assert
+        expect(notificationRepo.findAll()).toHaveLength(expected);
+      },
+    );
   });
 
   describe("afterAction", () => {

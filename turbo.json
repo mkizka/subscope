@@ -22,7 +22,14 @@
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": [
+        "DATABASE_URL",
+        "REDIS_URL",
+        "PLC_URL",
+        "ATPROTO_PLC_URL",
+        "ATPROTO_HANDLE_RESOLVER_URL"
+      ]
     }
   }
 }

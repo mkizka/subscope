@@ -138,6 +138,7 @@ export const subscriptions = pgTable("subscriptions", {
     .primaryKey()
     .references(() => actors.did, { onDelete: "cascade" }),
   inviteCode: varchar({ length: 256 }).references(() => inviteCodes.code),
+  seenAt: timestamp(),
   createdAt: timestamp().notNull(),
 });
 
@@ -220,6 +221,40 @@ export const reposts = pgTable(
     index("reposts_sort_at_idx").on(table.sortAt),
     index("reposts_subject_uri_idx").on(table.subjectUri),
     index("reposts_subject_sort_idx").on(table.subjectUri, table.sortAt.desc()),
+  ],
+);
+
+const notificationReason = [
+  "like",
+  "repost",
+  "follow",
+  "mention",
+  "reply",
+  "quote",
+] as const;
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    recordUri: varchar({ length: 256 })
+      .notNull()
+      .references(() => records.uri, { onDelete: "cascade" }),
+    recipientDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did, { onDelete: "cascade" }),
+    authorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did, { onDelete: "cascade" }),
+    reason: varchar({ length: 32, enum: notificationReason }).notNull(),
+    reasonSubject: varchar({ length: 256 }),
+    sortAt: timestamp().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.recordUri, table.recipientDid] }),
+    index("notifications_recipient_sort_idx").on(
+      table.recipientDid,
+      table.sortAt.desc(),
+    ),
   ],
 );
 

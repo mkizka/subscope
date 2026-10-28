@@ -1,5 +1,5 @@
 {
-  "id": "d496e7d6-4e98-42ff-8cd6-606ec6e0d8cf",
+  "id": "4c13f253-fae5-4106-8068-abd80fa91e6c",
   "prevId": "dc16367f-6eae-4ea1-856f-9aec643a7f95",
   "version": "7",
   "dialect": "postgresql",
@@ -761,87 +761,105 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.lists": {
-      "name": "lists",
+    "public.notifications": {
+      "name": "notifications",
       "schema": "",
       "columns": {
-        "uri": {
-          "name": "uri",
-          "type": "varchar(256)",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "cid": {
-          "name": "cid",
+        "record_uri": {
+          "name": "record_uri",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
-        "actor_did": {
-          "name": "actor_did",
+        "recipient_did": {
+          "name": "recipient_did",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
-        "purpose": {
-          "name": "purpose",
+        "author_did": {
+          "name": "author_did",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
+        "reason": {
+          "name": "reason",
+          "type": "varchar(32)",
           "primaryKey": false,
           "notNull": true
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "avatar_cid": {
-          "name": "avatar_cid",
+        "reason_subject": {
+          "name": "reason_subject",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "indexed_at": {
-          "name": "indexed_at",
+        "sort_at": {
+          "name": "sort_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "notifications_recipient_sort_idx": {
+          "name": "notifications_recipient_sort_idx",
+          "columns": [
+            {
+              "expression": "recipient_did",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "lists_uri_records_uri_fk": {
-          "name": "lists_uri_records_uri_fk",
-          "tableFrom": "lists",
+        "notifications_record_uri_records_uri_fk": {
+          "name": "notifications_record_uri_records_uri_fk",
+          "tableFrom": "notifications",
           "tableTo": "records",
-          "columnsFrom": ["uri"],
+          "columnsFrom": ["record_uri"],
           "columnsTo": ["uri"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "lists_actor_did_actors_did_fk": {
-          "name": "lists_actor_did_actors_did_fk",
-          "tableFrom": "lists",
+        "notifications_recipient_did_actors_did_fk": {
+          "name": "notifications_recipient_did_actors_did_fk",
+          "tableFrom": "notifications",
           "tableTo": "actors",
-          "columnsFrom": ["actor_did"],
+          "columnsFrom": ["recipient_did"],
+          "columnsTo": ["did"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "notifications_author_did_actors_did_fk": {
+          "name": "notifications_author_did_actors_did_fk",
+          "tableFrom": "notifications",
+          "tableTo": "actors",
+          "columnsFrom": ["author_did"],
           "columnsTo": ["did"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "notifications_record_uri_recipient_did_pk": {
+          "name": "notifications_record_uri_recipient_did_pk",
+          "columns": ["record_uri", "recipient_did"]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -1541,6 +1559,12 @@
         "invite_code": {
           "name": "invite_code",
           "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seen_at": {
+          "name": "seen_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
