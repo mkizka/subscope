@@ -13,9 +13,9 @@
     "db:generate": "pnpm --filter @repo/db db:generate",
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "node --import tsx ./dev-env/server.mts pnpm turbo run dev --ui tui",
-    "format": "pnpm -s _prettier . --write && turbo run format",
+    "format": "pnpm -s run _prettier . --write && turbo run format",
     "get-docs": "./scripts/get-docs.sh",
-    "lint": "pnpm -s _prettier . --check && turbo run lint",
+    "lint": "pnpm -s run _prettier . --check && turbo run lint",
     "prepare": "husky",
     "storybook": "pnpm --filter @repo/web storybook",
     "test": "vitest",
@@ -38,7 +38,7 @@
     "vitest": "5.0.5"
   },
   "lint-staged": {
-    "*": "pnpm -s _prettier --ignore-unknown --write"
+    "*": "pnpm -s run _prettier --ignore-unknown --write"
   },
   "prettier": {
     "plugins": [
