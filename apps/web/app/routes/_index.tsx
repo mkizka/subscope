@@ -72,6 +72,9 @@ const maybeString = (value: unknown) =>
 function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
   return {
     uri: post.uri,
+    cid: post.cid,
+    viewerLike: post.viewer?.like,
+    viewerRepost: post.viewer?.repost,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,

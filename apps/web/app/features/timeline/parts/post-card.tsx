@@ -1,4 +1,5 @@
 import { HeartIcon, MessageCircleIcon, RepeatIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 export type PostCardProps = {
   authorAvatar?: string;
@@ -13,6 +14,7 @@ export type PostCardProps = {
     byDisplayName?: string;
     byHandle: string;
   };
+  toolbar?: ReactNode;
 };
 
 function formatRelativeTime(dateString: string) {
@@ -40,9 +42,11 @@ export function PostCard({
   likeCount,
   createdAt,
   reasonRepost,
+  toolbar,
 }: PostCardProps) {
   return (
-    <div className="border-b border-border/40 px-4 py-3">
+    <article className="group relative border-b border-border/40 px-4 py-3">
+      {toolbar}
       {reasonRepost && (
         <div
           className="
@@ -97,6 +101,6 @@ export function PostCard({
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
