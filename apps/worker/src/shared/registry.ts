@@ -110,7 +110,7 @@ export const createWorkerRegistry = (env: Env) =>
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))
-    .service("postIndexer", ["postRepository", "feedItemRepository", "jobScheduler"], asClassArgs(PostIndexer))
+    .service("postIndexer", ["postRepository", "feedItemRepository", "subscriptionRepository", "notificationRepository", "jobScheduler"], asClassArgs(PostIndexer))
     .service("indexActorService", ["actorRepository", "profileRepository", "jobScheduler"], asClassArgs(IndexActorService))
     .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionRepository"], asClassArgs(FollowIndexer))
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
