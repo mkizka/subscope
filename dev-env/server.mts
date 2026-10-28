@@ -27,7 +27,7 @@ const [postgres, redis] = await Promise.all([
 ]);
 const DATABASE_URL = postgres.getConnectionUri();
 const REDIS_URL = `redis://${redis.getHost()}:${redis.getMappedPort(6379)}`;
-execSync("pnpm -s db:migrate", {
+execSync("pnpm db:migrate", {
   stdio: "inherit",
   env: { ...process.env, DATABASE_URL },
 });
