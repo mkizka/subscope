@@ -6,8 +6,10 @@ import type {
 import { FeedItem, Repost } from "@repo/common/domain";
 
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
+import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
+import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
 export class RepostIndexer implements ICollectionIndexer {
@@ -16,12 +18,16 @@ export class RepostIndexer implements ICollectionIndexer {
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postRepository: IPostRepository,
     private readonly jobScheduler: IJobScheduler,
+    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly notificationRepository: INotificationRepository,
   ) {}
   static inject = [
     "repostRepository",
     "feedItemRepository",
     "postRepository",
     "jobScheduler",
+    "subscriptionRepository",
+    "notificationRepository",
   ] as const;
 
   async upsert({
@@ -40,6 +46,26 @@ export class RepostIndexer implements ICollectionIndexer {
 
     const feedItem = FeedItem.fromRepost(repost);
     await this.feedItemRepository.upsert({ ctx, feedItem });
+
+    const recipientDid = repost.subjectUri.host;
+    if (
+      recipientDid !== repost.actorDid &&
+      (await this.subscriptionRepository.isSubscriber(ctx, recipientDid))
+    ) {
+      await this.notificationRepository.createMany({
+        ctx,
+        notifications: [
+          {
+            recordUri: repost.uri.toString(),
+            recipientDid,
+            authorDid: repost.actorDid,
+            reason: "repost",
+            reasonSubject: repost.subjectUri.toString(),
+            sortAt: repost.sortAt,
+          },
+        ],
+      });
+    }
 
     const subjectExists = await this.postRepository.exists(
       ctx,
