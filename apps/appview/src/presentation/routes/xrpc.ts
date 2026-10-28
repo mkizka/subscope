@@ -6,17 +6,9 @@ import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
 import type { GetFeedGenerators } from "./app/bsky/feed/getFeedGenerators.js";
 import type { GetLikes } from "./app/bsky/feed/getLikes.js";
 import type { GetPosts } from "./app/bsky/feed/getPosts.js";
-import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
-import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
-import type { GetFollows } from "./app/bsky/graph/getFollows.js";
-import type { GetList } from "./app/bsky/graph/getList.js";
-import type { GetLists } from "./app/bsky/graph/getLists.js";
-import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
-import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
-import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 
 export const xrpcRouterFactory = (
   getActorLikes: GetActorLikes,
@@ -24,17 +16,9 @@ export const xrpcRouterFactory = (
   getFeedGenerators: GetFeedGenerators,
   getLikes: GetLikes,
   getPosts: GetPosts,
-  getPostThread: GetPostThread,
   getRepostedBy: GetRepostedBy,
   getTimeline: GetTimeline,
   searchPosts: SearchPosts,
-  getFollows: GetFollows,
-  getFollowers: GetFollowers,
-  getList: GetList,
-  getLists: GetLists,
-  getUnreadCount: GetUnreadCount,
-  listNotifications: ListNotifications,
-  updateSeen: UpdateSeen,
 ): Router => {
   const handlers = [
     getActorLikes,
@@ -42,17 +26,9 @@ export const xrpcRouterFactory = (
     getFeedGenerators,
     getLikes,
     getPosts,
-    getPostThread,
     getRepostedBy,
     getTimeline,
     searchPosts,
-    getFollows,
-    getFollowers,
-    getList,
-    getLists,
-    getUnreadCount,
-    listNotifications,
-    updateSeen,
   ];
 
   const server = createServer();
@@ -67,15 +43,7 @@ xrpcRouterFactory.inject = [
   "getFeedGenerators",
   "getLikes",
   "getPosts",
-  "getPostThread",
   "getRepostedBy",
   "getTimeline",
   "searchPosts",
-  "getFollows",
-  "getFollowers",
-  "getList",
-  "getLists",
-  "getUnreadCount",
-  "listNotifications",
-  "updateSeen",
 ] as const;

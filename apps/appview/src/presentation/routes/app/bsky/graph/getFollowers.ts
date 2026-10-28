@@ -1,6 +1,5 @@
-import { isDid } from "@atproto/did";
-import type { Server } from "@repo/client/server";
-import { isHandle } from "@repo/common/utils";
+import type { LexRouter } from "@atproto/lex-server";
+import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
 
 import type { GetFollowersUseCase } from "../../../../../application/use-cases/graph/get-followers-use-case.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
@@ -12,31 +11,21 @@ export class GetFollowers {
   ) {}
   static inject = ["getFollowersUseCase", "handleMiddleware"] as const;
 
-  handle(server: Server) {
-    server.app.bsky.graph.getFollowers({
-      handler: async ({ params }) => {
-        if (!isDid(params.actor) && !isHandle(params.actor)) {
-          return {
-            status: 400,
-            message: "Invalid actor",
-          };
-        }
+  handle(router: LexRouter) {
+    router.add(getFollowers, async ({ params }) => {
+      const actorDid = await this.handleMiddleware.resolveHandleOrDid(
+        params.actor,
+      );
 
-        const actorDid = await this.handleMiddleware.resolveHandleOrDid(
-          params.actor,
-        );
+      const result = await this.getFollowersUseCase.execute({
+        actorDid,
+        limit: params.limit,
+        cursor: params.cursor,
+      });
 
-        const result = await this.getFollowersUseCase.execute({
-          actorDid,
-          limit: params.limit,
-          cursor: params.cursor,
-        });
-
-        return {
-          encoding: "application/json",
-          body: result,
-        };
-      },
+      return {
+        body: result,
+      };
     });
   }
 }

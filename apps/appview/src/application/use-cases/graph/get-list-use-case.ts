@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { AppBskyGraphGetList } from "@repo/client/server";
+import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getList";
 import type { ListItem } from "@repo/common/domain";
 
 import type { IListRepository } from "../../../application/interfaces/list-repository.js";
@@ -24,7 +24,7 @@ export class GetListUseCase {
     listUri: AtUri;
     limit: number;
     cursor?: string;
-  }): Promise<AppBskyGraphGetList.OutputSchema | null> {
+  }): Promise<$OutputBody | null> {
     const list = await this.listRepository.findByUri(params.listUri);
     if (!list) return null;
     const [listView] = await this.listViewService.findListViews([list]);

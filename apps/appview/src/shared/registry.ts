@@ -274,8 +274,8 @@ export const createAppRegistry = (env: Env) =>
     .service("subscribeServer", ["subscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(SubscribeServer))
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("xrpcRouter", ["getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getPostThread", "getRepostedBy", "getTimeline", "searchPosts", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen"], asFunctionArgs(xrpcRouterFactory))
-    .service("lexRouter", ["getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "createInviteCode", "deleteInviteCode", "getInviteCodes", "registerAdmin", "verifyAccess", "getSetupStatus", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers"], asFunctionArgs(lexRouterFactory))
+    .service("xrpcRouter", ["getActorLikes", "getAuthorFeed", "getFeedGenerators", "getLikes", "getPosts", "getRepostedBy", "getTimeline", "searchPosts"], asFunctionArgs(xrpcRouterFactory))
+    .service("lexRouter", ["getPostThread", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "createInviteCode", "deleteInviteCode", "getInviteCodes", "registerAdmin", "verifyAccess", "getSetupStatus", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
