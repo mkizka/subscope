@@ -31,8 +31,6 @@ export class ProfileRepository implements IProfileRepository {
       results.map(({ profile, actor }) => [
         actor.did,
         new ProfileDetailed({
-          uri: profile?.uri ?? `at://${actor.did}/app.bsky.actor.profile/self`,
-          cid: profile?.cid ?? "",
           actorDid: actor.did,
           handle: actor.handle,
           avatarCid: profile?.avatarCid,
@@ -82,8 +80,6 @@ export class ProfileRepository implements IProfileRepository {
     return results.map(
       (result) =>
         new ProfileDetailed({
-          uri: result.profile.uri,
-          cid: result.profile.cid,
           actorDid: result.profile.actorDid,
           handle: result.actor.handle,
           avatarCid: result.profile.avatarCid,
