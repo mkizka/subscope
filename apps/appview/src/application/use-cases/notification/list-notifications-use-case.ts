@@ -1,5 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
-import type { AppBskyNotificationListNotifications } from "@repo/client/server";
+import { asAtUriString, toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyNotificationListNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type {
@@ -20,7 +21,7 @@ export class ListNotificationsUseCase {
     viewerDid: Did;
     limit: number;
     cursor?: string;
-  }): Promise<AppBskyNotificationListNotifications.OutputSchema> {
+  }): Promise<AppBskyNotificationListNotifications.$OutputBody> {
     const paginator = createCursorPaginator<NotificationItem>({
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),
@@ -45,15 +46,18 @@ export class ListNotificationsUseCase {
         const author = authors.get(asDid(item.authorDid));
         if (!author) return [];
         return {
-          uri: item.recordUri,
+          uri: asAtUriString(item.recordUri),
           cid: item.cid,
           author,
           reason: item.reason,
-          reasonSubject: item.reasonSubject ?? undefined,
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          record: item.record as { [_ in string]: unknown },
+          reasonSubject: item.reasonSubject
+            ? asAtUriString(item.reasonSubject)
+            : undefined,
+          record:
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            item.record as AppBskyNotificationListNotifications.Notification["record"],
           isRead: item.isRead,
-          indexedAt: item.sortAt.toISOString(),
+          indexedAt: toDatetimeString(item.sortAt),
         };
       }),
     };
