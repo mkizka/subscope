@@ -9,6 +9,7 @@
     "build": "react-router build",
     "build-storybook": "storybook build",
     "dev": "react-router dev | pino-pretty",
+    "e2e": "playwright test",
     "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
     "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
     "preview": "vite preview",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@dword-design/eslint-plugin-import-alias": "8.1.8",
     "@mkizka/eslint-config": "10.0.0",
+    "@playwright/test": "1.63.0",
     "@react-router/dev": "8.5.0",
     "@storybook/react-vite": "10.6.4",
     "@tailwindcss/vite": "4.3.3",
