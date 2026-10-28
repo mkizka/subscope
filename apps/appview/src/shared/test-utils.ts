@@ -29,7 +29,7 @@ import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-ve
 import type { Env } from "./env.js";
 import { createAppRegistry } from "./registry.js";
 
-const testEnv = {
+export const testEnv = {
   NODE_ENV: "test",
   LOG_LEVEL: "error",
   PORT: 3001,
