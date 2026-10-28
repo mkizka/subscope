@@ -2,6 +2,8 @@ import { LexRouter } from "@atproto/lex-server";
 import { toRequestListener } from "@atproto/lex-server/nodejs";
 import type { RequestHandler } from "express";
 
+import type { GetLikes } from "./app/bsky/feed/getLikes.js";
+import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
@@ -22,6 +24,8 @@ export const lexRouterFactory = (
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
   getSetupStatus: GetSetupStatus,
+  getLikes: GetLikes,
+  getRepostedBy: GetRepostedBy,
 ): RequestHandler => {
   const handlers = [
     getSubscriptionStatus,
@@ -33,6 +37,8 @@ export const lexRouterFactory = (
     registerAdmin,
     verifyAccess,
     getSetupStatus,
+    getLikes,
+    getRepostedBy,
   ];
 
   const router = new LexRouter();
@@ -61,4 +67,6 @@ lexRouterFactory.inject = [
   "registerAdmin",
   "verifyAccess",
   "getSetupStatus",
+  "getLikes",
+  "getRepostedBy",
 ] as const;

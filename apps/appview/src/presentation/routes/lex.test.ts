@@ -114,6 +114,23 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "AdminAlreadyExists" });
   });
 
+  test("getLikesはlexiconに沿ったレスポンスを返す", async () => {
+    const uri = "at://did:plc:bob/app.bsky.feed.post/123";
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getLikes?uri=${encodeURIComponent(uri)}`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ uri, likes: [] });
+  });
+
+  test("getRepostedByはパラメータが不正な場合400エラーを返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.feed.getRepostedBy`);
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ error: "InvalidRequest" });
+  });
+
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {
     const res = await fetch(`${baseUrl}/app.bsky.actor.getProfile`);
 
