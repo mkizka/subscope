@@ -1,4 +1,5 @@
-import type { AppBskyGraphDefs } from "@repo/client/server";
+import { toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyGraphDefs from "@repo/client/lex/app/bsky/graph/defs";
 import type { List } from "@repo/common/domain";
 
 import type { IAssetUrlBuilder } from "../../../application/interfaces/asset-url-builder.js";
@@ -27,13 +28,13 @@ export class ListViewService {
         name: list.name,
         purpose: list.purpose,
         description: list.description,
-        avatar:
-          list.avatarCid &&
-          this.assetUrlBuilder.getAvatarThumbnailUrl(
-            list.actorDid,
-            list.avatarCid,
-          ),
-        indexedAt: list.indexedAt.toISOString(),
+        avatar: list.avatarCid
+          ? this.assetUrlBuilder.getAvatarThumbnailUrl(
+              list.actorDid,
+              list.avatarCid,
+            )
+          : undefined,
+        indexedAt: toDatetimeString(list.indexedAt),
       };
     });
   }

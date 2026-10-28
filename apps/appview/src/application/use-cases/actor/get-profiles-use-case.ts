@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { $Typed, AppBskyActorDefs } from "@repo/client/server";
+import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 
@@ -10,7 +10,7 @@ export class GetProfilesUseCase {
   async execute(
     dids: Did[],
     viewerDid?: Did | null,
-  ): Promise<$Typed<AppBskyActorDefs.ProfileViewDetailed>[]> {
+  ): Promise<AppBskyActorDefs.ProfileViewDetailed[]> {
     return await this.profileViewService.findProfileViewDetailed(
       dids,
       viewerDid,

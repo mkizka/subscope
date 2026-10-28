@@ -1,6 +1,8 @@
+import type { UriString } from "@atproto/syntax";
+
 export interface IAssetUrlBuilder {
-  getAvatarThumbnailUrl: (actorDid: string, cid: string) => string;
-  getBannerUrl: (actorDid: string, cid: string) => string;
-  getFeedThumbnailUrl: (actorDid: string, cid: string) => string;
-  getFeedFullsizeUrl: (actorDid: string, cid: string) => string;
+  getAvatarThumbnailUrl: (actorDid: string, cid: string) => UriString;
+  getBannerUrl: (actorDid: string, cid: string) => UriString;
+  getFeedThumbnailUrl: (actorDid: string, cid: string) => UriString;
+  getFeedFullsizeUrl: (actorDid: string, cid: string) => UriString;
 }
