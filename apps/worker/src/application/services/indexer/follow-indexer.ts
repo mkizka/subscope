@@ -6,6 +6,7 @@ import type {
 import { Follow } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
+import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
@@ -16,12 +17,14 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly jobScheduler: IJobScheduler,
     private readonly indexActorService: IndexActorService,
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly notificationRepository: INotificationRepository,
   ) {}
   static inject = [
     "followRepository",
     "jobScheduler",
     "indexActorService",
     "subscriptionRepository",
+    "notificationRepository",
   ] as const;
 
   async upsert({
@@ -47,6 +50,25 @@ export class FollowIndexer implements ICollectionIndexer {
     );
     if (isFollowerSubscriber) {
       await this.jobScheduler.scheduleAddTapRepo(follow.subjectDid);
+    }
+
+    if (
+      follow.subjectDid !== follow.actorDid &&
+      (await this.subscriptionRepository.isSubscriber(ctx, follow.subjectDid))
+    ) {
+      await this.notificationRepository.createMany({
+        ctx,
+        notifications: [
+          {
+            recordUri: follow.uri.toString(),
+            recipientDid: follow.subjectDid,
+            authorDid: follow.actorDid,
+            reason: "follow",
+            reasonSubject: null,
+            sortAt: follow.sortAt,
+          },
+        ],
+      });
     }
   }
 
