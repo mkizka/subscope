@@ -6,7 +6,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.actor.getProfile", () => {
   const { ctx } = testSetup;
 
-  test("プロフィールがある場合、profileViewDetailedを返す", async () => {
+  test("getProfile-1: プロフィールがあるアクターを指定した場合、そのアクターのprofileViewDetailedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
@@ -24,7 +24,7 @@ describe("app.bsky.actor.getProfile", () => {
     });
   });
 
-  test("アクターが存在しない場合、400を返す", async () => {
+  test("getProfile-2: 存在しないアクターを指定した場合、400を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 

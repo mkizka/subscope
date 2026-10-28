@@ -61,6 +61,7 @@ Reactコンポーネントは以下の方針で実装しています。
 
 - システム仕様
   - docs/specs 以下を参照
+  - 仕様駆動で開発する。仕様の追加・変更は docs/specs を先に更新し、各項目のIDをテスト名の先頭に書いてE2EテストまたはAPIテストと1対1で対応させる
 - Lexiconのインデックス実装追加ガイド
   - docs/dev/lexicon-implementation.md
 - Identity Event処理

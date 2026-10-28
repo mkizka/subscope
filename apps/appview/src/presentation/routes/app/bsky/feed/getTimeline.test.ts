@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getTimeline", () => {
   const { ctx } = testSetup;
 
-  test("認証がない場合、401を返す", async () => {
+  test("getTimeline-1: 認証がない場合、401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 
@@ -24,7 +24,7 @@ describe("app.bsky.feed.getTimeline", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("フォロイーの投稿がある場合、feedViewPostとして返す", async () => {
+  test("getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db).create();
