@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@atproto/jwk-jose": "0.2.4",
+    "@atproto/lex": "0.4.2",
     "@atproto/oauth-client-node": "0.5.13",
     "@atproto/syntax": "0.7.7",
-    "@atproto/xrpc": "0.8.16",
     "@base-ui/react": "1.9.0",
     "@bull-board/api": "7.2.1",
     "@conform-to/react": "1.21.2",

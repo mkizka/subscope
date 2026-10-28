@@ -30,7 +30,9 @@ const schema = z
       prod: z.url(),
       dev: z.url().default("http://localhost:3001"),
     }),
-    APPVIEW_DID: z.string().optional(),
+    APPVIEW_DID: z
+      .templateLiteral(["did:", z.string(), ":", z.string()])
+      .optional(),
     // openssl rand -base64 33
     COOKIE_SECRET: match({
       prod: z.string().min(32),
