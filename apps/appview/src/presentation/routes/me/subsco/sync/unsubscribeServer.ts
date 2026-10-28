@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import { me } from "@repo/client/lex";
+import unsubscribeServer from "@repo/client/lex/me/subsco/sync/unsubscribeServer";
 
 import {
   NotSubscribedError,
@@ -19,7 +19,7 @@ export class UnsubscribeServer {
   ] as const;
 
   handle(router: LexRouter) {
-    router.add(me.subsco.sync.unsubscribeServer, {
+    router.add(unsubscribeServer, {
       auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
       handler: async ({ credentials }) => {
         try {

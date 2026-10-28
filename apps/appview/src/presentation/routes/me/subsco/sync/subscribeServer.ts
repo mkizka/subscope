@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import { me } from "@repo/client/lex";
+import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
 
 import {
   AlreadySubscribedError,
@@ -17,7 +17,7 @@ export class SubscribeServer {
   static inject = ["subscribeServerUseCase", "authVerifierMiddleware"] as const;
 
   handle(router: LexRouter) {
-    router.add(me.subsco.sync.subscribeServer, {
+    router.add(subscribeServer, {
       auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
       handler: async ({ input, credentials }) => {
         try {
