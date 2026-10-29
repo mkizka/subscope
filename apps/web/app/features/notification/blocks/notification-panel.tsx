@@ -15,6 +15,7 @@ type Props = {
 const reasonLabels: Record<string, string> = {
   like: "さんがいいねしました",
   repost: "さんがリポストしました",
+  follow: "さんにフォローされました",
 };
 
 export function NotificationPanel({ notifications }: Props) {

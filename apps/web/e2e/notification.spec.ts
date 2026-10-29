@@ -24,6 +24,28 @@ test.describe("通知", () => {
 });
 
 test.describe("通知（PC）", () => {
+  test("notification-2: フォローされると、相手の名前が通知に出る", async ({
+    page,
+  }) => {
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    await follow("bob.test", "alice.test");
+
+    await login(page);
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page
+          .getByRole("complementary")
+          .getByText("Bobさんにフォローされました")
+          .first(),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
   test("notification-1: 自分の投稿がいいね・リポストされると、相手の名前と対象の投稿の本文が通知に出る", async ({
     page,
   }) => {
