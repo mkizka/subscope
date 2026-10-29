@@ -14,7 +14,6 @@ import { testSetup } from "@repo/test-utils";
 import express from "express";
 import { onTestFinished } from "vitest";
 
-import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import { createAppRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";
 
@@ -25,7 +24,7 @@ const apiTestRegistry = createAppRegistry(testEnv)
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
-  .replaceService("tokenVerifier", asClassArgs(InMemoryTokenVerifier));
+  .replaceValue("tokenVerifier", { verify: ({ token }: { token: string }) => Promise.resolve({ did: asDid(token) }) });
 
 export const setupApiTest = async () => {
   const services = await apiTestRegistry.resolve();
@@ -36,10 +35,10 @@ export const setupApiTest = async () => {
   });
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { port } = server.address() as AddressInfo;
-  const client = new Client(`http://localhost:${port}`);
-  const loginAs = (did: string) => {
-    services.tokenVerifier.setVerifyResult({ did: asDid(did) });
-    client.headers.set("authorization", "Bearer token");
+  const createClient = () => new Client(`http://localhost:${port}`);
+  const client = createClient();
+  const loginAs = (did: string, target = client) => {
+    target.headers.set("authorization", `Bearer ${did}`);
   };
-  return { client, loginAs, jobScheduler: services.jobScheduler };
+  return { client, createClient, loginAs, jobScheduler: services.jobScheduler };
 };
