@@ -1,6 +1,7 @@
 import { TID } from "@atproto/common-web";
 import { Client } from "@atproto/lex";
 import { currentDatetimeString } from "@atproto/syntax";
+import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import post from "@repo/client/lex/app/bsky/feed/post";
@@ -15,6 +16,7 @@ import { HomePage } from "@/app/features/home/pages/home";
 import {
   countGraphemes,
   isReplyRule,
+  MAX_IMAGES,
   MAX_POST_LENGTH,
   type ReplyRule,
 } from "@/app/features/timeline/blocks/post-form";
@@ -68,11 +70,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!subscribed.isTypeOf(subscriptionResponse)) {
     return data({ state: "home" as const });
   }
-  const timeline = await agent.call(getTimeline, { limit: 20 });
+  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
+  const timeline = await agent.call(getTimeline, { limit: 20, cursor });
   return data({
     state: "timeline" as const,
     atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
     posts: timeline.feed.map(toTimelinePost).reverse(),
+    cursor: timeline.cursor,
   });
 };
 
@@ -89,13 +93,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
   }
   const formData = await request.formData();
   const text = formData.get("text");
+  const files = formData.getAll("image").filter((f) => f instanceof File);
+  const alts = formData.getAll("alt");
   const allow = formData.get("allow");
   const rules =
     typeof allow === "string" ? allow.split(",").filter(Boolean) : [];
   if (
     typeof text !== "string" ||
-    text.trim() === "" ||
+    (text.trim() === "" && files.length === 0) ||
     countGraphemes(text) > MAX_POST_LENGTH ||
+    files.length > MAX_IMAGES ||
     !rules.every(isReplyRule)
   ) {
     return data({ error: "投稿内容が不正です" }, { status: 400 });
@@ -104,8 +111,25 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const uri = `at://${agent.assertDid}/app.bsky.feed.post/${rkey}` as const;
   const createdAt = currentDatetimeString();
   try {
+    const images = await Promise.all(
+      files.map(async (file, i) => {
+        const { body } = await agent.uploadBlob(file);
+        return { image: body.blob, alt: maybeString(alts[i]) ?? "" };
+      }),
+    );
     await agent.applyWrites((op) => [
-      op.create(post, { text, createdAt }, { rkey }),
+      op.create(
+        post,
+        {
+          text,
+          embed:
+            images.length > 0
+              ? { $type: "app.bsky.embed.images", images }
+              : undefined,
+          createdAt,
+        },
+        { rkey },
+      ),
       ...(typeof allow === "string"
         ? [
             op.create(
@@ -133,6 +157,9 @@ const maybeString = (value: unknown) =>
 function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
   return {
     uri: post.uri,
+    cid: post.cid,
+    viewerLike: post.viewer?.like,
+    viewerRepost: post.viewer?.repost,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
@@ -140,6 +167,7 @@ function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
+    images: imagesView.matches(post.embed) ? post.embed.images : undefined,
     createdAt: maybeString(post.record.createdAt),
     reasonRepost:
       reason && "by" in reason
@@ -157,6 +185,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <TimelinePage
         atprotoProxy={loaderData.atprotoProxy}
         posts={loaderData.posts}
+        cursor={loaderData.cursor}
       />
     );
   }

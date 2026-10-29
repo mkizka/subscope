@@ -1,4 +1,5 @@
 import { HeartIcon, MessageCircleIcon, RepeatIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 export type PostCardProps = {
   authorAvatar?: string;
@@ -9,10 +10,12 @@ export type PostCardProps = {
   repostCount?: number;
   likeCount?: number;
   createdAt?: string;
+  images?: { thumb: string; alt: string }[];
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
   };
+  toolbar?: ReactNode;
 };
 
 function formatRelativeTime(dateString: string) {
@@ -39,10 +42,13 @@ export function PostCard({
   repostCount,
   likeCount,
   createdAt,
+  images,
   reasonRepost,
+  toolbar,
 }: PostCardProps) {
   return (
-    <div className="border-b border-border/40 px-4 py-3">
+    <article className="group relative border-b border-border/40 px-4 py-3">
+      {toolbar}
       {reasonRepost && (
         <div
           className="
@@ -81,6 +87,18 @@ export function PostCard({
             </span>
           </div>
           <p className="mt-1 wrap-break-word whitespace-pre-wrap">{text}</p>
+          {images && (
+            <div className="mt-2 grid grid-cols-2 gap-1">
+              {images.map((image) => (
+                <img
+                  key={image.thumb}
+                  src={image.thumb}
+                  alt={image.alt}
+                  className="w-full rounded-sm object-cover"
+                />
+              ))}
+            </div>
+          )}
           <div className="mt-2 flex gap-6 text-muted-foreground">
             <span className="flex items-center gap-1 text-sm">
               <MessageCircleIcon className="size-4" />
@@ -97,6 +115,6 @@ export function PostCard({
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

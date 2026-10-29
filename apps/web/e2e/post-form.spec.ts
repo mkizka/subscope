@@ -1,8 +1,18 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
+import { resolveHandle } from "./pds";
 
 const PDS_URL = "http://localhost:2583";
+
+const image = (name: string) => ({
+  name,
+  mimeType: "image/png",
+  buffer: Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+    "base64",
+  ),
+});
 
 test.describe("投稿欄", () => {
   test.beforeEach(async ({ page }) => {
@@ -50,11 +60,38 @@ test.describe("投稿欄", () => {
     await expect(submit).toBeDisabled();
   });
 
-  test("post-form-3: 返信できる人を選んで投稿すると、投稿と同じrkeyのthreadgateにその設定が保存される", async ({
+  test("post-form-3: 画像を添付してALTを入力して投稿すると、タイムラインの投稿にALT付きの画像が表示される", async ({
+    page,
+  }) => {
+    const alt = `post-form-3: ${Date.now()}`;
+    await page.getByLabel("画像を追加").setInputFiles(image("a.png"));
+    await page.getByRole("textbox", { name: "画像1のALT" }).fill(alt);
+    await page.getByRole("button", { name: "投稿", exact: true }).click();
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByRole("img", { name: alt })).toBeAttached({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
+  test("post-form-4: 画像は4枚まで添付でき、4枚添付すると画像を追加できない", async ({
+    page,
+  }) => {
+    const input = page.getByLabel("画像を追加");
+    await input.setInputFiles(
+      ["1", "2", "3", "4"].map((n) => image(`${n}.png`)),
+    );
+
+    await expect(page.getByRole("textbox", { name: /のALT$/ })).toHaveCount(4);
+    await expect(input).toBeDisabled();
+  });
+  test("post-form-5: 返信できる人を選んで投稿すると、投稿と同じrkeyのthreadgateにその設定が保存される", async ({
     page,
     request,
   }) => {
-    const text = `post-form-3: ${Date.now()}`;
+    const text = `post-form-5: ${Date.now()}`;
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("checkbox", { name: "フォロワー" }).check();
     await page.getByRole("checkbox", { name: "メンションした人" }).check();
@@ -63,11 +100,7 @@ test.describe("投稿欄", () => {
       page.getByRole("button", { name: "いまどうしてる？" }),
     ).toBeVisible();
 
-    const resolved = await request.get(
-      `${PDS_URL}/xrpc/com.atproto.identity.resolveHandle`,
-      { params: { handle: "alice.test" } },
-    );
-    const { did } = await resolved.json();
+    const did = await resolveHandle("alice.test");
     const threadgates = await request.get(
       `${PDS_URL}/xrpc/com.atproto.repo.listRecords`,
       {
