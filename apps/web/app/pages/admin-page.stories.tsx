@@ -3,14 +3,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { InviteCodeTableContainer } from "@/app/features/admin/blocks/invite-code-table-container";
 import { SubscriberTableContainer } from "@/app/features/admin/blocks/subscriber-table-container";
 
-import { AdminLayout } from "./admin";
+import { AdminPage } from "./admin-page";
 
 const meta = {
-  component: AdminLayout,
+  component: AdminPage,
   parameters: {
     layout: "fullscreen",
   },
-} satisfies Meta<typeof AdminLayout>;
+} satisfies Meta<typeof AdminPage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

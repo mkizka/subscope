@@ -26,6 +26,7 @@ export function SideNavContainer() {
       did={data?.did}
       avatarUrl={data?.avatarUrl}
       handle={data?.handle}
+      isAdmin={data?.isAdmin}
     />
   );
 }
