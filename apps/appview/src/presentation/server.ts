@@ -23,13 +23,6 @@ export class AppViewServer {
     this.app.use(wellKnownRouter);
     this.app.use(lexRouter);
   }
-  static inject = [
-    "loggerManager",
-    "lexRouter",
-    "healthRouter",
-    "wellKnownRouter",
-    "port",
-  ] as const;
 
   start() {
     this.app.listen(this.port, () => {

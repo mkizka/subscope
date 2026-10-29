@@ -6,7 +6,6 @@ import type { ICollectionIndexer } from "../../interfaces/services/index-collect
 
 export class ListIndexer implements ICollectionIndexer {
   constructor(private readonly listRepository: IListRepository) {}
-  static inject = ["listRepository"] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const list = List.from(record);

@@ -11,7 +11,6 @@ export class ListViewService {
     private readonly profileViewService: ProfileViewService,
     private readonly assetUrlBuilder: IAssetUrlBuilder,
   ) {}
-  static inject = ["profileViewService", "assetUrlBuilder"] as const;
 
   async findListViews(lists: List[]): Promise<AppBskyGraphDefs.ListView[]> {
     const profileMap = await this.profileViewService

@@ -13,11 +13,6 @@ export class IndexCommitUseCase {
     private readonly indexRecordService: IndexRecordService,
     private readonly recordRevRepository: IRecordRevRepository,
   ) {}
-  static inject = [
-    "transactionManager",
-    "indexRecordService",
-    "recordRevRepository",
-  ] as const;
 
   async execute(command: IndexCommitCommand) {
     await command.jobLogger.log(

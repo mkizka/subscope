@@ -38,12 +38,6 @@ export class DidResolver implements IDidResolver {
     this.resolver = new Resolver({ didCache, plcUrl, fetch }, metricReporter);
     this.logger = loggerManager.createLogger("DidResolver");
   }
-  static inject = [
-    "plcUrl",
-    "loggerManager",
-    "didCache",
-    "metricReporter",
-  ] as const;
 
   async resolve(did: string) {
     try {

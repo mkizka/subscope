@@ -17,12 +17,6 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly notificationRepository: INotificationRepository,
   ) {}
-  static inject = [
-    "likeRepository",
-    "jobScheduler",
-    "subscriptionRepository",
-    "notificationRepository",
-  ] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const like = Like.from(record);

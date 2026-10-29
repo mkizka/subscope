@@ -11,11 +11,6 @@ export class GetActorLikes {
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = [
-    "getActorLikesUseCase",
-    "handleMiddleware",
-    "authVerifierMiddleware",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(getActorLikes, {

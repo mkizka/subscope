@@ -9,7 +9,6 @@ import {
 
 export class FollowService {
   constructor(private readonly followRepository: IFollowRepository) {}
-  static inject = ["followRepository"] as const;
 
   async findFollowsWithPagination({
     actorDid,

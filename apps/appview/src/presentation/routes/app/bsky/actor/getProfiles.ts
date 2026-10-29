@@ -11,7 +11,6 @@ export class GetProfiles {
     private getProfilesUseCase: GetProfilesUseCase,
     private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getProfilesUseCase", "handleMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(getProfiles, async ({ params }) => {

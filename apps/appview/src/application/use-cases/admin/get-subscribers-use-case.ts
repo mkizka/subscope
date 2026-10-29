@@ -16,11 +16,6 @@ export class GetSubscribersUseCase {
     private readonly profileViewService: ProfileViewService,
     private readonly actorRepository: IActorRepository,
   ) {}
-  static inject = [
-    "subscriptionService",
-    "profileViewService",
-    "actorRepository",
-  ] as const;
 
   async execute(
     params: GetSubscribersParams,

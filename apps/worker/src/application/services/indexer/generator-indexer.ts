@@ -6,7 +6,6 @@ import type { ICollectionIndexer } from "../../interfaces/services/index-collect
 
 export class GeneratorIndexer implements ICollectionIndexer {
   constructor(private readonly generatorRepository: IGeneratorRepository) {}
-  static inject = ["generatorRepository"] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const generator = Generator.from(record);

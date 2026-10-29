@@ -10,7 +10,6 @@ import type {
 
 export class PostStatsRepository implements IPostStatsRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findMap(uris: AtUri[]): Promise<Map<string, PostStats>> {
     if (uris.length === 0) {

@@ -55,7 +55,6 @@ export class JobQueue implements IJobQueue {
       syncTapRepo: new Queue("syncTapRepo", queueOptions(withRetry)),
     };
   }
-  static inject = ["redisUrl"] as const;
 
   async add<T extends QueueName>({
     queueName,

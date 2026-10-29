@@ -5,7 +5,6 @@ import type { GetRepostedByUseCase } from "../../../../../application/use-cases/
 
 export class GetRepostedBy {
   constructor(private getRepostedByUseCase: GetRepostedByUseCase) {}
-  static inject = ["getRepostedByUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getRepostedBy, async ({ params }) => {

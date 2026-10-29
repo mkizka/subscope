@@ -8,7 +8,6 @@ import {
 
 export class LikeService {
   constructor(private readonly likeRepository: ILikeRepository) {}
-  static inject = ["likeRepository"] as const;
 
   async findLikesWithPagination({
     subjectUri,

@@ -10,7 +10,6 @@ export class GetFollowsUseCase {
     private readonly followService: FollowService,
     private readonly profileViewService: ProfileViewService,
   ) {}
-  static inject = ["followService", "profileViewService"] as const;
 
   async execute(params: {
     actorDid: Did;

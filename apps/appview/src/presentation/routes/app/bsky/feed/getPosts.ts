@@ -6,7 +6,6 @@ import type { GetPostsUseCase } from "../../../../../application/use-cases/feed/
 
 export class GetPosts {
   constructor(private readonly getPostsUseCase: GetPostsUseCase) {}
-  static inject = ["getPostsUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getPosts, async ({ params }) => {

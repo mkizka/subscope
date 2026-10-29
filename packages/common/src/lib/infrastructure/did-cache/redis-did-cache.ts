@@ -39,7 +39,6 @@ export class RedisDidCache implements IDidCache {
       store: new KeyvRedis<CacheVal>(redisOptions),
     });
   }
-  static inject = ["redisUrl", "metricReporter"] as const;
 
   async cacheDid(did: string, doc: DidDocument): Promise<void> {
     await this.cache.set(did, { doc, updatedAt: Date.now() }, this.maxTTL);

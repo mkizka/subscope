@@ -8,7 +8,6 @@ type VerifyAccessParams = {
 
 export class VerifyAccessUseCase {
   constructor(private readonly actorRepository: IActorRepository) {}
-  static inject = ["actorRepository"] as const;
 
   async execute(
     params: VerifyAccessParams,

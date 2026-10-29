@@ -13,7 +13,6 @@ export class CreateAdminService {
     private readonly actorRepository: IActorRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = ["actorRepository", "jobScheduler"] as const;
 
   async execute({
     ctx,

@@ -8,7 +8,6 @@ import type { IRepostRepository } from "../../application/interfaces/repost-repo
 
 export class RepostRepository implements IRepostRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findRepostsByPost({
     subjectUri,

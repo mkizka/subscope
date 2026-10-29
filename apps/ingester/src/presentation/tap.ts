@@ -47,13 +47,6 @@ export class TapIngester {
     });
   }
 
-  static inject = [
-    "loggerManager",
-    "handleCommitUseCase",
-    "handleIdentityUseCase",
-    "tapUrl",
-  ] as const;
-
   private recordEventToDto(event: RecordEvent): CommitEventDto | null {
     if (!isSupportedCollection(event.collection)) {
       return null;

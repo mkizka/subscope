@@ -8,7 +8,6 @@ export class UpsertIdentityUseCase {
     private readonly db: DatabaseClient,
     private readonly indexActorService: IndexActorService,
   ) {}
-  static inject = ["db", "indexActorService"] as const;
 
   async execute(command: UpsertIdentityCommand) {
     if (!command.handle) {

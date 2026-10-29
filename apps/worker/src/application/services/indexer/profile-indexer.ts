@@ -6,7 +6,6 @@ import type { ICollectionIndexer } from "../../interfaces/services/index-collect
 
 export class ProfileIndexer implements ICollectionIndexer {
   constructor(private readonly profileRepository: IProfileRepository) {}
-  static inject = ["profileRepository"] as const;
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const profile = Profile.from(record);

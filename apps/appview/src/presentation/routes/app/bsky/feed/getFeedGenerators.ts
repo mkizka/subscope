@@ -8,7 +8,6 @@ export class GetFeedGenerators {
   constructor(
     private readonly getFeedGeneratorsUseCase: GetFeedGeneratorsUseCase,
   ) {}
-  static inject = ["getFeedGeneratorsUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getFeedGenerators, async ({ params }) => {

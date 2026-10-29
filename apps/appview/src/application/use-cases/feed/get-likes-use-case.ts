@@ -10,7 +10,6 @@ export class GetLikesUseCase {
     private readonly likeService: LikeService,
     private readonly profileViewService: ProfileViewService,
   ) {}
-  static inject = ["likeService", "profileViewService"] as const;
 
   async execute(
     params: AppBskyFeedGetLikes.$Params,

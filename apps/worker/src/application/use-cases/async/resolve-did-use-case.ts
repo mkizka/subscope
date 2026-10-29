@@ -10,7 +10,6 @@ export class ResolveDidUseCase {
     private readonly actorRepository: IActorRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = ["didResolver", "actorRepository", "db"] as const;
 
   async execute(did: Did) {
     const { handle } = await this.didResolver.resolve(did);

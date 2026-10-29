@@ -12,7 +12,6 @@ type ReplyPost = Post & {
 
 export class ReplyRefService {
   constructor(private readonly postViewService: PostViewService) {}
-  static inject = ["postViewService"] as const;
 
   async findMap(
     posts: Post[],

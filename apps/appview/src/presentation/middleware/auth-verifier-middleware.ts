@@ -17,7 +17,6 @@ const extractToken = (request: Request) => {
 
 export class AuthVerifierMiddleware {
   constructor(private readonly tokenVerifier: ITokenVerifier) {}
-  static inject = ["tokenVerifier"] as const;
 
   async loginRequired({ request }: { request: Request }) {
     const did = await this.optionalAuth({ request });
