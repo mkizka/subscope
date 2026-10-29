@@ -1,5 +1,7 @@
 import type { Did } from "@atproto/did";
+import type { IJobScheduler } from "@repo/common/domain";
 
+import type { IFollowRepository } from "../../../application/interfaces/follow-repository.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
 
 export class NotSubscribedError extends Error {
@@ -16,8 +18,14 @@ type UnsubscribeServerParams = {
 export class UnsubscribeServerUseCase {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly followRepository: IFollowRepository,
+    private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
+  static inject = [
+    "subscriptionRepository",
+    "followRepository",
+    "jobScheduler",
+  ] as const;
 
   async execute(params: UnsubscribeServerParams): Promise<void> {
     const existingSubscription = await this.subscriptionRepository.findFirst(
@@ -28,5 +36,12 @@ export class UnsubscribeServerUseCase {
     }
 
     await this.subscriptionRepository.delete(params.actorDid);
+
+    const followeeDids = await this.followRepository.findFolloweeDids(
+      params.actorDid,
+    );
+    for (const did of [params.actorDid, ...followeeDids]) {
+      await this.jobScheduler.scheduleSyncTapRepo(did);
+    }
   }
 }

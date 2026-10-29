@@ -40,5 +40,5 @@ export const setupApiTest = async () => {
   const loginAs = (did: string, target = client) => {
     target.headers.set("authorization", `Bearer ${did}`);
   };
-  return { client, createClient, loginAs };
+  return { client, createClient, loginAs, jobScheduler: services.jobScheduler };
 };

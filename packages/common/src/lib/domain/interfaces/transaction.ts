@@ -7,8 +7,12 @@ export type TransactionContext = {
   db: DatabaseClient;
 };
 
+export type AfterCommitContext = TransactionContext & {
+  afterCommit: (task: () => Promise<void>) => void;
+};
+
 export interface ITransactionManager {
   transaction: <T>(
-    fn: (context: TransactionContext) => Promise<T>,
+    fn: (context: AfterCommitContext) => Promise<T>,
   ) => Promise<T>;
 }
