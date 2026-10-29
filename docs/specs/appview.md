@@ -50,44 +50,45 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 指定したアクターがいいねした投稿を新しい順に返す。認証は任意。
 
-- getActorLikes-1: いいねした投稿がある場合、その投稿をfeedViewPostとして返す
+- getActorLikes-1: 指定したアクターがいいねした投稿をfeedViewPostで返す
 
 ## app.bsky.feed.getLikes
 
 指定した投稿へのいいねを新しい順に返す。認証は任意。
 
-- getLikes-1: いいねがある場合、いいねしたアクターのprofileViewを返す
+- getLikes-1: 指定した投稿にいいねしたアクターをprofileViewで返す
 
 ## app.bsky.feed.getRepostedBy
 
 指定した投稿をリポストしたアクターを新しい順に返す。認証は任意。
 
-- getRepostedBy-1: リポストがある場合、リポストしたアクターのprofileViewを返す
+- getRepostedBy-1: 指定した投稿をリポストしたアクターをprofileViewで返す
 
 ## app.bsky.feed.getFeedGenerators
 
 指定したフィードジェネレーターの情報を返す。認証は任意。
 
-- getFeedGenerators-1: 存在するフィードジェネレーターを指定した場合、そのgeneratorViewを返す
+- getFeedGenerators-1: 指定したフィードジェネレーターをgeneratorViewで返す
 
 ## app.bsky.feed.searchPosts
 
 本文が検索クエリに一致する投稿を新しい順に返す。認証は任意。
 
-- searchPosts-1: クエリに一致する投稿がある場合、その投稿をpostViewとして返す
+- searchPosts-1: 本文がクエリに一致する投稿をpostViewで返す
 
 ## app.bsky.feed.getPosts
 
 指定したURIの投稿をpostViewとして返す。認証は任意。
 
-- getPosts-1: 複数のURIを指定した場合、指定した順に投稿を返し、存在しない投稿は除外する
+- getPosts-1: 指定したURIの順に投稿を並べる
+- getPosts-2: 存在しない投稿は含めない
 
 ## app.bsky.feed.getPostThread
 
 指定した投稿を中心に、親投稿とリプライを含むスレッドを返す。認証は任意。
 
-- getPostThread-1: 親投稿とリプライがある投稿を指定した場合、それらを含むthreadViewPostを返す
-- getPostThread-2: 存在しない投稿を指定した場合、400 NotFoundを返す
+- getPostThread-1: 指定した投稿の親投稿とリプライをthreadViewPostに含める
+- getPostThread-2: 存在しない投稿には400とNotFoundを返す
 
 ## app.bsky.feed.getAuthorFeed
 

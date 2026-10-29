@@ -14,7 +14,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getRepostedBy", () => {
   const { ctx } = testSetup;
 
-  test("getRepostedBy-1: リポストがある場合、リポストしたアクターのprofileViewを返す", async () => {
+  test("getRepostedBy-1: 指定した投稿をリポストしたアクターをprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
