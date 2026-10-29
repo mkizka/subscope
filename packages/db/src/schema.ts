@@ -18,6 +18,7 @@ export const actors = pgTable(
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
     isAdmin: boolean().default(false).notNull(),
+    isBanned: boolean().default(false).notNull(),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("handle_idx").on(table.handle)],

@@ -1,6 +1,13 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
+import { subscribeServer } from "./pds";
+
+const createInviteCode = async (page: Page) => {
+  const response = await page.request.post("/admin/api/invite-codes");
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return ((await response.json()) as { code: string }).code;
+};
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -27,15 +34,35 @@ test.describe("登録ユーザー", () => {
     }).toPass();
     await expect(row.getByText("管理者")).toBeVisible();
   });
+
+  test("subscribers-2: サブスクライバーをBANすると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+    page,
+  }) => {
+    await login(page);
+    const subscribed = await subscribeServer(
+      "bob.test",
+      await createInviteCode(page),
+    );
+    expect(subscribed.status).toBe(200);
+    const row = page.getByRole("row", { name: "@bob.test" });
+    await expect(async () => {
+      await page.goto("/admin/subscribers");
+      await expect(row).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    page.once("dialog", (dialog) => void dialog.accept());
+    await row.getByRole("button", { name: "BAN" }).click();
+
+    await expect(row).toHaveCount(0);
+    const resubscribed = await subscribeServer(
+      "bob.test",
+      await createInviteCode(page),
+    );
+    expect(resubscribed.status).toBe(400);
+  });
 });
 
 test.describe("招待コード", () => {
-  const createInviteCode = async (page: Page) => {
-    const response = await page.request.post("/admin/api/invite-codes");
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return ((await response.json()) as { code: string }).code;
-  };
-
   test("invite-codes-1: 招待コードを新しい順に並べ、コード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
     page,
   }) => {

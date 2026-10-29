@@ -1,5 +1,6 @@
 import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { SubscriberTable } from "./subscriber-table";
 
@@ -17,21 +18,38 @@ async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
 }
 
 export function SubscriberTableContainer() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: ["subscribers"],
-      queryFn: ({ pageParam }) => fetchSubscribers(pageParam),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      initialPageParam: undefined as string | undefined,
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      select: (data) =>
-        data.pages.flatMap((page) =>
-          page.subscribers.map(({ profile, isAdmin }) => ({
-            ...profile,
-            isAdmin,
-          })),
-        ),
+  const [banningDid, setBanningDid] = useState<string | null>(null);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["subscribers"],
+    queryFn: ({ pageParam }) => fetchSubscribers(pageParam),
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    select: (data) =>
+      data.pages.flatMap((page) =>
+        page.subscribers.map(({ profile, isAdmin }) => ({
+          ...profile,
+          isAdmin,
+        })),
+      ),
+  });
+
+  const ban = async (did: string) => {
+    setBanningDid(did);
+    await fetch("/admin/api/subscribers", {
+      method: "POST",
+      body: JSON.stringify({ did }),
     });
+    await refetch();
+    setBanningDid(null);
+  };
 
   return (
     <SubscriberTable
@@ -40,6 +58,8 @@ export function SubscriberTableContainer() {
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={fetchNextPage}
       hasNextPage={hasNextPage}
+      onBan={(did) => void ban(did)}
+      banningDid={banningDid}
     />
   );
 }

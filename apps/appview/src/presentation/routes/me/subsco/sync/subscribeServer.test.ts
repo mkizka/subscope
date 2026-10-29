@@ -34,4 +34,25 @@ describe("me.subsco.sync.subscribeServer", () => {
       { reason: { status: 400 } },
     ]);
   });
+
+  test("subscribeServer-2: BANされたアカウントは登録せず、400とBannedを返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const actor = await actorFactory(ctx.db)
+      .props({ isBanned: () => true })
+      .create();
+    const inviteCode = await inviteCodeFactory(ctx.db).create();
+    loginAs(actor.did);
+
+    // act
+    const promise = client.call(subscribeServer, {
+      inviteCode: inviteCode.code,
+    });
+
+    // assert
+    await expect(promise).rejects.toMatchObject({
+      status: 400,
+      error: "Banned",
+    });
+  });
 });

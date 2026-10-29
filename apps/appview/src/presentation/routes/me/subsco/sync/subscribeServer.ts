@@ -4,6 +4,7 @@ import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
 
 import {
   AlreadySubscribedError,
+  BannedError,
   InvalidInviteCodeError,
   type SubscribeServerUseCase,
 } from "../../../../../application/use-cases/sync/subscribe-server-use-case.js";
@@ -35,7 +36,8 @@ export class SubscribeServer {
         } catch (error) {
           if (
             error instanceof InvalidInviteCodeError ||
-            error instanceof AlreadySubscribedError
+            error instanceof AlreadySubscribedError ||
+            error instanceof BannedError
           ) {
             throw new LexServerError(400, {
               error: error.name,

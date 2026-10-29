@@ -80,3 +80,19 @@ export const follow = async (handle: string, subjectHandle: string) => {
     createdAt: new Date().toISOString(),
   });
 };
+
+export const subscribeServer = async (handle: string, inviteCode: string) => {
+  const { accessJwt } = await xrpc<{ accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  return fetch(`${PDS_URL}/xrpc/me.subsco.sync.subscribeServer`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${accessJwt}`,
+      "atproto-proxy": "did:web:localhost%3A3001#bsky_appview",
+    },
+    body: JSON.stringify({ inviteCode }),
+  });
+};

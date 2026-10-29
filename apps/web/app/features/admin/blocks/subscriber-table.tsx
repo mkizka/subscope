@@ -14,6 +14,8 @@ type Props = {
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  onBan?: (did: string) => void;
+  banningDid?: string | null;
 };
 
 export function SubscriberTable({
@@ -22,6 +24,8 @@ export function SubscriberTable({
   isFetchingNextPage,
   onLoadMore,
   hasNextPage,
+  onBan,
+  banningDid,
 }: Props) {
   return (
     <>
@@ -34,19 +38,20 @@ export function SubscriberTable({
                 <th>ユーザー</th>
                 <th>DID</th>
                 <th>権限</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {!isLoading && subscribers.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="py-8 text-center">
+                  <td colSpan={4} className="py-8 text-center">
                     登録アカウントはまだありません
                   </td>
                 </tr>
               )}
               {isLoading && (
                 <tr>
-                  <td colSpan={3} className="py-8 text-center">
+                  <td colSpan={4} className="py-8 text-center">
                     読み込み中...
                   </td>
                 </tr>
@@ -80,6 +85,26 @@ export function SubscriberTable({
                   <td>
                     {subscriber.isAdmin && (
                       <span className="badge badge-primary">管理者</span>
+                    )}
+                  </td>
+                  <td>
+                    {!subscriber.isAdmin && (
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-error btn-sm"
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `@${subscriber.handle} をBANしますか？`,
+                            )
+                          ) {
+                            onBan?.(subscriber.did);
+                          }
+                        }}
+                        disabled={banningDid === subscriber.did}
+                      >
+                        BAN
+                      </button>
                     )}
                   </td>
                 </tr>
