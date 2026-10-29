@@ -24,6 +24,7 @@ export const createRecord = async (
   handle: string,
   collection: string,
   record: Record<string, unknown>,
+  rkey?: string,
 ) => {
   const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
     "com.atproto.server.createSession",
@@ -31,7 +32,7 @@ export const createRecord = async (
   );
   return xrpc<{ uri: string; cid: string }>(
     "com.atproto.repo.createRecord",
-    { repo: did, collection, record: { $type: collection, ...record } },
+    { repo: did, collection, rkey, record: { $type: collection, ...record } },
     accessJwt,
   );
 };
