@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { MenuIcon, XIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
@@ -7,7 +8,6 @@ import { NotificationBellContainer } from "@/app/features/notification/blocks/no
 import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
 import { ProfilePanelContainer } from "@/app/features/profile/blocks/profile-panel-container";
 import { ThreadPanelContainer } from "@/app/features/thread/blocks/thread-panel-container";
-import { cn } from "@/app/lib/utils";
 
 type Props = {
   children: ReactNode;
@@ -56,7 +56,7 @@ export const ThreeColumnLayout = ({ children }: Props) => {
           className="peer hidden"
         />
         <aside
-          className={cn(
+          className={clsx(
             `
               hidden overflow-y-auto border-base-300
               max-lg:peer-checked:fixed max-lg:peer-checked:inset-0
