@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
-import { subscribeServer } from "./pds";
+import { resolveHandle, subscribeServer } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -21,11 +21,11 @@ test.describe("登録ユーザー", () => {
     page,
   }) => {
     await login(page);
-    const row = page.getByRole("row", { name: "@alice.test" });
-    await expect(async () => {
-      await page.goto("/admin/subscribers");
-      await expect(row).toBeVisible({ timeout: 1000 });
-    }).toPass();
+    const aliceDid = await resolveHandle("alice.test");
+
+    await page.goto("/admin/subscribers");
+
+    const row = page.getByRole("row").filter({ hasText: aliceDid });
     await expect(row.getByText("管理者")).toBeVisible();
   });
 
@@ -37,11 +37,11 @@ test.describe("登録ユーザー", () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
     await subscribeServer("bob.test", code);
-    const row = page.getByRole("row", { name: "@bob.test" });
-    await expect(async () => {
-      await page.goto("/admin/subscribers");
-      await expect(row).toBeVisible({ timeout: 1000 });
-    }).toPass();
+    const bobDid = await resolveHandle("bob.test");
+
+    await page.goto("/admin/subscribers");
+
+    const row = page.getByRole("row").filter({ hasText: bobDid });
 
     page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
@@ -89,5 +89,46 @@ test.describe("招待コード", () => {
     await page.getByRole("row").last().scrollIntoViewIfNeeded();
 
     await expect(page.getByText(oldest)).toBeVisible();
+  });
+
+  test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
+    page,
+  }) => {
+    await login(page);
+    const existing = await createInviteCode(page);
+    await page.goto("/admin/invite-codes");
+    const firstRow = page.getByRole("row").nth(1);
+    await expect(firstRow).toContainText(existing);
+
+    await page.getByRole("button", { name: "新規作成" }).click();
+
+    await expect(firstRow).not.toContainText(existing);
+    await expect(firstRow).toContainText("未使用");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await expect(firstRow).toContainText(
+      expiresAt.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }),
+    );
+  });
+
+  test("invite-codes-4: 未使用の招待コードだけを削除でき、期限切れでないものは削除前に確認する", async ({
+    page,
+  }) => {
+    await login(page);
+    const code = await createInviteCode(page);
+
+    await page.goto("/admin/invite-codes");
+    const row = page.getByRole("row", { name: code });
+
+    page.once("dialog", (dialog) => {
+      expect(dialog.message()).toContain(code);
+      void dialog.accept();
+    });
+    await row.getByRole("button", { name: "削除" }).click();
+
+    await expect(row).toHaveCount(0);
   });
 });
