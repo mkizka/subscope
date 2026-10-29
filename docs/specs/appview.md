@@ -162,6 +162,8 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 閲覧者のサブスクライバー登録を解除する。認証が必要。使った招待コードは使用済みのまま残る。登録していなければ400とNotSubscribedを返す。
 
+- unsubscribeServer-1: 本人とそのフォロイーのsyncTapRepoジョブを積む
+
 ## me.subsco.sync.getSubscriptionStatus
 
 閲覧者がサブスクライバーかどうかを返す。認証が必要。

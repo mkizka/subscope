@@ -241,7 +241,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getSetupStatusUseCase", ["actorRepository"], asClassArgs(GetSetupStatusUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
-    .service("unsubscribeServerUseCase", ["subscriptionRepository"], asClassArgs(UnsubscribeServerUseCase))
+    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followRepository", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
     .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))

@@ -42,6 +42,14 @@ export class FollowRepository implements IFollowRepository {
     );
   }
 
+  async findFolloweeDids(actorDid: Did): Promise<Did[]> {
+    const results = await this.db
+      .select({ subjectDid: schema.follows.subjectDid })
+      .from(schema.follows)
+      .where(eq(schema.follows.actorDid, actorDid));
+    return results.map((result) => asDid(result.subjectDid));
+  }
+
   async findFollowers(params: {
     actorDid: Did;
     limit: number;
