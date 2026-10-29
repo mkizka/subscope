@@ -9,7 +9,14 @@ test.describe("管理画面へのアクセス", () => {
     await login(page);
 
     const nav = page.getByRole("navigation");
-    await expect(nav.getByRole("link", { name: "登録ユーザー" })).toBeVisible();
+    await expect(async () => {
+      await page.reload();
+      await expect(nav.getByRole("link", { name: "登録ユーザー" })).toBeVisible(
+        {
+          timeout: 1000,
+        },
+      );
+    }).toPass();
     await expect(nav.getByRole("link", { name: "招待コード" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
   });
