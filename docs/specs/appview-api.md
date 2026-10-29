@@ -41,6 +41,7 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - updateSeen-1: 認証がない場合、401を返す
 - updateSeen-2: 指定した時刻以前の通知を既読にする
+
 ## app.bsky.actor.getProfiles
 
 指定した複数アクターの詳細なプロフィールを返す。認証は任意。
