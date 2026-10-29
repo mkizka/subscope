@@ -84,6 +84,52 @@ describe("ActorRepository", () => {
     });
   });
 
+  describe("アクターの保存", () => {
+    test("actor-1: ハンドルのないアクターを保存しても、保存済みのハンドルは消さない", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const staleActor = Actor.reconstruct({
+        did: asDid(actor.did),
+        handle: null,
+        isAdmin: false,
+        indexedAt: actor.indexedAt,
+      });
+
+      // act
+      await actorRepository.upsert({ ctx, actor: staleActor });
+
+      // assert
+      const result = await actorRepository.findByDid({
+        ctx,
+        did: asDid(actor.did),
+      });
+      expect(result?.handle).toBe(actor.handle);
+    });
+
+    test("actor-2: アクターを保存しても、管理者かどうかは変えない", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db)
+        .props({ isAdmin: () => true })
+        .create();
+      const staleActor = Actor.reconstruct({
+        did: asDid(actor.did),
+        handle: actor.handle,
+        isAdmin: false,
+        indexedAt: actor.indexedAt,
+      });
+
+      // act
+      await actorRepository.upsert({ ctx, actor: staleActor });
+
+      // assert
+      const result = await actorRepository.findByDid({
+        ctx,
+        did: asDid(actor.did),
+      });
+      expect(result?.isAdmin).toBe(true);
+    });
+  });
+
   describe("exists", () => {
     test("アクターが存在しない場合、falseを返す", async () => {
       // arrange
