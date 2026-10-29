@@ -1,6 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
+import { resolveHandle } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -20,11 +21,11 @@ test.describe("登録ユーザー", () => {
     page,
   }) => {
     await login(page);
-    const row = page.getByRole("row", { name: "@alice.test" });
-    await expect(async () => {
-      await page.goto("/admin/subscribers");
-      await expect(row).toBeVisible({ timeout: 1000 });
-    }).toPass();
+    const aliceDid = await resolveHandle("alice.test");
+
+    await page.goto("/admin/subscribers");
+
+    const row = page.getByRole("row").filter({ hasText: aliceDid });
     await expect(row.getByText("管理者")).toBeVisible();
   });
 });
@@ -91,5 +92,23 @@ test.describe("招待コード", () => {
         day: "2-digit",
       }),
     );
+  });
+
+  test("invite-codes-4: 未使用の招待コードだけを削除でき、期限切れでないものは削除前に確認する", async ({
+    page,
+  }) => {
+    await login(page);
+    const code = await createInviteCode(page);
+
+    await page.goto("/admin/invite-codes");
+    const row = page.getByRole("row", { name: code });
+
+    page.once("dialog", (dialog) => {
+      expect(dialog.message()).toContain(code);
+      void dialog.accept();
+    });
+    await row.getByRole("button", { name: "削除" }).click();
+
+    await expect(row).toHaveCount(0);
   });
 });

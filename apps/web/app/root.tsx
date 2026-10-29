@@ -6,7 +6,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import type { Route } from "./+types/root";
 import { NavigationOverlayContainer } from "./components/navigation-overlay-container";
-import { ErrorPage } from "./pages/error-page";
+import { ErrorPage } from "./pages/client/error-page";
 
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },

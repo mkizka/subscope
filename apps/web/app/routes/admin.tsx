@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
 import { adminRequiredMiddleware } from "@/app/middlewares/auth";
-import { AdminPage } from "@/app/pages/admin-page";
+import { AdminPage } from "@/app/pages/admin/admin-page";
 
 import type { Route } from "./+types/admin";
 
