@@ -1,4 +1,5 @@
-import type { AppBskyFeedGetLikes } from "@repo/client/server";
+import { toDatetimeString } from "@atproto/syntax";
+import type * as AppBskyFeedGetLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { LikeService } from "../../../application/service/graph/like-service.js";
@@ -12,8 +13,8 @@ export class GetLikesUseCase {
   static inject = ["likeService", "profileViewService"] as const;
 
   async execute(
-    params: AppBskyFeedGetLikes.QueryParams,
-  ): Promise<AppBskyFeedGetLikes.OutputSchema> {
+    params: AppBskyFeedGetLikes.$Params,
+  ): Promise<AppBskyFeedGetLikes.$OutputBody> {
     const cursor = params.cursor ? new Date(params.cursor) : undefined;
 
     const paginationResult = await this.likeService.findLikesWithPagination({
@@ -35,8 +36,8 @@ export class GetLikesUseCase {
         }
         return {
           $type: "app.bsky.feed.getLikes#like",
-          indexedAt: like.sortAt.toISOString(), // TODO: indexedAtに修正
-          createdAt: like.createdAt.toISOString(),
+          indexedAt: toDatetimeString(like.sortAt), // TODO: indexedAtに修正
+          createdAt: toDatetimeString(like.createdAt),
           actor: profileView,
         };
       },

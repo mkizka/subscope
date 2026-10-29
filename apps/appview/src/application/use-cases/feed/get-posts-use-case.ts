@@ -1,5 +1,6 @@
+import type { $Typed } from "@atproto/lex";
 import type { AtUri } from "@atproto/syntax";
-import type { $Typed, AppBskyFeedDefs } from "@repo/client/server";
+import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 
 import type { PostViewService } from "../../../application/service/feed/post-view-service.js";
 

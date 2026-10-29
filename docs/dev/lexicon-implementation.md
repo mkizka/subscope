@@ -12,7 +12,7 @@ Tap → Ingester → BullMQ Queue → Worker(IndexCommitUseCase) → IndexRecord
 
 ### 1. Lexicon定義の取得
 
-1. `pnpm --filter @repo/client exec ts-lex install <NSID>` を実行すると、定義を取得して`packages/client/lexicons`と`lexicons.json`に追加する
+1. `pnpm --filter @repo/client exec lex install <NSID>` を実行すると、定義を取得して`packages/client/lexicons`と`lexicons.json`に追加する
 2. `pnpm build`や`pnpm typecheck`を実行すると、`@repo/client`のコードを生成する
 
 Lexicon定義ファイルは手動で作成しないでください。

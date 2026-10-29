@@ -13,7 +13,7 @@ export class VerifyAccess {
 
   handle(router: LexRouter) {
     router.add(verifyAccess, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials }) => {
         const result = await this.verifyAccessUseCase.execute({
           requesterDid: credentials.did,

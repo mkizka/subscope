@@ -23,7 +23,7 @@ export class GetPostThread {
 
   handle(router: LexRouter) {
     router.add(getPostThread, {
-      auth: (ctx) => this.authVerifierMiddleware.lexOptionalAuth(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
         const resolvedUri = await this.atUriService.resolveHostname(
           new AtUri(params.uri),

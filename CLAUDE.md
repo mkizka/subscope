@@ -32,7 +32,7 @@ packagesディレクトリ(共通パッケージ)
 - `@repo/common/domain` - ドメインモデル
 - `@repo/common/infrastructure` - インフラストラクチャ
 - `@repo/common/utils` - 共有ユーティリティ関数
-- `@repo/client` - lex-cliで生成したXRPCクライアント実装
+- `@repo/client` - `@atproto/lex`で生成したlexiconスキーマ
 - `@repo/test-utils` - テスト用データ生成ファクトリを含むユーティリティ
 
 ### 実装パターン(サーバー)

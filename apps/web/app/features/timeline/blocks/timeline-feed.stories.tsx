@@ -6,9 +6,11 @@ const meta = {
   title: "features/Timeline/TimelineFeed",
   component: TimelineFeed,
   args: {
+    onCompose: () => {},
     posts: [
       {
         uri: "at://did:plc:example1/app.bsky.feed.post/1",
+        cid: "bafyexample1",
         authorHandle: "alice.bsky.social",
         authorDisplayName: "Alice",
         text: "こんにちは！今日はいい天気ですね。",
@@ -19,6 +21,7 @@ const meta = {
       },
       {
         uri: "at://did:plc:example2/app.bsky.feed.post/2",
+        cid: "bafyexample2",
         authorHandle: "bob.bsky.social",
         authorDisplayName: "Bob",
         text: "AT Protocolについての考察。分散型SNSの未来について。",
@@ -33,6 +36,7 @@ const meta = {
       },
       {
         uri: "at://did:plc:example3/app.bsky.feed.post/3",
+        cid: "bafyexample3",
         authorHandle: "dave.bsky.social",
         text: "displayNameなしのユーザーです。",
         replyCount: 0,
@@ -51,6 +55,7 @@ export const Default: Story = {};
 
 export const Empty: Story = {
   args: {
+    onCompose: () => {},
     posts: [],
   },
 };

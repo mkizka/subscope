@@ -25,6 +25,11 @@ export function NotificationPanelContainer() {
     uri: notification.uri,
     authorName: notification.author.displayName ?? notification.author.handle,
     reason: notification.reason,
+    text:
+      ["reply", "quote", "mention"].includes(notification.reason) &&
+      typeof notification.record.text === "string"
+        ? notification.record.text
+        : undefined,
   }));
 
   return <NotificationPanel notifications={notifications} />;

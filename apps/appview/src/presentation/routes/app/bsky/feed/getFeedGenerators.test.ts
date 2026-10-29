@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import getFeedGenerators from "@repo/client/lex/app/bsky/feed/getFeedGenerators";
 import {
   actorFactory,
   generatorFactory,
@@ -27,12 +29,12 @@ describe("app.bsky.feed.getFeedGenerators", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.getFeedGenerators({
-      feeds: [generator.uri],
+    const res = await client.call(getFeedGenerators, {
+      feeds: [asAtUriString(generator.uri)],
     });
 
     // assert
-    expect(res.data.feeds).toMatchObject([
+    expect(res.feeds).toMatchObject([
       { uri: generator.uri, creator: { did: creator.did } },
     ]);
   });
