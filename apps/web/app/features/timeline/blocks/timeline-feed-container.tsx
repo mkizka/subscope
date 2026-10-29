@@ -26,7 +26,7 @@ const maybeString = (value: unknown): string | undefined => {
   return undefined;
 };
 
-function toTimelinePost({
+export function toTimelinePost({
   post,
   reason,
 }: TimelineResponse["feed"][number]): TimelinePost {
