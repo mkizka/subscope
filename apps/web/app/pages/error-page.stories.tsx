@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ErrorPage } from "./error";
+import { ErrorPage } from "./error-page";
 
 const meta = {
-  title: "pages/error",
   component: ErrorPage,
   parameters: {
     layout: "fullscreen",

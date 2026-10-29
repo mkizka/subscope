@@ -1,19 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Label } from "./label";
+import { AppLayout } from "./app-layout";
 
 const meta = {
-  title: "ui/Label",
-  component: Label,
+  component: AppLayout,
   args: {
-    children: "Label",
+    children: <p>コンテンツ</p>,
   },
-  argTypes: {
-    children: {
-      control: "text",
-    },
+  parameters: {
+    layout: "fullscreen",
   },
-} satisfies Meta<typeof Label>;
+} satisfies Meta<typeof AppLayout>;
 
 export default meta;
 

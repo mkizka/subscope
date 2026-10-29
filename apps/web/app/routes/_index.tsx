@@ -75,7 +75,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   return data({
     state: "timeline" as const,
     atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
-    posts: timeline.feed.map(toTimelinePost).reverse(),
+    posts: timeline.feed
+      .filter(({ post, reason }) => reason || !post.record.reply)
+      .map(toTimelinePost)
+      .reverse(),
     cursor: timeline.cursor,
   });
 };
@@ -178,7 +181,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
 
-function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
+export function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
   return {
     uri: post.uri,
     cid: post.cid,

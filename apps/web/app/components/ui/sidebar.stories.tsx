@@ -33,7 +33,6 @@ const items = [
 ];
 
 const meta = {
-  title: "ui/Sidebar",
   component: Sidebar,
   args: {
     side: "left",
