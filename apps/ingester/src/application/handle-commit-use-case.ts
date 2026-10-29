@@ -14,7 +14,6 @@ export class HandleCommitUseCase {
   ) {
     this.logger = loggerManager.createLogger("HandleCommitUseCase");
   }
-  static inject = ["loggerManager", "metricReporter", "jobQueue"] as const;
 
   async execute(dto: CommitEventDto) {
     this.logger.debug(

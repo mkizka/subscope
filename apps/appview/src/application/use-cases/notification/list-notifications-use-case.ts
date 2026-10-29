@@ -18,11 +18,6 @@ export class ListNotificationsUseCase {
     private readonly profileViewService: ProfileViewService,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
-  static inject = [
-    "notificationRepository",
-    "profileViewService",
-    "subscriptionRepository",
-  ] as const;
 
   async execute(params: {
     viewerDid: Did;

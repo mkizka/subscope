@@ -6,7 +6,6 @@ import type { GeneratorViewService } from "../../../application/service/feed/gen
 
 export class GetFeedGeneratorsUseCase {
   constructor(private readonly generatorViewService: GeneratorViewService) {}
-  static inject = ["generatorViewService"] as const;
 
   async execute(
     uris: AtUri[],

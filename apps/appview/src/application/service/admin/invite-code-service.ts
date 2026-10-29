@@ -7,7 +7,6 @@ import {
 
 export class InviteCodeService {
   constructor(private readonly inviteCodeRepository: IInviteCodeRepository) {}
-  static inject = ["inviteCodeRepository"] as const;
 
   async findInviteCodesWithPagination({
     cursor,

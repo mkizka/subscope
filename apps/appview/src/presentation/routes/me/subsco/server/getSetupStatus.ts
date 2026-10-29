@@ -5,7 +5,6 @@ import type { GetSetupStatusUseCase } from "../../../../../application/use-cases
 
 export class GetSetupStatus {
   constructor(private readonly getSetupStatusUseCase: GetSetupStatusUseCase) {}
-  static inject = ["getSetupStatusUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getSetupStatus, async () => {

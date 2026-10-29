@@ -11,11 +11,6 @@ export class GetAuthorFeed {
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = [
-    "getAuthorFeedUseCase",
-    "handleMiddleware",
-    "authVerifierMiddleware",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(getAuthorFeed, {

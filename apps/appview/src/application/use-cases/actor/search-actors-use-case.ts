@@ -16,7 +16,6 @@ export class SearchActorsUseCase {
     private readonly profileSearchService: ProfileSearchService,
     private readonly profileViewService: ProfileViewService,
   ) {}
-  static inject = ["profileSearchService", "profileViewService"] as const;
 
   async execute(
     params: SearchActorsParams,

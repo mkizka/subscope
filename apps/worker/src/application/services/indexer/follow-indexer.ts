@@ -19,13 +19,6 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly notificationRepository: INotificationRepository,
   ) {}
-  static inject = [
-    "followRepository",
-    "jobScheduler",
-    "indexActorService",
-    "subscriptionRepository",
-    "notificationRepository",
-  ] as const;
 
   async upsert({
     ctx,

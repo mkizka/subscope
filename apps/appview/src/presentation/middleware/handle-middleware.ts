@@ -17,7 +17,6 @@ export class HandleMiddleware {
   ) {
     this.logger = loggerManager.createLogger("HandleMiddleware");
   }
-  static inject = ["handleResolver", "loggerManager"] as const;
 
   async resolveHandleOrDid(handleOrDid: Handle | Did): Promise<Did> {
     if (isDid(handleOrDid)) {

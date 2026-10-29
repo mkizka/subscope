@@ -9,7 +9,6 @@ export class VerifyAccess {
     private verifyAccessUseCase: VerifyAccessUseCase,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = ["verifyAccessUseCase", "authVerifierMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(verifyAccess, {

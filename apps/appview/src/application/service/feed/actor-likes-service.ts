@@ -9,7 +9,6 @@ import {
 
 export class ActorLikesService {
   constructor(private readonly likeRepository: ILikeRepository) {}
-  static inject = ["likeRepository"] as const;
 
   async findLikesWithPagination({
     actorDid,

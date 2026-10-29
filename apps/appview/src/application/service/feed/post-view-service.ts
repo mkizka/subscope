@@ -40,16 +40,6 @@ export class PostViewService {
     private readonly repostRepository: IRepostRepository,
     private readonly likeRepository: ILikeRepository,
   ) {}
-  static readonly inject = [
-    "postRepository",
-    "postStatsRepository",
-    "recordRepository",
-    "profileViewService",
-    "generatorViewService",
-    "postEmbedViewBuilder",
-    "repostRepository",
-    "likeRepository",
-  ] as const;
 
   private getEmbedRecordUris(posts: Post[]): AtUri[] {
     const embedRecordUris = new Set<string>();

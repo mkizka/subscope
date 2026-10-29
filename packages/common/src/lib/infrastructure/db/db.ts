@@ -10,7 +10,6 @@ export const connectionPoolFactory = (databaseUrl: string) => {
     connectionString: databaseUrl,
   });
 };
-connectionPoolFactory.inject = ["databaseUrl"] as const;
 
 export const databaseFactory = (
   connectionPool: ReturnType<typeof connectionPoolFactory>,
@@ -35,4 +34,3 @@ export const databaseFactory = (
     logger: new DrizzleLogger(),
   });
 };
-databaseFactory.inject = ["connectionPool", "loggerManager"] as const;

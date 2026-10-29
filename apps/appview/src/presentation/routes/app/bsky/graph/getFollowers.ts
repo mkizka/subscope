@@ -9,7 +9,6 @@ export class GetFollowers {
     private getFollowersUseCase: GetFollowersUseCase,
     private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getFollowersUseCase", "handleMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(getFollowers, async ({ params }) => {

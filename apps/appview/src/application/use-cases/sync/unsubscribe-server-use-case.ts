@@ -21,11 +21,6 @@ export class UnsubscribeServerUseCase {
     private readonly followRepository: IFollowRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = [
-    "subscriptionRepository",
-    "followRepository",
-    "jobScheduler",
-  ] as const;
 
   async execute(params: UnsubscribeServerParams): Promise<void> {
     const existingSubscription = await this.subscriptionRepository.findFirst(

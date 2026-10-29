@@ -5,7 +5,6 @@ import type { ProfileViewService } from "../../../application/service/actor/prof
 
 export class GetProfilesUseCase {
   constructor(private readonly profileViewService: ProfileViewService) {}
-  static inject = ["profileViewService"] as const;
 
   async execute(
     dids: Did[],

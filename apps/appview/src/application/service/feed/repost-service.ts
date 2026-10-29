@@ -8,7 +8,6 @@ import {
 
 export class RepostService {
   constructor(private readonly repostRepository: IRepostRepository) {}
-  static inject = ["repostRepository"] as const;
 
   async findRepostsWithPagination({
     subjectUri,

@@ -16,7 +16,6 @@ export class GetTimelineUseCase {
     private readonly timelineService: TimelineService,
     private readonly feedProcessor: FeedProcessor,
   ) {}
-  static inject = ["timelineService", "feedProcessor"] as const;
 
   async execute({
     limit,

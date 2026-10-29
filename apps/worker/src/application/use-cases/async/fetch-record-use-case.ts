@@ -17,11 +17,6 @@ export class FetchRecordUseCase {
     private readonly transactionManager: ITransactionManager,
     private readonly indexRecordService: IndexRecordService,
   ) {}
-  static inject = [
-    "recordFetcher",
-    "transactionManager",
-    "indexRecordService",
-  ] as const;
 
   async execute({
     uri,

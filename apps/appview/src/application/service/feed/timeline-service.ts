@@ -9,7 +9,6 @@ import {
 
 export class TimelineService {
   constructor(private readonly timelineRepository: ITimelineRepository) {}
-  static inject = ["timelineRepository"] as const;
 
   async findFeedItemsWithPagination({
     viewerDid,

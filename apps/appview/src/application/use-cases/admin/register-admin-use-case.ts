@@ -28,13 +28,6 @@ export class RegisterAdminUseCase {
     private readonly createAdminService: CreateAdminService,
     private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = [
-    "transactionManager",
-    "actorRepository",
-    "subscriptionRepository",
-    "createAdminService",
-    "jobScheduler",
-  ] as const;
 
   async execute(params: RegisterAdminParams): Promise<void> {
     const hasAnyAdmin = await this.actorRepository.hasAnyAdmin();

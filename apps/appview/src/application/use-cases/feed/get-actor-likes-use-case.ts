@@ -9,7 +9,6 @@ export class GetActorLikesUseCase {
     private readonly actorLikesService: ActorLikesService,
     private readonly feedProcessor: FeedProcessor,
   ) {}
-  static inject = ["actorLikesService", "feedProcessor"] as const;
 
   async execute(params: {
     actorDid: Did;

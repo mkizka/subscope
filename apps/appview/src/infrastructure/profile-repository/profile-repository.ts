@@ -8,7 +8,6 @@ import type { IProfileRepository } from "../../application/interfaces/profile-re
 
 export class ProfileRepository implements IProfileRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   private escapeWildcards(query: string): string {
     return query.replace(/[%_]/g, "\\$&");

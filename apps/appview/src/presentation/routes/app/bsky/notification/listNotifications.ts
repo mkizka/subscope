@@ -9,10 +9,6 @@ export class ListNotifications {
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly listNotificationsUseCase: ListNotificationsUseCase,
   ) {}
-  static inject = [
-    "authVerifierMiddleware",
-    "listNotificationsUseCase",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(listNotifications, {

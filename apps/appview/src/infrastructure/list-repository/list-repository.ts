@@ -9,7 +9,6 @@ import type { IListRepository } from "../../application/interfaces/list-reposito
 
 export class ListRepository implements IListRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findByActor(params: {
     actorDid: Did;

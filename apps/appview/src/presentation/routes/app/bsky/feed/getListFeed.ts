@@ -9,7 +9,6 @@ export class GetListFeed {
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getListFeedUseCase: GetListFeedUseCase,
   ) {}
-  static inject = ["authVerifierMiddleware", "getListFeedUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getListFeed, {

@@ -9,7 +9,6 @@ const SYNC_TAP_REPO_DELAY_MS = 10 * 1000;
 
 export class JobScheduler implements IJobScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
-  static inject = ["jobQueue"] as const;
 
   async scheduleFetchRecord(
     uri: AtUri,

@@ -8,7 +8,6 @@ export class AdminMiddleware {
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly actorRepository: IActorRepository,
   ) {}
-  static inject = ["authVerifierMiddleware", "actorRepository"] as const;
 
   async requireAdmin(ctx: { request: Request }) {
     const credentials = await this.authVerifierMiddleware.loginRequired(ctx);

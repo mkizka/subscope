@@ -15,12 +15,6 @@ export class ProfileViewService {
     private readonly followRepository: IFollowRepository,
     private readonly profileViewBuilder: ProfileViewBuilder,
   ) {}
-  static inject = [
-    "profileRepository",
-    "actorStatsRepository",
-    "followRepository",
-    "profileViewBuilder",
-  ] as const;
 
   async findProfileViewBasic(dids: Did[], viewerDid?: Did | null) {
     const profiles = await this.profileRepository.findManyDetailed(dids);

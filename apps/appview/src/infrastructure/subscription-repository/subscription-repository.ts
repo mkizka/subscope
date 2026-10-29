@@ -11,7 +11,6 @@ import type { ISubscriptionRepository } from "../../application/interfaces/subsc
 
 export class SubscriptionRepository implements ISubscriptionRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findMany(params: {
     limit: number;

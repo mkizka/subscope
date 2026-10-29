@@ -11,7 +11,6 @@ export class GetListsUseCase {
     private readonly listRepository: IListRepository,
     private readonly listViewService: ListViewService,
   ) {}
-  static inject = ["listRepository", "listViewService"] as const;
 
   async execute(params: {
     actorDid: Did;

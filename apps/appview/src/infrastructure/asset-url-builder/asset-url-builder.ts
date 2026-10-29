@@ -4,7 +4,6 @@ import type { IAssetUrlBuilder } from "../../application/interfaces/asset-url-bu
 
 export class AssetUrlBuilder implements IAssetUrlBuilder {
   constructor(private readonly blobProxyUrl: UriString) {}
-  static inject = ["blobProxyUrl"] as const;
 
   // TODO: avatar,bunnerが使われていないので確認
   getAvatarThumbnailUrl(actorDid: string, cid: string): UriString {

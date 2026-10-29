@@ -38,13 +38,6 @@ export class SubscribeServerUseCase {
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = [
-    "transactionManager",
-    "actorRepository",
-    "inviteCodeRepository",
-    "subscriptionRepository",
-    "jobScheduler",
-  ] as const;
 
   private async validateInviteCode(
     code: string | undefined,

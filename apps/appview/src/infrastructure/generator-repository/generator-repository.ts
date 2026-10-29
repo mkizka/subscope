@@ -8,7 +8,6 @@ import type { IGeneratorRepository } from "../../application/interfaces/generato
 
 export class GeneratorRepository implements IGeneratorRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findByUris(uris: AtUri[]): Promise<Generator[]> {
     if (uris.length === 0) {

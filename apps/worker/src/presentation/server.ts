@@ -24,12 +24,6 @@ export class WorkerServer {
     this.app.use(promBundle({ includeMethod: true }));
     this.app.use(healthRouter);
   }
-  static inject = [
-    "loggerManager",
-    "syncWorker",
-    "healthRouter",
-    "port",
-  ] as const;
 
   start() {
     this.server = this.app.listen(this.port, async () => {

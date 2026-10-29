@@ -14,7 +14,6 @@ export class SearchPostsUseCase {
     private readonly searchService: PostSearchService,
     private readonly postViewService: PostViewService,
   ) {}
-  static inject = ["searchService", "postViewService"] as const;
 
   async execute(params: SearchPostsParams): Promise<$OutputBody> {
     if (!params.q.trim()) {

@@ -13,7 +13,6 @@ export class DeleteInviteCode {
     private deleteInviteCodeUseCase: DeleteInviteCodeUseCase,
     private adminMiddleware: AdminMiddleware,
   ) {}
-  static inject = ["deleteInviteCodeUseCase", "adminMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(deleteInviteCode, {

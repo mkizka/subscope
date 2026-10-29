@@ -10,7 +10,6 @@ export class SubscriptionService {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
 
   async findSubscribersWithPagination({
     cursor,

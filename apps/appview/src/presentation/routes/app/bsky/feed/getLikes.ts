@@ -5,7 +5,6 @@ import type { GetLikesUseCase } from "../../../../../application/use-cases/feed/
 
 export class GetLikes {
   constructor(private getLikesUseCase: GetLikesUseCase) {}
-  static inject = ["getLikesUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getLikes, async ({ params }) => {

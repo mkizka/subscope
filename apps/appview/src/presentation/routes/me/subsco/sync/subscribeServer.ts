@@ -14,7 +14,6 @@ export class SubscribeServer {
     private subscribeServerUseCase: SubscribeServerUseCase,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = ["subscribeServerUseCase", "authVerifierMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(subscribeServer, {

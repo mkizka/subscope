@@ -6,7 +6,6 @@ export class UpdateSeenUseCase {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
 
   async execute(params: { actorDid: Did; seenAt: Date }): Promise<void> {
     await this.subscriptionRepository.updateSeenAt(

@@ -10,7 +10,6 @@ export class CreateInviteCodeUseCase {
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly publicUrl: string,
   ) {}
-  static inject = ["db", "inviteCodeRepository", "publicUrl"] as const;
 
   async execute(params: {
     daysToExpire: number;

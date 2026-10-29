@@ -9,7 +9,6 @@ export class GetInviteCodes {
     private getInviteCodesUseCase: GetInviteCodesUseCase,
     private adminMiddleware: AdminMiddleware,
   ) {}
-  static inject = ["getInviteCodesUseCase", "adminMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(getInviteCodes, {
