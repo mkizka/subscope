@@ -3,12 +3,18 @@ import { cn } from "@/app/lib/utils";
 type Notification = {
   uri: string;
   authorName: string;
+  reason: string;
   text?: string;
   isRead: boolean;
 };
 
 type Props = {
   notifications: Notification[];
+};
+
+const reasonLabels: Record<string, string> = {
+  like: "さんがいいねしました",
+  repost: "さんがリポストしました",
 };
 
 export function NotificationPanel({ notifications }: Props) {
@@ -29,7 +35,10 @@ export function NotificationPanel({ notifications }: Props) {
                 !notification.isRead && "bg-base-200",
               )}
             >
-              <p>{notification.authorName}</p>
+              <p>
+                {notification.authorName}
+                {reasonLabels[notification.reason]}
+              </p>
               {notification.text && (
                 <p className="text-sm whitespace-pre-wrap">
                   {notification.text}
