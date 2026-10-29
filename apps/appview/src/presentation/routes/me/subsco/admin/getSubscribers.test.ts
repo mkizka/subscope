@@ -31,14 +31,13 @@ describe("me.subsco.admin.getSubscribers", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getSubscribers-3: サブスクライバーをprofileViewとして返す", async () => {
+  test("getSubscribers-3: サブスクライバーごとにprofileViewと管理者かどうかを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await actorFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.withProfile({}))
       .use((t) => t.subscriber())
       .create();
     loginAs(admin.did);
@@ -47,6 +46,8 @@ describe("me.subsco.admin.getSubscribers", () => {
     const res = await client.call(getSubscribers);
 
     // assert
-    expect(res.subscribers).toMatchObject([{ did: subscriber.did }]);
+    expect(res.subscribers).toMatchObject([
+      { profile: { did: subscriber.did }, isAdmin: false },
+    ]);
   });
 });

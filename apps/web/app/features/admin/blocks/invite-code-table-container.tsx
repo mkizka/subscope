@@ -1,92 +1,97 @@
+import { useFetcher } from "react-router";
+
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import type { loader } from "@/app/routes/admin.invite-codes";
+
 import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+  type InviteCode,
+  InviteCodeRows,
+  InviteCodeTable,
+} from "./invite-code-table";
 
-import { InviteCodeTable } from "./invite-code-table";
+type DeleteProps = {
+  onDeleteCode: (code: string) => void;
+  deletingCode: string | null;
+};
 
-type InviteCodesResponse = {
-  codes: {
-    code: string;
-    expiresAt: string;
-    createdAt: string;
-    usedAt?: string;
-    usedBy?: { did: string; handle?: string };
-  }[];
+function OlderInviteCodeRowsContainer({
+  cursor,
+  ...deleteProps
+}: DeleteProps & { cursor: string }) {
+  const fetcher = useFetcher<typeof loader>();
+
+  if (!fetcher.data) {
+    return (
+      <tbody>
+        <tr>
+          <td colSpan={6} className="text-center text-base-content/70">
+            {fetcher.state !== "idle" && "読み込み中..."}
+            <InfiniteScrollTrigger
+              onIntersect={() =>
+                void fetcher.load(
+                  `/admin/invite-codes?${new URLSearchParams({ cursor })}`,
+                )
+              }
+              enabled={fetcher.state === "idle"}
+            />
+          </td>
+        </tr>
+      </tbody>
+    );
+  }
+  return (
+    <>
+      <InviteCodeRows codes={fetcher.data.codes} {...deleteProps} />
+      {fetcher.data.cursor && (
+        <OlderInviteCodeRowsContainer
+          cursor={fetcher.data.cursor}
+          {...deleteProps}
+        />
+      )}
+    </>
+  );
+}
+
+type Props = {
+  codes: InviteCode[];
   cursor?: string;
 };
 
-async function fetchInviteCodes(cursor?: string): Promise<InviteCodesResponse> {
-  const params = new URLSearchParams();
-  if (cursor) {
-    params.set("cursor", cursor);
-  }
-  const response = await fetch(`/admin/api/invite-codes?${params.toString()}`);
-  if (!response.ok) {
-    throw new Error("招待コードの取得に失敗しました");
-  }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return response.json() as Promise<InviteCodesResponse>;
-}
-
-async function createInviteCode(): Promise<void> {
-  const response = await fetch("/admin/api/invite-codes", {
-    method: "POST",
-  });
-  if (!response.ok) {
-    throw new Error("招待コードの作成に失敗しました");
-  }
-}
-
-async function deleteInviteCode(code: string): Promise<void> {
-  const response = await fetch("/admin/api/invite-codes", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
-  });
-  if (!response.ok) {
-    throw new Error("招待コードの削除に失敗しました");
-  }
-}
-
-export function InviteCodeTableContainer() {
-  const queryClient = useQueryClient();
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: ["inviteCodes"],
-      queryFn: ({ pageParam }) => fetchInviteCodes(pageParam),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      initialPageParam: undefined as string | undefined,
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      select: (data) => data.pages.flatMap((page) => page.codes),
-    });
-
-  const createMutation = useMutation({
-    mutationFn: createInviteCode,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["inviteCodes"] });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteInviteCode,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["inviteCodes"] });
-    },
-  });
+export function InviteCodeTableContainer({ codes, cursor }: Props) {
+  const createFetcher = useFetcher();
+  const deleteFetcher = useFetcher();
+  const deleteProps = {
+    onDeleteCode: (code: string) =>
+      void deleteFetcher.submit(
+        { code },
+        {
+          method: "DELETE",
+          action: "/admin/api/invite-codes",
+          encType: "application/json",
+        },
+      ),
+    deletingCode:
+      deleteFetcher.state === "idle"
+        ? null
+        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          (deleteFetcher.json as { code: string }).code,
+  };
 
   return (
     <InviteCodeTable
-      codes={data ?? []}
-      isLoading={isLoading}
-      isFetchingNextPage={isFetchingNextPage}
-      onLoadMore={fetchNextPage}
-      hasNextPage={hasNextPage}
-      onCreateCode={() => createMutation.mutate()}
-      isCreating={createMutation.isPending}
-      onDeleteCode={(code) => deleteMutation.mutate(code)}
-      deletingCode={deleteMutation.isPending ? deleteMutation.variables : null}
-    />
+      codes={codes}
+      onCreateCode={() =>
+        void createFetcher.submit(null, {
+          method: "POST",
+          action: "/admin/api/invite-codes",
+        })
+      }
+      isCreating={createFetcher.state !== "idle"}
+      {...deleteProps}
+    >
+      {cursor && (
+        <OlderInviteCodeRowsContainer cursor={cursor} {...deleteProps} />
+      )}
+    </InviteCodeTable>
   );
 }

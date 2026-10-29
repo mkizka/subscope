@@ -49,6 +49,7 @@ describe("IndexCommitUseCase", () => {
       const commit = {
         operation: "create" as const,
         uri,
+        rev: "3aaaaaaaaaaaa",
         record,
       };
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
@@ -93,14 +94,19 @@ describe("IndexCommitUseCase", () => {
         },
       });
       const createCommand: IndexCommitCommand = {
-        commit: { operation: "create" as const, uri, record },
+        commit: {
+          operation: "create" as const,
+          uri,
+          rev: "3aaaaaaaaaaaa",
+          record,
+        },
         live: true,
         jobLogger,
       };
       await indexCommitUseCase.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
-        commit: { operation: "delete" as const, uri },
+        commit: { operation: "delete" as const, uri, rev: "3bbbbbbbbbbbb" },
         live: true,
         jobLogger,
       };
@@ -142,6 +148,7 @@ describe("IndexCommitUseCase", () => {
       const commit = {
         operation: "create" as const,
         uri,
+        rev: "3aaaaaaaaaaaa",
         record,
       };
       const command: IndexCommitCommand = { commit, live: true, jobLogger };
@@ -175,6 +182,7 @@ describe("IndexCommitUseCase", () => {
       const commit = {
         operation: "create" as const,
         uri,
+        rev: "3aaaaaaaaaaaa",
         record,
       };
       const command: IndexCommitCommand = { commit, live: true, jobLogger };

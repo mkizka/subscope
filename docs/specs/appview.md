@@ -8,6 +8,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - getProfile-1: 指定したアクターのprofileViewDetailedを返す
 - getProfile-2: 保存されていないアクターには400を返す
+- getProfile-3: プロフィールレコードがないアクターには、DIDとハンドルだけのprofileViewDetailedを返す
 
 ## app.bsky.actor.getProfiles
 
@@ -41,6 +42,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getTimeline-2: 閲覧者本人とフォロイーの投稿・リポストを含める
 - getTimeline-3: フォロイー以外の投稿・リポストは含めない
 - getTimeline-4: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getTimeline-5: 投稿者にプロフィールレコードがなくても投稿を含め、authorはDIDとハンドルだけにする
 
 ## app.bsky.feed.getListFeed
 
@@ -158,9 +160,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。管理者は招待コードなしで登録でき、それ以外は有効期限内の未使用の招待コードが必要で、使った招待コードは使用済みになる。招待コードが無効なら400とInvalidInviteCodeを、登録済みなら400とAlreadySubscribedを返す。
 
+- subscribeServer-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
+
 ## me.subsco.sync.unsubscribeServer
 
 閲覧者のサブスクライバー登録を解除する。認証が必要。使った招待コードは使用済みのまま残る。登録していなければ400とNotSubscribedを返す。
+
+- unsubscribeServer-1: 本人とそのフォロイーのsyncTapRepoジョブを積む
 
 ## me.subsco.sync.getSubscriptionStatus
 
@@ -176,11 +182,11 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## me.subsco.admin.getSubscribers
 
-サブスクライバーのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
+サブスクライバーのプロフィールと管理者かどうかを返す。管理者の認証が必要。limitとcursorでページングする。
 
 - getSubscribers-1: 認証がないリクエストには401を返す
 - getSubscribers-2: 管理者でないアカウントからのリクエストには401を返す
-- getSubscribers-3: サブスクライバーをprofileViewとして返す
+- getSubscribers-3: サブスクライバーごとにprofileViewと管理者かどうかを返す
 
 ## me.subsco.admin.createInviteCode
 

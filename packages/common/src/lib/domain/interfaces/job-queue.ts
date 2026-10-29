@@ -33,8 +33,9 @@ export type QueueName = keyof JobData;
 
 export type JobState = "inProgress" | "completed" | "failed";
 
-type JobOptions = {
+export type JobOptions = {
   jobId?: string;
+  deduplication?: { id: string; keepLastIfActive: boolean };
   delay?: number;
   priority?: number;
 };

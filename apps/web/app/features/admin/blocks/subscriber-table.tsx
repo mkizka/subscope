@@ -5,6 +5,7 @@ export type Subscriber = {
   handle: string;
   displayName?: string;
   avatar?: string;
+  isAdmin: boolean;
 };
 
 type Props = {
@@ -32,19 +33,20 @@ export function SubscriberTable({
               <tr>
                 <th>ユーザー</th>
                 <th>DID</th>
+                <th>権限</th>
               </tr>
             </thead>
             <tbody>
               {!isLoading && subscribers.length === 0 && (
                 <tr>
-                  <td colSpan={2} className="py-8 text-center">
+                  <td colSpan={3} className="py-8 text-center">
                     登録アカウントはまだありません
                   </td>
                 </tr>
               )}
               {isLoading && (
                 <tr>
-                  <td colSpan={2} className="py-8 text-center">
+                  <td colSpan={3} className="py-8 text-center">
                     読み込み中...
                   </td>
                 </tr>
@@ -75,6 +77,11 @@ export function SubscriberTable({
                     </div>
                   </td>
                   <td className="font-mono text-xs">{subscriber.did}</td>
+                  <td>
+                    {subscriber.isAdmin && (
+                      <span className="badge badge-primary">管理者</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -40,4 +40,22 @@ describe("app.bsky.actor.getProfile", () => {
     // assert
     await expect(promise).rejects.toMatchObject({ status: 400 });
   });
+
+  test("getProfile-3: プロフィールレコードがないアクターには、DIDとハンドルだけのprofileViewDetailedを返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const actor = await actorFactory(ctx.db).create();
+
+    // act
+    const res = await client.call(getProfile, {
+      actor: asAtIdentifierString(actor.did),
+    });
+
+    // assert
+    expect(res).toMatchObject({
+      did: actor.did,
+      handle: actor.handle,
+    });
+    expect(res.displayName).toBeUndefined();
+  });
 });

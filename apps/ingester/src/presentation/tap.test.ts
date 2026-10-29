@@ -80,7 +80,7 @@ describe("TapIngester", () => {
     await new Promise((resolve) => server.close(resolve));
   });
 
-  test("tap-1: サポートするコレクションのcreate・updateイベントは、レコードとCIDを含めてcommitキューに積む", async () => {
+  test("tap-1: サポートするコレクションのcreate・updateイベントは、レコードとCIDとrevを含めてcommitキューに積む", async () => {
     await send(recordEvent(1, {}), recordEvent(2, { action: "update" }));
 
     for (const operation of ["create", "update"]) {
@@ -94,6 +94,7 @@ describe("TapIngester", () => {
             operation,
             collection: "app.bsky.feed.post",
             rkey: "3l3qo2vuowo2b",
+            rev: "3l3qo2vutsw2b",
             record: post,
             cid,
           },
@@ -103,7 +104,7 @@ describe("TapIngester", () => {
     }
   });
 
-  test("tap-2: deleteイベントは、レコードとCIDを含めずにcommitキューに積む", async () => {
+  test("tap-2: deleteイベントは、revを含め、レコードとCIDを含めずにcommitキューに積む", async () => {
     await send(
       recordEvent(1, { action: "delete", record: undefined, cid: undefined }),
     );
@@ -118,6 +119,7 @@ describe("TapIngester", () => {
             operation: "delete",
             collection: "app.bsky.feed.post",
             rkey: "3l3qo2vuowo2b",
+            rev: "3l3qo2vutsw2b",
           },
         },
       }),

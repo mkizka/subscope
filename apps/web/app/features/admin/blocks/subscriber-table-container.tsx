@@ -1,18 +1,9 @@
+import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { SubscriberTable } from "./subscriber-table";
 
-type SubscribersResponse = {
-  subscribers: {
-    did: string;
-    handle: string;
-    displayName?: string;
-    avatar?: string;
-  }[];
-  cursor?: string;
-};
-
-async function fetchSubscribers(cursor?: string): Promise<SubscribersResponse> {
+async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
   const params = new URLSearchParams();
   if (cursor) {
     params.set("cursor", cursor);
@@ -22,7 +13,7 @@ async function fetchSubscribers(cursor?: string): Promise<SubscribersResponse> {
     throw new Error("登録アカウントの取得に失敗しました");
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return response.json() as Promise<SubscribersResponse>;
+  return response.json() as Promise<$OutputBody>;
 }
 
 export function SubscriberTableContainer() {
@@ -33,7 +24,13 @@ export function SubscriberTableContainer() {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage.cursor,
-      select: (data) => data.pages.flatMap((page) => page.subscribers),
+      select: (data) =>
+        data.pages.flatMap((page) =>
+          page.subscribers.map(({ profile, isAdmin }) => ({
+            ...profile,
+            isAdmin,
+          })),
+        ),
     });
 
   return (
