@@ -10,7 +10,6 @@ import {
 import { Input } from "./input";
 
 const meta = {
-  title: "ui/Field",
   component: Field,
   args: {
     orientation: "vertical",
