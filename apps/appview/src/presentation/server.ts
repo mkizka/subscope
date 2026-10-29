@@ -11,7 +11,6 @@ export class AppViewServer {
   constructor(
     loggerManager: ILoggerManager,
     lexRouter: RequestHandler,
-    xrpcRouter: Router,
     healthRouter: Router,
     wellKnownRouter: Router,
     private readonly port: number,
@@ -23,12 +22,10 @@ export class AppViewServer {
     this.app.use(healthRouter);
     this.app.use(wellKnownRouter);
     this.app.use(lexRouter);
-    this.app.use(xrpcRouter);
   }
   static inject = [
     "loggerManager",
     "lexRouter",
-    "xrpcRouter",
     "healthRouter",
     "wellKnownRouter",
     "port",
