@@ -20,43 +20,26 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
             <li>
               <a className="menu-active">フォロー中</a>
             </li>
-            <li>
-              <a>ローカル</a>
-            </li>
           </ul>
         </li>
-        <li>
-          <h2 className="menu-title">リスト</h2>
-        </li>
-        <li>
-          <h2 className="menu-title">サーバー</h2>
-          <ul>
-            <li>
-              <a>メンバー</a>
-            </li>
-            <li>
-              <a>追跡中のユーザー</a>
-            </li>
-            {isAdmin && (
-              <>
-                <li>
-                  <Link to="/admin/subscribers">登録ユーザー</Link>
-                </li>
-                <li>
-                  <Link to="/admin/invite-codes">招待コード</Link>
-                </li>
-                <li>
-                  <Link to="/admin/bull-board" reloadDocument>
-                    ジョブキュー
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </li>
-        <li>
-          <a>検索</a>
-        </li>
+        {isAdmin && (
+          <li>
+            <h2 className="menu-title">サーバー</h2>
+            <ul>
+              <li>
+                <Link to="/admin/subscribers">登録ユーザー</Link>
+              </li>
+              <li>
+                <Link to="/admin/invite-codes">招待コード</Link>
+              </li>
+              <li>
+                <Link to="/admin/bull-board" reloadDocument>
+                  ジョブキュー
+                </Link>
+              </li>
+            </ul>
+          </li>
+        )}
         <li>
           {profileId ? (
             <Link to={`/profile/${profileId}`}>プロフィール</Link>
