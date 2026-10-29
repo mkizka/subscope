@@ -52,7 +52,7 @@ describe("commit", () => {
   const postEvent = (
     did: string,
     operation: "create" | "update",
-    rev: string,
+    rev: string | undefined,
     text: string,
   ): CommitEventDto => ({
     did: asDid(did),
@@ -80,7 +80,7 @@ describe("commit", () => {
     return post ?? null;
   };
 
-  test("recordIndexing-1: 削除済みのレコードに対して、削除より古いrevの作成コミットを処理してもレコードは復活しない", async () => {
+  test("commit-1: 削除したレコードは、削除より古いrevのコミットで復活させない", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .use((t) => t.subscriber())
@@ -94,7 +94,7 @@ describe("commit", () => {
     expect(await findPost(actor.did)).toBeNull();
   });
 
-  test("recordIndexing-2: 更新済みのレコードに対して、更新より古いrevのコミットを処理してもレコードは古い内容に戻らない", async () => {
+  test("commit-2: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .use((t) => t.subscriber())
@@ -103,6 +103,20 @@ describe("commit", () => {
 
     // act
     await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "old"));
+
+    // assert
+    expect((await findPost(actor.did))?.text).toBe("new");
+  });
+
+  test("commit-3: revを持たないコミットは、revを比べずに処理する", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    await processCommit(deleteEvent(actor.did, "3bbbbbbbbbbbb"));
+
+    // act
+    await processCommit(postEvent(actor.did, "create", undefined, "new"));
 
     // assert
     expect((await findPost(actor.did))?.text).toBe("new");

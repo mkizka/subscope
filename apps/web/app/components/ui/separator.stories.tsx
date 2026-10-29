@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Separator } from "./separator";
 
 const meta = {
-  title: "ui/Separator",
   component: Separator,
   args: {
     orientation: "horizontal",

@@ -49,3 +49,50 @@ jobs:
       - run: pnpm i
       - run: pnpm --filter @repo/web exec playwright install --with-deps chromium
       - run: pnpm --filter @repo/web e2e
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-test-results
+          path: apps/web/test-results/
+  storybook:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: |
+          npm i -g corepack@latest
+          corepack enable pnpm
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm i
+      - run: pnpm --filter @repo/web exec storybook build
+      - name: Upload Storybook
+        if: github.ref == 'refs/heads/main' || github.actor == 'mkizka'
+        run: |
+          STORYBOOK_S3_PATH="storybook/${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.number) }}"
+          aws s3 cp apps/web/storybook-static "s3://subscope/$STORYBOOK_S3_PATH" --recursive
+          echo "STORYBOOK_URL=${{ vars.S3_BASE_URL }}/$STORYBOOK_S3_PATH/index.html" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+          AWS_DEFAULT_REGION: auto
+      - name: Comment on PR
+        if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        run: |
+          MARKER="<!-- storybook -->"
+          BODY="$MARKER
+          ## Storybook
+          📚 [View Storybook]($STORYBOOK_URL)"
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
+            --paginate --jq "[.[] | select(.body | startswith(\"$MARKER\"))][-1].id // empty")
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -f body="$BODY"
+          else
+            gh pr comment ${{ github.event.number }} --body "$BODY"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

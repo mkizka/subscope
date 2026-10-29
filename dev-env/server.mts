@@ -42,11 +42,13 @@ const network = await TestNetworkNoAppView.create({
   },
 });
 
-await network.pds.getAgent().createAccount({
-  handle: "alice.test",
-  email: "alice@example.com",
-  password: "password",
-});
+for (const name of ["alice", "bob"]) {
+  await network.pds.getAgent().createAccount({
+    handle: `${name}.test`,
+    email: `${name}@example.com`,
+    password: "password",
+  });
+}
 
 const [tap, atblob] = await Promise.all([
   new GenericContainer("ghcr.io/bluesky-social/indigo/tap:0.1")
@@ -67,7 +69,7 @@ const [tap, atblob] = await Promise.all([
     .start(),
 ]);
 
-process.stdout.write("Test account: alice.test / password\n");
+process.stdout.write("Test accounts: alice.test, bob.test / password\n");
 
 const app = spawn(process.argv.slice(2).join(" "), {
   shell: true,

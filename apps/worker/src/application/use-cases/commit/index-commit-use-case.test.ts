@@ -193,44 +193,4 @@ describe("IndexCommitUseCase", () => {
       );
     });
   });
-
-  describe("コミットの処理順序", () => {
-    const setup = (text: string) => {
-      const actor = actorFactory();
-      actorRepo.add(actor);
-      subscriptionRepo.add(subscriptionFactory({ actorDid: actor.did }));
-      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
-      return { uri, record: postRecord(uri, text) };
-    };
-    const postRecord = (uri: AtUri, text: string) =>
-      Record.create({
-        uri,
-        cid: `cid-${text}`,
-        json: {
-          $type: "app.bsky.feed.post",
-          text,
-          createdAt: new Date().toISOString(),
-        },
-      });
-
-    test("revがないコミットの場合、revを比較せずに処理する", async () => {
-      // arrange
-      const { uri, record } = setup("old");
-      await indexCommitUseCase.execute({
-        commit: { operation: "delete", uri, rev: "3bbbbbbbbbbbb" },
-        live: true,
-        jobLogger,
-      });
-
-      // act
-      await indexCommitUseCase.execute({
-        commit: { operation: "create", uri, rev: undefined, record },
-        live: true,
-        jobLogger,
-      });
-
-      // assert
-      expect(await recordRepo.findByUri({ ctx, uri })).not.toBeNull();
-    });
-  });
 });

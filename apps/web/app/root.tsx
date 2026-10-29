@@ -6,7 +6,11 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import type { Route } from "./+types/root";
 import { NavigationOverlayContainer } from "./components/navigation-overlay-container";
-import { ErrorPage } from "./features/error/pages/error";
+import { ErrorPage } from "./pages/error-page";
+
+export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
