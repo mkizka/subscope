@@ -124,4 +124,36 @@ test.describe("通知（PC）", () => {
       }
     }).toPass();
   });
+
+  test("notification-5: 未読の通知は背景色で区別され、通知を開いた後に再表示すると既読になる", async ({
+    page,
+  }) => {
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    await createRecord("bob.test", "app.bsky.graph.follow", {
+      subject: await resolveHandle("alice.test"),
+      createdAt: new Date().toISOString(),
+    });
+
+    await login(page);
+
+    const notification = page
+      .getByRole("region", { name: "通知" })
+      .getByRole("listitem")
+      .first();
+    await expect(async () => {
+      await page.reload();
+      await expect(notification).toHaveText("Bob", { timeout: 1000 });
+      await expect(notification).toHaveClass(/bg-base-200/, { timeout: 1000 });
+    }).toPass();
+
+    await expect(async () => {
+      await page.reload();
+      await expect(notification).not.toHaveClass(/bg-base-200/, {
+        timeout: 1000,
+      });
+    }).toPass();
+  });
 });

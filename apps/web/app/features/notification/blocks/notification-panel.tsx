@@ -1,8 +1,11 @@
+import { cn } from "@/app/lib/utils";
+
 type Notification = {
   uri: string;
   authorName: string;
   reason: string;
   text?: string;
+  isRead: boolean;
 };
 
 type Props = {
@@ -16,7 +19,7 @@ const reasonLabels: Record<string, string> = {
 
 export function NotificationPanel({ notifications }: Props) {
   return (
-    <section className="p-4">
+    <section aria-label="通知" className="p-4">
       <h2 className="font-bold">通知</h2>
       {notifications.length === 0 ? (
         <p className="py-8 text-center text-sm opacity-60">
@@ -27,7 +30,10 @@ export function NotificationPanel({ notifications }: Props) {
           {notifications.map((notification) => (
             <li
               key={notification.uri}
-              className="border-b border-base-300 py-2"
+              className={cn(
+                "border-b border-base-300 py-2",
+                !notification.isRead && "bg-base-200",
+              )}
             >
               <p>
                 {notification.authorName}

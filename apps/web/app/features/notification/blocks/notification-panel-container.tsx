@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 
 import type { loader } from "@/app/routes/api.notifications";
 
@@ -23,6 +24,22 @@ export function NotificationPanelContainer() {
     queryKey: ["notifications"],
     queryFn: fetchNotifications,
   });
+  const ref = useRef<HTMLDivElement>(null);
+  const latest = data?.notifications[0];
+
+  useEffect(() => {
+    if (!latest || latest.isRead || !ref.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      observer.disconnect();
+      void fetch("/api/notifications", {
+        method: "POST",
+        body: JSON.stringify({ seenAt: latest.indexedAt }),
+      });
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [latest]);
 
   const notifications = (data?.notifications ?? []).map((notification) => ({
     uri: notification.uri,
@@ -31,7 +48,12 @@ export function NotificationPanelContainer() {
     text: ["reply", "quote", "mention"].includes(notification.reason)
       ? maybeString(notification.record.text)
       : maybeString(data?.subjectTexts[notification.reasonSubject ?? ""]),
+    isRead: notification.isRead,
   }));
 
-  return <NotificationPanel notifications={notifications} />;
+  return (
+    <div ref={ref}>
+      <NotificationPanel notifications={notifications} />
+    </div>
+  );
 }
