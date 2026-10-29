@@ -72,3 +72,5 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceValue("syncWorker", {} as never);
 
 export type TestServices = Awaited<ReturnType<typeof testRegistry.resolve>>;
+
+export const afterCommit = (task: () => Promise<void>) => void task();

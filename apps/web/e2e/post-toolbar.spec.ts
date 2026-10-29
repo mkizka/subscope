@@ -55,13 +55,12 @@ for (const { id, name, collection } of cases) {
     }).toPass();
     const button = post.getByRole("button", { name });
 
-    await post.hover();
-    await button.click();
+    await post.getByRole("link", { name: "スレッドを開く" }).focus();
+    await button.press("Enter");
     await expect(button).toHaveAttribute("aria-pressed", "true");
     await expect.poll(hasRecord).toBe(true);
 
-    await post.hover();
-    await button.click();
+    await button.press("Enter");
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expect.poll(hasRecord).toBe(false);
   });

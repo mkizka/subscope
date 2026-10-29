@@ -1,3 +1,4 @@
+import type { AfterCommitContext } from "@repo/common/domain";
 import {
   actorFactory,
   recordFactory,
@@ -5,7 +6,11 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
 
 describe("FollowIndexer", () => {
   let followIndexer: TestServices["followIndexer"];
@@ -14,7 +19,7 @@ describe("FollowIndexer", () => {
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
-  let ctx: { db: TestServices["db"] };
+  let ctx: AfterCommitContext;
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     followIndexer = services.followIndexer;
@@ -23,7 +28,7 @@ describe("FollowIndexer", () => {
     subscriptionRepo = services.subscriptionRepository;
     notificationRepo = services.notificationRepository;
     db = services.db;
-    ctx = { db };
+    ctx = { db, afterCommit };
   });
 
   describe("upsert", () => {
