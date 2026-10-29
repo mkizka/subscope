@@ -17,7 +17,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("登録ユーザー", () => {
-  test("subscribers-1: サブスクライバーを新しい順に並べ、名前・ハンドル・管理者かどうかを出す", async ({
+  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうかを出す", async ({
     page,
   }) => {
     await login(page);
@@ -25,11 +25,14 @@ test.describe("登録ユーザー", () => {
 
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: aliceDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(aliceDid) });
     await expect(row.getByText("管理者")).toBeVisible();
   });
 
-  test("subscribers-3: 管理者でないサブスクライバーを、確認のうえ「管理者にする」で管理者にできる", async ({
+  test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await login(page);
@@ -41,8 +44,12 @@ test.describe("登録ユーザー", () => {
 
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: bobDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(bobDid) });
 
+    await row.getByRole("button", { name: "操作" }).click();
     page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
 
