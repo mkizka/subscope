@@ -13,7 +13,6 @@ import {
 } from "./sheet";
 
 const meta = {
-  title: "ui/Sheet",
   component: Sheet,
   render: () => (
     <Sheet>

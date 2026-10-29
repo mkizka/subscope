@@ -1,4 +1,4 @@
-import type { AppBskyFeedGetRepostedBy } from "@repo/client/server";
+import type * as AppBskyFeedGetRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { RepostService } from "../../../application/service/feed/repost-service.js";
@@ -12,8 +12,8 @@ export class GetRepostedByUseCase {
   static inject = ["repostService", "profileViewService"] as const;
 
   async execute(
-    params: AppBskyFeedGetRepostedBy.QueryParams,
-  ): Promise<AppBskyFeedGetRepostedBy.OutputSchema> {
+    params: AppBskyFeedGetRepostedBy.$Params,
+  ): Promise<AppBskyFeedGetRepostedBy.$OutputBody> {
     const cursor = params.cursor ? new Date(params.cursor) : undefined;
 
     const paginationResult = await this.repostService.findRepostsWithPagination(
@@ -29,7 +29,7 @@ export class GetRepostedByUseCase {
       .findProfileView(actorDids)
       .then(toMapByDid);
 
-    const repostedBy: AppBskyFeedGetRepostedBy.OutputSchema["repostedBy"] =
+    const repostedBy: AppBskyFeedGetRepostedBy.$OutputBody["repostedBy"] =
       paginationResult.items.map((repost) => {
         const profileView = profileViewMap.get(repost.actorDid);
         if (!profileView) {

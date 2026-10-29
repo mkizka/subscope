@@ -11,7 +11,7 @@
    - apps/web が Bluesky クライアント相当の機能を持つ（[Webクライアント仕様](./web-client.md)）
    - 公式 Bluesky アプリで AppView を Subscope に向けた場合も同等に使える
 3. **管理者が Web 画面から運用できる**
-   - 招待コード、サブスクライバーの管理（[管理画面仕様](./admin-page.md)）
+   - 招待コードの管理（[管理画面仕様](./web-admin.md)）
 
 ## v1.0 に必要なバックエンドの追加実装
 

@@ -1,4 +1,5 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
 
 import type { SearchActorsUseCase } from "../../../../../application/use-cases/actor/search-actors-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -10,11 +11,10 @@ export class SearchActors {
   ) {}
   static inject = ["authVerifierMiddleware", "searchActorsUseCase"] as const;
 
-  handle(server: Server) {
-    server.app.bsky.actor.searchActors({
-      handler: async ({ params, req }) => {
-        const viewerDid = await this.authVerifierMiddleware.getViewerDid(req);
-
+  handle(router: LexRouter) {
+    router.add(searchActors, {
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      handler: async ({ params, credentials: viewerDid }) => {
         const result = await this.searchActorsUseCase.execute({
           query: params.q,
           limit: params.limit,
@@ -23,7 +23,6 @@ export class SearchActors {
         });
 
         return {
-          encoding: "application/json",
           body: result,
         };
       },

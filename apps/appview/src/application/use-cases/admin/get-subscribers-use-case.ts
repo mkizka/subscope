@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import type { MeSubscoAdminGetSubscribers } from "@repo/client/server";
+import type * as MeSubscoAdminGetSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { SubscriptionService } from "../../../application/service/admin/subscription-service.js";
@@ -18,7 +18,7 @@ export class GetSubscribersUseCase {
 
   async execute(
     params: GetSubscribersParams,
-  ): Promise<MeSubscoAdminGetSubscribers.OutputSchema> {
+  ): Promise<MeSubscoAdminGetSubscribers.$OutputBody> {
     const paginationResult =
       await this.subscriptionService.findSubscribersWithPagination({
         limit: params.limit,

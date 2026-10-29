@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@atproto/did": "0.5.6",
+    "@atproto/lex": "0.4.2",
     "@atproto/tap": "0.4.16",
     "@atproto/xrpc-server": "0.13.6",
     "@gyaku/di": "5.0.0",
