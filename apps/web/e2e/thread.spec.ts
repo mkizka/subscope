@@ -1,65 +1,82 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
 import { createRecord } from "./pds";
 
-const createThread = async (id: string) => {
-  const parentText = `${id}: 親投稿`;
-  const replyText = `${id}: 返信`;
-  const parent = await createRecord("alice.test", "app.bsky.feed.post", {
-    text: parentText,
+const post = (text: string, parent?: { uri: string; cid: string }) =>
+  createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    reply: parent && { root: parent, parent },
     createdAt: new Date().toISOString(),
   });
-  const reply = await createRecord("alice.test", "app.bsky.feed.post", {
-    text: replyText,
-    reply: { root: parent, parent },
-    createdAt: new Date().toISOString(),
-  });
-  return { parent, reply, parentText, replyText };
+
+const openThread = async (page: Page, uri: string, text: string) => {
+  await login(page);
+  await page.waitForURL("/");
+  await expect(async () => {
+    await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
+    await expect(
+      page.getByRole("region", { name: "スレッド" }).getByText(text),
+    ).toBeVisible({ timeout: 1000 });
+  }).toPass();
 };
 
 test.describe("スレッド", () => {
-  test("thread-1: タイムラインの投稿を選ぶと、右カラムにその投稿のスレッド（親投稿と返信）が出る", async ({
+  test("thread-1: タイムラインの投稿を選ぶと、右カラムにその投稿のスレッドを開く", async ({
     page,
   }) => {
-    const { parentText, replyText } = await createThread("thread-1");
+    const text = "thread-1: 投稿";
+    await post(text);
 
     await login(page);
-    const post = page.getByRole("article").filter({ hasText: parentText });
+    const article = page.getByRole("article").filter({ hasText: text });
     await expect(async () => {
       await page.reload();
-      await expect(post).toBeVisible({ timeout: 1000 });
+      await expect(article).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await post.getByRole("link", { name: "スレッドを開く" }).click();
+    await article.getByRole("link", { name: "スレッドを開く" }).click();
 
-    const panel = page.getByRole("region", { name: "スレッド" });
-    await expect(panel.getByText(parentText)).toBeVisible();
-    await expect(panel.getByText(replyText)).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "スレッド" }).getByText(text),
+    ).toBeVisible();
   });
 
-  test("thread-2: URLの ?thread=投稿のAT URI で、右カラムにその投稿のスレッドが開く", async ({
+  test("thread-2: 親投稿はこのサーバーにあるところまでさかのぼって上に、直下の返信は下に並べる", async ({
     page,
   }) => {
-    const { reply, parentText, replyText } = await createThread("thread-2");
+    const grandparent = await post("thread-2: 親の親");
+    const parent = await post("thread-2: 親", grandparent);
+    const target = await post("thread-2: 投稿", parent);
+    await post("thread-2: 返信", target);
 
-    await login(page);
-    await page.waitForURL("/");
-    const panel = page.getByRole("region", { name: "スレッド" });
-    await expect(async () => {
-      await page.goto(`/?${new URLSearchParams({ thread: reply.uri })}`);
-      await expect(panel.getByText(replyText)).toBeVisible({ timeout: 1000 });
-    }).toPass();
-    await expect(panel.getByText(parentText)).toBeVisible();
+    await openThread(page, target.uri, "thread-2: 返信");
+
+    await expect(
+      page.getByRole("region", { name: "スレッド" }).getByText(/^thread-2: /),
+    ).toHaveText([
+      "thread-2: 親の親",
+      "thread-2: 親",
+      "thread-2: 投稿",
+      "thread-2: 返信",
+    ]);
   });
 
-  test("thread-3: スレッドを閉じると、右カラムが通知に戻る", async ({
+  test("thread-3: URLに ?thread=投稿のAT URI があると、右カラムにその投稿のスレッドを開く", async ({
     page,
   }) => {
-    const { parent } = await createThread("thread-3");
+    const text = "thread-3: 投稿";
+    const { uri } = await post(text);
 
-    await login(page);
-    await page.waitForURL("/");
-    await page.goto(`/?${new URLSearchParams({ thread: parent.uri })}`);
+    await openThread(page, uri, text);
+  });
+
+  test("thread-4: スレッドを閉じると、右カラムを通知に戻す", async ({
+    page,
+  }) => {
+    const text = "thread-4: 投稿";
+    const { uri } = await post(text);
+
+    await openThread(page, uri, text);
     await page.getByRole("link", { name: "閉じる" }).click();
 
     await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
