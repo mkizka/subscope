@@ -9,10 +9,6 @@ export class SearchActorsTypeahead {
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly searchActorsTypeaheadUseCase: SearchActorsTypeaheadUseCase,
   ) {}
-  static inject = [
-    "authVerifierMiddleware",
-    "searchActorsTypeaheadUseCase",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(searchActorsTypeahead, {

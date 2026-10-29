@@ -10,7 +10,6 @@ export class AggregateActorStatsUseCase {
     private readonly actorRepository: IActorRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = ["actorStatsRepository", "actorRepository", "db"] as const;
 
   async execute(command: AggregateActorStatsCommand) {
     const ctx = { db: this.db };

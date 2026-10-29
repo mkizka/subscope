@@ -9,7 +9,6 @@ export class GetTimeline {
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getTimelineUseCase: GetTimelineUseCase,
   ) {}
-  static inject = ["authVerifierMiddleware", "getTimelineUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getTimeline, {

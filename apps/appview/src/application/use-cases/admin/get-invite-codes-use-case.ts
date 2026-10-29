@@ -5,7 +5,6 @@ import type { InviteCodeService } from "../../../application/service/admin/invit
 
 export class GetInviteCodesUseCase {
   constructor(private readonly inviteCodeService: InviteCodeService) {}
-  static inject = ["inviteCodeService"] as const;
 
   async execute(params: {
     limit: number;

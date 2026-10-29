@@ -11,7 +11,6 @@ export class AggregatePostStatsUseCase {
     private readonly postRepository: IPostRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = ["postStatsRepository", "postRepository", "db"] as const;
 
   async execute(command: AggregatePostStatsCommand) {
     const ctx = { db: this.db };

@@ -17,7 +17,6 @@ import type { IAssetUrlBuilder } from "../../../application/interfaces/asset-url
 
 export class PostEmbedViewBuilder {
   constructor(private readonly assetUrlBuilder: IAssetUrlBuilder) {}
-  static inject = ["assetUrlBuilder"] as const;
 
   embedView(
     post: Post,

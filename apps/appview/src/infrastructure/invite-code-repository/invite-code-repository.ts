@@ -14,7 +14,6 @@ import type { IInviteCodeRepository } from "../../application/interfaces/invite-
 
 export class InviteCodeRepository implements IInviteCodeRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async upsert({
     inviteCode,

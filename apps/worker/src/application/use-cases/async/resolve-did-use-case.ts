@@ -12,12 +12,6 @@ export class ResolveDidUseCase {
     private readonly actorRepository: IActorRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = [
-    "didResolver",
-    "handleResolver",
-    "actorRepository",
-    "db",
-  ] as const;
 
   async execute(did: Did) {
     const existingActor = await this.actorRepository.findByDid({

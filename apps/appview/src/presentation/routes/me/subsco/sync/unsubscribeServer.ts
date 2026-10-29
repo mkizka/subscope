@@ -13,10 +13,6 @@ export class UnsubscribeServer {
     private unsubscribeServerUseCase: UnsubscribeServerUseCase,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = [
-    "unsubscribeServerUseCase",
-    "authVerifierMiddleware",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(unsubscribeServer, {

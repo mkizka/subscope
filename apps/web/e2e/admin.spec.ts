@@ -17,7 +17,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("登録ユーザー", () => {
-  test("subscribers-1: サブスクライバーを新しい順に並べ、名前・ハンドル・管理者かどうかを出す", async ({
+  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうかを出す", async ({
     page,
   }) => {
     await login(page);
@@ -25,11 +25,14 @@ test.describe("登録ユーザー", () => {
 
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: aliceDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(aliceDid) });
     await expect(row.getByText("管理者")).toBeVisible();
   });
 
-  test("subscribers-3: 管理者でないサブスクライバーを、確認のうえ「管理者にする」で管理者にできる", async ({
+  test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await login(page);
@@ -41,15 +44,19 @@ test.describe("登録ユーザー", () => {
 
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: bobDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(bobDid) });
 
+    await row.getByRole("button", { name: "操作" }).click();
     page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
 
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("subscribers-2: サブスクライバーをBANすると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("subscribers-2: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await login(page);
@@ -63,7 +70,12 @@ test.describe("登録ユーザー", () => {
 
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: carolDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(carolDid) });
+
+    await row.getByRole("button", { name: "操作" }).click();
     page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "BAN" }).click();
 
@@ -75,6 +87,9 @@ test.describe("登録ユーザー", () => {
 });
 
 test.describe("招待コード", () => {
+  const inviteCodeRows = (page: Page) =>
+    page.getByRole("list", { name: "招待コード" }).getByRole("listitem");
+
   const createInviteCode = async (page: Page) => {
     const response = await page.request.post("/admin/api/invite-codes");
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -90,12 +105,10 @@ test.describe("招待コード", () => {
 
     await page.goto("/admin/invite-codes");
 
-    await expect(page.getByRole("row").first()).toHaveText(
-      /コード\s*ステータス\s*使用者\s*有効期限\s*作成日/,
-    );
-    await expect(page.getByRole("row").nth(1)).toContainText(newer);
-    await expect(page.getByRole("row").nth(1)).toContainText("未使用");
-    await expect(page.getByRole("row").nth(2)).toContainText(older);
+    const rows = inviteCodeRows(page);
+    await expect(rows.nth(0)).toContainText(newer);
+    await expect(rows.nth(0)).toContainText("未使用");
+    await expect(rows.nth(1)).toContainText(older);
   });
 
   test("invite-codes-2: 一覧の下までスクロールすると続きを読み込む", async ({
@@ -110,7 +123,7 @@ test.describe("招待コード", () => {
     await page.goto("/admin/invite-codes");
     await expect(page.getByText(oldest)).toHaveCount(0);
 
-    await page.getByRole("row").last().scrollIntoViewIfNeeded();
+    await inviteCodeRows(page).last().scrollIntoViewIfNeeded();
 
     await expect(page.getByText(oldest)).toBeVisible();
   });
@@ -121,7 +134,7 @@ test.describe("招待コード", () => {
     await login(page);
     const existing = await createInviteCode(page);
     await page.goto("/admin/invite-codes");
-    const firstRow = page.getByRole("row").nth(1);
+    const firstRow = inviteCodeRows(page).first();
     await expect(firstRow).toContainText(existing);
 
     await page.getByRole("button", { name: "新規作成" }).click();
@@ -145,7 +158,7 @@ test.describe("招待コード", () => {
     const code = await createInviteCode(page);
 
     await page.goto("/admin/invite-codes");
-    const row = page.getByRole("row", { name: code });
+    const row = inviteCodeRows(page).filter({ hasText: code });
 
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toContain(code);

@@ -11,7 +11,6 @@ import type {
 
 export class NotificationRepository implements INotificationRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findMany(params: {
     recipientDid: Did;

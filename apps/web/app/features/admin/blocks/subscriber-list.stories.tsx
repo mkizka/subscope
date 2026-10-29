@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { SubscriberTable } from "./subscriber-table";
+import { SubscriberList } from "./subscriber-list";
 
 const meta = {
-  component: SubscriberTable,
-} satisfies Meta<typeof SubscriberTable>;
+  component: SubscriberList,
+} satisfies Meta<typeof SubscriberList>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

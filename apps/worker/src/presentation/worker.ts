@@ -133,17 +133,6 @@ export class SyncWorker {
       }),
     ];
   }
-  static inject = [
-    "upsertIdentityUseCase",
-    "indexCommitUseCase",
-    "resolveDidUseCase",
-    "fetchRecordUseCase",
-    "aggregatePostStatsUseCase",
-    "aggregateActorStatsUseCase",
-    "syncTapRepoUseCase",
-    "redisUrl",
-    "commitWorkerConcurrency",
-  ] as const;
 
   async start() {
     await Promise.all(this.workers.map((worker) => worker.run()));

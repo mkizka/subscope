@@ -14,11 +14,6 @@ export class GetListUseCase {
     private readonly listViewService: ListViewService,
     private readonly profileViewService: ProfileViewService,
   ) {}
-  static inject = [
-    "listRepository",
-    "listViewService",
-    "profileViewService",
-  ] as const;
 
   async execute(params: {
     listUri: AtUri;

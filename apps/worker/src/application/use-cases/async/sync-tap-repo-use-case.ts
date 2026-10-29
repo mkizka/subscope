@@ -11,12 +11,6 @@ export class SyncTapRepoUseCase {
     private readonly followRepository: IFollowRepository,
     private readonly db: DatabaseClient,
   ) {}
-  static inject = [
-    "tapClient",
-    "subscriptionRepository",
-    "followRepository",
-    "db",
-  ] as const;
 
   async execute(did: Did) {
     const ctx = { db: this.db };

@@ -27,7 +27,6 @@ export class GetPostThreadUseCase {
     private readonly postRepository: IPostRepository,
     private readonly postViewService: PostViewService,
   ) {}
-  static inject = ["postRepository", "postViewService"] as const;
 
   async execute(params: {
     uri: ResolvedAtUri;

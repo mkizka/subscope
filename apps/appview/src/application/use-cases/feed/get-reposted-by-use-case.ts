@@ -9,7 +9,6 @@ export class GetRepostedByUseCase {
     private readonly repostService: RepostService,
     private readonly profileViewService: ProfileViewService,
   ) {}
-  static inject = ["repostService", "profileViewService"] as const;
 
   async execute(
     params: AppBskyFeedGetRepostedBy.$Params,

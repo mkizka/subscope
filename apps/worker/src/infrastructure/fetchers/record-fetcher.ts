@@ -16,7 +16,6 @@ export class RecordFetcher implements IRecordFetcher {
     private readonly didResolver: IDidResolver,
     private readonly metricReporter: IMetricReporter,
   ) {}
-  static inject = ["didResolver", "metricReporter"] as const;
 
   async fetch(uri: AtUri): Promise<Record> {
     const { body } = await this.getRecord(uri);

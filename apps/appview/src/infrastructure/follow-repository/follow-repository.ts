@@ -9,7 +9,6 @@ import type { IFollowRepository } from "../../application/interfaces/follow-repo
 
 export class FollowRepository implements IFollowRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findFollows(params: {
     actorDid: Did;

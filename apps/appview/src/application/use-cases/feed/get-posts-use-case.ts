@@ -6,7 +6,6 @@ import type { PostViewService } from "../../../application/service/feed/post-vie
 
 export class GetPostsUseCase {
   constructor(private readonly postViewService: PostViewService) {}
-  static inject = ["postViewService"] as const;
 
   async execute(uris: AtUri[]): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
     return await this.postViewService.findPostView(uris);

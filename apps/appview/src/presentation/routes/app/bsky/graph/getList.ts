@@ -10,7 +10,6 @@ export class GetList {
     private getListUseCase: GetListUseCase,
     private atUriService: AtUriService,
   ) {}
-  static inject = ["getListUseCase", "atUriService"] as const;
 
   handle(router: LexRouter) {
     router.add(getList, async ({ params }) => {

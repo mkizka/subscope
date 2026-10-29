@@ -8,7 +8,6 @@ import {
 
 export class ProfileSearchService {
   constructor(private readonly profileRepository: IProfileRepository) {}
-  static inject = ["profileRepository"] as const;
 
   async findActorsWithPagination({
     query,

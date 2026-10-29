@@ -9,7 +9,6 @@ export class GetSubscribers {
     private getSubscribersUseCase: GetSubscribersUseCase,
     private adminMiddleware: AdminMiddleware,
   ) {}
-  static inject = ["getSubscribersUseCase", "adminMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(getSubscribers, {

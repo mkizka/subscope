@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { SubscriberTable } from "./subscriber-table";
+import { SubscriberList } from "./subscriber-list";
 
 async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
   const params = new URLSearchParams();
@@ -31,7 +31,7 @@ async function updateSubscriber(method: "POST" | "DELETE", did: string) {
   }
 }
 
-export function SubscriberTableContainer() {
+export function SubscriberListContainer() {
   const queryClient = useQueryClient();
   const onSuccess = () =>
     queryClient.invalidateQueries({ queryKey: ["subscribers"] });
@@ -60,7 +60,7 @@ export function SubscriberTableContainer() {
     });
 
   return (
-    <SubscriberTable
+    <SubscriberList
       subscribers={data ?? []}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}

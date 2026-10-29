@@ -9,7 +9,6 @@ export class TokenVerifier implements ITokenVerifier {
     private readonly didResolver: IDidResolver,
     private readonly serviceDid: string,
   ) {}
-  static inject = ["didResolver", "serviceDid"] as const;
 
   async verify(params: { token: string; nsid: string }) {
     const getSigninKey = async (did: string) => {

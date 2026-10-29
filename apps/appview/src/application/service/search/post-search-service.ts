@@ -8,7 +8,6 @@ import {
 
 export class PostSearchService {
   constructor(private readonly postRepository: IPostRepository) {}
-  static inject = ["postRepository"] as const;
 
   async findPostsWithPagination({
     query,

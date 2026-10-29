@@ -21,14 +21,6 @@ export class RepostIndexer implements ICollectionIndexer {
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly notificationRepository: INotificationRepository,
   ) {}
-  static inject = [
-    "repostRepository",
-    "feedItemRepository",
-    "postRepository",
-    "jobScheduler",
-    "subscriptionRepository",
-    "notificationRepository",
-  ] as const;
 
   async upsert({
     ctx,

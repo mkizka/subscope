@@ -8,7 +8,6 @@ import {
 
 export class AuthorFeedService {
   constructor(private readonly authorFeedRepository: IAuthorFeedRepository) {}
-  static inject = ["authorFeedRepository"] as const;
 
   async findFeedItemsWithPagination({
     actorDid,

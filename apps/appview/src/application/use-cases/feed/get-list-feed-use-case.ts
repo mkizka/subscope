@@ -11,7 +11,6 @@ export class GetListFeedUseCase {
     private readonly timelineRepository: ITimelineRepository,
     private readonly feedProcessor: FeedProcessor,
   ) {}
-  static inject = ["timelineRepository", "feedProcessor"] as const;
 
   async execute(params: {
     listUri: string;

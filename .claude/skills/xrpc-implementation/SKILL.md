@@ -17,7 +17,7 @@ AT ProtocolのXRPCエンドポイントを`apps/appview`に追加するための
 3. 必要に応じてRepository・Serviceを拡張する
 4. UseCaseを作成する。戻り値の型は生成コードの`$OutputBody`を使う
 5. ルートハンドラーを作成し、`LexRouter`に登録する
-6. `apps/appview/src/shared/registry.ts`に登録し、`apps/appview/src/presentation/routes/lex.ts`の`lexRouterFactory`の引数・`handlers`・`inject`に追加する
+6. `apps/appview/src/shared/registry.ts`に登録し、`apps/appview/src/presentation/routes/lex.ts`の`lexRouterFactory`の引数・`handlers`に追加する
 7. UseCaseのunitテストと、仕様項目IDを先頭に付けたAPIテストを追加する
 8. `pnpm all`を実行する
 
@@ -47,7 +47,6 @@ export class GetFollows {
     private getFollowsUseCase: GetFollowsUseCase,
     private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getFollowsUseCase", "handleMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(getFollows, async ({ params }) => {

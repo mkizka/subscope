@@ -9,7 +9,6 @@ export class UpdateSeen {
     private updateSeenUseCase: UpdateSeenUseCase,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = ["updateSeenUseCase", "authVerifierMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(updateSeen, {

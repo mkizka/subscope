@@ -12,7 +12,6 @@ import type { IActorRepository } from "../../application/interfaces/actor-reposi
 
 export class ActorRepository implements IActorRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
