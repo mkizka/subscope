@@ -65,7 +65,7 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
   });
 
-  test("syncTapRepo-3: サブスクライバーがフォローを解除し、フォロイーが追跡アクターでなくなった場合、Tapから削除する", async () => {
+  test("syncTapRepo-3: サブスクライバーがフォローを解除したアカウントは、追跡アクターでなくなればTapから削除する", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
@@ -83,7 +83,7 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
   });
 
-  test("syncTapRepo-4: フォローを解除されたアカウントが他のサブスクライバーにもフォローされている場合、Tapに残す", async () => {
+  test("syncTapRepo-4: 他のサブスクライバーにもフォローされているアカウントは、フォローを解除されてもTapから削除しない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
@@ -105,7 +105,7 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("syncTapRepo-5: フォローを解除されたアカウントがサブスクライバーの場合、Tapに残す", async () => {
+  test("syncTapRepo-5: サブスクライバーは、フォローを解除されてもTapから削除しない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
