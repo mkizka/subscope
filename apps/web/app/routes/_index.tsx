@@ -1,5 +1,6 @@
 import { Client } from "@atproto/lex";
 import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
+import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
@@ -12,6 +13,7 @@ import { data, redirect } from "react-router";
 import { HomePage } from "@/app/features/home/pages/home";
 import {
   countGraphemes,
+  MAX_IMAGES,
   MAX_POST_LENGTH,
 } from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
@@ -79,8 +81,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
   if (!agent) {
     throw redirect("/login");
   }
-  const form = await request.formData();
-  const text = form.get("text");
+  const formData = await request.formData();
+  const text = formData.get("text");
+  const files = formData.getAll("image").filter((f) => f instanceof File);
+  const alts = formData.getAll("alt");
   const ref = (
     uri: FormDataEntryValue | null,
     cid: FormDataEntryValue | null,
@@ -88,26 +92,44 @@ export const action = async ({ request }: Route.ActionArgs) => {
     typeof uri === "string" && uri && typeof cid === "string" && cid
       ? { uri: asAtUriString(uri), cid }
       : undefined;
-  const subject = ref(form.get("uri"), form.get("cid"));
-  const root = ref(form.get("rootUri"), form.get("rootCid")) ?? subject;
+  const subject = ref(formData.get("uri"), formData.get("cid"));
+  const root = ref(formData.get("rootUri"), formData.get("rootCid")) ?? subject;
+  const quote = formData.get("type") === "quote" ? subject : undefined;
   if (
     typeof text !== "string" ||
-    text.trim() === "" ||
-    countGraphemes(text) > MAX_POST_LENGTH
+    (text.trim() === "" && files.length === 0) ||
+    countGraphemes(text) > MAX_POST_LENGTH ||
+    files.length > MAX_IMAGES
   ) {
     return data({ error: "投稿内容が不正です" }, { status: 400 });
   }
   try {
+    const images = await Promise.all(
+      files.map(async (file, i) => {
+        const { body } = await agent.uploadBlob(file);
+        return { image: body.blob, alt: maybeString(alts[i]) ?? "" };
+      }),
+    );
+    const media =
+      images.length > 0
+        ? { $type: "app.bsky.embed.images" as const, images }
+        : undefined;
     const { uri } = await agent.create(postRecord, {
       text,
+      embed:
+        quote && media
+          ? {
+              $type: "app.bsky.embed.recordWithMedia",
+              record: { record: quote },
+              media,
+            }
+          : quote
+            ? { $type: "app.bsky.embed.record", record: quote }
+            : media,
       createdAt: currentDatetimeString(),
       reply:
-        form.get("type") === "reply" && subject && root
+        formData.get("type") === "reply" && subject && root
           ? { root, parent: subject }
-          : undefined,
-      embed:
-        form.get("type") === "quote" && subject
-          ? { $type: "app.bsky.embed.record", record: subject }
           : undefined,
     });
     return data({ uri });
@@ -136,6 +158,7 @@ function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
+    images: imagesView.matches(post.embed) ? post.embed.images : undefined,
     createdAt: maybeString(post.record.createdAt),
     reasonRepost:
       reason && "by" in reason

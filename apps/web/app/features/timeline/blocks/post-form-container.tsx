@@ -41,19 +41,20 @@ export function PostFormContainer({ target, onClearTarget }: Props) {
       error={
         fetcher.data && "error" in fetcher.data ? fetcher.data.error : undefined
       }
-      onSubmit={(text) =>
-        fetcher.submit(
-          {
-            text,
-            type: current?.type ?? "",
-            uri: current?.uri ?? "",
-            cid: current?.cid ?? "",
-            rootUri: current?.root?.uri ?? "",
-            rootCid: current?.root?.cid ?? "",
-          },
-          { method: "POST", action: "/?index" },
-        )
-      }
+      onSubmit={(formData) => {
+        if (current) {
+          formData.set("type", current.type);
+          formData.set("uri", current.uri);
+          formData.set("cid", current.cid);
+          formData.set("rootUri", current.root?.uri ?? "");
+          formData.set("rootCid", current.root?.cid ?? "");
+        }
+        return fetcher.submit(formData, {
+          method: "POST",
+          action: "/?index",
+          encType: "multipart/form-data",
+        });
+      }}
     />
   );
 }

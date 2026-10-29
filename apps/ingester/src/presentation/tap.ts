@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { lexToJson } from "@atproto/lex";
 import type { RecordEvent } from "@atproto/tap";
 import { SimpleIndexer, Tap } from "@atproto/tap";
 import type {
@@ -82,7 +83,7 @@ export class TapIngester {
         operation: event.action,
         collection: event.collection,
         rkey: event.rkey,
-        record: event.record,
+        record: lexToJson(event.record),
         cid: event.cid,
       },
     };
