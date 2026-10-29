@@ -1,6 +1,4 @@
 import { AppLayout } from "@/app/components/app-layout";
-import { Badge } from "@/app/components/ui/badge";
-import { Separator } from "@/app/components/ui/separator";
 import { HomeContent } from "@/app/features/home/parts/home-content";
 import { SetupContent } from "@/app/features/home/parts/setup-content";
 
@@ -15,13 +13,13 @@ export function HomePage({ variant }: Props) {
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold tracking-tight">Subscope</h1>
-            <Badge variant="secondary">Alpha</Badge>
+            <span className="badge badge-soft">Alpha</span>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-base-content/70">
             誰でもセルフホストできるBluesky互換AppView
           </p>
         </div>
-        <Separator />
+        <div className="divider my-0" />
         {variant === "setup" ? <SetupContent /> : <HomeContent />}
       </div>
     </AppLayout>

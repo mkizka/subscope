@@ -40,3 +40,26 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getAuthorFeed-1: アクターをハンドルで指定した場合、そのアクターの投稿をfeedViewPostとして返す
 - getAuthorFeed-2: 解決できないハンドルを指定した場合、400を返す
+## app.bsky.actor.getProfiles
+
+指定した複数アクターの詳細なプロフィールを返す。認証は任意。
+
+- getProfiles-1: DIDとハンドルを混在して指定した場合、解決できたアクターのprofileViewDetailedを指定順に返す
+
+## app.bsky.actor.searchActors
+
+表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
+
+- searchActors-1: 表示名が検索語に部分一致するアクターがある場合、そのアクターのprofileViewを返す
+
+## app.bsky.actor.searchActorsTypeahead
+
+入力補完用に、表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
+
+- searchActorsTypeahead-1: 表示名が検索語に部分一致するアクターがある場合、そのアクターのprofileViewBasicを返す
+
+## app.bsky.actor.getPreferences
+
+閲覧者の設定を返す。現在は固定値を返す。
+
+- getPreferences-1: Followingフィードをピン留めした設定を返す
