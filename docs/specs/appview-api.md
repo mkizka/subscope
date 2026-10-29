@@ -21,12 +21,6 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
 
-## me.subsco.admin.deleteInviteCode
-
-招待コードを削除する。管理者の認証が必要。
-
-- deleteInviteCode-1: 存在しない招待コードを指定した場合、400とInviteCodeNotFoundを返す
-- deleteInviteCode-2: 使用済みの招待コードを指定した場合、400とInviteCodeAlreadyUsedを返す
 ## app.bsky.actor.getProfiles
 
 指定した複数アクターの詳細なプロフィールを返す。認証は任意。
@@ -50,3 +44,10 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 閲覧者の設定を返す。現在は固定値を返す。
 
 - getPreferences-1: Followingフィードをピン留めした設定を返す
+
+## me.subsco.admin.deleteInviteCode
+
+招待コードを削除する。管理者の認証が必要。
+
+- deleteInviteCode-1: 存在しない招待コードを指定した場合、400とInviteCodeNotFoundを返す
+- deleteInviteCode-2: 使用済みの招待コードを指定した場合、400とInviteCodeAlreadyUsedを返す
