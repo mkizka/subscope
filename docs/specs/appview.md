@@ -127,27 +127,27 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 指定したアクターをフォローしているアクターを返す。認証は任意。
 
-- getFollowers-1: フォロワーがいるアクターを指定した場合、そのアクターをsubject、フォロワーのprofileViewをfollowersとして返す
+- getFollowers-1: 指定したアクターをsubjectに、そのフォロワーをfollowersにprofileViewで返す
 
 ## app.bsky.graph.getFollows
 
 指定したアクターがフォローしているアクターを返す。認証は任意。
 
-- getFollows-1: フォローしているアクターを指定した場合、そのアクターをsubject、フォロー先のprofileViewをfollowsとして返す
+- getFollows-1: 指定したアクターをsubjectに、そのフォロー先をfollowsにprofileViewで返す
 
 ## app.bsky.graph.getList
 
 指定したリストとそのリストに追加されたアクターを返す。認証は任意。
 
-- getList-1: リストを指定した場合、そのリストのlistViewをlist、追加されたアクターのprofileViewをitemsのsubjectとして返す
-- getList-2: 存在しないリストを指定した場合、400を返す
+- getList-1: 指定したリストのlistViewと、リストに追加されたアクターのprofileViewをitemsで返す
+- getList-2: 保存されていないリストには400を返す
 
 ## app.bsky.graph.getLists
 
 指定したアクターが作成したリストを返す。認証は任意。
 
-- getLists-1: リストを作成したアクターを指定した場合、そのリストのlistViewをlistsとして返す
-- getLists-2: purposesを指定した場合、指定した用途のリストのみを返す
+- getLists-1: 指定したアクターが作成したリストをlistViewで返す
+- getLists-2: purposesを指定すると、その用途のリストだけを返す
 
 ## me.subsco.server.getSetupStatus
 

@@ -24,7 +24,7 @@ describe("app.bsky.graph.getLists", () => {
       .props({ purpose: () => purpose })
       .create();
 
-  test("getLists-1: リストを作成したアクターを指定した場合、そのリストのlistViewをlistsとして返す", async () => {
+  test("getLists-1: 指定したアクターが作成したリストをlistViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
@@ -43,7 +43,7 @@ describe("app.bsky.graph.getLists", () => {
     ]);
   });
 
-  test("getLists-2: purposesを指定した場合、指定した用途のリストのみを返す", async () => {
+  test("getLists-2: purposesを指定すると、その用途のリストだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
