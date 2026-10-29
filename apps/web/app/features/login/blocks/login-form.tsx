@@ -2,10 +2,6 @@ import { AtSign } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Form } from "react-router";
 
-import { Button } from "@/app/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/app/components/ui/field";
-import { Input } from "@/app/components/ui/input";
-
 type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
@@ -25,28 +21,27 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
       className="flex flex-col gap-4"
       {...formProps}
     >
-      <Field>
-        <FieldLabel htmlFor={fields.identifier.id}>ハンドル</FieldLabel>
-        <div className="relative flex items-center">
-          <AtSign
-            className="
-              pointer-events-none absolute left-3 size-4 text-muted-foreground
-            "
-          />
-          <Input
-            className="pl-9"
+      <fieldset className="fieldset">
+        <label htmlFor={fields.identifier.id} className="fieldset-legend">
+          ハンドル
+        </label>
+        <div className="input w-full">
+          <AtSign className="size-4 opacity-50" />
+          <input
             placeholder="example.bsky.social"
             autoComplete="username"
             {...inputProps}
           />
         </div>
-        <FieldError errors={fields.identifier.errors} />
-      </Field>
-      <div className="flex justify-center">
-        <Button type="submit" className="w-fit">
-          ログイン
-        </Button>
-      </div>
+        {fields.identifier.errors && (
+          <p role="alert" className="text-error">
+            {fields.identifier.errors[0]}
+          </p>
+        )}
+      </fieldset>
+      <button type="submit" className="btn self-center btn-primary">
+        ログイン
+      </button>
     </Form>
   );
 }

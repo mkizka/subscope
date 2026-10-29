@@ -1,5 +1,5 @@
 import { type Did, isDid } from "@atproto/did";
-import { InvalidRequestError } from "@atproto/xrpc-server";
+import { LexServerError } from "@atproto/lex-server";
 import type { ILoggerManager, Logger } from "@repo/common/domain";
 import { type Handle, isHandle } from "@repo/common/utils";
 
@@ -27,7 +27,10 @@ export class HandleMiddleware {
       return await this.handleResolver.resolve(handleOrDid);
     } catch (error) {
       if (error instanceof HandleResolutionError) {
-        throw new InvalidRequestError("Profile not found");
+        throw new LexServerError(400, {
+          error: "InvalidRequest",
+          message: "Profile not found",
+        });
       }
       throw error;
     }
