@@ -17,7 +17,7 @@ function OlderTimelineFeedContainer({
   onCompose: OnCompose;
 }) {
   const fetcher = useFetcher<typeof loader>();
-  const data = fetcher.data?.state === "timeline" ? fetcher.data : undefined;
+  const data = fetcher.data;
   const distanceFromBottomRef = useRef(0);
 
   useLayoutEffect(() => {

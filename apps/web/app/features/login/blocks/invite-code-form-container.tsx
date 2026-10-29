@@ -8,39 +8,32 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
 import { useActionData } from "react-router";
 import { z } from "zodV4";
 
-import { RegisterCard } from "./register-card";
+import { InviteCodeForm } from "./invite-code-form";
 
-export const registerSchema = z.object({
+export const inviteCodeSchema = z.object({
   inviteCode: z.string({
     message: "招待コードを入力してください",
   }),
 });
 
-type Props = {
-  isLoggedIn: boolean;
-};
-
-export function RegisterCardContainer({ isLoggedIn }: Props) {
+export function InviteCodeFormContainer() {
   const lastResult = useActionData<SubmissionResult>();
-
   const [form, fields] = useForm({
-    id: "register-form",
+    id: "invite-code-form",
     lastResult,
-    constraint: getZodConstraint(registerSchema),
+    constraint: getZodConstraint(inviteCodeSchema),
     shouldValidate: "onBlur",
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: registerSchema });
+      return parseWithZod(formData, { schema: inviteCodeSchema });
     },
   });
 
   return (
-    <RegisterCard
-      isLoggedIn={isLoggedIn}
-      activeSubmit={isLoggedIn && form.dirty && form.valid}
+    <InviteCodeForm
       formProps={getFormProps(form)}
-      formErrors={form.errors}
       inputProps={getInputProps(fields.inviteCode, { type: "text" })}
       fields={fields}
+      error={(form.errors ?? fields.inviteCode.errors)?.[0]}
     />
   );
 }

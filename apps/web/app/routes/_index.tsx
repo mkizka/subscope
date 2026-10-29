@@ -1,12 +1,10 @@
 import { TID } from "@atproto/common-web";
-import { Client } from "@atproto/lex";
 import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
-import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
@@ -22,9 +20,7 @@ import {
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
-import { HomePage } from "@/app/pages/client/home-page";
 import { TimelinePage } from "@/app/pages/client/timeline-page";
-import { env } from "@/app/shared/env";
 
 import type { Route } from "./+types/_index";
 
@@ -39,41 +35,27 @@ export function meta() {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const logger = loggerManager.createLogger("_index");
-
-  const client = new Client(env.APPVIEW_URL);
-  let setupStatus;
-  try {
-    setupStatus = await client.call(getSetupStatus);
-  } catch (e) {
-    logger.error(e, "Failed to get setup status");
-    throw data("セットアップ状態の取得に失敗しました", { status: 500 });
-  }
-
-  if (!setupStatus.initialized) {
-    return data({ state: "setup" as const });
-  }
-
   const agent = await getAgent(request);
   if (!agent) {
-    return data({ state: "home" as const });
+    throw redirect("/login");
   }
 
   let subscriptionResponse;
   try {
     subscriptionResponse = await agent.call(getSubscriptionStatus);
   } catch (e) {
-    logger.error(e, "Failed to get subscription status");
+    loggerManager
+      .createLogger("_index")
+      .error(e, "Failed to get subscription status");
     throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
   }
 
   if (!subscribed.isTypeOf(subscriptionResponse)) {
-    return data({ state: "home" as const });
+    throw redirect("/login");
   }
   const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
   const timeline = await agent.call(getTimeline, { limit: 20, cursor });
   return data({
-    state: "timeline" as const,
     posts: timeline.feed
       .filter(({ post, reason }) => reason || !post.record.reply)
       .map(toTimelinePost)
@@ -206,11 +188,5 @@ export function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  if (loaderData.state === "setup") {
-    return <HomePage variant="setup" />;
-  }
-  if (loaderData.state === "timeline") {
-    return <TimelinePage posts={loaderData.posts} cursor={loaderData.cursor} />;
-  }
-  return <HomePage variant="home" />;
+  return <TimelinePage posts={loaderData.posts} cursor={loaderData.cursor} />;
 }
