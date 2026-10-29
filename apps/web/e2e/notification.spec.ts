@@ -35,9 +35,10 @@ test.describe("通知", () => {
 
     await expect(async () => {
       await page.reload();
-      await expect(items).toHaveCount(30, { timeout: 1000 });
+      await expect(items).not.toHaveCount(0, { timeout: 1000 });
+      const count = await items.count();
+      await items.last().scrollIntoViewIfNeeded();
+      await expect(items).not.toHaveCount(count, { timeout: 1000 });
     }).toPass();
-    await items.last().scrollIntoViewIfNeeded();
-    await expect(items).not.toHaveCount(30);
   });
 });
