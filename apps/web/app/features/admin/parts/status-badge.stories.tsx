@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatusBadge } from "./status-badge";
 
 const meta = {
-  title: "features/Admin/StatusBadge",
   component: StatusBadge,
 } satisfies Meta<typeof StatusBadge>;
 
