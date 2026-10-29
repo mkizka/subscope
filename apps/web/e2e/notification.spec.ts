@@ -1,19 +1,16 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
-import { createRecord, resolveDid } from "./pds";
+import { createRecord, putRecord, resolveDid } from "./pds";
 
 test.describe("通知", () => {
   test("notification-2: フォローされると、相手の名前が通知に出る", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();
-    await createRecord(
-      "bob.test",
-      "app.bsky.actor.profile",
-      { displayName: "Bob" },
-      "self",
-    );
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
     await createRecord("alice.test", "app.bsky.graph.follow", {
       subject: await resolveDid("bob.test"),
       createdAt,
