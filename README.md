@@ -1,6 +1,6 @@
 # Subscope
 
-<img src="./icon.png" width="128">
+<img src="./apps/web/public/favicon.svg" width="128">
 
 > [!WARNING]
 > This project is under development. All features are subject to breaking changes.
