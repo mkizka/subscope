@@ -1,3 +1,4 @@
+import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
 import {
   actorFactory,
   postFactory,
@@ -28,10 +29,10 @@ describe("app.bsky.feed.searchPosts", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.searchPosts({ q: "searchPosts" });
+    const res = await client.call(searchPosts, { q: "searchPosts" });
 
     // assert
-    expect(res.data.posts).toMatchObject([
+    expect(res.posts).toMatchObject([
       { uri: post.uri, author: { did: author.did } },
     ]);
   });

@@ -1,3 +1,4 @@
+import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
 import { actorFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -15,7 +16,7 @@ describe("me.subsco.admin.deleteInviteCode", () => {
     loginAs(admin.did);
 
     // act
-    const promise = client.me.subsco.admin.deleteInviteCode({
+    const promise = client.call(deleteInviteCode, {
       code: "notfound",
     });
 
@@ -38,7 +39,7 @@ describe("me.subsco.admin.deleteInviteCode", () => {
       .create();
 
     // act
-    const promise = client.me.subsco.admin.deleteInviteCode({
+    const promise = client.call(deleteInviteCode, {
       code: inviteCode.code,
     });
 

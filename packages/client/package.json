@@ -4,17 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./api": {
-      "import": "./dist/api.js",
-      "types": "./dist/api.d.ts"
-    },
     "./lex/*": {
-      "import": "./dist/generated/lex/*.js",
-      "types": "./dist/generated/lex/*.d.ts"
-    },
-    "./server": {
-      "import": "./dist/server.js",
-      "types": "./dist/server.d.ts"
+      "import": "./dist/generated/*.js",
+      "types": "./dist/generated/*.d.ts"
     }
   },
   "scripts": {
@@ -28,20 +20,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@atproto/api": "0.29.5",
-    "@atproto/lex": "0.4.2",
-    "@atproto/lex-server": "0.2.0",
-    "@atproto/lexicon": "0.7.17",
-    "@atproto/oauth-client": "0.9.0",
-    "@atproto/xrpc": "0.8.16",
-    "@atproto/xrpc-server": "0.13.6",
-    "multiformats": "14.0.5"
+    "@atproto/lex": "0.4.2"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "0.10.16",
     "@mkizka/eslint-config": "10.0.0",
     "@tsconfig/node-lts": "24.0.1",
-    "@types/express": "5.0.6",
     "@types/node": "26.6.5",
     "eslint": "10.13.0",
     "typescript": "6.0.3"

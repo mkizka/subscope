@@ -24,15 +24,59 @@ export const createRecord = async (
   handle: string,
   collection: string,
   record: Record<string, unknown>,
-  rkey?: string,
 ) => {
   const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
     "com.atproto.server.createSession",
     { identifier: handle, password: "password" },
   );
   return xrpc<{ uri: string; cid: string }>(
-    rkey ? "com.atproto.repo.putRecord" : "com.atproto.repo.createRecord",
+    "com.atproto.repo.createRecord",
+    { repo: did, collection, record: { $type: collection, ...record } },
+    accessJwt,
+  );
+};
+
+export const resolveHandle = async (handle: string) => {
+  const response = await fetch(
+    `${PDS_URL}/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`,
+  );
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { did } = (await response.json()) as { did: string };
+  return did;
+};
+
+export const putRecord = async (
+  handle: string,
+  collection: string,
+  rkey: string,
+  record: Record<string, unknown>,
+) => {
+  const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  return xrpc<{ uri: string; cid: string }>(
+    "com.atproto.repo.putRecord",
     { repo: did, collection, rkey, record: { $type: collection, ...record } },
     accessJwt,
   );
+};
+
+export const follow = async (handle: string, subjectHandle: string) => {
+  const [did, subject] = await Promise.all([
+    resolveHandle(handle),
+    resolveHandle(subjectHandle),
+  ]);
+  const response = await fetch(
+    `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=${did}&collection=app.bsky.graph.follow`,
+  );
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { records } = (await response.json()) as {
+    records: { value: { subject: string } }[];
+  };
+  if (records.some((record) => record.value.subject === subject)) return;
+  await createRecord(handle, "app.bsky.graph.follow", {
+    subject,
+    createdAt: new Date().toISOString(),
+  });
 };

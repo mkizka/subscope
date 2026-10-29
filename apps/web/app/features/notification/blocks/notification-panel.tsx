@@ -3,6 +3,7 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 type Notification = {
   uri: string;
   authorName: string;
+  text?: string;
 };
 
 type Props = {
@@ -17,7 +18,7 @@ export function NotificationPanel({
   hasNextPage,
 }: Props) {
   return (
-    <section aria-label="通知" className="p-4">
+    <section className="p-4">
       <h2 className="font-bold">通知</h2>
       {notifications.length === 0 ? (
         <p className="py-8 text-center text-sm opacity-60">
@@ -30,7 +31,12 @@ export function NotificationPanel({
               key={notification.uri}
               className="border-b border-base-300 py-2"
             >
-              {notification.authorName}
+              <p>{notification.authorName}</p>
+              {notification.text && (
+                <p className="text-sm whitespace-pre-wrap">
+                  {notification.text}
+                </p>
+              )}
             </li>
           ))}
         </ul>
