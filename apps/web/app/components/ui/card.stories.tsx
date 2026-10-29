@@ -10,7 +10,6 @@ import {
 } from "./card";
 
 const meta = {
-  title: "ui/Card",
   component: Card,
   args: {
     size: "default",

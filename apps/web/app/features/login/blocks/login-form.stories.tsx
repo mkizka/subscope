@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { LoginForm } from "./login-form";
 
 const meta = {
-  title: "features/Login/LoginForm",
   component: LoginForm,
   args: {
     formProps: {},

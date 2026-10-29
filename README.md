@@ -1,6 +1,6 @@
 # Subscope
 
-<img src="./icon.png" width="128">
+<img src="./apps/web/public/favicon.svg" width="128">
 
 > [!WARNING]
 > This project is under development. All features are subject to breaking changes.
@@ -46,4 +46,4 @@ The following servers will start.
 - worker ... http://localhost:3003
 - ingester ... http://localhost:3004
 
-A local PLC and PDS are also started with the test account `alice.test` / `password`.
+A local PLC and PDS are also started with the test accounts `alice.test` and `bob.test` (password: `password`).

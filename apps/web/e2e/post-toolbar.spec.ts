@@ -1,0 +1,125 @@
+import { expect, test } from "@playwright/test";
+
+import { login } from "./login";
+import { createRecord } from "./pds";
+
+const PDS_URL = "http://localhost:2583";
+
+const cases = [
+  { id: "post-toolbar-1", name: "いいね", collection: "app.bsky.feed.like" },
+  {
+    id: "post-toolbar-2",
+    name: "リポスト",
+    collection: "app.bsky.feed.repost",
+  },
+];
+
+for (const { id, name, collection } of cases) {
+  test(`${id}: ${name}ボタンで投稿に${name}し、もう一度押すと取り消す`, async ({
+    page,
+    request,
+  }) => {
+    const session = await request.post(
+      `${PDS_URL}/xrpc/com.atproto.server.createSession`,
+      { data: { identifier: "alice.test", password: "password" } },
+    );
+    const { did, accessJwt } = await session.json();
+    const createRecord = (collection: string, record: object, rkey?: string) =>
+      request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
+        headers: { Authorization: `Bearer ${accessJwt}` },
+        data: { repo: did, collection, rkey, record },
+      });
+    await createRecord(
+      "app.bsky.actor.profile",
+      { displayName: "Alice" },
+      "self",
+    );
+    const text = `${id}: 投稿`;
+    const created = await createRecord("app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+    const { uri }: { uri: string } = await created.json();
+    const hasRecord = async () => {
+      const res = await request.get(
+        `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=${did}&collection=${collection}`,
+      );
+      return (await res.text()).includes(uri);
+    };
+
+    await login(page);
+    const post = page.getByRole("article").filter({ hasText: text });
+    await expect(async () => {
+      await page.reload();
+      await expect(post).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    const button = post.getByRole("button", { name });
+
+    await post.hover();
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await expect.poll(hasRecord).toBe(true);
+
+    await post.hover();
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await expect.poll(hasRecord).toBe(false);
+  });
+}
+
+type PostRecord = {
+  text: string;
+  reply?: { parent: { uri: string } };
+  embed?: { record?: { uri: string } };
+};
+
+const composeCases = [
+  {
+    id: "post-toolbar-3",
+    name: "返信",
+    title: "返信ボタンで投稿欄が開き、投稿するとその投稿への返信になる",
+    subjectOf: (record: PostRecord) => record.reply?.parent.uri,
+  },
+  {
+    id: "post-toolbar-4",
+    name: "引用",
+    title: "引用ボタンで投稿欄が開き、投稿するとその投稿を引用した投稿になる",
+    subjectOf: (record: PostRecord) => record.embed?.record?.uri,
+  },
+];
+
+for (const { id, name, title, subjectOf } of composeCases) {
+  test(`${id}: ${title}`, async ({ page, request }) => {
+    const text = `${id}: 投稿`;
+    const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+
+    await login(page);
+    const post = page.getByRole("article").filter({ hasText: text });
+    await expect(async () => {
+      await page.reload();
+      await expect(post).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await post.hover();
+    await post.getByRole("button", { name }).click();
+    await page
+      .getByRole("textbox", { name: "投稿内容" })
+      .fill(`${id}: ${name}`);
+    await page.getByRole("button", { name: "投稿", exact: true }).click();
+
+    await expect
+      .poll(async () => {
+        const res = await request.get(
+          `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=alice.test&collection=app.bsky.feed.post`,
+        );
+        const { records }: { records: { value: PostRecord }[] } =
+          await res.json();
+        return records
+          .filter((r) => r.value.text === `${id}: ${name}`)
+          .map((r) => subjectOf(r.value));
+      })
+      .toContain(uri);
+  });
+}

@@ -1,3 +1,4 @@
+import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import {
   actorFactory,
   followFactory,
@@ -18,7 +19,7 @@ describe("app.bsky.feed.getTimeline", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.feed.getTimeline();
+    const promise = client.call(getTimeline);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
@@ -54,15 +55,15 @@ describe("app.bsky.feed.getTimeline", () => {
     loginAs(viewer.did);
 
     // act
-    const res = await client.app.bsky.feed.getTimeline();
+    const res = await client.call(getTimeline);
 
     // assert
-    expect(res.data.feed).toMatchObject([
+    expect(res.feed).toMatchObject([
       { post: { uri: post.uri, author: { did: followee.did } } },
     ]);
   });
 
-  test("getTimeline-3: 投稿者にプロフィールレコードがない場合も、その投稿をDIDとハンドルだけのauthorで返す", async () => {
+  test("getTimeline-3: 投稿者にプロフィールレコードがなくても投稿を含め、authorはDIDとハンドルだけにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db).create();
@@ -90,10 +91,10 @@ describe("app.bsky.feed.getTimeline", () => {
     loginAs(viewer.did);
 
     // act
-    const res = await client.app.bsky.feed.getTimeline();
+    const res = await client.call(getTimeline);
 
     // assert
-    expect(res.data.feed).toMatchObject([
+    expect(res.feed).toMatchObject([
       {
         post: {
           uri: post.uri,

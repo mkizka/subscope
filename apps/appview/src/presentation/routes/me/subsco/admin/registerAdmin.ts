@@ -16,7 +16,7 @@ export class RegisterAdmin {
 
   handle(router: LexRouter): void {
     router.add(registerAdmin, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials }) => {
         try {
           await this.registerAdminUseCase.execute({

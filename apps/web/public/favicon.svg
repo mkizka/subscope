@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="84 84 344 344">
+  <style>
+    .ink { fill: #1E1C1A; stroke: #1E1C1A; }
+    .lens { fill: #C4572E; }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #EDE9E3; stroke: #EDE9E3; }
+      .lens { fill: #E07650; }
+    }
+  </style>
+  <path class="ink" fill-rule="evenodd" stroke-width="24" stroke-linejoin="round" d="M104 112H286L408 300H104ZM120 206a72 72 0 1 0 144 0a72 72 0 1 0 -144 0Z"/>
+  <rect class="ink" stroke="none" x="177" y="296" width="120" height="104"/>
+  <circle class="lens" cx="192" cy="206" r="40"/>
+</svg>

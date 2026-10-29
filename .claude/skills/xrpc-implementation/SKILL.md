@@ -5,47 +5,86 @@ description: "subscopeプロジェクトにおけるAT Protocol XRPCエンドポ
 
 # XRPC Endpoint Implementation Guide
 
-AT ProtocolのXRPCエンドポイントをsubscopeプロジェクトに追加するためのスキル。
+AT ProtocolのXRPCエンドポイントを`apps/appview`に追加するためのスキル。
 
 ## 実装フロー
 
-1. Lexicon定義の配置とクライアントコード生成
-2. Repository拡張（必要に応じて）
-3. UseCase作成
-4. ルートハンドラー作成
-5. DIコンテナ登録
-6. テスト実装
-7. 型チェック・フォーマット確認（`pnpm all`）
-
-各ステップのコード例とテンプレートは [references/guide.md](references/guide.md) を参照。
+1. `docs/specs/appview.md` にIDを振った仕様項目を追加する
+2. Lexicon定義を取得する
+   - `pnpm --filter @repo/client exec lex install <NSID>` で`packages/client/lexicons`と`lexicons.json`に追加される
+   - `pnpm build`や`pnpm typecheck`で`@repo/client`のコードが生成される
+   - Lexicon定義ファイルは手動で作成しない
+3. 必要に応じてRepository・Serviceを拡張する
+4. UseCaseを作成する。戻り値の型は生成コードの`$OutputBody`を使う
+5. ルートハンドラーを作成し、`LexRouter`に登録する
+6. `apps/appview/src/shared/registry.ts`に登録し、`apps/appview/src/presentation/routes/lex.ts`の`lexRouterFactory`の引数・`handlers`・`inject`に追加する
+7. UseCaseのunitテストと、仕様項目IDを先頭に付けたAPIテストを追加する
+8. `pnpm all`を実行する
 
 ## ファイル配置規則
 
-| レイヤー            | パス                                                                          |
-| ------------------- | ----------------------------------------------------------------------------- |
-| Lexicon postinstall | `packages/client/scripts/postinstall.sh`                                      |
-| 型エクスポート      | `packages/client/src/server.ts`                                               |
-| Repository IF       | `apps/subscope/src/application/interfaces/{entity}-repository.ts`             |
-| Repository実装      | `apps/subscope/src/infrastructure/{entity}-repository.ts`                     |
-| UseCase             | `apps/subscope/src/application/{endpoint-name}-use-case.ts`                   |
-| ルートハンドラー    | `apps/subscope/src/presentation/routes/app/bsky/{category}/{endpointName}.ts` |
-| DIコンテナ          | `apps/subscope/src/appview.ts`                                                |
-| XRPCルーター        | `apps/subscope/src/presentation/routes/xrpc.ts`                               |
-| テスト              | `apps/subscope/src/application/{endpoint-name}-use-case.test.ts`              |
+| レイヤー         | パス                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| 仕様             | `docs/specs/appview.md`                                                              |
+| Repository IF    | `apps/appview/src/application/interfaces/{entity}-repository.ts`                     |
+| Repository実装   | `apps/appview/src/infrastructure/{entity}-repository/{entity}-repository.ts`         |
+| UseCase          | `apps/appview/src/application/use-cases/{category}/{endpoint-name}-use-case.ts`      |
+| ルートハンドラー | `apps/appview/src/presentation/routes/{namespace}/{category}/{endpointName}.ts`      |
+| APIテスト        | `apps/appview/src/presentation/routes/{namespace}/{category}/{endpointName}.test.ts` |
+| DIコンテナ       | `apps/appview/src/shared/registry.ts`, `apps/appview/src/shared/test-utils.ts`       |
+| ルーター         | `apps/appview/src/presentation/routes/lex.ts`                                        |
 
-## 重要な注意点
+## ルートハンドラー
 
-- `pnpm install` でLexiconファイル取得とクライアントコード生成が自動実行される
-- ProfileView vs ProfileViewDetailed の型の違いに注意（Lexiconが期待する型に合わせる）
-- DIコンテナの `static inject` 配列はコンストラクタ引数順と一致させる
-- カーソルペジネーションでは `limit + 1` 件取得して次ページ有無を判定する
-- 実装完了後は `pnpm all` で型チェック・フォーマット・テストを実行する
+生成コードはモジュールごとにdefault importし、`router.add`に渡す。
+
+```typescript
+import type { LexRouter } from "@atproto/lex-server";
+import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
+
+export class GetFollows {
+  constructor(
+    private getFollowsUseCase: GetFollowsUseCase,
+    private handleMiddleware: HandleMiddleware,
+  ) {}
+  static inject = ["getFollowsUseCase", "handleMiddleware"] as const;
+
+  handle(router: LexRouter) {
+    router.add(getFollows, async ({ params }) => {
+      const actorDid = await this.handleMiddleware.resolveHandleOrDid(
+        params.actor,
+      );
+      const result = await this.getFollowsUseCase.execute({
+        actorDid,
+        limit: params.limit,
+        cursor: params.cursor,
+      });
+      return { body: result };
+    });
+  }
+}
+```
+
+- パラメータは`LexRouter`がLexiconに沿って検証・デフォルト値補完する
+- 認証が必要な場合は`router.add(nsid, { auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx), handler })`の形にし、`handler`で`credentials.did`を使う
+- エラーは`LexServerError`を投げる（例: `new LexServerError(400, { error: "InvalidRequest", message: "List not found" })`）
+
+## APIテスト
+
+```typescript
+const { client } = await setupApiTest();
+const res = await client.call(getFollows, {
+  actor: asAtIdentifierString(actor.did),
+});
+```
+
+`client`は`@atproto/lex`の`Client`で、レスポンスをLexiconで検証する。
 
 ## 実装例
 
-`app.bsky.graph.getFollows` の実装ファイル：
+`app.bsky.graph.getFollows`:
 
-- UseCase: `apps/subscope/src/application/get-follows-use-case.ts`
-- Repository: `apps/subscope/src/infrastructure/follow-repository.ts`
-- Route: `apps/subscope/src/presentation/routes/app/bsky/graph/getFollows.ts`
-- Test: `apps/subscope/src/application/get-follows-use-case.test.ts`
+- UseCase: `apps/appview/src/application/use-cases/graph/get-follows-use-case.ts`
+- Route: `apps/appview/src/presentation/routes/app/bsky/graph/getFollows.ts`
+- APIテスト: `apps/appview/src/presentation/routes/app/bsky/graph/getFollows.test.ts`
+- UseCaseテスト: `apps/appview/src/application/use-cases/graph/get-follows-use-case.test.ts`

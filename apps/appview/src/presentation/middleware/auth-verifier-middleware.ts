@@ -1,83 +1,42 @@
-import type { IncomingMessage } from "node:http";
-
-import { type Did } from "@atproto/did";
+import type { Did } from "@atproto/did";
 import { LexServerAuthError } from "@atproto/lex-server";
-import { AuthRequiredError, parseReqNsid } from "@atproto/xrpc-server";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
 
-type MaybeHeaders = {
-  [key: string]: string | string[] | undefined;
+const extractToken = (request: Request) => {
+  const authorization = request.headers.get("authorization");
+  if (!authorization) {
+    return null;
+  }
+  const [type, token, ...rest] = authorization.split(" ");
+  if (type?.toLowerCase() !== "bearer" || !token || rest.length > 0) {
+    return null;
+  }
+  return token;
 };
-
-type MaybeRequest = {
-  headers: MaybeHeaders;
-  path: string;
-};
-
-const toMaybeRequest = (request: Request): MaybeRequest => ({
-  headers: Object.fromEntries(request.headers),
-  path: new URL(request.url).pathname,
-});
 
 export class AuthVerifierMiddleware {
   constructor(private readonly tokenVerifier: ITokenVerifier) {}
   static inject = ["tokenVerifier"] as const;
 
-  async loginRequired(request: MaybeRequest) {
-    const authorization =
-      request.headers.authorization ?? request.headers.Authorization;
-    if (typeof authorization !== "string") {
-      throw new AuthRequiredError("Bad authorization header");
+  async loginRequired({ request }: { request: Request }) {
+    const did = await this.optionalAuth({ request });
+    if (!did) {
+      throw new LexServerAuthError(
+        "AuthenticationRequired",
+        "Authentication required",
+      );
     }
-    const splitted = authorization.split(" ");
-    if (splitted.length !== 2) {
-      throw new AuthRequiredError("Bad authorization header");
-    }
-    const [type, token] = splitted;
-    if (!type || type.toLowerCase() !== "bearer") {
-      throw new AuthRequiredError("Bad authorization type");
-    }
+    return { did };
+  }
+
+  async optionalAuth({ request }: { request: Request }): Promise<Did | null> {
+    const token = extractToken(request);
     if (!token) {
-      throw new AuthRequiredError("No token provided");
+      return null;
     }
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const nsid = parseReqNsid({ url: request.path } as IncomingMessage);
+    const nsid = new URL(request.url).pathname.replace(/^\/xrpc\//, "");
     const credentials = await this.tokenVerifier.verify({ token, nsid });
-    if (!credentials) {
-      throw new AuthRequiredError("Invalid token");
-    }
-    return {
-      credentials,
-      artifacts: token,
-    };
-  }
-
-  async lexLoginRequired({ request }: { request: Request }) {
-    try {
-      const { credentials } = await this.loginRequired(toMaybeRequest(request));
-      return credentials;
-    } catch (error) {
-      if (error instanceof AuthRequiredError) {
-        throw new LexServerAuthError("AuthenticationRequired", error.message);
-      }
-      throw error;
-    }
-  }
-
-  lexOptionalAuth({ request }: { request: Request }) {
-    return this.getViewerDid(toMaybeRequest(request));
-  }
-
-  async getViewerDid(request: MaybeRequest): Promise<Did | null> {
-    try {
-      const authResult = await this.loginRequired(request);
-      return authResult.credentials.did;
-    } catch (error) {
-      if (error instanceof AuthRequiredError) {
-        return null;
-      }
-      throw error;
-    }
+    return credentials?.did ?? null;
   }
 }

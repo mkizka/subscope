@@ -1,13 +1,15 @@
-import { Spinner } from "./ui/spinner";
-
 export function NavigationOverlay() {
   return (
     <div
       className="
-        fixed inset-0 z-100 flex items-center justify-center bg-background/50
+        fixed inset-0 z-100 flex items-center justify-center bg-base-100/50
       "
     >
-      <Spinner className="size-8" />
+      <span
+        role="status"
+        aria-label="Loading"
+        className="loading loading-lg loading-spinner"
+      />
     </div>
   );
 }

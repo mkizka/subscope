@@ -1,21 +1,6 @@
-import { LoaderCircleIcon, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import { Button } from "@/app/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/app/components/ui/table";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 
 export type InviteCode = {
@@ -67,59 +52,63 @@ export function InviteCodeTable({
 }: Props) {
   return (
     <>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-2xl font-bold">招待コード一覧</CardTitle>
-          <Button onClick={onCreateCode} disabled={isCreating}>
+      <div className="card border border-base-300 bg-base-100">
+        <div className="flex items-center justify-between p-6 pb-2">
+          <h2 className="card-title text-2xl">招待コード一覧</h2>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={onCreateCode}
+            disabled={isCreating}
+          >
             {isCreating ? "作成中..." : "新規作成"}
-          </Button>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>コード</TableHead>
-                <TableHead>ステータス</TableHead>
-                <TableHead>使用者</TableHead>
-                <TableHead>有効期限</TableHead>
-                <TableHead>作成日</TableHead>
-                <TableHead>削除</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>コード</th>
+                <th>ステータス</th>
+                <th>使用者</th>
+                <th>有効期限</th>
+                <th>作成日</th>
+                <th>削除</th>
+              </tr>
+            </thead>
+            <tbody>
               {!isLoading && codes.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center">
+                <tr>
+                  <td colSpan={6} className="py-8 text-center">
                     招待コードはまだありません
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               )}
               {isLoading && (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center">
+                <tr>
+                  <td colSpan={6} className="py-8 text-center">
                     読み込み中...
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               )}
               {codes.map((code) => (
-                <TableRow key={code.code}>
-                  <TableCell className="font-mono">{code.code}</TableCell>
-                  <TableCell>
+                <tr key={code.code}>
+                  <td className="font-mono">{code.code}</td>
+                  <td>
                     <StatusBadge
                       usedAt={code.usedAt}
                       expiresAt={code.expiresAt}
                     />
-                  </TableCell>
-                  <TableCell>
-                    {code.usedBy?.handle ?? code.usedBy?.did ?? "-"}
-                  </TableCell>
-                  <TableCell>{formatDate(code.expiresAt)}</TableCell>
-                  <TableCell>{formatDate(code.createdAt)}</TableCell>
-                  <TableCell>
+                  </td>
+                  <td>{code.usedBy?.handle ?? code.usedBy?.did ?? "-"}</td>
+                  <td>{formatDate(code.expiresAt)}</td>
+                  <td>{formatDate(code.createdAt)}</td>
+                  <td>
                     {isDeletable(code) && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
+                      <button
+                        type="button"
+                        className="btn btn-square btn-ghost btn-sm"
+                        aria-label="削除"
                         onClick={() => {
                           if (
                             isExpired(code) ||
@@ -131,21 +120,21 @@ export function InviteCodeTable({
                         disabled={deletingCode === code.code}
                       >
                         {deletingCode === code.code ? (
-                          <LoaderCircleIcon className="animate-spin" />
+                          <span className="loading loading-sm loading-spinner" />
                         ) : (
-                          <XIcon className="text-destructive" />
+                          <XIcon className="size-4 text-error" />
                         )}
-                      </Button>
+                      </button>
                     )}
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
+      </div>
       {isFetchingNextPage && (
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="mt-4 text-center text-sm text-base-content/70">
           読み込み中...
         </p>
       )}

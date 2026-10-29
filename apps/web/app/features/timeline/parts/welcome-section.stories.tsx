@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { WelcomeSection } from "./welcome-section";
 
 const meta = {
-  title: "features/Timeline/WelcomeSection",
   component: WelcomeSection,
 } satisfies Meta<typeof WelcomeSection>;
 

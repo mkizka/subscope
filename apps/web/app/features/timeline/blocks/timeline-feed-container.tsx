@@ -1,77 +1,75 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { useFetcher } from "react-router";
 
-import type { loader } from "@/app/routes/api.timeline";
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import type { loader } from "@/app/routes/_index";
 
+import type { ComposeTarget } from "./post-form-container";
 import { TimelineFeed, type TimelinePost } from "./timeline-feed";
 
-type TimelineResponse = Awaited<ReturnType<typeof loader>>["data"];
+type OnCompose = (target: ComposeTarget) => void;
 
-async function fetchTimeline(cursor?: string): Promise<TimelineResponse> {
-  const params = new URLSearchParams();
-  if (cursor) {
-    params.set("cursor", cursor);
+function OlderTimelineFeedContainer({
+  cursor,
+  onCompose,
+}: {
+  cursor: string;
+  onCompose: OnCompose;
+}) {
+  const fetcher = useFetcher<typeof loader>();
+  const data = fetcher.data?.state === "timeline" ? fetcher.data : undefined;
+  const distanceFromBottomRef = useRef(0);
+
+  useLayoutEffect(() => {
+    if (!data) return;
+    window.scrollTo(
+      0,
+      document.body.scrollHeight - distanceFromBottomRef.current,
+    );
+  }, [data]);
+
+  if (!data) {
+    return (
+      <InfiniteScrollTrigger
+        onIntersect={() => {
+          distanceFromBottomRef.current =
+            document.body.scrollHeight - window.scrollY;
+          void fetcher.load(`/?${new URLSearchParams({ index: "", cursor })}`);
+        }}
+        enabled={fetcher.state === "idle"}
+      />
+    );
   }
-  const response = await fetch(`/api/timeline?${params.toString()}`);
-  if (!response.ok) {
-    throw new Error("タイムラインの取得に失敗しました");
-  }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return response.json() as Promise<TimelineResponse>;
+  return (
+    <>
+      {data.cursor && (
+        <OlderTimelineFeedContainer
+          cursor={data.cursor}
+          onCompose={onCompose}
+        />
+      )}
+      <TimelineFeed posts={data.posts} onCompose={onCompose} />
+    </>
+  );
 }
 
-const maybeString = (value: unknown): string | undefined => {
-  if (typeof value === "string") {
-    return value;
-  }
-  return undefined;
+type Props = {
+  posts: TimelinePost[];
+  cursor?: string;
+  onCompose: OnCompose;
 };
 
-function toTimelinePost({
-  post,
-  reason,
-}: TimelineResponse["feed"][number]): TimelinePost {
-  let reasonRepost;
-  if (reason && "by" in reason) {
-    reasonRepost = {
-      byDisplayName: reason.by.displayName,
-      byHandle: reason.by.handle,
-    };
-  }
-
-  return {
-    uri: post.uri,
-    authorAvatar: post.author.avatar,
-    authorDisplayName: post.author.displayName,
-    authorHandle: post.author.handle,
-    text: maybeString(post.record.text),
-    replyCount: post.replyCount,
-    repostCount: post.repostCount,
-    likeCount: post.likeCount,
-    createdAt: maybeString(post.record.createdAt),
-    reasonRepost,
-  };
-}
-
-export function TimelineFeedContainer() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: ["timeline"],
-      queryFn: ({ pageParam }) => fetchTimeline(pageParam),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      initialPageParam: undefined as string | undefined,
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      select: (data) => data.pages.flatMap((page) => page.feed),
-    });
-
-  const posts = (data ?? []).map(toTimelinePost);
+export function TimelineFeedContainer({ posts, cursor, onCompose }: Props) {
+  useEffect(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, []);
 
   return (
-    <TimelineFeed
-      posts={posts}
-      isLoading={isLoading}
-      isFetchingNextPage={isFetchingNextPage}
-      hasNextPage={hasNextPage}
-      onLoadMore={fetchNextPage}
-    />
+    <>
+      {cursor && (
+        <OlderTimelineFeedContainer cursor={cursor} onCompose={onCompose} />
+      )}
+      <TimelineFeed posts={posts} onCompose={onCompose} />
+    </>
   );
 }
