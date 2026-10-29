@@ -1,36 +1,43 @@
-import { expect, test } from "@playwright/test";
+import { type APIRequestContext, expect, test } from "@playwright/test";
 
 import { login } from "./login";
 
 const PDS_URL = "http://localhost:2583";
+
+const createPosts = async (request: APIRequestContext, texts: string[]) => {
+  const session = await request.post(
+    `${PDS_URL}/xrpc/com.atproto.server.createSession`,
+    { data: { identifier: "alice.test", password: "password" } },
+  );
+  const { did, accessJwt } = await session.json();
+  await request.post(`${PDS_URL}/xrpc/com.atproto.repo.putRecord`, {
+    headers: { Authorization: `Bearer ${accessJwt}` },
+    data: {
+      repo: did,
+      collection: "app.bsky.actor.profile",
+      rkey: "self",
+      record: { displayName: "Alice" },
+    },
+  });
+  for (const text of texts) {
+    await request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
+      headers: { Authorization: `Bearer ${accessJwt}` },
+      data: {
+        repo: did,
+        collection: "app.bsky.feed.post",
+        record: { text, createdAt: new Date().toISOString() },
+      },
+    });
+  }
+};
 
 test.describe("タイムライン", () => {
   test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しい投稿ほど下に並べて表示する", async ({
     page,
     request,
   }) => {
-    const session = await request.post(
-      `${PDS_URL}/xrpc/com.atproto.server.createSession`,
-      { data: { identifier: "alice.test", password: "password" } },
-    );
-    const { did, accessJwt } = await session.json();
-    const createRecord = (collection: string, record: object, rkey?: string) =>
-      request.post(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
-        headers: { Authorization: `Bearer ${accessJwt}` },
-        data: { repo: did, collection, rkey, record },
-      });
-    await createRecord(
-      "app.bsky.actor.profile",
-      { displayName: "Alice" },
-      "self",
-    );
     const texts = ["timeline-1: 古い投稿", "timeline-1: 新しい投稿"];
-    for (const text of texts) {
-      await createRecord("app.bsky.feed.post", {
-        text,
-        createdAt: new Date().toISOString(),
-      });
-    }
+    await createPosts(request, texts);
 
     await login(page);
 
@@ -40,5 +47,35 @@ test.describe("タイムライン", () => {
         timeout: 1000,
       });
     }).toPass();
+  });
+
+  test("timeline-4: 開くと最新の投稿までスクロールし、上にスクロールすると表示位置を保ったまま古い投稿を読み込む", async ({
+    page,
+    request,
+  }) => {
+    const texts = Array.from(
+      { length: 25 },
+      (_, i) => `timeline-4: 投稿${i + 1}`,
+    );
+    await createPosts(request, texts);
+
+    await login(page);
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByText("timeline-4: 投稿25")).toBeInViewport({
+        timeout: 1000,
+      });
+    }).toPass();
+    await expect(
+      page.getByText("timeline-4: 投稿1", { exact: true }),
+    ).toHaveCount(0);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    await expect(
+      page.getByText("timeline-4: 投稿1", { exact: true }),
+    ).toBeAttached();
+    await expect(page.getByText("timeline-4: 投稿6")).toBeInViewport();
   });
 });
