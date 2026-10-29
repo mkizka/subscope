@@ -1,7 +1,7 @@
 import type {
+  AfterCommitContext,
   DatabaseClient,
   ITransactionManager,
-  TransactionContext,
 } from "@repo/common/domain";
 
 export class TransactionManager implements ITransactionManager {
@@ -9,8 +9,13 @@ export class TransactionManager implements ITransactionManager {
   static inject = ["db"] as const;
 
   async transaction<T>(
-    fn: (ctx: TransactionContext) => Promise<T>,
+    fn: (ctx: AfterCommitContext) => Promise<T>,
   ): Promise<T> {
-    return await this.db.transaction((tx) => fn({ db: tx }));
+    const tasks: (() => Promise<void>)[] = [];
+    const result = await this.db.transaction((tx) =>
+      fn({ db: tx, afterCommit: (task) => tasks.push(task) }),
+    );
+    for (const task of tasks) await task();
+    return result;
   }
 }
