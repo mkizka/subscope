@@ -83,6 +83,8 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - listNotifications-1: 認証がない場合、401を返す
 - listNotifications-2: 閲覧者宛ての通知がある場合、新しい順に返し、既読時刻以前の通知を既読にする
+- listNotifications-3: reasonsを指定した場合、指定した種類の通知のみを返す
+- listNotifications-4: 閲覧者の既読時刻がある場合、seenAtにその時刻を返す
 
 ## app.bsky.notification.getUnreadCount
 
@@ -90,6 +92,7 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getUnreadCount-1: 認証がない場合、401を返す
 - getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す
+- getUnreadCount-3: seenAtを指定した場合、保存済みの既読時刻ではなくseenAtより新しい通知の数を返す
 
 ## app.bsky.notification.updateSeen
 
@@ -140,6 +143,13 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 指定したアクターがフォローしているアクターを返す。認証は任意。
 
 - getFollows-1: フォローしているアクターを指定した場合、そのアクターをsubject、フォロー先のprofileViewをfollowsとして返す
+
+## app.bsky.graph.getList
+
+指定したリストとそのリストに追加されたアクターを返す。認証は任意。
+
+- getList-1: リストを指定した場合、そのリストのlistViewをlist、追加されたアクターのprofileViewをitemsのsubjectとして返す
+- getList-2: 存在しないリストを指定した場合、400を返す
 
 ## app.bsky.graph.getLists
 

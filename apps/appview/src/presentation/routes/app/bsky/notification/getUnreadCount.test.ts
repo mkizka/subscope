@@ -51,4 +51,38 @@ describe("app.bsky.notification.getUnreadCount", () => {
     // assert
     expect(res).toEqual({ count: 2 });
   });
+
+  test("getUnreadCount-3: seenAtを指定した場合、保存済みの既読時刻ではなくseenAtより新しい通知の数を返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    const author = await actorFactory(ctx.db).create();
+    for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-04"]) {
+      const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => author })
+        .create();
+      await ctx.db.insert(schema.notifications).values({
+        recordUri: record.uri,
+        recipientDid: viewer.did,
+        authorDid: author.did,
+        reason: "follow",
+        sortAt: new Date(sortAt),
+      });
+    }
+    await ctx.db
+      .update(schema.subscriptions)
+      .set({ seenAt: new Date("2024-01-02") })
+      .where(eq(schema.subscriptions.actorDid, viewer.did));
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getUnreadCount, {
+      seenAt: "2024-01-03T12:00:00.000Z",
+    });
+
+    // assert
+    expect(res).toEqual({ count: 1 });
+  });
 });
