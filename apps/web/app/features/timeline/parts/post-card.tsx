@@ -47,12 +47,12 @@ export function PostCard({
   toolbar,
 }: PostCardProps) {
   return (
-    <article className="group relative border-b border-border/40 px-4 py-3">
+    <article className="group relative border-b border-base-300 px-4 py-3">
       {toolbar}
       {reasonRepost && (
         <div
           className="
-            mb-1 flex items-center gap-1 pl-10 text-xs text-muted-foreground
+            mb-1 flex items-center gap-1 pl-10 text-xs text-base-content/70
           "
         >
           <RepeatIcon className="size-3" />
@@ -71,7 +71,7 @@ export function PostCard({
               className="size-10 rounded-full object-cover"
             />
           ) : (
-            <div className="size-10 rounded-full bg-muted" />
+            <div className="size-10 rounded-full bg-base-200" />
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -79,10 +79,10 @@ export function PostCard({
             <span className="truncate font-semibold">
               {authorDisplayName ?? authorHandle}
             </span>
-            <span className="truncate text-muted-foreground">
+            <span className="truncate text-base-content/70">
               @{authorHandle}
             </span>
-            <span className="shrink-0 text-muted-foreground">
+            <span className="shrink-0 text-base-content/70">
               · {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
             </span>
           </div>
