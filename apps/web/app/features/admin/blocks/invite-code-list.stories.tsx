@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 
-import { InviteCodeTable } from "./invite-code-table";
+import { InviteCodeList } from "./invite-code-list";
 
 const meta = {
-  component: InviteCodeTable,
+  component: InviteCodeList,
   args: {
     onCreateCode: fn(),
     isCreating: false,
     onDeleteCode: fn(),
     deletingCode: null,
   },
-} satisfies Meta<typeof InviteCodeTable>;
+} satisfies Meta<typeof InviteCodeList>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

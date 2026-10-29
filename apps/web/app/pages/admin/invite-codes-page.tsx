@@ -1,5 +1,5 @@
-import type { InviteCode } from "@/app/features/admin/blocks/invite-code-table";
-import { InviteCodeTableContainer } from "@/app/features/admin/blocks/invite-code-table-container";
+import type { InviteCode } from "@/app/features/admin/blocks/invite-code-list";
+import { InviteCodeListContainer } from "@/app/features/admin/blocks/invite-code-list-container";
 
 type Props = {
   codes: InviteCode[];
@@ -7,5 +7,5 @@ type Props = {
 };
 
 export function InviteCodesPage({ codes, cursor }: Props) {
-  return <InviteCodeTableContainer codes={codes} cursor={cursor} />;
+  return <InviteCodeListContainer codes={codes} cursor={cursor} />;
 }
