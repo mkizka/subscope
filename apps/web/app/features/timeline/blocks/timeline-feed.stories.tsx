@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
 
 import { TimelineFeed } from "./timeline-feed";
 
 const meta = {
-  title: "features/Timeline/TimelineFeed",
   component: TimelineFeed,
   args: {
+    onCompose: () => {},
     posts: [
       {
         uri: "at://did:plc:example1/app.bsky.feed.post/1",
+        cid: "bafyexample1",
         authorHandle: "alice.bsky.social",
         authorDisplayName: "Alice",
         text: "こんにちは！今日はいい天気ですね。",
@@ -20,6 +20,7 @@ const meta = {
       },
       {
         uri: "at://did:plc:example2/app.bsky.feed.post/2",
+        cid: "bafyexample2",
         authorHandle: "bob.bsky.social",
         authorDisplayName: "Bob",
         text: "AT Protocolについての考察。分散型SNSの未来について。",
@@ -34,6 +35,7 @@ const meta = {
       },
       {
         uri: "at://did:plc:example3/app.bsky.feed.post/3",
+        cid: "bafyexample3",
         authorHandle: "dave.bsky.social",
         text: "displayNameなしのユーザーです。",
         replyCount: 0,
@@ -42,10 +44,6 @@ const meta = {
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
       },
     ],
-    isLoading: false,
-    isFetchingNextPage: false,
-    hasNextPage: true,
-    onLoadMore: fn(),
   },
 } satisfies Meta<typeof TimelineFeed>;
 
@@ -54,22 +52,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Loading: Story = {
-  args: {
-    posts: [],
-    isLoading: true,
-  },
-};
-
 export const Empty: Story = {
   args: {
+    onCompose: () => {},
     posts: [],
-  },
-};
-
-export const LoadingMore: Story = {
-  args: {
-    isFetchingNextPage: true,
-    hasNextPage: true,
   },
 };

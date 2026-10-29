@@ -2,8 +2,8 @@ import { once } from "node:events";
 import type { AddressInfo } from "node:net";
 
 import { asDid } from "@atproto/did";
+import { Client } from "@atproto/lex";
 import { asClassArgs } from "@gyaku/di";
-import { AtpBaseClient } from "@repo/client/api";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -28,20 +28,17 @@ const apiTestRegistry = createAppRegistry(testEnv)
 
 export const setupApiTest = async () => {
   const services = await apiTestRegistry.resolve();
-  const server = express()
-    .use(services.lexRouter)
-    .use(services.xrpcRouter)
-    .listen(0);
+  const server = express().use(services.lexRouter).listen(0);
   await once(server, "listening");
   onTestFinished(() => {
     server.close();
   });
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { port } = server.address() as AddressInfo;
-  const createClient = () => new AtpBaseClient(`http://localhost:${port}`);
+  const createClient = () => new Client(`http://localhost:${port}`);
   const client = createClient();
   const loginAs = (did: string, target = client) => {
-    target.setHeader("authorization", `Bearer ${did}`);
+    target.headers.set("authorization", `Bearer ${did}`);
   };
   return { client, createClient, loginAs };
 };

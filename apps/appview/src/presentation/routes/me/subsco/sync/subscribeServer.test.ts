@@ -1,3 +1,4 @@
+import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
 import { actorFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -6,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.sync.subscribeServer", () => {
   const { ctx } = testSetup;
 
-  test("subscribeServer-1: 同じ招待コードで同時に登録した場合、1件だけ成功し残りは400を返す", async () => {
+  test("subscribeServer-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す", async () => {
     // arrange
     const { createClient, loginAs } = await setupApiTest();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
@@ -22,7 +23,7 @@ describe("me.subsco.sync.subscribeServer", () => {
     // act
     const results = await Promise.allSettled(
       clients.map((client) =>
-        client.me.subsco.sync.subscribeServer({ inviteCode: inviteCode.code }),
+        client.call(subscribeServer, { inviteCode: inviteCode.code }),
       ),
     );
 

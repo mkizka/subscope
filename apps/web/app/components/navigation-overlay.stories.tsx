@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { NavigationOverlay } from "./navigation-overlay";
 
 const meta = {
-  title: "components/NavigationOverlay",
   component: NavigationOverlay,
   decorators: [
     (Story) => (
