@@ -20,6 +20,7 @@ import {
   TransactionManager,
 } from "@repo/common/infrastructure";
 
+import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
@@ -55,6 +56,7 @@ import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
+import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
@@ -99,6 +101,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
+    .service("handleResolver", asClassArgs<IHandleResolver>()(HandleResolver))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
     .service("actorRepository", asClassArgs<IActorRepository>()(ActorRepository))
     .service("inviteCodeRepository", asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
@@ -132,7 +135,7 @@ export const createWorkerRegistry = (env: Env) =>
     // application(use-case)
     .service("upsertIdentityUseCase", ["db", "indexActorService"], asClassArgs(UpsertIdentityUseCase))
     .service("indexCommitUseCase", ["transactionManager", "indexRecordService", "recordRevRepository"], asClassArgs(IndexCommitUseCase))
-    .service("resolveDidUseCase", ["didResolver", "actorRepository", "db"], asClassArgs(ResolveDidUseCase))
+    .service("resolveDidUseCase", ["didResolver", "handleResolver", "actorRepository", "db"], asClassArgs(ResolveDidUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsRepository", "postRepository", "db"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
