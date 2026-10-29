@@ -50,7 +50,7 @@ export class NotificationRepository implements INotificationRepository {
     }));
   }
 
-  async countUnread(recipientDid: Did): Promise<number> {
+  async countUnread(recipientDid: Did, seenAt?: Date): Promise<number> {
     const { notifications, subscriptions } = schema;
     const [row] = await this.db
       .select({ count: count() })
@@ -62,10 +62,12 @@ export class NotificationRepository implements INotificationRepository {
       .where(
         and(
           eq(notifications.recipientDid, recipientDid),
-          or(
-            isNull(subscriptions.seenAt),
-            gt(notifications.sortAt, subscriptions.seenAt),
-          ),
+          seenAt
+            ? gt(notifications.sortAt, seenAt)
+            : or(
+                isNull(subscriptions.seenAt),
+                gt(notifications.sortAt, subscriptions.seenAt),
+              ),
         ),
       );
     return row?.count ?? 0;

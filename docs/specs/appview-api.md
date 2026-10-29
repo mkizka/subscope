@@ -90,6 +90,7 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getUnreadCount-1: 認証がない場合、401を返す
 - getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す
+- getUnreadCount-3: seenAtを指定した場合、保存済みの既読時刻ではなくseenAtより新しい通知の数を返す
 
 ## app.bsky.notification.updateSeen
 
