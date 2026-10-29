@@ -9,8 +9,7 @@ export interface IJobScheduler {
     options: { live: boolean; depth: number },
   ) => Promise<void>;
   scheduleResolveDid: (did: Did) => Promise<void>;
-  scheduleAddTapRepo: (did: Did) => Promise<void>;
-  scheduleRemoveTapRepo: (did: Did) => Promise<void>;
+  scheduleSyncTapRepo: (did: Did) => Promise<void>;
   scheduleAggregatePostStats: (
     uri: AtUri,
     type: JobData["aggregatePostStats"]["type"],

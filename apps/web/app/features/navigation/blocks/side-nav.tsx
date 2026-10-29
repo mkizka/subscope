@@ -4,9 +4,10 @@ type Props = {
   did?: string;
   avatarUrl?: string;
   handle?: string;
+  isAdmin?: boolean;
 };
 
-export function SideNav({ did, avatarUrl, handle }: Props) {
+export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
   const profileId = handle === "handle.invalid" ? did : handle;
 
   return (
@@ -36,6 +37,21 @@ export function SideNav({ did, avatarUrl, handle }: Props) {
             <li>
               <a>追跡中のユーザー</a>
             </li>
+            {isAdmin && (
+              <>
+                <li>
+                  <Link to="/admin/subscribers">登録ユーザー</Link>
+                </li>
+                <li>
+                  <Link to="/admin/invite-codes">招待コード</Link>
+                </li>
+                <li>
+                  <Link to="/admin/bull-board" reloadDocument>
+                    ジョブキュー
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </li>
         <li>

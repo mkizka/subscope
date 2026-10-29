@@ -55,6 +55,6 @@ export class RegisterAdminUseCase {
       await this.subscriptionRepository.save({ ctx, subscription });
     });
 
-    await this.jobScheduler.scheduleAddTapRepo(params.requesterDid);
+    await this.jobScheduler.scheduleSyncTapRepo(params.requesterDid);
   }
 }

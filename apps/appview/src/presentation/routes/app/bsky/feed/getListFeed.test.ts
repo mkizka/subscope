@@ -32,7 +32,7 @@ describe("app.bsky.feed.getListFeed", () => {
     return { actor, post };
   };
 
-  test("getListFeed-1: リストのメンバーとメンバー以外の投稿がある場合、メンバーの投稿のみをfeedViewPostとして返す", async () => {
+  test("getListFeed-1: リストのメンバーの投稿だけをfeedViewPostで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const member = await createPost();

@@ -12,7 +12,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.searchPosts", () => {
   const { ctx } = testSetup;
 
-  test("searchPosts-1: クエリに一致する投稿がある場合、その投稿をpostViewとして返す", async () => {
+  test("searchPosts-1: 本文がクエリに一致する投稿をpostViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await actorFactory(ctx.db)

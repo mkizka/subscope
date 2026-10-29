@@ -19,6 +19,8 @@ import type { IPostRepository } from "../../interfaces/repositories/post-reposit
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
+const REPLY_NOTIFICATION_DEPTH = 4;
+
 export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
@@ -72,21 +74,29 @@ export class PostIndexer implements ICollectionIndexer {
     const mentionDids = (record.validate("app.bsky.feed.post").facets ?? [])
       .flatMap((facet) => facet.features)
       .flatMap((feature) => ("did" in feature ? [feature.did] : []));
+    const replySubjects = [];
+    for (
+      let uri = post.replyParent?.uri ?? null;
+      uri && replySubjects.length < REPLY_NOTIFICATION_DEPTH;
+      uri = await this.postRepository.findReplyParentUri(ctx, uri)
+    ) {
+      replySubjects.push(uri);
+    }
     const candidates = [
-      post.replyParent && {
-        recipientDid: post.replyParent.uri.hostname,
-        reason: "reply" as const,
-        reasonSubject: post.replyParent.uri.toString(),
-      },
+      ...mentionDids.map((did) => ({
+        recipientDid: did,
+        reason: "mention" as const,
+        reasonSubject: null,
+      })),
       quoteUri?.collection === "app.bsky.feed.post" && {
         recipientDid: quoteUri.hostname,
         reason: "quote" as const,
         reasonSubject: quoteUri.toString(),
       },
-      ...mentionDids.map((did) => ({
-        recipientDid: did,
-        reason: "mention" as const,
-        reasonSubject: null,
+      ...replySubjects.map((uri) => ({
+        recipientDid: uri.hostname,
+        reason: "reply" as const,
+        reasonSubject: uri.toString(),
       })),
     ];
 

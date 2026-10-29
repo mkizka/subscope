@@ -12,7 +12,6 @@ import getSubscriptionStatus, {
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 import { data, redirect } from "react-router";
 
-import { HomePage } from "@/app/features/home/pages/home";
 import {
   countGraphemes,
   isReplyRule,
@@ -21,9 +20,10 @@ import {
   type ReplyRule,
 } from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
-import { TimelinePage } from "@/app/features/timeline/pages/timeline";
 import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
+import { HomePage } from "@/app/pages/home-page";
+import { TimelinePage } from "@/app/pages/timeline-page";
 import { env } from "@/app/shared/env";
 
 import type { Route } from "./+types/_index";

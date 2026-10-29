@@ -28,7 +28,7 @@ describe("IndexCommitUseCase", () => {
   const jobLogger = { log: vi.fn() };
 
   describe("create/updateオペレーション", () => {
-    test("有効なpost作成オペレーションの場合、レコードがインデックスされる", async () => {
+    test("index-1: 作成・更新されたレコードを保存する", async () => {
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);
@@ -75,7 +75,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("deleteオペレーション", () => {
-    test("削除オペレーションの場合、レコードを削除する", async () => {
+    test("index-2: 削除されたレコードを削除する", async () => {
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);
@@ -128,7 +128,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("RecordValidationError", () => {
-    test("RecordValidationErrorが発生した場合、エラーメッセージをログに記録して正常終了する", async () => {
+    test("index-3: Lexiconのスキーマに合わないレコードはジョブを失敗させずにスキップする", async () => {
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);

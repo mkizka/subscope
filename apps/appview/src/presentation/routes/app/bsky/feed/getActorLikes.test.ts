@@ -14,7 +14,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getActorLikes", () => {
   const { ctx } = testSetup;
 
-  test("getActorLikes-1: いいねした投稿がある場合、その投稿をfeedViewPostとして返す", async () => {
+  test("getActorLikes-1: 指定したアクターがいいねした投稿をfeedViewPostで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db).create();

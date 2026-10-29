@@ -80,7 +80,7 @@ describe("commit", () => {
     return post ?? null;
   };
 
-  test("commit-1: 削除したレコードは、削除より古いrevのコミットで復活させない", async () => {
+  test("index-5: 削除したレコードは、削除より古いrevのコミットで復活させない", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .use((t) => t.subscriber())
@@ -94,7 +94,7 @@ describe("commit", () => {
     expect(await findPost(actor.did)).toBeNull();
   });
 
-  test("commit-2: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない", async () => {
+  test("index-6: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .use((t) => t.subscriber())
@@ -108,7 +108,7 @@ describe("commit", () => {
     expect((await findPost(actor.did))?.text).toBe("new");
   });
 
-  test("commit-3: revを持たないコミットは、revを比べずに処理する", async () => {
+  test("index-7: revを持たないコミットは、revを比べずに処理する", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
       .use((t) => t.subscriber())
