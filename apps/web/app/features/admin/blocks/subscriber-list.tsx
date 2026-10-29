@@ -54,7 +54,10 @@ export function SubscriberList({
               <div className="truncate font-medium">
                 {subscriber.displayName ?? subscriber.handle}
               </div>
-              <div className="truncate text-sm text-base-content/70">
+              <div
+                className="truncate text-sm text-base-content/70"
+                title={subscriber.did}
+              >
                 @{subscriber.handle}
               </div>
             </div>

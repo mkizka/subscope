@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
-import { subscribeServer } from "./pds";
+import { resolveHandle, subscribeServer } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -21,12 +21,14 @@ test.describe("登録ユーザー", () => {
     page,
   }) => {
     await login(page);
+    const aliceDid = await resolveHandle("alice.test");
+
     await page.goto("/admin/subscribers");
 
     const row = page
       .getByRole("main")
       .getByRole("listitem")
-      .filter({ hasText: "@alice.test" });
+      .filter({ has: page.getByTitle(aliceDid) });
     await expect(row.getByText("管理者")).toBeVisible();
   });
 
@@ -38,13 +40,14 @@ test.describe("登録ユーザー", () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
     await subscribeServer("bob.test", code);
+    const bobDid = await resolveHandle("bob.test");
 
     await page.goto("/admin/subscribers");
 
     const row = page
       .getByRole("main")
       .getByRole("listitem")
-      .filter({ hasText: "@bob.test" });
+      .filter({ has: page.getByTitle(bobDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
     page.once("dialog", (dialog) => void dialog.accept());
