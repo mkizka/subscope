@@ -54,7 +54,7 @@ describe("SubscribeServerUseCase", () => {
     });
     const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).toEqual(now);
-    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+    expect(jobScheduler.getSyncTapRepoJobs()).toContainEqual(
       expect.objectContaining({ did: asDid(actor.did) }),
     );
   });
@@ -180,7 +180,7 @@ describe("SubscribeServerUseCase", () => {
       inviteCode: inviteCode.code,
       createdAt: now,
     });
-    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+    expect(jobScheduler.getSyncTapRepoJobs()).toContainEqual(
       expect.objectContaining({ did }),
     );
   });
@@ -204,7 +204,7 @@ describe("SubscribeServerUseCase", () => {
       inviteCode: null,
       createdAt: now,
     });
-    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+    expect(jobScheduler.getSyncTapRepoJobs()).toContainEqual(
       expect.objectContaining({ did: asDid(admin.did) }),
     );
   });

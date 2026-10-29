@@ -1,11 +1,12 @@
 import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
+  postFactory,
   recordFactory,
   subscriptionFactory,
 } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
-import { beforeEach, describe, expect, test } from "vitest";
+import { assert, beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
@@ -162,41 +163,29 @@ describe("PostIndexer", () => {
       expect(feedItem?.sortAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
     });
 
-    test("サブスクライバー宛てのリプライ・引用・メンションの通知を作成する", async () => {
+    const mention = (did: string) => ({
+      index: { byteStart: 0, byteEnd: 1 },
+      features: [{ $type: "app.bsky.richtext.facet#mention", did }],
+    });
+
+    test("notify-7: 引用された投稿の作者に quote の、メンションされたアカウントに mention の通知を作る", async () => {
       const ctx = { db };
       // arrange
-      const author = actorFactory();
-      const replied = actorFactory();
       const quoted = actorFactory();
-      const nonSubscriber = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: replied.did }));
+      const mentioned = actorFactory();
       subscriptionRepo.add(subscriptionFactory({ actorDid: quoted.did }));
-      subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
-      const parentUri = `at://${replied.did}/app.bsky.feed.post/parent`;
+      subscriptionRepo.add(subscriptionFactory({ actorDid: mentioned.did }));
       const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
-      const cid = await randomCid();
-      const mention = (did: string) => ({
-        index: { byteStart: 0, byteEnd: 1 },
-        features: [{ $type: "app.bsky.richtext.facet#mention", did }],
-      });
       const record = recordFactory({
-        uri: `at://${author.did}/app.bsky.feed.post/notify`,
+        uri: `at://${actorFactory().did}/app.bsky.feed.post/notify`,
         json: {
           $type: "app.bsky.feed.post",
           text: "@",
-          reply: {
-            root: { uri: parentUri, cid },
-            parent: { uri: parentUri, cid },
-          },
           embed: {
             $type: "app.bsky.embed.record",
-            record: { uri: quotedUri, cid },
+            record: { uri: quotedUri, cid: await randomCid() },
           },
-          facets: [
-            mention(replied.did),
-            mention(nonSubscriber.did),
-            mention(author.did),
-          ],
+          facets: [mention(mentioned.did)],
           createdAt: new Date().toISOString(),
         },
       });
@@ -206,17 +195,94 @@ describe("PostIndexer", () => {
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
-        {
-          recipientDid: replied.did,
-          reason: "reply",
-          reasonSubject: parentUri,
-        },
-        {
-          recipientDid: quoted.did,
-          reason: "quote",
-          reasonSubject: quotedUri,
-        },
+        { recipientDid: mentioned.did, reason: "mention" },
+        { recipientDid: quoted.did, reason: "quote", reasonSubject: quotedUri },
       ]);
+    });
+
+    test("notify-8: 1つの投稿から同じ相手への通知は mention > quote > reply の優先順で1件にする", async () => {
+      const ctx = { db };
+      // arrange
+      const mentioned = actorFactory();
+      const quoted = actorFactory();
+      subscriptionRepo.add(subscriptionFactory({ actorDid: mentioned.did }));
+      subscriptionRepo.add(subscriptionFactory({ actorDid: quoted.did }));
+      const author = actorFactory();
+      const cid = await randomCid();
+      const postRecord = (rkey: string, did: string, withMention: boolean) => {
+        const subject = { uri: `at://${did}/app.bsky.feed.post/subject`, cid };
+        return recordFactory({
+          uri: `at://${author.did}/app.bsky.feed.post/${rkey}`,
+          json: {
+            $type: "app.bsky.feed.post",
+            text: "@",
+            reply: { root: subject, parent: subject },
+            embed: { $type: "app.bsky.embed.record", record: subject },
+            facets: withMention ? [mention(did)] : [],
+            createdAt: new Date().toISOString(),
+          },
+        });
+      };
+
+      // act
+      for (const record of [
+        postRecord("mention", mentioned.did, true),
+        postRecord("quote", quoted.did, false),
+      ]) {
+        await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+      }
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject([
+        { recipientDid: mentioned.did, reason: "mention" },
+        { recipientDid: quoted.did, reason: "quote" },
+      ]);
+    });
+
+    test("notify-6: リプライの親投稿を含めて4つ上までの投稿の作者に reply の通知を作る", async () => {
+      const ctx = { db };
+      // arrange
+      const ancestors = [];
+      for (let i = 0; i < 5; i++) {
+        const actor = actorFactory();
+        subscriptionRepo.add(subscriptionFactory({ actorDid: actor.did }));
+        const { post } = postFactory({
+          actorDid: actor.did,
+          uri: `at://${actor.did}/app.bsky.feed.post/ancestor${i}`,
+          replyParent: ancestors[0] && {
+            uri: ancestors[0].uri,
+            cid: ancestors[0].cid,
+          },
+        });
+        postRepo.add(post);
+        ancestors.unshift(post);
+      }
+      const [parent] = ancestors;
+      assert(parent);
+      const record = recordFactory({
+        uri: `at://${actorFactory().did}/app.bsky.feed.post/reply`,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "reply",
+          reply: {
+            root: { uri: parent.uri.toString(), cid: parent.cid },
+            parent: { uri: parent.uri.toString(), cid: parent.cid },
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject(
+        ancestors.slice(0, 4).map((ancestor) => ({
+          recipientDid: ancestor.actorDid,
+          reason: "reply",
+          reasonSubject: ancestor.uri.toString(),
+        })),
+      );
     });
   });
 

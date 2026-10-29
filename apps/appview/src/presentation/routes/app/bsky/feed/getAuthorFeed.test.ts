@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getAuthorFeed", () => {
   const { ctx } = testSetup;
 
-  test("getAuthorFeed-1: アクターをハンドルで指定した場合、そのアクターの投稿をfeedViewPostとして返す", async () => {
+  test("getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await actorFactory(ctx.db)
@@ -43,7 +43,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     ]);
   });
 
-  test("getAuthorFeed-2: 解決できないハンドルを指定した場合、400を返す", async () => {
+  test("getAuthorFeed-2: 解決できないハンドルには400を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 

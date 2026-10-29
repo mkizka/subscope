@@ -4,7 +4,7 @@ import { login } from "./login";
 import { createRecord, putRecord } from "./pds";
 
 test.describe("プロフィール", () => {
-  test("profile-1: 左カラムの「プロフィール」を選ぶと、中央カラムに自分のプロフィール（名前、ハンドル、フォロー数、フォロワー数、投稿一覧）が出る", async ({
+  test("profile-1: 左カラムの「プロフィール」から、中央カラムに自分のプロフィール（名前、ハンドル、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
     page,
   }) => {
     const text = `profile-1の投稿 ${Date.now()}`;
@@ -37,7 +37,7 @@ test.describe("プロフィール", () => {
       await page.goto("/?profile=alice.test");
     });
 
-    test("profile-2: URLの ?profile=ハンドル で、右カラムにそのユーザーのプロフィールの簡易表示が開く", async ({
+    test("profile-2: URLに ?profile=ハンドル があると、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
       page,
     }) => {
       const panel = page.getByRole("region", { name: "プロフィール" });
@@ -45,7 +45,7 @@ test.describe("プロフィール", () => {
       await expect(panel.getByText("フォロワー")).toBeVisible();
     });
 
-    test("profile-3: 簡易表示を閉じると、右カラムが通知に戻る", async ({
+    test("profile-3: 簡易表示を閉じると、右カラムを通知に戻す", async ({
       page,
     }) => {
       await page.getByRole("link", { name: "閉じる" }).click();

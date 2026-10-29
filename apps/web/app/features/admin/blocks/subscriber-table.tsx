@@ -1,18 +1,4 @@
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/app/components/ui/table";
 
 export type Subscriber = {
   did: string;
@@ -38,38 +24,34 @@ export function SubscriberTable({
 }: Props) {
   return (
     <>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-2xl font-bold">
-            登録アカウント一覧
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ユーザー</TableHead>
-                <TableHead>DID</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <div className="card border border-base-300 bg-base-100">
+        <h2 className="card-title p-6 pb-2 text-2xl">登録アカウント一覧</h2>
+        <div className="overflow-x-auto">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>ユーザー</th>
+                <th>DID</th>
+              </tr>
+            </thead>
+            <tbody>
               {!isLoading && subscribers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={2} className="py-8 text-center">
+                <tr>
+                  <td colSpan={2} className="py-8 text-center">
                     登録アカウントはまだありません
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               )}
               {isLoading && (
-                <TableRow>
-                  <TableCell colSpan={2} className="py-8 text-center">
+                <tr>
+                  <td colSpan={2} className="py-8 text-center">
                     読み込み中...
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               )}
               {subscribers.map((subscriber) => (
-                <TableRow key={subscriber.did}>
-                  <TableCell>
+                <tr key={subscriber.did}>
+                  <td>
                     <div className="flex items-center gap-3">
                       {subscriber.avatar ? (
                         <img
@@ -78,7 +60,7 @@ export function SubscriberTable({
                           className="size-8 rounded-full"
                         />
                       ) : (
-                        <div className="size-8 rounded-full bg-muted" />
+                        <div className="size-8 rounded-full bg-base-200" />
                       )}
                       <div className="flex flex-col">
                         {subscriber.displayName && (
@@ -86,23 +68,21 @@ export function SubscriberTable({
                             {subscriber.displayName}
                           </span>
                         )}
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-base-content/70">
                           @{subscriber.handle}
                         </span>
                       </div>
                     </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs">
-                    {subscriber.did}
-                  </TableCell>
-                </TableRow>
+                  </td>
+                  <td className="font-mono text-xs">{subscriber.did}</td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
+      </div>
       {isFetchingNextPage && (
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="mt-4 text-center text-sm text-base-content/70">
           読み込み中...
         </p>
       )}

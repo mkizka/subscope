@@ -10,7 +10,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.notification.updateSeen", () => {
   const { ctx } = testSetup;
 
-  test("updateSeen-1: 認証がない場合、401を返す", async () => {
+  test("updateSeen-1: 認証がないリクエストには401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 

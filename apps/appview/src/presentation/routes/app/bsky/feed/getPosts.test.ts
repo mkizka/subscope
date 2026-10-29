@@ -28,7 +28,7 @@ describe("app.bsky.feed.getPosts", () => {
       })
       .create();
 
-  test("getPosts-1: 複数のURIを指定した場合、指定した順に投稿を返し、存在しない投稿は除外する", async () => {
+  test("getPosts-1: 指定したURIの順に投稿を並べる", async () => {
     // arrange
     const { client } = await setupApiTest();
     const first = await createPost();
@@ -36,14 +36,27 @@ describe("app.bsky.feed.getPosts", () => {
 
     // act
     const res = await client.call(getPosts, {
-      uris: [
-        asAtUriString(second.uri),
-        "at://did:plc:notfound/app.bsky.feed.post/notfound",
-        asAtUriString(first.uri),
-      ],
+      uris: [asAtUriString(second.uri), asAtUriString(first.uri)],
     });
 
     // assert
     expect(res.posts.map((post) => post.uri)).toEqual([second.uri, first.uri]);
+  });
+
+  test("getPosts-2: 存在しない投稿は含めない", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const post = await createPost();
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [
+        "at://did:plc:notfound/app.bsky.feed.post/notfound",
+        asAtUriString(post.uri),
+      ],
+    });
+
+    // assert
+    expect(res.posts.map((post) => post.uri)).toEqual([post.uri]);
   });
 });
