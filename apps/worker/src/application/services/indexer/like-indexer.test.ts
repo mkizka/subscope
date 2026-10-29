@@ -61,36 +61,49 @@ describe("LikeIndexer", () => {
     });
 
     test.each([
-      { isSubscriber: true, expected: 1 },
-      { isSubscriber: false, expected: 0 },
-    ])(
-      "投稿者がサブスクライバーなら通知を作成する(isSubscriber=$isSubscriber)",
-      async ({ isSubscriber, expected }) => {
-        // arrange
-        const liker = actorFactory();
-        const author = actorFactory();
-        if (isSubscriber) {
-          subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
-        }
-        const record = recordFactory({
-          uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
-          json: {
-            $type: "app.bsky.feed.like",
-            subject: {
-              uri: `at://${author.did}/app.bsky.feed.post/123`,
-              cid: fakeCid(),
-            },
-            createdAt: new Date().toISOString(),
-          },
-        });
-
-        // act
-        await likeIndexer.upsert({ ctx: { db }, record });
-
-        // assert
-        expect(notificationRepo.findAll()).toHaveLength(expected);
+      {
+        name: "notify-1: 通知はサブスクライバー宛てにだけ作る",
+        isSubscriber: false,
+        isSelf: false,
+        expected: [],
       },
-    );
+      {
+        name: "notify-2: 自分自身の操作では通知を作らない",
+        isSubscriber: true,
+        isSelf: true,
+        expected: [],
+      },
+      {
+        name: "notify-3: いいねされた投稿の作者に like の通知を作る",
+        isSubscriber: true,
+        isSelf: false,
+        expected: [{ reason: "like" }],
+      },
+    ])("$name", async ({ isSubscriber, isSelf, expected }) => {
+      // arrange
+      const liker = actorFactory();
+      const author = isSelf ? liker : actorFactory();
+      if (isSubscriber) {
+        subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
+      }
+      const record = recordFactory({
+        uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
+        json: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: `at://${author.did}/app.bsky.feed.post/123`,
+            cid: fakeCid(),
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await likeIndexer.upsert({ ctx: { db }, record });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject(expected);
+    });
   });
 
   describe("afterAction", () => {
