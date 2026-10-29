@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getPostThread", () => {
   const { ctx } = testSetup;
 
-  test("getPostThread-1: 親投稿とリプライがある投稿を指定した場合、それらを含むthreadViewPostを返す", async () => {
+  test("getPostThread-1: 指定した投稿の親投稿とリプライをthreadViewPostに含める", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await actorFactory(ctx.db)
@@ -48,7 +48,7 @@ describe("app.bsky.feed.getPostThread", () => {
     });
   });
 
-  test("getPostThread-2: 存在しない投稿を指定した場合、400 NotFoundを返す", async () => {
+  test("getPostThread-2: 存在しない投稿には400とNotFoundを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 
