@@ -1,8 +1,9 @@
-import { BellIcon, MenuIcon, XIcon } from "lucide-react";
+import { MenuIcon, XIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
+import { NotificationBellContainer } from "@/app/features/notification/blocks/notification-bell-container";
 import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
 import { ProfilePanelContainer } from "@/app/features/profile/blocks/profile-panel-container";
 import { cn } from "@/app/lib/utils";
@@ -43,13 +44,7 @@ export const ThreeColumnLayout = ({ children }: Props) => {
               <MenuIcon />
             </label>
             <div className="flex-1 font-bold text-primary">Subscope</div>
-            <label
-              htmlFor="notification-toggle"
-              aria-label="通知を開く"
-              className="btn btn-square btn-ghost"
-            >
-              <BellIcon />
-            </label>
+            <NotificationBellContainer />
           </header>
           {children}
         </main>

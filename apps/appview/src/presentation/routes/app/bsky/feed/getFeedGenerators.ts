@@ -1,5 +1,6 @@
+import type { LexRouter } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
-import type { Server } from "@repo/client/server";
+import getFeedGenerators from "@repo/client/lex/app/bsky/feed/getFeedGenerators";
 
 import type { GetFeedGeneratorsUseCase } from "../../../../../application/use-cases/feed/get-feed-generators-use-case.js";
 
@@ -9,17 +10,14 @@ export class GetFeedGenerators {
   ) {}
   static inject = ["getFeedGeneratorsUseCase"] as const;
 
-  handle(server: Server) {
-    server.app.bsky.feed.getFeedGenerators({
-      handler: async ({ params }) => {
-        const feeds = await this.getFeedGeneratorsUseCase.execute(
-          params.feeds.map((uri) => new AtUri(uri)),
-        );
-        return {
-          encoding: "application/json",
-          body: { feeds },
-        };
-      },
+  handle(router: LexRouter) {
+    router.add(getFeedGenerators, async ({ params }) => {
+      const feeds = await this.getFeedGeneratorsUseCase.execute(
+        params.feeds.map((uri) => new AtUri(uri)),
+      );
+      return {
+        body: { feeds },
+      };
     });
   }
 }

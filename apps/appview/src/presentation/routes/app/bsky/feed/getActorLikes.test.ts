@@ -1,3 +1,5 @@
+import { asAtIdentifierString } from "@atproto/syntax";
+import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 import {
   actorFactory,
   likeFactory,
@@ -38,10 +40,12 @@ describe("app.bsky.feed.getActorLikes", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.getActorLikes({ actor: actor.did });
+    const res = await client.call(getActorLikes, {
+      actor: asAtIdentifierString(actor.did),
+    });
 
     // assert
-    expect(res.data.feed).toMatchObject([
+    expect(res.feed).toMatchObject([
       { post: { uri: post.uri, author: { did: author.did } } },
     ]);
   });

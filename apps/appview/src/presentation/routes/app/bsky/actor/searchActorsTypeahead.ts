@@ -16,7 +16,7 @@ export class SearchActorsTypeahead {
 
   handle(router: LexRouter) {
     router.add(searchActorsTypeahead, {
-      auth: (ctx) => this.authVerifierMiddleware.lexOptionalAuth(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
         const result = await this.searchActorsTypeaheadUseCase.execute({
           query: params.q,
