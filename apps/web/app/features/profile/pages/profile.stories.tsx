@@ -23,6 +23,9 @@ const meta = {
       },
     ],
   },
+  parameters: {
+    layout: "fullscreen",
+  },
 } satisfies Meta<typeof ProfilePage>;
 
 export default meta;
