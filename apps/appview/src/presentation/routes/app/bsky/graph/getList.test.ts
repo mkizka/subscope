@@ -14,7 +14,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.graph.getList", () => {
   const { ctx } = testSetup;
 
-  test("getList-1: リストを指定した場合、そのリストのlistViewをlist、追加されたアクターのprofileViewをitemsのsubjectとして返す", async () => {
+  test("getList-1: 指定したリストのlistViewと、リストに追加されたアクターのprofileViewをitemsで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const creator = await actorFactory(ctx.db)
@@ -49,7 +49,7 @@ describe("app.bsky.graph.getList", () => {
     ]);
   });
 
-  test("getList-2: 存在しないリストを指定した場合、400を返す", async () => {
+  test("getList-2: 保存されていないリストには400を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 

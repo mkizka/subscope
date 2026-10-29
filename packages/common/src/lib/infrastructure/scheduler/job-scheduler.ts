@@ -5,6 +5,7 @@ import type { IJobQueue, JobData } from "../../domain/interfaces/job-queue.js";
 import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
+const SYNC_TAP_REPO_DELAY_MS = 10 * 1000;
 
 export class JobScheduler implements IJobScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
@@ -42,21 +43,12 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleAddTapRepo(did: Did): Promise<void> {
+  async scheduleSyncTapRepo(did: Did): Promise<void> {
     await this.jobQueue.add({
-      queueName: "addTapRepo",
+      queueName: "syncTapRepo",
       jobName: did,
       data: did,
-      options: { jobId: did },
-    });
-  }
-
-  async scheduleRemoveTapRepo(did: Did): Promise<void> {
-    await this.jobQueue.add({
-      queueName: "removeTapRepo",
-      jobName: did,
-      data: did,
-      options: { jobId: did },
+      options: { delay: SYNC_TAP_REPO_DELAY_MS },
     });
   }
 

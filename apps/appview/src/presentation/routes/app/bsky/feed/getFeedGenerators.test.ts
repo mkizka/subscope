@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getFeedGenerators", () => {
   const { ctx } = testSetup;
 
-  test("getFeedGenerators-1: 存在するフィードジェネレーターを指定した場合、そのgeneratorViewを返す", async () => {
+  test("getFeedGenerators-1: 指定したフィードジェネレーターをgeneratorViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const creator = await actorFactory(ctx.db)

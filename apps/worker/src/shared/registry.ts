@@ -46,12 +46,11 @@ import { ListItemIndexer } from "../application/services/indexer/list-item-index
 import { PostIndexer } from "../application/services/indexer/post-indexer.js";
 import { ProfileIndexer } from "../application/services/indexer/profile-indexer.js";
 import { RepostIndexer } from "../application/services/indexer/repost-indexer.js";
-import { AddTapRepoUseCase } from "../application/use-cases/async/add-tap-repo-use-case.js";
 import { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
 import { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
-import { RemoveTapRepoUseCase } from "../application/use-cases/async/remove-tap-repo-use-case.js";
 import { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
+import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
@@ -134,9 +133,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsRepository", "postRepository", "db"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
-    .service("addTapRepoUseCase", ["tapClient"], asClassArgs(AddTapRepoUseCase))
-    .service("removeTapRepoUseCase", ["tapClient"], asClassArgs(RemoveTapRepoUseCase))
-    .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "addTapRepoUseCase", "removeTapRepoUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
+    .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "db"], asClassArgs(SyncTapRepoUseCase))
+    .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("workerServer", ["loggerManager", "syncWorker", "healthRouter", "port"], asClassArgs(WorkerServer));

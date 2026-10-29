@@ -49,7 +49,7 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.actorDid,
     );
     if (isFollowerSubscriber) {
-      await this.jobScheduler.scheduleAddTapRepo(follow.subjectDid);
+      await this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid);
     }
 
     if (
@@ -91,19 +91,11 @@ export class FollowIndexer implements ICollectionIndexer {
       "followers",
     );
 
-    if (action === "delete") {
-      const isFollowerSubscriber =
-        await this.subscriptionRepository.isSubscriber(ctx, follow.actorDid);
-      if (!isFollowerSubscriber) return;
-
-      const isStillFollowed =
-        await this.followRepository.isFollowedByAnySubscriber({
-          ctx,
-          subjectDid: follow.subjectDid,
-        });
-      if (isStillFollowed) return;
-
-      await this.jobScheduler.scheduleRemoveTapRepo(follow.subjectDid);
+    if (
+      action === "delete" &&
+      (await this.subscriptionRepository.isSubscriber(ctx, follow.actorDid))
+    ) {
+      await this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid);
     }
   }
 }

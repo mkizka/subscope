@@ -8,7 +8,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.actor.getProfiles", () => {
   const { ctx } = testSetup;
 
-  test("getProfiles-1: DIDとハンドルを混在して指定した場合、解決できたアクターのprofileViewDetailedを指定順に返す", async () => {
+  test("getProfiles-1: DIDとハンドルのどちらでも指定でき、見つかったアクターだけを指定した順に返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const alice = await actorFactory(ctx.db)

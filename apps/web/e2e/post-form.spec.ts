@@ -20,7 +20,7 @@ test.describe("投稿欄", () => {
     await page.getByRole("button", { name: "いまどうしてる？" }).click();
   });
 
-  test("post-form-1: 畳んだ投稿欄をクリックすると広がり、投稿した内容がタイムラインの一番下に表示される", async ({
+  test("post-form-1: 畳んだ投稿欄はクリックで広がり、投稿した内容をタイムラインの一番下に表示する", async ({
     page,
     request,
   }) => {
@@ -50,7 +50,7 @@ test.describe("投稿欄", () => {
     }).toPass();
   });
 
-  test("post-form-2: 300字を超えると投稿ボタンを押せない", async ({ page }) => {
+  test("post-form-2: 300字を超えると投稿できない", async ({ page }) => {
     const textbox = page.getByRole("textbox", { name: "投稿内容" });
     const submit = page.getByRole("button", { name: "投稿", exact: true });
 
@@ -60,7 +60,7 @@ test.describe("投稿欄", () => {
     await expect(submit).toBeDisabled();
   });
 
-  test("post-form-3: 画像を添付してALTを入力して投稿すると、タイムラインの投稿にALT付きの画像が表示される", async ({
+  test("post-form-3: 画像にALTを付けて添付でき、タイムラインの投稿にALT付きで表示する", async ({
     page,
   }) => {
     const alt = `post-form-3: ${Date.now()}`;
@@ -76,9 +76,7 @@ test.describe("投稿欄", () => {
     }).toPass();
   });
 
-  test("post-form-4: 画像は4枚まで添付でき、4枚添付すると画像を追加できない", async ({
-    page,
-  }) => {
+  test("post-form-4: 画像は4枚まで添付できる", async ({ page }) => {
     const input = page.getByLabel("画像を追加");
     await input.setInputFiles(
       ["1", "2", "3", "4"].map((n) => image(`${n}.png`)),
@@ -87,7 +85,7 @@ test.describe("投稿欄", () => {
     await expect(page.getByRole("textbox", { name: /のALT$/ })).toHaveCount(4);
     await expect(input).toBeDisabled();
   });
-  test("post-form-5: 返信できる人を選んで投稿すると、投稿と同じrkeyのthreadgateにその設定が保存される", async ({
+  test("post-form-5: 返信できる人の設定は、投稿と同じrkeyのthreadgateに保存する", async ({
     page,
     request,
   }) => {

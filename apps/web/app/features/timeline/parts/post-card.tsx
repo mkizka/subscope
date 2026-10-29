@@ -1,5 +1,6 @@
 import { RepeatIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 export type PostCardProps = {
   authorAvatar?: string;
@@ -16,6 +17,7 @@ export type PostCardProps = {
     byHandle: string;
   };
   toolbar?: ReactNode;
+  threadSearch?: string;
 };
 
 function formatRelativeTime(dateString: string) {
@@ -45,9 +47,17 @@ export function PostCard({
   images,
   reasonRepost,
   toolbar,
+  threadSearch,
 }: PostCardProps) {
   return (
     <article className="group relative border-b border-base-300 px-4 py-3">
+      {threadSearch && (
+        <Link
+          to={{ search: threadSearch }}
+          aria-label="スレッドを開く"
+          className="absolute inset-0"
+        />
+      )}
       {toolbar}
       {reasonRepost && (
         <div

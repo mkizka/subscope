@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
-import { AdminLayout } from "@/app/features/admin/pages/admin";
 import { adminRequiredMiddleware } from "@/app/middlewares/auth";
+import { AdminPage } from "@/app/pages/admin-page";
 
 import type { Route } from "./+types/admin";
 
@@ -13,8 +13,8 @@ export function meta() {
 
 export default function Admin() {
   return (
-    <AdminLayout>
+    <AdminPage>
       <Outlet />
-    </AdminLayout>
+    </AdminPage>
   );
 }
