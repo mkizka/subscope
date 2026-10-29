@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import getList from "@repo/client/lex/app/bsky/graph/getList";
 import {
   actorFactory,
   listFactory,
@@ -34,15 +36,15 @@ describe("app.bsky.graph.getList", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.graph.getList({ list: list.uri });
+    const res = await client.call(getList, { list: asAtUriString(list.uri) });
 
     // assert
-    expect(res.data.list).toMatchObject({
+    expect(res.list).toMatchObject({
       uri: list.uri,
       name: list.name,
       creator: { did: creator.did },
     });
-    expect(res.data.items).toMatchObject([
+    expect(res.items).toMatchObject([
       { uri: listItem.uri, subject: { did: subject.did } },
     ]);
   });
@@ -52,8 +54,8 @@ describe("app.bsky.graph.getList", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.graph.getList({
-      list: "at://did:plc:notfound/app.bsky.graph.list/notfound",
+    const promise = client.call(getList, {
+      list: asAtUriString("at://did:plc:notfound/app.bsky.graph.list/notfound"),
     });
 
     // assert
