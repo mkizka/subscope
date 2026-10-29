@@ -139,7 +139,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply font-sans bg-background text-foreground h-svh;
+    @apply font-sans bg-base-100 text-base-content h-svh;
   }
   html {
     @apply font-sans;

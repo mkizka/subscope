@@ -11,7 +11,6 @@ import {
 } from "./table";
 
 const meta = {
-  title: "ui/Table",
   component: Table,
   render: () => (
     <Table>
