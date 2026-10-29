@@ -9,7 +9,7 @@ test.describe("ログイン", () => {
     await login(page);
 
     await expect(
-      page.getByRole("heading", { name: "登録が完了しました" }),
+      page.getByRole("navigation").getByRole("link", { name: "登録ユーザー" }),
     ).toBeVisible();
   });
 });

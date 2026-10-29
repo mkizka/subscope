@@ -188,6 +188,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getSubscribers-2: 管理者でないアカウントからのリクエストには403を返す
 - getSubscribers-3: サブスクライバーごとにprofileViewと管理者かどうかを返す
 
+## me.subsco.admin.grantAdmin
+
+指定したサブスクライバーを管理者にする。管理者の認証が必要。
+
+- grantAdmin-1: 指定したサブスクライバーを管理者にする
+- grantAdmin-2: サブスクライバーでないアクターには400とNotSubscribedを返す
+
 ## me.subsco.admin.createInviteCode
 
 daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
