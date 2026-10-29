@@ -163,7 +163,7 @@ describe("PostIndexer", () => {
       expect(feedItem?.sortAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
     });
 
-    test("サブスクライバー宛てのリプライ・引用・メンションの通知を作成する", async () => {
+    test("notification-2: サブスクライバー宛ての通知を、同じ受信者にはmention > quote > replyの優先順で1件作成する", async () => {
       const ctx = { db };
       // arrange
       const author = actorFactory();
@@ -209,8 +209,8 @@ describe("PostIndexer", () => {
       expect(notificationRepo.findAll()).toMatchObject([
         {
           recipientDid: replied.did,
-          reason: "reply",
-          reasonSubject: parentUri,
+          reason: "mention",
+          reasonSubject: null,
         },
         {
           recipientDid: quoted.did,
