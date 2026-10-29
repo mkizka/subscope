@@ -88,7 +88,7 @@ describe("JobScheduler", () => {
   });
 
   describe("scheduleSyncTapRepo", () => {
-    test("syncTapRepoジョブを遅延付きでスケジュールする", async () => {
+    test("syncTapRepoジョブを遅延なしでスケジュールする", async () => {
       // arrange
       const did = "did:plc:test";
 
@@ -102,10 +102,8 @@ describe("JobScheduler", () => {
         queueName: "syncTapRepo",
         jobName: did,
         data: did,
-        options: {
-          delay: 10000,
-        },
       });
+      expect(jobs[0]?.options?.delay).toBeUndefined();
     });
   });
 
