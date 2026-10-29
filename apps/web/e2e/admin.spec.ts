@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
-import { subscribeServer } from "./pds";
+import { resolveHandle, subscribeServer } from "./pds";
 
 const createInviteCode = async (page: Page) => {
   const response = await page.request.post("/admin/api/invite-codes");
@@ -27,7 +27,9 @@ test.describe("登録ユーザー", () => {
     page,
   }) => {
     await login(page);
-    const row = page.getByRole("row", { name: "@alice.test" });
+    const row = page.getByRole("row", {
+      name: await resolveHandle("alice.test"),
+    });
     await expect(async () => {
       await page.goto("/admin/subscribers");
       await expect(row).toBeVisible({ timeout: 1000 });
@@ -44,7 +46,9 @@ test.describe("登録ユーザー", () => {
       await createInviteCode(page),
     );
     expect(subscribed.status).toBe(200);
-    const row = page.getByRole("row", { name: "@bob.test" });
+    const row = page.getByRole("row", {
+      name: await resolveHandle("bob.test"),
+    });
     await expect(async () => {
       await page.goto("/admin/subscribers");
       await expect(row).toBeVisible({ timeout: 1000 });
