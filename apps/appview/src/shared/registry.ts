@@ -144,7 +144,6 @@ import { GetSubscriptionStatus } from "../presentation/routes/me/subsco/sync/get
 import { SubscribeServer } from "../presentation/routes/me/subsco/sync/subscribeServer.js";
 import { UnsubscribeServer } from "../presentation/routes/me/subsco/sync/unsubscribeServer.js";
 import { wellKnownRouterFactory } from "../presentation/routes/well-known.js";
-import { xrpcRouterFactory } from "../presentation/routes/xrpc.js";
 import { AppViewServer } from "../presentation/server.js";
 import type { Env } from "./env.js";
 
@@ -278,9 +277,8 @@ export const createAppRegistry = (env: Env) =>
     .service("subscribeServer", ["subscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(SubscribeServer))
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("xrpcRouter", ["getFeedGenerators", "getLikes", "getPosts", "getRepostedBy"], asFunctionArgs(xrpcRouterFactory))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "createInviteCode", "deleteInviteCode", "getInviteCodes", "registerAdmin", "verifyAccess", "getSetupStatus", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "createInviteCode", "deleteInviteCode", "getInviteCodes", "registerAdmin", "verifyAccess", "getSetupStatus", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
-    .service("appViewServer", ["loggerManager", "lexRouter", "xrpcRouter", "healthRouter", "wellKnownRouter", "port"], asClassArgs(AppViewServer));
+    .service("appViewServer", ["loggerManager", "lexRouter", "healthRouter", "wellKnownRouter", "port"], asClassArgs(AppViewServer));
