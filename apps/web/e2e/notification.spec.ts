@@ -6,7 +6,7 @@ import { createRecord, follow, putRecord, resolveHandle } from "./pds";
 test.describe("通知", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
-  test("notification-6: モバイルでは、未読があるときヘッダーの🔔に未読数が出る", async ({
+  test("notification-6: モバイルでは、未読があるときヘッダーの🔔に未読数を表示する", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -24,7 +24,7 @@ test.describe("通知", () => {
 });
 
 test.describe("通知（PC）", () => {
-  test("notification-2: フォローされると、相手の名前が通知に出る", async ({
+  test("notification-2: フォローの通知には、相手の名前を表示する", async ({
     page,
   }) => {
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -46,7 +46,7 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-1: 自分の投稿がいいね・リポストされると、相手の名前と対象の投稿の本文が通知に出る", async ({
+  test("notification-1: いいね・リポストの通知には、相手の名前と対象の投稿の本文を表示する", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();
@@ -91,7 +91,7 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-3: 自分の投稿にリプライ・引用・メンションされると、その投稿が通知に出る", async ({
+  test("notification-3: リプライ・引用・メンションの通知には、その投稿を表示する", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();
@@ -147,7 +147,7 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-5: 未読の通知は背景色で区別され、通知を開いた後に再表示すると既読になる", async ({
+  test("notification-5: 未読の通知は背景色で区別し、通知を開いた後に再表示すると既読にする", async ({
     page,
   }) => {
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -181,7 +181,7 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-4: 通知は新しい順に並び、下までスクロールすると古い通知を読み込む", async ({
+  test("notification-4: 通知を新しい順に並べ、下までスクロールすると古い通知を読み込む", async ({
     page,
   }) => {
     const post = await createRecord("alice.test", "app.bsky.feed.post", {

@@ -3,8 +3,8 @@ import getSubscriptionStatus, {
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 import { redirect } from "react-router";
 
-import { LoginContainer } from "@/app/features/login/pages/login-container";
 import { getAgent } from "@/app/lib/oauth/session.server";
+import { LoginPage } from "@/app/pages/login-page";
 
 import type { Route } from "./+types/login";
 
@@ -20,5 +20,5 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 };
 
 export default function Login() {
-  return <LoginContainer />;
+  return <LoginPage />;
 }

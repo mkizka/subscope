@@ -57,7 +57,7 @@ describe("FollowIndexer", () => {
       });
     });
 
-    test("フォロイーがサブスクライバーなら通知を作成する", async () => {
+    test("notify-5: フォローされたアカウントに follow の通知を作る", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();

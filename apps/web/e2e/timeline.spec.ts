@@ -33,7 +33,7 @@ const createPosts = async (request: APIRequestContext, texts: string[]) => {
 };
 
 test.describe("タイムライン", () => {
-  test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しい投稿ほど下に並べて表示する", async ({
+  test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しいものほど下に並べる", async ({
     page,
     request,
   }) => {
@@ -50,7 +50,7 @@ test.describe("タイムライン", () => {
     }).toPass();
   });
 
-  test("timeline-4: 開くと最新の投稿までスクロールし、上にスクロールすると表示位置を保ったまま古い投稿を読み込む", async ({
+  test("timeline-4: 開いたときは最新の投稿までスクロールし、上にスクロールすると表示位置を保ったまま古い投稿を読み込む", async ({
     page,
     request,
   }) => {
@@ -80,7 +80,7 @@ test.describe("タイムライン", () => {
     await expect(page.getByText("timeline-4: 投稿6")).toBeInViewport();
   });
 
-  test("timeline-2: いいね数・リポスト数は1以上のときだけ投稿に表示する", async ({
+  test("timeline-2: いいね数・リポスト数は1以上のときだけ表示する", async ({
     page,
   }) => {
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {});
@@ -116,7 +116,7 @@ test.describe("タイムライン", () => {
     await expect(notReacted).not.toContainText("リポスト");
   });
 
-  test("timeline-3: リプライはタイムラインに出さず、親投稿に返信の件数を表示する", async ({
+  test("timeline-3: リプライはタイムラインに含めず、親投稿に返信の件数を表示する", async ({
     page,
   }) => {
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {});
