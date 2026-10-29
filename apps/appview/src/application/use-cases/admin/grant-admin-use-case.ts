@@ -11,7 +11,6 @@ export class GrantAdminUseCase {
     private readonly actorRepository: IActorRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
-  static inject = ["db", "actorRepository", "subscriptionRepository"] as const;
 
   async execute(params: { did: Did }): Promise<void> {
     const subscription = await this.subscriptionRepository.findFirst(

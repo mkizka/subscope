@@ -9,7 +9,6 @@ import type {
 
 export class ActorStatsRepository implements IActorStatsRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findStats(actorDids: string[]): Promise<Map<string, ActorStats>> {
     if (actorDids.length === 0) {

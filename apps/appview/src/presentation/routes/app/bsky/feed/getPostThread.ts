@@ -15,11 +15,6 @@ export class GetPostThread {
     private readonly atUriService: AtUriService,
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = [
-    "getPostThreadUseCase",
-    "atUriService",
-    "authVerifierMiddleware",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(getPostThread, {

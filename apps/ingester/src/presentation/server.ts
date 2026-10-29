@@ -25,15 +25,6 @@ export class IngesterServer {
     this.app.use(healthRouter);
     this.app.use(metricsRouter);
   }
-  static inject = [
-    "loggerManager",
-    "port",
-    "disableIngester",
-    "metricsRouter",
-    "healthRouter",
-    "tapIngester",
-    "labelIngester",
-  ] as const;
 
   start() {
     this.app.listen(this.port, () => {

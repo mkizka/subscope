@@ -10,7 +10,6 @@ export class GetSubscriptionStatusUseCase {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
-  static inject = ["subscriptionRepository"] as const;
 
   async execute(params: GetSubscriptionStatusParams) {
     const subscription = await this.subscriptionRepository.findFirst(

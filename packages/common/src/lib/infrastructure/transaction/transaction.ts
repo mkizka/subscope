@@ -6,7 +6,6 @@ import type {
 
 export class TransactionManager implements ITransactionManager {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async transaction<T>(
     fn: (ctx: AfterCommitContext) => Promise<T>,

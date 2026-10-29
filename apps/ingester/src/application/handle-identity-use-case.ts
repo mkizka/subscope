@@ -14,7 +14,6 @@ export class HandleIdentityUseCase {
   ) {
     this.logger = loggerManager.createLogger("HandleIdentityUseCase");
   }
-  static inject = ["loggerManager", "metricReporter", "jobQueue"] as const;
 
   async execute(dto: IdentityEventDto) {
     this.logger.debug({ did: dto.identity.did }, "identity event received");

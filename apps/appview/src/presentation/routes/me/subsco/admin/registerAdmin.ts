@@ -12,7 +12,6 @@ export class RegisterAdmin {
     private readonly registerAdminUseCase: RegisterAdminUseCase,
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = ["registerAdminUseCase", "authVerifierMiddleware"] as const;
 
   handle(router: LexRouter): void {
     router.add(registerAdmin, {

@@ -36,7 +36,6 @@ type SelectPost = typeof schema.posts.$inferSelect & {
 
 export class PostRepository implements IPostRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   private createPostEmbedImage(image: SelectPostEmbedImage): PostEmbedImage {
     return new PostEmbedImage({

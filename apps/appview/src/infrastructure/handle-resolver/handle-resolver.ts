@@ -12,7 +12,6 @@ import {
 
 export class HandleResolver implements IHandleResolver {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async resolve(handle: Handle): Promise<Did> {
     const [actor] = await this.db

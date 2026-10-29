@@ -21,7 +21,6 @@ export class DeleteInviteCodeUseCase {
     private readonly db: DatabaseClient,
     private readonly inviteCodeRepository: IInviteCodeRepository,
   ) {}
-  static inject = ["db", "inviteCodeRepository"] as const;
 
   async execute(params: { code: string }): Promise<void> {
     const inviteCode = await this.inviteCodeRepository.findFirst(params.code);

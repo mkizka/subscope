@@ -10,7 +10,6 @@ export class GrantAdmin {
     private grantAdminUseCase: GrantAdminUseCase,
     private adminMiddleware: AdminMiddleware,
   ) {}
-  static inject = ["grantAdminUseCase", "adminMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(grantAdmin, {

@@ -7,7 +7,6 @@ import type { IAuthorFeedRepository } from "../../application/interfaces/author-
 
 export class AuthorFeedRepository implements IAuthorFeedRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findFeedItems({
     actorDid,

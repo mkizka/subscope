@@ -7,7 +7,6 @@ import type { ITimelineRepository } from "../../application/interfaces/timeline-
 
 export class TimelineRepository implements ITimelineRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findFeedItems({
     viewerDid,

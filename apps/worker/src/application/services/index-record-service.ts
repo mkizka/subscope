@@ -54,18 +54,6 @@ export class IndexRecordService {
       "app.bsky.graph.listitem": listItemIndexer,
     };
   }
-  static inject = [
-    "recordRepository",
-    "indexActorService",
-    "postIndexer",
-    "profileIndexer",
-    "followIndexer",
-    "generatorIndexer",
-    "likeIndexer",
-    "repostIndexer",
-    "listIndexer",
-    "listItemIndexer",
-  ] as const;
 
   async upsert({
     ctx,

@@ -15,7 +15,6 @@ export class LabelIngester {
       validate: (obj: unknown) => subscribeLabels.$message.$ifMatches(obj),
     });
   }
-  static inject = ["metricReporter", "moderationUrl"] as const;
 
   async start() {
     for await (const message of this.subscription) {

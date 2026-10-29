@@ -8,7 +8,6 @@ import type { IRecordRepository } from "../../application/interfaces/record-repo
 
 export class RecordRepository implements IRecordRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findByUris(uris: AtUri[]): Promise<Record[]> {
     const stringUris = uris.map((uri) => uri.toString());

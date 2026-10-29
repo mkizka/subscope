@@ -9,7 +9,6 @@ export class TapClient implements ITapClient {
   constructor(tapUrl: string) {
     this.tap = new Tap(tapUrl);
   }
-  static inject = ["tapUrl"] as const;
 
   async addRepo(did: Did): Promise<void> {
     await this.tap.addRepos([did]);

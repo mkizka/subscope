@@ -8,7 +8,6 @@ import type { ILikeRepository } from "../../application/interfaces/like-reposito
 
 export class LikeRepository implements ILikeRepository {
   constructor(private readonly db: DatabaseClient) {}
-  static inject = ["db"] as const;
 
   async findMany({
     subjectUri,

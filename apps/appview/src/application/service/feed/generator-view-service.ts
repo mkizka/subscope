@@ -13,11 +13,6 @@ export class GeneratorViewService {
     private readonly profileViewService: ProfileViewService,
     private readonly assetUrlBuilder: IAssetUrlBuilder,
   ) {}
-  static inject = [
-    "generatorRepository",
-    "profileViewService",
-    "assetUrlBuilder",
-  ] as const;
 
   async findGeneratorViewMap(
     uris: AtUri[],

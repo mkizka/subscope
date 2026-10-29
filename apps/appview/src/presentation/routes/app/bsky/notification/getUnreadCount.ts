@@ -9,7 +9,6 @@ export class GetUnreadCount {
     private readonly authVerifierMiddleware: AuthVerifierMiddleware,
     private readonly getUnreadCountUseCase: GetUnreadCountUseCase,
   ) {}
-  static inject = ["authVerifierMiddleware", "getUnreadCountUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(getUnreadCount, {

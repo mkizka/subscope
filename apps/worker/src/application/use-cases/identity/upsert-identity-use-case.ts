@@ -8,7 +8,6 @@ export class UpsertIdentityUseCase {
     private readonly transactionManager: ITransactionManager,
     private readonly indexActorService: IndexActorService,
   ) {}
-  static inject = ["transactionManager", "indexActorService"] as const;
 
   async execute(command: UpsertIdentityCommand) {
     const handle = command.handle;

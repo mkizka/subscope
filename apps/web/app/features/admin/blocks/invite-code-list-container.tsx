@@ -5,16 +5,16 @@ import type { loader } from "@/app/routes/admin.invite-codes";
 
 import {
   type InviteCode,
-  InviteCodeRows,
-  InviteCodeTable,
-} from "./invite-code-table";
+  InviteCodeItems,
+  InviteCodeList,
+} from "./invite-code-list";
 
 type DeleteProps = {
   onDeleteCode: (code: string) => void;
   deletingCode: string | null;
 };
 
-function OlderInviteCodeRowsContainer({
+function OlderInviteCodeItemsContainer({
   cursor,
   ...deleteProps
 }: DeleteProps & { cursor: string }) {
@@ -22,28 +22,24 @@ function OlderInviteCodeRowsContainer({
 
   if (!fetcher.data) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={6} className="text-center text-base-content/70">
-            {fetcher.state !== "idle" && "読み込み中..."}
-            <InfiniteScrollTrigger
-              onIntersect={() =>
-                void fetcher.load(
-                  `/admin/invite-codes?${new URLSearchParams({ cursor })}`,
-                )
-              }
-              enabled={fetcher.state === "idle"}
-            />
-          </td>
-        </tr>
-      </tbody>
+      <li className="p-4 text-center text-base-content/70">
+        {fetcher.state !== "idle" && "読み込み中..."}
+        <InfiniteScrollTrigger
+          onIntersect={() =>
+            void fetcher.load(
+              `/admin/invite-codes?${new URLSearchParams({ cursor })}`,
+            )
+          }
+          enabled={fetcher.state === "idle"}
+        />
+      </li>
     );
   }
   return (
     <>
-      <InviteCodeRows codes={fetcher.data.codes} {...deleteProps} />
+      <InviteCodeItems codes={fetcher.data.codes} {...deleteProps} />
       {fetcher.data.cursor && (
-        <OlderInviteCodeRowsContainer
+        <OlderInviteCodeItemsContainer
           cursor={fetcher.data.cursor}
           {...deleteProps}
         />
@@ -57,7 +53,7 @@ type Props = {
   cursor?: string;
 };
 
-export function InviteCodeTableContainer({ codes, cursor }: Props) {
+export function InviteCodeListContainer({ codes, cursor }: Props) {
   const createFetcher = useFetcher();
   const deleteFetcher = useFetcher();
   const deleteProps = {
@@ -78,7 +74,7 @@ export function InviteCodeTableContainer({ codes, cursor }: Props) {
   };
 
   return (
-    <InviteCodeTable
+    <InviteCodeList
       codes={codes}
       onCreateCode={() =>
         void createFetcher.submit(null, {
@@ -90,8 +86,8 @@ export function InviteCodeTableContainer({ codes, cursor }: Props) {
       {...deleteProps}
     >
       {cursor && (
-        <OlderInviteCodeRowsContainer cursor={cursor} {...deleteProps} />
+        <OlderInviteCodeItemsContainer cursor={cursor} {...deleteProps} />
       )}
-    </InviteCodeTable>
+    </InviteCodeList>
   );
 }

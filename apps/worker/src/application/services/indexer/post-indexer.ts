@@ -29,13 +29,6 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly notificationRepository: INotificationRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = [
-    "postRepository",
-    "feedItemRepository",
-    "subscriptionRepository",
-    "notificationRepository",
-    "jobScheduler",
-  ] as const;
 
   async upsert({
     ctx,

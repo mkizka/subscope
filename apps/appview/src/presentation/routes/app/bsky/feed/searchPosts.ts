@@ -5,7 +5,6 @@ import type { SearchPostsUseCase } from "../../../../../application/use-cases/fe
 
 export class SearchPosts {
   constructor(private searchPostsUseCase: SearchPostsUseCase) {}
-  static inject = ["searchPostsUseCase"] as const;
 
   handle(router: LexRouter) {
     router.add(searchPosts, async ({ params }) => {

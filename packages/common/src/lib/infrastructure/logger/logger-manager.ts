@@ -25,7 +25,6 @@ export class LoggerManager implements ILoggerManager {
       },
     });
   }
-  static inject = ["logLevel"] as const;
 
   createLogger(name: string) {
     return this.rootLogger.child({ name });

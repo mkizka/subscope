@@ -13,11 +13,6 @@ export class GetProfile {
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = [
-    "getProfilesUseCase",
-    "handleMiddleware",
-    "authVerifierMiddleware",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(getProfile, {

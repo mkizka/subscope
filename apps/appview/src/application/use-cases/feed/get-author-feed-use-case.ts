@@ -29,7 +29,6 @@ export class GetAuthorFeedUseCase {
     private readonly authorFeedService: AuthorFeedService,
     private readonly feedProcessor: FeedProcessor,
   ) {}
-  static inject = ["authorFeedService", "feedProcessor"] as const;
 
   async execute(
     params: GetAuthorFeedParams,

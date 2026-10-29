@@ -10,7 +10,6 @@ export class ListItemIndexer implements ICollectionIndexer {
     private readonly listItemRepository: IListItemRepository,
     private readonly indexActorService: IndexActorService,
   ) {}
-  static inject = ["listItemRepository", "indexActorService"] as const;
 
   async upsert({
     ctx,

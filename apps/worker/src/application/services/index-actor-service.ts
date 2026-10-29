@@ -17,11 +17,6 @@ export class IndexActorService {
     private readonly profileRepository: IProfileRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
-  static inject = [
-    "actorRepository",
-    "profileRepository",
-    "jobScheduler",
-  ] as const;
 
   async upsert({
     ctx,

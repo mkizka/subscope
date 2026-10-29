@@ -19,13 +19,6 @@ export class FeedProcessor {
     private readonly profileViewService: ProfileViewService,
     private readonly replyRefService: ReplyRefService,
   ) {}
-  static inject = [
-    "postRepository",
-    "repostRepository",
-    "postViewService",
-    "profileViewService",
-    "replyRefService",
-  ] as const;
 
   async processFeedItems(
     feedItems: FeedItem[],

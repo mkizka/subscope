@@ -7,7 +7,6 @@ import { ResolvedAtUri } from "../../domain/models/at-uri.js";
 
 export class AtUriService {
   constructor(private readonly handleResolver: IHandleResolver) {}
-  static inject = ["handleResolver"] as const;
 
   async resolveHostname(uri: AtUri): Promise<ResolvedAtUri> {
     if (isDid(uri.hostname)) {

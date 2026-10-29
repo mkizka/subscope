@@ -9,10 +9,6 @@ export class GetSubscriptionStatus {
     private getSubscriptionStatusUseCase: GetSubscriptionStatusUseCase,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
-  static inject = [
-    "getSubscriptionStatusUseCase",
-    "authVerifierMiddleware",
-  ] as const;
 
   handle(router: LexRouter) {
     router.add(getSubscriptionStatus, {

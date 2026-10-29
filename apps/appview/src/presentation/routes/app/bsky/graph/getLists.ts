@@ -9,7 +9,6 @@ export class GetLists {
     private getListsUseCase: GetListsUseCase,
     private handleMiddleware: HandleMiddleware,
   ) {}
-  static inject = ["getListsUseCase", "handleMiddleware"] as const;
 
   handle(router: LexRouter) {
     router.add(getLists, async ({ params }) => {
