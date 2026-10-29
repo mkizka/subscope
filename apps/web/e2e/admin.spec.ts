@@ -20,10 +20,11 @@ test.describe("登録ユーザー", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/admin/subscribers");
-
     const row = page.getByRole("row", { name: "@alice.test" });
-    await expect(row).toBeVisible();
+    await expect(async () => {
+      await page.goto("/admin/subscribers");
+      await expect(row).toBeVisible({ timeout: 1000 });
+    }).toPass();
     await expect(row.getByText("管理者")).toBeVisible();
   });
 });
