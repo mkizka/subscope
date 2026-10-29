@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.deleteInviteCode", () => {
   const { ctx } = testSetup;
 
-  test("deleteInviteCode-1: 存在しない招待コードを指定した場合、400とInviteCodeNotFoundを返す", async () => {
+  test("deleteInviteCode-1: 存在しない招待コードには400とInviteCodeNotFoundを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await actorFactory(ctx.db)
@@ -27,7 +27,7 @@ describe("me.subsco.admin.deleteInviteCode", () => {
     });
   });
 
-  test("deleteInviteCode-2: 使用済みの招待コードを指定した場合、400とInviteCodeAlreadyUsedを返す", async () => {
+  test("deleteInviteCode-2: 使用済みの招待コードには400とInviteCodeAlreadyUsedを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await actorFactory(ctx.db)

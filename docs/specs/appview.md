@@ -120,21 +120,6 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - updateSeen-1: 認証がない場合、401を返す
 - updateSeen-2: 指定した時刻以前の通知を既読にする
 
-## me.subsco.admin.verifyAccess
-
-閲覧者の管理画面へのアクセス権を返す。認証が必要。statusは管理者が未登録なら `needsSetup`、閲覧者が管理者なら `authorized`、それ以外は `unauthorized` になる。
-
-## me.subsco.admin.registerAdmin
-
-管理者が未登録のとき、閲覧者を管理者として登録する。認証が必要。既に管理者がいる場合は400とAdminAlreadyExistsを、閲覧者のアクターがない場合は400とActorNotFoundを返す。
-
-## me.subsco.admin.deleteInviteCode
-
-招待コードを削除する。管理者の認証が必要。
-
-- deleteInviteCode-1: 存在しない招待コードを指定した場合、400とInviteCodeNotFoundを返す
-- deleteInviteCode-2: 使用済みの招待コードを指定した場合、400とInviteCodeAlreadyUsedを返す
-
 ## app.bsky.graph.getFollowers
 
 指定したアクターをフォローしているアクターを返す。認証は任意。
@@ -160,3 +145,46 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - getLists-1: リストを作成したアクターを指定した場合、そのリストのlistViewをlistsとして返す
 - getLists-2: purposesを指定した場合、指定した用途のリストのみを返す
+
+## me.subsco.server.getSetupStatus
+
+サーバーの初期設定が済んでいるかを返す。認証は不要。管理者が登録済みなら initialized を true にする。
+
+## me.subsco.sync.subscribeServer
+
+閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。管理者は招待コードなしで登録でき、それ以外は有効期限内の未使用の招待コードが必要で、使った招待コードは使用済みになる。招待コードが無効なら400とInvalidInviteCodeを、登録済みなら400とAlreadySubscribedを返す。
+
+## me.subsco.sync.unsubscribeServer
+
+閲覧者のサブスクライバー登録を解除する。認証が必要。使った招待コードは使用済みのまま残る。登録していなければ400とNotSubscribedを返す。
+
+## me.subsco.sync.getSubscriptionStatus
+
+閲覧者がサブスクライバーかどうかを返す。認証が必要。
+
+## me.subsco.admin.verifyAccess
+
+閲覧者の管理画面へのアクセス権を返す。認証が必要。statusは管理者が未登録なら `needsSetup`、閲覧者が管理者なら `authorized`、それ以外は `unauthorized` になる。
+
+## me.subsco.admin.registerAdmin
+
+管理者が未登録のとき、閲覧者を管理者として登録し、サブスクライバーにもする。認証が必要。既に管理者がいる場合は400とAdminAlreadyExistsを返す。
+
+## me.subsco.admin.getSubscribers
+
+サブスクライバーのプロフィールを返す。limitとcursorでページングする。今は認証を確認していない。
+
+## me.subsco.admin.createInviteCode
+
+daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
+
+## me.subsco.admin.getInviteCodes
+
+招待コードを、使用日時と使用したアクターとともに返す。管理者の認証が必要。limitとcursorでページングする。
+
+## me.subsco.admin.deleteInviteCode
+
+未使用の招待コードを削除する。管理者の認証が必要。
+
+- deleteInviteCode-1: 存在しない招待コードには400とInviteCodeNotFoundを返す
+- deleteInviteCode-2: 使用済みの招待コードには400とInviteCodeAlreadyUsedを返す
