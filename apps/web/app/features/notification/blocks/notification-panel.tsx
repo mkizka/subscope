@@ -1,6 +1,7 @@
 type Notification = {
   uri: string;
   authorName: string;
+  reason: string;
 };
 
 type Props = {
@@ -22,7 +23,9 @@ export function NotificationPanel({ notifications }: Props) {
               key={notification.uri}
               className="border-b border-base-300 py-2"
             >
-              {notification.authorName}
+              {notification.reason === "follow"
+                ? `${notification.authorName}さんにフォローされました`
+                : notification.authorName}
             </li>
           ))}
         </ul>

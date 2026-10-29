@@ -24,6 +24,7 @@ export function NotificationPanelContainer() {
   const notifications = (data?.notifications ?? []).map((notification) => ({
     uri: notification.uri,
     authorName: notification.author.displayName ?? notification.author.handle,
+    reason: notification.reason,
   }));
 
   return <NotificationPanel notifications={notifications} />;

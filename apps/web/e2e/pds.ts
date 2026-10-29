@@ -35,3 +35,12 @@ export const createRecord = async (
     accessJwt,
   );
 };
+
+export const resolveDid = async (handle: string) => {
+  const response = await fetch(
+    `${PDS_URL}/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`,
+  );
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { did } = (await response.json()) as { did: string };
+  return did;
+};
