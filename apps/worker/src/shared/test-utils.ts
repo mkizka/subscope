@@ -8,6 +8,7 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
+import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
@@ -65,6 +66,7 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
+  .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("syncWorker", {} as never);

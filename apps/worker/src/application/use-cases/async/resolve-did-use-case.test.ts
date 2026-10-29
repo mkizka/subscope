@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
 import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
@@ -9,60 +10,65 @@ describe("ResolveDidUseCase", () => {
   let resolveDidUseCase: TestServices["resolveDidUseCase"];
   let actorRepository: TestServices["actorRepository"];
   let didResolver: TestServices["didResolver"];
-  let db: TestServices["db"];
+  let handleResolver: TestServices["handleResolver"];
   let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     resolveDidUseCase = services.resolveDidUseCase;
     actorRepository = services.actorRepository;
     didResolver = services.didResolver;
-    db = services.db;
-    ctx = { db };
+    handleResolver = services.handleResolver;
+    ctx = { db: services.db };
   });
 
-  test("既存のactorが存在しない場合、新規actorを作成する", async () => {
-    // arrange
-    const did = asDid("did:plc:new-actor");
-    const handle = asHandle("newactor.test");
+  const setDidDocument = (did: Did, handle: string) => {
     didResolver.setResolveResult(did, {
-      handle,
+      handle: asHandle(handle),
       signingKey: "test-key",
       pds: new URL("https://example.com"),
     });
+  };
+
+  test("resolveDid-1: DIDドキュメントのハンドルは、そのハンドルが同じDIDに解決できるときだけ保存する", async () => {
+    // arrange
+    const did = asDid("did:plc:alice");
+    setDidDocument(did, "alice.test");
+    handleResolver.add(asHandle("alice.test"), did);
 
     // act
     await resolveDidUseCase.execute(did);
 
     // assert
     const actor = await actorRepository.findByDid({ ctx, did });
-    expect(actor).not.toBeNull();
-    expect(actor?.did).toBe(did);
-    expect(actor?.handle).toBe(handle);
+    expect(actor?.handle).toBe("alice.test");
   });
 
-  test("既存のactorが存在する場合、ハンドルを更新する", async () => {
+  test("resolveDid-2: ハンドルが同じDIDに解決できないときは handle.invalid を保存する", async () => {
     // arrange
-    const oldHandle = asHandle("oldhandle.test");
-    const newHandle = asHandle("newhandle.test");
-    const actor = actorFactory({ handle: oldHandle });
-    actorRepository.add(actor);
+    const did = asDid("did:plc:impostor");
+    setDidDocument(did, "alice.test");
+    handleResolver.add(asHandle("alice.test"), asDid("did:plc:alice"));
 
-    didResolver.setResolveResult(actor.did, {
-      handle: newHandle,
-      signingKey: "test-key",
-      pds: new URL("https://example.com"),
-    });
+    // act
+    await resolveDidUseCase.execute(did);
+
+    // assert
+    const actor = await actorRepository.findByDid({ ctx, did });
+    expect(actor?.handle).toBe("handle.invalid");
+  });
+
+  test("resolveDid-3: すでにハンドルを持つアクターのハンドルは上書きしない", async () => {
+    // arrange
+    const actor = actorFactory({ handle: asHandle("handle.invalid") });
+    actorRepository.add(actor);
+    setDidDocument(actor.did, "alice.test");
+    handleResolver.add(asHandle("alice.test"), actor.did);
 
     // act
     await resolveDidUseCase.execute(actor.did);
 
     // assert
-    const updatedActor = await actorRepository.findByDid({
-      ctx,
-      did: actor.did,
-    });
-    expect(updatedActor).not.toBeNull();
-    expect(updatedActor?.did).toBe(actor.did);
-    expect(updatedActor?.handle).toBe(newHandle);
+    const saved = await actorRepository.findByDid({ ctx, did: actor.did });
+    expect(saved?.handle).toBe("handle.invalid");
   });
 });
