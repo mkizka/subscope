@@ -1,4 +1,5 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
 
 import type { GetListFeedUseCase } from "../../../../../application/use-cases/feed/get-list-feed-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -10,20 +11,17 @@ export class GetListFeed {
   ) {}
   static inject = ["authVerifierMiddleware", "getListFeedUseCase"] as const;
 
-  handle(server: Server) {
-    server.app.bsky.feed.getListFeed({
-      handler: async ({ params, req }) => {
-        const viewerDid = await this.authVerifierMiddleware.getViewerDid(req);
-        const result = await this.getListFeedUseCase.execute({
+  handle(router: LexRouter) {
+    router.add(getListFeed, {
+      auth: (ctx) => this.authVerifierMiddleware.lexOptionalAuth(ctx),
+      handler: async ({ params, credentials: viewerDid }) => {
+        const body = await this.getListFeedUseCase.execute({
           listUri: params.list,
           limit: params.limit,
           cursor: params.cursor,
-          viewerDid: viewerDid || undefined,
+          viewerDid: viewerDid ?? undefined,
         });
-        return {
-          encoding: "application/json",
-          body: result,
-        };
+        return { body };
       },
     });
   }

@@ -1,0 +1,53 @@
+import { schema } from "@repo/db";
+import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
+import { eq } from "drizzle-orm";
+import { describe, expect, test } from "vitest";
+
+import { setupApiTest } from "../../../../../shared/api-test-utils.js";
+
+describe("app.bsky.notification.getUnreadCount", () => {
+  const { ctx } = testSetup;
+
+  test("getUnreadCount-1: 認証がない場合、401を返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+
+    // act
+    const promise = client.app.bsky.notification.getUnreadCount();
+
+    // assert
+    await expect(promise).rejects.toMatchObject({ status: 401 });
+  });
+
+  test("getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    const author = await actorFactory(ctx.db).create();
+    for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-04"]) {
+      const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => author })
+        .create();
+      await ctx.db.insert(schema.notifications).values({
+        recordUri: record.uri,
+        recipientDid: viewer.did,
+        authorDid: author.did,
+        reason: "follow",
+        sortAt: new Date(sortAt),
+      });
+    }
+    await ctx.db
+      .update(schema.subscriptions)
+      .set({ seenAt: new Date("2024-01-02") })
+      .where(eq(schema.subscriptions.actorDid, viewer.did));
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.app.bsky.notification.getUnreadCount();
+
+    // assert
+    expect(res.data).toEqual({ count: 2 });
+  });
+});

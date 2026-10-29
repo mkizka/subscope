@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AppBskyFeedGetListFeed } from "@repo/client/server";
+import type * as AppBskyFeedGetListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
 import type { FeedItem } from "@repo/common/domain";
 
 import type { ITimelineRepository } from "../../../application/interfaces/timeline-repository.js";
@@ -18,7 +18,7 @@ export class GetListFeedUseCase {
     limit: number;
     cursor?: string;
     viewerDid?: Did;
-  }): Promise<AppBskyFeedGetListFeed.OutputSchema> {
+  }): Promise<AppBskyFeedGetListFeed.$OutputBody> {
     const paginator = createCursorPaginator<FeedItem>({
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),

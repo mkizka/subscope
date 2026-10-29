@@ -1,46 +1,39 @@
-import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import {
   PostCard,
   type PostCardProps,
 } from "@/app/features/timeline/parts/post-card";
-import { PostCardSkeleton } from "@/app/features/timeline/parts/post-card-skeleton";
 
-export type TimelinePost = PostCardProps & {
+import type { ComposeTarget } from "./post-form-container";
+import { PostToolbarContainer } from "./post-toolbar-container";
+
+export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   uri: string;
+  cid: string;
+  viewerLike?: string;
+  viewerRepost?: string;
+  replyRoot?: { uri: string; cid: string };
 };
 
 type Props = {
   posts: TimelinePost[];
-  isLoading: boolean;
-  isFetchingNextPage: boolean;
-  hasNextPage: boolean;
-  onLoadMore: () => void;
+  onCompose: (target: ComposeTarget) => void;
 };
 
-export function TimelineFeed({
-  posts,
-  isLoading,
-  isFetchingNextPage,
-  hasNextPage,
-  onLoadMore,
-}: Props) {
+export function TimelineFeed({ posts, onCompose }: Props) {
   return (
     <section>
-      {isLoading &&
-        Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)}
-      {!isLoading && posts.length === 0 && (
+      {posts.length === 0 && (
         <p className="py-8 text-center text-sm text-muted-foreground">
           タイムラインに投稿がありません
         </p>
       )}
       {posts.map((post) => (
-        <PostCard key={post.uri} {...post} />
+        <PostCard
+          key={post.uri}
+          {...post}
+          toolbar={<PostToolbarContainer {...post} onCompose={onCompose} />}
+        />
       ))}
-      {isFetchingNextPage && <PostCardSkeleton />}
-      <InfiniteScrollTrigger
-        onIntersect={onLoadMore}
-        enabled={hasNextPage && !isFetchingNextPage}
-      />
     </section>
   );
 }

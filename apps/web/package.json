@@ -18,6 +18,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@atproto/common-web": "0.5.15",
     "@atproto/jwk-jose": "0.2.4",
     "@atproto/lex": "0.4.2",
     "@atproto/oauth-client-node": "0.5.13",
