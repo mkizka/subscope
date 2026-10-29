@@ -65,7 +65,7 @@ export class JobScheduler implements IJobScheduler {
         type,
       },
       options: {
-        jobId: `${type}__${postUri}`,
+        deduplication: { id: `${type}__${postUri}`, keepLastIfActive: true },
         delay: AGGREGATE_STATS_DELAY_MS,
       },
     });
@@ -83,7 +83,7 @@ export class JobScheduler implements IJobScheduler {
         type,
       },
       options: {
-        jobId: `${type}__${did}`,
+        deduplication: { id: `${type}__${did}`, keepLastIfActive: true },
         delay: AGGREGATE_STATS_DELAY_MS,
       },
     });
