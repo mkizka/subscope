@@ -7,6 +7,12 @@ test.describe("通知", () => {
   test("notification-4: 通知は新しい順に並び、下までスクロールすると古い通知を読み込む", async ({
     page,
   }) => {
+    await createRecord(
+      "bob.test",
+      "app.bsky.actor.profile",
+      { displayName: "Bob" },
+      "self",
+    );
     const bob = await createRecord("bob.test", "app.bsky.feed.post", {
       text: "notification-4: bobの投稿",
       createdAt: new Date().toISOString(),
