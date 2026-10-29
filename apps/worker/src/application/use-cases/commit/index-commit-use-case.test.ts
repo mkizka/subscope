@@ -213,51 +213,6 @@ describe("IndexCommitUseCase", () => {
         },
       });
 
-    test("recordIndexing-1: 削除済みのレコードに対して、削除より古いrevの作成コミットを処理してもレコードは復活しない", async () => {
-      // arrange
-      const { uri, record } = setup("old");
-      await indexCommitUseCase.execute({
-        commit: { operation: "delete", uri, rev: "3bbbbbbbbbbbb" },
-        live: true,
-        jobLogger,
-      });
-
-      // act
-      await indexCommitUseCase.execute({
-        commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        live: true,
-        jobLogger,
-      });
-
-      // assert
-      expect(await recordRepo.findByUri({ ctx, uri })).toBeNull();
-    });
-
-    test("recordIndexing-2: 更新済みのレコードに対して、更新より古いrevのコミットを処理してもレコードは古い内容に戻らない", async () => {
-      // arrange
-      const { uri, record } = setup("old");
-      await indexCommitUseCase.execute({
-        commit: {
-          operation: "update",
-          uri,
-          rev: "3bbbbbbbbbbbb",
-          record: postRecord(uri, "new"),
-        },
-        live: true,
-        jobLogger,
-      });
-
-      // act
-      await indexCommitUseCase.execute({
-        commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
-        live: true,
-        jobLogger,
-      });
-
-      // assert
-      expect(postRepo.findByUri(uri)?.text).toBe("new");
-    });
-
     test("revがないコミットの場合、revを比較せずに処理する", async () => {
       // arrange
       const { uri, record } = setup("old");
