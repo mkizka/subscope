@@ -1,5 +1,6 @@
 import { Client } from "@atproto/lex";
 import { currentDatetimeString } from "@atproto/syntax";
+import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import post from "@repo/client/lex/app/bsky/feed/post";
@@ -12,6 +13,7 @@ import { data, redirect } from "react-router";
 import { HomePage } from "@/app/features/home/pages/home";
 import {
   countGraphemes,
+  MAX_IMAGES,
   MAX_POST_LENGTH,
 } from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
@@ -79,17 +81,31 @@ export const action = async ({ request }: Route.ActionArgs) => {
   if (!agent) {
     throw redirect("/login");
   }
-  const text = (await request.formData()).get("text");
+  const formData = await request.formData();
+  const text = formData.get("text");
+  const files = formData.getAll("image").filter((f) => f instanceof File);
+  const alts = formData.getAll("alt");
   if (
     typeof text !== "string" ||
-    text.trim() === "" ||
-    countGraphemes(text) > MAX_POST_LENGTH
+    (text.trim() === "" && files.length === 0) ||
+    countGraphemes(text) > MAX_POST_LENGTH ||
+    files.length > MAX_IMAGES
   ) {
     return data({ error: "投稿内容が不正です" }, { status: 400 });
   }
   try {
+    const images = await Promise.all(
+      files.map(async (file, i) => {
+        const { body } = await agent.uploadBlob(file);
+        return { image: body.blob, alt: maybeString(alts[i]) ?? "" };
+      }),
+    );
     const { uri } = await agent.create(post, {
       text,
+      embed:
+        images.length > 0
+          ? { $type: "app.bsky.embed.images", images }
+          : undefined,
       createdAt: currentDatetimeString(),
     });
     return data({ uri });
@@ -115,6 +131,7 @@ function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
+    images: imagesView.matches(post.embed) ? post.embed.images : undefined,
     createdAt: maybeString(post.record.createdAt),
     reasonRepost:
       reason && "by" in reason
