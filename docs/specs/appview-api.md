@@ -162,6 +162,6 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 サブスクライバーのプロフィール一覧を返す。管理者のみ呼び出せる。
 
-- getSubscribers-1: 認証がない場合、401を返す
-- getSubscribers-2: 管理者でない場合、401を返す
-- getSubscribers-3: 管理者の場合、サブスクライバーをprofileViewとして返す
+- getSubscribers-1: 認証がないリクエストには401を返す
+- getSubscribers-2: 管理者でないアカウントからのリクエストには401を返す
+- getSubscribers-3: サブスクライバーをprofileViewとして返す

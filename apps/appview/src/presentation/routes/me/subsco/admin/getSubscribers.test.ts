@@ -1,3 +1,4 @@
+import getSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -6,31 +7,31 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.getSubscribers", () => {
   const { ctx } = testSetup;
 
-  test("getSubscribers-1: 認証がない場合、401を返す", async () => {
+  test("getSubscribers-1: 認証がないリクエストには401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.me.subsco.admin.getSubscribers();
+    const promise = client.call(getSubscribers);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getSubscribers-2: 管理者でない場合、401を返す", async () => {
+  test("getSubscribers-2: 管理者でないアカウントからのリクエストには401を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db).create();
     loginAs(viewer.did);
 
     // act
-    const promise = client.me.subsco.admin.getSubscribers();
+    const promise = client.call(getSubscribers);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getSubscribers-3: 管理者の場合、サブスクライバーをprofileViewとして返す", async () => {
+  test("getSubscribers-3: サブスクライバーをprofileViewとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await actorFactory(ctx.db)
@@ -43,9 +44,9 @@ describe("me.subsco.admin.getSubscribers", () => {
     loginAs(admin.did);
 
     // act
-    const res = await client.me.subsco.admin.getSubscribers();
+    const res = await client.call(getSubscribers);
 
     // assert
-    expect(res.data.subscribers).toMatchObject([{ did: subscriber.did }]);
+    expect(res.subscribers).toMatchObject([{ did: subscriber.did }]);
   });
 });
