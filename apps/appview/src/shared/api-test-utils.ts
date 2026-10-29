@@ -41,5 +41,5 @@ export const setupApiTest = async () => {
     services.tokenVerifier.setVerifyResult({ did: asDid(did) });
     client.headers.set("authorization", "Bearer token");
   };
-  return { client, loginAs };
+  return { client, loginAs, jobScheduler: services.jobScheduler };
 };
