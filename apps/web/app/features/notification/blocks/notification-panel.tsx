@@ -1,3 +1,5 @@
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+
 type Notification = {
   uri: string;
   authorName: string;
@@ -5,11 +7,17 @@ type Notification = {
 
 type Props = {
   notifications: Notification[];
+  onLoadMore: () => void;
+  hasNextPage: boolean;
 };
 
-export function NotificationPanel({ notifications }: Props) {
+export function NotificationPanel({
+  notifications,
+  onLoadMore,
+  hasNextPage,
+}: Props) {
   return (
-    <section className="p-4">
+    <section aria-label="通知" className="p-4">
       <h2 className="font-bold">通知</h2>
       {notifications.length === 0 ? (
         <p className="py-8 text-center text-sm opacity-60">
@@ -27,6 +35,7 @@ export function NotificationPanel({ notifications }: Props) {
           ))}
         </ul>
       )}
+      <InfiniteScrollTrigger onIntersect={onLoadMore} enabled={hasNextPage} />
     </section>
   );
 }
