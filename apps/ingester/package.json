@@ -30,12 +30,14 @@
   },
   "devDependencies": {
     "@mkizka/eslint-config": "10.0.0",
+    "@repo/vitest": "workspace:*",
     "@tsconfig/node-lts": "24.0.1",
     "@types/express": "5.0.6",
     "@types/node": "26.6.5",
     "@types/ws": "8.18.2",
     "eslint": "10.13.0",
     "pino-pretty": "13.2.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
   }
 }
