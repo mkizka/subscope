@@ -21,5 +21,11 @@ export function SideNavContainer() {
     queryFn: fetchMe,
   });
 
-  return <SideNav avatarUrl={data?.avatarUrl} handle={data?.handle} />;
+  return (
+    <SideNav
+      did={data?.did}
+      avatarUrl={data?.avatarUrl}
+      handle={data?.handle}
+    />
+  );
 }

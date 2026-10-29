@@ -14,6 +14,7 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
     actor: agent.assertDid,
   });
   return data({
+    did: profile.did,
     avatarUrl: profile.avatar,
     handle: profile.handle,
   });
