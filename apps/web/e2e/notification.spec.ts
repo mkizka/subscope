@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
-import { createRecord, putRecord, resolveHandle } from "./pds";
+import { createRecord, follow, putRecord, resolveHandle } from "./pds";
 
 test.describe("通知", () => {
   test.use({ viewport: { width: 375, height: 667 } });
@@ -9,15 +9,8 @@ test.describe("通知", () => {
   test("notification-6: モバイルでは、未読があるときヘッダーの🔔に未読数が出る", async ({
     page,
   }) => {
-    const createdAt = new Date().toISOString();
-    await createRecord("alice.test", "app.bsky.graph.follow", {
-      subject: await resolveHandle("bob.test"),
-      createdAt,
-    });
-    await createRecord("bob.test", "app.bsky.graph.follow", {
-      subject: await resolveHandle("alice.test"),
-      createdAt,
-    });
+    await follow("alice.test", "bob.test");
+    await follow("bob.test", "alice.test");
 
     await login(page);
 
@@ -43,10 +36,7 @@ test.describe("通知（PC）", () => {
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
       displayName: "Bob",
     });
-    await createRecord("alice.test", "app.bsky.graph.follow", {
-      subject: await resolveHandle("bob.test"),
-      createdAt,
-    });
+    await follow("alice.test", "bob.test");
     const ref = { uri: post.uri, cid: post.cid };
     const mention = "@alice.test";
     const mentionText = `notification-3: メンション ${mention}`;

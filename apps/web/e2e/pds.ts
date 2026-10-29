@@ -61,3 +61,22 @@ export const putRecord = async (
     accessJwt,
   );
 };
+
+export const follow = async (handle: string, subjectHandle: string) => {
+  const [did, subject] = await Promise.all([
+    resolveHandle(handle),
+    resolveHandle(subjectHandle),
+  ]);
+  const response = await fetch(
+    `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=${did}&collection=app.bsky.graph.follow`,
+  );
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { records } = (await response.json()) as {
+    records: { value: { subject: string } }[];
+  };
+  if (records.some((record) => record.value.subject === subject)) return;
+  await createRecord(handle, "app.bsky.graph.follow", {
+    subject,
+    createdAt: new Date().toISOString(),
+  });
+};
