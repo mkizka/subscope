@@ -9,6 +9,12 @@ type Props = {
   notifications: Notification[];
 };
 
+const reasonLabels: Record<string, string> = {
+  like: "さんがいいねしました",
+  repost: "さんがリポストしました",
+  follow: "さんにフォローされました",
+};
+
 export function NotificationPanel({ notifications }: Props) {
   return (
     <section className="p-4">
@@ -25,9 +31,8 @@ export function NotificationPanel({ notifications }: Props) {
               className="border-b border-base-300 py-2"
             >
               <p>
-                {notification.reason === "follow"
-                  ? `${notification.authorName}さんにフォローされました`
-                  : notification.authorName}
+                {notification.authorName}
+                {reasonLabels[notification.reason]}
               </p>
               {notification.text && (
                 <p className="text-sm whitespace-pre-wrap">
