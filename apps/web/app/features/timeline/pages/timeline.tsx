@@ -1,16 +1,20 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { TimelineFeedContainer } from "@/app/features/timeline/blocks/timeline-feed-container";
+import {
+  TimelineFeed,
+  type TimelinePost,
+} from "@/app/features/timeline/blocks/timeline-feed";
 import { WelcomeSectionContainer } from "@/app/features/timeline/blocks/welcome-section-container";
 
 type Props = {
   atprotoProxy: string;
+  posts: TimelinePost[];
 };
 
-export function TimelinePage({ atprotoProxy }: Props) {
+export function TimelinePage({ atprotoProxy, posts }: Props) {
   return (
     <ThreeColumnLayout>
       <WelcomeSectionContainer atprotoProxy={atprotoProxy} />
-      <TimelineFeedContainer />
+      <TimelineFeed posts={posts} />
     </ThreeColumnLayout>
   );
 }

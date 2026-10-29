@@ -1,4 +1,6 @@
 import { Client } from "@atproto/lex";
+import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
+import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import getSubscriptionStatus, {
   subscribed,
@@ -6,6 +8,7 @@ import getSubscriptionStatus, {
 import { data } from "react-router";
 
 import { HomePage } from "@/app/features/home/pages/home";
+import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
 import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
@@ -55,18 +58,46 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (!subscribed.isTypeOf(subscriptionResponse)) {
     return data({ state: "home" as const });
   }
+  const timeline = await agent.call(getTimeline, { limit: 20 });
   return data({
     state: "timeline" as const,
     atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
+    posts: timeline.feed.map(toTimelinePost).reverse(),
   });
 };
+
+const maybeString = (value: unknown) =>
+  typeof value === "string" ? value : undefined;
+
+function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
+  return {
+    uri: post.uri,
+    authorAvatar: post.author.avatar,
+    authorDisplayName: post.author.displayName,
+    authorHandle: post.author.handle,
+    text: maybeString(post.record.text),
+    replyCount: post.replyCount,
+    repostCount: post.repostCount,
+    likeCount: post.likeCount,
+    createdAt: maybeString(post.record.createdAt),
+    reasonRepost:
+      reason && "by" in reason
+        ? { byDisplayName: reason.by.displayName, byHandle: reason.by.handle }
+        : undefined,
+  };
+}
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   if (loaderData.state === "setup") {
     return <HomePage variant="setup" />;
   }
   if (loaderData.state === "timeline") {
-    return <TimelinePage atprotoProxy={loaderData.atprotoProxy} />;
+    return (
+      <TimelinePage
+        atprotoProxy={loaderData.atprotoProxy}
+        posts={loaderData.posts}
+      />
+    );
   }
   return <HomePage variant="home" />;
 }
