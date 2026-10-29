@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ErrorPage } from "./error";
 
 const meta = {
-  title: "pages/error",
   component: ErrorPage,
   parameters: {
     layout: "fullscreen",
