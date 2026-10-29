@@ -182,7 +182,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## me.subsco.admin.getSubscribers
 
-サブスクライバーのプロフィールを返す。limitとcursorでページングする。今は認証を確認していない。
+サブスクライバーのプロフィールと管理者かどうかを返す。limitとcursorでページングする。今は認証を確認していない。
 
 ## me.subsco.admin.createInviteCode
 

@@ -15,6 +15,20 @@ test.describe("管理画面へのアクセス", () => {
   });
 });
 
+test.describe("登録ユーザー", () => {
+  test("subscribers-1: サブスクライバーを新しい順に並べ、名前・ハンドル・管理者かどうかを出す", async ({
+    page,
+  }) => {
+    await login(page);
+    const row = page.getByRole("row", { name: "@alice.test" });
+    await expect(async () => {
+      await page.goto("/admin/subscribers");
+      await expect(row).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(row.getByText("管理者")).toBeVisible();
+  });
+});
+
 test.describe("招待コード", () => {
   const createInviteCode = async (page: Page) => {
     const response = await page.request.post("/admin/api/invite-codes");
