@@ -96,4 +96,27 @@ test.describe("招待コード", () => {
 
     await expect(page.getByText(oldest)).toBeVisible();
   });
+
+  test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
+    page,
+  }) => {
+    await login(page);
+    const existing = await createInviteCode(page);
+    await page.goto("/admin/invite-codes");
+    const firstRow = page.getByRole("row").nth(1);
+    await expect(firstRow).toContainText(existing);
+
+    await page.getByRole("button", { name: "新規作成" }).click();
+
+    await expect(firstRow).not.toContainText(existing);
+    await expect(firstRow).toContainText("未使用");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await expect(firstRow).toContainText(
+      expiresAt.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }),
+    );
+  });
 });

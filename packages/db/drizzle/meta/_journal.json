@@ -145,8 +145,15 @@
     {
       "idx": 20,
       "version": "7",
-      "when": 1793284460101,
-      "tag": "0020_add-actor-is_banned",
+      "when": 1793208999604,
+      "tag": "0020_create-record-revs",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793285388151,
+      "tag": "0021_add-actor-is_banned",
       "breakpoints": true
     }
   ]

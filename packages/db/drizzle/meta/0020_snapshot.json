@@ -1,5 +1,5 @@
 {
-  "id": "cd6bebc6-db4a-454f-91ee-10fa51fd3498",
+  "id": "4a25c2a1-f6d4-4f12-886e-d49f498244c8",
   "prevId": "5d642c8d-09da-4ed6-a1b0-c0dcf78f0ff4",
   "version": "7",
   "dialect": "postgresql",
@@ -72,13 +72,6 @@
         },
         "is_admin": {
           "name": "is_admin",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "is_banned": {
-          "name": "is_banned",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
@@ -1558,6 +1551,31 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.record_revs": {
+      "name": "record_revs",
+      "schema": "",
+      "columns": {
+        "uri": {
+          "name": "uri",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "rev": {
+          "name": "rev",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
