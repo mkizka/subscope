@@ -8,7 +8,7 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
 import { useActionData } from "react-router";
 import { z } from "zodV4";
 
-import { RegisterPage } from "./register";
+import { RegisterCard } from "./register-card";
 
 export const registerSchema = z.object({
   inviteCode: z.string({
@@ -20,7 +20,7 @@ type Props = {
   isLoggedIn: boolean;
 };
 
-export function RegisterContainer({ isLoggedIn }: Props) {
+export function RegisterCardContainer({ isLoggedIn }: Props) {
   const lastResult = useActionData<SubmissionResult>();
 
   const [form, fields] = useForm({
@@ -34,7 +34,7 @@ export function RegisterContainer({ isLoggedIn }: Props) {
   });
 
   return (
-    <RegisterPage
+    <RegisterCard
       isLoggedIn={isLoggedIn}
       activeSubmit={isLoggedIn && form.dirty && form.valid}
       formProps={getFormProps(form)}
