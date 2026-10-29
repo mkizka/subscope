@@ -105,6 +105,6 @@ export class SubscribeServerUseCase {
       }
     });
 
-    await this.jobScheduler.scheduleAddTapRepo(actorDid);
+    await this.jobScheduler.scheduleSyncTapRepo(actorDid);
   }
 }

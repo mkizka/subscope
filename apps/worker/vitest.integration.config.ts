@@ -6,7 +6,7 @@ export default mergeConfig(
   defineProject({
     test: {
       name: "worker:integration",
-      include: ["src/infrastructure/**/*.test.ts"],
+      include: ["src/{infrastructure,presentation}/**/*.test.ts"],
     },
   }),
 );

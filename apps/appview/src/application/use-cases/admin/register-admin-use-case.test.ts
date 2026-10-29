@@ -40,7 +40,7 @@ describe("RegisterAdminUseCase", () => {
       actorDid: requester.did,
       createdAt: now,
     });
-    expect(jobScheduler.getAddTapRepoJobs()).toContainEqual(
+    expect(jobScheduler.getSyncTapRepoJobs()).toContainEqual(
       expect.objectContaining({ did: asDid(requester.did) }),
     );
   });

@@ -27,7 +27,7 @@ import { InMemorySubscriptionRepository } from "../infrastructure/repositories/s
 import type { Env } from "./env.js";
 import { createWorkerRegistry } from "./registry.js";
 
-const testEnv = {
+export const testEnv = {
   NODE_ENV: "test",
   LOG_LEVEL: "error",
   PORT: 3003,

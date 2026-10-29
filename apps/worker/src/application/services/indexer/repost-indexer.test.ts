@@ -85,7 +85,7 @@ describe("RepostIndexer", () => {
       ]);
     });
 
-    test("投稿者がサブスクライバーなら通知を作成する", async () => {
+    test("notify-4: リポストされた投稿の作者に repost の通知を作る", async () => {
       // arrange
       const reposter = actorFactory();
       const author = actorFactory();

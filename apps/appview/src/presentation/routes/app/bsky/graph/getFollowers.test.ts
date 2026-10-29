@@ -13,7 +13,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.graph.getFollowers", () => {
   const { ctx } = testSetup;
 
-  test("getFollowers-1: フォロワーがいるアクターを指定した場合、そのアクターをsubject、フォロワーのprofileViewをfollowersとして返す", async () => {
+  test("getFollowers-1: 指定したアクターをsubjectに、そのフォロワーをfollowersにprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
