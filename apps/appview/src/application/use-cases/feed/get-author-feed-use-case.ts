@@ -1,10 +1,10 @@
 import { type Did } from "@atproto/did";
-import type { AppBskyFeedGetAuthorFeed } from "@repo/client/server";
+import type * as AppBskyFeedGetAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 
 import type { AuthorFeedService } from "../../../application/service/feed/author-feed-service.js";
 import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
 
-type Filter = AppBskyFeedGetAuthorFeed.QueryParams["filter"];
+type Filter = AppBskyFeedGetAuthorFeed.$Params["filter"];
 
 type GetAuthorFeedParams = {
   actorDid: Did;
@@ -33,7 +33,7 @@ export class GetAuthorFeedUseCase {
 
   async execute(
     params: GetAuthorFeedParams,
-  ): Promise<AppBskyFeedGetAuthorFeed.OutputSchema> {
+  ): Promise<AppBskyFeedGetAuthorFeed.$OutputBody> {
     if (!this.supportedFilters.includes(params.filter)) {
       return {
         feed: [],
