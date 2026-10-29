@@ -35,3 +35,29 @@ export const createRecord = async (
     accessJwt,
   );
 };
+
+export const resolveHandle = async (handle: string) => {
+  const response = await fetch(
+    `${PDS_URL}/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`,
+  );
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { did } = (await response.json()) as { did: string };
+  return did;
+};
+
+export const putRecord = async (
+  handle: string,
+  collection: string,
+  rkey: string,
+  record: Record<string, unknown>,
+) => {
+  const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  return xrpc<{ uri: string; cid: string }>(
+    "com.atproto.repo.putRecord",
+    { repo: did, collection, rkey, record: { $type: collection, ...record } },
+    accessJwt,
+  );
+};

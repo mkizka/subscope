@@ -3,8 +3,13 @@ import {
   type PostCardProps,
 } from "@/app/features/timeline/parts/post-card";
 
-export type TimelinePost = PostCardProps & {
+import { PostToolbarContainer } from "./post-toolbar-container";
+
+export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   uri: string;
+  cid: string;
+  viewerLike?: string;
+  viewerRepost?: string;
 };
 
 type Props = {
@@ -20,7 +25,11 @@ export function TimelineFeed({ posts }: Props) {
         </p>
       )}
       {posts.map((post) => (
-        <PostCard key={post.uri} {...post} />
+        <PostCard
+          key={post.uri}
+          {...post}
+          toolbar={<PostToolbarContainer {...post} />}
+        />
       ))}
     </section>
   );
