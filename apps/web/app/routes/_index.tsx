@@ -22,8 +22,8 @@ import {
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
-import { HomePage } from "@/app/pages/home-page";
-import { TimelinePage } from "@/app/pages/timeline-page";
+import { HomePage } from "@/app/pages/client/home-page";
+import { TimelinePage } from "@/app/pages/client/timeline-page";
 import { env } from "@/app/shared/env";
 
 import type { Route } from "./+types/_index";
