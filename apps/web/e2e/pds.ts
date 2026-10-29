@@ -31,7 +31,7 @@ export const createRecord = async (
     { identifier: handle, password: "password" },
   );
   return xrpc<{ uri: string; cid: string }>(
-    "com.atproto.repo.createRecord",
+    rkey ? "com.atproto.repo.putRecord" : "com.atproto.repo.createRecord",
     { repo: did, collection, rkey, record: { $type: collection, ...record } },
     accessJwt,
   );
