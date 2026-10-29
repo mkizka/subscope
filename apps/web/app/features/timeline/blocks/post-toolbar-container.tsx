@@ -17,7 +17,7 @@ function useReaction(type: string, post: Props, viewerUri?: string) {
     ? !fetcher.formData.get("recordUri")
     : !!recordUri;
   const toggle = () => {
-    if (fetcher.state !== "idle") return;
+    if (fetcher.state === "submitting") return;
     void fetcher.submit(
       { type, uri: post.uri, cid: post.cid, recordUri: recordUri ?? "" },
       { method: "post", action: "/api/reactions" },
