@@ -69,6 +69,7 @@ import { GetActorLikesUseCase } from "../application/use-cases/feed/get-actor-li
 import { GetAuthorFeedUseCase } from "../application/use-cases/feed/get-author-feed-use-case.js";
 import { GetFeedGeneratorsUseCase } from "../application/use-cases/feed/get-feed-generators-use-case.js";
 import { GetLikesUseCase } from "../application/use-cases/feed/get-likes-use-case.js";
+import { GetListFeedUseCase } from "../application/use-cases/feed/get-list-feed-use-case.js";
 import { GetPostThreadUseCase } from "../application/use-cases/feed/get-post-thread-use-case.js";
 import { GetPostsUseCase } from "../application/use-cases/feed/get-posts-use-case.js";
 import { GetRepostedByUseCase } from "../application/use-cases/feed/get-reposted-by-use-case.js";
@@ -117,6 +118,7 @@ import { GetActorLikes } from "../presentation/routes/app/bsky/feed/getActorLike
 import { GetAuthorFeed } from "../presentation/routes/app/bsky/feed/getAuthorFeed.js";
 import { GetFeedGenerators } from "../presentation/routes/app/bsky/feed/getFeedGenerators.js";
 import { GetLikes } from "../presentation/routes/app/bsky/feed/getLikes.js";
+import { GetListFeed } from "../presentation/routes/app/bsky/feed/getListFeed.js";
 import { GetPosts } from "../presentation/routes/app/bsky/feed/getPosts.js";
 import { GetPostThread } from "../presentation/routes/app/bsky/feed/getPostThread.js";
 import { GetRepostedBy } from "../presentation/routes/app/bsky/feed/getRepostedBy.js";
@@ -225,6 +227,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getAuthorFeedUseCase", ["authorFeedService", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["generatorViewService"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "profileViewService"], asClassArgs(GetLikesUseCase))
+    .service("getListFeedUseCase", ["timelineRepository", "feedProcessor"], asClassArgs(GetListFeedUseCase))
     .service("getRepostedByUseCase", ["repostService", "profileViewService"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowersUseCase))
@@ -258,6 +261,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getAuthorFeed", ["getAuthorFeedUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetAuthorFeed))
     .service("getFeedGenerators", ["getFeedGeneratorsUseCase"], asClassArgs(GetFeedGenerators))
     .service("getLikes", ["getLikesUseCase"], asClassArgs(GetLikes))
+    .service("getListFeed", ["authVerifierMiddleware", "getListFeedUseCase"], asClassArgs(GetListFeed))
     .service("getRepostedBy", ["getRepostedByUseCase"], asClassArgs(GetRepostedBy))
     .service("getFollows", ["getFollowsUseCase", "handleMiddleware"], asClassArgs(GetFollows))
     .service("getFollowers", ["getFollowersUseCase", "handleMiddleware"], asClassArgs(GetFollowers))
@@ -275,7 +279,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
     .service("xrpcRouter", ["getFeedGenerators", "getLikes", "getPosts", "getRepostedBy"], asFunctionArgs(xrpcRouterFactory))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "createInviteCode", "deleteInviteCode", "getInviteCodes", "registerAdmin", "verifyAccess", "getSetupStatus", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "createInviteCode", "deleteInviteCode", "getInviteCodes", "registerAdmin", "verifyAccess", "getSetupStatus", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
