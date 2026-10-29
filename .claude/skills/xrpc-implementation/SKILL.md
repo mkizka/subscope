@@ -9,7 +9,7 @@ AT ProtocolのXRPCエンドポイントを`apps/appview`に追加するための
 
 ## 実装フロー
 
-1. `docs/specs/appview-api.md` にIDを振った仕様項目を追加する
+1. `docs/specs/appview.md` にIDを振った仕様項目を追加する
 2. Lexicon定義を取得する
    - `pnpm --filter @repo/client exec lex install <NSID>` で`packages/client/lexicons`と`lexicons.json`に追加される
    - `pnpm build`や`pnpm typecheck`で`@repo/client`のコードが生成される
@@ -25,7 +25,7 @@ AT ProtocolのXRPCエンドポイントを`apps/appview`に追加するための
 
 | レイヤー         | パス                                                                                 |
 | ---------------- | ------------------------------------------------------------------------------------ |
-| 仕様             | `docs/specs/appview-api.md`                                                          |
+| 仕様             | `docs/specs/appview.md`                                                              |
 | Repository IF    | `apps/appview/src/application/interfaces/{entity}-repository.ts`                     |
 | Repository実装   | `apps/appview/src/infrastructure/{entity}-repository/{entity}-repository.ts`         |
 | UseCase          | `apps/appview/src/application/use-cases/{category}/{endpoint-name}-use-case.ts`      |
