@@ -55,7 +55,7 @@ describe("app.bsky.graph.getList", () => {
 
     // act
     const promise = client.call(getList, {
-      list: asAtUriString("at://did:plc:notfound/app.bsky.graph.list/notfound"),
+      list: "at://did:plc:notfound/app.bsky.graph.list/notfound",
     });
 
     // assert
