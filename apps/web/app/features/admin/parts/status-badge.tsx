@@ -21,7 +21,7 @@ const statusLabel = {
 
 const statusClass = {
   active: "badge badge-primary",
-  used: "badge badge-neutral",
+  used: "badge badge-ghost",
   expired: "badge badge-error",
 } as const;
 
