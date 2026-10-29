@@ -1,4 +1,4 @@
-import type { AppBskyFeedDefs } from "@repo/client/server";
+import type { $OutputBody } from "@repo/client/lex/app/bsky/feed/searchPosts";
 
 import type { PostViewService } from "../../../application/service/feed/post-view-service.js";
 import type { PostSearchService } from "../../../application/service/search/post-search-service.js";
@@ -9,11 +9,6 @@ type SearchPostsParams = {
   cursor?: string;
 };
 
-type SearchPostsResult = {
-  posts: AppBskyFeedDefs.PostView[];
-  cursor?: string;
-};
-
 export class SearchPostsUseCase {
   constructor(
     private readonly searchService: PostSearchService,
@@ -21,7 +16,7 @@ export class SearchPostsUseCase {
   ) {}
   static inject = ["searchService", "postViewService"] as const;
 
-  async execute(params: SearchPostsParams): Promise<SearchPostsResult> {
+  async execute(params: SearchPostsParams): Promise<$OutputBody> {
     if (!params.q.trim()) {
       return {
         posts: [],

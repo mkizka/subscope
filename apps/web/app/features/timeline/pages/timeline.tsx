@@ -1,6 +1,5 @@
-import { AppLayout } from "@/app/components/app-layout";
+import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { TimelineFeedContainer } from "@/app/features/timeline/blocks/timeline-feed-container";
-import { TimelineHeaderContainer } from "@/app/features/timeline/blocks/timeline-header-container";
 import { WelcomeSectionContainer } from "@/app/features/timeline/blocks/welcome-section-container";
 
 type Props = {
@@ -9,9 +8,9 @@ type Props = {
 
 export function TimelinePage({ atprotoProxy }: Props) {
   return (
-    <AppLayout header={<TimelineHeaderContainer />}>
+    <ThreeColumnLayout>
       <WelcomeSectionContainer atprotoProxy={atprotoProxy} />
       <TimelineFeedContainer />
-    </AppLayout>
+    </ThreeColumnLayout>
   );
 }

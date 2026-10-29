@@ -1,28 +1,26 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import { savedFeedsPrefV2 } from "@repo/client/lex/app/bsky/actor/defs";
+import getPreferences from "@repo/client/lex/app/bsky/actor/getPreferences";
 
 export class GetPreferences {
-  handle(server: Server) {
-    server.app.bsky.actor.getPreferences({
-      handler: () => {
-        return {
-          encoding: "application/json",
-          body: {
-            preferences: [
-              {
-                $type: "app.bsky.actor.defs#savedFeedsPrefV2",
-                items: [
-                  {
-                    id: "3ksog462gr22d",
-                    type: "timeline",
-                    value: "following",
-                    pinned: true,
-                  },
-                ],
-              },
-            ],
-          },
-        };
-      },
+  handle(router: LexRouter) {
+    router.add(getPreferences, () => {
+      return {
+        body: {
+          preferences: [
+            savedFeedsPrefV2.build({
+              items: [
+                {
+                  id: "3ksog462gr22d",
+                  type: "timeline",
+                  value: "following",
+                  pinned: true,
+                },
+              ],
+            }),
+          ],
+        },
+      };
     });
   }
 }

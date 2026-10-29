@@ -133,8 +133,60 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "AdminAlreadyExists" });
   });
 
+  test("getListは存在しないリストに400エラーを返す", async () => {
+    const res = await fetch(
+      `${baseUrl}/app.bsky.graph.getList?list=at://did:plc:alice/app.bsky.graph.list/notfound`,
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "InvalidRequest",
+      message: "List not found",
+    });
+  });
+
+  test("getPostThreadは存在しない投稿に400エラーを返す", async () => {
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getPostThread?uri=at://did:plc:alice/app.bsky.feed.post/notfound`,
+    );
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "NotFound",
+      message: "Post not found: at://did:plc:alice/app.bsky.feed.post/notfound",
+    });
+  });
+
+  test("getPreferencesは固定のフィード設定を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.actor.getPreferences`);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      preferences: [
+        {
+          $type: "app.bsky.actor.defs#savedFeedsPrefV2",
+          items: [
+            {
+              id: "3ksog462gr22d",
+              type: "timeline",
+              value: "following",
+              pinned: true,
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  test("searchPostsは空白のみのクエリに空の結果を返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.feed.searchPosts?q=%20`);
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ posts: [] });
+  });
+
   test("LexRouterにないNSIDは次のルーターへ流す", async () => {
-    const res = await fetch(`${baseUrl}/app.bsky.actor.getProfile`);
+    const res = await fetch(`${baseUrl}/app.bsky.feed.getLikes`);
 
     expect(res.status).toBe(418);
   });
