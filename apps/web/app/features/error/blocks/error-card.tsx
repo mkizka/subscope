@@ -1,14 +1,6 @@
 import { CheckIcon, CopyIcon, HomeIcon } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@/app/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/card";
 import { ErrorIcon } from "@/app/features/error/parts/error-icon";
 
 type Props = {
@@ -30,27 +22,24 @@ export function ErrorCard({ title, details, status, stack }: Props) {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
+    <div className="card w-full border border-base-300 bg-base-100">
+      <div className="card-body">
         <div className="flex items-center gap-3">
           <ErrorIcon status={status} />
-          <CardTitle className="text-2xl">{title}</CardTitle>
+          <h2 className="card-title text-2xl">{title}</h2>
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-base-content/70">
           {details}
           {status && `（ステータス：${status}）`}
         </p>
         {stack && (
-          <div className="relative mt-4">
-            <pre className="overflow-x-auto rounded-2xl bg-muted p-4 text-xs">
+          <div className="relative">
+            <pre className="overflow-x-auto rounded-box bg-base-200 p-4 text-xs">
               <code>{stack}</code>
             </pre>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 size-7 text-muted-foreground"
+            <button
+              type="button"
+              className="btn absolute top-2 right-2 btn-square btn-ghost btn-sm"
               onClick={handleCopy}
               aria-label="スタックトレースをコピー"
             >
@@ -59,16 +48,16 @@ export function ErrorCard({ title, details, status, stack }: Props) {
               ) : (
                 <CopyIcon className="size-4" />
               )}
-            </Button>
+            </button>
           </div>
         )}
-      </CardContent>
-      <CardFooter className="justify-end">
-        <Button variant="outline" render={<a href="/" />} nativeButton={false}>
-          <HomeIcon />
-          ホームに戻る
-        </Button>
-      </CardFooter>
-    </Card>
+        <div className="card-actions justify-end">
+          <a href="/" className="btn btn-outline">
+            <HomeIcon className="size-4" />
+            ホームに戻る
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { AppBskyFeedGetTimeline } from "@repo/client/server";
+import type * as AppBskyFeedGetTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 
 import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
 import type { TimelineService } from "../../../application/service/feed/timeline-service.js";
@@ -23,7 +23,7 @@ export class GetTimelineUseCase {
     viewerDid,
     algorithm: _, // TODO: アルゴリズムごとに実装を追加
     cursor,
-  }: GetTimelineParams): Promise<AppBskyFeedGetTimeline.OutputSchema> {
+  }: GetTimelineParams): Promise<AppBskyFeedGetTimeline.$OutputBody> {
     const page = await this.timelineService.findFeedItemsWithPagination({
       viewerDid,
       limit,

@@ -10,10 +10,10 @@ export function ErrorIcon({ status }: Props) {
   return (
     <div
       className="
-        flex size-12 items-center justify-center rounded-full bg-destructive/10
+        flex size-12 items-center justify-center rounded-full bg-error/10
       "
     >
-      <Icon className="size-6 text-destructive" />
+      <Icon className="size-6 text-error" />
     </div>
   );
 }
