@@ -12,6 +12,7 @@ type CreateOrUpdateCommitEventDto<
     operation: "create" | "update";
     collection: RecordType;
     rkey: string;
+    rev?: string;
     record: unknown;
     cid: string;
   };
@@ -24,6 +25,7 @@ type DeleteCommitEventDto<RecordType extends string = SupportedCollection> = {
     operation: "delete";
     collection: RecordType;
     rkey: string;
+    rev?: string;
   };
 };
 

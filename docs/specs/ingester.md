@@ -6,8 +6,8 @@ ingesterはTapから受け取ったイベントをジョブキューに積む。
 
 Tapの `/channel` にWebSocketで接続し、recordイベントをcommitキューに、identityイベントをidentityキューに積む。
 
-- tap-1: サポートするコレクションのcreate・updateイベントは、レコードとCIDを含めてcommitキューに積む
-- tap-2: deleteイベントは、レコードとCIDを含めずにcommitキューに積む
+- tap-1: サポートするコレクションのcreate・updateイベントは、レコードとCIDとrevを含めてcommitキューに積む
+- tap-2: deleteイベントは、revを含め、レコードとCIDを含めずにcommitキューに積む
 - tap-3: サポートしないコレクションのイベントは積まない
 - tap-4: バックフィル(liveがfalse)のイベントは、ライブのイベントより低い優先度で積む
 - tap-5: identityイベントはidentityキューに積む
