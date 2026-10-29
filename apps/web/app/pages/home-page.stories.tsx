@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { HomePage } from "./home";
+import { HomePage } from "./home-page";
 
 const meta = {
   component: HomePage,

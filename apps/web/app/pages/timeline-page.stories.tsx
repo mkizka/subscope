@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { TimelinePage } from "./timeline";
+import { TimelinePage } from "./timeline-page";
 
 const meta = {
   component: TimelinePage,
