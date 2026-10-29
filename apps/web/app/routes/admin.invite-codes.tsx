@@ -1,7 +1,7 @@
 import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 
 import { agentContext } from "@/app/context/agent";
-import { InviteCodesPage } from "@/app/pages/invite-codes-page";
+import { InviteCodesPage } from "@/app/pages/admin/invite-codes-page";
 
 import type { Route } from "./+types/admin.invite-codes";
 

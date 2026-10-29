@@ -4,7 +4,7 @@ import getSubscriptionStatus, {
 import { redirect } from "react-router";
 
 import { getAgent } from "@/app/lib/oauth/session.server";
-import { LoginPage } from "@/app/pages/login-page";
+import { LoginPage } from "@/app/pages/client/login-page";
 
 import type { Route } from "./+types/login";
 
