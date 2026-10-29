@@ -1,3 +1,4 @@
+import searchActorsTypeahead from "@repo/client/lex/app/bsky/actor/searchActorsTypeahead";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -18,12 +19,12 @@ describe("app.bsky.actor.searchActorsTypeahead", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.actor.searchActorsTypeahead({
+    const res = await client.call(searchActorsTypeahead, {
       q: "zqx",
     });
 
     // assert
-    expect(res.data.actors).toMatchObject([
+    expect(res.actors).toMatchObject([
       { did: actor.did, displayName: "Zqx Alice" },
     ]);
   });

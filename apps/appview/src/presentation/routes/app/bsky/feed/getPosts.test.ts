@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
   actorFactory,
   postFactory,
@@ -33,18 +35,15 @@ describe("app.bsky.feed.getPosts", () => {
     const second = await createPost();
 
     // act
-    const res = await client.app.bsky.feed.getPosts({
+    const res = await client.call(getPosts, {
       uris: [
-        second.uri,
+        asAtUriString(second.uri),
         "at://did:plc:notfound/app.bsky.feed.post/notfound",
-        first.uri,
+        asAtUriString(first.uri),
       ],
     });
 
     // assert
-    expect(res.data.posts.map((post) => post.uri)).toEqual([
-      second.uri,
-      first.uri,
-    ]);
+    expect(res.posts.map((post) => post.uri)).toEqual([second.uri, first.uri]);
   });
 });

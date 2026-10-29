@@ -1,3 +1,4 @@
+import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import {
   actorFactory,
   postFactory,
@@ -32,12 +33,12 @@ describe("app.bsky.feed.getAuthorFeed", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.getAuthorFeed({
+    const res = await client.call(getAuthorFeed, {
       actor: "alice.test",
     });
 
     // assert
-    expect(res.data.feed).toMatchObject([
+    expect(res.feed).toMatchObject([
       { post: { uri: post.uri, author: { did: author.did } } },
     ]);
   });
@@ -47,7 +48,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.feed.getAuthorFeed({
+    const promise = client.call(getAuthorFeed, {
       actor: "notfound.test",
     });
 

@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import getRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
 import {
   actorFactory,
   postFactory,
@@ -30,10 +32,12 @@ describe("app.bsky.feed.getRepostedBy", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.getRepostedBy({ uri: post.uri });
+    const res = await client.call(getRepostedBy, {
+      uri: asAtUriString(post.uri),
+    });
 
     // assert
-    expect(res.data).toMatchObject({
+    expect(res).toMatchObject({
       uri: post.uri,
       repostedBy: [{ did: actor.did }],
     });

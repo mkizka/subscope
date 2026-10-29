@@ -2,8 +2,8 @@ import { once } from "node:events";
 import type { AddressInfo } from "node:net";
 
 import { asDid } from "@atproto/did";
+import { Client } from "@atproto/lex";
 import { asClassArgs } from "@gyaku/di";
-import { AtpBaseClient } from "@repo/client/api";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -36,10 +36,10 @@ export const setupApiTest = async () => {
   });
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { port } = server.address() as AddressInfo;
-  const client = new AtpBaseClient(`http://localhost:${port}`);
+  const client = new Client(`http://localhost:${port}`);
   const loginAs = (did: string) => {
     services.tokenVerifier.setVerifyResult({ did: asDid(did) });
-    client.setHeader("authorization", "Bearer token");
+    client.headers.set("authorization", "Bearer token");
   };
   return { client, loginAs };
 };
