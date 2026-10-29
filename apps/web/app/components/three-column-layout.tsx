@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
-import { NotificationPanel } from "@/app/features/notification/blocks/notification-panel";
+import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
 import { ProfilePanelContainer } from "@/app/features/profile/blocks/profile-panel-container";
 import { cn } from "@/app/lib/utils";
 
@@ -89,7 +89,7 @@ export const ThreeColumnLayout = ({ children }: Props) => {
               >
                 <XIcon />
               </label>
-              <NotificationPanel />
+              <NotificationPanelContainer />
             </>
           )}
         </aside>
