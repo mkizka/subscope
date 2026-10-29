@@ -50,6 +50,7 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 本文が検索クエリに一致する投稿を新しい順に返す。認証は任意。
 
 - searchPosts-1: クエリに一致する投稿がある場合、その投稿をpostViewとして返す
+
 ## app.bsky.actor.getProfiles
 
 指定した複数アクターの詳細なプロフィールを返す。認証は任意。
