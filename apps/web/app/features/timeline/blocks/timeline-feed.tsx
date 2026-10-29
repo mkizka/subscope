@@ -31,6 +31,7 @@ export function TimelineFeed({ posts, onCompose }: Props) {
         <PostCard
           key={post.uri}
           {...post}
+          threadSearch={new URLSearchParams({ thread: post.uri }).toString()}
           toolbar={<PostToolbarContainer {...post} onCompose={onCompose} />}
         />
       ))}
