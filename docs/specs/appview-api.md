@@ -83,6 +83,8 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - listNotifications-1: 認証がない場合、401を返す
 - listNotifications-2: 閲覧者宛ての通知がある場合、新しい順に返し、既読時刻以前の通知を既読にする
+- listNotifications-3: reasonsを指定した場合、指定した種類の通知のみを返す
+- listNotifications-4: 閲覧者の既読時刻がある場合、seenAtにその時刻を返す
 
 ## app.bsky.notification.getUnreadCount
 
