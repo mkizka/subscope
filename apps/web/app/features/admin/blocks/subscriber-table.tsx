@@ -14,6 +14,8 @@ type Props = {
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  onGrantAdmin?: (did: string) => void;
+  grantingDid?: string | null;
   onBan?: (did: string) => void;
   banningDid?: string | null;
 };
@@ -24,6 +26,8 @@ export function SubscriberTable({
   isFetchingNextPage,
   onLoadMore,
   hasNextPage,
+  onGrantAdmin,
+  grantingDid,
   onBan,
   banningDid,
 }: Props) {
@@ -83,8 +87,25 @@ export function SubscriberTable({
                   </td>
                   <td className="font-mono text-xs">{subscriber.did}</td>
                   <td>
-                    {subscriber.isAdmin && (
+                    {subscriber.isAdmin ? (
                       <span className="badge badge-primary">管理者</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        disabled={grantingDid === subscriber.did}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `@${subscriber.handle} を管理者にしますか？`,
+                            )
+                          ) {
+                            onGrantAdmin?.(subscriber.did);
+                          }
+                        }}
+                      >
+                        管理者にする
+                      </button>
                     )}
                   </td>
                   <td>
@@ -92,6 +113,7 @@ export function SubscriberTable({
                       <button
                         type="button"
                         className="btn btn-outline btn-error btn-sm"
+                        disabled={banningDid === subscriber.did}
                         onClick={() => {
                           if (
                             window.confirm(
@@ -101,7 +123,6 @@ export function SubscriberTable({
                             onBan?.(subscriber.did);
                           }
                         }}
-                        disabled={banningDid === subscriber.did}
                       >
                         BAN
                       </button>

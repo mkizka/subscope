@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
+
 import { TimelinePage } from "./timeline-page";
 
 const meta = {
@@ -14,7 +16,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    atprotoProxy: "did:web:example.com",
-    posts: [],
+    posts: TimelineFeedStories.args.posts,
   },
 };

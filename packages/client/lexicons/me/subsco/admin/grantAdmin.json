@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.grantAdmin",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Grant admin to a subscriber",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "did": {
+              "type": "string",
+              "format": "did",
+              "description": "The DID of the subscriber to grant admin"
+            }
+          },
+          "required": ["did"]
+        }
+      },
+      "errors": [
+        {
+          "name": "AdminRequired"
+        },
+        {
+          "name": "NotSubscribed"
+        }
+      ]
+    }
+  }
+}

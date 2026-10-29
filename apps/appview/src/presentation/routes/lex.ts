@@ -29,6 +29,7 @@ import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
+import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
@@ -57,6 +58,7 @@ export const lexRouterFactory = (
   createInviteCode: CreateInviteCode,
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
+  grantAdmin: GrantAdmin,
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
   getSetupStatus: GetSetupStatus,
@@ -92,6 +94,7 @@ export const lexRouterFactory = (
     createInviteCode,
     deleteInviteCode,
     getInviteCodes,
+    grantAdmin,
     registerAdmin,
     verifyAccess,
     getSetupStatus,
@@ -134,6 +137,7 @@ lexRouterFactory.inject = [
   "createInviteCode",
   "deleteInviteCode",
   "getInviteCodes",
+  "grantAdmin",
   "registerAdmin",
   "verifyAccess",
   "getSetupStatus",

@@ -8,7 +8,7 @@ import { data, redirect } from "react-router";
 
 import { registerSchema } from "@/app/features/register/blocks/register-card-container";
 import { getAgent } from "@/app/lib/oauth/session.server";
-import { RegisterPage } from "@/app/pages/register-page";
+import { RegisterPage } from "@/app/pages/client/register-page";
 
 import type { Route } from "./+types/register";
 

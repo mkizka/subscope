@@ -9,13 +9,13 @@ describe("CreateAdminService", () => {
   let createAdminService: TestServices["createAdminService"];
   let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let db: TestServices["db"];
+  let transactionManager: TestServices["transactionManager"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     createAdminService = services.createAdminService;
     actorRepo = services.actorRepository;
     jobScheduler = services.jobScheduler;
-    db = services.db;
+    transactionManager = services.transactionManager;
   });
 
   test("actorが存在しない場合、新規作成して管理者に昇格しジョブをスケジュールする", async () => {
@@ -23,10 +23,9 @@ describe("CreateAdminService", () => {
     const did = "did:plc:newactor";
 
     // act
-    await createAdminService.execute({
-      ctx: { db },
-      did,
-    });
+    await transactionManager.transaction((ctx) =>
+      createAdminService.execute({ ctx, did }),
+    );
 
     // assert
     const savedActor = await actorRepo.findByDid(did);
@@ -59,10 +58,9 @@ describe("CreateAdminService", () => {
     actorRepo.add(existingActor);
 
     // act
-    await createAdminService.execute({
-      ctx: { db },
-      did: existingActor.did,
-    });
+    await transactionManager.transaction((ctx) =>
+      createAdminService.execute({ ctx, did: existingActor.did }),
+    );
 
     // assert
     const savedActor = await actorRepo.findByDid(existingActor.did);
@@ -87,5 +85,22 @@ describe("CreateAdminService", () => {
         uri: profileUri,
       }),
     );
+  });
+
+  test("トランザクションが失敗した場合、ジョブをスケジュールしない", async () => {
+    // arrange
+    const did = "did:plc:newactor";
+
+    // act
+    await expect(
+      transactionManager.transaction(async (ctx) => {
+        await createAdminService.execute({ ctx, did });
+        throw new Error("rollback");
+      }),
+    ).rejects.toThrow("rollback");
+
+    // assert
+    expect(jobScheduler.getResolveDidJobs()).toHaveLength(0);
+    expect(jobScheduler.getFetchRecordJobs()).toHaveLength(0);
   });
 });

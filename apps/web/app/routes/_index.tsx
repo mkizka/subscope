@@ -22,8 +22,8 @@ import {
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
-import { HomePage } from "@/app/pages/home-page";
-import { TimelinePage } from "@/app/pages/timeline-page";
+import { HomePage } from "@/app/pages/client/home-page";
+import { TimelinePage } from "@/app/pages/client/timeline-page";
 import { env } from "@/app/shared/env";
 
 import type { Route } from "./+types/_index";
@@ -74,7 +74,6 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const timeline = await agent.call(getTimeline, { limit: 20, cursor });
   return data({
     state: "timeline" as const,
-    atprotoProxy: `${env.APPVIEW_DID}#bsky_appview`,
     posts: timeline.feed
       .filter(({ post, reason }) => reason || !post.record.reply)
       .map(toTimelinePost)
@@ -211,13 +210,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     return <HomePage variant="setup" />;
   }
   if (loaderData.state === "timeline") {
-    return (
-      <TimelinePage
-        atprotoProxy={loaderData.atprotoProxy}
-        posts={loaderData.posts}
-        cursor={loaderData.cursor}
-      />
-    );
+    return <TimelinePage posts={loaderData.posts} cursor={loaderData.cursor} />;
   }
   return <HomePage variant="home" />;
 }

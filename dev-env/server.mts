@@ -42,7 +42,7 @@ const network = await TestNetworkNoAppView.create({
   },
 });
 
-for (const name of ["alice", "bob"]) {
+for (const name of ["alice", "bob", "carol"]) {
   await network.pds.getAgent().createAccount({
     handle: `${name}.test`,
     email: `${name}@example.com`,
@@ -69,7 +69,9 @@ const [tap, atblob] = await Promise.all([
     .start(),
 ]);
 
-process.stdout.write("Test accounts: alice.test, bob.test / password\n");
+process.stdout.write(
+  "Test accounts: alice.test, bob.test, carol.test / password\n",
+);
 
 const app = spawn(process.argv.slice(2).join(" "), {
   shell: true,

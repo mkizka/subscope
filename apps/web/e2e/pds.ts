@@ -86,13 +86,23 @@ export const subscribeServer = async (handle: string, inviteCode: string) => {
     "com.atproto.server.createSession",
     { identifier: handle, password: "password" },
   );
-  return fetch(`${PDS_URL}/xrpc/me.subsco.sync.subscribeServer`, {
+  const lxm = "me.subsco.sync.subscribeServer";
+  const serviceAuth = await fetch(
+    `${PDS_URL}/xrpc/com.atproto.server.getServiceAuth?aud=did:web:localhost%253A3001&lxm=${lxm}`,
+    { headers: { authorization: `Bearer ${accessJwt}` } },
+  );
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { token } = (await serviceAuth.json()) as { token: string };
+  const response = await fetch(`http://localhost:3001/xrpc/${lxm}`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${accessJwt}`,
-      "atproto-proxy": "did:web:localhost%3A3001#bsky_appview",
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ inviteCode }),
   });
+  const body = await response.text();
+  if (!response.ok && !body.includes("AlreadySubscribed")) {
+    throw new Error(`${lxm} failed: ${body}`);
+  }
 };

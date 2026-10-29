@@ -5,7 +5,7 @@ import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
-import { ProfilePage } from "@/app/pages/profile-page";
+import { ProfilePage } from "@/app/pages/client/profile-page";
 
 import { toTimelinePost } from "./_index";
 import type { Route } from "./+types/profile.$handle";

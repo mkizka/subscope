@@ -13,10 +13,4 @@ export interface IRecordRepository {
   }) => Promise<void>;
 
   delete: (params: { ctx: TransactionContext; uri: AtUri }) => Promise<void>;
-
-  claimRev: (params: {
-    ctx: TransactionContext;
-    uri: AtUri;
-    rev: string;
-  }) => Promise<boolean>;
 }

@@ -75,6 +75,7 @@
     "me.subsco.admin.deleteInviteCode",
     "me.subsco.admin.getInviteCodes",
     "me.subsco.admin.getSubscribers",
+    "me.subsco.admin.grantAdmin",
     "me.subsco.admin.registerAdmin",
     "me.subsco.admin.verifyAccess",
     "me.subsco.server.getSetupStatus",
@@ -330,6 +331,10 @@
     "me.subsco.admin.getSubscribers": {
       "uri": "file://./lexicons/me/subsco/admin/getSubscribers.json",
       "cid": "bafyreic33ivg4qvbuz67yue4c7gb3nczqjzjn56ztepnsa2uay7twkz3zi"
+    },
+    "me.subsco.admin.grantAdmin": {
+      "uri": "file://./lexicons/me/subsco/admin/grantAdmin.json",
+      "cid": "bafyreicl6ljof5pslyrh3tw7sotbsvtjl7o4newvxeiyfpxxiyr677liza"
     },
     "me.subsco.admin.registerAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/registerAdmin.json",

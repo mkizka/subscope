@@ -1,6 +1,9 @@
 import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getSubscribers";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { SubscriberTable } from "./subscriber-table";
 
@@ -17,39 +20,44 @@ async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
   return response.json() as Promise<$OutputBody>;
 }
 
-export function SubscriberTableContainer() {
-  const [banningDid, setBanningDid] = useState<string | null>(null);
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    refetch,
-  } = useInfiniteQuery({
-    queryKey: ["subscribers"],
-    queryFn: ({ pageParam }) => fetchSubscribers(pageParam),
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.cursor,
-    select: (data) =>
-      data.pages.flatMap((page) =>
-        page.subscribers.map(({ profile, isAdmin }) => ({
-          ...profile,
-          isAdmin,
-        })),
-      ),
+async function updateSubscriber(method: "POST" | "DELETE", did: string) {
+  const response = await fetch("/admin/api/subscribers", {
+    method,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ did }),
   });
+  if (!response.ok) {
+    throw new Error("登録アカウントの更新に失敗しました");
+  }
+}
 
-  const ban = async (did: string) => {
-    setBanningDid(did);
-    await fetch("/admin/api/subscribers", {
-      method: "POST",
-      body: JSON.stringify({ did }),
+export function SubscriberTableContainer() {
+  const queryClient = useQueryClient();
+  const onSuccess = () =>
+    queryClient.invalidateQueries({ queryKey: ["subscribers"] });
+  const grantAdminMutation = useMutation({
+    mutationFn: (did: string) => updateSubscriber("POST", did),
+    onSuccess,
+  });
+  const banMutation = useMutation({
+    mutationFn: (did: string) => updateSubscriber("DELETE", did),
+    onSuccess,
+  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteQuery({
+      queryKey: ["subscribers"],
+      queryFn: ({ pageParam }) => fetchSubscribers(pageParam),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.cursor,
+      select: (data) =>
+        data.pages.flatMap((page) =>
+          page.subscribers.map(({ profile, isAdmin }) => ({
+            ...profile,
+            isAdmin,
+          })),
+        ),
     });
-    await refetch();
-    setBanningDid(null);
-  };
 
   return (
     <SubscriberTable
@@ -58,8 +66,12 @@ export function SubscriberTableContainer() {
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={fetchNextPage}
       hasNextPage={hasNextPage}
-      onBan={(did) => void ban(did)}
-      banningDid={banningDid}
+      onGrantAdmin={grantAdminMutation.mutate}
+      grantingDid={
+        grantAdminMutation.isPending ? grantAdminMutation.variables : null
+      }
+      onBan={banMutation.mutate}
+      banningDid={banMutation.isPending ? banMutation.variables : null}
     />
   );
 }
