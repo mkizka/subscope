@@ -8,7 +8,11 @@ import {
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
 
-import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
 
 describe("PostIndexer", () => {
   let postIndexer: TestServices["postIndexer"];
@@ -31,7 +35,7 @@ describe("PostIndexer", () => {
 
   describe("upsert", () => {
     test("投稿レコードを正しく保存する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -70,7 +74,7 @@ describe("PostIndexer", () => {
     });
 
     test("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const author = actorFactory();
       const embedCid = await randomCid();
@@ -110,7 +114,7 @@ describe("PostIndexer", () => {
     });
 
     test("embedがない場合、fetchRecordジョブは追加されない", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -135,7 +139,7 @@ describe("PostIndexer", () => {
     });
 
     test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -169,7 +173,7 @@ describe("PostIndexer", () => {
     });
 
     test("notify-7: 引用された投稿の作者に quote の、メンションされたアカウントに mention の通知を作る", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const quoted = actorFactory();
       const mentioned = actorFactory();
@@ -201,7 +205,7 @@ describe("PostIndexer", () => {
     });
 
     test("notify-8: 1つの投稿から同じ相手への通知は mention > quote > reply の優先順で1件にする", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const mentioned = actorFactory();
       const quoted = actorFactory();
@@ -240,7 +244,7 @@ describe("PostIndexer", () => {
     });
 
     test("notify-6: リプライの親投稿を含めて4つ上までの投稿の作者に reply の通知を作る", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const ancestors = [];
       for (let i = 0; i < 5; i++) {
@@ -288,7 +292,7 @@ describe("PostIndexer", () => {
 
   describe("afterAction", () => {
     test("投稿時にpost_statsとactorの投稿数の集計がスケジュールされる", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
@@ -327,7 +331,7 @@ describe("PostIndexer", () => {
     });
 
     test("リプライの場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const parentAuthor = actorFactory();
       const parentUri = `at://${parentAuthor.did}/app.bsky.feed.post/parentpost`;
@@ -380,7 +384,7 @@ describe("PostIndexer", () => {
     });
 
     test("引用投稿の場合、quote集計ジョブがスケジュールされる", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const quotedAuthor = actorFactory();
       const quotedUri = `at://${quotedAuthor.did}/app.bsky.feed.post/quotedpost`;
@@ -423,7 +427,7 @@ describe("PostIndexer", () => {
     });
 
     test("親投稿が存在しない場合でも親投稿に対する集計ジョブがスケジュールされる", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const replier = actorFactory();
       const nonExistentParentUri =
@@ -475,7 +479,7 @@ describe("PostIndexer", () => {
     });
 
     test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがactor_statsは更新する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const author = actorFactory();
       const record = recordFactory({
