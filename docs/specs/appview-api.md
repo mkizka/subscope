@@ -125,6 +125,14 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getPreferences-1: Followingフィードをピン留めした設定を返す
 
+## me.subsco.admin.verifyAccess
+
+閲覧者の管理画面へのアクセス権を返す。認証が必要。statusは管理者が未登録なら `needsSetup`、閲覧者が管理者なら `authorized`、それ以外は `unauthorized` になる。
+
+## me.subsco.admin.registerAdmin
+
+管理者が未登録のとき、閲覧者を管理者として登録する。認証が必要。既に管理者がいる場合は400とAdminAlreadyExistsを、閲覧者のアクターがない場合は400とActorNotFoundを返す。
+
 ## me.subsco.admin.deleteInviteCode
 
 招待コードを削除する。管理者の認証が必要。
