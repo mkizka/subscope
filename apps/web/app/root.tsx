@@ -8,6 +8,10 @@ import type { Route } from "./+types/root";
 import { NavigationOverlayContainer } from "./components/navigation-overlay-container";
 import { ErrorPage } from "./features/error/pages/error";
 
+export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+];
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
