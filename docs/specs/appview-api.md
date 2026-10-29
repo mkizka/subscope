@@ -115,3 +115,15 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 閲覧者の設定を返す。現在は固定値を返す。
 
 - getPreferences-1: Followingフィードをピン留めした設定を返す
+
+## app.bsky.graph.getFollowers
+
+指定したアクターをフォローしているアクターを返す。認証は任意。
+
+- getFollowers-1: フォロワーがいるアクターを指定した場合、そのアクターをsubject、フォロワーのprofileViewをfollowersとして返す
+
+## app.bsky.graph.getFollows
+
+指定したアクターがフォローしているアクターを返す。認証は任意。
+
+- getFollows-1: フォローしているアクターを指定した場合、そのアクターをsubject、フォロー先のprofileViewをfollowsとして返す
