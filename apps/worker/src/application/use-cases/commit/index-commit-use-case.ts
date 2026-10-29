@@ -3,7 +3,7 @@ import {
   RecordValidationError,
 } from "@repo/common/domain";
 
-import type { IRecordRepository } from "../../interfaces/repositories/record-repository.js";
+import type { IRecordRevRepository } from "../../interfaces/repositories/record-rev-repository.js";
 import type { IndexRecordService } from "../../services/index-record-service.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
@@ -11,12 +11,12 @@ export class IndexCommitUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly indexRecordService: IndexRecordService,
-    private readonly recordRepository: IRecordRepository,
+    private readonly recordRevRepository: IRecordRevRepository,
   ) {}
   static inject = [
     "transactionManager",
     "indexRecordService",
-    "recordRepository",
+    "recordRevRepository",
   ] as const;
 
   async execute(command: IndexCommitCommand) {
@@ -37,14 +37,14 @@ export class IndexCommitUseCase {
 
   async doIndexCommit({ commit, live, jobLogger }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
-      const claimed =
+      const isNewer =
         commit.rev === undefined ||
-        (await this.recordRepository.claimRev({
+        (await this.recordRevRepository.saveIfNewer({
           ctx,
           uri: commit.uri,
           rev: commit.rev,
         }));
-      if (!claimed) {
+      if (!isNewer) {
         await jobLogger.log(`Skipping stale commit: rev ${commit.rev}`);
         return;
       }
