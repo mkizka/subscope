@@ -1,9 +1,11 @@
+import { TID } from "@atproto/common-web";
 import { Client } from "@atproto/lex";
 import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
+import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import getSubscriptionStatus, {
   subscribed,
@@ -13,8 +15,10 @@ import { data, redirect } from "react-router";
 import { HomePage } from "@/app/features/home/pages/home";
 import {
   countGraphemes,
+  isReplyRule,
   MAX_IMAGES,
   MAX_POST_LENGTH,
+  type ReplyRule,
 } from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
@@ -76,6 +80,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   });
 };
 
+const THREADGATE_RULES = {
+  follower: { $type: "app.bsky.feed.threadgate#followerRule" },
+  following: { $type: "app.bsky.feed.threadgate#followingRule" },
+  mention: { $type: "app.bsky.feed.threadgate#mentionRule" },
+} as const satisfies Record<ReplyRule, unknown>;
+
 export const action = async ({ request }: Route.ActionArgs) => {
   const agent = await getAgent(request);
   if (!agent) {
@@ -95,14 +105,21 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const subject = ref(formData.get("uri"), formData.get("cid"));
   const root = ref(formData.get("rootUri"), formData.get("rootCid")) ?? subject;
   const quote = formData.get("type") === "quote" ? subject : undefined;
+  const allow = formData.get("allow");
+  const rules =
+    typeof allow === "string" ? allow.split(",").filter(Boolean) : [];
   if (
     typeof text !== "string" ||
     (text.trim() === "" && files.length === 0) ||
     countGraphemes(text) > MAX_POST_LENGTH ||
-    files.length > MAX_IMAGES
+    files.length > MAX_IMAGES ||
+    !rules.every(isReplyRule)
   ) {
     return data({ error: "投稿内容が不正です" }, { status: 400 });
   }
+  const rkey = TID.nextStr();
+  const uri = `at://${agent.assertDid}/app.bsky.feed.post/${rkey}` as const;
+  const createdAt = currentDatetimeString();
   try {
     const images = await Promise.all(
       files.map(async (file, i) => {
@@ -114,24 +131,43 @@ export const action = async ({ request }: Route.ActionArgs) => {
       images.length > 0
         ? { $type: "app.bsky.embed.images" as const, images }
         : undefined;
-    const { uri } = await agent.create(postRecord, {
-      text,
-      embed:
-        quote && media
-          ? {
-              $type: "app.bsky.embed.recordWithMedia",
-              record: { record: quote },
-              media,
-            }
-          : quote
-            ? { $type: "app.bsky.embed.record", record: quote }
-            : media,
-      createdAt: currentDatetimeString(),
-      reply:
-        formData.get("type") === "reply" && subject && root
-          ? { root, parent: subject }
-          : undefined,
-    });
+    await agent.applyWrites((op) => [
+      op.create(
+        postRecord,
+        {
+          text,
+          embed:
+            quote && media
+              ? {
+                  $type: "app.bsky.embed.recordWithMedia",
+                  record: { record: quote },
+                  media,
+                }
+              : quote
+                ? { $type: "app.bsky.embed.record", record: quote }
+                : media,
+          reply:
+            formData.get("type") === "reply" && subject && root
+              ? { root, parent: subject }
+              : undefined,
+          createdAt,
+        },
+        { rkey },
+      ),
+      ...(typeof allow === "string"
+        ? [
+            op.create(
+              threadgate,
+              {
+                post: uri,
+                allow: rules.map((rule) => THREADGATE_RULES[rule]),
+                createdAt,
+              },
+              { rkey },
+            ),
+          ]
+        : []),
+    ]);
     return data({ uri });
   } catch (e) {
     loggerManager.createLogger("_index").error(e, "Failed to create post");

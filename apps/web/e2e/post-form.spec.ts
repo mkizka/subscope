@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
+import { resolveHandle } from "./pds";
 
 const PDS_URL = "http://localhost:2583";
 
@@ -85,5 +86,50 @@ test.describe("投稿欄", () => {
 
     await expect(page.getByRole("textbox", { name: /のALT$/ })).toHaveCount(4);
     await expect(input).toBeDisabled();
+  });
+  test("post-form-5: 返信できる人を選んで投稿すると、投稿と同じrkeyのthreadgateにその設定が保存される", async ({
+    page,
+    request,
+  }) => {
+    const text = `post-form-5: ${Date.now()}`;
+    await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
+    await page.getByRole("checkbox", { name: "フォロワー" }).check();
+    await page.getByRole("checkbox", { name: "メンションした人" }).check();
+    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "いまどうしてる？" }),
+    ).toBeVisible();
+
+    const did = await resolveHandle("alice.test");
+    const threadgates = await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.listRecords`,
+      {
+        params: {
+          repo: did,
+          collection: "app.bsky.feed.threadgate",
+          limit: 1,
+        },
+      },
+    );
+    const {
+      records: [threadgate],
+    }: { records: [{ uri: string; value: { allow: unknown } }] } =
+      await threadgates.json();
+    expect(threadgate.value.allow).toEqual([
+      { $type: "app.bsky.feed.threadgate#followerRule" },
+      { $type: "app.bsky.feed.threadgate#mentionRule" },
+    ]);
+    const postRecord = await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.getRecord`,
+      {
+        params: {
+          repo: did,
+          collection: "app.bsky.feed.post",
+          rkey: threadgate.uri.replace(/.*\//, ""),
+        },
+      },
+    );
+    const { value }: { value: { text: string } } = await postRecord.json();
+    expect(value.text).toBe(text);
   });
 });
