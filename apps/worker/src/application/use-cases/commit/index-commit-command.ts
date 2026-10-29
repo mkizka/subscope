@@ -17,6 +17,7 @@ export const indexCommitCommandFactory = ({
       commit: {
         operation: event.commit.operation,
         uri,
+        rev: event.commit.rev,
       },
       live: event.live,
       jobLogger,
@@ -26,6 +27,7 @@ export const indexCommitCommandFactory = ({
     commit: {
       operation: event.commit.operation,
       uri,
+      rev: event.commit.rev,
       record: Record.create({
         uri,
         cid: event.commit.cid,
