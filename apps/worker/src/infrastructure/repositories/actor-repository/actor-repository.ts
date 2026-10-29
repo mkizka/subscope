@@ -3,26 +3,27 @@ import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
 import type { Actor } from "@repo/common/domain";
 import { Actor as ActorDomain } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { eq, sql } from "drizzle-orm";
+import { type ActorInsert, schema } from "@repo/db";
+import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../../../application/interfaces/repositories/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
   async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
+    const data = {
+      handle: actor.handle,
+      isAdmin: actor.isAdmin,
+    } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
       .values({
         did: actor.did,
-        handle: actor.handle,
-        isAdmin: actor.isAdmin,
         indexedAt: actor.indexedAt,
+        ...data,
       })
       .onConflictDoUpdate({
         target: schema.actors.did,
-        set: {
-          handle: sql`coalesce(excluded.handle, ${schema.actors.handle})`,
-        },
+        set: data,
       });
   }
 
