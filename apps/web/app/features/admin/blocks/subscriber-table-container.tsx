@@ -1,5 +1,9 @@
 import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getSubscribers";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { SubscriberTable } from "./subscriber-table";
 
@@ -16,7 +20,24 @@ async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
   return response.json() as Promise<$OutputBody>;
 }
 
+async function grantAdmin(did: string) {
+  const response = await fetch("/admin/api/subscribers", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ did }),
+  });
+  if (!response.ok) {
+    throw new Error("管理者の付与に失敗しました");
+  }
+}
+
 export function SubscriberTableContainer() {
+  const queryClient = useQueryClient();
+  const grantAdminMutation = useMutation({
+    mutationFn: grantAdmin,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["subscribers"] }),
+  });
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
       queryKey: ["subscribers"],
@@ -40,6 +61,10 @@ export function SubscriberTableContainer() {
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={fetchNextPage}
       hasNextPage={hasNextPage}
+      onGrantAdmin={grantAdminMutation.mutate}
+      grantingDid={
+        grantAdminMutation.isPending ? grantAdminMutation.variables : null
+      }
     />
   );
 }
