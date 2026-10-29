@@ -29,7 +29,7 @@ test.describe("登録ユーザー", () => {
     await expect(row.getByText("管理者")).toBeVisible();
   });
 
-  test("subscribers-3: 管理者でないサブスクライバーを「管理者にする」で管理者にできる", async ({
+  test("subscribers-3: 管理者でないサブスクライバーを、確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await login(page);
@@ -43,6 +43,7 @@ test.describe("登録ユーザー", () => {
       await expect(row).toBeVisible({ timeout: 1000 });
     }).toPass();
 
+    page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
 
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();

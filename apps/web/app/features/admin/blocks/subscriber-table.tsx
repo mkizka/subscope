@@ -89,7 +89,15 @@ export function SubscriberTable({
                         type="button"
                         className="btn btn-sm"
                         disabled={grantingDid === subscriber.did}
-                        onClick={() => onGrantAdmin?.(subscriber.did)}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `@${subscriber.handle} を管理者にしますか？`,
+                            )
+                          ) {
+                            onGrantAdmin?.(subscriber.did);
+                          }
+                        }}
                       >
                         管理者にする
                       </button>
