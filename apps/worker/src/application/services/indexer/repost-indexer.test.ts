@@ -126,7 +126,7 @@ describe("RepostIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
+    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", () => {
       // arrange
       const { post } = postFactory();
       postRepo.add(post);
@@ -143,7 +143,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.afterAction({ ctx: { db, afterCommit }, record });
+      repostIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();
