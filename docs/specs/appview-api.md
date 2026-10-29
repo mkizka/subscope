@@ -134,3 +134,10 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 指定したアクターがフォローしているアクターを返す。認証は任意。
 
 - getFollows-1: フォローしているアクターを指定した場合、そのアクターをsubject、フォロー先のprofileViewをfollowsとして返す
+
+## app.bsky.graph.getLists
+
+指定したアクターが作成したリストを返す。認証は任意。
+
+- getLists-1: リストを作成したアクターを指定した場合、そのリストのlistViewをlistsとして返す
+- getLists-2: purposesを指定した場合、指定した用途のリストのみを返す

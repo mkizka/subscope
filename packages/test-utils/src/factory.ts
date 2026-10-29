@@ -446,6 +446,33 @@ export const generatorFactory = (db: Database) =>
       actorDid: async ({ vars }) => (await vars.record).actorDid,
     });
 
+export const listFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          uri: later<string>(),
+          cid: later<string>(),
+          actorDid: later<string>(),
+          purpose: () => "app.bsky.graph.defs#curatelist",
+          name: () => faker.lorem.words(),
+          description: () => faker.lorem.sentence() as string | null,
+          avatarCid: () => null as string | null,
+          createdAt: () => faker.date.recent(),
+          indexedAt: () => faker.date.recent(),
+        },
+        vars: {
+          record: () => recordFactory(db, "app.bsky.graph.list").create(),
+        },
+      },
+      (props) => create(db, schema.lists, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.record).uri,
+      cid: async ({ vars }) => (await vars.record).cid,
+      actorDid: async ({ vars }) => (await vars.record).actorDid,
+    });
+
 export const inviteCodeFactory = (db: Database) =>
   factory.define(
     {
