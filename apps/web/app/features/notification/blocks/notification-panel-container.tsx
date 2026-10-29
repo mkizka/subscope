@@ -21,10 +21,5 @@ export function NotificationPanelContainer() {
     queryFn: fetchNotifications,
   });
 
-  const notifications = (data?.notifications ?? []).map((notification) => ({
-    uri: notification.uri,
-    authorName: notification.author.displayName ?? notification.author.handle,
-  }));
-
-  return <NotificationPanel notifications={notifications} />;
+  return <NotificationPanel notifications={data?.notifications ?? []} />;
 }
