@@ -18,7 +18,7 @@ describe("me.subsco.admin.getSubscribers", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getSubscribers-2: 管理者でないアカウントからのリクエストには401を返す", async () => {
+  test("getSubscribers-2: 管理者でないアカウントからのリクエストには403を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db).create();
@@ -28,7 +28,7 @@ describe("me.subsco.admin.getSubscribers", () => {
     const promise = client.call(getSubscribers);
 
     // assert
-    await expect(promise).rejects.toMatchObject({ status: 401 });
+    await expect(promise).rejects.toMatchObject({ status: 403 });
   });
 
   test("getSubscribers-3: サブスクライバーごとにprofileViewと管理者かどうかを返す", async () => {
