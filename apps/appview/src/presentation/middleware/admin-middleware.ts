@@ -1,4 +1,4 @@
-import { LexServerAuthError } from "@atproto/lex-server";
+import { LexServerError } from "@atproto/lex-server";
 
 import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
 import type { AuthVerifierMiddleware } from "./auth-verifier-middleware.js";
@@ -14,12 +14,11 @@ export class AdminMiddleware {
     const credentials = await this.authVerifierMiddleware.loginRequired(ctx);
 
     const actor = await this.actorRepository.findByDid(credentials.did);
-    // TODO: lexiconに定義したエラーを返す
     if (!actor?.isAdmin) {
-      throw new LexServerAuthError(
-        "AuthenticationRequired",
-        "Admin access required",
-      );
+      throw new LexServerError(403, {
+        error: "Forbidden",
+        message: "Admin access required",
+      });
     }
 
     return credentials;

@@ -106,14 +106,14 @@ describe("lexRouter", () => {
     expect(res.status).toBe(200);
   });
 
-  test("管理者でない場合、admin APIは401エラーを返す", async () => {
+  test("管理者でない場合、admin APIは403エラーを返す", async () => {
     const res = await fetch(`${baseUrl}/me.subsco.admin.getInviteCodes`, {
       headers: auth,
     });
 
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({
-      error: "AuthenticationRequired",
+      error: "Forbidden",
       message: "Admin access required",
     });
   });
