@@ -24,6 +24,73 @@ test.describe("通知", () => {
 });
 
 test.describe("通知（PC）", () => {
+  test("notification-2: フォローされると、相手の名前が通知に出る", async ({
+    page,
+  }) => {
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    await follow("bob.test", "alice.test");
+
+    await login(page);
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page
+          .getByRole("complementary")
+          .getByText("Bobさんにフォローされました")
+          .first(),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
+  test("notification-1: 自分の投稿がいいね・リポストされると、相手の名前と対象の投稿の本文が通知に出る", async ({
+    page,
+  }) => {
+    const createdAt = new Date().toISOString();
+    const text = `notification-1: ${createdAt}`;
+    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt,
+    });
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    const subject = { uri: post.uri, cid: post.cid };
+    await createRecord("bob.test", "app.bsky.feed.like", {
+      subject,
+      createdAt,
+    });
+    await createRecord("bob.test", "app.bsky.feed.repost", {
+      subject,
+      createdAt,
+    });
+
+    await login(page);
+
+    const panel = page.getByRole("complementary");
+    await expect(async () => {
+      await page.reload();
+      for (const label of [
+        "Bobさんがいいねしました",
+        "Bobさんがリポストしました",
+      ]) {
+        await expect(
+          panel
+            .getByRole("listitem")
+            .filter({ hasText: label })
+            .filter({ hasText: text }),
+        ).toBeVisible({ timeout: 1000 });
+      }
+    }).toPass();
+  });
+
   test("notification-3: 自分の投稿にリプライ・引用・メンションされると、その投稿が通知に出る", async ({
     page,
   }) => {
@@ -77,6 +144,77 @@ test.describe("通知（PC）", () => {
       for (const text of texts) {
         await expect(panel.getByText(text)).toBeVisible({ timeout: 1000 });
       }
+    }).toPass();
+  });
+
+  test("notification-5: 未読の通知は背景色で区別され、通知を開いた後に再表示すると既読になる", async ({
+    page,
+  }) => {
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    await createRecord("bob.test", "app.bsky.graph.follow", {
+      subject: await resolveHandle("alice.test"),
+      createdAt: new Date().toISOString(),
+    });
+
+    await login(page);
+
+    const notification = page
+      .getByRole("region", { name: "通知" })
+      .getByRole("listitem")
+      .first();
+    await expect(async () => {
+      await page.reload();
+      await expect(notification).toHaveText("Bobさんにフォローされました", {
+        timeout: 1000,
+      });
+      await expect(notification).toHaveClass(/bg-base-200/, { timeout: 1000 });
+    }).toPass();
+
+    await expect(async () => {
+      await page.reload();
+      await expect(notification).not.toHaveClass(/bg-base-200/, {
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
+  test("notification-4: 通知は新しい順に並び、下までスクロールすると古い通知を読み込む", async ({
+    page,
+  }) => {
+    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "notification-4: 元の投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    const ref = { uri: post.uri, cid: post.cid };
+    const texts = Array.from(
+      { length: 31 },
+      (_, i) => `notification-4: リプライ${i}`,
+    );
+    for (const text of texts) {
+      await createRecord("bob.test", "app.bsky.feed.post", {
+        text,
+        reply: { root: ref, parent: ref },
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    await login(page);
+
+    const replies = page
+      .getByRole("complementary")
+      .getByText(/^notification-4: リプライ/);
+    await expect(async () => {
+      await page.reload();
+      await expect(replies.first()).toBeVisible({ timeout: 1000 });
+      await replies.last().scrollIntoViewIfNeeded();
+      await expect(replies).toHaveText([...texts].reverse(), { timeout: 1000 });
     }).toPass();
   });
 });

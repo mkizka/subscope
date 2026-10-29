@@ -1,11 +1,12 @@
 import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, count, desc, eq, gt, isNull, lt, or } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, isNull, lt, or } from "drizzle-orm";
 
 import type {
   INotificationRepository,
   NotificationItem,
+  NotificationReason,
 } from "../../application/interfaces/notification-repository.js";
 
 export class NotificationRepository implements INotificationRepository {
@@ -16,6 +17,7 @@ export class NotificationRepository implements INotificationRepository {
     recipientDid: Did;
     limit: number;
     cursor?: Date;
+    reasons?: NotificationReason[];
   }): Promise<NotificationItem[]> {
     const { notifications, records, subscriptions } = schema;
     const rows = await this.db
@@ -39,6 +41,9 @@ export class NotificationRepository implements INotificationRepository {
         and(
           eq(notifications.recipientDid, params.recipientDid),
           params.cursor ? lt(notifications.sortAt, params.cursor) : undefined,
+          params.reasons
+            ? inArray(notifications.reason, params.reasons)
+            : undefined,
         ),
       )
       .orderBy(desc(notifications.sortAt))
@@ -50,7 +55,7 @@ export class NotificationRepository implements INotificationRepository {
     }));
   }
 
-  async countUnread(recipientDid: Did): Promise<number> {
+  async countUnread(recipientDid: Did, seenAt?: Date): Promise<number> {
     const { notifications, subscriptions } = schema;
     const [row] = await this.db
       .select({ count: count() })
@@ -62,10 +67,12 @@ export class NotificationRepository implements INotificationRepository {
       .where(
         and(
           eq(notifications.recipientDid, recipientDid),
-          or(
-            isNull(subscriptions.seenAt),
-            gt(notifications.sortAt, subscriptions.seenAt),
-          ),
+          seenAt
+            ? gt(notifications.sortAt, seenAt)
+            : or(
+                isNull(subscriptions.seenAt),
+                gt(notifications.sortAt, subscriptions.seenAt),
+              ),
         ),
       );
     return row?.count ?? 0;

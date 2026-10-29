@@ -1,4 +1,4 @@
-import { HeartIcon, MessageCircleIcon, RepeatIcon } from "lucide-react";
+import { RepeatIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
@@ -50,7 +50,7 @@ export function PostCard({
   threadSearch,
 }: PostCardProps) {
   return (
-    <article className="group relative border-b border-border/40 px-4 py-3">
+    <article className="group relative border-b border-base-300 px-4 py-3">
       {threadSearch && (
         <Link
           to={{ search: threadSearch }}
@@ -62,7 +62,7 @@ export function PostCard({
       {reasonRepost && (
         <div
           className="
-            mb-1 flex items-center gap-1 pl-10 text-xs text-muted-foreground
+            mb-1 flex items-center gap-1 pl-10 text-xs text-base-content/70
           "
         >
           <RepeatIcon className="size-3" />
@@ -81,7 +81,7 @@ export function PostCard({
               className="size-10 rounded-full object-cover"
             />
           ) : (
-            <div className="size-10 rounded-full bg-muted" />
+            <div className="size-10 rounded-full bg-base-200" />
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -89,10 +89,10 @@ export function PostCard({
             <span className="truncate font-semibold">
               {authorDisplayName ?? authorHandle}
             </span>
-            <span className="truncate text-muted-foreground">
+            <span className="truncate text-base-content/70">
               @{authorHandle}
             </span>
-            <span className="shrink-0 text-muted-foreground">
+            <span className="shrink-0 text-base-content/70">
               · {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
             </span>
           </div>
@@ -109,19 +109,21 @@ export function PostCard({
               ))}
             </div>
           )}
-          <div className="mt-2 flex gap-6 text-muted-foreground">
-            <span className="flex items-center gap-1 text-sm">
-              <MessageCircleIcon className="size-4" />
-              {replyCount ?? 0}
-            </span>
-            <span className="flex items-center gap-1 text-sm">
-              <RepeatIcon className="size-4" />
-              {repostCount ?? 0}
-            </span>
-            <span className="flex items-center gap-1 text-sm">
-              <HeartIcon className="size-4" />
-              {likeCount ?? 0}
-            </span>
+          <div
+            className="
+              mt-2 flex gap-2
+              empty:hidden
+            "
+          >
+            {!!replyCount && (
+              <span className="badge badge-sm">{replyCount}件の返信</span>
+            )}
+            {!!repostCount && (
+              <span className="badge badge-sm">{repostCount}件のリポスト</span>
+            )}
+            {!!likeCount && (
+              <span className="badge badge-sm">{likeCount}件のいいね</span>
+            )}
           </div>
         </div>
       </div>

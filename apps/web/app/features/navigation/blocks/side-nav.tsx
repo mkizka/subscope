@@ -1,9 +1,14 @@
+import { Link } from "react-router";
+
 type Props = {
+  did?: string;
   avatarUrl?: string;
   handle?: string;
 };
 
-export function SideNav({ avatarUrl, handle }: Props) {
+export function SideNav({ did, avatarUrl, handle }: Props) {
+  const profileId = handle === "handle.invalid" ? did : handle;
+
   return (
     <nav className="flex h-full flex-col">
       <div className="p-4 text-lg font-bold text-primary">Subscope</div>
@@ -37,7 +42,11 @@ export function SideNav({ avatarUrl, handle }: Props) {
           <a>検索</a>
         </li>
         <li>
-          <a>プロフィール</a>
+          {profileId ? (
+            <Link to={`/profile/${profileId}`}>プロフィール</Link>
+          ) : (
+            <a>プロフィール</a>
+          )}
         </li>
       </ul>
       <div className="flex items-center gap-2 border-t border-base-300 p-4">

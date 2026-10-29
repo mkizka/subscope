@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TimelineFeed } from "./timeline-feed";
 
 const meta = {
-  title: "features/Timeline/TimelineFeed",
   component: TimelineFeed,
   args: {
     onCompose: () => {},

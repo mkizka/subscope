@@ -59,4 +59,58 @@ describe("app.bsky.notification.listNotifications", () => {
       { uri: read.uri, author: { did: author.did }, isRead: true },
     ]);
   });
+
+  test("listNotifications-3: reasonsを指定した場合、指定した種類の通知のみを返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    const author = await actorFactory(ctx.db)
+      .use((t) => t.withProfile({}))
+      .create();
+    const notify = async (reason: "follow" | "like") => {
+      const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
+        .vars({ actor: () => author })
+        .create();
+      await ctx.db.insert(schema.notifications).values({
+        recordUri: record.uri,
+        recipientDid: viewer.did,
+        authorDid: author.did,
+        reason,
+        sortAt: new Date(),
+      });
+      return record;
+    };
+    const follow = await notify("follow");
+    await notify("like");
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(listNotifications, { reasons: ["follow"] });
+
+    // assert
+    expect(res.notifications).toMatchObject([
+      { uri: follow.uri, reason: "follow" },
+    ]);
+  });
+
+  test("listNotifications-4: 閲覧者の既読時刻がある場合、seenAtにその時刻を返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    await ctx.db
+      .update(schema.subscriptions)
+      .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
+      .where(eq(schema.subscriptions.actorDid, viewer.did));
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(listNotifications);
+
+    // assert
+    expect(res.seenAt).toBe("2024-01-02T00:00:00.000Z");
+  });
 });
