@@ -61,7 +61,7 @@ describe("FollowIndexer", () => {
       });
     });
 
-    test("フォロワーがサブスクライバーの場合、フォロイーのDIDがTapに登録される", async () => {
+    test("tap-1: サブスクライバーがフォローしたアカウントをTapに登録する", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -91,7 +91,7 @@ describe("FollowIndexer", () => {
       );
     });
 
-    test("フォロワーがサブスクライバーでない場合、TapにDIDが登録されない", async () => {
+    test("tap-2: サブスクライバー以外のフォローではTapに登録しない", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -186,7 +186,7 @@ describe("FollowIndexer", () => {
       );
     });
 
-    test("フォロー削除時、フォロワーがサブスクライバーで他のサブスクライバーからフォローされていない場合、Tapから削除される", async () => {
+    test("tap-3: サブスクライバーがフォローを外したアカウントは、どのサブスクライバーからもフォローされていなければTapから外す", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -218,7 +218,7 @@ describe("FollowIndexer", () => {
       );
     });
 
-    test("フォロー削除時、フォロワーがサブスクライバーでも他のサブスクライバーからフォローされている場合、Tapから削除されない", async () => {
+    test("tap-4: 他のサブスクライバーがフォローしているアカウントはTapから外さない", async () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
@@ -253,7 +253,7 @@ describe("FollowIndexer", () => {
       );
     });
 
-    test("フォロー削除時、フォロワーがサブスクライバーでない場合、Tap削除処理は実行されない", async () => {
+    test("tap-5: サブスクライバー以外がフォローを外してもTapから外さない", async () => {
       // arrange
       const subscriber = actorFactory();
       const nonSubscriber = actorFactory();
