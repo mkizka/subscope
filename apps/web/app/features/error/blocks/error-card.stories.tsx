@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ErrorCard } from "./error-card";
 
 const meta = {
-  title: "features/Error/ErrorCard",
   component: ErrorCard,
 } satisfies Meta<typeof ErrorCard>;
 

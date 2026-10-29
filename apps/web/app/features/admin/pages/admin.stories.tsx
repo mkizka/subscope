@@ -6,7 +6,6 @@ import { SubscriberTableContainer } from "@/app/features/admin/blocks/subscriber
 import { AdminLayout } from "./admin";
 
 const meta = {
-  title: "pages/admin",
   component: AdminLayout,
   parameters: {
     layout: "fullscreen",

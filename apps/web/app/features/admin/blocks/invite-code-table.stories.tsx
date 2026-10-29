@@ -4,7 +4,6 @@ import { fn } from "storybook/test";
 import { InviteCodeTable } from "./invite-code-table";
 
 const meta = {
-  title: "features/Admin/InviteCodeTable",
   component: InviteCodeTable,
   args: {
     onCreateCode: fn(),

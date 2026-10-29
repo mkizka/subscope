@@ -9,7 +9,6 @@ import {
 } from "./tooltip";
 
 const meta = {
-  title: "ui/Tooltip",
   component: Tooltip,
   render: () => (
     <TooltipProvider>

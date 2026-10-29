@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Skeleton } from "./skeleton";
 
 const meta = {
-  title: "ui/Skeleton",
   component: Skeleton,
   render: () => (
     <div className="flex flex-col gap-4">

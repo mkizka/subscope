@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { SubscriberTable } from "./subscriber-table";
 
 const meta = {
-  title: "features/Admin/SubscriberTable",
   component: SubscriberTable,
 } satisfies Meta<typeof SubscriberTable>;
 
