@@ -1,11 +1,12 @@
 import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
+  postFactory,
   recordFactory,
   subscriptionFactory,
 } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
-import { beforeEach, describe, expect, test } from "vitest";
+import { assert, beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
@@ -217,6 +218,52 @@ describe("PostIndexer", () => {
           reasonSubject: quotedUri,
         },
       ]);
+    });
+
+    test("notification-1: 親投稿を含めて4つ上までの保存済みの投稿の作者にリプライ通知を作成する", async () => {
+      const ctx = { db };
+      // arrange
+      const ancestors = [];
+      for (let i = 0; i < 5; i++) {
+        const actor = actorFactory();
+        subscriptionRepo.add(subscriptionFactory({ actorDid: actor.did }));
+        const { post } = postFactory({
+          actorDid: actor.did,
+          uri: `at://${actor.did}/app.bsky.feed.post/ancestor${i}`,
+          replyParent: ancestors[0] && {
+            uri: ancestors[0].uri,
+            cid: ancestors[0].cid,
+          },
+        });
+        postRepo.add(post);
+        ancestors.unshift(post);
+      }
+      const [parent] = ancestors;
+      assert(parent);
+      const record = recordFactory({
+        uri: `at://${actorFactory().did}/app.bsky.feed.post/reply`,
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "reply",
+          reply: {
+            root: { uri: parent.uri.toString(), cid: parent.cid },
+            parent: { uri: parent.uri.toString(), cid: parent.cid },
+          },
+          createdAt: new Date().toISOString(),
+        },
+      });
+
+      // act
+      await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
+
+      // assert
+      expect(notificationRepo.findAll()).toMatchObject(
+        ancestors.slice(0, 4).map((ancestor) => ({
+          recipientDid: ancestor.actorDid,
+          reason: "reply",
+          reasonSubject: ancestor.uri.toString(),
+        })),
+      );
     });
   });
 

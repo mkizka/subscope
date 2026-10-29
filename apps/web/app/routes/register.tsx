@@ -6,11 +6,9 @@ import getSubscriptionStatus, {
 import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
 import { data, redirect } from "react-router";
 
-import {
-  RegisterContainer,
-  registerSchema,
-} from "@/app/features/register/pages/register-container";
+import { registerSchema } from "@/app/features/register/blocks/register-card-container";
 import { getAgent } from "@/app/lib/oauth/session.server";
+import { RegisterPage } from "@/app/pages/register-page";
 
 import type { Route } from "./+types/register";
 
@@ -72,5 +70,5 @@ export const action = async ({ request }: Route.ActionArgs) => {
 };
 
 export default function Register({ loaderData }: Route.ComponentProps) {
-  return <RegisterContainer isLoggedIn={loaderData.isLoggedIn} />;
+  return <RegisterPage isLoggedIn={loaderData.isLoggedIn} />;
 }

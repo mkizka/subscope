@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { RegisterPage } from "./register";
+import { RegisterPage } from "./register-page";
 
 const meta = {
   component: RegisterPage,
@@ -9,16 +9,6 @@ const meta = {
   },
   args: {
     isLoggedIn: false,
-    formProps: {},
-    inputProps: {
-      id: "inviteCode",
-      name: "inviteCode",
-    },
-    fields: {
-      inviteCode: {
-        id: "inviteCode",
-      },
-    },
   },
 } satisfies Meta<typeof RegisterPage>;
 
