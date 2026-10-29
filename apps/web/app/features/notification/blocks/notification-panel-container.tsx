@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 
 import type { loader } from "@/app/routes/api.notifications";
 
@@ -33,6 +34,22 @@ export function NotificationPanelContainer() {
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage.cursor,
     });
+  const ref = useRef<HTMLDivElement>(null);
+  const latest = data?.pages[0]?.notifications[0];
+
+  useEffect(() => {
+    if (!latest || latest.isRead || !ref.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      observer.disconnect();
+      void fetch("/api/notifications", {
+        method: "POST",
+        body: JSON.stringify({ seenAt: latest.indexedAt }),
+      });
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [latest]);
 
   const notifications = (data?.pages ?? []).flatMap((page) =>
     page.notifications.map((notification) => ({
@@ -42,14 +59,17 @@ export function NotificationPanelContainer() {
       text: ["reply", "quote", "mention"].includes(notification.reason)
         ? maybeString(notification.record.text)
         : maybeString(page.subjectTexts[notification.reasonSubject ?? ""]),
+      isRead: notification.isRead,
     })),
   );
 
   return (
-    <NotificationPanel
-      notifications={notifications}
-      onLoadMore={fetchNextPage}
-      hasNextPage={hasNextPage && !isFetchingNextPage}
-    />
+    <div ref={ref}>
+      <NotificationPanel
+        notifications={notifications}
+        onLoadMore={fetchNextPage}
+        hasNextPage={hasNextPage && !isFetchingNextPage}
+      />
+    </div>
   );
 }

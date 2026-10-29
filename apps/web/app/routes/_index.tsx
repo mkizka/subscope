@@ -181,7 +181,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
 
-function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
+export function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
   return {
     uri: post.uri,
     cid: post.cid,
