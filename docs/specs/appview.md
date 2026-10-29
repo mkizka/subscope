@@ -35,16 +35,18 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## app.bsky.feed.getTimeline
 
-閲覧者のホームタイムラインを新しい順に返す。認証が必要。
+閲覧者のホームタイムラインを返す。認証が必要。
 
-- getTimeline-1: 認証がない場合、401を返す
-- getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
+- getTimeline-1: 認証がないリクエストには401を返す
+- getTimeline-2: 閲覧者本人とフォロイーの投稿・リポストを含める
+- getTimeline-3: フォロイー以外の投稿・リポストは含めない
+- getTimeline-4: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getListFeed
 
 指定したリストのメンバーの投稿とリポストを新しい順に返す。認証は任意。
 
-- getListFeed-1: リストのメンバーとメンバー以外の投稿がある場合、メンバーの投稿のみをfeedViewPostとして返す
+- getListFeed-1: リストのメンバーの投稿だけをfeedViewPostで返す
 
 ## app.bsky.feed.getActorLikes
 
@@ -93,8 +95,8 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 指定したアクターの投稿とリポストを新しい順に返す。認証は任意。
 
-- getAuthorFeed-1: アクターをハンドルで指定した場合、そのアクターの投稿をfeedViewPostとして返す
-- getAuthorFeed-2: 解決できないハンドルを指定した場合、400を返す
+- getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す
+- getAuthorFeed-2: 解決できないハンドルには400を返す
 
 ## app.bsky.notification.listNotifications
 
