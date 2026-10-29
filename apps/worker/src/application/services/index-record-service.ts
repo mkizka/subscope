@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { AfterCommitContext } from "@repo/common/domain";
 import type { Record } from "@repo/common/domain";
 import {
   isSupportedCollection,
@@ -74,7 +74,7 @@ export class IndexRecordService {
     live,
     depth,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     jobLogger: JobLogger;
     force?: boolean;
@@ -101,7 +101,7 @@ export class IndexRecordService {
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
   }
 
-  async delete({ ctx, uri }: { ctx: TransactionContext; uri: AtUri }) {
+  async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {
     const existingRecord = await this.recordRepository.findByUri({ ctx, uri });
 
     await this.recordRepository.delete({ ctx, uri });

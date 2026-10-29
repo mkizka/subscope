@@ -1,4 +1,4 @@
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type { AfterCommitContext, Record } from "@repo/common/domain";
 import { ListItem } from "@repo/common/domain";
 
 import type { IListItemRepository } from "../../interfaces/repositories/list-item-repository.js";
@@ -17,7 +17,7 @@ export class ListItemIndexer implements ICollectionIndexer {
     record,
     live,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     live: boolean;
   }) {

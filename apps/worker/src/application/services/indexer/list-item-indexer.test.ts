@@ -1,7 +1,7 @@
 import { actorFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
-import { testRegistry } from "../../../shared/test-utils.js";
+import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
 
 describe("ListItemIndexer", () => {
   test("リスト項目レコードを保存し、対象アクターを作成する", async () => {
@@ -22,7 +22,11 @@ describe("ListItemIndexer", () => {
     });
 
     // act
-    await listItemIndexer.upsert({ ctx: { db }, record, live: false });
+    await listItemIndexer.upsert({
+      ctx: { db, afterCommit },
+      record,
+      live: false,
+    });
 
     // assert
     expect(listItemRepository.findByUri(record.uri)).toMatchObject({
