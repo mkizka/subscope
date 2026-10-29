@@ -9,7 +9,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.notification.getUnreadCount", () => {
   const { ctx } = testSetup;
 
-  test("getUnreadCount-1: 認証がない場合、401を返す", async () => {
+  test("getUnreadCount-1: 認証がないリクエストには401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 
@@ -20,7 +20,7 @@ describe("app.bsky.notification.getUnreadCount", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す", async () => {
+  test("getUnreadCount-2: 既読時刻より新しい通知の数を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
@@ -52,7 +52,7 @@ describe("app.bsky.notification.getUnreadCount", () => {
     expect(res).toEqual({ count: 2 });
   });
 
-  test("getUnreadCount-3: seenAtを指定した場合、保存済みの既読時刻ではなくseenAtより新しい通知の数を返す", async () => {
+  test("getUnreadCount-3: seenAtを指定すると、保存した既読時刻の代わりにseenAtより新しい通知の数を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)

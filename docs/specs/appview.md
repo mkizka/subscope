@@ -98,26 +98,27 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## app.bsky.notification.listNotifications
 
-閲覧者宛ての通知を新しい順に返す。認証が必要。
+閲覧者宛ての通知を返す。認証が必要。priorityは無視し、常に全件を返す。
 
-- listNotifications-1: 認証がない場合、401を返す
-- listNotifications-2: 閲覧者宛ての通知がある場合、新しい順に返し、既読時刻以前の通知を既読にする
-- listNotifications-3: reasonsを指定した場合、指定した種類の通知のみを返す
-- listNotifications-4: 閲覧者の既読時刻がある場合、seenAtにその時刻を返す
+- listNotifications-1: 認証がないリクエストには401を返す
+- listNotifications-2: 閲覧者宛ての通知を新しい順に返す
+- listNotifications-3: 既読時刻以前の通知は既読にし、それより後の通知は未読にする
+- listNotifications-4: reasonsを指定すると、その種類の通知だけを返す
+- listNotifications-5: seenAtに閲覧者の既読時刻を返す
 
 ## app.bsky.notification.getUnreadCount
 
-閲覧者宛ての未読通知の数を返す。認証が必要。
+閲覧者宛ての未読通知の数を返す。認証が必要。priorityは無視する。
 
-- getUnreadCount-1: 認証がない場合、401を返す
-- getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す
-- getUnreadCount-3: seenAtを指定した場合、保存済みの既読時刻ではなくseenAtより新しい通知の数を返す
+- getUnreadCount-1: 認証がないリクエストには401を返す
+- getUnreadCount-2: 既読時刻より新しい通知の数を返す
+- getUnreadCount-3: seenAtを指定すると、保存した既読時刻の代わりにseenAtより新しい通知の数を返す
 
 ## app.bsky.notification.updateSeen
 
 閲覧者の既読時刻を更新する。認証が必要。
 
-- updateSeen-1: 認証がない場合、401を返す
+- updateSeen-1: 認証がないリクエストには401を返す
 - updateSeen-2: 指定した時刻以前の通知を既読にする
 
 ## app.bsky.graph.getFollowers
