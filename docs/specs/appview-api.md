@@ -21,6 +21,27 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
 
+## app.bsky.notification.listNotifications
+
+閲覧者宛ての通知を新しい順に返す。認証が必要。
+
+- listNotifications-1: 認証がない場合、401を返す
+- listNotifications-2: 閲覧者宛ての通知がある場合、新しい順に返し、既読時刻以前の通知を既読にする
+
+## app.bsky.notification.getUnreadCount
+
+閲覧者宛ての未読通知の数を返す。認証が必要。
+
+- getUnreadCount-1: 認証がない場合、401を返す
+- getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す
+
+## app.bsky.notification.updateSeen
+
+閲覧者の既読時刻を更新する。認証が必要。
+
+- updateSeen-1: 認証がない場合、401を返す
+- updateSeen-2: 指定した時刻以前の通知を既読にする
+
 ## app.bsky.actor.getProfiles
 
 指定した複数アクターの詳細なプロフィールを返す。認証は任意。
