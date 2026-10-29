@@ -5,7 +5,6 @@ import type { IRecordRepository } from "../../../application/interfaces/reposito
 
 export class InMemoryRecordRepository implements IRecordRepository {
   private records: Map<string, Record> = new Map();
-  private revs: Map<string, string> = new Map();
 
   add(record: Record): void {
     this.records.set(record.uri.toString(), record);
@@ -13,7 +12,6 @@ export class InMemoryRecordRepository implements IRecordRepository {
 
   clear(): void {
     this.records.clear();
-    this.revs.clear();
   }
 
   findAll(): Record[] {
@@ -45,21 +43,5 @@ export class InMemoryRecordRepository implements IRecordRepository {
     uri: AtUri;
   }): Promise<void> {
     this.records.delete(uri.toString());
-  }
-
-  async claimRev({
-    uri,
-    rev,
-  }: {
-    ctx: TransactionContext;
-    uri: AtUri;
-    rev: string;
-  }): Promise<boolean> {
-    const current = this.revs.get(uri.toString());
-    if (current !== undefined && current >= rev) {
-      return false;
-    }
-    this.revs.set(uri.toString(), rev);
-    return true;
   }
 }
