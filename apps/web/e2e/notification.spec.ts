@@ -18,7 +18,7 @@ test.describe("通知", () => {
       createdAt: new Date().toISOString(),
     });
     await createRecord("alice.test", "app.bsky.graph.follow", {
-      subject: new URL(bob.uri).hostname,
+      subject: bob.uri.split("/")[2],
       createdAt: new Date().toISOString(),
     });
     const alice = await createRecord("alice.test", "app.bsky.feed.post", {
