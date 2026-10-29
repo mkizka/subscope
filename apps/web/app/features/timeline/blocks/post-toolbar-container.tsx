@@ -3,11 +3,11 @@ import { useFetcher } from "react-router";
 import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
 import type { action } from "@/app/routes/api.reactions";
 
-type Props = {
-  uri: string;
-  cid: string;
-  viewerLike?: string;
-  viewerRepost?: string;
+import type { ComposeTarget } from "./post-form-container";
+import type { TimelinePost } from "./timeline-feed";
+
+type Props = TimelinePost & {
+  onCompose: (target: ComposeTarget) => void;
 };
 
 function useReaction(type: string, post: Props, viewerUri?: string) {
@@ -17,7 +17,7 @@ function useReaction(type: string, post: Props, viewerUri?: string) {
     ? !fetcher.formData.get("recordUri")
     : !!recordUri;
   const toggle = () => {
-    if (fetcher.state !== "idle") return;
+    if (fetcher.state === "submitting") return;
     void fetcher.submit(
       { type, uri: post.uri, cid: post.cid, recordUri: recordUri ?? "" },
       { method: "post", action: "/api/reactions" },
@@ -35,6 +35,23 @@ export function PostToolbarContainer(props: Props) {
       reposted={repost.active}
       onLike={like.toggle}
       onRepost={repost.toggle}
+      onReply={() =>
+        props.onCompose({
+          type: "reply",
+          uri: props.uri,
+          cid: props.cid,
+          handle: props.authorHandle,
+          root: props.replyRoot,
+        })
+      }
+      onQuote={() =>
+        props.onCompose({
+          type: "quote",
+          uri: props.uri,
+          cid: props.cid,
+          handle: props.authorHandle,
+        })
+      }
     />
   );
 }

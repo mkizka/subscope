@@ -1,16 +1,24 @@
-import { HeartIcon, type LucideIcon, RepeatIcon } from "lucide-react";
+import {
+  HeartIcon,
+  type LucideIcon,
+  MessageCircleIcon,
+  QuoteIcon,
+  RepeatIcon,
+} from "lucide-react";
 
 type Props = {
   liked: boolean;
   reposted: boolean;
   onLike: () => void;
   onRepost: () => void;
+  onReply: () => void;
+  onQuote: () => void;
 };
 
 function ToggleButton(props: {
   label: string;
   Icon: LucideIcon;
-  pressed: boolean;
+  pressed?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -29,7 +37,14 @@ function ToggleButton(props: {
   );
 }
 
-export function PostToolbar({ liked, reposted, onLike, onRepost }: Props) {
+export function PostToolbar({
+  liked,
+  reposted,
+  onLike,
+  onRepost,
+  onReply,
+  onQuote,
+}: Props) {
   return (
     <div
       className="
@@ -39,12 +54,14 @@ export function PostToolbar({ liked, reposted, onLike, onRepost }: Props) {
         group-hover:flex
       "
     >
+      <ToggleButton label="返信" Icon={MessageCircleIcon} onClick={onReply} />
       <ToggleButton
         label="リポスト"
         Icon={RepeatIcon}
         pressed={reposted}
         onClick={onRepost}
       />
+      <ToggleButton label="引用" Icon={QuoteIcon} onClick={onQuote} />
       <ToggleButton
         label="いいね"
         Icon={HeartIcon}

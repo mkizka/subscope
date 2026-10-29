@@ -4,9 +4,18 @@ import { useFetcher } from "react-router";
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import type { loader } from "@/app/routes/_index";
 
+import type { ComposeTarget } from "./post-form-container";
 import { TimelineFeed, type TimelinePost } from "./timeline-feed";
 
-function OlderTimelineFeedContainer({ cursor }: { cursor: string }) {
+type OnCompose = (target: ComposeTarget) => void;
+
+function OlderTimelineFeedContainer({
+  cursor,
+  onCompose,
+}: {
+  cursor: string;
+  onCompose: OnCompose;
+}) {
   const fetcher = useFetcher<typeof loader>();
   const data = fetcher.data?.state === "timeline" ? fetcher.data : undefined;
   const distanceFromBottomRef = useRef(0);
@@ -33,8 +42,13 @@ function OlderTimelineFeedContainer({ cursor }: { cursor: string }) {
   }
   return (
     <>
-      {data.cursor && <OlderTimelineFeedContainer cursor={data.cursor} />}
-      <TimelineFeed posts={data.posts} />
+      {data.cursor && (
+        <OlderTimelineFeedContainer
+          cursor={data.cursor}
+          onCompose={onCompose}
+        />
+      )}
+      <TimelineFeed posts={data.posts} onCompose={onCompose} />
     </>
   );
 }
@@ -42,17 +56,20 @@ function OlderTimelineFeedContainer({ cursor }: { cursor: string }) {
 type Props = {
   posts: TimelinePost[];
   cursor?: string;
+  onCompose: OnCompose;
 };
 
-export function TimelineFeedContainer({ posts, cursor }: Props) {
+export function TimelineFeedContainer({ posts, cursor, onCompose }: Props) {
   useEffect(() => {
     window.scrollTo(0, document.body.scrollHeight);
   }, []);
 
   return (
     <>
-      {cursor && <OlderTimelineFeedContainer cursor={cursor} />}
-      <TimelineFeed posts={posts} />
+      {cursor && (
+        <OlderTimelineFeedContainer cursor={cursor} onCompose={onCompose} />
+      )}
+      <TimelineFeed posts={posts} onCompose={onCompose} />
     </>
   );
 }

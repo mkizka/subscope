@@ -1,10 +1,10 @@
 import { TID } from "@atproto/common-web";
 import { Client } from "@atproto/lex";
-import { currentDatetimeString } from "@atproto/syntax";
+import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
-import post from "@repo/client/lex/app/bsky/feed/post";
+import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import getSubscriptionStatus, {
@@ -95,6 +95,16 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const text = formData.get("text");
   const files = formData.getAll("image").filter((f) => f instanceof File);
   const alts = formData.getAll("alt");
+  const ref = (
+    uri: FormDataEntryValue | null,
+    cid: FormDataEntryValue | null,
+  ) =>
+    typeof uri === "string" && uri && typeof cid === "string" && cid
+      ? { uri: asAtUriString(uri), cid }
+      : undefined;
+  const subject = ref(formData.get("uri"), formData.get("cid"));
+  const root = ref(formData.get("rootUri"), formData.get("rootCid")) ?? subject;
+  const quote = formData.get("type") === "quote" ? subject : undefined;
   const allow = formData.get("allow");
   const rules =
     typeof allow === "string" ? allow.split(",").filter(Boolean) : [];
@@ -117,14 +127,28 @@ export const action = async ({ request }: Route.ActionArgs) => {
         return { image: body.blob, alt: maybeString(alts[i]) ?? "" };
       }),
     );
+    const media =
+      images.length > 0
+        ? { $type: "app.bsky.embed.images" as const, images }
+        : undefined;
     await agent.applyWrites((op) => [
       op.create(
-        post,
+        postRecord,
         {
           text,
           embed:
-            images.length > 0
-              ? { $type: "app.bsky.embed.images", images }
+            quote && media
+              ? {
+                  $type: "app.bsky.embed.recordWithMedia",
+                  record: { record: quote },
+                  media,
+                }
+              : quote
+                ? { $type: "app.bsky.embed.record", record: quote }
+                : media,
+          reply:
+            formData.get("type") === "reply" && subject && root
+              ? { root, parent: subject }
               : undefined,
           createdAt,
         },
@@ -160,6 +184,9 @@ function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
     cid: post.cid,
     viewerLike: post.viewer?.like,
     viewerRepost: post.viewer?.repost,
+    replyRoot: postRecord.matches(post.record)
+      ? post.record.reply?.root
+      : undefined,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,

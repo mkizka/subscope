@@ -20,17 +20,25 @@ export const isReplyRule = (value: string): value is ReplyRule =>
 type Props = {
   isSubmitting: boolean;
   error?: string;
+  context?: string;
+  onCancelContext?: () => void;
   onSubmit: (formData: FormData) => void;
 };
 
-export function PostForm({ isSubmitting, error, onSubmit }: Props) {
+export function PostForm({
+  isSubmitting,
+  error,
+  context,
+  onCancelContext,
+  onSubmit,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState("");
   const [allow, setAllow] = useState<ReplyRule[]>();
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const length = countGraphemes(text);
 
-  if (!isOpen) {
+  if (!isOpen && !context) {
     return (
       <button
         type="button"
@@ -53,6 +61,18 @@ export function PostForm({ isSubmitting, error, onSubmit }: Props) {
         onSubmit(formData);
       }}
     >
+      {context && (
+        <div className="flex items-center justify-between text-sm">
+          {context}
+          <button
+            type="button"
+            className="btn btn-ghost btn-xs"
+            onClick={onCancelContext}
+          >
+            やめる
+          </button>
+        </div>
+      )}
       <textarea
         name="text"
         aria-label="投稿内容"

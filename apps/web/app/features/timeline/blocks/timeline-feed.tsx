@@ -3,6 +3,7 @@ import {
   type PostCardProps,
 } from "@/app/features/timeline/parts/post-card";
 
+import type { ComposeTarget } from "./post-form-container";
 import { PostToolbarContainer } from "./post-toolbar-container";
 
 export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
@@ -10,13 +11,15 @@ export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   cid: string;
   viewerLike?: string;
   viewerRepost?: string;
+  replyRoot?: { uri: string; cid: string };
 };
 
 type Props = {
   posts: TimelinePost[];
+  onCompose: (target: ComposeTarget) => void;
 };
 
-export function TimelineFeed({ posts }: Props) {
+export function TimelineFeed({ posts, onCompose }: Props) {
   return (
     <section>
       {posts.length === 0 && (
@@ -28,7 +31,7 @@ export function TimelineFeed({ posts }: Props) {
         <PostCard
           key={post.uri}
           {...post}
-          toolbar={<PostToolbarContainer {...post} />}
+          toolbar={<PostToolbarContainer {...post} onCompose={onCompose} />}
         />
       ))}
     </section>
