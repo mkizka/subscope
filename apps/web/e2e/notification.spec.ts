@@ -167,7 +167,9 @@ test.describe("通知（PC）", () => {
       .first();
     await expect(async () => {
       await page.reload();
-      await expect(notification).toHaveText("Bob", { timeout: 1000 });
+      await expect(notification).toHaveText("Bobさんにフォローされました", {
+        timeout: 1000,
+      });
       await expect(notification).toHaveClass(/bg-base-200/, { timeout: 1000 });
     }).toPass();
 
