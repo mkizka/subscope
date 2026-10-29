@@ -8,6 +8,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - getProfile-1: 指定したアクターのprofileViewDetailedを返す
 - getProfile-2: 保存されていないアクターには400を返す
+- getProfile-3: プロフィールレコードがないアクターには、DIDとハンドルだけのprofileViewDetailedを返す
 
 ## app.bsky.actor.getProfiles
 
@@ -41,6 +42,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getTimeline-2: 閲覧者本人とフォロイーの投稿・リポストを含める
 - getTimeline-3: フォロイー以外の投稿・リポストは含めない
 - getTimeline-4: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getTimeline-5: 投稿者にプロフィールレコードがなくても投稿を含め、authorはDIDとハンドルだけにする
 
 ## app.bsky.feed.getListFeed
 
@@ -161,6 +163,8 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 ## me.subsco.sync.unsubscribeServer
 
 閲覧者のサブスクライバー登録を解除する。認証が必要。使った招待コードは使用済みのまま残る。登録していなければ400とNotSubscribedを返す。
+
+- unsubscribeServer-1: 本人とそのフォロイーのsyncTapRepoジョブを積む
 
 ## me.subsco.sync.getSubscriptionStatus
 

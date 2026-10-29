@@ -59,13 +59,6 @@ export const Creating: Story = {
   },
 };
 
-export const Loading: Story = {
-  args: {
-    codes: [],
-    isLoading: true,
-  },
-};
-
 export const Deleting: Story = {
   args: {
     codes: [
@@ -83,18 +76,5 @@ export const Deleting: Story = {
       },
     ],
     deletingCode: "abc-123-def",
-  },
-};
-
-export const LoadingMore: Story = {
-  args: {
-    codes: [
-      {
-        code: "abc-123-def",
-        expiresAt: "2099-12-31T23:59:59.000Z",
-        createdAt: "2025-01-01T00:00:00.000Z",
-      },
-    ],
-    isFetchingNextPage: true,
   },
 };

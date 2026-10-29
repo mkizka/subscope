@@ -3,6 +3,7 @@ import type { Queue } from "bullmq";
 import type {
   IJobQueue,
   JobData,
+  JobOptions,
   QueueName,
 } from "../../domain/interfaces/job-queue.js";
 
@@ -10,10 +11,7 @@ interface AddedJob<T extends QueueName = QueueName> {
   queueName: T;
   jobName: string;
   data: JobData[T];
-  options?: {
-    jobId?: string;
-    delay?: number;
-  };
+  options?: JobOptions;
 }
 
 export class InMemoryJobQueue implements IJobQueue {
@@ -27,7 +25,7 @@ export class InMemoryJobQueue implements IJobQueue {
     queueName: T;
     jobName: string;
     data: AddedJob<T>["data"];
-    options?: { jobId?: string; delay?: number };
+    options?: JobOptions;
   }): Promise<void> {
     this.jobs.push(params);
   }

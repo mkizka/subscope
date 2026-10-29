@@ -34,6 +34,14 @@ export class InMemoryFollowRepository implements IFollowRepository {
     return Promise.resolve(items.slice(0, params.limit));
   }
 
+  findFolloweeDids(actorDid: Did): Promise<Did[]> {
+    return Promise.resolve(
+      this.follows
+        .filter((follow) => follow.actorDid === actorDid)
+        .map((follow) => follow.subjectDid),
+    );
+  }
+
   findFollowers(params: {
     actorDid: Did;
     limit: number;

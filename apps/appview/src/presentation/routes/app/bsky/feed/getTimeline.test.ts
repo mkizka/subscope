@@ -151,4 +151,27 @@ describe("app.bsky.feed.getTimeline", () => {
     ]);
     expect(secondPage.feed.map((item) => item.post.uri)).toEqual([oldPost.uri]);
   });
+
+  test("getTimeline-5: 投稿者にプロフィールレコードがなくても投稿を含め、authorはDIDとハンドルだけにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await createActor();
+    const followee = await actorFactory(ctx.db).create();
+    await follow(viewer, followee);
+    const post = await createPost(followee);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getTimeline);
+
+    // assert
+    expect(res.feed).toMatchObject([
+      {
+        post: {
+          uri: post.uri,
+          author: { did: followee.did, handle: followee.handle },
+        },
+      },
+    ]);
+  });
 });
