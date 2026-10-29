@@ -21,6 +21,26 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
 
+## app.bsky.feed.getPosts
+
+指定したURIの投稿をpostViewとして返す。認証は任意。
+
+- getPosts-1: 複数のURIを指定した場合、指定した順に投稿を返し、存在しない投稿は除外する
+
+## app.bsky.feed.getPostThread
+
+指定した投稿を中心に、親投稿とリプライを含むスレッドを返す。認証は任意。
+
+- getPostThread-1: 親投稿とリプライがある投稿を指定した場合、それらを含むthreadViewPostを返す
+- getPostThread-2: 存在しない投稿を指定した場合、400 NotFoundを返す
+
+## app.bsky.feed.getAuthorFeed
+
+指定したアクターの投稿とリポストを新しい順に返す。認証は任意。
+
+- getAuthorFeed-1: アクターをハンドルで指定した場合、そのアクターの投稿をfeedViewPostとして返す
+- getAuthorFeed-2: 解決できないハンドルを指定した場合、400を返す
+
 ## app.bsky.notification.listNotifications
 
 閲覧者宛ての通知を新しい順に返す。認証が必要。
