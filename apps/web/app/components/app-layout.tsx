@@ -1,6 +1,5 @@
+import { clsx } from "clsx";
 import type { ReactNode } from "react";
-
-import { cn } from "@/app/lib/utils";
 
 type Props = {
   children: ReactNode;
@@ -10,11 +9,11 @@ type Props = {
 
 export const AppLayout = ({ children, header, verticalCenter }: Props) => {
   return (
-    <div className={cn("flex size-full flex-col", header && "pt-12")}>
+    <div className={clsx("flex size-full flex-col", header && "pt-12")}>
       {header}
       <div className="flex flex-1 justify-center">
         <div
-          className={cn(
+          className={clsx(
             "flex w-full max-w-lg flex-col",
             verticalCenter && "justify-center",
           )}
