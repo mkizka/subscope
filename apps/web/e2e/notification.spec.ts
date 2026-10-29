@@ -24,6 +24,51 @@ test.describe("通知", () => {
 });
 
 test.describe("通知（PC）", () => {
+  test("notification-1: 自分の投稿がいいね・リポストされると、相手の名前と対象の投稿の本文が通知に出る", async ({
+    page,
+  }) => {
+    const createdAt = new Date().toISOString();
+    const text = `notification-1: ${createdAt}`;
+    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt,
+    });
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    const subject = { uri: post.uri, cid: post.cid };
+    await createRecord("bob.test", "app.bsky.feed.like", {
+      subject,
+      createdAt,
+    });
+    await createRecord("bob.test", "app.bsky.feed.repost", {
+      subject,
+      createdAt,
+    });
+
+    await login(page);
+
+    const panel = page.getByRole("complementary");
+    await expect(async () => {
+      await page.reload();
+      for (const label of [
+        "Bobさんがいいねしました",
+        "Bobさんがリポストしました",
+      ]) {
+        await expect(
+          panel
+            .getByRole("listitem")
+            .filter({ hasText: label })
+            .filter({ hasText: text }),
+        ).toBeVisible({ timeout: 1000 });
+      }
+    }).toPass();
+  });
+
   test("notification-3: 自分の投稿にリプライ・引用・メンションされると、その投稿が通知に出る", async ({
     page,
   }) => {
