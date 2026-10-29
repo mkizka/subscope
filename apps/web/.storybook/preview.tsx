@@ -14,20 +14,6 @@ const queryClient = new QueryClient({
 });
 
 const preview: Preview = {
-  parameters: {
-    viewport: {
-      options: {
-        mobile: {
-          name: "Mobile",
-          styles: { width: "375px", height: "812px" },
-          type: "mobile",
-        },
-      },
-    },
-  },
-  initialGlobals: {
-    viewport: { value: "mobile", isRotated: false },
-  },
   decorators: [
     (Story, { parameters }) => {
       const Stub = createRoutesStub([
