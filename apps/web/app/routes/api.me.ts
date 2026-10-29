@@ -12,13 +12,13 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 export const loader = async ({ context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);
   const [profile, access] = await Promise.all([
-    agent.call(getProfile, { actor: agent.assertDid }),
+    agent.call(getProfile, { actor: agent.assertDid }).catch(() => undefined),
     agent.call(verifyAccess),
   ]);
   return data({
-    did: profile.did,
-    avatarUrl: profile.avatar,
-    handle: profile.handle,
+    did: agent.assertDid,
+    avatarUrl: profile?.avatar,
+    handle: profile?.handle,
     isAdmin: access.status === "authorized",
   });
 };
