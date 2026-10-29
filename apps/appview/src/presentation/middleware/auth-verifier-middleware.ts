@@ -15,6 +15,11 @@ type MaybeRequest = {
   path: string;
 };
 
+const toMaybeRequest = (request: Request): MaybeRequest => ({
+  headers: Object.fromEntries(request.headers),
+  path: new URL(request.url).pathname,
+});
+
 export class AuthVerifierMiddleware {
   constructor(private readonly tokenVerifier: ITokenVerifier) {}
   static inject = ["tokenVerifier"] as const;
@@ -50,10 +55,7 @@ export class AuthVerifierMiddleware {
 
   async lexLoginRequired({ request }: { request: Request }) {
     try {
-      const { credentials } = await this.loginRequired({
-        headers: Object.fromEntries(request.headers),
-        path: new URL(request.url).pathname,
-      });
+      const { credentials } = await this.loginRequired(toMaybeRequest(request));
       return credentials;
     } catch (error) {
       if (error instanceof AuthRequiredError) {
@@ -61,6 +63,10 @@ export class AuthVerifierMiddleware {
       }
       throw error;
     }
+  }
+
+  lexOptionalAuth({ request }: { request: Request }) {
+    return this.getViewerDid(toMaybeRequest(request));
   }
 
   async getViewerDid(request: MaybeRequest): Promise<Did | null> {
