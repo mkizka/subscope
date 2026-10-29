@@ -195,30 +195,30 @@ describe("PostIndexer", () => {
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
-        { recipientDid: quoted.did, reason: "quote", reasonSubject: quotedUri },
         { recipientDid: mentioned.did, reason: "mention" },
+        { recipientDid: quoted.did, reason: "quote", reasonSubject: quotedUri },
       ]);
     });
 
-    test("notify-8: 1つの投稿から同じ相手への通知は reply > quote > mention の優先順で1件にする", async () => {
+    test("notify-8: 1つの投稿から同じ相手への通知は mention > quote > reply の優先順で1件にする", async () => {
       const ctx = { db };
       // arrange
-      const replied = actorFactory();
+      const mentioned = actorFactory();
       const quoted = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: replied.did }));
+      subscriptionRepo.add(subscriptionFactory({ actorDid: mentioned.did }));
       subscriptionRepo.add(subscriptionFactory({ actorDid: quoted.did }));
       const author = actorFactory();
       const cid = await randomCid();
-      const postRecord = (rkey: string, did: string, reply: boolean) => {
+      const postRecord = (rkey: string, did: string, withMention: boolean) => {
         const subject = { uri: `at://${did}/app.bsky.feed.post/subject`, cid };
         return recordFactory({
           uri: `at://${author.did}/app.bsky.feed.post/${rkey}`,
           json: {
             $type: "app.bsky.feed.post",
             text: "@",
-            reply: reply ? { root: subject, parent: subject } : undefined,
+            reply: { root: subject, parent: subject },
             embed: { $type: "app.bsky.embed.record", record: subject },
-            facets: [mention(did)],
+            facets: withMention ? [mention(did)] : [],
             createdAt: new Date().toISOString(),
           },
         });
@@ -226,7 +226,7 @@ describe("PostIndexer", () => {
 
       // act
       for (const record of [
-        postRecord("reply", replied.did, true),
+        postRecord("mention", mentioned.did, true),
         postRecord("quote", quoted.did, false),
       ]) {
         await postIndexer.upsert({ ctx, record, live: false, depth: 0 });
@@ -234,7 +234,7 @@ describe("PostIndexer", () => {
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject([
-        { recipientDid: replied.did, reason: "reply" },
+        { recipientDid: mentioned.did, reason: "mention" },
         { recipientDid: quoted.did, reason: "quote" },
       ]);
     });
