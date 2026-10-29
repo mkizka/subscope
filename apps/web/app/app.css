@@ -2,6 +2,25 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/noto-sans-jp";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --color-primary: oklch(62% 0.2 40);
+  --color-primary-content: oklch(98% 0 0);
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersdark: true;
+  --color-base-100: oklch(20% 0 0);
+  --color-base-200: oklch(17% 0 0);
+  --color-base-300: oklch(14% 0 0);
+  --color-base-content: oklch(95% 0 0);
+  --color-primary: oklch(70% 0.18 40);
+  --color-primary-content: oklch(15% 0 0);
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -100,7 +119,6 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
