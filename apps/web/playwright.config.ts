@@ -9,7 +9,7 @@ export default defineConfig({
   },
   projects: [
     { name: "login", testMatch: "login.spec.ts" },
-    { name: "main", testIgnore: "login.spec.ts", dependencies: ["login"] },
+    { name: "app", testIgnore: "login.spec.ts", dependencies: ["login"] },
   ],
   webServer: {
     command: "node --import tsx ./dev-env/server.mts pnpm turbo run dev",
