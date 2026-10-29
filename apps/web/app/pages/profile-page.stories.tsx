@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ProfilePage } from "./profile";
+import { ProfilePage } from "./profile-page";
 
 const meta = {
   component: ProfilePage,

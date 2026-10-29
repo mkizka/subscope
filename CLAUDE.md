@@ -55,7 +55,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - features/{feature}
     - /parts ... components/uiなどを使用した最小のUI。単体で意味を持たない
     - /blocks ... partsを使用したUIのまとまり。単体で意味を持つ
-    - /pages ... parts,blocksを使用したページレイアウト
+- ページはpagesディレクトリに{name}-page.tsxとして配置し、storyを書く
+  - routesはloader/actionを持ち、表示はpagesのページコンポーネントに任せる
 
 ### 仕様書・資料など
 

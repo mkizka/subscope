@@ -4,8 +4,8 @@ import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
-import { ProfilePage } from "@/app/features/profile/pages/profile";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
+import { ProfilePage } from "@/app/pages/profile-page";
 
 import { toTimelinePost } from "./_index";
 import type { Route } from "./+types/profile.$handle";
