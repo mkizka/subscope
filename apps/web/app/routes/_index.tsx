@@ -1,13 +1,19 @@
 import { Client } from "@atproto/lex";
+import { currentDatetimeString } from "@atproto/syntax";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
+import post from "@repo/client/lex/app/bsky/feed/post";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
-import { data } from "react-router";
+import { data, redirect } from "react-router";
 
 import { HomePage } from "@/app/features/home/pages/home";
+import {
+  countGraphemes,
+  MAX_POST_LENGTH,
+} from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { TimelinePage } from "@/app/features/timeline/pages/timeline";
 import { loggerManager } from "@/app/lib/logger.server";
@@ -68,12 +74,40 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   });
 };
 
+export const action = async ({ request }: Route.ActionArgs) => {
+  const agent = await getAgent(request);
+  if (!agent) {
+    throw redirect("/login");
+  }
+  const text = (await request.formData()).get("text");
+  if (
+    typeof text !== "string" ||
+    text.trim() === "" ||
+    countGraphemes(text) > MAX_POST_LENGTH
+  ) {
+    return data({ error: "投稿内容が不正です" }, { status: 400 });
+  }
+  try {
+    const { uri } = await agent.create(post, {
+      text,
+      createdAt: currentDatetimeString(),
+    });
+    return data({ uri });
+  } catch (e) {
+    loggerManager.createLogger("_index").error(e, "Failed to create post");
+    return data({ error: "投稿に失敗しました" }, { status: 500 });
+  }
+};
+
 const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
 
 function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
   return {
     uri: post.uri,
+    cid: post.cid,
+    viewerLike: post.viewer?.like,
+    viewerRepost: post.viewer?.repost,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
