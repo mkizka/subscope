@@ -1,5 +1,6 @@
+import { clsx } from "clsx";
+
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import { cn } from "@/app/lib/utils";
 
 type Notification = {
   uri: string;
@@ -38,7 +39,7 @@ export function NotificationPanel({
           {notifications.map((notification) => (
             <li
               key={notification.uri}
-              className={cn(
+              className={clsx(
                 "border-b border-base-300 py-2",
                 !notification.isRead && "bg-base-200",
               )}

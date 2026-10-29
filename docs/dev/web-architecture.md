@@ -45,7 +45,6 @@
 - テーマは `apps/web/app/app.css` で daisyUI の `light` / `dark` を上書きして定義し、OSの設定で切り替える
 - アイコンは潜望鏡の先端（くさび形のヘッドと丸いレンズ）を記号化した形とし、ヘッドは墨、レンズはアクセント色にする
   - `apps/web/public/favicon.svg` をfaviconとREADMEで共有し、ライト・ダークで色を切り替える
-- shadcn/ui から daisyUI へ移行中
 
 ## 今後追加する画面
 
