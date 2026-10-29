@@ -14,6 +14,8 @@ type Props = {
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  onGrantAdmin?: (did: string) => void;
+  grantingDid?: string | null;
 };
 
 export function SubscriberTable({
@@ -22,6 +24,8 @@ export function SubscriberTable({
   isFetchingNextPage,
   onLoadMore,
   hasNextPage,
+  onGrantAdmin,
+  grantingDid,
 }: Props) {
   return (
     <>
@@ -78,8 +82,17 @@ export function SubscriberTable({
                   </td>
                   <td className="font-mono text-xs">{subscriber.did}</td>
                   <td>
-                    {subscriber.isAdmin && (
+                    {subscriber.isAdmin ? (
                       <span className="badge badge-primary">管理者</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        disabled={grantingDid === subscriber.did}
+                        onClick={() => onGrantAdmin?.(subscriber.did)}
+                      >
+                        管理者にする
+                      </button>
                     )}
                   </td>
                 </tr>
