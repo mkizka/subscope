@@ -7,19 +7,16 @@ import {
 } from "@/app/features/timeline/blocks/post-form-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { TimelineFeedContainer } from "@/app/features/timeline/blocks/timeline-feed-container";
-import { WelcomeSectionContainer } from "@/app/features/timeline/blocks/welcome-section-container";
 
 type Props = {
-  atprotoProxy: string;
   posts: TimelinePost[];
   cursor?: string;
 };
 
-export function TimelinePage({ atprotoProxy, posts, cursor }: Props) {
+export function TimelinePage({ posts, cursor }: Props) {
   const [target, setTarget] = useState<ComposeTarget>();
   return (
     <ThreeColumnLayout>
-      <WelcomeSectionContainer atprotoProxy={atprotoProxy} />
       <TimelineFeedContainer
         posts={posts}
         cursor={cursor}
