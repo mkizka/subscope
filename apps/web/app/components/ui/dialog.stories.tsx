@@ -13,7 +13,6 @@ import {
 } from "./dialog";
 
 const meta = {
-  title: "ui/Dialog",
   component: Dialog,
   render: () => (
     <Dialog>
