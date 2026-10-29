@@ -22,6 +22,7 @@ export class ListNotifications {
           viewerDid: credentials.did,
           limit: params.limit,
           cursor: params.cursor,
+          reasons: params.reasons,
         });
         return { body };
       },

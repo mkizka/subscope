@@ -8,7 +8,7 @@ export class GetUnreadCountUseCase {
   ) {}
   static inject = ["notificationRepository"] as const;
 
-  async execute(viewerDid: Did): Promise<number> {
-    return await this.notificationRepository.countUnread(viewerDid);
+  async execute(viewerDid: Did, seenAt?: Date): Promise<number> {
+    return await this.notificationRepository.countUnread(viewerDid, seenAt);
   }
 }
