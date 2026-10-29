@@ -116,6 +116,13 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 
 - getPreferences-1: Followingフィードをピン留めした設定を返す
 
+## me.subsco.admin.deleteInviteCode
+
+招待コードを削除する。管理者の認証が必要。
+
+- deleteInviteCode-1: 存在しない招待コードを指定した場合、400とInviteCodeNotFoundを返す
+- deleteInviteCode-2: 使用済みの招待コードを指定した場合、400とInviteCodeAlreadyUsedを返す
+
 ## app.bsky.graph.getFollowers
 
 指定したアクターをフォローしているアクターを返す。認証は任意。
