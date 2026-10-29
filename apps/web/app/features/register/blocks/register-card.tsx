@@ -1,21 +1,8 @@
 import { CheckCircle2Icon } from "lucide-react";
 import type { ComponentProps } from "react";
+import { useRef } from "react";
 import { Form } from "react-router";
 
-import { Button } from "@/app/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/app/components/ui/dialog";
-import { FieldError } from "@/app/components/ui/field";
-import { Input } from "@/app/components/ui/input";
 import { LoginFormContainer } from "@/app/features/login/blocks/login-form-container";
 
 type Props = {
@@ -40,29 +27,39 @@ export function RegisterCard({
   inputProps,
   fields,
 }: Props) {
+  const loginDialogRef = useRef<HTMLDialogElement>(null);
+  const error = (formErrors ?? fields.inviteCode.errors)?.[0];
+
   return (
-    <Card className="w-full gap-4">
-      <CardHeader>
-        <CardTitle tag="h1">アカウント登録</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+    <div className="card w-full border border-base-300 bg-base-100">
+      <div className="card-body gap-4">
+        <h1 className="card-title">アカウント登録</h1>
         <div className="flex flex-col gap-2">
           <h2 className="font-medium">1. atprotoアカウントでログイン</h2>
           <div className="pl-4">
             {isLoggedIn ? (
-              <Button variant="outline" className="w-fit">
-                <CheckCircle2Icon className="size-4 text-green-600" />
+              <button type="button" className="btn btn-outline">
+                <CheckCircle2Icon className="size-4 text-success" />
                 ログイン済み
-              </Button>
+              </button>
             ) : (
-              <Dialog>
-                <DialogTrigger
-                  render={<Button className="w-fit">ログイン</Button>}
-                />
-                <DialogContent>
-                  <LoginFormContainer />
-                </DialogContent>
-              </Dialog>
+              <>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => loginDialogRef.current?.showModal()}
+                >
+                  ログイン
+                </button>
+                <dialog ref={loginDialogRef} className="modal">
+                  <div className="modal-box">
+                    <LoginFormContainer />
+                  </div>
+                  <form method="dialog" className="modal-backdrop">
+                    <button>閉じる</button>
+                  </form>
+                </dialog>
+              </>
             )}
           </div>
         </div>
@@ -70,21 +67,28 @@ export function RegisterCard({
           <div className="flex flex-col gap-2">
             <h2 className="font-medium">2. 招待コードを入力</h2>
             <div className="flex flex-col gap-2 pl-4">
-              <Input
+              <input
+                className="input w-full"
                 disabled={!isLoggedIn}
                 placeholder="subsco-me-abcde"
                 {...inputProps}
               />
-              <FieldError errors={formErrors ?? fields.inviteCode.errors} />
+              {error && (
+                <p role="alert" className="text-sm text-error">
+                  {error}
+                </p>
+              )}
             </div>
           </div>
-          <div className="flex justify-center">
-            <Button type="submit" className="w-fit" disabled={!activeSubmit}>
-              登録する
-            </Button>
-          </div>
+          <button
+            type="submit"
+            className="btn self-center btn-primary"
+            disabled={!activeSubmit}
+          >
+            登録する
+          </button>
         </Form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

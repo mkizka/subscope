@@ -1,5 +1,5 @@
 import { type Did } from "@atproto/did";
-import type { AppBskyActorSearchActorsTypeahead } from "@repo/client/server";
+import type * as AppBskyActorSearchActorsTypeahead from "@repo/client/lex/app/bsky/actor/searchActorsTypeahead";
 
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { ProfileSearchService } from "../../../application/service/search/profile-search-service.js";
@@ -19,7 +19,7 @@ export class SearchActorsTypeaheadUseCase {
 
   async execute(
     params: SearchActorsTypeaheadParams,
-  ): Promise<AppBskyActorSearchActorsTypeahead.OutputSchema> {
+  ): Promise<AppBskyActorSearchActorsTypeahead.$OutputBody> {
     if (!params.query || params.query.trim() === "") {
       return {
         actors: [],
