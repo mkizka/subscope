@@ -32,10 +32,10 @@ const unfollowEvent = (actorDid: string, subjectDid: string) => ({
   },
 });
 
-describe("syncTapRepo", () => {
+describe("Tapへの登録", () => {
   const { ctx } = testSetup;
 
-  test("syncTapRepo-1: サブスクライバーがフォローしたアカウントをTapに登録する", async () => {
+  test("tap-1: サブスクライバーがフォローしたアカウントをTapに登録する", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
@@ -51,7 +51,7 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("syncTapRepo-2: サブスクライバーでないアカウントのフォローでは、フォロイーをTapに登録しない", async () => {
+  test("tap-2: サブスクライバー以外のフォローではTapに登録しない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const nonSubscriber = await actorFactory(ctx.db).create();
@@ -65,7 +65,7 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
   });
 
-  test("syncTapRepo-3: サブスクライバーがフォローを解除したアカウントは、追跡アクターでなくなればTapから削除する", async () => {
+  test("tap-3: サブスクライバーがフォローを外したアカウントは、追跡アクターでなくなればTapから外す", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
@@ -83,7 +83,7 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
   });
 
-  test("syncTapRepo-4: 他のサブスクライバーにもフォローされているアカウントは、フォローを解除されてもTapから削除しない", async () => {
+  test("tap-4: 他のサブスクライバーがフォローしているアカウントはTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
@@ -105,7 +105,27 @@ describe("syncTapRepo", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("syncTapRepo-5: サブスクライバーは、フォローを解除されてもTapから削除しない", async () => {
+  test("tap-5: サブスクライバー以外がフォローを外してもTapから外さない", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
+    const subscriber = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    const nonSubscriber = await actorFactory(ctx.db).create();
+    const followee = await actorFactory(ctx.db).create();
+    await indexCommit(await followEvent(subscriber.did, followee.did));
+    await indexCommit(await followEvent(nonSubscriber.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // act
+    await indexCommit(unfollowEvent(nonSubscriber.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(tapClient.getRegisteredDids()).toContain(followee.did);
+  });
+
+  test("tap-6: サブスクライバーは、フォローを外されてもTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const subscriber = await actorFactory(ctx.db)
