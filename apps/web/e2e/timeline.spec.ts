@@ -106,14 +106,18 @@ test.describe("タイムライン", () => {
       .last();
     await expect(async () => {
       await page.reload();
-      await expect(reacted).toContainText("1件のいいね", { timeout: 1000 });
-      await expect(reacted).toContainText("1件のリポスト", { timeout: 1000 });
+      await expect(reacted.getByTitle("1件のいいね")).toBeVisible({
+        timeout: 1000,
+      });
+      await expect(reacted.getByTitle("1件のリポスト")).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
     const notReacted = page
       .getByRole("article")
       .filter({ hasText: "timeline-2: 反応なし" });
-    await expect(notReacted).not.toContainText("いいね");
-    await expect(notReacted).not.toContainText("リポスト");
+    await expect(notReacted.getByTitle(/いいね/)).toHaveCount(0);
+    await expect(notReacted.getByTitle(/リポスト/)).toHaveCount(0);
   });
 
   test("timeline-3: リプライはタイムラインに含めず、親投稿に返信の件数を表示する", async ({
@@ -137,7 +141,9 @@ test.describe("タイムライン", () => {
       .filter({ hasText: "timeline-3: 親投稿" });
     await expect(async () => {
       await page.reload();
-      await expect(parentPost).toContainText("1件の返信", { timeout: 1000 });
+      await expect(parentPost.getByTitle("1件の返信")).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
     await expect(page.getByText("timeline-3: 返信")).toHaveCount(0);
   });
