@@ -1,3 +1,4 @@
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { cn } from "@/app/lib/utils";
 
 type Notification = {
@@ -10,6 +11,8 @@ type Notification = {
 
 type Props = {
   notifications: Notification[];
+  onLoadMore: () => void;
+  hasNextPage: boolean;
 };
 
 const reasonLabels: Record<string, string> = {
@@ -18,7 +21,11 @@ const reasonLabels: Record<string, string> = {
   follow: "さんにフォローされました",
 };
 
-export function NotificationPanel({ notifications }: Props) {
+export function NotificationPanel({
+  notifications,
+  onLoadMore,
+  hasNextPage,
+}: Props) {
   return (
     <section aria-label="通知" className="p-4">
       <h2 className="font-bold">通知</h2>
@@ -49,6 +56,7 @@ export function NotificationPanel({ notifications }: Props) {
           ))}
         </ul>
       )}
+      <InfiniteScrollTrigger onIntersect={onLoadMore} enabled={hasNextPage} />
     </section>
   );
 }

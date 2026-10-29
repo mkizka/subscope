@@ -12,9 +12,13 @@ import type { Route } from "./+types/api.notifications";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);
-  const { notifications } = await agent.call(listNotifications, { limit: 25 });
+  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
+  const { notifications, cursor: nextCursor } = await agent.call(
+    listNotifications,
+    { limit: 25, cursor },
+  );
   const subjectUris = [
     ...new Set(
       notifications.flatMap((notification) =>
@@ -31,6 +35,7 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
       : { posts: [] };
   return data({
     notifications,
+    cursor: nextCursor,
     subjectTexts: Object.fromEntries(
       posts.map((post) => [post.uri, post.record.text]),
     ),

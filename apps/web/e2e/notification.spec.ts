@@ -180,4 +180,41 @@ test.describe("通知（PC）", () => {
       });
     }).toPass();
   });
+
+  test("notification-4: 通知は新しい順に並び、下までスクロールすると古い通知を読み込む", async ({
+    page,
+  }) => {
+    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "notification-4: 元の投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+    });
+    await follow("alice.test", "bob.test");
+    const ref = { uri: post.uri, cid: post.cid };
+    const texts = Array.from(
+      { length: 31 },
+      (_, i) => `notification-4: リプライ${i}`,
+    );
+    for (const text of texts) {
+      await createRecord("bob.test", "app.bsky.feed.post", {
+        text,
+        reply: { root: ref, parent: ref },
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    await login(page);
+
+    const replies = page
+      .getByRole("complementary")
+      .getByText(/^notification-4: リプライ/);
+    await expect(async () => {
+      await page.reload();
+      await expect(replies.first()).toBeVisible({ timeout: 1000 });
+      await replies.last().scrollIntoViewIfNeeded();
+      await expect(replies).toHaveText([...texts].reverse(), { timeout: 1000 });
+    }).toPass();
+  });
 });
