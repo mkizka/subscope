@@ -1,4 +1,4 @@
-import type { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atproto/syntax";
 import {
   type Post,
   PostEmbedExternal,
@@ -159,5 +159,17 @@ export class PostRepository implements IPostRepository {
       .limit(1);
 
     return result.length > 0;
+  }
+
+  async findReplyParentUri(
+    ctx: TransactionContext,
+    uri: AtUri,
+  ): Promise<AtUri | null> {
+    const [post] = await ctx.db
+      .select({ replyParentUri: schema.posts.replyParentUri })
+      .from(schema.posts)
+      .where(eq(schema.posts.uri, uri.toString()))
+      .limit(1);
+    return post?.replyParentUri ? new AtUri(post.replyParentUri) : null;
   }
 }
