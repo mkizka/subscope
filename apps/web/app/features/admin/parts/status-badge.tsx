@@ -14,7 +14,7 @@ function getStatus(code: Props) {
 }
 
 const statusLabel = {
-  active: "有効",
+  active: "未使用",
   used: "使用済み",
   expired: "期限切れ",
 } as const;

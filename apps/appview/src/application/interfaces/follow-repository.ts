@@ -8,6 +8,7 @@ export interface IFollowRepository {
     limit: number;
     cursor?: string;
   }) => Promise<Follow[]>;
+  findFolloweeDids: (actorDid: Did) => Promise<Did[]>;
   findFollowers: (params: {
     actorDid: Did;
     limit: number;

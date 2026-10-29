@@ -99,9 +99,16 @@ export class SubscribeServerUseCase {
       });
       await this.subscriptionRepository.save({ ctx, subscription });
 
-      if (inviteCode) {
-        inviteCode.markAsUsed();
-        await this.inviteCodeRepository.upsert({ ctx, inviteCode });
+      if (
+        inviteCode &&
+        !(await this.inviteCodeRepository.markAsUsed({
+          ctx,
+          code: inviteCode.code,
+        }))
+      ) {
+        throw new InvalidInviteCodeError(
+          "Invite code has expired or already been used",
+        );
       }
     });
 

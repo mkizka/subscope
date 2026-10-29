@@ -1,35 +1,12 @@
 import { XrpcResponseError } from "@atproto/lex";
 import createInviteCode from "@repo/client/lex/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
-import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 import { data } from "react-router";
 import { z } from "zodV4";
 
 import { agentContext } from "@/app/context/agent";
 
 import type { Route } from "./+types/admin.api.invite-codes";
-
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const agent = context.get(agentContext);
-
-  try {
-    const url = new URL(request.url);
-    const cursor = url.searchParams.get("cursor") ?? undefined;
-    const response = await agent.call(getInviteCodes, {
-      limit: 20,
-      cursor,
-    });
-    return data(response);
-  } catch (e) {
-    if (
-      e instanceof XrpcResponseError &&
-      (e.status === 401 || e.status === 403)
-    ) {
-      throw data({ error: "Unauthorized" }, { status: 403 });
-    }
-    throw e;
-  }
-};
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const agent = context.get(agentContext);
