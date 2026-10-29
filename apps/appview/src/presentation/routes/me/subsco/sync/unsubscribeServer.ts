@@ -20,7 +20,7 @@ export class UnsubscribeServer {
 
   handle(router: LexRouter) {
     router.add(unsubscribeServer, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials }) => {
         try {
           await this.unsubscribeServerUseCase.execute({

@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import getLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 import {
   actorFactory,
   likeFactory,
@@ -30,10 +32,10 @@ describe("app.bsky.feed.getLikes", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.getLikes({ uri: post.uri });
+    const res = await client.call(getLikes, { uri: asAtUriString(post.uri) });
 
     // assert
-    expect(res.data).toMatchObject({
+    expect(res).toMatchObject({
       uri: post.uri,
       likes: [{ actor: { did: actor.did } }],
     });

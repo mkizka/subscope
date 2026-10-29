@@ -13,7 +13,7 @@ export class GetUnreadCount {
 
   handle(router: LexRouter) {
     router.add(getUnreadCount, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials }) => {
         const count = await this.getUnreadCountUseCase.execute(credentials.did);
         return { body: { count } };

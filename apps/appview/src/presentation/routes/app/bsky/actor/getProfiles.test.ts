@@ -1,3 +1,5 @@
+import { asAtIdentifierString } from "@atproto/syntax";
+import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -18,12 +20,14 @@ describe("app.bsky.actor.getProfiles", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.actor.getProfiles({
-      actors: [alice.did, "bob.test", "notfound.test"],
+    const res = await client.call(getProfiles, {
+      actors: [alice.did, "bob.test", "notfound.test"].map(
+        asAtIdentifierString,
+      ),
     });
 
     // assert
-    expect(res.data.profiles).toMatchObject([
+    expect(res.profiles).toMatchObject([
       { did: alice.did },
       { did: bob.did, handle: "bob.test" },
     ]);

@@ -7,4 +7,10 @@ export interface ITimelineRepository {
     limit: number;
     cursor?: Date;
   }) => Promise<FeedItem[]>;
+
+  findListFeedItems: (params: {
+    listUri: string;
+    limit: number;
+    cursor?: Date;
+  }) => Promise<FeedItem[]>;
 }

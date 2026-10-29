@@ -16,7 +16,7 @@ export class ListNotifications {
 
   handle(router: LexRouter) {
     router.add(listNotifications, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ params, credentials }) => {
         const body = await this.listNotificationsUseCase.execute({
           viewerDid: credentials.did,

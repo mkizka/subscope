@@ -24,9 +24,6 @@ describe("lexRouter", () => {
     services = await testRegistry.resolve();
     const app = express();
     app.use(services.lexRouter);
-    app.use((_req, res) => {
-      res.status(418).end();
-    });
     server = app.listen(0);
     await once(server, "listening");
     const address = server.address();
@@ -44,13 +41,13 @@ describe("lexRouter", () => {
 
   const auth = { authorization: "Bearer token" };
 
-  test("認証がない場合、xrpc-serverと同じ401エラーを返す", async () => {
+  test("認証がない場合、401エラーを返す", async () => {
     const res = await fetch(`${baseUrl}/me.subsco.sync.getSubscriptionStatus`);
 
     expect(res.status).toBe(401);
     expect(await res.json()).toMatchObject({
       error: "AuthenticationRequired",
-      message: "Bad authorization header",
+      message: "Authentication required",
     });
   });
 
@@ -185,9 +182,47 @@ describe("lexRouter", () => {
     expect(await res.json()).toEqual({ posts: [] });
   });
 
-  test("LexRouterにないNSIDは次のルーターへ流す", async () => {
-    const res = await fetch(`${baseUrl}/app.bsky.feed.getLikes`);
+  test("getLikesはlexiconに沿ったレスポンスを返す", async () => {
+    const uri = "at://did:plc:bob/app.bsky.feed.post/123";
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getLikes?uri=${encodeURIComponent(uri)}`,
+    );
 
-    expect(res.status).toBe(418);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ uri, likes: [] });
+  });
+
+  test("getPostsは存在しない投稿を除いて返す", async () => {
+    const uri = "at://did:plc:bob/app.bsky.feed.post/123";
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getPosts?uris=${encodeURIComponent(uri)}`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ posts: [] });
+  });
+
+  test("getFeedGeneratorsは存在しないフィードを除いて返す", async () => {
+    const uri = "at://did:plc:bob/app.bsky.feed.generator/123";
+    const res = await fetch(
+      `${baseUrl}/app.bsky.feed.getFeedGenerators?feeds=${encodeURIComponent(uri)}`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ feeds: [] });
+  });
+
+  test("getRepostedByはパラメータが不正な場合400エラーを返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.feed.getRepostedBy`);
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ error: "InvalidRequest" });
+  });
+
+  test("未実装のNSIDは501エラーを返す", async () => {
+    const res = await fetch(`${baseUrl}/app.bsky.feed.getFeed`);
+
+    expect(res.status).toBe(501);
+    expect(await res.json()).toMatchObject({ error: "MethodNotImplemented" });
   });
 });

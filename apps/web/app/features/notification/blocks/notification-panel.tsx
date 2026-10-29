@@ -3,6 +3,7 @@ import { cn } from "@/app/lib/utils";
 type Notification = {
   uri: string;
   authorName: string;
+  text?: string;
   isRead: boolean;
 };
 
@@ -28,7 +29,12 @@ export function NotificationPanel({ notifications }: Props) {
                 !notification.isRead && "bg-base-200",
               )}
             >
-              {notification.authorName}
+              <p>{notification.authorName}</p>
+              {notification.text && (
+                <p className="text-sm whitespace-pre-wrap">
+                  {notification.text}
+                </p>
+              )}
             </li>
           ))}
         </ul>

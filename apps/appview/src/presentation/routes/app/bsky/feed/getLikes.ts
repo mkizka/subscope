@@ -1,4 +1,5 @@
-import type { Server } from "@repo/client/server";
+import type { LexRouter } from "@atproto/lex-server";
+import getLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 
 import type { GetLikesUseCase } from "../../../../../application/use-cases/feed/get-likes-use-case.js";
 
@@ -6,20 +7,10 @@ export class GetLikes {
   constructor(private getLikesUseCase: GetLikesUseCase) {}
   static inject = ["getLikesUseCase"] as const;
 
-  handle(server: Server) {
-    server.app.bsky.feed.getLikes({
-      handler: async ({ params }) => {
-        const result = await this.getLikesUseCase.execute({
-          uri: params.uri,
-          cid: params.cid,
-          limit: params.limit,
-          cursor: params.cursor,
-        });
-        return {
-          encoding: "application/json",
-          body: result,
-        };
-      },
+  handle(router: LexRouter) {
+    router.add(getLikes, async ({ params }) => {
+      const result = await this.getLikesUseCase.execute(params);
+      return { body: result };
     });
   }
 }
