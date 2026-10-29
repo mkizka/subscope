@@ -27,10 +27,12 @@ export class InMemoryNotificationRepository implements INotificationRepository {
     );
   }
 
-  countUnread(recipientDid: Did): Promise<number> {
+  countUnread(recipientDid: Did, seenAt?: Date): Promise<number> {
     return Promise.resolve(
       this.items.filter(
-        (item) => item.recipientDid === recipientDid && !item.isRead,
+        (item) =>
+          item.recipientDid === recipientDid &&
+          (seenAt ? item.sortAt > seenAt : !item.isRead),
       ).length,
     );
   }

@@ -17,5 +17,5 @@ export interface INotificationRepository {
     limit: number;
     cursor?: Date;
   }) => Promise<NotificationItem[]>;
-  countUnread: (recipientDid: Did) => Promise<number>;
+  countUnread: (recipientDid: Did, seenAt?: Date) => Promise<number>;
 }
