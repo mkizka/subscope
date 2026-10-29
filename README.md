@@ -46,4 +46,4 @@ The following servers will start.
 - worker ... http://localhost:3003
 - ingester ... http://localhost:3004
 
-A local PLC and PDS are also started with the test account `alice.test` / `password`.
+A local PLC and PDS are also started with the test accounts `alice.test` and `bob.test` (password: `password`).
