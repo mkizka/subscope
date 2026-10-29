@@ -20,5 +20,5 @@ export interface ICollectionIndexer {
     ctx: AfterCommitContext;
     record: Record;
     action: "upsert" | "delete";
-  }) => Promise<void>;
+  }) => void | Promise<void>;
 }

@@ -1,7 +1,7 @@
 import type {
+  AfterCommitContext,
   IJobScheduler,
   Record,
-  TransactionContext,
 } from "@repo/common/domain";
 import { FeedItem, Repost } from "@repo/common/domain";
 
@@ -28,7 +28,7 @@ export class RepostIndexer implements ICollectionIndexer {
     live,
     depth,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     live: boolean;
     depth: number;
@@ -64,18 +64,19 @@ export class RepostIndexer implements ICollectionIndexer {
       repost.subjectUri,
     );
     if (!subjectExists) {
-      await this.jobScheduler.scheduleFetchRecord(repost.subjectUri, {
-        live,
-        depth,
-      });
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleFetchRecord(repost.subjectUri, {
+          live,
+          depth,
+        }),
+      );
     }
   }
 
-  async afterAction({ record }: { record: Record }): Promise<void> {
+  afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const repost = Repost.from(record);
-    await this.jobScheduler.scheduleAggregatePostStats(
-      repost.subjectUri,
-      "repost",
+    ctx.afterCommit(() =>
+      this.jobScheduler.scheduleAggregatePostStats(repost.subjectUri, "repost"),
     );
   }
 }

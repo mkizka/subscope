@@ -8,7 +8,11 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
 
 describe("RepostIndexer", () => {
   let repostIndexer: TestServices["repostIndexer"];
@@ -33,7 +37,7 @@ describe("RepostIndexer", () => {
 
   describe("upsert", () => {
     test("リポストレコードを正しく保存する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const reposter = actorFactory();
       const author = actorFactory();
@@ -102,7 +106,7 @@ describe("RepostIndexer", () => {
 
       // act
       await repostIndexer.upsert({
-        ctx: { db },
+        ctx: { db, afterCommit },
         record,
         live: false,
         depth: 0,
@@ -122,7 +126,7 @@ describe("RepostIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", async () => {
+    test("リポスト投稿の場合、対象投稿に対してrepost集計ジョブがスケジュールされる", () => {
       // arrange
       const { post } = postFactory();
       postRepo.add(post);
@@ -139,7 +143,7 @@ describe("RepostIndexer", () => {
       });
 
       // act
-      await repostIndexer.afterAction({ record });
+      repostIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();
