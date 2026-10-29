@@ -33,6 +33,9 @@ test.describe("通知（PC）", () => {
       text,
       createdAt,
     });
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
       displayName: "Bob",
     });
