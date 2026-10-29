@@ -3,6 +3,7 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 type Notification = {
   uri: string;
   authorName: string;
+  reason: string;
   text?: string;
 };
 
@@ -10,6 +11,11 @@ type Props = {
   notifications: Notification[];
   onLoadMore: () => void;
   hasNextPage: boolean;
+};
+
+const reasonLabels: Record<string, string> = {
+  like: "さんがいいねしました",
+  repost: "さんがリポストしました",
 };
 
 export function NotificationPanel({
@@ -31,7 +37,10 @@ export function NotificationPanel({
               key={notification.uri}
               className="border-b border-base-300 py-2"
             >
-              <p>{notification.authorName}</p>
+              <p>
+                {notification.authorName}
+                {reasonLabels[notification.reason]}
+              </p>
               {notification.text && (
                 <p className="text-sm whitespace-pre-wrap">
                   {notification.text}

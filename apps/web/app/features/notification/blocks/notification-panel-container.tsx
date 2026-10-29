@@ -21,6 +21,9 @@ async function fetchNotifications(
   return response.json() as Promise<NotificationsResponse>;
 }
 
+const maybeString = (value: unknown) =>
+  typeof value === "string" ? value : undefined;
+
 export function NotificationPanelContainer() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
@@ -31,17 +34,16 @@ export function NotificationPanelContainer() {
       getNextPageParam: (lastPage) => lastPage.cursor,
     });
 
-  const notifications = (data?.pages ?? [])
-    .flatMap((page) => page.notifications)
-    .map((notification) => ({
+  const notifications = (data?.pages ?? []).flatMap((page) =>
+    page.notifications.map((notification) => ({
       uri: notification.uri,
       authorName: notification.author.displayName ?? notification.author.handle,
-      text:
-        ["reply", "quote", "mention"].includes(notification.reason) &&
-        typeof notification.record.text === "string"
-          ? notification.record.text
-          : undefined,
-    }));
+      reason: notification.reason,
+      text: ["reply", "quote", "mention"].includes(notification.reason)
+        ? maybeString(notification.record.text)
+        : maybeString(page.subjectTexts[notification.reasonSubject ?? ""]),
+    })),
+  );
 
   return (
     <NotificationPanel
