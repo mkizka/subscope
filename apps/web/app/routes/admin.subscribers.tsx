@@ -1,5 +1,5 @@
-import { SubscriberTableContainer } from "@/app/features/admin/blocks/subscriber-table-container";
+import { SubscriberListContainer } from "@/app/features/admin/blocks/subscriber-list-container";
 
 export default function AdminSubscribers() {
-  return <SubscriberTableContainer />;
+  return <SubscriberListContainer />;
 }

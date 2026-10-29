@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { SubscriberTable } from "./subscriber-table";
+import { SubscriberList } from "./subscriber-list";
 
 async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
   const params = new URLSearchParams();
@@ -31,7 +31,7 @@ async function grantAdmin(did: string) {
   }
 }
 
-export function SubscriberTableContainer() {
+export function SubscriberListContainer() {
   const queryClient = useQueryClient();
   const grantAdminMutation = useMutation({
     mutationFn: grantAdmin,
@@ -55,7 +55,7 @@ export function SubscriberTableContainer() {
     });
 
   return (
-    <SubscriberTable
+    <SubscriberList
       subscribers={data ?? []}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}

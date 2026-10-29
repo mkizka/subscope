@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
-import { resolveHandle, subscribeServer } from "./pds";
+import { subscribeServer } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -17,19 +17,20 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("登録ユーザー", () => {
-  test("subscribers-1: サブスクライバーを新しい順に並べ、名前・ハンドル・管理者かどうかを出す", async ({
+  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうかを出す", async ({
     page,
   }) => {
     await login(page);
-    const aliceDid = await resolveHandle("alice.test");
-
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: aliceDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "@alice.test" });
     await expect(row.getByText("管理者")).toBeVisible();
   });
 
-  test("subscribers-3: 管理者でないサブスクライバーを、確認のうえ「管理者にする」で管理者にできる", async ({
+  test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await login(page);
@@ -37,12 +38,15 @@ test.describe("登録ユーザー", () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
     await subscribeServer("bob.test", code);
-    const bobDid = await resolveHandle("bob.test");
 
     await page.goto("/admin/subscribers");
 
-    const row = page.getByRole("row").filter({ hasText: bobDid });
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "@bob.test" });
 
+    await row.getByRole("button", { name: "操作" }).click();
     page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
 
