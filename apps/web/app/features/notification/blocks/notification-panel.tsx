@@ -1,6 +1,7 @@
 type Notification = {
   uri: string;
   authorName: string;
+  text?: string;
 };
 
 type Props = {
@@ -22,7 +23,12 @@ export function NotificationPanel({ notifications }: Props) {
               key={notification.uri}
               className="border-b border-base-300 py-2"
             >
-              {notification.authorName}
+              <p>{notification.authorName}</p>
+              {notification.text && (
+                <p className="text-sm whitespace-pre-wrap">
+                  {notification.text}
+                </p>
+              )}
             </li>
           ))}
         </ul>

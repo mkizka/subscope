@@ -24,6 +24,11 @@ export function NotificationPanelContainer() {
   const notifications = (data?.notifications ?? []).map((notification) => ({
     uri: notification.uri,
     authorName: notification.author.displayName ?? notification.author.handle,
+    text:
+      ["reply", "quote", "mention"].includes(notification.reason) &&
+      typeof notification.record.text === "string"
+        ? notification.record.text
+        : undefined,
   }));
 
   return <NotificationPanel notifications={notifications} />;
