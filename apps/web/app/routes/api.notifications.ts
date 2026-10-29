@@ -8,8 +8,9 @@ import type { Route } from "./+types/api.notifications";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);
-  const response = await agent.call(listNotifications, { limit: 30 });
+  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
+  const response = await agent.call(listNotifications, { limit: 30, cursor });
   return data(response);
 };
