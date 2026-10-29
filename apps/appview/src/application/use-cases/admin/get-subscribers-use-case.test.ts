@@ -11,11 +11,13 @@ describe("GetSubscribersUseCase", () => {
   let getSubscribersUseCase: TestServices["getSubscribersUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let profileRepo: TestServices["profileRepository"];
+  let actorRepo: TestServices["actorRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getSubscribersUseCase = services.getSubscribersUseCase;
     subscriptionRepo = services.subscriptionRepository;
     profileRepo = services.profileRepository;
+    actorRepo = services.actorRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00Z"));
   });
@@ -24,9 +26,10 @@ describe("GetSubscribersUseCase", () => {
     vi.useRealTimers();
   });
 
-  test("subscriberが存在する場合、ProfileViewの配列を返す", async () => {
+  test("subscriberが存在する場合、ProfileViewと管理者かどうかの配列を返す", async () => {
     // arrange
-    const actor1 = actorFactory();
+    const actor1 = actorFactory({ isAdmin: true });
+    actorRepo.add(actor1);
     const profile1 = profileDetailedFactory({
       actorDid: actor1.did,
       displayName: "Subscriber One",
@@ -59,14 +62,20 @@ describe("GetSubscribersUseCase", () => {
     expect(result).toMatchObject({
       subscribers: [
         {
-          $type: "app.bsky.actor.defs#profileView",
-          did: actor2.did,
-          displayName: "Subscriber Two",
+          profile: {
+            $type: "app.bsky.actor.defs#profileView",
+            did: actor2.did,
+            displayName: "Subscriber Two",
+          },
+          isAdmin: false,
         },
         {
-          $type: "app.bsky.actor.defs#profileView",
-          did: actor1.did,
-          displayName: "Subscriber One",
+          profile: {
+            $type: "app.bsky.actor.defs#profileView",
+            did: actor1.did,
+            displayName: "Subscriber One",
+          },
+          isAdmin: true,
         },
       ],
       cursor: undefined,
@@ -118,12 +127,16 @@ describe("GetSubscribersUseCase", () => {
     expect(result).toMatchObject({
       subscribers: [
         {
-          did: actor2?.actor.did,
-          displayName: "Test User 2",
+          profile: {
+            did: actor2?.actor.did,
+            displayName: "Test User 2",
+          },
         },
         {
-          did: actor1?.actor.did,
-          displayName: "Test User 1",
+          profile: {
+            did: actor1?.actor.did,
+            displayName: "Test User 1",
+          },
         },
       ],
       cursor: expect.any(String),
@@ -180,12 +193,16 @@ describe("GetSubscribersUseCase", () => {
     expect(firstPage).toMatchObject({
       subscribers: [
         {
-          did: actor1.did,
-          displayName: "First",
+          profile: {
+            did: actor1.did,
+            displayName: "First",
+          },
         },
         {
-          did: actor2.did,
-          displayName: "Second",
+          profile: {
+            did: actor2.did,
+            displayName: "Second",
+          },
         },
       ],
       cursor: expect.any(String),
@@ -201,8 +218,10 @@ describe("GetSubscribersUseCase", () => {
     expect(secondPage).toMatchObject({
       subscribers: [
         {
-          did: actor3.did,
-          displayName: "Third",
+          profile: {
+            did: actor3.did,
+            displayName: "Third",
+          },
         },
       ],
       cursor: undefined,

@@ -14,3 +14,16 @@ test.describe("管理画面へのアクセス", () => {
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
   });
 });
+
+test.describe("登録ユーザー", () => {
+  test("subscribers-1: サブスクライバーを新しい順に並べ、名前・ハンドル・管理者かどうかを出す", async ({
+    page,
+  }) => {
+    await login(page);
+    await page.goto("/admin/subscribers");
+
+    const row = page.getByRole("row", { name: "@alice.test" });
+    await expect(row).toBeVisible();
+    await expect(row.getByText("管理者")).toBeVisible();
+  });
+});
