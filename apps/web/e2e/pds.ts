@@ -20,18 +20,31 @@ const xrpc = async <T>(
   return response.json() as Promise<T>;
 };
 
+const createSession = (handle: string) =>
+  xrpc<{ did: string; accessJwt: string }>("com.atproto.server.createSession", {
+    identifier: handle,
+    password: "password",
+  });
+
 export const createRecord = async (
   handle: string,
   collection: string,
   record: Record<string, unknown>,
 ) => {
-  const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
-    "com.atproto.server.createSession",
-    { identifier: handle, password: "password" },
-  );
+  const { did, accessJwt } = await createSession(handle);
   return xrpc<{ uri: string; cid: string }>(
     "com.atproto.repo.createRecord",
     { repo: did, collection, record: { $type: collection, ...record } },
+    accessJwt,
+  );
+};
+
+export const putProfile = async (handle: string) => {
+  const { did, accessJwt } = await createSession(handle);
+  const collection = "app.bsky.actor.profile";
+  await xrpc(
+    "com.atproto.repo.putRecord",
+    { repo: did, collection, rkey: "self", record: { $type: collection } },
     accessJwt,
   );
 };
