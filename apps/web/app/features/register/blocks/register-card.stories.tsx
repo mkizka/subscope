@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { RegisterCard } from "./register-card";
 
 const meta = {
-  title: "features/Register/RegisterCard",
   component: RegisterCard,
   args: {
     isLoggedIn: false,

@@ -1,7 +1,20 @@
-import { InvalidRequestError } from "@atproto/xrpc-server";
 import type { DatabaseClient } from "@repo/common/domain";
 
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
+
+export class InviteCodeNotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InviteCodeNotFound";
+  }
+}
+
+export class InviteCodeAlreadyUsedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InviteCodeAlreadyUsed";
+  }
+}
 
 export class DeleteInviteCodeUseCase {
   constructor(
@@ -14,17 +27,11 @@ export class DeleteInviteCodeUseCase {
     const inviteCode = await this.inviteCodeRepository.findFirst(params.code);
 
     if (!inviteCode) {
-      throw new InvalidRequestError(
-        "Invite code not found",
-        "InviteCodeNotFound",
-      );
+      throw new InviteCodeNotFoundError("Invite code not found");
     }
 
     if (inviteCode.isUsed()) {
-      throw new InvalidRequestError(
-        "Invite code already used",
-        "InviteCodeAlreadyUsed",
-      );
+      throw new InviteCodeAlreadyUsedError("Invite code already used");
     }
 
     await this.inviteCodeRepository.delete({

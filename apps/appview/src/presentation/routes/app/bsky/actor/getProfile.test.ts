@@ -1,3 +1,5 @@
+import { asAtIdentifierString } from "@atproto/syntax";
+import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -14,10 +16,12 @@ describe("app.bsky.actor.getProfile", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.actor.getProfile({ actor: actor.did });
+    const res = await client.call(getProfile, {
+      actor: asAtIdentifierString(actor.did),
+    });
 
     // assert
-    expect(res.data).toMatchObject({
+    expect(res).toMatchObject({
       did: actor.did,
       handle: actor.handle,
       displayName: "Alice",
@@ -29,7 +33,7 @@ describe("app.bsky.actor.getProfile", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.actor.getProfile({
+    const promise = client.call(getProfile, {
       actor: "did:plc:notfound",
     });
 

@@ -18,7 +18,7 @@ export class SubscribeServer {
 
   handle(router: LexRouter) {
     router.add(subscribeServer, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ input, credentials }) => {
         try {
           await this.subscribeServerUseCase.execute({

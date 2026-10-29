@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { PostCard } from "./post-card";
 
 const meta = {
-  title: "features/Timeline/PostCard",
   component: PostCard,
 } satisfies Meta<typeof PostCard>;
 

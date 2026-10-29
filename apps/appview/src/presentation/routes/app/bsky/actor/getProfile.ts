@@ -1,6 +1,6 @@
 import { isDid } from "@atproto/did";
-import { InvalidRequestError } from "@atproto/xrpc-server";
-import type { Server } from "@repo/client/server";
+import { type LexRouter, LexServerError } from "@atproto/lex-server";
+import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import { isHandle } from "@repo/common/utils";
 
 import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";
@@ -19,28 +19,33 @@ export class GetProfile {
     "authVerifierMiddleware",
   ] as const;
 
-  handle(server: Server) {
-    server.app.bsky.actor.getProfile({
-      handler: async ({ params, req }) => {
+  handle(router: LexRouter) {
+    router.add(getProfile, {
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      handler: async ({ params, credentials: viewerDid }) => {
         if (!isDid(params.actor) && !isHandle(params.actor)) {
-          throw new InvalidRequestError("Invalid actor");
+          throw new LexServerError(400, {
+            error: "InvalidRequest",
+            message: "Invalid actor",
+          });
         }
 
-        const [did, viewerDid] = await Promise.all([
-          this.handleMiddleware.resolveHandleOrDid(params.actor),
-          this.authVerifierMiddleware.getViewerDid(req),
-        ]);
+        const did = await this.handleMiddleware.resolveHandleOrDid(
+          params.actor,
+        );
 
         const [profile] = await this.getProfilesUseCase.execute(
           [did],
           viewerDid,
         );
         if (!profile) {
-          throw new InvalidRequestError("Profile not found");
+          throw new LexServerError(400, {
+            error: "InvalidRequest",
+            message: "Profile not found",
+          });
         }
 
         return {
-          encoding: "application/json",
           body: profile,
         };
       },

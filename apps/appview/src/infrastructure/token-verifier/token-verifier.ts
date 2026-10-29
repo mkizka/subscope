@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import { verifyJwt } from "@atproto/xrpc-server";
+import { AuthRequiredError, verifyJwt } from "@atproto/xrpc-server";
 import type { IDidResolver } from "@repo/common/domain";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
@@ -21,7 +21,15 @@ export class TokenVerifier implements ITokenVerifier {
       this.serviceDid,
       params.nsid,
       getSigninKey,
-    );
+    ).catch((error: unknown) => {
+      if (error instanceof AuthRequiredError) {
+        return null;
+      }
+      throw error;
+    });
+    if (!payload) {
+      return null;
+    }
     /**
      * メモ
      * {
