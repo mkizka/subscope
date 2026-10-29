@@ -13,7 +13,7 @@ export class GetTimeline {
 
   handle(router: LexRouter) {
     router.add(getTimeline, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ params, credentials }) => {
         const body = await this.getTimelineUseCase.execute({
           algorithm: params.algorithm,

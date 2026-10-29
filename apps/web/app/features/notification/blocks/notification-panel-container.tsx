@@ -15,11 +15,23 @@ async function fetchNotifications(): Promise<NotificationsResponse> {
   return response.json() as Promise<NotificationsResponse>;
 }
 
+const maybeString = (value: unknown) =>
+  typeof value === "string" ? value : undefined;
+
 export function NotificationPanelContainer() {
   const { data } = useQuery({
     queryKey: ["notifications"],
     queryFn: fetchNotifications,
   });
 
-  return <NotificationPanel notifications={data?.notifications ?? []} />;
+  const notifications = (data?.notifications ?? []).map((notification) => ({
+    uri: notification.uri,
+    authorName: notification.author.displayName ?? notification.author.handle,
+    reason: notification.reason,
+    text: ["reply", "quote", "mention"].includes(notification.reason)
+      ? maybeString(notification.record.text)
+      : maybeString(data?.subjectTexts[notification.reasonSubject ?? ""]),
+  }));
+
+  return <NotificationPanel notifications={notifications} />;
 }

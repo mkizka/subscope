@@ -1,3 +1,4 @@
+import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
 import { schema } from "@repo/db";
 import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
@@ -13,7 +14,7 @@ describe("app.bsky.notification.getUnreadCount", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.notification.getUnreadCount();
+    const promise = client.call(getUnreadCount);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
@@ -45,9 +46,9 @@ describe("app.bsky.notification.getUnreadCount", () => {
     loginAs(viewer.did);
 
     // act
-    const res = await client.app.bsky.notification.getUnreadCount();
+    const res = await client.call(getUnreadCount);
 
     // assert
-    expect(res.data).toEqual({ count: 2 });
+    expect(res).toEqual({ count: 2 });
   });
 });

@@ -15,7 +15,10 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
   const subjectUris = [
     ...new Set(
       notifications.flatMap((notification) =>
-        notification.reasonSubject ? [notification.reasonSubject] : [],
+        ["like", "repost"].includes(notification.reason) &&
+        notification.reasonSubject
+          ? [notification.reasonSubject]
+          : [],
       ),
     ),
   ];
@@ -23,21 +26,10 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
     subjectUris.length > 0
       ? await agent.call(getPosts, { uris: subjectUris })
       : { posts: [] };
-  const subjectTexts = new Map(
-    posts.map((post) => [post.uri, post.record.text]),
-  );
   return data({
-    notifications: notifications.map((notification) => {
-      const subjectText =
-        notification.reasonSubject &&
-        subjectTexts.get(notification.reasonSubject);
-      return {
-        uri: notification.uri,
-        authorName:
-          notification.author.displayName ?? notification.author.handle,
-        reason: notification.reason,
-        subjectText: typeof subjectText === "string" ? subjectText : undefined,
-      };
-    }),
+    notifications,
+    subjectTexts: Object.fromEntries(
+      posts.map((post) => [post.uri, post.record.text]),
+    ),
   });
 };

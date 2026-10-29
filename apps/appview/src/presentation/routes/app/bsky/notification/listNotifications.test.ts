@@ -1,3 +1,4 @@
+import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
 import { schema } from "@repo/db";
 import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
@@ -13,7 +14,7 @@ describe("app.bsky.notification.listNotifications", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.notification.listNotifications();
+    const promise = client.call(listNotifications);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
@@ -50,10 +51,10 @@ describe("app.bsky.notification.listNotifications", () => {
     loginAs(viewer.did);
 
     // act
-    const res = await client.app.bsky.notification.listNotifications();
+    const res = await client.call(listNotifications);
 
     // assert
-    expect(res.data.notifications).toMatchObject([
+    expect(res.notifications).toMatchObject([
       { uri: unread.uri, author: { did: author.did }, isRead: false },
       { uri: read.uri, author: { did: author.did }, isRead: true },
     ]);

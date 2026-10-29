@@ -21,6 +21,12 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
 
+## app.bsky.feed.getListFeed
+
+指定したリストのメンバーの投稿とリポストを新しい順に返す。認証は任意。
+
+- getListFeed-1: リストのメンバーとメンバー以外の投稿がある場合、メンバーの投稿のみをfeedViewPostとして返す
+
 ## app.bsky.feed.getActorLikes
 
 指定したアクターがいいねした投稿を新しい順に返す。認証は任意。

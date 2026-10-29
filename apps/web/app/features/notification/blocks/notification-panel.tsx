@@ -2,16 +2,16 @@ type Notification = {
   uri: string;
   authorName: string;
   reason: string;
-  subjectText?: string;
-};
-
-const reasonLabels: Record<string, string> = {
-  like: "いいねしました",
-  repost: "リポストしました",
+  text?: string;
 };
 
 type Props = {
   notifications: Notification[];
+};
+
+const reasonLabels: Record<string, string> = {
+  like: "さんがいいねしました",
+  repost: "さんがリポストしました",
 };
 
 export function NotificationPanel({ notifications }: Props) {
@@ -31,11 +31,12 @@ export function NotificationPanel({ notifications }: Props) {
             >
               <p>
                 {notification.authorName}
-                {reasonLabels[notification.reason] &&
-                  `さんが${reasonLabels[notification.reason]}`}
+                {reasonLabels[notification.reason]}
               </p>
-              {notification.subjectText && (
-                <p className="text-sm opacity-60">{notification.subjectText}</p>
+              {notification.text && (
+                <p className="text-sm whitespace-pre-wrap">
+                  {notification.text}
+                </p>
               )}
             </li>
           ))}

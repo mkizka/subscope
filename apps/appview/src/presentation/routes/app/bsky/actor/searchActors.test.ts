@@ -1,3 +1,4 @@
+import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
@@ -18,10 +19,10 @@ describe("app.bsky.actor.searchActors", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.actor.searchActors({ q: "zqx" });
+    const res = await client.call(searchActors, { q: "zqx" });
 
     // assert
-    expect(res.data.actors).toMatchObject([
+    expect(res.actors).toMatchObject([
       { did: actor.did, displayName: "Zqx Alice" },
     ]);
   });
