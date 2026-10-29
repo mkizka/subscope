@@ -16,7 +16,7 @@
 | quote   | `app.bsky.feed.post`    | 引用された投稿の作者                         |
 | mention | `app.bsky.feed.post`    | メンションされたアカウント                   |
 
-- 1つの投稿から同じ受信者への通知は reply > quote > mention の優先順で1件にする
+- notification-2: 1つの投稿から同じ受信者への通知は mention > quote > reply の優先順で1件にする
 - notification-1: リプライ通知は、親投稿を含めて4つ上の投稿まで保存済みの投稿をたどり、その作者に送る。未保存の投稿に当たったら打ち切る
 
 ## API

@@ -83,20 +83,20 @@ export class PostIndexer implements ICollectionIndexer {
       replySubjects.push(uri);
     }
     const candidates = [
-      ...replySubjects.map((uri) => ({
-        recipientDid: uri.hostname,
-        reason: "reply" as const,
-        reasonSubject: uri.toString(),
+      ...mentionDids.map((did) => ({
+        recipientDid: did,
+        reason: "mention" as const,
+        reasonSubject: null,
       })),
       quoteUri?.collection === "app.bsky.feed.post" && {
         recipientDid: quoteUri.hostname,
         reason: "quote" as const,
         reasonSubject: quoteUri.toString(),
       },
-      ...mentionDids.map((did) => ({
-        recipientDid: did,
-        reason: "mention" as const,
-        reasonSubject: null,
+      ...replySubjects.map((uri) => ({
+        recipientDid: uri.hostname,
+        reason: "reply" as const,
+        reasonSubject: uri.toString(),
       })),
     ];
 
