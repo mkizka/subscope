@@ -4,6 +4,7 @@ import { Queue } from "bullmq";
 import type {
   IJobQueue,
   JobData,
+  JobOptions,
   QueueName,
 } from "../../domain/interfaces/job-queue.js";
 
@@ -65,11 +66,7 @@ export class JobQueue implements IJobQueue {
     queueName: T;
     jobName: string;
     data: JobData[T];
-    options?: {
-      jobId?: string;
-      delay?: number;
-      priority?: number;
-    };
+    options?: JobOptions;
   }) {
     await this.queues[queueName].add(jobName, data, {
       ...options,

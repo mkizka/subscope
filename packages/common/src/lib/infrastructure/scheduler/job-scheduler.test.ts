@@ -128,7 +128,10 @@ describe("JobScheduler", () => {
           type: "reply",
         },
         options: {
-          jobId: `reply__${uri.toString()}`,
+          deduplication: {
+            id: `reply__${uri.toString()}`,
+            keepLastIfActive: true,
+          },
           delay: AGGREGATE_STATS_DELAY_MS,
         },
       });
@@ -154,7 +157,7 @@ describe("JobScheduler", () => {
           type: "posts",
         },
         options: {
-          jobId: `posts__${did}`,
+          deduplication: { id: `posts__${did}`, keepLastIfActive: true },
           delay: AGGREGATE_STATS_DELAY_MS,
         },
       });
