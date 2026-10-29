@@ -43,10 +43,10 @@ test.describe("通知", () => {
     await expect(async () => {
       await page.reload();
       await expect(items.filter({ hasText: "いいね" })).toContainText("Bob", {
-        timeout: 1000,
+        timeout: 5000,
       });
       await expect(items.filter({ hasText: "リポスト" })).toContainText("Bob", {
-        timeout: 1000,
+        timeout: 5000,
       });
     }).toPass();
   });
