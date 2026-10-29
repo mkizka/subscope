@@ -6,6 +6,17 @@ export const MAX_IMAGES = 4;
 export const countGraphemes = (text: string) =>
   [...new Intl.Segmenter().segment(text)].length;
 
+const REPLY_RULES = [
+  { rule: "follower", label: "フォロワー" },
+  { rule: "following", label: "フォロー中" },
+  { rule: "mention", label: "メンションした人" },
+] as const;
+
+export type ReplyRule = (typeof REPLY_RULES)[number]["rule"];
+
+export const isReplyRule = (value: string): value is ReplyRule =>
+  REPLY_RULES.some(({ rule }) => rule === value);
+
 type Props = {
   isSubmitting: boolean;
   error?: string;
@@ -15,6 +26,7 @@ type Props = {
 export function PostForm({ isSubmitting, error, onSubmit }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState("");
+  const [allow, setAllow] = useState<ReplyRule[]>();
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const length = countGraphemes(text);
 
@@ -37,6 +49,7 @@ export function PostForm({ isSubmitting, error, onSubmit }: Props) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         images.forEach(({ file }) => formData.append("image", file));
+        if (allow) formData.set("allow", allow.join(","));
         onSubmit(formData);
       }}
     >
@@ -73,6 +86,42 @@ export function PostForm({ isSubmitting, error, onSubmit }: Props) {
           ))}
         </div>
       )}
+      <fieldset className="flex flex-wrap items-center gap-3 text-sm">
+        <legend className="sr-only">返信できる人</legend>
+        <label className="flex items-center gap-1">
+          <input
+            type="radio"
+            className="radio radio-xs"
+            checked={allow === undefined}
+            onChange={() => setAllow(undefined)}
+          />
+          誰でも
+        </label>
+        <label className="flex items-center gap-1">
+          <input
+            type="radio"
+            className="radio radio-xs"
+            checked={allow?.length === 0}
+            onChange={() => setAllow([])}
+          />
+          返信不可
+        </label>
+        {REPLY_RULES.map(({ rule, label }) => (
+          <label key={rule} className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-xs"
+              checked={allow?.includes(rule) ?? false}
+              onChange={(e) => {
+                const next = (allow ?? []).filter((r) => r !== rule);
+                if (e.target.checked) next.push(rule);
+                setAllow(next.length > 0 ? next : undefined);
+              }}
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
       <div className="flex items-center justify-end gap-3">
         <label
           className={`
