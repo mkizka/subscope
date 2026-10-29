@@ -6,6 +6,10 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:3000",
     trace: "retain-on-failure",
   },
+  projects: [
+    { name: "login", testMatch: "login.spec.ts" },
+    { name: "app", testIgnore: "login.spec.ts", dependencies: ["login"] },
+  ],
   webServer: {
     command: "node --import tsx ./dev-env/server.mts pnpm turbo run dev",
     cwd: "../..",

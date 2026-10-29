@@ -21,6 +21,77 @@ AppViewが提供するXRPC APIの振る舞いを定める。
 - getTimeline-1: 認証がない場合、401を返す
 - getTimeline-2: フォロイーの投稿がある場合、その投稿をfeedViewPostとして返す
 
+## app.bsky.feed.getActorLikes
+
+指定したアクターがいいねした投稿を新しい順に返す。認証は任意。
+
+- getActorLikes-1: いいねした投稿がある場合、その投稿をfeedViewPostとして返す
+
+## app.bsky.feed.getLikes
+
+指定した投稿へのいいねを新しい順に返す。認証は任意。
+
+- getLikes-1: いいねがある場合、いいねしたアクターのprofileViewを返す
+
+## app.bsky.feed.getRepostedBy
+
+指定した投稿をリポストしたアクターを新しい順に返す。認証は任意。
+
+- getRepostedBy-1: リポストがある場合、リポストしたアクターのprofileViewを返す
+
+## app.bsky.feed.getFeedGenerators
+
+指定したフィードジェネレーターの情報を返す。認証は任意。
+
+- getFeedGenerators-1: 存在するフィードジェネレーターを指定した場合、そのgeneratorViewを返す
+
+## app.bsky.feed.searchPosts
+
+本文が検索クエリに一致する投稿を新しい順に返す。認証は任意。
+
+- searchPosts-1: クエリに一致する投稿がある場合、その投稿をpostViewとして返す
+
+## app.bsky.feed.getPosts
+
+指定したURIの投稿をpostViewとして返す。認証は任意。
+
+- getPosts-1: 複数のURIを指定した場合、指定した順に投稿を返し、存在しない投稿は除外する
+
+## app.bsky.feed.getPostThread
+
+指定した投稿を中心に、親投稿とリプライを含むスレッドを返す。認証は任意。
+
+- getPostThread-1: 親投稿とリプライがある投稿を指定した場合、それらを含むthreadViewPostを返す
+- getPostThread-2: 存在しない投稿を指定した場合、400 NotFoundを返す
+
+## app.bsky.feed.getAuthorFeed
+
+指定したアクターの投稿とリポストを新しい順に返す。認証は任意。
+
+- getAuthorFeed-1: アクターをハンドルで指定した場合、そのアクターの投稿をfeedViewPostとして返す
+- getAuthorFeed-2: 解決できないハンドルを指定した場合、400を返す
+
+## app.bsky.notification.listNotifications
+
+閲覧者宛ての通知を新しい順に返す。認証が必要。
+
+- listNotifications-1: 認証がない場合、401を返す
+- listNotifications-2: 閲覧者宛ての通知がある場合、新しい順に返し、既読時刻以前の通知を既読にする
+
+## app.bsky.notification.getUnreadCount
+
+閲覧者宛ての未読通知の数を返す。認証が必要。
+
+- getUnreadCount-1: 認証がない場合、401を返す
+- getUnreadCount-2: 閲覧者宛ての通知のうち、既読時刻より新しい通知の数を返す
+
+## app.bsky.notification.updateSeen
+
+閲覧者の既読時刻を更新する。認証が必要。
+
+- updateSeen-1: 認証がない場合、401を返す
+- updateSeen-2: 指定した時刻以前の通知を既読にする
+
 ## app.bsky.actor.getProfiles
 
 指定した複数アクターの詳細なプロフィールを返す。認証は任意。
