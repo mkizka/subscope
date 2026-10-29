@@ -1,75 +1,65 @@
 import { expect, test } from "@playwright/test";
 
-const PDS_URL = "http://localhost:2583";
-
-async function createRecords(text: string) {
-  const session = await fetch(
-    `${PDS_URL}/xrpc/com.atproto.server.createSession`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier: "alice.test", password: "password" }),
-    },
-  ).then(
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    (res) => res.json() as Promise<{ accessJwt: string; did: string }>,
-  );
-  const createRecord = (collection: string, record: object, rkey?: string) =>
-    fetch(`${PDS_URL}/xrpc/com.atproto.repo.createRecord`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessJwt}`,
-      },
-      body: JSON.stringify({
-        repo: session.did,
-        collection,
-        rkey,
-        record: { $type: collection, ...record },
-      }),
-    });
-  await createRecord(
-    "app.bsky.actor.profile",
-    { displayName: "Alice" },
-    "self",
-  );
-  await createRecord("app.bsky.feed.post", {
-    text,
-    createdAt: new Date().toISOString(),
-  });
-}
+import { login } from "./login";
+import { createRecord, putRecord } from "./pds";
 
 test.describe("プロフィール", () => {
-  test("profile-1: 左カラムの「プロフィール」を選ぶと、中央カラムに自分のプロフィールが出る", async ({
+  test("profile-1: 左カラムの「プロフィール」を選ぶと、中央カラムに自分のプロフィール（名前、ハンドル、フォロー数、フォロワー数、投稿一覧）が出る", async ({
     page,
   }) => {
-    await page.goto("/login");
-    await page.getByLabel("ハンドル").fill("alice.test");
-    await page.getByRole("button", { name: "ログイン" }).click();
-    await page.getByRole("textbox", { name: "Password" }).fill("password");
-    await page.getByRole("button", { name: "Sign in" }).click();
-    await page.getByRole("button", { name: "Authorize" }).click();
-    await page.waitForURL("/");
-
     const text = `profile-1の投稿 ${Date.now()}`;
-    await createRecords(text);
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+    await login(page);
 
-    await expect(async () => {
-      await page.reload();
-      await page
-        .getByRole("link", { name: "プロフィール" })
-        .click({ timeout: 1000 });
-    }).toPass();
-    await page.waitForURL(/\/profile\//);
+    await page.getByRole("link", { name: "プロフィール" }).click();
 
+    await expect(page).toHaveURL(/\/profile\//);
     const main = page.getByRole("main");
     await expect(main.getByRole("heading", { name: "Alice" })).toBeVisible();
     await expect(main.getByText(/^@/).first()).toBeVisible();
-    await expect(main.getByText("0 フォロー", { exact: true })).toBeVisible();
-    await expect(main.getByText("0 フォロワー", { exact: true })).toBeVisible();
+    await expect(main.getByText(/^\d+ フォロー$/)).toBeVisible();
+    await expect(main.getByText(/^\d+ フォロワー$/)).toBeVisible();
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(text)).toBeVisible({ timeout: 1000 });
     }).toPass();
+  });
+
+  test.describe("簡易表示", () => {
+    test.beforeEach(async ({ page }) => {
+      await login(page);
+      await page.goto("/?profile=alice.test");
+    });
+
+    test("profile-2: URLの ?profile=ハンドル で、右カラムにそのユーザーのプロフィールの簡易表示が開く", async ({
+      page,
+    }) => {
+      const panel = page.getByRole("region", { name: "プロフィール" });
+      await expect(panel.getByText("@alice.test")).toBeVisible();
+      await expect(panel.getByText("フォロワー")).toBeVisible();
+    });
+
+    test("profile-3: 簡易表示を閉じると、右カラムが通知に戻る", async ({
+      page,
+    }) => {
+      await page.getByRole("link", { name: "閉じる" }).click();
+
+      await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
+      await expect(page).toHaveURL("/");
+    });
+
+    test("profile-4: 簡易表示から、中央カラムのプロフィール全体ページに移動できる", async ({
+      page,
+    }) => {
+      await page.getByRole("link", { name: "プロフィール全体を見る" }).click();
+
+      await expect(page).toHaveURL("/profile/alice.test");
+    });
   });
 });

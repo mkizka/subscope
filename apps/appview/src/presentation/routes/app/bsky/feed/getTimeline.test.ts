@@ -1,3 +1,4 @@
+import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import {
   actorFactory,
   followFactory,
@@ -18,7 +19,7 @@ describe("app.bsky.feed.getTimeline", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.feed.getTimeline();
+    const promise = client.call(getTimeline);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
@@ -54,10 +55,10 @@ describe("app.bsky.feed.getTimeline", () => {
     loginAs(viewer.did);
 
     // act
-    const res = await client.app.bsky.feed.getTimeline();
+    const res = await client.call(getTimeline);
 
     // assert
-    expect(res.data.feed).toMatchObject([
+    expect(res.feed).toMatchObject([
       { post: { uri: post.uri, author: { did: followee.did } } },
     ]);
   });

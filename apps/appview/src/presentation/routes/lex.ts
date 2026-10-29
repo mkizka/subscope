@@ -9,7 +9,12 @@ import type { SearchActors } from "./app/bsky/actor/searchActors.js";
 import type { SearchActorsTypeahead } from "./app/bsky/actor/searchActorsTypeahead.js";
 import type { GetActorLikes } from "./app/bsky/feed/getActorLikes.js";
 import type { GetAuthorFeed } from "./app/bsky/feed/getAuthorFeed.js";
+import type { GetFeedGenerators } from "./app/bsky/feed/getFeedGenerators.js";
+import type { GetLikes } from "./app/bsky/feed/getLikes.js";
+import type { GetListFeed } from "./app/bsky/feed/getListFeed.js";
+import type { GetPosts } from "./app/bsky/feed/getPosts.js";
 import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
+import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
@@ -36,6 +41,7 @@ export const lexRouterFactory = (
   getActorLikes: GetActorLikes,
   getAuthorFeed: GetAuthorFeed,
   getTimeline: GetTimeline,
+  getListFeed: GetListFeed,
   getFollows: GetFollows,
   getFollowers: GetFollowers,
   getList: GetList,
@@ -58,6 +64,10 @@ export const lexRouterFactory = (
   searchActors: SearchActors,
   searchActorsTypeahead: SearchActorsTypeahead,
   getSubscribers: GetSubscribers,
+  getLikes: GetLikes,
+  getRepostedBy: GetRepostedBy,
+  getFeedGenerators: GetFeedGenerators,
+  getPosts: GetPosts,
 ): RequestHandler => {
   const handlers = [
     getPostThread,
@@ -65,6 +75,7 @@ export const lexRouterFactory = (
     getActorLikes,
     getAuthorFeed,
     getTimeline,
+    getListFeed,
     getFollows,
     getFollowers,
     getList,
@@ -87,23 +98,17 @@ export const lexRouterFactory = (
     searchActors,
     searchActorsTypeahead,
     getSubscribers,
+    getLikes,
+    getRepostedBy,
+    getFeedGenerators,
+    getPosts,
   ];
 
   const router = new LexRouter();
   for (const handler of handlers) {
     handler.handle(router);
   }
-  const paths = new Set(
-    Array.from(router.handlers.keys(), (nsid) => `/xrpc/${nsid}`),
-  );
-  const listener = toRequestListener(router.fetch);
-  return (req, res, next) => {
-    if (paths.has(req.path)) {
-      listener(req, res, next);
-    } else {
-      next();
-    }
-  };
+  return toRequestListener(router.fetch);
 };
 lexRouterFactory.inject = [
   "getPostThread",
@@ -111,6 +116,7 @@ lexRouterFactory.inject = [
   "getActorLikes",
   "getAuthorFeed",
   "getTimeline",
+  "getListFeed",
   "getFollows",
   "getFollowers",
   "getList",
@@ -133,4 +139,8 @@ lexRouterFactory.inject = [
   "searchActors",
   "searchActorsTypeahead",
   "getSubscribers",
+  "getLikes",
+  "getRepostedBy",
+  "getFeedGenerators",
+  "getPosts",
 ] as const;

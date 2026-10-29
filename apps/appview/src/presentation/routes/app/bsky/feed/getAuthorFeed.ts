@@ -19,7 +19,7 @@ export class GetAuthorFeed {
 
   handle(router: LexRouter) {
     router.add(getAuthorFeed, {
-      auth: (ctx) => this.authVerifierMiddleware.lexOptionalAuth(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
         const actorDid = await this.handleMiddleware.resolveHandleOrDid(
           params.actor,

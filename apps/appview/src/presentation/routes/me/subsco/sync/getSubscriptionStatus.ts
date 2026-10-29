@@ -16,7 +16,7 @@ export class GetSubscriptionStatus {
 
   handle(router: LexRouter) {
     router.add(getSubscriptionStatus, {
-      auth: (ctx) => this.authVerifierMiddleware.lexLoginRequired(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials }) => {
         const result = await this.getSubscriptionStatusUseCase.execute({
           actorDid: credentials.did,

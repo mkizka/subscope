@@ -13,7 +13,7 @@ export class SearchActors {
 
   handle(router: LexRouter) {
     router.add(searchActors, {
-      auth: (ctx) => this.authVerifierMiddleware.lexOptionalAuth(ctx),
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
         const result = await this.searchActorsUseCase.execute({
           query: params.q,

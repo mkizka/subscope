@@ -11,7 +11,7 @@ export class AdminMiddleware {
   static inject = ["authVerifierMiddleware", "actorRepository"] as const;
 
   async requireAdmin(ctx: { request: Request }) {
-    const credentials = await this.authVerifierMiddleware.lexLoginRequired(ctx);
+    const credentials = await this.authVerifierMiddleware.loginRequired(ctx);
 
     const actor = await this.actorRepository.findByDid(credentials.did);
     // TODO: lexiconに定義したエラーを返す
