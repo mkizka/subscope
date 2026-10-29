@@ -69,4 +69,22 @@ test.describe("招待コード", () => {
 
     await expect(page.getByText(oldest)).toBeVisible();
   });
+
+  test("invite-codes-4: 未使用の招待コードだけを削除でき、期限切れでないものは削除前に確認する", async ({
+    page,
+  }) => {
+    await login(page);
+    const code = await createInviteCode(page);
+
+    await page.goto("/admin/invite-codes");
+    const row = page.getByRole("row", { name: code });
+
+    page.once("dialog", (dialog) => {
+      expect(dialog.message()).toContain(code);
+      void dialog.accept();
+    });
+    await row.getByRole("button", { name: "削除" }).click();
+
+    await expect(row).toHaveCount(0);
+  });
 });
