@@ -269,7 +269,7 @@ export const createAppRegistry = (env: Env) =>
     .service("createInviteCode", ["createInviteCodeUseCase", "adminMiddleware"], asClassArgs(CreateInviteCode))
     .service("deleteInviteCode", ["deleteInviteCodeUseCase", "adminMiddleware"], asClassArgs(DeleteInviteCode))
     .service("getInviteCodes", ["getInviteCodesUseCase", "adminMiddleware"], asClassArgs(GetInviteCodes))
-    .service("getSubscribers", ["getSubscribersUseCase"], asClassArgs(GetSubscribers))
+    .service("getSubscribers", ["getSubscribersUseCase", "adminMiddleware"], asClassArgs(GetSubscribers))
     .service("registerAdmin", ["registerAdminUseCase", "authVerifierMiddleware"], asClassArgs(RegisterAdmin))
     .service("verifyAccess", ["verifyAccessUseCase", "authVerifierMiddleware"], asClassArgs(VerifyAccess))
     .service("getSetupStatus", ["getSetupStatusUseCase"], asClassArgs(GetSetupStatus))
