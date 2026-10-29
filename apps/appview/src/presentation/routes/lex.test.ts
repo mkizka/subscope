@@ -41,13 +41,13 @@ describe("lexRouter", () => {
 
   const auth = { authorization: "Bearer token" };
 
-  test("認証がない場合、xrpc-serverと同じ401エラーを返す", async () => {
+  test("認証がない場合、401エラーを返す", async () => {
     const res = await fetch(`${baseUrl}/me.subsco.sync.getSubscriptionStatus`);
 
     expect(res.status).toBe(401);
     expect(await res.json()).toMatchObject({
       error: "AuthenticationRequired",
-      message: "Bad authorization header",
+      message: "Authentication required",
     });
   });
 
