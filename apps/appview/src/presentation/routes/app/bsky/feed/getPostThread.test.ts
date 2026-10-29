@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 import {
   actorFactory,
   postFactory,
@@ -33,10 +35,12 @@ describe("app.bsky.feed.getPostThread", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.feed.getPostThread({ uri: target.uri });
+    const res = await client.call(getPostThread, {
+      uri: asAtUriString(target.uri),
+    });
 
     // assert
-    expect(res.data.thread).toMatchObject({
+    expect(res.thread).toMatchObject({
       $type: "app.bsky.feed.defs#threadViewPost",
       post: { uri: target.uri },
       parent: { post: { uri: root.uri } },
@@ -49,7 +53,7 @@ describe("app.bsky.feed.getPostThread", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.feed.getPostThread({
+    const promise = client.call(getPostThread, {
       uri: "at://did:plc:notfound/app.bsky.feed.post/notfound",
     });
 

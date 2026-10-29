@@ -1,3 +1,5 @@
+import { asAtIdentifierString } from "@atproto/syntax";
+import getLists from "@repo/client/lex/app/bsky/graph/getLists";
 import {
   actorFactory,
   listFactory,
@@ -31,10 +33,12 @@ describe("app.bsky.graph.getLists", () => {
     const list = await createList(actor.did, "app.bsky.graph.defs#curatelist");
 
     // act
-    const res = await client.app.bsky.graph.getLists({ actor: actor.did });
+    const res = await client.call(getLists, {
+      actor: asAtIdentifierString(actor.did),
+    });
 
     // assert
-    expect(res.data.lists).toMatchObject([
+    expect(res.lists).toMatchObject([
       { uri: list.uri, name: list.name, creator: { did: actor.did } },
     ]);
   });
@@ -52,12 +56,12 @@ describe("app.bsky.graph.getLists", () => {
     await createList(actor.did, "app.bsky.graph.defs#modlist");
 
     // act
-    const res = await client.app.bsky.graph.getLists({
-      actor: actor.did,
+    const res = await client.call(getLists, {
+      actor: asAtIdentifierString(actor.did),
       purposes: ["curatelist"],
     });
 
     // assert
-    expect(res.data.lists).toMatchObject([{ uri: curatelist.uri }]);
+    expect(res.lists).toMatchObject([{ uri: curatelist.uri }]);
   });
 });

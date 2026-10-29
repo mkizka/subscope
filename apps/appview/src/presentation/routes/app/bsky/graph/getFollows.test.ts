@@ -1,3 +1,5 @@
+import { asAtIdentifierString } from "@atproto/syntax";
+import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
 import {
   actorFactory,
   followFactory,
@@ -31,10 +33,12 @@ describe("app.bsky.graph.getFollows", () => {
       .create();
 
     // act
-    const res = await client.app.bsky.graph.getFollows({ actor: actor.did });
+    const res = await client.call(getFollows, {
+      actor: asAtIdentifierString(actor.did),
+    });
 
     // assert
-    expect(res.data).toMatchObject({
+    expect(res).toMatchObject({
       subject: { did: actor.did },
       follows: [{ did: followee.did }],
     });

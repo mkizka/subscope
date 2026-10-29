@@ -1,3 +1,4 @@
+import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
 import { schema } from "@repo/db";
 import {
   actorFactory,
@@ -52,10 +53,10 @@ describe("app.bsky.feed.getListFeed", () => {
     });
 
     // act
-    const res = await client.app.bsky.feed.getListFeed({ list: listUri });
+    const res = await client.call(getListFeed, { list: listUri });
 
     // assert
-    expect(res.data.feed).toMatchObject([
+    expect(res.feed).toMatchObject([
       { post: { uri: member.post.uri, author: { did: member.actor.did } } },
     ]);
   });

@@ -1,3 +1,6 @@
+import { asDatetimeString } from "@atproto/syntax";
+import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
+import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
 import { schema } from "@repo/db";
 import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -12,8 +15,8 @@ describe("app.bsky.notification.updateSeen", () => {
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.app.bsky.notification.updateSeen({
-      seenAt: new Date().toISOString(),
+    const promise = client.call(updateSeen, {
+      seenAt: asDatetimeString(new Date().toISOString()),
     });
 
     // assert
@@ -42,12 +45,12 @@ describe("app.bsky.notification.updateSeen", () => {
     loginAs(viewer.did);
 
     // act
-    await client.app.bsky.notification.updateSeen({
-      seenAt: new Date("2024-01-02").toISOString(),
+    await client.call(updateSeen, {
+      seenAt: asDatetimeString(new Date("2024-01-02").toISOString()),
     });
 
     // assert
-    const res = await client.app.bsky.notification.getUnreadCount();
-    expect(res.data).toEqual({ count: 1 });
+    const res = await client.call(getUnreadCount);
+    expect(res).toEqual({ count: 1 });
   });
 });
