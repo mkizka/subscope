@@ -17,6 +17,12 @@ test.describe("通知", () => {
       subject: bobDid,
       createdAt,
     });
+    await createRecord(
+      "bob.test",
+      "app.bsky.actor.profile",
+      { displayName: "Bob" },
+      "self",
+    );
     const text = `notification-1: ${createdAt}`;
     const subject = await createRecord("alice.test", "app.bsky.feed.post", {
       text,
@@ -36,14 +42,12 @@ test.describe("通知", () => {
     const items = page.getByRole("listitem").filter({ hasText: text });
     await expect(async () => {
       await page.reload();
-      await expect(items.filter({ hasText: "いいね" })).toContainText(
-        "bob.test",
-        { timeout: 1000 },
-      );
-      await expect(items.filter({ hasText: "リポスト" })).toContainText(
-        "bob.test",
-        { timeout: 1000 },
-      );
+      await expect(items.filter({ hasText: "いいね" })).toContainText("Bob", {
+        timeout: 1000,
+      });
+      await expect(items.filter({ hasText: "リポスト" })).toContainText("Bob", {
+        timeout: 1000,
+      });
     }).toPass();
   });
 });
