@@ -32,6 +32,7 @@ import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
+import type { GetMembers } from "./me/subsco/server/getMembers.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 import type { GetTrackedActors } from "./me/subsco/server/getTrackedActors.js";
 import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
@@ -62,6 +63,7 @@ export const lexRouterFactory = (
   grantAdmin: GrantAdmin,
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
+  getMembers: GetMembers,
   getSetupStatus: GetSetupStatus,
   getTrackedActors: GetTrackedActors,
   getPreferences: GetPreferences,
@@ -99,6 +101,7 @@ export const lexRouterFactory = (
     grantAdmin,
     registerAdmin,
     verifyAccess,
+    getMembers,
     getSetupStatus,
     getTrackedActors,
     getPreferences,
