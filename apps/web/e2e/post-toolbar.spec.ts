@@ -124,3 +124,39 @@ for (const { id, name, title, subjectOf } of composeCases) {
       .toContain(uri);
   });
 }
+
+test("post-toolbar-5: いいね・リポストのボタンは、押した結果を画面に反映し終えるまで押せない", async ({
+  page,
+  request,
+}) => {
+  const text = "post-toolbar-5: 投稿";
+  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  await login(page);
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+
+  for (const [name, collection] of [
+    ["いいね", "app.bsky.feed.like"],
+    ["リポスト", "app.bsky.feed.repost"],
+  ]) {
+    const button = post.getByRole("button", { name });
+    await button.click();
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await button.click({ force: true });
+    await expect(button).not.toHaveAttribute("aria-disabled", "true");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    const res = await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=alice.test&collection=${collection}`,
+    );
+    const { records }: { records: { value: { subject: { uri: string } } }[] } =
+      await res.json();
+    expect(records.filter((r) => r.value.subject.uri === uri)).toHaveLength(1);
+  }
+});
