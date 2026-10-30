@@ -103,6 +103,14 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getPostThread-1: 指定した投稿の親投稿とリプライをthreadViewPostに含める
 - getPostThread-2: 存在しない投稿には400とNotFoundを返す
 
+## app.bsky.unspecced.getPostThreadV2
+
+アンカー投稿を中心に、親投稿とリプライを深さ付きの平坦なリストで返す。認証は任意。branchingFactorとsortは無視し、hasOtherRepliesは常にfalseを返す。
+
+- getPostThreadV2-1: 親投稿を負のdepth、アンカー投稿をdepth 0、リプライを正のdepthとして、上から順にthreadに含める
+- getPostThreadV2-2: aboveがfalseのとき、親投稿を含めない
+- getPostThreadV2-3: 存在しない投稿は、depth 0のthreadItemNotFoundとして返す
+
 ## app.bsky.feed.getAuthorFeed
 
 指定したアクターの投稿とリポストを新しい順に返す。認証は任意。

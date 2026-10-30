@@ -1,7 +1,11 @@
 {
   "version": 2,
   "resolvers": [
-    { "type": "directory", "path": "./lexicons", "include": ["me.subsco.*"] },
+    {
+      "type": "directory",
+      "path": "./lexicons",
+      "include": ["me.subsco.*", "app.bsky.unspecced.*"]
+    },
     {
       "type": "repo",
       "repo": "did:plc:4v4y5r3lwsbtmsxhile2ljac",
@@ -58,6 +62,7 @@
     "app.bsky.notification.listNotifications",
     "app.bsky.notification.updateSeen",
     "app.bsky.richtext.facet",
+    "app.bsky.unspecced.getPostThreadV2",
     "com.atproto.label.defs",
     "com.atproto.label.queryLabels",
     "com.atproto.label.subscribeLabels",
@@ -268,6 +273,14 @@
     "app.bsky.richtext.facet": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.richtext.facet",
       "cid": "bafyreidg56eo7zynf6ihz4xb627vwoqf5idnevkmwp7sxc4tijg6xngbu4"
+    },
+    "app.bsky.unspecced.defs": {
+      "uri": "file://./lexicons/app/bsky/unspecced/defs.json",
+      "cid": "bafyreic4tv275uaol2sdm364bmytwe7sxaqu452evvbaxibfk4kkc43hby"
+    },
+    "app.bsky.unspecced.getPostThreadV2": {
+      "uri": "file://./lexicons/app/bsky/unspecced/getPostThreadV2.json",
+      "cid": "bafyreiegbg32gbzmg23tjzcwj6aosqvkcbnm6vdjeluy5sni3upmgl2mvq"
     },
     "com.atproto.label.defs": {
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.label.defs",

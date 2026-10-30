@@ -24,6 +24,7 @@ import type { GetLists } from "./app/bsky/graph/getLists.js";
 import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
+import type { GetPostThreadV2 } from "./app/bsky/unspecced/getPostThreadV2.js";
 import type { BanSubscriber } from "./me/subsco/admin/banSubscriber.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
@@ -80,6 +81,7 @@ export const lexRouterFactory = (
   getRepostedBy: GetRepostedBy,
   getFeedGenerators: GetFeedGenerators,
   getPosts: GetPosts,
+  getPostThreadV2: GetPostThreadV2,
 ): RequestHandler => {
   const handlers = [
     getPostThread,
@@ -120,6 +122,7 @@ export const lexRouterFactory = (
     getRepostedBy,
     getFeedGenerators,
     getPosts,
+    getPostThreadV2,
   ];
 
   const router = new LexRouter();
