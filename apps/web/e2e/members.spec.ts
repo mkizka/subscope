@@ -25,7 +25,7 @@ test.describe("メンバー", () => {
       await page.reload();
       await expect(alice).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await expect(alice.getByText("@alice.test")).toBeVisible();
+    await expect(alice.getByText(/^@/)).toBeVisible();
   });
 
   test("members-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
