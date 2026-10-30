@@ -1,14 +1,13 @@
 import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import {
-  createKeyvRedis,
   JobQueue,
   LoggerManager,
   MetricReporter,
 } from "@repo/common/infrastructure";
-import Keyv from "keyv";
 
 import { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
+import { LabelCursorStore } from "../infrastructure/label-cursor-store.js";
 import { LabelIngester } from "../presentation/label.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { metricsRouterFactory } from "../presentation/routes/metrics.js";
@@ -30,8 +29,8 @@ export const createIngesterRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("jobQueue", ["redisUrl"], asClassArgs(JobQueue))
-    .service("metricReporter", () => new MetricReporter())
-    .service("labelCursorStore", ["redisUrl"], ({ redisUrl }) => new Keyv<number>({ namespace: "label-cursor", useKeyPrefix: false, store: createKeyvRedis<number>(redisUrl) }))
+    .service("metricReporter", asClassArgs(MetricReporter))
+    .service("labelCursorStore", ["redisUrl"], asClassArgs(LabelCursorStore))
     // application
     .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleIdentityUseCase))
     .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleCommitUseCase))
