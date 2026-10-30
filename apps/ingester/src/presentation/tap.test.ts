@@ -140,15 +140,15 @@ describe("TapIngester", () => {
     );
   });
 
-  test("tap-5: identityイベントはidentityキューに積む", async () => {
+  test("tap-5: identityイベントは、ハンドルとアカウントの状態を含めてidentityキューに積む", async () => {
     const identityEvent = {
       id: 1,
       type: "identity",
       identity: {
         did,
         handle: "alice.test",
-        is_active: true,
-        status: "active",
+        is_active: false,
+        status: "takendown",
       },
     };
 
@@ -157,7 +157,7 @@ describe("TapIngester", () => {
     expect(jobQueue.add).toHaveBeenCalledWith({
       queueName: "identity",
       jobName: "at://alice.test",
-      data: { identity: { did, handle: "alice.test" } },
+      data: { identity: { did, handle: "alice.test", status: "takendown" } },
     });
   });
 
