@@ -30,10 +30,10 @@ test.describe("追跡中のユーザー", () => {
       });
     }).toPass();
     await expect(bob.getByText(/^@/)).toBeVisible();
-    await expect(bob.getByText(/^[1-9]\d* メンバーがフォロー$/)).toBeVisible();
+    await expect(bob.getByText(/^メンバー[1-9]\d*人がフォロー$/)).toBeVisible();
     const counts = (
       await items.getByText(/メンバーがフォロー$/).allTextContents()
-    ).map((text) => parseInt(text, 10));
+    ).map((text) => parseInt(text.replace("メンバー", ""), 10));
     expect(counts).toEqual([...counts].sort((a, b) => b - a));
   });
 
@@ -47,6 +47,20 @@ test.describe("追跡中のユーザー", () => {
     await expect(page).toHaveURL(/\/tracked-actors\?profile=/);
     const panel = page.getByRole("region", { name: "プロフィール" });
     await expect(panel.getByText("Bob")).toBeVisible();
+  });
+
+  test("tracked-actors-3: 一覧の上に、追跡アクターがメンバーとそのフォロー先であり、このサーバーはその人たちの投稿だけを保存することを説明する", async ({
+    page,
+  }) => {
+    await page.goto("/tracked-actors");
+
+    await expect(
+      page
+        .getByRole("main")
+        .getByText(
+          "メンバーとそのフォロー先です。このサーバーはこの人たちの投稿だけを保存します。",
+        ),
+    ).toBeVisible();
   });
 
   test("tracked-actors-4: 見出しの横に追跡アクターの人数を出す", async ({
