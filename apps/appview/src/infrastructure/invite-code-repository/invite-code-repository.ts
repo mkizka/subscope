@@ -5,11 +5,10 @@ import type {
   TransactionContext,
 } from "@repo/common/domain";
 import { InviteCode as InviteCodeDomain } from "@repo/common/domain";
-import { asHandle } from "@repo/common/utils";
 import { schema } from "@repo/db";
 import { and, desc, eq, gt, isNull, lt } from "drizzle-orm";
 
-import type { InviteCodeDto } from "../../application/dto/invite-code-with-handle.js";
+import type { InviteCodeDto } from "../../application/dto/invite-code-dto.js";
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
 
 export class InviteCodeRepository implements IInviteCodeRepository {
@@ -69,16 +68,11 @@ export class InviteCodeRepository implements IInviteCodeRepository {
         usedAt: schema.inviteCodes.usedAt,
         createdAt: schema.inviteCodes.createdAt,
         usedByDid: schema.subscriptions.actorDid,
-        usedByHandle: schema.actors.handle,
       })
       .from(schema.inviteCodes)
       .leftJoin(
         schema.subscriptions,
         eq(schema.inviteCodes.code, schema.subscriptions.inviteCode),
-      )
-      .leftJoin(
-        schema.actors,
-        eq(schema.subscriptions.actorDid, schema.actors.did),
       )
       .orderBy(desc(schema.inviteCodes.createdAt))
       .limit(params.limit);
@@ -94,12 +88,7 @@ export class InviteCodeRepository implements IInviteCodeRepository {
       expiresAt: row.expiresAt,
       createdAt: row.createdAt,
       usedAt: row.usedAt,
-      usedBy: row.usedByDid
-        ? {
-            did: asDid(row.usedByDid),
-            handle: row.usedByHandle ? asHandle(row.usedByHandle) : null,
-          }
-        : null,
+      usedByDid: row.usedByDid ? asDid(row.usedByDid) : null,
     }));
   }
 

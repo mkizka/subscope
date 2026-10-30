@@ -1,6 +1,6 @@
 import type { InviteCode, TransactionContext } from "@repo/common/domain";
 
-import type { InviteCodeDto } from "../../application/dto/invite-code-with-handle.js";
+import type { InviteCodeDto } from "../../application/dto/invite-code-dto.js";
 
 export interface IInviteCodeRepository {
   upsert: (params: {
