@@ -59,20 +59,47 @@ describe("app.bsky.actor.getProfile", () => {
     expect(res.displayName).toBeUndefined();
   });
 
-  test("getProfile-4: テイクダウンされたアカウントには400とAccountTakedownを返す", async () => {
+  test("getProfile-4: テイクダウンされたアカウントと、状態が takendown か suspended のアカウントには400とAccountTakedownを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const label = await labelFactory(ctx.db).create();
+    const takendown = await actorFactory(ctx.db)
+      .props({ status: () => "takendown" })
+      .create();
+    const suspended = await actorFactory(ctx.db)
+      .props({ status: () => "suspended" })
+      .create();
+
+    // act
+    const promises = [label.actorDid, takendown.did, suspended.did].map((did) =>
+      client.call(getProfile, { actor: asAtIdentifierString(did) }),
+    );
+
+    // assert
+    for (const promise of promises) {
+      await expect(promise).rejects.toMatchObject({
+        status: 400,
+        error: "AccountTakedown",
+      });
+    }
+  });
+
+  test("getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const actor = await actorFactory(ctx.db)
+      .props({ status: () => "deactivated" })
+      .create();
 
     // act
     const promise = client.call(getProfile, {
-      actor: asAtIdentifierString(label.actorDid),
+      actor: asAtIdentifierString(actor.did),
     });
 
     // assert
     await expect(promise).rejects.toMatchObject({
       status: 400,
-      error: "AccountTakedown",
+      error: "AccountDeactivated",
     });
   });
 });

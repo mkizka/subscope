@@ -2,6 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 
 import type { Handle } from "../../utils/handle.js";
 import { asHandle } from "../../utils/handle.js";
+import type { ActorStatus } from "../actor/actor.js";
 
 export type ProfileDetailedParams = {
   actorDid: string;
@@ -12,6 +13,7 @@ export type ProfileDetailedParams = {
   displayName?: string | null;
   createdAt?: Date | string | null;
   indexedAt: Date | string;
+  status?: ActorStatus;
 };
 
 export class ProfileDetailed {
@@ -23,6 +25,7 @@ export class ProfileDetailed {
   readonly displayName: string | null;
   readonly createdAt: Date | null;
   readonly indexedAt: Date;
+  readonly status: ActorStatus;
 
   constructor(params: ProfileDetailedParams) {
     this.actorDid = asDid(params.actorDid);
@@ -33,5 +36,6 @@ export class ProfileDetailed {
     this.displayName = params.displayName ?? null;
     this.createdAt = params.createdAt ? new Date(params.createdAt) : null;
     this.indexedAt = new Date(params.indexedAt);
+    this.status = params.status ?? "active";
   }
 }

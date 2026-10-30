@@ -4,7 +4,7 @@ import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import { isHandle } from "@repo/common/utils";
 
 import {
-  AccountTakedownError,
+  AccountHiddenError,
   type GetProfileUseCase,
 } from "../../../../../application/use-cases/actor/get-profile-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
@@ -35,7 +35,7 @@ export class GetProfile {
         const profile = await this.getProfileUseCase
           .execute(did, viewerDid)
           .catch((error: unknown) => {
-            if (error instanceof AccountTakedownError) {
+            if (error instanceof AccountHiddenError) {
               throw new LexServerError(400, {
                 error: error.name,
                 message: error.message,
