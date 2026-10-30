@@ -72,6 +72,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
   - docs/dev/identity-event-handling.md
+- appviewのビュー生成(hydratorとviews)
+  - docs/dev/hydration.md
 
 ## 開発の進め方(仕様駆動)
 

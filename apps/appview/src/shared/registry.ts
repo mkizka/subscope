@@ -18,6 +18,7 @@ import {
   TransactionManager,
 } from "@repo/common/infrastructure";
 
+import { ActorHydrator } from "../application/hydration/actor-hydrator.js";
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/actor-stats-repository.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
@@ -205,7 +206,8 @@ export const createAppRegistry = (env: Env) =>
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileViewBuilder", ["assetUrlBuilder"], asClassArgs(ProfileViewBuilder))
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
-    .service("profileViewService", ["profileRepository", "actorStatsRepository", "followRepository", "profileViewBuilder", "labelRepository"], asClassArgs(ProfileViewService))
+    .service("actorHydrator", ["profileRepository", "actorStatsRepository", "followRepository", "labelRepository"], asClassArgs(ActorHydrator))
+    .service("profileViewService", ["actorHydrator", "profileViewBuilder"], asClassArgs(ProfileViewService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("generatorViewService", ["generatorRepository", "profileViewService", "assetUrlBuilder"], asClassArgs(GeneratorViewService))
