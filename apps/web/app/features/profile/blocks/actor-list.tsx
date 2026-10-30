@@ -45,8 +45,8 @@ export function ActorList({ actors }: Props) {
                 </p>
               </div>
               {actor.subscriberFollowersCount !== undefined && (
-                <span className="text-sm text-base-content/60">
-                  {actor.subscriberFollowersCount} メンバーがフォロー
+                <span className="badge badge-ghost badge-sm">
+                  メンバー{actor.subscriberFollowersCount}人がフォロー
                 </span>
               )}
             </Link>
