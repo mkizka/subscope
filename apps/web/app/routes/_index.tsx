@@ -1,27 +1,9 @@
-import { setTimeout } from "node:timers/promises";
-
-import { TID } from "@atproto/common-web";
-import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
-import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
-import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
-import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
-import postRecord from "@repo/client/lex/app/bsky/feed/post";
-import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
-import getSubscriptionStatus, {
-  subscribed,
-} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import { parseWithZod } from "@conform-to/zod/v4";
 import { data, redirect } from "react-router";
 
-import {
-  countGraphemes,
-  isReplyRule,
-  MAX_IMAGES,
-  MAX_POST_LENGTH,
-  type ReplyRule,
-} from "@/app/features/timeline/blocks/post-form";
-import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
-import { getAgent } from "@/app/middlewares/auth";
+import { didContext } from "@/app/context/did";
+import { postSchema } from "@/app/features/timeline/blocks/post-form-container";
+import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { TimelinePage } from "@/app/pages/client/timeline-page";
 import { di } from "@/app/server/di";
 
@@ -37,165 +19,55 @@ export function meta() {
   ];
 }
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const agent = await getAgent(request);
-  if (!agent) {
-    throw redirect("/login");
-  }
+export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
-  let subscriptionResponse;
-  try {
-    subscriptionResponse = await agent.call(getSubscriptionStatus);
-  } catch (e) {
-    di.loggerManager
-      .createLogger("_index")
-      .error(e, "Failed to get subscription status");
-    throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
-  }
-
-  if (!subscribed.isTypeOf(subscriptionResponse)) {
-    throw redirect("/login");
-  }
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
-  const timeline = await agent.call(getTimeline, { limit: 20, cursor });
-  return data({
-    posts: timeline.feed
-      .filter(({ post, reason }) => reason || !post.record.reply)
-      .map(toTimelinePost)
-      .reverse(),
-    cursor: timeline.cursor,
-  });
+  const timeline = await di.getTimelineUseCase
+    .execute(context.get(didContext), cursor)
+    .catch((e: unknown) => {
+      di.loggerManager
+        .createLogger("_index")
+        .error(e, "Failed to get timeline");
+      throw data("タイムラインの取得に失敗しました", { status: 500 });
+    });
+  if (!timeline) {
+    throw redirect("/login");
+  }
+  return data(timeline);
 };
 
-const THREADGATE_RULES = {
-  follower: { $type: "app.bsky.feed.threadgate#followerRule" },
-  following: { $type: "app.bsky.feed.threadgate#followingRule" },
-  mention: { $type: "app.bsky.feed.threadgate#mentionRule" },
-} as const satisfies Record<ReplyRule, unknown>;
-
-export const action = async ({ request }: Route.ActionArgs) => {
-  const agent = await getAgent(request);
-  if (!agent) {
-    throw redirect("/login");
-  }
-  const formData = await request.formData();
-  const text = formData.get("text");
-  const files = formData.getAll("image").filter((f) => f instanceof File);
-  const alts = formData.getAll("alt");
-  const ref = (
-    uri: FormDataEntryValue | null,
-    cid: FormDataEntryValue | null,
-  ) =>
-    typeof uri === "string" && uri && typeof cid === "string" && cid
-      ? { uri: asAtUriString(uri), cid }
-      : undefined;
-  const subject = ref(formData.get("uri"), formData.get("cid"));
-  const root = ref(formData.get("rootUri"), formData.get("rootCid")) ?? subject;
-  const quote = formData.get("type") === "quote" ? subject : undefined;
-  const allow = formData.get("allow");
-  const rules =
-    typeof allow === "string" ? allow.split(",").filter(Boolean) : [];
-  if (
-    typeof text !== "string" ||
-    (text.trim() === "" && files.length === 0) ||
-    countGraphemes(text) > MAX_POST_LENGTH ||
-    files.length > MAX_IMAGES ||
-    !rules.every(isReplyRule)
-  ) {
+export const action = async ({ request, context }: Route.ActionArgs) => {
+  const submission = parseWithZod(await request.formData(), {
+    schema: postSchema,
+  });
+  if (submission.status !== "success") {
     return data({ error: "投稿内容が不正です" }, { status: 400 });
   }
-  const rkey = TID.nextStr();
-  const uri = `at://${agent.assertDid}/app.bsky.feed.post/${rkey}` as const;
-  const createdAt = currentDatetimeString();
+  const { text, image, alt, type, uri, cid, rootUri, rootCid } =
+    submission.value;
+  const subject = uri && cid ? { uri, cid } : undefined;
+  const root = rootUri && rootCid ? { uri: rootUri, cid: rootCid } : subject;
   try {
-    const images = await Promise.all(
-      files.map(async (file, i) => {
-        const { body } = await agent.uploadBlob(file);
-        return { image: body.blob, alt: maybeString(alts[i]) ?? "" };
-      }),
+    const postUri = await di.createPostUseCase.execute(
+      context.get(didContext),
+      {
+        text,
+        images: image.map((file, i) => ({ file, alt: alt[i] ?? "" })),
+        reply:
+          type === "reply" && subject && root
+            ? { root, parent: subject }
+            : undefined,
+        quote: type === "quote" ? subject : undefined,
+        allow: submission.value.threadgate ? submission.value.allow : undefined,
+      },
     );
-    const media =
-      images.length > 0
-        ? { $type: "app.bsky.embed.images" as const, images }
-        : undefined;
-    await agent.applyWrites((op) => [
-      op.create(
-        postRecord,
-        {
-          text,
-          embed:
-            quote && media
-              ? {
-                  $type: "app.bsky.embed.recordWithMedia",
-                  record: { record: quote },
-                  media,
-                }
-              : quote
-                ? { $type: "app.bsky.embed.record", record: quote }
-                : media,
-          reply:
-            formData.get("type") === "reply" && subject && root
-              ? { root, parent: subject }
-              : undefined,
-          createdAt,
-        },
-        { rkey },
-      ),
-      ...(typeof allow === "string"
-        ? [
-            op.create(
-              threadgate,
-              {
-                post: uri,
-                allow: rules.map((rule) => THREADGATE_RULES[rule]),
-                createdAt,
-              },
-              { rkey },
-            ),
-          ]
-        : []),
-    ]);
-    for (let i = 0; i < 20; i++) {
-      const { posts } = await agent
-        .call(getPosts, { uris: [uri] })
-        .catch(() => ({ posts: [] }));
-      if (posts.length > 0) break;
-      await setTimeout(250);
-    }
-    return data({ uri });
+    return data({ uri: postUri });
   } catch (e) {
     di.loggerManager.createLogger("_index").error(e, "Failed to create post");
     return data({ error: "投稿に失敗しました" }, { status: 500 });
   }
 };
-
-const maybeString = (value: unknown) =>
-  typeof value === "string" ? value : undefined;
-
-export function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
-  return {
-    uri: post.uri,
-    cid: post.cid,
-    viewerLike: post.viewer?.like,
-    viewerRepost: post.viewer?.repost,
-    replyRoot: postRecord.matches(post.record)
-      ? post.record.reply?.root
-      : undefined,
-    authorAvatar: post.author.avatar,
-    authorDisplayName: post.author.displayName,
-    authorHandle: post.author.handle,
-    text: maybeString(post.record.text),
-    replyCount: post.replyCount,
-    repostCount: post.repostCount,
-    likeCount: post.likeCount,
-    images: imagesView.matches(post.embed) ? post.embed.images : undefined,
-    createdAt: maybeString(post.record.createdAt),
-    reasonRepost:
-      reason && "by" in reason
-        ? { byDisplayName: reason.by.displayName, byHandle: reason.by.handle }
-        : undefined,
-  };
-}
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   return <TimelinePage posts={loaderData.posts} cursor={loaderData.cursor} />;
