@@ -173,10 +173,11 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## me.subsco.server.getTrackedActors
 
-追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数を返す。認証が必要。limitとcursorでページングする。
+追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数、追跡アクターの総数を返す。認証が必要。limitとcursorでページングする。
 
 - getTrackedActors-1: サブスクライバーとそのフォロイーを返し、それ以外のアクターは含めない
 - getTrackedActors-2: フォローしているサブスクライバーが多い順に並べる
+- getTrackedActors-3: totalにはページングに関係なく追跡アクターの総数を入れる
 
 ## me.subsco.sync.subscribeServer
 

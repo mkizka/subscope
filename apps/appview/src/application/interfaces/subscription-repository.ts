@@ -11,6 +11,7 @@ export interface ISubscriptionRepository {
     limit: number;
     cursor?: string;
   }) => Promise<{ did: Did; subscriberFollowersCount: number }[]>;
+  countTrackedActors: () => Promise<number>;
   existsByInviteCode: (inviteCode: string) => Promise<boolean>;
   save: (params: {
     subscription: Subscription;
