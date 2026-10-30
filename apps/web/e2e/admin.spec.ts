@@ -55,6 +55,35 @@ test.describe("登録ユーザー", () => {
 
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
+
+  test("subscribers-2: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+    page,
+  }) => {
+    await login(page);
+    const createInviteCode = async () => {
+      const response = await page.request.post("/admin/api/invite-codes");
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return ((await response.json()) as { code: string }).code;
+    };
+    await subscribeServer("dave.test", await createInviteCode());
+    const daveDid = await resolveHandle("dave.test");
+
+    await page.goto("/admin/subscribers");
+
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(daveDid) });
+
+    await row.getByRole("button", { name: "操作" }).click();
+    page.once("dialog", (dialog) => void dialog.accept());
+    await row.getByRole("button", { name: "BAN" }).click();
+
+    await expect(row).toHaveCount(0);
+    await expect(
+      subscribeServer("dave.test", await createInviteCode()),
+    ).rejects.toThrow("Banned");
+  });
 });
 
 test.describe("招待コード", () => {
@@ -122,7 +151,7 @@ test.describe("招待コード", () => {
     );
   });
 
-  test("invite-codes-4: 未使用の招待コードだけを削除でき、期限切れでないものは削除前に確認する", async ({
+  test("invite-codes-4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
     page,
   }) => {
     await login(page);
@@ -135,6 +164,34 @@ test.describe("招待コード", () => {
       expect(dialog.message()).toContain(code);
       void dialog.accept();
     });
+    await row.getByRole("button", { name: "削除" }).click();
+
+    await expect(row).toHaveCount(0);
+  });
+
+  test("invite-codes-5: 使用済みの招待コードは削除できない", async ({
+    page,
+  }) => {
+    await login(page);
+    const code = await createInviteCode(page);
+    await subscribeServer("carol.test", code);
+
+    await page.goto("/admin/invite-codes");
+    const row = inviteCodeRows(page).filter({ hasText: code });
+
+    await expect(row).toContainText("使用済み");
+    await expect(row.getByRole("button", { name: "削除" })).toHaveCount(0);
+  });
+
+  test("invite-codes-6: 期限切れの招待コードは確認せずに削除できる", async ({
+    page,
+  }) => {
+    await login(page);
+    const code = await createInviteCode(page);
+    await page.clock.setFixedTime(Date.now() + 8 * 24 * 60 * 60 * 1000);
+
+    await page.goto("/admin/invite-codes");
+    const row = inviteCodeRows(page).filter({ hasText: code });
     await row.getByRole("button", { name: "削除" }).click();
 
     await expect(row).toHaveCount(0);

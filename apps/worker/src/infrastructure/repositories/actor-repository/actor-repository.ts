@@ -40,6 +40,7 @@ export class ActorRepository implements IActorRepository {
       did: asDid(row.did),
       handle: row.handle || null,
       isAdmin: row.isAdmin,
+      isBanned: row.isBanned,
       indexedAt: row.indexedAt,
     });
   }

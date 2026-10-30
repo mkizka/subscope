@@ -41,6 +41,12 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
           </li>
         )}
         <li>
+          <Link to="/members">メンバー</Link>
+        </li>
+        <li>
+          <Link to="/tracked-actors">追跡中のユーザー</Link>
+        </li>
+        <li>
           {profileId ? (
             <Link to={`/profile/${profileId}`}>プロフィール</Link>
           ) : (

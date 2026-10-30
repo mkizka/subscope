@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import type { Route } from "./+types/root";
-import { NavigationOverlayContainer } from "./components/navigation-overlay-container";
 import { ErrorPage } from "./pages/client/error-page";
 
 export const links: Route.LinksFunction = () => [
@@ -40,7 +39,6 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavigationOverlayContainer />
       <Outlet />
     </QueryClientProvider>
   );

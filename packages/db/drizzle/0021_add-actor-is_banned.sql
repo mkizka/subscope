@@ -1,0 +1,1 @@
+ALTER TABLE "actors" ADD COLUMN "is_banned" boolean DEFAULT false NOT NULL;
