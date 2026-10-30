@@ -7,14 +7,13 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetActorLikesUseCase", () => {
   let getActorLikesUseCase: TestServices["getActorLikesUseCase"];
   let likeRepo: TestServices["likeRepository"];
   let postRepo: TestServices["postRepository"];
-  let postStatsRepo: TestServices["postStatsRepository"];
+  let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
@@ -22,7 +21,7 @@ describe("GetActorLikesUseCase", () => {
     getActorLikesUseCase = services.getActorLikesUseCase;
     likeRepo = services.likeRepository;
     postRepo = services.postRepository;
-    postStatsRepo = services.postStatsRepository;
+    postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
     recordRepo = services.recordRepository;
   });
@@ -44,7 +43,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 1,
       repostCount: 2,
       replyCount: 3,
@@ -122,7 +121,7 @@ describe("GetActorLikesUseCase", () => {
       postRepo.add(post);
       recordRepo.add(record);
 
-      const postStats: PostStats = {
+      const postStats = {
         likeCount: 0,
         repostCount: 0,
         replyCount: 0,
@@ -166,7 +165,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(firstPost);
     recordRepo.add(firstRecord);
 
-    const firstPostStats: PostStats = {
+    const firstPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -180,7 +179,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(secondPost);
     recordRepo.add(secondRecord);
 
-    const secondPostStats: PostStats = {
+    const secondPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -194,7 +193,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(thirdPost);
     recordRepo.add(thirdRecord);
 
-    const thirdPostStats: PostStats = {
+    const thirdPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -277,7 +276,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -333,7 +332,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(existingPost);
     recordRepo.add(existingRecord);
 
-    const existingPostStats: PostStats = {
+    const existingPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -390,7 +389,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 2,
       repostCount: 1,
       replyCount: 0,
@@ -462,7 +461,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(earlyPost);
     recordRepo.add(earlyRecord);
 
-    const earlyPostStats: PostStats = {
+    const earlyPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -476,7 +475,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(latestPost);
     recordRepo.add(latestRecord);
 
-    const latestPostStats: PostStats = {
+    const latestPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -490,7 +489,7 @@ describe("GetActorLikesUseCase", () => {
     postRepo.add(middlePost);
     recordRepo.add(middleRecord);
 
-    const middlePostStats: PostStats = {
+    const middlePostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
