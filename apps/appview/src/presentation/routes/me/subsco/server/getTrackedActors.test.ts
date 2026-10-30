@@ -81,4 +81,20 @@ describe("me.subsco.server.getTrackedActors", () => {
       { profile: { did: followedByOne.did }, subscriberFollowersCount: 1 },
     ]);
   });
+
+  test("getTrackedActors-3: totalにはページングに関係なく追跡アクターの総数を入れる", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const subscriber = await createSubscriber();
+    await follow(subscriber, await createActor());
+    await follow(subscriber, await createActor());
+    loginAs(subscriber.did);
+
+    // act
+    const res = await client.call(getTrackedActors, { limit: 1 });
+
+    // assert
+    expect(res.trackedActors).toHaveLength(1);
+    expect(res.total).toBe(3);
+  });
 });

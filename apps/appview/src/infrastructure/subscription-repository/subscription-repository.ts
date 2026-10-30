@@ -64,15 +64,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       .from(actors)
       .leftJoin(follows, eq(follows.subjectDid, actors.did))
       .leftJoin(subscriptions, eq(subscriptions.actorDid, follows.actorDid))
-      .where(
-        or(
-          isNotNull(subscriptions.actorDid),
-          inArray(
-            actors.did,
-            this.db.select({ did: subscriptions.actorDid }).from(subscriptions),
-          ),
-        ),
-      )
+      .where(this.isTrackedActor())
       .groupBy(actors.did)
       .having(
         cursor
@@ -89,6 +81,28 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       .limit(params.limit);
 
     return rows.map((row) => ({ ...row, did: asDid(row.did) }));
+  }
+
+  async countTrackedActors(): Promise<number> {
+    const { actors, follows, subscriptions } = schema;
+    const [row] = await this.db
+      .select({ total: countDistinct(actors.did) })
+      .from(actors)
+      .leftJoin(follows, eq(follows.subjectDid, actors.did))
+      .leftJoin(subscriptions, eq(subscriptions.actorDid, follows.actorDid))
+      .where(this.isTrackedActor());
+    return row?.total ?? 0;
+  }
+
+  private isTrackedActor() {
+    const { actors, subscriptions } = schema;
+    return or(
+      isNotNull(subscriptions.actorDid),
+      inArray(
+        actors.did,
+        this.db.select({ did: subscriptions.actorDid }).from(subscriptions),
+      ),
+    );
   }
 
   async findFirst(actorDid: Did): Promise<Subscription | null> {
