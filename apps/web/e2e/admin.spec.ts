@@ -1,7 +1,7 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { login } from "./login";
-import { resolveHandle, subscribeServer } from "./pds";
+import { putRecord, resolveHandle, subscribeServer, uploadImage } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -214,6 +214,25 @@ test.describe("招待コード", () => {
 
     await expect(row).toContainText("使用済み");
     await expect(row.getByRole("button", { name: "削除" })).toHaveCount(0);
+  });
+
+  test("invite-codes-8: 使用済みの招待コードには、使用者のアバターと名前を出す", async ({
+    page,
+  }) => {
+    await putRecord("erin.test", "app.bsky.actor.profile", "self", {
+      displayName: "Erin",
+      avatar: await uploadImage("erin.test"),
+    });
+    await login(page);
+    const code = await createInviteCode(page);
+    await subscribeServer("erin.test", code);
+
+    const row = inviteCodeRows(page).filter({ hasText: code });
+    await expect(async () => {
+      await page.goto("/admin/invite-codes");
+      await expect(row).toContainText("Erin が使用", { timeout: 1000 });
+      await expect(row.locator("img")).toBeVisible({ timeout: 1000 });
+    }).toPass();
   });
 
   test("invite-codes-6: 期限切れの招待コードは確認せずに削除できる", async ({

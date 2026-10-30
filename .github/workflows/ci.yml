@@ -37,6 +37,8 @@ jobs:
       - run: pnpm test --coverage
   e2e:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: |
@@ -49,11 +51,33 @@ jobs:
       - run: pnpm i
       - run: pnpm --filter @repo/web exec playwright install --with-deps chromium
       - run: pnpm --filter @repo/web e2e
-      - if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: playwright-test-results
-          path: apps/web/test-results/
+      - name: Upload Report
+        if: always() && (github.ref == 'refs/heads/main' || github.actor == 'mkizka')
+        run: |
+          REPORT_S3_PATH="playwright-report/${{ github.ref == 'refs/heads/main' && 'main' || github.sha }}"
+          aws s3 cp apps/web/playwright-report "s3://subscope/$REPORT_S3_PATH" --recursive
+          echo "REPORT_URL=${{ vars.S3_BASE_URL }}/$REPORT_S3_PATH/index.html" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+          AWS_DEFAULT_REGION: auto
+      - name: Comment on PR
+        if: always() && github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        run: |
+          MARKER="<!-- e2e-report -->"
+          BODY="$MARKER
+          ## E2E Report
+          📊 [View Report]($REPORT_URL)"
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
+            --paginate --jq "[.[] | select(.body | startswith(\"$MARKER\"))][-1].id // empty")
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -f body="$BODY"
+          else
+            gh pr comment ${{ github.event.number }} --body "$BODY"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   storybook:
     runs-on: ubuntu-latest
     permissions:

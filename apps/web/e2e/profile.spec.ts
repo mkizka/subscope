@@ -1,7 +1,15 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
-import { createRecord, putRecord, uploadImage } from "./pds";
+import {
+  createRecord,
+  follow,
+  putRecord,
+  resolveHandle,
+  uploadImage,
+} from "./pds";
+
+const PDS_URL = "http://localhost:2583";
 
 test.describe("プロフィール", () => {
   test("profile-1: 左カラムの「プロフィール」から、中央カラムに自分のプロフィール（バナー、アイコン、名前、ハンドル、自己紹介、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
@@ -69,5 +77,52 @@ test.describe("プロフィール", () => {
 
       await expect(page).toHaveURL("/profile/alice.test");
     });
+  });
+
+  test("profile-5: 全体ページのフォローボタンでそのユーザーをフォローし、もう一度押すと外す", async ({
+    page,
+  }) => {
+    await follow("alice.test", "bob.test");
+    const bob = await resolveHandle("bob.test");
+    const isFollowing = async () => {
+      const res = await fetch(
+        `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=alice.test&collection=app.bsky.graph.follow`,
+      );
+      return (await res.text()).includes(bob);
+    };
+    await login(page);
+    await page.goto(`/profile/${bob}`);
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        main.getByRole("button", { name: "フォロー中" }),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await main.getByRole("button", { name: "フォロー中" }).click();
+    await expect(
+      main.getByRole("button", { name: "フォロー", exact: true }),
+    ).toBeVisible();
+    await expect.poll(isFollowing).toBe(false);
+
+    await main.getByRole("button", { name: "フォロー", exact: true }).click();
+    await expect(
+      main.getByRole("button", { name: "フォロー中" }),
+    ).toBeVisible();
+    await expect.poll(isFollowing).toBe(true);
+  });
+
+  test("profile-6: 自分のプロフィールにはフォローボタンを出さない", async ({
+    page,
+  }) => {
+    await login(page);
+    await page.getByRole("link", { name: "プロフィール" }).click();
+
+    const main = page.getByRole("main");
+    await expect(main.getByText(/^\d+ フォロワー$/)).toBeVisible();
+    await expect(main.getByRole("button", { name: /^フォロー/ })).toHaveCount(
+      0,
+    );
   });
 });

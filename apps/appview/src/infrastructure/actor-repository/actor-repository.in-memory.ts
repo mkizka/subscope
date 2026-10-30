@@ -31,4 +31,14 @@ export class InMemoryActorRepository implements IActorRepository {
     }
     return Promise.resolve(false);
   }
+
+  findBannedDids(params: { limit: number; cursor?: string }): Promise<Did[]> {
+    const dids = [...this.actors.values()]
+      .filter((actor) => actor.isBanned)
+      .map((actor) => actor.did)
+      .filter((did) => !params.cursor || did > params.cursor)
+      .sort()
+      .slice(0, params.limit);
+    return Promise.resolve(dids);
+  }
 }

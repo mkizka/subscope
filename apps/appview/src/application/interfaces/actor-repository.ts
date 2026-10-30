@@ -5,4 +5,8 @@ export interface IActorRepository {
   findByDid: (did: Did) => Promise<Actor | null>;
   upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
   hasAnyAdmin: () => Promise<boolean>;
+  findBannedDids: (params: {
+    limit: number;
+    cursor?: string;
+  }) => Promise<Did[]>;
 }

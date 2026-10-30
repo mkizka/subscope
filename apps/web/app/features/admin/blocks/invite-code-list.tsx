@@ -10,7 +10,12 @@ export type InviteCode = {
   expiresAt: string;
   createdAt: string;
   usedAt?: string;
-  usedBy?: { did: string; handle?: string };
+  usedBy?: {
+    did: string;
+    handle: string;
+    displayName?: string;
+    avatar?: string;
+  };
 };
 
 type RowsProps = {
@@ -69,7 +74,25 @@ export function InviteCodeItems({
           {!code.usedAt && !isExpired(code) && <CopyButton code={code.code} />}
         </div>
         <div className="text-sm text-base-content/60">
-          {code.usedBy && `${code.usedBy.handle ?? code.usedBy.did} が使用・`}
+          {code.usedBy && (
+            <>
+              {code.usedBy.avatar ? (
+                <img
+                  src={code.usedBy.avatar}
+                  alt=""
+                  className="inline size-4 rounded-full align-text-bottom"
+                />
+              ) : (
+                <span
+                  className="
+                    inline-block size-4 rounded-full bg-base-200
+                    align-text-bottom
+                  "
+                />
+              )}{" "}
+              {code.usedBy.displayName ?? code.usedBy.handle} が使用・
+            </>
+          )}
           {formatDate(code.expiresAt)} まで有効・{formatDate(code.createdAt)}{" "}
           作成
         </div>

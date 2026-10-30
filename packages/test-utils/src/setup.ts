@@ -1,4 +1,4 @@
-import { asClassArgs, createRegistry } from "@gyaku/di";
+import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import {
   connectionPoolFactory,
   databaseFactory,
@@ -18,8 +18,8 @@ const testRegistry = createRegistry()
   .value("logLevel", "error" as const)
   .value("databaseUrl", inject("databaseUrl"))
   .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
-  .service("connectionPool", ["databaseUrl"], ({ databaseUrl }) => connectionPoolFactory(databaseUrl))
-  .service("db", ["connectionPool", "loggerManager"], ({ connectionPool, loggerManager }) => databaseFactory(connectionPool, loggerManager))
+  .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+  .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
   .service("transactionManager", ["db"], asClassArgs(TransactionManager));
 
 const services = await testRegistry.resolve();

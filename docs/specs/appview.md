@@ -230,6 +230,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - banSubscriber-1: 管理者はBANせず、400とCannotBanAdminを返す
 - banSubscriber-2: 本人とそのフォロイーのsyncTapRepoジョブを積む
 
+## me.subsco.admin.getBannedActors
+
+BANされたアクターのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
+
+- getBannedActors-1: BANされたアクターのprofileViewを返す
+- getBannedActors-2: BANされていないアクターは含めない
+
 ## me.subsco.admin.unbanActor
 
 アカウントのBANを解除する。管理者の認証が必要。サブスクライバーには戻さず、本人が改めて登録する。
