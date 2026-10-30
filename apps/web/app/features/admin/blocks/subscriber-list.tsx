@@ -2,6 +2,7 @@ import { BanIcon, EllipsisIcon, ShieldIcon } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
+import { formatDate } from "@/app/lib/format-date";
 
 export type Subscriber = {
   did: string;
@@ -9,10 +10,12 @@ export type Subscriber = {
   displayName?: string;
   avatar?: string;
   isAdmin: boolean;
+  subscribedAt: string;
 };
 
 type Props = {
   subscribers: Subscriber[];
+  total?: number;
   isLoading?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
@@ -25,6 +28,7 @@ type Props = {
 
 export function SubscriberList({
   subscribers,
+  total,
   isLoading,
   isFetchingNextPage,
   onLoadMore,
@@ -36,8 +40,11 @@ export function SubscriberList({
 }: Props) {
   return (
     <>
-      <div className="px-6 pt-6 pb-3">
+      <div className="flex items-baseline gap-2 px-6 pt-6 pb-3">
         <h1 className="text-xl font-bold">登録ユーザー</h1>
+        {total !== undefined && (
+          <span className="text-sm text-base-content/70">{total}人</span>
+        )}
       </div>
       {!isLoading && subscribers.length === 0 && (
         <p className="py-8 text-center">登録アカウントはまだありません</p>
@@ -64,6 +71,9 @@ export function SubscriberList({
                 title={subscriber.did}
               >
                 @{subscriber.handle}
+              </div>
+              <div className="text-xs text-base-content/70">
+                {formatDate(subscriber.subscribedAt)} 登録
               </div>
             </div>
             {subscriber.isAdmin ? (

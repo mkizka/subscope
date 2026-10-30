@@ -17,7 +17,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("登録ユーザー", () => {
-  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうかを出す", async ({
+  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await login(page);
@@ -30,6 +30,17 @@ test.describe("登録ユーザー", () => {
       .getByRole("listitem")
       .filter({ has: page.getByTitle(aliceDid) });
     await expect(row.getByText("管理者")).toBeVisible();
+    await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
+  });
+
+  test("subscribers-4: 見出しの横に登録ユーザーの人数を出す", async ({
+    page,
+  }) => {
+    await login(page);
+
+    await page.goto("/admin/subscribers");
+
+    await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
   });
 
   test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
