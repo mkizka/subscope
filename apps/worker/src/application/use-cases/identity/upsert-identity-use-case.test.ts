@@ -27,6 +27,7 @@ describe("UpsertIdentityUseCase", () => {
     const command: UpsertIdentityCommand = {
       did: "did:plc:nohandle",
       handle: undefined,
+      status: "active",
     };
 
     // act
@@ -50,6 +51,7 @@ describe("UpsertIdentityUseCase", () => {
     const command: UpsertIdentityCommand = {
       did: actor.did,
       handle: "new-handle.bsky.social",
+      status: "active",
     };
 
     // act
@@ -78,10 +80,45 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute({
       did: actor.did,
       handle: asHandle("handle.invalid"),
+      status: "active",
     });
 
     // assert
     const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
     expect(foundActor?.handle).toBe("alice.test");
+  });
+
+  test("account-1: アカウントの状態をアクターに保存する", async () => {
+    // arrange
+    const actor = actorFactory();
+    actorRepo.add(actor);
+
+    // act
+    await upsertIdentityUseCase.execute({
+      did: actor.did,
+      handle: asHandle("alice.test"),
+      status: "takendown",
+    });
+
+    // assert
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor?.status).toBe("takendown");
+  });
+
+  test("account-2: 状態が deleted のアカウントは、アクターを削除する", async () => {
+    // arrange
+    const actor = actorFactory();
+    actorRepo.add(actor);
+
+    // act
+    await upsertIdentityUseCase.execute({
+      did: actor.did,
+      handle: asHandle("alice.test"),
+      status: "deleted",
+    });
+
+    // assert
+    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    expect(foundActor).toBeNull();
   });
 });

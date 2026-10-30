@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
   Actor,
+  type ActorStatus,
   type AfterCommitContext,
   type IJobScheduler,
   type TransactionContext,
@@ -22,11 +23,13 @@ export class IndexActorService {
     ctx,
     did,
     handle,
+    status,
     live,
   }: {
     ctx: AfterCommitContext;
     did: Did;
     handle?: Handle;
+    status?: ActorStatus;
     live: boolean;
   }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
@@ -34,6 +37,9 @@ export class IndexActorService {
 
     if (handle) {
       actor.updateHandle(handle);
+    }
+    if (status) {
+      actor.updateStatus(status);
     }
 
     await this.actorRepository.upsert({ ctx, actor });

@@ -3,11 +3,15 @@ import { asDid, type Did } from "@atproto/did";
 import type { Handle } from "../../utils/handle.js";
 import { asHandle } from "../../utils/handle.js";
 
+export type ActorStatus =
+  "active" | "deactivated" | "deleted" | "suspended" | "takendown";
+
 export type ActorParams = {
   did: string;
   handle: string | null;
   isAdmin: boolean;
   isBanned: boolean;
+  status?: ActorStatus;
   indexedAt: Date;
 };
 
@@ -16,6 +20,7 @@ export class Actor {
   private _handle: Handle | null = null;
   private _isAdmin: boolean;
   private _isBanned: boolean;
+  private _status: ActorStatus;
   readonly indexedAt: Date;
 
   private constructor(params: ActorParams) {
@@ -23,6 +28,7 @@ export class Actor {
     this._handle = params.handle ? asHandle(params.handle) : null;
     this._isAdmin = params.isAdmin;
     this._isBanned = params.isBanned;
+    this._status = params.status ?? "active";
     this.indexedAt = params.indexedAt;
   }
 
@@ -50,6 +56,14 @@ export class Actor {
 
   get isBanned(): boolean {
     return this._isBanned;
+  }
+
+  get status(): ActorStatus {
+    return this._status;
+  }
+
+  updateStatus(status: ActorStatus): void {
+    this._status = status;
   }
 
   updateHandle(handle: string | null): void {

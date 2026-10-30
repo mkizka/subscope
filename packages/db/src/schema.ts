@@ -19,6 +19,10 @@ export const actors = pgTable(
     handle: varchar({ length: 256 }),
     isAdmin: boolean().default(false).notNull(),
     isBanned: boolean().default(false).notNull(),
+    status: varchar({ length: 32 })
+      .$type<"active" | "deactivated" | "deleted" | "suspended" | "takendown">()
+      .default("active")
+      .notNull(),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("handle_idx").on(table.handle)],
