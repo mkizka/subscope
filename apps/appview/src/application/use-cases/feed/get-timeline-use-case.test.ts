@@ -7,14 +7,13 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetTimelineUseCase", () => {
   let getTimelineUseCase: TestServices["getTimelineUseCase"];
   let timelineRepo: TestServices["timelineRepository"];
   let postRepo: TestServices["postRepository"];
-  let postStatsRepo: TestServices["postStatsRepository"];
+  let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
@@ -22,7 +21,7 @@ describe("GetTimelineUseCase", () => {
     getTimelineUseCase = services.getTimelineUseCase;
     timelineRepo = services.timelineRepository;
     postRepo = services.postRepository;
-    postStatsRepo = services.postStatsRepository;
+    postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
     recordRepo = services.recordRepository;
   });
@@ -65,7 +64,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 5,
       repostCount: 2,
       replyCount: 3,
@@ -123,7 +122,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -181,7 +180,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(olderPost);
     recordRepo.add(olderRecord);
 
-    const olderPostStats: PostStats = {
+    const olderPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -200,7 +199,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(newerPost);
     recordRepo.add(newerRecord);
 
-    const newerPostStats: PostStats = {
+    const newerPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -254,7 +253,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -317,7 +316,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(post1);
     recordRepo.add(record1);
 
-    const post1Stats: PostStats = {
+    const post1Stats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -336,7 +335,7 @@ describe("GetTimelineUseCase", () => {
     postRepo.add(post2);
     recordRepo.add(record2);
 
-    const post2Stats: PostStats = {
+    const post2Stats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,

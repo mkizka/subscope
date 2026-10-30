@@ -9,6 +9,7 @@ import type {
   Repost,
 } from "@repo/common/domain";
 
+import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
 import type { IGeneratorRepository } from "../interfaces/generator-repository.js";
 import {
@@ -18,13 +19,11 @@ import {
 } from "../interfaces/label-repository.js";
 import type { ILikeRepository } from "../interfaces/like-repository.js";
 import type { IPostRepository } from "../interfaces/post-repository.js";
-import type {
-  IPostStatsRepository,
-  PostStats,
-} from "../interfaces/post-stats-repository.js";
+import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
 import type { IRepostRepository } from "../interfaces/repost-repository.js";
+import { hiddenReason } from "../visibility/visibility-filter.js";
 import { Batch } from "./batch.js";
 
 export type Viewer = {
@@ -38,7 +37,7 @@ type Repositories = {
   followRepository: IFollowRepository;
   postRepository: IPostRepository;
   recordRepository: IRecordRepository;
-  postStatsRepository: IPostStatsRepository;
+  postStatsQuery: IPostStatsQuery;
   likeRepository: ILikeRepository;
   repostRepository: IRepostRepository;
   generatorRepository: IGeneratorRepository;
@@ -56,7 +55,7 @@ export class ViewContext {
   private readonly followedBy: Batch<Did, [Did, AtUri]>;
   private readonly posts: Batch<string, Post>;
   private readonly records: Batch<string, Record>;
-  private readonly postStats: Batch<string, [string, PostStats]>;
+  private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, Like>;
   private readonly viewerReposts: Batch<string, Repost>;
   private readonly generators: Batch<string, Generator>;
@@ -103,11 +102,8 @@ export class ViewContext {
       byUri,
     );
     this.postStats = Batch.one(
-      (uris) =>
-        repos.postStatsRepository
-          .findMap(toAtUris(uris))
-          .then((map) => [...map]),
-      first,
+      (uris) => repos.postStatsQuery.findStats(toAtUris(uris)),
+      (stats) => stats.uri,
     );
     this.viewerLikes = Batch.one<string, Like>(
       viewerDid
@@ -137,11 +133,14 @@ export class ViewContext {
   }
 
   async profile(did: Did) {
-    const [profile, visible] = await Promise.all([
+    const [profile, labels] = await Promise.all([
       this.profiles.load(did),
-      this.isVisible(did),
+      this.labels.load(did),
     ]);
-    return visible ? profile : undefined;
+    if (!profile || this.viewer.includeTakedowns) {
+      return profile;
+    }
+    return hiddenReason(profile, labels) ? undefined : profile;
   }
 
   async post(uri: string) {
@@ -159,8 +158,8 @@ export class ViewContext {
     return this.records.load(uri);
   }
 
-  async stats(uri: string) {
-    return (await this.postStats.load(uri))?.[1];
+  stats(uri: string) {
+    return this.postStats.load(uri);
   }
 
   generator(uri: string) {
@@ -193,7 +192,7 @@ export class ViewContextFactory {
     followRepository: IFollowRepository,
     postRepository: IPostRepository,
     recordRepository: IRecordRepository,
-    postStatsRepository: IPostStatsRepository,
+    postStatsQuery: IPostStatsQuery,
     likeRepository: ILikeRepository,
     repostRepository: IRepostRepository,
     generatorRepository: IGeneratorRepository,
@@ -204,7 +203,7 @@ export class ViewContextFactory {
       followRepository,
       postRepository,
       recordRepository,
-      postStatsRepository,
+      postStatsQuery,
       likeRepository,
       repostRepository,
       generatorRepository,

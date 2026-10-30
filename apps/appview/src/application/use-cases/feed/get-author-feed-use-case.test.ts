@@ -8,14 +8,13 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetAuthorFeedUseCase", () => {
   let getAuthorFeedUseCase: TestServices["getAuthorFeedUseCase"];
   let authorFeedRepo: TestServices["authorFeedRepository"];
   let postRepo: TestServices["postRepository"];
-  let postStatsRepo: TestServices["postStatsRepository"];
+  let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
   let repostRepo: TestServices["repostRepository"];
@@ -24,7 +23,7 @@ describe("GetAuthorFeedUseCase", () => {
     getAuthorFeedUseCase = services.getAuthorFeedUseCase;
     authorFeedRepo = services.authorFeedRepository;
     postRepo = services.postRepository;
-    postStatsRepo = services.postStatsRepository;
+    postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
     recordRepo = services.recordRepository;
     repostRepo = services.repostRepository;
@@ -48,7 +47,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 5,
       repostCount: 2,
       replyCount: 3,
@@ -69,7 +68,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(reply);
     recordRepo.add(replyRecord);
 
-    const replyStats: PostStats = {
+    const replyStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -145,7 +144,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -222,7 +221,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(originalPost);
     recordRepo.add(originalRecord);
 
-    const originalPostStats: PostStats = {
+    const originalPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -300,7 +299,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -356,7 +355,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(olderPost);
     recordRepo.add(olderRecord);
 
-    const olderPostStats: PostStats = {
+    const olderPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -374,7 +373,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(newerPost);
     recordRepo.add(newerRecord);
 
-    const newerPostStats: PostStats = {
+    const newerPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -479,7 +478,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(post1);
     recordRepo.add(record1);
 
-    const post1Stats: PostStats = {
+    const post1Stats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -498,7 +497,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo.add(post2);
     recordRepo.add(record2);
 
-    const post2Stats: PostStats = {
+    const post2Stats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
