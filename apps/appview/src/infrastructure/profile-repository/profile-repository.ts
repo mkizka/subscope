@@ -38,6 +38,7 @@ export class ProfileRepository implements IProfileRepository {
           displayName: profile?.displayName,
           createdAt: profile?.createdAt,
           indexedAt: profile?.indexedAt ?? actor.indexedAt,
+          status: actor.status,
         }),
       ]),
     );
@@ -86,6 +87,7 @@ export class ProfileRepository implements IProfileRepository {
           displayName: result.profile.displayName,
           createdAt: result.profile.createdAt,
           indexedAt: result.profile.indexedAt,
+          status: result.actor.status,
         }),
     );
   }
