@@ -8,6 +8,7 @@ import { schema } from "@repo/db";
 import {
   and,
   asc,
+  count,
   countDistinct,
   desc,
   eq,
@@ -49,6 +50,13 @@ export class SubscriptionRepository implements ISubscriptionRepository {
           createdAt: row.createdAt,
         }),
     );
+  }
+
+  async count(): Promise<number> {
+    const [row] = await this.db
+      .select({ count: count() })
+      .from(schema.subscriptions);
+    return row?.count ?? 0;
   }
 
   async findTrackedActors(params: {

@@ -205,12 +205,14 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## me.subsco.admin.getSubscribers
 
-サブスクライバーのプロフィールと管理者かどうかを返す。管理者の認証が必要。limitとcursorでページングする。
+サブスクライバーのプロフィール、管理者かどうか、登録日時と、サブスクライバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
 
 - getSubscribers-1: 認証がないリクエストには401を返す
 - getSubscribers-2: 管理者でないアカウントからのリクエストには403を返す
 - getSubscribers-3: サブスクライバーごとにprofileViewと管理者かどうかを返す
 - getSubscribers-4: テイクダウンされたサブスクライバーも含める
+- getSubscribers-5: サブスクライバーごとに登録日時をsubscribedAtとして返す
+- getSubscribers-6: ページングに関係なくサブスクライバーの総数をtotalとして返す
 
 ## me.subsco.admin.grantAdmin
 
