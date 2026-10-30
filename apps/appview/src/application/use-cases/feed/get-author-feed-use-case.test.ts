@@ -16,7 +16,7 @@ describe("GetAuthorFeedUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
@@ -25,7 +25,7 @@ describe("GetAuthorFeedUseCase", () => {
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
     repostRepo = services.repostRepository;
   });
 
