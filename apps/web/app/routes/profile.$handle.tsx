@@ -6,8 +6,8 @@ import { data } from "react-router";
 import { agentContext } from "@/app/context/agent";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ProfilePage } from "@/app/pages/client/profile-page";
+import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-repository";
 
-import { toTimelinePost } from "./_index";
 import type { Route } from "./+types/profile.$handle";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];

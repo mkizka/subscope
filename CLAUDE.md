@@ -73,7 +73,7 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
   - docs/dev/identity-event-handling.md
-- appviewのビュー生成(Loader、VisibilityFilter、ViewBuilder)
+- appviewのビュー生成(ViewContext、*Views)
   - docs/dev/view-pipeline.md
 
 ## 開発の進め方(仕様駆動)
