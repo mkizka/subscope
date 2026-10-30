@@ -1,4 +1,9 @@
-import { RepeatIcon } from "lucide-react";
+import {
+  HeartIcon,
+  type LucideIcon,
+  MessageCircleIcon,
+  RepeatIcon,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
@@ -35,6 +40,19 @@ function formatRelativeTime(dateString: string) {
   return new Date(dateString).toLocaleDateString("ja-JP");
 }
 
+function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
+  if (!props.count) return null;
+  return (
+    <span
+      title={`${props.count}件の${props.label}`}
+      className="badge gap-1 badge-ghost badge-sm"
+    >
+      <props.Icon className="size-3" />
+      {props.count}
+    </span>
+  );
+}
+
 export function PostCard({
   authorAvatar,
   authorDisplayName,
@@ -50,7 +68,12 @@ export function PostCard({
   threadSearch,
 }: PostCardProps) {
   return (
-    <article className="group relative border-b border-base-300 px-4 py-3">
+    <article
+      className="
+        group relative px-4 py-2
+        hover:bg-base-200
+      "
+    >
       {threadSearch && (
         <Link
           to={{ search: threadSearch }}
@@ -62,7 +85,7 @@ export function PostCard({
       {reasonRepost && (
         <div
           className="
-            mb-1 flex items-center gap-1 pl-10 text-xs text-base-content/70
+            mb-1 flex items-center gap-1 pl-12 text-xs text-base-content/70
           "
         >
           <RepeatIcon className="size-3" />
@@ -78,25 +101,22 @@ export function PostCard({
             <img
               src={authorAvatar}
               alt=""
-              className="size-10 rounded-full object-cover"
+              className="size-9 rounded-md object-cover"
             />
           ) : (
-            <div className="size-10 rounded-full bg-base-200" />
+            <div className="size-9 rounded-md bg-base-300" />
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-1">
-            <span className="truncate font-semibold">
+          <div className="flex items-baseline gap-2">
+            <span className="truncate font-bold">
               {authorDisplayName ?? authorHandle}
             </span>
-            <span className="truncate text-base-content/70">
-              @{authorHandle}
-            </span>
-            <span className="shrink-0 text-base-content/70">
-              · {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
+            <span className="shrink-0 text-xs text-base-content/60">
+              {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
             </span>
           </div>
-          <p className="mt-1 wrap-break-word whitespace-pre-wrap">{text}</p>
+          <p className="wrap-break-word whitespace-pre-wrap">{text}</p>
           {images && (
             <div className="mt-2 grid grid-cols-2 gap-1">
               {images.map((image) => (
@@ -111,20 +131,23 @@ export function PostCard({
           )}
           <div
             className="
-              mt-2 flex gap-2
+              mt-1 flex gap-1
               empty:hidden
             "
           >
-            {!!replyCount && (
-              <span className="badge badge-sm">{replyCount}件の返信</span>
-            )}
-            {!!repostCount && (
-              <span className="badge badge-sm">{repostCount}件のリポスト</span>
-            )}
-            {!!likeCount && (
-              <span className="badge badge-sm">{likeCount}件のいいね</span>
-            )}
+            <CountChip Icon={RepeatIcon} count={repostCount} label="リポスト" />
+            <CountChip Icon={HeartIcon} count={likeCount} label="いいね" />
           </div>
+          {!!replyCount && (
+            <div
+              className="
+                mt-1 flex items-center gap-1 text-sm font-bold text-primary
+              "
+            >
+              <MessageCircleIcon className="size-4" />
+              {replyCount}件の返信
+            </div>
+          )}
         </div>
       </div>
     </article>
