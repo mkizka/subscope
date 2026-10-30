@@ -9,6 +9,7 @@ const meta = {
     displayName: "Alice",
     followsCount: 120,
     followersCount: 345,
+    follow: { did: "did:plc:alice" },
     posts: [
       {
         uri: "at://did:plc:alice/app.bsky.feed.post/1",

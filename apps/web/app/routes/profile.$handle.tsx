@@ -22,7 +22,11 @@ export const loader = async ({ params, context }: Route.LoaderArgs) => {
     agent.call(getProfile, { actor: params.handle }),
     agent.call(getAuthorFeed, { actor: params.handle, limit: 20 }),
   ]);
-  return data({ profile, posts: authorFeed.feed.map(toTimelinePost) });
+  return data({
+    profile,
+    isSelf: profile.did === agent.assertDid,
+    posts: authorFeed.feed.map(toTimelinePost),
+  });
 };
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -30,7 +34,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export default function Profile({ loaderData }: Route.ComponentProps) {
-  const { profile, posts } = loaderData;
+  const { profile, isSelf, posts } = loaderData;
   return (
     <ProfilePage
       displayName={profile.displayName}
@@ -38,6 +42,11 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       avatarUrl={profile.avatar}
       followsCount={profile.followsCount ?? 0}
       followersCount={profile.followersCount ?? 0}
+      follow={
+        isSelf
+          ? undefined
+          : { did: profile.did, viewerFollowing: profile.viewer?.following }
+      }
       posts={posts}
     />
   );

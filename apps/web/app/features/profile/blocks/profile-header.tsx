@@ -1,9 +1,12 @@
+import type { ReactNode } from "react";
+
 type Props = {
   displayName?: string;
   handle: string;
   avatarUrl?: string;
   followsCount: number;
   followersCount: number;
+  action?: ReactNode;
 };
 
 export function ProfileHeader({
@@ -12,6 +15,7 @@ export function ProfileHeader({
   avatarUrl,
   followsCount,
   followersCount,
+  action,
 }: Props) {
   return (
     <section className="flex items-center gap-4 border-b border-base-300 p-4">
@@ -32,6 +36,7 @@ export function ProfileHeader({
           <span>{followersCount} フォロワー</span>
         </div>
       </div>
+      {action && <div className="ml-auto self-start">{action}</div>}
     </section>
   );
 }
