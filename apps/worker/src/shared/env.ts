@@ -18,6 +18,7 @@ const schema = z.object({
     prod: z.url(),
     dev: z.url().default("http://localhost:2480"),
   }),
+  MODERATION_URL: z.url().default("https://mod.bsky.app"),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
 });
 

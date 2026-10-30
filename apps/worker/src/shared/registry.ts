@@ -21,6 +21,7 @@ import {
 } from "@repo/common/infrastructure";
 
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
+import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
@@ -57,6 +58,7 @@ import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
+import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
@@ -92,6 +94,7 @@ export const createWorkerRegistry = (env: Env) =>
     .value("nodeEnv", env.NODE_ENV)
     .value("plcUrl", env.PLC_URL)
     .value("tapUrl", env.TAP_URL)
+    .value("moderationUrl", env.MODERATION_URL)
     .value("port", env.PORT)
     .value("commitWorkerConcurrency", env.COMMIT_WORKER_CONCURRENCY)
     // infrastructure
@@ -105,6 +108,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
     .service("handleResolver", asClassArgs<IHandleResolver>()(HandleResolver))
+    .service("labelFetcher", ["moderationUrl"], asClassArgs<ILabelFetcher>()(LabelFetcher))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
     .service("actorRepository", asClassArgs<IActorRepository>()(ActorRepository))
     .service("inviteCodeRepository", asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
@@ -143,8 +147,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsRepository", "postRepository", "db"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
-    .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "db"], asClassArgs(SyncTapRepoUseCase))
     .service("indexLabelUseCase", ["labelRepository", "actorRepository", "db"], asClassArgs(IndexLabelUseCase))
+    .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "labelFetcher", "indexLabelUseCase", "db"], asClassArgs(SyncTapRepoUseCase))
     .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)

@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import { schema } from "@repo/db";
 import { actorFactory, labelFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -71,5 +72,28 @@ describe("ラベルの保存", () => {
     // assert
     const labels = await ctx.db.select().from(schema.labels);
     expect(labels).toHaveLength(0);
+  });
+
+  test("label-4: Tapに登録したアカウントと、そのアカウントのレコードに付いているラベルをモデレーションサービスの queryLabels で取り寄せて保存する", async () => {
+    // arrange
+    const { syncTapRepo, labelFetcher } = await setupJobTest();
+    const subscriber = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    const postUri = `at://${subscriber.did}/app.bsky.feed.post/3l3qo2vuowo2b`;
+    const cts = "2026-01-01T00:00:00.000Z";
+    labelFetcher.add({ src, uri: subscriber.did, val: "!takedown", cts });
+    labelFetcher.add({ src, uri: postUri, val: "porn", cts });
+    labelFetcher.add({ src, uri: "did:plc:other", val: "!takedown", cts });
+
+    // act
+    await syncTapRepo(asDid(subscriber.did));
+
+    // assert
+    const labels = await ctx.db.select().from(schema.labels);
+    expect(labels).toEqual([
+      expect.objectContaining({ uri: subscriber.did }),
+      expect.objectContaining({ uri: postUri }),
+    ]);
   });
 });

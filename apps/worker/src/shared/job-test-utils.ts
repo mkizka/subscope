@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import { asClassArgs } from "@gyaku/di";
 import type { CommitEventDto, JobData } from "@repo/common/domain";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
@@ -10,6 +11,7 @@ import {
 import { testSetup } from "@repo/test-utils";
 
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
+import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
 import { createWorkerRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";
 
@@ -21,6 +23,7 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
   .replaceService("jobScheduler", asClassArgs(InMemoryJobScheduler))
   .replaceService("didCache", asClassArgs(InMemoryDidCache))
   .replaceService("didResolver", asClassArgs(InMemoryDidResolver))
+  .replaceService("labelFetcher", asClassArgs(InMemoryLabelFetcher))
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("syncWorker", {} as never);
 
@@ -42,8 +45,10 @@ export const setupJobTest = async () => {
   return {
     indexCommit,
     runSyncTapRepoJobs,
+    syncTapRepo: (did: Did) => services.syncTapRepoUseCase.execute(did),
     indexLabel: (label: JobData["label"]) =>
       services.indexLabelUseCase.execute(label),
     tapClient: services.tapClient,
+    labelFetcher: services.labelFetcher,
   };
 };
