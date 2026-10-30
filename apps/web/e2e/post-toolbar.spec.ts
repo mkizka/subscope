@@ -105,7 +105,7 @@ for (const { id, name, title, subjectOf } of composeCases) {
       await page.reload();
       await expect(post).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await post.hover();
+    await post.getByRole("link", { name: "スレッドを開く" }).focus();
     await post.getByRole("button", { name }).click();
     await page
       .getByRole("textbox", { name: "投稿内容" })
