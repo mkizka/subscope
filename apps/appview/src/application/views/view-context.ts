@@ -3,12 +3,12 @@ import { AtUri } from "@atproto/syntax";
 import type {
   Generator,
   Like,
-  Post,
   ProfileDetailed,
   Record,
   Repost,
 } from "@repo/common/domain";
 
+import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
 import type { IGeneratorRepository } from "../interfaces/generator-repository.js";
@@ -18,7 +18,7 @@ import {
   type Label,
 } from "../interfaces/label-repository.js";
 import type { ILikeRepository } from "../interfaces/like-repository.js";
-import type { IPostRepository } from "../interfaces/post-repository.js";
+import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
@@ -35,7 +35,7 @@ type Repositories = {
   profileRepository: IProfileRepository;
   labelRepository: ILabelRepository;
   followRepository: IFollowRepository;
-  postRepository: IPostRepository;
+  postQuery: IPostQuery;
   recordRepository: IRecordRepository;
   postStatsQuery: IPostStatsQuery;
   likeRepository: ILikeRepository;
@@ -53,7 +53,7 @@ export class ViewContext {
   private readonly labels: Batch<string, Label[]>;
   private readonly following: Batch<Did, [Did, AtUri]>;
   private readonly followedBy: Batch<Did, [Did, AtUri]>;
-  private readonly posts: Batch<string, Post>;
+  private readonly posts: Batch<string, PostDto>;
   private readonly records: Batch<string, Record>;
   private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, Like>;
@@ -94,8 +94,8 @@ export class ViewContext {
       first,
     );
     this.posts = Batch.one(
-      (uris) => repos.postRepository.findByUris(toAtUris(uris)),
-      byUri,
+      (uris) => repos.postQuery.findByUris(toAtUris(uris)),
+      (post) => post.uri,
     );
     this.records = Batch.one(
       (uris) => repos.recordRepository.findByUris(toAtUris(uris)),
@@ -190,7 +190,7 @@ export class ViewContextFactory {
     profileRepository: IProfileRepository,
     labelRepository: ILabelRepository,
     followRepository: IFollowRepository,
-    postRepository: IPostRepository,
+    postQuery: IPostQuery,
     recordRepository: IRecordRepository,
     postStatsQuery: IPostStatsQuery,
     likeRepository: ILikeRepository,
@@ -201,7 +201,7 @@ export class ViewContextFactory {
       profileRepository,
       labelRepository,
       followRepository,
-      postRepository,
+      postQuery,
       recordRepository,
       postStatsQuery,
       likeRepository,

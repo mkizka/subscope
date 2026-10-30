@@ -1,17 +1,15 @@
 import type { $Typed } from "@atproto/lex";
-import { type AtUri, toDatetimeString, type UriString } from "@atproto/syntax";
+import { AtUri, toDatetimeString, type UriString } from "@atproto/syntax";
 import type * as AppBskyEmbedExternal from "@repo/client/lex/app/bsky/embed/external";
 import type * as AppBskyEmbedImages from "@repo/client/lex/app/bsky/embed/images";
 import type * as AppBskyEmbedRecord from "@repo/client/lex/app/bsky/embed/record";
 import type * as AppBskyEmbedRecordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
-import {
-  type Post,
-  PostEmbedExternal,
-  type PostEmbedImage,
-  PostEmbedRecord,
-  PostEmbedRecordWithMedia,
-} from "@repo/common/domain";
 
+import type {
+  PostDto,
+  PostEmbedExternalDto,
+  PostEmbedImageDto,
+} from "../dto/post-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
 import { asLexMap } from "../utils/lex.js";
 import type { GeneratorViews } from "./generator-views.js";
@@ -27,23 +25,32 @@ export class EmbedViews {
     private readonly assetUrlBuilder: IAssetUrlBuilder,
   ) {}
 
-  async embedView(post: Post, ctx: ViewContext, depth = 0) {
-    if (Array.isArray(post.embed)) {
-      return this.imagesView(post.embed, post.actorDid);
+  async embedView(post: PostDto, ctx: ViewContext, depth = 0) {
+    const media = this.mediaView(post);
+    if (!post.embedRecordUri) {
+      return media;
     }
-    if (post.embed instanceof PostEmbedExternal) {
-      return this.externalView(post.embed, post.actorDid);
+    const record = await this.recordView(
+      new AtUri(post.embedRecordUri),
+      ctx,
+      depth,
+    );
+    if (!media) {
+      return record;
     }
-    if (post.embed instanceof PostEmbedRecord) {
-      return await this.recordView(post.embed.uri, ctx, depth);
+    return {
+      $type: "app.bsky.embed.recordWithMedia#view" as const,
+      record,
+      media,
+    } satisfies $Typed<AppBskyEmbedRecordWithMedia.View>;
+  }
+
+  private mediaView(post: PostDto) {
+    if (post.embedImages.length > 0) {
+      return this.imagesView(post.embedImages, post.actorDid);
     }
-    if (post.embed instanceof PostEmbedRecordWithMedia) {
-      return await this.recordWithMediaView(
-        post.embed,
-        post.actorDid,
-        ctx,
-        depth,
-      );
+    if (post.embedExternal) {
+      return this.externalView(post.embedExternal, post.actorDid);
     }
     return undefined;
   }
@@ -93,7 +100,7 @@ export class EmbedViews {
     }
     return {
       $type: "app.bsky.embed.record#viewRecord",
-      uri: post.uri.toString(),
+      uri: post.uri,
       cid: record.cid,
       author,
       value: asLexMap(record.json),
@@ -106,23 +113,8 @@ export class EmbedViews {
     };
   }
 
-  private async recordWithMediaView(
-    embed: PostEmbedRecordWithMedia,
-    actorDid: string,
-    ctx: ViewContext,
-    depth: number,
-  ): Promise<$Typed<AppBskyEmbedRecordWithMedia.View>> {
-    return {
-      $type: "app.bsky.embed.recordWithMedia#view",
-      record: await this.recordView(embed.uri, ctx, depth),
-      media: Array.isArray(embed.media)
-        ? this.imagesView(embed.media, actorDid)
-        : this.externalView(embed.media, actorDid),
-    };
-  }
-
   private externalView(
-    embed: PostEmbedExternal,
+    embed: PostEmbedExternalDto,
     actorDid: string,
   ): $Typed<AppBskyEmbedExternal.View> {
     return {
@@ -140,7 +132,7 @@ export class EmbedViews {
   }
 
   private imagesView(
-    images: PostEmbedImage[],
+    images: PostEmbedImageDto[],
     actorDid: string,
   ): $Typed<AppBskyEmbedImages.View> {
     return {
