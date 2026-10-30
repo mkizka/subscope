@@ -1,12 +1,10 @@
 import { isAtIdentifierString } from "@atproto/syntax";
-import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
-import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import { data } from "react-router";
 
-import { agentContext } from "@/app/context/agent";
+import { didContext } from "@/app/context/did";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ProfilePage } from "@/app/pages/client/profile-page";
-import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-repository";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/profile.$handle";
 
@@ -16,17 +14,12 @@ export const loader = async ({ params, context }: Route.LoaderArgs) => {
   if (!isAtIdentifierString(params.handle)) {
     throw data("ユーザーが見つかりません", { status: 404 });
   }
-  const agent = context.get(agentContext);
-  // ponytail: 最初の20件のみ。古い投稿の読み込みはapi.timelineと同様のAPIルートを足すとき
-  const [profile, authorFeed] = await Promise.all([
-    agent.call(getProfile, { actor: params.handle }),
-    agent.call(getAuthorFeed, { actor: params.handle, limit: 20 }),
-  ]);
-  return data({
-    profile,
-    isSelf: profile.did === agent.assertDid,
-    posts: authorFeed.feed.map(toTimelinePost),
-  });
+  return data(
+    await di.getProfilePageUseCase.execute(
+      context.get(didContext),
+      params.handle,
+    ),
+  );
 };
 
 export function meta({ loaderData }: Route.MetaArgs) {
