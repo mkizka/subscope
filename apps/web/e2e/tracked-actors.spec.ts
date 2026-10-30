@@ -31,8 +31,10 @@ test.describe("追跡中のユーザー", () => {
     }).toPass();
     await expect(bob.getByText(/^@/)).toBeVisible();
     await expect(bob.getByText(/^[1-9]\d* メンバーがフォロー$/)).toBeVisible();
-    const names = await items.locator("p:first-child").allTextContents();
-    expect(names.indexOf("Bob")).toBeLessThan(names.indexOf("Alice"));
+    const counts = (
+      await items.getByText(/メンバーがフォロー$/).allTextContents()
+    ).map((text) => parseInt(text, 10));
+    expect(counts).toEqual([...counts].sort((a, b) => b - a));
   });
 
   test("tracked-actors-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
