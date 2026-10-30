@@ -25,6 +25,13 @@ export class AlreadySubscribedError extends Error {
   }
 }
 
+export class BannedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "Banned";
+  }
+}
+
 type SubscribeServerParams = {
   actorDid: Did;
   code?: string;
@@ -72,6 +79,9 @@ export class SubscribeServerUseCase {
     }
 
     const existingActor = await this.actorRepository.findByDid(actorDid);
+    if (existingActor?.isBanned) {
+      throw new BannedError("Banned from this server");
+    }
     const inviteCode = await this.validateInviteCode(
       code,
       existingActor?.isAdmin,

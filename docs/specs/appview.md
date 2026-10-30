@@ -152,15 +152,29 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getLists-1: 指定したアクターが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
+## me.subsco.server.getMembers
+
+サーバーのメンバー（サブスクライバー）のプロフィールを返す。メンバー一覧は公開情報とし、認証は不要。limitとcursorでページングする。
+
+- getMembers-1: メンバーごとにprofileViewを返す
+
 ## me.subsco.server.getSetupStatus
 
 サーバーの初期設定が済んでいるかを返す。認証は不要。管理者が登録済みなら initialized を true にする。
+
+## me.subsco.server.getTrackedActors
+
+追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数を返す。認証が必要。limitとcursorでページングする。
+
+- getTrackedActors-1: サブスクライバーとそのフォロイーを返し、それ以外のアクターは含めない
+- getTrackedActors-2: フォローしているサブスクライバーが多い順に並べる
 
 ## me.subsco.sync.subscribeServer
 
 閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。管理者は招待コードなしで登録でき、それ以外は有効期限内の未使用の招待コードが必要で、使った招待コードは使用済みになる。招待コードが無効なら400とInvalidInviteCodeを、登録済みなら400とAlreadySubscribedを返す。
 
 - subscribeServer-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
+- subscribeServer-2: BANされたアカウントは登録せず、400とBannedを返す
 
 ## me.subsco.sync.unsubscribeServer
 
@@ -194,6 +208,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - grantAdmin-1: 指定したサブスクライバーを管理者にする
 - grantAdmin-2: サブスクライバーでないアクターには400とNotSubscribedを返す
+
+## me.subsco.admin.banSubscriber
+
+サブスクライバーの登録を解除し、BANする。管理者の認証が必要。登録していなければ400とNotSubscribedを返す。
+
+- banSubscriber-1: 管理者はBANせず、400とCannotBanAdminを返す
+- banSubscriber-2: 本人とそのフォロイーのsyncTapRepoジョブを積む
 
 ## me.subsco.admin.createInviteCode
 

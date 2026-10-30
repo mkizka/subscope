@@ -70,6 +70,7 @@
     "com.atproto.repo.strongRef",
     "com.atproto.sync.getBlob",
     "com.atproto.sync.getRepo",
+    "me.subsco.admin.banSubscriber",
     "me.subsco.admin.createInviteCode",
     "me.subsco.admin.deleteInviteCode",
     "me.subsco.admin.getInviteCodes",
@@ -77,7 +78,9 @@
     "me.subsco.admin.grantAdmin",
     "me.subsco.admin.registerAdmin",
     "me.subsco.admin.verifyAccess",
+    "me.subsco.server.getMembers",
     "me.subsco.server.getSetupStatus",
+    "me.subsco.server.getTrackedActors",
     "me.subsco.sync.getSubscriptionStatus",
     "me.subsco.sync.subscribeServer",
     "me.subsco.sync.unsubscribeServer"
@@ -311,6 +314,10 @@
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.sync.getRepo",
       "cid": "bafyreieyt5x6wf4pgcn56tb2724uplmwcqjivkubmi25km3xrvroz6dw5q"
     },
+    "me.subsco.admin.banSubscriber": {
+      "uri": "file://./lexicons/me/subsco/admin/banSubscriber.json",
+      "cid": "bafyreibu3tp2asfio5g5s5y23ruhysvikbphi5eh36q4cht6fq77f5yzde"
+    },
     "me.subsco.admin.createInviteCode": {
       "uri": "file://./lexicons/me/subsco/admin/createInviteCode.json",
       "cid": "bafyreieaenfblshoxk5s72tudpmfqmlsls76vqgj5bl4hrvylzpjtbh4cy"
@@ -339,9 +346,17 @@
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
     },
+    "me.subsco.server.getMembers": {
+      "uri": "file://./lexicons/me/subsco/server/getMembers.json",
+      "cid": "bafyreibji27lzrepdc6hklaazr65ocxlodbr5klsey6i47xfaiqeux77x4"
+    },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
       "cid": "bafyreiaml7lvp3tih3gcbfaxmpuc4eelqgpxy23ld7gzrejeqtu5ytqb2q"
+    },
+    "me.subsco.server.getTrackedActors": {
+      "uri": "file://./lexicons/me/subsco/server/getTrackedActors.json",
+      "cid": "bafyreiewkprzou5t2jfddpu4lztg4avosvq6xntm4xmi3lzjrv6xn7ddta"
     },
     "me.subsco.sync.getSubscriptionStatus": {
       "uri": "file://./lexicons/me/subsco/sync/getSubscriptionStatus.json",
@@ -349,7 +364,7 @@
     },
     "me.subsco.sync.subscribeServer": {
       "uri": "file://./lexicons/me/subsco/sync/subscribeServer.json",
-      "cid": "bafyreiehmm6o5nyqu4s44g3oe65bpg24ewv7framwfs6l7g7g5xjxyhudi"
+      "cid": "bafyreid7pocepkz6u2knadb6i5tcieduzpm52zku35ypz4g6fuk72vcs3a"
     },
     "me.subsco.sync.unsubscribeServer": {
       "uri": "file://./lexicons/me/subsco/sync/unsubscribeServer.json",

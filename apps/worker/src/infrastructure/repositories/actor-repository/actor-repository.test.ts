@@ -36,6 +36,7 @@ describe("ActorRepository", () => {
         did: actor.did,
         handle: actor.handle,
         isAdmin: actor.isAdmin,
+        isBanned: actor.isBanned,
         indexedAt: actor.indexedAt,
       });
       expect(result).toEqual(expected);
@@ -50,6 +51,7 @@ describe("ActorRepository", () => {
         did: did,
         handle: "newactor.test",
         isAdmin: false,
+        isBanned: false,
         indexedAt: new Date(),
       });
 
@@ -69,6 +71,7 @@ describe("ActorRepository", () => {
         did: actor.did,
         handle: "updated.test",
         isAdmin: false,
+        isBanned: false,
         indexedAt: actor.indexedAt,
       });
 

@@ -1,11 +1,22 @@
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
 import {
   type DatabaseClient,
   Subscription,
   type TransactionContext,
 } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { eq, lt } from "drizzle-orm";
+import {
+  and,
+  asc,
+  countDistinct,
+  desc,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  lt,
+  or,
+} from "drizzle-orm";
 
 import type { ISubscriptionRepository } from "../../application/interfaces/subscription-repository.js";
 
@@ -38,6 +49,46 @@ export class SubscriptionRepository implements ISubscriptionRepository {
           createdAt: row.createdAt,
         }),
     );
+  }
+
+  async findTrackedActors(params: {
+    limit: number;
+    cursor?: string;
+  }): Promise<{ did: Did; subscriberFollowersCount: number }[]> {
+    const { actors, follows, subscriptions } = schema;
+    const subscriberFollowersCount = countDistinct(subscriptions.actorDid);
+    const cursor = params.cursor?.split("::");
+
+    const rows = await this.db
+      .select({ did: actors.did, subscriberFollowersCount })
+      .from(actors)
+      .leftJoin(follows, eq(follows.subjectDid, actors.did))
+      .leftJoin(subscriptions, eq(subscriptions.actorDid, follows.actorDid))
+      .where(
+        or(
+          isNotNull(subscriptions.actorDid),
+          inArray(
+            actors.did,
+            this.db.select({ did: subscriptions.actorDid }).from(subscriptions),
+          ),
+        ),
+      )
+      .groupBy(actors.did)
+      .having(
+        cursor
+          ? or(
+              lt(subscriberFollowersCount, Number(cursor[0])),
+              and(
+                eq(subscriberFollowersCount, Number(cursor[0])),
+                gt(actors.did, cursor[1] ?? ""),
+              ),
+            )
+          : undefined,
+      )
+      .orderBy(desc(subscriberFollowersCount), asc(actors.did))
+      .limit(params.limit);
+
+    return rows.map((row) => ({ ...row, did: asDid(row.did) }));
   }
 
   async findFirst(actorDid: Did): Promise<Subscription | null> {

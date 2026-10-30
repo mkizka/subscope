@@ -20,23 +20,28 @@ async function fetchSubscribers(cursor?: string): Promise<$OutputBody> {
   return response.json() as Promise<$OutputBody>;
 }
 
-async function grantAdmin(did: string) {
+async function updateSubscriber(method: "POST" | "DELETE", did: string) {
   const response = await fetch("/admin/api/subscribers", {
-    method: "POST",
+    method,
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ did }),
   });
   if (!response.ok) {
-    throw new Error("管理者の付与に失敗しました");
+    throw new Error("登録アカウントの更新に失敗しました");
   }
 }
 
 export function SubscriberListContainer() {
   const queryClient = useQueryClient();
+  const onSuccess = () =>
+    queryClient.invalidateQueries({ queryKey: ["subscribers"] });
   const grantAdminMutation = useMutation({
-    mutationFn: grantAdmin,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["subscribers"] }),
+    mutationFn: (did: string) => updateSubscriber("POST", did),
+    onSuccess,
+  });
+  const banMutation = useMutation({
+    mutationFn: (did: string) => updateSubscriber("DELETE", did),
+    onSuccess,
   });
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
@@ -65,6 +70,8 @@ export function SubscriberListContainer() {
       grantingDid={
         grantAdminMutation.isPending ? grantAdminMutation.variables : null
       }
+      onBan={banMutation.mutate}
+      banningDid={banMutation.isPending ? banMutation.variables : null}
     />
   );
 }
