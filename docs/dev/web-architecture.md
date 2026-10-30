@@ -49,4 +49,3 @@
 ## 今後追加する画面
 
 - ローカルタイムライン: サーバーのメンバー全員の投稿を流す（`me.subsco.feed.getLocalTimeline`）
-- メンバー: サブスクライバーの一覧（`me.subsco.server.getMembers`）
