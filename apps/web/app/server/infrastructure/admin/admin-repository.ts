@@ -1,8 +1,15 @@
 import type { DidString } from "@atproto/syntax";
 import banSubscriber from "@repo/client/lex/me/subsco/admin/banSubscriber";
+import createInviteCode, {
+  type $OutputBody as CreateInviteCodeOutput,
+} from "@repo/client/lex/me/subsco/admin/createInviteCode";
+import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
 import getBannedActors, {
   type $OutputBody as GetBannedActorsOutput,
 } from "@repo/client/lex/me/subsco/admin/getBannedActors";
+import getInviteCodes, {
+  type $OutputBody as GetInviteCodesOutput,
+} from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 import getSubscribers, {
   type $OutputBody as GetSubscribersOutput,
 } from "@repo/client/lex/me/subsco/admin/getSubscribers";
@@ -23,6 +30,12 @@ export interface IAdminRepository {
     cursor?: string,
   ) => Promise<GetBannedActorsOutput>;
   unbanActor: (did: string, target: DidString) => Promise<void>;
+  getInviteCodes: (
+    did: string,
+    cursor?: string,
+  ) => Promise<GetInviteCodesOutput>;
+  createInviteCode: (did: string) => Promise<CreateInviteCodeOutput>;
+  deleteInviteCode: (did: string, code: string) => Promise<void>;
 }
 
 export const adminRepositoryFactory = ({
@@ -58,6 +71,18 @@ export const adminRepositoryFactory = ({
     async unbanActor(did, target) {
       const agent = await restore(did);
       await agent.call(unbanActor, { did: target });
+    },
+    async getInviteCodes(did, cursor) {
+      const agent = await restore(did);
+      return agent.call(getInviteCodes, { limit: 20, cursor });
+    },
+    async createInviteCode(did) {
+      const agent = await restore(did);
+      return agent.call(createInviteCode, { daysToExpire: 7 });
+    },
+    async deleteInviteCode(did, code) {
+      const agent = await restore(did);
+      await agent.call(deleteInviteCode, { code });
     },
   };
 };
