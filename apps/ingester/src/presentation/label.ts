@@ -1,6 +1,7 @@
 import { Subscription } from "@atproto/xrpc-server";
 import * as subscribeLabels from "@repo/client/lex/com/atproto/label/subscribeLabels";
 import type { IJobQueue, IMetricReporter } from "@repo/common/domain";
+import type Keyv from "keyv";
 
 export class LabelIngester {
   private readonly subscription;
@@ -8,11 +9,16 @@ export class LabelIngester {
   constructor(
     private readonly metricReporter: IMetricReporter,
     private readonly jobQueue: IJobQueue,
-    moderationUrl: string,
+    private readonly labelCursorStore: Keyv<number>,
+    private readonly moderationUrl: string,
   ) {
     this.subscription = new Subscription({
       service: moderationUrl,
       method: subscribeLabels.$nsid,
+      getParams: async () => {
+        const cursor = await this.labelCursorStore.get(this.moderationUrl);
+        return cursor === undefined ? {} : { cursor };
+      },
       validate: (obj: unknown) => subscribeLabels.$message.$ifMatches(obj),
     });
   }
@@ -28,6 +34,7 @@ export class LabelIngester {
             data: { src, uri, cid, val, neg, cts, exp },
           });
         }
+        await this.labelCursorStore.set(this.moderationUrl, message.seq);
       } else if (subscribeLabels.info.$isTypeOf(message)) {
         this.metricReporter.increment("ingester_labels_info_total");
       }

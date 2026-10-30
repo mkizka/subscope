@@ -1,7 +1,8 @@
 import type { CacheResult, DidDocument } from "@atproto/identity";
-import KeyvRedis, { type RedisClientOptions } from "@keyv/redis";
 import type { IDidCache, IMetricReporter } from "@repo/common/domain";
 import Keyv from "keyv";
+
+import { createKeyvRedis } from "../keyv-redis/keyv-redis.js";
 
 type CacheVal = {
   doc: DidDocument;
@@ -20,23 +21,11 @@ export class RedisDidCache implements IDidCache {
     redisUrl: string,
     private readonly metricReporter: IMetricReporter,
   ) {
-    const url = new URL(redisUrl);
-    const family = url.searchParams.get("family");
-
-    // @keyv/redisが内部で@redis/clientを使用している影響でURLの?family=0が反映されない
-    // 代わりにパースしてオプションで渡す
-    const redisOptions: RedisClientOptions = {
-      url: redisUrl,
-      socket: {
-        family: family ? Number(family) : undefined,
-      },
-    };
-
     this.cache = new Keyv({
       namespace: "did-cache",
       // https://github.com/jaredwray/keyv/issues/1255
       useKeyPrefix: false,
-      store: new KeyvRedis<CacheVal>(redisOptions),
+      store: createKeyvRedis<CacheVal>(redisUrl),
     });
   }
 
