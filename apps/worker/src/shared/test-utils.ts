@@ -37,6 +37,7 @@ export const testEnv = {
   DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres",
   REDIS_URL: "redis://localhost:6379",
   TAP_URL: "http://localhost:2480",
+  MODERATION_URL: "https://mod.bsky.app",
   COMMIT_WORKER_CONCURRENCY: 128,
 } satisfies Env;
 

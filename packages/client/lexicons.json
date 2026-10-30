@@ -59,6 +59,7 @@
     "app.bsky.notification.updateSeen",
     "app.bsky.richtext.facet",
     "com.atproto.label.defs",
+    "com.atproto.label.queryLabels",
     "com.atproto.label.subscribeLabels",
     "com.atproto.moderation.defs",
     "com.atproto.repo.createRecord",
@@ -269,6 +270,10 @@
     "com.atproto.label.defs": {
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.label.defs",
       "cid": "bafyreidp2wpcbzl2qiob2uwoc7lhntojx3tjcr553mmahw2f5cumtm3wpm"
+    },
+    "com.atproto.label.queryLabels": {
+      "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.label.queryLabels",
+      "cid": "bafyreig424opkctuzynvqvbwcoqafbqzqu6tl2kilwif7ivnwcdmafbhni"
     },
     "com.atproto.label.subscribeLabels": {
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.label.subscribeLabels",
