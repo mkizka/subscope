@@ -32,6 +32,10 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     return Promise.resolve(subscriptions.slice(0, params.limit));
   }
 
+  count(): Promise<number> {
+    return Promise.resolve(this.subscriptions.size);
+  }
+
   findTrackedActors(): Promise<
     { did: Did; subscriberFollowersCount: number }[]
   > {
