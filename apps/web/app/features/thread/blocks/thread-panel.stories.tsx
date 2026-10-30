@@ -13,11 +13,16 @@ const post = (uri: string, text: string) => ({
 const meta = {
   component: ThreadPanel,
   args: {
-    posts: [
-      post("at://a/1", "親投稿です"),
-      post("at://a/2", "選んだ投稿です"),
-      post("at://a/3", "返信です"),
-    ],
+    thread: {
+      ancestors: [post("at://a/1", "親投稿です")],
+      post: {
+        ...post("at://a/2", "選んだ投稿です"),
+        replyCount: 1,
+        repostCount: 1,
+        likeCount: 8,
+      },
+      replies: [post("at://a/3", "返信です")],
+    },
     closeSearch: "",
   },
 } satisfies Meta<typeof ThreadPanel>;
