@@ -1,18 +1,18 @@
 import { Link } from "react-router";
 
-export type TrackedActor = {
+export type Actor = {
   did: string;
   handle: string;
   displayName?: string;
   avatarUrl?: string;
-  subscriberFollowersCount: number;
+  subscriberFollowersCount?: number;
 };
 
 type Props = {
-  actors: TrackedActor[];
+  actors: Actor[];
 };
 
-export function TrackedActorList({ actors }: Props) {
+export function ActorList({ actors }: Props) {
   return (
     <ul className="list">
       {actors.map((actor) => {
@@ -44,9 +44,11 @@ export function TrackedActorList({ actors }: Props) {
                   @{profileId}
                 </p>
               </div>
-              <span className="text-sm text-base-content/60">
-                {actor.subscriberFollowersCount} メンバーがフォロー
-              </span>
+              {actor.subscriberFollowersCount !== undefined && (
+                <span className="text-sm text-base-content/60">
+                  {actor.subscriberFollowersCount} メンバーがフォロー
+                </span>
+              )}
             </Link>
           </li>
         );
