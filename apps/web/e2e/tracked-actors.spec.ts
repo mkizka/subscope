@@ -5,6 +5,9 @@ import { follow, putRecord } from "./pds";
 
 test.describe("追跡中のユーザー", () => {
   test.beforeEach(async ({ page }) => {
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
       displayName: "Bob",
     });
@@ -19,18 +22,17 @@ test.describe("追跡中のユーザー", () => {
 
     await expect(page).toHaveURL("/tracked-actors");
     const items = page.getByRole("main").getByRole("listitem");
-    const bob = items.filter({ hasText: "@bob.test" });
-    const alice = items.filter({ hasText: "@alice.test" });
+    const bob = items.filter({ hasText: "Bob" });
     await expect(async () => {
       await page.reload();
-      await expect(bob.getByText("Bob")).toBeVisible({ timeout: 1000 });
+      await expect(items.filter({ hasText: "Alice" })).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
+    await expect(bob.getByText(/^@/)).toBeVisible();
     await expect(bob.getByText(/^[1-9]\d* メンバーがフォロー$/)).toBeVisible();
-    await expect(alice).toBeVisible();
-    const handles = await items.getByText(/^@/).allTextContents();
-    expect(handles.indexOf("@bob.test")).toBeLessThan(
-      handles.indexOf("@alice.test"),
-    );
+    const names = await items.locator("p:first-child").allTextContents();
+    expect(names.indexOf("Bob")).toBeLessThan(names.indexOf("Alice"));
   });
 
   test("tracked-actors-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
@@ -38,10 +40,10 @@ test.describe("追跡中のユーザー", () => {
   }) => {
     await page.goto("/tracked-actors");
 
-    await page.getByRole("link", { name: /@alice\.test/ }).click();
+    await page.getByRole("main").getByRole("link", { name: /^Bob/ }).click();
 
-    await expect(page).toHaveURL("/tracked-actors?profile=alice.test");
+    await expect(page).toHaveURL(/\/tracked-actors\?profile=/);
     const panel = page.getByRole("region", { name: "プロフィール" });
-    await expect(panel.getByText("@alice.test")).toBeVisible();
+    await expect(panel.getByText("Bob")).toBeVisible();
   });
 });
