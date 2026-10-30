@@ -36,5 +36,5 @@ export const createIngesterRegistry = (env: Env) =>
     .service("metricsRouter", ["jobQueue", "metricReporter"], asFunctionArgs(metricsRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], asClassArgs(TapIngester))
-    .service("labelIngester", ["metricReporter", "moderationUrl"], asClassArgs(LabelIngester))
+    .service("labelIngester", ["metricReporter", "jobQueue", "moderationUrl"], asClassArgs(LabelIngester))
     .service("ingesterServer", ["loggerManager", "port", "disableIngester", "metricsRouter", "healthRouter", "tapIngester", "labelIngester"], asClassArgs(IngesterServer));

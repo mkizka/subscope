@@ -1,5 +1,5 @@
 import { asClassArgs } from "@gyaku/di";
-import type { CommitEventDto } from "@repo/common/domain";
+import type { CommitEventDto, JobData } from "@repo/common/domain";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -39,5 +39,11 @@ export const setupJobTest = async () => {
     }
     services.jobScheduler.clear();
   };
-  return { indexCommit, runSyncTapRepoJobs, tapClient: services.tapClient };
+  return {
+    indexCommit,
+    runSyncTapRepoJobs,
+    indexLabel: (label: JobData["label"]) =>
+      services.indexLabelUseCase.execute(label),
+    tapClient: services.tapClient,
+  };
 };

@@ -1,6 +1,6 @@
 import { asAtIdentifierString } from "@atproto/syntax";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { actorFactory, labelFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -57,5 +57,22 @@ describe("app.bsky.actor.getProfile", () => {
       handle: actor.handle,
     });
     expect(res.displayName).toBeUndefined();
+  });
+
+  test("getProfile-4: テイクダウンされたアカウントには400とAccountTakedownを返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const label = await labelFactory(ctx.db).create();
+
+    // act
+    const promise = client.call(getProfile, {
+      actor: asAtIdentifierString(label.actorDid),
+    });
+
+    // assert
+    await expect(promise).rejects.toMatchObject({
+      status: 400,
+      error: "AccountTakedown",
+    });
   });
 });

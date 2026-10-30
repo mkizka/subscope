@@ -15,8 +15,13 @@ Tapの `/channel` にWebSocketで接続し、recordイベントをcommitキュ�
 
 ackしなかったイベントはTapが再送する。
 
+## ラベルの受信
+
+`MODERATION_URL` のモデレーションサービスの `subscribeLabels` に接続し、受け取ったラベルをlabelキューに積む。デフォルトはBluesky公式の `wss://mod.bsky.app` で、セルフホストする場合は環境変数で上書きできる。
+
+- label-1: 受け取ったラベルを1件ずつlabelキューに積む
+
 ## その他
 
 - `DISABLE_INGESTER` が `true` のときはTapとモデレーションサービスに接続しない
-- モデレーションサービスのラベルを購読し、受信数をメトリクスに記録する(保存はしない)
 - `/health` で稼働状態を、`/metrics` でキューとイベント数のメトリクスを返す
