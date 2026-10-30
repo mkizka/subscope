@@ -106,3 +106,26 @@ export const subscribeServer = async (handle: string, inviteCode: string) => {
     throw new Error(`${lxm} failed: ${body}`);
   }
 };
+
+export const uploadBlob = async (
+  handle: string,
+  body: Uint8Array<ArrayBuffer>,
+) => {
+  const { accessJwt } = await xrpc<{ accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  const response = await fetch(`${PDS_URL}/xrpc/com.atproto.repo.uploadBlob`, {
+    method: "POST",
+    headers: {
+      "content-type": "image/png",
+      authorization: `Bearer ${accessJwt}`,
+    },
+    body,
+  });
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { blob } = (await response.json()) as {
+    blob: { ref: { $link: string } };
+  };
+  return blob;
+};
