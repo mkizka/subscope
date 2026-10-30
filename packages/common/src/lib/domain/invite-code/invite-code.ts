@@ -1,3 +1,5 @@
+import { randomInt } from "node:crypto";
+
 type InviteCodeParams = {
   code: string;
   expiresAt: Date;
@@ -19,10 +21,11 @@ export class InviteCode {
   }
 
   static generate(publicUrl: string, daysToExpire: number): InviteCode {
-    const randomSuffix = Math.random()
-      .toString(36)
-      .substring(2, 7)
-      .toLowerCase();
+    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+    const randomSuffix = Array.from(
+      { length: 5 },
+      () => chars[randomInt(chars.length)],
+    ).join("");
 
     const domain = new URL(publicUrl).hostname;
     const domainKebab = domain.replace(/\./g, "-");
