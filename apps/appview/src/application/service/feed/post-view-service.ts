@@ -27,7 +27,7 @@ import {
 import type { ILikeRepository } from "../../../application/interfaces/like-repository.js";
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../../../application/interfaces/post-stats-query.js";
-import type { IRecordRepository } from "../../../application/interfaces/record-repository.js";
+import type { IRecordQuery } from "../../../application/interfaces/record-query.js";
 import type { IRepostRepository } from "../../../application/interfaces/repost-repository.js";
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { GeneratorViewService } from "./generator-view-service.js";
@@ -37,7 +37,7 @@ export class PostViewService {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly postStatsQuery: IPostStatsQuery,
-    private readonly recordRepository: IRecordRepository,
+    private readonly recordQuery: IRecordQuery,
     private readonly profileViewService: ProfileViewService,
     private readonly generatorViewService: GeneratorViewService,
     private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
@@ -103,8 +103,8 @@ export class PostViewService {
     const posts = await this.findPosts(postUris);
 
     const [recordMap, profileMap, postStats] = await Promise.all([
-      this.recordRepository
-        .findByUris(posts.map((post) => post.uri))
+      this.recordQuery
+        .findRecords(posts.map((post) => post.uri))
         .then(toMapByUri),
       this.profileViewService
         .findProfileViewBasic(posts.map((post) => post.actorDid))
@@ -175,8 +175,8 @@ export class PostViewService {
 
     const [recordMap, profileMap, postStats, viewerRepostMap, viewerLikeMap] =
       await Promise.all([
-        this.recordRepository
-          .findByUris(posts.map((post) => post.uri))
+        this.recordQuery
+          .findRecords(posts.map((post) => post.uri))
           .then(toMapByUri),
         this.profileViewService
           .findProfileViewBasic(posts.map((post) => post.actorDid))

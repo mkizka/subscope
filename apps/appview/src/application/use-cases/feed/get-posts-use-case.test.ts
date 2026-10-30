@@ -12,13 +12,13 @@ describe("GetPostsUseCase", () => {
   let getPostsUseCase: TestServices["getPostsUseCase"];
   let postRepo: TestServices["postRepository"];
   let profileRepo: TestServices["profileRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getPostsUseCase = services.getPostsUseCase;
     postRepo = services.postRepository;
     profileRepo = services.profileRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
   });
 
   test("複数の投稿を、投稿と著者それぞれ1回のクエリでまとめて取る", async () => {
