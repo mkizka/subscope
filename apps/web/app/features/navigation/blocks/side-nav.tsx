@@ -1,3 +1,4 @@
+import { ExternalLinkIcon } from "lucide-react";
 import { Link } from "react-router";
 
 type Props = {
@@ -33,9 +34,14 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
                 <Link to="/admin/invite-codes">招待コード</Link>
               </li>
               <li>
-                <Link to="/admin/bull-board" reloadDocument>
+                <a href="/admin/bull-board" target="_blank" rel="noreferrer">
                   ジョブキュー
-                </Link>
+                  <ExternalLinkIcon
+                    className="size-3.5"
+                    aria-hidden
+                    data-testid="external-link-icon"
+                  />
+                </a>
               </li>
             </ul>
           </li>
