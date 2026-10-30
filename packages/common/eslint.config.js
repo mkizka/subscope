@@ -8,4 +8,35 @@ export default [
       "@typescript-eslint/require-await": "off",
     },
   },
+  {
+    files: ["src/application/**", "src/shared/**", "src/lib/domain/**"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "keyv",
+                "@keyv/*",
+                "bullmq",
+                "pg",
+                "pino",
+                "pino-*",
+                "prom-client",
+                "ws",
+                "drizzle-orm",
+                "drizzle-orm/*",
+                "@atproto/tap",
+                "@atproto/identity",
+              ],
+              allowTypeImports: true,
+              message:
+                "ライブラリを直接使わないでください。infrastructure層にクラスを作成してラップしてください(例: LabelCursorStore)。",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

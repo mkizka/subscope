@@ -40,7 +40,7 @@ packagesディレクトリ(共通パッケージ)
 各アプリはオニオンアーキテクチャパターンを参考に以下のような構成で実装しています。
 
 - `application/` - ユースケースとビジネスロジック
-- `infrastructure/` - 外部サービス実装
+- `infrastructure/` - 外部サービス実装。ライブラリはここでクラスにラップし、application/shared/domainからは直接使わない(ESLintで検査)
 - `presentation/` - HTTPルートとWebSocketハンドラー
 - `shared/` - 環境設定とユーティリティ
 
