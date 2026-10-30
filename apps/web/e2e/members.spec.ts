@@ -7,11 +7,12 @@ test.describe("メンバー", () => {
   test.beforeEach(async ({ page }) => {
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {
       displayName: "Alice",
+      description: "Blueskyを使っています",
     });
     await login(page);
   });
 
-  test("members-1: 左カラムの「メンバー」から、中央カラムにメンバー（名前、ハンドル）を一覧表示する", async ({
+  test("members-1: 左カラムの「メンバー」から、中央カラムにメンバー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.getByRole("link", { name: "メンバー", exact: true }).click();
@@ -26,6 +27,7 @@ test.describe("メンバー", () => {
       await expect(alice).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(alice.getByText(/^@/)).toBeVisible();
+    await expect(alice.getByText("Blueskyを使っています")).toBeVisible();
   });
 
   test("members-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
@@ -41,5 +43,13 @@ test.describe("メンバー", () => {
     await expect(page).toHaveURL(/\/members\?profile=/);
     const panel = page.getByRole("region", { name: "プロフィール" });
     await expect(panel.getByText("Alice")).toBeVisible();
+  });
+
+  test("members-3: 見出しにメンバーの人数を表示する", async ({ page }) => {
+    await page.goto("/members");
+
+    await expect(
+      page.getByRole("heading", { name: /^メンバー \d+人$/ }),
+    ).toBeVisible();
   });
 });

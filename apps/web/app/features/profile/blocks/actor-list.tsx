@@ -5,6 +5,7 @@ export type Actor = {
   handle: string;
   displayName?: string;
   avatarUrl?: string;
+  description?: string;
   subscriberFollowersCount?: number;
 };
 
@@ -43,6 +44,9 @@ export function ActorList({ actors }: Props) {
                 <p className="truncate text-sm text-base-content/60">
                   @{profileId}
                 </p>
+                {actor.description && (
+                  <p className="truncate text-sm">{actor.description}</p>
+                )}
               </div>
               {actor.subscriberFollowersCount !== undefined && (
                 <span className="text-sm text-base-content/60">
