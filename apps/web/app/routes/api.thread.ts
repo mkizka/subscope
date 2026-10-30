@@ -8,8 +8,8 @@ import { data } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
+import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-repository";
 
-import { toTimelinePost } from "./_index";
 import type { Route } from "./+types/api.thread";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];

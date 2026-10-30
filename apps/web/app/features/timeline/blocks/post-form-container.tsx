@@ -1,9 +1,34 @@
 import { useState } from "react";
 import { useFetcher } from "react-router";
+import { z } from "zodV4";
 
 import type { action } from "@/app/routes/_index";
 
-import { PostForm } from "./post-form";
+import {
+  countGraphemes,
+  MAX_IMAGES,
+  MAX_POST_LENGTH,
+  PostForm,
+  REPLY_RULES,
+} from "./post-form";
+
+export const postSchema = z
+  .object({
+    text: z
+      .string()
+      .default("")
+      .refine((text) => countGraphemes(text) <= MAX_POST_LENGTH),
+    image: z.array(z.instanceof(File)).max(MAX_IMAGES).default([]),
+    alt: z.array(z.string().default("")).default([]),
+    type: z.enum(["reply", "quote"]).optional(),
+    uri: z.string().optional(),
+    cid: z.string().optional(),
+    rootUri: z.string().optional(),
+    rootCid: z.string().optional(),
+    threadgate: z.boolean().default(false),
+    allow: z.array(z.enum(REPLY_RULES.map(({ rule }) => rule))).default([]),
+  })
+  .refine(({ text, image }) => text.trim() !== "" || image.length > 0);
 
 export type ComposeTarget = {
   type: "reply" | "quote";
