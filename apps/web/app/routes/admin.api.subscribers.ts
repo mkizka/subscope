@@ -1,5 +1,6 @@
 import { XrpcResponseError } from "@atproto/lex";
 import { type DidString, isValidDid } from "@atproto/syntax";
+import banSubscriber from "@repo/client/lex/me/subsco/admin/banSubscriber";
 import getSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
 import { data } from "react-router";
@@ -38,7 +39,9 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     const { did } = z
       .object({ did: z.custom<DidString>(isValidDid) })
       .parse(await request.json());
-    await agent.call(grantAdmin, { did });
+    await agent.call(request.method === "DELETE" ? banSubscriber : grantAdmin, {
+      did,
+    });
     return data({ success: true });
   } catch (e) {
     if (

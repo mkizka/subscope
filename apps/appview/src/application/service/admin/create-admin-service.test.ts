@@ -34,6 +34,7 @@ describe("CreateAdminService", () => {
         did,
         handle: null,
         isAdmin: true,
+        isBanned: false,
         indexedAt: expect.any(Date),
       }),
     );
@@ -68,6 +69,7 @@ describe("CreateAdminService", () => {
         did: existingActor.did,
         handle: existingActor.handle,
         isAdmin: true,
+        isBanned: false,
         indexedAt: expect.any(Date),
       }),
     );

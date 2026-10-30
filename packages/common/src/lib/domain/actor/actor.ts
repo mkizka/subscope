@@ -7,6 +7,7 @@ export type ActorParams = {
   did: string;
   handle: string | null;
   isAdmin: boolean;
+  isBanned: boolean;
   indexedAt: Date;
 };
 
@@ -14,12 +15,14 @@ export class Actor {
   readonly did: Did;
   private _handle: Handle | null = null;
   private _isAdmin: boolean;
+  private _isBanned: boolean;
   readonly indexedAt: Date;
 
   private constructor(params: ActorParams) {
     this.did = asDid(params.did);
     this._handle = params.handle ? asHandle(params.handle) : null;
     this._isAdmin = params.isAdmin;
+    this._isBanned = params.isBanned;
     this.indexedAt = params.indexedAt;
   }
 
@@ -28,6 +31,7 @@ export class Actor {
       did: params.did,
       handle: params.handle ?? null,
       isAdmin: false,
+      isBanned: false,
       indexedAt: new Date(),
     });
   }
@@ -44,11 +48,19 @@ export class Actor {
     return this._isAdmin;
   }
 
+  get isBanned(): boolean {
+    return this._isBanned;
+  }
+
   updateHandle(handle: string | null): void {
     this._handle = handle ? asHandle(handle) : null;
   }
 
   promoteToAdmin(): void {
     this._isAdmin = true;
+  }
+
+  ban(): void {
+    this._isBanned = true;
   }
 }
