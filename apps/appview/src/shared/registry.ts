@@ -69,6 +69,7 @@ import { GetInviteCodesUseCase } from "../application/use-cases/admin/get-invite
 import { GetSubscribersUseCase } from "../application/use-cases/admin/get-subscribers-use-case.js";
 import { GrantAdminUseCase } from "../application/use-cases/admin/grant-admin-use-case.js";
 import { RegisterAdminUseCase } from "../application/use-cases/admin/register-admin-use-case.js";
+import { UnbanActorUseCase } from "../application/use-cases/admin/unban-actor-use-case.js";
 import { VerifyAccessUseCase } from "../application/use-cases/admin/verify-access-use-case.js";
 import { GetActorLikesUseCase } from "../application/use-cases/feed/get-actor-likes-use-case.js";
 import { GetAuthorFeedUseCase } from "../application/use-cases/feed/get-author-feed-use-case.js";
@@ -148,6 +149,7 @@ import { GetInviteCodes } from "../presentation/routes/me/subsco/admin/getInvite
 import { GetSubscribers } from "../presentation/routes/me/subsco/admin/getSubscribers.js";
 import { GrantAdmin } from "../presentation/routes/me/subsco/admin/grantAdmin.js";
 import { RegisterAdmin } from "../presentation/routes/me/subsco/admin/registerAdmin.js";
+import { UnbanActor } from "../presentation/routes/me/subsco/admin/unbanActor.js";
 import { VerifyAccess } from "../presentation/routes/me/subsco/admin/verifyAccess.js";
 import { GetMembers } from "../presentation/routes/me/subsco/server/getMembers.js";
 import { GetSetupStatus } from "../presentation/routes/me/subsco/server/getSetupStatus.js";
@@ -260,6 +262,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
     .service("unsubscribeServerUseCase", ["subscriptionRepository", "followRepository", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
+    .service("unbanActorUseCase", ["db", "actorRepository"], asClassArgs(UnbanActorUseCase))
     .service("banSubscriberUseCase", ["transactionManager", "actorRepository", "unsubscribeServerUseCase"], asClassArgs(BanSubscriberUseCase))
     .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
@@ -298,9 +301,10 @@ export const createAppRegistry = (env: Env) =>
     .service("getSubscriptionStatus", ["getSubscriptionStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetSubscriptionStatus))
     .service("subscribeServer", ["subscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(SubscribeServer))
     .service("unsubscribeServer", ["unsubscribeServerUseCase", "authVerifierMiddleware"], asClassArgs(UnsubscribeServer))
+    .service("unbanActor", ["unbanActorUseCase", "adminMiddleware"], asClassArgs(UnbanActor))
     .service("banSubscriber", ["banSubscriberUseCase", "adminMiddleware"], asClassArgs(BanSubscriber))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
