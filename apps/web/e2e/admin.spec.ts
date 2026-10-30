@@ -65,15 +65,15 @@ test.describe("登録ユーザー", () => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       return ((await response.json()) as { code: string }).code;
     };
-    await subscribeServer("carol.test", await createInviteCode());
-    const carolDid = await resolveHandle("carol.test");
+    await subscribeServer("dave.test", await createInviteCode());
+    const daveDid = await resolveHandle("dave.test");
 
     await page.goto("/admin/subscribers");
 
     const row = page
       .getByRole("main")
       .getByRole("listitem")
-      .filter({ has: page.getByTitle(carolDid) });
+      .filter({ has: page.getByTitle(daveDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
     page.once("dialog", (dialog) => void dialog.accept());
@@ -81,7 +81,7 @@ test.describe("登録ユーザー", () => {
 
     await expect(row).toHaveCount(0);
     await expect(
-      subscribeServer("carol.test", await createInviteCode()),
+      subscribeServer("dave.test", await createInviteCode()),
     ).rejects.toThrow("Banned");
   });
 });
