@@ -42,7 +42,9 @@ test.describe("メンバー", () => {
 
     await expect(page).toHaveURL(/\/members\?profile=/);
     const panel = page.getByRole("region", { name: "プロフィール" });
-    await expect(panel.getByText("Alice")).toBeVisible();
+    await expect(
+      panel.getByRole("heading", { name: "Alice", exact: true }),
+    ).toBeVisible();
   });
 
   test("members-3: 見出しにメンバーの人数を表示する", async ({ page }) => {

@@ -7,6 +7,7 @@ import {
 
 import { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
+import type { ILabelCursorStore } from "../application/interfaces/label-cursor-store.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store.js";
 import { LabelIngester } from "../presentation/label.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
@@ -30,7 +31,7 @@ export const createIngesterRegistry = (env: Env) =>
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("jobQueue", ["redisUrl"], asClassArgs(JobQueue))
     .service("metricReporter", asClassArgs(MetricReporter))
-    .service("labelCursorStore", ["redisUrl"], asClassArgs(LabelCursorStore))
+    .service("labelCursorStore", ["redisUrl"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
     // application
     .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleIdentityUseCase))
     .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleCommitUseCase))
