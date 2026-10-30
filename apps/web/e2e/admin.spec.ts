@@ -4,7 +4,7 @@ import { login } from "./login";
 import { resolveHandle, subscribeServer } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await login(page);
