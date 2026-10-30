@@ -118,6 +118,78 @@ test.describe("登録ユーザー", () => {
       subscribeServer("dave.test", await createInviteCode()),
     ).rejects.toThrow("Banned");
   });
+
+  const banSubscriber = async (page: Page, handle: string) => {
+    const response = await page.request.post("/admin/api/invite-codes");
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const { code } = (await response.json()) as { code: string };
+    await subscribeServer(handle, code);
+    const did = await resolveHandle(handle);
+    await page.request.delete("/admin/api/subscribers", { data: { did } });
+    return did;
+  };
+
+  test("subscribers-5: 「登録ユーザー」「BAN済み」のタブで一覧を切り替える", async ({
+    page,
+  }) => {
+    await login(page);
+    const aliceDid = await resolveHandle("alice.test");
+
+    await page.goto("/admin/subscribers");
+    await page.getByRole("tab", { name: "BAN済み" }).click();
+
+    await expect(page.getByRole("tab", { name: "BAN済み" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(page.getByTitle(aliceDid)).toHaveCount(0);
+
+    await page.getByRole("tab", { name: "登録ユーザー" }).click();
+
+    await expect(page.getByTitle(aliceDid)).toBeVisible();
+  });
+
+  test("subscribers-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
+    page,
+  }) => {
+    await login(page);
+    const graceDid = await banSubscriber(page, "grace.test");
+
+    await page.goto("/admin/subscribers");
+    await page.getByRole("tab", { name: "BAN済み" }).click();
+
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(graceDid) });
+    await expect(row).toContainText("@grace.test");
+  });
+
+  test("subscribers-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+    page,
+  }) => {
+    await login(page);
+    const frankDid = await banSubscriber(page, "frank.test");
+
+    await page.goto("/admin/subscribers");
+    await page.getByRole("tab", { name: "BAN済み" }).click();
+
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(frankDid) });
+    await row.getByRole("button", { name: "解除" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "解除する" })
+      .click();
+
+    await expect(row).toHaveCount(0);
+    const response = await page.request.post("/admin/api/invite-codes");
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const { code } = (await response.json()) as { code: string };
+    await subscribeServer("frank.test", code);
+  });
 });
 
 test.describe("招待コード", () => {
