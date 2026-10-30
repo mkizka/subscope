@@ -33,7 +33,7 @@ export class PostViews {
     }
     return {
       $type: "app.bsky.feed.defs#postView",
-      uri: post.uri.toString(),
+      uri: post.uri,
       cid: record.cid,
       author,
       record: asLexMap(record.json),
