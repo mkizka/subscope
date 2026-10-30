@@ -48,4 +48,12 @@ test.describe("追跡中のユーザー", () => {
     const panel = page.getByRole("region", { name: "プロフィール" });
     await expect(panel.getByText("Bob")).toBeVisible();
   });
+
+  test("tracked-actors-4: 見出しの横に追跡アクターの人数を出す", async ({
+    page,
+  }) => {
+    await page.goto("/tracked-actors");
+
+    await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
+  });
 });
