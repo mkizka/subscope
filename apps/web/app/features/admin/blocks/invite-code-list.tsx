@@ -1,6 +1,7 @@
 import { Trash2Icon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 
 export type InviteCode = {
@@ -56,26 +57,31 @@ export function InviteCodeItems({
       </div>
       <StatusBadge usedAt={code.usedAt} expiresAt={code.expiresAt} />
       {isDeletable(code) ? (
-        <button
-          type="button"
-          className="btn btn-square btn-ghost btn-sm"
-          aria-label="削除"
-          onClick={() => {
-            if (
-              isExpired(code) ||
-              window.confirm(`${code.code} を削除しますか？`)
-            ) {
-              onDeleteCode(code.code);
-            }
-          }}
-          disabled={deletingCode === code.code}
+        <ConfirmDialog
+          title={`${code.code} を削除しますか？`}
+          description="このコードでは登録できなくなります。"
+          confirmLabel="削除する"
+          danger
+          onConfirm={() => onDeleteCode(code.code)}
         >
-          {deletingCode === code.code ? (
-            <span className="loading loading-sm loading-spinner" />
-          ) : (
-            <Trash2Icon className="size-4 text-error" />
+          {(open) => (
+            <button
+              type="button"
+              className="btn btn-square btn-ghost btn-sm"
+              aria-label="削除"
+              onClick={() =>
+                isExpired(code) ? onDeleteCode(code.code) : open()
+              }
+              disabled={deletingCode === code.code}
+            >
+              {deletingCode === code.code ? (
+                <span className="loading loading-sm loading-spinner" />
+              ) : (
+                <Trash2Icon className="size-4 text-error" />
+              )}
+            </button>
           )}
-        </button>
+        </ConfirmDialog>
       ) : (
         <span className="size-8" />
       )}

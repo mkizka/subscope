@@ -50,8 +50,11 @@ test.describe("登録ユーザー", () => {
       .filter({ has: page.getByTitle(bobDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "管理者にする" })
+      .click();
 
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
@@ -76,8 +79,11 @@ test.describe("登録ユーザー", () => {
       .filter({ has: page.getByTitle(daveDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "BAN" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "BANする" })
+      .click();
 
     await expect(row).toHaveCount(0);
     await expect(
@@ -160,11 +166,10 @@ test.describe("招待コード", () => {
     await page.goto("/admin/invite-codes");
     const row = inviteCodeRows(page).filter({ hasText: code });
 
-    page.once("dialog", (dialog) => {
-      expect(dialog.message()).toContain(code);
-      void dialog.accept();
-    });
     await row.getByRole("button", { name: "削除" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toContainText(code);
+    await dialog.getByRole("button", { name: "削除する" }).click();
 
     await expect(row).toHaveCount(0);
   });
