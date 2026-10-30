@@ -29,7 +29,12 @@ export const Default: Story = {
         expiresAt: "2099-12-31T23:59:59.000Z",
         createdAt: "2025-01-10T00:00:00.000Z",
         usedAt: "2025-01-15T10:00:00.000Z",
-        usedBy: { did: "did:plc:example123", handle: "alice.bsky.social" },
+        usedBy: {
+          did: "did:plc:example123",
+          handle: "alice.bsky.social",
+          displayName: "Alice",
+          avatar: "https://placehold.co/32",
+        },
       },
       {
         code: "mno-789-pqr",
@@ -72,7 +77,12 @@ export const Deleting: Story = {
         expiresAt: "2099-12-31T23:59:59.000Z",
         createdAt: "2025-01-10T00:00:00.000Z",
         usedAt: "2025-01-15T10:00:00.000Z",
-        usedBy: { did: "did:plc:example123", handle: "alice.bsky.social" },
+        usedBy: {
+          did: "did:plc:example123",
+          handle: "alice.bsky.social",
+          displayName: "Alice",
+          avatar: "https://placehold.co/32",
+        },
       },
     ],
     deletingCode: "abc-123-def",
