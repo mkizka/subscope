@@ -6,16 +6,13 @@ export const MAX_IMAGES = 4;
 export const countGraphemes = (text: string) =>
   [...new Intl.Segmenter().segment(text)].length;
 
-const REPLY_RULES = [
+export const REPLY_RULES = [
   { rule: "follower", label: "フォロワー" },
   { rule: "following", label: "フォロー中" },
   { rule: "mention", label: "メンションした人" },
 ] as const;
 
 export type ReplyRule = (typeof REPLY_RULES)[number]["rule"];
-
-export const isReplyRule = (value: string): value is ReplyRule =>
-  REPLY_RULES.some(({ rule }) => rule === value);
 
 type Props = {
   isSubmitting: boolean;
@@ -57,7 +54,10 @@ export function PostForm({
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         images.forEach(({ file }) => formData.append("image", file));
-        if (allow) formData.set("allow", allow.join(","));
+        if (allow) {
+          formData.set("threadgate", "on");
+          allow.forEach((rule) => formData.append("allow", rule));
+        }
         onSubmit(formData);
       }}
     >
