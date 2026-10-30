@@ -13,6 +13,7 @@ export class ActorRepository implements IActorRepository {
     const data = {
       handle: actor.handle,
       isAdmin: actor.isAdmin,
+      status: actor.status,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
@@ -41,6 +42,7 @@ export class ActorRepository implements IActorRepository {
       handle: row.handle || null,
       isAdmin: row.isAdmin,
       isBanned: row.isBanned,
+      status: row.status,
       indexedAt: row.indexedAt,
     });
   }
