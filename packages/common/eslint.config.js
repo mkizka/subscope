@@ -1,11 +1,3 @@
-import { mkizka } from "@mkizka/eslint-config";
+import { config } from "@repo/eslint-config";
 
-export default [
-  ...mkizka,
-  {
-    files: ["**/*.in-memory.ts"],
-    rules: {
-      "@typescript-eslint/require-await": "off",
-    },
-  },
-];
+export default config;

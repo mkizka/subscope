@@ -28,7 +28,7 @@
     "vitest": "5.0.5"
   },
   "devDependencies": {
-    "@mkizka/eslint-config": "10.0.0",
+    "@repo/eslint-config": "workspace:*",
     "@tsconfig/node-lts": "24.0.1",
     "@types/node": "26.6.5",
     "drizzle-orm": "0.45.4",
