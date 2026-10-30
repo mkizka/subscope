@@ -21,4 +21,21 @@ export const config = [
       "@typescript-eslint/require-await": "off",
     },
   },
+  {
+    files: ["**/shared/registry.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^(?!@gyaku/di$|@repo/|\\.)",
+              message:
+                "DIの配線でライブラリを直接使わないでください。自前のinterfaceを実装したクラスでラップしてください(例: LabelCursorStore)。",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
