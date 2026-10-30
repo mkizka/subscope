@@ -23,17 +23,12 @@ export function ErrorCard({ title, details, status, stack }: Props) {
 
   return (
     <div className="card w-full border border-base-300 bg-base-100">
-      <div className="card-body">
-        <div className="flex items-center gap-3">
-          <ErrorIcon status={status} />
-          <h2 className="card-title text-2xl">{title}</h2>
-        </div>
-        <p className="text-sm text-base-content/70">
-          {details}
-          {status && `（ステータス：${status}）`}
-        </p>
+      <div className="card-body items-center text-center">
+        <ErrorIcon status={status} />
+        <h2 className="card-title text-2xl">{title}</h2>
+        <p className="text-sm text-base-content/70">{details}</p>
         {stack && (
-          <div className="relative">
+          <div className="relative w-full text-left">
             <pre className="overflow-x-auto rounded-box bg-base-200 p-4 text-xs">
               <code>{stack}</code>
             </pre>
@@ -51,12 +46,13 @@ export function ErrorCard({ title, details, status, stack }: Props) {
             </button>
           </div>
         )}
-        <div className="card-actions justify-end">
-          <a href="/" className="btn btn-outline">
+        <div className="mt-2 card-actions">
+          <a href="/" className="btn btn-primary">
             <HomeIcon className="size-4" />
             ホームに戻る
           </a>
         </div>
+        {status && <p className="text-xs text-base-content/50">{status}</p>}
       </div>
     </div>
   );

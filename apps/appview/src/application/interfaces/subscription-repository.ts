@@ -6,11 +6,13 @@ export interface ISubscriptionRepository {
     limit: number;
     cursor?: string;
   }) => Promise<Subscription[]>;
+  count: () => Promise<number>;
   findFirst: (actorDid: Did) => Promise<Subscription | null>;
   findTrackedActors: (params: {
     limit: number;
     cursor?: string;
   }) => Promise<{ did: Did; subscriberFollowersCount: number }[]>;
+  countTrackedActors: () => Promise<number>;
   existsByInviteCode: (inviteCode: string) => Promise<boolean>;
   save: (params: {
     subscription: Subscription;

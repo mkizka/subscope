@@ -20,9 +20,9 @@ const statusLabel = {
 } as const;
 
 const statusClass = {
-  active: "badge badge-primary",
+  active: "badge badge-soft badge-success",
   used: "badge badge-ghost",
-  expired: "badge badge-error",
+  expired: "badge badge-ghost",
 } as const;
 
 export function StatusBadge(props: Props) {

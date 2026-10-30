@@ -4,7 +4,7 @@ import { login } from "./login";
 import { resolveHandle, subscribeServer } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-1: 左カラムの「サーバー」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await login(page);
@@ -17,7 +17,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("登録ユーザー", () => {
-  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうかを出す", async ({
+  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await login(page);
@@ -30,6 +30,17 @@ test.describe("登録ユーザー", () => {
       .getByRole("listitem")
       .filter({ has: page.getByTitle(aliceDid) });
     await expect(row.getByText("管理者")).toBeVisible();
+    await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
+  });
+
+  test("subscribers-4: 見出しの横に登録ユーザーの人数を出す", async ({
+    page,
+  }) => {
+    await login(page);
+
+    await page.goto("/admin/subscribers");
+
+    await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
   });
 
   test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
@@ -50,8 +61,11 @@ test.describe("登録ユーザー", () => {
       .filter({ has: page.getByTitle(bobDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "管理者にする" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "管理者にする" })
+      .click();
 
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
@@ -76,8 +90,11 @@ test.describe("登録ユーザー", () => {
       .filter({ has: page.getByTitle(daveDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    page.once("dialog", (dialog) => void dialog.accept());
     await row.getByRole("button", { name: "BAN" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "BANする" })
+      .click();
 
     await expect(row).toHaveCount(0);
     await expect(
@@ -121,11 +138,11 @@ test.describe("招待コード", () => {
     }
 
     await page.goto("/admin/invite-codes");
-    await expect(page.getByText(oldest)).toHaveCount(0);
+    await expect(page.getByText(oldest, { exact: true })).toHaveCount(0);
 
     await inviteCodeRows(page).last().scrollIntoViewIfNeeded();
 
-    await expect(page.getByText(oldest)).toBeVisible();
+    await expect(page.getByText(oldest, { exact: true })).toBeVisible();
   });
 
   test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
@@ -160,11 +177,10 @@ test.describe("招待コード", () => {
     await page.goto("/admin/invite-codes");
     const row = inviteCodeRows(page).filter({ hasText: code });
 
-    page.once("dialog", (dialog) => {
-      expect(dialog.message()).toContain(code);
-      void dialog.accept();
-    });
     await row.getByRole("button", { name: "削除" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toContainText(code);
+    await dialog.getByRole("button", { name: "削除する" }).click();
 
     await expect(row).toHaveCount(0);
   });
@@ -195,5 +211,22 @@ test.describe("招待コード", () => {
     await row.getByRole("button", { name: "削除" }).click();
 
     await expect(row).toHaveCount(0);
+  });
+
+  test("invite-codes-7: 未使用で期限内の招待コードは、コードの横のボタンでコードをクリップボードにコピーできる", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await login(page);
+    const code = await createInviteCode(page);
+
+    await page.goto("/admin/invite-codes");
+    const row = inviteCodeRows(page).filter({ hasText: code });
+    await row.getByRole("button", { name: "コピー" }).click();
+
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe(code);
   });
 });

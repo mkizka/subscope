@@ -78,6 +78,7 @@
     "me.subsco.admin.getSubscribers",
     "me.subsco.admin.grantAdmin",
     "me.subsco.admin.registerAdmin",
+    "me.subsco.admin.unbanActor",
     "me.subsco.admin.verifyAccess",
     "me.subsco.server.getMembers",
     "me.subsco.server.getSetupStatus",
@@ -333,11 +334,11 @@
     },
     "me.subsco.admin.getInviteCodes": {
       "uri": "file://./lexicons/me/subsco/admin/getInviteCodes.json",
-      "cid": "bafyreiaaxfx7o45zxzlsl267t2o34rvhq74zfaovwbig5lc4lypb5qqz5e"
+      "cid": "bafyreibuqqttk42fvohuom5axi4myelti4risi4fuwe6zj4h342qtgttma"
     },
     "me.subsco.admin.getSubscribers": {
       "uri": "file://./lexicons/me/subsco/admin/getSubscribers.json",
-      "cid": "bafyreic33ivg4qvbuz67yue4c7gb3nczqjzjn56ztepnsa2uay7twkz3zi"
+      "cid": "bafyreiacg7taclpuhre2g3q4dqqla2thuonxnqt3kdfdzhpbkttk2b4h3a"
     },
     "me.subsco.admin.grantAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/grantAdmin.json",
@@ -347,13 +348,17 @@
       "uri": "file://./lexicons/me/subsco/admin/registerAdmin.json",
       "cid": "bafyreidh653anvtfbwrnl3frr2vcs6ycc4p2dj4ii23rp4ahcdjpruh4a4"
     },
+    "me.subsco.admin.unbanActor": {
+      "uri": "file://./lexicons/me/subsco/admin/unbanActor.json",
+      "cid": "bafyreiddl7kjfrpbc5logj4h4efdo5rqftsyo7l33nkox2dliloqiquysm"
+    },
     "me.subsco.admin.verifyAccess": {
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
     },
     "me.subsco.server.getMembers": {
       "uri": "file://./lexicons/me/subsco/server/getMembers.json",
-      "cid": "bafyreibji27lzrepdc6hklaazr65ocxlodbr5klsey6i47xfaiqeux77x4"
+      "cid": "bafyreidlwstpnjufwgnj5add3sox5phflt4lpryuht4vzrofuzlczkjouq"
     },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
@@ -361,7 +366,7 @@
     },
     "me.subsco.server.getTrackedActors": {
       "uri": "file://./lexicons/me/subsco/server/getTrackedActors.json",
-      "cid": "bafyreiewkprzou5t2jfddpu4lztg4avosvq6xntm4xmi3lzjrv6xn7ddta"
+      "cid": "bafyreigy6eoevmqjqmhlhidfbiejur3m744rl7lfbf5fpuvofdeeblh4cu"
     },
     "me.subsco.sync.getSubscriptionStatus": {
       "uri": "file://./lexicons/me/subsco/sync/getSubscriptionStatus.json",

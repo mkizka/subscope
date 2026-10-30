@@ -30,7 +30,5 @@ export function ThreadPanelContainer({ uri }: Props) {
   const closeParams = new URLSearchParams(searchParams);
   closeParams.delete("thread");
 
-  return (
-    <ThreadPanel posts={data ?? []} closeSearch={closeParams.toString()} />
-  );
+  return <ThreadPanel thread={data} closeSearch={closeParams.toString()} />;
 }

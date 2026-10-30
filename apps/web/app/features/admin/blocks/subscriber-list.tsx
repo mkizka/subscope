@@ -1,6 +1,8 @@
 import { BanIcon, EllipsisIcon, ShieldIcon } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
+import { formatDate } from "@/app/lib/format-date";
 
 export type Subscriber = {
   did: string;
@@ -8,10 +10,12 @@ export type Subscriber = {
   displayName?: string;
   avatar?: string;
   isAdmin: boolean;
+  subscribedAt: string;
 };
 
 type Props = {
   subscribers: Subscriber[];
+  total?: number;
   isLoading?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
@@ -24,6 +28,7 @@ type Props = {
 
 export function SubscriberList({
   subscribers,
+  total,
   isLoading,
   isFetchingNextPage,
   onLoadMore,
@@ -35,8 +40,11 @@ export function SubscriberList({
 }: Props) {
   return (
     <>
-      <div className="px-6 pt-6 pb-3">
+      <div className="flex items-baseline gap-2 px-6 pt-6 pb-3">
         <h1 className="text-xl font-bold">登録ユーザー</h1>
+        {total !== undefined && (
+          <span className="text-sm text-base-content/70">{total}人</span>
+        )}
       </div>
       {!isLoading && subscribers.length === 0 && (
         <p className="py-8 text-center">登録アカウントはまだありません</p>
@@ -64,6 +72,9 @@ export function SubscriberList({
               >
                 @{subscriber.handle}
               </div>
+              <div className="text-xs text-base-content/70">
+                {formatDate(subscriber.subscribedAt)} 登録
+              </div>
             </div>
             {subscriber.isAdmin ? (
               <span className="badge badge-soft badge-sm badge-primary">
@@ -71,59 +82,62 @@ export function SubscriberList({
                 管理者
               </span>
             ) : (
-              <div className="dropdown dropdown-end">
-                <button
-                  type="button"
-                  className="btn btn-square btn-ghost btn-sm"
-                  aria-label="操作"
-                >
-                  <EllipsisIcon className="size-4" />
-                </button>
-                <ul
-                  className="
-                    menu dropdown-content z-10 w-44 rounded-box border
-                    border-base-300 bg-base-100 p-2 shadow-sm
-                  "
-                >
-                  <li>
-                    <button
-                      type="button"
-                      disabled={grantingDid === subscriber.did}
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `@${subscriber.handle} を管理者にしますか？`,
-                          )
-                        ) {
-                          onGrantAdmin?.(subscriber.did);
-                        }
-                      }}
-                    >
-                      <ShieldIcon className="size-4" />
-                      管理者にする
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="text-error"
-                      disabled={banningDid === subscriber.did}
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `@${subscriber.handle} をBANしますか？`,
-                          )
-                        ) {
-                          onBan?.(subscriber.did);
-                        }
-                      }}
-                    >
-                      <BanIcon className="size-4" />
-                      BAN
-                    </button>
-                  </li>
-                </ul>
-              </div>
+              <ConfirmDialog
+                title={`@${subscriber.handle} を管理者にしますか？`}
+                description="管理画面のすべての操作ができるようになります。"
+                confirmLabel="管理者にする"
+                onConfirm={() => onGrantAdmin?.(subscriber.did)}
+              >
+                {(openGrantAdmin) => (
+                  <ConfirmDialog
+                    title={`@${subscriber.handle} をBANしますか？`}
+                    description="登録が解除され、招待コードでも再登録できなくなります。"
+                    confirmLabel="BANする"
+                    danger
+                    onConfirm={() => onBan?.(subscriber.did)}
+                  >
+                    {(openBan) => (
+                      <div className="dropdown dropdown-end">
+                        <button
+                          type="button"
+                          className="btn btn-square btn-ghost btn-sm"
+                          aria-label="操作"
+                        >
+                          <EllipsisIcon className="size-4" />
+                        </button>
+                        <ul
+                          className="
+                            menu dropdown-content z-10 w-44 rounded-box border
+                            border-base-300 bg-base-100 p-2 shadow-sm
+                          "
+                        >
+                          <li>
+                            <button
+                              type="button"
+                              disabled={grantingDid === subscriber.did}
+                              onClick={openGrantAdmin}
+                            >
+                              <ShieldIcon className="size-4" />
+                              管理者にする
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              type="button"
+                              className="text-error"
+                              disabled={banningDid === subscriber.did}
+                              onClick={openBan}
+                            >
+                              <BanIcon className="size-4" />
+                              BAN
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </ConfirmDialog>
+                )}
+              </ConfirmDialog>
             )}
           </li>
         ))}

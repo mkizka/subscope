@@ -6,7 +6,7 @@ import type { IRecordRevRepository } from "../../../application/interfaces/repos
 export class InMemoryRecordRevRepository implements IRecordRevRepository {
   private revs: Map<string, string> = new Map();
 
-  async saveIfNewer({
+  async saveIfNotOlder({
     uri,
     rev,
   }: {
@@ -15,7 +15,7 @@ export class InMemoryRecordRevRepository implements IRecordRevRepository {
     rev: string;
   }): Promise<boolean> {
     const current = this.revs.get(uri.toString());
-    if (current !== undefined && current >= rev) {
+    if (current !== undefined && current > rev) {
       return false;
     }
     this.revs.set(uri.toString(), rev);
