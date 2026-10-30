@@ -18,7 +18,7 @@ export class ResolveDidUseCase {
       ctx: { db: this.db },
       did,
     });
-    if (existingActor?.handle) {
+    if (existingActor?.handle && existingActor.handle !== "handle.invalid") {
       return;
     }
 
