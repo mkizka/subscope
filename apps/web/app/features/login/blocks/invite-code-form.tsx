@@ -35,7 +35,7 @@ export function InviteCodeForm({
           </p>
         )}
       </fieldset>
-      <button type="submit" className="btn self-center btn-primary">
+      <button type="submit" className="btn btn-block btn-primary">
         登録する
       </button>
     </Form>

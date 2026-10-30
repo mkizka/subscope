@@ -70,7 +70,7 @@ export function PostCard({
   return (
     <article
       className="
-        group relative px-4 py-2
+        relative px-4 py-2
         hover:bg-base-200
       "
     >
@@ -81,7 +81,6 @@ export function PostCard({
           className="absolute inset-0"
         />
       )}
-      {toolbar}
       {reasonRepost && (
         <div
           className="
@@ -129,24 +128,32 @@ export function PostCard({
               ))}
             </div>
           )}
-          <div
-            className="
-              mt-1 flex gap-1
-              empty:hidden
-            "
-          >
-            <CountChip Icon={RepeatIcon} count={repostCount} label="リポスト" />
-            <CountChip Icon={HeartIcon} count={likeCount} label="いいね" />
-          </div>
-          {!!replyCount && (
-            <div
-              className="
-                mt-1 flex items-center gap-1 text-sm font-bold text-primary
-              "
-            >
-              <MessageCircleIcon className="size-4" />
-              {replyCount}件の返信
-            </div>
+          {toolbar ?? (
+            <>
+              <div
+                className="
+                  mt-1 flex gap-1
+                  empty:hidden
+                "
+              >
+                <CountChip
+                  Icon={RepeatIcon}
+                  count={repostCount}
+                  label="リポスト"
+                />
+                <CountChip Icon={HeartIcon} count={likeCount} label="いいね" />
+              </div>
+              {!!replyCount && (
+                <div
+                  className="
+                    mt-1 flex items-center gap-1 text-sm font-bold text-primary
+                  "
+                >
+                  <MessageCircleIcon className="size-4" />
+                  {replyCount}件の返信
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -39,7 +39,7 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
           </p>
         )}
       </fieldset>
-      <button type="submit" className="btn self-center btn-primary">
+      <button type="submit" className="btn btn-block btn-primary">
         ログイン
       </button>
     </Form>

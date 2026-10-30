@@ -10,12 +10,14 @@ const meta = {
         did: "did:plc:alice",
         handle: "alice.bsky.social",
         displayName: "Alice",
+        description: "Blueskyを使っています。",
       },
       {
         did: "did:plc:carol",
         handle: "handle.invalid",
       },
     ],
+    hasMore: false,
   },
   parameters: {
     layout: "fullscreen",

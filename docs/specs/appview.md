@@ -233,6 +233,13 @@ BANされたアクターのプロフィールを返す。管理者の認証が�
 - getBannedActors-1: BANされたアクターのprofileViewを返す
 - getBannedActors-2: BANされていないアクターは含めない
 
+## me.subsco.admin.unbanActor
+
+アカウントのBANを解除する。管理者の認証が必要。サブスクライバーには戻さず、本人が改めて登録する。
+
+- unbanActor-1: BANを解除したアカウントは招待コードで再登録できる
+- unbanActor-2: BANされていないアカウントには400とNotBannedを返す
+
 ## me.subsco.admin.createInviteCode
 
 daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
