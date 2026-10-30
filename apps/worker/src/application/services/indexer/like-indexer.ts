@@ -1,7 +1,7 @@
 import type {
+  AfterCommitContext,
   IJobScheduler,
   Record,
-  TransactionContext,
 } from "@repo/common/domain";
 import { Like } from "@repo/common/domain";
 
@@ -18,7 +18,7 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+  async upsert({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = Like.from(record);
     await this.likeRepository.upsert({ ctx, like });
 
@@ -43,8 +43,10 @@ export class LikeIndexer implements ICollectionIndexer {
     }
   }
 
-  async afterAction({ record }: { record: Record }): Promise<void> {
+  afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = Like.from(record);
-    await this.jobScheduler.scheduleAggregatePostStats(like.subjectUri, "like");
+    ctx.afterCommit(() =>
+      this.jobScheduler.scheduleAggregatePostStats(like.subjectUri, "like"),
+    );
   }
 }

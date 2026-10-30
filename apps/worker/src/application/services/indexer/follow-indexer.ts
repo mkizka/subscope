@@ -1,7 +1,7 @@
 import type {
+  AfterCommitContext,
   IJobScheduler,
   Record,
-  TransactionContext,
 } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
@@ -25,7 +25,7 @@ export class FollowIndexer implements ICollectionIndexer {
     record,
     live,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     live: boolean;
   }) {
@@ -42,7 +42,9 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.actorDid,
     );
     if (isFollowerSubscriber) {
-      await this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid);
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
+      );
     }
 
     if (
@@ -70,25 +72,28 @@ export class FollowIndexer implements ICollectionIndexer {
     record,
     action,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     action: "upsert" | "delete";
   }): Promise<void> {
     const follow = Follow.from(record);
-    await this.jobScheduler.scheduleAggregateActorStats(
-      follow.actorDid,
-      "follows",
+    ctx.afterCommit(() =>
+      this.jobScheduler.scheduleAggregateActorStats(follow.actorDid, "follows"),
     );
-    await this.jobScheduler.scheduleAggregateActorStats(
-      follow.subjectDid,
-      "followers",
+    ctx.afterCommit(() =>
+      this.jobScheduler.scheduleAggregateActorStats(
+        follow.subjectDid,
+        "followers",
+      ),
     );
 
     if (
       action === "delete" &&
       (await this.subscriptionRepository.isSubscriber(ctx, follow.actorDid))
     ) {
-      await this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid);
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
+      );
     }
   }
 }

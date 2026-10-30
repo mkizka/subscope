@@ -1,4 +1,5 @@
 import type {
+  AfterCommitContext,
   IJobScheduler,
   Record,
   TransactionContext,
@@ -36,7 +37,7 @@ export class PostIndexer implements ICollectionIndexer {
     live,
     depth,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     live: boolean;
     depth: number;
@@ -53,7 +54,9 @@ export class PostIndexer implements ICollectionIndexer {
     if (embedUri) {
       const embedExists = await this.postRepository.exists(ctx, embedUri);
       if (!embedExists) {
-        await this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth });
+        ctx.afterCommit(() =>
+          this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth }),
+        );
       }
     }
   }
@@ -119,30 +122,35 @@ export class PostIndexer implements ICollectionIndexer {
     });
   }
 
-  async afterAction({
+  afterAction({
+    ctx,
     record,
     action,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     action: "upsert" | "delete";
   }): Promise<void> {
     const post = Post.from(record);
 
-    await this.jobScheduler.scheduleAggregateActorStats(post.actorDid, "posts");
+    ctx.afterCommit(() =>
+      this.jobScheduler.scheduleAggregateActorStats(post.actorDid, "posts"),
+    );
 
     // 削除時にafterActionが呼ばれる場合は投稿が存在しないのでupsertに限定
     if (action === "upsert") {
       // 投稿をインデックスする時点でいいね/リポストが存在する可能性があるので集計する
       // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
       //    → このとき、リポスト数が0なので1にする必要がある
-      await this.jobScheduler.scheduleAggregatePostStats(post.uri, "all");
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleAggregatePostStats(post.uri, "all"),
+      );
     }
 
-    if (post.replyParent) {
-      await this.jobScheduler.scheduleAggregatePostStats(
-        post.replyParent.uri,
-        "reply",
+    const replyParent = post.replyParent;
+    if (replyParent) {
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleAggregatePostStats(replyParent.uri, "reply"),
       );
     }
 
@@ -150,10 +158,12 @@ export class PostIndexer implements ICollectionIndexer {
       post.embed instanceof PostEmbedRecord ||
       post.embed instanceof PostEmbedRecordWithMedia
     ) {
-      await this.jobScheduler.scheduleAggregatePostStats(
-        post.embed.uri,
-        "quote",
+      const embedUri = post.embed.uri;
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleAggregatePostStats(embedUri, "quote"),
       );
     }
+
+    return Promise.resolve();
   }
 }

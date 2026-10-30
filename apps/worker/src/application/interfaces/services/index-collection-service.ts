@@ -1,4 +1,4 @@
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type { AfterCommitContext, Record } from "@repo/common/domain";
 
 export interface ICollectionIndexer {
   upsert: ({
@@ -7,7 +7,7 @@ export interface ICollectionIndexer {
     live,
     depth,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     live: boolean;
     depth: number;
@@ -17,8 +17,8 @@ export interface ICollectionIndexer {
     record,
     action,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     record: Record;
     action: "upsert" | "delete";
-  }) => Promise<void>;
+  }) => void | Promise<void>;
 }

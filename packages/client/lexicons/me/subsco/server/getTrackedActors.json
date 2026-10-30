@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.server.getTrackedActors",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get tracked actors ordered by the number of subscribers following them.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["trackedActors"],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "trackedActors": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#trackedActor"
+              }
+            }
+          }
+        }
+      }
+    },
+    "trackedActor": {
+      "type": "object",
+      "required": ["profile", "subscriberFollowersCount"],
+      "properties": {
+        "profile": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "subscriberFollowersCount": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

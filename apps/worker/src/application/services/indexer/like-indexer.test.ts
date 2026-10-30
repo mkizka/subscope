@@ -7,7 +7,11 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../../shared/test-utils.js";
 
 describe("LikeIndexer", () => {
   let likeIndexer: TestServices["likeIndexer"];
@@ -28,7 +32,7 @@ describe("LikeIndexer", () => {
 
   describe("upsert", () => {
     test("いいねレコードを正しく保存する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
@@ -99,7 +103,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.upsert({ ctx: { db }, record });
+      await likeIndexer.upsert({ ctx: { db, afterCommit }, record });
 
       // assert
       expect(notificationRepo.findAll()).toMatchObject(expected);
@@ -108,7 +112,7 @@ describe("LikeIndexer", () => {
 
   describe("afterAction", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
@@ -129,7 +133,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.afterAction({ record });
+      likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();
@@ -141,7 +145,7 @@ describe("LikeIndexer", () => {
       );
     });
 
-    test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
+    test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", () => {
       // arrange
       const liker = actorFactory();
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey789";
@@ -158,7 +162,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.afterAction({ record });
+      likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();
@@ -170,7 +174,7 @@ describe("LikeIndexer", () => {
       );
     });
 
-    test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", async () => {
+    test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", () => {
       // arrange
       const liker = actorFactory();
       const nonExistentPostUri =
@@ -188,7 +192,7 @@ describe("LikeIndexer", () => {
       });
 
       // act
-      await likeIndexer.afterAction({ record });
+      likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
       const jobs = jobScheduler.getAggregatePostStatsJobs();

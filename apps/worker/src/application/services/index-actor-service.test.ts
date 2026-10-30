@@ -4,7 +4,11 @@ import { actorFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { testRegistry, type TestServices } from "../../shared/test-utils.js";
+import {
+  afterCommit,
+  testRegistry,
+  type TestServices,
+} from "../../shared/test-utils.js";
 
 describe("IndexActorService", () => {
   let indexActorService: TestServices["indexActorService"];
@@ -21,7 +25,7 @@ describe("IndexActorService", () => {
 
   describe("upsert", () => {
     test("handle指定あり、既存actorなしの場合は、actorを作成する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const testDid = asDid("did:plc:new-with-handle");
       const testHandle = asHandle("new-with-handle.bsky.social");
@@ -52,7 +56,7 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleなしの場合は、handleを更新する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const existingDid = asDid("did:plc:no-handle-to-handle");
       const newHandle = asHandle("new-handle.bsky.social");
@@ -78,7 +82,7 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで同じ値の場合は、何もしない", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const existingDid = asDid("did:plc:same-handle");
       const existingHandle = asHandle("same-handle.bsky.social");
@@ -104,7 +108,7 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定あり、既存actorあり、既存actorのhandleありで異なる値の場合は、handleを更新する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const existingDid = asDid("did:plc:changed-handle");
       const oldHandle = asHandle("old-handle.bsky.social");
@@ -131,7 +135,7 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorなしの場合は、actorを作成してresolvDidジョブを追加する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const newDid = asDid("did:plc:new-no-handle");
 
@@ -157,7 +161,7 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleなしの場合は、resolvDidジョブを追加する", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const existingDidNoHandle = asDid("did:plc:existing-no-handle");
       const existingActor = actorFactory({
@@ -190,7 +194,7 @@ describe("IndexActorService", () => {
     });
 
     test("handle指定なし、既存actorあり、既存actorのhandleありの場合は、何もしない", async () => {
-      const ctx = { db };
+      const ctx = { db, afterCommit };
       // arrange
       const existingDid = asDid("did:plc:existing-with-handle");
       const existingHandle = asHandle("existing-with-handle.bsky.social");

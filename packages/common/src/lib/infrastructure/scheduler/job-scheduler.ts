@@ -5,7 +5,6 @@ import type { IJobQueue, JobData } from "../../domain/interfaces/job-queue.js";
 import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
-const SYNC_TAP_REPO_DELAY_MS = 10 * 1000;
 
 export class JobScheduler implements IJobScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
@@ -47,7 +46,6 @@ export class JobScheduler implements IJobScheduler {
       queueName: "syncTapRepo",
       jobName: did,
       data: did,
-      options: { delay: SYNC_TAP_REPO_DELAY_MS },
     });
   }
 

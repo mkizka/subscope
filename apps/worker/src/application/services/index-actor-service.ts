@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
   Actor,
+  type AfterCommitContext,
   type IJobScheduler,
   type TransactionContext,
 } from "@repo/common/domain";
@@ -23,7 +24,7 @@ export class IndexActorService {
     handle,
     live,
   }: {
-    ctx: TransactionContext;
+    ctx: AfterCommitContext;
     did: Did;
     handle?: Handle;
     live: boolean;
@@ -38,7 +39,7 @@ export class IndexActorService {
     await this.actorRepository.upsert({ ctx, actor });
 
     if (!actor.handle) {
-      await this.jobScheduler.scheduleResolveDid(did);
+      ctx.afterCommit(() => this.jobScheduler.scheduleResolveDid(did));
     }
 
     const profileExists = await this.profileRepository.exists({
@@ -47,10 +48,12 @@ export class IndexActorService {
     });
     if (!profileExists) {
       const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");
-      await this.jobScheduler.scheduleFetchRecord(profileUri, {
-        live,
-        depth: 0,
-      });
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleFetchRecord(profileUri, {
+          live,
+          depth: 0,
+        }),
+      );
     }
   }
 
