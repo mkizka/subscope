@@ -1,7 +1,13 @@
 import { createRegistry } from "@gyaku/di";
 
+import { banSubscriberUseCaseFactory } from "./application/admin/ban-subscriber-use-case";
+import { getBannedActorsUseCaseFactory } from "./application/admin/get-banned-actors-use-case";
+import { getSubscribersUseCaseFactory } from "./application/admin/get-subscribers-use-case";
+import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
+import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
+import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
 import { oauthClientFactory } from "./infrastructure/auth/oauth-client";
 import {
@@ -34,4 +40,22 @@ export const di = await createRegistry()
     getTimelineUseCaseFactory,
   )
   .service("createPostUseCase", ["postRepository"], createPostUseCaseFactory)
+  .service("adminRepository", ["oauthClient"], adminRepositoryFactory)
+  .service(
+    "getSubscribersUseCase",
+    ["adminRepository"],
+    getSubscribersUseCaseFactory,
+  )
+  .service(
+    "banSubscriberUseCase",
+    ["adminRepository"],
+    banSubscriberUseCaseFactory,
+  )
+  .service("grantAdminUseCase", ["adminRepository"], grantAdminUseCaseFactory)
+  .service(
+    "getBannedActorsUseCase",
+    ["adminRepository"],
+    getBannedActorsUseCaseFactory,
+  )
+  .service("unbanActorUseCase", ["adminRepository"], unbanActorUseCaseFactory)
   .resolve();
