@@ -12,6 +12,12 @@ export default defineConfig(
     },
   },
   importAlias.configs.recommended,
+  {
+    files: ["**/shared/registry.ts"],
+    rules: {
+      "@dword-design/import-alias/prefer-alias": "off",
+    },
+  },
   storybook.configs["flat/recommended"],
   {
     extends: [eslintPluginBetterTailwindcss.configs.recommended],

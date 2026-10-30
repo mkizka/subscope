@@ -2,7 +2,7 @@ import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ReactRouterAdapter } from "bull-board-react-router";
 
-import { jobQueue } from "@/app/lib/job-queue.server";
+import { services } from "@/app/server";
 
 import type { Route } from "./+types/admin.bull-board.$";
 
@@ -14,7 +14,9 @@ const getServerAdapter = () => {
     serverAdapter = new ReactRouterAdapter();
     serverAdapter.setBasePath("/admin/bull-board");
     createBullBoard({
-      queues: jobQueue.getQueues().map((queue) => new BullMQAdapter(queue)),
+      queues: services.jobQueue
+        .getQueues()
+        .map((queue) => new BullMQAdapter(queue)),
       serverAdapter,
     });
   }

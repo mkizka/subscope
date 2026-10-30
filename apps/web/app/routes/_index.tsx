@@ -18,9 +18,9 @@ import {
   type ReplyRule,
 } from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
-import { loggerManager } from "@/app/lib/logger.server";
-import { getAgent } from "@/app/lib/oauth/session.server";
+import { getAgent } from "@/app/middlewares/auth";
 import { TimelinePage } from "@/app/pages/client/timeline-page";
+import { services } from "@/app/server";
 
 import type { Route } from "./+types/_index";
 
@@ -44,7 +44,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   try {
     subscriptionResponse = await agent.call(getSubscriptionStatus);
   } catch (e) {
-    loggerManager
+    services.loggerManager
       .createLogger("_index")
       .error(e, "Failed to get subscription status");
     throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
@@ -154,7 +154,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
     ]);
     return data({ uri });
   } catch (e) {
-    loggerManager.createLogger("_index").error(e, "Failed to create post");
+    services.loggerManager
+      .createLogger("_index")
+      .error(e, "Failed to create post");
     return data({ error: "投稿に失敗しました" }, { status: 500 });
   }
 };

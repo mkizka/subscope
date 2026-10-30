@@ -4,14 +4,15 @@ import type {
   NodeSavedState,
   NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
+import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import { db } from "./db.server.js";
+export class OAuthStateStore implements NodeSavedStateStore {
+  constructor(private readonly db: DatabaseClient) {}
 
-class StateStore implements NodeSavedStateStore {
   async get(key: string): Promise<NodeSavedState | undefined> {
-    const [result] = await db
+    const [result] = await this.db
       .select()
       .from(schema.authState)
       .where(eq(schema.authState.key, key))
@@ -23,7 +24,7 @@ class StateStore implements NodeSavedStateStore {
 
   async set(key: string, val: NodeSavedState) {
     const state = JSON.stringify(val);
-    await db
+    await this.db
       .insert(schema.authState)
       .values({ key, state })
       .onConflictDoUpdate({
@@ -33,13 +34,15 @@ class StateStore implements NodeSavedStateStore {
   }
 
   async del(key: string) {
-    await db.delete(schema.authState).where(eq(schema.authState.key, key));
+    await this.db.delete(schema.authState).where(eq(schema.authState.key, key));
   }
 }
 
-class SessionStore implements NodeSavedSessionStore {
+export class OAuthSessionStore implements NodeSavedSessionStore {
+  constructor(private readonly db: DatabaseClient) {}
+
   async get(key: string): Promise<NodeSavedSession | undefined> {
-    const [result] = await db
+    const [result] = await this.db
       .select()
       .from(schema.authSession)
       .where(eq(schema.authSession.key, key))
@@ -51,7 +54,7 @@ class SessionStore implements NodeSavedSessionStore {
 
   async set(key: string, val: NodeSavedSession) {
     const session = JSON.stringify(val);
-    await db
+    await this.db
       .insert(schema.authSession)
       .values({ key, session })
       .onConflictDoUpdate({
@@ -61,9 +64,8 @@ class SessionStore implements NodeSavedSessionStore {
   }
 
   async del(key: string) {
-    await db.delete(schema.authSession).where(eq(schema.authSession.key, key));
+    await this.db
+      .delete(schema.authSession)
+      .where(eq(schema.authSession.key, key));
   }
 }
-
-export const stateStore = new StateStore();
-export const sessionStore = new SessionStore();

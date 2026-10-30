@@ -2,7 +2,12 @@ import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 import { data, redirect, type RouterContextProvider } from "react-router";
 
 import { agentContext } from "@/app/context/agent";
-import { getAgent } from "@/app/lib/oauth/session.server";
+import { services } from "@/app/server";
+
+export const getAgent = async (request: Request) => {
+  const did = await services.cookieSession.getDid(request);
+  return did ? services.oauthClient.restore(did) : null;
+};
 
 export const loginRequiredMiddleware = async ({
   request,

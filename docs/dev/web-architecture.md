@@ -18,6 +18,12 @@
   - 内部で `@repo/client` を使って PDS に XRPC リクエストを送る
 - 書き込み（投稿、いいね等）も BFF の action から PDS に XRPC で送る
 
+## サーバー側の構成
+
+- loader/action の処理は `apps/web/app/server` 以下にオニオンアーキテクチャで置き、routes は入力の検証・ユースケースの呼び出し・応答だけにする
+- DI は appview と同じく `@gyaku/di` を使い、`app/server/shared/registry.ts` で配線する
+- 層の詳細は `.claude/skills/web-server/SKILL.md` を参照
+
 ## 技術選定
 
 | 項目           | 採用                                                  |

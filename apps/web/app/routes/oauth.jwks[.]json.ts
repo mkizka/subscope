@@ -1,5 +1,5 @@
-import { oauthClient } from "@/app/lib/oauth/client.server";
+import { services } from "@/app/server";
 
 export const loader = () => {
-  return Response.json(oauthClient.jwks);
+  return Response.json(services.oauthClient.jwks);
 };
