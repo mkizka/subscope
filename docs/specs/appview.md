@@ -173,10 +173,11 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## me.subsco.server.getTrackedActors
 
-追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数を返す。認証が必要。limitとcursorでページングする。
+追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数、追跡アクターの総数を返す。認証が必要。limitとcursorでページングする。
 
 - getTrackedActors-1: サブスクライバーとそのフォロイーを返し、それ以外のアクターは含めない
 - getTrackedActors-2: フォローしているサブスクライバーが多い順に並べる
+- getTrackedActors-3: totalにはページングに関係なく追跡アクターの総数を入れる
 
 ## me.subsco.sync.subscribeServer
 
@@ -225,6 +226,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - banSubscriber-1: 管理者はBANせず、400とCannotBanAdminを返す
 - banSubscriber-2: 本人とそのフォロイーのsyncTapRepoジョブを積む
+
+## me.subsco.admin.unbanActor
+
+アカウントのBANを解除する。管理者の認証が必要。サブスクライバーには戻さず、本人が改めて登録する。
+
+- unbanActor-1: BANを解除したアカウントは招待コードで再登録できる
+- unbanActor-2: BANされていないアカウントには400とNotBannedを返す
 
 ## me.subsco.admin.createInviteCode
 

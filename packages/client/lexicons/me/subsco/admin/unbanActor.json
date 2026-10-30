@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.unbanActor",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Allow a banned actor to subscribe again",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "did": {
+              "type": "string",
+              "format": "did"
+            }
+          },
+          "required": ["did"]
+        }
+      },
+      "errors": [
+        {
+          "name": "AdminRequired"
+        },
+        {
+          "name": "NotBanned"
+        }
+      ]
+    }
+  }
+}

@@ -55,6 +55,7 @@ export function NotificationPanelContainer() {
     page.notifications.map((notification) => ({
       uri: notification.uri,
       authorName: notification.author.displayName ?? notification.author.handle,
+      avatarUrl: notification.author.avatar,
       reason: notification.reason,
       text: ["reply", "quote", "mention"].includes(notification.reason)
         ? maybeString(notification.record.text)

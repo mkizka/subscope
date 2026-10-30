@@ -38,6 +38,10 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     throw new Error("Not implemented");
   }
 
+  countTrackedActors(): Promise<number> {
+    throw new Error("Not implemented");
+  }
+
   findFirst(actorDid: Did): Promise<Subscription | null> {
     return Promise.resolve(this.subscriptions.get(actorDid) ?? null);
   }
