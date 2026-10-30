@@ -77,6 +77,7 @@
     "me.subsco.admin.grantAdmin",
     "me.subsco.admin.registerAdmin",
     "me.subsco.admin.verifyAccess",
+    "me.subsco.server.getMembers",
     "me.subsco.server.getSetupStatus",
     "me.subsco.sync.getSubscriptionStatus",
     "me.subsco.sync.subscribeServer",
@@ -338,6 +339,10 @@
     "me.subsco.admin.verifyAccess": {
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
+    },
+    "me.subsco.server.getMembers": {
+      "uri": "file://./lexicons/me/subsco/server/getMembers.json",
+      "cid": "bafyreidzmsoxnzqynnf5svirdtika5dpd2ibzwjamnyhalijl7fpa3l56u"
     },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",

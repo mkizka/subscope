@@ -152,6 +152,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getLists-1: 指定したアクターが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
+## me.subsco.server.getMembers
+
+サーバーのメンバー（サブスクライバー）のプロフィールを返す。サブスクライバーの認証が必要。limitとcursorでページングする。
+
+- getMembers-1: サブスクライバーでないアカウントからのリクエストには403とNotSubscribedを返す
+- getMembers-2: メンバーごとにprofileViewを返す
+
 ## me.subsco.server.getSetupStatus
 
 サーバーの初期設定が済んでいるかを返す。認証は不要。管理者が登録済みなら initialized を true にする。
