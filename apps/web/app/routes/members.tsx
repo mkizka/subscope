@@ -15,12 +15,13 @@ export const loader = async () => {
   // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
   const { members, cursor } = await client.call(getMembers, { limit: 100 });
   return data({
-    members: members.map((profile) => ({
+    members: members.map(({ profile, isAdmin }) => ({
       did: profile.did,
       handle: profile.handle,
       displayName: profile.displayName,
       avatarUrl: profile.avatar,
       description: profile.description,
+      isAdmin,
     })),
     hasMore: cursor !== undefined,
   });
