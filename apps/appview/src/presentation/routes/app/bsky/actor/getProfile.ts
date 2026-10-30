@@ -3,13 +3,16 @@ import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import { isHandle } from "@repo/common/utils";
 
-import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";
+import {
+  AccountTakedownError,
+  type GetProfileUseCase,
+} from "../../../../../application/use-cases/actor/get-profile-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
 
 export class GetProfile {
   constructor(
-    private getProfilesUseCase: GetProfilesUseCase,
+    private getProfileUseCase: GetProfileUseCase,
     private handleMiddleware: HandleMiddleware,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
@@ -29,10 +32,17 @@ export class GetProfile {
           params.actor,
         );
 
-        const [profile] = await this.getProfilesUseCase.execute(
-          [did],
-          viewerDid,
-        );
+        const profile = await this.getProfileUseCase
+          .execute(did, viewerDid)
+          .catch((error: unknown) => {
+            if (error instanceof AccountTakedownError) {
+              throw new LexServerError(400, {
+                error: error.name,
+                message: error.message,
+              });
+            }
+            throw error;
+          });
         if (!profile) {
           throw new LexServerError(400, {
             error: "InvalidRequest",

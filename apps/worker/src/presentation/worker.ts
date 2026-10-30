@@ -13,6 +13,7 @@ import { indexCommitCommandFactory } from "../application/use-cases/commit/index
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { upsertIdentityCommandFactory } from "../application/use-cases/identity/upsert-identity-command.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
+import type { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { createJobLogger } from "../shared/job.js";
 
 const SECONDS = 1000;
@@ -48,6 +49,7 @@ export class SyncWorker {
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
     syncTapRepoUseCase: SyncTapRepoUseCase,
+    indexLabelUseCase: IndexLabelUseCase,
     redisUrl: string,
     commitWorkerConcurrency: number,
   ) {
@@ -130,6 +132,9 @@ export class SyncWorker {
       }),
       createWorker("syncTapRepo", async (job) => {
         await syncTapRepoUseCase.execute(job.data);
+      }),
+      createWorker("label", async (job) => {
+        await indexLabelUseCase.execute(job.data);
       }),
     ];
   }

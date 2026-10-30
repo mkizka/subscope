@@ -20,6 +20,10 @@ function asLexMap(value: unknown): LexMap {
 
 import type { Did } from "@atproto/did";
 
+import {
+  type ILabelRepository,
+  isTakendown,
+} from "../../../application/interfaces/label-repository.js";
 import type { ILikeRepository } from "../../../application/interfaces/like-repository.js";
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
 import type { IPostStatsRepository } from "../../../application/interfaces/post-stats-repository.js";
@@ -39,7 +43,19 @@ export class PostViewService {
     private readonly postEmbedViewBuilder: PostEmbedViewBuilder,
     private readonly repostRepository: IRepostRepository,
     private readonly likeRepository: ILikeRepository,
+    private readonly labelRepository: ILabelRepository,
   ) {}
+
+  private async findPosts(uris: AtUri[]) {
+    const [posts, labels] = await Promise.all([
+      this.postRepository.findByUris(uris),
+      this.labelRepository.findBySubjects(uris.map((uri) => uri.toString())),
+    ]);
+    const labelMap = Map.groupBy(labels, (label) => label.uri);
+    return posts.filter(
+      (post) => !isTakendown(labelMap.get(post.uri.toString())),
+    );
+  }
 
   private getEmbedRecordUris(posts: Post[]): AtUri[] {
     const embedRecordUris = new Set<string>();
@@ -84,7 +100,7 @@ export class PostViewService {
       return viewRecordMap;
     }
 
-    const posts = await this.postRepository.findByUris(postUris);
+    const posts = await this.findPosts(postUris);
 
     const [recordMap, profileMap, postStats] = await Promise.all([
       this.recordRepository
@@ -150,7 +166,7 @@ export class PostViewService {
     uris: AtUri[],
     viewerDid?: Did,
   ): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
-    const posts = await this.postRepository.findByUris(uris);
+    const posts = await this.findPosts(uris);
     const postMap = toMapByUri(posts);
 
     const postUris = posts.map((post) => post.uri.toString());

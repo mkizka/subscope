@@ -1,5 +1,5 @@
 import getSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { actorFactory, labelFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -48,6 +48,29 @@ describe("me.subsco.admin.getSubscribers", () => {
     // assert
     expect(res.subscribers).toMatchObject([
       { profile: { did: subscriber.did }, isAdmin: false },
+    ]);
+  });
+
+  test("getSubscribers-4: テイクダウンされたサブスクライバーも含める", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const admin = await actorFactory(ctx.db)
+      .props({ isAdmin: () => true })
+      .create();
+    const subscriber = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    await labelFactory(ctx.db)
+      .vars({ actor: () => subscriber })
+      .create();
+    loginAs(admin.did);
+
+    // act
+    const res = await client.call(getSubscribers);
+
+    // assert
+    expect(res.subscribers).toMatchObject([
+      { profile: { did: subscriber.did } },
     ]);
   });
 });

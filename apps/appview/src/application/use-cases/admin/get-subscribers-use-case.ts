@@ -28,7 +28,9 @@ export class GetSubscribersUseCase {
 
     const dids = paginationResult.items.map((sub) => asDid(sub.actorDid));
     const [profiles, actors] = await Promise.all([
-      this.profileViewService.findProfileView(dids),
+      this.profileViewService.findProfileView(dids, null, {
+        includeTakedowns: true,
+      }),
       Promise.all(dids.map((did) => this.actorRepository.findByDid(did))),
     ]);
     const adminDids = new Set(
