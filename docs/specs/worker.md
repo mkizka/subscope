@@ -43,6 +43,15 @@ null文字を含む文字列はPostgreSQLに保存できないため除外する
 
 ラベルは受け取った時点で保存済みのアクターの分だけを保存するため、あとから追跡を始めたアカウントに以前から付いていたラベルは label-4 で取り寄せる。モデレーションサービスは環境変数 `MODERATION_URL` で指定し、デフォルトはBluesky公式の `https://mod.bsky.app`。
 
+## アカウント状態の保存
+
+Tapのidentityイベントが持つアカウントの状態（active、deactivated、deleted、suspended、takendown）をアクターに保存する。
+
+- account-1: アカウントの状態をアクターに保存する
+- account-2: 状態が deleted のアカウントは、アクターを削除する
+
+deleted は取り消せないため、アクターと一緒にそのレコードやサブスクリプションも削除する。それ以外の状態は元に戻りうるため、データを残してappviewで隠す。
+
 ## ハンドルの解決
 
 ハンドルを持たないか handle.invalid のアクターのDIDドキュメントを`resolveDid`ジョブで解決し、ハンドルを保存する。

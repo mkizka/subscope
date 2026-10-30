@@ -12,6 +12,12 @@ export class UpsertIdentityUseCase {
   ) {}
 
   async execute(command: UpsertIdentityCommand) {
+    if (command.status === "deleted") {
+      await this.transactionManager.transaction((ctx) =>
+        this.indexActorService.delete({ ctx, did: command.did }),
+      );
+      return;
+    }
     const handle = command.handle;
     if (!handle) {
       return;
@@ -21,6 +27,7 @@ export class UpsertIdentityUseCase {
         ctx,
         did: command.did,
         handle,
+        status: command.status,
         live: true,
       }),
     );

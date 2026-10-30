@@ -2,6 +2,7 @@ import type { Did } from "@atproto/did";
 
 import type { SupportedCollection } from "../../utils/collection.js";
 import type { Handle } from "../../utils/handle.js";
+import type { ActorStatus } from "../actor/actor.js";
 
 type CreateOrUpdateCommitEventDto<
   RecordType extends string = SupportedCollection,
@@ -36,6 +37,6 @@ export interface IdentityEventDto {
   identity: {
     did: Did;
     handle?: Handle;
-    status: "active" | "deactivated" | "deleted" | "suspended" | "takendown";
+    status: ActorStatus;
   };
 }
