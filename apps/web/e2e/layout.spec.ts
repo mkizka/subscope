@@ -36,4 +36,17 @@ test.describe("レイアウト", () => {
 
     await expect(page).toHaveURL("/login");
   });
+
+  test("layout-3: 左カラムのアカウント欄に、自分のハンドルを表示する", async ({
+    page,
+  }) => {
+    await login(page);
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page.getByRole("navigation").getByText("@alice.test"),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
 });
