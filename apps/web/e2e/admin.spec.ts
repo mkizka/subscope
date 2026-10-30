@@ -156,13 +156,16 @@ test.describe("登録ユーザー", () => {
     const graceDid = await banSubscriber(page, "grace.test");
 
     await page.goto("/admin/subscribers");
-    await page.getByRole("tab", { name: "BAN済み" }).click();
 
     const row = page
       .getByRole("main")
       .getByRole("listitem")
       .filter({ has: page.getByTitle(graceDid) });
-    await expect(row).toContainText("@grace.test");
+    await expect(async () => {
+      await page.reload();
+      await page.getByRole("tab", { name: "BAN済み" }).click();
+      await expect(row).toContainText("@grace.test", { timeout: 1000 });
+    }).toPass();
   });
 
   test("subscribers-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
