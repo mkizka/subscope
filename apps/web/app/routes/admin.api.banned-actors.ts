@@ -1,11 +1,10 @@
 import { XrpcResponseError } from "@atproto/lex";
 import { type DidString, isValidDid } from "@atproto/syntax";
-import getBannedActors from "@repo/client/lex/me/subsco/admin/getBannedActors";
-import unbanActor from "@repo/client/lex/me/subsco/admin/unbanActor";
 import { data } from "react-router";
 import { z } from "zodV4";
 
-import { agentContext } from "@/app/context/agent";
+import { didContext } from "@/app/context/did";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/admin.api.banned-actors";
 
@@ -20,22 +19,22 @@ const handleError = (e: unknown) => {
 };
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const agent = context.get(agentContext);
+  const did = context.get(didContext);
   try {
     const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
-    return data(await agent.call(getBannedActors, { limit: 20, cursor }));
+    return data(await di.getBannedActorsUseCase(did, cursor));
   } catch (e) {
     throw handleError(e);
   }
 };
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const agent = context.get(agentContext);
+  const did = context.get(didContext);
   try {
-    const { did } = z
+    const { did: target } = z
       .object({ did: z.custom<DidString>(isValidDid) })
       .parse(await request.json());
-    await agent.call(unbanActor, { did });
+    await di.unbanActorUseCase(did, target);
     return data({ success: true });
   } catch (e) {
     throw handleError(e);
