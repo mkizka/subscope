@@ -3,6 +3,7 @@ import { type ReactNode, useState } from "react";
 
 import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
+import { formatDate } from "@/app/lib/format-date";
 
 export type InviteCode = {
   code: string;
@@ -11,14 +12,6 @@ export type InviteCode = {
   usedAt?: string;
   usedBy?: { did: string; handle?: string };
 };
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-}
 
 type RowsProps = {
   codes: InviteCode[];

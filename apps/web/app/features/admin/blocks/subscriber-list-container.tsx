@@ -50,18 +50,22 @@ export function SubscriberListContainer() {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage.cursor,
-      select: (data) =>
-        data.pages.flatMap((page) =>
-          page.subscribers.map(({ profile, isAdmin }) => ({
+      select: (data) => ({
+        total: data.pages[0]?.total,
+        subscribers: data.pages.flatMap((page) =>
+          page.subscribers.map(({ profile, isAdmin, subscribedAt }) => ({
             ...profile,
             isAdmin,
+            subscribedAt,
           })),
         ),
+      }),
     });
 
   return (
     <SubscriberList
-      subscribers={data ?? []}
+      subscribers={data?.subscribers ?? []}
+      total={data?.total}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={fetchNextPage}

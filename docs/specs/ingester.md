@@ -10,7 +10,7 @@ Tapの `/channel` にWebSocketで接続し、recordイベントをcommitキュ�
 - tap-2: deleteイベントは、revを含め、レコードとCIDを含めずにcommitキューに積む
 - tap-3: サポートしないコレクションのイベントは積まない
 - tap-4: バックフィル(liveがfalse)のイベントは、ライブのイベントより低い優先度で積む
-- tap-5: identityイベントはidentityキューに積む
+- tap-5: identityイベントは、ハンドルとアカウントの状態を含めてidentityキューに積む
 - tap-6: キューに積めなかったイベントはTapにackしない
 
 ackしなかったイベントはTapが再送する。
