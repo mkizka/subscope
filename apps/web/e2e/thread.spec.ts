@@ -82,4 +82,37 @@ test.describe("スレッド", () => {
     await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
     await expect(page).toHaveURL("/");
   });
+
+  test("thread-5: 選んだ投稿は本文を大きくし、投稿日時と返信・リポスト・いいねの件数を表示する", async ({
+    page,
+  }) => {
+    const target = await post("thread-5: 投稿");
+    await post("thread-5: 返信", target);
+    await createRecord("alice.test", "app.bsky.feed.like", {
+      subject: target,
+      createdAt: new Date().toISOString(),
+    });
+
+    await openThread(page, target.uri, "thread-5: 返信");
+
+    const focused = page
+      .getByRole("region", { name: "スレッド" })
+      .getByRole("article", { name: "選んだ投稿" });
+    await expect(focused.getByText("thread-5: 投稿")).toHaveCSS(
+      "font-size",
+      "18px",
+    );
+    await expect(focused.locator("time")).toHaveText(
+      /\d{4}\/\d{2}\/\d{2} \d{1,2}:\d{2}/,
+    );
+    await expect(async () => {
+      await page.reload();
+      await expect(focused.getByText("1件の返信")).toBeVisible({
+        timeout: 1000,
+      });
+      await expect(focused.getByText("1件のいいね")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
 });

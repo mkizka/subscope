@@ -1,6 +1,7 @@
-import { Trash2Icon } from "lucide-react";
-import type { ReactNode } from "react";
+import { CheckIcon, CopyIcon, Trash2Icon } from "lucide-react";
+import { type ReactNode, useState } from "react";
 
+import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 
 export type InviteCode = {
@@ -39,6 +40,29 @@ function isExpired(code: InviteCode) {
   return new Date(code.expiresAt) < new Date();
 }
 
+function CopyButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="btn btn-square btn-ghost btn-xs"
+      aria-label="コピー"
+      onClick={() =>
+        void navigator.clipboard.writeText(code).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+      }
+    >
+      {copied ? (
+        <CheckIcon className="size-3.5" />
+      ) : (
+        <CopyIcon className="size-3.5" />
+      )}
+    </button>
+  );
+}
+
 export function InviteCodeItems({
   codes,
   onDeleteCode,
@@ -47,7 +71,10 @@ export function InviteCodeItems({
   return codes.map((code) => (
     <li key={code.code} className="list-row items-center">
       <div className="min-w-0">
-        <div className="font-mono">{code.code}</div>
+        <div className="flex items-center gap-1">
+          <span className="font-mono">{code.code}</span>
+          {!code.usedAt && !isExpired(code) && <CopyButton code={code.code} />}
+        </div>
         <div className="text-sm text-base-content/60">
           {code.usedBy && `${code.usedBy.handle ?? code.usedBy.did} が使用・`}
           {formatDate(code.expiresAt)} まで有効・{formatDate(code.createdAt)}{" "}
@@ -56,26 +83,31 @@ export function InviteCodeItems({
       </div>
       <StatusBadge usedAt={code.usedAt} expiresAt={code.expiresAt} />
       {isDeletable(code) ? (
-        <button
-          type="button"
-          className="btn btn-square btn-ghost btn-sm"
-          aria-label="削除"
-          onClick={() => {
-            if (
-              isExpired(code) ||
-              window.confirm(`${code.code} を削除しますか？`)
-            ) {
-              onDeleteCode(code.code);
-            }
-          }}
-          disabled={deletingCode === code.code}
+        <ConfirmDialog
+          title={`${code.code} を削除しますか？`}
+          description="このコードでは登録できなくなります。"
+          confirmLabel="削除する"
+          danger
+          onConfirm={() => onDeleteCode(code.code)}
         >
-          {deletingCode === code.code ? (
-            <span className="loading loading-sm loading-spinner" />
-          ) : (
-            <Trash2Icon className="size-4 text-error" />
+          {(open) => (
+            <button
+              type="button"
+              className="btn btn-square btn-ghost btn-sm"
+              aria-label="削除"
+              onClick={() =>
+                isExpired(code) ? onDeleteCode(code.code) : open()
+              }
+              disabled={deletingCode === code.code}
+            >
+              {deletingCode === code.code ? (
+                <span className="loading loading-sm loading-spinner" />
+              ) : (
+                <Trash2Icon className="size-4 text-error" />
+              )}
+            </button>
           )}
-        </button>
+        </ConfirmDialog>
       ) : (
         <span className="size-8" />
       )}

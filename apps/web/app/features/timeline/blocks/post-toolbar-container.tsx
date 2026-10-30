@@ -10,29 +10,45 @@ type Props = TimelinePost & {
   onCompose: (target: ComposeTarget) => void;
 };
 
-function useReaction(type: string, post: Props, viewerUri?: string) {
+function useReaction(type: string, post: Props, viewerUri?: string, count = 0) {
   const fetcher = useFetcher<typeof action>();
   const recordUri = fetcher.data ? fetcher.data.uri : viewerUri;
   const active = fetcher.formData
     ? !fetcher.formData.get("recordUri")
     : !!recordUri;
+  const busy = fetcher.state !== "idle";
   const toggle = () => {
-    if (fetcher.state === "submitting") return;
+    if (busy) return;
     void fetcher.submit(
       { type, uri: post.uri, cid: post.cid, recordUri: recordUri ?? "" },
       { method: "post", action: "/api/reactions" },
     );
   };
-  return { active, toggle };
+  return {
+    active,
+    busy,
+    toggle,
+    count: count - Number(!!viewerUri) + Number(active),
+  };
 }
 
 export function PostToolbarContainer(props: Props) {
-  const like = useReaction("like", props, props.viewerLike);
-  const repost = useReaction("repost", props, props.viewerRepost);
+  const like = useReaction("like", props, props.viewerLike, props.likeCount);
+  const repost = useReaction(
+    "repost",
+    props,
+    props.viewerRepost,
+    props.repostCount,
+  );
   return (
     <PostToolbar
+      replyCount={props.replyCount}
+      repostCount={repost.count}
+      likeCount={like.count}
       liked={like.active}
       reposted={repost.active}
+      likeBusy={like.busy}
+      repostBusy={repost.busy}
       onLike={like.toggle}
       onRepost={repost.toggle}
       onReply={() =>

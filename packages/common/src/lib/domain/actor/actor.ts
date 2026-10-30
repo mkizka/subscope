@@ -63,4 +63,8 @@ export class Actor {
   ban(): void {
     this._isBanned = true;
   }
+
+  unban(): void {
+    this._isBanned = false;
+  }
 }
