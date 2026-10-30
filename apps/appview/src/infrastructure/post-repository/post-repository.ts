@@ -11,7 +11,6 @@ import { schema } from "@repo/db";
 import { and, desc, eq, ilike, inArray, isNull, lt } from "drizzle-orm";
 
 import type { IPostRepository } from "../../application/interfaces/post-repository.js";
-import { notTakenDown } from "../takedown.js";
 
 const getStrongRef = (uri: string | null, cid: string | null) => {
   if (uri === null || cid === null) {
@@ -138,12 +137,9 @@ export class PostRepository implements IPostRepository {
 
   async findByUris(uris: AtUri[]) {
     const postsWithEmbeds = await this.db.query.posts.findMany({
-      where: and(
-        inArray(
-          schema.posts.uri,
-          uris.map((uri) => uri.toString()),
-        ),
-        notTakenDown(this.db, schema.posts.uri, ["!takedown"]),
+      where: inArray(
+        schema.posts.uri,
+        uris.map((uri) => uri.toString()),
       ),
       with: {
         embedImages: {

@@ -1,4 +1,5 @@
-import { asAtUriString } from "@atproto/syntax";
+import { asAtIdentifierString, asAtUriString } from "@atproto/syntax";
+import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
   actorFactory,
@@ -14,17 +15,17 @@ import { setupApiTest } from "../../shared/api-test-utils.js";
 describe("テイクダウン", () => {
   const { ctx } = testSetup;
 
+  const createActor = () =>
+    actorFactory(ctx.db)
+      .use((t) => t.withProfile({}))
+      .create();
+
   const createPost = () =>
     postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({
-              actor: () =>
-                actorFactory(ctx.db)
-                  .use((t) => t.withProfile({}))
-                  .create(),
-            })
+            .vars({ actor: createActor })
             .create(),
       })
       .create();
@@ -37,41 +38,57 @@ describe("テイクダウン", () => {
     return res.posts.map((post) => post.uri);
   };
 
+  const fetchProfileDids = async (dids: string[]) => {
+    const { client } = await setupApiTest();
+    const res = await client.call(getProfiles, {
+      actors: dids.map((did) => asAtIdentifierString(did)),
+    });
+    return res.profiles.map((profile) => profile.did);
+  };
+
   test.each(["!takedown", "!suspend"])(
-    "takedown-1: `!takedown` か `!suspend` のラベルが付いたアカウントと、その投稿は応答に含めない(%s)",
+    "takedown-1: `!takedown` か `!suspend` のラベルが付いたアカウントと投稿は応答に含めない(%s)",
     async (val) => {
       // arrange
+      const actor = await createActor();
+      const visibleActor = await createActor();
       const post = await createPost();
-      const visible = await createPost();
+      const visiblePost = await createPost();
+      await labelFactory(ctx.db)
+        .vars({ actor: () => actor })
+        .props({ val: () => val })
+        .create();
       await labelFactory(ctx.db)
         .props({
-          uri: () => post.actorDid,
+          uri: () => post.uri,
           actorDid: () => post.actorDid,
           val: () => val,
         })
         .create();
 
       // act
-      const uris = await fetchPostUris([post.uri, visible.uri]);
+      const dids = await fetchProfileDids([actor.did, visibleActor.did]);
+      const uris = await fetchPostUris([post.uri, visiblePost.uri]);
 
       // assert
-      expect(uris).toEqual([visible.uri]);
+      expect(dids).toEqual([visibleActor.did]);
+      expect(uris).toEqual([visiblePost.uri]);
     },
   );
 
-  test("takedown-2: `!takedown` のラベルが付いた投稿は応答に含めない", async () => {
+  test("takedown-2: テイクダウンされたアカウントの投稿は応答に含めない", async () => {
     // arrange
     const post = await createPost();
-    const visible = await createPost();
+    const visiblePost = await createPost();
     await labelFactory(ctx.db)
-      .props({ uri: () => post.uri, actorDid: () => post.actorDid })
+      .props({ uri: () => post.actorDid, actorDid: () => post.actorDid })
       .create();
 
     // act
-    const uris = await fetchPostUris([post.uri, visible.uri]);
+    const uris = await fetchPostUris([post.uri, visiblePost.uri]);
 
     // assert
-    expect(uris).toEqual([visible.uri]);
+    expect(uris).toEqual([visiblePost.uri]);
   });
 
   test("takedown-3: 期限が切れたラベルは無視する", async () => {

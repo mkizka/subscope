@@ -26,6 +26,7 @@ import type { IFollowRepository } from "../application/interfaces/follow-reposit
 import type { IGeneratorRepository } from "../application/interfaces/generator-repository.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
+import type { ILabelRepository } from "../application/interfaces/label-repository.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 import type { IListRepository } from "../application/interfaces/list-repository.js";
 import type { INotificationRepository } from "../application/interfaces/notification-repository.js";
@@ -56,6 +57,7 @@ import { LikeService } from "../application/service/graph/like-service.js";
 import { ListViewService } from "../application/service/graph/list-view-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
+import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
 import { GetProfilesUseCase } from "../application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "../application/use-cases/actor/search-actors-typeahead-use-case.js";
 import { SearchActorsUseCase } from "../application/use-cases/actor/search-actors-use-case.js";
@@ -98,6 +100,7 @@ import { FollowRepository } from "../infrastructure/follow-repository/follow-rep
 import { GeneratorRepository } from "../infrastructure/generator-repository/generator-repository.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
+import { LabelRepository } from "../infrastructure/label-repository/label-repository.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
 import { ListRepository } from "../infrastructure/list-repository/list-repository.js";
 import { NotificationRepository } from "../infrastructure/notification-repository/notification-repository.js";
@@ -176,6 +179,7 @@ export const createAppRegistry = (env: Env) =>
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
     .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
+    .service("labelRepository", ["db"], asClassArgs<ILabelRepository>()(LabelRepository))
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
     .service("actorStatsRepository", ["db"], asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
@@ -199,13 +203,13 @@ export const createAppRegistry = (env: Env) =>
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileViewBuilder", ["assetUrlBuilder"], asClassArgs(ProfileViewBuilder))
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
-    .service("profileViewService", ["profileRepository", "actorStatsRepository", "followRepository", "profileViewBuilder"], asClassArgs(ProfileViewService))
+    .service("profileViewService", ["profileRepository", "actorStatsRepository", "followRepository", "profileViewBuilder", "labelRepository"], asClassArgs(ProfileViewService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("generatorViewService", ["generatorRepository", "profileViewService", "assetUrlBuilder"], asClassArgs(GeneratorViewService))
     .service("listViewService", ["profileViewService", "assetUrlBuilder"], asClassArgs(ListViewService))
     .service("postEmbedViewBuilder", ["assetUrlBuilder"], asClassArgs(PostEmbedViewBuilder))
-    .service("postViewService", ["postRepository", "postStatsRepository", "recordRepository", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository"], asClassArgs(PostViewService))
+    .service("postViewService", ["postRepository", "postStatsRepository", "recordRepository", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
     .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
     .service("timelineService", ["timelineRepository"], asClassArgs(TimelineService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
@@ -220,6 +224,7 @@ export const createAppRegistry = (env: Env) =>
     .service("followService", ["followRepository"], asClassArgs(FollowService))
     .service("feedProcessor", ["postRepository", "repostRepository", "postViewService", "profileViewService", "replyRefService"], asClassArgs(FeedProcessor))
     // use-cases
+    .service("getProfileUseCase", ["profileViewService", "labelRepository"], asClassArgs(GetProfileUseCase))
     .service("getProfilesUseCase", ["profileViewService"], asClassArgs(GetProfilesUseCase))
     .service("searchActorsUseCase", ["profileSearchService", "profileViewService"], asClassArgs(SearchActorsUseCase))
     .service("searchActorsTypeaheadUseCase", ["profileSearchService", "profileViewService"], asClassArgs(SearchActorsTypeaheadUseCase))
@@ -254,7 +259,7 @@ export const createAppRegistry = (env: Env) =>
     .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))
-    .service("getProfile", ["getProfilesUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfile))
+    .service("getProfile", ["getProfileUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfile))
     .service("getProfiles", ["getProfilesUseCase", "handleMiddleware"], asClassArgs(GetProfiles))
     .service("searchActors", ["authVerifierMiddleware", "searchActorsUseCase"], asClassArgs(SearchActors))
     .service("searchActorsTypeahead", ["authVerifierMiddleware", "searchActorsTypeaheadUseCase"], asClassArgs(SearchActorsTypeahead))

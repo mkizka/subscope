@@ -5,7 +5,6 @@ import { schema } from "@repo/db";
 import { and, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
 
 import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
-import { notTakenDown } from "../takedown.js";
 
 export class ProfileRepository implements IProfileRepository {
   constructor(private readonly db: DatabaseClient) {}
@@ -25,12 +24,7 @@ export class ProfileRepository implements IProfileRepository {
         schema.profiles,
         eq(schema.actors.did, schema.profiles.actorDid),
       )
-      .where(
-        and(
-          inArray(schema.actors.did, dids),
-          notTakenDown(this.db, schema.actors.did, ["!takedown", "!suspend"]),
-        ),
-      );
+      .where(inArray(schema.actors.did, dids));
 
     const profileMap = new Map(
       results.map(({ profile, actor }) => [
