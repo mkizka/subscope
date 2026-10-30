@@ -5,20 +5,19 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchPostsUseCase", () => {
   let searchPostsUseCase: TestServices["searchPostsUseCase"];
   let postRepo: TestServices["postRepository"];
-  let postStatsRepo: TestServices["postStatsRepository"];
+  let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     searchPostsUseCase = services.searchPostsUseCase;
     postRepo = services.postRepository;
-    postStatsRepo = services.postStatsRepository;
+    postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
     recordRepo = services.recordRepository;
   });
@@ -68,7 +67,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -115,7 +114,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -154,7 +153,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(firstPost);
     recordRepo.add(firstRecord);
 
-    const firstPostStats: PostStats = {
+    const firstPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -170,7 +169,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(secondPost);
     recordRepo.add(secondRecord);
 
-    const secondPostStats: PostStats = {
+    const secondPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -213,7 +212,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(firstPost);
     recordRepo.add(firstRecord);
 
-    const firstPostStats: PostStats = {
+    const firstPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -229,7 +228,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(secondPost);
     recordRepo.add(secondRecord);
 
-    const secondPostStats: PostStats = {
+    const secondPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -289,7 +288,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(originalPost);
     recordRepo.add(originalRecord);
 
-    const originalPostStats: PostStats = {
+    const originalPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -306,7 +305,7 @@ describe("SearchPostsUseCase", () => {
     postRepo.add(replyPost);
     recordRepo.add(replyRecord);
 
-    const replyPostStats: PostStats = {
+    const replyPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,

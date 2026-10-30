@@ -26,7 +26,7 @@ import {
 } from "../../../application/interfaces/label-repository.js";
 import type { ILikeRepository } from "../../../application/interfaces/like-repository.js";
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
-import type { IPostStatsRepository } from "../../../application/interfaces/post-stats-repository.js";
+import type { IPostStatsQuery } from "../../../application/interfaces/post-stats-query.js";
 import type { IRecordRepository } from "../../../application/interfaces/record-repository.js";
 import type { IRepostRepository } from "../../../application/interfaces/repost-repository.js";
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
@@ -36,7 +36,7 @@ import type { PostEmbedViewBuilder } from "./post-embed-view-builder.js";
 export class PostViewService {
   constructor(
     private readonly postRepository: IPostRepository,
-    private readonly postStatsRepository: IPostStatsRepository,
+    private readonly postStatsQuery: IPostStatsQuery,
     private readonly recordRepository: IRecordRepository,
     private readonly profileViewService: ProfileViewService,
     private readonly generatorViewService: GeneratorViewService,
@@ -109,7 +109,9 @@ export class PostViewService {
       this.profileViewService
         .findProfileViewBasic(posts.map((post) => post.actorDid))
         .then(toMapByDid),
-      this.postStatsRepository.findMap(posts.map((post) => post.uri)),
+      this.postStatsQuery
+        .findStats(posts.map((post) => post.uri))
+        .then(toMapByUri),
     ]);
 
     const deepEmbedMaps = await this.findEmbedMaps(
@@ -179,7 +181,9 @@ export class PostViewService {
         this.profileViewService
           .findProfileViewBasic(posts.map((post) => post.actorDid))
           .then(toMapByDid),
-        this.postStatsRepository.findMap(posts.map((post) => post.uri)),
+        this.postStatsQuery
+          .findStats(posts.map((post) => post.uri))
+          .then(toMapByUri),
         viewerDid &&
           this.repostRepository
             // TODO: AtUriのまま渡せるようにする

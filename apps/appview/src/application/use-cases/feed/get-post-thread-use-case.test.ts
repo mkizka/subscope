@@ -12,7 +12,6 @@ import {
   vi,
 } from "vitest";
 
-import type { PostStats } from "../../../application/interfaces/post-stats-repository.js";
 import { PostNotFoundError } from "../../../application/use-cases/feed/get-post-thread-use-case.js";
 import { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -20,7 +19,7 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("GetPostThreadUseCase", () => {
   let getPostThreadUseCase: TestServices["getPostThreadUseCase"];
   let postRepo: TestServices["postRepository"];
-  let postStatsRepo: TestServices["postStatsRepository"];
+  let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
   let recordRepo: TestServices["recordRepository"];
   let spyFindByUri: MockInstance;
@@ -29,7 +28,7 @@ describe("GetPostThreadUseCase", () => {
     const services = await testRegistry.resolve();
     getPostThreadUseCase = services.getPostThreadUseCase;
     postRepo = services.postRepository;
-    postStatsRepo = services.postStatsRepository;
+    postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
     recordRepo = services.recordRepository;
     spyFindByUri = vi.spyOn(postRepo, "findByUri");
@@ -70,7 +69,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const postStats: PostStats = {
+    const postStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -118,7 +117,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(rootPost);
     recordRepo.add(rootRecord);
 
-    const rootPostStats: PostStats = {
+    const rootPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -141,7 +140,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(parentPost);
     recordRepo.add(parentRecord);
 
-    const parentPostStats: PostStats = {
+    const parentPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -164,7 +163,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(targetPost);
     recordRepo.add(targetRecord);
 
-    const targetPostStats: PostStats = {
+    const targetPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -228,7 +227,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(rootPost);
     recordRepo.add(rootRecord);
 
-    const rootPostStats: PostStats = {
+    const rootPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -251,7 +250,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(replyPost);
     recordRepo.add(replyRecord);
 
-    const replyPostStats: PostStats = {
+    const replyPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -274,7 +273,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(grandchildPost);
     recordRepo.add(grandchildRecord);
 
-    const grandchildPostStats: PostStats = {
+    const grandchildPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -343,7 +342,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(rootPost);
     recordRepo.add(rootRecord);
 
-    const rootPostStats: PostStats = {
+    const rootPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -366,7 +365,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(level1Post);
     recordRepo.add(level1Record);
 
-    const level1PostStats: PostStats = {
+    const level1PostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -389,7 +388,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(level2Post);
     recordRepo.add(level2Record);
 
-    const level2PostStats: PostStats = {
+    const level2PostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -412,7 +411,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(level3Post);
     recordRepo.add(level3Record);
 
-    const level3PostStats: PostStats = {
+    const level3PostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -482,7 +481,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(level0Post);
     recordRepo.add(level0Record);
 
-    const level0PostStats: PostStats = {
+    const level0PostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -505,7 +504,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(level1Post);
     recordRepo.add(level1Record);
 
-    const level1PostStats: PostStats = {
+    const level1PostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -528,7 +527,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(level2Post);
     recordRepo.add(level2Record);
 
-    const level2PostStats: PostStats = {
+    const level2PostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
@@ -551,7 +550,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo.add(targetPost);
     recordRepo.add(targetRecord);
 
-    const targetPostStats: PostStats = {
+    const targetPostStats = {
       likeCount: 0,
       repostCount: 0,
       replyCount: 0,
