@@ -26,6 +26,13 @@ const meta = {
         reason: "follow",
         isRead: true,
       },
+      {
+        uri: "at://did:plc:dave/app.bsky.feed.post/1",
+        authorName: "Dave",
+        reason: "reply",
+        text: "返信の本文",
+        isRead: true,
+      },
     ],
     onLoadMore: () => {},
     hasNextPage: false,
