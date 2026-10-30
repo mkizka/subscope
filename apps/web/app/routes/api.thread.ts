@@ -22,7 +22,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);
   const { thread } = await agent.call(getPostThread, { uri });
   if (!threadViewPost.matches(thread)) {
-    return data([]);
+    return data(null);
   }
   const ancestors: ThreadViewPost[] = [];
   for (let p = thread.parent; threadViewPost.matches(p); p = p.parent) {
@@ -31,9 +31,9 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const replies = (thread.replies ?? []).filter((r) =>
     threadViewPost.matches(r),
   );
-  return data(
-    [...ancestors, thread, ...replies].map(({ post }) =>
-      toTimelinePost({ post }),
-    ),
-  );
+  return data({
+    ancestors: ancestors.map(({ post }) => toTimelinePost({ post })),
+    post: toTimelinePost({ post: thread.post }),
+    replies: replies.map(({ post }) => toTimelinePost({ post })),
+  });
 };

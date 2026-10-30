@@ -23,10 +23,13 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["trackedActors"],
+          "required": ["trackedActors", "total"],
           "properties": {
             "cursor": {
               "type": "string"
+            },
+            "total": {
+              "type": "integer"
             },
             "trackedActors": {
               "type": "array",

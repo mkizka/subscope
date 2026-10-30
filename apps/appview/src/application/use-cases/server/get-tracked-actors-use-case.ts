@@ -22,12 +22,14 @@ export class GetTrackedActorsUseCase {
       limit: params.limit,
       getCursor: (item) => `${item.subscriberFollowersCount}::${item.did}`,
     });
-    const page = paginator.extractPage(
-      await this.subscriptionRepository.findTrackedActors({
+    const [items, total] = await Promise.all([
+      this.subscriptionRepository.findTrackedActors({
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
-    );
+      this.subscriptionRepository.countTrackedActors(),
+    ]);
+    const page = paginator.extractPage(items);
 
     const profiles = await this.profileViewService.findProfileView(
       page.items.map((item) => item.did),
@@ -36,6 +38,7 @@ export class GetTrackedActorsUseCase {
 
     return {
       cursor: page.cursor,
+      total,
       trackedActors: page.items.flatMap((item) => {
         const profile = profileMap.get(item.did);
         return profile

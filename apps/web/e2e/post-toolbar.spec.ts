@@ -55,16 +55,15 @@ for (const { id, name, collection } of cases) {
     }).toPass();
     const button = post.getByRole("button", { name });
 
-    await post.getByRole("link", { name: "スレッドを開く" }).focus();
     const reacted = page.waitForResponse((res) =>
       res.url().includes("/api/reactions"),
     );
-    await button.press("Enter");
+    await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "true");
     await reacted;
     await expect.poll(hasRecord).toBe(true);
 
-    await button.press("Enter");
+    await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expect.poll(hasRecord).toBe(false);
   });
@@ -105,7 +104,6 @@ for (const { id, name, title, subjectOf } of composeCases) {
       await page.reload();
       await expect(post).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await post.getByRole("link", { name: "スレッドを開く" }).focus();
     await post.getByRole("button", { name }).click();
     await page
       .getByRole("textbox", { name: "投稿内容" })
@@ -126,3 +124,39 @@ for (const { id, name, title, subjectOf } of composeCases) {
       .toContain(uri);
   });
 }
+
+test("post-toolbar-5: いいね・リポストのボタンは、押した結果を画面に反映し終えるまで押せない", async ({
+  page,
+  request,
+}) => {
+  const text = "post-toolbar-5: 投稿";
+  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  await login(page);
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+
+  for (const [name, collection] of [
+    ["いいね", "app.bsky.feed.like"],
+    ["リポスト", "app.bsky.feed.repost"],
+  ]) {
+    const button = post.getByRole("button", { name });
+    await button.click();
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await button.click({ force: true });
+    await expect(button).not.toHaveAttribute("aria-disabled", "true");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    const res = await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=alice.test&collection=${collection}`,
+    );
+    const { records }: { records: { value: { subject: { uri: string } } }[] } =
+      await res.json();
+    expect(records.filter((r) => r.value.subject.uri === uri)).toHaveLength(1);
+  }
+});
