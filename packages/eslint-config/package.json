@@ -1,0 +1,13 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "@mkizka/eslint-config": "10.0.0"
+  },
+  "sideEffects": false
+}

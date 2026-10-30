@@ -1,12 +1,12 @@
 import importAlias from "@dword-design/eslint-plugin-import-alias";
-import { mkizka } from "@mkizka/eslint-config";
+import { config } from "@repo/eslint-config";
 import { defineConfig } from "eslint/config";
 import eslintPluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import storybook from "eslint-plugin-storybook";
 
 export default defineConfig(
   {
-    extends: mkizka,
+    extends: config,
     rules: {
       "@typescript-eslint/only-throw-error": "off",
     },

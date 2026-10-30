@@ -34,6 +34,7 @@ packagesディレクトリ(共通パッケージ)
 - `@repo/common/utils` - 共有ユーティリティ関数
 - `@repo/client` - `@atproto/lex`で生成したlexiconスキーマ
 - `@repo/test-utils` - テスト用データ生成ファクトリを含むユーティリティ
+- `@repo/eslint-config` - 全パッケージ共通のESLint設定
 
 ### 実装パターン(サーバー)
 

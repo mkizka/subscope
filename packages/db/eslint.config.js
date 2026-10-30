@@ -1,3 +1,3 @@
-import { mkizka } from "@mkizka/eslint-config";
+import { config } from "@repo/eslint-config";
 
-export default mkizka;
+export default config;
