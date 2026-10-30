@@ -48,7 +48,10 @@ for (const { id, name, collection } of cases) {
     };
 
     await login(page);
-    const post = page.getByRole("article").filter({ hasText: text });
+    const post = page
+      .getByRole("article")
+      .filter({ hasText: text })
+      .filter({ hasNotText: "がリポスト" });
     await expect(async () => {
       await page.reload();
       await expect(post).toBeVisible({ timeout: 1000 });
@@ -136,7 +139,10 @@ test("post-toolbar-5: いいね・リポストのボタンは、押した結果�
   });
 
   await login(page);
-  const post = page.getByRole("article").filter({ hasText: text });
+  const post = page
+    .getByRole("article")
+    .filter({ hasText: text })
+    .filter({ hasNotText: "がリポスト" });
   await expect(async () => {
     await page.reload();
     await expect(post).toBeVisible({ timeout: 1000 });
