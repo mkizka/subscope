@@ -12,13 +12,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("ReplyRefService", () => {
   let replyRefService: TestServices["replyRefService"];
   let postRepo: TestServices["postRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     replyRefService = services.replyRefService;
     postRepo = services.postRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
     profileRepo = services.profileRepository;
   });
 

@@ -33,7 +33,7 @@ import type { INotificationRepository } from "../application/interfaces/notifica
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
-import type { IRecordRepository } from "../application/interfaces/record-repository.js";
+import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 import type { ITimelineRepository } from "../application/interfaces/timeline-repository.js";
@@ -117,7 +117,7 @@ import { NotificationRepository } from "../infrastructure/notification-repositor
 import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
 import { ProfileRepository } from "../infrastructure/profile-repository/profile-repository.js";
-import { RecordRepository } from "../infrastructure/record-repository/record-repository.js";
+import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import { TimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.js";
@@ -197,7 +197,7 @@ export const createAppRegistry = (env: Env) =>
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
     .service("actorStatsRepository", ["db"], asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
-    .service("recordRepository", ["db"], asClassArgs<IRecordRepository>()(RecordRepository))
+    .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationRepository", ["db"], asClassArgs<INotificationRepository>()(NotificationRepository))
     .service("postRepository", ["db"], asClassArgs<IPostRepository>()(PostRepository))
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
@@ -224,7 +224,7 @@ export const createAppRegistry = (env: Env) =>
     .service("generatorViewService", ["generatorRepository", "profileViewService", "assetUrlBuilder"], asClassArgs(GeneratorViewService))
     .service("listViewService", ["profileViewService", "assetUrlBuilder"], asClassArgs(ListViewService))
     .service("postEmbedViewBuilder", ["assetUrlBuilder"], asClassArgs(PostEmbedViewBuilder))
-    .service("postViewService", ["postRepository", "postStatsQuery", "recordRepository", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
+    .service("postViewService", ["postRepository", "postStatsQuery", "recordQuery", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
     .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
     .service("timelineService", ["timelineRepository"], asClassArgs(TimelineService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
@@ -237,7 +237,7 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postRepository", "recordRepository", "postStatsQuery", "likeRepository", "repostRepository", "generatorRepository"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postRepository", "recordQuery", "postStatsQuery", "likeRepository", "repostRepository", "generatorRepository"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
