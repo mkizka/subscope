@@ -27,6 +27,7 @@ import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { BanSubscriber } from "./me/subsco/admin/banSubscriber.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
+import type { GetBannedActors } from "./me/subsco/admin/getBannedActors.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
@@ -72,6 +73,7 @@ export const lexRouterFactory = (
   searchActors: SearchActors,
   searchActorsTypeahead: SearchActorsTypeahead,
   getSubscribers: GetSubscribers,
+  getBannedActors: GetBannedActors,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
   getFeedGenerators: GetFeedGenerators,
@@ -110,6 +112,7 @@ export const lexRouterFactory = (
     searchActors,
     searchActorsTypeahead,
     getSubscribers,
+    getBannedActors,
     getLikes,
     getRepostedBy,
     getFeedGenerators,

@@ -74,6 +74,7 @@
     "me.subsco.admin.banSubscriber",
     "me.subsco.admin.createInviteCode",
     "me.subsco.admin.deleteInviteCode",
+    "me.subsco.admin.getBannedActors",
     "me.subsco.admin.getInviteCodes",
     "me.subsco.admin.getSubscribers",
     "me.subsco.admin.grantAdmin",
@@ -330,6 +331,10 @@
     "me.subsco.admin.deleteInviteCode": {
       "uri": "file://./lexicons/me/subsco/admin/deleteInviteCode.json",
       "cid": "bafyreifh5jqpyvvp45rhvmkt33yojwdok6zc2cy5cpci3kiebfhkefaw5i"
+    },
+    "me.subsco.admin.getBannedActors": {
+      "uri": "file://./lexicons/me/subsco/admin/getBannedActors.json",
+      "cid": "bafyreiflckky5auyphr6njwfrrf4iorkyk47ay4hehfrxrlzvjypdzwxmy"
     },
     "me.subsco.admin.getInviteCodes": {
       "uri": "file://./lexicons/me/subsco/admin/getInviteCodes.json",

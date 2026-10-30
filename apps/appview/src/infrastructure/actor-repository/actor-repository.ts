@@ -6,7 +6,7 @@ import {
   type TransactionContext,
 } from "@repo/common/domain";
 import { type ActorInsert, schema } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, gt } from "drizzle-orm";
 
 import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
 
@@ -65,5 +65,23 @@ export class ActorRepository implements IActorRepository {
       .where(eq(schema.actors.isAdmin, true))
       .limit(1);
     return rows.length > 0;
+  }
+
+  async findBannedDids(params: {
+    limit: number;
+    cursor?: string;
+  }): Promise<Did[]> {
+    const rows = await this.db
+      .select({ did: schema.actors.did })
+      .from(schema.actors)
+      .where(
+        and(
+          eq(schema.actors.isBanned, true),
+          params.cursor ? gt(schema.actors.did, params.cursor) : undefined,
+        ),
+      )
+      .orderBy(asc(schema.actors.did))
+      .limit(params.limit);
+    return rows.map((row) => asDid(row.did));
   }
 }
