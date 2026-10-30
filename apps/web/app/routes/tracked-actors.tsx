@@ -12,8 +12,11 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 export const loader = async ({ context }: Route.LoaderArgs) => {
   const agent = context.get(agentContext);
   // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-  const { trackedActors } = await agent.call(getTrackedActors, { limit: 100 });
+  const { trackedActors, total } = await agent.call(getTrackedActors, {
+    limit: 100,
+  });
   return data({
+    total,
     actors: trackedActors.map(({ profile, subscriberFollowersCount }) => ({
       did: profile.did,
       handle: profile.handle,
@@ -29,5 +32,7 @@ export function meta() {
 }
 
 export default function TrackedActors({ loaderData }: Route.ComponentProps) {
-  return <TrackedActorsPage actors={loaderData.actors} />;
+  return (
+    <TrackedActorsPage actors={loaderData.actors} total={loaderData.total} />
+  );
 }

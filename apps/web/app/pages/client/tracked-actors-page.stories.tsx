@@ -5,6 +5,7 @@ import { TrackedActorsPage } from "./tracked-actors-page";
 const meta = {
   component: TrackedActorsPage,
   args: {
+    total: 3,
     actors: [
       {
         did: "did:plc:bob",
