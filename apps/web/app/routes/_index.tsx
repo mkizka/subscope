@@ -1,4 +1,5 @@
 import { TID } from "@atproto/common-web";
+import { lexToJson } from "@atproto/lex";
 import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
@@ -18,6 +19,7 @@ import {
   type ReplyRule,
 } from "@/app/features/timeline/blocks/post-form";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
+import { indexCommit } from "@/app/lib/index-commit.server";
 import { loggerManager } from "@/app/lib/logger.server";
 import { getAgent } from "@/app/lib/oauth/session.server";
 import { TimelinePage } from "@/app/pages/client/timeline-page";
@@ -115,29 +117,26 @@ export const action = async ({ request }: Route.ActionArgs) => {
       images.length > 0
         ? { $type: "app.bsky.embed.images" as const, images }
         : undefined;
-    await agent.applyWrites((op) => [
-      op.create(
-        postRecord,
-        {
-          text,
-          embed:
-            quote && media
-              ? {
-                  $type: "app.bsky.embed.recordWithMedia",
-                  record: { record: quote },
-                  media,
-                }
-              : quote
-                ? { $type: "app.bsky.embed.record", record: quote }
-                : media,
-          reply:
-            formData.get("type") === "reply" && subject && root
-              ? { root, parent: subject }
-              : undefined,
-          createdAt,
-        },
-        { rkey },
-      ),
+    const post = postRecord.$build({
+      text,
+      embed:
+        quote && media
+          ? {
+              $type: "app.bsky.embed.recordWithMedia",
+              record: { record: quote },
+              media,
+            }
+          : quote
+            ? { $type: "app.bsky.embed.record", record: quote }
+            : media,
+      reply:
+        formData.get("type") === "reply" && subject && root
+          ? { root, parent: subject }
+          : undefined,
+      createdAt,
+    });
+    const { body } = await agent.applyWrites((op) => [
+      op.create(postRecord, post, { rkey }),
       ...(typeof allow === "string"
         ? [
             op.create(
@@ -152,6 +151,23 @@ export const action = async ({ request }: Route.ActionArgs) => {
           ]
         : []),
     ]);
+    const result = body.results?.[0];
+    if (result && "cid" in result) {
+      await indexCommit({
+        did: agent.assertDid,
+        live: true,
+        commit: {
+          operation: "create",
+          collection: "app.bsky.feed.post",
+          rkey,
+          rev: body.commit?.rev,
+          record: lexToJson(post),
+          cid: result.cid,
+        },
+      }).catch((e: unknown) =>
+        loggerManager.createLogger("_index").warn(e, "Failed to index post"),
+      );
+    }
     return data({ uri });
   } catch (e) {
     loggerManager.createLogger("_index").error(e, "Failed to create post");
