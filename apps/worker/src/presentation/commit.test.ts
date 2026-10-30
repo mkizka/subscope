@@ -121,4 +121,18 @@ describe("commit", () => {
     // assert
     expect((await findPost(actor.did))?.text).toBe("new");
   });
+
+  test("index-8: 処理済みのrevと同じrevのコミットは、もう一度処理する", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "old"));
+
+    // act
+    await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "new"));
+
+    // assert
+    expect((await findPost(actor.did))?.text).toBe("new");
+  });
 });
