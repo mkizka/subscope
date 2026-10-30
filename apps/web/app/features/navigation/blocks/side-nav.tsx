@@ -1,6 +1,7 @@
 import {
   CircleUserIcon,
   EllipsisIcon,
+  ExternalLinkIcon,
   HomeIcon,
   ListIcon,
   LogOutIcon,
@@ -9,7 +10,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { Form, Link, NavLink } from "react-router";
+import { Form, NavLink } from "react-router";
 
 type Props = {
   did?: string;
@@ -89,10 +90,15 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
                 招待コード
               </NavItem>
               <li>
-                <Link to="/admin/bull-board" reloadDocument>
+                <a href="/admin/bull-board" target="_blank" rel="noreferrer">
                   <ListIcon className="size-4" />
                   ジョブキュー
-                </Link>
+                  <ExternalLinkIcon
+                    className="size-3.5"
+                    aria-hidden
+                    data-testid="external-link-icon"
+                  />
+                </a>
               </li>
             </ul>
           </li>

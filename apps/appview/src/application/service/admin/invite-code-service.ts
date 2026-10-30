@@ -1,4 +1,4 @@
-import type { InviteCodeDto } from "../../../application/dto/invite-code-with-handle.js";
+import type { InviteCodeDto } from "../../../application/dto/invite-code-dto.js";
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 import {
   createCursorPaginator,

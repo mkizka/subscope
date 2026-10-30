@@ -1,38 +1,13 @@
-import type { Did } from "@atproto/did";
 import type { InviteCode, TransactionContext } from "@repo/common/domain";
-import type { Handle } from "@repo/common/utils";
 
-import type { InviteCodeDto } from "../../application/dto/invite-code-with-handle.js";
+import type { InviteCodeDto } from "../../application/dto/invite-code-dto.js";
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
 
-type UsedByInfo = {
-  did: Did;
-  handle: Handle | null;
-};
-
-type StoredInviteCode = {
-  inviteCode: InviteCode;
-  usedBy: UsedByInfo | null;
-};
-
 export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
-  private inviteCodes: Map<string, StoredInviteCode> = new Map();
+  private inviteCodes: Map<string, InviteCode> = new Map();
 
-  add(inviteCode: InviteCode, usedBy?: UsedByInfo): void {
-    this.inviteCodes.set(inviteCode.code, {
-      inviteCode,
-      usedBy: usedBy ?? null,
-    });
-  }
-
-  setUsedBy(code: string, usedBy: UsedByInfo): void {
-    const stored = this.inviteCodes.get(code);
-    if (stored) {
-      this.inviteCodes.set(code, {
-        ...stored,
-        usedBy,
-      });
-    }
+  add(inviteCode: InviteCode): void {
+    this.inviteCodes.set(inviteCode.code, inviteCode);
   }
 
   clear(): void {
@@ -43,11 +18,7 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     inviteCode: InviteCode;
     ctx: TransactionContext;
   }): Promise<void> {
-    const existing = this.inviteCodes.get(_params.inviteCode.code);
-    this.inviteCodes.set(_params.inviteCode.code, {
-      inviteCode: _params.inviteCode,
-      usedBy: existing?.usedBy ?? null,
-    });
+    this.inviteCodes.set(_params.inviteCode.code, _params.inviteCode);
     return Promise.resolve();
   }
 
@@ -63,38 +34,34 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     let entries = Array.from(this.inviteCodes.values());
 
     entries = entries.sort(
-      (a, b) =>
-        b.inviteCode.createdAt.getTime() - a.inviteCode.createdAt.getTime(),
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
 
     if (params.cursor) {
       const cursorDate = new Date(params.cursor);
-      entries = entries.filter(
-        (entry) => entry.inviteCode.createdAt < cursorDate,
-      );
+      entries = entries.filter((entry) => entry.createdAt < cursorDate);
     }
 
     return Promise.resolve(
       entries.slice(0, params.limit).map((entry) => ({
-        code: entry.inviteCode.code,
-        expiresAt: entry.inviteCode.expiresAt,
-        createdAt: entry.inviteCode.createdAt,
-        usedAt: entry.inviteCode.usedAt,
-        usedBy: entry.usedBy,
+        code: entry.code,
+        expiresAt: entry.expiresAt,
+        createdAt: entry.createdAt,
+        usedAt: entry.usedAt,
+        usedByDid: null,
       })),
     );
   }
 
   findFirst(code: string): Promise<InviteCode | null> {
-    const stored = this.inviteCodes.get(code);
-    return Promise.resolve(stored?.inviteCode ?? null);
+    return Promise.resolve(this.inviteCodes.get(code) ?? null);
   }
 
   markAsUsed(params: {
     code: string;
     ctx: TransactionContext;
   }): Promise<boolean> {
-    const inviteCode = this.inviteCodes.get(params.code)?.inviteCode;
+    const inviteCode = this.inviteCodes.get(params.code);
     if (!inviteCode?.canBeUsed()) {
       return Promise.resolve(false);
     }

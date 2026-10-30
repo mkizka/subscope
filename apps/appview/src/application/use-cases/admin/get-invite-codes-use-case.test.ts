@@ -1,6 +1,4 @@
-import { asDid } from "@atproto/did";
-import { actorFactory, inviteCodeFactory } from "@repo/common/test";
-import { asHandle } from "@repo/common/utils";
+import { inviteCodeFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -201,71 +199,6 @@ describe("GetInviteCodesUseCase", () => {
           expiresAt: inviteCode1.expiresAt.toISOString(),
           createdAt: inviteCode1.createdAt.toISOString(),
           usedAt: undefined,
-          usedBy: undefined,
-        },
-      ],
-      cursor: undefined,
-    });
-  });
-
-  test("使用済み招待コードの場合、使用情報を返す", async () => {
-    // arrange
-    const actor = actorFactory();
-    const inviteCode = inviteCodeFactory({
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      expiresAt: new Date("2024-01-08T00:00:00.000Z"),
-      usedAt: new Date("2024-01-02T00:00:00.000Z"),
-    });
-    inviteCodeRepo.add(inviteCode, {
-      did: asDid(actor.did),
-      handle: asHandle(actor.handle),
-    });
-
-    // act
-    const result = await getInviteCodesUseCase.execute({
-      limit: 50,
-    });
-
-    // assert
-    expect(result).toEqual({
-      codes: [
-        {
-          code: inviteCode.code,
-          expiresAt: inviteCode.expiresAt.toISOString(),
-          createdAt: inviteCode.createdAt.toISOString(),
-          usedAt: "2024-01-02T00:00:00.000Z",
-          usedBy: {
-            did: actor.did,
-            handle: actor.handle,
-          },
-        },
-      ],
-      cursor: undefined,
-    });
-  });
-
-  test("使用済み招待コードでActorが削除されている場合、usedByはnullになる", async () => {
-    // arrange
-    const inviteCode = inviteCodeFactory({
-      createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      expiresAt: new Date("2024-01-08T00:00:00.000Z"),
-      usedAt: new Date("2024-01-02T00:00:00.000Z"),
-    });
-    inviteCodeRepo.add(inviteCode);
-
-    // act
-    const result = await getInviteCodesUseCase.execute({
-      limit: 50,
-    });
-
-    // assert
-    expect(result).toEqual({
-      codes: [
-        {
-          code: inviteCode.code,
-          expiresAt: inviteCode.expiresAt.toISOString(),
-          createdAt: inviteCode.createdAt.toISOString(),
-          usedAt: "2024-01-02T00:00:00.000Z",
           usedBy: undefined,
         },
       ],

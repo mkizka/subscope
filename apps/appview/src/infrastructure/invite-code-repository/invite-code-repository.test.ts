@@ -84,7 +84,7 @@ describe("InviteCodeRepository", () => {
       expect(result[0]?.code).toBe(inviteCode1.code);
     });
 
-    test("未使用の招待コードの場合、usedByがnullになる", async () => {
+    test("未使用の招待コードの場合、usedByDidがnullになる", async () => {
       // arrange
       const inviteCode = await inviteCodeFactory(ctx.db).create();
 
@@ -95,11 +95,11 @@ describe("InviteCodeRepository", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         code: inviteCode.code,
-        usedBy: null,
+        usedByDid: null,
       });
     });
 
-    test("使用済みの招待コードの場合、usedBy情報を含む", async () => {
+    test("使用済みの招待コードの場合、usedByDidを含む", async () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const inviteCode = await inviteCodeFactory(ctx.db).create();
@@ -117,10 +117,7 @@ describe("InviteCodeRepository", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         code: inviteCode.code,
-        usedBy: {
-          did: actor.did,
-          handle: actor.handle,
-        },
+        usedByDid: actor.did,
       });
     });
   });
