@@ -57,7 +57,7 @@ describe("CreateInviteCodeUseCase", () => {
     expect(diffInDays365).toBe(365);
   });
 
-  test("同じ有効期限でくり返し呼ばれた場合、異なる招待コードを返す", async () => {
+  test("createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする", async () => {
     // arrange & act
     const result1 = await useCase.execute({ daysToExpire: 30 });
     const result2 = await useCase.execute({ daysToExpire: 30 });

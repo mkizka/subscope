@@ -18,19 +18,23 @@ export const Default: Story = {
         displayName: "Alice",
         avatar: "https://placehold.co/32",
         isAdmin: true,
+        subscribedAt: "2024-01-03T00:00:00.000Z",
       },
       {
         did: "did:plc:example456",
         handle: "bob.bsky.social",
         displayName: "Bob",
         isAdmin: false,
+        subscribedAt: "2024-01-02T00:00:00.000Z",
       },
       {
         did: "did:plc:example789",
         handle: "carol.bsky.social",
         isAdmin: false,
+        subscribedAt: "2024-01-01T00:00:00.000Z",
       },
     ],
+    total: 3,
   },
 };
 
@@ -55,6 +59,7 @@ export const LoadingMore: Story = {
         handle: "alice.bsky.social",
         displayName: "Alice",
         isAdmin: true,
+        subscribedAt: "2024-01-03T00:00:00.000Z",
       },
     ],
     isFetchingNextPage: true,

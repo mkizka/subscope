@@ -248,9 +248,16 @@ BANされたアクターのプロフィールを返す。管理者の認証が�
 
 daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
 
+- createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする
+
+ランダムな5文字は推測されないよう暗号論的乱数で作る。
+
 ## me.subsco.admin.getInviteCodes
 
 招待コードを、使用日時と使用したアクターとともに返す。管理者の認証が必要。limitとcursorでページングする。
+
+- getInviteCodes-1: 使用済みの招待コードには使用したアクターのprofileViewを含める
+- getInviteCodes-2: 使用したアクターがテイクダウンされていてもprofileViewを含める
 
 ## me.subsco.admin.deleteInviteCode
 
