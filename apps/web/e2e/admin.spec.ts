@@ -55,6 +55,35 @@ test.describe("登録ユーザー", () => {
 
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
+
+  test("subscribers-2: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+    page,
+  }) => {
+    await login(page);
+    const createInviteCode = async () => {
+      const response = await page.request.post("/admin/api/invite-codes");
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return ((await response.json()) as { code: string }).code;
+    };
+    await subscribeServer("dave.test", await createInviteCode());
+    const daveDid = await resolveHandle("dave.test");
+
+    await page.goto("/admin/subscribers");
+
+    const row = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ has: page.getByTitle(daveDid) });
+
+    await row.getByRole("button", { name: "操作" }).click();
+    page.once("dialog", (dialog) => void dialog.accept());
+    await row.getByRole("button", { name: "BAN" }).click();
+
+    await expect(row).toHaveCount(0);
+    await expect(
+      subscribeServer("dave.test", await createInviteCode()),
+    ).rejects.toThrow("Banned");
+  });
 });
 
 test.describe("招待コード", () => {

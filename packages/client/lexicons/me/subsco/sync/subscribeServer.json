@@ -42,6 +42,10 @@
         {
           "name": "AlreadySubscribed",
           "description": "The user is already subscribed to this server"
+        },
+        {
+          "name": "Banned",
+          "description": "The user is banned from this server"
         }
       ]
     }

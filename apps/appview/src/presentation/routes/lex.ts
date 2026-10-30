@@ -24,6 +24,7 @@ import type { GetLists } from "./app/bsky/graph/getLists.js";
 import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
+import type { BanSubscriber } from "./me/subsco/admin/banSubscriber.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
@@ -54,6 +55,7 @@ export const lexRouterFactory = (
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
   unsubscribeServer: UnsubscribeServer,
+  banSubscriber: BanSubscriber,
   createInviteCode: CreateInviteCode,
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
@@ -90,6 +92,7 @@ export const lexRouterFactory = (
     getSubscriptionStatus,
     subscribeServer,
     unsubscribeServer,
+    banSubscriber,
     createInviteCode,
     deleteInviteCode,
     getInviteCodes,

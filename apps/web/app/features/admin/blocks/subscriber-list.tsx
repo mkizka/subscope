@@ -1,4 +1,4 @@
-import { EllipsisIcon, ShieldIcon } from "lucide-react";
+import { BanIcon, EllipsisIcon, ShieldIcon } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 
@@ -18,6 +18,8 @@ type Props = {
   hasNextPage?: boolean;
   onGrantAdmin?: (did: string) => void;
   grantingDid?: string | null;
+  onBan?: (did: string) => void;
+  banningDid?: string | null;
 };
 
 export function SubscriberList({
@@ -28,6 +30,8 @@ export function SubscriberList({
   hasNextPage,
   onGrantAdmin,
   grantingDid,
+  onBan,
+  banningDid,
 }: Props) {
   return (
     <>
@@ -97,6 +101,25 @@ export function SubscriberList({
                     >
                       <ShieldIcon className="size-4" />
                       管理者にする
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="text-error"
+                      disabled={banningDid === subscriber.did}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `@${subscriber.handle} をBANしますか？`,
+                          )
+                        ) {
+                          onBan?.(subscriber.did);
+                        }
+                      }}
+                    >
+                      <BanIcon className="size-4" />
+                      BAN
                     </button>
                   </li>
                 </ul>
