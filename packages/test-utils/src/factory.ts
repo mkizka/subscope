@@ -516,3 +516,27 @@ export const inviteCodeFactory = (db: Database) =>
     },
     (props) => create(db, schema.inviteCodes, props),
   );
+
+export const labelFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          src: () => "did:plc:ar7c4by46qjdydhdevvrndac",
+          uri: later<string>(),
+          val: () => "!takedown",
+          actorDid: later<string>(),
+          cid: () => null as string | null,
+          cts: () => faker.date.recent(),
+          exp: () => null as Date | null,
+        },
+        vars: {
+          actor: () => actorFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.labels, props),
+    )
+    .props({
+      uri: async ({ vars }) => (await vars.actor).did,
+      actorDid: async ({ vars }) => (await vars.actor).did,
+    });

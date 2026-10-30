@@ -2,6 +2,14 @@
 
 AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞いを定める。レスポンスは常にlexiconに適合する。
 
+## テイクダウン
+
+モデレーションサービスがテイクダウンしたアカウントや投稿を、すべてのAPIの応答から隠す。
+
+- takedown-1: `!takedown` か `!suspend` のラベルが付いたアカウントと、その投稿は応答に含めない
+- takedown-2: `!takedown` のラベルが付いた投稿は応答に含めない
+- takedown-3: 期限が切れたラベルは無視する
+
 ## app.bsky.actor.getProfile
 
 指定したアクターの詳細なプロフィールを返す。認証は任意。

@@ -155,6 +155,13 @@
       "when": 1793285388151,
       "tag": "0021_add-actor-is_banned",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793360991444,
+      "tag": "0022_create-labels",
+      "breakpoints": true
     }
   ]
 }

@@ -413,6 +413,25 @@ export const postEmbedRecordsRelations = relations(
   }),
 );
 
+export const labels = pgTable(
+  "labels",
+  {
+    src: varchar({ length: 256 }).notNull(),
+    uri: varchar({ length: 256 }).notNull(),
+    val: varchar({ length: 128 }).notNull(),
+    actorDid: varchar({ length: 256 })
+      .notNull()
+      .references(() => actors.did, { onDelete: "cascade" }),
+    cid: varchar({ length: 256 }),
+    cts: timestamp().notNull(),
+    exp: timestamp(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.src, table.uri, table.val] }),
+    index("labels_uri_idx").on(table.uri),
+  ],
+);
+
 export const inviteCodes = pgTable("invite_codes", {
   code: varchar({ length: 256 }).primaryKey(),
   expiresAt: timestamp().notNull(),

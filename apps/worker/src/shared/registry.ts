@@ -27,6 +27,7 @@ import type { IFeedItemRepository } from "../application/interfaces/repositories
 import type { IFollowRepository } from "../application/interfaces/repositories/follow-repository.js";
 import type { IGeneratorRepository } from "../application/interfaces/repositories/generator-repository.js";
 import type { IInviteCodeRepository } from "../application/interfaces/repositories/invite-code-repository.js";
+import type { ILabelRepository } from "../application/interfaces/repositories/label-repository.js";
 import type { ILikeRepository } from "../application/interfaces/repositories/like-repository.js";
 import type { IListItemRepository } from "../application/interfaces/repositories/list-item-repository.js";
 import type { IListRepository } from "../application/interfaces/repositories/list-repository.js";
@@ -55,6 +56,7 @@ import { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-us
 import { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
 import { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
+import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
@@ -63,6 +65,7 @@ import { FeedItemRepository } from "../infrastructure/repositories/feed-item-rep
 import { FollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.js";
 import { InviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.js";
+import { LabelRepository } from "../infrastructure/repositories/label-repository/label-repository.js";
 import { LikeRepository } from "../infrastructure/repositories/like-repository/like-repository.js";
 import { ListItemRepository } from "../infrastructure/repositories/list-item-repository/list-item-repository.js";
 import { ListRepository } from "../infrastructure/repositories/list-repository/list-repository.js";
@@ -119,6 +122,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("repostRepository", asClassArgs<IRepostRepository>()(RepostRepository))
     .service("subscriptionRepository", asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("feedItemRepository", asClassArgs<IFeedItemRepository>()(FeedItemRepository))
+    .service("labelRepository", asClassArgs<ILabelRepository>()(LabelRepository))
     .service("notificationRepository", asClassArgs<INotificationRepository>()(NotificationRepository))
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
@@ -140,7 +144,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregatePostStatsUseCase", ["postStatsRepository", "postRepository", "db"], asClassArgs(AggregatePostStatsUseCase))
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "db"], asClassArgs(SyncTapRepoUseCase))
-    .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
+    .service("indexLabelUseCase", ["labelRepository", "actorRepository", "db"], asClassArgs(IndexLabelUseCase))
+    .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("workerServer", ["loggerManager", "syncWorker", "healthRouter", "port"], asClassArgs(WorkerServer));

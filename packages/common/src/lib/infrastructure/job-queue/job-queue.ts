@@ -53,6 +53,7 @@ export class JobQueue implements IJobQueue {
         queueOptions(withRetry),
       ),
       syncTapRepo: new Queue("syncTapRepo", queueOptions(withRetry)),
+      label: new Queue("label", queueOptions(withRetry)),
     };
   }
 
