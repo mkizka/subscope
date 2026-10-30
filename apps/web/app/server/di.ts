@@ -8,6 +8,9 @@ import { getInviteCodesUseCaseFactory } from "./application/admin/get-invite-cod
 import { getSubscribersUseCaseFactory } from "./application/admin/get-subscribers-use-case";
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
+import { countUnreadNotificationsUseCaseFactory } from "./application/notification/count-unread-notifications-use-case";
+import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
+import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
@@ -20,6 +23,7 @@ import {
 import { dbFactory } from "./infrastructure/db/db";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
+import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
 import { timelineRepositoryFactory } from "./infrastructure/timeline/timeline-repository";
 
@@ -35,6 +39,26 @@ export const di = await createRegistry()
     oauthClientFactory,
   )
   .service("cookieSessionStorage", cookieSessionStorageFactory)
+  .service(
+    "notificationRepository",
+    ["oauthClient"],
+    notificationRepositoryFactory,
+  )
+  .service(
+    "getNotificationsUseCase",
+    ["notificationRepository"],
+    getNotificationsUseCaseFactory,
+  )
+  .service(
+    "countUnreadNotificationsUseCase",
+    ["notificationRepository"],
+    countUnreadNotificationsUseCaseFactory,
+  )
+  .service(
+    "markNotificationsSeenUseCase",
+    ["notificationRepository"],
+    markNotificationsSeenUseCaseFactory,
+  )
   .service("timelineRepository", ["oauthClient"], timelineRepositoryFactory)
   .service("postRepository", ["oauthClient"], postRepositoryFactory)
   .service(
