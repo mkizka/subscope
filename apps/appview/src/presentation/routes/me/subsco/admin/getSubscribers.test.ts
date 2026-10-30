@@ -1,5 +1,10 @@
 import getSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
-import { actorFactory, labelFactory, testSetup } from "@repo/test-utils";
+import {
+  actorFactory,
+  labelFactory,
+  subscriptionFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -72,5 +77,49 @@ describe("me.subsco.admin.getSubscribers", () => {
     expect(res.subscribers).toMatchObject([
       { profile: { did: subscriber.did } },
     ]);
+  });
+
+  test("getSubscribers-5: サブスクライバーごとに登録日時をsubscribedAtとして返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const admin = await actorFactory(ctx.db)
+      .props({ isAdmin: () => true })
+      .create();
+    const subscriber = await actorFactory(ctx.db).create();
+    await subscriptionFactory(ctx.db)
+      .vars({ actor: () => subscriber })
+      .props({ createdAt: () => new Date("2024-01-01T00:00:00.000Z") })
+      .create();
+    loginAs(admin.did);
+
+    // act
+    const res = await client.call(getSubscribers);
+
+    // assert
+    expect(res.subscribers).toMatchObject([
+      {
+        profile: { did: subscriber.did },
+        subscribedAt: "2024-01-01T00:00:00.000Z",
+      },
+    ]);
+  });
+
+  test("getSubscribers-6: ページングに関係なくサブスクライバーの総数をtotalとして返す", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const admin = await actorFactory(ctx.db)
+      .props({ isAdmin: () => true })
+      .create();
+    await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .createList(3);
+    loginAs(admin.did);
+
+    // act
+    const res = await client.call(getSubscribers, { limit: 1 });
+
+    // assert
+    expect(res.subscribers).toHaveLength(1);
+    expect(res.total).toBe(3);
   });
 });

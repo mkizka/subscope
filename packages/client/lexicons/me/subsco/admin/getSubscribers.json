@@ -23,10 +23,13 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["subscribers"],
+          "required": ["subscribers", "total"],
           "properties": {
             "cursor": {
               "type": "string"
+            },
+            "total": {
+              "type": "integer"
             },
             "subscribers": {
               "type": "array",
@@ -41,7 +44,7 @@
     },
     "subscriber": {
       "type": "object",
-      "required": ["profile", "isAdmin"],
+      "required": ["profile", "isAdmin", "subscribedAt"],
       "properties": {
         "profile": {
           "type": "ref",
@@ -49,6 +52,10 @@
         },
         "isAdmin": {
           "type": "boolean"
+        },
+        "subscribedAt": {
+          "type": "string",
+          "format": "datetime"
         }
       }
     }

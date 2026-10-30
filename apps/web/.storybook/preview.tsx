@@ -100,9 +100,18 @@ queryClient.setQueryData<{
   pages: [
     {
       subscribers: [
-        { profile: alice, isAdmin: true },
-        { profile: bob, isAdmin: false },
+        {
+          profile: alice,
+          isAdmin: true,
+          subscribedAt: "2024-01-01T00:00:00.000Z",
+        },
+        {
+          profile: bob,
+          isAdmin: false,
+          subscribedAt: "2024-01-02T00:00:00.000Z",
+        },
       ],
+      total: 2,
     },
   ],
   pageParams: [undefined],
