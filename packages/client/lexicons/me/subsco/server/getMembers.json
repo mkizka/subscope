@@ -37,12 +37,7 @@
             }
           }
         }
-      },
-      "errors": [
-        {
-          "name": "NotSubscribed"
-        }
-      ]
+      }
     }
   }
 }

@@ -154,10 +154,9 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## me.subsco.server.getMembers
 
-サーバーのメンバー（サブスクライバー）のプロフィールを返す。サブスクライバーの認証が必要。limitとcursorでページングする。
+サーバーのメンバー（サブスクライバー）のプロフィールを返す。メンバー一覧は公開情報とし、認証は不要。limitとcursorでページングする。
 
-- getMembers-1: サブスクライバーでないアカウントからのリクエストには403とNotSubscribedを返す
-- getMembers-2: メンバーごとにprofileViewを返す
+- getMembers-1: メンバーごとにprofileViewを返す
 
 ## me.subsco.server.getSetupStatus
 
