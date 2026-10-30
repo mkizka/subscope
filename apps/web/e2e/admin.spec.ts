@@ -127,11 +127,11 @@ test.describe("招待コード", () => {
     }
 
     await page.goto("/admin/invite-codes");
-    await expect(page.getByText(oldest)).toHaveCount(0);
+    await expect(page.getByText(oldest, { exact: true })).toHaveCount(0);
 
     await inviteCodeRows(page).last().scrollIntoViewIfNeeded();
 
-    await expect(page.getByText(oldest)).toBeVisible();
+    await expect(page.getByText(oldest, { exact: true })).toBeVisible();
   });
 
   test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
