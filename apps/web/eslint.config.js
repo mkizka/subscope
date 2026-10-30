@@ -12,6 +12,23 @@ export default defineConfig(
     },
   },
   importAlias.configs.recommended,
+  {
+    files: ["app/server/di.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^(?!@gyaku/di$|\\.)",
+              message:
+                "DIの配線でライブラリを直接使わないでください。自前のinterfaceを返すファクトリ関数でラップしてください。",
+            },
+          ],
+        },
+      ],
+    },
+  },
   storybook.configs["flat/recommended"],
   {
     extends: [eslintPluginBetterTailwindcss.configs.recommended],

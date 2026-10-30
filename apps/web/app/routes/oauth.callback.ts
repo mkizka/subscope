@@ -2,30 +2,21 @@ import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import { redirect } from "react-router";
 
-import { loggerManager } from "@/app/lib/logger.server";
-import { oauthClient } from "@/app/lib/oauth/client.server";
-import {
-  commitSession,
-  createAgent,
-  getSession,
-} from "@/app/lib/oauth/session.server";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/oauth.callback";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const logger = loggerManager.createLogger("oauth.callback");
+  const logger = di.loggerManager.createLogger("oauth.callback");
 
-  let oauthSession;
+  let agent;
   try {
-    const url = new URL(request.url);
-    const callbackResult = await oauthClient.callback(url.searchParams);
-    oauthSession = callbackResult.session;
+    agent = await di.oauthClient.callback(new URL(request.url).searchParams);
   } catch (e) {
     logger.error(e, "OAuth callback failed");
     return redirect("/?error=oauth_callback_failed");
   }
 
-  const agent = createAgent(oauthSession);
   let response;
   try {
     response = await agent.call(getSetupStatus);
@@ -43,11 +34,12 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     return redirect("/?error=admin_registration_failed");
   }
 
-  const cookieSession = await getSession(request);
-  cookieSession.set("did", oauthSession.did);
   return redirect("/login", {
     headers: {
-      "Set-Cookie": await commitSession(cookieSession),
+      "Set-Cookie": await di.cookieSessionStorage.commit(
+        request.headers.get("Cookie"),
+        agent.assertDid,
+      ),
     },
   });
 };

@@ -4,7 +4,7 @@ import { data } from "react-router";
 
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { MembersPage } from "@/app/pages/client/members-page";
-import { env } from "@/app/shared/env";
+import { env } from "@/app/server/env";
 
 import type { Route } from "./+types/members";
 
