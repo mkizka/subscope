@@ -12,6 +12,8 @@ type Props = {
   likeCount?: number;
   liked: boolean;
   reposted: boolean;
+  likeBusy?: boolean;
+  repostBusy?: boolean;
   onLike: () => void;
   onRepost: () => void;
   onReply: () => void;
@@ -23,6 +25,7 @@ function ToggleButton(props: {
   Icon: LucideIcon;
   count?: number;
   pressed?: boolean;
+  busy?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -30,6 +33,7 @@ function ToggleButton(props: {
       type="button"
       aria-label={props.label}
       aria-pressed={props.pressed}
+      aria-disabled={props.busy}
       className={`
         btn gap-1 btn-ghost px-2 font-normal btn-sm
         ${props.pressed ? "text-primary" : "text-base-content/70"}
@@ -50,6 +54,8 @@ export function PostToolbar({
   likeCount,
   liked,
   reposted,
+  likeBusy,
+  repostBusy,
   onLike,
   onRepost,
   onReply,
@@ -68,6 +74,7 @@ export function PostToolbar({
         Icon={RepeatIcon}
         count={repostCount}
         pressed={reposted}
+        busy={repostBusy}
         onClick={onRepost}
       />
       <ToggleButton label="引用" Icon={QuoteIcon} onClick={onQuote} />
@@ -76,6 +83,7 @@ export function PostToolbar({
         Icon={HeartIcon}
         count={likeCount}
         pressed={liked}
+        busy={likeBusy}
         onClick={onLike}
       />
     </div>

@@ -11,6 +11,7 @@ const meta = {
         handle: "alice.bsky.social",
         displayName: "Alice",
         description: "Blueskyを使っています。",
+        isAdmin: true,
       },
       {
         did: "did:plc:carol",

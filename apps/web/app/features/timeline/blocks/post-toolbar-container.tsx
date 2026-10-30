@@ -16,8 +16,9 @@ function useReaction(type: string, post: Props, viewerUri?: string, count = 0) {
   const active = fetcher.formData
     ? !fetcher.formData.get("recordUri")
     : !!recordUri;
+  const busy = fetcher.state !== "idle";
   const toggle = () => {
-    if (fetcher.state === "submitting") return;
+    if (busy) return;
     void fetcher.submit(
       { type, uri: post.uri, cid: post.cid, recordUri: recordUri ?? "" },
       { method: "post", action: "/api/reactions" },
@@ -25,6 +26,7 @@ function useReaction(type: string, post: Props, viewerUri?: string, count = 0) {
   };
   return {
     active,
+    busy,
     toggle,
     count: count - Number(!!viewerUri) + Number(active),
   };
@@ -45,6 +47,8 @@ export function PostToolbarContainer(props: Props) {
       likeCount={like.count}
       liked={like.active}
       reposted={repost.active}
+      likeBusy={like.busy}
+      repostBusy={repost.busy}
       onLike={like.toggle}
       onRepost={repost.toggle}
       onReply={() =>

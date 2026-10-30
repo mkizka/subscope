@@ -52,4 +52,16 @@ test.describe("メンバー", () => {
       page.getByRole("heading", { name: /^メンバー \d+人$/ }),
     ).toBeVisible();
   });
+
+  test("members-4: 管理者のメンバーには「管理者」バッジを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/members");
+
+    const alice = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Alice" });
+    await expect(alice.getByText("管理者")).toBeVisible();
+  });
 });
