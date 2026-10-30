@@ -1,7 +1,10 @@
 import { createRegistry } from "@gyaku/di";
 
 import { banSubscriberUseCaseFactory } from "./application/admin/ban-subscriber-use-case";
+import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
+import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
 import { getBannedActorsUseCaseFactory } from "./application/admin/get-banned-actors-use-case";
+import { getInviteCodesUseCaseFactory } from "./application/admin/get-invite-codes-use-case";
 import { getSubscribersUseCaseFactory } from "./application/admin/get-subscribers-use-case";
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
@@ -58,4 +61,19 @@ export const di = await createRegistry()
     getBannedActorsUseCaseFactory,
   )
   .service("unbanActorUseCase", ["adminRepository"], unbanActorUseCaseFactory)
+  .service(
+    "getInviteCodesUseCase",
+    ["adminRepository"],
+    getInviteCodesUseCaseFactory,
+  )
+  .service(
+    "createInviteCodeUseCase",
+    ["adminRepository"],
+    createInviteCodeUseCaseFactory,
+  )
+  .service(
+    "deleteInviteCodeUseCase",
+    ["adminRepository"],
+    deleteInviteCodeUseCaseFactory,
+  )
   .resolve();
