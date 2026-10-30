@@ -6,24 +6,130 @@ import {
   type PostCardProps,
 } from "@/app/features/timeline/parts/post-card";
 
+type ThreadPost = PostCardProps & { uri: string };
+
 type Props = {
-  posts: (PostCardProps & { uri: string })[];
+  thread?: {
+    ancestors: ThreadPost[];
+    post: ThreadPost;
+    replies: ThreadPost[];
+  } | null;
   closeSearch: string;
 };
 
-export function ThreadPanel({ posts, closeSearch }: Props) {
+function FocusedPost({
+  authorAvatar,
+  authorDisplayName,
+  authorHandle,
+  text,
+  images,
+  createdAt,
+  replyCount,
+  repostCount,
+  likeCount,
+}: ThreadPost) {
+  const counts = [
+    { count: replyCount, label: "返信" },
+    { count: repostCount, label: "リポスト" },
+    { count: likeCount, label: "いいね" },
+  ].filter(({ count }) => !!count);
+  return (
+    <article
+      aria-label="選んだ投稿"
+      className="border-b border-base-300 px-4 pt-2 pb-3"
+    >
+      <div className="flex items-center gap-3">
+        {authorAvatar ? (
+          <img
+            src={authorAvatar}
+            alt=""
+            className="size-9 rounded-md object-cover"
+          />
+        ) : (
+          <div className="size-9 rounded-md bg-base-300" />
+        )}
+        <div className="min-w-0">
+          <div className="truncate font-bold">
+            {authorDisplayName ?? authorHandle}
+          </div>
+          <div className="truncate text-sm text-base-content/60">
+            @{authorHandle}
+          </div>
+        </div>
+      </div>
+      <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">{text}</p>
+      {images && (
+        <div className="mt-2 grid grid-cols-2 gap-1">
+          {images.map((image) => (
+            <img
+              key={image.thumb}
+              src={image.thumb}
+              alt={image.alt}
+              className="w-full rounded-sm object-cover"
+            />
+          ))}
+        </div>
+      )}
+      {createdAt && (
+        <time
+          dateTime={createdAt}
+          className="mt-2 block text-sm text-base-content/60"
+        >
+          {new Date(createdAt).toLocaleString("ja-JP", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })}
+        </time>
+      )}
+      {counts.length > 0 && (
+        <div className="mt-2 flex gap-4 text-sm">
+          {counts.map(({ count, label }) => (
+            <span key={label}>
+              <b>{count}</b>件の{label}
+            </span>
+          ))}
+        </div>
+      )}
+    </article>
+  );
+}
+
+export function ThreadPanel({ thread, closeSearch }: Props) {
   return (
     <section aria-label="スレッド" className="flex flex-col">
-      <Link
-        to={{ search: closeSearch }}
-        aria-label="閉じる"
-        className="btn m-2 btn-square self-end btn-ghost"
+      <header
+        className="
+          flex items-center justify-between border-b border-base-300 py-1 pr-2
+          pl-4
+        "
       >
-        <XIcon />
-      </Link>
-      {posts.map((post) => (
-        <PostCard key={post.uri} {...post} />
-      ))}
+        <h2 className="font-bold">スレッド</h2>
+        <Link
+          to={{ search: closeSearch }}
+          aria-label="閉じる"
+          className="btn btn-square btn-ghost btn-sm"
+        >
+          <XIcon className="size-4" />
+        </Link>
+      </header>
+      {thread && (
+        <>
+          {thread.ancestors.map((post) => (
+            <div key={post.uri} className="relative">
+              <div
+                className="
+                  absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
+                "
+              />
+              <PostCard {...post} />
+            </div>
+          ))}
+          <FocusedPost {...thread.post} />
+          {thread.replies.map((post) => (
+            <PostCard key={post.uri} {...post} />
+          ))}
+        </>
+      )}
     </section>
   );
 }
