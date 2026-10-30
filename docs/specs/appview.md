@@ -4,11 +4,12 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 ## テイクダウン
 
-モデレーションサービスがテイクダウンしたアカウントや投稿を、APIの応答から隠す。データは消さないので、ラベルが取り消されれば元に戻る。
+モデレーションサービスがテイクダウンしたアカウントや投稿と、PDSで停止されたアカウントを、APIの応答から隠す。データは消さないので、ラベルが取り消されたりアカウントが再開されたりすれば元に戻る。
 
 - takedown-1: `!takedown` か `!suspend` のラベルが付いたアカウントと投稿は応答に含めない
 - takedown-2: テイクダウンされたアカウントの投稿は応答に含めない
 - takedown-3: 期限が切れたラベルは無視する
+- takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない
 
 ## app.bsky.actor.getProfile
 
@@ -17,7 +18,8 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getProfile-1: 指定したアクターのprofileViewDetailedを返す
 - getProfile-2: 保存されていないアクターには400を返す
 - getProfile-3: プロフィールレコードがないアクターには、DIDとハンドルだけのprofileViewDetailedを返す
-- getProfile-4: テイクダウンされたアカウントには400とAccountTakedownを返す
+- getProfile-4: テイクダウンされたアカウントと、状態が takendown か suspended のアカウントには400とAccountTakedownを返す
+- getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す
 
 ## app.bsky.actor.getProfiles
 

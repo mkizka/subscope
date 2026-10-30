@@ -2,6 +2,7 @@
 import { AtUri } from "@atproto/syntax";
 import { factory, later } from "@factory-js/factory";
 import { faker } from "@faker-js/faker";
+import type { ActorStatus } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
@@ -32,6 +33,7 @@ export const actorFactory = (db: Database) =>
           indexedAt: () => faker.date.recent(),
           isAdmin: () => false,
           isBanned: () => false,
+          status: (): ActorStatus => "active",
         },
         vars: {},
       },
