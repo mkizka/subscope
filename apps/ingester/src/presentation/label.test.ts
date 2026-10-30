@@ -4,6 +4,7 @@ import { once } from "node:events";
 import { MessageFrame } from "@atproto/xrpc-server";
 import type { IJobQueue } from "@repo/common/domain";
 import { MetricReporter } from "@repo/common/infrastructure";
+import Keyv from "keyv";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
 import { WebSocketServer } from "ws";
@@ -19,32 +20,45 @@ const label = (val: string) => ({
 
 describe("LabelIngester", () => {
   let server: WebSocketServer;
-  let socket: WebSocket;
+  let moderationUrl: string;
   const jobQueue = { add: vi.fn(), getQueues: vi.fn() } satisfies IJobQueue;
+  const labelCursorStore = new Keyv<number>();
 
-  beforeEach(async () => {
-    server = new WebSocketServer({ port: 0 });
-    await once(server, "listening");
-    const address = server.address();
-    assert(typeof address === "object" && address);
-    const connection = new Promise<WebSocket>((resolve) =>
-      server.once("connection", resolve),
+  const connect = async () => {
+    const connection = new Promise<[WebSocket, URL]>((resolve) =>
+      server.once("connection", (socket, req) =>
+        resolve([socket, new URL(req.url ?? "", moderationUrl)]),
+      ),
     );
     const ingester = new LabelIngester(
       new MetricReporter(),
       jobQueue,
-      `ws://localhost:${address.port}`,
+      labelCursorStore,
+      moderationUrl,
     );
     void ingester.start();
-    socket = await connection;
+    return connection;
+  };
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    await labelCursorStore.clear();
+    server = new WebSocketServer({ port: 0 });
+    await once(server, "listening");
+    const address = server.address();
+    assert(typeof address === "object" && address);
+    moderationUrl = `ws://localhost:${address.port}`;
   });
 
   afterEach(async () => {
-    socket.close(1000);
+    for (const client of server.clients) {
+      client.close(1000);
+    }
     await new Promise((resolve) => server.close(resolve));
   });
 
   test("label-1: 受け取ったラベルを1件ずつlabelキューに積む", async () => {
+    const [socket] = await connect();
     const labels = [label("!takedown"), { ...label("spam"), neg: true }];
     socket.send(
       new MessageFrame({ seq: 1, labels }, { type: "#labels" }).toBytes(),
@@ -58,5 +72,23 @@ describe("LabelIngester", () => {
         data: expect.objectContaining(data),
       });
     }
+  });
+
+  test("label-2: 最後に受け取ったラベルのseqをRedisに保存し、再接続時はその続きから受け取る", async () => {
+    const [firstSocket, firstUrl] = await connect();
+    expect(firstUrl.searchParams.has("cursor")).toBe(false);
+
+    firstSocket.send(
+      new MessageFrame(
+        { seq: 42, labels: [label("!takedown")] },
+        { type: "#labels" },
+      ).toBytes(),
+    );
+    await vi.waitFor(async () =>
+      expect(await labelCursorStore.get(moderationUrl)).toBe(42),
+    );
+
+    const [, secondUrl] = await connect();
+    expect(secondUrl.searchParams.get("cursor")).toBe("42");
   });
 });

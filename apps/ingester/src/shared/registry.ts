@@ -1,9 +1,11 @@
 import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
 import {
+  createKeyvRedis,
   JobQueue,
   LoggerManager,
   MetricReporter,
 } from "@repo/common/infrastructure";
+import Keyv from "keyv";
 
 import { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
@@ -29,6 +31,7 @@ export const createIngesterRegistry = (env: Env) =>
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("jobQueue", ["redisUrl"], asClassArgs(JobQueue))
     .service("metricReporter", () => new MetricReporter())
+    .service("labelCursorStore", ["redisUrl"], ({ redisUrl }) => new Keyv<number>({ namespace: "label-cursor", useKeyPrefix: false, store: createKeyvRedis<number>(redisUrl) }))
     // application
     .service("handleIdentityUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleIdentityUseCase))
     .service("handleCommitUseCase", ["loggerManager", "metricReporter", "jobQueue"], asClassArgs(HandleCommitUseCase))
@@ -36,5 +39,5 @@ export const createIngesterRegistry = (env: Env) =>
     .service("metricsRouter", ["jobQueue", "metricReporter"], asFunctionArgs(metricsRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], asClassArgs(TapIngester))
-    .service("labelIngester", ["metricReporter", "jobQueue", "moderationUrl"], asClassArgs(LabelIngester))
+    .service("labelIngester", ["metricReporter", "jobQueue", "labelCursorStore", "moderationUrl"], asClassArgs(LabelIngester))
     .service("ingesterServer", ["loggerManager", "port", "disableIngester", "metricsRouter", "healthRouter", "tapIngester", "labelIngester"], asClassArgs(IngesterServer));
