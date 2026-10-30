@@ -20,7 +20,7 @@ test.describe("投稿欄", () => {
     await page.getByRole("button", { name: "いまどうしてる？" }).click();
   });
 
-  test("post-form-1: 畳んだ投稿欄はクリックで広がり、投稿した内容をタイムラインの一番下に表示する", async ({
+  test("post-form-1: 畳んだ投稿欄はクリックで広がり、投稿した内容を再読み込みなしでタイムラインの一番下に表示する", async ({
     page,
     request,
   }) => {
@@ -42,12 +42,7 @@ test.describe("投稿欄", () => {
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
 
-    await expect(async () => {
-      await page.reload();
-      await expect(page.getByText(/^post-form-1: /).last()).toHaveText(text, {
-        timeout: 1000,
-      });
-    }).toPass();
+    await expect(page.getByText(/^post-form-1: /).last()).toHaveText(text);
   });
 
   test("post-form-2: 300字を超えると投稿できない", async ({ page }) => {
@@ -68,12 +63,7 @@ test.describe("投稿欄", () => {
     await page.getByRole("textbox", { name: "画像1のALT" }).fill(alt);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
 
-    await expect(async () => {
-      await page.reload();
-      await expect(page.getByRole("img", { name: alt })).toBeAttached({
-        timeout: 1000,
-      });
-    }).toPass();
+    await expect(page.getByRole("img", { name: alt })).toBeAttached();
   });
 
   test("post-form-4: 画像は4枚まで添付できる", async ({ page }) => {

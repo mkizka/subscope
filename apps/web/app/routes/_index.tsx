@@ -1,7 +1,10 @@
+import { setTimeout } from "node:timers/promises";
+
 import { TID } from "@atproto/common-web";
 import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
+import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
@@ -152,6 +155,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
           ]
         : []),
     ]);
+    for (let i = 0; i < 20; i++) {
+      const { posts } = await agent
+        .call(getPosts, { uris: [uri] })
+        .catch(() => ({ posts: [] }));
+      if (posts.length > 0) break;
+      await setTimeout(250);
+    }
     return data({ uri });
   } catch (e) {
     loggerManager.createLogger("_index").error(e, "Failed to create post");
