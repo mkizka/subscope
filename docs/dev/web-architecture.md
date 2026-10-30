@@ -50,4 +50,3 @@
 
 - ローカルタイムライン: サーバーのメンバー全員の投稿を流す（`me.subsco.feed.getLocalTimeline`）
 - メンバー: サブスクライバーの一覧（`me.subsco.server.getMembers`）
-- 追跡中のユーザー: [追跡アクター](../glossary.md)の一覧。フォローしているメンバーが多い順に並べる（`me.subsco.server.getTrackedActors`）
