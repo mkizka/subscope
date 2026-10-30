@@ -4,11 +4,11 @@ import { once } from "node:events";
 import { MessageFrame } from "@atproto/xrpc-server";
 import type { IJobQueue } from "@repo/common/domain";
 import { MetricReporter } from "@repo/common/infrastructure";
-import Keyv from "keyv";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
 import { WebSocketServer } from "ws";
 
+import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store.in-memory.js";
 import { LabelIngester } from "./label.js";
 
 const label = (val: string) => ({
@@ -22,7 +22,7 @@ describe("LabelIngester", () => {
   let server: WebSocketServer;
   let moderationUrl: string;
   const jobQueue = { add: vi.fn(), getQueues: vi.fn() } satisfies IJobQueue;
-  const labelCursorStore = new Keyv<number>();
+  const labelCursorStore = new InMemoryLabelCursorStore();
 
   const connect = async () => {
     const connection = new Promise<[WebSocket, URL]>((resolve) =>
@@ -42,7 +42,7 @@ describe("LabelIngester", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    await labelCursorStore.clear();
+    labelCursorStore.clear();
     server = new WebSocketServer({ port: 0 });
     await once(server, "listening");
     const address = server.address();
@@ -85,7 +85,7 @@ describe("LabelIngester", () => {
       ).toBytes(),
     );
     await vi.waitFor(async () =>
-      expect(await labelCursorStore.get(moderationUrl)).toBe(42),
+      expect(await labelCursorStore.getCursor(moderationUrl)).toBe(42),
     );
 
     const [, secondUrl] = await connect();
