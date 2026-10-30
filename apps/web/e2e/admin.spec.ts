@@ -16,6 +16,23 @@ test.describe("管理画面へのアクセス", () => {
   });
 });
 
+test.describe("ジョブキュー", () => {
+  test("bull-board-1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
+    page,
+  }) => {
+    await login(page);
+
+    const link = page
+      .getByRole("navigation")
+      .getByRole("link", { name: "ジョブキュー" });
+    await expect(link.getByTestId("external-link-icon")).toBeVisible();
+    const popupPromise = page.waitForEvent("popup");
+    await link.click();
+    const popup = await popupPromise;
+    await expect(popup).toHaveURL(/\/admin\/bull-board/);
+  });
+});
+
 test.describe("登録ユーザー", () => {
   test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
