@@ -1,6 +1,7 @@
 import { asAtIdentifierString, asAtUriString } from "@atproto/syntax";
 import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
+import { schema } from "@repo/db";
 import {
   actorFactory,
   labelFactory,
@@ -8,6 +9,7 @@ import {
   recordFactory,
   testSetup,
 } from "@repo/test-utils";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../shared/api-test-utils.js";
@@ -90,6 +92,30 @@ describe("テイクダウン", () => {
     // assert
     expect(uris).toEqual([visiblePost.uri]);
   });
+
+  test.each(["takendown", "suspended", "deactivated"] as const)(
+    "takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない(%s)",
+    async (status) => {
+      // arrange
+      const post = await createPost();
+      const visiblePost = await createPost();
+      await ctx.db
+        .update(schema.actors)
+        .set({ status })
+        .where(eq(schema.actors.did, post.actorDid));
+
+      // act
+      const dids = await fetchProfileDids([
+        post.actorDid,
+        visiblePost.actorDid,
+      ]);
+      const uris = await fetchPostUris([post.uri, visiblePost.uri]);
+
+      // assert
+      expect(dids).toEqual([visiblePost.actorDid]);
+      expect(uris).toEqual([visiblePost.uri]);
+    },
+  );
 
   test("takedown-3: 期限が切れたラベルは無視する", async () => {
     // arrange

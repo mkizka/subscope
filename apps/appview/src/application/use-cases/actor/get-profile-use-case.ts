@@ -1,32 +1,38 @@
 import type { Did } from "@atproto/did";
 
-import {
-  type ILabelRepository,
-  isTakendown,
-} from "../../../application/interfaces/label-repository.js";
+import type { ActorLoader } from "../../../application/loader/actor-loader.js";
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
+import { hiddenReason } from "../../../application/visibility/visibility-filter.js";
 
-export class AccountTakedownError extends Error {
-  constructor() {
-    super("Account has been suspended");
-    this.name = "AccountTakedown";
+const messages = {
+  AccountTakedown: "Account has been suspended",
+  AccountDeactivated: "Account is deactivated",
+};
+
+export class AccountHiddenError extends Error {
+  constructor(reason: keyof typeof messages) {
+    super(messages[reason]);
+    this.name = reason;
   }
 }
 
 export class GetProfileUseCase {
   constructor(
     private readonly profileViewService: ProfileViewService,
-    private readonly labelRepository: ILabelRepository,
+    private readonly actorLoader: ActorLoader,
   ) {}
 
   async execute(did: Did, viewerDid?: Did | null) {
-    if (isTakendown(await this.labelRepository.findBySubjects([did]))) {
-      throw new AccountTakedownError();
+    const data = await this.actorLoader.loadProfiles([did]);
+    const profile = data.profiles.get(did);
+    const reason = profile && hiddenReason(profile, data.labels.get(did));
+    if (reason) {
+      throw new AccountHiddenError(reason);
     }
-    const [profile] = await this.profileViewService.findProfileViewDetailed(
+    const [view] = await this.profileViewService.findProfileViewDetailed(
       [did],
       viewerDid,
     );
-    return profile;
+    return view;
   }
 }

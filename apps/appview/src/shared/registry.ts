@@ -234,7 +234,7 @@ export const createAppRegistry = (env: Env) =>
     .service("followService", ["followRepository"], asClassArgs(FollowService))
     .service("feedProcessor", ["postRepository", "repostRepository", "postViewService", "profileViewService", "replyRefService"], asClassArgs(FeedProcessor))
     // use-cases
-    .service("getProfileUseCase", ["profileViewService", "labelRepository"], asClassArgs(GetProfileUseCase))
+    .service("getProfileUseCase", ["profileViewService", "actorLoader"], asClassArgs(GetProfileUseCase))
     .service("getProfilesUseCase", ["profileViewService"], asClassArgs(GetProfilesUseCase))
     .service("searchActorsUseCase", ["profileSearchService", "profileViewService"], asClassArgs(SearchActorsUseCase))
     .service("searchActorsTypeaheadUseCase", ["profileSearchService", "profileViewService"], asClassArgs(SearchActorsTypeaheadUseCase))
