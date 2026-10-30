@@ -1,6 +1,5 @@
 import { isRouteErrorResponse } from "react-router";
 
-import { AppLayout } from "@/app/components/app-layout";
 import { ErrorCard } from "@/app/features/error/blocks/error-card";
 
 type Props = {
@@ -29,13 +28,15 @@ export function ErrorPage({ error }: Props) {
   }
 
   return (
-    <AppLayout verticalCenter>
-      <ErrorCard
-        title={title}
-        details={details}
-        status={status}
-        stack={stack}
-      />
-    </AppLayout>
+    <main className="flex min-h-dvh items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <ErrorCard
+          title={title}
+          details={details}
+          status={status}
+          stack={stack}
+        />
+      </div>
+    </main>
   );
 }
