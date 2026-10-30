@@ -25,7 +25,6 @@ import type {
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
 import type { IRepostRepository } from "../interfaces/repost-repository.js";
-import { toMap, toMapBySubjectUri, toMapByUri } from "../utils/map.js";
 import { Batch } from "./batch.js";
 
 export type Viewer = {
@@ -46,15 +45,18 @@ type Repositories = {
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
+const byUri = (record: { uri: AtUri }): string => record.uri.toString();
+const bySubjectUri = (record: { subjectUri: AtUri }) =>
+  record.subjectUri.toString();
 
 export class ViewContext {
   private readonly profiles: Batch<Did, ProfileDetailed>;
   private readonly labels: Batch<string, Label[]>;
-  private readonly following: Batch<Did, AtUri>;
-  private readonly followedBy: Batch<Did, AtUri>;
+  private readonly following: Batch<Did, [Did, AtUri]>;
+  private readonly followedBy: Batch<Did, [Did, AtUri]>;
   private readonly posts: Batch<string, Post>;
   private readonly records: Batch<string, Record>;
-  private readonly postStats: Batch<string, PostStats>;
+  private readonly postStats: Batch<string, [string, PostStats]>;
   private readonly viewerLikes: Batch<string, Like>;
   private readonly viewerReposts: Batch<string, Repost>;
   private readonly generators: Batch<string, Generator>;
@@ -64,62 +66,66 @@ export class ViewContext {
     readonly viewer: Viewer,
   ) {
     const viewerDid = viewer.viewerDid;
-    const none = () => Promise.resolve(new Map());
-    this.profiles = new Batch((dids) =>
-      repos.profileRepository
-        .findManyDetailed(dids)
-        .then((profiles) => toMap(profiles, (profile) => profile.actorDid)),
+    const none = () => Promise.resolve([]);
+    const first = <K>([key]: [K, unknown]) => key;
+    this.profiles = Batch.one(
+      (dids) => repos.profileRepository.findManyDetailed(dids),
+      (profile) => profile.actorDid,
     );
-    this.labels = new Batch((subjects) =>
-      repos.labelRepository
-        .findBySubjects(subjects)
-        .then((labels) => Map.groupBy(labels, (label) => label.uri)),
+    this.labels = Batch.many(
+      (subjects) => repos.labelRepository.findBySubjects(subjects),
+      (label) => label.uri,
     );
-    this.following = new Batch<Did, AtUri>(
+    this.following = Batch.one(
       viewerDid
         ? (targetDids) =>
-            repos.followRepository.findFollowingMap({
-              actorDid: viewerDid,
-              targetDids,
-            })
+            repos.followRepository
+              .findFollowingMap({ actorDid: viewerDid, targetDids })
+              .then((map) => [...map])
         : none,
+      first,
     );
-    this.followedBy = new Batch<Did, AtUri>(
+    this.followedBy = Batch.one(
       viewerDid
         ? (targetDids) =>
-            repos.followRepository.findFollowedByMap({
-              actorDid: viewerDid,
-              targetDids,
-            })
+            repos.followRepository
+              .findFollowedByMap({ actorDid: viewerDid, targetDids })
+              .then((map) => [...map])
         : none,
+      first,
     );
-    this.posts = new Batch((uris) =>
-      repos.postRepository.findByUris(toAtUris(uris)).then(toMapByUri),
+    this.posts = Batch.one(
+      (uris) => repos.postRepository.findByUris(toAtUris(uris)),
+      byUri,
     );
-    this.records = new Batch((uris) =>
-      repos.recordRepository.findByUris(toAtUris(uris)).then(toMapByUri),
+    this.records = Batch.one(
+      (uris) => repos.recordRepository.findByUris(toAtUris(uris)),
+      byUri,
     );
-    this.postStats = new Batch((uris) =>
-      repos.postStatsRepository.findMap(toAtUris(uris)),
+    this.postStats = Batch.one(
+      (uris) =>
+        repos.postStatsRepository
+          .findMap(toAtUris(uris))
+          .then((map) => [...map]),
+      first,
     );
-    this.viewerLikes = new Batch<string, Like>(
+    this.viewerLikes = Batch.one<string, Like>(
       viewerDid
         ? (subjectUris) =>
-            repos.likeRepository
-              .findViewerLikes({ viewerDid, subjectUris })
-              .then(toMapBySubjectUri)
+            repos.likeRepository.findViewerLikes({ viewerDid, subjectUris })
         : none,
+      bySubjectUri,
     );
-    this.viewerReposts = new Batch<string, Repost>(
+    this.viewerReposts = Batch.one<string, Repost>(
       viewerDid
         ? (subjectUris) =>
-            repos.repostRepository
-              .findViewerReposts({ viewerDid, subjectUris })
-              .then(toMapBySubjectUri)
+            repos.repostRepository.findViewerReposts({ viewerDid, subjectUris })
         : none,
+      bySubjectUri,
     );
-    this.generators = new Batch((uris) =>
-      repos.generatorRepository.findByUris(toAtUris(uris)).then(toMapByUri),
+    this.generators = Batch.one(
+      (uris) => repos.generatorRepository.findByUris(toAtUris(uris)),
+      byUri,
     );
   }
 
@@ -153,8 +159,8 @@ export class ViewContext {
     return this.records.load(uri);
   }
 
-  stats(uri: string) {
-    return this.postStats.load(uri);
+  async stats(uri: string) {
+    return (await this.postStats.load(uri))?.[1];
   }
 
   generator(uri: string) {
@@ -166,7 +172,7 @@ export class ViewContext {
       this.following.load(did),
       this.followedBy.load(did),
     ]);
-    return { following, followedBy };
+    return { following: following?.[1], followedBy: followedBy?.[1] };
   }
 
   async viewerPostState(uri: string) {
