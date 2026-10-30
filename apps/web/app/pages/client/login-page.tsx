@@ -1,25 +1,29 @@
-import { Link } from "react-router";
-
-import { AppLayout } from "@/app/components/app-layout";
+import { InviteCodeFormContainer } from "@/app/features/login/blocks/invite-code-form-container";
 import { LoginFormContainer } from "@/app/features/login/blocks/login-form-container";
 
-export function LoginPage() {
+type Props = {
+  step: "setup" | "login" | "inviteCode";
+};
+
+export function LoginPage({ step }: Props) {
   return (
-    <AppLayout verticalCenter>
-      <div className="flex flex-col gap-4">
-        <div className="card border border-base-300 bg-base-100">
-          <div className="card-body">
-            <h2 className="card-title">atprotoでログイン</h2>
+    <main className="flex min-h-dvh items-center justify-center p-4">
+      <div className="card w-full max-w-sm border border-base-300 bg-base-100">
+        <div className="card-body">
+          <h1 className="card-title">Subscope</h1>
+          {step === "setup" && (
+            <p>最初にログインしたアカウントがこのサーバーの管理者になります</p>
+          )}
+          {step === "inviteCode" && (
+            <p>このサーバーを使うには招待コードを入力してください</p>
+          )}
+          {step === "inviteCode" ? (
+            <InviteCodeFormContainer />
+          ) : (
             <LoginFormContainer />
-          </div>
+          )}
         </div>
-        <p className="text-center text-sm text-base-content/70">
-          はじめて利用する場合は
-          <Link to="/register" className="link">
-            アカウントを登録してください
-          </Link>
-        </p>
       </div>
-    </AppLayout>
+    </main>
   );
 }

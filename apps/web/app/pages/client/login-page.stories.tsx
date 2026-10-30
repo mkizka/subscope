@@ -7,6 +7,9 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
+  args: {
+    step: "login",
+  },
 } satisfies Meta<typeof LoginPage>;
 
 export default meta;
@@ -14,3 +17,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Setup: Story = {
+  args: {
+    step: "setup",
+  },
+};
+
+export const InviteCode: Story = {
+  args: {
+    step: "inviteCode",
+  },
+};

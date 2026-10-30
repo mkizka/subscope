@@ -45,7 +45,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   const cookieSession = await getSession(request);
   cookieSession.set("did", oauthSession.did);
-  return redirect("/register", {
+  return redirect("/login", {
     headers: {
       "Set-Cookie": await commitSession(cookieSession),
     },
