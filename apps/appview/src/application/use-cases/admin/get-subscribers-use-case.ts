@@ -1,4 +1,5 @@
 import { asDid } from "@atproto/did";
+import { toDatetimeString } from "@atproto/syntax";
 import type * as MeSubscoAdminGetSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
@@ -54,7 +55,7 @@ export class GetSubscribersUseCase {
           {
             profile,
             isAdmin: adminDids.has(profile.did),
-            subscribedAt: sub.createdAt.toISOString(),
+            subscribedAt: toDatetimeString(sub.createdAt),
           },
         ];
       }),
