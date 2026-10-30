@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 type Props = {
   displayName?: string;
   handle: string;
@@ -6,6 +8,7 @@ type Props = {
   description?: string;
   followsCount: number;
   followersCount: number;
+  action?: ReactNode;
 };
 
 export function ProfileHeader({
@@ -16,6 +19,7 @@ export function ProfileHeader({
   description,
   followsCount,
   followersCount,
+  action,
 }: Props) {
   return (
     <section className="border-b border-base-300">
@@ -25,21 +29,25 @@ export function ProfileHeader({
         <div className="h-32 bg-base-300" />
       )}
       <div className="flex flex-col gap-2 px-4 pb-4">
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt=""
-            className="
-              -mt-10 size-20 rounded-full border-4 border-base-100 object-cover
-            "
-          />
-        ) : (
-          <div
-            className="
-              -mt-10 size-20 rounded-full border-4 border-base-100 bg-base-300
-            "
-          />
-        )}
+        <div className="flex items-end justify-between">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt=""
+              className="
+                -mt-10 size-20 rounded-full border-4 border-base-100
+                object-cover
+              "
+            />
+          ) : (
+            <div
+              className="
+                -mt-10 size-20 rounded-full border-4 border-base-100 bg-base-300
+              "
+            />
+          )}
+          {action}
+        </div>
         <div className="min-w-0">
           <h1 className="truncate text-lg font-bold">
             {displayName || handle}
