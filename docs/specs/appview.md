@@ -234,6 +234,9 @@ daysToExpire日後に期限が切れる招待コードを作る。管理者の�
 
 招待コードを、使用日時と使用したアクターとともに返す。管理者の認証が必要。limitとcursorでページングする。
 
+- getInviteCodes-1: 使用済みの招待コードには使用したアクターのprofileViewを含める
+- getInviteCodes-2: 使用したアクターがテイクダウンされていてもprofileViewを含める
+
 ## me.subsco.admin.deleteInviteCode
 
 未使用の招待コードを削除する。管理者の認証が必要。
