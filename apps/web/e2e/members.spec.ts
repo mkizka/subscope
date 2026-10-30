@@ -42,4 +42,16 @@ test.describe("メンバー", () => {
     const panel = page.getByRole("region", { name: "プロフィール" });
     await expect(panel.getByText("Alice")).toBeVisible();
   });
+
+  test("members-3: 管理者のメンバーには「管理者」バッジを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/members");
+
+    const alice = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Alice" });
+    await expect(alice.getByText("管理者")).toBeVisible();
+  });
 });

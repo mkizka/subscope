@@ -10,6 +10,7 @@ const meta = {
         did: "did:plc:alice",
         handle: "alice.bsky.social",
         displayName: "Alice",
+        isAdmin: true,
       },
       {
         did: "did:plc:carol",

@@ -1,3 +1,4 @@
+import { ShieldIcon } from "lucide-react";
 import { Link } from "react-router";
 
 export type Actor = {
@@ -6,6 +7,7 @@ export type Actor = {
   displayName?: string;
   avatarUrl?: string;
   subscriberFollowersCount?: number;
+  isAdmin?: boolean;
 };
 
 type Props = {
@@ -44,6 +46,12 @@ export function ActorList({ actors }: Props) {
                   @{profileId}
                 </p>
               </div>
+              {actor.isAdmin && (
+                <span className="badge badge-soft badge-sm badge-primary">
+                  <ShieldIcon className="size-3" />
+                  管理者
+                </span>
+              )}
               {actor.subscriberFollowersCount !== undefined && (
                 <span className="text-sm text-base-content/60">
                   {actor.subscriberFollowersCount} メンバーがフォロー
