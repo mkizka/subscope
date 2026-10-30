@@ -227,6 +227,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - banSubscriber-1: 管理者はBANせず、400とCannotBanAdminを返す
 - banSubscriber-2: 本人とそのフォロイーのsyncTapRepoジョブを積む
 
+## me.subsco.admin.unbanActor
+
+アカウントのBANを解除する。管理者の認証が必要。サブスクライバーには戻さず、本人が改めて登録する。
+
+- unbanActor-1: BANを解除したアカウントは招待コードで再登録できる
+- unbanActor-2: BANされていないアカウントには400とNotBannedを返す
+
 ## me.subsco.admin.createInviteCode
 
 daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。

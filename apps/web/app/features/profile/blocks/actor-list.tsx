@@ -6,6 +6,7 @@ export type Actor = {
   handle: string;
   displayName?: string;
   avatarUrl?: string;
+  description?: string;
   subscriberFollowersCount?: number;
   isAdmin?: boolean;
 };
@@ -45,6 +46,9 @@ export function ActorList({ actors }: Props) {
                 <p className="truncate text-sm text-base-content/60">
                   @{profileId}
                 </p>
+                {actor.description && (
+                  <p className="truncate text-sm">{actor.description}</p>
+                )}
               </div>
               {actor.isAdmin && (
                 <span className="badge badge-soft badge-sm badge-primary">

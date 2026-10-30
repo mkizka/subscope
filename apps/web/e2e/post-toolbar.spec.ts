@@ -55,16 +55,15 @@ for (const { id, name, collection } of cases) {
     }).toPass();
     const button = post.getByRole("button", { name });
 
-    await post.getByRole("link", { name: "スレッドを開く" }).focus();
     const reacted = page.waitForResponse((res) =>
       res.url().includes("/api/reactions"),
     );
-    await button.press("Enter");
+    await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "true");
     await reacted;
     await expect.poll(hasRecord).toBe(true);
 
-    await button.press("Enter");
+    await button.click();
     await expect(button).toHaveAttribute("aria-pressed", "false");
     await expect.poll(hasRecord).toBe(false);
   });
@@ -105,7 +104,6 @@ for (const { id, name, title, subjectOf } of composeCases) {
       await page.reload();
       await expect(post).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await post.getByRole("link", { name: "スレッドを開く" }).focus();
     await post.getByRole("button", { name }).click();
     await page
       .getByRole("textbox", { name: "投稿内容" })
