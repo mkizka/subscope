@@ -77,7 +77,7 @@ test.describe("プロフィール", () => {
       return (await res.text()).includes(bob);
     };
     await login(page);
-    await page.goto("/profile/bob.test");
+    await page.goto(`/profile/${bob}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -103,10 +103,10 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     await login(page);
-    await page.goto("/profile/alice.test");
+    await page.getByRole("link", { name: "プロフィール" }).click();
 
     const main = page.getByRole("main");
-    await expect(main.getByText("@alice.test")).toBeVisible();
+    await expect(main.getByText(/^\d+ フォロワー$/)).toBeVisible();
     await expect(main.getByRole("button", { name: /^フォロー/ })).toHaveCount(
       0,
     );
