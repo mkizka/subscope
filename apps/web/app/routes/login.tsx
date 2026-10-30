@@ -10,7 +10,7 @@ import { data, redirect } from "react-router";
 import { inviteCodeSchema } from "@/app/features/login/blocks/invite-code-form-container";
 import { getAgent } from "@/app/middlewares/auth";
 import { LoginPage } from "@/app/pages/client/login-page";
-import { env } from "@/app/server/shared/env";
+import { env } from "@/app/server/env";
 
 import type { Route } from "./+types/login";
 

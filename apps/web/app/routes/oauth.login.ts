@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data, redirect } from "react-router";
 
 import { loginSchema } from "@/app/features/login/blocks/login-form-container";
-import { services } from "@/app/server";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/oauth.login";
 
@@ -16,7 +16,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   try {
     return redirect(
-      await services.oauthClient.authorize(submission.value.identifier),
+      await di.oauthClient.authorize(submission.value.identifier),
     );
   } catch {
     return redirect("/login?error=auth_failed");

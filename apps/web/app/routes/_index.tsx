@@ -20,7 +20,7 @@ import {
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import { getAgent } from "@/app/middlewares/auth";
 import { TimelinePage } from "@/app/pages/client/timeline-page";
-import { services } from "@/app/server";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/_index";
 
@@ -44,7 +44,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   try {
     subscriptionResponse = await agent.call(getSubscriptionStatus);
   } catch (e) {
-    services.loggerManager
+    di.loggerManager
       .createLogger("_index")
       .error(e, "Failed to get subscription status");
     throw data("アカウント登録状態の取得に失敗しました", { status: 500 });
@@ -154,9 +154,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     ]);
     return data({ uri });
   } catch (e) {
-    services.loggerManager
-      .createLogger("_index")
-      .error(e, "Failed to create post");
+    di.loggerManager.createLogger("_index").error(e, "Failed to create post");
     return data({ error: "投稿に失敗しました" }, { status: 500 });
   }
 };

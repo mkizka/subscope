@@ -1,5 +1,5 @@
-import { services } from "@/app/server";
+import { di } from "@/app/server/di";
 
 export const loader = () => {
-  return Response.json(services.oauthClient.clientMetadata);
+  return Response.json(di.oauthClient.clientMetadata);
 };

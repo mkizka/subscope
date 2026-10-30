@@ -1,5 +1,5 @@
-import { services } from "@/app/server";
+import { di } from "@/app/server/di";
 
 export const loader = () => {
-  return Response.json(services.oauthClient.jwks);
+  return Response.json(di.oauthClient.jwks);
 };

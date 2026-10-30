@@ -9,39 +9,49 @@ routes の loader/action はできるだけ薄くし、処理は `apps/web/app/s
 
 ## 層
 
-| 層             | パス                                                            | 置くもの                                                                                      |
-| -------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| domain         | `app/server/domain/`                                            | ライブラリに依存しないルール(文字数上限、選択肢の検証など)                                    |
-| application    | `app/server/application/use-cases/{feature}/{name}-use-case.ts` | 画面1つ・操作1つごとのユースケース。PDSへのXRPC呼び出しと、画面が使う形への変換               |
-| application    | `app/server/application/interfaces/`                            | ユースケースが使うinfrastructureのinterface                                                   |
-| infrastructure | `app/server/infrastructure/`                                    | OAuthクライアント、Cookieセッション、DB、ジョブキューなど外部とのやりとり                     |
-| shared         | `app/server/shared/env.ts`, `app/server/shared/registry.ts`     | 環境変数とDIの配線                                                                            |
-| presentation   | `app/routes/`, `app/middlewares/`                               | 入力の検証、ユースケースの呼び出し、`data`/`redirect`での応答。React Routerの制約でここに置く |
+| 層             | 場所                                | 置くもの                                                                                      |
+| -------------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
+| domain         | `app/server/domain/{関心}/`         | ライブラリに依存しないルール(文字数上限、選択肢の検証など)                                    |
+| application    | `app/server/application/{関心}/`    | 画面1つ・操作1つごとのユースケース                                                            |
+| infrastructure | `app/server/infrastructure/{関心}/` | OAuth、Cookie、DB、ジョブキュー、PDSへのXRPC呼び出しなど外部とのやりとり                      |
+| presentation   | `app/routes/`, `app/middlewares/`   | 入力の検証、ユースケースの呼び出し、`data`/`redirect`での応答。React Routerの制約でここに置く |
+| DI             | `app/server/di.ts`                  | 依存の組み立て                                                                                |
+| 環境変数       | `app/server/env.ts`                 |                                                                                               |
 
-依存の向きは presentation → application → domain とし、application は infrastructure を interface 経由でのみ使う。
+- 依存の向きは presentation → application → domain とする。application は infrastructure を、infrastructure のファイルが export する interface 経由でだけ使う
+- ユースケースは PDS のクライアント(`@atproto/lex` の `Client`)を受け取らず、DID などの値だけを受け取る。クライアントの組み立てと XRPC の呼び出しは infrastructure で行い(`di.oauthClient.restore(did)`)、外部の値は infrastructure で画面が使う形に変換して返す
+- ログイン中ユーザーの DID はミドルウェアが `didContext` に入れるので、routes は `context.get(didContext)` で取り出してユースケースに渡す
 
-## ユースケース
+## 書き方
 
-- クラスで書き、`execute` の第1引数にログイン中ユーザーの `Client`(`@atproto/lex`)を受け取る。`Client` はリクエストごとに作られるのでDIせず引数で渡す
-- 戻り値は画面が使うプレーンなオブジェクトにする。`Request` や `data` などReact Routerのものは使わない
+クラスは使わず、依存をオブジェクトで受け取って interface を返すファクトリ関数で書く。
 
 ```ts
-export class GetTrackedActorsUseCase {
-  async execute(agent: Client) {
-    const { trackedActors, total } = await agent.call(getTrackedActors, { limit: 100 });
-    return { total, actors: trackedActors.map(...) };
-  }
+export interface ITimelineRepository {
+  findPosts: (did: string, cursor?: string) => Promise<TimelinePostDto[]>;
 }
+
+export const timelineRepositoryFactory = ({
+  oauthClient,
+}: {
+  oauthClient: IOAuthClient;
+}): ITimelineRepository => ({
+  async findPosts(did, cursor) { ... },
+});
 ```
 
-## DIの配線
+- 名前は `{名前}Factory`、戻り値の interface は `I{名前}` とし、同じファイルから export する
+- 環境変数は `@/app/server/env` から直接読む。DI の value にしない
+- ライブラリのクラスは関数内に閉じ込め、interface に出さない(例: `oauthClientFactory` は `NodeOAuthClient` を内部に持つ)
 
-- `app/server/shared/registry.ts` に `@gyaku/di` で登録する。registryは `@gyaku/di`・`@repo/*`・相対パスのみimportできる(ESLintで強制)
-- ライブラリのクラスは registry に登録せず、自前のクラスで private に包む(例: `OAuthClient` は `NodeOAuthClient` を包む)。非同期の初期化が必要なら、包んだクラスを返す `create〇〇` 関数を `asFunctionArgs` で登録する
-- 解決済みのサービスは `app/server/index.ts` の `services` から使う
+## DI
+
+- `app/server/di.ts` で `createRegistry()` に `.service("名前", ["依存"], 〇〇Factory)` と並べ、`resolve()` した結果を `di` として export する
+- `di.ts` は `@gyaku/di` と相対パスだけを import できる(ESLintで強制)
+- routes・middlewares からは `di.〇〇` で使う
 
 ## routes(presentation)
 
-- ログインが必要なルートは `loginRequiredMiddleware`/`adminRequiredMiddleware` を付け、`context.get(agentContext)` で `Client` を取り出してユースケースに渡す
+- ログインが必要なルートは `loginRequiredMiddleware`/`adminRequiredMiddleware` を `middleware` に並べる
 - フォームの入力は必ず conform-to(`parseWithZod`)で検証する。スキーマはフォームのコンポーネント(`features/**/blocks/*-container.tsx`)と共有する
 - `app/server` は loader/action/middleware からだけ参照する。コンポーネントから参照するとクライアントバンドルにサーバーの処理が入る

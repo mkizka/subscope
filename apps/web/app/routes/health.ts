@@ -1,4 +1,4 @@
-import { env } from "@/app/server/shared/env";
+import { env } from "@/app/server/env";
 
 export const loader = () => {
   return Response.json({

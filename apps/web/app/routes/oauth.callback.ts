@@ -2,18 +2,16 @@ import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
 import { redirect } from "react-router";
 
-import { services } from "@/app/server";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/oauth.callback";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const logger = services.loggerManager.createLogger("oauth.callback");
+  const logger = di.loggerManager.createLogger("oauth.callback");
 
   let agent;
   try {
-    agent = await services.oauthClient.callback(
-      new URL(request.url).searchParams,
-    );
+    agent = await di.oauthClient.callback(new URL(request.url).searchParams);
   } catch (e) {
     logger.error(e, "OAuth callback failed");
     return redirect("/?error=oauth_callback_failed");
@@ -38,7 +36,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   return redirect("/login", {
     headers: {
-      "Set-Cookie": await services.cookieSession.commit(agent.assertDid),
+      "Set-Cookie": await di.cookieSessionStorage.commit(
+        request.headers.get("Cookie"),
+        agent.assertDid,
+      ),
     },
   });
 };

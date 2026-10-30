@@ -21,7 +21,7 @@
 ## サーバー側の構成
 
 - loader/action の処理は `apps/web/app/server` 以下にオニオンアーキテクチャで置き、routes は入力の検証・ユースケースの呼び出し・応答だけにする
-- DI は appview と同じく `@gyaku/di` を使い、`app/server/shared/registry.ts` で配線する
+- DI は `@gyaku/di` を使い、ファクトリ関数を `app/server/di.ts` で組み立てる
 - 層の詳細は `.claude/skills/web-server/SKILL.md` を参照
 
 ## 技術選定

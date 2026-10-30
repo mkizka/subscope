@@ -13,9 +13,20 @@ export default defineConfig(
   },
   importAlias.configs.recommended,
   {
-    files: ["**/shared/registry.ts"],
+    files: ["app/server/di.ts"],
     rules: {
-      "@dword-design/import-alias/prefer-alias": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^(?!@gyaku/di$|\\.)",
+              message:
+                "DIの配線でライブラリを直接使わないでください。自前のinterfaceを返すファクトリ関数でラップしてください。",
+            },
+          ],
+        },
+      ],
     },
   },
   storybook.configs["flat/recommended"],
