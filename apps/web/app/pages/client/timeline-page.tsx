@@ -17,6 +17,9 @@ export function TimelinePage({ posts, cursor }: Props) {
   const [target, setTarget] = useState<ComposeTarget>();
   return (
     <ThreeColumnLayout>
+      <h1 className="border-b border-base-300 p-4 text-lg font-bold">
+        フォロー中
+      </h1>
       <TimelineFeedContainer
         posts={posts}
         cursor={cursor}

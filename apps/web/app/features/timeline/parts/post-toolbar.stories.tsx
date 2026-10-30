@@ -6,6 +6,9 @@ import { PostToolbar } from "./post-toolbar";
 const meta = {
   component: PostToolbar,
   args: {
+    replyCount: 3,
+    repostCount: 5,
+    likeCount: 12,
     liked: false,
     reposted: false,
     onLike: fn(),
@@ -13,11 +16,6 @@ const meta = {
     onReply: fn(),
     onQuote: fn(),
   },
-  decorators: (Story) => (
-    <div className="group relative h-12 w-64">
-      <Story />
-    </div>
-  ),
 } satisfies Meta<typeof PostToolbar>;
 
 export default meta;

@@ -7,6 +7,7 @@ const meta = {
   args: {
     handle: "alice.bsky.social",
     displayName: "Alice",
+    description: "Blueskyを使っています。",
     followsCount: 120,
     followersCount: 345,
     follow: { did: "did:plc:alice" },

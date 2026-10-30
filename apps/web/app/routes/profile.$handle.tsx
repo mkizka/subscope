@@ -40,6 +40,8 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       displayName={profile.displayName}
       handle={profile.handle}
       avatarUrl={profile.avatar}
+      bannerUrl={profile.banner}
+      description={profile.description}
       followsCount={profile.followsCount ?? 0}
       followersCount={profile.followersCount ?? 0}
       follow={

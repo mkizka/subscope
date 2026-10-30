@@ -7,6 +7,9 @@ import {
 } from "lucide-react";
 
 type Props = {
+  replyCount?: number;
+  repostCount?: number;
+  likeCount?: number;
   liked: boolean;
   reposted: boolean;
   onLike: () => void;
@@ -18,6 +21,7 @@ type Props = {
 function ToggleButton(props: {
   label: string;
   Icon: LucideIcon;
+  count?: number;
   pressed?: boolean;
   onClick: () => void;
 }) {
@@ -27,17 +31,23 @@ function ToggleButton(props: {
       aria-label={props.label}
       aria-pressed={props.pressed}
       className={`
-        btn join-item btn-square btn-ghost btn-sm
-        ${props.pressed ? "text-primary" : ""}
+        btn gap-1 btn-ghost px-2 font-normal btn-sm
+        ${props.pressed ? "text-primary" : "text-base-content/70"}
       `}
       onClick={props.onClick}
     >
       <props.Icon className="size-4" />
+      {!!props.count && (
+        <span title={`${props.count}件の${props.label}`}>{props.count}</span>
+      )}
     </button>
   );
 }
 
 export function PostToolbar({
+  replyCount,
+  repostCount,
+  likeCount,
   liked,
   reposted,
   onLike,
@@ -46,18 +56,17 @@ export function PostToolbar({
   onQuote,
 }: Props) {
   return (
-    <div
-      className="
-        absolute top-1 right-2 join hidden rounded-box border border-base-300
-        bg-base-100 shadow-sm
-        group-focus-within:flex
-        group-hover:flex
-      "
-    >
-      <ToggleButton label="返信" Icon={MessageCircleIcon} onClick={onReply} />
+    <div className="relative -ml-2 flex gap-2">
+      <ToggleButton
+        label="返信"
+        Icon={MessageCircleIcon}
+        count={replyCount}
+        onClick={onReply}
+      />
       <ToggleButton
         label="リポスト"
         Icon={RepeatIcon}
+        count={repostCount}
         pressed={reposted}
         onClick={onRepost}
       />
@@ -65,6 +74,7 @@ export function PostToolbar({
       <ToggleButton
         label="いいね"
         Icon={HeartIcon}
+        count={likeCount}
         pressed={liked}
         onClick={onLike}
       />

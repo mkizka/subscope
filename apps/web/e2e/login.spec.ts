@@ -54,6 +54,20 @@ test.describe("ログイン", () => {
     );
   });
 
+  test("login-8: 招待コードの入力を求めるときは「ログイン」「招待コード」の2段階の手順を出し、今が「招待コード」の段階であることを示す", async ({
+    page,
+  }) => {
+    await login(page, "bob.test", "/login");
+
+    const steps = page.getByRole("list", { name: "手順" });
+    await expect(steps.getByRole("listitem")).toHaveText([
+      "ログイン",
+      "招待コード",
+    ]);
+    await expect(steps.locator('[aria-current="step"]')).toHaveText(
+      "招待コード",
+    );
+  });
   test("login-6: 有効な招待コードを入力すると、サブスクライバーとして登録してタイムラインに移動する", async ({
     page,
     browser,
@@ -71,5 +85,17 @@ test.describe("ログイン", () => {
 
     await page.waitForURL("/");
     await expect(page.getByRole("navigation")).toBeVisible();
+  });
+
+  test("login-7: ログイン画面には、Blueskyのアカウントでログインする招待制のサーバーであることを出す", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+
+    await expect(
+      page.getByText(
+        "招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。",
+      ),
+    ).toBeVisible();
   });
 });

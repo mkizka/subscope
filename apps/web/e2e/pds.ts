@@ -36,6 +36,27 @@ export const createRecord = async (
   );
 };
 
+const PNG_BASE64 =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
+export const uploadImage = async (handle: string) => {
+  const { accessJwt } = await xrpc<{ accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  const response = await fetch(`${PDS_URL}/xrpc/com.atproto.repo.uploadBlob`, {
+    method: "POST",
+    headers: {
+      "content-type": "image/png",
+      authorization: `Bearer ${accessJwt}`,
+    },
+    body: new Blob([Buffer.from(PNG_BASE64, "base64")]),
+  });
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { blob } = (await response.json()) as { blob: unknown };
+  return blob;
+};
+
 export const resolveHandle = async (handle: string) => {
   const response = await fetch(
     `${PDS_URL}/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`,
@@ -105,4 +126,27 @@ export const subscribeServer = async (handle: string, inviteCode: string) => {
   if (!response.ok && !body.includes("AlreadySubscribed")) {
     throw new Error(`${lxm} failed: ${body}`);
   }
+};
+
+export const uploadBlob = async (
+  handle: string,
+  body: Uint8Array<ArrayBuffer>,
+) => {
+  const { accessJwt } = await xrpc<{ accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  const response = await fetch(`${PDS_URL}/xrpc/com.atproto.repo.uploadBlob`, {
+    method: "POST",
+    headers: {
+      "content-type": "image/png",
+      authorization: `Bearer ${accessJwt}`,
+    },
+    body,
+  });
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const { blob } = (await response.json()) as {
+    blob: { ref: { $link: string } };
+  };
+  return blob;
 };

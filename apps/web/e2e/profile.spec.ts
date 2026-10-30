@@ -1,17 +1,25 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
-import { createRecord, follow, putRecord, resolveHandle } from "./pds";
+import {
+  createRecord,
+  follow,
+  putRecord,
+  resolveHandle,
+  uploadImage,
+} from "./pds";
 
 const PDS_URL = "http://localhost:2583";
 
 test.describe("プロフィール", () => {
-  test("profile-1: 左カラムの「プロフィール」から、中央カラムに自分のプロフィール（名前、ハンドル、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
+  test("profile-1: 左カラムの「プロフィール」から、中央カラムに自分のプロフィール（バナー、アイコン、名前、ハンドル、自己紹介、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
     page,
   }) => {
     const text = `profile-1の投稿 ${Date.now()}`;
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {
       displayName: "Alice",
+      description: "profile-1の自己紹介",
+      banner: await uploadImage("alice.test"),
     });
     await createRecord("alice.test", "app.bsky.feed.post", {
       text,
@@ -30,6 +38,12 @@ test.describe("プロフィール", () => {
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(text)).toBeVisible({ timeout: 1000 });
+      await expect(main.getByText("profile-1の自己紹介")).toBeVisible({
+        timeout: 1000,
+      });
+      await expect(main.locator('img[src*="/img/banner/"]')).toBeAttached({
+        timeout: 1000,
+      });
     }).toPass();
   });
 

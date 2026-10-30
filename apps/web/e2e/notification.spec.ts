@@ -1,7 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
-import { createRecord, follow, putRecord, resolveHandle } from "./pds";
+import {
+  createRecord,
+  follow,
+  putRecord,
+  resolveHandle,
+  uploadBlob,
+} from "./pds";
 
 test.describe("通知", () => {
   test.use({ viewport: { width: 375, height: 667 } });
@@ -91,7 +97,7 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-3: リプライ・引用・メンションの通知には、その投稿を表示する", async ({
+  test("notification-3: リプライ・引用・メンションの通知には、相手の名前とその投稿を表示する", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();
@@ -141,8 +147,17 @@ test.describe("通知（PC）", () => {
     const panel = page.getByRole("complementary");
     await expect(async () => {
       await page.reload();
-      for (const text of texts) {
-        await expect(panel.getByText(text)).toBeVisible({ timeout: 1000 });
+      for (const [label, text] of [
+        ["Bobさんが返信しました", texts[0]],
+        ["Bobさんが引用しました", texts[1]],
+        ["Bobさんがメンションしました", texts[2]],
+      ] as const) {
+        await expect(
+          panel
+            .getByRole("listitem")
+            .filter({ hasText: label })
+            .filter({ hasText: text }),
+        ).toBeVisible({ timeout: 1000 });
       }
     }).toPass();
   });
@@ -215,6 +230,46 @@ test.describe("通知（PC）", () => {
       await expect(replies.first()).toBeVisible({ timeout: 1000 });
       await replies.last().scrollIntoViewIfNeeded();
       await expect(replies).toHaveText([...texts].reverse(), { timeout: 1000 });
+    }).toPass();
+  });
+
+  test("notification-7: 通知には、種類を表す色付きのアイコンと相手のアバターを表示する", async ({
+    page,
+  }) => {
+    const avatar = await uploadBlob(
+      "bob.test",
+      Uint8Array.from(
+        Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+          "base64",
+        ),
+      ),
+    );
+    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
+      displayName: "Bob",
+      avatar,
+    });
+    await follow("alice.test", "bob.test");
+    await createRecord("bob.test", "app.bsky.graph.follow", {
+      subject: await resolveHandle("alice.test"),
+      createdAt: new Date().toISOString(),
+    });
+
+    await login(page);
+
+    const notification = page
+      .getByRole("complementary")
+      .getByRole("listitem")
+      .filter({ hasText: "Bobさんにフォローされました" })
+      .first();
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        notification.getByRole("img", { name: "フォロー" }),
+      ).toBeVisible({ timeout: 1000 });
+      await expect(
+        notification.locator(`img[src*="${avatar.ref.$link}"]`),
+      ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
 });
