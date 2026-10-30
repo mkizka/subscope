@@ -163,6 +163,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 サーバーの初期設定が済んでいるかを返す。認証は不要。管理者が登録済みなら initialized を true にする。
 
+## me.subsco.server.getTrackedActors
+
+追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数を返す。認証が必要。limitとcursorでページングする。
+
+- getTrackedActors-1: サブスクライバーとそのフォロイーを返し、それ以外のアクターは含めない
+- getTrackedActors-2: フォローしているサブスクライバーが多い順に並べる
+
 ## me.subsco.sync.subscribeServer
 
 閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。管理者は招待コードなしで登録でき、それ以外は有効期限内の未使用の招待コードが必要で、使った招待コードは使用済みになる。招待コードが無効なら400とInvalidInviteCodeを、登録済みなら400とAlreadySubscribedを返す。
