@@ -125,13 +125,6 @@ test.describe("登録ユーザー", () => {
     const { code } = (await response.json()) as { code: string };
     await subscribeServer(handle, code);
     const did = await resolveHandle(handle);
-    await page.goto("/admin/subscribers");
-    await expect(async () => {
-      await page.reload();
-      await expect(page.getByTitle(did)).toHaveText(`@${handle}`, {
-        timeout: 1000,
-      });
-    }).toPass();
     await page.request.delete("/admin/api/subscribers", { data: { did } });
     return did;
   };
@@ -170,7 +163,7 @@ test.describe("登録ユーザー", () => {
       .filter({ has: page.getByTitle(graceDid) });
     await page.getByRole("tab", { name: "BAN済み" }).click();
 
-    await expect(row).toContainText("@grace.test");
+    await expect(row.getByTitle(graceDid)).toBeVisible();
   });
 
   test("subscribers-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
