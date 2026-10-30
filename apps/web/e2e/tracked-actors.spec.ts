@@ -46,7 +46,9 @@ test.describe("追跡中のユーザー", () => {
 
     await expect(page).toHaveURL(/\/tracked-actors\?profile=/);
     const panel = page.getByRole("region", { name: "プロフィール" });
-    await expect(panel.getByText("Bob")).toBeVisible();
+    await expect(
+      panel.getByRole("heading", { name: "Bob", exact: true }),
+    ).toBeVisible();
   });
 
   test("tracked-actors-3: 一覧の上に、追跡アクターがメンバーとそのフォロー先であり、このサーバーはその人たちの投稿だけを保存することを説明する", async ({

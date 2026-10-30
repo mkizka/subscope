@@ -57,9 +57,9 @@ describe("ResolveDidUseCase", () => {
     expect(actor?.handle).toBe("handle.invalid");
   });
 
-  test("resolveDid-3: すでにハンドルを持つアクターのハンドルは上書きしない", async () => {
+  test("resolveDid-3: すでに handle.invalid 以外のハンドルを持つアクターのハンドルは上書きしない", async () => {
     // arrange
-    const actor = actorFactory({ handle: asHandle("handle.invalid") });
+    const actor = actorFactory({ handle: asHandle("old.test") });
     actorRepository.add(actor);
     setDidDocument(actor.did, "alice.test");
     handleResolver.add(asHandle("alice.test"), actor.did);
@@ -69,6 +69,6 @@ describe("ResolveDidUseCase", () => {
 
     // assert
     const saved = await actorRepository.findByDid({ ctx, did: actor.did });
-    expect(saved?.handle).toBe("handle.invalid");
+    expect(saved?.handle).toBe("old.test");
   });
 });

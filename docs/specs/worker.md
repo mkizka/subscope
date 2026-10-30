@@ -45,13 +45,16 @@ null文字を含む文字列はPostgreSQLに保存できないため除外する
 
 ## ハンドルの解決
 
-ハンドルを持たないアクターのDIDドキュメントを`resolveDid`ジョブで解決し、ハンドルを保存する。
+ハンドルを持たないか handle.invalid のアクターのDIDドキュメントを`resolveDid`ジョブで解決し、ハンドルを保存する。
 
 - resolveDid-1: DIDドキュメントのハンドルは、そのハンドルが同じDIDに解決できるときだけ保存する
 - resolveDid-2: ハンドルが同じDIDに解決できないときは handle.invalid を保存する
-- resolveDid-3: すでにハンドルを持つアクターのハンドルは上書きしない
+- resolveDid-3: すでに handle.invalid 以外のハンドルを持つアクターのハンドルは上書きしない
+- resolveDid-4: Tapのidentityイベントのハンドルが handle.invalid のときは、DIDドキュメントからハンドルを解決し直す
 
-DIDドキュメントのハンドルは本人以外も自由に書けるため、公式AppViewと同じくハンドルからDIDへの解決と照らしてから保存する。Tapもidentityイベントで同じ検証をしてハンドルを送るので、すでにあるハンドルはそちらを優先する。
+DIDドキュメントのハンドルは本人以外も自由に書けるため、公式AppViewと同じくハンドルからDIDへの解決と照らしてから保存する。Tapもidentityイベントで同じ検証をしてハンドルを送るので、すでにあるハンドルはそちらを優先する。ただしTapはハンドルの解決に一時的に失敗したときも handle.invalid を送り、開発環境の`.test`のハンドルは常に解決できないため、handle.invalid だけは自分でも解決し直す。
+
+`ATPROTO_HANDLE_RESOLVER_URL`を設定すると、ハンドルはDNSやHTTPSではなくそのサーバーの`com.atproto.identity.resolveHandle`で解決する。`.test`のハンドルを使う開発環境向けの設定である。
 
 ## 統計の集計
 

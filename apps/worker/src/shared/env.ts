@@ -12,6 +12,7 @@ const schema = z.object({
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3003),
   PLC_URL: z.url().default("https://plc.directory"),
+  ATPROTO_HANDLE_RESOLVER_URL: z.url().optional(),
   DATABASE_URL: z.url(),
   REDIS_URL: z.url(),
   TAP_URL: match({
