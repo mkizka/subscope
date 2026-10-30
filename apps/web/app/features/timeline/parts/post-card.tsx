@@ -135,14 +135,19 @@ export function PostCard({
               empty:hidden
             "
           >
-            <CountChip
-              Icon={MessageCircleIcon}
-              count={replyCount}
-              label="返信"
-            />
             <CountChip Icon={RepeatIcon} count={repostCount} label="リポスト" />
             <CountChip Icon={HeartIcon} count={likeCount} label="いいね" />
           </div>
+          {!!replyCount && (
+            <div
+              className="
+                mt-1 flex items-center gap-1 text-sm font-bold text-primary
+              "
+            >
+              <MessageCircleIcon className="size-4" />
+              {replyCount}件の返信
+            </div>
+          )}
         </div>
       </div>
     </article>

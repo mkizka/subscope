@@ -141,7 +141,7 @@ test.describe("タイムライン", () => {
       .filter({ hasText: "timeline-3: 親投稿" });
     await expect(async () => {
       await page.reload();
-      await expect(parentPost.getByTitle("1件の返信")).toBeVisible({
+      await expect(parentPost).toContainText("1件の返信", {
         timeout: 1000,
       });
     }).toPass();
