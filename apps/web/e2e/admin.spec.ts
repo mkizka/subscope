@@ -196,4 +196,21 @@ test.describe("招待コード", () => {
 
     await expect(row).toHaveCount(0);
   });
+
+  test("invite-codes-7: 未使用で期限内の招待コードは、コードの横のボタンでコードをクリップボードにコピーできる", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await login(page);
+    const code = await createInviteCode(page);
+
+    await page.goto("/admin/invite-codes");
+    const row = inviteCodeRows(page).filter({ hasText: code });
+    await row.getByRole("button", { name: "コピー" }).click();
+
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe(code);
+  });
 });
