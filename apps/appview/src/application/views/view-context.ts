@@ -24,6 +24,7 @@ import type { IProfileRepository } from "../interfaces/profile-repository.js";
 import type { IRecordRepository } from "../interfaces/record-repository.js";
 import type { IRepostRepository } from "../interfaces/repost-repository.js";
 import { toMap, toMapBySubjectUri, toMapByUri } from "../utils/map.js";
+import { hiddenReason } from "../visibility/visibility-filter.js";
 import { Batch } from "./batch.js";
 
 export type Viewer = {
@@ -129,11 +130,14 @@ export class ViewContext {
   }
 
   async profile(did: Did) {
-    const [profile, visible] = await Promise.all([
+    const [profile, labels] = await Promise.all([
       this.profiles.load(did),
-      this.isVisible(did),
+      this.labels.load(did),
     ]);
-    return visible ? profile : undefined;
+    if (!profile || this.viewer.includeTakedowns) {
+      return profile;
+    }
+    return hiddenReason(profile, labels) ? undefined : profile;
   }
 
   async post(uri: string) {
