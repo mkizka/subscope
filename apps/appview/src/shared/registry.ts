@@ -18,7 +18,6 @@ import {
   TransactionManager,
 } from "@repo/common/infrastructure";
 
-import { ActorHydrator } from "../application/hydration/actor-hydrator.js";
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/actor-stats-repository.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
@@ -39,6 +38,7 @@ import type { IRepostRepository } from "../application/interfaces/repost-reposit
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 import type { ITimelineRepository } from "../application/interfaces/timeline-repository.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
+import { ActorLoader } from "../application/loader/actor-loader.js";
 import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
 import { ProfileViewService } from "../application/service/actor/profile-view-service.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
@@ -206,8 +206,8 @@ export const createAppRegistry = (env: Env) =>
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileViewBuilder", ["assetUrlBuilder"], asClassArgs(ProfileViewBuilder))
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
-    .service("actorHydrator", ["profileRepository", "actorStatsRepository", "followRepository", "labelRepository"], asClassArgs(ActorHydrator))
-    .service("profileViewService", ["actorHydrator", "profileViewBuilder"], asClassArgs(ProfileViewService))
+    .service("actorLoader", ["profileRepository", "actorStatsRepository", "followRepository", "labelRepository"], asClassArgs(ActorLoader))
+    .service("profileViewService", ["actorLoader", "profileViewBuilder"], asClassArgs(ProfileViewService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("generatorViewService", ["generatorRepository", "profileViewService", "assetUrlBuilder"], asClassArgs(GeneratorViewService))
