@@ -42,7 +42,7 @@ const network = await TestNetworkNoAppView.create({
   },
 });
 
-for (const name of ["alice", "bob"]) {
+for (const name of ["alice", "bob", "carol"]) {
   await network.pds.getAgent().createAccount({
     handle: `${name}.test`,
     email: `${name}@example.com`,
