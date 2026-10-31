@@ -1,4 +1,3 @@
-import type { Did } from "@atproto/did";
 import type { Like } from "@repo/common/domain";
 
 import type { ILikeRepository } from "../../application/interfaces/like-repository.js";
@@ -35,22 +34,6 @@ export class InMemoryLikeRepository implements ILikeRepository {
       likes
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
         .slice(0, limit),
-    );
-  }
-
-  findViewerLikes({
-    viewerDid,
-    subjectUris,
-  }: {
-    viewerDid: Did;
-    subjectUris: string[];
-  }): Promise<Like[]> {
-    return Promise.resolve(
-      Array.from(this.likes.values()).filter(
-        (l) =>
-          l.actorDid === viewerDid &&
-          subjectUris.includes(l.subjectUri.toString()),
-      ),
     );
   }
 }
