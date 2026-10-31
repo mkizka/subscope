@@ -104,6 +104,7 @@ import { SubscribeServerUseCase } from "../application/use-cases/sync/subscribe-
 import { UnsubscribeServerUseCase } from "../application/use-cases/sync/unsubscribe-server-use-case.js";
 import { EmbedViews } from "../application/views/embed-views.js";
 import { GeneratorViews } from "../application/views/generator-views.js";
+import { ListViews } from "../application/views/list-views.js";
 import { NotificationViews } from "../application/views/notification-views.js";
 import { PostViews } from "../application/views/post-views.js";
 import { ProfileViews } from "../application/views/profile-views.js";
@@ -259,11 +260,12 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
-    .service("postViews", ["profileViews", "embedViews"], asClassArgs(PostViews))
+    .service("listViews", ["assetUrlBuilder"], asClassArgs(ListViews))
+    .service("postViews", ["profileViews", "embedViews", "listViews"], asClassArgs(PostViews))
     .service("notificationViews", ["profileViews", "postViews", "generatorViews"], asClassArgs(NotificationViews))
     .service("feedProcessor", ["postRepository", "repostRepository", "postViewService", "profileViewService", "replyRefService"], asClassArgs(FeedProcessor))
     // use-cases
@@ -289,9 +291,9 @@ export const createAppRegistry = (env: Env) =>
     .service("getListsUseCase", ["listQuery", "listViewService"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["db", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["db", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
-    .service("getBannedActorsUseCase", ["actorRepository", "profileViewService"], asClassArgs(GetBannedActorsUseCase))
-    .service("getInviteCodesUseCase", ["inviteCodeService", "profileViewService"], asClassArgs(GetInviteCodesUseCase))
-    .service("getSubscribersUseCase", ["subscriptionService", "profileViewService", "actorRepository", "subscriptionRepository"], asClassArgs(GetSubscribersUseCase))
+    .service("getBannedActorsUseCase", ["actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
+    .service("getInviteCodesUseCase", ["inviteCodeService", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
+    .service("getSubscribersUseCase", ["subscriptionService", "viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository"], asClassArgs(GetSubscribersUseCase))
     .service("grantAdminUseCase", ["db", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorRepository", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["actorRepository"], asClassArgs(VerifyAccessUseCase))

@@ -4,7 +4,6 @@ import { getFollowListUseCaseFactory } from "./application/actor/get-follow-list
 import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
-import { searchActorsUseCaseFactory } from "./application/actor/search-actors-use-case";
 import { banSubscriberUseCaseFactory } from "./application/admin/ban-subscriber-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
@@ -16,6 +15,7 @@ import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-ca
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
+import { deleteListUseCaseFactory } from "./application/list/delete-list-use-case";
 import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
 import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
 import { removeListMemberUseCaseFactory } from "./application/list/remove-list-member-use-case";
@@ -29,7 +29,9 @@ import { countUnreadNotificationsUseCaseFactory } from "./application/notificati
 import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
+import { deletePostUseCaseFactory } from "./application/post/delete-post-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
+import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorQueryFactory } from "./infrastructure/actor/actor-query";
@@ -114,6 +116,11 @@ export const di = await createRegistry()
     ["postCommand", "postQuery"],
     createPostUseCaseFactory,
   )
+  .service(
+    "deletePostUseCase",
+    ["postCommand", "postQuery"],
+    deletePostUseCaseFactory,
+  )
   .service("adminQuery", ["oauthClient"], adminQueryFactory)
   .service("adminCommand", ["oauthClient"], adminCommandFactory)
   .service(
@@ -157,7 +164,11 @@ export const di = await createRegistry()
     ["actorQuery"],
     getProfilePageUseCaseFactory,
   )
-  .service("searchActorsUseCase", ["actorQuery"], searchActorsUseCaseFactory)
+  .service(
+    "searchUseCase",
+    ["actorQuery", "timelineQuery"],
+    searchUseCaseFactory,
+  )
   .service("followCommand", ["oauthClient"], followCommandFactory)
   .service("reactionCommand", ["oauthClient"], reactionCommandFactory)
   .service("toggleFollowUseCase", ["followCommand"], toggleFollowUseCaseFactory)
@@ -178,6 +189,7 @@ export const di = await createRegistry()
   .service("getListPageUseCase", ["listQuery"], getListPageUseCaseFactory)
   .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
   .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
+  .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
   .service(
     "addListMemberUseCase",
     ["actorQuery", "listCommand"],

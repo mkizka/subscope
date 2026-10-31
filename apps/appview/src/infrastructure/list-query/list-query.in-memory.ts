@@ -35,9 +35,10 @@ export class InMemoryListQuery implements IListQuery {
     );
   }
 
-  findByUri(uri: AtUri): Promise<ListDto | null> {
+  findByUris(uris: AtUri[]): Promise<ListDto[]> {
+    const keys = uris.map((uri) => uri.toString());
     return Promise.resolve(
-      this.lists.find((list) => list.uri === uri.toString()) ?? null,
+      this.lists.filter((list) => keys.includes(list.uri)),
     );
   }
 

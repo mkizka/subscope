@@ -40,6 +40,7 @@ e2eディレクトリ
 
 - `@repo/e2e`
   - PDS・ingester・worker・appview・webを全て起動し、Webクライアントを操作してシステム全体を検証するPlaywrightのE2Eテスト
+  - `tests/{仕様書名}/` にテスト、`helpers/` にPDS操作やログインなどの共通処理を置く
 
 ### 実装パターン(サーバー)
 

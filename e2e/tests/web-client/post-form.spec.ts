@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { resolveHandle } from "./pds";
-
-const PDS_URL = "http://localhost:2583";
+import { PDS_URL, resolveHandle } from "../../helpers/pds";
 
 const image = (name: string) => ({
   name,

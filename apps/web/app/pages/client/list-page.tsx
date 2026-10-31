@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { ListForm } from "@/app/features/list/blocks/list-form";
 import {
@@ -23,6 +24,7 @@ type Props = {
   posts: TimelinePost[];
   members: (Actor & { listItemUri: string })[];
   isSelf: boolean;
+  onDelete: () => void;
 };
 
 export function ListPage({
@@ -33,6 +35,7 @@ export function ListPage({
   posts,
   members,
   isSelf,
+  onDelete,
 }: Props) {
   return (
     <ThreeColumnLayout>
@@ -45,12 +48,31 @@ export function ListPage({
         )}
       </section>
       {isSelf && (
-        <ListForm
-          summary="編集する"
-          submitLabel="保存する"
-          name={name}
-          description={description}
-        />
+        <>
+          <ListForm
+            summary="編集する"
+            submitLabel="保存する"
+            name={name}
+            description={description}
+          />
+          <ConfirmDialog
+            title={`「${name}」を削除しますか？`}
+            description="リストとそのメンバー登録が削除され、元に戻せません。"
+            confirmLabel="削除する"
+            danger
+            onConfirm={onDelete}
+          >
+            {(open) => (
+              <button
+                type="button"
+                className="btn m-4 btn-outline btn-error btn-sm"
+                onClick={open}
+              >
+                削除する
+              </button>
+            )}
+          </ConfirmDialog>
+        </>
       )}
       <div role="tablist" className="tabs tabs-border">
         {(

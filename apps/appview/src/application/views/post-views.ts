@@ -11,6 +11,7 @@ import { gateUri } from "../utils/gate-uri.js";
 import { asLexMap } from "../utils/lex.js";
 import type { EmbedViews } from "./embed-views.js";
 import { toLabelViews } from "./label-views.js";
+import type { ListViews } from "./list-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
 
@@ -18,6 +19,7 @@ export class PostViews {
   constructor(
     private readonly profileViews: ProfileViews,
     private readonly embedViews: EmbedViews,
+    private readonly listViews: ListViews,
   ) {}
 
   async postView(
@@ -43,6 +45,10 @@ export class PostViews {
     if (!record || !author) {
       return undefined;
     }
+    const [replyDisabled, threadgate] = await Promise.all([
+      gate && this.replyDisabled(rootUri, gate, ctx),
+      gate && rootUri === uri ? this.threadgateView(gate, ctx) : undefined,
+    ]);
     return {
       $type: "app.bsky.feed.defs#postView",
       uri: post.uri,
@@ -57,20 +63,31 @@ export class PostViews {
       viewer: {
         repost: viewer.repost?.uri,
         like: viewer.like?.uri,
-        replyDisabled: gate && (await this.replyDisabled(rootUri, gate, ctx)),
+        replyDisabled,
         embeddingDisabled:
           postgate && this.embeddingDisabled(post.actorDid, postgate, ctx),
       },
-      threadgate:
-        gate && rootUri === uri
-          ? {
-              uri: asAtUriString(gate.uri),
-              cid: gate.cid,
-              record: asLexMap(gate.json),
-            }
-          : undefined,
+      threadgate,
       labels: toLabelViews(labels),
       indexedAt: toDatetimeString(post.indexedAt),
+    };
+  }
+
+  private async threadgateView(
+    gate: RecordDto,
+    ctx: ViewContext,
+  ): Promise<AppBskyFeedDefs.ThreadgateView> {
+    const { allow } = Record.create(gate).validate("app.bsky.feed.threadgate");
+    const lists = await Promise.all(
+      (allow ?? [])
+        .filter((rule) => listRule.isTypeOf(rule))
+        .map((rule) => this.listViews.basic(rule.list, ctx)),
+    );
+    return {
+      uri: asAtUriString(gate.uri),
+      cid: gate.cid,
+      record: asLexMap(gate.json),
+      lists: lists.filter((list) => list !== undefined),
     };
   }
 

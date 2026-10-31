@@ -3,12 +3,11 @@ import { expect, test } from "@playwright/test";
 import {
   createRecord,
   follow,
+  PDS_URL,
   putRecord,
   resolveHandle,
   uploadImage,
-} from "./pds";
-
-const PDS_URL = "http://localhost:2583";
+} from "../../helpers/pds";
 
 test.describe("プロフィール", () => {
   test("profile-1: 左カラムの「プロフィール」から、中央カラムに自分のプロフィール（バナー、アイコン、名前、ハンドル、自己紹介、フォロー数、フォロワー数、投稿一覧）を表示する", async ({
