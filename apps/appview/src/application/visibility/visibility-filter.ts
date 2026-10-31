@@ -4,7 +4,10 @@ import type { LabelDto } from "../dto/label-dto.js";
 import { isTakendown } from "../interfaces/label-query.js";
 import type { ViewData } from "../loader/actor-loader.js";
 
-export const hiddenReason = (profile: ProfileDetailed, labels?: LabelDto[]) => {
+export const hiddenReason = (
+  profile: Pick<ProfileDetailed, "status">,
+  labels?: LabelDto[],
+) => {
   if (profile.status === "deactivated") {
     return "AccountDeactivated";
   }

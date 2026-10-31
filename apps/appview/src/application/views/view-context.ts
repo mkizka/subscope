@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { ProfileDetailed, Repost } from "@repo/common/domain";
+import type { Repost } from "@repo/common/domain";
 
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
@@ -8,6 +8,7 @@ import type { LabelDto } from "../dto/label-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
+import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { IFollowQuery } from "../interfaces/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/generator-query.js";
@@ -15,7 +16,7 @@ import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
-import type { IProfileRepository } from "../interfaces/profile-repository.js";
+import type { IProfileQuery } from "../interfaces/profile-query.js";
 import type { IRecordQuery } from "../interfaces/record-query.js";
 import type { IRepostRepository } from "../interfaces/repost-repository.js";
 import { hiddenReason } from "../visibility/visibility-filter.js";
@@ -27,7 +28,7 @@ export type Viewer = {
 };
 
 type Repositories = {
-  profileRepository: IProfileRepository;
+  profileQuery: IProfileQuery;
   labelQuery: ILabelQuery;
   followQuery: IFollowQuery;
   postQuery: IPostQuery;
@@ -43,7 +44,7 @@ const bySubjectUri = (record: { subjectUri: AtUri }) =>
   record.subjectUri.toString();
 
 export class ViewContext {
-  private readonly profiles: Batch<Did, ProfileDetailed>;
+  private readonly profiles: Batch<Did, ProfileDto>;
   private readonly labels: Batch<string, LabelDto[]>;
   private readonly following: Batch<Did, FollowDto>;
   private readonly followedBy: Batch<Did, FollowDto>;
@@ -61,7 +62,7 @@ export class ViewContext {
     const viewerDid = viewer.viewerDid;
     const none = () => Promise.resolve([]);
     this.profiles = Batch.one(
-      (dids) => repos.profileRepository.findManyDetailed(dids),
+      (dids) => repos.profileQuery.findByDids(dids),
       (profile) => profile.actorDid,
     );
     this.labels = Batch.many(
@@ -185,7 +186,7 @@ export class ViewContextFactory {
   private readonly repos: Repositories;
 
   constructor(
-    profileRepository: IProfileRepository,
+    profileQuery: IProfileQuery,
     labelQuery: ILabelQuery,
     followQuery: IFollowQuery,
     postQuery: IPostQuery,
@@ -196,7 +197,7 @@ export class ViewContextFactory {
     generatorQuery: IGeneratorQuery,
   ) {
     this.repos = {
-      profileRepository,
+      profileQuery,
       labelQuery,
       followQuery,
       postQuery,

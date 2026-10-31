@@ -26,6 +26,7 @@ import { InMemoryNotificationRepository } from "../infrastructure/notification-r
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryPostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.in-memory.js";
+import { InMemoryProfileQuery } from "../infrastructure/profile-query/profile-query.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
 import { InMemoryRecordQuery } from "../infrastructure/record-query/record-query.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repost-repository/repost-repository.in-memory.js";
@@ -52,6 +53,7 @@ export const testRegistry = createAppRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
   .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
+  .replaceService("profileQuery", asClassArgs(InMemoryProfileQuery))
   .replaceService("labelRepository", asClassArgs(InMemoryLabelRepository))
   .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
