@@ -4,14 +4,14 @@ import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-import { NotificationRepository } from "./notification-repository.js";
+import { NotificationQuery } from "./notification-query.js";
 
-describe("NotificationRepository", () => {
+describe("NotificationQuery", () => {
   const { ctx } = testSetup;
 
-  const notificationRepository = new NotificationRepository(ctx.db);
+  const notificationQuery = new NotificationQuery(ctx.db);
 
-  describe("findMany", () => {
+  describe("findNotifications", () => {
     test("受信者の通知をcursorより古いものから新しい順に返し、seenAt以前のものを既読にする", async () => {
       // arrange
       const recipient = await actorFactory(ctx.db)
@@ -40,7 +40,7 @@ describe("NotificationRepository", () => {
         .where(eq(schema.subscriptions.actorDid, recipient.did));
 
       // act
-      const result = await notificationRepository.findMany({
+      const result = await notificationQuery.findNotifications({
         recipientDid: asDid(recipient.did),
         limit: 10,
         cursor: new Date("2024-01-04T00:00:00.000Z"),
@@ -79,9 +79,7 @@ describe("NotificationRepository", () => {
         .where(eq(schema.subscriptions.actorDid, recipient.did));
 
       // act
-      const result = await notificationRepository.countUnread(
-        asDid(recipient.did),
-      );
+      const result = await notificationQuery.countUnread(asDid(recipient.did));
 
       // assert
       expect(result).toBe(2);

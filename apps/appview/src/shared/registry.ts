@@ -33,7 +33,7 @@ import type { ILabelRepository } from "../application/interfaces/label-repositor
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 import type { IListRepository } from "../application/interfaces/list-repository.js";
-import type { INotificationRepository } from "../application/interfaces/notification-repository.js";
+import type { INotificationQuery } from "../application/interfaces/notification-query.js";
 import type { IPostQuery } from "../application/interfaces/post-query.js";
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
@@ -126,7 +126,7 @@ import { LabelRepository } from "../infrastructure/label-repository/label-reposi
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
 import { ListRepository } from "../infrastructure/list-repository/list-repository.js";
-import { NotificationRepository } from "../infrastructure/notification-repository/notification-repository.js";
+import { NotificationQuery } from "../infrastructure/notification-query/notification-query.js";
 import { PostQuery } from "../infrastructure/post-query/post-query.js";
 import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
@@ -218,7 +218,7 @@ export const createAppRegistry = (env: Env) =>
     .service("actorStatsRepository", ["db"], asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
-    .service("notificationRepository", ["db"], asClassArgs<INotificationRepository>()(NotificationRepository))
+    .service("notificationQuery", ["db"], asClassArgs<INotificationQuery>()(NotificationQuery))
     .service("postRepository", ["db"], asClassArgs<IPostRepository>()(PostRepository))
     .service("generatorQuery", ["db"], asClassArgs<IGeneratorQuery>()(GeneratorQuery))
     .service("likeQuery", ["db"], asClassArgs<ILikeQuery>()(LikeQuery))
@@ -278,7 +278,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostThreadUseCase", ["postRepository", "postViewService"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineService", "feedProcessor"], asClassArgs(GetTimelineUseCase))
-    .service("listNotificationsUseCase", ["notificationRepository", "profileViewService", "subscriptionRepository"], asClassArgs(ListNotificationsUseCase))
+    .service("listNotificationsUseCase", ["notificationQuery", "profileViewService", "subscriptionRepository"], asClassArgs(ListNotificationsUseCase))
     .service("searchPostsUseCase", ["searchService", "postViewService"], asClassArgs(SearchPostsUseCase))
     .service("getActorLikesUseCase", ["actorLikesService", "feedProcessor"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedService", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
@@ -318,9 +318,9 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostThreadV2", ["getPostThreadV2UseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThreadV2))
     .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase"], asClassArgs(GetTimeline))
     .service("listNotifications", ["authVerifierMiddleware", "listNotificationsUseCase"], asClassArgs(ListNotifications))
-    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "notificationViews"], asClassArgs(GetGroupedNotificationsUseCase))
+    .service("getGroupedNotificationsUseCase", ["notificationQuery", "subscriptionRepository", "viewContextFactory", "notificationViews"], asClassArgs(GetGroupedNotificationsUseCase))
     .service("getGroupedNotifications", ["authVerifierMiddleware", "getGroupedNotificationsUseCase"], asClassArgs(GetGroupedNotifications))
-    .service("getUnreadCountUseCase", ["notificationRepository"], asClassArgs(GetUnreadCountUseCase))
+    .service("getUnreadCountUseCase", ["notificationQuery"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
     .service("searchPosts", ["searchPostsUseCase"], asClassArgs(SearchPosts))
     .service("searchPostsV2", ["searchPostsUseCase"], asClassArgs(SearchPostsV2))

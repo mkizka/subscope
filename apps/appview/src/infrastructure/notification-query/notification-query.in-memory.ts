@@ -1,24 +1,24 @@
 import type { Did } from "@atproto/did";
 
 import type {
-  INotificationRepository,
-  NotificationItem,
+  NotificationDto,
   NotificationReason,
-} from "../../application/interfaces/notification-repository.js";
+} from "../../application/dto/notification-dto.js";
+import type { INotificationQuery } from "../../application/interfaces/notification-query.js";
 
-export class InMemoryNotificationRepository implements INotificationRepository {
-  private items: (NotificationItem & { recipientDid: string })[] = [];
+export class InMemoryNotificationQuery implements INotificationQuery {
+  private items: (NotificationDto & { recipientDid: string })[] = [];
 
-  add(item: NotificationItem & { recipientDid: string }): void {
+  add(item: NotificationDto & { recipientDid: string }): void {
     this.items.push(item);
   }
 
-  findMany(params: {
+  findNotifications(params: {
     recipientDid: Did;
     limit: number;
     cursor?: Date;
     reasons?: NotificationReason[];
-  }): Promise<NotificationItem[]> {
+  }): Promise<NotificationDto[]> {
     const cursor = params.cursor;
     return Promise.resolve(
       this.items

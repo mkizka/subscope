@@ -6,12 +6,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ListNotificationsUseCase", () => {
   let listNotificationsUseCase: TestServices["listNotificationsUseCase"];
-  let notificationRepo: TestServices["notificationRepository"];
+  let notificationQuery: TestServices["notificationQuery"];
   let profileRepo: TestServices["profileRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     listNotificationsUseCase = services.listNotificationsUseCase;
-    notificationRepo = services.notificationRepository;
+    notificationQuery = services.notificationQuery;
     profileRepo = services.profileRepository;
   });
 
@@ -23,7 +23,7 @@ describe("ListNotificationsUseCase", () => {
       profileDetailedFactory({ actorDid: author.did, handle: "author.test" }),
     );
     const notify = (sortAt: string, isRead: boolean) =>
-      notificationRepo.add({
+      notificationQuery.add({
         recipientDid: viewer.did,
         recordUri: `at://${author.did}/app.bsky.feed.like/${sortAt}`,
         cid: "bafyreib",
