@@ -1,13 +1,16 @@
-import type { ISubscopeRepository } from "@/app/server/infrastructure/subscope/subscope-repository";
+import type {
+  ISubscopeQuery,
+  MembersDto,
+} from "@/app/server/infrastructure/subscope/subscope-query";
 
 export interface IGetMembersUseCase {
-  execute: () => ReturnType<ISubscopeRepository["findMembers"]>;
+  execute: () => Promise<MembersDto>;
 }
 
 export const getMembersUseCaseFactory = ({
-  subscopeRepository,
+  subscopeQuery,
 }: {
-  subscopeRepository: ISubscopeRepository;
+  subscopeQuery: ISubscopeQuery;
 }): IGetMembersUseCase => ({
-  execute: () => subscopeRepository.findMembers(),
+  execute: () => subscopeQuery.findMembers(),
 });

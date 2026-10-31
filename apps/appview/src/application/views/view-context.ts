@@ -1,14 +1,15 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { Generator, ProfileDetailed, Repost } from "@repo/common/domain";
+import type { ProfileDetailed, Repost } from "@repo/common/domain";
 
+import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LabelDto } from "../dto/label-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
-import type { IGeneratorRepository } from "../interfaces/generator-repository.js";
+import type { IGeneratorQuery } from "../interfaces/generator-query.js";
 import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
@@ -33,11 +34,10 @@ type Repositories = {
   postStatsQuery: IPostStatsQuery;
   likeQuery: ILikeQuery;
   repostRepository: IRepostRepository;
-  generatorRepository: IGeneratorRepository;
+  generatorQuery: IGeneratorQuery;
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
-const byUri = (record: { uri: AtUri }): string => record.uri.toString();
 const bySubjectUri = (record: { subjectUri: AtUri }) =>
   record.subjectUri.toString();
 
@@ -51,7 +51,7 @@ export class ViewContext {
   private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, LikeDto>;
   private readonly viewerReposts: Batch<string, Repost>;
-  private readonly generators: Batch<string, Generator>;
+  private readonly generators: Batch<string, GeneratorDto>;
 
   constructor(
     repos: Repositories,
@@ -116,8 +116,8 @@ export class ViewContext {
       bySubjectUri,
     );
     this.generators = Batch.one(
-      (uris) => repos.generatorRepository.findByUris(toAtUris(uris)),
-      byUri,
+      (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
+      (generator) => generator.uri,
     );
   }
 
@@ -191,7 +191,7 @@ export class ViewContextFactory {
     postStatsQuery: IPostStatsQuery,
     likeQuery: ILikeQuery,
     repostRepository: IRepostRepository,
-    generatorRepository: IGeneratorRepository,
+    generatorQuery: IGeneratorQuery,
   ) {
     this.repos = {
       profileRepository,
@@ -202,7 +202,7 @@ export class ViewContextFactory {
       postStatsQuery,
       likeQuery,
       repostRepository,
-      generatorRepository,
+      generatorQuery,
     };
   }
 

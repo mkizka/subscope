@@ -24,12 +24,12 @@ export class GeneratorViews {
     }
     return {
       $type: "app.bsky.feed.defs#generatorView",
-      uri: generator.uri.toString(),
+      uri: generator.uri,
       cid: generator.cid,
       did: generator.did,
       creator,
       displayName: generator.displayName,
-      description: generator.description,
+      description: generator.description ?? undefined,
       avatar: generator.avatarCid
         ? this.assetUrlBuilder.getAvatarThumbnailUrl(
             generator.actorDid,
