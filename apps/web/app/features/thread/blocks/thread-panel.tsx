@@ -14,7 +14,7 @@ type Props = {
   thread?: {
     ancestors: ThreadPost[];
     post: ThreadPost;
-    replies: ThreadPost[];
+    replies: ThreadPost[][];
   } | null;
   closeSearch: string;
 };
@@ -100,6 +100,19 @@ function FocusedPost({
   );
 }
 
+function ConnectedPost(post: ThreadPost) {
+  return (
+    <div className="relative">
+      <div
+        className="
+          absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
+        "
+      />
+      <PostCard {...post} />
+    </div>
+  );
+}
+
 export function ThreadPanel({ thread, closeSearch }: Props) {
   return (
     <section aria-label="スレッド" className="flex flex-col">
@@ -121,19 +134,18 @@ export function ThreadPanel({ thread, closeSearch }: Props) {
       {thread && (
         <>
           {thread.ancestors.map((post) => (
-            <div key={post.uri} className="relative">
-              <div
-                className="
-                  absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
-                "
-              />
-              <PostCard {...post} />
-            </div>
+            <ConnectedPost key={post.uri} {...post} />
           ))}
           <FocusedPost {...thread.post} />
-          {thread.replies.map((post) => (
-            <PostCard key={post.uri} {...post} />
-          ))}
+          {thread.replies.map((chain) =>
+            chain.map((post, i) =>
+              i < chain.length - 1 ? (
+                <ConnectedPost key={post.uri} {...post} />
+              ) : (
+                <PostCard key={post.uri} {...post} />
+              ),
+            ),
+          )}
         </>
       )}
     </section>

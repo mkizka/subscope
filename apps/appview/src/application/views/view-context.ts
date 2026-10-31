@@ -61,6 +61,7 @@ export class ViewContext {
   private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, LikeDto>;
   private readonly viewerReposts: Batch<string, RepostDto>;
+  private readonly reposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, GeneratorDto>;
   private readonly actorStatsBatch: Batch<Did, ActorStatsDto>;
   private readonly lists: Batch<string, ListDto>;
@@ -131,6 +132,10 @@ export class ViewContext {
             })
         : none,
       (repost) => repost.subjectUri,
+    );
+    this.reposts = Batch.one(
+      (uris) => repos.repostQuery.findByUris(toAtUris(uris)),
+      (repost) => repost.uri,
     );
     this.generators = Batch.one(
       (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
@@ -204,6 +209,10 @@ export class ViewContext {
 
   stats(uri: string) {
     return this.postStats.load(uri);
+  }
+
+  repost(uri: string) {
+    return this.reposts.load(uri);
   }
 
   generator(uri: string) {

@@ -32,6 +32,7 @@ const toPostDto = (post: SelectPost): PostDto => ({
   },
   embedRecordUri: post.embedRecord?.uri ?? null,
   replyRootUri: post.replyRootUri,
+  replyParentUri: post.replyParentUri,
   indexedAt: post.indexedAt,
 });
 

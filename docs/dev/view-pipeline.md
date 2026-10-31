@@ -13,7 +13,7 @@ appviewはXRPCの応答に含めるビュー(profileView、postViewなど)を、
 
 ## *Views
 
-`apps/appview/src/application/views/` に lexicon の defs と同じ単位で置く(ProfileViews、PostViews、EmbedViews、GeneratorViews、NotificationViews など)。
+`apps/appview/src/application/views/` に lexicon の defs と同じ単位で置く(ProfileViews、PostViews、EmbedViews、FeedViews、GeneratorViews、NotificationViews など)。
 
 - `(対象, ctx)` を受け取り、ViewContext から取ったデータを lexicon の形にする。無ければ `undefined` を返し、置き換え(viewNotFound など)は呼び出し側の Views が決める
 - lexicon の入れ子と同じ向きに互いを呼ぶ(FeedViews → PostViews → ProfileViews / EmbedViews)
@@ -26,4 +26,4 @@ appviewはXRPCの応答に含めるビュー(profileView、postViewなど)を、
 
 ## 移行中の古い構成
 
-`application/loader/`、`application/visibility/`、`application/service/*/*-view-service.ts`、`FeedProcessor`、`ReplyRefService` は旧構成で、use case を順に移行したあとに消す。
+`application/loader/`、`application/visibility/`、`application/service/*/*-view-service.ts` は旧構成で、use case を順に移行したあとに消す。

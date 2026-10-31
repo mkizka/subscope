@@ -34,8 +34,15 @@ describe("app.bsky.feed.getTimeline", () => {
       })
       .create();
 
-  const createPost = async (actor: Actor, createdAt = new Date()) => {
+  type ReplyTo = { uri: string; cid: string };
+
+  const createPost = async (
+    actor: Actor,
+    createdAt = new Date(),
+    replyTo?: [parent: ReplyTo, root?: ReplyTo],
+  ) => {
     const post = await postFactory(ctx.db)
+      .use((t) => (replyTo ? t.asReplyTo(...replyTo) : {}))
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
@@ -170,6 +177,77 @@ describe("app.bsky.feed.getTimeline", () => {
         post: {
           uri: post.uri,
           author: { did: followee.did, handle: followee.handle },
+        },
+      },
+    ]);
+  });
+
+  test("feedViewPost-1: リプライには、スレッドの起点と親の投稿をreplyに含める", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await createActor();
+    const root = await createPost(viewer, new Date("2024-01-01"));
+    const parent = await createPost(viewer, new Date("2024-01-02"), [root]);
+    await createPost(viewer, new Date("2024-01-03"), [parent, root]);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getTimeline, { limit: 1 });
+
+    // assert
+    expect(res.feed).toMatchObject([
+      {
+        reply: {
+          root: { $type: "app.bsky.feed.defs#postView", uri: root.uri },
+          parent: { $type: "app.bsky.feed.defs#postView", uri: parent.uri },
+        },
+      },
+    ]);
+  });
+
+  test("feedViewPost-2: 起点や親の投稿が見つからない場合、replyのその投稿をnotFoundPostにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await createActor();
+    const missing = {
+      uri: `at://${viewer.did}/app.bsky.feed.post/missing`,
+      cid: "bafyreimissing",
+    };
+    await createPost(viewer, new Date(), [missing]);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getTimeline);
+
+    // assert
+    const notFoundPost = {
+      $type: "app.bsky.feed.defs#notFoundPost",
+      uri: missing.uri,
+      notFound: true,
+    };
+    expect(res.feed).toMatchObject([
+      { reply: { root: notFoundPost, parent: notFoundPost } },
+    ]);
+  });
+
+  test("feedViewPost-3: リポストには、リポストしたアカウントとリポストの日時をreasonに含める", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await createActor();
+    const repost = await createRepost(viewer);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getTimeline);
+
+    // assert
+    expect(res.feed).toMatchObject([
+      {
+        post: { uri: repost.subjectUri },
+        reason: {
+          $type: "app.bsky.feed.defs#reasonRepost",
+          by: { did: viewer.did },
+          indexedAt: repost.indexedAt.toISOString(),
         },
       },
     ]);
