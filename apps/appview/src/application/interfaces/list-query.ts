@@ -1,18 +1,19 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
-import type { List, ListItem } from "@repo/common/domain";
 
-export interface IListRepository {
+import type { ListDto, ListItemDto } from "../dto/list-dto.js";
+
+export interface IListQuery {
   findByActor: (params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
     purposes?: string[];
-  }) => Promise<List[]>;
-  findByUri: (uri: AtUri) => Promise<List | null>;
+  }) => Promise<ListDto[]>;
+  findByUri: (uri: AtUri) => Promise<ListDto | null>;
   findItems: (params: {
     listUri: AtUri;
     limit: number;
     cursor?: string;
-  }) => Promise<ListItem[]>;
+  }) => Promise<ListItemDto[]>;
 }

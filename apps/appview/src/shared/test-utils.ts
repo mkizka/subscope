@@ -20,7 +20,7 @@ import { InMemoryLabelQuery } from "../infrastructure/label-query/label-query.in
 import { InMemoryLabelRepository } from "../infrastructure/label-repository/label-repository.in-memory.js";
 import { InMemoryLikeQuery } from "../infrastructure/like-query/like-query.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-repository.in-memory.js";
-import { InMemoryListRepository } from "../infrastructure/list-repository/list-repository.in-memory.js";
+import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
 import { InMemoryNotificationRepository } from "../infrastructure/notification-repository/notification-repository.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
@@ -71,7 +71,7 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
   .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))
-  .replaceService("listRepository", asClassArgs(InMemoryListRepository))
+  .replaceService("listQuery", asClassArgs(InMemoryListQuery))
   .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
   .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
