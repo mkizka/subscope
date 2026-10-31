@@ -4,6 +4,7 @@ import type { Repost } from "@repo/common/domain";
 
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
+import type { LabelDto } from "../dto/label-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
@@ -11,11 +12,7 @@ import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { IFollowQuery } from "../interfaces/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/generator-query.js";
-import {
-  type ILabelRepository,
-  isTakendown,
-  type Label,
-} from "../interfaces/label-repository.js";
+import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
@@ -32,7 +29,7 @@ export type Viewer = {
 
 type Repositories = {
   profileQuery: IProfileQuery;
-  labelRepository: ILabelRepository;
+  labelQuery: ILabelQuery;
   followQuery: IFollowQuery;
   postQuery: IPostQuery;
   recordQuery: IRecordQuery;
@@ -48,7 +45,7 @@ const bySubjectUri = (record: { subjectUri: AtUri }) =>
 
 export class ViewContext {
   private readonly profiles: Batch<Did, ProfileDto>;
-  private readonly labels: Batch<string, Label[]>;
+  private readonly labels: Batch<string, LabelDto[]>;
   private readonly following: Batch<Did, FollowDto>;
   private readonly followedBy: Batch<Did, FollowDto>;
   private readonly posts: Batch<string, PostDto>;
@@ -69,7 +66,7 @@ export class ViewContext {
       (profile) => profile.actorDid,
     );
     this.labels = Batch.many(
-      (subjects) => repos.labelRepository.findBySubjects(subjects),
+      (subjects) => repos.labelQuery.findBySubjects(subjects),
       (label) => label.uri,
     );
     this.following = Batch.one(
@@ -190,7 +187,7 @@ export class ViewContextFactory {
 
   constructor(
     profileQuery: IProfileQuery,
-    labelRepository: ILabelRepository,
+    labelQuery: ILabelQuery,
     followQuery: IFollowQuery,
     postQuery: IPostQuery,
     recordQuery: IRecordQuery,
@@ -201,7 +198,7 @@ export class ViewContextFactory {
   ) {
     this.repos = {
       profileQuery,
-      labelRepository,
+      labelQuery,
       followQuery,
       postQuery,
       recordQuery,

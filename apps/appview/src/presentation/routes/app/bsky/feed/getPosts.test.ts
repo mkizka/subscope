@@ -1,7 +1,8 @@
-import { asAtUriString } from "@atproto/syntax";
+import { asAtUriString, AtUri } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
   actorFactory,
+  followFactory,
   likeFactory,
   postFactory,
   recordFactory,
@@ -15,7 +16,52 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getPosts", () => {
   const { ctx } = testSetup;
 
-  const createPost = () =>
+  const createPost = (facets?: unknown[]) =>
+    postFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.post")
+            .vars({
+              actor: () =>
+                actorFactory(ctx.db)
+                  .use((t) => t.withProfile({}))
+                  .create(),
+            })
+            .props({
+              json: () => ({
+                $type: "app.bsky.feed.post",
+                text: "post",
+                createdAt: new Date().toISOString(),
+                facets,
+              }),
+            })
+            .create(),
+      })
+      .create();
+
+  const createGate = (
+    post: { uri: string; actorDid: string },
+    allow?: unknown[],
+  ) =>
+    recordFactory(ctx.db, "app.bsky.feed.threadgate")
+      .vars({ actorDid: () => post.actorDid })
+      .props({
+        uri: () =>
+          AtUri.make(
+            post.actorDid,
+            "app.bsky.feed.threadgate",
+            new AtUri(post.uri).rkey,
+          ).toString(),
+        json: () => ({
+          $type: "app.bsky.feed.threadgate",
+          post: post.uri,
+          createdAt: new Date().toISOString(),
+          allow,
+        }),
+      })
+      .create();
+
+  const createReply = (root: { uri: string; cid: string }) =>
     postFactory(ctx.db)
       .vars({
         record: () =>
@@ -28,6 +74,18 @@ describe("app.bsky.feed.getPosts", () => {
             })
             .create(),
       })
+      .use((t) => t.asReplyTo(root))
+      .create();
+
+  const follow = (actor: { did: string }, followee: { did: string }) =>
+    followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ actorDid: () => actor.did })
+            .create(),
+      })
+      .props({ subjectDid: () => followee.did })
       .create();
 
   test("getPosts-1: 指定したURIの順に投稿を並べる", async () => {
@@ -96,5 +154,105 @@ describe("app.bsky.feed.getPosts", () => {
     expect(res.posts).toMatchObject([
       { viewer: { like: like.uri, repost: repost.uri } },
     ]);
+  });
+
+  test("threadgate-1: スレッドの起点の投稿は、そのthreadgateをthreadgateに含める", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const root = await createPost();
+    const reply = await createReply(root);
+    const gate = await createGate(root, []);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(root.uri), asAtUriString(reply.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.threadgate).toEqual({
+      uri: gate.uri,
+      cid: gate.cid,
+      record: gate.json,
+    });
+    expect(res.posts[1]?.threadgate).toBeUndefined();
+  });
+
+  test("threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const root = await createPost();
+    const reply = await createReply(root);
+    await createGate(root, [
+      { $type: "app.bsky.feed.threadgate#mentionRule" },
+      { $type: "app.bsky.feed.threadgate#followingRule" },
+      { $type: "app.bsky.feed.threadgate#followerRule" },
+    ]);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(root.uri), asAtUriString(reply.uri)],
+    });
+
+    // assert
+    expect(res.posts.map((post) => post.viewer?.replyDisabled)).toEqual([
+      true,
+      true,
+    ]);
+  });
+
+  test("threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const mentioned = await actorFactory(ctx.db).create();
+    const followed = await actorFactory(ctx.db).create();
+    const follower = await actorFactory(ctx.db).create();
+    const root = await createPost([
+      {
+        index: { byteStart: 0, byteEnd: 4 },
+        features: [
+          { $type: "app.bsky.richtext.facet#mention", did: mentioned.did },
+        ],
+      },
+    ]);
+    const author = { did: root.actorDid };
+    await follow(author, followed);
+    await follow(follower, author);
+    await createGate(root, [
+      { $type: "app.bsky.feed.threadgate#mentionRule" },
+      { $type: "app.bsky.feed.threadgate#followingRule" },
+      { $type: "app.bsky.feed.threadgate#followerRule" },
+    ]);
+
+    // act
+    const results = [];
+    for (const viewer of [author, mentioned, followed, follower]) {
+      loginAs(viewer.did);
+      const res = await client.call(getPosts, {
+        uris: [asAtUriString(root.uri)],
+      });
+      results.push(res.posts[0]?.viewer?.replyDisabled);
+    }
+
+    // assert
+    expect(results).toEqual([false, false, false, false]);
+  });
+
+  test("threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const root = await createPost();
+    await createGate(root);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(root.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
   });
 });

@@ -1,11 +1,12 @@
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import { isTakendown, type Label } from "../interfaces/label-repository.js";
+import type { LabelDto } from "../dto/label-dto.js";
+import { isTakendown } from "../interfaces/label-query.js";
 import type { ViewData } from "../loader/actor-loader.js";
 
 export const hiddenReason = (
   profile: Pick<ProfileDetailed, "status">,
-  labels?: Label[],
+  labels?: LabelDto[],
 ) => {
   if (profile.status === "deactivated") {
     return "AccountDeactivated";
