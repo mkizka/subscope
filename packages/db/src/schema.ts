@@ -63,9 +63,6 @@ export const follows = pgTable(
       .notNull(),
   },
   (table) => [
-    index("follows_sort_at_idx").on(table.sortAt),
-    index("follows_actor_did_idx").on(table.actorDid),
-    index("follows_subject_did_idx").on(table.subjectDid),
     index("follows_actor_subject_idx").on(table.actorDid, table.subjectDid),
     index("follows_subject_actor_idx").on(table.subjectDid, table.actorDid),
   ],
@@ -116,7 +113,6 @@ export const posts = pgTable(
   (table) => [
     index("posts_actor_did_idx").on(table.actorDid),
     index("posts_sort_at_idx").on(table.sortAt),
-    index("posts_reply_parent_uri_idx").on(table.replyParentUri),
     index("posts_reply_parent_sort_idx").on(
       table.replyParentUri,
       table.sortAt.desc(),
@@ -226,8 +222,7 @@ export const likes = pgTable(
       .notNull(),
   },
   (table) => [
-    index("likes_sort_at_idx").on(table.sortAt),
-    index("likes_subject_uri_idx").on(table.subjectUri),
+    index("likes_actor_sort_idx").on(table.actorDid, table.sortAt.desc()),
     index("likes_subject_sort_idx").on(table.subjectUri, table.sortAt.desc()),
   ],
 );
@@ -251,8 +246,6 @@ export const reposts = pgTable(
       .notNull(),
   },
   (table) => [
-    index("reposts_sort_at_idx").on(table.sortAt),
-    index("reposts_subject_uri_idx").on(table.subjectUri),
     index("reposts_subject_sort_idx").on(table.subjectUri, table.sortAt.desc()),
   ],
 );
@@ -309,7 +302,6 @@ export const feedItems = pgTable(
   },
   (table) => [
     index("feed_items_sort_at_idx").on(table.sortAt),
-    index("feed_items_actor_did_idx").on(table.actorDid),
     index("feed_items_actor_sort_idx").on(table.actorDid, table.sortAt.desc()),
   ],
 );
