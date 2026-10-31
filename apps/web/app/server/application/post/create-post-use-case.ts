@@ -19,9 +19,9 @@ export const createPostUseCaseFactory = ({
 }): ICreatePostUseCase => ({
   async execute(did, post) {
     const uri = await postCommand.create(did, post);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 5; i++) {
+      if (i > 0) await setTimeout(1000);
       if (await postQuery.exists(did, uri)) break;
-      await setTimeout(250);
     }
     return uri;
   },

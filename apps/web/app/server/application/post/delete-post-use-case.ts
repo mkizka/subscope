@@ -19,9 +19,9 @@ export const deletePostUseCaseFactory = ({
       throw new Error("Cannot delete another user's post");
     }
     await postCommand.delete(did, uri);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 5; i++) {
+      if (i > 0) await setTimeout(1000);
       if (!(await postQuery.exists(did, uri))) break;
-      await setTimeout(250);
     }
   },
 });
