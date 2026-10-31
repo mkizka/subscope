@@ -4,5 +4,5 @@ import { login } from "./login";
 
 setup("aliceでログインする", async ({ page }) => {
   await login(page);
-  await page.context().storageState({ path: "e2e/.auth/alice.json" });
+  await page.context().storageState({ path: ".auth/alice.json" });
 });

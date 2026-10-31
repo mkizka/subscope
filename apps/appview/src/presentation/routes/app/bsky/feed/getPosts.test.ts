@@ -4,6 +4,8 @@ import {
   actorFactory,
   followFactory,
   likeFactory,
+  listFactory,
+  listItemFactory,
   postEmbedRecordFactory,
   postFactory,
   recordFactory,
@@ -206,10 +208,12 @@ describe("app.bsky.feed.getPosts", () => {
     const viewer = await actorFactory(ctx.db).create();
     const root = await createPost();
     const reply = await createReply(root);
+    const list = await listFactory(ctx.db).create();
     await createGate(root, [
       { $type: "app.bsky.feed.threadgate#mentionRule" },
       { $type: "app.bsky.feed.threadgate#followingRule" },
       { $type: "app.bsky.feed.threadgate#followerRule" },
+      { $type: "app.bsky.feed.threadgate#listRule", list: list.uri },
     ]);
     loginAs(viewer.did);
 
@@ -268,6 +272,33 @@ describe("app.bsky.feed.getPosts", () => {
     const viewer = await actorFactory(ctx.db).create();
     const root = await createPost();
     await createGate(root);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(root.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
+  });
+
+  test("threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const root = await createPost();
+    const [other, list] = await Promise.all([
+      listFactory(ctx.db).create(),
+      listFactory(ctx.db).create(),
+    ]);
+    await listItemFactory(ctx.db)
+      .vars({ list: () => list, subject: () => viewer })
+      .create();
+    await createGate(root, [
+      { $type: "app.bsky.feed.threadgate#listRule", list: other.uri },
+      { $type: "app.bsky.feed.threadgate#listRule", list: list.uri },
+    ]);
     loginAs(viewer.did);
 
     // act

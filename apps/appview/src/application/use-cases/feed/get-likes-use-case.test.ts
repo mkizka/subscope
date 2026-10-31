@@ -11,12 +11,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("GetLikesUseCase", () => {
   let getLikesUseCase: TestServices["getLikesUseCase"];
   let likeRepo: TestServices["likeRepository"];
-  let profileRepo: TestServices["profileRepository"];
+  let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getLikesUseCase = services.getLikesUseCase;
     likeRepo = services.likeRepository;
-    profileRepo = services.profileRepository;
+    profileQuery = services.profileQuery;
   });
 
   test("投稿にいいねが付いている場合、いいねしたユーザーのプロフィールを含むレスポンスを返す", async () => {
@@ -28,7 +28,7 @@ describe("GetLikesUseCase", () => {
       actorDid: likerActor.did,
       displayName: "Liker User",
     });
-    profileRepo.add(profile);
+    profileQuery.add(profile);
 
     const { post } = postFactory({
       actorDid: targetActor.did,
@@ -96,7 +96,7 @@ describe("GetLikesUseCase", () => {
       const profile = profileDetailedFactory({
         actorDid: likerActor.did,
       });
-      profileRepo.add(profile);
+      profileQuery.add(profile);
 
       const like = likeFactory({
         actorDid: likerActor.did,
@@ -130,21 +130,21 @@ describe("GetLikesUseCase", () => {
       actorDid: firstLiker.did,
       displayName: "First Liker",
     });
-    profileRepo.add(firstProfile);
+    profileQuery.add(firstProfile);
 
     const secondLiker = actorFactory();
     const secondProfile = profileDetailedFactory({
       actorDid: secondLiker.did,
       displayName: "Second Liker",
     });
-    profileRepo.add(secondProfile);
+    profileQuery.add(secondProfile);
 
     const thirdLiker = actorFactory();
     const thirdProfile = profileDetailedFactory({
       actorDid: thirdLiker.did,
       displayName: "Third Liker",
     });
-    profileRepo.add(thirdProfile);
+    profileQuery.add(thirdProfile);
 
     const firstLike = likeFactory({
       actorDid: firstLiker.did,
@@ -225,7 +225,7 @@ describe("GetLikesUseCase", () => {
       actorDid: likerActor.did,
       displayName: "Liker User",
     });
-    profileRepo.add(profile);
+    profileQuery.add(profile);
 
     const { post } = postFactory({
       actorDid: targetActor.did,
@@ -303,21 +303,21 @@ describe("GetLikesUseCase", () => {
       actorDid: earlyLiker.did,
       displayName: "Early Liker",
     });
-    profileRepo.add(earlyProfile);
+    profileQuery.add(earlyProfile);
 
     const latestLiker = actorFactory();
     const latestProfile = profileDetailedFactory({
       actorDid: latestLiker.did,
       displayName: "Latest Liker",
     });
-    profileRepo.add(latestProfile);
+    profileQuery.add(latestProfile);
 
     const middleLiker = actorFactory();
     const middleProfile = profileDetailedFactory({
       actorDid: middleLiker.did,
       displayName: "Middle Liker",
     });
-    profileRepo.add(middleProfile);
+    profileQuery.add(middleProfile);
 
     const earlyLike = likeFactory({
       actorDid: earlyLiker.did,

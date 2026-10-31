@@ -1,3 +1,4 @@
+import { asAtUriString } from "@atproto/syntax";
 import { FeedItem } from "@repo/common/domain";
 import {
   actorFactory,
@@ -8,6 +9,15 @@ import {
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import type { FeedItemDto } from "../../dto/feed-item-dto.js";
+
+const toDto = (item: FeedItem): FeedItemDto => ({
+  uri: asAtUriString(item.uri.toString()),
+  type: item.type,
+  subjectUri: item.subjectUri ? asAtUriString(item.subjectUri) : null,
+  actorDid: item.actorDid,
+  sortAt: item.sortAt,
+});
 
 describe("FeedProcessor", () => {
   let feedProcessor: TestServices["feedProcessor"];
@@ -40,7 +50,7 @@ describe("FeedProcessor", () => {
     postRepo.add(post);
     recordRepo.add(record);
 
-    const feedItem = FeedItem.fromPost(post);
+    const feedItem = toDto(FeedItem.fromPost(post));
 
     // act
     const result = await feedProcessor.processFeedItems([feedItem]);
@@ -99,7 +109,7 @@ describe("FeedProcessor", () => {
     });
     repostRepo.add(repost);
 
-    const feedItem = FeedItem.fromRepost(repost);
+    const feedItem = toDto(FeedItem.fromRepost(repost));
 
     // act
     const result = await feedProcessor.processFeedItems([feedItem]);
@@ -162,7 +172,7 @@ describe("FeedProcessor", () => {
     postRepo.add(replyPost);
     recordRepo.add(replyRecord);
 
-    const feedItem = FeedItem.fromPost(replyPost);
+    const feedItem = toDto(FeedItem.fromPost(replyPost));
 
     // act
     const result = await feedProcessor.processFeedItems([feedItem]);
@@ -246,8 +256,8 @@ describe("FeedProcessor", () => {
     });
     repostRepo.add(repost);
 
-    const feedItem1 = FeedItem.fromPost(post1);
-    const feedItem2 = FeedItem.fromRepost(repost);
+    const feedItem1 = toDto(FeedItem.fromPost(post1));
+    const feedItem2 = toDto(FeedItem.fromRepost(repost));
 
     // act
     const result = await feedProcessor.processFeedItems([feedItem1, feedItem2]);
@@ -275,7 +285,7 @@ describe("FeedProcessor", () => {
       actorDid: author.did,
     });
 
-    const feedItem = FeedItem.fromPost(post);
+    const feedItem = toDto(FeedItem.fromPost(post));
 
     // act
     const result = await feedProcessor.processFeedItems([feedItem]);

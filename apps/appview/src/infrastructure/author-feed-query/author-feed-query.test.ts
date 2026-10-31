@@ -9,12 +9,12 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { AuthorFeedRepository } from "./author-feed-repository.js";
+import { AuthorFeedQuery } from "./author-feed-query.js";
 
-describe("AuthorFeedRepository", () => {
+describe("AuthorFeedQuery", () => {
   const { ctx } = testSetup;
 
-  const authorFeedRepository = new AuthorFeedRepository(ctx.db);
+  const authorFeedQuery = new AuthorFeedQuery(ctx.db);
 
   describe("findFeedItems", () => {
     test("指定されたアクターの投稿がない場合、空の配列を返す", async () => {
@@ -22,7 +22,7 @@ describe("AuthorFeedRepository", () => {
       const actor = await actorFactory(ctx.db).create();
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor.did,
         limit: 10,
       });
@@ -45,7 +45,7 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor.did,
         limit: 10,
       });
@@ -53,7 +53,7 @@ describe("AuthorFeedRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: { href: feedItem.uri },
+        uri: feedItem.uri,
         type: "post",
         actorDid: actor.did,
       });
@@ -89,15 +89,15 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor.did,
         limit: 10,
       });
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri.href).toBe(feedItem2.uri);
-      expect(result[1]?.uri.href).toBe(feedItem1.uri);
+      expect(result[0]?.uri).toBe(feedItem2.uri);
+      expect(result[1]?.uri).toBe(feedItem1.uri);
     });
 
     test("リポストも含めて返す", async () => {
@@ -114,7 +114,7 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor.did,
         limit: 10,
       });
@@ -122,7 +122,7 @@ describe("AuthorFeedRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: { href: feedItem.uri },
+        uri: feedItem.uri,
         type: "repost",
         actorDid: actor.did,
       });
@@ -146,7 +146,7 @@ describe("AuthorFeedRepository", () => {
       );
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor.did,
         limit: 2,
       });
@@ -187,7 +187,7 @@ describe("AuthorFeedRepository", () => {
       const cursorDate = new Date("2024-01-01T01:30:00.000Z");
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor.did,
         cursor: cursorDate,
         limit: 10,
@@ -195,7 +195,7 @@ describe("AuthorFeedRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri.href).toBe(feedItem1.uri);
+      expect(result[0]?.uri).toBe(feedItem1.uri);
     });
 
     test("異なるアクターの投稿は含まれない", async () => {
@@ -214,7 +214,7 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItems({
+      const result = await authorFeedQuery.findFeedItems({
         actorDid: actor1.did,
         limit: 10,
       });
@@ -230,7 +230,7 @@ describe("AuthorFeedRepository", () => {
       const actor = await actorFactory(ctx.db).create();
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor.did,
         limit: 10,
       });
@@ -270,14 +270,14 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor.did,
         limit: 10,
       });
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri.href).toBe(rootFeedItem.uri);
+      expect(result[0]?.uri).toBe(rootFeedItem.uri);
     });
 
     test("リポストを含めて返す", async () => {
@@ -294,7 +294,7 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor.did,
         limit: 10,
       });
@@ -302,7 +302,7 @@ describe("AuthorFeedRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: { href: feedItem.uri },
+        uri: feedItem.uri,
         type: "repost",
         actorDid: actor.did,
       });
@@ -338,15 +338,15 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor.did,
         limit: 10,
       });
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri.href).toBe(feedItem2.uri);
-      expect(result[1]?.uri.href).toBe(feedItem1.uri);
+      expect(result[0]?.uri).toBe(feedItem2.uri);
+      expect(result[1]?.uri).toBe(feedItem1.uri);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
@@ -367,7 +367,7 @@ describe("AuthorFeedRepository", () => {
       );
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor.did,
         limit: 2,
       });
@@ -408,7 +408,7 @@ describe("AuthorFeedRepository", () => {
       const cursorDate = new Date("2024-01-01T01:30:00.000Z");
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor.did,
         cursor: cursorDate,
         limit: 10,
@@ -416,7 +416,7 @@ describe("AuthorFeedRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri.href).toBe(feedItem1.uri);
+      expect(result[0]?.uri).toBe(feedItem1.uri);
     });
 
     test("異なるアクターの投稿は含まれない", async () => {
@@ -435,7 +435,7 @@ describe("AuthorFeedRepository", () => {
         .create();
 
       // act
-      const result = await authorFeedRepository.findFeedItemsWithoutReplies({
+      const result = await authorFeedQuery.findFeedItemsWithoutReplies({
         actorDid: actor1.did,
         limit: 10,
       });
