@@ -47,4 +47,26 @@ test.describe("レイアウト", () => {
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
+
+  test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    let release = () => {};
+    const released = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/members.data*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "メンバー" })
+      .click();
+
+    const progress = page.getByRole("progressbar", { name: "読み込み中" });
+    await expect(progress).toBeVisible();
+    release();
+    await expect(progress).toBeHidden();
+  });
 });

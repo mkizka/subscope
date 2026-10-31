@@ -2,7 +2,14 @@ import "./app.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useNavigation,
+} from "react-router";
 
 import type { Route } from "./+types/root";
 import { ErrorPage } from "./pages/client/error-page";
@@ -31,6 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const [queryClient] = useState(() => new QueryClient());
+  const navigation = useNavigation();
 
   useEffect(() => {
     // @ts-expect-error
@@ -39,6 +47,15 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {navigation.state === "loading" && (
+        <progress
+          className="
+            progress fixed inset-x-0 top-0 z-50 h-1 rounded-none
+            progress-primary
+          "
+          aria-label="読み込み中"
+        />
+      )}
       <Outlet />
     </QueryClientProvider>
   );
