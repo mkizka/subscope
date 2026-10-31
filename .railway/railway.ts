@@ -116,6 +116,32 @@ export default defineRailway(() => {
     },
   });
 
+  const prometheusData = volume("prometheus-data", { region, sizeMB: 2000 });
+  const prometheus = service("Prometheus", {
+    source: github("mkizka/subscope", {
+      branch: "main",
+      rootDirectory: "/prometheus",
+    }),
+    build: { watchPatterns: ["/prometheus/**/*"] },
+    replicas: { [region]: 1 },
+    volumeMounts: { "/prometheus": prometheusData },
+  });
+
+  const grafana = service("Grafana", {
+    source: github("mkizka/subscope", {
+      branch: "main",
+      rootDirectory: "/grafana",
+    }),
+    build: { watchPatterns: ["/grafana/**/*"] },
+    replicas: { [region]: 1 },
+    networking: {
+      serviceDomains: { "subscope-grafana.up.railway.app": { port: 3000 } },
+    },
+    env: {
+      GF_SECURITY_ADMIN_PASSWORD: preserve(),
+    },
+  });
+
   return project("Subscope", {
     resources: [
       db,
@@ -127,6 +153,9 @@ export default defineRailway(() => {
       web,
       worker,
       ingester,
+      prometheusData,
+      prometheus,
+      grafana,
     ],
   });
 });

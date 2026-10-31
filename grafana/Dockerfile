@@ -1,0 +1,6 @@
+FROM grafana/grafana:12.2.1
+
+COPY provisioning /etc/grafana/provisioning
+COPY dashboards /var/lib/grafana/dashboards
+
+ENTRYPOINT ["sh", "-c", ": \"${GF_SECURITY_ADMIN_PASSWORD:?}\" && exec /run.sh"]
