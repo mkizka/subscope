@@ -1,13 +1,14 @@
 import type * as AppBskyFeedGetRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
 
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { RepostService } from "../../../application/service/feed/repost-service.js";
-import { toMapByDid } from "../../../application/utils/map.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetRepostedByUseCase {
   constructor(
     private readonly repostService: RepostService,
-    private readonly profileViewService: ProfileViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(
@@ -23,25 +24,18 @@ export class GetRepostedByUseCase {
       },
     );
 
-    const actorDids = paginationResult.items.map((repost) => repost.actorDid);
-    const profileViewMap = await this.profileViewService
-      .findProfileView(actorDids)
-      .then(toMapByDid);
-
-    const repostedBy: AppBskyFeedGetRepostedBy.$OutputBody["repostedBy"] =
-      paginationResult.items.map((repost) => {
-        const profileView = profileViewMap.get(repost.actorDid);
-        if (!profileView) {
-          throw new Error(`Profile not found for actor: ${repost.actorDid}`);
-        }
-        return profileView;
-      });
+    const ctx = this.viewContextFactory.create();
+    const repostedBy = await Promise.all(
+      paginationResult.items.map((repost) =>
+        this.profileViews.view(repost.actorDid, ctx),
+      ),
+    );
 
     return {
       uri: params.uri,
       cid: params.cid,
       cursor: paginationResult.cursor,
-      repostedBy,
+      repostedBy: repostedBy.filter((profile) => profile !== undefined),
     };
   }
 }
