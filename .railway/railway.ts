@@ -48,6 +48,7 @@ export default defineRailway(() => {
     volumeMounts: { "/data": tapData },
     env: {
       TAP_DATABASE_URL: "sqlite:///data/tap.db",
+      TAP_METRICS_LISTEN: ":6009",
     },
   });
 
