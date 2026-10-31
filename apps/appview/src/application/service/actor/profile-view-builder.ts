@@ -52,9 +52,9 @@ export class ProfileViewBuilder {
       $type: "app.bsky.actor.defs#profileViewDetailed",
       banner: this.getBannerUrl(profile),
       description: profile.description ?? undefined,
-      followersCount: stats?.followersCount,
-      followsCount: stats?.followsCount,
-      postsCount: stats?.postsCount,
+      followersCount: stats?.followersCount ?? 0,
+      followsCount: stats?.followsCount ?? 0,
+      postsCount: stats?.postsCount ?? 0,
       indexedAt: toDatetimeString(profile.indexedAt),
     };
   }
