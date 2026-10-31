@@ -6,13 +6,15 @@ import { SearchForm } from "./search-form";
 
 export const searchSchema = z.object({
   q: z.string().optional(),
+  tab: z.literal("posts").optional(),
 });
 
 type Props = {
   q?: string;
+  tab: "actors" | "posts";
 };
 
-export const SearchFormContainer = ({ q }: Props) => {
+export const SearchFormContainer = ({ q, tab }: Props) => {
   const [form, fields] = useForm({
     id: "search-form",
     defaultValue: { q },
@@ -26,6 +28,7 @@ export const SearchFormContainer = ({ q }: Props) => {
     <SearchForm
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.q, { type: "search" })}
+      tab={tab}
     />
   );
 };
