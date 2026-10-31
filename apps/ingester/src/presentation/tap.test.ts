@@ -168,4 +168,17 @@ describe("TapIngester", () => {
 
     expect(acks).toEqual([2]);
   });
+
+  test("tap-7: 複数のイベントを並行してキューに積み、積み終えたイベントから順にackする", async () => {
+    let finishFirst = () => {};
+    jobQueue.add.mockImplementationOnce(
+      () => new Promise<void>((resolve) => (finishFirst = resolve)),
+    );
+
+    await send(recordEvent(1, {}), recordEvent(2, {}));
+    expect(acks).toEqual([2]);
+
+    finishFirst();
+    await vi.waitFor(() => expect(acks).toEqual([2, 1]));
+  });
 });

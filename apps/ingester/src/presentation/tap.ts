@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { lexToJson } from "@atproto/lex";
-import type { RecordEvent } from "@atproto/tap";
+import type { RecordEvent, TapHandler } from "@atproto/tap";
 import { SimpleIndexer, Tap } from "@atproto/tap";
 import type {
   CommitEventDto,
@@ -11,6 +11,8 @@ import { isSupportedCollection } from "@repo/common/utils";
 
 import type { HandleCommitUseCase } from "../application/handle-commit-use-case.js";
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
+
+const MAX_IN_FLIGHT_EVENTS = 64;
 
 export class TapIngester {
   private readonly tap;
@@ -85,8 +87,27 @@ export class TapIngester {
     };
   }
 
+  private parallelHandler(): TapHandler {
+    const inFlight = new Set<Promise<void>>();
+    return {
+      onEvent: async (evt, opts) => {
+        if (inFlight.size >= MAX_IN_FLIGHT_EVENTS) await Promise.race(inFlight);
+        const task = this.indexer
+          .onEvent(evt, opts)
+          .catch((cause: unknown) => {
+            this.indexer.onError(
+              new Error(`Failed to process event ${evt.id}`, { cause }),
+            );
+          })
+          .finally(() => inFlight.delete(task));
+        inFlight.add(task);
+      },
+      onError: (error) => this.indexer.onError(error),
+    };
+  }
+
   async start() {
-    const channel = this.tap.channel(this.indexer, {
+    const channel = this.tap.channel(this.parallelHandler(), {
       // 初回同期で大量のイベントが流れる間は処理が追いつかずsocketが一時停止し、
       // pongを読めず既定(10s)のheartbeatが健全な接続を誤ってterminateするため間隔を伸ばす
       heartbeatIntervalMs: 60_000,
