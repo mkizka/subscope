@@ -17,6 +17,7 @@ export type PostCardProps = {
   likeCount?: number;
   createdAt?: string;
   images?: { thumb: string; alt: string }[];
+  quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
@@ -53,6 +54,28 @@ function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
   );
 }
 
+export function QuotedPost({
+  quote,
+}: {
+  quote: NonNullable<PostCardProps["quote"]>;
+}) {
+  return (
+    <blockquote className="mt-2 rounded-box border border-base-300 px-3 py-2">
+      <div className="flex items-baseline gap-2 text-sm">
+        <span className="truncate font-bold">
+          {quote.authorDisplayName ?? quote.authorHandle}
+        </span>
+        <span className="truncate text-base-content/60">
+          @{quote.authorHandle}
+        </span>
+      </div>
+      <p className="text-sm wrap-break-word whitespace-pre-wrap">
+        {quote.text}
+      </p>
+    </blockquote>
+  );
+}
+
 export function PostCard({
   authorAvatar,
   authorDisplayName,
@@ -63,6 +86,7 @@ export function PostCard({
   likeCount,
   createdAt,
   images,
+  quote,
   reasonRepost,
   toolbar,
   threadSearch,
@@ -128,6 +152,7 @@ export function PostCard({
               ))}
             </div>
           )}
+          {quote && <QuotedPost quote={quote} />}
           {toolbar ?? (
             <>
               <div

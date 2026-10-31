@@ -44,6 +44,9 @@ export function ProfilePage({ follow, tabs, tab, posts, ...profile }: Props) {
             {tabLabels[value]}
           </Link>
         ))}
+        <Link to="lists" role="tab" className="tab">
+          リスト
+        </Link>
       </div>
       {/* ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ */}
       <TimelineFeed posts={posts} onCompose={() => {}} />
