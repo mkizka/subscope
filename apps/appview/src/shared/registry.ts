@@ -23,6 +23,7 @@ import type { IActorStatsRepository } from "../application/interfaces/actor-stat
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
 import type { IAuthorFeedRepository } from "../application/interfaces/author-feed-repository.js";
 import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
+import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IGeneratorRepository } from "../application/interfaces/generator-repository.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
@@ -109,6 +110,7 @@ import { ActorStatsRepository } from "../infrastructure/actor-stats-repository/a
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
 import { AuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.js";
 import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
+import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { GeneratorRepository } from "../infrastructure/generator-repository/generator-repository.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
@@ -144,6 +146,7 @@ import { GetPostThread } from "../presentation/routes/app/bsky/feed/getPostThrea
 import { GetRepostedBy } from "../presentation/routes/app/bsky/feed/getRepostedBy.js";
 import { GetTimeline } from "../presentation/routes/app/bsky/feed/getTimeline.js";
 import { SearchPosts } from "../presentation/routes/app/bsky/feed/searchPosts.js";
+import { SearchPostsV2 } from "../presentation/routes/app/bsky/feed/searchPostsV2.js";
 import { GetFollowers } from "../presentation/routes/app/bsky/graph/getFollowers.js";
 import { GetFollows } from "../presentation/routes/app/bsky/graph/getFollows.js";
 import { GetList } from "../presentation/routes/app/bsky/graph/getList.js";
@@ -204,6 +207,7 @@ export const createAppRegistry = (env: Env) =>
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationRepository", ["db"], asClassArgs<INotificationRepository>()(NotificationRepository))
     .service("postRepository", ["db"], asClassArgs<IPostRepository>()(PostRepository))
+    .service("generatorQuery", ["db"], asClassArgs<IGeneratorQuery>()(GeneratorQuery))
     .service("likeQuery", ["db"], asClassArgs<ILikeQuery>()(LikeQuery))
     .service("postQuery", ["db"], asClassArgs<IPostQuery>()(PostQuery))
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
@@ -243,7 +247,7 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorRepository"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
@@ -301,6 +305,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getUnreadCountUseCase", ["notificationRepository"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
     .service("searchPosts", ["searchPostsUseCase"], asClassArgs(SearchPosts))
+    .service("searchPostsV2", ["searchPostsUseCase"], asClassArgs(SearchPostsV2))
     .service("getActorLikes", ["getActorLikesUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetActorLikes))
     .service("getAuthorFeed", ["getAuthorFeedUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetAuthorFeed))
     .service("getFeedGenerators", ["getFeedGeneratorsUseCase"], asClassArgs(GetFeedGenerators))
@@ -328,7 +333,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unbanActor", ["unbanActorUseCase", "adminMiddleware"], asClassArgs(UnbanActor))
     .service("banSubscriber", ["banSubscriberUseCase", "adminMiddleware"], asClassArgs(BanSubscriber))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getBannedActors", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getBannedActors", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
