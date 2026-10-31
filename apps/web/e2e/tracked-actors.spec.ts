@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { follow, putRecord } from "./pds";
 
 test.describe("追跡中のユーザー", () => {
@@ -12,7 +11,7 @@ test.describe("追跡中のユーザー", () => {
       displayName: "Bob",
     });
     await follow("alice.test", "bob.test");
-    await login(page);
+    await page.goto("/");
   });
 
   test("tracked-actors-1: 左カラムの「追跡中のユーザー」から、中央カラムに追跡アクター（名前、ハンドル、フォローしているメンバー数）を、フォローしているメンバーが多い順に一覧表示する", async ({

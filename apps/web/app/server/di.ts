@@ -13,8 +13,10 @@ import { getSubscribersUseCaseFactory } from "./application/admin/get-subscriber
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
+import { createListUseCaseFactory } from "./application/list/create-list-use-case";
 import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
 import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
+import { updateListUseCaseFactory } from "./application/list/update-list-use-case";
 import { getLoginStepUseCaseFactory } from "./application/login/get-login-step-use-case";
 import { oauthCallbackUseCaseFactory } from "./application/login/oauth-callback-use-case";
 import { subscribeServerUseCaseFactory } from "./application/login/subscribe-server-use-case";
@@ -39,6 +41,7 @@ import {
 import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
+import { listCommandFactory } from "./infrastructure/list/list-command";
 import { listQueryFactory } from "./infrastructure/list/list-query";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
 import { notificationCommandFactory } from "./infrastructure/notification/notification-command";
@@ -162,6 +165,13 @@ export const di = await createRegistry()
   .service("threadQuery", ["oauthClient"], threadQueryFactory)
   .service("getThreadUseCase", ["threadQuery"], getThreadUseCaseFactory)
   .service("listQuery", ["oauthClient"], listQueryFactory)
-  .service("getListsPageUseCase", ["listQuery"], getListsPageUseCaseFactory)
+  .service("listCommand", ["oauthClient"], listCommandFactory)
+  .service(
+    "getListsPageUseCase",
+    ["listQuery", "actorQuery"],
+    getListsPageUseCaseFactory,
+  )
   .service("getListPageUseCase", ["listQuery"], getListPageUseCaseFactory)
+  .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
+  .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
   .resolve();

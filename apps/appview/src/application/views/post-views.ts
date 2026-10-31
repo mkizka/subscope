@@ -6,16 +6,12 @@ import { mention } from "@repo/client/lex/app/bsky/richtext/facet";
 import { Record } from "@repo/common/domain";
 
 import type { RecordDto } from "../dto/record-dto.js";
+import { gateUri } from "../utils/gate-uri.js";
 import { asLexMap } from "../utils/lex.js";
 import type { EmbedViews } from "./embed-views.js";
 import { toLabelViews } from "./label-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
-
-const threadgateUri = (postUri: string) => {
-  const uri = new AtUri(postUri);
-  return AtUri.make(uri.host, "app.bsky.feed.threadgate", uri.rkey).toString();
-};
 
 export class PostViews {
   constructor(
@@ -32,14 +28,15 @@ export class PostViews {
       return undefined;
     }
     const rootUri = post.replyRootUri ?? uri;
-    const [record, author, stats, viewer, embed, gate, labels] =
+    const [record, author, stats, viewer, embed, gate, postgate, labels] =
       await Promise.all([
         ctx.record(uri),
         this.profileViews.basic(post.actorDid, ctx),
         ctx.stats(uri),
         ctx.viewerPostState(uri),
         this.embedViews.embedView(post, ctx),
-        ctx.record(threadgateUri(rootUri)),
+        ctx.record(gateUri(rootUri, "app.bsky.feed.threadgate")),
+        ctx.record(gateUri(uri, "app.bsky.feed.postgate")),
         ctx.labelsOf(uri),
       ]);
     if (!record || !author) {
@@ -57,9 +54,11 @@ export class PostViews {
       likeCount: stats?.likeCount ?? 0,
       quoteCount: stats?.quoteCount ?? 0,
       viewer: {
-        repost: viewer.repost?.uri.toString(),
+        repost: viewer.repost?.uri,
         like: viewer.like?.uri,
         replyDisabled: gate && (await this.replyDisabled(rootUri, gate, ctx)),
+        embeddingDisabled:
+          postgate && this.embeddingDisabled(post.actorDid, postgate, ctx),
       },
       threadgate:
         gate && rootUri === uri
@@ -72,6 +71,26 @@ export class PostViews {
       labels: toLabelViews(labels),
       indexedAt: toDatetimeString(post.indexedAt),
     };
+  }
+
+  private embeddingDisabled(
+    authorDid: string,
+    postgate: RecordDto,
+    ctx: ViewContext,
+  ) {
+    const viewerDid = ctx.viewer.viewerDid;
+    if (!viewerDid) {
+      return undefined;
+    }
+    const { embeddingRules } = Record.create(postgate).validate(
+      "app.bsky.feed.postgate",
+    );
+    return (
+      viewerDid !== authorDid &&
+      !!embeddingRules?.some(
+        (rule) => rule.$type === "app.bsky.feed.postgate#disableRule",
+      )
+    );
   }
 
   private async replyDisabled(

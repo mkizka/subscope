@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { createRecord, uploadImage } from "./pds";
 
 test.describe("引用投稿", () => {
@@ -17,7 +16,7 @@ test.describe("引用投稿", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await login(page);
+    await page.goto("/");
     const quote = page
       .getByRole("article")
       .filter({ hasText: "quote-1: 引用した投稿" })
@@ -52,7 +51,7 @@ test.describe("引用投稿", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await login(page);
+    await page.goto("/");
     const post = page
       .getByRole("article")
       .filter({ hasText: "quote-2: 引用した投稿" });

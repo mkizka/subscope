@@ -13,6 +13,7 @@ import {
 export type ListDto = {
   uri: ListView["uri"];
   rkey: string;
+  creatorDid: string;
   name: string;
   description?: string;
 };
@@ -41,6 +42,7 @@ export interface IListQuery {
 const toList = (list: ListView): ListDto => ({
   uri: list.uri,
   rkey: new AtUri(list.uri).rkey,
+  creatorDid: list.creator.did,
   name: list.name,
   description: list.description,
 });
