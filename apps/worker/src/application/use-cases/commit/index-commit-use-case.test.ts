@@ -73,6 +73,36 @@ describe("IndexCommitUseCase", () => {
       expect(savedPost?.text).toBe("Hello world");
     });
 
+    test("index-10: レコードの作成者やフォロー先などのアクターは、すでに保存済みでハンドルと状態が変わらなければ更新しない", async () => {
+      // arrange
+      const actor = actorFactory();
+      actorRepo.add(actor);
+      const upsertSpy = vi.spyOn(actorRepo, "upsert");
+
+      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
+      const record = Record.create({
+        uri,
+        cid: "cid123",
+        json: {
+          $type: "app.bsky.feed.post",
+          text: "Hello world",
+          createdAt: new Date().toISOString(),
+        },
+      });
+      const command: IndexCommitCommand = {
+        commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+        live: true,
+        jobLogger,
+      };
+
+      // act
+      await indexCommitUseCase.execute(command);
+
+      // assert
+      expect(postRepo.findByUri(uri)).not.toBeNull();
+      expect(upsertSpy).not.toHaveBeenCalled();
+    });
+
     test("index-9: threadgate と postgate は、同じアカウントで同じrkeyの投稿を対象とするものだけ保存する", async () => {
       // arrange
       const actor = actorFactory();

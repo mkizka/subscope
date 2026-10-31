@@ -34,6 +34,10 @@ export class IndexActorService {
   }): Promise<void> {
     const existingActor = await this.actorRepository.findByDid({ ctx, did });
     const actor = existingActor ?? Actor.create({ did });
+    const changed =
+      !existingActor ||
+      (!!handle && handle !== actor.handle) ||
+      (!!status && status !== actor.status);
 
     if (handle) {
       actor.updateHandle(handle);
@@ -42,7 +46,9 @@ export class IndexActorService {
       actor.updateStatus(status);
     }
 
-    await this.actorRepository.upsert({ ctx, actor });
+    if (changed) {
+      await this.actorRepository.upsert({ ctx, actor });
+    }
 
     if (!actor.handle) {
       ctx.afterCommit(() => this.jobScheduler.scheduleResolveDid(did));
