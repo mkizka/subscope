@@ -1,7 +1,7 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 import type { ProfileViewDetailed } from "@repo/client/lex/app/bsky/actor/defs";
 
-import type { IActorRepository } from "@/app/server/infrastructure/actor/actor-repository";
+import type { IActorQuery } from "@/app/server/infrastructure/actor/actor-query";
 
 export interface IGetProfileUseCase {
   execute: (
@@ -11,9 +11,9 @@ export interface IGetProfileUseCase {
 }
 
 export const getProfileUseCaseFactory = ({
-  actorRepository,
+  actorQuery,
 }: {
-  actorRepository: IActorRepository;
+  actorQuery: IActorQuery;
 }): IGetProfileUseCase => ({
-  execute: (did, actor) => actorRepository.findProfile(did, actor),
+  execute: (did, actor) => actorQuery.findProfile(did, actor),
 });

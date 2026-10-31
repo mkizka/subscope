@@ -5,26 +5,28 @@ import {
 } from "@repo/client/lex/app/bsky/feed/defs";
 import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 
-import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-repository";
+import {
+  type TimelinePostDto,
+  toTimelinePost,
+} from "@/app/server/infrastructure/timeline/timeline-query";
 
-export interface IThreadRepository {
+export interface IThreadQuery {
   findThread: (
     did: string,
     uri: AtUriString,
   ) => Promise<{
-    ancestors: TimelinePost[];
-    post: TimelinePost;
-    replies: TimelinePost[];
+    ancestors: TimelinePostDto[];
+    post: TimelinePostDto;
+    replies: TimelinePostDto[];
   } | null>;
 }
 
-export const threadRepositoryFactory = ({
+export const threadQueryFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): IThreadRepository => ({
+}): IThreadQuery => ({
   async findThread(did, uri) {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("OAuth session not found");

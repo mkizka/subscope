@@ -24,7 +24,7 @@ import { createPostUseCaseFactory } from "./application/post/create-post-use-cas
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
-import { actorRepositoryFactory } from "./infrastructure/actor/actor-repository";
+import { actorQueryFactory } from "./infrastructure/actor/actor-query";
 import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
 import { oauthClientFactory } from "./infrastructure/auth/oauth-client";
@@ -36,12 +36,13 @@ import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
-import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
+import { notificationCommandFactory } from "./infrastructure/notification/notification-command";
+import { notificationQueryFactory } from "./infrastructure/notification/notification-query";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
 import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
 import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
-import { threadRepositoryFactory } from "./infrastructure/thread/thread-repository";
-import { timelineRepositoryFactory } from "./infrastructure/timeline/timeline-repository";
+import { threadQueryFactory } from "./infrastructure/thread/thread-query";
+import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 
 export const di = await createRegistry()
   .service("loggerManager", loggerManagerFactory)
@@ -81,33 +82,26 @@ export const di = await createRegistry()
     ["subscopeRepository"],
     getTrackedActorsUseCaseFactory,
   )
-  .service(
-    "notificationRepository",
-    ["oauthClient"],
-    notificationRepositoryFactory,
-  )
+  .service("notificationQuery", ["oauthClient"], notificationQueryFactory)
+  .service("notificationCommand", ["oauthClient"], notificationCommandFactory)
   .service(
     "getNotificationsUseCase",
-    ["notificationRepository"],
+    ["notificationQuery"],
     getNotificationsUseCaseFactory,
   )
   .service(
     "countUnreadNotificationsUseCase",
-    ["notificationRepository"],
+    ["notificationQuery"],
     countUnreadNotificationsUseCaseFactory,
   )
   .service(
     "markNotificationsSeenUseCase",
-    ["notificationRepository"],
+    ["notificationCommand"],
     markNotificationsSeenUseCaseFactory,
   )
-  .service("timelineRepository", ["oauthClient"], timelineRepositoryFactory)
+  .service("timelineQuery", ["oauthClient"], timelineQueryFactory)
   .service("postRepository", ["oauthClient"], postRepositoryFactory)
-  .service(
-    "getTimelineUseCase",
-    ["timelineRepository"],
-    getTimelineUseCaseFactory,
-  )
+  .service("getTimelineUseCase", ["timelineQuery"], getTimelineUseCaseFactory)
   .service("createPostUseCase", ["postRepository"], createPostUseCaseFactory)
   .service("adminRepository", ["oauthClient"], adminRepositoryFactory)
   .service(
@@ -142,12 +136,12 @@ export const di = await createRegistry()
     ["adminRepository"],
     deleteInviteCodeUseCaseFactory,
   )
-  .service("actorRepository", ["oauthClient"], actorRepositoryFactory)
-  .service("getMeUseCase", ["actorRepository"], getMeUseCaseFactory)
-  .service("getProfileUseCase", ["actorRepository"], getProfileUseCaseFactory)
+  .service("actorQuery", ["oauthClient"], actorQueryFactory)
+  .service("getMeUseCase", ["actorQuery"], getMeUseCaseFactory)
+  .service("getProfileUseCase", ["actorQuery"], getProfileUseCaseFactory)
   .service(
     "getProfilePageUseCase",
-    ["actorRepository"],
+    ["actorQuery"],
     getProfilePageUseCaseFactory,
   )
   .service("followCommand", ["oauthClient"], followCommandFactory)
@@ -158,6 +152,6 @@ export const di = await createRegistry()
     ["reactionCommand"],
     toggleReactionUseCaseFactory,
   )
-  .service("threadRepository", ["oauthClient"], threadRepositoryFactory)
-  .service("getThreadUseCase", ["threadRepository"], getThreadUseCaseFactory)
+  .service("threadQuery", ["oauthClient"], threadQueryFactory)
+  .service("getThreadUseCase", ["threadQuery"], getThreadUseCaseFactory)
   .resolve();
