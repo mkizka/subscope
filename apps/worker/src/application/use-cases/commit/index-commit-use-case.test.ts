@@ -72,6 +72,60 @@ describe("IndexCommitUseCase", () => {
       expect(savedPost?.actorDid).toBe(actor.did);
       expect(savedPost?.text).toBe("Hello world");
     });
+
+    test("index-9: threadgate と postgate は、同じアカウントで同じrkeyの投稿を対象とするものだけ保存する", async () => {
+      // arrange
+      const actor = actorFactory();
+      actorRepo.add(actor);
+      const gate = (collection: string, rkey: string, postRkey: string) => {
+        const uri = new AtUri(`at://${actor.did}/${collection}/${rkey}`);
+        const record = Record.create({
+          uri,
+          cid: "cid123",
+          json: {
+            $type: collection,
+            post: `at://${actor.did}/app.bsky.feed.post/${postRkey}`,
+            createdAt: new Date().toISOString(),
+          },
+        });
+        return {
+          uri,
+          command: {
+            commit: {
+              operation: "create" as const,
+              uri,
+              rev: "3aaaaaaaaaaaa",
+              record,
+            },
+            live: true,
+            jobLogger,
+          },
+        };
+      };
+      const threadgate = gate("app.bsky.feed.threadgate", "123", "123");
+      const postgate = gate("app.bsky.feed.postgate", "123", "123");
+      const mismatched = gate("app.bsky.feed.threadgate", "456", "123");
+
+      // act
+      await indexCommitUseCase.execute(threadgate.command);
+      await indexCommitUseCase.execute(postgate.command);
+      await indexCommitUseCase.execute(mismatched.command);
+
+      // assert
+      expect(
+        await recordRepo.findByUri({ ctx, uri: threadgate.uri }),
+      ).not.toBeNull();
+      expect(
+        await recordRepo.findByUri({ ctx, uri: postgate.uri }),
+      ).not.toBeNull();
+      expect(jobLogger.log).toHaveBeenCalledWith(
+        expect.stringMatching(
+          new RegExp(
+            `^Record validation error: .*${mismatched.uri.toString()}$`,
+          ),
+        ),
+      );
+    });
   });
 
   describe("deleteオペレーション", () => {

@@ -43,6 +43,7 @@ import type { ISubscriptionRepository } from "../application/interfaces/reposito
 import { IndexActorService } from "../application/services/index-actor-service.js";
 import { IndexRecordService } from "../application/services/index-record-service.js";
 import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
+import { GateIndexer } from "../application/services/indexer/gate-indexer.js";
 import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
 import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
 import { ListIndexer } from "../application/services/indexer/list-indexer.js";
@@ -138,9 +139,10 @@ export const createWorkerRegistry = (env: Env) =>
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
     .service("listItemIndexer", ["listItemRepository", "indexActorService"], asClassArgs(ListItemIndexer))
+    .service("gateIndexer", asClassArgs(GateIndexer))
     .service("likeIndexer", ["likeRepository", "jobScheduler", "subscriptionRepository", "notificationRepository"], asClassArgs(LikeIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository", "postRepository", "jobScheduler", "subscriptionRepository", "notificationRepository"], asClassArgs(RepostIndexer))
-    .service("indexRecordService", ["recordRepository", "indexActorService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer"], asClassArgs(IndexRecordService))
+    .service("indexRecordService", ["recordRepository", "indexActorService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("resolveDidUseCase", ["didResolver", "handleResolver", "actorRepository", "db"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexActorService", "resolveDidUseCase"], asClassArgs(UpsertIdentityUseCase))

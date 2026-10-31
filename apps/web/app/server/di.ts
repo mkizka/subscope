@@ -1,5 +1,6 @@
 import { createRegistry } from "@gyaku/di";
 
+import { getFollowListUseCaseFactory } from "./application/actor/get-follow-list-use-case";
 import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
@@ -144,6 +145,7 @@ export const di = await createRegistry()
   .service("actorQuery", ["oauthClient"], actorQueryFactory)
   .service("getMeUseCase", ["actorQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["actorQuery"], getProfileUseCaseFactory)
+  .service("getFollowListUseCase", ["actorQuery"], getFollowListUseCaseFactory)
   .service(
     "getProfilePageUseCase",
     ["actorQuery"],
