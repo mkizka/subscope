@@ -19,3 +19,5 @@ export function meta() {
 export default function Members({ loaderData }: Route.ComponentProps) {
   return <MembersPage {...loaderData} />;
 }
+
+export { shouldRevalidate } from "@/app/lib/should-revalidate";

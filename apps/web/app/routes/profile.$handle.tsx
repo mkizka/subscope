@@ -63,3 +63,5 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
     />
   );
 }
+
+export { shouldRevalidate } from "@/app/lib/should-revalidate";

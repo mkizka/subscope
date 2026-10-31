@@ -134,6 +134,7 @@ export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
         <h2 className="font-bold">スレッド</h2>
         <Link
           to={{ search: closeSearch }}
+          preventScrollReset
           aria-label="閉じる"
           className="btn btn-square btn-ghost btn-sm"
         >

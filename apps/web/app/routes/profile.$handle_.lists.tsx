@@ -42,3 +42,5 @@ export function meta() {
 export default function Lists({ loaderData }: Route.ComponentProps) {
   return <ListsPage {...loaderData} />;
 }
+
+export { shouldRevalidate } from "@/app/lib/should-revalidate";

@@ -24,6 +24,7 @@ export function ProfilePanel({
     <section aria-label="プロフィール" className="flex flex-col gap-3 p-4">
       <Link
         to={{ search: closeSearch }}
+        preventScrollReset
         aria-label="閉じる"
         className="btn btn-square self-end btn-ghost"
       >
