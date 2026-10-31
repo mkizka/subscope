@@ -59,3 +59,17 @@ export const LongText: Story = {
     createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
   },
 };
+
+export const WithQuote: Story = {
+  args: {
+    authorHandle: "erin.bsky.social",
+    authorDisplayName: "Erin",
+    text: "この投稿に同意です。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    quote: {
+      authorHandle: "alice.bsky.social",
+      authorDisplayName: "Alice",
+      text: "Subscopeは省ストレージを目指した互換AppViewの実装です。",
+    },
+  },
+};
