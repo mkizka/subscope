@@ -1,6 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { login } from "./login";
 import { createRecord } from "./pds";
 
 const post = (text: string, parent?: { uri: string; cid: string }) =>
@@ -11,7 +10,7 @@ const post = (text: string, parent?: { uri: string; cid: string }) =>
   });
 
 const openThread = async (page: Page, uri: string, text: string) => {
-  await login(page);
+  await page.goto("/");
   await page.waitForURL("/");
   await expect(async () => {
     await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
@@ -28,7 +27,7 @@ test.describe("スレッド", () => {
     const text = "thread-1: 投稿";
     await post(text);
 
-    await login(page);
+    await page.goto("/");
     const article = page.getByRole("article").filter({ hasText: text });
     await expect(async () => {
       await page.reload();

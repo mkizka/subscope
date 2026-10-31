@@ -1,10 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
-
 test.describe("エラー", () => {
   test.beforeEach(async ({ page }) => {
-    await login(page);
     await page.goto("/not-found-page");
   });
 

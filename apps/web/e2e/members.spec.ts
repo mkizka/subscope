@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { putRecord } from "./pds";
 
 test.describe("メンバー", () => {
@@ -9,7 +8,7 @@ test.describe("メンバー", () => {
       displayName: "Alice",
       description: "Blueskyを使っています",
     });
-    await login(page);
+    await page.goto("/");
   });
 
   test("members-1: 左カラムの「メンバー」から、中央カラムにメンバー（名前、ハンドル、自己紹介）を一覧表示する", async ({

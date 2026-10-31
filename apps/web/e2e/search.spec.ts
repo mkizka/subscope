@@ -1,20 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { putRecord } from "./pds";
 
 test.describe("検索", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {
       displayName: "Alice",
       description: "Blueskyを使っています",
     });
-    await login(page);
   });
 
   test("search-1: 左カラムの「検索」から開いた検索欄で検索すると、表示名またはハンドルが検索語に部分一致するユーザー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
+    await page.goto("/");
     await page.getByRole("link", { name: "検索", exact: true }).click();
     await expect(page).toHaveURL("/search");
 
