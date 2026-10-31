@@ -19,8 +19,9 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする
 - threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする
 - threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする
+- threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする
 
-listRuleのメンバーかどうかは今は判定しない。listRuleがあり他の規則に合わないときは、replyDisabledを含めない。
+リストに入っているかは、インデックスしたlistitemで判定する。
 
 ## app.bsky.actor.getProfile
 

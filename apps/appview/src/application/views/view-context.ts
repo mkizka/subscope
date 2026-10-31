@@ -5,6 +5,7 @@ import type { Repost } from "@repo/common/domain";
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
+import type { ListItemDto } from "../dto/list-item-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { ProfileDto } from "../dto/profile-dto.js";
@@ -17,6 +18,7 @@ import {
   type Label,
 } from "../interfaces/label-repository.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
+import type { IListItemQuery } from "../interfaces/list-item-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../interfaces/profile-query.js";
@@ -40,6 +42,7 @@ type Repositories = {
   likeQuery: ILikeQuery;
   repostRepository: IRepostRepository;
   generatorQuery: IGeneratorQuery;
+  listItemQuery: IListItemQuery;
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
@@ -57,6 +60,7 @@ export class ViewContext {
   private readonly viewerLikes: Batch<string, LikeDto>;
   private readonly viewerReposts: Batch<string, Repost>;
   private readonly generators: Batch<string, GeneratorDto>;
+  private readonly viewerListItems: Batch<string, ListItemDto>;
 
   constructor(
     repos: Repositories,
@@ -125,6 +129,13 @@ export class ViewContext {
       (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
       (generator) => generator.uri,
     );
+    this.viewerListItems = Batch.one(
+      viewerDid
+        ? (listUris) =>
+            repos.listItemQuery.findItems({ listUris, subjectDid: viewerDid })
+        : none,
+      (item) => item.listUri,
+    );
   }
 
   private async isVisible(subject: string) {
@@ -183,6 +194,10 @@ export class ViewContext {
     ]);
     return { like, repost };
   }
+
+  viewerListItem(listUri: string) {
+    return this.viewerListItems.load(listUri);
+  }
 }
 
 export class ViewContextFactory {
@@ -198,6 +213,7 @@ export class ViewContextFactory {
     likeQuery: ILikeQuery,
     repostRepository: IRepostRepository,
     generatorQuery: IGeneratorQuery,
+    listItemQuery: IListItemQuery,
   ) {
     this.repos = {
       profileQuery,
@@ -209,6 +225,7 @@ export class ViewContextFactory {
       likeQuery,
       repostRepository,
       generatorQuery,
+      listItemQuery,
     };
   }
 
