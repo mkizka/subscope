@@ -27,7 +27,8 @@ jobs:
       - run: pnpm i
       - run: npm i -g @railway/cli
       - name: Plan
-        run: railway config plan --out railway-plan.json | tee plan-output.txt
+        shell: bash
+        run: railway config plan --out railway-plan.json 2>&1 | tee plan-output.txt
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
