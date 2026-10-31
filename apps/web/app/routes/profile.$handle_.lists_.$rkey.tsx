@@ -58,5 +58,12 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 export default function List({ loaderData }: Route.ComponentProps) {
   const { list, ...rest } = loaderData;
-  return <ListPage name={list.name} description={list.description} {...rest} />;
+  return (
+    <ListPage
+      uri={list.uri}
+      name={list.name}
+      description={list.description}
+      {...rest}
+    />
+  );
 }

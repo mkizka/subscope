@@ -1,5 +1,10 @@
-import { currentDatetimeString } from "@atproto/syntax";
+import {
+  AtUri,
+  type AtUriString,
+  currentDatetimeString,
+} from "@atproto/syntax";
 import list from "@repo/client/lex/app/bsky/graph/list";
+import listitem from "@repo/client/lex/app/bsky/graph/listitem";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
@@ -8,6 +13,12 @@ type ListInput = { name: string; description?: string };
 export interface IListCommand {
   create: (did: string, input: ListInput) => Promise<void>;
   update: (did: string, rkey: string, input: ListInput) => Promise<void>;
+  addMember: (
+    did: string,
+    listUri: AtUriString,
+    subject: `did:${string}:${string}`,
+  ) => Promise<void>;
+  removeMember: (did: string, listItemUri: string) => Promise<void>;
 }
 
 export const listCommandFactory = ({
@@ -42,6 +53,18 @@ export const listCommandFactory = ({
         },
         { rkey },
       );
+    },
+    async addMember(did, listUri, subject) {
+      const agent = await restore(did);
+      await agent.create(listitem, {
+        list: listUri,
+        subject,
+        createdAt: currentDatetimeString(),
+      });
+    },
+    async removeMember(did, listItemUri) {
+      const agent = await restore(did);
+      await agent.delete(listitem, { rkey: new AtUri(listItemUri).rkey });
     },
   };
 };
