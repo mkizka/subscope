@@ -35,7 +35,9 @@ test.describe("リスト", () => {
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
-      await expect(main.getByText(name)).toBeVisible({ timeout: 1000 });
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
       await expect(main.getByText(`${name}の説明`)).toBeVisible({
         timeout: 1000,
       });
@@ -60,10 +62,12 @@ test.describe("リスト", () => {
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
-      await expect(main.getByText(name)).toBeVisible({ timeout: 1000 });
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
 
-    await main.getByText(name).click();
+    await main.getByText(name, { exact: true }).click();
 
     await expect(page).toHaveURL(`/profile/alice.test/lists/${rkey}`);
     await expect(main.getByRole("heading", { name })).toBeVisible();
