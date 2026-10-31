@@ -120,9 +120,9 @@ export default defineRailway(() => {
   const prometheus = service("Prometheus", {
     source: github("mkizka/subscope", {
       branch: "main",
-      rootDirectory: "/prometheus",
+      rootDirectory: "/.railway/prometheus",
     }),
-    build: { watchPatterns: ["/prometheus/**/*"] },
+    build: { watchPatterns: ["/.railway/prometheus/**/*"] },
     replicas: { [region]: 1 },
     volumeMounts: { "/prometheus": prometheusData },
   });
@@ -130,9 +130,9 @@ export default defineRailway(() => {
   const grafana = service("Grafana", {
     source: github("mkizka/subscope", {
       branch: "main",
-      rootDirectory: "/grafana",
+      rootDirectory: "/.railway/grafana",
     }),
-    build: { watchPatterns: ["/grafana/**/*"] },
+    build: { watchPatterns: ["/.railway/grafana/**/*"] },
     replicas: { [region]: 1 },
     networking: {
       serviceDomains: { "subscope-grafana.up.railway.app": { port: 3000 } },
