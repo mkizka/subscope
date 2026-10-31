@@ -7,10 +7,11 @@ import type {
   Repost,
 } from "@repo/common/domain";
 
+import type { FollowDto } from "../dto/follow-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
-import type { IFollowRepository } from "../interfaces/follow-repository.js";
+import type { IFollowQuery } from "../interfaces/follow-query.js";
 import type { IGeneratorRepository } from "../interfaces/generator-repository.js";
 import {
   type ILabelRepository,
@@ -34,7 +35,7 @@ export type Viewer = {
 type Repositories = {
   profileRepository: IProfileRepository;
   labelRepository: ILabelRepository;
-  followRepository: IFollowRepository;
+  followQuery: IFollowQuery;
   postQuery: IPostQuery;
   recordQuery: IRecordQuery;
   postStatsQuery: IPostStatsQuery;
@@ -51,8 +52,8 @@ const bySubjectUri = (record: { subjectUri: AtUri }) =>
 export class ViewContext {
   private readonly profiles: Batch<Did, ProfileDetailed>;
   private readonly labels: Batch<string, Label[]>;
-  private readonly following: Batch<Did, [Did, AtUri]>;
-  private readonly followedBy: Batch<Did, [Did, AtUri]>;
+  private readonly following: Batch<Did, FollowDto>;
+  private readonly followedBy: Batch<Did, FollowDto>;
   private readonly posts: Batch<string, PostDto>;
   private readonly records: Batch<string, RecordDto>;
   private readonly postStats: Batch<string, PostStatsDto>;
@@ -66,7 +67,6 @@ export class ViewContext {
   ) {
     const viewerDid = viewer.viewerDid;
     const none = () => Promise.resolve([]);
-    const first = <K>([key]: [K, unknown]) => key;
     this.profiles = Batch.one(
       (dids) => repos.profileRepository.findManyDetailed(dids),
       (profile) => profile.actorDid,
@@ -77,21 +77,23 @@ export class ViewContext {
     );
     this.following = Batch.one(
       viewerDid
-        ? (targetDids) =>
-            repos.followRepository
-              .findFollowingMap({ actorDid: viewerDid, targetDids })
-              .then((map) => [...map])
+        ? (subjectDids) =>
+            repos.followQuery.findFollows({
+              actorDids: [viewerDid],
+              subjectDids,
+            })
         : none,
-      first,
+      (follow) => follow.subjectDid,
     );
     this.followedBy = Batch.one(
       viewerDid
-        ? (targetDids) =>
-            repos.followRepository
-              .findFollowedByMap({ actorDid: viewerDid, targetDids })
-              .then((map) => [...map])
+        ? (actorDids) =>
+            repos.followQuery.findFollows({
+              actorDids,
+              subjectDids: [viewerDid],
+            })
         : none,
-      first,
+      (follow) => follow.actorDid,
     );
     this.posts = Batch.one(
       (uris) => repos.postQuery.findByUris(toAtUris(uris)),
@@ -171,7 +173,7 @@ export class ViewContext {
       this.following.load(did),
       this.followedBy.load(did),
     ]);
-    return { following: following?.[1], followedBy: followedBy?.[1] };
+    return { following: following?.uri, followedBy: followedBy?.uri };
   }
 
   async viewerPostState(uri: string) {
@@ -189,7 +191,7 @@ export class ViewContextFactory {
   constructor(
     profileRepository: IProfileRepository,
     labelRepository: ILabelRepository,
-    followRepository: IFollowRepository,
+    followQuery: IFollowQuery,
     postQuery: IPostQuery,
     recordQuery: IRecordQuery,
     postStatsQuery: IPostStatsQuery,
@@ -200,7 +202,7 @@ export class ViewContextFactory {
     this.repos = {
       profileRepository,
       labelRepository,
-      followRepository,
+      followQuery,
       postQuery,
       recordQuery,
       postStatsQuery,

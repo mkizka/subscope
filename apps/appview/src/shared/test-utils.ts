@@ -11,6 +11,7 @@ import { InMemoryActorRepository } from "../infrastructure/actor-repository/acto
 import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
 import { InMemoryAuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.in-memory.js";
+import { InMemoryFollowQuery } from "../infrastructure/follow-query/follow-query.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/generator-repository/generator-repository.in-memory.js";
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
@@ -62,6 +63,7 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
   .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
   .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
+  .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))
   .replaceService("listRepository", asClassArgs(InMemoryListRepository))
   .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
