@@ -40,7 +40,8 @@ import { notificationCommandFactory } from "./infrastructure/notification/notifi
 import { notificationQueryFactory } from "./infrastructure/notification/notification-query";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
 import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
-import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
+import { subscopeCommandFactory } from "./infrastructure/subscope/subscope-command";
+import { subscopeQueryFactory } from "./infrastructure/subscope/subscope-query";
 import { threadQueryFactory } from "./infrastructure/thread/thread-query";
 import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 
@@ -56,30 +57,23 @@ export const di = await createRegistry()
     oauthClientFactory,
   )
   .service("cookieSessionStorage", cookieSessionStorageFactory)
-  .service("subscopeRepository", ["oauthClient"], subscopeRepositoryFactory)
-  .service(
-    "getLoginStepUseCase",
-    ["subscopeRepository"],
-    getLoginStepUseCaseFactory,
-  )
+  .service("subscopeQuery", ["oauthClient"], subscopeQueryFactory)
+  .service("subscopeCommand", ["oauthClient"], subscopeCommandFactory)
+  .service("getLoginStepUseCase", ["subscopeQuery"], getLoginStepUseCaseFactory)
   .service(
     "subscribeServerUseCase",
-    ["subscopeRepository"],
+    ["subscopeCommand"],
     subscribeServerUseCaseFactory,
   )
   .service(
     "oauthCallbackUseCase",
-    ["oauthClient", "subscopeRepository", "loggerManager"],
+    ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service(
-    "getMembersUseCase",
-    ["subscopeRepository"],
-    getMembersUseCaseFactory,
-  )
+  .service("getMembersUseCase", ["subscopeQuery"], getMembersUseCaseFactory)
   .service(
     "getTrackedActorsUseCase",
-    ["subscopeRepository"],
+    ["subscopeQuery"],
     getTrackedActorsUseCaseFactory,
   )
   .service("notificationQuery", ["oauthClient"], notificationQueryFactory)
