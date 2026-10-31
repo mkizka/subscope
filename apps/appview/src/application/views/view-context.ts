@@ -27,6 +27,7 @@ import { Batch } from "./batch.js";
 export type Viewer = {
   viewerDid?: Did | null;
   includeTakedowns?: boolean;
+  labelerDids?: string[];
 };
 
 type Repositories = {
@@ -170,8 +171,12 @@ export class ViewContext {
     return (await this.profile(post.actorDid)) ? post : undefined;
   }
 
-  labelsOf(subject: string) {
-    return this.labels.load(subject);
+  async labelsOf(subject: string) {
+    const labels = await this.labels.load(subject);
+    const { labelerDids } = this.viewer;
+    return labelerDids
+      ? labels?.filter((label) => labelerDids.includes(label.src))
+      : labels;
   }
 
   record(uri: string) {
