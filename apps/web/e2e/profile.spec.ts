@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import {
   createRecord,
   follow,
@@ -25,7 +24,7 @@ test.describe("プロフィール", () => {
       text,
       createdAt: new Date().toISOString(),
     });
-    await login(page);
+    await page.goto("/");
 
     await page.getByRole("link", { name: "プロフィール" }).click();
 
@@ -49,7 +48,6 @@ test.describe("プロフィール", () => {
 
   test.describe("簡易表示", () => {
     test.beforeEach(async ({ page }) => {
-      await login(page);
       await page.goto("/?profile=alice.test");
     });
 
@@ -90,7 +88,6 @@ test.describe("プロフィール", () => {
       );
       return (await res.text()).includes(bob);
     };
-    await login(page);
     await page.goto(`/profile/${bob}`);
     const main = page.getByRole("main");
     await expect(async () => {
@@ -116,7 +113,7 @@ test.describe("プロフィール", () => {
   test("profile-6: 自分のプロフィールにはフォローボタンを出さない", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     await page.getByRole("link", { name: "プロフィール" }).click();
 
     const main = page.getByRole("main");
@@ -138,7 +135,6 @@ test.describe("プロフィール", () => {
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
     });
-    await login(page);
     await page.goto("/profile/alice.test?tab=replies");
     const main = page.getByRole("main");
     await expect(async () => {
@@ -165,7 +161,6 @@ test.describe("プロフィール", () => {
       subject,
       createdAt: new Date().toISOString(),
     });
-    await login(page);
     await page.goto("/profile/alice.test");
     const main = page.getByRole("main");
 
@@ -182,7 +177,6 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     await follow("alice.test", "bob.test");
-    await login(page);
     await page.goto("/profile/bob.test");
 
     const main = page.getByRole("main");
@@ -207,7 +201,6 @@ test.describe("プロフィール", () => {
       text,
       createdAt: new Date().toISOString(),
     });
-    await login(page);
     await page.goto("/profile/alice.test?tab=media");
     const main = page.getByRole("main");
 

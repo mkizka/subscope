@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { createRecord, follow, resolveHandle } from "./pds";
 
 const createList = async (name: string) => {
@@ -26,7 +25,6 @@ test.describe("リスト", () => {
   }) => {
     const name = `list-1のリスト ${Date.now()}`;
     await createList(name);
-    await login(page);
     await page.goto("/profile/alice.test");
 
     await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
@@ -57,7 +55,6 @@ test.describe("リスト", () => {
         createdAt: new Date().toISOString(),
       });
     }
-    await login(page);
     await page.goto("/profile/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
@@ -86,7 +83,6 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-3のリスト ${Date.now()}`);
-    await login(page);
     await page.goto(`/profile/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
