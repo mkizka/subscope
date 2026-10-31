@@ -49,6 +49,8 @@ export default defineRailway(() => {
     env: {
       TAP_DATABASE_URL: "sqlite:///data/tap.db",
       TAP_METRICS_LISTEN: ":6009",
+      TAP_COLLECTION_FILTERS:
+        "app.bsky.actor.profile,app.bsky.feed.generator,app.bsky.feed.like,app.bsky.feed.post,app.bsky.feed.postgate,app.bsky.feed.repost,app.bsky.feed.threadgate,app.bsky.graph.follow,app.bsky.graph.list,app.bsky.graph.listitem",
     },
   });
 
