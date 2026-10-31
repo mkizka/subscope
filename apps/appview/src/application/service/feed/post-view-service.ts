@@ -20,10 +20,8 @@ function asLexMap(value: unknown): LexMap {
 
 import type { Did } from "@atproto/did";
 
-import {
-  type ILabelRepository,
-  isTakendown,
-} from "../../../application/interfaces/label-repository.js";
+import { isTakendown } from "../../../application/interfaces/label-query.js";
+import type { ILabelRepository } from "../../../application/interfaces/label-repository.js";
 import type { ILikeRepository } from "../../../application/interfaces/like-repository.js";
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../../../application/interfaces/post-stats-query.js";
