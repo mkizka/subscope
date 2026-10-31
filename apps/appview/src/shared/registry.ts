@@ -43,7 +43,7 @@ import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostQuery } from "../application/interfaces/repost-query.js";
 import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
-import type { ITimelineRepository } from "../application/interfaces/timeline-repository.js";
+import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { ActorLoader } from "../application/loader/actor-loader.js";
 import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
@@ -59,7 +59,6 @@ import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-vie
 import { PostViewService } from "../application/service/feed/post-view-service.js";
 import { ReplyRefService } from "../application/service/feed/reply-ref-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
-import { TimelineService } from "../application/service/feed/timeline-service.js";
 import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
 import { ListViewService } from "../application/service/graph/list-view-service.js";
@@ -136,7 +135,7 @@ import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostQuery } from "../infrastructure/repost-query/repost-query.js";
 import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
-import { TimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.js";
+import { TimelineQuery } from "../infrastructure/timeline-query/timeline-query.js";
 import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.js";
 import { AdminMiddleware } from "../presentation/middleware/admin-middleware.js";
 import { AuthVerifierMiddleware } from "../presentation/middleware/auth-verifier-middleware.js";
@@ -224,7 +223,7 @@ export const createAppRegistry = (env: Env) =>
     .service("likeQuery", ["db"], asClassArgs<ILikeQuery>()(LikeQuery))
     .service("postQuery", ["db"], asClassArgs<IPostQuery>()(PostQuery))
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
-    .service("timelineRepository", ["db"], asClassArgs<ITimelineRepository>()(TimelineRepository))
+    .service("timelineQuery", ["db"], asClassArgs<ITimelineQuery>()(TimelineQuery))
     .service("authorFeedRepository", ["db"], asClassArgs<IAuthorFeedRepository>()(AuthorFeedRepository))
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
@@ -251,7 +250,6 @@ export const createAppRegistry = (env: Env) =>
     .service("postEmbedViewBuilder", ["assetUrlBuilder"], asClassArgs(PostEmbedViewBuilder))
     .service("postViewService", ["postRepository", "postStatsQuery", "recordQuery", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
     .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
-    .service("timelineService", ["timelineRepository"], asClassArgs(TimelineService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
     .service("authorFeedService", ["authorFeedRepository"], asClassArgs(AuthorFeedService))
     .service("actorLikesService", ["likeRepository"], asClassArgs(ActorLikesService))
@@ -277,14 +275,14 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
     .service("getPostThreadUseCase", ["postRepository", "postViewService"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
-    .service("getTimelineUseCase", ["timelineService", "feedProcessor"], asClassArgs(GetTimelineUseCase))
+    .service("getTimelineUseCase", ["timelineQuery", "feedProcessor"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationRepository", "profileViewService", "subscriptionRepository"], asClassArgs(ListNotificationsUseCase))
     .service("searchPostsUseCase", ["searchService", "postViewService"], asClassArgs(SearchPostsUseCase))
     .service("getActorLikesUseCase", ["actorLikesService", "feedProcessor"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedService", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["generatorViewService"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "profileViewService"], asClassArgs(GetLikesUseCase))
-    .service("getListFeedUseCase", ["timelineRepository", "feedProcessor"], asClassArgs(GetListFeedUseCase))
+    .service("getListFeedUseCase", ["timelineQuery", "feedProcessor"], asClassArgs(GetListFeedUseCase))
     .service("getRepostedByUseCase", ["repostService", "profileViewService"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowersUseCase))

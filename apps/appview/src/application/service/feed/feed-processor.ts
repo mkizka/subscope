@@ -4,6 +4,7 @@ import { AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type { FeedItem } from "@repo/common/domain";
 
+import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
 import type { IRepostRepository } from "../../../application/interfaces/repost-repository.js";
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
@@ -21,7 +22,7 @@ export class FeedProcessor {
   ) {}
 
   async processFeedItems(
-    feedItems: FeedItem[],
+    feedItems: (FeedItem | FeedItemDto)[],
     viewerDid?: Did,
   ): Promise<$Typed<AppBskyFeedDefs.FeedViewPost>[]> {
     const postUris = new Set<string>();
