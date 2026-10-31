@@ -6,12 +6,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("SearchActorsUseCase", () => {
   let searchActorsUseCase: TestServices["searchActorsUseCase"];
   let profileRepo: TestServices["profileRepository"];
-  let actorStatsRepo: TestServices["actorStatsRepository"];
+  let actorStatsQuery: TestServices["actorStatsQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     searchActorsUseCase = services.searchActorsUseCase;
     profileRepo = services.profileRepository;
-    actorStatsRepo = services.actorStatsRepository;
+    actorStatsQuery = services.actorStatsQuery;
   });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
@@ -65,7 +65,7 @@ describe("SearchActorsUseCase", () => {
       handle: "match.test",
     });
     profileRepo.add(matchProfile);
-    actorStatsRepo.add(matchActor.did, {
+    actorStatsQuery.add(matchActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -78,7 +78,7 @@ describe("SearchActorsUseCase", () => {
       handle: "nomatch.test",
     });
     profileRepo.add(noMatchProfile);
-    actorStatsRepo.add(noMatchActor.did, {
+    actorStatsQuery.add(noMatchActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -111,7 +111,7 @@ describe("SearchActorsUseCase", () => {
       displayName: "No Match User",
     });
     profileRepo.add(profile);
-    actorStatsRepo.add(actor.did, {
+    actorStatsQuery.add(actor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -138,7 +138,7 @@ describe("SearchActorsUseCase", () => {
       displayName: "Limit Test User 1",
     });
     profileRepo.add(profile1);
-    actorStatsRepo.add(actor1.did, {
+    actorStatsQuery.add(actor1.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -150,7 +150,7 @@ describe("SearchActorsUseCase", () => {
       displayName: "Limit Test User 2",
     });
     profileRepo.add(profile2);
-    actorStatsRepo.add(actor2.did, {
+    actorStatsQuery.add(actor2.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -177,7 +177,7 @@ describe("SearchActorsUseCase", () => {
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
     profileRepo.add(profile1);
-    actorStatsRepo.add(actor1.did, {
+    actorStatsQuery.add(actor1.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -191,7 +191,7 @@ describe("SearchActorsUseCase", () => {
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
     profileRepo.add(profile2);
-    actorStatsRepo.add(actor2.did, {
+    actorStatsQuery.add(actor2.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -245,7 +245,7 @@ describe("SearchActorsUseCase", () => {
       handle: "different.handle.com",
     });
     profileRepo.add(displayNameProfile);
-    actorStatsRepo.add(displayNameActor.did, {
+    actorStatsQuery.add(displayNameActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,
@@ -258,7 +258,7 @@ describe("SearchActorsUseCase", () => {
       handle: "testhandle.example.com",
     });
     profileRepo.add(handleProfile);
-    actorStatsRepo.add(handleActor.did, {
+    actorStatsQuery.add(handleActor.did, {
       followersCount: 0,
       followsCount: 0,
       postsCount: 0,

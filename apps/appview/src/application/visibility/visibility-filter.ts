@@ -6,7 +6,7 @@ import type { ViewData } from "../loader/actor-loader.js";
 
 export const hiddenReason = (
   profile: Pick<ProfileDetailed, "status">,
-  labels?: LabelDto[],
+  labels?: Pick<LabelDto, "val">[],
 ) => {
   if (profile.status === "deactivated") {
     return "AccountDeactivated";
