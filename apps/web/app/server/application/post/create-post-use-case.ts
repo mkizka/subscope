@@ -18,17 +18,9 @@ export const createPostUseCaseFactory = ({
   postQuery: IPostQuery;
 }): ICreatePostUseCase => ({
   async execute(did, post) {
-    const parentUri = post.reply?.parent.uri;
-    const replyCount = parentUri
-      ? await postQuery.getReplyCount(did, parentUri)
-      : 0;
     const uri = await postCommand.create(did, post);
-    const isIndexed = async () =>
-      parentUri
-        ? (await postQuery.getReplyCount(did, parentUri)) > replyCount
-        : await postQuery.exists(did, uri);
     for (let i = 0; i < 20; i++) {
-      if (await isIndexed()) break;
+      if (await postQuery.exists(did, uri)) break;
       await setTimeout(250);
     }
     return uri;
