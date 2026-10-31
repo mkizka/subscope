@@ -125,4 +125,96 @@ test.describe("プロフィール", () => {
       0,
     );
   });
+  test("profile-7: 全体ページの「投稿」タブではリプライを除いた投稿を、「リプライ」タブではリプライを含めた投稿を表示する", async ({
+    page,
+  }) => {
+    const parent = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: `profile-7の親 ${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    });
+    const reply = `profile-7のリプライ ${Date.now()}`;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: reply,
+      reply: { root: parent, parent },
+      createdAt: new Date().toISOString(),
+    });
+    await login(page);
+    await page.goto("/profile/alice.test?tab=replies");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(reply)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await main.getByRole("tab", { name: "投稿" }).click();
+
+    await expect(main.getByText(/^profile-7の親/).first()).toBeVisible();
+    await expect(main.getByText(reply)).toHaveCount(0);
+  });
+
+  test("profile-8: 自分のプロフィールの「いいね」タブに、自分がいいねした投稿を表示する", async ({
+    page,
+  }) => {
+    await follow("alice.test", "bob.test");
+    const text = `profile-8の投稿 ${Date.now()}`;
+    const subject = await createRecord("bob.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.like", {
+      subject,
+      createdAt: new Date().toISOString(),
+    });
+    await login(page);
+    await page.goto("/profile/alice.test");
+    const main = page.getByRole("main");
+
+    await main.getByRole("tab", { name: "いいね" }).click();
+
+    await expect(page).toHaveURL("/profile/alice.test?tab=likes");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(text)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
+  test("profile-9: 他のユーザーのプロフィールには「いいね」タブを出さない", async ({
+    page,
+  }) => {
+    await follow("alice.test", "bob.test");
+    await login(page);
+    await page.goto("/profile/bob.test");
+
+    const main = page.getByRole("main");
+    await expect(main.getByRole("tab", { name: "リプライ" })).toBeVisible();
+    await expect(main.getByRole("tab", { name: "いいね" })).toHaveCount(0);
+  });
+
+  test("profile-10: 全体ページの「メディア」タブには、画像付きの投稿だけを表示する", async ({
+    page,
+  }) => {
+    const image = `profile-10の画像付き ${Date.now()}`;
+    const text = `profile-10のテキストのみ ${Date.now()}`;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: image,
+      embed: {
+        $type: "app.bsky.embed.images",
+        images: [{ image: await uploadImage("alice.test"), alt: "" }],
+      },
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+    await login(page);
+    await page.goto("/profile/alice.test?tab=media");
+    const main = page.getByRole("main");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(image)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(main.getByText(text)).toHaveCount(0);
+  });
 });
