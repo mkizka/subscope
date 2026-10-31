@@ -16,7 +16,7 @@ const app = (
   target: "appview" | "web" | "worker" | "ingester",
   watch: string[],
 ) => ({
-  source: github("mkizka/subscope", { branch: "main", checkSuites: true }),
+  source: github("mkizka/subscope", { branch: "main" }),
   build: {
     watchPatterns: [
       `/apps/${target}/**/*`,
