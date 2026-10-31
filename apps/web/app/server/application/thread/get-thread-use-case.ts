@@ -1,18 +1,18 @@
 import type { AtUriString } from "@atproto/syntax";
 
-import type { IThreadRepository } from "@/app/server/infrastructure/thread/thread-repository";
+import type { IThreadQuery } from "@/app/server/infrastructure/thread/thread-query";
 
 export interface IGetThreadUseCase {
   execute: (
     did: string,
     uri: AtUriString,
-  ) => ReturnType<IThreadRepository["findThread"]>;
+  ) => ReturnType<IThreadQuery["findThread"]>;
 }
 
 export const getThreadUseCaseFactory = ({
-  threadRepository,
+  threadQuery,
 }: {
-  threadRepository: IThreadRepository;
+  threadQuery: IThreadQuery;
 }): IGetThreadUseCase => ({
-  execute: (did, uri) => threadRepository.findThread(did, uri),
+  execute: (did, uri) => threadQuery.findThread(did, uri),
 });
