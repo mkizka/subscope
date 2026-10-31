@@ -7,16 +7,13 @@ import type {
   Repost,
 } from "@repo/common/domain";
 
+import type { LabelDto } from "../dto/label-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
 import type { IGeneratorRepository } from "../interfaces/generator-repository.js";
-import {
-  type ILabelRepository,
-  isTakendown,
-  type Label,
-} from "../interfaces/label-repository.js";
+import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeRepository } from "../interfaces/like-repository.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
@@ -33,7 +30,7 @@ export type Viewer = {
 
 type Repositories = {
   profileRepository: IProfileRepository;
-  labelRepository: ILabelRepository;
+  labelQuery: ILabelQuery;
   followRepository: IFollowRepository;
   postQuery: IPostQuery;
   recordQuery: IRecordQuery;
@@ -50,7 +47,7 @@ const bySubjectUri = (record: { subjectUri: AtUri }) =>
 
 export class ViewContext {
   private readonly profiles: Batch<Did, ProfileDetailed>;
-  private readonly labels: Batch<string, Label[]>;
+  private readonly labels: Batch<string, LabelDto[]>;
   private readonly following: Batch<Did, [Did, AtUri]>;
   private readonly followedBy: Batch<Did, [Did, AtUri]>;
   private readonly posts: Batch<string, PostDto>;
@@ -72,7 +69,7 @@ export class ViewContext {
       (profile) => profile.actorDid,
     );
     this.labels = Batch.many(
-      (subjects) => repos.labelRepository.findBySubjects(subjects),
+      (subjects) => repos.labelQuery.findBySubjects(subjects),
       (label) => label.uri,
     );
     this.following = Batch.one(
@@ -188,7 +185,7 @@ export class ViewContextFactory {
 
   constructor(
     profileRepository: IProfileRepository,
-    labelRepository: ILabelRepository,
+    labelQuery: ILabelQuery,
     followRepository: IFollowRepository,
     postQuery: IPostQuery,
     recordQuery: IRecordQuery,
@@ -199,7 +196,7 @@ export class ViewContextFactory {
   ) {
     this.repos = {
       profileRepository,
-      labelRepository,
+      labelQuery,
       followRepository,
       postQuery,
       recordQuery,
