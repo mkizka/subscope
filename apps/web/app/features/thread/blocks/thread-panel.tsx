@@ -10,6 +10,7 @@ import {
   type PostCardProps,
   QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
+import { PostImages } from "@/app/features/timeline/parts/post-images";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 type Props = {
@@ -67,18 +68,7 @@ function FocusedPost({
         </div>
       </div>
       <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">{text}</p>
-      {images && (
-        <div className="mt-2 grid grid-cols-2 gap-1">
-          {images.map((image) => (
-            <img
-              key={image.thumb}
-              src={image.thumb}
-              alt={image.alt}
-              className="aspect-square w-full rounded-sm object-cover"
-            />
-          ))}
-        </div>
-      )}
+      {images && <PostImages images={images} />}
       {quote && <QuotedPost quote={quote} />}
       {createdAt && (
         <time

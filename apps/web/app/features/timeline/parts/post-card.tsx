@@ -9,6 +9,8 @@ import { Link } from "react-router";
 
 import { useHydrated } from "@/app/lib/use-hydrated";
 
+import { type PostImage, PostImages } from "./post-images";
+
 export type PostCardProps = {
   authorAvatar?: string;
   authorDisplayName?: string;
@@ -18,7 +20,7 @@ export type PostCardProps = {
   repostCount?: number;
   likeCount?: number;
   createdAt?: string;
-  images?: { thumb: string; alt: string }[];
+  images?: PostImage[];
   quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: {
     byDisplayName?: string;
@@ -146,18 +148,7 @@ export function PostCard({
             </span>
           </div>
           <p className="wrap-break-word whitespace-pre-wrap">{text}</p>
-          {images && (
-            <div className="mt-2 grid grid-cols-2 gap-1">
-              {images.map((image) => (
-                <img
-                  key={image.thumb}
-                  src={image.thumb}
-                  alt={image.alt}
-                  className="aspect-square w-full rounded-sm object-cover"
-                />
-              ))}
-            </div>
-          )}
+          {images && <PostImages images={images} />}
           {quote && <QuotedPost quote={quote} />}
           {toolbar ?? (
             <>
