@@ -21,7 +21,7 @@ describe("GetPostThreadUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   let spyFindByUri: MockInstance;
   let spyFindReplies: MockInstance;
   beforeEach(async () => {
@@ -30,7 +30,7 @@ describe("GetPostThreadUseCase", () => {
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
     spyFindByUri = vi.spyOn(postRepo, "findByUri");
     spyFindReplies = vi.spyOn(postRepo, "findReplies");
   });

@@ -11,10 +11,12 @@ import { getInviteCodesUseCaseFactory } from "./application/admin/get-invite-cod
 import { getSubscribersUseCaseFactory } from "./application/admin/get-subscribers-use-case";
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
+import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { countUnreadNotificationsUseCaseFactory } from "./application/notification/count-unread-notifications-use-case";
 import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
+import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorRepositoryFactory } from "./infrastructure/actor/actor-repository";
 import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
@@ -25,10 +27,12 @@ import {
   stateStoreFactory,
 } from "./infrastructure/auth/oauth-storage";
 import { dbFactory } from "./infrastructure/db/db";
+import { followRepositoryFactory } from "./infrastructure/follow/follow-repository";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
 import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
+import { reactionRepositoryFactory } from "./infrastructure/reaction/reaction-repository";
 import { timelineRepositoryFactory } from "./infrastructure/timeline/timeline-repository";
 
 export const di = await createRegistry()
@@ -111,5 +115,17 @@ export const di = await createRegistry()
     "getProfilePageUseCase",
     ["actorRepository"],
     getProfilePageUseCaseFactory,
+  )
+  .service("followRepository", ["oauthClient"], followRepositoryFactory)
+  .service("reactionRepository", ["oauthClient"], reactionRepositoryFactory)
+  .service(
+    "toggleFollowUseCase",
+    ["followRepository"],
+    toggleFollowUseCaseFactory,
+  )
+  .service(
+    "toggleReactionUseCase",
+    ["reactionRepository"],
+    toggleReactionUseCaseFactory,
   )
   .resolve();

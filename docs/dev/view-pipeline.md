@@ -6,7 +6,7 @@ appviewはXRPCの応答に含めるビュー(profileView、postViewなど)を、
 
 `apps/appview/src/application/views/view-context.ts` に置く。`ViewContextFactory.create(viewer)` でリクエストごとに作る。
 
-- リポジトリごとに `Batch` を持ち、同じティックに届いた要求を1回のクエリにまとめ、結果をリクエスト内でキャッシュする
+- リポジトリごとに `Batch` を持ち、同じティックに届いた要求を1回のクエリにまとめ、結果をリクエスト内でキャッシュする。1対1は `Batch.one`、1対多は `Batch.many` で作り、取得した配列からキー関数で引き当てる
 - `profile(did)` と `post(uri)` はテイクダウンされたものを返さない。著者が隠されていれば投稿も返さない。管理画面などの例外は `includeTakedowns` で切り替える
 - 閲覧者ごとの状態(フォロー、いいね、リポスト)も閲覧者がいるときだけ取る
 - 形にはしない

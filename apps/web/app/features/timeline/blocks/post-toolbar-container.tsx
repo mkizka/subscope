@@ -1,4 +1,5 @@
 import { useFetcher } from "react-router";
+import { z } from "zodV4";
 
 import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
 import type { action } from "@/app/routes/api.reactions";
@@ -6,11 +7,23 @@ import type { action } from "@/app/routes/api.reactions";
 import type { ComposeTarget } from "./post-form-container";
 import type { TimelinePost } from "./timeline-feed";
 
+export const reactionSchema = z.object({
+  type: z.enum(["like", "repost"]),
+  uri: z.string(),
+  cid: z.string(),
+  recordUri: z.string().optional(),
+});
+
 type Props = TimelinePost & {
   onCompose: (target: ComposeTarget) => void;
 };
 
-function useReaction(type: string, post: Props, viewerUri?: string, count = 0) {
+function useReaction(
+  type: z.infer<typeof reactionSchema>["type"],
+  post: Props,
+  viewerUri?: string,
+  count = 0,
+) {
   const fetcher = useFetcher<typeof action>();
   const recordUri = fetcher.data ? fetcher.data.uri : viewerUri;
   const active = fetcher.formData

@@ -6,9 +6,9 @@ describe("Batch", () => {
   test("同じティックの load をまとめて1回だけ fetch し、同じキーはキャッシュする", async () => {
     // arrange
     const fetch = vi.fn((keys: string[]) =>
-      Promise.resolve(new Map(keys.map((key) => [key, key.toUpperCase()]))),
+      Promise.resolve(keys.map((key) => key.toUpperCase())),
     );
-    const batch = new Batch(fetch);
+    const batch = Batch.one(fetch, (value) => value.toLowerCase());
 
     // act
     const first = await Promise.all([
@@ -27,8 +27,9 @@ describe("Batch", () => {
 
   test("fetch に無いキーは undefined になる", async () => {
     // arrange
-    const batch = new Batch<string, string>(() =>
-      Promise.resolve(new Map<string, string>()),
+    const batch = Batch.one<string, string>(
+      () => Promise.resolve([]),
+      (value) => value,
     );
 
     // act
@@ -36,5 +37,19 @@ describe("Batch", () => {
 
     // assert
     expect(value).toBeUndefined();
+  });
+
+  test("many は同じキーの値を配列にまとめる", async () => {
+    // arrange
+    const batch = Batch.many(
+      () => Promise.resolve(["a1", "b1", "a2"]),
+      (value: string) => value.charAt(0),
+    );
+
+    // act
+    const values = await Promise.all([batch.load("a"), batch.load("b")]);
+
+    // assert
+    expect(values).toEqual([["a1", "a2"], ["b1"]]);
   });
 });
