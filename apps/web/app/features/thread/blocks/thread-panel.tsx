@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import {
   PostCard,
   type PostCardProps,
+  QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
 
 type ThreadPost = PostCardProps & { uri: string };
@@ -23,6 +24,7 @@ function FocusedPost({
   authorHandle,
   text,
   images,
+  quote,
   createdAt,
   replyCount,
   repostCount,
@@ -70,6 +72,7 @@ function FocusedPost({
           ))}
         </div>
       )}
+      {quote && <QuotedPost quote={quote} />}
       {createdAt && (
         <time
           dateTime={createdAt}
