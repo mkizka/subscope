@@ -31,6 +31,7 @@ const toPostDto = (post: SelectPost): PostDto => ({
     thumbCid: post.embedExternal.thumbCid,
   },
   embedRecordUri: post.embedRecord?.uri ?? null,
+  replyRootUri: post.replyRootUri,
   indexedAt: post.indexedAt,
 });
 

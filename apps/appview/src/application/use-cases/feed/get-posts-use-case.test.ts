@@ -38,6 +38,7 @@ describe("GetPostsUseCase", () => {
         embedImages: [],
         embedExternal: null,
         embedRecordUri: null,
+        replyRootUri: null,
         indexedAt: post.indexedAt,
       });
       recordRepo.add(record);
