@@ -124,7 +124,7 @@ export default defineRailway(() => {
     }),
     build: { watchPatterns: ["/.railway/prometheus/**/*"] },
     replicas: { [region]: 1 },
-    volumeMounts: { "/.railway/prometheus": prometheusData },
+    volumeMounts: { "/prometheus": prometheusData },
   });
 
   const grafana = service("Grafana", {
