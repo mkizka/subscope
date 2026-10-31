@@ -105,6 +105,7 @@ import { SubscribeServerUseCase } from "../application/use-cases/sync/subscribe-
 import { UnsubscribeServerUseCase } from "../application/use-cases/sync/unsubscribe-server-use-case.js";
 import { EmbedViews } from "../application/views/embed-views.js";
 import { GeneratorViews } from "../application/views/generator-views.js";
+import { NotificationViews } from "../application/views/notification-views.js";
 import { PostViews } from "../application/views/post-views.js";
 import { ProfileViews } from "../application/views/profile-views.js";
 import { ViewContextFactory } from "../application/views/view-context.js";
@@ -263,6 +264,7 @@ export const createAppRegistry = (env: Env) =>
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
     .service("postViews", ["profileViews", "embedViews"], asClassArgs(PostViews))
+    .service("notificationViews", ["profileViews", "postViews", "generatorViews"], asClassArgs(NotificationViews))
     .service("feedProcessor", ["postRepository", "repostRepository", "postViewService", "profileViewService", "replyRefService"], asClassArgs(FeedProcessor))
     // use-cases
     .service("getProfileUseCase", ["profileViewService", "actorLoader"], asClassArgs(GetProfileUseCase))
@@ -313,7 +315,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostThreadV2", ["getPostThreadV2UseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThreadV2))
     .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase"], asClassArgs(GetTimeline))
     .service("listNotifications", ["authVerifierMiddleware", "listNotificationsUseCase"], asClassArgs(ListNotifications))
-    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "profileViews", "postViews", "generatorViews"], asClassArgs(GetGroupedNotificationsUseCase))
+    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "notificationViews"], asClassArgs(GetGroupedNotificationsUseCase))
     .service("getGroupedNotifications", ["authVerifierMiddleware", "getGroupedNotificationsUseCase"], asClassArgs(GetGroupedNotifications))
     .service("getUnreadCountUseCase", ["notificationRepository"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
