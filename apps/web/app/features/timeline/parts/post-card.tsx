@@ -104,6 +104,7 @@ export function PostCard({
       {threadSearch && (
         <Link
           to={{ search: threadSearch }}
+          preventScrollReset
           aria-label="スレッドを開く"
           className="absolute inset-0"
         />

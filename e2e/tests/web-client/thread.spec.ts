@@ -215,4 +215,40 @@ test.describe("スレッド", () => {
       thread.getByRole("article").filter({ hasText: "thread-9: 返信" }),
     ).toBeVisible();
   });
+
+  test("thread-10: スレッドを開閉しても、中央の画面は読み込み直さず、スクロール位置も変えない", async ({
+    page,
+  }) => {
+    for (let i = 1; i <= 10; i++) {
+      await post(`thread-10: 投稿${i}`);
+    }
+    const article = page
+      .getByRole("article")
+      .filter({ hasText: "thread-10: 投稿10" });
+    await page.goto("/");
+    await expect(async () => {
+      await page.reload();
+      await expect(article).toBeInViewport({ timeout: 1000 });
+    }).toPass();
+    const scrollY = await page.evaluate(() => window.scrollY);
+    const dataRequests: string[] = [];
+    page.on("request", (request) => {
+      if (new URL(request.url()).pathname.endsWith(".data")) {
+        dataRequests.push(request.url());
+      }
+    });
+
+    await article.getByRole("link", { name: "スレッドを開く" }).click();
+    await expect(
+      page
+        .getByRole("region", { name: "スレッド" })
+        .getByText("thread-10: 投稿10"),
+    ).toBeVisible();
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
+    await page.getByRole("link", { name: "閉じる" }).click();
+    await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
+
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
+    expect(dataRequests).toEqual([]);
+  });
 });

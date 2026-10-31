@@ -72,3 +72,5 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 export default function Home({ loaderData }: Route.ComponentProps) {
   return <TimelinePage posts={loaderData.posts} cursor={loaderData.cursor} />;
 }
+
+export { shouldRevalidate } from "@/app/lib/should-revalidate";

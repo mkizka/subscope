@@ -24,3 +24,5 @@ export default function TrackedActors({ loaderData }: Route.ComponentProps) {
     <TrackedActorsPage actors={loaderData.actors} total={loaderData.total} />
   );
 }
+
+export { shouldRevalidate } from "@/app/lib/should-revalidate";

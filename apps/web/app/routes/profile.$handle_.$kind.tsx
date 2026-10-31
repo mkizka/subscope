@@ -37,3 +37,5 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export default function FollowList({ loaderData }: Route.ComponentProps) {
   return <FollowListPage {...loaderData} />;
 }
+
+export { shouldRevalidate } from "@/app/lib/should-revalidate";

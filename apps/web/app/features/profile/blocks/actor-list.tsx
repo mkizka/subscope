@@ -30,6 +30,7 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
           <li key={actor.did} className="flex items-center pr-2">
             <Link
               to={`?${profileParams}`}
+              preventScrollReset
               className="
                 list-row min-w-0 flex-1 items-center
                 hover:bg-base-200
