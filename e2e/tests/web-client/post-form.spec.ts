@@ -14,7 +14,12 @@ const image = (name: string) => ({
 test.describe("投稿欄", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "いまどうしてる？" }).click();
+    await expect(async () => {
+      await page.getByRole("button", { name: "いまどうしてる？" }).click();
+      await expect(page.getByRole("textbox", { name: "投稿内容" })).toBeVisible(
+        { timeout: 1000 },
+      );
+    }).toPass();
   });
 
   test("post-form-1: 畳んだ投稿欄はクリックで広がり、投稿した内容を再読み込みなしでタイムラインの一番下に表示する", async ({

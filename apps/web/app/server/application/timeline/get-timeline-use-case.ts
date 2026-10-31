@@ -7,7 +7,10 @@ export interface IGetTimelineUseCase {
   execute: (
     did: string,
     cursor?: string,
-  ) => Promise<{ posts: TimelinePostDto[]; cursor?: string } | null>;
+  ) => Promise<{
+    posts: (TimelinePostDto & { deletable: boolean })[];
+    cursor?: string;
+  } | null>;
 }
 
 export const getTimelineUseCaseFactory = ({
@@ -21,6 +24,10 @@ export const getTimelineUseCaseFactory = ({
     return {
       posts: timeline.posts
         .filter((post) => post.reasonRepost || !post.replyRoot)
+        .map((post) => ({
+          ...post,
+          deletable: post.uri.startsWith(`at://${did}/`),
+        }))
         .reverse(),
       cursor: timeline.cursor,
     };
