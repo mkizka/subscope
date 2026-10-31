@@ -118,10 +118,10 @@ test.describe("スレッド", () => {
   test.describe(() => {
     test.use({ timezoneId: "Pacific/Kiritimati" });
 
-    test("thread-6: 選んだ投稿の投稿日時は、ブラウザのタイムゾーンで表示する", async ({
+    test("thread-7: 選んだ投稿の投稿日時は、ブラウザのタイムゾーンで表示する", async ({
       page,
     }) => {
-      const text = "thread-6: 投稿";
+      const text = "thread-7: 投稿";
       const { uri } = await post(text);
       const errors: string[] = [];
       page.on("console", (msg) => {
