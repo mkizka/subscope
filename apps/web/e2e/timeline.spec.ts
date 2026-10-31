@@ -1,6 +1,5 @@
 import { type APIRequestContext, expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { createRecord, putRecord } from "./pds";
 
 const PDS_URL = "http://localhost:2583";
@@ -40,7 +39,7 @@ test.describe("タイムライン", () => {
     const texts = ["timeline-1: 古い投稿", "timeline-1: 新しい投稿"];
     await createPosts(request, texts);
 
-    await login(page);
+    await page.goto("/");
 
     await expect(async () => {
       await page.reload();
@@ -60,7 +59,7 @@ test.describe("タイムライン", () => {
     );
     await createPosts(request, texts);
 
-    await login(page);
+    await page.goto("/");
 
     await expect(async () => {
       await page.reload();
@@ -98,7 +97,7 @@ test.describe("タイムライン", () => {
     }
     await post("timeline-2: 反応なし");
 
-    await login(page);
+    await page.goto("/");
 
     const reacted = page
       .getByRole("article")
@@ -134,7 +133,7 @@ test.describe("タイムライン", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await login(page);
+    await page.goto("/");
 
     const parentPost = page
       .getByRole("article")

@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import {
   createRecord,
   follow,
@@ -18,7 +17,7 @@ test.describe("通知", () => {
     await follow("alice.test", "bob.test");
     await follow("bob.test", "alice.test");
 
-    await login(page);
+    await page.goto("/");
 
     await expect(async () => {
       await page.reload();
@@ -39,7 +38,7 @@ test.describe("通知（PC）", () => {
     await follow("alice.test", "bob.test");
     await follow("bob.test", "alice.test");
 
-    await login(page);
+    await page.goto("/");
 
     await expect(async () => {
       await page.reload();
@@ -78,7 +77,7 @@ test.describe("通知（PC）", () => {
       createdAt,
     });
 
-    await login(page);
+    await page.goto("/");
 
     const panel = page.getByRole("complementary");
     await expect(async () => {
@@ -142,7 +141,7 @@ test.describe("通知（PC）", () => {
       createdAt,
     });
 
-    await login(page);
+    await page.goto("/");
 
     const panel = page.getByRole("complementary");
     await expect(async () => {
@@ -174,7 +173,7 @@ test.describe("通知（PC）", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await login(page);
+    await page.goto("/");
 
     const notification = page
       .getByRole("region", { name: "通知" })
@@ -220,7 +219,7 @@ test.describe("通知（PC）", () => {
       });
     }
 
-    await login(page);
+    await page.goto("/");
 
     const replies = page
       .getByRole("complementary")
@@ -255,7 +254,7 @@ test.describe("通知（PC）", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await login(page);
+    await page.goto("/");
 
     const notification = page
       .getByRole("complementary")

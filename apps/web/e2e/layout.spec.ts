@@ -1,12 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
-
 test.describe("レイアウト", () => {
   test("layout-1: 左カラムのメニューで、今いるページの項目を強調する", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
 
     const nav = page.getByRole("navigation");
     await expect(nav.getByRole("link", { name: "ホーム" })).toHaveAttribute(
@@ -28,7 +26,7 @@ test.describe("レイアウト", () => {
   test("layout-2: 左カラムのアカウント欄の⋯から「ログアウト」すると、ログイン画面に移動する", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
 
     const nav = page.getByRole("navigation");
     await nav.getByRole("button", { name: "アカウントメニュー" }).click();
@@ -40,7 +38,7 @@ test.describe("レイアウト", () => {
   test("layout-3: 左カラムのアカウント欄に、自分のハンドルを表示する", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
 
     await expect(async () => {
       await page.reload();

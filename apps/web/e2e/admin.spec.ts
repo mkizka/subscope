@@ -1,13 +1,12 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { login } from "./login";
 import { putRecord, resolveHandle, subscribeServer, uploadImage } from "./pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
 
     const nav = page.getByRole("navigation");
     await expect(nav.getByRole("link", { name: "登録ユーザー" })).toBeVisible();
@@ -20,7 +19,7 @@ test.describe("ジョブキュー", () => {
   test("bull-board-1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
 
     const link = page
       .getByRole("navigation")
@@ -37,7 +36,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
     await page.goto("/admin/subscribers");
@@ -53,7 +52,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-4: 見出しの横に登録ユーザーの人数を出す", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
 
     await page.goto("/admin/subscribers");
 
@@ -63,7 +62,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const response = await page.request.post("/admin/api/invite-codes");
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
@@ -90,7 +89,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-2: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const createInviteCode = async () => {
       const response = await page.request.post("/admin/api/invite-codes");
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -132,7 +131,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-5: 「登録ユーザー」「BAN済み」のタブで一覧を切り替える", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
     await page.goto("/admin/subscribers");
@@ -152,7 +151,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const graceDid = await banSubscriber(page, "grace.test");
 
     await page.goto("/admin/subscribers");
@@ -169,7 +168,7 @@ test.describe("登録ユーザー", () => {
   test("subscribers-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const frankDid = await banSubscriber(page, "frank.test");
 
     await page.goto("/admin/subscribers");
@@ -206,7 +205,7 @@ test.describe("招待コード", () => {
   test("invite-codes-1: 招待コードを新しい順に並べ、コード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const older = await createInviteCode(page);
     const newer = await createInviteCode(page);
 
@@ -221,7 +220,7 @@ test.describe("招待コード", () => {
   test("invite-codes-2: 一覧の下までスクロールすると続きを読み込む", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const oldest = await createInviteCode(page);
     for (let i = 0; i < 20; i++) {
       await createInviteCode(page);
@@ -238,7 +237,7 @@ test.describe("招待コード", () => {
   test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const existing = await createInviteCode(page);
     await page.goto("/admin/invite-codes");
     const firstRow = inviteCodeRows(page).first();
@@ -261,7 +260,7 @@ test.describe("招待コード", () => {
   test("invite-codes-4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const code = await createInviteCode(page);
 
     await page.goto("/admin/invite-codes");
@@ -278,7 +277,7 @@ test.describe("招待コード", () => {
   test("invite-codes-5: 使用済みの招待コードは削除できない", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const code = await createInviteCode(page);
     await subscribeServer("carol.test", code);
 
@@ -296,7 +295,7 @@ test.describe("招待コード", () => {
       displayName: "Erin",
       avatar: await uploadImage("erin.test"),
     });
-    await login(page);
+    await page.goto("/");
     const code = await createInviteCode(page);
     await subscribeServer("erin.test", code);
 
@@ -311,7 +310,7 @@ test.describe("招待コード", () => {
   test("invite-codes-6: 期限切れの招待コードは確認せずに削除できる", async ({
     page,
   }) => {
-    await login(page);
+    await page.goto("/");
     const code = await createInviteCode(page);
     await page.clock.setFixedTime(Date.now() + 8 * 24 * 60 * 60 * 1000);
 
@@ -327,7 +326,7 @@ test.describe("招待コード", () => {
     context,
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await login(page);
+    await page.goto("/");
     const code = await createInviteCode(page);
 
     await page.goto("/admin/invite-codes");
