@@ -14,14 +14,6 @@ export class InMemoryProfileRepository implements IProfileRepository {
     this.profiles.clear();
   }
 
-  findManyDetailed(dids: Did[]): Promise<ProfileDetailed[]> {
-    return Promise.resolve(
-      dids
-        .map((did) => this.profiles.get(did))
-        .filter((profile): profile is ProfileDetailed => profile !== undefined),
-    );
-  }
-
   searchActors(params: {
     query: string;
     limit: number;

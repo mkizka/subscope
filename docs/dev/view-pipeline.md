@@ -23,7 +23,3 @@ appviewはXRPCの応答に含めるビュー(profileView、postViewなど)を、
 ## use case
 
 `viewContextFactory.create(...)` で ctx を作り、欲しい Views を呼ぶだけにする。
-
-## 移行中の古い構成
-
-`application/loader/`、`application/visibility/`、`application/service/*/*-view-service.ts` は旧構成で、use case を順に移行したあとに消す。

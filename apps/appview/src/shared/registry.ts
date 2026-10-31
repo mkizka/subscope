@@ -28,7 +28,6 @@ import type { IGeneratorQuery } from "../application/interfaces/generator-query.
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 import type { ILabelQuery } from "../application/interfaces/label-query.js";
-import type { ILabelRepository } from "../application/interfaces/label-repository.js";
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 import type { IListItemQuery } from "../application/interfaces/list-item-query.js";
@@ -45,9 +44,6 @@ import type { IRepostRepository } from "../application/interfaces/repost-reposit
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
-import { ActorLoader } from "../application/loader/actor-loader.js";
-import { ProfileViewBuilder } from "../application/service/actor/profile-view-builder.js";
-import { ProfileViewService } from "../application/service/actor/profile-view-service.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
@@ -114,7 +110,6 @@ import { GeneratorQuery } from "../infrastructure/generator-query/generator-quer
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
 import { LabelQuery } from "../infrastructure/label-query/label-query.js";
-import { LabelRepository } from "../infrastructure/label-repository/label-repository.js";
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
 import { ListItemQuery } from "../infrastructure/list-item-query/list-item-query.js";
@@ -205,7 +200,6 @@ export const createAppRegistry = (env: Env) =>
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
     .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
-    .service("labelRepository", ["db"], asClassArgs<ILabelRepository>()(LabelRepository))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
     .service("actorStatsQuery", ["db"], asClassArgs<IActorStatsQuery>()(ActorStatsQuery))
@@ -233,10 +227,7 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("profileViewBuilder", ["assetUrlBuilder"], asClassArgs(ProfileViewBuilder))
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
-    .service("actorLoader", ["profileRepository", "followRepository", "labelRepository"], asClassArgs(ActorLoader))
-    .service("profileViewService", ["actorLoader", "profileViewBuilder"], asClassArgs(ProfileViewService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
