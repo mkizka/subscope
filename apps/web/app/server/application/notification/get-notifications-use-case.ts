@@ -1,6 +1,6 @@
 import type { Notification } from "@repo/client/lex/app/bsky/notification/listNotifications";
 
-import type { INotificationRepository } from "@/app/server/infrastructure/notification/notification-repository";
+import type { INotificationQuery } from "@/app/server/infrastructure/notification/notification-query";
 
 export interface IGetNotificationsUseCase {
   execute: (
@@ -14,13 +14,13 @@ export interface IGetNotificationsUseCase {
 }
 
 export const getNotificationsUseCaseFactory = ({
-  notificationRepository,
+  notificationQuery,
 }: {
-  notificationRepository: INotificationRepository;
+  notificationQuery: INotificationQuery;
 }): IGetNotificationsUseCase => ({
   async execute(did, cursor) {
     const { notifications, cursor: nextCursor } =
-      await notificationRepository.findMany(did, cursor);
+      await notificationQuery.findMany(did, cursor);
     const subjectUris = [
       ...new Set(
         notifications.flatMap((notification) =>
@@ -34,10 +34,7 @@ export const getNotificationsUseCaseFactory = ({
     return {
       notifications,
       cursor: nextCursor,
-      subjectTexts: await notificationRepository.findPostTexts(
-        did,
-        subjectUris,
-      ),
+      subjectTexts: await notificationQuery.findPostTexts(did, subjectUris),
     };
   },
 });
