@@ -1,12 +1,10 @@
 import { createRequestHandler } from "@react-router/express";
-import compression from "compression";
 import express from "express";
 import morgan from "morgan";
 
 const app = express();
 app.set("trust proxy", true);
 app.disable("x-powered-by");
-app.use(compression());
 app.use(
   "/assets",
   express.static("build/client/assets", { immutable: true, maxAge: "1y" }),
