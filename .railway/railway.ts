@@ -69,6 +69,7 @@ export default defineRailway(() => {
     ...app("appview", ["/packages/db/**/*"]),
     preDeploy: "pnpm db:migrate",
     deploy: deploy(2),
+    domains: ["appview.subsco.me"],
     env: {
       BUILD_TARGET: "appview",
       DATABASE_URL: db.env.DATABASE_URL,
@@ -82,6 +83,7 @@ export default defineRailway(() => {
     ...app("web", ["/packages/db/**/*"]),
     preDeploy: "pnpm db:migrate",
     deploy: deploy(1),
+    domains: ["alpha.subsco.me"],
     env: {
       BUILD_TARGET: "web",
       DATABASE_URL: db.env.DATABASE_URL,
