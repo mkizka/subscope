@@ -135,7 +135,6 @@ test.describe("プロフィール", () => {
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
     });
-    await login(page);
     await page.goto("/profile/alice.test?tab=replies");
     const main = page.getByRole("main");
     await expect(async () => {
@@ -162,7 +161,6 @@ test.describe("プロフィール", () => {
       subject,
       createdAt: new Date().toISOString(),
     });
-    await login(page);
     await page.goto("/profile/alice.test");
     const main = page.getByRole("main");
 
@@ -179,7 +177,6 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     await follow("alice.test", "bob.test");
-    await login(page);
     await page.goto("/profile/bob.test");
 
     const main = page.getByRole("main");
@@ -204,7 +201,6 @@ test.describe("プロフィール", () => {
       text,
       createdAt: new Date().toISOString(),
     });
-    await login(page);
     await page.goto("/profile/alice.test?tab=media");
     const main = page.getByRole("main");
 
