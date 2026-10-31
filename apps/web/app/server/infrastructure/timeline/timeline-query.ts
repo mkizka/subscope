@@ -6,22 +6,39 @@ import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 
-import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
-export interface ITimelineRepository {
+export type TimelinePostDto = {
+  uri: string;
+  cid: string;
+  viewerLike?: string;
+  viewerRepost?: string;
+  replyRoot?: { uri: string; cid: string };
+  authorAvatar?: string;
+  authorDisplayName?: string;
+  authorHandle: string;
+  text?: string;
+  replyCount?: number;
+  repostCount?: number;
+  likeCount?: number;
+  createdAt?: string;
+  images?: { thumb: string; alt: string }[];
+  reasonRepost?: { byDisplayName?: string; byHandle: string };
+};
+
+export interface ITimelineQuery {
   isSubscribed: (did: string) => Promise<boolean>;
   findPosts: (
     did: string,
     cursor?: string,
-  ) => Promise<{ posts: TimelinePost[]; cursor?: string }>;
+  ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
 }
 
-export const timelineRepositoryFactory = ({
+export const timelineQueryFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): ITimelineRepository => {
+}): ITimelineQuery => {
   const restore = async (did: string) => {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("OAuth session not found");
@@ -46,7 +63,10 @@ export const timelineRepositoryFactory = ({
 const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
 
-export function toTimelinePost({ post, reason }: FeedViewPost): TimelinePost {
+export function toTimelinePost({
+  post,
+  reason,
+}: FeedViewPost): TimelinePostDto {
   return {
     uri: post.uri,
     cid: post.cid,
