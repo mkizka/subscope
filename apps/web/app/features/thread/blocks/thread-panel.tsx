@@ -74,7 +74,7 @@ function FocusedPost({
               key={image.thumb}
               src={image.thumb}
               alt={image.alt}
-              className="w-full rounded-sm object-cover"
+              className="aspect-square w-full rounded-sm object-cover"
             />
           ))}
         </div>
