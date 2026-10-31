@@ -103,6 +103,7 @@ import { UnsubscribeServerUseCase } from "../application/use-cases/sync/unsubscr
 import { EmbedViews } from "../application/views/embed-views.js";
 import { FeedViews } from "../application/views/feed-views.js";
 import { GeneratorViews } from "../application/views/generator-views.js";
+import { ListViews } from "../application/views/list-views.js";
 import { NotificationViews } from "../application/views/notification-views.js";
 import { PostViews } from "../application/views/post-views.js";
 import { ProfileViews } from "../application/views/profile-views.js";
@@ -257,11 +258,12 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
-    .service("postViews", ["profileViews", "embedViews"], asClassArgs(PostViews))
+    .service("listViews", ["assetUrlBuilder"], asClassArgs(ListViews))
+    .service("postViews", ["profileViews", "embedViews", "listViews"], asClassArgs(PostViews))
     .service("feedViews", ["postViews", "profileViews"], asClassArgs(FeedViews))
     .service("notificationViews", ["profileViews", "postViews", "generatorViews"], asClassArgs(NotificationViews))
     // use-cases

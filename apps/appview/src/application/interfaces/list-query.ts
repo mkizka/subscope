@@ -10,7 +10,7 @@ export interface IListQuery {
     cursor?: string;
     purposes?: string[];
   }) => Promise<ListDto[]>;
-  findByUri: (uri: AtUri) => Promise<ListDto | null>;
+  findByUris: (uris: AtUri[]) => Promise<ListDto[]>;
   findItems: (params: {
     listUri: AtUri;
     limit: number;

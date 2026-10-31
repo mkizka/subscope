@@ -6,6 +6,7 @@ import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LabelDto } from "../dto/label-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
+import type { ListDto } from "../dto/list-dto.js";
 import type { ListItemDto } from "../dto/list-item-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
@@ -18,6 +19,7 @@ import type { IGeneratorQuery } from "../interfaces/generator-query.js";
 import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
 import type { IListItemQuery } from "../interfaces/list-item-query.js";
+import type { IListQuery } from "../interfaces/list-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../interfaces/profile-query.js";
@@ -43,6 +45,7 @@ type Repositories = {
   repostQuery: IRepostQuery;
   generatorQuery: IGeneratorQuery;
   actorStatsQuery: IActorStatsQuery;
+  listQuery: IListQuery;
   listItemQuery: IListItemQuery;
 };
 
@@ -61,6 +64,7 @@ export class ViewContext {
   private readonly reposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, GeneratorDto>;
   private readonly actorStatsBatch: Batch<Did, ActorStatsDto>;
+  private readonly lists: Batch<string, ListDto>;
   private readonly viewerListItems: Batch<string, ListItemDto>;
 
   constructor(
@@ -140,6 +144,10 @@ export class ViewContext {
     this.actorStatsBatch = Batch.one(
       (dids) => repos.actorStatsQuery.findStats(dids),
       (stats) => stats.actorDid,
+    );
+    this.lists = Batch.one(
+      (uris) => repos.listQuery.findByUris(toAtUris(uris)),
+      (list) => list.uri,
     );
     this.viewerListItems = Batch.one(
       viewerDid
@@ -231,6 +239,10 @@ export class ViewContext {
     return { like, repost };
   }
 
+  list(uri: string) {
+    return this.lists.load(uri);
+  }
+
   viewerListItem(listUri: string) {
     return this.viewerListItems.load(listUri);
   }
@@ -250,6 +262,7 @@ export class ViewContextFactory {
     repostQuery: IRepostQuery,
     generatorQuery: IGeneratorQuery,
     actorStatsQuery: IActorStatsQuery,
+    listQuery: IListQuery,
     listItemQuery: IListItemQuery,
   ) {
     this.repos = {
@@ -263,6 +276,7 @@ export class ViewContextFactory {
       repostQuery,
       generatorQuery,
       actorStatsQuery,
+      listQuery,
       listItemQuery,
     };
   }
