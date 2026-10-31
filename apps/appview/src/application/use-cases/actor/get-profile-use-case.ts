@@ -1,8 +1,7 @@
 import type { Did } from "@atproto/did";
 
-import type { ActorLoader } from "../../../application/loader/actor-loader.js";
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
-import { hiddenReason } from "../../../application/visibility/visibility-filter.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 const messages = {
   AccountTakedown: "Account has been suspended",
@@ -18,21 +17,16 @@ export class AccountHiddenError extends Error {
 
 export class GetProfileUseCase {
   constructor(
-    private readonly profileViewService: ProfileViewService,
-    private readonly actorLoader: ActorLoader,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(did: Did, viewerDid?: Did | null) {
-    const data = await this.actorLoader.loadProfiles([did]);
-    const profile = data.profiles.get(did);
-    const reason = profile && hiddenReason(profile, data.labels.get(did));
+    const ctx = this.viewContextFactory.create({ viewerDid });
+    const reason = await ctx.hiddenReason(did);
     if (reason) {
       throw new AccountHiddenError(reason);
     }
-    const [view] = await this.profileViewService.findProfileViewDetailed(
-      [did],
-      viewerDid,
-    );
-    return view;
+    return await this.profileViews.detailed(did, ctx);
   }
 }

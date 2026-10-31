@@ -43,22 +43,6 @@ export class ProfileViewService {
     );
   }
 
-  async findProfileViewDetailed(
-    dids: Did[],
-    viewerDid?: Did | null,
-  ): Promise<AppBskyActorDefs.ProfileViewDetailed[]> {
-    const data = filterVisible(
-      await this.actorLoader.loadProfilesDetailed(dids, viewerDid),
-    );
-    return [...data.profiles.values()].map((profile) =>
-      this.profileViewBuilder.profileViewDetailed(
-        profile,
-        this.viewerState(profile.actorDid, data, viewerDid),
-        data.actorStats.get(profile.actorDid),
-      ),
-    );
-  }
-
   private viewerState(did: Did, data: ViewData, viewerDid?: Did | null) {
     if (!viewerDid) {
       return this.profileViewBuilder.emptyViewerState();
