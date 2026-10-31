@@ -18,7 +18,7 @@ export interface IThreadQuery {
   ) => Promise<{
     ancestors: TimelinePostDto[];
     post: TimelinePostDto;
-    replies: TimelinePostDto[];
+    replies: TimelinePostDto[][];
   } | null>;
 }
 
@@ -38,13 +38,25 @@ export const threadQueryFactory = ({
     for (let p = thread.parent; threadViewPost.matches(p); p = p.parent) {
       ancestors.unshift(p);
     }
-    const replies = (thread.replies ?? []).filter((r) =>
-      threadViewPost.matches(r),
-    );
+    const replies = (thread.replies ?? [])
+      .filter((r) => threadViewPost.matches(r))
+      .map((reply) => {
+        const chain: ThreadViewPost[] = [];
+        for (
+          let p: unknown = reply;
+          threadViewPost.matches(p);
+          p = p.replies?.find((r) => threadViewPost.matches(r))
+        ) {
+          chain.push(p);
+        }
+        return chain;
+      });
     return {
       ancestors: ancestors.map(({ post }) => toTimelinePost({ post })),
       post: toTimelinePost({ post: thread.post }),
-      replies: replies.map(({ post }) => toTimelinePost({ post })),
+      replies: replies.map((chain) =>
+        chain.map(({ post }) => toTimelinePost({ post })),
+      ),
     };
   },
 });

@@ -21,7 +21,9 @@ const meta = {
         repostCount: 1,
         likeCount: 8,
       },
-      replies: [post("at://a/3", "返信です")],
+      replies: [
+        [post("at://a/3", "返信です"), post("at://a/4", "返信への返信です")],
+      ],
     },
     closeSearch: "",
   },
