@@ -1,15 +1,11 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type {
-  Generator,
-  Like,
-  ProfileDetailed,
-  Repost,
-} from "@repo/common/domain";
+import type { Generator, Like, ProfileDetailed } from "@repo/common/domain";
 
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
+import type { RepostDto } from "../dto/repost-dto.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
 import type { IGeneratorRepository } from "../interfaces/generator-repository.js";
 import {
@@ -22,7 +18,7 @@ import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileRepository } from "../interfaces/profile-repository.js";
 import type { IRecordQuery } from "../interfaces/record-query.js";
-import type { IRepostRepository } from "../interfaces/repost-repository.js";
+import type { IRepostQuery } from "../interfaces/repost-query.js";
 import { hiddenReason } from "../visibility/visibility-filter.js";
 import { Batch } from "./batch.js";
 
@@ -39,7 +35,7 @@ type Repositories = {
   recordQuery: IRecordQuery;
   postStatsQuery: IPostStatsQuery;
   likeRepository: ILikeRepository;
-  repostRepository: IRepostRepository;
+  repostQuery: IRepostQuery;
   generatorRepository: IGeneratorRepository;
 };
 
@@ -57,7 +53,7 @@ export class ViewContext {
   private readonly records: Batch<string, RecordDto>;
   private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, Like>;
-  private readonly viewerReposts: Batch<string, Repost>;
+  private readonly viewerReposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, Generator>;
 
   constructor(
@@ -112,12 +108,15 @@ export class ViewContext {
         : none,
       bySubjectUri,
     );
-    this.viewerReposts = Batch.one<string, Repost>(
+    this.viewerReposts = Batch.one(
       viewerDid
         ? (subjectUris) =>
-            repos.repostRepository.findViewerReposts({ viewerDid, subjectUris })
+            repos.repostQuery.findViewerReposts({
+              viewerDid,
+              subjectUris: toAtUris(subjectUris),
+            })
         : none,
-      bySubjectUri,
+      (repost) => repost.subjectUri,
     );
     this.generators = Batch.one(
       (uris) => repos.generatorRepository.findByUris(toAtUris(uris)),
@@ -194,7 +193,7 @@ export class ViewContextFactory {
     recordQuery: IRecordQuery,
     postStatsQuery: IPostStatsQuery,
     likeRepository: ILikeRepository,
-    repostRepository: IRepostRepository,
+    repostQuery: IRepostQuery,
     generatorRepository: IGeneratorRepository,
   ) {
     this.repos = {
@@ -205,7 +204,7 @@ export class ViewContextFactory {
       recordQuery,
       postStatsQuery,
       likeRepository,
-      repostRepository,
+      repostQuery,
       generatorRepository,
     };
   }
