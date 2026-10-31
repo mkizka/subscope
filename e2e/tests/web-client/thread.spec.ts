@@ -143,4 +143,35 @@ test.describe("スレッド", () => {
       /^thread-6: 返信の返信の返信[AB]$/,
     ]);
   });
+
+  test.describe(() => {
+    test.use({ timezoneId: "Pacific/Kiritimati" });
+
+    test("thread-7: 選んだ投稿の投稿日時は、ブラウザのタイムゾーンで表示する", async ({
+      page,
+    }) => {
+      const text = "thread-7: 投稿";
+      const { uri } = await post(text);
+      const errors: string[] = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error") errors.push(msg.text());
+      });
+
+      await openThread(page, uri, text);
+
+      const time = page
+        .getByRole("region", { name: "スレッド" })
+        .getByRole("article", { name: "選んだ投稿" })
+        .locator("time");
+      const createdAt = (await time.getAttribute("datetime")) ?? "";
+      await expect(time).toHaveText(
+        new Date(createdAt).toLocaleString("ja-JP", {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "Pacific/Kiritimati",
+        }),
+      );
+      expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([]);
+    });
+  });
 });

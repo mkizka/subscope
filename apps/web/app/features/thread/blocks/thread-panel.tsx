@@ -6,6 +6,7 @@ import {
   type PostCardProps,
   QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
+import { useHydrated } from "@/app/lib/use-hydrated";
 
 type ThreadPost = PostCardProps & { uri: string };
 
@@ -30,6 +31,7 @@ function FocusedPost({
   repostCount,
   likeCount,
 }: ThreadPost) {
+  const hydrated = useHydrated();
   const counts = [
     { count: replyCount, label: "返信" },
     { count: repostCount, label: "リポスト" },
@@ -78,10 +80,11 @@ function FocusedPost({
           dateTime={createdAt}
           className="mt-2 block text-sm text-base-content/60"
         >
-          {new Date(createdAt).toLocaleString("ja-JP", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })}
+          {hydrated &&
+            new Date(createdAt).toLocaleString("ja-JP", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
         </time>
       )}
       {counts.length > 0 && (
