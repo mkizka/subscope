@@ -1,4 +1,4 @@
-import type { IReactionRepository } from "@/app/server/infrastructure/reaction/reaction-repository";
+import type { IReactionCommand } from "@/app/server/infrastructure/reaction/reaction-command";
 
 export interface IToggleReactionUseCase {
   execute: (
@@ -13,15 +13,15 @@ export interface IToggleReactionUseCase {
 }
 
 export const toggleReactionUseCaseFactory = ({
-  reactionRepository,
+  reactionCommand,
 }: {
-  reactionRepository: IReactionRepository;
+  reactionCommand: IReactionCommand;
 }): IToggleReactionUseCase => ({
   async execute(did, { type, uri, cid, recordUri }) {
     if (recordUri) {
-      await reactionRepository.delete(did, type, recordUri);
+      await reactionCommand.delete(did, type, recordUri);
       return { uri: null };
     }
-    return { uri: await reactionRepository.create(did, type, { uri, cid }) };
+    return { uri: await reactionCommand.create(did, type, { uri, cid }) };
   },
 });

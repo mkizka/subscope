@@ -11,14 +11,17 @@ routes の loader/action はできるだけ薄くし、処理は `apps/web/app/s
 
 | 層             | 場所                                | 置くもの                                                                                      |
 | -------------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| domain         | `app/server/domain/{関心}/`         | ライブラリに依存しないルール(文字数上限、選択肢の検証など)                                    |
 | application    | `app/server/application/{関心}/`    | 画面1つ・操作1つごとのユースケース                                                            |
 | infrastructure | `app/server/infrastructure/{関心}/` | OAuth、Cookie、DB、ジョブキュー、PDSへのXRPC呼び出しなど外部とのやりとり                      |
 | presentation   | `app/routes/`, `app/middlewares/`   | 入力の検証、ユースケースの呼び出し、`data`/`redirect`での応答。React Routerの制約でここに置く |
 | DI             | `app/server/di.ts`                  | 依存の組み立て                                                                                |
 | 環境変数       | `app/server/env.ts`                 |                                                                                               |
 
-- 依存の向きは presentation → application → domain とする。application は infrastructure を、infrastructure のファイルが export する interface 経由でだけ使う
+- 依存の向きは presentation → application → infrastructure とする。application は infrastructure を、infrastructure のファイルが export する interface 経由でだけ使う
+- web は状態を持たない BFF なので、ドメインモデルとリポジトリは置かない。PDS・appview とのやりとりは次の2種類に分ける
+  - 読み込みは `{関心}-query.ts` の `I{関心}Query` にし、server で定義した DTO を返す。`app/features` の型は使わない
+  - 書き込み(レコードの作成・削除、procedure の呼び出し)は `{関心}-command.ts` の `I{関心}Command` にする
+- routes はユースケースだけを呼ぶ。Query・Command を1回呼ぶだけでもユースケースを置く
 - ユースケースは PDS のクライアント(`@atproto/lex` の `Client`)を受け取らず、DID などの値だけを受け取る。クライアントの組み立てと XRPC の呼び出しは infrastructure で行い(`di.oauthClient.restore(did)`)、外部の値は infrastructure で画面が使う形に変換して返す
 - ログイン中ユーザーの DID はミドルウェアが `didContext` に入れるので、routes は `context.get(didContext)` で取り出してユースケースに渡す
 
@@ -27,15 +30,15 @@ routes の loader/action はできるだけ薄くし、処理は `apps/web/app/s
 クラスは使わず、依存をオブジェクトで受け取って interface を返すファクトリ関数で書く。
 
 ```ts
-export interface ITimelineRepository {
+export interface ITimelineQuery {
   findPosts: (did: string, cursor?: string) => Promise<TimelinePostDto[]>;
 }
 
-export const timelineRepositoryFactory = ({
+export const timelineQueryFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): ITimelineRepository => ({
+}): ITimelineQuery => ({
   async findPosts(did, cursor) { ... },
 });
 ```

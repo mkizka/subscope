@@ -1,4 +1,4 @@
-import type { IFollowRepository } from "@/app/server/infrastructure/follow/follow-repository";
+import type { IFollowCommand } from "@/app/server/infrastructure/follow/follow-command";
 
 export interface IToggleFollowUseCase {
   execute: (
@@ -8,15 +8,15 @@ export interface IToggleFollowUseCase {
 }
 
 export const toggleFollowUseCaseFactory = ({
-  followRepository,
+  followCommand,
 }: {
-  followRepository: IFollowRepository;
+  followCommand: IFollowCommand;
 }): IToggleFollowUseCase => ({
   async execute(did, params) {
     if (params.followUri) {
-      await followRepository.delete(did, params.followUri);
+      await followCommand.delete(did, params.followUri);
       return { uri: null };
     }
-    return { uri: await followRepository.create(did, params.did) };
+    return { uri: await followCommand.create(did, params.did) };
   },
 });

@@ -33,12 +33,12 @@ import {
   stateStoreFactory,
 } from "./infrastructure/auth/oauth-storage";
 import { dbFactory } from "./infrastructure/db/db";
-import { followRepositoryFactory } from "./infrastructure/follow/follow-repository";
+import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
 import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
-import { reactionRepositoryFactory } from "./infrastructure/reaction/reaction-repository";
+import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
 import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
 import { threadRepositoryFactory } from "./infrastructure/thread/thread-repository";
 import { timelineRepositoryFactory } from "./infrastructure/timeline/timeline-repository";
@@ -150,16 +150,12 @@ export const di = await createRegistry()
     ["actorRepository"],
     getProfilePageUseCaseFactory,
   )
-  .service("followRepository", ["oauthClient"], followRepositoryFactory)
-  .service("reactionRepository", ["oauthClient"], reactionRepositoryFactory)
-  .service(
-    "toggleFollowUseCase",
-    ["followRepository"],
-    toggleFollowUseCaseFactory,
-  )
+  .service("followCommand", ["oauthClient"], followCommandFactory)
+  .service("reactionCommand", ["oauthClient"], reactionCommandFactory)
+  .service("toggleFollowUseCase", ["followCommand"], toggleFollowUseCaseFactory)
   .service(
     "toggleReactionUseCase",
-    ["reactionRepository"],
+    ["reactionCommand"],
     toggleReactionUseCaseFactory,
   )
   .service("threadRepository", ["oauthClient"], threadRepositoryFactory)
