@@ -23,10 +23,11 @@ test.describe("メンバー", () => {
       .filter({ hasText: "Alice" });
     await expect(async () => {
       await page.reload();
-      await expect(alice).toBeVisible({ timeout: 1000 });
+      await expect(alice.getByText("Blueskyを使っています")).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
     await expect(alice.getByText(/^@/)).toBeVisible();
-    await expect(alice.getByText("Blueskyを使っています")).toBeVisible();
   });
 
   test("members-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
