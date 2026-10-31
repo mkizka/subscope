@@ -1,0 +1,10 @@
+{
+  "extends": ["@tsconfig/node-lts/tsconfig"],
+  "compilerOptions": {
+    "lib": ["DOM", "ES2024"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["**/*.ts"]
+}
