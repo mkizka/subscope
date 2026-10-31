@@ -1,6 +1,6 @@
-import type { IAdminRepository } from "@/app/server/infrastructure/admin/admin-repository";
+import type { IAdminQuery } from "@/app/server/infrastructure/admin/admin-query";
 
 export const getBannedActorsUseCaseFactory =
-  ({ adminRepository }: { adminRepository: IAdminRepository }) =>
+  ({ adminQuery }: { adminQuery: IAdminQuery }) =>
   (did: string, cursor?: string) =>
-    adminRepository.getBannedActors(did, cursor);
+    adminQuery.getBannedActors(did, cursor);
