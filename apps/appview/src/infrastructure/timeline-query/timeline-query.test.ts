@@ -11,12 +11,12 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { TimelineRepository } from "./timeline-repository.js";
+import { TimelineQuery } from "./timeline-query.js";
 
-describe("TimelineRepository", () => {
+describe("TimelineQuery", () => {
   const { ctx } = testSetup;
 
-  const timelineRepository = new TimelineRepository(ctx.db);
+  const timelineQuery = new TimelineQuery(ctx.db);
 
   describe("findFeedItems", () => {
     test("フォロー中のアクターがいない場合、ビューアー自身の投稿のみ返す", async () => {
@@ -44,7 +44,7 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
@@ -52,7 +52,7 @@ describe("TimelineRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: { href: feedItem.uri },
+        uri: feedItem.uri,
         actorDid: viewerActor.did,
       });
     });
@@ -83,7 +83,7 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
@@ -91,7 +91,7 @@ describe("TimelineRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: { href: feedItem.uri },
+        uri: feedItem.uri,
         actorDid: followedActor.did,
       });
     });
@@ -135,15 +135,15 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result.map((r) => r.uri.href)).toContain(viewerFeedItem.uri);
-      expect(result.map((r) => r.uri.href)).toContain(followedFeedItem.uri);
+      expect(result.map((r) => r.uri)).toContain(viewerFeedItem.uri);
+      expect(result.map((r) => r.uri)).toContain(followedFeedItem.uri);
     });
 
     test("フォローしていないアクターの投稿は含まれない", async () => {
@@ -162,7 +162,7 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
@@ -218,15 +218,15 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result.map((r) => r.uri.href)).toContain(feedItem1.uri);
-      expect(result.map((r) => r.uri.href)).toContain(feedItem2.uri);
+      expect(result.map((r) => r.uri)).toContain(feedItem1.uri);
+      expect(result.map((r) => r.uri)).toContain(feedItem2.uri);
     });
 
     test("リポストも含めて返す", async () => {
@@ -255,7 +255,7 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
@@ -263,7 +263,7 @@ describe("TimelineRepository", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        uri: { href: feedItem.uri },
+        uri: feedItem.uri,
         type: "repost",
         actorDid: followedActor.did,
       });
@@ -311,15 +311,15 @@ describe("TimelineRepository", () => {
         .create();
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 10,
       });
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.uri.href).toBe(feedItem2.uri);
-      expect(result[1]?.uri.href).toBe(feedItem1.uri);
+      expect(result[0]?.uri).toBe(feedItem2.uri);
+      expect(result[1]?.uri).toBe(feedItem1.uri);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
@@ -352,7 +352,7 @@ describe("TimelineRepository", () => {
       );
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         limit: 2,
       });
@@ -405,7 +405,7 @@ describe("TimelineRepository", () => {
       const cursorDate = new Date("2024-01-01T01:30:00.000Z");
 
       // act
-      const result = await timelineRepository.findFeedItems({
+      const result = await timelineQuery.findFeedItems({
         viewerDid: asDid(viewerActor.did),
         cursor: cursorDate,
         limit: 10,
@@ -413,7 +413,7 @@ describe("TimelineRepository", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.uri.href).toBe(feedItem1.uri);
+      expect(result[0]?.uri).toBe(feedItem1.uri);
     });
   });
 });

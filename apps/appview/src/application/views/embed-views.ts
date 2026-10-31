@@ -20,6 +20,7 @@ import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
 import { gateUri } from "../utils/gate-uri.js";
 import { asLexMap } from "../utils/lex.js";
 import type { GeneratorViews } from "./generator-views.js";
+import { toLabelViews } from "./label-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
 
@@ -119,11 +120,12 @@ export class EmbedViews {
     if (!post) {
       return undefined;
     }
-    const [record, author, stats, embed] = await Promise.all([
+    const [record, author, stats, embed, labels] = await Promise.all([
       ctx.record(uri),
       this.profileViews.basic(post.actorDid, ctx),
       ctx.stats(uri),
       this.embedView(post, ctx, depth),
+      ctx.labelsOf(uri),
     ]);
     if (!record || !author) {
       return undefined;
@@ -139,6 +141,7 @@ export class EmbedViews {
       likeCount: stats?.likeCount ?? 0,
       quoteCount: stats?.quoteCount ?? 0,
       embeds: embed ? [embed] : [],
+      labels: toLabelViews(labels),
       indexedAt: toDatetimeString(post.indexedAt),
     };
   }

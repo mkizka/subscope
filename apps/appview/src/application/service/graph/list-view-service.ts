@@ -1,7 +1,7 @@
 import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyGraphDefs from "@repo/client/lex/app/bsky/graph/defs";
-import type { List } from "@repo/common/domain";
 
+import type { ListDto } from "../../../application/dto/list-dto.js";
 import type { IAssetUrlBuilder } from "../../../application/interfaces/asset-url-builder.js";
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import { toMapByDid } from "../../../application/utils/map.js";
@@ -12,7 +12,7 @@ export class ListViewService {
     private readonly assetUrlBuilder: IAssetUrlBuilder,
   ) {}
 
-  async findListViews(lists: List[]): Promise<AppBskyGraphDefs.ListView[]> {
+  async findListViews(lists: ListDto[]): Promise<AppBskyGraphDefs.ListView[]> {
     const profileMap = await this.profileViewService
       .findProfileView([...new Set(lists.map((list) => list.actorDid))])
       .then(toMapByDid);
@@ -21,12 +21,12 @@ export class ListViewService {
       const creator = profileMap.get(list.actorDid);
       if (!creator) return [];
       return {
-        uri: list.uri.toString(),
+        uri: list.uri,
         cid: list.cid,
         creator,
         name: list.name,
         purpose: list.purpose,
-        description: list.description,
+        description: list.description ?? undefined,
         avatar: list.avatarCid
           ? this.assetUrlBuilder.getAvatarThumbnailUrl(
               list.actorDid,

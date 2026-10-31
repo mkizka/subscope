@@ -9,6 +9,7 @@ import type { RecordDto } from "../dto/record-dto.js";
 import { gateUri } from "../utils/gate-uri.js";
 import { asLexMap } from "../utils/lex.js";
 import type { EmbedViews } from "./embed-views.js";
+import { toLabelViews } from "./label-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
 
@@ -27,7 +28,7 @@ export class PostViews {
       return undefined;
     }
     const rootUri = post.replyRootUri ?? uri;
-    const [record, author, stats, viewer, embed, gate, postgate] =
+    const [record, author, stats, viewer, embed, gate, postgate, labels] =
       await Promise.all([
         ctx.record(uri),
         this.profileViews.basic(post.actorDid, ctx),
@@ -36,6 +37,7 @@ export class PostViews {
         this.embedViews.embedView(post, ctx),
         ctx.record(gateUri(rootUri, "app.bsky.feed.threadgate")),
         ctx.record(gateUri(uri, "app.bsky.feed.postgate")),
+        ctx.labelsOf(uri),
       ]);
     if (!record || !author) {
       return undefined;
@@ -66,6 +68,7 @@ export class PostViews {
               record: asLexMap(gate.json),
             }
           : undefined,
+      labels: toLabelViews(labels),
       indexedAt: toDatetimeString(post.indexedAt),
     };
   }

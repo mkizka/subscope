@@ -25,6 +25,9 @@ describe("app.bsky.actor.getProfile", () => {
       did: actor.did,
       handle: actor.handle,
       displayName: "Alice",
+      followersCount: 0,
+      followsCount: 0,
+      postsCount: 0,
     });
   });
 

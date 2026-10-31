@@ -2,10 +2,6 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import type {
-  ActorStats,
-  IActorStatsRepository,
-} from "../interfaces/actor-stats-repository.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
 import type {
   ILabelRepository,
@@ -17,14 +13,12 @@ export type ViewData = {
   profiles: Map<Did, ProfileDetailed>;
   following: Map<Did, AtUri>;
   followedBy: Map<Did, AtUri>;
-  actorStats: Map<string, ActorStats>;
   labels: Map<string, Label[]>;
 };
 
 export class ActorLoader {
   constructor(
     private readonly profileRepository: IProfileRepository,
-    private readonly actorStatsRepository: IActorStatsRepository,
     private readonly followRepository: IFollowRepository,
     private readonly labelRepository: ILabelRepository,
   ) {}
@@ -50,19 +44,7 @@ export class ActorLoader {
       profiles: new Map(profiles.map((profile) => [profile.actorDid, profile])),
       following,
       followedBy,
-      actorStats: new Map(),
       labels: Map.groupBy(labels, (label) => label.uri),
     };
-  }
-
-  async loadProfilesDetailed(
-    dids: Did[],
-    viewerDid?: Did | null,
-  ): Promise<ViewData> {
-    const [data, actorStats] = await Promise.all([
-      this.loadProfiles(dids, viewerDid),
-      this.actorStatsRepository.findStats(dids),
-    ]);
-    return { ...data, actorStats };
   }
 }
