@@ -1,5 +1,8 @@
 import { createRegistry } from "@gyaku/di";
 
+import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
+import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
+import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
 import { banSubscriberUseCaseFactory } from "./application/admin/ban-subscriber-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
@@ -15,6 +18,7 @@ import { markNotificationsSeenUseCaseFactory } from "./application/notification/
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
+import { actorRepositoryFactory } from "./infrastructure/actor/actor-repository";
 import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
 import { oauthClientFactory } from "./infrastructure/auth/oauth-client";
@@ -103,6 +107,14 @@ export const di = await createRegistry()
     "deleteInviteCodeUseCase",
     ["adminRepository"],
     deleteInviteCodeUseCaseFactory,
+  )
+  .service("actorRepository", ["oauthClient"], actorRepositoryFactory)
+  .service("getMeUseCase", ["actorRepository"], getMeUseCaseFactory)
+  .service("getProfileUseCase", ["actorRepository"], getProfileUseCaseFactory)
+  .service(
+    "getProfilePageUseCase",
+    ["actorRepository"],
+    getProfilePageUseCaseFactory,
   )
   .service("followRepository", ["oauthClient"], followRepositoryFactory)
   .service("reactionRepository", ["oauthClient"], reactionRepositoryFactory)
