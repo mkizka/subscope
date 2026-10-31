@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getList";
-import type { ListItem } from "@repo/common/domain";
 
-import type { IListRepository } from "../../../application/interfaces/list-repository.js";
+import type { ListItemDto } from "../../../application/dto/list-dto.js";
+import type { IListQuery } from "../../../application/interfaces/list-query.js";
 import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { ListViewService } from "../../../application/service/graph/list-view-service.js";
 import { toMapByDid } from "../../../application/utils/map.js";
@@ -10,7 +10,7 @@ import { createCursorPaginator } from "../../../application/utils/pagination.js"
 
 export class GetListUseCase {
   constructor(
-    private readonly listRepository: IListRepository,
+    private readonly listQuery: IListQuery,
     private readonly listViewService: ListViewService,
     private readonly profileViewService: ProfileViewService,
   ) {}
@@ -20,17 +20,17 @@ export class GetListUseCase {
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody | null> {
-    const list = await this.listRepository.findByUri(params.listUri);
+    const list = await this.listQuery.findByUri(params.listUri);
     if (!list) return null;
     const [listView] = await this.listViewService.findListViews([list]);
     if (!listView) return null;
 
-    const paginator = createCursorPaginator<ListItem>({
+    const paginator = createCursorPaginator<ListItemDto>({
       limit: params.limit,
       getCursor: (item) => item.createdAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.listRepository.findItems({
+      await this.listQuery.findItems({
         listUri: params.listUri,
         limit: paginator.queryLimit,
         cursor: params.cursor,
@@ -45,7 +45,7 @@ export class GetListUseCase {
       list: listView,
       items: page.items.flatMap((item) => {
         const subject = profileMap.get(item.subjectDid);
-        return subject ? { uri: item.uri.toString(), subject } : [];
+        return subject ? { uri: item.uri, subject } : [];
       }),
     };
   }

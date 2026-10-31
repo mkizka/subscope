@@ -27,6 +27,7 @@ describe("GetPostsUseCase", () => {
         displayName: null,
         description: null,
         avatarCid: null,
+        bannerCid: null,
         createdAt: null,
         indexedAt: new Date(),
         status: "active",

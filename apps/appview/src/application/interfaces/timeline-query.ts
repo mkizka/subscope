@@ -1,16 +1,17 @@
 import type { Did } from "@atproto/did";
-import type { FeedItem } from "@repo/common/domain";
 
-export interface ITimelineRepository {
+import type { FeedItemDto } from "../dto/feed-item-dto.js";
+
+export interface ITimelineQuery {
   findFeedItems: (params: {
     viewerDid: Did;
     limit: number;
     cursor?: Date;
-  }) => Promise<FeedItem[]>;
+  }) => Promise<FeedItemDto[]>;
 
   findListFeedItems: (params: {
     listUri: string;
     limit: number;
     cursor?: Date;
-  }) => Promise<FeedItem[]>;
+  }) => Promise<FeedItemDto[]>;
 }
