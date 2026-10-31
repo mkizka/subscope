@@ -128,6 +128,12 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 - getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す
 - getAuthorFeed-2: 解決できないハンドルには400を返す
+- getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアクター自身の投稿だけを返し、リポストは含めない
+- getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない
+- getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアクター自身の投稿であるものだけを含める
+- getAuthorFeed-6: filterがposts_with_videoのとき、空のfeedを返す
+
+動画の埋め込みはインデックスしていないため、posts_with_videoは常に空になる。
 
 ## app.bsky.notification.listNotifications
 
