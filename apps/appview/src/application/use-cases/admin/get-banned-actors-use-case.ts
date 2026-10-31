@@ -2,13 +2,15 @@ import type { Did } from "@atproto/did";
 import type * as MeSubscoAdminGetBannedActors from "@repo/client/lex/me/subsco/admin/getBannedActors";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetBannedActorsUseCase {
   constructor(
     private readonly actorRepository: IActorRepository,
-    private readonly profileViewService: ProfileViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(params: {
@@ -25,14 +27,14 @@ export class GetBannedActorsUseCase {
         cursor: params.cursor,
       }),
     );
-    const actors = await this.profileViewService.findProfileView(
-      page.items,
-      null,
-      {
-        includeTakedowns: true,
-      },
+    const ctx = this.viewContextFactory.create({ includeTakedowns: true });
+    const actors = await Promise.all(
+      page.items.map((did) => this.profileViews.view(did, ctx)),
     );
 
-    return { cursor: page.cursor, actors };
+    return {
+      cursor: page.cursor,
+      actors: actors.filter((actor) => actor !== undefined),
+    };
   }
 }

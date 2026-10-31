@@ -7,6 +7,7 @@ import { view as recordWithMediaView } from "@repo/client/lex/app/bsky/embed/rec
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
+import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
@@ -38,6 +39,7 @@ export interface ITimelineQuery {
     did: string,
     cursor?: string,
   ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
+  searchPosts: (did: string, q: string) => Promise<TimelinePostDto[]>;
 }
 
 export const timelineQueryFactory = ({
@@ -62,6 +64,11 @@ export const timelineQueryFactory = ({
         cursor,
       });
       return { posts: feed.map(toTimelinePost), cursor: next };
+    },
+    async searchPosts(did, q) {
+      const agent = await restore(did);
+      const { posts } = await agent.call(searchPosts, { q });
+      return posts.map((post) => toTimelinePost({ post }));
     },
   };
 };

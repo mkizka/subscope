@@ -15,12 +15,14 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const submission = parseWithZod(new URL(request.url).searchParams, {
     schema: searchSchema,
   });
-  const q = submission.status === "success" ? submission.value.q : undefined;
+  const { q, tab = "actors" as const } =
+    submission.status === "success" ? submission.value : {};
   return data({
     q,
-    actors: q
-      ? await di.searchActorsUseCase.execute(context.get(didContext), q)
-      : [],
+    tab,
+    ...(q
+      ? await di.searchUseCase.execute(context.get(didContext), q, tab)
+      : { actors: [], posts: [] }),
   });
 };
 
