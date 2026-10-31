@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { putRecord } from "./pds";
+import { putRecord } from "../../helpers/pds";
 
 test.describe("検索", () => {
   test.beforeEach(async () => {
