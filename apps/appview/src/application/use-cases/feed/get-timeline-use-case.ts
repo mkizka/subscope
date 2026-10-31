@@ -3,8 +3,9 @@ import type * as AppBskyFeedGetTimeline from "@repo/client/lex/app/bsky/feed/get
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import type { ITimelineQuery } from "../../../application/interfaces/timeline-query.js";
-import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { FeedViews } from "../../views/feed-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type GetTimelineParams = {
   limit: number;
@@ -16,7 +17,8 @@ type GetTimelineParams = {
 export class GetTimelineUseCase {
   constructor(
     private readonly timelineQuery: ITimelineQuery,
-    private readonly feedProcessor: FeedProcessor,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly feedViews: FeedViews,
   ) {}
 
   async execute({
@@ -37,13 +39,13 @@ export class GetTimelineUseCase {
     });
     const page = paginator.extractPage(feedItems);
 
-    const feed = await this.feedProcessor.processFeedItems(
-      page.items,
-      viewerDid,
+    const ctx = this.viewContextFactory.create({ viewerDid });
+    const feed = await Promise.all(
+      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
     );
 
     return {
-      feed,
+      feed: feed.filter((item) => item !== undefined),
       cursor: page.cursor,
     };
   }
