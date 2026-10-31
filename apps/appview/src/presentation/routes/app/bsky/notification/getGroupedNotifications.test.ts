@@ -269,21 +269,21 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     ]);
   });
 
-  test("getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、空のグループを返す", async () => {
+  test("getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、501とMethodNotImplementedを返す", async () => {
     // arrange
-    const { client, notify } = await setup();
-    await notify({ reason: "mention" });
+    const { client } = await setup();
 
     // act
-    const peopleIFollow = await client.call(getGroupedNotifications, {
+    const peopleIFollow = client.call(getGroupedNotifications, {
       feed: "people-i-follow",
     });
-    const activity = await client.call(getGroupedNotifications, {
+    const activity = client.call(getGroupedNotifications, {
       feed: "activity",
     });
 
     // assert
-    expect(peopleIFollow.groups).toEqual([]);
-    expect(activity.groups).toEqual([]);
+    const error = { status: 501, error: "MethodNotImplemented" };
+    await expect(peopleIFollow).rejects.toMatchObject(error);
+    await expect(activity).rejects.toMatchObject(error);
   });
 });

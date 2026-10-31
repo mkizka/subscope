@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { resolveHandle } from "./pds";
 
 const PDS_URL = "http://localhost:2583";
@@ -16,7 +15,7 @@ const image = (name: string) => ({
 
 test.describe("投稿欄", () => {
   test.beforeEach(async ({ page }) => {
-    await login(page);
+    await page.goto("/");
     await page.getByRole("button", { name: "いまどうしてる？" }).click();
   });
 

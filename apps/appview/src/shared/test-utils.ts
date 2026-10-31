@@ -8,7 +8,7 @@ import {
 } from "@repo/common/test";
 
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
-import { InMemoryActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.in-memory.js";
+import { InMemoryActorStatsQuery } from "../infrastructure/actor-stats-query/actor-stats-query.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
 import { InMemoryAuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.in-memory.js";
 import { InMemoryFollowQuery } from "../infrastructure/follow-query/follow-query.in-memory.js";
@@ -17,6 +17,7 @@ import { InMemoryGeneratorQuery } from "../infrastructure/generator-query/genera
 import { InMemoryGeneratorRepository } from "../infrastructure/generator-repository/generator-repository.in-memory.js";
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.in-memory.js";
+import { InMemoryLabelQuery } from "../infrastructure/label-query/label-query.in-memory.js";
 import { InMemoryLabelRepository } from "../infrastructure/label-repository/label-repository.in-memory.js";
 import { InMemoryLikeQuery } from "../infrastructure/like-query/like-query.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-repository.in-memory.js";
@@ -28,9 +29,9 @@ import { InMemoryPostStatsQuery } from "../infrastructure/post-stats-query/post-
 import { InMemoryProfileQuery } from "../infrastructure/profile-query/profile-query.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
 import { InMemoryRecordQuery } from "../infrastructure/record-query/record-query.in-memory.js";
+import { InMemoryRepostQuery } from "../infrastructure/repost-query/repost-query.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
-import { InMemoryTimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.in-memory.js";
 import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import type { Env } from "./env.js";
 import { createAppRegistry } from "./registry.js";
@@ -54,8 +55,9 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
   .replaceService("profileQuery", asClassArgs(InMemoryProfileQuery))
   .replaceService("labelRepository", asClassArgs(InMemoryLabelRepository))
+  .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
-  .replaceService("actorStatsRepository", asClassArgs(InMemoryActorStatsRepository))
+  .replaceService("actorStatsQuery", asClassArgs(InMemoryActorStatsQuery))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))
   .replaceService("notificationRepository", asClassArgs(InMemoryNotificationRepository))
@@ -64,10 +66,10 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("likeQuery", asClassArgs(InMemoryLikeQuery))
   .replaceService("postQuery", asClassArgs(InMemoryPostQuery))
   .replaceService("postStatsQuery", asClassArgs(InMemoryPostStatsQuery))
-  .replaceService("timelineRepository", asClassArgs(InMemoryTimelineRepository))
   .replaceService("authorFeedRepository", asClassArgs(InMemoryAuthorFeedRepository))
   .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
   .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
+  .replaceService("repostQuery", asClassArgs(InMemoryRepostQuery))
   .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
   .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))

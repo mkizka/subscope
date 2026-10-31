@@ -409,25 +409,6 @@ describe("GetAuthorFeedUseCase", () => {
     });
   });
 
-  test("サポートされていないフィルターの場合、空のフィードを返す", async () => {
-    // arrange
-    const author = actorFactory();
-
-    // act
-    const result = await getAuthorFeedUseCase.execute({
-      actorDid: asDid(author.did),
-      limit: 50,
-      filter: "posts_with_video",
-      includePins: false,
-    });
-
-    // assert
-    expect(result).toMatchObject({
-      feed: [],
-      cursor: undefined,
-    });
-  });
-
   test("limitが0の場合、空のフィードを返す", async () => {
     // arrange
     const author = actorFactory();

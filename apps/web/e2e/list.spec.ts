@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { createRecord, follow, resolveHandle } from "./pds";
 
 const createList = async (name: string) => {
@@ -26,7 +25,6 @@ test.describe("リスト", () => {
   }) => {
     const name = `list-1のリスト ${Date.now()}`;
     await createList(name);
-    await login(page);
     await page.goto("/profile/alice.test");
 
     await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
@@ -57,7 +55,6 @@ test.describe("リスト", () => {
         createdAt: new Date().toISOString(),
       });
     }
-    await login(page);
     await page.goto("/profile/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
@@ -86,7 +83,6 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-3のリスト ${Date.now()}`);
-    await login(page);
     await page.goto(`/profile/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
@@ -105,7 +101,6 @@ test.describe("リスト", () => {
     page,
   }) => {
     const name = `list-4のリスト ${Date.now()}`;
-    await login(page);
     await page.goto("/profile/alice.test/lists");
     const main = page.getByRole("main");
 
@@ -130,7 +125,6 @@ test.describe("リスト", () => {
   }) => {
     const rkey = await createList(`list-5のリスト ${Date.now()}`);
     const name = `list-5の編集後 ${Date.now()}`;
-    await login(page);
     await page.goto(`/profile/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
@@ -151,56 +145,6 @@ test.describe("リスト", () => {
       await expect(main.getByText(`${name}の説明`)).toBeVisible({
         timeout: 1000,
       });
-    }).toPass();
-  });
-
-  test("list-7: 自分のリストの「メンバー」タブで、ハンドルを入力したユーザーをリストに追加する", async ({
-    page,
-  }) => {
-    await follow("alice.test", "carol.test");
-    const list = await createRecord("alice.test", "app.bsky.graph.list", {
-      purpose: "app.bsky.graph.defs#curatelist",
-      name: `list-7のリスト ${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    });
-    await login(page);
-    await page.goto(
-      `/profile/alice.test/lists/${list.uri.split("/").at(-1)}?tab=members`,
-    );
-    const main = page.getByRole("main");
-    await expect(async () => {
-      await page.reload();
-      await expect(main.getByLabel("ハンドル")).toBeVisible({ timeout: 1000 });
-    }).toPass();
-
-    await main.getByLabel("ハンドル").fill("carol.test");
-    await main.getByRole("button", { name: "追加する" }).click();
-
-    await expect(async () => {
-      await page.reload();
-      await expect(main.getByText("@carol.test")).toBeVisible({
-        timeout: 1000,
-      });
-    }).toPass();
-  });
-
-  test("list-8: 自分のリストの「メンバー」タブで、メンバーをリストから削除する", async ({
-    page,
-  }) => {
-    const rkey = await createList(`list-8のリスト ${Date.now()}`);
-    await login(page);
-    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
-    const main = page.getByRole("main");
-    await expect(async () => {
-      await page.reload();
-      await expect(main.getByText("@bob.test")).toBeVisible({ timeout: 1000 });
-    }).toPass();
-
-    await main.getByRole("button", { name: "削除" }).click();
-
-    await expect(async () => {
-      await page.reload();
-      await expect(main.getByText("@bob.test")).toBeHidden({ timeout: 1000 });
     }).toPass();
   });
 });

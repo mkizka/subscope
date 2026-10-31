@@ -1,27 +1,24 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { Repost } from "@repo/common/domain";
 
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
+import type { LabelDto } from "../dto/label-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
+import type { RepostDto } from "../dto/repost-dto.js";
 import type { IFollowQuery } from "../interfaces/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/generator-query.js";
-import {
-  type ILabelRepository,
-  isTakendown,
-  type Label,
-} from "../interfaces/label-repository.js";
+import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../interfaces/profile-query.js";
 import type { IRecordQuery } from "../interfaces/record-query.js";
-import type { IRepostRepository } from "../interfaces/repost-repository.js";
+import type { IRepostQuery } from "../interfaces/repost-query.js";
 import { hiddenReason } from "../visibility/visibility-filter.js";
 import { Batch } from "./batch.js";
 
@@ -32,30 +29,28 @@ export type Viewer = {
 
 type Repositories = {
   profileQuery: IProfileQuery;
-  labelRepository: ILabelRepository;
+  labelQuery: ILabelQuery;
   followQuery: IFollowQuery;
   postQuery: IPostQuery;
   recordQuery: IRecordQuery;
   postStatsQuery: IPostStatsQuery;
   likeQuery: ILikeQuery;
-  repostRepository: IRepostRepository;
+  repostQuery: IRepostQuery;
   generatorQuery: IGeneratorQuery;
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
-const bySubjectUri = (record: { subjectUri: AtUri }) =>
-  record.subjectUri.toString();
 
 export class ViewContext {
   private readonly profiles: Batch<Did, ProfileDto>;
-  private readonly labels: Batch<string, Label[]>;
+  private readonly labels: Batch<string, LabelDto[]>;
   private readonly following: Batch<Did, FollowDto>;
   private readonly followedBy: Batch<Did, FollowDto>;
   private readonly posts: Batch<string, PostDto>;
   private readonly records: Batch<string, RecordDto>;
   private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, LikeDto>;
-  private readonly viewerReposts: Batch<string, Repost>;
+  private readonly viewerReposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, GeneratorDto>;
 
   constructor(
@@ -69,7 +64,7 @@ export class ViewContext {
       (profile) => profile.actorDid,
     );
     this.labels = Batch.many(
-      (subjects) => repos.labelRepository.findBySubjects(subjects),
+      (subjects) => repos.labelQuery.findBySubjects(subjects),
       (label) => label.uri,
     );
     this.following = Batch.one(
@@ -114,12 +109,15 @@ export class ViewContext {
         : none,
       (like) => like.subjectUri,
     );
-    this.viewerReposts = Batch.one<string, Repost>(
+    this.viewerReposts = Batch.one(
       viewerDid
         ? (subjectUris) =>
-            repos.repostRepository.findViewerReposts({ viewerDid, subjectUris })
+            repos.repostQuery.findViewerReposts({
+              viewerDid,
+              subjectUris: toAtUris(subjectUris),
+            })
         : none,
-      bySubjectUri,
+      (repost) => repost.subjectUri,
     );
     this.generators = Batch.one(
       (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
@@ -156,6 +154,10 @@ export class ViewContext {
     return (await this.profile(post.actorDid)) ? post : undefined;
   }
 
+  labelsOf(subject: string) {
+    return this.labels.load(subject);
+  }
+
   record(uri: string) {
     return this.records.load(uri);
   }
@@ -190,24 +192,24 @@ export class ViewContextFactory {
 
   constructor(
     profileQuery: IProfileQuery,
-    labelRepository: ILabelRepository,
+    labelQuery: ILabelQuery,
     followQuery: IFollowQuery,
     postQuery: IPostQuery,
     recordQuery: IRecordQuery,
     postStatsQuery: IPostStatsQuery,
     likeQuery: ILikeQuery,
-    repostRepository: IRepostRepository,
+    repostQuery: IRepostQuery,
     generatorQuery: IGeneratorQuery,
   ) {
     this.repos = {
       profileQuery,
-      labelRepository,
+      labelQuery,
       followQuery,
       postQuery,
       recordQuery,
       postStatsQuery,
       likeQuery,
-      repostRepository,
+      repostQuery,
       generatorQuery,
     };
   }
