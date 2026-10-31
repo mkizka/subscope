@@ -32,7 +32,13 @@ describe("LabelQuery", () => {
 
       // assert
       expect(result).toEqual([
-        { src: label.src, uri: label.uri, val: label.val },
+        {
+          src: label.src,
+          uri: label.uri,
+          val: label.val,
+          cid: label.cid,
+          cts: label.cts,
+        },
       ]);
     });
   });
