@@ -1,8 +1,17 @@
 import { type APIRequestContext, expect, test } from "@playwright/test";
 
-import { createRecord, PDS_URL, putRecord } from "../../helpers/pds";
+import {
+  createRecord,
+  PDS_URL,
+  putRecord,
+  uploadImage,
+} from "../../helpers/pds";
 
-const createPosts = async (request: APIRequestContext, texts: string[]) => {
+const createPosts = async (
+  request: APIRequestContext,
+  texts: string[],
+  embed?: unknown,
+) => {
   const session = await request.post(
     `${PDS_URL}/xrpc/com.atproto.server.createSession`,
     { data: { identifier: "alice.test", password: "password" } },
@@ -23,7 +32,7 @@ const createPosts = async (request: APIRequestContext, texts: string[]) => {
       data: {
         repo: did,
         collection: "app.bsky.feed.post",
-        record: { text, createdAt: new Date().toISOString() },
+        record: { text, embed, createdAt: new Date().toISOString() },
       },
     });
   }
@@ -55,7 +64,16 @@ test.describe("タイムライン", () => {
       { length: 25 },
       (_, i) => `timeline-4: 投稿${i + 1}`,
     );
-    await createPosts(request, texts);
+    await createPosts(request, texts, {
+      $type: "app.bsky.embed.images",
+      images: [{ image: await uploadImage("alice.test"), alt: "" }],
+    });
+    await page.route("**/*", async (route) => {
+      if (route.request().resourceType() === "image") {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+      await route.continue();
+    });
 
     const latestPost = page
       .getByRole("article")
