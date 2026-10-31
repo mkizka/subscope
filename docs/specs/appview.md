@@ -171,6 +171,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - getLists-1: 指定したアクターが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
+## 未対応の読み取りAPI
+
+公式クライアントが呼ぶがSubscopeが扱わないデータの読み取りAPIは、エラーにせず空の応答を返す。対象は app.bsky.feed.getFeed、getActorFeeds、app.bsky.graph.getActorStarterPacks、getBlocks、getMutes、getListBlocks、getListMutes、getSuggestedFollowsByActor、getStarterPacksWithMembership、searchStarterPacksV2、app.bsky.labeler.getServices、app.bsky.notification.listActivitySubscriptions、app.bsky.bookmark.getBookmarks、app.bsky.draft.getDrafts と、app.bsky.unspecced のおすすめ・トレンド系API。書き込みAPIは保存されたように見えてしまうため対象にしない。
+
+- emptyResponses-1: 対象のAPIは空の一覧を返す
+- emptyResponses-2: app.bsky.notification.getPreferences はすべての通知を有効にした既定値を返す
+
 ## me.subsco.server.getMembers
 
 サーバーのメンバー（サブスクライバー）のプロフィールを返す。メンバー一覧は公開情報とし、認証は不要。limitとcursorでページングする。

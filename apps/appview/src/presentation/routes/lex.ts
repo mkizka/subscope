@@ -25,6 +25,7 @@ import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetPostThreadV2 } from "./app/bsky/unspecced/getPostThreadV2.js";
+import { emptyResponses } from "./empty-responses.js";
 import type { BanSubscriber } from "./me/subsco/admin/banSubscriber.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
@@ -129,5 +130,11 @@ export const lexRouterFactory = (
   for (const handler of handlers) {
     handler.handle(router);
   }
-  return toRequestListener(router.fetch);
+  return toRequestListener((request, connection) => {
+    const nsid = new URL(request.url).pathname.replace("/xrpc/", "");
+    const body = emptyResponses.get(nsid);
+    return body
+      ? Promise.resolve(Response.json(body))
+      : router.fetch(request, connection);
+  });
 };

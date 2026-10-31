@@ -35,10 +35,17 @@ export const setupApiTest = async () => {
   });
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const { port } = server.address() as AddressInfo;
-  const createClient = () => new Client(`http://localhost:${port}`);
+  const url = `http://localhost:${port}`;
+  const createClient = () => new Client(url);
   const client = createClient();
   const loginAs = (did: string, target = client) => {
     target.headers.set("authorization", `Bearer ${did}`);
   };
-  return { client, createClient, loginAs, jobScheduler: services.jobScheduler };
+  return {
+    url,
+    client,
+    createClient,
+    loginAs,
+    jobScheduler: services.jobScheduler,
+  };
 };
