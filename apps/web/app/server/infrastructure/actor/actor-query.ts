@@ -4,11 +4,13 @@ import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
-import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-repository";
+import {
+  type TimelinePostDto,
+  toTimelinePost,
+} from "@/app/server/infrastructure/timeline/timeline-query";
 
-export interface IActorRepository {
+export interface IActorQuery {
   findProfile: (
     did: string,
     actor: AtIdentifierString,
@@ -16,15 +18,15 @@ export interface IActorRepository {
   findPosts: (
     did: string,
     actor: AtIdentifierString,
-  ) => Promise<TimelinePost[]>;
+  ) => Promise<TimelinePostDto[]>;
   isAdmin: (did: string) => Promise<boolean>;
 }
 
-export const actorRepositoryFactory = ({
+export const actorQueryFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): IActorRepository => {
+}): IActorQuery => {
   const restore = async (did: string) => {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("OAuth session not found");
