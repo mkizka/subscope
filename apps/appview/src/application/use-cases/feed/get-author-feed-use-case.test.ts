@@ -56,7 +56,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem);
 
     const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
@@ -77,7 +77,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(reply.uri.toString(), replyStats);
 
     const replyFeedItem = FeedItem.fromPost(reply);
-    authorFeedRepo.add(replyFeedItem, true);
+    authorFeedRepo.add(replyFeedItem, { isReply: true });
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -153,7 +153,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem);
 
     const { post: reply, record: replyRecord } = postFactory({
       actorDid: author.did,
@@ -165,7 +165,7 @@ describe("GetAuthorFeedUseCase", () => {
     recordRepo.add(replyRecord);
 
     const replyFeedItem = FeedItem.fromPost(reply);
-    authorFeedRepo.add(replyFeedItem, true);
+    authorFeedRepo.add(replyFeedItem, { isReply: true });
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -238,7 +238,7 @@ describe("GetAuthorFeedUseCase", () => {
     repostRepo.add(repost);
 
     const repostFeedItem = FeedItem.fromRepost(repost);
-    authorFeedRepo.add(repostFeedItem, false);
+    authorFeedRepo.add(repostFeedItem);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -308,7 +308,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(post.uri.toString(), postStats);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -364,7 +364,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(olderPost.uri.toString(), olderPostStats);
 
     const olderPostFeedItem = FeedItem.fromPost(olderPost);
-    authorFeedRepo.add(olderPostFeedItem, false);
+    authorFeedRepo.add(olderPostFeedItem);
 
     const { post: newerPost, record: newerRecord } = postFactory({
       actorDid: author.did,
@@ -382,7 +382,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(newerPost.uri.toString(), newerPostStats);
 
     const newerPostFeedItem = FeedItem.fromPost(newerPost);
-    authorFeedRepo.add(newerPostFeedItem, false);
+    authorFeedRepo.add(newerPostFeedItem);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -445,7 +445,7 @@ describe("GetAuthorFeedUseCase", () => {
     recordRepo.add(record);
 
     const postFeedItem = FeedItem.fromPost(post);
-    authorFeedRepo.add(postFeedItem, false);
+    authorFeedRepo.add(postFeedItem);
 
     // act
     const result = await getAuthorFeedUseCase.execute({
@@ -487,7 +487,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(post1.uri.toString(), post1Stats);
 
     const post1FeedItem = FeedItem.fromPost(post1);
-    authorFeedRepo.add(post1FeedItem, false);
+    authorFeedRepo.add(post1FeedItem);
 
     const { post: post2, record: record2 } = postFactory({
       actorDid: author.did,
@@ -506,7 +506,7 @@ describe("GetAuthorFeedUseCase", () => {
     postStatsRepo.add(post2.uri.toString(), post2Stats);
 
     const post2FeedItem = FeedItem.fromPost(post2);
-    authorFeedRepo.add(post2FeedItem, false);
+    authorFeedRepo.add(post2FeedItem);
 
     // act
     const result = await getAuthorFeedUseCase.execute({

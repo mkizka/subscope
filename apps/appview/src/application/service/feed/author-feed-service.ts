@@ -54,6 +54,14 @@ export class AuthorFeedService {
       });
     }
 
+    if (filter === "posts_and_author_threads") {
+      return this.authorFeedRepository.findFeedItemsWithAuthorThreads({
+        actorDid,
+        limit,
+        cursor,
+      });
+    }
+
     if (filter === "posts_with_media") {
       return this.authorFeedRepository.findFeedItemsWithMedia({
         actorDid,

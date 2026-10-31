@@ -1,21 +1,14 @@
 import type { FeedItem } from "@repo/common/domain";
 
+type FindParams = {
+  actorDid: string;
+  limit: number;
+  cursor?: Date;
+};
+
 export interface IAuthorFeedRepository {
-  findFeedItems: (params: {
-    actorDid: string;
-    limit: number;
-    cursor?: Date;
-  }) => Promise<FeedItem[]>;
-
-  findFeedItemsWithoutReplies: (params: {
-    actorDid: string;
-    limit: number;
-    cursor?: Date;
-  }) => Promise<FeedItem[]>;
-
-  findFeedItemsWithMedia: (params: {
-    actorDid: string;
-    limit: number;
-    cursor?: Date;
-  }) => Promise<FeedItem[]>;
+  findFeedItems: (params: FindParams) => Promise<FeedItem[]>;
+  findFeedItemsWithoutReplies: (params: FindParams) => Promise<FeedItem[]>;
+  findFeedItemsWithMedia: (params: FindParams) => Promise<FeedItem[]>;
+  findFeedItemsWithAuthorThreads: (params: FindParams) => Promise<FeedItem[]>;
 }
