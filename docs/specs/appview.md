@@ -97,6 +97,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - getPosts-1: 指定したURIの順に投稿を並べる
 - getPosts-2: 存在しない投稿は含めない
+- getPosts-3: 閲覧者がいいね・リポストした投稿は、そのURIをviewer.likeとviewer.repostに含める
 
 ## app.bsky.feed.getPostThread
 
