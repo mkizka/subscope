@@ -48,7 +48,6 @@ test.describe("プロフィール", () => {
 
   test.describe("簡易表示", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/");
       await page.goto("/?profile=alice.test");
     });
 
@@ -89,7 +88,6 @@ test.describe("プロフィール", () => {
       );
       return (await res.text()).includes(bob);
     };
-    await page.goto("/");
     await page.goto(`/profile/${bob}`);
     const main = page.getByRole("main");
     await expect(async () => {

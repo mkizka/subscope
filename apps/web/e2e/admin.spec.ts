@@ -52,8 +52,6 @@ test.describe("登録ユーザー", () => {
   test("subscribers-4: 見出しの横に登録ユーザーの人数を出す", async ({
     page,
   }) => {
-    await page.goto("/");
-
     await page.goto("/admin/subscribers");
 
     await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
