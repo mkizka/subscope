@@ -15,6 +15,13 @@ type GetAuthorFeedParams = {
   viewerDid?: Did;
 };
 
+export class UnsupportedFilterError extends Error {
+  constructor(filter: string) {
+    super(`filter ${filter} is not supported`);
+    this.name = "UnsupportedFilterError";
+  }
+}
+
 export class GetAuthorFeedUseCase {
   private supportedFilters: Filter[] = [
     "posts_with_replies",
@@ -32,10 +39,7 @@ export class GetAuthorFeedUseCase {
     params: GetAuthorFeedParams,
   ): Promise<AppBskyFeedGetAuthorFeed.$OutputBody> {
     if (!this.supportedFilters.includes(params.filter)) {
-      return {
-        feed: [],
-        cursor: undefined,
-      };
+      throw new UnsupportedFilterError(params.filter);
     }
 
     const page = await this.authorFeedService.findFeedItemsWithPagination({
