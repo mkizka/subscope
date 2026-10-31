@@ -220,7 +220,7 @@ describe("lexRouter", () => {
   });
 
   test("未実装のNSIDは501エラーを返す", async () => {
-    const res = await fetch(`${baseUrl}/app.bsky.feed.getFeed`);
+    const res = await fetch(`${baseUrl}/app.bsky.feed.getQuotes`);
 
     expect(res.status).toBe(501);
     expect(await res.json()).toMatchObject({ error: "MethodNotImplemented" });
