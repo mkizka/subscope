@@ -1,6 +1,6 @@
 import { test as setup } from "@playwright/test";
 
-import { login } from "./login";
+import { login } from "../helpers/login";
 
 setup("aliceでログインする", async ({ page }) => {
   await login(page);

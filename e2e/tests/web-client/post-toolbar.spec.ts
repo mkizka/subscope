@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord } from "./pds";
-
-const PDS_URL = "http://localhost:2583";
+import { createRecord, PDS_URL } from "../../helpers/pds";
 
 const cases = [
   { id: "post-toolbar-1", name: "いいね", collection: "app.bsky.feed.like" },

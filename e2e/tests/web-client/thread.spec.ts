@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { createRecord } from "./pds";
+import { createRecord } from "../../helpers/pds";
 
 const post = (text: string, parent?: { uri: string; cid: string }) =>
   createRecord("alice.test", "app.bsky.feed.post", {

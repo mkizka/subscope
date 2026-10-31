@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
+import { login } from "../../helpers/login";
 
 test.describe("ログイン", () => {
   test("login-2: ログインしていないときにトップページを開くと、ログイン画面に移動する", async ({
