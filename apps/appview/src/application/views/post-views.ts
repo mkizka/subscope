@@ -4,6 +4,7 @@ import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 
 import { asLexMap } from "../utils/lex.js";
 import type { EmbedViews } from "./embed-views.js";
+import { toLabelViews } from "./label-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
 
@@ -21,12 +22,13 @@ export class PostViews {
     if (!post) {
       return undefined;
     }
-    const [record, author, stats, viewer, embed] = await Promise.all([
+    const [record, author, stats, viewer, embed, labels] = await Promise.all([
       ctx.record(uri),
       this.profileViews.basic(post.actorDid, ctx),
       ctx.stats(uri),
       ctx.viewerPostState(uri),
       this.embedViews.embedView(post, ctx),
+      ctx.labelsOf(uri),
     ]);
     if (!record || !author) {
       return undefined;
@@ -46,6 +48,7 @@ export class PostViews {
         repost: viewer.repost?.uri.toString(),
         like: viewer.like?.uri,
       },
+      labels: toLabelViews(labels),
       indexedAt: toDatetimeString(post.indexedAt),
     };
   }

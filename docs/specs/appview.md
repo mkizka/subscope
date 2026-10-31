@@ -11,6 +11,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - takedown-3: 期限が切れたラベルは無視する
 - takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない
 
+## ラベル
+
+モデレーションサービスが付けたラベルを、プロフィールと投稿のビューの labels に載せる。公式クライアントは labels を見て警告やぼかしを表示する。
+
+- labels-1: プロフィールのビューの labels に、そのアカウントのDIDに付いたラベルを含める
+- labels-2: 投稿のビューの labels に、その投稿に付いたラベルを含める
+
 ## app.bsky.actor.getProfile
 
 指定したアクターの詳細なプロフィールを返す。認証は任意。
