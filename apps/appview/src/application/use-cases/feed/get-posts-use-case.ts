@@ -1,3 +1,4 @@
+import type { Did } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
 import type { AtUri } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
@@ -11,8 +12,11 @@ export class GetPostsUseCase {
     private readonly postViews: PostViews,
   ) {}
 
-  async execute(uris: AtUri[]): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
-    const ctx = this.viewContextFactory.create();
+  async execute(
+    uris: AtUri[],
+    viewerDid: Did | null,
+  ): Promise<$Typed<AppBskyFeedDefs.PostView>[]> {
+    const ctx = this.viewContextFactory.create({ viewerDid });
     const posts = await Promise.all(
       uris.map((uri) => this.postViews.postView(uri.toString(), ctx)),
     );

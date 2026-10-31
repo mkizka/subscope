@@ -91,12 +91,21 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - searchPosts-1: 本文がクエリに一致する投稿をpostViewで返す
 
+## app.bsky.feed.searchPostsV2
+
+searchPostsの後継で、公式クライアントの投稿検索はこれを使う。認証は任意。
+
+- searchPostsV2-1: 本文がqueryに一致する投稿をpostViewで返す
+
+query以外の絞り込みパラメータ(authors、sortなど)は今は無視する。
+
 ## app.bsky.feed.getPosts
 
 指定したURIの投稿をpostViewとして返す。認証は任意。
 
 - getPosts-1: 指定したURIの順に投稿を並べる
 - getPosts-2: 存在しない投稿は含めない
+- getPosts-3: 閲覧者がいいね・リポストした投稿は、そのURIをviewer.likeとviewer.repostに含める
 
 ## app.bsky.feed.getPostThread
 
