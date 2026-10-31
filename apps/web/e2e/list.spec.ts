@@ -101,7 +101,6 @@ test.describe("リスト", () => {
     page,
   }) => {
     const name = `list-4のリスト ${Date.now()}`;
-    await login(page);
     await page.goto("/profile/alice.test/lists");
     const main = page.getByRole("main");
 
@@ -126,7 +125,6 @@ test.describe("リスト", () => {
   }) => {
     const rkey = await createList(`list-5のリスト ${Date.now()}`);
     const name = `list-5の編集後 ${Date.now()}`;
-    await login(page);
     await page.goto(`/profile/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
