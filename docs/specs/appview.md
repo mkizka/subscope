@@ -11,6 +11,17 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - takedown-3: 期限が切れたラベルは無視する
 - takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない
 
+## 返信制限
+
+スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsだけが対応する。
+
+- threadgate-1: スレッドの起点の投稿は、そのthreadgateをthreadgateに含める
+- threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする
+- threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする
+- threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする
+
+listRuleのメンバーかどうかは今は判定しない。listRuleがあり他の規則に合わないときは、replyDisabledを含めない。
+
 ## app.bsky.actor.getProfile
 
 指定したアクターの詳細なプロフィールを返す。認証は任意。
