@@ -20,7 +20,7 @@ export class GetAuthorFeedUseCase {
   private supportedFilters: Filter[] = [
     "posts_with_replies",
     "posts_no_replies",
-    // "posts_with_media",
+    "posts_with_media",
     // "posts_and_author_threads",
     // "posts_with_video",
   ];

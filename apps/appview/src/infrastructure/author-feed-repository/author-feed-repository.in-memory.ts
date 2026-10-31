@@ -5,13 +5,14 @@ import type { IAuthorFeedRepository } from "../../application/interfaces/author-
 type FeedItemWithMeta = {
   feedItem: FeedItem;
   isReply: boolean;
+  hasMedia: boolean;
 };
 
 export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
   private feedItems: FeedItemWithMeta[] = [];
 
-  add(feedItem: FeedItem, isReply = false): void {
-    this.feedItems.push({ feedItem, isReply });
+  add(feedItem: FeedItem, isReply = false, hasMedia = false): void {
+    this.feedItems.push({ feedItem, isReply, hasMedia });
   }
 
   clear(): void {
@@ -52,6 +53,30 @@ export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
         }
         return !item.isReply;
       })
+      .map((item) => item.feedItem);
+
+    if (params.cursor) {
+      const cursor = params.cursor;
+      items = items.filter((item) => item.sortAt < cursor);
+    }
+
+    items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
+
+    return Promise.resolve(items.slice(0, params.limit));
+  }
+
+  findFeedItemsWithMedia(params: {
+    actorDid: string;
+    limit: number;
+    cursor?: Date;
+  }): Promise<FeedItem[]> {
+    let items = this.feedItems
+      .filter(
+        (item) =>
+          item.feedItem.actorDid === params.actorDid &&
+          item.feedItem.type === "post" &&
+          item.hasMedia,
+      )
       .map((item) => item.feedItem);
 
     if (params.cursor) {

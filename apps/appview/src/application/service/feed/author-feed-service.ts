@@ -54,6 +54,14 @@ export class AuthorFeedService {
       });
     }
 
+    if (filter === "posts_with_media") {
+      return this.authorFeedRepository.findFeedItemsWithMedia({
+        actorDid,
+        limit,
+        cursor,
+      });
+    }
+
     return this.authorFeedRepository.findFeedItems({
       actorDid,
       limit,

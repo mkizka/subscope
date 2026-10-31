@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import { type DatabaseClient, FeedItem } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, isNull, lt, or } from "drizzle-orm";
+import { and, desc, eq, exists, isNull, lt, or, type SQL } from "drizzle-orm";
 
 import type { IAuthorFeedRepository } from "../../application/interfaces/author-feed-repository.js";
 
@@ -12,12 +12,14 @@ export class AuthorFeedRepository implements IAuthorFeedRepository {
     actorDid,
     cursor,
     limit,
+    conditions = [],
   }: {
     actorDid: string;
     cursor?: Date;
     limit: number;
+    conditions?: SQL[];
   }): Promise<FeedItem[]> {
-    const filters = [eq(schema.feedItems.actorDid, actorDid)];
+    const filters = [eq(schema.feedItems.actorDid, actorDid), ...conditions];
     if (cursor) {
       filters.push(lt(schema.feedItems.sortAt, cursor));
     }
@@ -101,5 +103,30 @@ export class AuthorFeedRepository implements IAuthorFeedRepository {
           sortAt: item.sortAt,
         }),
     );
+  }
+
+  async findFeedItemsWithMedia({
+    actorDid,
+    cursor,
+    limit,
+  }: {
+    actorDid: string;
+    cursor?: Date;
+    limit: number;
+  }): Promise<FeedItem[]> {
+    return this.findFeedItems({
+      actorDid,
+      cursor,
+      limit,
+      conditions: [
+        eq(schema.feedItems.type, "post"),
+        exists(
+          this.db
+            .select()
+            .from(schema.postEmbedImages)
+            .where(eq(schema.postEmbedImages.postUri, schema.feedItems.uri)),
+        ),
+      ],
+    });
   }
 }

@@ -417,7 +417,7 @@ describe("GetAuthorFeedUseCase", () => {
     const result = await getAuthorFeedUseCase.execute({
       actorDid: asDid(author.did),
       limit: 50,
-      filter: "posts_with_media",
+      filter: "posts_with_video",
       includePins: false,
     });
 

@@ -12,4 +12,10 @@ export interface IAuthorFeedRepository {
     limit: number;
     cursor?: Date;
   }) => Promise<FeedItem[]>;
+
+  findFeedItemsWithMedia: (params: {
+    actorDid: string;
+    limit: number;
+    cursor?: Date;
+  }) => Promise<FeedItem[]>;
 }

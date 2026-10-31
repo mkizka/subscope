@@ -119,6 +119,7 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す
 - getAuthorFeed-2: 解決できないハンドルには400を返す
+- getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアクター自身の投稿だけを返し、リポストは含めない
 
 ## app.bsky.notification.listNotifications
 
