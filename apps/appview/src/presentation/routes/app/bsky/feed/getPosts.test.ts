@@ -2,8 +2,10 @@ import { asAtUriString } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
   actorFactory,
+  likeFactory,
   postFactory,
   recordFactory,
+  repostFactory,
   testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -58,5 +60,41 @@ describe("app.bsky.feed.getPosts", () => {
 
     // assert
     expect(res.posts.map((post) => post.uri)).toEqual([post.uri]);
+  });
+
+  test("getPosts-3: 閲覧者がいいね・リポストした投稿は、そのURIをviewer.likeとviewer.repostに含める", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const post = await createPost();
+    const like = await likeFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.like")
+            .vars({ actor: () => viewer })
+            .create(),
+        subject: () => post,
+      })
+      .create();
+    const repost = await repostFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.feed.repost")
+            .vars({ actor: () => viewer })
+            .create(),
+        subject: () => post,
+      })
+      .create();
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(post.uri)],
+    });
+
+    // assert
+    expect(res.posts).toMatchObject([
+      { viewer: { like: like.uri, repost: repost.uri } },
+    ]);
   });
 });

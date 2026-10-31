@@ -42,7 +42,10 @@ describe("GetPostsUseCase", () => {
     const findManyDetailed = vi.spyOn(profileRepo, "findManyDetailed");
 
     // act
-    const result = await getPostsUseCase.execute(posts.map((post) => post.uri));
+    const result = await getPostsUseCase.execute(
+      posts.map((post) => post.uri),
+      null,
+    );
 
     // assert
     expect(result.map((post) => post.author.did)).toEqual(
