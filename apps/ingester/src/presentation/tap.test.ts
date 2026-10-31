@@ -99,7 +99,10 @@ describe("TapIngester", () => {
             cid,
           },
         },
-        options: { priority: undefined },
+        options: {
+          priority: undefined,
+          jobId: `at://${did}/app.bsky.feed.post/3l3qo2vuowo2b@3l3qo2vutsw2b`,
+        },
       });
     }
   });
@@ -136,7 +139,9 @@ describe("TapIngester", () => {
     await send(recordEvent(1, { live: false }));
 
     expect(jobQueue.add).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { priority: 1 } }),
+      expect.objectContaining({
+        options: expect.objectContaining({ priority: 1 }),
+      }),
     );
   });
 
@@ -167,5 +172,19 @@ describe("TapIngester", () => {
     await send(recordEvent(1, {}), recordEvent(2, {}));
 
     expect(acks).toEqual([2]);
+  });
+
+  test("tap-7: 同じレコードの同じrevのイベントは、同じjobIdで積んでキューでの重複を防ぐ", async () => {
+    await send(recordEvent(1, {}), recordEvent(2, {}));
+
+    const jobId = `at://${did}/app.bsky.feed.post/3l3qo2vuowo2b@3l3qo2vutsw2b`;
+    for (const n of [1, 2]) {
+      expect(jobQueue.add).toHaveBeenNthCalledWith(
+        n,
+        expect.objectContaining({
+          options: expect.objectContaining({ jobId }),
+        }),
+      );
+    }
   });
 });

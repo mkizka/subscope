@@ -24,11 +24,15 @@ export class HandleCommitUseCase {
       collection: dto.commit.collection,
     });
 
+    const uri = `at://${dto.did}/${dto.commit.collection}/${dto.commit.rkey}`;
     await this.jobQueue.add({
       queueName: "commit",
-      jobName: `at://${dto.did}/${dto.commit.collection}/${dto.commit.rkey}`,
+      jobName: uri,
       data: dto,
-      options: { priority: dto.live ? undefined : 1 },
+      options: {
+        priority: dto.live ? undefined : 1,
+        jobId: `${uri}@${dto.commit.rev}`,
+      },
     });
   }
 }
