@@ -41,6 +41,7 @@ describe("PostQuery", () => {
           embedImages: [],
           embedExternal: null,
           embedRecordUri: null,
+          replyRootUri: null,
           indexedAt: post.indexedAt,
         },
       ]);

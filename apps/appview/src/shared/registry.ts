@@ -28,6 +28,7 @@ import type { IGeneratorQuery } from "../application/interfaces/generator-query.
 import type { IGeneratorRepository } from "../application/interfaces/generator-repository.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
+import type { ILabelQuery } from "../application/interfaces/label-query.js";
 import type { ILabelRepository } from "../application/interfaces/label-repository.js";
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
@@ -104,6 +105,7 @@ import { SubscribeServerUseCase } from "../application/use-cases/sync/subscribe-
 import { UnsubscribeServerUseCase } from "../application/use-cases/sync/unsubscribe-server-use-case.js";
 import { EmbedViews } from "../application/views/embed-views.js";
 import { GeneratorViews } from "../application/views/generator-views.js";
+import { NotificationViews } from "../application/views/notification-views.js";
 import { PostViews } from "../application/views/post-views.js";
 import { ProfileViews } from "../application/views/profile-views.js";
 import { ViewContextFactory } from "../application/views/view-context.js";
@@ -118,6 +120,7 @@ import { GeneratorQuery } from "../infrastructure/generator-query/generator-quer
 import { GeneratorRepository } from "../infrastructure/generator-repository/generator-repository.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
+import { LabelQuery } from "../infrastructure/label-query/label-query.js";
 import { LabelRepository } from "../infrastructure/label-repository/label-repository.js";
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
@@ -208,6 +211,7 @@ export const createAppRegistry = (env: Env) =>
     .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelRepository", ["db"], asClassArgs<ILabelRepository>()(LabelRepository))
+    .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
     .service("actorStatsRepository", ["db"], asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
@@ -255,11 +259,12 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileQuery", "labelRepository", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
     .service("postViews", ["profileViews", "embedViews"], asClassArgs(PostViews))
+    .service("notificationViews", ["profileViews", "postViews", "generatorViews"], asClassArgs(NotificationViews))
     .service("feedProcessor", ["postRepository", "repostRepository", "postViewService", "profileViewService", "replyRefService"], asClassArgs(FeedProcessor))
     // use-cases
     .service("getProfileUseCase", ["profileViewService", "actorLoader"], asClassArgs(GetProfileUseCase))
@@ -310,7 +315,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostThreadV2", ["getPostThreadV2UseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThreadV2))
     .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase"], asClassArgs(GetTimeline))
     .service("listNotifications", ["authVerifierMiddleware", "listNotificationsUseCase"], asClassArgs(ListNotifications))
-    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "profileViews", "postViews", "generatorViews"], asClassArgs(GetGroupedNotificationsUseCase))
+    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "notificationViews"], asClassArgs(GetGroupedNotificationsUseCase))
     .service("getGroupedNotifications", ["authVerifierMiddleware", "getGroupedNotificationsUseCase"], asClassArgs(GetGroupedNotifications))
     .service("getUnreadCountUseCase", ["notificationRepository"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
