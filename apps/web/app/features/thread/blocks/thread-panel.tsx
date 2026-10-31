@@ -5,13 +5,17 @@ import { Link } from "react-router";
 import type { ComposeTarget } from "@/app/features/timeline/blocks/post-form-container";
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
-import { PostCard, QuotedPost } from "@/app/features/timeline/parts/post-card";
+import {
+  PostCard,
+  type PostCardProps,
+  QuotedPost,
+} from "@/app/features/timeline/parts/post-card";
 
 type Props = {
   thread?: {
     ancestors: TimelinePost[];
     post: TimelinePost;
-    replies: TimelinePost[];
+    replies: TimelinePost[][];
   } | null;
   closeSearch: string;
   onCompose: (target: ComposeTarget) => void;
@@ -99,6 +103,19 @@ function FocusedPost({
   );
 }
 
+function ConnectedPost(props: PostCardProps) {
+  return (
+    <div className="relative">
+      <div
+        className="
+          absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
+        "
+      />
+      <PostCard {...props} />
+    </div>
+  );
+}
+
 export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
   const toolbar = (post: TimelinePost) => (
     <PostToolbarContainer {...post} onCompose={onCompose} />
@@ -123,19 +140,22 @@ export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
       {thread && (
         <>
           {thread.ancestors.map((post) => (
-            <div key={post.uri} className="relative">
-              <div
-                className="
-                  absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
-                "
-              />
-              <PostCard {...post} toolbar={toolbar(post)} />
-            </div>
+            <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
           ))}
           <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
-          {thread.replies.map((post) => (
-            <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
-          ))}
+          {thread.replies.map((chain) =>
+            chain.map((post, i) =>
+              i < chain.length - 1 ? (
+                <ConnectedPost
+                  key={post.uri}
+                  {...post}
+                  toolbar={toolbar(post)}
+                />
+              ) : (
+                <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
+              ),
+            ),
+          )}
         </>
       )}
       {form && (
