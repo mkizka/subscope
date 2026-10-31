@@ -3,6 +3,10 @@ import { Link } from "react-router";
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { ListForm } from "@/app/features/list/blocks/list-form";
 import {
+  AddListMemberForm,
+  RemoveListMemberButton,
+} from "@/app/features/list/blocks/list-member-forms";
+import {
   type Actor,
   ActorList,
 } from "@/app/features/profile/blocks/actor-list";
@@ -12,15 +16,17 @@ import {
 } from "@/app/features/timeline/blocks/timeline-feed";
 
 type Props = {
+  uri: string;
   name: string;
   description?: string;
   tab: "posts" | "members";
   posts: TimelinePost[];
-  members: Actor[];
+  members: (Actor & { listItemUri: string })[];
   isSelf: boolean;
 };
 
 export function ListPage({
+  uri,
   name,
   description,
   tab,
@@ -67,7 +73,19 @@ export function ListPage({
       {tab === "posts" ? (
         <TimelineFeed posts={posts} onCompose={() => {}} />
       ) : (
-        <ActorList actors={members} />
+        <>
+          {isSelf && <AddListMemberForm listUri={uri} />}
+          <ActorList
+            actors={members}
+            renderAction={
+              isSelf
+                ? (member) => (
+                    <RemoveListMemberButton listItemUri={member.listItemUri} />
+                  )
+                : undefined
+            }
+          />
+        </>
       )}
     </ThreeColumnLayout>
   );

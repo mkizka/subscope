@@ -19,6 +19,7 @@ export type ListDto = {
 };
 
 export type ListMemberDto = {
+  listItemUri: string;
   did: string;
   handle: string;
   displayName?: string;
@@ -73,7 +74,8 @@ export const listQueryFactory = ({
       });
       return {
         list: toList(list),
-        members: items.map(({ subject }) => ({
+        members: items.map(({ uri, subject }) => ({
+          listItemUri: uri,
           did: subject.did,
           handle: subject.handle,
           displayName: subject.displayName,

@@ -1,8 +1,9 @@
 import { type Did } from "@atproto/did";
 import type * as AppBskyActorSearchActorsTypeahead from "@repo/client/lex/app/bsky/actor/searchActorsTypeahead";
 
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { ProfileSearchService } from "../../../application/service/search/profile-search-service.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type SearchActorsTypeaheadParams = {
   query: string | undefined;
@@ -13,7 +14,8 @@ type SearchActorsTypeaheadParams = {
 export class SearchActorsTypeaheadUseCase {
   constructor(
     private readonly profileSearchService: ProfileSearchService,
-    private readonly profileViewService: ProfileViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(
@@ -30,15 +32,15 @@ export class SearchActorsTypeaheadUseCase {
       limit: params.limit,
     });
 
-    const dids = profiles.map((profile) => profile.actorDid);
-    // TODO: 2回profileをDBから取得しているので引数をdidsではなくprofilesにする？
-    const actors = await this.profileViewService.findProfileViewBasic(
-      dids,
-      params.viewerDid,
+    const ctx = this.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
+    const actors = await Promise.all(
+      profiles.map((profile) => this.profileViews.basic(profile.actorDid, ctx)),
     );
 
     return {
-      actors,
+      actors: actors.filter((actor) => actor !== undefined),
     };
   }
 }

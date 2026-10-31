@@ -52,7 +52,7 @@ describe("GetPostsUseCase", () => {
     // act
     const result = await getPostsUseCase.execute(
       posts.map((post) => post.uri),
-      null,
+      {},
     );
 
     // assert

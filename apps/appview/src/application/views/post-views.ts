@@ -2,6 +2,7 @@ import { asDid } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
 import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
+import { listRule } from "@repo/client/lex/app/bsky/feed/threadgate";
 import { mention } from "@repo/client/lex/app/bsky/richtext/facet";
 import { Record } from "@repo/common/domain";
 
@@ -108,9 +109,14 @@ export class PostViews {
       return false;
     }
     const has = (type: string) => allow.some((rule) => rule.$type === type);
-    const [root, { following, followedBy }] = await Promise.all([
+    const [root, { following, followedBy }, listItems] = await Promise.all([
       ctx.record(rootUri),
       ctx.viewerState(ownerDid),
+      Promise.all(
+        allow
+          .filter((rule) => listRule.isTypeOf(rule))
+          .map((rule) => ctx.viewerListItem(rule.list)),
+      ),
     ]);
     const mentioned = root
       ? Record.create(root)
@@ -125,10 +131,11 @@ export class PostViews {
     if (
       (has("app.bsky.feed.threadgate#mentionRule") && mentioned) ||
       (has("app.bsky.feed.threadgate#followingRule") && followedBy) ||
-      (has("app.bsky.feed.threadgate#followerRule") && following)
+      (has("app.bsky.feed.threadgate#followerRule") && following) ||
+      listItems.some(Boolean)
     ) {
       return false;
     }
-    return has("app.bsky.feed.threadgate#listRule") ? undefined : true;
+    return true;
   }
 }
