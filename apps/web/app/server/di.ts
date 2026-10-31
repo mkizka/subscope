@@ -25,7 +25,8 @@ import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reac
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorQueryFactory } from "./infrastructure/actor/actor-query";
-import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
+import { adminCommandFactory } from "./infrastructure/admin/admin-command";
+import { adminQueryFactory } from "./infrastructure/admin/admin-query";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
 import { oauthClientFactory } from "./infrastructure/auth/oauth-client";
 import {
@@ -97,37 +98,38 @@ export const di = await createRegistry()
   .service("postRepository", ["oauthClient"], postRepositoryFactory)
   .service("getTimelineUseCase", ["timelineQuery"], getTimelineUseCaseFactory)
   .service("createPostUseCase", ["postRepository"], createPostUseCaseFactory)
-  .service("adminRepository", ["oauthClient"], adminRepositoryFactory)
+  .service("adminQuery", ["oauthClient"], adminQueryFactory)
+  .service("adminCommand", ["oauthClient"], adminCommandFactory)
   .service(
     "getSubscribersUseCase",
-    ["adminRepository"],
+    ["adminQuery"],
     getSubscribersUseCaseFactory,
   )
   .service(
     "banSubscriberUseCase",
-    ["adminRepository"],
+    ["adminCommand"],
     banSubscriberUseCaseFactory,
   )
-  .service("grantAdminUseCase", ["adminRepository"], grantAdminUseCaseFactory)
+  .service("grantAdminUseCase", ["adminCommand"], grantAdminUseCaseFactory)
   .service(
     "getBannedActorsUseCase",
-    ["adminRepository"],
+    ["adminQuery"],
     getBannedActorsUseCaseFactory,
   )
-  .service("unbanActorUseCase", ["adminRepository"], unbanActorUseCaseFactory)
+  .service("unbanActorUseCase", ["adminCommand"], unbanActorUseCaseFactory)
   .service(
     "getInviteCodesUseCase",
-    ["adminRepository"],
+    ["adminQuery"],
     getInviteCodesUseCaseFactory,
   )
   .service(
     "createInviteCodeUseCase",
-    ["adminRepository"],
+    ["adminCommand"],
     createInviteCodeUseCaseFactory,
   )
   .service(
     "deleteInviteCodeUseCase",
-    ["adminRepository"],
+    ["adminCommand"],
     deleteInviteCodeUseCaseFactory,
   )
   .service("actorQuery", ["oauthClient"], actorQueryFactory)
