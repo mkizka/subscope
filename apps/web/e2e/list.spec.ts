@@ -100,4 +100,57 @@ test.describe("リスト", () => {
 
     await expect(main.getByText("@bob.test")).toBeVisible();
   });
+
+  test("list-4: 自分のリスト一覧で、名前と説明を入力してリストを作成する", async ({
+    page,
+  }) => {
+    const name = `list-4のリスト ${Date.now()}`;
+    await login(page);
+    await page.goto("/profile/alice.test/lists");
+    const main = page.getByRole("main");
+
+    await main.getByText("新しいリスト").click();
+    await main.getByLabel("名前").fill(name);
+    await main.getByLabel("説明").fill(`${name}の説明`);
+    await main.getByRole("button", { name: "作成する" }).click();
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
+      await expect(main.getByText(`${name}の説明`)).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
+  test("list-5: 自分のリスト詳細で、リストの名前と説明を編集する", async ({
+    page,
+  }) => {
+    const rkey = await createList(`list-5のリスト ${Date.now()}`);
+    const name = `list-5の編集後 ${Date.now()}`;
+    await login(page);
+    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("編集する")).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await main.getByText("編集する").click();
+    await main.getByLabel("名前").fill(name);
+    await main.getByLabel("説明").fill(`${name}の説明`);
+    await main.getByRole("button", { name: "保存する" }).click();
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByRole("heading", { name })).toBeVisible({
+        timeout: 1000,
+      });
+      await expect(main.getByText(`${name}の説明`)).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
 });

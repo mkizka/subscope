@@ -17,6 +17,7 @@ export interface IGetListPageUseCase {
     list: ListDto;
     members: ListMemberDto[];
     posts: TimelinePostDto[];
+    isSelf: boolean;
   }>;
 }
 
@@ -29,6 +30,6 @@ export const getListPageUseCaseFactory = ({
     const { list, members } = await listQuery.findList(did, actor, rkey);
     const posts =
       tab === "posts" ? await listQuery.findPosts(did, list.uri) : [];
-    return { list, members, posts };
+    return { list, members, posts, isSelf: list.creatorDid === did };
   },
 });

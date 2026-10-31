@@ -8,6 +8,7 @@ const meta = {
     name: "友達",
     description: "よく話す人たち",
     tab: "posts",
+    isSelf: true,
     posts: [
       {
         uri: "at://did:plc:bob/app.bsky.feed.post/1",
