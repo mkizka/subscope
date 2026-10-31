@@ -32,7 +32,7 @@ import type { ILabelQuery } from "../application/interfaces/label-query.js";
 import type { ILabelRepository } from "../application/interfaces/label-repository.js";
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
-import type { IListRepository } from "../application/interfaces/list-repository.js";
+import type { IListQuery } from "../application/interfaces/list-query.js";
 import type { INotificationRepository } from "../application/interfaces/notification-repository.js";
 import type { IPostQuery } from "../application/interfaces/post-query.js";
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
@@ -123,7 +123,7 @@ import { LabelQuery } from "../infrastructure/label-query/label-query.js";
 import { LabelRepository } from "../infrastructure/label-repository/label-repository.js";
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
-import { ListRepository } from "../infrastructure/list-repository/list-repository.js";
+import { ListQuery } from "../infrastructure/list-query/list-query.js";
 import { NotificationRepository } from "../infrastructure/notification-repository/notification-repository.js";
 import { PostQuery } from "../infrastructure/post-query/post-query.js";
 import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
@@ -230,7 +230,7 @@ export const createAppRegistry = (env: Env) =>
     .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("generatorRepository", ["db"], asClassArgs<IGeneratorRepository>()(GeneratorRepository))
-    .service("listRepository", ["db"], asClassArgs<IListRepository>()(ListRepository))
+    .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("subscriptionRepository", ["db"], asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("tokenVerifier", ["didResolver", "serviceDid"], asClassArgs<ITokenVerifier>()(TokenVerifier))
@@ -284,8 +284,8 @@ export const createAppRegistry = (env: Env) =>
     .service("getRepostedByUseCase", ["repostService", "profileViewService"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowersUseCase))
-    .service("getListUseCase", ["listRepository", "listViewService", "profileViewService"], asClassArgs(GetListUseCase))
-    .service("getListsUseCase", ["listRepository", "listViewService"], asClassArgs(GetListsUseCase))
+    .service("getListUseCase", ["listQuery", "listViewService", "profileViewService"], asClassArgs(GetListUseCase))
+    .service("getListsUseCase", ["listQuery", "listViewService"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["db", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["db", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorRepository", "profileViewService"], asClassArgs(GetBannedActorsUseCase))

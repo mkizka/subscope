@@ -1,14 +1,14 @@
 import type { Did } from "@atproto/did";
 import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getLists";
-import type { List } from "@repo/common/domain";
 
-import type { IListRepository } from "../../../application/interfaces/list-repository.js";
+import type { ListDto } from "../../../application/dto/list-dto.js";
+import type { IListQuery } from "../../../application/interfaces/list-query.js";
 import type { ListViewService } from "../../../application/service/graph/list-view-service.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 
 export class GetListsUseCase {
   constructor(
-    private readonly listRepository: IListRepository,
+    private readonly listQuery: IListQuery,
     private readonly listViewService: ListViewService,
   ) {}
 
@@ -18,12 +18,12 @@ export class GetListsUseCase {
     cursor?: string;
     purposes?: string[];
   }): Promise<$OutputBody> {
-    const paginator = createCursorPaginator<List>({
+    const paginator = createCursorPaginator<ListDto>({
       limit: params.limit,
       getCursor: (list) => list.createdAt.toISOString(),
     });
 
-    const lists = await this.listRepository.findByActor({
+    const lists = await this.listQuery.findByActor({
       actorDid: params.actorDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
