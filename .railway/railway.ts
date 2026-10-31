@@ -135,7 +135,7 @@ export default defineRailway(() => {
     }),
     build: { watchPatterns: ["/.railway/grafana/**/*"] },
     replicas: { [region]: 1 },
-    domains: ["grafana.subsco.me"],
+    domains: [{ domain: "grafana.subsco.me", port: 3000 }],
     env: {
       GF_SECURITY_ADMIN_PASSWORD: preserve(),
     },
