@@ -16,7 +16,7 @@ const app = (
   target: "appview" | "web" | "worker" | "ingester",
   watch: string[],
 ) => ({
-  source: github("mkizka/subscope", { branch: "main", checkSuites: true }),
+  source: github("mkizka/subscope", { branch: "main" }),
   build: {
     watchPatterns: [
       `/apps/${target}/**/*`,
@@ -54,6 +54,7 @@ export default defineRailway(() => {
   const atblob = service("ATBlob", {
     source: image("ghcr.io/mkizka/atblob:latest"),
     replicas: { [region]: 1 },
+    domains: ["cdn.subsco.me"],
     env: {
       PORT: "8080",
       DID_CACHE: "redis",
