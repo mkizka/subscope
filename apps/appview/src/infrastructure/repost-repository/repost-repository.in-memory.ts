@@ -1,4 +1,3 @@
-import type { Did } from "@atproto/did";
 import type { Repost } from "@repo/common/domain";
 
 import type { IRepostRepository } from "../../application/interfaces/repost-repository.js";
@@ -35,30 +34,6 @@ export class InMemoryRepostRepository implements IRepostRepository {
       reposts
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
         .slice(0, limit),
-    );
-  }
-
-  findByUris(uris: string[]): Promise<Repost[]> {
-    return Promise.resolve(
-      Array.from(this.reposts.values()).filter((r) =>
-        uris.includes(r.uri.toString()),
-      ),
-    );
-  }
-
-  findViewerReposts({
-    viewerDid,
-    subjectUris,
-  }: {
-    viewerDid: Did;
-    subjectUris: string[];
-  }): Promise<Repost[]> {
-    return Promise.resolve(
-      Array.from(this.reposts.values()).filter(
-        (r) =>
-          r.actorDid === viewerDid &&
-          subjectUris.includes(r.subjectUri.toString()),
-      ),
     );
   }
 }
