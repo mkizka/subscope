@@ -1,15 +1,16 @@
-import type { ISubscopeRepository } from "@/app/server/infrastructure/subscope/subscope-repository";
+import type {
+  ISubscopeQuery,
+  TrackedActorsDto,
+} from "@/app/server/infrastructure/subscope/subscope-query";
 
 export interface IGetTrackedActorsUseCase {
-  execute: (
-    did: string,
-  ) => ReturnType<ISubscopeRepository["findTrackedActors"]>;
+  execute: (did: string) => Promise<TrackedActorsDto>;
 }
 
 export const getTrackedActorsUseCaseFactory = ({
-  subscopeRepository,
+  subscopeQuery,
 }: {
-  subscopeRepository: ISubscopeRepository;
+  subscopeQuery: ISubscopeQuery;
 }): IGetTrackedActorsUseCase => ({
-  execute: (did) => subscopeRepository.findTrackedActors(did),
+  execute: (did) => subscopeQuery.findTrackedActors(did),
 });
