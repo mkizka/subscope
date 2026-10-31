@@ -1,6 +1,7 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 import type { ProfileViewDetailed } from "@repo/client/lex/app/bsky/actor/defs";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
+import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
@@ -9,6 +10,14 @@ import {
   type TimelinePostDto,
   toTimelinePost,
 } from "@/app/server/infrastructure/timeline/timeline-query";
+
+export type ActorDto = {
+  did: string;
+  handle: string;
+  displayName?: string;
+  avatarUrl?: string;
+  description?: string;
+};
 
 export interface IActorQuery {
   findProfile: (
@@ -20,6 +29,7 @@ export interface IActorQuery {
     actor: AtIdentifierString,
   ) => Promise<TimelinePostDto[]>;
   isAdmin: (did: string) => Promise<boolean>;
+  searchActors: (did: string, q: string) => Promise<ActorDto[]>;
 }
 
 export const actorQueryFactory = ({
@@ -47,6 +57,18 @@ export const actorQueryFactory = ({
       const agent = await restore(did);
       const { status } = await agent.call(verifyAccess);
       return status === "authorized";
+    },
+    async searchActors(did, q) {
+      const agent = await restore(did);
+      // ponytail: 最初の25件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
+      const { actors } = await agent.call(searchActors, { q });
+      return actors.map((actor) => ({
+        did: actor.did,
+        handle: actor.handle,
+        displayName: actor.displayName,
+        avatarUrl: actor.avatar,
+        description: actor.description,
+      }));
     },
   };
 };
