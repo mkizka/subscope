@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, uploadImage } from "./pds";
+import { createRecord, uploadImage } from "../../helpers/pds";
 
 test.describe("引用投稿", () => {
   test("quote-1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する", async ({

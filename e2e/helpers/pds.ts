@@ -1,4 +1,4 @@
-const PDS_URL = "http://localhost:2583";
+export const PDS_URL = "http://localhost:2583";
 
 const xrpc = async <T>(
   nsid: string,

@@ -1,6 +1,11 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { putRecord, resolveHandle, subscribeServer, uploadImage } from "./pds";
+import {
+  putRecord,
+  resolveHandle,
+  subscribeServer,
+  uploadImage,
+} from "../../helpers/pds";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({

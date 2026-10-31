@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, follow, resolveHandle } from "./pds";
+import { createRecord, follow, resolveHandle } from "../../helpers/pds";
 
 const createList = async (name: string) => {
   const bob = await resolveHandle("bob.test");

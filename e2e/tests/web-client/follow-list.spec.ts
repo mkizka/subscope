@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { follow, putRecord } from "./pds";
+import { follow, putRecord } from "../../helpers/pds";
 
 test.describe("フォロー・フォロワー", () => {
   test.beforeEach(async ({ page }) => {
