@@ -1,13 +1,13 @@
-import type { INotificationRepository } from "@/app/server/infrastructure/notification/notification-repository";
+import type { INotificationQuery } from "@/app/server/infrastructure/notification/notification-query";
 
 export interface ICountUnreadNotificationsUseCase {
   execute: (did: string) => Promise<{ count: number }>;
 }
 
 export const countUnreadNotificationsUseCaseFactory = ({
-  notificationRepository,
+  notificationQuery,
 }: {
-  notificationRepository: INotificationRepository;
+  notificationQuery: INotificationQuery;
 }): ICountUnreadNotificationsUseCase => ({
-  execute: (did) => notificationRepository.countUnread(did),
+  execute: (did) => notificationQuery.countUnread(did),
 });
