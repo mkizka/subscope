@@ -192,7 +192,7 @@ export const createAppRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("metricReporter", asClassArgs(MetricReporter))
-    .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+    .service("connectionPool", ["databaseUrl"], connectionPoolFactory)
     .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))

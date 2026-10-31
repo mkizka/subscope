@@ -21,6 +21,7 @@ const schema = z.object({
   }),
   MODERATION_URL: z.url().default("https://mod.bsky.app"),
   COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
+  DATABASE_POOL_MAX: z.coerce.number().default(32),
 });
 
 export type Env = z.infer<typeof schema>;

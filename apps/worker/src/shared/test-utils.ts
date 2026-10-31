@@ -39,6 +39,7 @@ export const testEnv = {
   TAP_URL: "http://localhost:2480",
   MODERATION_URL: "https://mod.bsky.app",
   COMMIT_WORKER_CONCURRENCY: 128,
+  DATABASE_POOL_MAX: 32,
 } satisfies Env;
 
 // prettier-ignore

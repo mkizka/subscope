@@ -90,6 +90,7 @@ export const createWorkerRegistry = (env: Env) =>
   createRegistry()
     // envs
     .value("databaseUrl", env.DATABASE_URL)
+    .value("databasePoolMax", env.DATABASE_POOL_MAX)
     .value("redisUrl", env.REDIS_URL)
     .value("logLevel", env.LOG_LEVEL)
     .value("nodeEnv", env.NODE_ENV)
@@ -102,7 +103,7 @@ export const createWorkerRegistry = (env: Env) =>
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("tapClient", ["tapUrl"], asClassArgs<ITapClient>()(TapClient))
-    .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+    .service("connectionPool", ["databaseUrl", "databasePoolMax"], connectionPoolFactory)
     .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
     .service("transactionManager", ["db"], asClassArgs<ITransactionManager>()(TransactionManager))
     .service("metricReporter", asClassArgs(MetricReporter))

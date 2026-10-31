@@ -5,9 +5,16 @@ import { Pool } from "pg";
 
 import type { ILoggerManager, Logger } from "../../domain/interfaces/logger.js";
 
-export const connectionPoolFactory = (databaseUrl: string) => {
+export const connectionPoolFactory = ({
+  databaseUrl,
+  databasePoolMax,
+}: {
+  databaseUrl: string;
+  databasePoolMax?: number;
+}) => {
   return new Pool({
     connectionString: databaseUrl,
+    max: databasePoolMax,
   });
 };
 
