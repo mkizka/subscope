@@ -50,8 +50,8 @@ export class ProfileViews {
         : undefined,
       viewer: {
         $type: "app.bsky.actor.defs#viewerState",
-        following: viewerState.following?.toString(),
-        followedBy: viewerState.followedBy?.toString(),
+        following: viewerState.following,
+        followedBy: viewerState.followedBy,
       },
       createdAt: profile.createdAt
         ? toDatetimeString(profile.createdAt)

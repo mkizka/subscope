@@ -290,7 +290,7 @@ export const postFeedItemFactory = (db: Database) =>
           uri: later<string>(),
           cid: later<string>(),
           type: () => "post" as const,
-          subjectUri: later<string>(),
+          subjectUri: () => null,
           actorDid: later<string>(),
           sortAt: later<Date>(),
           indexedAt: () => faker.date.recent(),
@@ -305,7 +305,6 @@ export const postFeedItemFactory = (db: Database) =>
       uri: async ({ vars }) => (await vars.post).uri,
       cid: async ({ vars }) => (await vars.post).cid,
       actorDid: async ({ vars }) => (await vars.post).actorDid,
-      subjectUri: async ({ vars }) => (await vars.post).uri,
       sortAt: async ({ vars }) => (await vars.post).createdAt,
     });
 
