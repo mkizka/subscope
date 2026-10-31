@@ -10,13 +10,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("GetSubscribersUseCase", () => {
   let getSubscribersUseCase: TestServices["getSubscribersUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
-  let profileRepo: TestServices["profileRepository"];
+  let profileQuery: TestServices["profileQuery"];
   let actorRepo: TestServices["actorRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getSubscribersUseCase = services.getSubscribersUseCase;
     subscriptionRepo = services.subscriptionRepository;
-    profileRepo = services.profileRepository;
+    profileQuery = services.profileQuery;
     actorRepo = services.actorRepository;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2024-01-01T00:00:00Z"));
@@ -34,7 +34,7 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor1.did,
       displayName: "Subscriber One",
     });
-    profileRepo.add(profile1);
+    profileQuery.add(profile1);
     const subscription1 = subscriptionFactory({
       actorDid: actor1.did,
       createdAt: new Date("2024-01-01T00:00:00Z"),
@@ -46,7 +46,7 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor2.did,
       displayName: "Subscriber Two",
     });
-    profileRepo.add(profile2);
+    profileQuery.add(profile2);
     const subscription2 = subscriptionFactory({
       actorDid: actor2.did,
       createdAt: new Date("2024-01-01T00:00:01Z"),
@@ -107,7 +107,7 @@ describe("GetSubscribersUseCase", () => {
         actorDid: actor.did,
         displayName: `Test User ${index}`,
       });
-      profileRepo.add(profile);
+      profileQuery.add(profile);
       const subscription = subscriptionFactory({
         actorDid: actor.did,
         createdAt: new Date(`2024-01-01T00:00:0${index}Z`),
@@ -150,7 +150,7 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor1.did,
       displayName: "First",
     });
-    profileRepo.add(profile1);
+    profileQuery.add(profile1);
     subscriptionRepo.add(
       subscriptionFactory({
         actorDid: actor1.did,
@@ -163,7 +163,7 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor2.did,
       displayName: "Second",
     });
-    profileRepo.add(profile2);
+    profileQuery.add(profile2);
     subscriptionRepo.add(
       subscriptionFactory({
         actorDid: actor2.did,
@@ -176,7 +176,7 @@ describe("GetSubscribersUseCase", () => {
       actorDid: actor3.did,
       displayName: "Third",
     });
-    profileRepo.add(profile3);
+    profileQuery.add(profile3);
     subscriptionRepo.add(
       subscriptionFactory({
         actorDid: actor3.did,

@@ -4,8 +4,9 @@ import type * as MeSubscoAdminGetSubscribers from "@repo/client/lex/me/subsco/ad
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { SubscriptionService } from "../../../application/service/admin/subscription-service.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type GetSubscribersParams = {
   limit: number;
@@ -15,7 +16,8 @@ type GetSubscribersParams = {
 export class GetSubscribersUseCase {
   constructor(
     private readonly subscriptionService: SubscriptionService,
-    private readonly profileViewService: ProfileViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
     private readonly actorRepository: IActorRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
@@ -31,34 +33,28 @@ export class GetSubscribersUseCase {
       this.subscriptionRepository.count(),
     ]);
 
-    const dids = paginationResult.items.map((sub) => asDid(sub.actorDid));
-    const [profiles, actors] = await Promise.all([
-      this.profileViewService.findProfileView(dids, null, {
-        includeTakedowns: true,
+    const ctx = this.viewContextFactory.create({ includeTakedowns: true });
+    const subscribers = await Promise.all(
+      paginationResult.items.map(async (sub) => {
+        const did = asDid(sub.actorDid);
+        const [profile, actor] = await Promise.all([
+          this.profileViews.view(did, ctx),
+          this.actorRepository.findByDid(did),
+        ]);
+        return (
+          profile && {
+            profile,
+            isAdmin: actor?.isAdmin ?? false,
+            subscribedAt: toDatetimeString(sub.createdAt),
+          }
+        );
       }),
-      Promise.all(dids.map((did) => this.actorRepository.findByDid(did))),
-    ]);
-    const profileMap = new Map(
-      profiles.map((profile) => [profile.did, profile]),
-    );
-    const adminDids = new Set(
-      actors.filter((actor) => actor?.isAdmin).map((actor) => actor?.did),
     );
 
     return {
       cursor: paginationResult.cursor,
       total,
-      subscribers: paginationResult.items.flatMap((sub) => {
-        const profile = profileMap.get(sub.actorDid);
-        if (!profile) return [];
-        return [
-          {
-            profile,
-            isAdmin: adminDids.has(profile.did),
-            subscribedAt: toDatetimeString(sub.createdAt),
-          },
-        ];
-      }),
+      subscribers: subscribers.filter((sub) => sub !== undefined),
     };
   }
 }
