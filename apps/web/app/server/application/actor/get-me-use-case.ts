@@ -1,6 +1,6 @@
 import type { DidString } from "@atproto/syntax";
 
-import type { IActorRepository } from "@/app/server/infrastructure/actor/actor-repository";
+import type { IActorQuery } from "@/app/server/infrastructure/actor/actor-query";
 
 export interface IGetMeUseCase {
   execute: (did: DidString) => Promise<{
@@ -12,14 +12,14 @@ export interface IGetMeUseCase {
 }
 
 export const getMeUseCaseFactory = ({
-  actorRepository,
+  actorQuery,
 }: {
-  actorRepository: IActorRepository;
+  actorQuery: IActorQuery;
 }): IGetMeUseCase => ({
   async execute(did) {
     const [profile, isAdmin] = await Promise.all([
-      actorRepository.findProfile(did, did).catch(() => undefined),
-      actorRepository.isAdmin(did),
+      actorQuery.findProfile(did, did).catch(() => undefined),
+      actorQuery.isAdmin(did),
     ]);
     return {
       did,
