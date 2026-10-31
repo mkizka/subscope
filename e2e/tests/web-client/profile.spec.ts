@@ -100,6 +100,9 @@ test.describe("プロフィール", () => {
     await expect(
       main.getByRole("button", { name: "フォロー", exact: true }),
     ).toBeVisible();
+    await expect(
+      main.getByRole("button", { name: "フォロー", exact: true }),
+    ).not.toHaveAttribute("aria-disabled", "true");
     await expect.poll(isFollowing).toBe(false);
 
     await main.getByRole("button", { name: "フォロー", exact: true }).click();
@@ -208,5 +211,37 @@ test.describe("プロフィール", () => {
       await expect(main.getByText(image)).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(main.getByText(text)).toHaveCount(0);
+  });
+
+  test("profile-11: フォローボタンは、押した結果を画面に反映し終えるまで押せない", async ({
+    page,
+  }) => {
+    await follow("alice.test", "bob.test");
+    const bob = await resolveHandle("bob.test");
+    await page.goto(`/profile/${bob}`);
+    const button = page
+      .getByRole("main")
+      .getByRole("button", { name: /^フォロー/ });
+    await expect(async () => {
+      await page.reload();
+      await expect(button).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route(
+      (url) => url.pathname.startsWith("/api/follows"),
+      async (route) => {
+        await held;
+        await route.continue();
+      },
+      { times: 1 },
+    );
+    const initial = (await button.textContent()) ?? "";
+    await button.click();
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await button.click({ force: true });
+    release();
+    await expect(button).not.toHaveAttribute("aria-disabled", "true");
+    await expect(button).not.toHaveText(initial);
   });
 });
