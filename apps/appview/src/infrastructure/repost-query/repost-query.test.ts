@@ -52,7 +52,11 @@ describe("RepostQuery", () => {
 
       // assert
       expect(result).toEqual([
-        { uri: viewerRepost.uri, subjectUri: viewerRepost.subjectUri },
+        {
+          uri: viewerRepost.uri,
+          subjectUri: viewerRepost.subjectUri,
+          indexedAt: viewerRepost.indexedAt,
+        },
       ]);
     });
   });

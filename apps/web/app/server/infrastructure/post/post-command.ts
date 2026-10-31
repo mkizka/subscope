@@ -1,5 +1,5 @@
 import { TID } from "@atproto/common-web";
-import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
+import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
 
@@ -18,6 +18,7 @@ export type NewPost = {
 
 export interface IPostCommand {
   create: (did: string, post: NewPost) => Promise<string>;
+  delete: (did: string, uri: string) => Promise<void>;
 }
 
 const THREADGATE_RULES = {
@@ -92,6 +93,10 @@ export const postCommandFactory = ({
           : []),
       ]);
       return uri;
+    },
+    async delete(did, uri) {
+      const agent = await restore(did);
+      await agent.delete(postRecord, { rkey: new AtUri(uri).rkey });
     },
   };
 };

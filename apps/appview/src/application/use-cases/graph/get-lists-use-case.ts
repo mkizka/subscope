@@ -1,15 +1,17 @@
 import type { Did } from "@atproto/did";
 import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getLists";
-import type { List } from "@repo/common/domain";
 
-import type { IListRepository } from "../../../application/interfaces/list-repository.js";
-import type { ListViewService } from "../../../application/service/graph/list-view-service.js";
+import type { ListDto } from "../../../application/dto/list-dto.js";
+import type { IListQuery } from "../../../application/interfaces/list-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ListViews } from "../../views/list-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetListsUseCase {
   constructor(
-    private readonly listRepository: IListRepository,
-    private readonly listViewService: ListViewService,
+    private readonly listQuery: IListQuery,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly listViews: ListViews,
   ) {}
 
   async execute(params: {
@@ -18,12 +20,12 @@ export class GetListsUseCase {
     cursor?: string;
     purposes?: string[];
   }): Promise<$OutputBody> {
-    const paginator = createCursorPaginator<List>({
+    const paginator = createCursorPaginator<ListDto>({
       limit: params.limit,
       getCursor: (list) => list.createdAt.toISOString(),
     });
 
-    const lists = await this.listRepository.findByActor({
+    const lists = await this.listQuery.findByActor({
       actorDid: params.actorDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
@@ -33,9 +35,13 @@ export class GetListsUseCase {
     });
     const page = paginator.extractPage(lists);
 
+    const ctx = this.viewContextFactory.create();
+    const views = await Promise.all(
+      page.items.map((list) => this.listViews.view(list.uri, ctx)),
+    );
     return {
       cursor: page.cursor,
-      lists: await this.listViewService.findListViews(page.items),
+      lists: views.filter((view) => view !== undefined),
     };
   }
 }

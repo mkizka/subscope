@@ -19,33 +19,55 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## ラベル
 
-モデレーションサービスが付けたラベルと、作成者がレコードに付けたセルフラベルを、プロフィールと投稿のビューの labels に載せる。公式クライアントは labels を見て警告やぼかしを表示する。今はgetPostsだけが対応する。
+モデレーションサービスが付けたラベルと、作成者がレコードに付けたセルフラベルを、プロフィールと投稿のビューの labels に載せる。公式クライアントは labels を見て警告やぼかしを表示する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
 
 - labels-1: プロフィールのビューの labels に、そのアカウントのDIDに付いたラベルを含める
 - labels-2: 投稿のビューの labels に、その投稿に付いたラベルを含める
 - labels-3: プロフィールのビューの labels に、プロフィールレコードに付いたラベルを含める
 - labels-4: プロフィールのビューの labels に、プロフィールレコードのセルフラベルを含める
 - labels-5: 投稿のビューの labels に、投稿レコードのセルフラベルを含める
+- labels-6: 引用された投稿のビューの labels に、その投稿に付いたラベルを含める
 
 セルフラベルは、レコードの作成者をsrc、レコードのURIとCIDをuriとcid、レコードのcreatedAtをctsとしたラベルとして返す。
 
+## ラベラーの指定
+
+クライアントが `atproto-accept-labelers` ヘッダーで指定したラベラー（モデレーションサービス）のラベルだけを labels に載せる。公式クライアントは、ユーザーが登録したラベラーをこのヘッダーで送る。今はgetPostsだけが対応する。
+
+- labelers-1: labels には、`atproto-accept-labelers` ヘッダーで指定されたラベラーが付けたラベルだけを含める
+- labelers-2: `atproto-accept-labelers` ヘッダーがないか不正な場合は、すべてのラベラーのラベルを labels に含める
+- labelers-3: `atproto-accept-labelers` ヘッダーで指定されたラベラーを、応答の `atproto-content-labelers` ヘッダーで返す
+- labelers-4: テイクダウンは、`atproto-accept-labelers` ヘッダーで指定されていないラベラーのラベルでも適用する
+
+ヘッダーの `redact` パラメーターは、応答の `atproto-content-labelers` ヘッダーにそのまま返すだけで、テイクダウンの適用には使わない。
+
 ## 返信制限
 
-スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsだけが対応する。
+スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
 
 - threadgate-1: スレッドの起点の投稿は、そのthreadgateをthreadgateに含める
 - threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする
 - threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする
 - threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする
+- threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする
+- threadgate-6: allowのlistRuleで指定したリストのうちインデックスしたものを、threadgate.listsにlistViewBasicとして含める
 
-listRuleのメンバーかどうかは今は判定しない。listRuleがあり他の規則に合わないときは、replyDisabledを含めない。
+リストに入っているかは、インデックスしたlistitemで判定する。
 
 ## 引用制限
 
-投稿者がpostgateで決めた引用の禁止と切り離しを、postViewに反映する。今はgetPostsだけが対応する。
+投稿者がpostgateで決めた引用の禁止と切り離しを、postViewに反映する。今はgetPostsとフィード(getTimeline、getAuthorFeed、getActorLikes、getListFeed)が対応する。
 
 - postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする
 - postgate-2: 引用された投稿のpostgateのdetachedEmbeddingUrisに引用した投稿が含まれる場合、引用をviewDetachedにする
+
+## フィード
+
+getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPostで返す。
+
+- feedViewPost-1: リプライには、スレッドの起点と親の投稿をreplyに含める
+- feedViewPost-2: 起点や親の投稿が見つからない場合、replyのその投稿をnotFoundPostにする
+- feedViewPost-3: リポストには、リポストしたアカウントとリポストの日時をreasonに含める
 
 ## app.bsky.actor.getProfile
 

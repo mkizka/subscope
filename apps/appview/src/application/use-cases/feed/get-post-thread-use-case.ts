@@ -1,14 +1,14 @@
 import type { Did } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
-import { AtUri } from "@atproto/syntax";
+import type { AtUri } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type * as AppBskyFeedGetPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 import type { Post } from "@repo/common/domain";
 
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
-import type { PostViewService } from "../../../application/service/feed/post-view-service.js";
-import { toMapByUri } from "../../../application/utils/map.js";
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
+import type { PostViews } from "../../views/post-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type ThreadViewPost = $Typed<AppBskyFeedDefs.ThreadViewPost>;
 type PostView = $Typed<AppBskyFeedDefs.PostView>;
@@ -25,7 +25,8 @@ export class PostNotFoundError extends Error {
 export class GetPostThreadUseCase {
   constructor(
     private readonly postRepository: IPostRepository,
-    private readonly postViewService: PostViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly postViews: PostViews,
   ) {}
 
   async execute(params: {
@@ -101,10 +102,15 @@ export class GetPostThreadUseCase {
     uris: Set<string>,
     viewerDid?: Did,
   ): Promise<Map<string, PostView>> {
-    const uriArray = Array.from(uris).map((uri) => new AtUri(uri));
-    return await this.postViewService
-      .findPostView(uriArray, viewerDid)
-      .then(toMapByUri);
+    const ctx = this.viewContextFactory.create({ viewerDid });
+    const views = await Promise.all(
+      Array.from(uris, (uri) => this.postViews.postView(uri, ctx)),
+    );
+    return new Map(
+      views
+        .filter((view) => view !== undefined)
+        .map((view) => [view.uri, view]),
+    );
   }
 
   private buildThreadStructure({

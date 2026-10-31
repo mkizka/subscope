@@ -1,8 +1,7 @@
-import { type Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { ProfileDetailed } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
+import { and, desc, eq, ilike, lt, or } from "drizzle-orm";
 
 import type { IProfileRepository } from "../../application/interfaces/profile-repository.js";
 
@@ -11,41 +10,6 @@ export class ProfileRepository implements IProfileRepository {
 
   private escapeWildcards(query: string): string {
     return query.replace(/[%_]/g, "\\$&");
-  }
-
-  async findManyDetailed(dids: Did[]) {
-    const results = await this.db
-      .select({
-        profile: schema.profiles,
-        actor: schema.actors,
-      })
-      .from(schema.actors)
-      .leftJoin(
-        schema.profiles,
-        eq(schema.actors.did, schema.profiles.actorDid),
-      )
-      .where(inArray(schema.actors.did, dids));
-
-    const profileMap = new Map(
-      results.map(({ profile, actor }) => [
-        actor.did,
-        new ProfileDetailed({
-          actorDid: actor.did,
-          handle: actor.handle,
-          avatarCid: profile?.avatarCid,
-          bannerCid: profile?.bannerCid,
-          description: profile?.description,
-          displayName: profile?.displayName,
-          createdAt: profile?.createdAt,
-          indexedAt: profile?.indexedAt ?? actor.indexedAt,
-          status: actor.status,
-        }),
-      ]),
-    );
-
-    return dids
-      .map((did) => profileMap.get(did))
-      .filter((profile) => !!profile);
   }
 
   async searchActors(params: {

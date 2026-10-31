@@ -1,7 +1,7 @@
 import { CheckIcon, CopyIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
-import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 import { formatDate } from "@/app/lib/format-date";
 

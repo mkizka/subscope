@@ -1,8 +1,7 @@
-import type { Did } from "@atproto/did";
 import type { DatabaseClient } from "@repo/common/domain";
 import { Like } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, inArray, lt } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 
 import type { ILikeRepository } from "../../application/interfaces/like-repository.js";
 
@@ -30,74 +29,6 @@ export class LikeRepository implements ILikeRepository {
       .where(and(...filters))
       .orderBy(desc(schema.likes.sortAt))
       .limit(limit);
-
-    return likes.map(
-      (like) =>
-        new Like({
-          uri: like.uri,
-          cid: like.cid,
-          actorDid: like.actorDid,
-          subjectUri: like.subjectUri,
-          subjectCid: like.subjectCid,
-          createdAt: like.createdAt,
-          indexedAt: like.indexedAt,
-        }),
-    );
-  }
-
-  async findLikesByActor({
-    actorDid,
-    limit,
-    cursor,
-  }: {
-    actorDid: Did;
-    limit: number;
-    cursor?: string;
-  }): Promise<Like[]> {
-    const filters = [eq(schema.likes.actorDid, actorDid)];
-
-    if (cursor) {
-      const cursorDate = new Date(cursor);
-      filters.push(lt(schema.likes.sortAt, cursorDate));
-    }
-
-    const likes = await this.db
-      .select()
-      .from(schema.likes)
-      .where(and(...filters))
-      .orderBy(desc(schema.likes.sortAt))
-      .limit(limit);
-
-    return likes.map(
-      (like) =>
-        new Like({
-          uri: like.uri,
-          cid: like.cid,
-          actorDid: like.actorDid,
-          subjectUri: like.subjectUri,
-          subjectCid: like.subjectCid,
-          createdAt: like.createdAt,
-          indexedAt: like.indexedAt,
-        }),
-    );
-  }
-
-  async findViewerLikes({
-    viewerDid,
-    subjectUris,
-  }: {
-    viewerDid: Did;
-    subjectUris: string[];
-  }): Promise<Like[]> {
-    const likes = await this.db
-      .select()
-      .from(schema.likes)
-      .where(
-        and(
-          eq(schema.likes.actorDid, viewerDid),
-          inArray(schema.likes.subjectUri, subjectUris),
-        ),
-      );
 
     return likes.map(
       (like) =>

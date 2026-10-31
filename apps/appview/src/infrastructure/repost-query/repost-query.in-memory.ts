@@ -11,6 +11,15 @@ export class InMemoryRepostQuery implements IRepostQuery {
     this.reposts.push(repost);
   }
 
+  findByUris(uris: AtUri[]): Promise<RepostDto[]> {
+    const targets: string[] = uris.map((uri) => uri.toString());
+    return Promise.resolve(
+      this.reposts
+        .filter((repost) => targets.includes(repost.uri))
+        .map(({ actorDid: _, ...repost }) => repost),
+    );
+  }
+
   findViewerReposts({
     viewerDid,
     subjectUris,
@@ -25,7 +34,7 @@ export class InMemoryRepostQuery implements IRepostQuery {
           (repost) =>
             repost.actorDid === viewerDid && uris.includes(repost.subjectUri),
         )
-        .map(({ uri, subjectUri }) => ({ uri, subjectUri })),
+        .map(({ actorDid: _, ...repost }) => repost),
     );
   }
 }

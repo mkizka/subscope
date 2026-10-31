@@ -1,18 +1,19 @@
 import type { AtUri } from "@atproto/syntax";
 import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getList";
-import type { ListItem } from "@repo/common/domain";
 
-import type { IListRepository } from "../../../application/interfaces/list-repository.js";
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
-import type { ListViewService } from "../../../application/service/graph/list-view-service.js";
-import { toMapByDid } from "../../../application/utils/map.js";
+import type { ListItemDto } from "../../../application/dto/list-dto.js";
+import type { IListQuery } from "../../../application/interfaces/list-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ListViews } from "../../views/list-views.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetListUseCase {
   constructor(
-    private readonly listRepository: IListRepository,
-    private readonly listViewService: ListViewService,
-    private readonly profileViewService: ProfileViewService,
+    private readonly listQuery: IListQuery,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly listViews: ListViews,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(params: {
@@ -20,33 +21,32 @@ export class GetListUseCase {
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody | null> {
-    const list = await this.listRepository.findByUri(params.listUri);
+    const ctx = this.viewContextFactory.create();
+    const list = await this.listViews.view(params.listUri.toString(), ctx);
     if (!list) return null;
-    const [listView] = await this.listViewService.findListViews([list]);
-    if (!listView) return null;
 
-    const paginator = createCursorPaginator<ListItem>({
+    const paginator = createCursorPaginator<ListItemDto>({
       limit: params.limit,
       getCursor: (item) => item.createdAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.listRepository.findItems({
+      await this.listQuery.findItems({
         listUri: params.listUri,
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
     );
-    const profileMap = await this.profileViewService
-      .findProfileView(page.items.map((item) => item.subjectDid))
-      .then(toMapByDid);
+    const items = await Promise.all(
+      page.items.map(async (item) => {
+        const subject = await this.profileViews.view(item.subjectDid, ctx);
+        return subject && { uri: item.uri, subject };
+      }),
+    );
 
     return {
       cursor: page.cursor,
-      list: listView,
-      items: page.items.flatMap((item) => {
-        const subject = profileMap.get(item.subjectDid);
-        return subject ? { uri: item.uri.toString(), subject } : [];
-      }),
+      list,
+      items: items.filter((item) => item !== undefined),
     };
   }
 }

@@ -21,5 +21,6 @@ export type PostDto = {
   embedExternal: PostEmbedExternalDto | null;
   embedRecordUri: string | null;
   replyRootUri: string | null;
+  replyParentUri: string | null;
   indexedAt: Date;
 };

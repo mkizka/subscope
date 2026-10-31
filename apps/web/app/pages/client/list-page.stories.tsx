@@ -1,14 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { ListPage } from "./list-page";
 
 const meta = {
   component: ListPage,
   args: {
+    uri: "at://did:plc:alice/app.bsky.graph.list/1",
     name: "友達",
     description: "よく話す人たち",
     tab: "posts",
     isSelf: true,
+    onDelete: fn(),
     posts: [
       {
         uri: "at://did:plc:bob/app.bsky.feed.post/1",
@@ -21,6 +24,7 @@ const meta = {
     ],
     members: [
       {
+        listItemUri: "at://did:plc:alice/app.bsky.graph.listitem/1",
         did: "did:plc:bob",
         handle: "bob.bsky.social",
         displayName: "Bob",

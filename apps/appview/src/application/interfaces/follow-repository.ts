@@ -1,5 +1,4 @@
 import type { Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
 import type { Follow } from "@repo/common/domain";
 
 export interface IFollowRepository {
@@ -14,12 +13,4 @@ export interface IFollowRepository {
     limit: number;
     cursor?: string;
   }) => Promise<Follow[]>;
-  findFollowingMap: (params: {
-    actorDid: Did;
-    targetDids: Did[];
-  }) => Promise<Map<Did, AtUri>>;
-  findFollowedByMap: (params: {
-    actorDid: Did;
-    targetDids: Did[];
-  }) => Promise<Map<Did, AtUri>>;
 }

@@ -3,10 +3,10 @@ import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyNotificationGetGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
 
 import type {
-  INotificationRepository,
-  NotificationItem,
+  NotificationDto,
   NotificationReason,
-} from "../../interfaces/notification-repository.js";
+} from "../../dto/notification-dto.js";
+import type { INotificationQuery } from "../../interfaces/notification-query.js";
 import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
 import {
   ITEMS_PER_GROUP,
@@ -29,7 +29,7 @@ export class UnsupportedFeedError extends Error {
   }
 }
 
-const groupKey = (item: NotificationItem) => {
+const groupKey = (item: NotificationDto) => {
   switch (item.reason) {
     case "like":
     case "repost":
@@ -43,7 +43,7 @@ const groupKey = (item: NotificationItem) => {
 
 export class GetGroupedNotificationsUseCase {
   constructor(
-    private readonly notificationRepository: INotificationRepository,
+    private readonly notificationQuery: INotificationQuery,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly notificationViews: NotificationViews,
@@ -59,14 +59,14 @@ export class GetGroupedNotificationsUseCase {
       throw new UnsupportedFeedError(params.feed);
     }
     const queryLimit = params.limit * ITEMS_PER_GROUP;
-    const items = await this.notificationRepository.findMany({
+    const items = await this.notificationQuery.findNotifications({
       recipientDid: params.viewerDid,
       limit: queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,
       reasons: FEED_REASONS[params.feed],
     });
 
-    const grouped = new Map<string, NotificationItem[]>();
+    const grouped = new Map<string, NotificationDto[]>();
     let consumed = 0;
     for (const item of items) {
       const key = groupKey(item);

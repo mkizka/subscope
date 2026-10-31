@@ -1,8 +1,11 @@
 import { type Did } from "@atproto/did";
 import type * as AppBskyFeedGetAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 
-import type { AuthorFeedService } from "../../../application/service/feed/author-feed-service.js";
-import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
+import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
+import type { IAuthorFeedQuery } from "../../../application/interfaces/author-feed-query.js";
+import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { FeedViews } from "../../views/feed-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type Filter = AppBskyFeedGetAuthorFeed.$Params["filter"];
 
@@ -31,8 +34,9 @@ export class GetAuthorFeedUseCase {
   ];
 
   constructor(
-    private readonly authorFeedService: AuthorFeedService,
-    private readonly feedProcessor: FeedProcessor,
+    private readonly authorFeedQuery: IAuthorFeedQuery,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly feedViews: FeedViews,
   ) {}
 
   async execute(
@@ -42,21 +46,42 @@ export class GetAuthorFeedUseCase {
       throw new UnsupportedFilterError(params.filter);
     }
 
-    const page = await this.authorFeedService.findFeedItemsWithPagination({
-      actorDid: params.actorDid,
-      cursor: params.cursor,
+    const paginator = createCursorPaginator<FeedItemDto>({
       limit: params.limit,
-      filter: params.filter,
+      getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feed = await this.feedProcessor.processFeedItems(
-      page.items,
-      params.viewerDid,
+    const feedItems = await this.findFeedItems(params.filter, {
+      actorDid: params.actorDid,
+      limit: paginator.queryLimit,
+      cursor: params.cursor,
+    });
+    const page = paginator.extractPage(feedItems);
+
+    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const feed = await Promise.all(
+      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
     );
 
     return {
-      feed,
+      feed: feed.filter((item) => item !== undefined),
       cursor: page.cursor,
     };
+  }
+
+  private findFeedItems(
+    filter: Filter,
+    params: { actorDid: Did; limit: number; cursor?: Date },
+  ): Promise<FeedItemDto[]> {
+    switch (filter) {
+      case "posts_no_replies":
+        return this.authorFeedQuery.findFeedItemsWithoutReplies(params);
+      case "posts_with_media":
+        return this.authorFeedQuery.findFeedItemsWithMedia(params);
+      case "posts_and_author_threads":
+        return this.authorFeedQuery.findFeedItemsWithAuthorThreads(params);
+      default:
+        return this.authorFeedQuery.findFeedItems(params);
+    }
   }
 }

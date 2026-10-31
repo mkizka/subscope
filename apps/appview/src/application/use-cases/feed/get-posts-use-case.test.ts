@@ -27,6 +27,7 @@ describe("GetPostsUseCase", () => {
         displayName: null,
         description: null,
         avatarCid: null,
+        bannerCid: null,
         createdAt: null,
         indexedAt: new Date(),
         status: "active",
@@ -39,6 +40,7 @@ describe("GetPostsUseCase", () => {
         embedExternal: null,
         embedRecordUri: null,
         replyRootUri: null,
+        replyParentUri: null,
         indexedAt: post.indexedAt,
       });
       recordRepo.add(record);
@@ -50,7 +52,7 @@ describe("GetPostsUseCase", () => {
     // act
     const result = await getPostsUseCase.execute(
       posts.map((post) => post.uri),
-      null,
+      {},
     );
 
     // assert

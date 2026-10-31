@@ -4,7 +4,10 @@ import {
   MessageCircleIcon,
   QuoteIcon,
   RepeatIcon,
+  Trash2Icon,
 } from "lucide-react";
+
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
 
 type Props = {
   replyCount?: number;
@@ -14,10 +17,12 @@ type Props = {
   reposted: boolean;
   likeBusy?: boolean;
   repostBusy?: boolean;
+  deleteBusy?: boolean;
   onLike: () => void;
   onRepost: () => void;
   onReply: () => void;
   onQuote: () => void;
+  onDelete?: () => void;
 };
 
 function ToggleButton(props: {
@@ -56,10 +61,12 @@ export function PostToolbar({
   reposted,
   likeBusy,
   repostBusy,
+  deleteBusy,
   onLike,
   onRepost,
   onReply,
   onQuote,
+  onDelete,
 }: Props) {
   return (
     <div className="relative -ml-2 flex gap-2">
@@ -86,6 +93,24 @@ export function PostToolbar({
         busy={likeBusy}
         onClick={onLike}
       />
+      {onDelete && (
+        <ConfirmDialog
+          title="投稿を削除"
+          description="この投稿を削除しますか？"
+          confirmLabel="削除"
+          danger
+          onConfirm={onDelete}
+        >
+          {(open) => (
+            <ToggleButton
+              label="削除"
+              Icon={Trash2Icon}
+              busy={deleteBusy}
+              onClick={() => !deleteBusy && open()}
+            />
+          )}
+        </ConfirmDialog>
+      )}
     </div>
   );
 }

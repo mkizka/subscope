@@ -7,6 +7,7 @@ import {
   LogOutIcon,
   MailIcon,
   RadarIcon,
+  SearchIcon,
   UsersIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -51,6 +52,9 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
       <ul className="menu w-full flex-1">
         <NavItem to="/" icon={<HomeIcon className="size-4" />}>
           ホーム
+        </NavItem>
+        <NavItem to="/search" icon={<SearchIcon className="size-4" />}>
+          検索
         </NavItem>
         <NavItem to="/members" icon={<UsersIcon className="size-4" />}>
           メンバー

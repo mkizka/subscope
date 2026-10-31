@@ -34,6 +34,32 @@ export class ProfileViews {
     };
   }
 
+  async detailed(
+    did: Did,
+    ctx: ViewContext,
+  ): Promise<AppBskyActorDefs.ProfileViewDetailed | undefined> {
+    const profile = await ctx.profile(did);
+    if (!profile) {
+      return undefined;
+    }
+    const [basic, stats] = await Promise.all([
+      this.toBasic(profile, ctx),
+      ctx.actorStats(did),
+    ]);
+    return {
+      ...basic,
+      $type: "app.bsky.actor.defs#profileViewDetailed",
+      description: profile.description ?? undefined,
+      banner: profile.bannerCid
+        ? this.assetUrlBuilder.getBannerUrl(profile.actorDid, profile.bannerCid)
+        : undefined,
+      followersCount: stats?.followersCount ?? 0,
+      followsCount: stats?.followsCount ?? 0,
+      postsCount: stats?.postsCount ?? 0,
+      indexedAt: toDatetimeString(profile.indexedAt),
+    };
+  }
+
   private async toBasic(
     profile: ProfileDto,
     ctx: ViewContext,

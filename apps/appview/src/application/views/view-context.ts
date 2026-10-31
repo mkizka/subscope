@@ -1,30 +1,36 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
+import type { ActorStatsDto } from "../dto/actor-stats-dto.js";
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LabelDto } from "../dto/label-dto.js";
 import type { LikeDto } from "../dto/like-dto.js";
+import type { ListDto } from "../dto/list-dto.js";
+import type { ListItemDto } from "../dto/list-item-dto.js";
 import type { PostDto } from "../dto/post-dto.js";
 import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { RepostDto } from "../dto/repost-dto.js";
+import type { IActorStatsQuery } from "../interfaces/actor-stats-query.js";
 import type { IFollowQuery } from "../interfaces/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/generator-query.js";
 import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
 import type { ILikeQuery } from "../interfaces/like-query.js";
+import type { IListItemQuery } from "../interfaces/list-item-query.js";
+import type { IListQuery } from "../interfaces/list-query.js";
 import type { IPostQuery } from "../interfaces/post-query.js";
 import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../interfaces/profile-query.js";
 import type { IRecordQuery } from "../interfaces/record-query.js";
 import type { IRepostQuery } from "../interfaces/repost-query.js";
-import { hiddenReason } from "../visibility/visibility-filter.js";
 import { Batch } from "./batch.js";
 
 export type Viewer = {
   viewerDid?: Did | null;
   includeTakedowns?: boolean;
+  labelerDids?: string[];
 };
 
 type Repositories = {
@@ -37,6 +43,9 @@ type Repositories = {
   likeQuery: ILikeQuery;
   repostQuery: IRepostQuery;
   generatorQuery: IGeneratorQuery;
+  actorStatsQuery: IActorStatsQuery;
+  listQuery: IListQuery;
+  listItemQuery: IListItemQuery;
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
@@ -51,7 +60,11 @@ export class ViewContext {
   private readonly postStats: Batch<string, PostStatsDto>;
   private readonly viewerLikes: Batch<string, LikeDto>;
   private readonly viewerReposts: Batch<string, RepostDto>;
+  private readonly reposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, GeneratorDto>;
+  private readonly actorStatsBatch: Batch<Did, ActorStatsDto>;
+  private readonly lists: Batch<string, ListDto>;
+  private readonly viewerListItems: Batch<string, ListItemDto>;
 
   constructor(
     repos: Repositories,
@@ -119,9 +132,28 @@ export class ViewContext {
         : none,
       (repost) => repost.subjectUri,
     );
+    this.reposts = Batch.one(
+      (uris) => repos.repostQuery.findByUris(toAtUris(uris)),
+      (repost) => repost.uri,
+    );
     this.generators = Batch.one(
       (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
       (generator) => generator.uri,
+    );
+    this.actorStatsBatch = Batch.one(
+      (dids) => repos.actorStatsQuery.findStats(dids),
+      (stats) => stats.actorDid,
+    );
+    this.lists = Batch.one(
+      (uris) => repos.listQuery.findByUris(toAtUris(uris)),
+      (list) => list.uri,
+    );
+    this.viewerListItems = Batch.one(
+      viewerDid
+        ? (listUris) =>
+            repos.listItemQuery.findItems({ listUris, subjectDid: viewerDid })
+        : none,
+      (item) => item.listUri,
     );
   }
 
@@ -133,14 +165,31 @@ export class ViewContext {
   }
 
   async profile(did: Did) {
-    const [profile, labels] = await Promise.all([
+    const [profile, reason] = await Promise.all([
       this.profiles.load(did),
-      this.labels.load(did),
+      this.hiddenReason(did),
     ]);
     if (!profile || this.viewer.includeTakedowns) {
       return profile;
     }
-    return hiddenReason(profile, labels) ? undefined : profile;
+    return reason ? undefined : profile;
+  }
+
+  async hiddenReason(did: Did) {
+    const [profile, labels] = await Promise.all([
+      this.profiles.load(did),
+      this.labels.load(did),
+    ]);
+    if (!profile) {
+      return undefined;
+    }
+    if (profile.status === "deactivated") {
+      return "AccountDeactivated";
+    }
+    if (profile.status !== "active" || isTakendown(labels)) {
+      return "AccountTakedown";
+    }
+    return null;
   }
 
   async post(uri: string) {
@@ -154,8 +203,12 @@ export class ViewContext {
     return (await this.profile(post.actorDid)) ? post : undefined;
   }
 
-  labelsOf(subject: string) {
-    return this.labels.load(subject);
+  async labelsOf(subject: string) {
+    const labels = await this.labels.load(subject);
+    const { labelerDids } = this.viewer;
+    return labelerDids
+      ? labels?.filter((label) => labelerDids.includes(label.src))
+      : labels;
   }
 
   record(uri: string) {
@@ -166,8 +219,16 @@ export class ViewContext {
     return this.postStats.load(uri);
   }
 
+  repost(uri: string) {
+    return this.reposts.load(uri);
+  }
+
   generator(uri: string) {
     return this.generators.load(uri);
+  }
+
+  actorStats(did: Did) {
+    return this.actorStatsBatch.load(did);
   }
 
   async viewerState(did: Did) {
@@ -185,6 +246,14 @@ export class ViewContext {
     ]);
     return { like, repost };
   }
+
+  list(uri: string) {
+    return this.lists.load(uri);
+  }
+
+  viewerListItem(listUri: string) {
+    return this.viewerListItems.load(listUri);
+  }
 }
 
 export class ViewContextFactory {
@@ -200,6 +269,9 @@ export class ViewContextFactory {
     likeQuery: ILikeQuery,
     repostQuery: IRepostQuery,
     generatorQuery: IGeneratorQuery,
+    actorStatsQuery: IActorStatsQuery,
+    listQuery: IListQuery,
+    listItemQuery: IListItemQuery,
   ) {
     this.repos = {
       profileQuery,
@@ -211,6 +283,9 @@ export class ViewContextFactory {
       likeQuery,
       repostQuery,
       generatorQuery,
+      actorStatsQuery,
+      listQuery,
+      listItemQuery,
     };
   }
 

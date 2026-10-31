@@ -11,12 +11,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("GetRepostedByUseCase", () => {
   let getRepostedByUseCase: TestServices["getRepostedByUseCase"];
   let repostRepo: TestServices["repostRepository"];
-  let profileRepo: TestServices["profileRepository"];
+  let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getRepostedByUseCase = services.getRepostedByUseCase;
     repostRepo = services.repostRepository;
-    profileRepo = services.profileRepository;
+    profileQuery = services.profileQuery;
   });
 
   test("リポストがない場合、空のrepostedByを返す", async () => {
@@ -51,7 +51,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: repostActor.did,
       displayName: "Reposter",
     });
-    profileRepo.add(profile);
+    profileQuery.add(profile);
 
     const repost = repostFactory({
       actorDid: repostActor.did,
@@ -91,7 +91,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: firstReposter.did,
       displayName: "First Reposter",
     });
-    profileRepo.add(firstProfile);
+    profileQuery.add(firstProfile);
 
     const firstRepost = repostFactory({
       actorDid: firstReposter.did,
@@ -106,7 +106,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: secondReposter.did,
       displayName: "Second Reposter",
     });
-    profileRepo.add(secondProfile);
+    profileQuery.add(secondProfile);
 
     const secondRepost = repostFactory({
       actorDid: secondReposter.did,
@@ -152,7 +152,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: firstReposter.did,
       displayName: "First Reposter",
     });
-    profileRepo.add(firstProfile);
+    profileQuery.add(firstProfile);
 
     const firstRepost = repostFactory({
       actorDid: firstReposter.did,
@@ -167,7 +167,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: secondReposter.did,
       displayName: "Second Reposter",
     });
-    profileRepo.add(secondProfile);
+    profileQuery.add(secondProfile);
 
     const secondRepost = repostFactory({
       actorDid: secondReposter.did,
@@ -209,7 +209,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: firstReposter.did,
       displayName: "First Reposter",
     });
-    profileRepo.add(firstProfile);
+    profileQuery.add(firstProfile);
 
     const firstRepost = repostFactory({
       actorDid: firstReposter.did,
@@ -224,7 +224,7 @@ describe("GetRepostedByUseCase", () => {
       actorDid: secondReposter.did,
       displayName: "Second Reposter",
     });
-    profileRepo.add(secondProfile);
+    profileQuery.add(secondProfile);
 
     const secondRepost = repostFactory({
       actorDid: secondReposter.did,

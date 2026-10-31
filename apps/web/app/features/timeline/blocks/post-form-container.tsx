@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
@@ -36,6 +36,7 @@ export type ComposeTarget = {
   cid: string;
   handle: string;
   root?: { uri: string; cid: string };
+  onPosted?: () => void;
 };
 
 type Props = {
@@ -53,6 +54,7 @@ export function PostFormContainer({ target, onClearTarget }: Props) {
   if (uri && uri !== posted?.uri) {
     setPosted({ uri, target });
   }
+  useEffect(() => posted?.target?.onPosted?.(), [posted]);
   const current = posted?.target === target ? undefined : target;
   return (
     <PostForm

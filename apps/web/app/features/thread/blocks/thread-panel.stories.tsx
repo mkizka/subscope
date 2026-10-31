@@ -4,6 +4,7 @@ import { ThreadPanel } from "./thread-panel";
 
 const post = (uri: string, text: string) => ({
   uri,
+  cid: "bafyexample",
   authorDisplayName: "Alice",
   authorHandle: "alice.bsky.social",
   text,
@@ -21,9 +22,12 @@ const meta = {
         repostCount: 1,
         likeCount: 8,
       },
-      replies: [post("at://a/3", "返信です")],
+      replies: [
+        [post("at://a/3", "返信です"), post("at://a/4", "返信への返信です")],
+      ],
     },
     closeSearch: "",
+    onCompose: () => {},
   },
 } satisfies Meta<typeof ThreadPanel>;
 

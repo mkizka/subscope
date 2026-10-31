@@ -36,6 +36,12 @@ packagesディレクトリ(共通パッケージ)
 - `@repo/test-utils` - テスト用データ生成ファクトリを含むユーティリティ
 - `@repo/eslint-config` - 全パッケージ共通のESLint設定
 
+e2eディレクトリ
+
+- `@repo/e2e`
+  - PDS・ingester・worker・appview・webを全て起動し、Webクライアントを操作してシステム全体を検証するPlaywrightのE2Eテスト
+  - `tests/{仕様書名}/` にテスト、`helpers/` にPDS操作やログインなどの共通処理を置く
+
 ### 実装パターン(サーバー)
 
 各アプリはオニオンアーキテクチャパターンを参考に以下のような構成で実装しています。
