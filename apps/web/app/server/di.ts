@@ -21,6 +21,7 @@ import { countUnreadNotificationsUseCaseFactory } from "./application/notificati
 import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
+import { deletePostUseCaseFactory } from "./application/post/delete-post-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
@@ -103,6 +104,11 @@ export const di = await createRegistry()
     "createPostUseCase",
     ["postCommand", "postQuery"],
     createPostUseCaseFactory,
+  )
+  .service(
+    "deletePostUseCase",
+    ["postCommand", "postQuery"],
+    deletePostUseCaseFactory,
   )
   .service("adminQuery", ["oauthClient"], adminQueryFactory)
   .service("adminCommand", ["oauthClient"], adminCommandFactory)

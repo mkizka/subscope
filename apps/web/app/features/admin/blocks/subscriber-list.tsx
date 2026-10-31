@@ -1,8 +1,8 @@
 import { BanIcon, EllipsisIcon, ShieldIcon, UndoIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
 import { formatDate } from "@/app/lib/format-date";
 
 export type BannedActor = {

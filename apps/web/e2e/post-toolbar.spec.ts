@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { login } from "./login";
-import { createRecord } from "./pds";
+import { createRecord, follow } from "./pds";
 
 const PDS_URL = "http://localhost:2583";
 
@@ -165,4 +165,63 @@ test("post-toolbar-5: いいね・リポストのボタンは、押した結果�
       await res.json();
     expect(records.filter((r) => r.value.subject.uri === uri)).toHaveLength(1);
   }
+});
+
+test("post-toolbar-6: 削除ボタンは自分の投稿にだけ表示する", async ({
+  page,
+}) => {
+  await follow("alice.test", "bob.test");
+  const createdAt = new Date().toISOString();
+  await createRecord("alice.test", "app.bsky.feed.post", {
+    text: "post-toolbar-6: 自分の投稿",
+    createdAt,
+  });
+  await createRecord("bob.test", "app.bsky.feed.post", {
+    text: "post-toolbar-6: 他人の投稿",
+    createdAt,
+  });
+
+  await login(page);
+  const mine = page
+    .getByRole("article")
+    .filter({ hasText: "post-toolbar-6: 自分の投稿" });
+  const others = page
+    .getByRole("article")
+    .filter({ hasText: "post-toolbar-6: 他人の投稿" });
+  await expect(async () => {
+    await page.reload();
+    await expect(mine).toBeVisible({ timeout: 1000 });
+    await expect(others).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await expect(mine.getByRole("button", { name: "削除" })).toBeVisible();
+  await expect(others.getByRole("button", { name: "削除" })).toHaveCount(0);
+});
+
+test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除すると再読み込みなしでタイムラインから投稿を消す", async ({
+  page,
+  request,
+}) => {
+  const text = "post-toolbar-7: 投稿";
+  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  await login(page);
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await post.getByRole("button", { name: "削除" }).click();
+  await page
+    .getByRole("dialog", { name: "投稿を削除" })
+    .getByRole("button", { name: "削除" })
+    .click();
+
+  await expect(post).toHaveCount(0);
+  const res = await request.get(
+    `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=alice.test&collection=app.bsky.feed.post`,
+  );
+  expect(await res.text()).not.toContain(uri);
 });

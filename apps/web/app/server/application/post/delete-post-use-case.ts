@@ -1,0 +1,24 @@
+import { setTimeout } from "node:timers/promises";
+
+import type { IPostCommand } from "@/app/server/infrastructure/post/post-command";
+import type { IPostQuery } from "@/app/server/infrastructure/post/post-query";
+
+export interface IDeletePostUseCase {
+  execute: (did: string, uri: string) => Promise<void>;
+}
+
+export const deletePostUseCaseFactory = ({
+  postCommand,
+  postQuery,
+}: {
+  postCommand: IPostCommand;
+  postQuery: IPostQuery;
+}): IDeletePostUseCase => ({
+  async execute(did, uri) {
+    await postCommand.delete(did, uri);
+    for (let i = 0; i < 20; i++) {
+      if (!(await postQuery.exists(did, uri))) break;
+      await setTimeout(250);
+    }
+  },
+});
