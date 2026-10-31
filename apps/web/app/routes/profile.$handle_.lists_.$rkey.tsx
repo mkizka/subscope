@@ -66,6 +66,7 @@ export default function List({ loaderData }: Route.ComponentProps) {
   const submit = useSubmit();
   return (
     <ListPage
+      uri={list.uri}
       name={list.name}
       description={list.description}
       {...rest}

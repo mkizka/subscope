@@ -5,12 +5,22 @@ import { didContext } from "@/app/context/did";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ProfilePage } from "@/app/pages/client/profile-page";
 import { di } from "@/app/server/di";
+import type { ProfileTab } from "@/app/server/infrastructure/actor/actor-query";
 
 import type { Route } from "./+types/profile.$handle";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
-export const loader = async ({ params, context }: Route.LoaderArgs) => {
+const toTab = (value: string | null): ProfileTab =>
+  value === "replies" || value === "media" || value === "likes"
+    ? value
+    : "posts";
+
+export const loader = async ({
+  params,
+  request,
+  context,
+}: Route.LoaderArgs) => {
   if (!isAtIdentifierString(params.handle)) {
     throw data("ユーザーが見つかりません", { status: 404 });
   }
@@ -18,6 +28,7 @@ export const loader = async ({ params, context }: Route.LoaderArgs) => {
     await di.getProfilePageUseCase.execute(
       context.get(didContext),
       params.handle,
+      toTab(new URL(request.url).searchParams.get("tab")),
     ),
   );
 };
@@ -27,7 +38,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export default function Profile({ loaderData }: Route.ComponentProps) {
-  const { profile, isSelf, posts } = loaderData;
+  const { profile, isSelf, posts, tab } = loaderData;
   return (
     <ProfilePage
       displayName={profile.displayName}
@@ -42,6 +53,12 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
           ? undefined
           : { did: profile.did, viewerFollowing: profile.viewer?.following }
       }
+      tabs={
+        isSelf
+          ? ["posts", "replies", "media", "likes"]
+          : ["posts", "replies", "media"]
+      }
+      tab={tab}
       posts={posts}
     />
   );

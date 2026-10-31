@@ -7,6 +7,7 @@ export type ProfileDto = {
   displayName: string | null;
   description: string | null;
   avatarCid: string | null;
+  bannerCid: string | null;
   createdAt: Date | null;
   indexedAt: Date;
   status: "active" | "deactivated" | "deleted" | "suspended" | "takendown";

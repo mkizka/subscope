@@ -13,10 +13,12 @@ import { getSubscribersUseCaseFactory } from "./application/admin/get-subscriber
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
+import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
 import { deleteListUseCaseFactory } from "./application/list/delete-list-use-case";
 import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
 import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
+import { removeListMemberUseCaseFactory } from "./application/list/remove-list-member-use-case";
 import { updateListUseCaseFactory } from "./application/list/update-list-use-case";
 import { getLoginStepUseCaseFactory } from "./application/login/get-login-step-use-case";
 import { oauthCallbackUseCaseFactory } from "./application/login/oauth-callback-use-case";
@@ -28,6 +30,7 @@ import { getNotificationsUseCaseFactory } from "./application/notification/get-n
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
+import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorQueryFactory } from "./infrastructure/actor/actor-query";
@@ -155,6 +158,11 @@ export const di = await createRegistry()
     ["actorQuery"],
     getProfilePageUseCaseFactory,
   )
+  .service(
+    "searchUseCase",
+    ["actorQuery", "timelineQuery"],
+    searchUseCaseFactory,
+  )
   .service("followCommand", ["oauthClient"], followCommandFactory)
   .service("reactionCommand", ["oauthClient"], reactionCommandFactory)
   .service("toggleFollowUseCase", ["followCommand"], toggleFollowUseCaseFactory)
@@ -176,4 +184,14 @@ export const di = await createRegistry()
   .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
   .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
   .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
+  .service(
+    "addListMemberUseCase",
+    ["actorQuery", "listCommand"],
+    addListMemberUseCaseFactory,
+  )
+  .service(
+    "removeListMemberUseCase",
+    ["listCommand"],
+    removeListMemberUseCaseFactory,
+  )
   .resolve();

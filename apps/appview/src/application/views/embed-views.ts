@@ -1,9 +1,15 @@
 import type { $Typed } from "@atproto/lex";
-import { AtUri, toDatetimeString, type UriString } from "@atproto/syntax";
+import {
+  asAtUriString,
+  AtUri,
+  toDatetimeString,
+  type UriString,
+} from "@atproto/syntax";
 import type * as AppBskyEmbedExternal from "@repo/client/lex/app/bsky/embed/external";
 import type * as AppBskyEmbedImages from "@repo/client/lex/app/bsky/embed/images";
 import type * as AppBskyEmbedRecord from "@repo/client/lex/app/bsky/embed/record";
 import type * as AppBskyEmbedRecordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
+import { Record } from "@repo/common/domain";
 
 import type {
   PostDto,
@@ -11,8 +17,10 @@ import type {
   PostEmbedImageDto,
 } from "../dto/post-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
+import { gateUri } from "../utils/gate-uri.js";
 import { asLexMap } from "../utils/lex.js";
 import type { GeneratorViews } from "./generator-views.js";
+import { toLabelViews } from "./label-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
 
@@ -32,6 +40,7 @@ export class EmbedViews {
     }
     const record = await this.recordView(
       new AtUri(post.embedRecordUri),
+      post.uri,
       ctx,
       depth,
     );
@@ -57,12 +66,13 @@ export class EmbedViews {
 
   private async recordView(
     uri: AtUri,
+    parentUri: string,
     ctx: ViewContext,
     depth: number,
   ): Promise<$Typed<AppBskyEmbedRecord.View>> {
     return {
       $type: "app.bsky.embed.record#view",
-      record: (await this.embeddedRecord(uri, ctx, depth)) ?? {
+      record: (await this.embeddedRecord(uri, parentUri, ctx, depth)) ?? {
         $type: "app.bsky.embed.record#viewNotFound",
         uri: uri.toString(),
         notFound: true,
@@ -70,12 +80,33 @@ export class EmbedViews {
     };
   }
 
-  private async embeddedRecord(uri: AtUri, ctx: ViewContext, depth: number) {
+  private async embeddedRecord(
+    uri: AtUri,
+    parentUri: string,
+    ctx: ViewContext,
+    depth: number,
+  ) {
     if (uri.collection === "app.bsky.feed.generator") {
       return await this.generatorViews.generatorView(uri.toString(), ctx);
     }
     if (uri.collection === "app.bsky.feed.post" && depth < MAX_RECORD_DEPTH) {
-      return await this.viewRecord(uri.toString(), ctx, depth + 1);
+      const [postgate, view] = await Promise.all([
+        ctx.record(gateUri(uri.toString(), "app.bsky.feed.postgate")),
+        this.viewRecord(uri.toString(), ctx, depth + 1),
+      ]);
+      const detached =
+        postgate &&
+        Record.create(postgate)
+          .validate("app.bsky.feed.postgate")
+          .detachedEmbeddingUris?.includes(asAtUriString(parentUri));
+      if (detached) {
+        return {
+          $type: "app.bsky.embed.record#viewDetached" as const,
+          uri: uri.toString(),
+          detached: true as const,
+        } satisfies $Typed<AppBskyEmbedRecord.ViewDetached>;
+      }
+      return view;
     }
     return undefined;
   }
@@ -89,11 +120,12 @@ export class EmbedViews {
     if (!post) {
       return undefined;
     }
-    const [record, author, stats, embed] = await Promise.all([
+    const [record, author, stats, embed, labels] = await Promise.all([
       ctx.record(uri),
       this.profileViews.basic(post.actorDid, ctx),
       ctx.stats(uri),
       this.embedView(post, ctx, depth),
+      ctx.labelsOf(uri),
     ]);
     if (!record || !author) {
       return undefined;
@@ -109,6 +141,7 @@ export class EmbedViews {
       likeCount: stats?.likeCount ?? 0,
       quoteCount: stats?.quoteCount ?? 0,
       embeds: embed ? [embed] : [],
+      labels: toLabelViews(labels),
       indexedAt: toDatetimeString(post.indexedAt),
     };
   }

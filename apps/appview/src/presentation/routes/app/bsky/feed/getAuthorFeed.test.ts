@@ -174,21 +174,23 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     );
   });
 
-  test("getAuthorFeed-6: filterがposts_with_videoのとき、空のfeedを返す", async () => {
+  test("getAuthorFeed-6: filterがposts_with_videoのとき、501とMethodNotImplementedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    await actorFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
-    await createPost(author);
 
     // act
-    const res = await client.call(getAuthorFeed, {
+    const promise = client.call(getAuthorFeed, {
       actor: "alice.test",
       filter: "posts_with_video",
     });
 
     // assert
-    expect(res.feed).toEqual([]);
+    await expect(promise).rejects.toMatchObject({
+      status: 501,
+      error: "MethodNotImplemented",
+    });
   });
 });

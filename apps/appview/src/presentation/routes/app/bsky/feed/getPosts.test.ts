@@ -4,6 +4,9 @@ import {
   actorFactory,
   followFactory,
   likeFactory,
+  listFactory,
+  listItemFactory,
+  postEmbedRecordFactory,
   postFactory,
   recordFactory,
   repostFactory,
@@ -57,6 +60,28 @@ describe("app.bsky.feed.getPosts", () => {
           post: post.uri,
           createdAt: new Date().toISOString(),
           allow,
+        }),
+      })
+      .create();
+
+  const createPostgate = (
+    post: { uri: string; actorDid: string },
+    json: object,
+  ) =>
+    recordFactory(ctx.db, "app.bsky.feed.postgate")
+      .vars({ actorDid: () => post.actorDid })
+      .props({
+        uri: () =>
+          AtUri.make(
+            post.actorDid,
+            "app.bsky.feed.postgate",
+            new AtUri(post.uri).rkey,
+          ).toString(),
+        json: () => ({
+          $type: "app.bsky.feed.postgate",
+          post: post.uri,
+          createdAt: new Date().toISOString(),
+          ...json,
         }),
       })
       .create();
@@ -183,10 +208,12 @@ describe("app.bsky.feed.getPosts", () => {
     const viewer = await actorFactory(ctx.db).create();
     const root = await createPost();
     const reply = await createReply(root);
+    const list = await listFactory(ctx.db).create();
     await createGate(root, [
       { $type: "app.bsky.feed.threadgate#mentionRule" },
       { $type: "app.bsky.feed.threadgate#followingRule" },
       { $type: "app.bsky.feed.threadgate#followerRule" },
+      { $type: "app.bsky.feed.threadgate#listRule", list: list.uri },
     ]);
     loginAs(viewer.did);
 
@@ -254,5 +281,92 @@ describe("app.bsky.feed.getPosts", () => {
 
     // assert
     expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
+  });
+
+  test("threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const root = await createPost();
+    const [other, list] = await Promise.all([
+      listFactory(ctx.db).create(),
+      listFactory(ctx.db).create(),
+    ]);
+    await listItemFactory(ctx.db)
+      .vars({ list: () => list, subject: () => viewer })
+      .create();
+    await createGate(root, [
+      { $type: "app.bsky.feed.threadgate#listRule", list: other.uri },
+      { $type: "app.bsky.feed.threadgate#listRule", list: list.uri },
+    ]);
+    loginAs(viewer.did);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(root.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
+  });
+
+  test("postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const viewer = await actorFactory(ctx.db).create();
+    const post = await createPost();
+    await createPostgate(post, {
+      embeddingRules: [{ $type: "app.bsky.feed.postgate#disableRule" }],
+    });
+
+    // act
+    const results = [];
+    for (const did of [viewer.did, post.actorDid]) {
+      loginAs(did);
+      const res = await client.call(getPosts, {
+        uris: [asAtUriString(post.uri)],
+      });
+      results.push(res.posts[0]?.viewer?.embeddingDisabled);
+    }
+
+    // assert
+    expect(results).toEqual([true, false]);
+  });
+
+  test("postgate-2: 引用された投稿のpostgateのdetachedEmbeddingUrisに引用した投稿が含まれる場合、引用をviewDetachedにする", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const quoted = await createPost();
+    const [detached, attached] = await Promise.all([
+      createPost(),
+      createPost(),
+    ]);
+    for (const post of [detached, attached]) {
+      await postEmbedRecordFactory(ctx.db)
+        .vars({ post: () => post, embeddedPost: () => quoted })
+        .create();
+    }
+    await createPostgate(quoted, { detachedEmbeddingUris: [detached.uri] });
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(detached.uri), asAtUriString(attached.uri)],
+    });
+
+    // assert
+    expect(res.posts.map((post) => post.embed)).toMatchObject([
+      {
+        $type: "app.bsky.embed.record#view",
+        record: {
+          $type: "app.bsky.embed.record#viewDetached",
+          uri: quoted.uri,
+          detached: true,
+        },
+      },
+      {
+        $type: "app.bsky.embed.record#view",
+        record: { $type: "app.bsky.embed.record#viewRecord", uri: quoted.uri },
+      },
+    ]);
   });
 });

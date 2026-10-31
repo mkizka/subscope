@@ -38,27 +38,6 @@ export class ProfileViewBuilder {
     };
   }
 
-  profileViewDetailed(
-    profile: ProfileDetailed,
-    viewerState: AppBskyActorDefs.ViewerState,
-    stats?: {
-      followsCount: number;
-      followersCount: number;
-      postsCount: number;
-    },
-  ): AppBskyActorDefs.ProfileViewDetailed {
-    return {
-      ...this.profileViewBasic(profile, viewerState),
-      $type: "app.bsky.actor.defs#profileViewDetailed",
-      banner: this.getBannerUrl(profile),
-      description: profile.description ?? undefined,
-      followersCount: stats?.followersCount,
-      followsCount: stats?.followsCount,
-      postsCount: stats?.postsCount,
-      indexedAt: toDatetimeString(profile.indexedAt),
-    };
-  }
-
   emptyViewerState(): AppBskyActorDefs.ViewerState {
     return {
       $type: "app.bsky.actor.defs#viewerState",
@@ -87,16 +66,6 @@ export class ProfileViewBuilder {
     return this.assetUrlBuilder.getAvatarThumbnailUrl(
       profile.actorDid,
       profile.avatarCid,
-    );
-  }
-
-  private getBannerUrl(profile: ProfileDetailed) {
-    if (!profile.bannerCid) {
-      return undefined;
-    }
-    return this.assetUrlBuilder.getBannerUrl(
-      profile.actorDid,
-      profile.bannerCid,
     );
   }
 }

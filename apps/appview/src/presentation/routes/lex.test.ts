@@ -219,7 +219,7 @@ describe("lexRouter", () => {
     expect(await res.json()).toMatchObject({ error: "InvalidRequest" });
   });
 
-  test("未実装のNSIDは501エラーを返す", async () => {
+  test("notImplemented-1: 実装していないXRPCには501とMethodNotImplementedを返す", async () => {
     const res = await fetch(`${baseUrl}/app.bsky.feed.getFeed`);
 
     expect(res.status).toBe(501);

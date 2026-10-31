@@ -4,6 +4,8 @@ import type {
   ProfileViewDetailed,
 } from "@repo/client/lex/app/bsky/actor/defs";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
+import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
+import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
 import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
@@ -15,7 +17,15 @@ import {
   toTimelinePost,
 } from "@/app/server/infrastructure/timeline/timeline-query";
 
-type ActorDto = {
+export type ProfileTab = "posts" | "replies" | "media" | "likes";
+
+const filters = {
+  posts: "posts_no_replies",
+  replies: "posts_with_replies",
+  media: "posts_with_media",
+} as const;
+
+export type ActorDto = {
   did: string;
   handle: string;
   displayName?: string;
@@ -44,6 +54,7 @@ export interface IActorQuery {
   findPosts: (
     did: string,
     actor: AtIdentifierString,
+    tab: ProfileTab,
   ) => Promise<TimelinePostDto[]>;
   findFollowList: (
     did: string,
@@ -51,6 +62,7 @@ export interface IActorQuery {
     kind: "follows" | "followers",
   ) => Promise<FollowListDto>;
   isAdmin: (did: string) => Promise<boolean>;
+  searchActors: (did: string, q: string) => Promise<ActorDto[]>;
 }
 
 export const actorQueryFactory = ({
@@ -68,10 +80,17 @@ export const actorQueryFactory = ({
       const agent = await restore(did);
       return agent.call(getProfile, { actor });
     },
-    async findPosts(did, actor) {
+    async findPosts(did, actor, tab) {
       const agent = await restore(did);
       // ponytail: 最初の20件のみ。古い投稿の読み込みはapi.timelineと同様のAPIルートを足すとき
-      const { feed } = await agent.call(getAuthorFeed, { actor, limit: 20 });
+      const { feed } =
+        tab === "likes"
+          ? await agent.call(getActorLikes, { actor, limit: 20 })
+          : await agent.call(getAuthorFeed, {
+              actor,
+              limit: 20,
+              filter: filters[tab],
+            });
       return feed.map(toTimelinePost);
     },
     async findFollowList(did, actor, kind) {
@@ -89,6 +108,12 @@ export const actorQueryFactory = ({
       const agent = await restore(did);
       const { status } = await agent.call(verifyAccess);
       return status === "authorized";
+    },
+    async searchActors(did, q) {
+      const agent = await restore(did);
+      // ponytail: 最初の25件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
+      const { actors } = await agent.call(searchActors, { q });
+      return actors.map(toActor);
     },
   };
 };

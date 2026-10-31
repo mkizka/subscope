@@ -1,14 +1,14 @@
 import type { Did } from "@atproto/did";
 import type * as AppBskyFeedGetListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
-import type { FeedItem } from "@repo/common/domain";
 
-import type { ITimelineRepository } from "../../../application/interfaces/timeline-repository.js";
+import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
+import type { ITimelineQuery } from "../../../application/interfaces/timeline-query.js";
 import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 
 export class GetListFeedUseCase {
   constructor(
-    private readonly timelineRepository: ITimelineRepository,
+    private readonly timelineQuery: ITimelineQuery,
     private readonly feedProcessor: FeedProcessor,
   ) {}
 
@@ -18,12 +18,12 @@ export class GetListFeedUseCase {
     cursor?: string;
     viewerDid?: Did;
   }): Promise<AppBskyFeedGetListFeed.$OutputBody> {
-    const paginator = createCursorPaginator<FeedItem>({
+    const paginator = createCursorPaginator<FeedItemDto>({
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feedItems = await this.timelineRepository.findListFeedItems({
+    const feedItems = await this.timelineQuery.findListFeedItems({
       listUri: params.listUri,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,

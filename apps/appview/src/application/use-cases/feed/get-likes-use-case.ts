@@ -1,14 +1,15 @@
 import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedGetLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { LikeService } from "../../../application/service/graph/like-service.js";
-import { toMapByDid } from "../../../application/utils/map.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetLikesUseCase {
   constructor(
     private readonly likeService: LikeService,
-    private readonly profileViewService: ProfileViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(
@@ -22,31 +23,28 @@ export class GetLikesUseCase {
       limit: params.limit,
     });
 
-    const actorDids = paginationResult.items.map((like) => like.actorDid);
-    const profileViewMap = await this.profileViewService
-      .findProfileView(actorDids)
-      .then(toMapByDid);
-
-    const likes: AppBskyFeedGetLikes.Like[] = paginationResult.items.map(
-      (like) => {
-        const profileView = profileViewMap.get(like.actorDid);
-        if (!profileView) {
-          throw new Error(`Profile not found for actor: ${like.actorDid}`);
-        }
-        return {
-          $type: "app.bsky.feed.getLikes#like",
-          indexedAt: toDatetimeString(like.sortAt), // TODO: indexedAtに修正
-          createdAt: toDatetimeString(like.createdAt),
-          actor: profileView,
-        };
-      },
+    const ctx = this.viewContextFactory.create();
+    const likes = await Promise.all(
+      paginationResult.items.map(
+        async (like): Promise<AppBskyFeedGetLikes.Like | undefined> => {
+          const actor = await this.profileViews.view(like.actorDid, ctx);
+          return (
+            actor && {
+              $type: "app.bsky.feed.getLikes#like",
+              indexedAt: toDatetimeString(like.sortAt), // TODO: indexedAtに修正
+              createdAt: toDatetimeString(like.createdAt),
+              actor,
+            }
+          );
+        },
+      ),
     );
 
     return {
       uri: params.uri,
       cid: params.cid,
       cursor: paginationResult.cursor,
-      likes,
+      likes: likes.filter((like) => like !== undefined),
     };
   }
 }
