@@ -22,6 +22,7 @@ import type { IActorRepository } from "../application/interfaces/actor-repositor
 import type { IActorStatsRepository } from "../application/interfaces/actor-stats-repository.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
 import type { IAuthorFeedRepository } from "../application/interfaces/author-feed-repository.js";
+import type { IFollowQuery } from "../application/interfaces/follow-query.js";
 import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IGeneratorRepository } from "../application/interfaces/generator-repository.js";
@@ -90,6 +91,7 @@ import { GetFollowersUseCase } from "../application/use-cases/graph/get-follower
 import { GetFollowsUseCase } from "../application/use-cases/graph/get-follows-use-case.js";
 import { GetListUseCase } from "../application/use-cases/graph/get-list-use-case.js";
 import { GetListsUseCase } from "../application/use-cases/graph/get-lists-use-case.js";
+import { GetGroupedNotificationsUseCase } from "../application/use-cases/notification/get-grouped-notifications-use-case.js";
 import { GetUnreadCountUseCase } from "../application/use-cases/notification/get-unread-count-use-case.js";
 import { ListNotificationsUseCase } from "../application/use-cases/notification/list-notifications-use-case.js";
 import { UpdateSeenUseCase } from "../application/use-cases/notification/update-seen-use-case.js";
@@ -109,6 +111,7 @@ import { ActorRepository } from "../infrastructure/actor-repository/actor-reposi
 import { ActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
 import { AuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.js";
+import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
 import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { GeneratorRepository } from "../infrastructure/generator-repository/generator-repository.js";
@@ -151,6 +154,7 @@ import { GetFollowers } from "../presentation/routes/app/bsky/graph/getFollowers
 import { GetFollows } from "../presentation/routes/app/bsky/graph/getFollows.js";
 import { GetList } from "../presentation/routes/app/bsky/graph/getList.js";
 import { GetLists } from "../presentation/routes/app/bsky/graph/getLists.js";
+import { GetGroupedNotifications } from "../presentation/routes/app/bsky/notification/getGroupedNotifications.js";
 import { GetUnreadCount } from "../presentation/routes/app/bsky/notification/getUnreadCount.js";
 import { ListNotifications } from "../presentation/routes/app/bsky/notification/listNotifications.js";
 import { UpdateSeen } from "../presentation/routes/app/bsky/notification/updateSeen.js";
@@ -216,6 +220,7 @@ export const createAppRegistry = (env: Env) =>
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
+    .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("generatorRepository", ["db"], asClassArgs<IGeneratorRepository>()(GeneratorRepository))
     .service("listRepository", ["db"], asClassArgs<IListRepository>()(ListRepository))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
@@ -247,7 +252,7 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileRepository", "labelRepository", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
@@ -302,6 +307,8 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostThreadV2", ["getPostThreadV2UseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThreadV2))
     .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase"], asClassArgs(GetTimeline))
     .service("listNotifications", ["authVerifierMiddleware", "listNotificationsUseCase"], asClassArgs(ListNotifications))
+    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "profileViews", "postViews", "generatorViews"], asClassArgs(GetGroupedNotificationsUseCase))
+    .service("getGroupedNotifications", ["authVerifierMiddleware", "getGroupedNotificationsUseCase"], asClassArgs(GetGroupedNotifications))
     .service("getUnreadCountUseCase", ["notificationRepository"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
     .service("searchPosts", ["searchPostsUseCase"], asClassArgs(SearchPosts))
@@ -333,7 +340,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unbanActor", ["unbanActorUseCase", "adminMiddleware"], asClassArgs(UnbanActor))
     .service("banSubscriber", ["banSubscriberUseCase", "adminMiddleware"], asClassArgs(BanSubscriber))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getBannedActors", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getBannedActors", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
