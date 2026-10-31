@@ -3,6 +3,7 @@ import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
   actorFactory,
   labelFactory,
+  postEmbedRecordFactory,
   postFactory,
   recordFactory,
   testSetup,
@@ -77,5 +78,35 @@ describe("ラベル", () => {
         cts: label.cts.toISOString(),
       },
     ]);
+  });
+
+  test("labels-6: 引用された投稿のビューの labels に、その投稿に付いたラベルを含める", async () => {
+    // arrange
+    const { actor, post: quoted } = await createPost();
+    const { post } = await createPost();
+    await postEmbedRecordFactory(ctx.db)
+      .vars({ post: () => post, embeddedPost: () => quoted })
+      .create();
+    const label = await labelFactory(ctx.db)
+      .vars({ actor: () => actor })
+      .props({ uri: () => quoted.uri, val: () => "porn" })
+      .create();
+
+    // act
+    const res = await fetchPost(post.uri);
+
+    // assert
+    expect(res?.embed).toMatchObject({
+      record: {
+        labels: [
+          {
+            src: label.src,
+            uri: quoted.uri,
+            val: "porn",
+            cts: label.cts.toISOString(),
+          },
+        ],
+      },
+    });
   });
 });

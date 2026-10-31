@@ -1,11 +1,13 @@
 import { asDid, type Did } from "@atproto/did";
-import { type DatabaseClient, FeedItem } from "@repo/common/domain";
+import { asAtUriString } from "@atproto/syntax";
+import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, exists, lt, sql } from "drizzle-orm";
 
-import type { ITimelineRepository } from "../../application/interfaces/timeline-repository.js";
+import type { FeedItemDto } from "../../application/dto/feed-item-dto.js";
+import type { ITimelineQuery } from "../../application/interfaces/timeline-query.js";
 
-export class TimelineRepository implements ITimelineRepository {
+export class TimelineQuery implements ITimelineQuery {
   constructor(private readonly db: DatabaseClient) {}
 
   async findFeedItems({
@@ -16,7 +18,7 @@ export class TimelineRepository implements ITimelineRepository {
     viewerDid: Did;
     cursor?: Date;
     limit: number;
-  }): Promise<FeedItem[]> {
+  }): Promise<FeedItemDto[]> {
     const filters = [];
     if (cursor) {
       filters.push(lt(schema.feedItems.sortAt, cursor));
@@ -25,7 +27,6 @@ export class TimelineRepository implements ITimelineRepository {
     const feedItems = await this.db
       .select({
         uri: schema.feedItems.uri,
-        cid: schema.feedItems.cid,
         sortAt: schema.feedItems.sortAt,
         type: schema.feedItems.type,
         actorDid: schema.feedItems.actorDid,
@@ -52,7 +53,6 @@ export class TimelineRepository implements ITimelineRepository {
         this.db
           .select({
             uri: schema.feedItems.uri,
-            cid: schema.feedItems.cid,
             sortAt: schema.feedItems.sortAt,
             type: schema.feedItems.type,
             actorDid: schema.feedItems.actorDid,
@@ -64,17 +64,7 @@ export class TimelineRepository implements ITimelineRepository {
       .orderBy(desc(sql`"sort_at"`))
       .limit(limit);
 
-    return feedItems.map(
-      (item) =>
-        new FeedItem({
-          uri: item.uri,
-          cid: item.cid,
-          type: item.type,
-          subjectUri: item.subjectUri,
-          actorDid: asDid(item.actorDid),
-          sortAt: item.sortAt,
-        }),
-    );
+    return feedItems.map(toFeedItemDto);
   }
 
   async findListFeedItems({
@@ -85,7 +75,7 @@ export class TimelineRepository implements ITimelineRepository {
     listUri: string;
     cursor?: Date;
     limit: number;
-  }): Promise<FeedItem[]> {
+  }): Promise<FeedItemDto[]> {
     const filters = [];
     if (cursor) {
       filters.push(lt(schema.feedItems.sortAt, cursor));
@@ -113,16 +103,20 @@ export class TimelineRepository implements ITimelineRepository {
       .orderBy(desc(schema.feedItems.sortAt))
       .limit(limit);
 
-    return feedItems.map(
-      (item) =>
-        new FeedItem({
-          uri: item.uri,
-          cid: item.cid,
-          type: item.type,
-          subjectUri: item.subjectUri,
-          actorDid: asDid(item.actorDid),
-          sortAt: item.sortAt,
-        }),
-    );
+    return feedItems.map(toFeedItemDto);
   }
 }
+
+const toFeedItemDto = (item: {
+  uri: string;
+  type: FeedItemDto["type"];
+  subjectUri: string | null;
+  actorDid: string;
+  sortAt: Date;
+}): FeedItemDto => ({
+  uri: asAtUriString(item.uri),
+  type: item.type,
+  subjectUri: item.subjectUri ? asAtUriString(item.subjectUri) : null,
+  actorDid: asDid(item.actorDid),
+  sortAt: item.sortAt,
+});
