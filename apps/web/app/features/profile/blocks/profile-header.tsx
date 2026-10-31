@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 type Props = {
   displayName?: string;
@@ -60,12 +61,12 @@ export function ProfileHeader({
           </p>
         )}
         <div className="flex gap-4 text-sm">
-          <span>
+          <Link to={`/profile/${handle}/follows`} className="hover:underline">
             <b>{followsCount}</b> フォロー
-          </span>
-          <span>
+          </Link>
+          <Link to={`/profile/${handle}/followers`} className="hover:underline">
             <b>{followersCount}</b> フォロワー
-          </span>
+          </Link>
         </div>
       </div>
     </section>

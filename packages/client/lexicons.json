@@ -59,6 +59,7 @@
     "app.bsky.graph.listitem",
     "app.bsky.labeler.defs",
     "app.bsky.notification.defs",
+    "app.bsky.notification.getGroupedNotifications",
     "app.bsky.notification.getUnreadCount",
     "app.bsky.notification.listNotifications",
     "app.bsky.notification.updateSeen",
@@ -262,6 +263,10 @@
     "app.bsky.notification.defs": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.notification.defs",
       "cid": "bafyreifzktxnol5rafjoznauk5j7ub2gsxxm7qjskg3vqmcgn6krrsz55u"
+    },
+    "app.bsky.notification.getGroupedNotifications": {
+      "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.notification.getGroupedNotifications",
+      "cid": "bafyreihlp4gpub6pvz7uf7b6qtch3sghv4m5heqzjaxzg5zuxk2qvltwra"
     },
     "app.bsky.notification.getUnreadCount": {
       "uri": "at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.notification.getUnreadCount",
