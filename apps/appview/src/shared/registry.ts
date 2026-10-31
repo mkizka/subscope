@@ -91,6 +91,7 @@ import { GetFollowersUseCase } from "../application/use-cases/graph/get-follower
 import { GetFollowsUseCase } from "../application/use-cases/graph/get-follows-use-case.js";
 import { GetListUseCase } from "../application/use-cases/graph/get-list-use-case.js";
 import { GetListsUseCase } from "../application/use-cases/graph/get-lists-use-case.js";
+import { GetGroupedNotificationsUseCase } from "../application/use-cases/notification/get-grouped-notifications-use-case.js";
 import { GetUnreadCountUseCase } from "../application/use-cases/notification/get-unread-count-use-case.js";
 import { ListNotificationsUseCase } from "../application/use-cases/notification/list-notifications-use-case.js";
 import { UpdateSeenUseCase } from "../application/use-cases/notification/update-seen-use-case.js";
@@ -153,6 +154,7 @@ import { GetFollowers } from "../presentation/routes/app/bsky/graph/getFollowers
 import { GetFollows } from "../presentation/routes/app/bsky/graph/getFollows.js";
 import { GetList } from "../presentation/routes/app/bsky/graph/getList.js";
 import { GetLists } from "../presentation/routes/app/bsky/graph/getLists.js";
+import { GetGroupedNotifications } from "../presentation/routes/app/bsky/notification/getGroupedNotifications.js";
 import { GetUnreadCount } from "../presentation/routes/app/bsky/notification/getUnreadCount.js";
 import { ListNotifications } from "../presentation/routes/app/bsky/notification/listNotifications.js";
 import { UpdateSeen } from "../presentation/routes/app/bsky/notification/updateSeen.js";
@@ -305,6 +307,8 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostThreadV2", ["getPostThreadV2UseCase", "atUriService", "authVerifierMiddleware"], asClassArgs(GetPostThreadV2))
     .service("getTimeline", ["authVerifierMiddleware", "getTimelineUseCase"], asClassArgs(GetTimeline))
     .service("listNotifications", ["authVerifierMiddleware", "listNotificationsUseCase"], asClassArgs(ListNotifications))
+    .service("getGroupedNotificationsUseCase", ["notificationRepository", "subscriptionRepository", "viewContextFactory", "profileViews", "postViews", "generatorViews"], asClassArgs(GetGroupedNotificationsUseCase))
+    .service("getGroupedNotifications", ["authVerifierMiddleware", "getGroupedNotificationsUseCase"], asClassArgs(GetGroupedNotifications))
     .service("getUnreadCountUseCase", ["notificationRepository"], asClassArgs(GetUnreadCountUseCase))
     .service("getUnreadCount", ["authVerifierMiddleware", "getUnreadCountUseCase"], asClassArgs(GetUnreadCount))
     .service("searchPosts", ["searchPostsUseCase"], asClassArgs(SearchPosts))
@@ -336,7 +340,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unbanActor", ["unbanActorUseCase", "adminMiddleware"], asClassArgs(UnbanActor))
     .service("banSubscriber", ["banSubscriberUseCase", "adminMiddleware"], asClassArgs(BanSubscriber))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getBannedActors", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getSubscriptionStatus", "subscribeServer", "unsubscribeServer", "banSubscriber", "unbanActor", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getMembers", "getSetupStatus", "getTrackedActors", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "getSubscribers", "getBannedActors", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap
