@@ -222,3 +222,27 @@ test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除�
   );
   expect(await res.text()).not.toContain(uri);
 });
+
+test("post-toolbar-8: 返信を投稿すると、再読み込みなしで返信先の投稿の返信の件数を増やす", async ({
+  page,
+}) => {
+  const text = "post-toolbar-8: 投稿";
+  await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  await page.goto("/");
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await post.getByRole("button", { name: "返信" }).click();
+  await page
+    .getByRole("textbox", { name: "投稿内容" })
+    .fill("post-toolbar-8: 返信");
+  await page.getByRole("button", { name: "投稿", exact: true }).click();
+
+  await expect(post.getByTitle("1件の返信")).toHaveText("1");
+});

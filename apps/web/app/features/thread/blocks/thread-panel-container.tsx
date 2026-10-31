@@ -40,16 +40,21 @@ export function ThreadPanelContainer({ uri }: Props) {
     <ThreadPanel
       thread={data}
       closeSearch={closeParams.toString()}
-      onCompose={setTarget}
+      onCompose={(next) =>
+        setTarget({
+          ...next,
+          onPosted: () => {
+            next.onPosted?.();
+            setTarget(undefined);
+            void refetch();
+          },
+        })
+      }
       form={
         target && (
           <PostFormContainer
             target={target}
             onClearTarget={() => setTarget(undefined)}
-            onPosted={() => {
-              setTarget(undefined);
-              void refetch();
-            }}
           />
         )
       }

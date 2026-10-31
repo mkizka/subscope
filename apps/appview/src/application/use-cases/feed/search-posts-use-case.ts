@@ -1,7 +1,8 @@
 import type { $OutputBody } from "@repo/client/lex/app/bsky/feed/searchPosts";
 
-import type { PostViewService } from "../../../application/service/feed/post-view-service.js";
 import type { PostSearchService } from "../../../application/service/search/post-search-service.js";
+import type { PostViews } from "../../views/post-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type SearchPostsParams = {
   q: string;
@@ -12,7 +13,8 @@ type SearchPostsParams = {
 export class SearchPostsUseCase {
   constructor(
     private readonly searchService: PostSearchService,
-    private readonly postViewService: PostViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly postViews: PostViews,
   ) {}
 
   async execute(params: SearchPostsParams): Promise<$OutputBody> {
@@ -31,12 +33,15 @@ export class SearchPostsUseCase {
       limit: params.limit,
     });
 
-    const posts = await this.postViewService.findPostView(
-      paginationResult.items.map((post) => post.uri),
+    const ctx = this.viewContextFactory.create();
+    const posts = await Promise.all(
+      paginationResult.items.map((post) =>
+        this.postViews.postView(post.uri.toString(), ctx),
+      ),
     );
 
     return {
-      posts,
+      posts: posts.filter((post) => post !== undefined),
       cursor: paginationResult.cursor,
     };
   }

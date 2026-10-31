@@ -53,8 +53,6 @@ import { CreateAdminService } from "../application/service/admin/create-admin-se
 import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
 import { GeneratorViewService } from "../application/service/feed/generator-view-service.js";
-import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-view-builder.js";
-import { PostViewService } from "../application/service/feed/post-view-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
 import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
@@ -248,8 +246,6 @@ export const createAppRegistry = (env: Env) =>
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("generatorViewService", ["generatorRepository", "profileViewService", "assetUrlBuilder"], asClassArgs(GeneratorViewService))
     .service("listViewService", ["profileViewService", "assetUrlBuilder"], asClassArgs(ListViewService))
-    .service("postEmbedViewBuilder", ["assetUrlBuilder"], asClassArgs(PostEmbedViewBuilder))
-    .service("postViewService", ["postRepository", "postStatsQuery", "recordQuery", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
@@ -272,11 +268,11 @@ export const createAppRegistry = (env: Env) =>
     .service("searchActorsUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
     .service("searchActorsTypeaheadUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
-    .service("getPostThreadUseCase", ["postRepository", "postViewService"], asClassArgs(GetPostThreadUseCase))
+    .service("getPostThreadUseCase", ["postRepository", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationQuery", "subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(ListNotificationsUseCase))
-    .service("searchPostsUseCase", ["searchService", "postViewService"], asClassArgs(SearchPostsUseCase))
+    .service("searchPostsUseCase", ["searchService", "viewContextFactory", "postViews"], asClassArgs(SearchPostsUseCase))
     .service("getActorLikesUseCase", ["likeQuery", "viewContextFactory", "feedViews"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedQuery", "viewContextFactory", "feedViews"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["generatorViewService"], asClassArgs(GetFeedGeneratorsUseCase))

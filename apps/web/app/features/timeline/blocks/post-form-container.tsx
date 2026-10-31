@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
@@ -36,15 +36,15 @@ export type ComposeTarget = {
   cid: string;
   handle: string;
   root?: { uri: string; cid: string };
+  onPosted?: () => void;
 };
 
 type Props = {
   target?: ComposeTarget;
   onClearTarget: () => void;
-  onPosted?: () => void;
 };
 
-export function PostFormContainer({ target, onClearTarget, onPosted }: Props) {
+export function PostFormContainer({ target, onClearTarget }: Props) {
   const fetcher = useFetcher<typeof action>();
   const [posted, setPosted] = useState<{
     uri: string;
@@ -54,10 +54,7 @@ export function PostFormContainer({ target, onClearTarget, onPosted }: Props) {
   if (uri && uri !== posted?.uri) {
     setPosted({ uri, target });
   }
-  const notifyPosted = useEffectEvent(() => onPosted?.());
-  useEffect(() => {
-    if (posted) notifyPosted();
-  }, [posted]);
+  useEffect(() => posted?.target?.onPosted?.(), [posted]);
   const current = posted?.target === target ? undefined : target;
   return (
     <PostForm
