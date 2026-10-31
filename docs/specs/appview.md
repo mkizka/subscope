@@ -156,6 +156,22 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - listNotifications-4: reasonsを指定すると、その種類の通知だけを返す
 - listNotifications-5: seenAtに閲覧者の既読時刻を返す
 
+## app.bsky.notification.getGroupedNotifications
+
+閲覧者宛ての通知を、まとめた形で返す。認証が必要。公式アプリの通知画面はこのAPIだけを使う。
+
+まとめるのは1ページ内の通知だけで、ページをまたいだ同じ投稿へのいいねは別のグループになる。
+
+- getGroupedNotifications-1: 認証がないリクエストには401を返す
+- getGroupedNotifications-2: 同じ投稿へのいいねとリポストは、種類ごとに1つのグループにまとめる
+- getGroupedNotifications-3: フィードジェネレーターへのいいねは、フィードジェネレーターごとに1つのグループにまとめる
+- getGroupedNotifications-4: フォローは1つのグループにまとめる
+- getGroupedNotifications-5: 返信・引用・メンションはまとめずに1件ずつ返す
+- getGroupedNotifications-6: relatedViewsに、グループが参照するアクターと投稿とフィードジェネレーターのビューを返す
+- getGroupedNotifications-7: グループの中で最新の通知が既読時刻以前なら、グループを既読にする
+- getGroupedNotifications-8: feedにconversationsを指定すると返信・引用・メンションだけを、followersを指定するとフォローだけを返す
+- getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、空のグループを返す
+
 ## app.bsky.notification.getUnreadCount
 
 閲覧者宛ての未読通知の数を返す。認証が必要。priorityは無視する。

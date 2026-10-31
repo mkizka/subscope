@@ -1,9 +1,5 @@
 import { asDid } from "@atproto/did";
-import {
-  actorFactory,
-  postFactory,
-  profileDetailedFactory,
-} from "@repo/common/test";
+import { actorFactory, postFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -11,13 +7,13 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("GetPostsUseCase", () => {
   let getPostsUseCase: TestServices["getPostsUseCase"];
   let postQuery: TestServices["postQuery"];
-  let profileRepo: TestServices["profileRepository"];
+  let profileQuery: TestServices["profileQuery"];
   let recordRepo: TestServices["recordQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getPostsUseCase = services.getPostsUseCase;
     postQuery = services.postQuery;
-    profileRepo = services.profileRepository;
+    profileQuery = services.profileQuery;
     recordRepo = services.recordQuery;
   });
 
@@ -25,7 +21,16 @@ describe("GetPostsUseCase", () => {
     // arrange
     const authors = [actorFactory(), actorFactory()];
     const posts = authors.map((author) => {
-      profileRepo.add(profileDetailedFactory({ actorDid: author.did }));
+      profileQuery.add({
+        actorDid: asDid(author.did),
+        handle: null,
+        displayName: null,
+        description: null,
+        avatarCid: null,
+        createdAt: null,
+        indexedAt: new Date(),
+        status: "active",
+      });
       const { post, record } = postFactory({ actorDid: author.did });
       postQuery.add({
         uri: post.uri.toString(),
@@ -40,7 +45,7 @@ describe("GetPostsUseCase", () => {
       return post;
     });
     const findByUris = vi.spyOn(postQuery, "findByUris");
-    const findManyDetailed = vi.spyOn(profileRepo, "findManyDetailed");
+    const findByDids = vi.spyOn(profileQuery, "findByDids");
 
     // act
     const result = await getPostsUseCase.execute(
@@ -53,6 +58,6 @@ describe("GetPostsUseCase", () => {
       authors.map((author) => asDid(author.did)),
     );
     expect(findByUris).toHaveBeenCalledTimes(1);
-    expect(findManyDetailed).toHaveBeenCalledTimes(1);
+    expect(findByDids).toHaveBeenCalledTimes(1);
   });
 });
