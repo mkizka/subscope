@@ -2,21 +2,22 @@ import { asDid, type Did } from "@atproto/did";
 import { asAtUriString, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyNotificationListNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
 
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import {
   isNotificationReason,
   type NotificationDto,
 } from "../../dto/notification-dto.js";
 import type { INotificationQuery } from "../../interfaces/notification-query.js";
 import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
-import { toMapByDid } from "../../utils/map.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class ListNotificationsUseCase {
   constructor(
     private readonly notificationQuery: INotificationQuery,
-    private readonly profileViewService: ProfileViewService,
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(params: {
@@ -37,24 +38,23 @@ export class ListNotificationsUseCase {
     });
     const page = paginator.extractPage(items);
 
-    const authors = toMapByDid(
-      await this.profileViewService.findProfileView(
-        [...new Set(page.items.map((item) => asDid(item.authorDid)))],
-        params.viewerDid,
+    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const [authors, subscription] = await Promise.all([
+      Promise.all(
+        page.items.map((item) =>
+          this.profileViews.view(asDid(item.authorDid), ctx),
+        ),
       ),
-    );
-
-    const subscription = await this.subscriptionRepository.findFirst(
-      params.viewerDid,
-    );
+      this.subscriptionRepository.findFirst(params.viewerDid),
+    ]);
 
     return {
       cursor: page.cursor,
       seenAt: subscription?.seenAt
         ? toDatetimeString(subscription.seenAt)
         : undefined,
-      notifications: page.items.flatMap((item) => {
-        const author = authors.get(asDid(item.authorDid));
+      notifications: page.items.flatMap((item, i) => {
+        const author = authors[i];
         if (!author) return [];
         return {
           uri: asAtUriString(item.recordUri),

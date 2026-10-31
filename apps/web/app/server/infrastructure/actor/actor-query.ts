@@ -4,6 +4,7 @@ import type {
   ProfileViewDetailed,
 } from "@repo/client/lex/app/bsky/actor/defs";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
+import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
 import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
@@ -24,7 +25,7 @@ const filters = {
   media: "posts_with_media",
 } as const;
 
-type ActorDto = {
+export type ActorDto = {
   did: string;
   handle: string;
   displayName?: string;
@@ -61,6 +62,7 @@ export interface IActorQuery {
     kind: "follows" | "followers",
   ) => Promise<FollowListDto>;
   isAdmin: (did: string) => Promise<boolean>;
+  searchActors: (did: string, q: string) => Promise<ActorDto[]>;
 }
 
 export const actorQueryFactory = ({
@@ -106,6 +108,12 @@ export const actorQueryFactory = ({
       const agent = await restore(did);
       const { status } = await agent.call(verifyAccess);
       return status === "authorized";
+    },
+    async searchActors(did, q) {
+      const agent = await restore(did);
+      // ponytail: 最初の25件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
+      const { actors } = await agent.call(searchActors, { q });
+      return actors.map(toActor);
     },
   };
 };
