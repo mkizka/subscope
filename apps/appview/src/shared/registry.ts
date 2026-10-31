@@ -51,11 +51,9 @@ import { ProfileViewService } from "../application/service/actor/profile-view-se
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
-import { FeedProcessor } from "../application/service/feed/feed-processor.js";
 import { GeneratorViewService } from "../application/service/feed/generator-view-service.js";
 import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-view-builder.js";
 import { PostViewService } from "../application/service/feed/post-view-service.js";
-import { ReplyRefService } from "../application/service/feed/reply-ref-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
 import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
@@ -102,6 +100,7 @@ import { GetSubscriptionStatusUseCase } from "../application/use-cases/sync/get-
 import { SubscribeServerUseCase } from "../application/use-cases/sync/subscribe-server-use-case.js";
 import { UnsubscribeServerUseCase } from "../application/use-cases/sync/unsubscribe-server-use-case.js";
 import { EmbedViews } from "../application/views/embed-views.js";
+import { FeedViews } from "../application/views/feed-views.js";
 import { GeneratorViews } from "../application/views/generator-views.js";
 import { NotificationViews } from "../application/views/notification-views.js";
 import { PostViews } from "../application/views/post-views.js";
@@ -247,7 +246,6 @@ export const createAppRegistry = (env: Env) =>
     .service("listViewService", ["profileViewService", "assetUrlBuilder"], asClassArgs(ListViewService))
     .service("postEmbedViewBuilder", ["assetUrlBuilder"], asClassArgs(PostEmbedViewBuilder))
     .service("postViewService", ["postRepository", "postStatsQuery", "recordQuery", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
-    .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
@@ -261,8 +259,8 @@ export const createAppRegistry = (env: Env) =>
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
     .service("postViews", ["profileViews", "embedViews"], asClassArgs(PostViews))
+    .service("feedViews", ["postViews", "profileViews"], asClassArgs(FeedViews))
     .service("notificationViews", ["profileViews", "postViews", "generatorViews"], asClassArgs(NotificationViews))
-    .service("feedProcessor", ["postRepository", "repostRepository", "postViewService", "profileViewService", "replyRefService"], asClassArgs(FeedProcessor))
     // use-cases
     .service("getProfileUseCase", ["viewContextFactory", "profileViews"], asClassArgs(GetProfileUseCase))
     .service("getProfilesUseCase", ["viewContextFactory", "profileViews"], asClassArgs(GetProfilesUseCase))
@@ -271,14 +269,14 @@ export const createAppRegistry = (env: Env) =>
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
     .service("getPostThreadUseCase", ["postRepository", "postViewService"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
-    .service("getTimelineUseCase", ["timelineQuery", "feedProcessor"], asClassArgs(GetTimelineUseCase))
+    .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationRepository", "profileViewService", "subscriptionRepository"], asClassArgs(ListNotificationsUseCase))
     .service("searchPostsUseCase", ["searchService", "postViewService"], asClassArgs(SearchPostsUseCase))
-    .service("getActorLikesUseCase", ["likeQuery", "feedProcessor"], asClassArgs(GetActorLikesUseCase))
-    .service("getAuthorFeedUseCase", ["authorFeedQuery", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
+    .service("getActorLikesUseCase", ["likeQuery", "viewContextFactory", "feedViews"], asClassArgs(GetActorLikesUseCase))
+    .service("getAuthorFeedUseCase", ["authorFeedQuery", "viewContextFactory", "feedViews"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["generatorViewService"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "profileViewService"], asClassArgs(GetLikesUseCase))
-    .service("getListFeedUseCase", ["timelineQuery", "feedProcessor"], asClassArgs(GetListFeedUseCase))
+    .service("getListFeedUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetListFeedUseCase))
     .service("getRepostedByUseCase", ["repostService", "profileViewService"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followService", "profileViewService"], asClassArgs(GetFollowersUseCase))

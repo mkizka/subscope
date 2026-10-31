@@ -3,8 +3,9 @@ import type * as AppBskyFeedGetAuthorFeed from "@repo/client/lex/app/bsky/feed/g
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import type { IAuthorFeedQuery } from "../../../application/interfaces/author-feed-query.js";
-import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { FeedViews } from "../../views/feed-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type Filter = AppBskyFeedGetAuthorFeed.$Params["filter"];
 
@@ -34,7 +35,8 @@ export class GetAuthorFeedUseCase {
 
   constructor(
     private readonly authorFeedQuery: IAuthorFeedQuery,
-    private readonly feedProcessor: FeedProcessor,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly feedViews: FeedViews,
   ) {}
 
   async execute(
@@ -56,13 +58,13 @@ export class GetAuthorFeedUseCase {
     });
     const page = paginator.extractPage(feedItems);
 
-    const feed = await this.feedProcessor.processFeedItems(
-      page.items,
-      params.viewerDid,
+    const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
+    const feed = await Promise.all(
+      page.items.map((item) => this.feedViews.feedViewPost(item, ctx)),
     );
 
     return {
-      feed,
+      feed: feed.filter((item) => item !== undefined),
       cursor: page.cursor,
     };
   }
