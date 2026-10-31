@@ -45,43 +45,6 @@ export class LikeRepository implements ILikeRepository {
     );
   }
 
-  async findLikesByActor({
-    actorDid,
-    limit,
-    cursor,
-  }: {
-    actorDid: Did;
-    limit: number;
-    cursor?: string;
-  }): Promise<Like[]> {
-    const filters = [eq(schema.likes.actorDid, actorDid)];
-
-    if (cursor) {
-      const cursorDate = new Date(cursor);
-      filters.push(lt(schema.likes.sortAt, cursorDate));
-    }
-
-    const likes = await this.db
-      .select()
-      .from(schema.likes)
-      .where(and(...filters))
-      .orderBy(desc(schema.likes.sortAt))
-      .limit(limit);
-
-    return likes.map(
-      (like) =>
-        new Like({
-          uri: like.uri,
-          cid: like.cid,
-          actorDid: like.actorDid,
-          subjectUri: like.subjectUri,
-          subjectCid: like.subjectCid,
-          createdAt: like.createdAt,
-          indexedAt: like.indexedAt,
-        }),
-    );
-  }
-
   async findViewerLikes({
     viewerDid,
     subjectUris,

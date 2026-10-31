@@ -25,6 +25,7 @@ export class ProfileQuery implements IProfileQuery {
       displayName: profile?.displayName ?? null,
       description: profile?.description ?? null,
       avatarCid: profile?.avatarCid ?? null,
+      bannerCid: profile?.bannerCid ?? null,
       createdAt: profile?.createdAt ?? null,
       indexedAt: profile?.indexedAt ?? actor.indexedAt,
       status: actor.status,
