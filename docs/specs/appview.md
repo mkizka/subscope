@@ -11,6 +11,17 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - takedown-3: 期限が切れたラベルは無視する
 - takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない
 
+## 返信制限
+
+スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsだけが対応する。
+
+- threadgate-1: スレッドの起点の投稿は、そのthreadgateをthreadgateに含める
+- threadgate-2: 閲覧者がthreadgateで返信を許されていないスレッドの投稿は、viewer.replyDisabledをtrueにする
+- threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする
+- threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする
+
+listRuleのメンバーかどうかは今は判定しない。listRuleがあり他の規則に合わないときは、replyDisabledを含めない。
+
 ## app.bsky.actor.getProfile
 
 指定したアクターの詳細なプロフィールを返す。認証は任意。
@@ -91,12 +102,21 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - searchPosts-1: 本文がクエリに一致する投稿をpostViewで返す
 
+## app.bsky.feed.searchPostsV2
+
+searchPostsの後継で、公式クライアントの投稿検索はこれを使う。認証は任意。
+
+- searchPostsV2-1: 本文がqueryに一致する投稿をpostViewで返す
+
+query以外の絞り込みパラメータ(authors、sortなど)は今は無視する。
+
 ## app.bsky.feed.getPosts
 
 指定したURIの投稿をpostViewとして返す。認証は任意。
 
 - getPosts-1: 指定したURIの順に投稿を並べる
 - getPosts-2: 存在しない投稿は含めない
+- getPosts-3: 閲覧者がいいね・リポストした投稿は、そのURIをviewer.likeとviewer.repostに含める
 
 ## app.bsky.feed.getPostThread
 
@@ -119,6 +139,12 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 - getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す
 - getAuthorFeed-2: 解決できないハンドルには400を返す
+- getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアクター自身の投稿だけを返し、リポストは含めない
+- getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない
+- getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアクター自身の投稿であるものだけを含める
+- getAuthorFeed-6: filterがposts_with_videoのとき、空のfeedを返す
+
+動画の埋め込みはインデックスしていないため、posts_with_videoは常に空になる。
 
 ## app.bsky.notification.listNotifications
 
@@ -129,6 +155,22 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 - listNotifications-3: 既読時刻以前の通知は既読にし、それより後の通知は未読にする
 - listNotifications-4: reasonsを指定すると、その種類の通知だけを返す
 - listNotifications-5: seenAtに閲覧者の既読時刻を返す
+
+## app.bsky.notification.getGroupedNotifications
+
+閲覧者宛ての通知を、まとめた形で返す。認証が必要。公式アプリの通知画面はこのAPIだけを使う。
+
+まとめるのは1ページ内の通知だけで、ページをまたいだ同じ投稿へのいいねは別のグループになる。
+
+- getGroupedNotifications-1: 認証がないリクエストには401を返す
+- getGroupedNotifications-2: 同じ投稿へのいいねとリポストは、種類ごとに1つのグループにまとめる
+- getGroupedNotifications-3: フィードジェネレーターへのいいねは、フィードジェネレーターごとに1つのグループにまとめる
+- getGroupedNotifications-4: フォローは1つのグループにまとめる
+- getGroupedNotifications-5: 返信・引用・メンションはまとめずに1件ずつ返す
+- getGroupedNotifications-6: relatedViewsに、グループが参照するアクターと投稿とフィードジェネレーターのビューを返す
+- getGroupedNotifications-7: グループの中で最新の通知が既読時刻以前なら、グループを既読にする
+- getGroupedNotifications-8: feedにconversationsを指定すると返信・引用・メンションだけを、followersを指定するとフォローだけを返す
+- getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、空のグループを返す
 
 ## app.bsky.notification.getUnreadCount
 

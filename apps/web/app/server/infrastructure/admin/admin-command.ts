@@ -4,45 +4,24 @@ import createInviteCode, {
   type $OutputBody as CreateInviteCodeOutput,
 } from "@repo/client/lex/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
-import getBannedActors, {
-  type $OutputBody as GetBannedActorsOutput,
-} from "@repo/client/lex/me/subsco/admin/getBannedActors";
-import getInviteCodes, {
-  type $OutputBody as GetInviteCodesOutput,
-} from "@repo/client/lex/me/subsco/admin/getInviteCodes";
-import getSubscribers, {
-  type $OutputBody as GetSubscribersOutput,
-} from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
 import unbanActor from "@repo/client/lex/me/subsco/admin/unbanActor";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
-export interface IAdminRepository {
-  getSubscribers: (
-    did: string,
-    cursor?: string,
-  ) => Promise<GetSubscribersOutput>;
+export interface IAdminCommand {
   banSubscriber: (did: string, target: DidString) => Promise<void>;
   grantAdmin: (did: string, target: DidString) => Promise<void>;
-  getBannedActors: (
-    did: string,
-    cursor?: string,
-  ) => Promise<GetBannedActorsOutput>;
   unbanActor: (did: string, target: DidString) => Promise<void>;
-  getInviteCodes: (
-    did: string,
-    cursor?: string,
-  ) => Promise<GetInviteCodesOutput>;
   createInviteCode: (did: string) => Promise<CreateInviteCodeOutput>;
   deleteInviteCode: (did: string, code: string) => Promise<void>;
 }
 
-export const adminRepositoryFactory = ({
+export const adminCommandFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): IAdminRepository => {
+}): IAdminCommand => {
   const restore = async (did: string) => {
     const agent = await oauthClient.restore(did);
     if (!agent) {
@@ -52,10 +31,6 @@ export const adminRepositoryFactory = ({
   };
 
   return {
-    async getSubscribers(did, cursor) {
-      const agent = await restore(did);
-      return agent.call(getSubscribers, { limit: 20, cursor });
-    },
     async banSubscriber(did, target) {
       const agent = await restore(did);
       await agent.call(banSubscriber, { did: target });
@@ -64,17 +39,9 @@ export const adminRepositoryFactory = ({
       const agent = await restore(did);
       await agent.call(grantAdmin, { did: target });
     },
-    async getBannedActors(did, cursor) {
-      const agent = await restore(did);
-      return agent.call(getBannedActors, { limit: 20, cursor });
-    },
     async unbanActor(did, target) {
       const agent = await restore(did);
       await agent.call(unbanActor, { did: target });
-    },
-    async getInviteCodes(did, cursor) {
-      const agent = await restore(did);
-      return agent.call(getInviteCodes, { limit: 20, cursor });
     },
     async createInviteCode(did) {
       const agent = await restore(did);

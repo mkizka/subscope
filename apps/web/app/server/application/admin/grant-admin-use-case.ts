@@ -1,8 +1,8 @@
 import type { DidString } from "@atproto/syntax";
 
-import type { IAdminRepository } from "@/app/server/infrastructure/admin/admin-repository";
+import type { IAdminCommand } from "@/app/server/infrastructure/admin/admin-command";
 
 export const grantAdminUseCaseFactory =
-  ({ adminRepository }: { adminRepository: IAdminRepository }) =>
+  ({ adminCommand }: { adminCommand: IAdminCommand }) =>
   (did: string, target: DidString) =>
-    adminRepository.grantAdmin(did, target);
+    adminCommand.grantAdmin(did, target);

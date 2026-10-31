@@ -1,16 +1,16 @@
 import type {
-  ISubscopeRepository,
+  ISubscopeCommand,
   SubscribeResult,
-} from "@/app/server/infrastructure/subscope/subscope-repository";
+} from "@/app/server/infrastructure/subscope/subscope-command";
 
 export interface ISubscribeServerUseCase {
   execute: (did: string, inviteCode: string) => Promise<SubscribeResult>;
 }
 
 export const subscribeServerUseCaseFactory = ({
-  subscopeRepository,
+  subscopeCommand,
 }: {
-  subscopeRepository: ISubscopeRepository;
+  subscopeCommand: ISubscopeCommand;
 }): ISubscribeServerUseCase => ({
-  execute: (did, inviteCode) => subscopeRepository.subscribe(did, inviteCode),
+  execute: (did, inviteCode) => subscopeCommand.subscribe(did, inviteCode),
 });

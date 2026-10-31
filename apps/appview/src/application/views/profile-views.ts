@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
-import type { ProfileDetailed } from "@repo/common/domain";
 
+import type { ProfileDto } from "../dto/profile-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
 import type { ViewContext } from "./view-context.js";
 
@@ -34,7 +34,7 @@ export class ProfileViews {
   }
 
   private toBasic(
-    profile: ProfileDetailed,
+    profile: ProfileDto,
     viewerState: Awaited<ReturnType<ViewContext["viewerState"]>>,
   ): AppBskyActorDefs.ProfileViewBasic {
     return {
@@ -50,8 +50,8 @@ export class ProfileViews {
         : undefined,
       viewer: {
         $type: "app.bsky.actor.defs#viewerState",
-        following: viewerState.following?.toString(),
-        followedBy: viewerState.followedBy?.toString(),
+        following: viewerState.following,
+        followedBy: viewerState.followedBy,
       },
       createdAt: profile.createdAt
         ? toDatetimeString(profile.createdAt)

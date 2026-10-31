@@ -1,4 +1,9 @@
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
+import {
+  view as recordView,
+  viewRecord,
+} from "@repo/client/lex/app/bsky/embed/record";
+import { view as recordWithMediaView } from "@repo/client/lex/app/bsky/embed/recordWithMedia";
 import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
@@ -23,6 +28,7 @@ export type TimelinePostDto = {
   likeCount?: number;
   createdAt?: string;
   images?: { thumb: string; alt: string }[];
+  quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };
 
@@ -67,6 +73,14 @@ export function toTimelinePost({
   post,
   reason,
 }: FeedViewPost): TimelinePostDto {
+  const media = recordWithMediaView.matches(post.embed)
+    ? post.embed.media
+    : post.embed;
+  const quoted = recordWithMediaView.matches(post.embed)
+    ? post.embed.record.record
+    : recordView.matches(post.embed)
+      ? post.embed.record
+      : undefined;
   return {
     uri: post.uri,
     cid: post.cid,
@@ -82,7 +96,14 @@ export function toTimelinePost({
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
-    images: imagesView.matches(post.embed) ? post.embed.images : undefined,
+    images: imagesView.matches(media) ? media.images : undefined,
+    quote: viewRecord.matches(quoted)
+      ? {
+          authorDisplayName: quoted.author.displayName,
+          authorHandle: quoted.author.handle,
+          text: maybeString(quoted.value.text),
+        }
+      : undefined,
     createdAt: maybeString(post.record.createdAt),
     reasonRepost:
       reason && "by" in reason

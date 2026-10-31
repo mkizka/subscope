@@ -1,7 +1,8 @@
 import type { ILoggerManager } from "@repo/common/domain";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-import type { ISubscopeRepository } from "@/app/server/infrastructure/subscope/subscope-repository";
+import type { ISubscopeCommand } from "@/app/server/infrastructure/subscope/subscope-command";
+import type { ISubscopeQuery } from "@/app/server/infrastructure/subscope/subscope-query";
 
 type OAuthCallbackResult =
   | { did: string }
@@ -18,11 +19,13 @@ export interface IOAuthCallbackUseCase {
 
 export const oauthCallbackUseCaseFactory = ({
   oauthClient,
-  subscopeRepository,
+  subscopeQuery,
+  subscopeCommand,
   loggerManager,
 }: {
   oauthClient: IOAuthClient;
-  subscopeRepository: ISubscopeRepository;
+  subscopeQuery: ISubscopeQuery;
+  subscopeCommand: ISubscopeCommand;
   loggerManager: ILoggerManager;
 }): IOAuthCallbackUseCase => {
   const logger = loggerManager.createLogger("oauthCallbackUseCase");
@@ -38,7 +41,7 @@ export const oauthCallbackUseCaseFactory = ({
 
       let initialized;
       try {
-        initialized = await subscopeRepository.isInitialized();
+        initialized = await subscopeQuery.isInitialized();
       } catch (e) {
         logger.error(e, "Failed to check server setup status");
         return { error: "setup_status_check_failed" };
@@ -46,7 +49,7 @@ export const oauthCallbackUseCaseFactory = ({
 
       try {
         if (!initialized) {
-          await subscopeRepository.registerAdmin(did);
+          await subscopeCommand.registerAdmin(did);
         }
       } catch (e) {
         logger.error(e, "Admin registration failed");

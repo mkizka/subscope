@@ -17,10 +17,12 @@ import type { GetPostThread } from "./app/bsky/feed/getPostThread.js";
 import type { GetRepostedBy } from "./app/bsky/feed/getRepostedBy.js";
 import type { GetTimeline } from "./app/bsky/feed/getTimeline.js";
 import type { SearchPosts } from "./app/bsky/feed/searchPosts.js";
+import type { SearchPostsV2 } from "./app/bsky/feed/searchPostsV2.js";
 import type { GetFollowers } from "./app/bsky/graph/getFollowers.js";
 import type { GetFollows } from "./app/bsky/graph/getFollows.js";
 import type { GetList } from "./app/bsky/graph/getList.js";
 import type { GetLists } from "./app/bsky/graph/getLists.js";
+import type { GetGroupedNotifications } from "./app/bsky/notification/getGroupedNotifications.js";
 import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
@@ -55,6 +57,7 @@ export const lexRouterFactory = (
   getLists: GetLists,
   getUnreadCount: GetUnreadCount,
   listNotifications: ListNotifications,
+  getGroupedNotifications: GetGroupedNotifications,
   updateSeen: UpdateSeen,
   getSubscriptionStatus: GetSubscriptionStatus,
   subscribeServer: SubscribeServer,
@@ -82,6 +85,7 @@ export const lexRouterFactory = (
   getFeedGenerators: GetFeedGenerators,
   getPosts: GetPosts,
   getPostThreadV2: GetPostThreadV2,
+  searchPostsV2: SearchPostsV2,
 ): RequestHandler => {
   const handlers = [
     getPostThread,
@@ -96,6 +100,7 @@ export const lexRouterFactory = (
     getLists,
     getUnreadCount,
     listNotifications,
+    getGroupedNotifications,
     updateSeen,
     getSubscriptionStatus,
     subscribeServer,
@@ -123,6 +128,7 @@ export const lexRouterFactory = (
     getFeedGenerators,
     getPosts,
     getPostThreadV2,
+    searchPostsV2,
   ];
 
   const router = new LexRouter();

@@ -1,5 +1,6 @@
 import { createRegistry } from "@gyaku/di";
 
+import { getFollowListUseCaseFactory } from "./application/actor/get-follow-list-use-case";
 import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
@@ -12,6 +13,8 @@ import { getSubscribersUseCaseFactory } from "./application/admin/get-subscriber
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
+import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
+import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
 import { getLoginStepUseCaseFactory } from "./application/login/get-login-step-use-case";
 import { oauthCallbackUseCaseFactory } from "./application/login/oauth-callback-use-case";
 import { subscribeServerUseCaseFactory } from "./application/login/subscribe-server-use-case";
@@ -25,7 +28,8 @@ import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reac
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorQueryFactory } from "./infrastructure/actor/actor-query";
-import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
+import { adminCommandFactory } from "./infrastructure/admin/admin-command";
+import { adminQueryFactory } from "./infrastructure/admin/admin-query";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
 import { oauthClientFactory } from "./infrastructure/auth/oauth-client";
 import {
@@ -35,12 +39,15 @@ import {
 import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
+import { listQueryFactory } from "./infrastructure/list/list-query";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
 import { notificationCommandFactory } from "./infrastructure/notification/notification-command";
 import { notificationQueryFactory } from "./infrastructure/notification/notification-query";
-import { postRepositoryFactory } from "./infrastructure/post/post-repository";
+import { postCommandFactory } from "./infrastructure/post/post-command";
+import { postQueryFactory } from "./infrastructure/post/post-query";
 import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
-import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
+import { subscopeCommandFactory } from "./infrastructure/subscope/subscope-command";
+import { subscopeQueryFactory } from "./infrastructure/subscope/subscope-query";
 import { threadQueryFactory } from "./infrastructure/thread/thread-query";
 import { timelineQueryFactory } from "./infrastructure/timeline/timeline-query";
 
@@ -56,30 +63,23 @@ export const di = await createRegistry()
     oauthClientFactory,
   )
   .service("cookieSessionStorage", cookieSessionStorageFactory)
-  .service("subscopeRepository", ["oauthClient"], subscopeRepositoryFactory)
-  .service(
-    "getLoginStepUseCase",
-    ["subscopeRepository"],
-    getLoginStepUseCaseFactory,
-  )
+  .service("subscopeQuery", ["oauthClient"], subscopeQueryFactory)
+  .service("subscopeCommand", ["oauthClient"], subscopeCommandFactory)
+  .service("getLoginStepUseCase", ["subscopeQuery"], getLoginStepUseCaseFactory)
   .service(
     "subscribeServerUseCase",
-    ["subscopeRepository"],
+    ["subscopeCommand"],
     subscribeServerUseCaseFactory,
   )
   .service(
     "oauthCallbackUseCase",
-    ["oauthClient", "subscopeRepository", "loggerManager"],
+    ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service(
-    "getMembersUseCase",
-    ["subscopeRepository"],
-    getMembersUseCaseFactory,
-  )
+  .service("getMembersUseCase", ["subscopeQuery"], getMembersUseCaseFactory)
   .service(
     "getTrackedActorsUseCase",
-    ["subscopeRepository"],
+    ["subscopeQuery"],
     getTrackedActorsUseCaseFactory,
   )
   .service("notificationQuery", ["oauthClient"], notificationQueryFactory)
@@ -100,45 +100,52 @@ export const di = await createRegistry()
     markNotificationsSeenUseCaseFactory,
   )
   .service("timelineQuery", ["oauthClient"], timelineQueryFactory)
-  .service("postRepository", ["oauthClient"], postRepositoryFactory)
+  .service("postCommand", ["oauthClient"], postCommandFactory)
+  .service("postQuery", ["oauthClient"], postQueryFactory)
   .service("getTimelineUseCase", ["timelineQuery"], getTimelineUseCaseFactory)
-  .service("createPostUseCase", ["postRepository"], createPostUseCaseFactory)
-  .service("adminRepository", ["oauthClient"], adminRepositoryFactory)
+  .service(
+    "createPostUseCase",
+    ["postCommand", "postQuery"],
+    createPostUseCaseFactory,
+  )
+  .service("adminQuery", ["oauthClient"], adminQueryFactory)
+  .service("adminCommand", ["oauthClient"], adminCommandFactory)
   .service(
     "getSubscribersUseCase",
-    ["adminRepository"],
+    ["adminQuery"],
     getSubscribersUseCaseFactory,
   )
   .service(
     "banSubscriberUseCase",
-    ["adminRepository"],
+    ["adminCommand"],
     banSubscriberUseCaseFactory,
   )
-  .service("grantAdminUseCase", ["adminRepository"], grantAdminUseCaseFactory)
+  .service("grantAdminUseCase", ["adminCommand"], grantAdminUseCaseFactory)
   .service(
     "getBannedActorsUseCase",
-    ["adminRepository"],
+    ["adminQuery"],
     getBannedActorsUseCaseFactory,
   )
-  .service("unbanActorUseCase", ["adminRepository"], unbanActorUseCaseFactory)
+  .service("unbanActorUseCase", ["adminCommand"], unbanActorUseCaseFactory)
   .service(
     "getInviteCodesUseCase",
-    ["adminRepository"],
+    ["adminQuery"],
     getInviteCodesUseCaseFactory,
   )
   .service(
     "createInviteCodeUseCase",
-    ["adminRepository"],
+    ["adminCommand"],
     createInviteCodeUseCaseFactory,
   )
   .service(
     "deleteInviteCodeUseCase",
-    ["adminRepository"],
+    ["adminCommand"],
     deleteInviteCodeUseCaseFactory,
   )
   .service("actorQuery", ["oauthClient"], actorQueryFactory)
   .service("getMeUseCase", ["actorQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["actorQuery"], getProfileUseCaseFactory)
+  .service("getFollowListUseCase", ["actorQuery"], getFollowListUseCaseFactory)
   .service(
     "getProfilePageUseCase",
     ["actorQuery"],
@@ -154,4 +161,7 @@ export const di = await createRegistry()
   )
   .service("threadQuery", ["oauthClient"], threadQueryFactory)
   .service("getThreadUseCase", ["threadQuery"], getThreadUseCaseFactory)
+  .service("listQuery", ["oauthClient"], listQueryFactory)
+  .service("getListsPageUseCase", ["listQuery"], getListsPageUseCaseFactory)
+  .service("getListPageUseCase", ["listQuery"], getListPageUseCaseFactory)
   .resolve();
