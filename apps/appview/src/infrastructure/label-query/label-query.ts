@@ -15,6 +15,8 @@ export class LabelQuery implements ILabelQuery {
         src: schema.labels.src,
         uri: schema.labels.uri,
         val: schema.labels.val,
+        cid: schema.labels.cid,
+        cts: schema.labels.cts,
       })
       .from(schema.labels)
       .where(
