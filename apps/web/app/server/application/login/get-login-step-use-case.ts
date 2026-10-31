@@ -1,4 +1,4 @@
-import type { ISubscopeRepository } from "@/app/server/infrastructure/subscope/subscope-repository";
+import type { ISubscopeQuery } from "@/app/server/infrastructure/subscope/subscope-query";
 
 export interface IGetLoginStepUseCase {
   execute: (
@@ -7,15 +7,15 @@ export interface IGetLoginStepUseCase {
 }
 
 export const getLoginStepUseCaseFactory = ({
-  subscopeRepository,
+  subscopeQuery,
 }: {
-  subscopeRepository: ISubscopeRepository;
+  subscopeQuery: ISubscopeQuery;
 }): IGetLoginStepUseCase => ({
   async execute(did) {
     if (!did) {
-      return (await subscopeRepository.isInitialized()) ? "login" : "setup";
+      return (await subscopeQuery.isInitialized()) ? "login" : "setup";
     }
-    return (await subscopeRepository.isSubscribed(did))
+    return (await subscopeQuery.isSubscribed(did))
       ? "subscribed"
       : "inviteCode";
   },

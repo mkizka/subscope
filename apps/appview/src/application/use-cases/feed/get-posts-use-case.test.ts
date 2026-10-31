@@ -47,7 +47,10 @@ describe("GetPostsUseCase", () => {
     const findByDids = vi.spyOn(profileQuery, "findByDids");
 
     // act
-    const result = await getPostsUseCase.execute(posts.map((post) => post.uri));
+    const result = await getPostsUseCase.execute(
+      posts.map((post) => post.uri),
+      null,
+    );
 
     // assert
     expect(result.map((post) => post.author.did)).toEqual(
