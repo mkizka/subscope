@@ -1,5 +1,3 @@
-import type { Did } from "@atproto/did";
-
 export const notificationReasons = [
   "like",
   "repost",
@@ -16,7 +14,7 @@ export const isNotificationReason = (
 ): reason is NotificationReason =>
   notificationReasons.some((known) => known === reason);
 
-export type NotificationItem = {
+export type NotificationDto = {
   recordUri: string;
   cid: string;
   record: unknown;
@@ -26,13 +24,3 @@ export type NotificationItem = {
   sortAt: Date;
   isRead: boolean;
 };
-
-export interface INotificationRepository {
-  findMany: (params: {
-    recipientDid: Did;
-    limit: number;
-    cursor?: Date;
-    reasons?: NotificationReason[];
-  }) => Promise<NotificationItem[]>;
-  countUnread: (recipientDid: Did, seenAt?: Date) => Promise<number>;
-}

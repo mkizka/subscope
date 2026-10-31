@@ -1,13 +1,11 @@
 import type { Did } from "@atproto/did";
 
-import type { INotificationRepository } from "../../interfaces/notification-repository.js";
+import type { INotificationQuery } from "../../interfaces/notification-query.js";
 
 export class GetUnreadCountUseCase {
-  constructor(
-    private readonly notificationRepository: INotificationRepository,
-  ) {}
+  constructor(private readonly notificationQuery: INotificationQuery) {}
 
   async execute(viewerDid: Did, seenAt?: Date): Promise<number> {
-    return await this.notificationRepository.countUnread(viewerDid, seenAt);
+    return await this.notificationQuery.countUnread(viewerDid, seenAt);
   }
 }

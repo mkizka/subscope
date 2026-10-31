@@ -4,20 +4,20 @@ import { schema } from "@repo/db";
 import { and, count, desc, eq, gt, inArray, isNull, lt, or } from "drizzle-orm";
 
 import type {
-  INotificationRepository,
-  NotificationItem,
+  NotificationDto,
   NotificationReason,
-} from "../../application/interfaces/notification-repository.js";
+} from "../../application/dto/notification-dto.js";
+import type { INotificationQuery } from "../../application/interfaces/notification-query.js";
 
-export class NotificationRepository implements INotificationRepository {
+export class NotificationQuery implements INotificationQuery {
   constructor(private readonly db: DatabaseClient) {}
 
-  async findMany(params: {
+  async findNotifications(params: {
     recipientDid: Did;
     limit: number;
     cursor?: Date;
     reasons?: NotificationReason[];
-  }): Promise<NotificationItem[]> {
+  }): Promise<NotificationDto[]> {
     const { notifications, records, subscriptions } = schema;
     const rows = await this.db
       .select({
