@@ -1,6 +1,7 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
+import type { ActorStatsDto } from "../dto/actor-stats-dto.js";
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LabelDto } from "../dto/label-dto.js";
@@ -10,6 +11,7 @@ import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { RepostDto } from "../dto/repost-dto.js";
+import type { IActorStatsQuery } from "../interfaces/actor-stats-query.js";
 import type { IFollowQuery } from "../interfaces/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/generator-query.js";
 import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
@@ -25,6 +27,7 @@ import { Batch } from "./batch.js";
 export type Viewer = {
   viewerDid?: Did | null;
   includeTakedowns?: boolean;
+  labelerDids?: string[];
 };
 
 type Repositories = {
@@ -37,6 +40,7 @@ type Repositories = {
   likeQuery: ILikeQuery;
   repostQuery: IRepostQuery;
   generatorQuery: IGeneratorQuery;
+  actorStatsQuery: IActorStatsQuery;
 };
 
 const toAtUris = (uris: string[]) => uris.map((uri) => new AtUri(uri));
@@ -52,6 +56,7 @@ export class ViewContext {
   private readonly viewerLikes: Batch<string, LikeDto>;
   private readonly viewerReposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, GeneratorDto>;
+  private readonly actorStatsBatch: Batch<Did, ActorStatsDto>;
 
   constructor(
     repos: Repositories,
@@ -123,6 +128,10 @@ export class ViewContext {
       (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
       (generator) => generator.uri,
     );
+    this.actorStatsBatch = Batch.one(
+      (dids) => repos.actorStatsQuery.findStats(dids),
+      (stats) => stats.actorDid,
+    );
   }
 
   private async isVisible(subject: string) {
@@ -133,14 +142,22 @@ export class ViewContext {
   }
 
   async profile(did: Did) {
-    const [profile, labels] = await Promise.all([
+    const [profile, reason] = await Promise.all([
       this.profiles.load(did),
-      this.labels.load(did),
+      this.hiddenReason(did),
     ]);
     if (!profile || this.viewer.includeTakedowns) {
       return profile;
     }
-    return hiddenReason(profile, labels) ? undefined : profile;
+    return reason ? undefined : profile;
+  }
+
+  async hiddenReason(did: Did) {
+    const [profile, labels] = await Promise.all([
+      this.profiles.load(did),
+      this.labels.load(did),
+    ]);
+    return profile && hiddenReason(profile, labels);
   }
 
   async post(uri: string) {
@@ -154,6 +171,14 @@ export class ViewContext {
     return (await this.profile(post.actorDid)) ? post : undefined;
   }
 
+  async labelsOf(subject: string) {
+    const labels = await this.labels.load(subject);
+    const { labelerDids } = this.viewer;
+    return labelerDids
+      ? labels?.filter((label) => labelerDids.includes(label.src))
+      : labels;
+  }
+
   record(uri: string) {
     return this.records.load(uri);
   }
@@ -164,6 +189,10 @@ export class ViewContext {
 
   generator(uri: string) {
     return this.generators.load(uri);
+  }
+
+  actorStats(did: Did) {
+    return this.actorStatsBatch.load(did);
   }
 
   async viewerState(did: Did) {
@@ -196,6 +225,7 @@ export class ViewContextFactory {
     likeQuery: ILikeQuery,
     repostQuery: IRepostQuery,
     generatorQuery: IGeneratorQuery,
+    actorStatsQuery: IActorStatsQuery,
   ) {
     this.repos = {
       profileQuery,
@@ -207,6 +237,7 @@ export class ViewContextFactory {
       likeQuery,
       repostQuery,
       generatorQuery,
+      actorStatsQuery,
     };
   }
 

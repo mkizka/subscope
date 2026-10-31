@@ -53,6 +53,7 @@ describe("ProfileQuery", () => {
           displayName: null,
           description: null,
           avatarCid: null,
+          bannerCid: null,
           createdAt: null,
           indexedAt: actor.indexedAt,
           status: actor.status,

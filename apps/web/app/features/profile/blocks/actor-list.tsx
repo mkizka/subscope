@@ -1,4 +1,5 @@
 import { ShieldIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 
 export type Actor = {
@@ -11,11 +12,12 @@ export type Actor = {
   isAdmin?: boolean;
 };
 
-type Props = {
-  actors: Actor[];
+type Props<T extends Actor> = {
+  actors: T[];
+  renderAction?: (actor: T) => ReactNode;
 };
 
-export function ActorList({ actors }: Props) {
+export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
   const [searchParams] = useSearchParams();
   return (
     <ul className="list">
@@ -25,11 +27,11 @@ export function ActorList({ actors }: Props) {
         const profileParams = new URLSearchParams(searchParams);
         profileParams.set("profile", profileId);
         return (
-          <li key={actor.did}>
+          <li key={actor.did} className="flex items-center pr-2">
             <Link
               to={`?${profileParams}`}
               className="
-                list-row items-center
+                list-row min-w-0 flex-1 items-center
                 hover:bg-base-200
               "
             >
@@ -65,6 +67,7 @@ export function ActorList({ actors }: Props) {
                 </span>
               )}
             </Link>
+            {renderAction?.(actor)}
           </li>
         );
       })}

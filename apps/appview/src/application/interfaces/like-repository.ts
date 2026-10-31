@@ -8,12 +8,6 @@ export interface ILikeRepository {
     cursor?: Date;
   }) => Promise<Like[]>;
 
-  findLikesByActor: (params: {
-    actorDid: Did;
-    limit: number;
-    cursor?: string;
-  }) => Promise<Like[]>;
-
   findViewerLikes: (params: {
     viewerDid: Did;
     subjectUris: string[];

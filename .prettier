@@ -2,3 +2,4 @@
 apps/
 packages/
 pnpm-lock.yaml
+e2e/

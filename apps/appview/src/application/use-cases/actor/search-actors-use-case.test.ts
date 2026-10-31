@@ -6,12 +6,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("SearchActorsUseCase", () => {
   let searchActorsUseCase: TestServices["searchActorsUseCase"];
   let profileRepo: TestServices["profileRepository"];
-  let actorStatsRepo: TestServices["actorStatsRepository"];
+  let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     searchActorsUseCase = services.searchActorsUseCase;
     profileRepo = services.profileRepository;
-    actorStatsRepo = services.actorStatsRepository;
+    profileQuery = services.profileQuery;
   });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {
@@ -65,11 +65,7 @@ describe("SearchActorsUseCase", () => {
       handle: "match.test",
     });
     profileRepo.add(matchProfile);
-    actorStatsRepo.add(matchActor.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(matchProfile);
 
     const noMatchActor = actorFactory();
     const noMatchProfile = profileDetailedFactory({
@@ -78,11 +74,7 @@ describe("SearchActorsUseCase", () => {
       handle: "nomatch.test",
     });
     profileRepo.add(noMatchProfile);
-    actorStatsRepo.add(noMatchActor.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(noMatchProfile);
 
     // act
     const result = await searchActorsUseCase.execute({
@@ -111,11 +103,7 @@ describe("SearchActorsUseCase", () => {
       displayName: "No Match User",
     });
     profileRepo.add(profile);
-    actorStatsRepo.add(actor.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(profile);
 
     // act
     const result = await searchActorsUseCase.execute({
@@ -138,11 +126,7 @@ describe("SearchActorsUseCase", () => {
       displayName: "Limit Test User 1",
     });
     profileRepo.add(profile1);
-    actorStatsRepo.add(actor1.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(profile1);
 
     const actor2 = actorFactory();
     const profile2 = profileDetailedFactory({
@@ -150,11 +134,7 @@ describe("SearchActorsUseCase", () => {
       displayName: "Limit Test User 2",
     });
     profileRepo.add(profile2);
-    actorStatsRepo.add(actor2.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(profile2);
 
     // act
     const result = await searchActorsUseCase.execute({
@@ -177,11 +157,7 @@ describe("SearchActorsUseCase", () => {
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
     profileRepo.add(profile1);
-    actorStatsRepo.add(actor1.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(profile1);
 
     const actor2 = actorFactory();
     const profile2 = profileDetailedFactory({
@@ -191,11 +167,7 @@ describe("SearchActorsUseCase", () => {
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
     profileRepo.add(profile2);
-    actorStatsRepo.add(actor2.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(profile2);
 
     // act - 最初のページ
     const firstPage = await searchActorsUseCase.execute({
@@ -245,11 +217,7 @@ describe("SearchActorsUseCase", () => {
       handle: "different.handle.com",
     });
     profileRepo.add(displayNameProfile);
-    actorStatsRepo.add(displayNameActor.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(displayNameProfile);
 
     const handleActor = actorFactory();
     const handleProfile = profileDetailedFactory({
@@ -258,11 +226,7 @@ describe("SearchActorsUseCase", () => {
       handle: "testhandle.example.com",
     });
     profileRepo.add(handleProfile);
-    actorStatsRepo.add(handleActor.did, {
-      followersCount: 0,
-      followsCount: 0,
-      postsCount: 0,
-    });
+    profileQuery.add(handleProfile);
 
     // act - displayNameで検索
     const displayNameResult = await searchActorsUseCase.execute({

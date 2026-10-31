@@ -1,8 +1,9 @@
 import { type Did } from "@atproto/did";
 import type * as AppBskyActorSearchActors from "@repo/client/lex/app/bsky/actor/searchActors";
 
-import type { ProfileViewService } from "../../../application/service/actor/profile-view-service.js";
 import type { ProfileSearchService } from "../../../application/service/search/profile-search-service.js";
+import type { ProfileViews } from "../../views/profile-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 type SearchActorsParams = {
   query: string | undefined;
@@ -14,7 +15,8 @@ type SearchActorsParams = {
 export class SearchActorsUseCase {
   constructor(
     private readonly profileSearchService: ProfileSearchService,
-    private readonly profileViewService: ProfileViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly profileViews: ProfileViews,
   ) {}
 
   async execute(
@@ -35,15 +37,18 @@ export class SearchActorsUseCase {
       cursor,
     });
 
-    const dids = result.items.map((profile) => profile.actorDid);
-    const actors = await this.profileViewService.findProfileView(
-      dids,
-      params.viewerDid,
+    const ctx = this.viewContextFactory.create({
+      viewerDid: params.viewerDid,
+    });
+    const actors = await Promise.all(
+      result.items.map((profile) =>
+        this.profileViews.view(profile.actorDid, ctx),
+      ),
     );
 
     return {
       cursor: result.cursor,
-      actors,
+      actors: actors.filter((actor) => actor !== undefined),
     };
   }
 }

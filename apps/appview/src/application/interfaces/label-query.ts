@@ -6,5 +6,5 @@ export interface ILabelQuery {
 
 const TAKEDOWN_VALS = ["!takedown", "!suspend"];
 
-export const isTakendown = (labels: LabelDto[] = []) =>
+export const isTakendown = (labels: Pick<LabelDto, "val">[] = []) =>
   labels.some((label) => TAKEDOWN_VALS.includes(label.val));
