@@ -1,6 +1,6 @@
 import { isAtIdentifierString } from "@atproto/syntax";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { data } from "react-router";
+import { data, redirect, useSubmit } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { listSchema } from "@/app/features/list/blocks/list-form";
@@ -38,7 +38,12 @@ export const action = async ({
   request,
   context,
 }: Route.ActionArgs) => {
-  const submission = parseWithZod(await request.formData(), {
+  const formData = await request.formData();
+  if (formData.get("intent") === "delete") {
+    await di.deleteListUseCase.execute(context.get(didContext), params.rkey);
+    return redirect(`/profile/${params.handle}/lists`);
+  }
+  const submission = parseWithZod(formData, {
     schema: listSchema,
   });
   if (submission.status !== "success") {
@@ -58,12 +63,14 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 export default function List({ loaderData }: Route.ComponentProps) {
   const { list, ...rest } = loaderData;
+  const submit = useSubmit();
   return (
     <ListPage
       uri={list.uri}
       name={list.name}
       description={list.description}
       {...rest}
+      onDelete={() => submit({ intent: "delete" }, { method: "post" })}
     />
   );
 }

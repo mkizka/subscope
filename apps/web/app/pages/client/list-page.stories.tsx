@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { ListPage } from "./list-page";
 
@@ -10,6 +11,7 @@ const meta = {
     description: "よく話す人たち",
     tab: "posts",
     isSelf: true,
+    onDelete: fn(),
     posts: [
       {
         uri: "at://did:plc:bob/app.bsky.feed.post/1",

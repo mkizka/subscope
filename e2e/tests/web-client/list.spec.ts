@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, follow, resolveHandle } from "../../helpers/pds";
+import {
+  createRecord,
+  follow,
+  PDS_URL,
+  resolveHandle,
+} from "../../helpers/pds";
 
 const createList = async (name: string) => {
   const bob = await resolveHandle("bob.test");
@@ -146,5 +151,48 @@ test.describe("リスト", () => {
         timeout: 1000,
       });
     }).toPass();
+  });
+
+  test("list-6: 自分のリスト詳細で、確認のうえリストとそのメンバー登録を削除し、リスト一覧に戻る", async ({
+    page,
+  }) => {
+    const name = `list-6のリスト ${Date.now()}`;
+    const rkey = await createList(name);
+    const alice = await resolveHandle("alice.test");
+    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByRole("button", { name: "削除する" })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+
+    await main.getByRole("button", { name: "削除する" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "削除する" })
+      .click();
+
+    await expect(page).toHaveURL("/profile/alice.test/lists");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeHidden({
+        timeout: 1000,
+      });
+    }).toPass();
+    const response = await fetch(
+      `${PDS_URL}/xrpc/com.atproto.repo.listRecords?repo=${alice}&collection=app.bsky.graph.listitem&limit=100`,
+    );
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const { records } = (await response.json()) as {
+      records: { value: { list: string } }[];
+    };
+    expect(
+      records.filter(
+        ({ value }) =>
+          value.list === `at://${alice}/app.bsky.graph.list/${rkey}`,
+      ),
+    ).toEqual([]);
   });
 });
