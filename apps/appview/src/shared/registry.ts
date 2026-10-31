@@ -51,7 +51,6 @@ import { ProfileViewService } from "../application/service/actor/profile-view-se
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
-import { ActorLikesService } from "../application/service/feed/actor-likes-service.js";
 import { AuthorFeedService } from "../application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "../application/service/feed/feed-processor.js";
 import { GeneratorViewService } from "../application/service/feed/generator-view-service.js";
@@ -252,7 +251,6 @@ export const createAppRegistry = (env: Env) =>
     .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
     .service("authorFeedService", ["authorFeedRepository"], asClassArgs(AuthorFeedService))
-    .service("actorLikesService", ["likeRepository"], asClassArgs(ActorLikesService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
@@ -278,7 +276,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getTimelineUseCase", ["timelineQuery", "feedProcessor"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationRepository", "profileViewService", "subscriptionRepository"], asClassArgs(ListNotificationsUseCase))
     .service("searchPostsUseCase", ["searchService", "postViewService"], asClassArgs(SearchPostsUseCase))
-    .service("getActorLikesUseCase", ["actorLikesService", "feedProcessor"], asClassArgs(GetActorLikesUseCase))
+    .service("getActorLikesUseCase", ["likeQuery", "feedProcessor"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedService", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["generatorViewService"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "profileViewService"], asClassArgs(GetLikesUseCase))
