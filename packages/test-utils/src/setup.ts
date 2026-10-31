@@ -18,7 +18,7 @@ const testRegistry = createRegistry()
   .value("logLevel", "error" as const)
   .value("databaseUrl", inject("databaseUrl"))
   .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
-  .service("connectionPool", ["databaseUrl"], asFunctionArgs(connectionPoolFactory))
+  .service("connectionPool", ["databaseUrl"], connectionPoolFactory)
   .service("db", ["connectionPool", "loggerManager"], asFunctionArgs(databaseFactory))
   .service("transactionManager", ["db"], asClassArgs(TransactionManager));
 
