@@ -1,6 +1,10 @@
 import { XIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import type { ComposeTarget } from "@/app/features/timeline/blocks/post-form-container";
+import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
+import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import {
   PostCard,
   type PostCardProps,
@@ -8,15 +12,15 @@ import {
 } from "@/app/features/timeline/parts/post-card";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
-type ThreadPost = PostCardProps & { uri: string };
-
 type Props = {
   thread?: {
-    ancestors: ThreadPost[];
-    post: ThreadPost;
-    replies: ThreadPost[][];
+    ancestors: TimelinePost[];
+    post: TimelinePost;
+    replies: TimelinePost[][];
   } | null;
   closeSearch: string;
+  onCompose: (target: ComposeTarget) => void;
+  form?: ReactNode;
 };
 
 function FocusedPost({
@@ -30,7 +34,8 @@ function FocusedPost({
   replyCount,
   repostCount,
   likeCount,
-}: ThreadPost) {
+  toolbar,
+}: TimelinePost & { toolbar: ReactNode }) {
   const hydrated = useHydrated();
   const counts = [
     { count: replyCount, label: "返信" },
@@ -96,11 +101,12 @@ function FocusedPost({
           ))}
         </div>
       )}
+      <div className="mt-2">{toolbar}</div>
     </article>
   );
 }
 
-function ConnectedPost(post: ThreadPost) {
+function ConnectedPost(props: PostCardProps) {
   return (
     <div className="relative">
       <div
@@ -108,12 +114,15 @@ function ConnectedPost(post: ThreadPost) {
           absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
         "
       />
-      <PostCard {...post} />
+      <PostCard {...props} />
     </div>
   );
 }
 
-export function ThreadPanel({ thread, closeSearch }: Props) {
+export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
+  const toolbar = (post: TimelinePost) => (
+    <PostToolbarContainer {...post} onCompose={onCompose} />
+  );
   return (
     <section aria-label="スレッド" className="flex flex-col">
       <header
@@ -134,19 +143,28 @@ export function ThreadPanel({ thread, closeSearch }: Props) {
       {thread && (
         <>
           {thread.ancestors.map((post) => (
-            <ConnectedPost key={post.uri} {...post} />
+            <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
           ))}
-          <FocusedPost {...thread.post} />
+          <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
           {thread.replies.map((chain) =>
             chain.map((post, i) =>
               i < chain.length - 1 ? (
-                <ConnectedPost key={post.uri} {...post} />
+                <ConnectedPost
+                  key={post.uri}
+                  {...post}
+                  toolbar={toolbar(post)}
+                />
               ) : (
-                <PostCard key={post.uri} {...post} />
+                <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
               ),
             ),
           )}
         </>
+      )}
+      {form && (
+        <div className="sticky bottom-0 border-t border-base-300 bg-base-100 p-3">
+          {form}
+        </div>
       )}
     </section>
   );
