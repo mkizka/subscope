@@ -114,4 +114,33 @@ test.describe("スレッド", () => {
       });
     }).toPass();
   });
+
+  test("thread-6: 直下の返信の下には、返信への返信を1件ずつたどって並べる", async ({
+    page,
+  }) => {
+    const target = await post("thread-6: 投稿");
+    const reply = await post("thread-6: 返信", target);
+    const nested = await post("thread-6: 返信の返信", reply);
+    await post("thread-6: 返信の返信の返信A", nested);
+    await post("thread-6: 返信の返信の返信B", nested);
+    const region = page.getByRole("region", { name: "スレッド" });
+
+    await page.goto("/");
+    await page.waitForURL("/");
+    await expect(async () => {
+      await page.goto(`/?${new URLSearchParams({ thread: nested.uri })}`);
+      await expect(region.getByText(/^thread-6: 返信の返信の返信/)).toHaveCount(
+        2,
+        { timeout: 1000 },
+      );
+    }).toPass();
+    await page.goto(`/?${new URLSearchParams({ thread: target.uri })}`);
+
+    await expect(region.getByText(/^thread-6: /)).toHaveText([
+      "thread-6: 投稿",
+      "thread-6: 返信",
+      "thread-6: 返信の返信",
+      /^thread-6: 返信の返信の返信[AB]$/,
+    ]);
+  });
 });
