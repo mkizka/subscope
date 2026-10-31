@@ -12,14 +12,14 @@ describe("SearchPostsUseCase", () => {
   let postRepo: TestServices["postRepository"];
   let postStatsRepo: TestServices["postStatsQuery"];
   let profileRepo: TestServices["profileRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     searchPostsUseCase = services.searchPostsUseCase;
     postRepo = services.postRepository;
     postStatsRepo = services.postStatsQuery;
     profileRepo = services.profileRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
   });
 
   test("検索クエリが空の場合、空の結果を返す", async () => {

@@ -12,14 +12,14 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("FeedProcessor", () => {
   let feedProcessor: TestServices["feedProcessor"];
   let postRepo: TestServices["postRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   let profileRepo: TestServices["profileRepository"];
   let repostRepo: TestServices["repostRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     feedProcessor = services.feedProcessor;
     postRepo = services.postRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
     profileRepo = services.profileRepository;
     repostRepo = services.repostRepository;
   });

@@ -22,7 +22,7 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("PostViewService", () => {
   let postViewService: TestServices["postViewService"];
   let postRepo: TestServices["postRepository"];
-  let recordRepo: TestServices["recordRepository"];
+  let recordRepo: TestServices["recordQuery"];
   let profileRepo: TestServices["profileRepository"];
   let generatorRepo: TestServices["generatorRepository"];
   let likeRepo: TestServices["likeRepository"];
@@ -31,7 +31,7 @@ describe("PostViewService", () => {
     const services = await testRegistry.resolve();
     postViewService = services.postViewService;
     postRepo = services.postRepository;
-    recordRepo = services.recordRepository;
+    recordRepo = services.recordQuery;
     profileRepo = services.profileRepository;
     generatorRepo = services.generatorRepository;
     likeRepo = services.likeRepository;

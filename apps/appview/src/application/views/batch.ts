@@ -8,7 +8,26 @@ export class Batch<K, V> {
   private readonly cache = new Map<K, Promise<V | undefined>>();
   private pending: Pending<K, V>[] = [];
 
-  constructor(private readonly fetch: (keys: K[]) => Promise<Map<K, V>>) {}
+  private constructor(
+    private readonly fetch: (keys: K[]) => Promise<Map<K, V>>,
+  ) {}
+
+  static one<K, V>(
+    fetch: (keys: K[]) => Promise<V[]>,
+    keyOf: (value: V) => K,
+  ): Batch<K, V> {
+    return new Batch(
+      async (keys) =>
+        new Map((await fetch(keys)).map((value) => [keyOf(value), value])),
+    );
+  }
+
+  static many<K, V>(
+    fetch: (keys: K[]) => Promise<V[]>,
+    keyOf: (value: V) => K,
+  ): Batch<K, V[]> {
+    return new Batch(async (keys) => Map.groupBy(await fetch(keys), keyOf));
+  }
 
   load(key: K): Promise<V | undefined> {
     const cached = this.cache.get(key);

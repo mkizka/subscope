@@ -19,10 +19,11 @@ import { InMemoryLabelRepository } from "../infrastructure/label-repository/labe
 import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-repository.in-memory.js";
 import { InMemoryListRepository } from "../infrastructure/list-repository/list-repository.in-memory.js";
 import { InMemoryNotificationRepository } from "../infrastructure/notification-repository/notification-repository.in-memory.js";
+import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryPostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
-import { InMemoryRecordRepository } from "../infrastructure/record-repository/record-repository.in-memory.js";
+import { InMemoryRecordQuery } from "../infrastructure/record-query/record-query.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTimelineRepository } from "../infrastructure/timeline-repository/timeline-repository.in-memory.js";
@@ -51,9 +52,10 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
   .replaceService("actorStatsRepository", asClassArgs(InMemoryActorStatsRepository))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
-  .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
+  .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))
   .replaceService("notificationRepository", asClassArgs(InMemoryNotificationRepository))
   .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
+  .replaceService("postQuery", asClassArgs(InMemoryPostQuery))
   .replaceService("postStatsQuery", asClassArgs(InMemoryPostStatsQuery))
   .replaceService("timelineRepository", asClassArgs(InMemoryTimelineRepository))
   .replaceService("authorFeedRepository", asClassArgs(InMemoryAuthorFeedRepository))

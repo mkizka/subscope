@@ -76,12 +76,14 @@ describe("app.bsky.actor.getProfile", () => {
     );
 
     // assert
-    for (const promise of promises) {
-      await expect(promise).rejects.toMatchObject({
-        status: 400,
-        error: "AccountTakedown",
-      });
-    }
+    await Promise.all(
+      promises.map((promise) =>
+        expect(promise).rejects.toMatchObject({
+          status: 400,
+          error: "AccountTakedown",
+        }),
+      ),
+    );
   });
 
   test("getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す", async () => {
