@@ -22,6 +22,7 @@ import type { IActorRepository } from "../application/interfaces/actor-repositor
 import type { IActorStatsRepository } from "../application/interfaces/actor-stats-repository.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
 import type { IAuthorFeedRepository } from "../application/interfaces/author-feed-repository.js";
+import type { IFollowQuery } from "../application/interfaces/follow-query.js";
 import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IGeneratorRepository } from "../application/interfaces/generator-repository.js";
@@ -109,6 +110,7 @@ import { ActorRepository } from "../infrastructure/actor-repository/actor-reposi
 import { ActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.js";
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
 import { AuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.js";
+import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
 import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { GeneratorRepository } from "../infrastructure/generator-repository/generator-repository.js";
@@ -216,6 +218,7 @@ export const createAppRegistry = (env: Env) =>
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
+    .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("generatorRepository", ["db"], asClassArgs<IGeneratorRepository>()(GeneratorRepository))
     .service("listRepository", ["db"], asClassArgs<IListRepository>()(ListRepository))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
@@ -247,7 +250,7 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileRepository", "labelRepository", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))

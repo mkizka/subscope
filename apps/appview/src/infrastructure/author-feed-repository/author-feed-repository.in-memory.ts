@@ -2,65 +2,66 @@ import type { FeedItem } from "@repo/common/domain";
 
 import type { IAuthorFeedRepository } from "../../application/interfaces/author-feed-repository.js";
 
-type FeedItemWithMeta = {
-  feedItem: FeedItem;
-  isReply: boolean;
+type FeedItemMeta = {
+  isReply?: boolean;
+  isAuthorThread?: boolean;
+  hasMedia?: boolean;
+};
+
+type FindParams = {
+  actorDid: string;
+  limit: number;
+  cursor?: Date;
 };
 
 export class InMemoryAuthorFeedRepository implements IAuthorFeedRepository {
-  private feedItems: FeedItemWithMeta[] = [];
+  private feedItems: { feedItem: FeedItem; meta: FeedItemMeta }[] = [];
 
-  add(feedItem: FeedItem, isReply = false): void {
-    this.feedItems.push({ feedItem, isReply });
+  add(feedItem: FeedItem, meta: FeedItemMeta = {}): void {
+    this.feedItems.push({ feedItem, meta });
   }
 
   clear(): void {
     this.feedItems = [];
   }
 
-  findFeedItems(params: {
-    actorDid: string;
-    limit: number;
-    cursor?: Date;
-  }): Promise<FeedItem[]> {
-    let items = this.feedItems
-      .filter((item) => item.feedItem.actorDid === params.actorDid)
-      .map((item) => item.feedItem);
-
-    if (params.cursor) {
-      const cursor = params.cursor;
-      items = items.filter((item) => item.sortAt < cursor);
-    }
-
-    items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
+  findFeedItems(
+    params: FindParams,
+    predicate: (feedItem: FeedItem, meta: FeedItemMeta) => boolean = () => true,
+  ): Promise<FeedItem[]> {
+    const cursor = params.cursor;
+    const items = this.feedItems
+      .filter(
+        ({ feedItem, meta }) =>
+          feedItem.actorDid === params.actorDid &&
+          (!cursor || feedItem.sortAt < cursor) &&
+          predicate(feedItem, meta),
+      )
+      .map(({ feedItem }) => feedItem)
+      .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
 
     return Promise.resolve(items.slice(0, params.limit));
   }
 
-  findFeedItemsWithoutReplies(params: {
-    actorDid: string;
-    limit: number;
-    cursor?: Date;
-  }): Promise<FeedItem[]> {
-    let items = this.feedItems
-      .filter((item) => {
-        if (item.feedItem.actorDid !== params.actorDid) {
-          return false;
-        }
-        if (item.feedItem.type === "repost") {
-          return true;
-        }
-        return !item.isReply;
-      })
-      .map((item) => item.feedItem);
+  findFeedItemsWithoutReplies(params: FindParams): Promise<FeedItem[]> {
+    return this.findFeedItems(
+      params,
+      (feedItem, meta) => feedItem.type === "repost" || !meta.isReply,
+    );
+  }
 
-    if (params.cursor) {
-      const cursor = params.cursor;
-      items = items.filter((item) => item.sortAt < cursor);
-    }
+  findFeedItemsWithMedia(params: FindParams): Promise<FeedItem[]> {
+    return this.findFeedItems(
+      params,
+      (feedItem, meta) => feedItem.type === "post" && !!meta.hasMedia,
+    );
+  }
 
-    items.sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime());
-
-    return Promise.resolve(items.slice(0, params.limit));
+  findFeedItemsWithAuthorThreads(params: FindParams): Promise<FeedItem[]> {
+    return this.findFeedItems(
+      params,
+      (feedItem, meta) =>
+        feedItem.type === "repost" || !meta.isReply || !!meta.isAuthorThread,
+    );
   }
 }
