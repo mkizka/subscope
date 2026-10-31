@@ -44,7 +44,7 @@ export class PostViews {
       quoteCount: stats?.quoteCount ?? 0,
       viewer: {
         repost: viewer.repost?.uri,
-        like: viewer.like?.uri.toString(),
+        like: viewer.like?.uri,
       },
       indexedAt: toDatetimeString(post.indexedAt),
     };

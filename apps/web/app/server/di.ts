@@ -36,7 +36,8 @@ import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
-import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
+import { notificationCommandFactory } from "./infrastructure/notification/notification-command";
+import { notificationQueryFactory } from "./infrastructure/notification/notification-query";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
 import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
 import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
@@ -81,24 +82,21 @@ export const di = await createRegistry()
     ["subscopeRepository"],
     getTrackedActorsUseCaseFactory,
   )
-  .service(
-    "notificationRepository",
-    ["oauthClient"],
-    notificationRepositoryFactory,
-  )
+  .service("notificationQuery", ["oauthClient"], notificationQueryFactory)
+  .service("notificationCommand", ["oauthClient"], notificationCommandFactory)
   .service(
     "getNotificationsUseCase",
-    ["notificationRepository"],
+    ["notificationQuery"],
     getNotificationsUseCaseFactory,
   )
   .service(
     "countUnreadNotificationsUseCase",
-    ["notificationRepository"],
+    ["notificationQuery"],
     countUnreadNotificationsUseCaseFactory,
   )
   .service(
     "markNotificationsSeenUseCase",
-    ["notificationRepository"],
+    ["notificationCommand"],
     markNotificationsSeenUseCaseFactory,
   )
   .service("timelineQuery", ["oauthClient"], timelineQueryFactory)

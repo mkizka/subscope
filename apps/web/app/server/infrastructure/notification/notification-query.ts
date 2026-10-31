@@ -1,13 +1,12 @@
-import type { AtUriString, DatetimeString } from "@atproto/syntax";
+import type { AtUriString } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
 import type { Notification } from "@repo/client/lex/app/bsky/notification/listNotifications";
 import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
-import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
-export interface INotificationRepository {
+export interface INotificationQuery {
   findMany: (
     did: string,
     cursor?: string,
@@ -17,14 +16,13 @@ export interface INotificationRepository {
     uris: AtUriString[],
   ) => Promise<Record<string, unknown>>;
   countUnread: (did: string) => Promise<{ count: number }>;
-  updateSeen: (did: string, seenAt: DatetimeString) => Promise<void>;
 }
 
-export const notificationRepositoryFactory = ({
+export const notificationQueryFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): INotificationRepository => {
+}): INotificationQuery => {
   const restore = async (did: string) => {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("Failed to restore OAuth session");
@@ -46,10 +44,6 @@ export const notificationRepositoryFactory = ({
     async countUnread(did) {
       const agent = await restore(did);
       return agent.call(getUnreadCount, {});
-    },
-    async updateSeen(did, seenAt) {
-      const agent = await restore(did);
-      await agent.call(updateSeen, { seenAt });
     },
   };
 };

@@ -27,6 +27,7 @@ import type { IGeneratorRepository } from "../application/interfaces/generator-r
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 import type { ILabelRepository } from "../application/interfaces/label-repository.js";
+import type { ILikeQuery } from "../application/interfaces/like-query.js";
 import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 import type { IListRepository } from "../application/interfaces/list-repository.js";
 import type { INotificationRepository } from "../application/interfaces/notification-repository.js";
@@ -113,6 +114,7 @@ import { GeneratorRepository } from "../infrastructure/generator-repository/gene
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
 import { LabelRepository } from "../infrastructure/label-repository/label-repository.js";
+import { LikeQuery } from "../infrastructure/like-query/like-query.js";
 import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
 import { ListRepository } from "../infrastructure/list-repository/list-repository.js";
 import { NotificationRepository } from "../infrastructure/notification-repository/notification-repository.js";
@@ -204,6 +206,7 @@ export const createAppRegistry = (env: Env) =>
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationRepository", ["db"], asClassArgs<INotificationRepository>()(NotificationRepository))
     .service("postRepository", ["db"], asClassArgs<IPostRepository>()(PostRepository))
+    .service("likeQuery", ["db"], asClassArgs<ILikeQuery>()(LikeQuery))
     .service("postQuery", ["db"], asClassArgs<IPostQuery>()(PostQuery))
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
     .service("timelineRepository", ["db"], asClassArgs<ITimelineRepository>()(TimelineRepository))
@@ -243,7 +246,7 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postQuery", "recordQuery", "postStatsQuery", "likeRepository", "repostQuery", "generatorRepository"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileRepository", "labelRepository", "followRepository", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorRepository"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
