@@ -19,7 +19,7 @@ import {
 } from "@repo/common/infrastructure";
 
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
-import type { IActorStatsRepository } from "../application/interfaces/actor-stats-repository.js";
+import type { IActorStatsQuery } from "../application/interfaces/actor-stats-query.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
 import type { IAuthorFeedRepository } from "../application/interfaces/author-feed-repository.js";
 import type { IFollowQuery } from "../application/interfaces/follow-query.js";
@@ -112,7 +112,7 @@ import { ProfileViews } from "../application/views/profile-views.js";
 import { ViewContextFactory } from "../application/views/view-context.js";
 import { AtUriService } from "../domain/service/at-uri-service.js";
 import { ActorRepository } from "../infrastructure/actor-repository/actor-repository.js";
-import { ActorStatsRepository } from "../infrastructure/actor-stats-repository/actor-stats-repository.js";
+import { ActorStatsQuery } from "../infrastructure/actor-stats-query/actor-stats-query.js";
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
 import { AuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.js";
 import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
@@ -215,7 +215,7 @@ export const createAppRegistry = (env: Env) =>
     .service("labelRepository", ["db"], asClassArgs<ILabelRepository>()(LabelRepository))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
-    .service("actorStatsRepository", ["db"], asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
+    .service("actorStatsQuery", ["db"], asClassArgs<IActorStatsQuery>()(ActorStatsQuery))
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationRepository", ["db"], asClassArgs<INotificationRepository>()(NotificationRepository))
@@ -242,7 +242,7 @@ export const createAppRegistry = (env: Env) =>
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileViewBuilder", ["assetUrlBuilder"], asClassArgs(ProfileViewBuilder))
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
-    .service("actorLoader", ["profileRepository", "actorStatsRepository", "followRepository", "labelRepository"], asClassArgs(ActorLoader))
+    .service("actorLoader", ["profileRepository", "actorStatsQuery", "followRepository", "labelRepository"], asClassArgs(ActorLoader))
     .service("profileViewService", ["actorLoader", "profileViewBuilder"], asClassArgs(ProfileViewService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))

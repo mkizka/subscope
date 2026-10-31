@@ -6,19 +6,18 @@ import {
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import type { ActorStats } from "../../../application/interfaces/actor-stats-repository.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ProfileViewService", () => {
   let profileViewService: TestServices["profileViewService"];
   let profileRepo: TestServices["profileRepository"];
-  let actorStatsRepo: TestServices["actorStatsRepository"];
+  let actorStatsQuery: TestServices["actorStatsQuery"];
   let followRepo: TestServices["followRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     profileViewService = services.profileViewService;
     profileRepo = services.profileRepository;
-    actorStatsRepo = services.actorStatsRepository;
+    actorStatsQuery = services.actorStatsQuery;
     followRepo = services.followRepository;
   });
 
@@ -73,12 +72,12 @@ describe("ProfileViewService", () => {
       });
       profileRepo.add(profile);
 
-      const actorStats: ActorStats = {
+      const actorStats = {
         followsCount: 10,
         followersCount: 20,
         postsCount: 30,
       };
-      actorStatsRepo.add(actor.did, actorStats);
+      actorStatsQuery.add(actor.did, actorStats);
 
       // act
       const results = await profileViewService.findProfileViewDetailed([
@@ -137,12 +136,12 @@ describe("ProfileViewService", () => {
       });
       profileRepo.add(profile1);
 
-      const actorStats1: ActorStats = {
+      const actorStats1 = {
         followsCount: 5,
         followersCount: 10,
         postsCount: 15,
       };
-      actorStatsRepo.add(actor1.did, actorStats1);
+      actorStatsQuery.add(actor1.did, actorStats1);
 
       const actor2 = actorFactory();
       const profile2 = profileDetailedFactory({
@@ -151,12 +150,12 @@ describe("ProfileViewService", () => {
       });
       profileRepo.add(profile2);
 
-      const actorStats2: ActorStats = {
+      const actorStats2 = {
         followsCount: 20,
         followersCount: 25,
         postsCount: 30,
       };
-      actorStatsRepo.add(actor2.did, actorStats2);
+      actorStatsQuery.add(actor2.did, actorStats2);
 
       // act
       const results = await profileViewService.findProfileViewDetailed([
