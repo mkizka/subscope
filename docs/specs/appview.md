@@ -17,6 +17,13 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 - takedown-3: 期限が切れたラベルは無視する
 - takedown-4: 状態が takendown、suspended、deactivated のアカウントとその投稿は応答に含めない
 
+## ラベル
+
+モデレーションサービスが付けたラベルを、プロフィールと投稿のビューの labels に載せる。公式クライアントは labels を見て警告やぼかしを表示する。今はgetPostsだけが対応する。
+
+- labels-1: プロフィールのビューの labels に、そのアカウントのDIDに付いたラベルを含める
+- labels-2: 投稿のビューの labels に、その投稿に付いたラベルを含める
+
 ## 返信制限
 
 スレッドの起点の投稿者がthreadgateで決めた返信できる人を、postViewに反映する。今はgetPostsだけが対応する。

@@ -165,6 +165,10 @@ export class ViewContext {
     return (await this.profile(post.actorDid)) ? post : undefined;
   }
 
+  labelsOf(subject: string) {
+    return this.labels.load(subject);
+  }
+
   record(uri: string) {
     return this.records.load(uri);
   }
