@@ -11,6 +11,8 @@ const meta = {
     followsCount: 120,
     followersCount: 345,
     follow: { did: "did:plc:alice" },
+    tabs: ["posts", "replies"],
+    tab: "posts",
     posts: [
       {
         uri: "at://did:plc:alice/app.bsky.feed.post/1",

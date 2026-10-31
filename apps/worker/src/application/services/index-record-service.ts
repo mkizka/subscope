@@ -11,6 +11,7 @@ import type { IRecordRepository } from "../interfaces/repositories/record-reposi
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
+import type { GateIndexer } from "./indexer/gate-indexer.js";
 import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
 import type { LikeIndexer } from "./indexer/like-indexer.js";
 import type { ListIndexer } from "./indexer/list-indexer.js";
@@ -42,6 +43,7 @@ export class IndexRecordService {
     repostIndexer: RepostIndexer,
     listIndexer: ListIndexer,
     listItemIndexer: ListItemIndexer,
+    gateIndexer: GateIndexer,
   ) {
     this.indexers = {
       "app.bsky.feed.post": postIndexer,
@@ -52,6 +54,8 @@ export class IndexRecordService {
       "app.bsky.feed.like": likeIndexer,
       "app.bsky.graph.list": listIndexer,
       "app.bsky.graph.listitem": listItemIndexer,
+      "app.bsky.feed.threadgate": gateIndexer,
+      "app.bsky.feed.postgate": gateIndexer,
     };
   }
 

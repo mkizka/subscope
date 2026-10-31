@@ -4,7 +4,7 @@
 
 ## レコードのインデックス
 
-Tapから受け取ったコミットのレコードをDBに保存・削除する。対象のコレクションは post、repost、like、follow、profile、feed generator、list、listitem。
+Tapから受け取ったコミットのレコードをDBに保存・削除する。対象のコレクションは post、repost、like、follow、profile、feed generator、list、listitem、threadgate、postgate。
 
 - index-1: 作成・更新されたレコードを保存する
 - index-2: 削除されたレコードを削除する
@@ -14,10 +14,13 @@ Tapから受け取ったコミットのレコードをDBに保存・削除する
 - index-6: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない
 - index-7: revを持たないコミットは、revを比べずに処理する
 - index-8: 処理済みのrevと同じrevのコミットは、もう一度処理する
+- index-9: threadgate と postgate は、同じアカウントで同じrkeyの投稿を対象とするものだけ保存する
 
 null文字を含む文字列はPostgreSQLに保存できないため除外する。
 
 コミットは並列に処理され、失敗したジョブはリトライされるため、同じレコードへのコミットが届いた順に処理されるとは限らない。そのためレコードのURIごとに処理済みの最新のrev(リポジトリのコミットを表すTID)を記録する。DBのコミット後、後続のジョブを積む前にジョブが落ちた場合でも、リトライで後続のジョブを積み直せるように、同じrevは古いとみなさない。
+
+threadgate と postgate は専用のテーブルを持たず、レコードのJSONだけを保存する。Lexiconの定めにより対象の投稿と同じrkeyを持つため、appviewは投稿のURIから引ける。
 
 ## Tapへの登録
 

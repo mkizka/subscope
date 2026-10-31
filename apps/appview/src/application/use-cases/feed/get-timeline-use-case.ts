@@ -1,8 +1,10 @@
 import type { Did } from "@atproto/did";
 import type * as AppBskyFeedGetTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 
+import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
+import type { ITimelineQuery } from "../../../application/interfaces/timeline-query.js";
 import type { FeedProcessor } from "../../../application/service/feed/feed-processor.js";
-import type { TimelineService } from "../../../application/service/feed/timeline-service.js";
+import { createCursorPaginator } from "../../../application/utils/pagination.js";
 
 type GetTimelineParams = {
   limit: number;
@@ -13,7 +15,7 @@ type GetTimelineParams = {
 
 export class GetTimelineUseCase {
   constructor(
-    private readonly timelineService: TimelineService,
+    private readonly timelineQuery: ITimelineQuery,
     private readonly feedProcessor: FeedProcessor,
   ) {}
 
@@ -23,11 +25,17 @@ export class GetTimelineUseCase {
     algorithm: _, // TODO: アルゴリズムごとに実装を追加
     cursor,
   }: GetTimelineParams): Promise<AppBskyFeedGetTimeline.$OutputBody> {
-    const page = await this.timelineService.findFeedItemsWithPagination({
-      viewerDid,
+    const paginator = createCursorPaginator<FeedItemDto>({
       limit,
+      getCursor: (item) => item.sortAt.toISOString(),
+    });
+
+    const feedItems = await this.timelineQuery.findFeedItems({
+      viewerDid,
+      limit: paginator.queryLimit,
       cursor: cursor ? new Date(cursor) : undefined,
     });
+    const page = paginator.extractPage(feedItems);
 
     const feed = await this.feedProcessor.processFeedItems(
       page.items,
