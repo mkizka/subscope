@@ -1,10 +1,10 @@
 import type { Did } from "@atproto/did";
-import { toDatetimeString } from "@atproto/syntax";
+import { AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
 
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
-import { toLabelViews } from "./label-views.js";
+import { toLabelViews, toSelfLabelViews } from "./label-views.js";
 import type { ViewContext } from "./view-context.js";
 
 export class ProfileViews {
@@ -64,9 +64,16 @@ export class ProfileViews {
     profile: ProfileDto,
     ctx: ViewContext,
   ): Promise<AppBskyActorDefs.ProfileViewBasic> {
-    const [viewerState, labels] = await Promise.all([
+    const profileUri = AtUri.make(
+      profile.actorDid,
+      "app.bsky.actor.profile",
+      "self",
+    ).toString();
+    const [viewerState, didLabels, profileLabels, record] = await Promise.all([
       ctx.viewerState(profile.actorDid),
       ctx.labelsOf(profile.actorDid),
+      ctx.labelsOf(profileUri),
+      ctx.record(profileUri),
     ]);
     return {
       $type: "app.bsky.actor.defs#profileViewBasic",
@@ -84,7 +91,11 @@ export class ProfileViews {
         following: viewerState.following,
         followedBy: viewerState.followedBy,
       },
-      labels: toLabelViews(labels),
+      labels: [
+        ...toLabelViews(didLabels),
+        ...toLabelViews(profileLabels),
+        ...toSelfLabelViews(record),
+      ],
       createdAt: profile.createdAt
         ? toDatetimeString(profile.createdAt)
         : undefined,

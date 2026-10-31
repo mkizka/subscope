@@ -10,7 +10,7 @@ import type { RecordDto } from "../dto/record-dto.js";
 import { gateUri } from "../utils/gate-uri.js";
 import { asLexMap } from "../utils/lex.js";
 import type { EmbedViews } from "./embed-views.js";
-import { toLabelViews } from "./label-views.js";
+import { toLabelViews, toSelfLabelViews } from "./label-views.js";
 import type { ListViews } from "./list-views.js";
 import type { ProfileViews } from "./profile-views.js";
 import type { ViewContext } from "./view-context.js";
@@ -68,7 +68,7 @@ export class PostViews {
           postgate && this.embeddingDisabled(post.actorDid, postgate, ctx),
       },
       threadgate,
-      labels: toLabelViews(labels),
+      labels: [...toLabelViews(labels), ...toSelfLabelViews(record)],
       indexedAt: toDatetimeString(post.indexedAt),
     };
   }
