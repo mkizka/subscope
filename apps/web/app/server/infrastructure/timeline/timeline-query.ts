@@ -28,7 +28,7 @@ export type TimelinePostDto = {
   repostCount?: number;
   likeCount?: number;
   createdAt?: string;
-  images?: { thumb: string; alt: string }[];
+  images?: { thumb: string; fullsize: string; alt: string }[];
   quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };
