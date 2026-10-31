@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { follow, putRecord } from "./pds";
 
 test.describe("フォロー・フォロワー", () => {
@@ -13,7 +12,7 @@ test.describe("フォロー・フォロワー", () => {
       displayName: "Bob",
     });
     await follow("alice.test", "bob.test");
-    await login(page);
+    await page.goto("/");
   });
 
   test("follow-list-1: プロフィール全体ページのフォロー数から、中央カラムにそのユーザーのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({

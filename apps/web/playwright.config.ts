@@ -11,7 +11,17 @@ export default defineConfig({
   },
   projects: [
     { name: "login", testMatch: "login.spec.ts" },
-    { name: "app", testIgnore: "login.spec.ts", dependencies: ["login"] },
+    {
+      name: "auth",
+      testMatch: "auth.setup.ts",
+      dependencies: ["login"],
+    },
+    {
+      name: "app",
+      testIgnore: ["login.spec.ts", "auth.setup.ts"],
+      dependencies: ["auth"],
+      use: { storageState: "e2e/.auth/alice.json" },
+    },
   ],
   webServer: {
     command: "node --import tsx ./dev-env/server.mts pnpm turbo run dev",

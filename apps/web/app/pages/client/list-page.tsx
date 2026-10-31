@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
+import { ListForm } from "@/app/features/list/blocks/list-form";
 import {
   type Actor,
   ActorList,
@@ -16,9 +17,17 @@ type Props = {
   tab: "posts" | "members";
   posts: TimelinePost[];
   members: Actor[];
+  isSelf: boolean;
 };
 
-export function ListPage({ name, description, tab, posts, members }: Props) {
+export function ListPage({
+  name,
+  description,
+  tab,
+  posts,
+  members,
+  isSelf,
+}: Props) {
   return (
     <ThreeColumnLayout>
       <section className="flex flex-col gap-2 border-b border-base-300 p-4">
@@ -29,6 +38,14 @@ export function ListPage({ name, description, tab, posts, members }: Props) {
           </p>
         )}
       </section>
+      {isSelf && (
+        <ListForm
+          summary="編集する"
+          submitLabel="保存する"
+          name={name}
+          description={description}
+        />
+      )}
       <div role="tablist" className="tabs tabs-border">
         {(
           [

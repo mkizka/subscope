@@ -1,7 +1,9 @@
 import { isAtIdentifierString } from "@atproto/syntax";
+import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
+import { listSchema } from "@/app/features/list/blocks/list-form";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ListPage } from "@/app/pages/client/list-page";
 import { di } from "@/app/server/di";
@@ -29,6 +31,25 @@ export const loader = async ({
     tab,
   );
   return data({ ...result, tab });
+};
+
+export const action = async ({
+  params,
+  request,
+  context,
+}: Route.ActionArgs) => {
+  const submission = parseWithZod(await request.formData(), {
+    schema: listSchema,
+  });
+  if (submission.status !== "success") {
+    throw data("リストの内容が不正です", { status: 400 });
+  }
+  await di.updateListUseCase.execute(
+    context.get(didContext),
+    params.rkey,
+    submission.value,
+  );
+  return null;
 };
 
 export function meta({ loaderData }: Route.MetaArgs) {

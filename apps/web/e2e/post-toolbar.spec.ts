@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "./login";
 import { createRecord } from "./pds";
 
 const PDS_URL = "http://localhost:2583";
@@ -47,7 +46,7 @@ for (const { id, name, collection } of cases) {
       return (await res.text()).includes(uri);
     };
 
-    await login(page);
+    await page.goto("/");
     const post = page
       .getByRole("article")
       .filter({ hasText: text })
@@ -101,7 +100,7 @@ for (const { id, name, title, subjectOf } of composeCases) {
       createdAt: new Date().toISOString(),
     });
 
-    await login(page);
+    await page.goto("/");
     const post = page.getByRole("article").filter({ hasText: text });
     await expect(async () => {
       await page.reload();
@@ -138,7 +137,7 @@ test("post-toolbar-5: いいね・リポストのボタンは、押した結果�
     createdAt: new Date().toISOString(),
   });
 
-  await login(page);
+  await page.goto("/");
   const post = page
     .getByRole("article")
     .filter({ hasText: text })

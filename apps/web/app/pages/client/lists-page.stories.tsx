@@ -9,6 +9,7 @@ const meta = {
       { rkey: "1", name: "友達", description: "よく話す人たち" },
       { rkey: "2", name: "ニュース" },
     ],
+    isSelf: true,
   },
   parameters: {
     layout: "fullscreen",

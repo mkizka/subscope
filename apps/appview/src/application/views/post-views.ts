@@ -53,7 +53,7 @@ export class PostViews {
       likeCount: stats?.likeCount ?? 0,
       quoteCount: stats?.quoteCount ?? 0,
       viewer: {
-        repost: viewer.repost?.uri.toString(),
+        repost: viewer.repost?.uri,
         like: viewer.like?.uri,
         replyDisabled: gate && (await this.replyDisabled(rootUri, gate, ctx)),
         embeddingDisabled:
