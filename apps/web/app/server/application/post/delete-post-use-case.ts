@@ -15,6 +15,9 @@ export const deletePostUseCaseFactory = ({
   postQuery: IPostQuery;
 }): IDeletePostUseCase => ({
   async execute(did, uri) {
+    if (!uri.startsWith(`at://${did}/`)) {
+      throw new Error("Cannot delete another user's post");
+    }
     await postCommand.delete(did, uri);
     for (let i = 0; i < 20; i++) {
       if (!(await postQuery.exists(did, uri))) break;
