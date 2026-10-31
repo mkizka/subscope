@@ -1,5 +1,6 @@
 import { asDid } from "@atproto/did";
-import { type DatabaseClient, FeedItem } from "@repo/common/domain";
+import { asAtUriString } from "@atproto/syntax";
+import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   and,
@@ -13,7 +14,8 @@ import {
   type SQL,
 } from "drizzle-orm";
 
-import type { IAuthorFeedRepository } from "../../application/interfaces/author-feed-repository.js";
+import type { FeedItemDto } from "../../application/dto/feed-item-dto.js";
+import type { IAuthorFeedQuery } from "../../application/interfaces/author-feed-query.js";
 
 type FindParams = {
   actorDid: string;
@@ -21,13 +23,13 @@ type FindParams = {
   limit: number;
 };
 
-export class AuthorFeedRepository implements IAuthorFeedRepository {
+export class AuthorFeedQuery implements IAuthorFeedQuery {
   constructor(private readonly db: DatabaseClient) {}
 
   async findFeedItems(
     { actorDid, cursor, limit }: FindParams,
     condition?: SQL,
-  ): Promise<FeedItem[]> {
+  ): Promise<FeedItemDto[]> {
     const filters = [eq(schema.feedItems.actorDid, actorDid), condition];
     if (cursor) {
       filters.push(lt(schema.feedItems.sortAt, cursor));
@@ -36,7 +38,6 @@ export class AuthorFeedRepository implements IAuthorFeedRepository {
     const feedItems = await this.db
       .select({
         uri: schema.feedItems.uri,
-        cid: schema.feedItems.cid,
         sortAt: schema.feedItems.sortAt,
         type: schema.feedItems.type,
         actorDid: schema.feedItems.actorDid,
@@ -48,20 +49,16 @@ export class AuthorFeedRepository implements IAuthorFeedRepository {
       .orderBy(desc(schema.feedItems.sortAt))
       .limit(limit);
 
-    return feedItems.map(
-      (item) =>
-        new FeedItem({
-          uri: item.uri,
-          cid: item.cid,
-          type: item.type,
-          subjectUri: item.subjectUri,
-          actorDid: asDid(item.actorDid),
-          sortAt: item.sortAt,
-        }),
-    );
+    return feedItems.map((item) => ({
+      uri: asAtUriString(item.uri),
+      type: item.type,
+      subjectUri: item.subjectUri ? asAtUriString(item.subjectUri) : null,
+      actorDid: asDid(item.actorDid),
+      sortAt: item.sortAt,
+    }));
   }
 
-  findFeedItemsWithoutReplies(params: FindParams): Promise<FeedItem[]> {
+  findFeedItemsWithoutReplies(params: FindParams): Promise<FeedItemDto[]> {
     return this.findFeedItems(
       params,
       or(
@@ -71,7 +68,7 @@ export class AuthorFeedRepository implements IAuthorFeedRepository {
     );
   }
 
-  findFeedItemsWithMedia(params: FindParams): Promise<FeedItem[]> {
+  findFeedItemsWithMedia(params: FindParams): Promise<FeedItemDto[]> {
     return this.findFeedItems(
       params,
       and(
@@ -86,7 +83,7 @@ export class AuthorFeedRepository implements IAuthorFeedRepository {
     );
   }
 
-  findFeedItemsWithAuthorThreads(params: FindParams): Promise<FeedItem[]> {
+  findFeedItemsWithAuthorThreads(params: FindParams): Promise<FeedItemDto[]> {
     const authorUri = `at://${params.actorDid}/%`;
     return this.findFeedItems(
       params,
