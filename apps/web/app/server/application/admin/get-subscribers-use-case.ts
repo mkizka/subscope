@@ -1,6 +1,6 @@
-import type { IAdminRepository } from "@/app/server/infrastructure/admin/admin-repository";
+import type { IAdminQuery } from "@/app/server/infrastructure/admin/admin-query";
 
 export const getSubscribersUseCaseFactory =
-  ({ adminRepository }: { adminRepository: IAdminRepository }) =>
+  ({ adminQuery }: { adminQuery: IAdminQuery }) =>
   (did: string, cursor?: string) =>
-    adminRepository.getSubscribers(did, cursor);
+    adminQuery.getSubscribers(did, cursor);

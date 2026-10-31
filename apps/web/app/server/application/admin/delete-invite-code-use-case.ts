@@ -1,6 +1,6 @@
-import type { IAdminRepository } from "@/app/server/infrastructure/admin/admin-repository";
+import type { IAdminCommand } from "@/app/server/infrastructure/admin/admin-command";
 
 export const deleteInviteCodeUseCaseFactory =
-  ({ adminRepository }: { adminRepository: IAdminRepository }) =>
+  ({ adminCommand }: { adminCommand: IAdminCommand }) =>
   (did: string, code: string) =>
-    adminRepository.deleteInviteCode(did, code);
+    adminCommand.deleteInviteCode(did, code);
