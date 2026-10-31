@@ -1,21 +1,21 @@
 import { XIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 
-import {
-  PostCard,
-  type PostCardProps,
-  QuotedPost,
-} from "@/app/features/timeline/parts/post-card";
-
-type ThreadPost = PostCardProps & { uri: string };
+import type { ComposeTarget } from "@/app/features/timeline/blocks/post-form-container";
+import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
+import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
+import { PostCard, QuotedPost } from "@/app/features/timeline/parts/post-card";
 
 type Props = {
   thread?: {
-    ancestors: ThreadPost[];
-    post: ThreadPost;
-    replies: ThreadPost[];
+    ancestors: TimelinePost[];
+    post: TimelinePost;
+    replies: TimelinePost[];
   } | null;
   closeSearch: string;
+  onCompose: (target: ComposeTarget) => void;
+  form?: ReactNode;
 };
 
 function FocusedPost({
@@ -29,7 +29,8 @@ function FocusedPost({
   replyCount,
   repostCount,
   likeCount,
-}: ThreadPost) {
+  toolbar,
+}: TimelinePost & { toolbar: ReactNode }) {
   const counts = [
     { count: replyCount, label: "返信" },
     { count: repostCount, label: "リポスト" },
@@ -93,11 +94,15 @@ function FocusedPost({
           ))}
         </div>
       )}
+      <div className="mt-2">{toolbar}</div>
     </article>
   );
 }
 
-export function ThreadPanel({ thread, closeSearch }: Props) {
+export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
+  const toolbar = (post: TimelinePost) => (
+    <PostToolbarContainer {...post} onCompose={onCompose} />
+  );
   return (
     <section aria-label="スレッド" className="flex flex-col">
       <header
@@ -124,14 +129,19 @@ export function ThreadPanel({ thread, closeSearch }: Props) {
                   absolute top-12 -bottom-1 left-[33px] w-0.5 bg-base-content/20
                 "
               />
-              <PostCard {...post} />
+              <PostCard {...post} toolbar={toolbar(post)} />
             </div>
           ))}
-          <FocusedPost {...thread.post} />
+          <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
           {thread.replies.map((post) => (
-            <PostCard key={post.uri} {...post} />
+            <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
           ))}
         </>
+      )}
+      {form && (
+        <div className="sticky bottom-0 border-t border-base-300 bg-base-100 p-3">
+          {form}
+        </div>
       )}
     </section>
   );

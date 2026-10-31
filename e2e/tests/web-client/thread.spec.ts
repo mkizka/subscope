@@ -114,4 +114,45 @@ test.describe("スレッド", () => {
       });
     }).toPass();
   });
+
+  test("thread-6: スレッドの投稿にも投稿のツールバーを表示する", async ({
+    page,
+  }) => {
+    const parent = await post("thread-6: 親");
+    const target = await post("thread-6: 投稿", parent);
+    await post("thread-6: 返信", target);
+
+    await openThread(page, target.uri, "thread-6: 返信");
+
+    const thread = page.getByRole("region", { name: "スレッド" });
+    for (const text of ["thread-6: 親", "thread-6: 投稿", "thread-6: 返信"]) {
+      await expect(
+        thread
+          .getByRole("article")
+          .filter({ hasText: text })
+          .getByRole("button", { name: "いいね" }),
+      ).toBeVisible();
+    }
+  });
+
+  test("thread-7: スレッドで返信ボタンを押すとスレッドの下に投稿欄が開き、投稿すると再読み込みなしでスレッドに返信を表示する", async ({
+    page,
+  }) => {
+    const target = await post("thread-7: 投稿");
+
+    await openThread(page, target.uri, "thread-7: 投稿");
+    const thread = page.getByRole("region", { name: "スレッド" });
+    await thread
+      .getByRole("article", { name: "選んだ投稿" })
+      .getByRole("button", { name: "返信" })
+      .click();
+    await thread
+      .getByRole("textbox", { name: "投稿内容" })
+      .fill("thread-7: 返信");
+    await thread.getByRole("button", { name: "投稿", exact: true }).click();
+
+    await expect(
+      thread.getByRole("article").filter({ hasText: "thread-7: 返信" }),
+    ).toBeVisible();
+  });
 });

@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useSearchParams } from "react-router";
 
+import {
+  type ComposeTarget,
+  PostFormContainer,
+} from "@/app/features/timeline/blocks/post-form-container";
 import type { loader } from "@/app/routes/api.thread";
 
 import { ThreadPanel } from "./thread-panel";
@@ -22,7 +27,8 @@ type Props = {
 
 export function ThreadPanelContainer({ uri }: Props) {
   const [searchParams] = useSearchParams();
-  const { data } = useQuery({
+  const [target, setTarget] = useState<ComposeTarget>();
+  const { data, refetch } = useQuery({
     queryKey: ["thread", uri],
     queryFn: () => fetchThread(uri),
   });
@@ -30,5 +36,23 @@ export function ThreadPanelContainer({ uri }: Props) {
   const closeParams = new URLSearchParams(searchParams);
   closeParams.delete("thread");
 
-  return <ThreadPanel thread={data} closeSearch={closeParams.toString()} />;
+  return (
+    <ThreadPanel
+      thread={data}
+      closeSearch={closeParams.toString()}
+      onCompose={setTarget}
+      form={
+        target && (
+          <PostFormContainer
+            target={target}
+            onClearTarget={() => setTarget(undefined)}
+            onPosted={() => {
+              setTarget(undefined);
+              void refetch();
+            }}
+          />
+        )
+      }
+    />
+  );
 }
