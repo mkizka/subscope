@@ -2,7 +2,6 @@ import type { Did } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
 import { AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
-import type { FeedItem } from "@repo/common/domain";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
@@ -22,7 +21,7 @@ export class FeedProcessor {
   ) {}
 
   async processFeedItems(
-    feedItems: (FeedItem | FeedItemDto)[],
+    feedItems: FeedItemDto[],
     viewerDid?: Did,
   ): Promise<$Typed<AppBskyFeedDefs.FeedViewPost>[]> {
     const postUris = new Set<string>();
@@ -31,10 +30,10 @@ export class FeedProcessor {
 
     for (const item of feedItems) {
       if (item.type === "post") {
-        postUris.add(item.uri.toString());
+        postUris.add(item.uri);
       } else if (item.subjectUri) {
         postUris.add(item.subjectUri);
-        repostUris.add(item.uri.toString());
+        repostUris.add(item.uri);
         reposterDids.add(item.actorDid);
       }
     }
@@ -57,7 +56,7 @@ export class FeedProcessor {
     return feedItems
       .map((item) => {
         const postUri =
-          item.type === "post" ? item.uri.toString() : item.subjectUri;
+          item.type === "post" ? item.uri : item.subjectUri;
         if (!postUri) {
           return null;
         }
@@ -78,7 +77,7 @@ export class FeedProcessor {
         }
 
         if (item.type === "repost") {
-          const repost = repostMap.get(item.uri.toString());
+          const repost = repostMap.get(item.uri);
           if (repost) {
             const reposter = reposterMap.get(repost.actorDid);
             if (reposter) {

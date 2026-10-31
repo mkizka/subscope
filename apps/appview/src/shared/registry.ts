@@ -21,7 +21,7 @@ import {
 import type { IActorRepository } from "../application/interfaces/actor-repository.js";
 import type { IActorStatsQuery } from "../application/interfaces/actor-stats-query.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
-import type { IAuthorFeedRepository } from "../application/interfaces/author-feed-repository.js";
+import type { IAuthorFeedQuery } from "../application/interfaces/author-feed-query.js";
 import type { IFollowQuery } from "../application/interfaces/follow-query.js";
 import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
@@ -51,7 +51,6 @@ import { ProfileViewService } from "../application/service/actor/profile-view-se
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
-import { AuthorFeedService } from "../application/service/feed/author-feed-service.js";
 import { FeedProcessor } from "../application/service/feed/feed-processor.js";
 import { GeneratorViewService } from "../application/service/feed/generator-view-service.js";
 import { PostEmbedViewBuilder } from "../application/service/feed/post-embed-view-builder.js";
@@ -112,7 +111,7 @@ import { AtUriService } from "../domain/service/at-uri-service.js";
 import { ActorRepository } from "../infrastructure/actor-repository/actor-repository.js";
 import { ActorStatsQuery } from "../infrastructure/actor-stats-query/actor-stats-query.js";
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
-import { AuthorFeedRepository } from "../infrastructure/author-feed-repository/author-feed-repository.js";
+import { AuthorFeedQuery } from "../infrastructure/author-feed-query/author-feed-query.js";
 import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
 import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
@@ -223,7 +222,7 @@ export const createAppRegistry = (env: Env) =>
     .service("postQuery", ["db"], asClassArgs<IPostQuery>()(PostQuery))
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
     .service("timelineQuery", ["db"], asClassArgs<ITimelineQuery>()(TimelineQuery))
-    .service("authorFeedRepository", ["db"], asClassArgs<IAuthorFeedRepository>()(AuthorFeedRepository))
+    .service("authorFeedQuery", ["db"], asClassArgs<IAuthorFeedQuery>()(AuthorFeedQuery))
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
@@ -250,7 +249,6 @@ export const createAppRegistry = (env: Env) =>
     .service("postViewService", ["postRepository", "postStatsQuery", "recordQuery", "profileViewService", "generatorViewService", "postEmbedViewBuilder", "repostRepository", "likeRepository", "labelRepository"], asClassArgs(PostViewService))
     .service("replyRefService", ["postViewService"], asClassArgs(ReplyRefService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
-    .service("authorFeedService", ["authorFeedRepository"], asClassArgs(AuthorFeedService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
@@ -277,7 +275,7 @@ export const createAppRegistry = (env: Env) =>
     .service("listNotificationsUseCase", ["notificationRepository", "profileViewService", "subscriptionRepository"], asClassArgs(ListNotificationsUseCase))
     .service("searchPostsUseCase", ["searchService", "postViewService"], asClassArgs(SearchPostsUseCase))
     .service("getActorLikesUseCase", ["likeQuery", "feedProcessor"], asClassArgs(GetActorLikesUseCase))
-    .service("getAuthorFeedUseCase", ["authorFeedService", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
+    .service("getAuthorFeedUseCase", ["authorFeedQuery", "feedProcessor"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["generatorViewService"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "profileViewService"], asClassArgs(GetLikesUseCase))
     .service("getListFeedUseCase", ["timelineQuery", "feedProcessor"], asClassArgs(GetListFeedUseCase))
