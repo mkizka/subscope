@@ -4,6 +4,7 @@ import { getFollowListUseCaseFactory } from "./application/actor/get-follow-list
 import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
+import { searchActorsUseCaseFactory } from "./application/actor/search-actors-use-case";
 import { banSubscriberUseCaseFactory } from "./application/admin/ban-subscriber-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
@@ -156,6 +157,7 @@ export const di = await createRegistry()
     ["actorQuery"],
     getProfilePageUseCaseFactory,
   )
+  .service("searchActorsUseCase", ["actorQuery"], searchActorsUseCaseFactory)
   .service("followCommand", ["oauthClient"], followCommandFactory)
   .service("reactionCommand", ["oauthClient"], reactionCommandFactory)
   .service("toggleFollowUseCase", ["followCommand"], toggleFollowUseCaseFactory)

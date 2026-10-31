@@ -1,8 +1,6 @@
 import { type APIRequestContext, expect, test } from "@playwright/test";
 
-import { createRecord, putRecord } from "./pds";
-
-const PDS_URL = "http://localhost:2583";
+import { createRecord, PDS_URL, putRecord } from "../../helpers/pds";
 
 const createPosts = async (request: APIRequestContext, texts: string[]) => {
   const session = await request.post(

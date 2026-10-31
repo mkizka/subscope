@@ -6,7 +6,7 @@ import {
   putRecord,
   resolveHandle,
   uploadBlob,
-} from "./pds";
+} from "../../helpers/pds";
 
 test.describe("通知", () => {
   test.use({ viewport: { width: 375, height: 667 } });
