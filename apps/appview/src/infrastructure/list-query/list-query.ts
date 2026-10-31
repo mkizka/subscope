@@ -32,12 +32,20 @@ export class ListQuery implements IListQuery {
     return lists.map(toListDto);
   }
 
-  async findByUri(uri: AtUri): Promise<ListDto | null> {
-    const [list] = await this.db
+  async findByUris(uris: AtUri[]): Promise<ListDto[]> {
+    if (uris.length === 0) {
+      return [];
+    }
+    const lists = await this.db
       .select()
       .from(schema.lists)
-      .where(eq(schema.lists.uri, uri.toString()));
-    return list ? toListDto(list) : null;
+      .where(
+        inArray(
+          schema.lists.uri,
+          uris.map((uri) => uri.toString()),
+        ),
+      );
+    return lists.map(toListDto);
   }
 
   async findItems(params: {
