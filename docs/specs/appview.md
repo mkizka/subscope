@@ -22,6 +22,13 @@ AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞�
 
 listRuleのメンバーかどうかは今は判定しない。listRuleがあり他の規則に合わないときは、replyDisabledを含めない。
 
+## 引用制限
+
+投稿者がpostgateで決めた引用の禁止と切り離しを、postViewに反映する。今はgetPostsだけが対応する。
+
+- postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする
+- postgate-2: 引用された投稿のpostgateのdetachedEmbeddingUrisに引用した投稿が含まれる場合、引用をviewDetachedにする
+
 ## app.bsky.actor.getProfile
 
 指定したアクターの詳細なプロフィールを返す。認証は任意。
