@@ -156,4 +156,4 @@ export const createWorkerRegistry = (env: Env) =>
     .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
-    .service("workerServer", ["loggerManager", "syncWorker", "healthRouter", "port"], asClassArgs(WorkerServer));
+    .service("workerServer", ["loggerManager", "syncWorker", "jobQueue", "healthRouter", "port"], asClassArgs(WorkerServer));

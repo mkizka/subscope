@@ -1,6 +1,6 @@
 import type { Server } from "node:http";
 
-import type { ILoggerManager, Logger } from "@repo/common/domain";
+import type { IJobQueue, ILoggerManager, Logger } from "@repo/common/domain";
 import { loggingMiddleware } from "@repo/common/utils";
 import express, { type Router } from "express";
 import promBundle from "express-prom-bundle";
@@ -15,6 +15,7 @@ export class WorkerServer {
   constructor(
     loggerManager: ILoggerManager,
     private readonly syncWorker: SyncWorker,
+    private readonly jobQueue: IJobQueue,
     healthRouter: Router,
     private readonly port: number,
   ) {
@@ -30,9 +31,32 @@ export class WorkerServer {
       this.logger.info(`Worker server listening on port ${this.port}`);
       await this.syncWorker.start();
     });
+    setInterval(() => void this.logQueueCounts(), 60 * 1000).unref();
 
     process.on("SIGTERM", () => this.shutdown());
     process.on("SIGINT", () => this.shutdown());
+  }
+
+  private async logQueueCounts() {
+    try {
+      const entries = await Promise.all(
+        this.jobQueue
+          .getQueues()
+          .map(async (queue) => [
+            queue.name,
+            await queue.getJobCounts(
+              "waiting",
+              "prioritized",
+              "active",
+              "delayed",
+              "failed",
+            ),
+          ]),
+      );
+      this.logger.info({ queues: Object.fromEntries(entries) }, "Queue counts");
+    } catch (error) {
+      this.logger.error({ error }, "Failed to get queue counts");
+    }
   }
 
   private async shutdown() {
