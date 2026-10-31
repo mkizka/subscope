@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
@@ -57,9 +58,11 @@ export function PostToolbarContainer(props: Props) {
     props.repostCount,
   );
   const deleter = useFetcher<typeof deletePostAction>();
+  const [minReplyCount, setMinReplyCount] = useState(0);
+  const replyCount = Math.max(props.replyCount ?? 0, minReplyCount);
   return (
     <PostToolbar
-      replyCount={props.replyCount}
+      replyCount={replyCount}
       repostCount={repost.count}
       likeCount={like.count}
       liked={like.active}
@@ -85,6 +88,7 @@ export function PostToolbarContainer(props: Props) {
           cid: props.cid,
           handle: props.authorHandle,
           root: props.replyRoot,
+          onPosted: () => setMinReplyCount(replyCount + 1),
         })
       }
       onQuote={() =>
