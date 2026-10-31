@@ -93,6 +93,7 @@ export class SyncWorker {
           await resolveDidUseCase.execute(job.data);
         },
         {
+          concurrency: 8,
           limiter: {
             max: 4, // plc.directoryの負荷を抑えるためにrpsを制限
             duration: 1000,
@@ -110,6 +111,7 @@ export class SyncWorker {
           });
         },
         {
+          concurrency: 20,
           limiter: {
             max: 10, // PDSの負荷を抑えるためにrpsを制限
             duration: 1000,
