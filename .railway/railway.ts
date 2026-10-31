@@ -18,7 +18,6 @@ const app = (
 ) => ({
   source: github("mkizka/subscope", { branch: "main", checkSuites: true }),
   build: {
-    builder: "DOCKERFILE" as const,
     watchPatterns: [
       `/apps/${target}/**/*`,
       "/packages/client/**/*",
@@ -35,7 +34,6 @@ const app = (
 
 const deploy = (cpu: number) => ({
   restartPolicyType: "ALWAYS" as const,
-  restartPolicyMaxRetries: 3,
   limitOverride: { containers: { cpu, memoryBytes: 1_000_000_000 } },
 });
 
@@ -43,7 +41,7 @@ export default defineRailway(() => {
   const db = postgres("Postgres", { region });
   const cache = redis("Redis", { region });
 
-  const tapData = volume("tap-data", { region });
+  const tapData = volume("tap-data", { region, sizeMB: 5000 });
   const tap = service("Tap", {
     source: image("ghcr.io/bluesky-social/indigo/tap:0.1"),
     replicas: { [region]: 1 },
