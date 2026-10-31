@@ -6,7 +6,7 @@ import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client
 
 type ReactionType = "like" | "repost";
 
-export interface IReactionRepository {
+export interface IReactionCommand {
   create: (
     did: string,
     type: ReactionType,
@@ -17,11 +17,11 @@ export interface IReactionRepository {
 
 const schemas = { like, repost };
 
-export const reactionRepositoryFactory = ({
+export const reactionCommandFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): IReactionRepository => {
+}): IReactionCommand => {
   const restore = async (did: string) => {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("Failed to restore OAuth session");
