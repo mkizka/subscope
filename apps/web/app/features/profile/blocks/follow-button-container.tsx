@@ -21,12 +21,13 @@ export function FollowButtonContainer({ did, viewerFollowing }: Props) {
   const following = fetcher.formData
     ? !fetcher.formData.get("followUri")
     : !!followUri;
+  const busy = fetcher.state !== "idle";
   const toggle = () => {
-    if (fetcher.state === "submitting") return;
+    if (busy) return;
     void fetcher.submit(
       { did, followUri: followUri ?? "" },
       { method: "post", action: "/api/follows" },
     );
   };
-  return <FollowButton following={following} onClick={toggle} />;
+  return <FollowButton following={following} busy={busy} onClick={toggle} />;
 }
