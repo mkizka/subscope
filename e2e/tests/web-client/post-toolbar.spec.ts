@@ -150,9 +150,20 @@ test("post-toolbar-5: いいね・リポストのボタンは、押した結果�
     ["リポスト", "app.bsky.feed.repost"],
   ]) {
     const button = post.getByRole("button", { name });
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route(
+      (url) => url.pathname.startsWith("/api/reactions"),
+      async (route) => {
+        await held;
+        await route.continue();
+      },
+      { times: 1 },
+    );
     await button.click();
     await expect(button).toHaveAttribute("aria-disabled", "true");
     await button.click({ force: true });
+    release();
     await expect(button).not.toHaveAttribute("aria-disabled", "true");
     await expect(button).toHaveAttribute("aria-pressed", "true");
     const res = await request.get(
