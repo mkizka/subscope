@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { ConfirmDialog } from "@/app/features/admin/parts/confirm-dialog";
 import { ListForm } from "@/app/features/list/blocks/list-form";
 import {
   AddListMemberForm,
