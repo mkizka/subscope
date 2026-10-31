@@ -57,11 +57,15 @@ test.describe("タイムライン", () => {
     );
     await createPosts(request, texts);
 
+    const latestPost = page
+      .getByRole("article")
+      .filter({ hasText: "timeline-4: 投稿25" });
     await page.goto("/");
 
     await expect(async () => {
       await page.reload();
-      await expect(page.getByText("timeline-4: 投稿25")).toBeInViewport({
+      await expect(latestPost).toBeInViewport({ timeout: 1000 });
+      await expect(latestPost.getByText(/^\d+(秒|分)$/)).toBeVisible({
         timeout: 1000,
       });
     }).toPass();
