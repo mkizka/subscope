@@ -55,8 +55,7 @@ export class FeedProcessor {
 
     return feedItems
       .map((item) => {
-        const postUri =
-          item.type === "post" ? item.uri : item.subjectUri;
+        const postUri = item.type === "post" ? item.uri : item.subjectUri;
         if (!postUri) {
           return null;
         }
