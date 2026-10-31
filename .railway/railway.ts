@@ -10,7 +10,7 @@ import {
   volume,
 } from "railway/iac";
 
-const region = "us-east4-eqdc4a";
+const region = "asia-southeast1-eqsg3a";
 
 const app = (
   target: "appview" | "web" | "worker" | "ingester",
