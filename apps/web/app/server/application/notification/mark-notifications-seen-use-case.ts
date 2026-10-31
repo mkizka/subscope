@@ -1,15 +1,15 @@
 import type { DatetimeString } from "@atproto/syntax";
 
-import type { INotificationRepository } from "@/app/server/infrastructure/notification/notification-repository";
+import type { INotificationCommand } from "@/app/server/infrastructure/notification/notification-command";
 
 export interface IMarkNotificationsSeenUseCase {
   execute: (did: string, seenAt: DatetimeString) => Promise<void>;
 }
 
 export const markNotificationsSeenUseCaseFactory = ({
-  notificationRepository,
+  notificationCommand,
 }: {
-  notificationRepository: INotificationRepository;
+  notificationCommand: INotificationCommand;
 }): IMarkNotificationsSeenUseCase => ({
-  execute: (did, seenAt) => notificationRepository.updateSeen(did, seenAt),
+  execute: (did, seenAt) => notificationCommand.updateSeen(did, seenAt),
 });
