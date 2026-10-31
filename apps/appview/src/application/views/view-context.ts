@@ -25,7 +25,6 @@ import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../interfaces/profile-query.js";
 import type { IRecordQuery } from "../interfaces/record-query.js";
 import type { IRepostQuery } from "../interfaces/repost-query.js";
-import { hiddenReason } from "../visibility/visibility-filter.js";
 import { Batch } from "./batch.js";
 
 export type Viewer = {
@@ -181,7 +180,16 @@ export class ViewContext {
       this.profiles.load(did),
       this.labels.load(did),
     ]);
-    return profile && hiddenReason(profile, labels);
+    if (!profile) {
+      return undefined;
+    }
+    if (profile.status === "deactivated") {
+      return "AccountDeactivated";
+    }
+    if (profile.status !== "active" || isTakendown(labels)) {
+      return "AccountTakedown";
+    }
+    return null;
   }
 
   async post(uri: string) {
