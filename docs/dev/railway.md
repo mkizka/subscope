@@ -1,6 +1,6 @@
 # Railwayへのデプロイ(IaC)
 
-本番環境のRailwayプロジェクトは `.railway/railway.ts` で定義する。構成は `deploy/compose.yaml` と同じで、Appview・Web・Worker・Ingester・Tap・ATBlob・Postgres・Redisを置く。
+本番環境のRailwayプロジェクトは `.railway/railway.ts` で定義する。構成は `deploy/compose.yaml` と同じで、シンガポールリージョンにAppview・Web・Worker・Ingester・Tap・ATBlob・Postgres・Redisを置く。
 
 ## 反映の流れ
 
@@ -14,4 +14,4 @@
 2. トークンをGitHubリポジトリのシークレット `RAILWAY_TOKEN` に登録する
 3. `.railway/**` を変更するPRをマージしてapplyする(手元で `railway link` して `railway config apply` してもよい)
 4. Webの `COOKIE_SECRET` と `PRIVATE_KEY_ES256_B64` をダッシュボードで設定する(値の作り方は `apps/web/app/server/env.ts` のコメントを参照)
-5. Appview・Web・ATBlobにダッシュボードで公開ドメインを発行する
+5. `railway.ts` の `domains` に書いたカスタムドメインのDNSレコードを、ダッシュボードの表示どおりに設定する
