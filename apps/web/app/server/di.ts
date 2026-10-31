@@ -22,6 +22,7 @@ import { getNotificationsUseCaseFactory } from "./application/notification/get-n
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
+import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorRepositoryFactory } from "./infrastructure/actor/actor-repository";
 import { adminRepositoryFactory } from "./infrastructure/admin/admin-repository";
@@ -39,6 +40,7 @@ import { notificationRepositoryFactory } from "./infrastructure/notification/not
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
 import { reactionRepositoryFactory } from "./infrastructure/reaction/reaction-repository";
 import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
+import { threadRepositoryFactory } from "./infrastructure/thread/thread-repository";
 import { timelineRepositoryFactory } from "./infrastructure/timeline/timeline-repository";
 
 export const di = await createRegistry()
@@ -160,4 +162,6 @@ export const di = await createRegistry()
     ["reactionRepository"],
     toggleReactionUseCaseFactory,
   )
+  .service("threadRepository", ["oauthClient"], threadRepositoryFactory)
+  .service("getThreadUseCase", ["threadRepository"], getThreadUseCaseFactory)
   .resolve();

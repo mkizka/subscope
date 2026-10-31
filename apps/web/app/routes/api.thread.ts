@@ -1,14 +1,9 @@
 import { isAtUriString } from "@atproto/syntax";
-import {
-  type ThreadViewPost,
-  threadViewPost,
-} from "@repo/client/lex/app/bsky/feed/defs";
-import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 import { data } from "react-router";
 
-import { agentContext } from "@/app/context/agent";
+import { didContext } from "@/app/context/did";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
-import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-repository";
+import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/api.thread";
 
@@ -19,21 +14,5 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   if (!isAtUriString(uri)) {
     throw data("不正なURIです", { status: 400 });
   }
-  const agent = context.get(agentContext);
-  const { thread } = await agent.call(getPostThread, { uri });
-  if (!threadViewPost.matches(thread)) {
-    return data(null);
-  }
-  const ancestors: ThreadViewPost[] = [];
-  for (let p = thread.parent; threadViewPost.matches(p); p = p.parent) {
-    ancestors.unshift(p);
-  }
-  const replies = (thread.replies ?? []).filter((r) =>
-    threadViewPost.matches(r),
-  );
-  return data({
-    ancestors: ancestors.map(({ post }) => toTimelinePost({ post })),
-    post: toTimelinePost({ post: thread.post }),
-    replies: replies.map(({ post }) => toTimelinePost({ post })),
-  });
+  return data(await di.getThreadUseCase.execute(context.get(didContext), uri));
 };
