@@ -9,12 +9,23 @@ import {
   type TimelinePost,
 } from "@/app/features/timeline/blocks/timeline-feed";
 
+const tabLabels = {
+  posts: "投稿",
+  replies: "リプライ",
+  media: "メディア",
+  likes: "いいね",
+};
+
+type ProfileTab = keyof typeof tabLabels;
+
 type Props = Omit<ComponentProps<typeof ProfileHeader>, "action"> & {
   follow?: ComponentProps<typeof FollowButtonContainer>;
+  tabs: ProfileTab[];
+  tab: ProfileTab;
   posts: TimelinePost[];
 };
 
-export function ProfilePage({ follow, posts, ...profile }: Props) {
+export function ProfilePage({ follow, tabs, tab, posts, ...profile }: Props) {
   return (
     <ThreeColumnLayout>
       <ProfileHeader
@@ -22,9 +33,17 @@ export function ProfilePage({ follow, posts, ...profile }: Props) {
         action={follow && <FollowButtonContainer {...follow} />}
       />
       <div role="tablist" className="tabs tabs-border">
-        <span role="tab" aria-selected className="tab tab-active">
-          投稿
-        </span>
+        {tabs.map((value) => (
+          <Link
+            key={value}
+            to={value === "posts" ? "." : `?tab=${value}`}
+            role="tab"
+            aria-selected={tab === value}
+            className={tab === value ? "tab tab-active" : "tab"}
+          >
+            {tabLabels[value]}
+          </Link>
+        ))}
         <Link to="lists" role="tab" className="tab">
           リスト
         </Link>
