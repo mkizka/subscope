@@ -7,6 +7,8 @@ import {
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { useHydrated } from "@/app/lib/use-hydrated";
+
 export type PostCardProps = {
   authorAvatar?: string;
   authorDisplayName?: string;
@@ -91,6 +93,7 @@ export function PostCard({
   toolbar,
   threadSearch,
 }: PostCardProps) {
+  const hydrated = useHydrated();
   return (
     <article
       className="
@@ -136,7 +139,9 @@ export function PostCard({
               {authorDisplayName ?? authorHandle}
             </span>
             <span className="shrink-0 text-xs text-base-content/60">
-              {createdAt ? formatRelativeTime(createdAt) : "日時不明"}
+              {createdAt
+                ? hydrated && formatRelativeTime(createdAt)
+                : "日時不明"}
             </span>
           </div>
           <p className="wrap-break-word whitespace-pre-wrap">{text}</p>

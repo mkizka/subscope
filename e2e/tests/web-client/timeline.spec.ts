@@ -77,6 +77,28 @@ test.describe("タイムライン", () => {
     await expect(page.getByText("timeline-4: 投稿6")).toBeInViewport();
   });
 
+  test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
+    page,
+    request,
+  }) => {
+    const text = "timeline-5: 投稿";
+    await createPosts(request, [text]);
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") errors.push(msg.text());
+    });
+    await page.clock.setFixedTime(Date.now() + 3 * 60 * 60 * 1000);
+
+    const article = page.getByRole("article").filter({ hasText: text });
+    await expect(async () => {
+      await page.goto("/");
+      await expect(article).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await expect(article.getByText("3時間")).toBeVisible();
+    expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([]);
+  });
+
   test("timeline-2: いいね数・リポスト数は1以上のときだけ表示する", async ({
     page,
   }) => {

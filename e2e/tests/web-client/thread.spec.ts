@@ -144,17 +144,48 @@ test.describe("スレッド", () => {
     ]);
   });
 
-  test("thread-7: スレッドの投稿にも投稿のツールバーを表示する", async ({
+  test.describe(() => {
+    test.use({ timezoneId: "Pacific/Kiritimati" });
+
+    test("thread-7: 選んだ投稿の投稿日時は、ブラウザのタイムゾーンで表示する", async ({
+      page,
+    }) => {
+      const text = "thread-7: 投稿";
+      const { uri } = await post(text);
+      const errors: string[] = [];
+      page.on("console", (msg) => {
+        if (msg.type() === "error") errors.push(msg.text());
+      });
+
+      await openThread(page, uri, text);
+
+      const time = page
+        .getByRole("region", { name: "スレッド" })
+        .getByRole("article", { name: "選んだ投稿" })
+        .locator("time");
+      const createdAt = (await time.getAttribute("datetime")) ?? "";
+      await expect(time).toHaveText(
+        new Date(createdAt).toLocaleString("ja-JP", {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "Pacific/Kiritimati",
+        }),
+      );
+      expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([]);
+    });
+  });
+
+  test("thread-8: スレッドの投稿にも投稿のツールバーを表示する", async ({
     page,
   }) => {
-    const parent = await post("thread-7: 親");
-    const target = await post("thread-7: 投稿", parent);
-    await post("thread-7: 返信", target);
+    const parent = await post("thread-8: 親");
+    const target = await post("thread-8: 投稿", parent);
+    await post("thread-8: 返信", target);
 
-    await openThread(page, target.uri, "thread-7: 返信");
+    await openThread(page, target.uri, "thread-8: 返信");
 
     const thread = page.getByRole("region", { name: "スレッド" });
-    for (const text of ["thread-7: 親", "thread-7: 投稿", "thread-7: 返信"]) {
+    for (const text of ["thread-8: 親", "thread-8: 投稿", "thread-8: 返信"]) {
       await expect(
         thread
           .getByRole("article")
@@ -164,12 +195,12 @@ test.describe("スレッド", () => {
     }
   });
 
-  test("thread-8: スレッドで返信ボタンを押すとスレッドの下に投稿欄が開き、投稿すると再読み込みなしでスレッドに返信を表示する", async ({
+  test("thread-9: スレッドで返信ボタンを押すとスレッドの下に投稿欄が開き、投稿すると再読み込みなしでスレッドに返信を表示する", async ({
     page,
   }) => {
-    const target = await post("thread-8: 投稿");
+    const target = await post("thread-9: 投稿");
 
-    await openThread(page, target.uri, "thread-8: 投稿");
+    await openThread(page, target.uri, "thread-9: 投稿");
     const thread = page.getByRole("region", { name: "スレッド" });
     await thread
       .getByRole("article", { name: "選んだ投稿" })
@@ -177,11 +208,11 @@ test.describe("スレッド", () => {
       .click();
     await thread
       .getByRole("textbox", { name: "投稿内容" })
-      .fill("thread-8: 返信");
+      .fill("thread-9: 返信");
     await thread.getByRole("button", { name: "投稿", exact: true }).click();
 
     await expect(
-      thread.getByRole("article").filter({ hasText: "thread-8: 返信" }),
+      thread.getByRole("article").filter({ hasText: "thread-9: 返信" }),
     ).toBeVisible();
   });
 });

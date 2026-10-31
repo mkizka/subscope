@@ -3,13 +3,15 @@ import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getLists";
 
 import type { ListDto } from "../../../application/dto/list-dto.js";
 import type { IListQuery } from "../../../application/interfaces/list-query.js";
-import type { ListViewService } from "../../../application/service/graph/list-view-service.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ListViews } from "../../views/list-views.js";
+import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetListsUseCase {
   constructor(
     private readonly listQuery: IListQuery,
-    private readonly listViewService: ListViewService,
+    private readonly viewContextFactory: ViewContextFactory,
+    private readonly listViews: ListViews,
   ) {}
 
   async execute(params: {
@@ -33,9 +35,13 @@ export class GetListsUseCase {
     });
     const page = paginator.extractPage(lists);
 
+    const ctx = this.viewContextFactory.create();
+    const views = await Promise.all(
+      page.items.map((list) => this.listViews.view(list.uri, ctx)),
+    );
     return {
       cursor: page.cursor,
-      lists: await this.listViewService.findListViews(page.items),
+      lists: views.filter((view) => view !== undefined),
     };
   }
 }
