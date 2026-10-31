@@ -2,6 +2,12 @@
 
 AppViewが提供するXRPC API（Blueskyの標準APIと独自API）の振る舞いを定める。レスポンスは常にlexiconに適合する。
 
+## 未実装のAPI
+
+v1で対応しないXRPCやパラメータには、空の応答で成功を装わずエラーを返す。空の応答だと、クライアントは「データが無い」と区別できないため。
+
+- notImplemented-1: 実装していないXRPCには501とMethodNotImplementedを返す
+
 ## テイクダウン
 
 モデレーションサービスがテイクダウンしたアカウントや投稿と、PDSで停止されたアカウントを、APIの応答から隠す。データは消さないので、ラベルが取り消されたりアカウントが再開されたりすれば元に戻る。
@@ -142,9 +148,9 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアクター自身の投稿だけを返し、リポストは含めない
 - getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない
 - getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアクター自身の投稿であるものだけを含める
-- getAuthorFeed-6: filterがposts_with_videoのとき、空のfeedを返す
+- getAuthorFeed-6: filterがposts_with_videoのとき、501とMethodNotImplementedを返す
 
-動画の埋め込みはインデックスしていないため、posts_with_videoは常に空になる。
+動画の埋め込みはインデックスしていないため、posts_with_videoには対応しない。
 
 ## app.bsky.notification.listNotifications
 
@@ -170,7 +176,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getGroupedNotifications-6: relatedViewsに、グループが参照するアクターと投稿とフィードジェネレーターのビューを返す
 - getGroupedNotifications-7: グループの中で最新の通知が既読時刻以前なら、グループを既読にする
 - getGroupedNotifications-8: feedにconversationsを指定すると返信・引用・メンションだけを、followersを指定するとフォローだけを返す
-- getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、空のグループを返す
+- getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、501とMethodNotImplementedを返す
 
 ## app.bsky.notification.getUnreadCount
 

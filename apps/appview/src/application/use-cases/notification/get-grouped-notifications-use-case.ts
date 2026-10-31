@@ -33,6 +33,13 @@ const FEED_REASONS: Record<string, NotificationReason[] | undefined> = {
 
 const ITEMS_PER_GROUP = 10;
 
+export class UnsupportedFeedError extends Error {
+  constructor(feed: string) {
+    super(`feed ${feed} is not supported`);
+    this.name = "UnsupportedFeedError";
+  }
+}
+
 const groupKey = (item: NotificationItem) => {
   switch (item.reason) {
     case "like":
@@ -67,7 +74,7 @@ export class GetGroupedNotificationsUseCase {
     cursor?: string;
   }): Promise<Output> {
     if (!Object.hasOwn(FEED_REASONS, params.feed)) {
-      return { groups: [] };
+      throw new UnsupportedFeedError(params.feed);
     }
     const queryLimit = params.limit * ITEMS_PER_GROUP;
     const items = await this.notificationRepository.findMany({
