@@ -3,10 +3,10 @@ import { asAtUriString, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyNotificationListNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
 
 import {
-  type INotificationRepository,
   isNotificationReason,
-  type NotificationItem,
-} from "../../interfaces/notification-repository.js";
+  type NotificationDto,
+} from "../../dto/notification-dto.js";
+import type { INotificationQuery } from "../../interfaces/notification-query.js";
 import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -14,7 +14,7 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class ListNotificationsUseCase {
   constructor(
-    private readonly notificationRepository: INotificationRepository,
+    private readonly notificationQuery: INotificationQuery,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
@@ -26,11 +26,11 @@ export class ListNotificationsUseCase {
     cursor?: string;
     reasons?: string[];
   }): Promise<AppBskyNotificationListNotifications.$OutputBody> {
-    const paginator = createCursorPaginator<NotificationItem>({
+    const paginator = createCursorPaginator<NotificationDto>({
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),
     });
-    const items = await this.notificationRepository.findMany({
+    const items = await this.notificationQuery.findNotifications({
       recipientDid: params.viewerDid,
       limit: paginator.queryLimit,
       cursor: params.cursor ? new Date(params.cursor) : undefined,

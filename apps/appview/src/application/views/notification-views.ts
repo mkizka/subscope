@@ -7,7 +7,7 @@ import {
 } from "@atproto/syntax";
 import type * as AppBskyNotificationGetGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
 
-import type { NotificationItem } from "../interfaces/notification-repository.js";
+import type { NotificationDto } from "../dto/notification-dto.js";
 import type { GeneratorViews } from "./generator-views.js";
 import type { PostViews } from "./post-views.js";
 import type { ProfileViews } from "./profile-views.js";
@@ -34,7 +34,7 @@ export class NotificationViews {
   ) {}
 
   async group(
-    items: NotificationItem[],
+    items: NotificationDto[],
     ctx: ViewContext,
   ): Promise<
     { group: Group; relatedViews: [string, RelatedView][] } | undefined
@@ -87,7 +87,7 @@ export class NotificationViews {
   }
 
   private kind(
-    head: NotificationItem,
+    head: NotificationDto,
     items: { actor: Did }[],
     refs: {
       subjectUri?: AtUriString;
