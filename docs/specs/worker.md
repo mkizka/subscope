@@ -25,6 +25,8 @@ null文字を含む文字列はPostgreSQLに保存できないため除外する
 
 コミットのジョブは`COMMIT_WORKER_CONCURRENCY`(既定128)件まで並列に処理し、DBの接続は`DATABASE_POOL_MAX`(既定32)本まで使う。appviewとwebの接続(各10本)と、デプロイ時に新旧のWorkerが並ぶ間を合わせても、PostgreSQLの既定の上限(100本)に収まるようにしている。
 
+ほかのジョブも並列に処理する。`resolveDid`は4件、`fetchRecord`は10件、集計ジョブは16件まで同時に処理する。`resolveDid`と`fetchRecord`は外部サーバーへの負荷を抑えるため、同時数と同じ件数/秒に制限している。1件ずつ処理すると外部サーバーの応答を待つ間に進まず、バックフィルで積まれた大量のジョブを消化できない。
+
 threadgate と postgate は専用のテーブルを持たず、レコードのJSONだけを保存する。Lexiconの定めにより対象の投稿と同じrkeyを持つため、appviewは投稿のURIから引ける。
 
 ## Tapへの登録
