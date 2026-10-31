@@ -198,6 +198,7 @@ describe("app.bsky.feed.getPosts", () => {
       uri: gate.uri,
       cid: gate.cid,
       record: gate.json,
+      lists: [],
     });
     expect(res.posts[1]?.threadgate).toBeUndefined();
   });
@@ -308,6 +309,37 @@ describe("app.bsky.feed.getPosts", () => {
 
     // assert
     expect(res.posts[0]?.viewer?.replyDisabled).toBe(false);
+  });
+
+  test("threadgate-6: allowのlistRuleで指定したリストのうちインデックスしたものを、threadgate.listsにlistViewBasicとして含める", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const root = await createPost();
+    const list = await listFactory(ctx.db).create();
+    await createGate(root, [
+      { $type: "app.bsky.feed.threadgate#listRule", list: list.uri },
+      {
+        $type: "app.bsky.feed.threadgate#listRule",
+        list: "at://did:plc:unknown/app.bsky.graph.list/unknown",
+      },
+    ]);
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(root.uri)],
+    });
+
+    // assert
+    expect(res.posts[0]?.threadgate?.lists).toEqual([
+      {
+        $type: "app.bsky.graph.defs#listViewBasic",
+        uri: list.uri,
+        cid: list.cid,
+        name: list.name,
+        purpose: list.purpose,
+        indexedAt: list.indexedAt.toISOString(),
+      },
+    ]);
   });
 
   test("postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする", async () => {

@@ -45,6 +45,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 - threadgate-3: 起点の投稿者と、allowの規則(mentionRule・followingRule・followerRule)のどれかに合う閲覧者は、viewer.replyDisabledをfalseにする
 - threadgate-4: allowが無いthreadgateは、閲覧者のviewer.replyDisabledをfalseにする
 - threadgate-5: allowのlistRuleのリストに入っている閲覧者は、viewer.replyDisabledをfalseにする
+- threadgate-6: allowのlistRuleで指定したリストのうちインデックスしたものを、threadgate.listsにlistViewBasicとして含める
 
 リストに入っているかは、インデックスしたlistitemで判定する。
 

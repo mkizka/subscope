@@ -20,7 +20,7 @@ export class GetListUseCase {
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody | null> {
-    const list = await this.listQuery.findByUri(params.listUri);
+    const [list] = await this.listQuery.findByUris([params.listUri]);
     if (!list) return null;
     const [listView] = await this.listViewService.findListViews([list]);
     if (!listView) return null;
