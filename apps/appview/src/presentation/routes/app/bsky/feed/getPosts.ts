@@ -3,18 +3,26 @@ import { AtUri } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 
 import type { GetPostsUseCase } from "../../../../../application/use-cases/feed/get-posts-use-case.js";
+import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
 export class GetPosts {
-  constructor(private readonly getPostsUseCase: GetPostsUseCase) {}
+  constructor(
+    private readonly getPostsUseCase: GetPostsUseCase,
+    private readonly authVerifierMiddleware: AuthVerifierMiddleware,
+  ) {}
 
   handle(router: LexRouter) {
-    router.add(getPosts, async ({ params }) => {
-      const posts = await this.getPostsUseCase.execute(
-        params.uris.map((uri) => new AtUri(uri)),
-      );
-      return {
-        body: { posts },
-      };
+    router.add(getPosts, {
+      auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
+      handler: async ({ params, credentials: viewerDid }) => {
+        const posts = await this.getPostsUseCase.execute(
+          params.uris.map((uri) => new AtUri(uri)),
+          viewerDid,
+        );
+        return {
+          body: { posts },
+        };
+      },
     });
   }
 }
