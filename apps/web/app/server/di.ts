@@ -14,6 +14,7 @@ import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-ca
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
+import { deleteListUseCaseFactory } from "./application/list/delete-list-use-case";
 import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
 import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
 import { updateListUseCaseFactory } from "./application/list/update-list-use-case";
@@ -174,4 +175,5 @@ export const di = await createRegistry()
   .service("getListPageUseCase", ["listQuery"], getListPageUseCaseFactory)
   .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
   .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
+  .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
   .resolve();
