@@ -1,8 +1,8 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 import type { ProfileViewDetailed } from "@repo/client/lex/app/bsky/actor/defs";
 
-import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
-import type { IActorRepository } from "@/app/server/infrastructure/actor/actor-repository";
+import type { IActorQuery } from "@/app/server/infrastructure/actor/actor-query";
+import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export interface IGetProfilePageUseCase {
   execute: (
@@ -11,19 +11,19 @@ export interface IGetProfilePageUseCase {
   ) => Promise<{
     profile: ProfileViewDetailed;
     isSelf: boolean;
-    posts: TimelinePost[];
+    posts: TimelinePostDto[];
   }>;
 }
 
 export const getProfilePageUseCaseFactory = ({
-  actorRepository,
+  actorQuery,
 }: {
-  actorRepository: IActorRepository;
+  actorQuery: IActorQuery;
 }): IGetProfilePageUseCase => ({
   async execute(did, actor) {
     const [profile, posts] = await Promise.all([
-      actorRepository.findProfile(did, actor),
-      actorRepository.findPosts(did, actor),
+      actorQuery.findProfile(did, actor),
+      actorQuery.findPosts(did, actor),
     ]);
     return { profile, isSelf: profile.did === did, posts };
   },
