@@ -12,6 +12,11 @@ import { getSubscribersUseCaseFactory } from "./application/admin/get-subscriber
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
 import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
+import { getLoginStepUseCaseFactory } from "./application/login/get-login-step-use-case";
+import { oauthCallbackUseCaseFactory } from "./application/login/oauth-callback-use-case";
+import { subscribeServerUseCaseFactory } from "./application/login/subscribe-server-use-case";
+import { getMembersUseCaseFactory } from "./application/members/get-members-use-case";
+import { getTrackedActorsUseCaseFactory } from "./application/members/get-tracked-actors-use-case";
 import { countUnreadNotificationsUseCaseFactory } from "./application/notification/count-unread-notifications-use-case";
 import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
@@ -33,6 +38,7 @@ import { loggerManagerFactory } from "./infrastructure/logger/logger";
 import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
 import { postRepositoryFactory } from "./infrastructure/post/post-repository";
 import { reactionRepositoryFactory } from "./infrastructure/reaction/reaction-repository";
+import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
 import { timelineRepositoryFactory } from "./infrastructure/timeline/timeline-repository";
 
 export const di = await createRegistry()
@@ -47,6 +53,32 @@ export const di = await createRegistry()
     oauthClientFactory,
   )
   .service("cookieSessionStorage", cookieSessionStorageFactory)
+  .service("subscopeRepository", ["oauthClient"], subscopeRepositoryFactory)
+  .service(
+    "getLoginStepUseCase",
+    ["subscopeRepository"],
+    getLoginStepUseCaseFactory,
+  )
+  .service(
+    "subscribeServerUseCase",
+    ["subscopeRepository"],
+    subscribeServerUseCaseFactory,
+  )
+  .service(
+    "oauthCallbackUseCase",
+    ["oauthClient", "subscopeRepository", "loggerManager"],
+    oauthCallbackUseCaseFactory,
+  )
+  .service(
+    "getMembersUseCase",
+    ["subscopeRepository"],
+    getMembersUseCaseFactory,
+  )
+  .service(
+    "getTrackedActorsUseCase",
+    ["subscopeRepository"],
+    getTrackedActorsUseCaseFactory,
+  )
   .service(
     "notificationRepository",
     ["oauthClient"],
