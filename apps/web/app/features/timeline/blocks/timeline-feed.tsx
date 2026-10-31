@@ -14,6 +14,7 @@ export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   viewerLike?: string;
   viewerRepost?: string;
   replyRoot?: { uri: string; cid: string };
+  deletable?: boolean;
 };
 
 type Props = {

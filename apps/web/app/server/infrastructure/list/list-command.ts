@@ -19,6 +19,7 @@ export interface IListCommand {
     subject: `did:${string}:${string}`,
   ) => Promise<void>;
   removeMember: (did: string, listItemUri: string) => Promise<void>;
+  delete: (did: string, rkey: string) => Promise<void>;
 }
 
 export const listCommandFactory = ({
@@ -65,6 +66,20 @@ export const listCommandFactory = ({
     async removeMember(did, listItemUri) {
       const agent = await restore(did);
       await agent.delete(listitem, { rkey: new AtUri(listItemUri).rkey });
+    },
+    async delete(did, rkey) {
+      const agent = await restore(did);
+      const listUri = `at://${did}/app.bsky.graph.list/${rkey}`;
+      let cursor: string | undefined;
+      do {
+        const page = await agent.list(listitem, { limit: 100, cursor });
+        for (const record of page.records) {
+          if (record.value.list !== listUri) continue;
+          await agent.delete(listitem, { rkey: new AtUri(record.uri).rkey });
+        }
+        cursor = page.cursor;
+      } while (cursor);
+      await agent.delete(list, { rkey });
     },
   };
 };

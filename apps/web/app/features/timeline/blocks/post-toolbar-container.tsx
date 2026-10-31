@@ -2,6 +2,7 @@ import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
 import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
+import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";
 
 import type { ComposeTarget } from "./post-form-container";
@@ -13,6 +14,8 @@ export const reactionSchema = z.object({
   cid: z.string(),
   recordUri: z.string().optional(),
 });
+
+export const deletePostSchema = z.object({ uri: z.string() });
 
 type Props = TimelinePost & {
   onCompose: (target: ComposeTarget) => void;
@@ -53,6 +56,7 @@ export function PostToolbarContainer(props: Props) {
     props.viewerRepost,
     props.repostCount,
   );
+  const deleter = useFetcher<typeof deletePostAction>();
   return (
     <PostToolbar
       replyCount={props.replyCount}
@@ -64,6 +68,16 @@ export function PostToolbarContainer(props: Props) {
       repostBusy={repost.busy}
       onLike={like.toggle}
       onRepost={repost.toggle}
+      deleteBusy={deleter.state !== "idle"}
+      onDelete={
+        props.deletable
+          ? () =>
+              void deleter.submit(
+                { uri: props.uri },
+                { method: "post", action: "/api/posts" },
+              )
+          : undefined
+      }
       onReply={() =>
         props.onCompose({
           type: "reply",

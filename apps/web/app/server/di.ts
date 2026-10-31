@@ -15,6 +15,7 @@ import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-ca
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
+import { deleteListUseCaseFactory } from "./application/list/delete-list-use-case";
 import { getListPageUseCaseFactory } from "./application/list/get-list-page-use-case";
 import { getListsPageUseCaseFactory } from "./application/list/get-lists-page-use-case";
 import { removeListMemberUseCaseFactory } from "./application/list/remove-list-member-use-case";
@@ -28,6 +29,7 @@ import { countUnreadNotificationsUseCaseFactory } from "./application/notificati
 import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
 import { createPostUseCaseFactory } from "./application/post/create-post-use-case";
+import { deletePostUseCaseFactory } from "./application/post/delete-post-use-case";
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
@@ -114,6 +116,11 @@ export const di = await createRegistry()
     ["postCommand", "postQuery"],
     createPostUseCaseFactory,
   )
+  .service(
+    "deletePostUseCase",
+    ["postCommand", "postQuery"],
+    deletePostUseCaseFactory,
+  )
   .service("adminQuery", ["oauthClient"], adminQueryFactory)
   .service("adminCommand", ["oauthClient"], adminCommandFactory)
   .service(
@@ -182,6 +189,7 @@ export const di = await createRegistry()
   .service("getListPageUseCase", ["listQuery"], getListPageUseCaseFactory)
   .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
   .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
+  .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
   .service(
     "addListMemberUseCase",
     ["actorQuery", "listCommand"],
