@@ -118,20 +118,28 @@ export class SyncWorker {
           },
         },
       ),
-      createWorker("aggregatePostStats", async (job) => {
-        const command = aggregatePostStatsCommandFactory({
-          data: job.data,
-          jobLogger: createJobLogger(job),
-        });
-        await aggregatePostStatsUseCase.execute(command);
-      }),
-      createWorker("aggregateActorStats", async (job) => {
-        const command = aggregateActorStatsCommandFactory({
-          data: job.data,
-          jobLogger: createJobLogger(job),
-        });
-        await aggregateActorStatsUseCase.execute(command);
-      }),
+      createWorker(
+        "aggregatePostStats",
+        async (job) => {
+          const command = aggregatePostStatsCommandFactory({
+            data: job.data,
+            jobLogger: createJobLogger(job),
+          });
+          await aggregatePostStatsUseCase.execute(command);
+        },
+        { concurrency: 16 },
+      ),
+      createWorker(
+        "aggregateActorStats",
+        async (job) => {
+          const command = aggregateActorStatsCommandFactory({
+            data: job.data,
+            jobLogger: createJobLogger(job),
+          });
+          await aggregateActorStatsUseCase.execute(command);
+        },
+        { concurrency: 16 },
+      ),
       createWorker("syncTapRepo", async (job) => {
         await syncTapRepoUseCase.execute(job.data);
       }),
