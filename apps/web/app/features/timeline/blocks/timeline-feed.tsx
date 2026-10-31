@@ -1,3 +1,5 @@
+import { useSearchParams } from "react-router";
+
 import {
   PostCard,
   type PostCardProps,
@@ -21,6 +23,13 @@ type Props = {
 };
 
 export function TimelineFeed({ posts, onCompose }: Props) {
+  const [searchParams] = useSearchParams();
+  const threadSearch = (uri: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("profile");
+    params.set("thread", uri);
+    return params.toString();
+  };
   return (
     <section>
       {posts.length === 0 && (
@@ -32,7 +41,7 @@ export function TimelineFeed({ posts, onCompose }: Props) {
         <PostCard
           key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
           {...post}
-          threadSearch={new URLSearchParams({ thread: post.uri }).toString()}
+          threadSearch={threadSearch(post.uri)}
           toolbar={<PostToolbarContainer {...post} onCompose={onCompose} />}
         />
       ))}
