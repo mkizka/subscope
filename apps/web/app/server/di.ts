@@ -37,7 +37,8 @@ import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { loggerManagerFactory } from "./infrastructure/logger/logger";
 import { notificationRepositoryFactory } from "./infrastructure/notification/notification-repository";
-import { postRepositoryFactory } from "./infrastructure/post/post-repository";
+import { postCommandFactory } from "./infrastructure/post/post-command";
+import { postQueryFactory } from "./infrastructure/post/post-query";
 import { reactionCommandFactory } from "./infrastructure/reaction/reaction-command";
 import { subscopeRepositoryFactory } from "./infrastructure/subscope/subscope-repository";
 import { threadRepositoryFactory } from "./infrastructure/thread/thread-repository";
@@ -102,13 +103,18 @@ export const di = await createRegistry()
     markNotificationsSeenUseCaseFactory,
   )
   .service("timelineRepository", ["oauthClient"], timelineRepositoryFactory)
-  .service("postRepository", ["oauthClient"], postRepositoryFactory)
+  .service("postCommand", ["oauthClient"], postCommandFactory)
+  .service("postQuery", ["oauthClient"], postQueryFactory)
   .service(
     "getTimelineUseCase",
     ["timelineRepository"],
     getTimelineUseCaseFactory,
   )
-  .service("createPostUseCase", ["postRepository"], createPostUseCaseFactory)
+  .service(
+    "createPostUseCase",
+    ["postCommand", "postQuery"],
+    createPostUseCaseFactory,
+  )
   .service("adminRepository", ["oauthClient"], adminRepositoryFactory)
   .service(
     "getSubscribersUseCase",

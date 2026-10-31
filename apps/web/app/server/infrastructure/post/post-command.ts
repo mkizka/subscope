@@ -1,6 +1,5 @@
 import { TID } from "@atproto/common-web";
 import { asAtUriString, currentDatetimeString } from "@atproto/syntax";
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
 
@@ -17,9 +16,8 @@ export type NewPost = {
   allow?: ReplyRule[];
 };
 
-export interface IPostRepository {
+export interface IPostCommand {
   create: (did: string, post: NewPost) => Promise<string>;
-  exists: (did: string, uri: string) => Promise<boolean>;
 }
 
 const THREADGATE_RULES = {
@@ -33,11 +31,11 @@ const toStrongRef = ({ uri, cid }: PostRef) => ({
   cid,
 });
 
-export const postRepositoryFactory = ({
+export const postCommandFactory = ({
   oauthClient,
 }: {
   oauthClient: IOAuthClient;
-}): IPostRepository => {
+}): IPostCommand => {
   const restore = async (did: string) => {
     const agent = await oauthClient.restore(did);
     if (!agent) throw new Error("OAuth session not found");
@@ -94,13 +92,6 @@ export const postRepositoryFactory = ({
           : []),
       ]);
       return uri;
-    },
-    async exists(did, uri) {
-      const agent = await restore(did);
-      const { posts } = await agent
-        .call(getPosts, { uris: [asAtUriString(uri)] })
-        .catch(() => ({ posts: [] }));
-      return posts.length > 0;
     },
   };
 };
