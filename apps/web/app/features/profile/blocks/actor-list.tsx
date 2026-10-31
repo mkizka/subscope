@@ -1,5 +1,5 @@
 import { ShieldIcon } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 export type Actor = {
   did: string;
@@ -16,15 +16,18 @@ type Props = {
 };
 
 export function ActorList({ actors }: Props) {
+  const [searchParams] = useSearchParams();
   return (
     <ul className="list">
       {actors.map((actor) => {
         const profileId =
           actor.handle === "handle.invalid" ? actor.did : actor.handle;
+        const profileParams = new URLSearchParams(searchParams);
+        profileParams.set("profile", profileId);
         return (
           <li key={actor.did}>
             <Link
-              to={`?profile=${profileId}`}
+              to={`?${profileParams}`}
               className="
                 list-row items-center
                 hover:bg-base-200
