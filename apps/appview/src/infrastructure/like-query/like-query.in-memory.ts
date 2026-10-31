@@ -1,6 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
+import type { FeedItemDto } from "../../application/dto/feed-item-dto.js";
 import type { LikeDto } from "../../application/dto/like-dto.js";
 import type { ILikeQuery } from "../../application/interfaces/like-query.js";
 
@@ -27,5 +28,9 @@ export class InMemoryLikeQuery implements ILikeQuery {
         )
         .map(({ uri, subjectUri }) => ({ uri, subjectUri })),
     );
+  }
+
+  findActorLikeFeedItems(): Promise<FeedItemDto[]> {
+    throw new Error("Not implemented");
   }
 }
