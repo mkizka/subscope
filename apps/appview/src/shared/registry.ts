@@ -36,6 +36,7 @@ import type { INotificationRepository } from "../application/interfaces/notifica
 import type { IPostQuery } from "../application/interfaces/post-query.js";
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
+import type { IProfileQuery } from "../application/interfaces/profile-query.js";
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
@@ -125,6 +126,7 @@ import { NotificationRepository } from "../infrastructure/notification-repositor
 import { PostQuery } from "../infrastructure/post-query/post-query.js";
 import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
+import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
 import { ProfileRepository } from "../infrastructure/profile-repository/profile-repository.js";
 import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
@@ -204,6 +206,7 @@ export const createAppRegistry = (env: Env) =>
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
     .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
+    .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelRepository", ["db"], asClassArgs<ILabelRepository>()(LabelRepository))
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
     .service("actorStatsRepository", ["db"], asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
@@ -252,7 +255,7 @@ export const createAppRegistry = (env: Env) =>
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
     .service("followService", ["followRepository"], asClassArgs(FollowService))
-    .service("viewContextFactory", ["profileRepository", "labelRepository", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileQuery", "labelRepository", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostRepository", "generatorQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
