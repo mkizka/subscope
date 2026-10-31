@@ -2,10 +2,8 @@ import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { ProfileDetailed } from "@repo/common/domain";
 
-import type {
-  ActorStats,
-  IActorStatsRepository,
-} from "../interfaces/actor-stats-repository.js";
+import type { ActorStatsDto } from "../dto/actor-stats-dto.js";
+import type { IActorStatsQuery } from "../interfaces/actor-stats-query.js";
 import type { IFollowRepository } from "../interfaces/follow-repository.js";
 import type {
   ILabelRepository,
@@ -17,14 +15,14 @@ export type ViewData = {
   profiles: Map<Did, ProfileDetailed>;
   following: Map<Did, AtUri>;
   followedBy: Map<Did, AtUri>;
-  actorStats: Map<string, ActorStats>;
+  actorStats: Map<Did, ActorStatsDto>;
   labels: Map<string, Label[]>;
 };
 
 export class ActorLoader {
   constructor(
     private readonly profileRepository: IProfileRepository,
-    private readonly actorStatsRepository: IActorStatsRepository,
+    private readonly actorStatsQuery: IActorStatsQuery,
     private readonly followRepository: IFollowRepository,
     private readonly labelRepository: ILabelRepository,
   ) {}
@@ -61,8 +59,11 @@ export class ActorLoader {
   ): Promise<ViewData> {
     const [data, actorStats] = await Promise.all([
       this.loadProfiles(dids, viewerDid),
-      this.actorStatsRepository.findStats(dids),
+      this.actorStatsQuery.findStats(dids),
     ]);
-    return { ...data, actorStats };
+    return {
+      ...data,
+      actorStats: new Map(actorStats.map((stats) => [stats.actorDid, stats])),
+    };
   }
 }
