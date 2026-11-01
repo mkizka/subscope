@@ -49,6 +49,7 @@ export const ThreeColumnLayout = ({ children }: Props) => {
           />
         </main>
         <aside
+          aria-label="このサーバーについて"
           className="
             hidden border-base-300 p-4 text-sm
             lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
