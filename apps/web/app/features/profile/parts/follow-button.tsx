@@ -1,3 +1,5 @@
+import { Button } from "@/app/components/ui/button";
+
 type Props = {
   following: boolean;
   busy?: boolean;
@@ -6,16 +8,13 @@ type Props = {
 
 export function FollowButton({ following, busy, onClick }: Props) {
   return (
-    <button
-      type="button"
+    <Button
+      variant={following ? "secondary" : "primary"}
+      size="sm"
       aria-disabled={busy}
-      className={`
-        btn btn-sm
-        ${following ? "btn-outline" : "btn-primary"}
-      `}
       onClick={onClick}
     >
       {following ? "フォロー中" : "フォロー"}
-    </button>
+    </Button>
   );
 }

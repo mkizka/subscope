@@ -13,9 +13,9 @@ type Props = {
 export function FollowListPage({ title, subject, actors }: Props) {
   return (
     <ThreeColumnLayout>
-      <h1 className="border-b border-base-300 p-4 text-lg font-bold">
+      <h1 className="sticky top-0 border-b border-line bg-surface p-4 text-title">
         {title}{" "}
-        <span className="font-normal text-base-content/60">
+        <span className="font-normal text-muted">
           {subject.displayName || subject.handle}
         </span>
       </h1>
