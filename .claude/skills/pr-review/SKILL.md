@@ -14,7 +14,7 @@ description: PRを作成・更新する前に必ず実行する。mainとの差�
 - 使う側のコンストラクタ引数はinterfaceで受け取る
 - テストではライブラリではなく `*.in-memory.ts` の実装を使う
 
-例: `apps/ingester/src/infrastructure/label-cursor-store.ts` は `ILabelCursorStore` を実装し、Keyvをprivateに持つ。
+例: `apps/worker/src/infrastructure/label-cursor-store/label-cursor-store.ts` は `ILabelCursorStore` を実装し、Keyvをprivateに持つ。
 
 例外: `db`(drizzle)とexpressのRouterは許容する。dbを使うのはinfrastructureのリポジトリだけで、差し替えの単位はリポジトリだから。Routerを使うのはpresentationのサーバークラスだけだから。
 

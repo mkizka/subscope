@@ -14,8 +14,6 @@ AppViewの各機能を複数アプリケーションに分割したmonorepoで�
 
 appsディレクトリ(アプリケーション)
 
-- `@repo/ingester`
-  - 何もしない(削除予定)
 - `@repo/worker`
   - Tapとモデレーションサービスに接続し、受け取ったレコードとラベルをデータベースにインデックスするワーカー
 - `@repo/web`
@@ -39,7 +37,7 @@ packagesディレクトリ(共通パッケージ)
 e2eディレクトリ
 
 - `@repo/e2e`
-  - PDS・ingester・worker・appview・webを全て起動し、Webクライアントを操作してシステム全体を検証するPlaywrightのE2Eテスト
+  - PDS・worker・appview・webを全て起動し、Webクライアントを操作してシステム全体を検証するPlaywrightのE2Eテスト
   - `tests/{仕様書名}/` にテスト、`helpers/` にPDS操作やログインなどの共通処理を置く
 
 ### 実装パターン(サーバー)
@@ -98,7 +96,7 @@ Reactコンポーネントは以下の方針で実装しています。
 
 ### 仕様書の書き方
 
-- docs/specs には web-client.md、web-admin.md、appview.md、worker.md、ingester.md のみを置き、1ファイルで1アプリの振る舞いを定める
+- docs/specs には web-client.md、web-admin.md、appview.md、worker.md のみを置き、1ファイルで1アプリの振る舞いを定める
 - 見出しはAPIの名前か機能・画面の名前とし、直後にその機能が何をするかを1〜2文で書く
 - 仕様項目は「〜の場合、〜を返す」というテストの条件ではなく、「〜する」「〜は含めない」という振る舞いのルールを1つだけ書く
 - IDは`{見出しの短い名前}-{連番}`とする(例: getTimeline-1)

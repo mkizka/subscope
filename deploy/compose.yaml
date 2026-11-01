@@ -45,6 +45,7 @@ services:
     environment:
       TAP_DATABASE_URL: sqlite:///data/tap.db
       TAP_COLLECTION_FILTERS: app.bsky.*
+      TAP_OUTBOX_CAPACITY: 10000
     volumes:
       - tap_data:/data
   atblob:
@@ -81,9 +82,6 @@ services:
   worker:
     <<: *app
     build: { context: .., args: { BUILD_TARGET: worker } }
-  ingester:
-    <<: *app
-    build: { context: .., args: { BUILD_TARGET: ingester } }
 
 volumes:
   caddy_data:

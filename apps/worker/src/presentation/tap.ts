@@ -1,17 +1,46 @@
-import { asDid } from "@atproto/did";
 import { lexToJson } from "@atproto/lex";
+import { AtUri } from "@atproto/syntax";
 import type { RecordEvent, TapEvent } from "@atproto/tap";
 import { Tap } from "@atproto/tap";
-import type {
-  CommitEventDto,
-  ILoggerManager,
-  IMetricReporter,
-} from "@repo/common/domain";
+import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
+import { Record } from "@repo/common/domain";
 import { isSupportedCollection } from "@repo/common/utils";
 
-import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
+import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
+import type { JobLogger } from "../shared/job.js";
+
+export const indexCommitCommandFactory = (
+  event: RecordEvent,
+  jobLogger: JobLogger,
+): IndexCommitCommand | null => {
+  const uri = AtUri.make(event.did, event.collection, event.rkey);
+  if (event.action === "delete") {
+    return {
+      commit: { operation: event.action, uri, rev: event.rev },
+      live: event.live,
+      jobLogger,
+    };
+  }
+  if (event.record === undefined || event.cid === undefined) {
+    return null;
+  }
+  return {
+    commit: {
+      operation: event.action,
+      uri,
+      rev: event.rev,
+      record: Record.create({
+        uri,
+        cid: event.cid,
+        json: lexToJson(event.record),
+      }),
+    },
+    live: event.live,
+    jobLogger,
+  };
+};
 
 export class TapSubscriber {
   private readonly logger;
@@ -34,37 +63,6 @@ export class TapSubscriber {
     };
   }
 
-  private toCommitEvent(event: RecordEvent): CommitEventDto | null {
-    if (!isSupportedCollection(event.collection)) {
-      return null;
-    }
-    const base = {
-      did: asDid(event.did),
-      live: event.live,
-      commit: {
-        collection: event.collection,
-        rkey: event.rkey,
-        rev: event.rev,
-      },
-    };
-    if (event.action === "delete") {
-      return { ...base, commit: { ...base.commit, operation: "delete" } };
-    }
-    if (event.record === undefined || event.cid === undefined) {
-      this.logger.warn({ event }, "RecordEvent missing record or cid");
-      return null;
-    }
-    return {
-      ...base,
-      commit: {
-        ...base.commit,
-        operation: event.action,
-        record: lexToJson(event.record),
-        cid: event.cid,
-      },
-    };
-  }
-
   private async handleEvent(event: TapEvent) {
     if (event.type === "identity") {
       this.metricReporter.increment("worker_events_identity_total");
@@ -75,17 +73,16 @@ export class TapSubscriber {
       });
       return;
     }
-    const commitEvent = this.toCommitEvent(event);
-    if (!commitEvent) return;
+    if (!isSupportedCollection(event.collection)) return;
+    const command = indexCommitCommandFactory(event, this.jobLogger);
+    if (!command) {
+      this.logger.warn({ event }, "RecordEvent missing record or cid");
+      return;
+    }
     this.metricReporter.increment("worker_events_commit_total", {
-      collection: commitEvent.commit.collection,
+      collection: event.collection,
     });
-    await this.indexCommitUseCase.execute(
-      indexCommitCommandFactory({
-        event: commitEvent,
-        jobLogger: this.jobLogger,
-      }),
-    );
+    await this.indexCommitUseCase.execute(command);
   }
 
   async start() {

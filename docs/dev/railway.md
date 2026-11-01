@@ -1,6 +1,6 @@
 # Railwayへのデプロイ(IaC)
 
-本番環境のRailwayプロジェクトは `.railway/railway.ts` で定義する。構成は `deploy/compose.yaml` と同じで、シンガポールリージョンにAppview・Web・Worker・Ingester・Tap・ATBlob・Postgres・Redisを置く。加えて、Appview・Ingester・Worker・Tapの `/metrics` を集めるPrometheus(`.railway/prometheus/`)と、それを表示するGrafana(`.railway/grafana/`)を置く。Grafanaのデータソースとダッシュボードは `.railway/grafana/` 以下のファイルからプロビジョニングするので、ダッシュボードの変更はJSONを編集してPRにする。
+本番環境のRailwayプロジェクトは `.railway/railway.ts` で定義する。構成は `deploy/compose.yaml` と同じで、シンガポールリージョンにAppview・Web・Worker・Tap・ATBlob・Postgres・Redisを置く。加えて、Appview・Worker・Tapの `/metrics` を集めるPrometheus(`.railway/prometheus/`)と、それを表示するGrafana(`.railway/grafana/`)を置く。Grafanaのデータソースとダッシュボードは `.railway/grafana/` 以下のファイルからプロビジョニングするので、ダッシュボードの変更はJSONを編集してPRにする。
 
 ## 反映の流れ
 

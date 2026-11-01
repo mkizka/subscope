@@ -104,7 +104,6 @@ export const createWorkerRegistry = (env: Env) =>
     .value("moderationUrl", env.MODERATION_URL)
     .value("port", env.PORT)
     .value("tapConcurrency", env.TAP_CONCURRENCY)
-    .value("commitWorkerConcurrency", env.COMMIT_WORKER_CONCURRENCY)
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
     .service("tapClient", ["tapUrl"], asClassArgs<ITapClient>()(TapClient))
@@ -159,7 +158,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
     .service("indexLabelUseCase", ["labelRepository", "actorRepository", "db"], asClassArgs(IndexLabelUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "labelFetcher", "indexLabelUseCase", "db"], asClassArgs(SyncTapRepoUseCase))
-    .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
+    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "tapUrl", "tapConcurrency"], asClassArgs(TapSubscriber))

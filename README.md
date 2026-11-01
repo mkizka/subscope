@@ -22,7 +22,6 @@ Server implementations are located under the apps directory.
 
 - web ... Web client and admin dashboard
 - appview ... AppView server that exposes the XRPC API and serves the `did:web` document
-- ingester ... Does nothing (to be removed)
 - worker ... Worker that receives Tap events and labels and indexes them into the database
 
 ## Deployment
@@ -44,6 +43,5 @@ The following servers will start.
 - web ... http://localhost:3000
 - appview ... http://localhost:3001
 - worker ... http://localhost:3003
-- ingester ... http://localhost:3004
 
 A local PLC and PDS are also started with the test accounts `alice.test` and `bob.test` (password: `password`).

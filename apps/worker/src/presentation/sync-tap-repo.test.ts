@@ -1,35 +1,44 @@
 import { asDid } from "@atproto/did";
+import type { RecordEvent } from "@atproto/tap";
 import { actorFactory, randomCid, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupJobTest } from "../shared/job-test-utils.js";
 
+let revCount = 0;
+const nextRev = () => String(++revCount).padStart(13, "0");
+
 const rkeyOf = (subjectDid: string) => subjectDid.replaceAll(":", "-");
 
-const followEvent = async (actorDid: string, subjectDid: string) => ({
+const followEvent = async (
+  actorDid: string,
+  subjectDid: string,
+): Promise<RecordEvent> => ({
+  id: 1,
+  type: "record",
+  action: "create",
   did: asDid(actorDid),
-  live: true,
-  commit: {
-    operation: "create" as const,
-    collection: "app.bsky.graph.follow" as const,
-    rkey: rkeyOf(subjectDid),
-    cid: await randomCid(),
-    record: {
-      $type: "app.bsky.graph.follow",
-      subject: subjectDid,
-      createdAt: new Date().toISOString(),
-    },
+  rev: nextRev(),
+  collection: "app.bsky.graph.follow",
+  rkey: rkeyOf(subjectDid),
+  cid: await randomCid(),
+  record: {
+    $type: "app.bsky.graph.follow",
+    subject: subjectDid,
+    createdAt: new Date().toISOString(),
   },
+  live: true,
 });
 
-const unfollowEvent = (actorDid: string, subjectDid: string) => ({
+const unfollowEvent = (actorDid: string, subjectDid: string): RecordEvent => ({
+  id: 1,
+  type: "record",
+  action: "delete",
   did: asDid(actorDid),
+  rev: nextRev(),
+  collection: "app.bsky.graph.follow",
+  rkey: rkeyOf(subjectDid),
   live: true,
-  commit: {
-    operation: "delete" as const,
-    collection: "app.bsky.graph.follow" as const,
-    rkey: rkeyOf(subjectDid),
-  },
 });
 
 describe("Tapへの登録", () => {

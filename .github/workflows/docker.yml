@@ -14,7 +14,6 @@ jobs:
         target:
           - appview
           - admin
-          - ingester
           - worker
     permissions:
       packages: write

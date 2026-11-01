@@ -1,8 +1,6 @@
 import type { Did } from "@atproto/did";
 import type { Queue } from "bullmq";
 
-import type { CommitEventDto, IdentityEventDto } from "../dtos/event.js";
-
 type FetchRecordData = {
   uri: string;
   depth: number;
@@ -27,8 +25,6 @@ type LabelData = {
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
-  identity: IdentityEventDto;
-  commit: CommitEventDto;
   aggregatePostStats: null;
   aggregateActorStats: AggregateActorStatsData;
   syncTapRepo: Did;

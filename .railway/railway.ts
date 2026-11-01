@@ -12,10 +12,7 @@ import {
 
 const region = "asia-southeast1-eqsg3a";
 
-const app = (
-  target: "appview" | "web" | "worker" | "ingester",
-  watch: string[],
-) => ({
+const app = (target: "appview" | "web" | "worker", watch: string[]) => ({
   source: github("mkizka/subscope", { branch: "main" }),
   build: {
     watchPatterns: [
@@ -50,6 +47,7 @@ export default defineRailway(() => {
       TAP_DATABASE_URL: "sqlite:///data/tap.db",
       TAP_METRICS_LISTEN: ":6009",
       TAP_COLLECTION_FILTERS: "app.bsky.*",
+      TAP_OUTBOX_CAPACITY: "10000",
     },
   });
 
@@ -109,16 +107,6 @@ export default defineRailway(() => {
     },
   });
 
-  const ingester = service("Ingester", {
-    ...app("ingester", []),
-    deploy: deploy(1),
-    env: {
-      BUILD_TARGET: "ingester",
-      REDIS_URL: cache.env.REDIS_URL,
-      TAP_URL: tapUrl,
-    },
-  });
-
   const prometheusData = volume("prometheus-data", { region, sizeMB: 2000 });
   const prometheus = service("Prometheus", {
     source: github("mkizka/subscope", {
@@ -153,7 +141,6 @@ export default defineRailway(() => {
       appview,
       web,
       worker,
-      ingester,
       prometheusData,
       prometheus,
       grafana,

@@ -42,13 +42,11 @@ export class IndexCommitUseCase {
       ) {
         return;
       }
-      const isNotOlder =
-        commit.rev === undefined ||
-        (await this.recordRevRepository.saveIfNotOlder({
-          ctx,
-          uri: commit.uri,
-          rev: commit.rev,
-        }));
+      const isNotOlder = await this.recordRevRepository.saveIfNotOlder({
+        ctx,
+        uri: commit.uri,
+        rev: commit.rev,
+      });
       if (!isNotOlder) {
         await jobLogger.log(`Skipping stale commit: rev ${commit.rev}`);
         return;
