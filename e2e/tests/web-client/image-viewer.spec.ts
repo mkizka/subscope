@@ -144,7 +144,7 @@ test.describe("画像の拡大表示", () => {
       await main
         .getByRole("button", { name: "アイコンを拡大" })
         .click({ timeout: 1000 });
-      await expect(viewer.getByRole("img")).toHaveAttribute(
+      await expect(viewer.locator("img")).toHaveAttribute(
         "src",
         /\/img\/avatar/,
         { timeout: 1000 },
@@ -154,7 +154,7 @@ test.describe("画像の拡大表示", () => {
     await page.keyboard.press("Escape");
     await expect(viewer).toBeHidden();
     await main.getByRole("button", { name: "バナーを拡大" }).click();
-    await expect(viewer.getByRole("img")).toHaveAttribute(
+    await expect(viewer.locator("img")).toHaveAttribute(
       "src",
       /\/img\/banner\//,
     );
