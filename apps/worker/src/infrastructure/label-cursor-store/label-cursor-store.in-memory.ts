@@ -1,4 +1,4 @@
-import type { ILabelCursorStore } from "../application/interfaces/label-cursor-store.js";
+import type { ILabelCursorStore } from "../../application/interfaces/external/label-cursor-store.js";
 
 export class InMemoryLabelCursorStore implements ILabelCursorStore {
   private readonly cursors = new Map<string, number>();

@@ -8,8 +8,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
 import { WebSocketServer } from "ws";
 
-import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store.in-memory.js";
-import { LabelIngester } from "./label.js";
+import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.in-memory.js";
+import { LabelSubscriber } from "./label-subscriber.js";
 
 const label = (val: string) => ({
   src: "did:plc:ar7c4by46qjdydhdevvrndac",
@@ -18,7 +18,7 @@ const label = (val: string) => ({
   cts: "2026-01-01T00:00:00.000Z",
 });
 
-describe("LabelIngester", () => {
+describe("モデレーションサービスからのラベル受信", () => {
   let server: WebSocketServer;
   let moderationUrl: string;
   const jobQueue = {
@@ -35,13 +35,13 @@ describe("LabelIngester", () => {
         resolve([socket, new URL(req.url ?? "", moderationUrl)]),
       ),
     );
-    const ingester = new LabelIngester(
+    const subscriber = new LabelSubscriber(
       new MetricReporter(),
       jobQueue,
       labelCursorStore,
       moderationUrl,
     );
-    void ingester.start();
+    void subscriber.start();
     return connection;
   };
 
@@ -62,7 +62,7 @@ describe("LabelIngester", () => {
     await new Promise((resolve) => server.close(resolve));
   });
 
-  test("label-1: 受け取ったラベルを1件ずつlabelキューに積む", async () => {
+  test("subscribeLabels-1: 受け取ったラベルを1件ずつlabelキューに積む", async () => {
     const [socket] = await connect();
     const labels = [label("!takedown"), { ...label("spam"), neg: true }];
     socket.send(
@@ -79,7 +79,7 @@ describe("LabelIngester", () => {
     }
   });
 
-  test("label-2: 最後に受け取ったラベルのseqをRedisに保存し、再接続時はその続きから受け取る", async () => {
+  test("subscribeLabels-2: 最後に受け取ったラベルのseqをRedisに保存し、再接続時はその続きから受け取る", async () => {
     const [firstSocket, firstUrl] = await connect();
     expect(firstUrl.searchParams.has("cursor")).toBe(false);
 

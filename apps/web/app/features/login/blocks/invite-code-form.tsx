@@ -8,9 +8,15 @@ type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
   error?: string;
+  loading: boolean;
 };
 
-export function InviteCodeForm({ formProps, inputProps, error }: Props) {
+export function InviteCodeForm({
+  formProps,
+  inputProps,
+  error,
+  loading,
+}: Props) {
   return (
     <Form method="post" className="flex flex-col gap-4" {...formProps}>
       <Input
@@ -19,7 +25,9 @@ export function InviteCodeForm({ formProps, inputProps, error }: Props) {
         error={error}
         {...inputProps}
       />
-      <Button type="submit">登録する</Button>
+      <Button type="submit" loading={loading}>
+        登録する
+      </Button>
     </Form>
   );
 }

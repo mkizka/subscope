@@ -21,6 +21,7 @@ import {
 } from "@repo/common/infrastructure";
 
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
+import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/repositories/actor-stats-repository.js";
@@ -62,6 +63,7 @@ import { IndexLabelUseCase } from "../application/use-cases/label/index-label-us
 import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
+import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
@@ -80,6 +82,7 @@ import { RecordRepository } from "../infrastructure/repositories/record-reposito
 import { RecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
+import { LabelSubscriber } from "../presentation/label-subscriber.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { WorkerServer } from "../presentation/server.js";
 import { TapSubscriber } from "../presentation/tap.js";
@@ -113,6 +116,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
     .service("handleResolver", ["handleResolverUrl"], asClassArgs<IHandleResolver>()(HandleResolver))
+    .service("labelCursorStore", ["redisUrl"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
     .service("labelFetcher", ["moderationUrl"], asClassArgs<ILabelFetcher>()(LabelFetcher))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
     .service("actorRepository", asClassArgs<IActorRepository>()(ActorRepository))
@@ -159,4 +163,5 @@ export const createWorkerRegistry = (env: Env) =>
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "tapUrl", "tapConcurrency"], asClassArgs(TapSubscriber))
-    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "jobQueue", "healthRouter", "port"], asClassArgs(WorkerServer));
+    .service("labelSubscriber", ["metricReporter", "jobQueue", "labelCursorStore", "moderationUrl"], asClassArgs(LabelSubscriber))
+    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "healthRouter", "port"], asClassArgs(WorkerServer));
