@@ -48,6 +48,16 @@ test.describe("レイアウト", () => {
     }).toPass();
   });
 
+  test("layout-5: 右カラムに、このサーバーがメンバーとそのフォロー先の投稿だけを保存することを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await expect(page.getByRole("complementary")).toContainText(
+      "メンバーとそのフォロー先の投稿だけを保存します",
+    );
+  });
+
   test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
     page,
   }) => {

@@ -1,4 +1,5 @@
 import { BellIcon } from "lucide-react";
+import { Link } from "react-router";
 
 type Props = {
   unreadCount: number;
@@ -6,8 +7,8 @@ type Props = {
 
 export function NotificationBell({ unreadCount }: Props) {
   return (
-    <label
-      htmlFor="notification-toggle"
+    <Link
+      to="/notifications"
       aria-label="通知を開く"
       className="btn indicator btn-square btn-ghost"
     >
@@ -17,6 +18,6 @@ export function NotificationBell({ unreadCount }: Props) {
         </span>
       )}
       <BellIcon />
-    </label>
+    </Link>
   );
 }
