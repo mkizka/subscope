@@ -266,11 +266,14 @@ test.describe("スレッド", () => {
     await openThread(page, target.uri, "thread-11: 投稿");
     const thread = page.getByRole("region", { name: "スレッド" });
     await thread.getByRole("button", { name: "返信を書く" }).click();
-    await expect(page.getByText("@alice.test に返信")).toBeVisible();
-    await page
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("article", { name: "返信先" })).toContainText(
+      "thread-11: 投稿",
+    );
+    await dialog
       .getByRole("textbox", { name: "投稿内容" })
       .fill("thread-11: 返信");
-    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await dialog.getByRole("button", { name: "返信", exact: true }).click();
 
     await expect(
       thread.getByRole("article").filter({ hasText: "thread-11: 返信" }),
