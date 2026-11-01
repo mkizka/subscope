@@ -35,7 +35,7 @@ export function PostImages({ images }: { images: PostImage[] }) {
       </div>
       <dialog
         ref={ref}
-        className="modal bg-black/90 text-white"
+        className="modal bg-black/70 text-white"
         aria-label="画像の拡大表示"
         onClose={() => setIndex(null)}
         onKeyDown={(e) => {
