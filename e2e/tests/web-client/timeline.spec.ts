@@ -5,14 +5,9 @@ import {
   PDS_URL,
   putRecord,
   resolveHandle,
-  uploadImage,
 } from "../../helpers/pds";
 
-const createPosts = async (
-  request: APIRequestContext,
-  texts: string[],
-  embed?: unknown,
-) => {
+const createPosts = async (request: APIRequestContext, texts: string[]) => {
   const session = await request.post(
     `${PDS_URL}/xrpc/com.atproto.server.createSession`,
     { data: { identifier: "alice.test", password: "password" } },
@@ -33,19 +28,20 @@ const createPosts = async (
       data: {
         repo: did,
         collection: "app.bsky.feed.post",
-        record: { text, embed, createdAt: new Date().toISOString() },
+        record: { text, createdAt: new Date().toISOString() },
       },
     });
   }
 };
 
 test.describe("タイムライン", () => {
-  test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しいものほど下に並べる", async ({
+  test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しいものほど上に並べる", async ({
     page,
     request,
   }) => {
     const texts = ["timeline-1: 古い投稿", "timeline-1: 新しい投稿"];
     await createPosts(request, texts);
+    texts.reverse();
 
     await page.goto("/");
 
@@ -57,7 +53,7 @@ test.describe("タイムライン", () => {
     }).toPass();
   });
 
-  test("timeline-4: 開いたときは最新の投稿までスクロールし、上にスクロールすると表示位置を保ったまま古い投稿を読み込む", async ({
+  test("timeline-4: 下までスクロールすると、続きの古い投稿を読み込む", async ({
     page,
     request,
   }) => {
@@ -65,39 +61,20 @@ test.describe("タイムライン", () => {
       { length: 25 },
       (_, i) => `timeline-4: 投稿${i + 1}`,
     );
-    await createPosts(request, texts, {
-      $type: "app.bsky.embed.images",
-      images: [{ image: await uploadImage("alice.test"), alt: "" }],
-    });
-    await page.route("**/*", async (route) => {
-      if (route.request().resourceType() === "image") {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-      await route.continue();
-    });
+    await createPosts(request, texts);
 
-    const latestPost = page
-      .getByRole("article")
-      .filter({ hasText: "timeline-4: 投稿25" });
-    await page.goto("/");
-
+    const oldestPost = page.getByText("timeline-4: 投稿1", { exact: true });
     await expect(async () => {
-      await page.reload();
-      await expect(latestPost).toBeInViewport({ timeout: 1000 });
-      await expect(latestPost.getByText(/^\d+(秒|分)$/)).toBeVisible({
+      await page.goto("/");
+      await expect(page.getByText("timeline-4: 投稿25")).toBeVisible({
         timeout: 1000,
       });
     }).toPass();
-    await expect(
-      page.getByText("timeline-4: 投稿1", { exact: true }),
-    ).toHaveCount(0);
+    await expect(oldestPost).toHaveCount(0);
 
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
-    await expect(
-      page.getByText("timeline-4: 投稿1", { exact: true }),
-    ).toBeAttached();
-    await expect(page.getByText("timeline-4: 投稿6")).toBeInViewport();
+    await expect(oldestPost).toBeAttached();
   });
 
   test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
