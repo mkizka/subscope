@@ -4,6 +4,7 @@ import {
   createRecord,
   PDS_URL,
   putRecord,
+  resolveHandle,
   uploadImage,
 } from "../../helpers/pds";
 
@@ -225,5 +226,43 @@ test.describe("タイムライン", () => {
       "https://example.com/timeline-6/full",
     );
     await expect(link).toHaveAttribute("target", "_blank");
+  });
+
+  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、右カラムにそのユーザーのプロフィールの簡易表示を開くリンクにする", async ({
+    page,
+  }) => {
+    const prefix = "timeline-7: こんにちは ";
+    const label = "@alice.test";
+    const byteStart = new TextEncoder().encode(prefix).length;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: `${prefix}${label} さん`,
+      facets: [
+        {
+          index: { byteStart, byteEnd: byteStart + label.length },
+          features: [
+            {
+              $type: "app.bsky.richtext.facet#mention",
+              did: await resolveHandle("alice.test"),
+            },
+          ],
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const link = page
+      .getByRole("main")
+      .getByRole("article")
+      .filter({ hasText: prefix })
+      .getByRole("link", { name: label, exact: true });
+    await expect(async () => {
+      await page.reload();
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await link.click();
+    await expect(
+      page.getByRole("region", { name: "プロフィール" }).getByText(label),
+    ).toBeVisible();
   });
 });
