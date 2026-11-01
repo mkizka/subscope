@@ -5,7 +5,6 @@ import type {
 } from "@repo/common/domain";
 import { Like, RecordValidationError } from "@repo/common/domain";
 
-import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
@@ -16,7 +15,6 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly likeRepository: ILikeRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly followRepository: IFollowRepository,
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
@@ -25,15 +23,12 @@ export class LikeIndexer implements ICollectionIndexer {
     const recipientDid = like.subjectUri.host;
     const isRecipientSubscriber =
       await this.subscriptionRepository.isSubscriber(ctx, recipientDid);
-    const shouldSave =
-      isRecipientSubscriber ||
-      (await this.followRepository.isFollowedByAnySubscriber({
-        ctx,
-        subjectDid: recipientDid,
-      }));
-    if (!shouldSave) {
+    if (
+      !isRecipientSubscriber &&
+      !(await this.subscriptionRepository.isSubscriber(ctx, like.actorDid))
+    ) {
       throw new RecordValidationError(
-        "like subject is not a tracked actor's post",
+        "like is neither by nor to a subscriber",
         record.uri,
       );
     }
