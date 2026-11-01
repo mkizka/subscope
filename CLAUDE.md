@@ -21,7 +21,7 @@ appsディレクトリ(アプリケーション)
 - `@repo/web`
   - Webクライアント・管理画面を提供するサーバー
   - React Router(framework mode)で実装
-  - デザインはTailwind CSSと自前の色トークンで実装(daisyUIは撤去中)
+  - デザインはapps/web/DESIGN.mdのルールに従いTailwind CSSで実装(daisyUIは撤去中)
 - `@repo/appview`
   - XRPC APIを提供するAppViewサーバー
   - PDS経由のクライアントリクエストはここに `atproto-proxy` ヘッダで転送される
@@ -75,6 +75,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/glossary.md
 - Webクライアントの構成
   - docs/dev/web-architecture.md
+- Webクライアントのデザインルール
+  - apps/web/DESIGN.md
 - Lexiconのインデックス実装追加ガイド
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
