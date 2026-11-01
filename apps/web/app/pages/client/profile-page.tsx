@@ -32,19 +32,27 @@ export function ProfilePage({ follow, tabs, tab, posts, ...profile }: Props) {
         {...profile}
         action={follow && <FollowButtonContainer {...follow} />}
       />
-      <div role="tablist" className="tabs tabs-border">
+      <div role="tablist" className="flex border-b border-line">
         {tabs.map((value) => (
           <Link
             key={value}
             to={value === "posts" ? "." : `?tab=${value}`}
             role="tab"
             aria-selected={tab === value}
-            className={tab === value ? "tab tab-active" : "tab"}
+            className="
+              flex-1 py-2.5 text-center text-sm text-muted
+              aria-selected:font-bold aria-selected:text-ink
+              aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
+            "
           >
             {tabLabels[value]}
           </Link>
         ))}
-        <Link to="lists" role="tab" className="tab">
+        <Link
+          to="lists"
+          role="tab"
+          className="flex-1 py-2.5 text-center text-sm text-muted"
+        >
           リスト
         </Link>
       </div>

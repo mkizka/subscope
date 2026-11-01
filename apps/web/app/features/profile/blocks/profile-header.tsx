@@ -23,11 +23,11 @@ export function ProfileHeader({
   action,
 }: Props) {
   return (
-    <section className="border-b border-base-300">
+    <section className="border-b border-line">
       {bannerUrl ? (
         <img src={bannerUrl} alt="" className="h-32 w-full object-cover" />
       ) : (
-        <div className="h-32 bg-base-300" />
+        <div className="h-32 bg-line" />
       )}
       <div className="flex flex-col gap-2 px-4 pb-4">
         <div className="flex items-end justify-between">
@@ -36,14 +36,13 @@ export function ProfileHeader({
               src={avatarUrl}
               alt=""
               className="
-                -mt-10 size-20 rounded-full border-4 border-base-100
-                object-cover
+                -mt-10 size-20 rounded-full border-4 border-surface object-cover
               "
             />
           ) : (
             <div
               className="
-                -mt-10 size-20 rounded-full border-4 border-base-100 bg-base-300
+                -mt-10 size-20 rounded-full border-4 border-surface bg-line
               "
             />
           )}
@@ -53,19 +52,19 @@ export function ProfileHeader({
           <h1 className="truncate text-lg font-bold">
             {displayName || handle}
           </h1>
-          <p className="truncate text-sm text-base-content/60">@{handle}</p>
+          <p className="truncate text-sm text-muted">@{handle}</p>
         </div>
         {description && (
           <p className="text-sm wrap-break-word whitespace-pre-wrap">
             {description}
           </p>
         )}
-        <div className="flex gap-4 text-sm">
+        <div className="flex gap-4 text-sm text-muted">
           <Link to={`/profile/${handle}/follows`} className="hover:underline">
-            <b>{followsCount}</b> フォロー
+            <b className="text-ink">{followsCount}</b> フォロー
           </Link>
           <Link to={`/profile/${handle}/followers`} className="hover:underline">
-            <b>{followersCount}</b> フォロワー
+            <b className="text-ink">{followersCount}</b> フォロワー
           </Link>
         </div>
       </div>

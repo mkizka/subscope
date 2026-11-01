@@ -10,8 +10,15 @@ export function FollowButton({ following, busy, onClick }: Props) {
       type="button"
       aria-disabled={busy}
       className={`
-        btn btn-sm
-        ${following ? "btn-outline" : "btn-primary"}
+        rounded-full px-4 py-1.5 text-sm font-bold
+        ${
+          following
+            ? `
+              border border-line
+              hover:bg-surface-2
+            `
+            : "bg-brand text-on-brand"
+        }
       `}
       onClick={onClick}
     >

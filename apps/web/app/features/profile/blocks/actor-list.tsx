@@ -19,47 +19,58 @@ type Props<T extends Actor> = {
 
 export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
   return (
-    <ul className="list">
+    <ul>
       {actors.map((actor) => {
         const profileId =
           actor.handle === "handle.invalid" ? actor.did : actor.handle;
         return (
-          <li key={actor.did} className="flex items-center pr-2">
+          <li
+            key={actor.did}
+            className="flex items-center border-b border-line pr-2"
+          >
             <Link
               to={`/profile/${profileId}`}
               className="
-                list-row min-w-0 flex-1 items-center
-                hover:bg-base-200
+                flex min-w-0 flex-1 items-center gap-3 px-4 py-3
+                hover:bg-surface-2
               "
             >
               {actor.avatarUrl ? (
                 <img
                   src={actor.avatarUrl}
                   alt=""
-                  className="size-10 rounded-full object-cover"
+                  className="size-10 shrink-0 rounded-full object-cover"
                 />
               ) : (
-                <div className="size-10 rounded-full bg-base-300" />
+                <div className="size-10 shrink-0 rounded-full bg-line" />
               )}
-              <div className="min-w-0 list-col-grow">
+              <div className="min-w-0 flex-1">
                 <p className="truncate font-bold">
                   {actor.displayName || profileId}
                 </p>
-                <p className="truncate text-sm text-base-content/60">
-                  @{profileId}
-                </p>
+                <p className="truncate text-sm text-muted">@{profileId}</p>
                 {actor.description && (
                   <p className="truncate text-sm">{actor.description}</p>
                 )}
               </div>
               {actor.isAdmin && (
-                <span className="badge badge-soft badge-sm badge-primary">
+                <span
+                  className="
+                    flex shrink-0 items-center gap-1 rounded-full bg-brand-soft
+                    px-2 py-0.5 text-xs text-brand
+                  "
+                >
                   <ShieldIcon className="size-3" />
                   管理者
                 </span>
               )}
               {actor.subscriberFollowersCount !== undefined && (
-                <span className="badge badge-ghost badge-sm">
+                <span
+                  className="
+                    shrink-0 rounded-full border border-line px-2 py-0.5 text-xs
+                    text-muted
+                  "
+                >
                   メンバー{actor.subscriberFollowersCount}人がフォロー
                 </span>
               )}
