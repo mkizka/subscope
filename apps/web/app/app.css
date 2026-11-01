@@ -7,31 +7,54 @@
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --color-base-100: color-mix(in srgb, #b8326b 7%, #fff);
-  --color-base-200: color-mix(in srgb, #b8326b 13%, #fff);
-  --color-base-300: color-mix(in srgb, #b8326b 22%, #fff);
-  --color-base-content: #17191c;
-  --color-primary: #b8326b;
-  --color-primary-content: #fff;
+  --color-base-100: var(--color-surface);
+  --color-base-200: var(--color-surface-2);
+  --color-base-300: var(--color-line);
+  --color-base-content: var(--color-ink);
+  --color-primary: var(--color-brand);
+  --color-primary-content: var(--color-on-brand);
 }
 
 @plugin "daisyui/theme" {
   name: "dark";
   prefersdark: true;
-  --color-base-100: color-mix(in srgb, #e8709f 9%, #121314);
-  --color-base-200: color-mix(in srgb, #e8709f 5%, #0c0d0e);
-  --color-base-300: color-mix(in srgb, #e8709f 20%, #24262a);
-  --color-base-content: #eceef0;
-  --color-primary: #e8709f;
-  --color-primary-content: #17191c;
+  --color-base-100: var(--color-surface);
+  --color-base-200: var(--color-surface-2);
+  --color-base-300: var(--color-line);
+  --color-base-content: var(--color-ink);
+  --color-primary: var(--color-brand);
+  --color-primary-content: var(--color-on-brand);
 }
 
-@theme {
+@theme static {
   --font-sans: "Zen Maru Gothic", sans-serif;
+  --color-surface: color-mix(in srgb, #b8326b 7%, #fff);
+  --color-surface-2: color-mix(in srgb, #b8326b 13%, #fff);
+  --color-line: color-mix(in srgb, #b8326b 22%, #fff);
+  --color-ink: #17191c;
+  --color-muted: color-mix(in srgb, #17191c 62%, transparent);
+  --color-brand: #b8326b;
+  --color-on-brand: #fff;
+  --color-brand-soft: color-mix(in srgb, #b8326b 12%, transparent);
+  --color-danger: #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: color-mix(in srgb, #e8709f 9%, #121314);
+    --color-surface-2: color-mix(in srgb, #e8709f 5%, #0c0d0e);
+    --color-line: color-mix(in srgb, #e8709f 20%, #24262a);
+    --color-ink: #eceef0;
+    --color-muted: color-mix(in srgb, #eceef0 62%, transparent);
+    --color-brand: #e8709f;
+    --color-on-brand: #17191c;
+    --color-brand-soft: color-mix(in srgb, #e8709f 16%, transparent);
+    --color-danger: #ef6b6b;
+  }
 }
 
 @layer base {
   body {
-    @apply bg-base-100 text-base-content h-svh;
+    @apply bg-surface text-ink h-svh;
   }
 }
