@@ -12,16 +12,13 @@ type Props = {
 export function TrackedActorsPage({ actors, total }: Props) {
   return (
     <ThreeColumnLayout>
-      <div className="flex items-baseline gap-2 border-b border-base-300 p-4">
-        <h1 className="text-lg font-bold">追跡中のユーザー</h1>
-        <span className="text-sm text-base-content/70">{total}人</span>
+      <div className="flex items-baseline gap-2 border-b border-line p-4">
+        <h1 className="text-title">追跡中のユーザー</h1>
+        <span className="text-label text-muted">{total}人</span>
       </div>
-      <p
-        className="
-          border-b border-base-300 bg-base-200 px-4 py-2 text-sm
-          text-base-content/60
-        "
-      >
+      <p className="
+        border-b border-line bg-surface-2 px-4 py-2 text-label text-muted
+      ">
         メンバーとそのフォロー先です。このサーバーはこの人たちの投稿だけを保存します。
       </p>
       <ActorList actors={actors} />

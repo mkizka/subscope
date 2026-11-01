@@ -49,7 +49,6 @@
 ## デザイン
 
 - 色・文字・余白・部品などのデザインルールは [apps/web/DESIGN.md](../../apps/web/DESIGN.md) に従う
-- daisyUIは撤去中で、移行が済むまではdaisyUIのテーマ色を `app.css` の色トークンに向けている
 
 ## 今後追加する画面
 
