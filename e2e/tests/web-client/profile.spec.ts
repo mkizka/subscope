@@ -234,7 +234,7 @@ test.describe("プロフィール", () => {
     await article.locator('a[href="/profile/alice.test"]').first().click();
     await expect(page).toHaveURL("/profile/alice.test");
 
-    await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
+    await page.goto(`/profile/alice.test/post/${uri.split("/").pop()}`);
     await page
       .getByRole("article", { name: "選んだ投稿" })
       .getByRole("link", { name: /@alice\.test/ })

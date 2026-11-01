@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ThreadPanel } from "./thread-panel";
+import { ThreadPage } from "./thread-page";
 
 const post = (uri: string, text: string) => ({
   uri,
@@ -12,7 +12,10 @@ const post = (uri: string, text: string) => ({
 });
 
 const meta = {
-  component: ThreadPanel,
+  component: ThreadPage,
+  parameters: {
+    layout: "fullscreen",
+  },
   args: {
     thread: {
       ancestors: [post("at://a/1", "親投稿です")],
@@ -26,9 +29,8 @@ const meta = {
         [post("at://a/3", "返信です"), post("at://a/4", "返信への返信です")],
       ],
     },
-    closeSearch: "",
   },
-} satisfies Meta<typeof ThreadPanel>;
+} satisfies Meta<typeof ThreadPage>;
 
 export default meta;
 

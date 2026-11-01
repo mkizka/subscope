@@ -36,7 +36,7 @@ export type PostCardProps = {
     byHandle: string;
   };
   toolbar?: ReactNode;
-  threadSearch?: string;
+  threadPath?: string;
 };
 
 function formatRelativeTime(dateString: string) {
@@ -139,7 +139,7 @@ export function PostCard({
   quote,
   reasonRepost,
   toolbar,
-  threadSearch,
+  threadPath,
 }: PostCardProps) {
   const hydrated = useHydrated();
   return (
@@ -149,10 +149,9 @@ export function PostCard({
         hover:bg-base-200
       "
     >
-      {threadSearch && (
+      {threadPath && (
         <Link
-          to={{ search: threadSearch }}
-          preventScrollReset
+          to={threadPath}
           aria-label="スレッドを開く"
           className="absolute inset-0"
         />

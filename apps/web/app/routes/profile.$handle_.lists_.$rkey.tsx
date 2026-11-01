@@ -74,5 +74,3 @@ export default function List({ loaderData }: Route.ComponentProps) {
     />
   );
 }
-
-export { shouldRevalidate } from "@/app/lib/should-revalidate";
