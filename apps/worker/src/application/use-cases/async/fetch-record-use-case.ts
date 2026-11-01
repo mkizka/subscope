@@ -43,7 +43,7 @@ export class FetchRecordUseCase {
       return;
     }
     try {
-      await this.doFetchRecord(uri, depth, live, jobLogger);
+      await this.doFetchRecord(uri, depth, live);
     } catch (error) {
       if (
         error instanceof RecordFetchError ||
@@ -60,14 +60,11 @@ export class FetchRecordUseCase {
     uri: string,
     depth: number,
     live: boolean,
-    jobLogger: JobLogger,
   ): Promise<void> {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
     await this.transactionManager.transaction(async (ctx) => {
-      if (
-        !(await this.indexRecordService.shouldIndex({ ctx, record, jobLogger }))
-      ) {
+      if (!(await this.indexRecordService.shouldIndex({ ctx, record }))) {
         return;
       }
       await this.indexRecordService.upsert({

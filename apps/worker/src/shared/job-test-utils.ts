@@ -30,11 +30,7 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
 export const setupJobTest = async () => {
   const services = await jobTestRegistry.resolve();
   const indexCommit = async (event: CommitEventDto) => {
-    const command = indexCommitCommandFactory({
-      event,
-      jobLogger: { log: () => Promise.resolve(0) },
-    });
-    await services.indexCommitUseCase.execute(command);
+    await services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
   };
   const runSyncTapRepoJobs = async () => {
     for (const { did } of services.jobScheduler.getSyncTapRepoJobs()) {

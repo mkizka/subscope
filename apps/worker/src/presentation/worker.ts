@@ -76,11 +76,7 @@ export class SyncWorker {
       createWorker(
         "commit",
         async (job) => {
-          const command = indexCommitCommandFactory({
-            event: job.data,
-            jobLogger: createJobLogger(job),
-          });
-          await indexCommitUseCase.execute(command);
+          await indexCommitUseCase.execute(indexCommitCommandFactory(job.data));
         },
         {
           concurrency: commitWorkerConcurrency,

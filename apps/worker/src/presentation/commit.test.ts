@@ -15,7 +15,6 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
-import { InMemoryJobLogger } from "../shared/job-logger.in-memory.js";
 import { createWorkerRegistry } from "../shared/registry.js";
 import { testEnv } from "../shared/test-utils.js";
 
@@ -34,9 +33,7 @@ const services = await createWorkerRegistry(testEnv)
 describe("commit", () => {
   const { ctx } = testSetup;
   const processCommit = (event: CommitEventDto) =>
-    services.indexCommitUseCase.execute(
-      indexCommitCommandFactory({ event, jobLogger: new InMemoryJobLogger() }),
-    );
+    services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
 
   const deleteEvent = (did: string, rev: string): CommitEventDto => ({
     did: asDid(did),
