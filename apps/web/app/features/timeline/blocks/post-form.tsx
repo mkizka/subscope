@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import { Globe } from "lucide-react";
 import { type Ref, useId, useState } from "react";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -82,6 +83,8 @@ export function PostForm({
   const formId = useId();
   const [text, setText] = useState("");
   const [allow, setAllow] = useState<ReplyRule[]>();
+  const [showRules, setShowRules] = useState(false);
+  const canSetReplyRules = target?.type !== "reply";
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const length = countGraphemes(text);
 
@@ -117,7 +120,7 @@ export function PostForm({
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
           images.forEach(({ file }) => formData.append("image", file));
-          if (allow) {
+          if (canSetReplyRules && allow) {
             formData.set("threadgate", "on");
             allow.forEach((rule) => formData.append("allow", rule));
           }
@@ -189,41 +192,6 @@ export function PostForm({
             {target?.type === "quote" && <QuotedPost quote={target.post} />}
           </div>
         </div>
-        <fieldset
-          className={`flex flex-wrap items-center gap-3 text-label text-muted`}
-        >
-          <legend className="sr-only">返信できる人</legend>
-          <label className="flex items-center gap-1">
-            <input
-              type="radio"
-              checked={allow === undefined}
-              onChange={() => setAllow(undefined)}
-            />
-            誰でも
-          </label>
-          <label className="flex items-center gap-1">
-            <input
-              type="radio"
-              checked={allow?.length === 0}
-              onChange={() => setAllow([])}
-            />
-            返信不可
-          </label>
-          {REPLY_RULES.map(({ rule, label }) => (
-            <label key={rule} className="flex items-center gap-1">
-              <input
-                type="checkbox"
-                checked={allow?.includes(rule) ?? false}
-                onChange={(e) => {
-                  const next = (allow ?? []).filter((r) => r !== rule);
-                  if (e.target.checked) next.push(rule);
-                  setAllow(next.length > 0 ? next : undefined);
-                }}
-              />
-              {label}
-            </label>
-          ))}
-        </fieldset>
         <div
           className={`
             flex items-center gap-3 border-t border-line pt-3 text-label
@@ -233,7 +201,6 @@ export function PostForm({
           <label
             className={clsx(
               buttonClass({ variant: "secondary", size: "sm" }),
-              "mr-auto",
               images.length >= MAX_IMAGES && "pointer-events-none opacity-50",
             )}
           >
@@ -254,11 +221,69 @@ export function PostForm({
               }}
             />
           </label>
+          {canSetReplyRules && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              aria-expanded={showRules}
+              onClick={() => setShowRules(!showRules)}
+            >
+              <Globe className="size-4" />
+              {allow === undefined
+                ? "誰でも返信できます"
+                : allow.length === 0
+                  ? "返信不可"
+                  : "一部の人が返信できます"}
+            </Button>
+          )}
           {error && <span className="text-danger">{error}</span>}
-          <span className={clsx(length > MAX_POST_LENGTH && "text-danger")}>
+          <span
+            className={clsx(
+              "ml-auto",
+              length > MAX_POST_LENGTH && "text-danger",
+            )}
+          >
             {length}/{MAX_POST_LENGTH}
           </span>
         </div>
+        {canSetReplyRules && showRules && (
+          <fieldset
+            className={`flex flex-wrap items-center gap-3 text-label text-muted`}
+          >
+            <legend className="sr-only">返信できる人</legend>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                checked={allow === undefined}
+                onChange={() => setAllow(undefined)}
+              />
+              誰でも
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                checked={allow?.length === 0}
+                onChange={() => setAllow([])}
+              />
+              返信不可
+            </label>
+            {REPLY_RULES.map(({ rule, label }) => (
+              <label key={rule} className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={allow?.includes(rule) ?? false}
+                  onChange={(e) => {
+                    const next = (allow ?? []).filter((r) => r !== rule);
+                    if (e.target.checked) next.push(rule);
+                    setAllow(next.length > 0 ? next : undefined);
+                  }}
+                />
+                {label}
+              </label>
+            ))}
+          </fieldset>
+        )}
       </form>
     </Dialog>
   );

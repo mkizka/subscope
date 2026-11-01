@@ -165,7 +165,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (collection) (rate(ingester_events_commit_total[5m]))",
+          "expr": "sum by (collection) (rate(worker_events_commit_total[5m]))",
           "legendFormat": "{{collection}}",
           "refId": "A"
         }
@@ -197,8 +197,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (change_handle) (rate(ingester_events_identity_total[5m]))",
-          "legendFormat": "change_handle={{change_handle}}",
+          "expr": "sum(rate(worker_events_identity_total[5m]))",
+          "legendFormat": "identity",
           "refId": "A"
         }
       ]
