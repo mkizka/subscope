@@ -33,6 +33,7 @@ import { deletePostUseCaseFactory } from "./application/post/delete-post-use-cas
 import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reaction-use-case";
 import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
+import { getBackfillStatusUseCaseFactory } from "./application/timeline/get-backfill-status-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
 import { actorQueryFactory } from "./infrastructure/actor/actor-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
@@ -43,6 +44,7 @@ import {
   sessionStoreFactory,
   stateStoreFactory,
 } from "./infrastructure/auth/oauth-storage";
+import { backfillQueryFactory } from "./infrastructure/backfill/backfill-query";
 import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
@@ -89,6 +91,12 @@ export const di = await createRegistry()
     "getTrackedActorsUseCase",
     ["subscopeQuery"],
     getTrackedActorsUseCaseFactory,
+  )
+  .service("backfillQuery", ["db"], backfillQueryFactory)
+  .service(
+    "getBackfillStatusUseCase",
+    ["backfillQuery"],
+    getBackfillStatusUseCaseFactory,
   )
   .service("notificationQuery", ["oauthClient"], notificationQueryFactory)
   .service("notificationCommand", ["oauthClient"], notificationCommandFactory)
