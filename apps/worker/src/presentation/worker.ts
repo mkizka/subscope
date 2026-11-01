@@ -8,7 +8,6 @@ import type { AggregatePostStatsUseCase } from "../application/use-cases/async/a
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
 import type { SyncTapRepoUseCase } from "../application/use-cases/async/sync-tap-repo-use-case.js";
-import type { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { createJobLogger } from "../shared/job.js";
 
 const SECONDS = 1000;
@@ -42,7 +41,6 @@ export class SyncWorker {
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
     aggregateActorStatsUseCase: AggregateActorStatsUseCase,
     syncTapRepoUseCase: SyncTapRepoUseCase,
-    indexLabelUseCase: IndexLabelUseCase,
     redisUrl: string,
   ) {
     const createWorker = <T extends keyof JobData>(
@@ -109,9 +107,6 @@ export class SyncWorker {
       ),
       createWorker("syncTapRepo", async (job) => {
         await syncTapRepoUseCase.execute(job.data);
-      }),
-      createWorker("label", async (job) => {
-        await indexLabelUseCase.execute(job.data);
       }),
     ];
   }

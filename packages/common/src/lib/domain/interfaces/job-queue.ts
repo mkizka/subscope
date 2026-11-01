@@ -12,23 +12,12 @@ type AggregateActorStatsData = {
   type: "follows" | "followers" | "posts";
 };
 
-type LabelData = {
-  src: string;
-  uri: string;
-  cid?: string;
-  val: string;
-  neg?: boolean;
-  cts: string;
-  exp?: string;
-};
-
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
   aggregatePostStats: null;
   aggregateActorStats: AggregateActorStatsData;
   syncTapRepo: Did;
-  label: LabelData;
 };
 
 export type QueueName = keyof JobData;

@@ -3,7 +3,6 @@ import assert from "node:assert";
 import type { Did } from "@atproto/did";
 import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
-import type { JobData } from "@repo/common/domain";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -13,6 +12,7 @@ import {
 } from "@repo/common/test";
 import { testSetup } from "@repo/test-utils";
 
+import type { LabelData } from "../application/interfaces/repositories/label-repository.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
 import { indexCommitCommandFactory } from "../presentation/tap.js";
 import { createWorkerRegistry } from "./registry.js";
@@ -47,8 +47,7 @@ export const setupJobTest = async () => {
     indexCommit,
     runSyncTapRepoJobs,
     syncTapRepo: (did: Did) => services.syncTapRepoUseCase.execute(did),
-    indexLabel: (label: JobData["label"]) =>
-      services.indexLabelUseCase.execute(label),
+    indexLabel: (label: LabelData) => services.indexLabelUseCase.execute(label),
     tapClient: services.tapClient,
     labelFetcher: services.labelFetcher,
   };

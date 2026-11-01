@@ -82,9 +82,9 @@ threadgate と postgate は専用のテーブルを持たず、レコードのJS
 
 ## モデレーションサービスからのラベル受信
 
-`MODERATION_URL` のモデレーションサービスの `subscribeLabels` に接続し、受け取ったラベルをlabelキューに積む。
+`MODERATION_URL` のモデレーションサービスの `subscribeLabels` に接続し、受け取ったラベルを保存する。
 
-- subscribeLabels-1: 受け取ったラベルを1件ずつlabelキューに積む
+- subscribeLabels-1: 受け取ったラベルを1件ずつ保存する
 - subscribeLabels-2: 最後に受け取ったラベルのseqをRedisに保存し、再接続時はその続きから受け取る
 
 seqはモデレーションサービスのURLごとに保存するので、`MODERATION_URL` を変えた場合は新しいサービスの現在のラベルから受け取る。
