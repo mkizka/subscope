@@ -86,6 +86,7 @@ test.describe("投稿欄", () => {
   }) => {
     const text = `post-form-5: ${Date.now()}`;
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
+    await page.getByRole("button", { name: "誰でも返信できます" }).click();
     await page.getByRole("checkbox", { name: "フォロワー" }).check();
     await page.getByRole("checkbox", { name: "メンションした人" }).check();
     await page.getByRole("button", { name: "投稿", exact: true }).click();
@@ -175,6 +176,17 @@ test.describe("投稿欄", () => {
   }) => {
     await expect(page.getByRole("dialog")).toContainText("@alice.test");
   });
+
+  test("post-form-10: 返信できる人の設定は、入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ", async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole("radio", { name: "返信不可" }),
+    ).not.toBeVisible();
+    await page.getByRole("button", { name: "誰でも返信できます" }).click();
+    await page.getByRole("radio", { name: "返信不可" }).check();
+    await expect(page.getByRole("button", { name: "返信不可" })).toBeVisible();
+  });
 });
 
 const openComposeFrom = async (page: Page, text: string, button: string) => {
@@ -212,4 +224,21 @@ test("post-form-9: 引用するときは、入力欄の下に引用先の投稿�
   const dialog = await openComposeFrom(page, text, "引用");
 
   await expect(dialog.getByRole("blockquote")).toContainText(text);
+});
+
+test("post-form-11: 返信するときは、返信できる人の設定を表示しない", async ({
+  page,
+}) => {
+  const dialog = await openComposeFrom(
+    page,
+    `post-form-11: ${Date.now()}`,
+    "返信",
+  );
+
+  await expect(
+    dialog.getByRole("button", { name: "返信", exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "誰でも返信できます" }),
+  ).not.toBeVisible();
 });
