@@ -17,7 +17,7 @@ import { Form, NavLink } from "react-router";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
-  did?: string;
+  profileId?: string;
   avatarUrl?: string;
   handle?: string;
   isAdmin?: boolean;
@@ -46,9 +46,7 @@ function NavItem({
   );
 }
 
-export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
-  const profileId = handle === "handle.invalid" ? did : handle;
-
+export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
   return (
     <nav className="flex h-full flex-col">
       <div className="p-4 text-lg font-bold text-primary">Subscope</div>

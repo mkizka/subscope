@@ -5,7 +5,7 @@ import { SideNav } from "./side-nav";
 const meta = {
   component: SideNav,
   args: {
-    did: "did:plc:example",
+    profileId: "alice.bsky.social",
     handle: "alice.bsky.social",
   },
   parameters: {
