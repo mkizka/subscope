@@ -1,7 +1,9 @@
+import { RichText } from "@atproto/api";
 import { TID } from "@atproto/common-web";
 import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
+import * as facet from "@repo/client/lex/app/bsky/richtext/facet";
 
 import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
@@ -59,11 +61,15 @@ export const postCommandFactory = ({
           : undefined;
       const record = quote && { record: toStrongRef(quote) };
       const uri = `at://${did}/app.bsky.feed.post/${rkey}` as const;
+      const richText = new RichText({ text });
+      richText.detectFacetsWithoutResolution();
+      const facets = richText.facets?.filter((f) => facet.$matches(f));
       await agent.applyWrites((op) => [
         op.create(
           postRecord,
           {
             text,
+            facets,
             embed:
               record && media
                 ? { $type: "app.bsky.embed.recordWithMedia", record, media }

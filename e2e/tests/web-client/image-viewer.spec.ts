@@ -51,13 +51,13 @@ test.describe("画像の拡大表示", () => {
     ]);
 
     await viewer.getByRole("button", { name: "次の画像" }).click();
-    await expect(viewer.getByRole("img")).toHaveAccessibleName(
-      "image-viewer-2: 画像2",
-    );
+    await expect(
+      viewer.getByRole("img", { name: "image-viewer-2: 画像2" }),
+    ).toBeInViewport({ ratio: 1 });
     await viewer.getByRole("button", { name: "前の画像" }).click();
-    await expect(viewer.getByRole("img")).toHaveAccessibleName(
-      "image-viewer-2: 画像1",
-    );
+    await expect(
+      viewer.getByRole("img", { name: "image-viewer-2: 画像1" }),
+    ).toBeInViewport({ ratio: 1 });
   });
 
   test("image-viewer-3: 拡大した画像の下にALTを表示する", async ({ page }) => {
@@ -83,5 +83,47 @@ test.describe("画像の拡大表示", () => {
     await expect(viewer).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(viewer).toBeHidden();
+  });
+
+  test("image-viewer-5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる", async ({
+    page,
+  }) => {
+    const viewer = await openViewer(page, "image-viewer-5: 投稿", [
+      "image-viewer-5: 画像1",
+      "image-viewer-5: 画像2",
+    ]);
+    const swipe = async (dx: number) => {
+      const box = await viewer.boundingBox();
+      if (!box) throw new Error("ビューアが表示されていない");
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x + dx, y, { steps: 5 });
+      await page.mouse.up();
+    };
+
+    await swipe(-100);
+    await expect(
+      viewer.getByRole("img", { name: "image-viewer-5: 画像2" }),
+    ).toBeInViewport({ ratio: 1 });
+    await swipe(100);
+    await expect(
+      viewer.getByRole("img", { name: "image-viewer-5: 画像1" }),
+    ).toBeInViewport({ ratio: 1 });
+  });
+
+  test("image-viewer-6: 拡大表示した画像は、ピンチ操作か拡大ボタンでさらにズームできる", async ({
+    page,
+  }) => {
+    const viewer = await openViewer(page, "image-viewer-6: 投稿", [
+      "image-viewer-6: 画像",
+    ]);
+    const image = viewer.getByRole("img");
+    const width = async () => (await image.boundingBox())?.width ?? 0;
+    const before = await width();
+
+    await viewer.getByRole("button", { name: "拡大" }).click();
+    await expect.poll(width).toBeGreaterThan(before);
   });
 });

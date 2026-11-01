@@ -10,17 +10,26 @@ import { Link } from "react-router";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 import { type PostImage, PostImages } from "./post-images";
+import { ProfileLink } from "./profile-link";
+import { RichText, type TextLink } from "./rich-text";
 
 export type PostCardProps = {
   authorAvatar?: string;
   authorDisplayName?: string;
   authorHandle: string;
   text?: string;
+  links?: TextLink[];
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
   createdAt?: string;
   images?: PostImage[];
+  external?: {
+    uri: string;
+    title: string;
+    description: string;
+    thumb?: string;
+  };
   quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: {
     byDisplayName?: string;
@@ -80,16 +89,53 @@ export function QuotedPost({
   );
 }
 
+export function ExternalCard({
+  external,
+}: {
+  external: NonNullable<PostCardProps["external"]>;
+}) {
+  return (
+    <a
+      href={external.uri}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="
+        relative mt-2 block overflow-hidden rounded-box border border-base-300
+        hover:bg-base-300
+      "
+    >
+      {external.thumb && (
+        <img
+          src={external.thumb}
+          alt=""
+          className="aspect-[1.91/1] w-full object-cover"
+        />
+      )}
+      <div className="px-3 py-2">
+        <div className="truncate text-xs text-base-content/60">
+          {URL.canParse(external.uri)
+            ? new URL(external.uri).host
+            : external.uri}
+        </div>
+        <div className="line-clamp-2 text-sm font-bold">{external.title}</div>
+        <div className="line-clamp-2 text-sm">{external.description}</div>
+      </div>
+    </a>
+  );
+}
+
 export function PostCard({
   authorAvatar,
   authorDisplayName,
   authorHandle,
   text,
+  links,
   replyCount,
   repostCount,
   likeCount,
   createdAt,
   images,
+  external,
   quote,
   reasonRepost,
   toolbar,
@@ -125,7 +171,11 @@ export function PostCard({
         </div>
       )}
       <div className="flex gap-3">
-        <div className="shrink-0">
+        <ProfileLink
+          handle={authorHandle}
+          aria-label={authorDisplayName ?? authorHandle}
+          className="relative shrink-0 self-start"
+        >
           {authorAvatar ? (
             <img
               src={authorAvatar}
@@ -135,20 +185,29 @@ export function PostCard({
           ) : (
             <div className="size-9 rounded-md bg-base-300" />
           )}
-        </div>
+        </ProfileLink>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="truncate font-bold">
+            <ProfileLink
+              handle={authorHandle}
+              className="
+                relative truncate font-bold
+                hover:underline
+              "
+            >
               {authorDisplayName ?? authorHandle}
-            </span>
+            </ProfileLink>
             <span className="shrink-0 text-xs text-base-content/60">
               {createdAt
                 ? hydrated && formatRelativeTime(createdAt)
                 : "日時不明"}
             </span>
           </div>
-          <p className="wrap-break-word whitespace-pre-wrap">{text}</p>
+          <p className="wrap-break-word whitespace-pre-wrap">
+            {text && <RichText text={text} links={links} />}
+          </p>
           {images && <PostImages images={images} />}
+          {external && <ExternalCard external={external} />}
           {quote && <QuotedPost quote={quote} />}
           {toolbar ?? (
             <>

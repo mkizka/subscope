@@ -1,6 +1,13 @@
 import type { AfterCommitContext, Record } from "@repo/common/domain";
 
 export interface ICollectionIndexer {
+  shouldIndex?: ({
+    ctx,
+    record,
+  }: {
+    ctx: AfterCommitContext;
+    record: Record;
+  }) => Promise<boolean>;
   upsert: ({
     ctx,
     record,

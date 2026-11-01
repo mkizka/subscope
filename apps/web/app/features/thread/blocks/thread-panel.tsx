@@ -6,11 +6,14 @@ import type { ComposeTarget } from "@/app/features/timeline/blocks/post-form-con
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import {
+  ExternalCard,
   PostCard,
   type PostCardProps,
   QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
 import { PostImages } from "@/app/features/timeline/parts/post-images";
+import { ProfileLink } from "@/app/features/timeline/parts/profile-link";
+import { RichText } from "@/app/features/timeline/parts/rich-text";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 type Props = {
@@ -29,7 +32,9 @@ function FocusedPost({
   authorDisplayName,
   authorHandle,
   text,
+  links,
   images,
+  external,
   quote,
   createdAt,
   replyCount,
@@ -48,7 +53,13 @@ function FocusedPost({
       aria-label="選んだ投稿"
       className="border-b border-base-300 px-4 pt-2 pb-3"
     >
-      <div className="flex items-center gap-3">
+      <ProfileLink
+        handle={authorHandle}
+        className="
+          flex w-fit items-center gap-3
+          hover:underline
+        "
+      >
         {authorAvatar ? (
           <img
             src={authorAvatar}
@@ -66,9 +77,12 @@ function FocusedPost({
             @{authorHandle}
           </div>
         </div>
-      </div>
-      <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">{text}</p>
+      </ProfileLink>
+      <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">
+        {text && <RichText text={text} links={links} />}
+      </p>
       {images && <PostImages images={images} />}
+      {external && <ExternalCard external={external} />}
       {quote && <QuotedPost quote={quote} />}
       {createdAt && (
         <time

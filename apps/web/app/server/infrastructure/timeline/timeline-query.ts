@@ -1,3 +1,4 @@
+import { view as externalView } from "@repo/client/lex/app/bsky/embed/external";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import {
   view as recordView,
@@ -8,11 +9,19 @@ import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
+import { link, mention } from "@repo/client/lex/app/bsky/richtext/facet";
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+
+type TextLinkDto = {
+  byteStart: number;
+  byteEnd: number;
+  uri?: string;
+  did?: string;
+};
 
 export type TimelinePostDto = {
   uri: string;
@@ -24,11 +33,18 @@ export type TimelinePostDto = {
   authorDisplayName?: string;
   authorHandle: string;
   text?: string;
+  links?: TextLinkDto[];
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
   createdAt?: string;
   images?: { thumb: string; fullsize: string; alt: string }[];
+  external?: {
+    uri: string;
+    title: string;
+    description: string;
+    thumb?: string;
+  };
   quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };
@@ -100,10 +116,23 @@ export function toTimelinePost({
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
     text: maybeString(post.record.text),
+    links: postRecord.matches(post.record)
+      ? post.record.facets?.flatMap(
+          ({ index: { byteStart, byteEnd }, features }) =>
+            features.flatMap((feature): TextLinkDto[] =>
+              link.matches(feature)
+                ? [{ byteStart, byteEnd, uri: feature.uri }]
+                : mention.matches(feature)
+                  ? [{ byteStart, byteEnd, did: feature.did }]
+                  : [],
+            ),
+        )
+      : undefined,
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
     images: imagesView.matches(media) ? media.images : undefined,
+    external: externalView.matches(media) ? media.external : undefined,
     quote: viewRecord.matches(quoted)
       ? {
           authorDisplayName: quoted.author.displayName,
