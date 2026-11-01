@@ -127,7 +127,7 @@ function ReplyPrompt({ post }: { post: TimelinePost }) {
             type: "reply",
             uri: post.uri,
             cid: post.cid,
-            handle: post.authorHandle,
+            post,
             root: post.replyRoot,
           })
         }
