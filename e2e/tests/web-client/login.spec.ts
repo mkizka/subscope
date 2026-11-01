@@ -98,4 +98,18 @@ test.describe("ログイン", () => {
       ),
     ).toBeVisible();
   });
+
+  test("login-10: 「登録する」を押してから結果が出るまで、登録ボタンを無効にしてスピナーを出す", async ({
+    page,
+  }) => {
+    await login(page, "bob.test", "/login");
+    await page.route("**/login.data", async (route) => {
+      if (route.request().method() !== "POST") await route.continue();
+    });
+
+    await page.getByLabel("招待コード").fill("invalid-code");
+    await page.getByRole("button", { name: "登録する" }).click();
+
+    await expect(page.getByRole("button", { name: "登録する" })).toBeDisabled();
+  });
 });

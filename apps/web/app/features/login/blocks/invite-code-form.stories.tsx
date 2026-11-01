@@ -10,6 +10,7 @@ const meta = {
       id: "inviteCode",
       name: "inviteCode",
     },
+    loading: false,
   },
 } satisfies Meta<typeof InviteCodeForm>;
 
@@ -22,5 +23,11 @@ export const Default: Story = {};
 export const WithError: Story = {
   args: {
     error: "招待コードが無効または期限切れです",
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    loading: true,
   },
 };
