@@ -20,8 +20,8 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
       to={to}
       onClick={close}
       className="
-        flex items-center gap-3 rounded-full px-4 py-3
-        hover:bg-base-200
+        flex items-center gap-3 rounded-xl p-3
+        hover:bg-surface-2
       "
     >
       {icon}
@@ -33,14 +33,14 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
     <header
       className="
         sticky top-0 z-10 grid h-14 grid-cols-3 items-center border-b
-        border-base-300 bg-base-100 px-4
+        border-line bg-surface px-4
         lg:hidden
       "
     >
       <button
         type="button"
         aria-label="メニューを開く"
-        className="size-9 overflow-hidden rounded-full bg-base-300"
+        className="size-9 overflow-hidden rounded-full bg-line"
         onClick={() => ref.current?.showModal()}
       >
         {avatarUrl && (
@@ -52,13 +52,13 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
         ref={ref}
         aria-label="メニュー"
         className="
-          m-0 h-full max-h-none w-72 bg-base-100 p-4 text-base-content
+          m-0 h-full max-h-none w-72 bg-surface p-4 text-ink
           backdrop:bg-black/40
         "
         onClick={(e) => e.target === e.currentTarget && close()}
       >
         <ServerAbout />
-        <nav className="mt-4 flex flex-col border-t border-base-300 pt-4">
+        <nav className="mt-4 flex flex-col border-t border-line pt-4">
           {profileId &&
             item(
               `/profile/${profileId}/lists`,
@@ -76,8 +76,8 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
             <button
               type="submit"
               className="
-                flex w-full items-center gap-3 rounded-full px-4 py-3
-                hover:bg-base-200
+                flex w-full items-center gap-3 rounded-xl p-3
+                hover:bg-surface-2
               "
             >
               <LogOutIcon className="size-5" />

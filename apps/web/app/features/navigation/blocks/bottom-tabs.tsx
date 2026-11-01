@@ -21,7 +21,7 @@ function Tab({
       to={to}
       end
       className={({ isActive }) =>
-        `relative flex flex-col items-center gap-0.5 py-2 text-xs ${isActive ? "text-primary" : "text-base-content/70"}`
+        `relative flex flex-col items-center gap-0.5 py-2 text-xs ${isActive ? "font-bold text-ink" : "text-muted"}`
       }
     >
       {icon}
@@ -35,8 +35,8 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
     <nav
       aria-label="タブバー"
       className="
-        fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-base-300
-        bg-base-100
+        fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-line
+        bg-surface
         lg:hidden
       "
     >
@@ -51,8 +51,8 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
         {unreadCount > 0 && (
           <span
             className="
-              absolute top-1 left-1/2 ml-1 rounded-full bg-primary px-1.5
-              text-[10px] text-primary-content
+              absolute top-1 left-1/2 ml-1 rounded-full bg-brand px-1.5
+              text-[10px] font-bold text-on-brand
             "
           >
             {unreadCount}

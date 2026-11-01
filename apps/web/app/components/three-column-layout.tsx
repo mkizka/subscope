@@ -12,10 +12,10 @@ type Props = {
 
 export const ThreeColumnLayout = ({ children }: Props) => {
   return (
-    <div className="flex min-h-screen bg-base-100 text-base-content">
+    <div className="flex min-h-screen bg-surface text-ink">
       <aside
         className="
-          hidden w-60 shrink-0 border-r border-base-300 bg-base-200
+          hidden w-60 shrink-0 border-r border-line
           lg:sticky lg:top-0 lg:block lg:h-screen
         "
       >
@@ -31,7 +31,8 @@ export const ThreeColumnLayout = ({ children }: Props) => {
         {children}
         <ComposeButton
           className="
-            btn fixed right-4 bottom-20 z-10 btn-circle btn-lg btn-primary
+            fixed right-4 bottom-20 z-10 flex size-14 items-center
+            justify-center rounded-full bg-brand text-on-brand shadow-lg
             lg:hidden
           "
         />
@@ -40,12 +41,14 @@ export const ThreeColumnLayout = ({ children }: Props) => {
       <aside
         aria-label="このサーバーについて"
         className="
-          hidden border-base-300 p-4
+          hidden border-line p-4
           lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
           lg:border-l
         "
       >
-        <ServerAbout />
+        <div className="rounded-[14px] border border-line p-3.5 text-sm">
+          <ServerAbout />
+        </div>
       </aside>
     </div>
   );

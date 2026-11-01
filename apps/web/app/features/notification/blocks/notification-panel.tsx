@@ -52,19 +52,19 @@ const reasons: Record<
     label: "さんが返信しました",
     name: "返信",
     icon: MessageCircleIcon,
-    color: "text-primary",
+    color: "text-brand",
   },
   quote: {
     label: "さんが引用しました",
     name: "引用",
     icon: QuoteIcon,
-    color: "text-primary",
+    color: "text-brand",
   },
   mention: {
     label: "さんがメンションしました",
     name: "メンション",
     icon: AtSignIcon,
-    color: "text-primary",
+    color: "text-brand",
   },
 };
 
@@ -74,10 +74,12 @@ export function NotificationPanel({
   hasNextPage,
 }: Props) {
   return (
-    <section aria-label="通知" className="p-4">
-      <h2 className="font-bold">通知</h2>
+    <section aria-label="通知">
+      <h2 className="border-b border-line px-4 py-3.5 text-lg font-bold">
+        通知
+      </h2>
       {notifications.length === 0 ? (
-        <p className="py-8 text-center text-sm opacity-60">
+        <p className="py-8 text-center text-sm text-muted">
           通知はまだありません
         </p>
       ) : (
@@ -89,11 +91,11 @@ export function NotificationPanel({
               <li
                 key={notification.uri}
                 className={clsx(
-                  "flex gap-3 border-b border-base-300 py-2",
-                  !notification.isRead && "bg-base-200",
+                  "flex gap-3 border-b border-line px-4 py-3",
+                  !notification.isRead && "bg-brand-soft",
                 )}
               >
-                <div className="w-6 shrink-0">
+                <div className="flex w-7 shrink-0 justify-center pt-1">
                   {Icon && (
                     <Icon
                       role="img"
@@ -107,17 +109,17 @@ export function NotificationPanel({
                     <img
                       src={notification.avatarUrl}
                       alt=""
-                      className="size-6 rounded-full object-cover"
+                      className="size-7 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="size-6 rounded-full bg-base-300" />
+                    <div className="size-7 rounded-full bg-line" />
                   )}
-                  <p>
+                  <p className="mt-1">
                     <span className="font-bold">{notification.authorName}</span>
                     {reason?.label}
                   </p>
                   {notification.text && (
-                    <p className="text-sm whitespace-pre-wrap opacity-70">
+                    <p className="mt-0.5 text-sm whitespace-pre-wrap text-muted">
                       {notification.text}
                     </p>
                   )}
