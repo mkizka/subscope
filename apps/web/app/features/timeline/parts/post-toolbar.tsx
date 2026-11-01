@@ -40,8 +40,10 @@ function ToggleButton(props: {
       aria-pressed={props.pressed}
       aria-disabled={props.busy}
       className={`
-        btn gap-1 btn-ghost px-2 font-normal btn-sm
-        ${props.pressed ? "text-primary" : "text-base-content/70"}
+        inline-flex h-8 items-center gap-1 rounded-full px-2 text-label
+        hover:bg-surface-2
+        aria-disabled:cursor-not-allowed
+        ${props.pressed ? "text-brand" : "text-muted"}
       `}
       onClick={props.onClick}
     >
@@ -69,7 +71,7 @@ export function PostToolbar({
   onDelete,
 }: Props) {
   return (
-    <div className="relative -ml-2 flex gap-2">
+    <div className="relative mt-1 -ml-2 flex gap-6">
       <ToggleButton
         label="返信"
         Icon={MessageCircleIcon}

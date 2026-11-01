@@ -22,7 +22,7 @@ export function TimelineFeed({ posts }: Props) {
   return (
     <section>
       {posts.length === 0 && (
-        <p className="py-8 text-center text-sm text-base-content/70">
+        <p className="py-8 text-center text-label text-muted">
           タイムラインに投稿がありません
         </p>
       )}

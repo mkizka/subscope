@@ -10,7 +10,11 @@ type Props = {
 export function TimelinePage({ posts, cursor }: Props) {
   return (
     <ThreeColumnLayout>
-      <h1 className="border-b border-base-300 p-4 text-lg font-bold">
+      <h1
+        className="
+        sticky top-0 z-10 border-b border-line bg-surface p-4 text-heading
+      "
+      >
         フォロー中
       </h1>
       <TimelineFeedContainer posts={posts} cursor={cursor} />
