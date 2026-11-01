@@ -12,15 +12,14 @@ export function LoginPage({ step }: Props) {
     <main className="flex min-h-dvh items-center justify-center p-4">
       <div
         className="
-          flex w-full max-w-sm flex-col gap-4 rounded-[14px] border border-line
-          p-6
+          flex w-full max-w-sm flex-col gap-4 rounded-xl border border-line p-6
         "
       >
         <div className="flex items-center gap-2">
           <img src="/favicon.svg" alt="" className="size-8" />
-          <h1 className="text-xl font-bold">Subscope</h1>
+          <h1 className="text-title">Subscope</h1>
         </div>
-        <p className="text-sm text-muted">
+        <p className="text-label text-muted">
           招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。
         </p>
         {step === "setup" && (
@@ -28,7 +27,10 @@ export function LoginPage({ step }: Props) {
         )}
         {step === "inviteCode" && (
           <>
-            <ol aria-label="手順" className="flex items-center gap-2 text-sm">
+            <ol
+              aria-label="手順"
+              className="flex items-center gap-2 text-label"
+            >
               <li className="flex flex-1 items-center gap-1 text-muted">
                 <CheckIcon className="size-4 text-brand" />
                 ログイン

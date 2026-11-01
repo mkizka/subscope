@@ -21,7 +21,7 @@ export function InviteCodeForm({
   return (
     <Form method="post" className="flex flex-col gap-4" {...formProps}>
       <div className="flex flex-col gap-2">
-        <label htmlFor={fields.inviteCode.id} className="text-sm font-bold">
+        <label htmlFor={fields.inviteCode.id} className="text-label">
           招待コード
         </label>
         <input
@@ -34,7 +34,7 @@ export function InviteCodeForm({
           {...inputProps}
         />
         {error && (
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="text-label text-danger">
             {error}
           </p>
         )}

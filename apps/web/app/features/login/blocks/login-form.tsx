@@ -22,7 +22,7 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
       {...formProps}
     >
       <div className="flex flex-col gap-2">
-        <label htmlFor={fields.identifier.id} className="text-sm font-bold">
+        <label htmlFor={fields.identifier.id} className="text-label">
           ハンドル
         </label>
         <div
@@ -40,7 +40,7 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
           />
         </div>
         {fields.identifier.errors && (
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="text-label text-danger">
             {fields.identifier.errors[0]}
           </p>
         )}

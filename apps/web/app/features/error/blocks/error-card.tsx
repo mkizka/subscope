@@ -24,18 +24,16 @@ export function ErrorCard({ title, details, status, stack }: Props) {
   return (
     <div
       className="
-        flex w-full flex-col items-center gap-3 rounded-[14px] border
-        border-line p-6 text-center
+        flex w-full flex-col items-center gap-3 rounded-xl border border-line
+        p-6 text-center
       "
     >
       <ErrorIcon status={status} />
-      <h2 className="text-2xl font-bold">{title}</h2>
-      <p className="text-sm text-muted">{details}</p>
+      <h2 className="text-title">{title}</h2>
+      <p className="text-label text-muted">{details}</p>
       {stack && (
         <div className="relative w-full text-left">
-          <pre
-            className="overflow-x-auto rounded-[14px] bg-surface-2 p-4 text-xs"
-          >
+          <pre className="overflow-x-auto rounded-xl bg-surface-2 p-4 text-caption">
             <code>{stack}</code>
           </pre>
           <button
@@ -66,7 +64,7 @@ export function ErrorCard({ title, details, status, stack }: Props) {
         <HomeIcon className="size-4" />
         ホームに戻る
       </a>
-      {status && <p className="text-xs text-muted">{status}</p>}
+      {status && <p className="text-caption text-muted">{status}</p>}
     </div>
   );
 }
