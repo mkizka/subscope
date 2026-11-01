@@ -117,4 +117,26 @@ test.describe("検索", () => {
 
     await expect(page.getByText("投稿が見つかりません")).toBeVisible();
   });
+
+  test("search-7: 検索ボタンは、検索結果のページに移るまでスピナーを出して押せなくする", async ({
+    page,
+  }) => {
+    await page.goto("/search");
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/search.data?*", async (route) => {
+      await held;
+      await route.continue();
+    });
+    const button = page.getByRole("button", { name: "検索" });
+
+    await page.getByRole("searchbox", { name: "検索語" }).fill("alice");
+    await button.click();
+
+    await expect(button).toBeDisabled();
+    await expect(button.locator(".animate-spin")).toBeVisible();
+    release();
+    await expect(page).toHaveURL("/search?q=alice");
+    await expect(button).toBeEnabled();
+  });
 });
