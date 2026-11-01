@@ -24,6 +24,7 @@ type Props = {
   posts: TimelinePost[];
   members: (Actor & { listItemUri: string })[];
   isSelf: boolean;
+  deleting?: boolean;
   onDelete: () => void;
 };
 
@@ -35,6 +36,7 @@ export function ListPage({
   posts,
   members,
   isSelf,
+  deleting,
   onDelete,
 }: Props) {
   return (
@@ -62,7 +64,12 @@ export function ListPage({
           >
             {(open) => (
               <div className="m-4">
-                <Button variant="danger" size="sm" onClick={open}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  loading={deleting}
+                  onClick={open}
+                >
                   削除する
                 </Button>
               </div>
