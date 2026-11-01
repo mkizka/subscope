@@ -44,7 +44,7 @@ test.describe("通知（PC）", () => {
       await page.reload();
       await expect(
         page
-          .getByRole("complementary")
+          .getByRole("region", { name: "通知" })
           .getByText("Bobさんにフォローされました")
           .first(),
       ).toBeVisible({ timeout: 1000 });
@@ -225,7 +225,7 @@ test.describe("通知（PC）", () => {
     await page.goto("/notifications");
 
     const replies = page
-      .getByRole("complementary")
+      .getByRole("region", { name: "通知" })
       .getByText(/^notification-4: リプライ/);
     await expect(async () => {
       await page.reload();
@@ -260,7 +260,7 @@ test.describe("通知（PC）", () => {
     await page.goto("/notifications");
 
     const notification = page
-      .getByRole("complementary")
+      .getByRole("region", { name: "通知" })
       .getByRole("listitem")
       .filter({ hasText: "Bobさんにフォローされました" })
       .first();
