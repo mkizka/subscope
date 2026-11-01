@@ -9,7 +9,7 @@ import { env } from "@/app/server/env";
 
 const sha256 = (value: string) => createHash("sha256").update(value).digest();
 
-const isAdminApiTokenRequest = (request: Request) => {
+const canReadBullBoardWithToken = (request: Request) => {
   const authorization = request.headers.get("Authorization");
   return (
     env.ADMIN_API_TOKEN !== undefined &&
@@ -51,7 +51,7 @@ export const adminRequiredMiddleware = async ({
   request: Request;
   context: Readonly<RouterContextProvider>;
 }) => {
-  if (isAdminApiTokenRequest(request)) {
+  if (canReadBullBoardWithToken(request)) {
     return;
   }
   const agent = await getAgent(request);
