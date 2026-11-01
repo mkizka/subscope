@@ -7,6 +7,7 @@ export function PostImages({ images }: { images: PostImage[] }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [index, setIndex] = useState<number | null>(null);
   const image = index === null ? undefined : images[index];
+  const swipeStartXRef = useRef(0);
   const move = (delta: number) => {
     if (index === null) return;
     const next = index + delta;
@@ -47,12 +48,21 @@ export function PostImages({ images }: { images: PostImage[] }) {
           <>
             <figure
               className="
-                col-start-1 row-start-1 flex flex-col items-center gap-2 px-14
+                col-start-1 row-start-1 flex touch-pan-y touch-pinch-zoom
+                flex-col items-center gap-2 px-14
               "
+              onPointerDown={(e) => {
+                swipeStartXRef.current = e.clientX;
+              }}
+              onPointerUp={(e) => {
+                const dx = e.clientX - swipeStartXRef.current;
+                if (Math.abs(dx) > 50) move(dx < 0 ? 1 : -1);
+              }}
             >
               <img
                 src={image.fullsize}
                 alt={image.alt}
+                draggable={false}
                 className="max-h-[calc(100dvh-8rem)] object-contain"
               />
               {image.alt && (
