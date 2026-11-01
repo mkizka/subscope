@@ -1,6 +1,8 @@
 import { asDid } from "@atproto/did";
 import { Actor } from "@repo/common/domain";
+import { schema } from "@repo/db";
 import { actorFactory, testSetup } from "@repo/test-utils";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 import { ActorRepository } from "./actor-repository.js";
@@ -85,6 +87,32 @@ describe("ActorRepository", () => {
       });
       expect(result).toEqual(updatedActor);
     });
+  });
+
+  test("index-13: アクターを保存するときは、管理者権限を書き換えない", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db).create();
+    const staleActor = Actor.reconstruct({
+      did: actor.did,
+      handle: "updated.test",
+      isAdmin: false,
+      isBanned: false,
+      indexedAt: actor.indexedAt,
+    });
+    await ctx.db
+      .update(schema.actors)
+      .set({ isAdmin: true })
+      .where(eq(schema.actors.did, actor.did));
+
+    // act
+    await actorRepository.upsert({ ctx, actor: staleActor });
+
+    // assert
+    const result = await actorRepository.findByDid({
+      ctx,
+      did: asDid(actor.did),
+    });
+    expect(result?.isAdmin).toBe(true);
   });
 
   describe("exists", () => {
