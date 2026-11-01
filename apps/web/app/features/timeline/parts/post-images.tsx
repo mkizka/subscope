@@ -55,6 +55,7 @@ export function PostImages({ images }: { images: PostImage[] }) {
         carousel={{ finite: true }}
         zoom={{ maxZoomPixelRatio: 3 }}
         controller={{ closeOnBackdropClick: true }}
+        styles={{ container: { backgroundColor: "rgb(0 0 0 / 0.7)" } }}
         captions={{ descriptionTextAlign: "center" }}
         render={{
           buttonPrev: single ? () => null : undefined,
