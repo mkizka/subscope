@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "@fontsource/zen-maru-gothic/400.css";
-@import "@fontsource/zen-maru-gothic/500.css";
 @import "@fontsource/zen-maru-gothic/700.css";
 @plugin "daisyui";
 
@@ -37,6 +36,21 @@
   --color-on-brand: #fff;
   --color-brand-soft: color-mix(in srgb, #b8326b 12%, transparent);
   --color-danger: #c62828;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.4;
+  --text-title--font-weight: 700;
+  --text-heading: 1.125rem;
+  --text-heading--line-height: 1.4;
+  --text-heading--font-weight: 700;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.4;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --container-main: 37.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
