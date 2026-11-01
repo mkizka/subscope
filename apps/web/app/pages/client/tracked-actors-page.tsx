@@ -16,9 +16,11 @@ export function TrackedActorsPage({ actors, total }: Props) {
         <h1 className="text-title">追跡中のユーザー</h1>
         <span className="text-label text-muted">{total}人</span>
       </div>
-      <p className="
-        border-b border-line bg-surface-2 px-4 py-2 text-label text-muted
-      ">
+      <p
+        className="
+          border-b border-line bg-surface-2 px-4 py-2 text-label text-muted
+        "
+      >
         メンバーとそのフォロー先です。このサーバーはこの人たちの投稿だけを保存します。
       </p>
       <ActorList actors={actors} />
