@@ -55,17 +55,16 @@ test.describe("フォロー・フォロワー", () => {
     await expect(alice.getByText("@alice.test")).toBeVisible();
   });
 
-  test("follow-list-3: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
+  test("follow-list-3: 一覧のユーザーを選ぶと、そのユーザーのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test/follows");
 
     await page.getByRole("main").getByRole("link", { name: /^Bob/ }).click();
 
-    await expect(page).toHaveURL(/\/profile\/alice\.test\/follows\?profile=/);
-    const panel = page.getByRole("region", { name: "プロフィール" });
+    await expect(page).toHaveURL(/\/profile\/(?!alice\.test)[^/]+$/);
     await expect(
-      panel.getByRole("heading", { name: "Bob", exact: true }),
+      page.getByRole("main").getByRole("heading", { name: "Bob", exact: true }),
     ).toBeVisible();
   });
 });

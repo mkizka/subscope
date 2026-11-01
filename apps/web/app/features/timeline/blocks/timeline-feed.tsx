@@ -26,7 +26,6 @@ export function TimelineFeed({ posts, onCompose }: Props) {
   const [searchParams] = useSearchParams();
   const threadSearch = (uri: string) => {
     const params = new URLSearchParams(searchParams);
-    params.delete("profile");
     params.set("thread", uri);
     return params.toString();
   };

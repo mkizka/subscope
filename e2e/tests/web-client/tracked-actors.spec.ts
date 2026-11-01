@@ -36,17 +36,16 @@ test.describe("追跡中のユーザー", () => {
     expect(counts).toEqual([...counts].sort((a, b) => b - a));
   });
 
-  test("tracked-actors-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
+  test("tracked-actors-2: 一覧のユーザーを選ぶと、そのユーザーのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/tracked-actors");
 
     await page.getByRole("main").getByRole("link", { name: /^Bob/ }).click();
 
-    await expect(page).toHaveURL(/\/tracked-actors\?profile=/);
-    const panel = page.getByRole("region", { name: "プロフィール" });
+    await expect(page).toHaveURL(/\/profile\/[^/]+$/);
     await expect(
-      panel.getByRole("heading", { name: "Bob", exact: true }),
+      page.getByRole("main").getByRole("heading", { name: "Bob", exact: true }),
     ).toBeVisible();
   });
 
