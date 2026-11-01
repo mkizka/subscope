@@ -103,6 +103,25 @@ describe("JobScheduler", () => {
     });
   });
 
+  describe("scheduleCheckBackfill", () => {
+    test("試行回数に応じて10秒から10分まで遅延を伸ばす", async () => {
+      // act
+      for (const attempt of [0, 1, 2, 3, 4, 5]) {
+        await jobScheduler.scheduleCheckBackfill("did:plc:test", attempt);
+      }
+
+      // assert
+      expect(jobQueue.getJobs().map((job) => job.options?.delay)).toEqual([
+        0,
+        10 * 1000,
+        60 * 1000,
+        5 * 60 * 1000,
+        10 * 60 * 1000,
+        10 * 60 * 1000,
+      ]);
+    });
+  });
+
   describe("scheduleAggregatePostStats", () => {
     test("投稿のURIを集計待ちに追加してaggregatePostStatsジョブをスケジュールする", async () => {
       // arrange

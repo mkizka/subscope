@@ -17,4 +17,9 @@ export class TapClient implements ITapClient {
   async removeRepo(did: Did): Promise<void> {
     await this.tap.removeRepos([did]);
   }
+
+  async getRepoState(did: Did): Promise<string> {
+    const info = await this.tap.getRepoInfo(did);
+    return info.state;
+  }
 }

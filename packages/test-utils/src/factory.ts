@@ -34,6 +34,8 @@ export const actorFactory = (db: Database) =>
           isAdmin: () => false,
           isBanned: () => false,
           status: (): ActorStatus => "active",
+          backfillStatus: () =>
+            null as "inProgress" | "completed" | "error" | null,
         },
         vars: {},
       },
