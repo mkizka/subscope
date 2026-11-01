@@ -1,9 +1,13 @@
+import { setTimeout } from "node:timers/promises";
+
 import type {
   CommitEventDto,
   IJobQueue,
   ILoggerManager,
   IMetricReporter,
 } from "@repo/common/domain";
+
+const MAX_PENDING_COMMIT_JOBS = 100_000;
 
 export class HandleCommitUseCase {
   private readonly logger;
@@ -23,6 +27,12 @@ export class HandleCommitUseCase {
     this.metricReporter.increment("ingester_events_commit_total", {
       collection: dto.commit.collection,
     });
+
+    while (
+      (await this.jobQueue.countPending("commit")) >= MAX_PENDING_COMMIT_JOBS
+    ) {
+      await setTimeout(1000);
+    }
 
     const uri = `at://${dto.did}/${dto.commit.collection}/${dto.commit.rkey}`;
     await this.jobQueue.add({

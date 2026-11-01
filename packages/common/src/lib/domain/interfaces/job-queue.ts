@@ -60,4 +60,5 @@ export interface IJobQueue {
     options?: JobOptions;
   }) => Promise<void>;
   popBatchItems: (queueName: QueueName, count: number) => Promise<string[]>;
+  countPending: (queueName: QueueName) => Promise<number>;
 }

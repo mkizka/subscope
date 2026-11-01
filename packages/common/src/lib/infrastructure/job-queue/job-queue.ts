@@ -98,6 +98,13 @@ export class JobQueue implements IJobQueue {
     return await this.redis.spop(`${queueName}:batch`, count);
   }
 
+  async countPending(queueName: QueueName) {
+    return await this.queues[queueName].getJobCountByTypes(
+      "waiting",
+      "prioritized",
+    );
+  }
+
   async close() {
     this.redis.disconnect();
     await Promise.all(Object.values(this.queues).map((queue) => queue.close()));

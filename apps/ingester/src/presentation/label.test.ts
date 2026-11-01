@@ -26,6 +26,7 @@ describe("LabelIngester", () => {
     addBatchItems: vi.fn(),
     popBatchItems: vi.fn(),
     getQueues: vi.fn(),
+    countPending: vi.fn(),
   } satisfies IJobQueue;
   const labelCursorStore = new InMemoryLabelCursorStore();
 

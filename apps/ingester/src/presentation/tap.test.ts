@@ -45,6 +45,7 @@ describe("TapIngester", () => {
     addBatchItems: vi.fn(),
     popBatchItems: vi.fn(),
     getQueues: vi.fn(),
+    countPending: vi.fn(),
   } satisfies IJobQueue;
 
   const send = async (...events: { id: number }[]) => {
@@ -204,5 +205,19 @@ describe("TapIngester", () => {
 
     finishFirst();
     await vi.waitFor(() => expect(acks).toEqual([2, 1]));
+  });
+
+  test("tap-9: commitキューの未処理のジョブが上限(10万件)以上の間は、イベントを積まずackもしない", async () => {
+    jobQueue.countPending.mockResolvedValueOnce(100_000).mockResolvedValue(0);
+
+    socket.send(JSON.stringify(recordEvent(1, {})));
+    await vi.waitFor(() =>
+      expect(jobQueue.countPending).toHaveBeenCalledTimes(1),
+    );
+    expect(jobQueue.add).not.toHaveBeenCalled();
+    expect(acks).toEqual([]);
+
+    await vi.waitFor(() => expect(acks).toEqual([1]), { timeout: 3000 });
+    expect(jobQueue.add).toHaveBeenCalledTimes(1);
   });
 });
