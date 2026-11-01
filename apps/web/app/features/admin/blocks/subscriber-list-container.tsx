@@ -5,7 +5,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useState } from "react";
+import { useSearchParams } from "react-router";
 
 import { SubscriberList, type SubscriberTab } from "./subscriber-list";
 
@@ -60,7 +60,9 @@ async function updateSubscriber(method: "POST" | "DELETE", did: string) {
 }
 
 export function SubscriberListContainer() {
-  const [tab, setTab] = useState<SubscriberTab>("subscribers");
+  const [searchParams] = useSearchParams();
+  const tab: SubscriberTab =
+    searchParams.get("tab") === "banned" ? "banned" : "subscribers";
   const queryClient = useQueryClient();
   const onSuccess = () =>
     Promise.all([
@@ -109,7 +111,6 @@ export function SubscriberListContainer() {
   return (
     <SubscriberList
       tab={tab}
-      onTabChange={setTab}
       subscribers={subscribersQuery.data?.subscribers ?? []}
       bannedActors={bannedQuery.data ?? []}
       total={subscribersQuery.data?.total}

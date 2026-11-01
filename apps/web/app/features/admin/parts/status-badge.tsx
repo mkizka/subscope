@@ -1,3 +1,5 @@
+import { Badge } from "@/app/components/ui/badge";
+
 type Props = {
   usedAt?: string;
   expiresAt: string;
@@ -19,13 +21,6 @@ const statusLabel = {
   expired: "期限切れ",
 } as const;
 
-const statusClass = {
-  active: "badge badge-soft badge-success",
-  used: "badge badge-ghost",
-  expired: "badge badge-ghost",
-} as const;
-
 export function StatusBadge(props: Props) {
-  const status = getStatus(props);
-  return <span className={statusClass[status]}>{statusLabel[status]}</span>;
+  return <Badge>{statusLabel[getStatus(props)]}</Badge>;
 }

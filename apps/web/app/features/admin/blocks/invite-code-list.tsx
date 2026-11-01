@@ -2,6 +2,8 @@ import { CheckIcon, CopyIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
+import { Avatar } from "@/app/components/ui/avatar";
+import { Button } from "@/app/components/ui/button";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 import { formatDate } from "@/app/lib/format-date";
 
@@ -41,9 +43,10 @@ function isExpired(code: InviteCode) {
 function CopyButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <button
+    <Button
       type="button"
-      className="btn btn-square btn-ghost btn-xs"
+      variant="ghost"
+      size="sm"
       aria-label="コピー"
       onClick={() =>
         void navigator.clipboard.writeText(code).then(() => {
@@ -53,11 +56,11 @@ function CopyButton({ code }: { code: string }) {
       }
     >
       {copied ? (
-        <CheckIcon className="size-3.5" />
+        <CheckIcon className="size-4" />
       ) : (
-        <CopyIcon className="size-3.5" />
+        <CopyIcon className="size-4" />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -67,32 +70,22 @@ export function InviteCodeItems({
   deletingCode,
 }: RowsProps) {
   return codes.map((code) => (
-    <li key={code.code} className="list-row items-center">
-      <div className="min-w-0">
-        <div className="flex items-center gap-1">
+    <li
+      key={code.code}
+      className="flex items-center gap-3 border-b border-line px-4 py-3"
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
           <span className="font-mono">{code.code}</span>
           {!code.usedAt && !isExpired(code) && <CopyButton code={code.code} />}
         </div>
-        <div className="text-sm text-base-content/60">
-          {code.usedBy && (
-            <>
-              {code.usedBy.avatar ? (
-                <img
-                  src={code.usedBy.avatar}
-                  alt=""
-                  className="inline size-4 rounded-full align-text-bottom"
-                />
-              ) : (
-                <span
-                  className="
-                    inline-block size-4 rounded-full bg-base-200
-                    align-text-bottom
-                  "
-                />
-              )}{" "}
-              {code.usedBy.displayName ?? code.usedBy.handle} が使用・
-            </>
-          )}
+        {code.usedBy && (
+          <div className="flex items-center gap-2 py-1 text-label">
+            <Avatar src={code.usedBy.avatar} size="sm" />
+            {code.usedBy.displayName ?? code.usedBy.handle} が使用
+          </div>
+        )}
+        <div className="text-label text-muted">
           {formatDate(code.expiresAt)} まで有効・{formatDate(code.createdAt)}{" "}
           作成
         </div>
@@ -107,25 +100,23 @@ export function InviteCodeItems({
           onConfirm={() => onDeleteCode(code.code)}
         >
           {(open) => (
-            <button
+            <Button
               type="button"
-              className="btn btn-square btn-ghost btn-sm"
+              variant="ghost"
               aria-label="削除"
               onClick={() =>
                 isExpired(code) ? onDeleteCode(code.code) : open()
               }
-              disabled={deletingCode === code.code}
+              loading={deletingCode === code.code}
             >
-              {deletingCode === code.code ? (
-                <span className="loading loading-sm loading-spinner" />
-              ) : (
-                <Trash2Icon className="size-4 text-error" />
+              {deletingCode !== code.code && (
+                <Trash2Icon className="size-4 text-danger" />
               )}
-            </button>
+            </Button>
           )}
         </ConfirmDialog>
       ) : (
-        <span className="size-8" />
+        <span className="size-10" />
       )}
     </li>
   ));
@@ -141,20 +132,22 @@ export function InviteCodeList({
 }: Props) {
   return (
     <div>
-      <div className="flex items-center justify-between p-4">
-        <h1 className="text-xl font-bold">招待コード</h1>
-        <button
-          type="button"
-          className="btn btn-primary btn-sm"
-          onClick={onCreateCode}
-          disabled={isCreating}
-        >
-          {isCreating ? "作成中..." : "新規作成"}
-        </button>
+      <div
+        className="
+          sticky top-0 flex items-center justify-between border-b border-line
+          bg-surface px-4 py-3
+        "
+      >
+        <h1 className="text-title">招待コード</h1>
+        <Button type="button" onClick={onCreateCode} loading={isCreating}>
+          新規作成
+        </Button>
       </div>
-      <ul className="list" aria-label="招待コード">
+      <ul aria-label="招待コード">
         {codes.length === 0 ? (
-          <li className="py-8 text-center">招待コードはまだありません</li>
+          <li className="py-8 text-center text-label text-muted">
+            招待コードはまだありません
+          </li>
         ) : (
           <InviteCodeItems
             codes={codes}

@@ -195,6 +195,19 @@ test.describe("登録ユーザー", () => {
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
 
+  test("subscribers-8: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
+    page,
+  }) => {
+    await page.goto("/admin/subscribers");
+    await page.getByRole("tab", { name: "BAN済み" }).click();
+    await page.reload();
+
+    await expect(page.getByRole("tab", { name: "BAN済み" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
   test("subscribers-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
     page,
   }) => {

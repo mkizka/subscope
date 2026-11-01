@@ -1,8 +1,14 @@
+import { clsx } from "clsx";
 import { BanIcon, EllipsisIcon, ShieldIcon, UndoIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { Avatar } from "@/app/components/ui/avatar";
+import { Badge } from "@/app/components/ui/badge";
+import { Button } from "@/app/components/ui/button";
+import { Menu, menuItemClass } from "@/app/components/ui/menu";
+import { Tabs } from "@/app/components/ui/tabs";
 import { formatDate } from "@/app/lib/format-date";
 
 export type BannedActor = {
@@ -17,6 +23,8 @@ export type Subscriber = BannedActor & {
   subscribedAt: string;
 };
 
+const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";
+
 export type SubscriberTab = "subscribers" | "banned";
 
 function ProfileCell({
@@ -28,19 +36,12 @@ function ProfileCell({
 }) {
   return (
     <>
-      {actor.avatar ? (
-        <img src={actor.avatar} alt="" className="size-10 rounded-full" />
-      ) : (
-        <div className="size-10 rounded-full bg-base-200" />
-      )}
-      <div className="min-w-0">
-        <div className="truncate font-medium">
+      <Avatar src={actor.avatar} />
+      <div className="min-w-0 flex-1">
+        <div className="truncate font-bold">
           {actor.displayName ?? actor.handle}
         </div>
-        <div
-          className="truncate text-sm text-base-content/70"
-          title={actor.did}
-        >
+        <div className="truncate text-label text-muted" title={actor.did}>
           @{actor.handle}
         </div>
         {children}
@@ -51,7 +52,6 @@ function ProfileCell({
 
 type Props = {
   tab?: SubscriberTab;
-  onTabChange?: (tab: SubscriberTab) => void;
   subscribers: Subscriber[];
   bannedActors?: BannedActor[];
   total?: number;
@@ -69,7 +69,6 @@ type Props = {
 
 export function SubscriberList({
   tab = "subscribers",
-  onTabChange,
   subscribers,
   bannedActors = [],
   total,
@@ -88,43 +87,42 @@ export function SubscriberList({
     tab === "banned" ? bannedActors.length === 0 : subscribers.length === 0;
   return (
     <>
-      <div className="flex items-baseline gap-2 px-6 pt-6 pb-3">
-        <h1 className="text-xl font-bold">登録ユーザー</h1>
-        {total !== undefined && (
-          <span className="text-sm text-base-content/70">{total}人</span>
-        )}
-      </div>
-      <div role="tablist" className="tabs tabs-border mx-4">
-        {(
-          [
-            ["subscribers", "登録ユーザー"],
-            ["banned", "BAN済み"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            className={tab === value ? "tab tab-active" : "tab"}
-            onClick={() => onTabChange?.(value)}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="sticky top-0 bg-surface">
+        <div className="flex items-baseline gap-2 px-4 py-3">
+          <h1 className="text-title">登録ユーザー</h1>
+          {total !== undefined && (
+            <span className="text-label text-muted">{total}人</span>
+          )}
+        </div>
+        <Tabs
+          tabs={[
+            {
+              to: "/admin/subscribers",
+              label: "登録ユーザー",
+              selected: tab === "subscribers",
+            },
+            {
+              to: "/admin/subscribers?tab=banned",
+              label: "BAN済み",
+              selected: tab === "banned",
+            },
+          ]}
+        />
       </div>
       {!isLoading && isEmpty && (
-        <p className="py-8 text-center">
+        <p className="py-8 text-center text-label text-muted">
           {tab === "banned"
             ? "BAN済みのアカウントはありません"
             : "登録アカウントはまだありません"}
         </p>
       )}
-      {isLoading && <p className="py-8 text-center">読み込み中...</p>}
-      <ul className="list">
+      {isLoading && (
+        <p className="py-8 text-center text-label text-muted">読み込み中...</p>
+      )}
+      <ul>
         {tab === "banned" &&
           bannedActors.map((actor) => (
-            <li key={actor.did} className="list-row items-center">
+            <li key={actor.did} className={rowClass}>
               <ProfileCell actor={actor} />
               <ConfirmDialog
                 title={`@${actor.handle} のBANを解除しますか？`}
@@ -133,32 +131,32 @@ export function SubscriberList({
                 onConfirm={() => onUnban?.(actor.did)}
               >
                 {(open) => (
-                  <button
+                  <Button
                     type="button"
-                    className="btn btn-ghost btn-sm"
-                    disabled={unbanningDid === actor.did}
+                    variant="secondary"
+                    size="sm"
+                    loading={unbanningDid === actor.did}
                     onClick={open}
                   >
-                    <UndoIcon className="size-4" />
+                    {unbanningDid !== actor.did && (
+                      <UndoIcon className="size-4" />
+                    )}
                     解除
-                  </button>
+                  </Button>
                 )}
               </ConfirmDialog>
             </li>
           ))}
         {tab === "subscribers" &&
           subscribers.map((subscriber) => (
-            <li key={subscriber.did} className="list-row items-center">
+            <li key={subscriber.did} className={rowClass}>
               <ProfileCell actor={subscriber}>
-                <div className="text-xs text-base-content/70">
+                <div className="text-caption text-muted">
                   {formatDate(subscriber.subscribedAt)} 登録
                 </div>
               </ProfileCell>
               {subscriber.isAdmin ? (
-                <span className="badge badge-soft badge-sm badge-primary">
-                  <ShieldIcon className="size-3" />
-                  管理者
-                </span>
+                <Badge>管理者</Badge>
               ) : (
                 <ConfirmDialog
                   title={`@${subscriber.handle} を管理者にしますか？`}
@@ -175,43 +173,29 @@ export function SubscriberList({
                       onConfirm={() => onBan?.(subscriber.did)}
                     >
                       {(openBan) => (
-                        <div className="dropdown dropdown-end">
+                        <Menu
+                          label="操作"
+                          trigger={<EllipsisIcon className="size-4" />}
+                        >
                           <button
                             type="button"
-                            className="btn btn-square btn-ghost btn-sm"
-                            aria-label="操作"
+                            className={menuItemClass}
+                            disabled={grantingDid === subscriber.did}
+                            onClick={openGrantAdmin}
                           >
-                            <EllipsisIcon className="size-4" />
+                            <ShieldIcon className="size-4" />
+                            管理者にする
                           </button>
-                          <ul
-                            className="
-                              menu dropdown-content z-10 w-44 rounded-box border
-                              border-base-300 bg-base-100 p-2 shadow-sm
-                            "
+                          <button
+                            type="button"
+                            className={clsx(menuItemClass, "text-danger")}
+                            disabled={banningDid === subscriber.did}
+                            onClick={openBan}
                           >
-                            <li>
-                              <button
-                                type="button"
-                                disabled={grantingDid === subscriber.did}
-                                onClick={openGrantAdmin}
-                              >
-                                <ShieldIcon className="size-4" />
-                                管理者にする
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                type="button"
-                                className="text-error"
-                                disabled={banningDid === subscriber.did}
-                                onClick={openBan}
-                              >
-                                <BanIcon className="size-4" />
-                                BAN
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
+                            <BanIcon className="size-4" />
+                            BAN
+                          </button>
+                        </Menu>
                       )}
                     </ConfirmDialog>
                   )}
@@ -221,9 +205,7 @@ export function SubscriberList({
           ))}
       </ul>
       {isFetchingNextPage && (
-        <p className="mt-4 text-center text-sm text-base-content/70">
-          読み込み中...
-        </p>
+        <p className="py-4 text-center text-label text-muted">読み込み中...</p>
       )}
       {onLoadMore && (
         <InfiniteScrollTrigger
