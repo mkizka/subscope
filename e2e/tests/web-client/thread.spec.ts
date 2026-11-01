@@ -2,6 +2,9 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { createRecord } from "../../helpers/pds";
 
+const threadPath = (uri: string) =>
+  `/profile/alice.test/post/${uri.split("/").pop()}`;
+
 const post = (text: string, parent?: { uri: string; cid: string }) =>
   createRecord("alice.test", "app.bsky.feed.post", {
     text,
@@ -13,7 +16,7 @@ const openThread = async (page: Page, uri: string, text: string) => {
   await page.goto("/");
   await page.waitForURL("/");
   await expect(async () => {
-    await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
+    await page.goto(threadPath(uri));
     await expect(
       page.getByRole("region", { name: "スレッド" }).getByText(text),
     ).toBeVisible({ timeout: 1000 });
@@ -21,7 +24,7 @@ const openThread = async (page: Page, uri: string, text: string) => {
 };
 
 test.describe("スレッド", () => {
-  test("thread-1: タイムラインの投稿を選ぶと、右カラムにその投稿のスレッドを開く", async ({
+  test("thread-1: タイムラインや検索結果の投稿を選ぶと、その投稿のスレッドを開く", async ({
     page,
   }) => {
     const text = "thread-1: 投稿";
@@ -35,6 +38,7 @@ test.describe("スレッド", () => {
     }).toPass();
     await article.getByRole("link", { name: "スレッドを開く" }).click();
 
+    await expect(page).toHaveURL(/\/profile\/alice\.test\/post\/\w+$/);
     await expect(
       page.getByRole("region", { name: "スレッド" }).getByText(text),
     ).toBeVisible();
@@ -60,7 +64,7 @@ test.describe("スレッド", () => {
     ]);
   });
 
-  test("thread-3: URLに ?thread=投稿のAT URI があると、右カラムにその投稿のスレッドを開く", async ({
+  test("thread-3: /profile/ハンドル/post/rkey を開くと、その投稿のスレッドを表示する", async ({
     page,
   }) => {
     const text = "thread-3: 投稿";
@@ -69,17 +73,17 @@ test.describe("スレッド", () => {
     await openThread(page, uri, text);
   });
 
-  test("thread-4: スレッドを閉じると、右カラムを通知に戻す", async ({
+  test("thread-4: 見出しの戻るボタンを押すと、スレッドを開く前の画面に戻る", async ({
     page,
   }) => {
     const text = "thread-4: 投稿";
     const { uri } = await post(text);
 
-    await openThread(page, uri, text);
-    await page.getByRole("link", { name: "閉じる" }).click();
+    await page.goto("/search");
+    await page.goto(threadPath(uri));
+    await page.getByRole("button", { name: "戻る" }).click();
 
-    await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL("/search");
   });
 
   test("thread-5: 選んだ投稿は本文を大きくし、投稿日時と返信・リポスト・いいねの件数を表示する", async ({
@@ -128,13 +132,13 @@ test.describe("スレッド", () => {
     await page.goto("/");
     await page.waitForURL("/");
     await expect(async () => {
-      await page.goto(`/?${new URLSearchParams({ thread: nested.uri })}`);
+      await page.goto(threadPath(nested.uri));
       await expect(region.getByText(/^thread-6: 返信の返信の返信/)).toHaveCount(
         2,
         { timeout: 1000 },
       );
     }).toPass();
-    await page.goto(`/?${new URLSearchParams({ thread: target.uri })}`);
+    await page.goto(threadPath(target.uri));
 
     await expect(region.getByText(/^thread-6: /)).toHaveText([
       "thread-6: 投稿",
@@ -216,7 +220,7 @@ test.describe("スレッド", () => {
     ).toBeVisible();
   });
 
-  test("thread-10: スレッドを開閉しても、中央の画面は読み込み直さず、スクロール位置も変えない", async ({
+  test("thread-10: スレッドから戻ると、スレッドを開く前のスクロール位置に戻る", async ({
     page,
   }) => {
     for (let i = 1; i <= 10; i++) {
@@ -224,31 +228,26 @@ test.describe("スレッド", () => {
     }
     const article = page
       .getByRole("article")
-      .filter({ hasText: "thread-10: 投稿10" });
+      .filter({ hasText: "thread-10: 投稿1" })
+      .filter({ hasNotText: "thread-10: 投稿10" });
     await page.goto("/");
     await expect(async () => {
       await page.reload();
-      await expect(article).toBeInViewport({ timeout: 1000 });
+      await expect(article).toBeVisible({ timeout: 1000 });
     }).toPass();
+    await article.evaluate((el) => el.scrollIntoView());
     const scrollY = await page.evaluate(() => window.scrollY);
-    const dataRequests: string[] = [];
-    page.on("request", (request) => {
-      if (new URL(request.url()).pathname.endsWith(".data")) {
-        dataRequests.push(request.url());
-      }
-    });
+    expect(scrollY).toBeGreaterThan(0);
 
     await article.getByRole("link", { name: "スレッドを開く" }).click();
     await expect(
       page
         .getByRole("region", { name: "スレッド" })
-        .getByText("thread-10: 投稿10"),
+        .getByText("thread-10: 投稿1"),
     ).toBeVisible();
-    expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
-    await page.getByRole("link", { name: "閉じる" }).click();
-    await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
+    await page.getByRole("button", { name: "戻る" }).click();
 
-    expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
-    expect(dataRequests).toEqual([]);
+    await expect(article).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollY);
   });
 });

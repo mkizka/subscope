@@ -7,7 +7,6 @@ import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-cont
 import { NotificationBellContainer } from "@/app/features/notification/blocks/notification-bell-container";
 import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
 import { ProfilePanelContainer } from "@/app/features/profile/blocks/profile-panel-container";
-import { ThreadPanelContainer } from "@/app/features/thread/blocks/thread-panel-container";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -17,7 +16,6 @@ type Props = {
 export const ThreeColumnLayout = ({ children }: Props) => {
   const [searchParams] = useSearchParams();
   const profile = searchParams.get("profile");
-  const thread = searchParams.get("thread");
 
   return (
     <div
@@ -72,16 +70,14 @@ export const ThreeColumnLayout = ({ children }: Props) => {
               lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
               lg:border-l
             `,
-            (profile || thread) &&
+            profile &&
               `
                 max-lg:fixed max-lg:inset-0 max-lg:z-20 max-lg:block
                 max-lg:bg-base-100
               `,
           )}
         >
-          {thread ? (
-            <ThreadPanelContainer uri={thread} />
-          ) : profile ? (
+          {profile ? (
             <ProfilePanelContainer handle={profile} />
           ) : (
             <>

@@ -7,7 +7,6 @@ export function ProfileLink({
 }: Omit<ComponentProps<typeof Link>, "to"> & { handle: string }) {
   const [searchParams] = useSearchParams();
   const params = new URLSearchParams(searchParams);
-  params.delete("thread");
   params.set("profile", handle);
   return (
     <Link {...props} to={{ search: params.toString() }} preventScrollReset />

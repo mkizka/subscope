@@ -1,6 +1,6 @@
-import { XIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
@@ -16,12 +16,11 @@ import { RichText } from "@/app/features/timeline/parts/rich-text";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 type Props = {
-  thread?: {
+  thread: {
     ancestors: TimelinePost[];
     post: TimelinePost;
     replies: TimelinePost[][];
-  } | null;
-  closeSearch: string;
+  };
 };
 
 function FocusedPost({
@@ -120,46 +119,43 @@ function ConnectedPost(props: PostCardProps) {
   );
 }
 
-export function ThreadPanel({ thread, closeSearch }: Props) {
+function BackButton() {
+  const navigate = useNavigate();
+  return (
+    <button
+      type="button"
+      aria-label="戻る"
+      className="btn btn-square btn-ghost btn-sm"
+      onClick={() =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        window.history.state?.idx > 0 ? navigate(-1) : navigate("/")
+      }
+    >
+      <ArrowLeftIcon className="size-4" />
+    </button>
+  );
+}
+
+export function ThreadView({ thread }: Props) {
   const toolbar = (post: TimelinePost) => <PostToolbarContainer {...post} />;
   return (
     <section aria-label="スレッド" className="flex flex-col">
-      <header
-        className="
-          flex items-center justify-between border-b border-base-300 py-1 pr-2
-          pl-4
-        "
-      >
-        <h2 className="font-bold">スレッド</h2>
-        <Link
-          to={{ search: closeSearch }}
-          preventScrollReset
-          aria-label="閉じる"
-          className="btn btn-square btn-ghost btn-sm"
-        >
-          <XIcon className="size-4" />
-        </Link>
+      <header className="flex items-center gap-2 border-b border-base-300 p-2">
+        <BackButton />
+        <h1 className="font-bold">スレッド</h1>
       </header>
-      {thread && (
-        <>
-          {thread.ancestors.map((post) => (
+      {thread.ancestors.map((post) => (
+        <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
+      ))}
+      <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
+      {thread.replies.map((chain) =>
+        chain.map((post, i) =>
+          i < chain.length - 1 ? (
             <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
-          ))}
-          <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
-          {thread.replies.map((chain) =>
-            chain.map((post, i) =>
-              i < chain.length - 1 ? (
-                <ConnectedPost
-                  key={post.uri}
-                  {...post}
-                  toolbar={toolbar(post)}
-                />
-              ) : (
-                <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
-              ),
-            ),
-          )}
-        </>
+          ) : (
+            <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
+          ),
+        ),
       )}
     </section>
   );

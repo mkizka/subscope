@@ -1,6 +1,6 @@
 import type { ShouldRevalidateFunction } from "react-router";
 
-const PANEL_PARAMS = ["thread", "profile"];
+const PANEL_PARAMS = ["profile"];
 
 const withoutPanelParams = (url: URL) => {
   const params = new URLSearchParams(url.search);

@@ -116,20 +116,4 @@ test.describe("検索", () => {
 
     await expect(page.getByText("投稿が見つかりません")).toBeVisible();
   });
-
-  test("search-7: 一覧の投稿を選ぶと、検索結果を表示したまま右カラムにその投稿のスレッドを開く", async ({
-    page,
-  }) => {
-    const text = `search7-${Date.now()}`;
-    await post(text);
-    const article = await searchPosts(page, text, text);
-
-    await article.getByRole("link", { name: "スレッドを開く" }).click();
-
-    await expect(page).toHaveURL(/\/search\?q=search7-\d+&tab=posts&thread=/);
-    await expect(article).toBeVisible();
-    await expect(
-      page.getByRole("region", { name: "スレッド" }).getByText(text),
-    ).toBeVisible();
-  });
 });

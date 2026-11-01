@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { PenSquareIcon } from "lucide-react";
 import {
   createContext,
@@ -63,7 +62,6 @@ function PostFormDialogContainer({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const fetcher = useFetcher<typeof action>();
-  const queryClient = useQueryClient();
   const uri =
     fetcher.data && "uri" in fetcher.data ? fetcher.data.uri : undefined;
 
@@ -71,9 +69,8 @@ function PostFormDialogContainer({
   useEffect(() => {
     if (!uri) return;
     target?.onPosted?.();
-    void queryClient.invalidateQueries({ queryKey: ["thread"] });
     ref.current?.close();
-  }, [uri, target, queryClient]);
+  }, [uri, target]);
 
   return (
     <dialog ref={ref} className="modal" aria-label="投稿" onClose={onClose}>
