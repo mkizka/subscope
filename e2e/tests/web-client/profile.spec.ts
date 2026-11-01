@@ -45,37 +45,6 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test.describe("簡易表示", () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto("/?profile=alice.test");
-    });
-
-    test("profile-2: URLに ?profile=ハンドル があると、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
-      page,
-    }) => {
-      const panel = page.getByRole("region", { name: "プロフィール" });
-      await expect(panel.getByText("@alice.test")).toBeVisible();
-      await expect(panel.getByText("フォロワー")).toBeVisible();
-    });
-
-    test("profile-3: 簡易表示を閉じると、右カラムを通知に戻す", async ({
-      page,
-    }) => {
-      await page.getByRole("link", { name: "閉じる" }).click();
-
-      await expect(page.getByRole("heading", { name: "通知" })).toBeVisible();
-      await expect(page).toHaveURL("/");
-    });
-
-    test("profile-4: 簡易表示から、中央カラムのプロフィール全体ページに移動できる", async ({
-      page,
-    }) => {
-      await page.getByRole("link", { name: "プロフィール全体を見る" }).click();
-
-      await expect(page).toHaveURL("/profile/alice.test");
-    });
-  });
-
   test("profile-5: 全体ページのフォローボタンでそのユーザーをフォローし、もう一度押すと外す", async ({
     page,
   }) => {
@@ -245,7 +214,7 @@ test.describe("プロフィール", () => {
     await expect(button).not.toHaveText(initial);
   });
 
-  test("profile-12: タイムラインとスレッドの投稿のアイコンか名前を選ぶと、右カラムに投稿者のプロフィールの簡易表示を開く", async ({
+  test("profile-12: タイムラインとスレッドの投稿のアイコンか名前を選ぶと、投稿者のプロフィール全体ページに移動する", async ({
     page,
   }) => {
     const text = `profile-12の投稿 ${Date.now()}`;
@@ -253,7 +222,6 @@ test.describe("プロフィール", () => {
       text,
       createdAt: new Date().toISOString(),
     });
-    const panel = page.getByRole("region", { name: "プロフィール" });
     const article = page.getByRole("main").getByRole("article").filter({
       hasText: text,
     });
@@ -263,14 +231,14 @@ test.describe("プロフィール", () => {
       await expect(article).toBeVisible({ timeout: 1000 });
     }).toPass();
 
-    await article.locator('a[href*="profile="]').first().click();
-    await expect(panel.getByText("@alice.test")).toBeVisible();
+    await article.locator('a[href="/profile/alice.test"]').first().click();
+    await expect(page).toHaveURL("/profile/alice.test");
 
     await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
     await page
       .getByRole("article", { name: "選んだ投稿" })
       .getByRole("link", { name: /@alice\.test/ })
       .click();
-    await expect(panel.getByText("@alice.test")).toBeVisible();
+    await expect(page).toHaveURL("/profile/alice.test");
   });
 });

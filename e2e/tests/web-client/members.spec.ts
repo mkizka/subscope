@@ -30,7 +30,7 @@ test.describe("メンバー", () => {
     await expect(alice.getByText(/^@/)).toBeVisible();
   });
 
-  test("members-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
+  test("members-2: 一覧のユーザーを選ぶと、そのユーザーのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/members");
@@ -40,10 +40,11 @@ test.describe("メンバー", () => {
       .getByRole("link", { name: /^Alice/ })
       .click();
 
-    await expect(page).toHaveURL(/\/members\?profile=/);
-    const panel = page.getByRole("region", { name: "プロフィール" });
+    await expect(page).toHaveURL(/\/profile\/[^/]+$/);
     await expect(
-      panel.getByRole("heading", { name: "Alice", exact: true }),
+      page
+        .getByRole("main")
+        .getByRole("heading", { name: "Alice", exact: true }),
     ).toBeVisible();
   });
 

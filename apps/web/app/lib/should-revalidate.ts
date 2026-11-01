@@ -1,10 +1,8 @@
 import type { ShouldRevalidateFunction } from "react-router";
 
-const PANEL_PARAMS = ["thread", "profile"];
-
 const withoutPanelParams = (url: URL) => {
   const params = new URLSearchParams(url.search);
-  for (const name of PANEL_PARAMS) params.delete(name);
+  params.delete("thread");
   return `${url.pathname}?${params}`;
 };
 

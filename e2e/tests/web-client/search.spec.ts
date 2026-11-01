@@ -49,7 +49,7 @@ test.describe("検索", () => {
     await expect(alice.getByText("Blueskyを使っています")).toBeVisible();
   });
 
-  test("search-2: 一覧のユーザーを選ぶと、右カラムにそのユーザーのプロフィールの簡易表示を開く", async ({
+  test("search-2: 一覧のユーザーを選ぶと、そのユーザーのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     const link = page.getByRole("main").getByRole("link", { name: /^Alice/ });
@@ -60,10 +60,11 @@ test.describe("検索", () => {
 
     await link.click();
 
-    await expect(page).toHaveURL(/\/search\?q=alice&profile=/);
-    const panel = page.getByRole("region", { name: "プロフィール" });
+    await expect(page).toHaveURL("/profile/alice.test");
     await expect(
-      panel.getByRole("heading", { name: "Alice", exact: true }),
+      page
+        .getByRole("main")
+        .getByRole("heading", { name: "Alice", exact: true }),
     ).toBeVisible();
   });
 

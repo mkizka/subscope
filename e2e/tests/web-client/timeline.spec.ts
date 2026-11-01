@@ -205,7 +205,7 @@ test.describe("タイムライン", () => {
     await expect(link).toHaveAttribute("target", "_blank");
   });
 
-  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、右カラムにそのユーザーのプロフィールの簡易表示を開くリンクにする", async ({
+  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、そのユーザーのプロフィール全体ページへのリンクにする", async ({
     page,
   }) => {
     const prefix = "timeline-7: こんにちは ";
@@ -238,8 +238,8 @@ test.describe("タイムライン", () => {
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
     await link.click();
-    await expect(
-      page.getByRole("region", { name: "プロフィール" }).getByText(label),
-    ).toBeVisible();
+    await expect(page).toHaveURL(
+      `/profile/${await resolveHandle("alice.test")}`,
+    );
   });
 });
