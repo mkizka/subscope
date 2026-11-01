@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { BanIcon, EllipsisIcon, ShieldIcon, UndoIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -6,6 +7,8 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 import { Avatar } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
+import { Menu, menuItemClass } from "@/app/components/ui/menu";
+import { Tabs } from "@/app/components/ui/tabs";
 import { formatDate } from "@/app/lib/format-date";
 
 export type BannedActor = {
@@ -49,7 +52,6 @@ function ProfileCell({
 
 type Props = {
   tab?: SubscriberTab;
-  onTabChange?: (tab: SubscriberTab) => void;
   subscribers: Subscriber[];
   bannedActors?: BannedActor[];
   total?: number;
@@ -67,7 +69,6 @@ type Props = {
 
 export function SubscriberList({
   tab = "subscribers",
-  onTabChange,
   subscribers,
   bannedActors = [],
   total,
@@ -86,36 +87,27 @@ export function SubscriberList({
     tab === "banned" ? bannedActors.length === 0 : subscribers.length === 0;
   return (
     <>
-      <div className="sticky top-0 border-b border-line bg-surface">
+      <div className="sticky top-0 bg-surface">
         <div className="flex items-baseline gap-2 px-4 py-3">
           <h1 className="text-title">登録ユーザー</h1>
           {total !== undefined && (
             <span className="text-label text-muted">{total}人</span>
           )}
         </div>
-        <div role="tablist" className="flex">
-          {(
-            [
-              ["subscribers", "登録ユーザー"],
-              ["banned", "BAN済み"],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              role="tab"
-              aria-selected={tab === value}
-              className="
-                flex-1 py-2.5 text-label text-muted
-                aria-selected:font-bold aria-selected:text-ink
-                aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
-              "
-              onClick={() => onTabChange?.(value)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          tabs={[
+            {
+              to: "/admin/subscribers",
+              label: "登録ユーザー",
+              selected: tab === "subscribers",
+            },
+            {
+              to: "/admin/subscribers?tab=banned",
+              label: "BAN済み",
+              selected: tab === "banned",
+            },
+          ]}
+        />
       </div>
       {!isLoading && isEmpty && (
         <p className="py-8 text-center text-label text-muted">
@@ -181,54 +173,29 @@ export function SubscriberList({
                       onConfirm={() => onBan?.(subscriber.did)}
                     >
                       {(openBan) => (
-                        <div className="group relative">
+                        <Menu
+                          label="操作"
+                          trigger={<EllipsisIcon className="size-4" />}
+                        >
                           <button
                             type="button"
-                            className="
-                              inline-flex size-8 items-center justify-center
-                              rounded-full
-                              hover:bg-surface-2
-                            "
-                            aria-label="操作"
+                            className={menuItemClass}
+                            disabled={grantingDid === subscriber.did}
+                            onClick={openGrantAdmin}
                           >
-                            <EllipsisIcon className="size-4" />
+                            <ShieldIcon className="size-4" />
+                            管理者にする
                           </button>
-                          <ul
-                            className="
-                              invisible absolute right-0 z-10 w-44
-                              rounded-[14px] border border-line bg-surface p-1.5
-                              group-focus-within:visible
-                              [&_button]:flex [&_button]:w-full
-                              [&_button]:items-center [&_button]:gap-2
-                              [&_button]:rounded-[10px] [&_button]:px-3
-                              [&_button]:py-2 [&_button]:text-label
-                              [&_button:disabled]:opacity-50
-                              [&_button:hover]:bg-surface-2
-                            "
+                          <button
+                            type="button"
+                            className={clsx(menuItemClass, "text-danger")}
+                            disabled={banningDid === subscriber.did}
+                            onClick={openBan}
                           >
-                            <li>
-                              <button
-                                type="button"
-                                disabled={grantingDid === subscriber.did}
-                                onClick={openGrantAdmin}
-                              >
-                                <ShieldIcon className="size-4" />
-                                管理者にする
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                type="button"
-                                className="text-danger"
-                                disabled={banningDid === subscriber.did}
-                                onClick={openBan}
-                              >
-                                <BanIcon className="size-4" />
-                                BAN
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
+                            <BanIcon className="size-4" />
+                            BAN
+                          </button>
+                        </Menu>
                       )}
                     </ConfirmDialog>
                   )}
