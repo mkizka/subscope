@@ -9,12 +9,19 @@ import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
-import { link } from "@repo/client/lex/app/bsky/richtext/facet";
+import { link, mention } from "@repo/client/lex/app/bsky/richtext/facet";
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+
+type TextLinkDto = {
+  byteStart: number;
+  byteEnd: number;
+  uri?: string;
+  did?: string;
+};
 
 export type TimelinePostDto = {
   uri: string;
@@ -26,7 +33,7 @@ export type TimelinePostDto = {
   authorDisplayName?: string;
   authorHandle: string;
   text?: string;
-  links?: { byteStart: number; byteEnd: number; uri: string }[];
+  links?: TextLinkDto[];
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
@@ -110,14 +117,15 @@ export function toTimelinePost({
     authorHandle: post.author.handle,
     text: maybeString(post.record.text),
     links: postRecord.matches(post.record)
-      ? post.record.facets?.flatMap(({ index, features }) =>
-          features
-            .filter((feature) => link.matches(feature))
-            .map(({ uri }) => ({
-              byteStart: index.byteStart,
-              byteEnd: index.byteEnd,
-              uri,
-            })),
+      ? post.record.facets?.flatMap(
+          ({ index: { byteStart, byteEnd }, features }) =>
+            features.flatMap((feature): TextLinkDto[] =>
+              link.matches(feature)
+                ? [{ byteStart, byteEnd, uri: feature.uri }]
+                : mention.matches(feature)
+                  ? [{ byteStart, byteEnd, did: feature.did }]
+                  : [],
+            ),
         )
       : undefined,
     replyCount: post.replyCount,

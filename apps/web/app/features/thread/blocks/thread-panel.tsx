@@ -9,10 +9,10 @@ import {
   ExternalCard,
   PostCard,
   type PostCardProps,
-  ProfileLink,
   QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
 import { PostImages } from "@/app/features/timeline/parts/post-images";
+import { ProfileLink } from "@/app/features/timeline/parts/profile-link";
 import { RichText } from "@/app/features/timeline/parts/rich-text";
 import { useHydrated } from "@/app/lib/use-hydrated";
 

@@ -1,11 +1,21 @@
-export type TextLink = { byteStart: number; byteEnd: number; uri: string };
+import { ProfileLink } from "./profile-link";
+
+export type TextLink = {
+  byteStart: number;
+  byteEnd: number;
+  uri?: string;
+  did?: string;
+};
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 function splitByLinks(text: string, links: TextLink[] = []) {
   const bytes = encoder.encode(text);
-  const segments: { text: string; start: number; uri?: string }[] = [];
+  const segments: (Omit<TextLink, "byteStart" | "byteEnd"> & {
+    text: string;
+    start: number;
+  })[] = [];
   let cursor = 0;
   for (const link of [...links].sort((a, b) => a.byteStart - b.byteStart)) {
     if (
@@ -24,6 +34,7 @@ function splitByLinks(text: string, links: TextLink[] = []) {
       text: decoder.decode(bytes.slice(link.byteStart, link.byteEnd)),
       start: link.byteStart,
       uri: link.uri,
+      did: link.did,
     });
     cursor = link.byteEnd;
   }
@@ -41,7 +52,15 @@ export function RichText({
   links?: TextLink[];
 }) {
   return splitByLinks(text, links).map((segment) =>
-    segment.uri && /^https?:\/\//.test(segment.uri) ? (
+    segment.did ? (
+      <ProfileLink
+        key={segment.start}
+        handle={segment.did}
+        className="relative link link-primary"
+      >
+        {segment.text}
+      </ProfileLink>
+    ) : segment.uri && /^https?:\/\//.test(segment.uri) ? (
       <a
         key={segment.start}
         href={segment.uri}

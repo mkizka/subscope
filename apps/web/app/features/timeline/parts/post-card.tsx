@@ -4,12 +4,13 @@ import {
   MessageCircleIcon,
   RepeatIcon,
 } from "lucide-react";
-import type { ComponentProps, ReactNode } from "react";
-import { Link, useSearchParams } from "react-router";
+import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 import { type PostImage, PostImages } from "./post-images";
+import { ProfileLink } from "./profile-link";
 import { RichText, type TextLink } from "./rich-text";
 
 export type PostCardProps = {
@@ -63,19 +64,6 @@ function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
       <props.Icon className="size-3" />
       {props.count}
     </span>
-  );
-}
-
-export function ProfileLink({
-  handle,
-  ...props
-}: Omit<ComponentProps<typeof Link>, "to"> & { handle: string }) {
-  const [searchParams] = useSearchParams();
-  const params = new URLSearchParams(searchParams);
-  params.delete("thread");
-  params.set("profile", handle);
-  return (
-    <Link {...props} to={{ search: params.toString() }} preventScrollReset />
   );
 }
 
