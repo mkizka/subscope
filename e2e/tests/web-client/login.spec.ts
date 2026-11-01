@@ -98,4 +98,15 @@ test.describe("ログイン", () => {
       ),
     ).toBeVisible();
   });
+
+  test("login-9: 「ログイン」を押してから認証画面に移動するまで、ログインボタンを無効にしてスピナーを出す", async ({
+    page,
+  }) => {
+    await page.route("**/oauth/authorize**", () => {});
+    await page.goto("/login");
+    await page.getByLabel("ハンドル").fill("alice.test");
+    await page.getByRole("button", { name: "ログイン" }).click();
+
+    await expect(page.getByRole("button", { name: "ログイン" })).toBeDisabled();
+  });
 });

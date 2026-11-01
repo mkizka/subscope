@@ -1,6 +1,7 @@
 import { isValidHandle } from "@atproto/syntax";
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
+import { useNavigation } from "react-router";
 import { z } from "zodV4";
 
 import { LoginForm } from "./login-form";
@@ -16,6 +17,7 @@ export const loginSchema = z.object({
 });
 
 export const LoginFormContainer = () => {
+  const navigation = useNavigation();
   const [form, fields] = useForm({
     id: "login-form",
     constraint: getZodConstraint(loginSchema),
@@ -30,6 +32,7 @@ export const LoginFormContainer = () => {
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.identifier, { type: "text" })}
       error={fields.identifier.errors?.[0]}
+      loading={navigation.formAction === "/oauth/login"}
     />
   );
 };
