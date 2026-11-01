@@ -77,13 +77,17 @@ test.describe("スレッド", () => {
     page,
   }) => {
     const text = "thread-4: 投稿";
-    const { uri } = await post(text);
-
-    await page.goto("/search");
-    await page.goto(threadPath(uri));
+    await post(text);
+    const search = `/search?${new URLSearchParams({ q: text, tab: "posts" })}`;
+    const article = page.getByRole("article").filter({ hasText: text });
+    await expect(async () => {
+      await page.goto(search);
+      await expect(article).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await article.getByRole("link", { name: "スレッドを開く" }).click();
     await page.getByRole("button", { name: "戻る" }).click();
 
-    await expect(page).toHaveURL("/search");
+    await expect(page).toHaveURL(search);
   });
 
   test("thread-5: 選んだ投稿は本文を大きくし、投稿日時と返信・リポスト・いいねの件数を表示する", async ({
