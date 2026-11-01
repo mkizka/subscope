@@ -1,9 +1,12 @@
 import type { Did } from "@atproto/did";
-import type { JobData, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, eq } from "drizzle-orm";
 
-import type { ILabelRepository } from "../../../application/interfaces/repositories/label-repository.js";
+import type {
+  ILabelRepository,
+  LabelData,
+} from "../../../application/interfaces/repositories/label-repository.js";
 
 export class LabelRepository implements ILabelRepository {
   async upsert({
@@ -12,7 +15,7 @@ export class LabelRepository implements ILabelRepository {
     actorDid,
   }: {
     ctx: TransactionContext;
-    label: JobData["label"];
+    label: LabelData;
     actorDid: Did;
   }) {
     const data = {
@@ -35,13 +38,7 @@ export class LabelRepository implements ILabelRepository {
       });
   }
 
-  async delete({
-    ctx,
-    label,
-  }: {
-    ctx: TransactionContext;
-    label: JobData["label"];
-  }) {
+  async delete({ ctx, label }: { ctx: TransactionContext; label: LabelData }) {
     await ctx.db
       .delete(schema.labels)
       .where(

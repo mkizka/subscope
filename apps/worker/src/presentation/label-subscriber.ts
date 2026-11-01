@@ -1,15 +1,16 @@
 import { Subscription } from "@atproto/xrpc-server";
 import * as subscribeLabels from "@repo/client/lex/com/atproto/label/subscribeLabels";
-import type { IJobQueue, IMetricReporter } from "@repo/common/domain";
+import type { IMetricReporter } from "@repo/common/domain";
 
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
+import type { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 
 export class LabelSubscriber {
   private readonly subscription;
 
   constructor(
     private readonly metricReporter: IMetricReporter,
-    private readonly jobQueue: IJobQueue,
+    private readonly indexLabelUseCase: IndexLabelUseCase,
     private readonly labelCursorStore: ILabelCursorStore,
     private readonly moderationUrl: string,
   ) {
@@ -30,12 +31,8 @@ export class LabelSubscriber {
     for await (const message of this.subscription) {
       if (subscribeLabels.labels.$isTypeOf(message)) {
         this.metricReporter.increment("ingester_labels_labels_total");
-        for (const { src, uri, cid, val, neg, cts, exp } of message.labels) {
-          await this.jobQueue.add({
-            queueName: "label",
-            jobName: `${src}:${uri}:${val}`,
-            data: { src, uri, cid, val, neg, cts, exp },
-          });
+        for (const label of message.labels) {
+          await this.indexLabelUseCase.execute(label);
         }
         await this.labelCursorStore.setCursor(this.moderationUrl, message.seq);
       } else if (subscribeLabels.info.$isTypeOf(message)) {

@@ -1,9 +1,9 @@
 import type { Did } from "@atproto/did";
 import { Client } from "@atproto/lex";
 import * as queryLabels from "@repo/client/lex/com/atproto/label/queryLabels";
-import type { JobData } from "@repo/common/domain";
 
 import type { ILabelFetcher } from "../../application/interfaces/external/label-fetcher.js";
+import type { LabelData } from "../../application/interfaces/repositories/label-repository.js";
 
 export class LabelFetcher implements ILabelFetcher {
   private readonly client;
@@ -13,7 +13,7 @@ export class LabelFetcher implements ILabelFetcher {
   }
 
   async fetchByActor(did: Did) {
-    const labels: JobData["label"][] = [];
+    const labels: LabelData[] = [];
     let cursor: string | undefined;
     do {
       const res = await this.client.call(queryLabels, {

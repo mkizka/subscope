@@ -158,9 +158,9 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
     .service("indexLabelUseCase", ["labelRepository", "actorRepository", "db"], asClassArgs(IndexLabelUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "labelFetcher", "indexLabelUseCase", "db"], asClassArgs(SyncTapRepoUseCase))
-    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl"], asClassArgs(SyncWorker))
+    .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "redisUrl"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
     .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "tapUrl", "tapConcurrency"], asClassArgs(TapSubscriber))
-    .service("labelSubscriber", ["metricReporter", "jobQueue", "labelCursorStore", "moderationUrl"], asClassArgs(LabelSubscriber))
+    .service("labelSubscriber", ["metricReporter", "indexLabelUseCase", "labelCursorStore", "moderationUrl"], asClassArgs(LabelSubscriber))
     .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "labelSubscriber", "jobQueue", "healthRouter", "port"], asClassArgs(WorkerServer));
