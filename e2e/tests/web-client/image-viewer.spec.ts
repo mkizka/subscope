@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { createRecord, uploadImage } from "../../helpers/pds";
+import { createRecord, putRecord, uploadImage } from "../../helpers/pds";
 
 const openViewer = async (page: Page, text: string, alts: string[]) => {
   await createRecord("alice.test", "app.bsky.feed.post", {
@@ -125,5 +125,37 @@ test.describe("画像の拡大表示", () => {
 
     await viewer.getByRole("button", { name: "拡大" }).click();
     await expect.poll(width).toBeGreaterThan(before);
+  });
+
+  test("image-viewer-7: プロフィール全体ページのアイコンかバナーを選ぶと、その画像を拡大して表示する", async ({
+    page,
+  }) => {
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      avatar: await uploadImage("alice.test"),
+      banner: await uploadImage("alice.test"),
+    });
+    const main = page.getByRole("main");
+    const viewer = page.getByRole("dialog", { name: "画像の拡大表示" });
+    await page.goto("/");
+    await page.getByRole("link", { name: "プロフィール" }).click();
+    await expect(async () => {
+      await page.reload();
+      await main
+        .getByRole("button", { name: "アイコンを拡大" })
+        .click({ timeout: 1000 });
+      await expect(viewer.getByRole("img")).toHaveAttribute(
+        "src",
+        /\/img\/avatar/,
+        { timeout: 1000 },
+      );
+    }).toPass();
+
+    await page.keyboard.press("Escape");
+    await expect(viewer).toBeHidden();
+    await main.getByRole("button", { name: "バナーを拡大" }).click();
+    await expect(viewer.getByRole("img")).toHaveAttribute(
+      "src",
+      /\/img\/banner\//,
+    );
   });
 });
