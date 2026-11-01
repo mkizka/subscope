@@ -1,6 +1,8 @@
-import { SearchIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Form } from "react-router";
+
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
 
 type Props = {
   formProps: ComponentProps<typeof Form>;
@@ -10,15 +12,12 @@ type Props = {
 
 export function SearchForm({ formProps, inputProps, tab }: Props) {
   return (
-    <Form className="join w-full p-4" {...formProps}>
-      <label className="input join-item w-full">
-        <SearchIcon className="size-4 opacity-50" />
-        <input aria-label="検索語" placeholder="検索" {...inputProps} />
-      </label>
+    <Form className="flex gap-2 p-4" {...formProps}>
+      <div className="flex-1">
+        <Input aria-label="検索語" placeholder="検索" {...inputProps} />
+      </div>
       {tab === "posts" && <input type="hidden" name="tab" value="posts" />}
-      <button type="submit" className="btn join-item btn-primary">
-        検索
-      </button>
+      <Button type="submit">検索</Button>
     </Form>
   );
 }

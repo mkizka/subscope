@@ -1,7 +1,7 @@
-import { Link } from "react-router";
-
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
+import { Button } from "@/app/components/ui/button";
+import { Tabs } from "@/app/components/ui/tabs";
 import { ListForm } from "@/app/features/list/blocks/list-form";
 import {
   AddListMemberForm,
@@ -39,12 +39,10 @@ export function ListPage({
 }: Props) {
   return (
     <ThreeColumnLayout>
-      <section className="flex flex-col gap-2 border-b border-base-300 p-4">
-        <h1 className="text-lg font-bold">{name}</h1>
+      <section className="flex flex-col gap-2 border-b border-line p-4">
+        <h1 className="text-title">{name}</h1>
         {description && (
-          <p className="text-sm wrap-break-word whitespace-pre-wrap">
-            {description}
-          </p>
+          <p className="wrap-break-word whitespace-pre-wrap">{description}</p>
         )}
       </section>
       {isSelf && (
@@ -63,35 +61,25 @@ export function ListPage({
             onConfirm={onDelete}
           >
             {(open) => (
-              <button
-                type="button"
-                className="btn m-4 btn-outline btn-error btn-sm"
-                onClick={open}
-              >
-                削除する
-              </button>
+              <div className="m-4">
+                <Button variant="danger" size="sm" onClick={open}>
+                  削除する
+                </Button>
+              </div>
             )}
           </ConfirmDialog>
         </>
       )}
-      <div role="tablist" className="tabs tabs-border">
-        {(
-          [
-            ["posts", "投稿", "."],
-            ["members", "メンバー", "?tab=members"],
-          ] as const
-        ).map(([value, label, to]) => (
-          <Link
-            key={value}
-            to={to}
-            role="tab"
-            aria-selected={tab === value}
-            className={tab === value ? "tab tab-active" : "tab"}
-          >
-            {label}
-          </Link>
-        ))}
-      </div>
+      <Tabs
+        tabs={[
+          { to: ".", label: "投稿", selected: tab === "posts" },
+          {
+            to: "?tab=members",
+            label: "メンバー",
+            selected: tab === "members",
+          },
+        ]}
+      />
       {tab === "posts" ? (
         <TimelineFeed posts={posts} />
       ) : (
