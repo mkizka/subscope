@@ -75,6 +75,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/glossary.md
 - Webクライアントの構成
   - docs/dev/web-architecture.md
+- Webクライアントのデザインルール
+  - docs/dev/design.md
 - Lexiconのインデックス実装追加ガイド
   - docs/dev/lexicon-implementation.md
 - Identity Event処理

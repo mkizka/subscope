@@ -55,6 +55,14 @@
 
 @layer base {
   body {
-    @apply bg-surface text-ink h-svh;
+    @apply bg-surface text-ink h-svh accent-brand;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand;
+  }
+
+  button:not(:disabled) {
+    @apply cursor-pointer;
   }
 }
