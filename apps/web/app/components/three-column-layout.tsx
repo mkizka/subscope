@@ -1,12 +1,9 @@
-import { clsx } from "clsx";
 import { MenuIcon, XIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { useSearchParams } from "react-router";
 
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { NotificationBellContainer } from "@/app/features/notification/blocks/notification-bell-container";
 import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
-import { ProfilePanelContainer } from "@/app/features/profile/blocks/profile-panel-container";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -14,9 +11,6 @@ type Props = {
 };
 
 export const ThreeColumnLayout = ({ children }: Props) => {
-  const [searchParams] = useSearchParams();
-  const profile = searchParams.get("profile");
-
   return (
     <div
       className="
@@ -61,39 +55,26 @@ export const ThreeColumnLayout = ({ children }: Props) => {
           className="peer hidden"
         />
         <aside
-          className={clsx(
-            `
-              hidden overflow-y-auto border-base-300
-              max-lg:peer-checked:fixed max-lg:peer-checked:inset-0
-              max-lg:peer-checked:z-20 max-lg:peer-checked:block
-              max-lg:peer-checked:bg-base-100
-              lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
-              lg:border-l
-            `,
-            profile &&
-              `
-                max-lg:fixed max-lg:inset-0 max-lg:z-20 max-lg:block
-                max-lg:bg-base-100
-              `,
-          )}
+          className="
+            hidden overflow-y-auto border-base-300
+            max-lg:peer-checked:fixed max-lg:peer-checked:inset-0
+            max-lg:peer-checked:z-20 max-lg:peer-checked:block
+            max-lg:peer-checked:bg-base-100
+            lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
+            lg:border-l
+          "
         >
-          {profile ? (
-            <ProfilePanelContainer handle={profile} />
-          ) : (
-            <>
-              <label
-                htmlFor="notification-toggle"
-                aria-label="通知を閉じる"
-                className="
-                  btn m-2 btn-square btn-ghost
-                  lg:hidden
-                "
-              >
-                <XIcon />
-              </label>
-              <NotificationPanelContainer />
-            </>
-          )}
+          <label
+            htmlFor="notification-toggle"
+            aria-label="通知を閉じる"
+            className="
+              btn m-2 btn-square btn-ghost
+              lg:hidden
+            "
+          >
+            <XIcon />
+          </label>
+          <NotificationPanelContainer />
         </aside>
       </div>
       <div className="drawer-side z-30">

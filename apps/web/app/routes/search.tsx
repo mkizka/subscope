@@ -33,5 +33,3 @@ export function meta() {
 export default function Search({ loaderData }: Route.ComponentProps) {
   return <SearchPage {...loaderData} />;
 }
-
-export { shouldRevalidate } from "@/app/lib/should-revalidate";
