@@ -22,7 +22,7 @@ function OlderInviteCodeItemsContainer({
 
   if (!fetcher.data) {
     return (
-      <li className="p-4 text-center text-base-content/70">
+      <li className="p-4 text-center text-muted">
         {fetcher.state !== "idle" && "読み込み中..."}
         <InfiniteScrollTrigger
           onIntersect={() =>

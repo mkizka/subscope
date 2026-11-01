@@ -17,6 +17,8 @@ export type Subscriber = BannedActor & {
   subscribedAt: string;
 };
 
+const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";
+
 export type SubscriberTab = "subscribers" | "banned";
 
 function ProfileCell({
@@ -29,18 +31,19 @@ function ProfileCell({
   return (
     <>
       {actor.avatar ? (
-        <img src={actor.avatar} alt="" className="size-10 rounded-full" />
+        <img
+          src={actor.avatar}
+          alt=""
+          className="size-10 shrink-0 rounded-full"
+        />
       ) : (
-        <div className="size-10 rounded-full bg-base-200" />
+        <div className="size-10 shrink-0 rounded-full bg-surface-2" />
       )}
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="truncate font-medium">
           {actor.displayName ?? actor.handle}
         </div>
-        <div
-          className="truncate text-sm text-base-content/70"
-          title={actor.did}
-        >
+        <div className="truncate text-sm text-muted" title={actor.did}>
           @{actor.handle}
         </div>
         {children}
@@ -88,13 +91,13 @@ export function SubscriberList({
     tab === "banned" ? bannedActors.length === 0 : subscribers.length === 0;
   return (
     <>
-      <div className="flex items-baseline gap-2 px-6 pt-6 pb-3">
-        <h1 className="text-xl font-bold">登録ユーザー</h1>
+      <div className="flex items-baseline gap-2 px-4 py-3">
+        <h1 className="text-lg font-bold">登録ユーザー</h1>
         {total !== undefined && (
-          <span className="text-sm text-base-content/70">{total}人</span>
+          <span className="text-sm text-muted">{total}人</span>
         )}
       </div>
-      <div role="tablist" className="tabs tabs-border mx-4">
+      <div role="tablist" className="flex border-b border-line">
         {(
           [
             ["subscribers", "登録ユーザー"],
@@ -106,7 +109,11 @@ export function SubscriberList({
             type="button"
             role="tab"
             aria-selected={tab === value}
-            className={tab === value ? "tab tab-active" : "tab"}
+            className="
+              flex-1 py-2.5 text-sm text-muted
+              aria-selected:font-bold aria-selected:text-ink
+              aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
+            "
             onClick={() => onTabChange?.(value)}
           >
             {label}
@@ -114,17 +121,19 @@ export function SubscriberList({
         ))}
       </div>
       {!isLoading && isEmpty && (
-        <p className="py-8 text-center">
+        <p className="py-8 text-center text-muted">
           {tab === "banned"
             ? "BAN済みのアカウントはありません"
             : "登録アカウントはまだありません"}
         </p>
       )}
-      {isLoading && <p className="py-8 text-center">読み込み中...</p>}
-      <ul className="list">
+      {isLoading && (
+        <p className="py-8 text-center text-muted">読み込み中...</p>
+      )}
+      <ul>
         {tab === "banned" &&
           bannedActors.map((actor) => (
-            <li key={actor.did} className="list-row items-center">
+            <li key={actor.did} className={rowClass}>
               <ProfileCell actor={actor} />
               <ConfirmDialog
                 title={`@${actor.handle} のBANを解除しますか？`}
@@ -135,7 +144,12 @@ export function SubscriberList({
                 {(open) => (
                   <button
                     type="button"
-                    className="btn btn-ghost btn-sm"
+                    className="
+                      inline-flex items-center gap-1 rounded-full border
+                      border-line px-3 py-1 text-sm
+                      hover:bg-surface-2
+                      disabled:opacity-50
+                    "
                     disabled={unbanningDid === actor.did}
                     onClick={open}
                   >
@@ -148,14 +162,19 @@ export function SubscriberList({
           ))}
         {tab === "subscribers" &&
           subscribers.map((subscriber) => (
-            <li key={subscriber.did} className="list-row items-center">
+            <li key={subscriber.did} className={rowClass}>
               <ProfileCell actor={subscriber}>
-                <div className="text-xs text-base-content/70">
+                <div className="text-xs text-muted">
                   {formatDate(subscriber.subscribedAt)} 登録
                 </div>
               </ProfileCell>
               {subscriber.isAdmin ? (
-                <span className="badge badge-soft badge-sm badge-primary">
+                <span
+                  className="
+                    inline-flex shrink-0 items-center gap-1 rounded-full
+                    bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand
+                  "
+                >
                   <ShieldIcon className="size-3" />
                   管理者
                 </span>
@@ -175,18 +194,29 @@ export function SubscriberList({
                       onConfirm={() => onBan?.(subscriber.did)}
                     >
                       {(openBan) => (
-                        <div className="dropdown dropdown-end">
+                        <div className="group relative">
                           <button
                             type="button"
-                            className="btn btn-square btn-ghost btn-sm"
+                            className="
+                              inline-flex size-8 items-center justify-center
+                              rounded-full
+                              hover:bg-surface-2
+                            "
                             aria-label="操作"
                           >
                             <EllipsisIcon className="size-4" />
                           </button>
                           <ul
                             className="
-                              menu dropdown-content z-10 w-44 rounded-box border
-                              border-base-300 bg-base-100 p-2 shadow-sm
+                              invisible absolute right-0 z-10 w-44
+                              rounded-[14px] border border-line bg-surface p-1.5
+                              group-focus-within:visible
+                              [&_button]:flex [&_button]:w-full
+                              [&_button]:items-center [&_button]:gap-2
+                              [&_button]:rounded-[10px] [&_button]:px-3
+                              [&_button]:py-2 [&_button]:text-sm
+                              [&_button:disabled]:opacity-50
+                              [&_button:hover]:bg-surface-2
                             "
                           >
                             <li>
@@ -202,7 +232,7 @@ export function SubscriberList({
                             <li>
                               <button
                                 type="button"
-                                className="text-error"
+                                className="text-danger"
                                 disabled={banningDid === subscriber.did}
                                 onClick={openBan}
                               >
@@ -221,9 +251,7 @@ export function SubscriberList({
           ))}
       </ul>
       {isFetchingNextPage && (
-        <p className="mt-4 text-center text-sm text-base-content/70">
-          読み込み中...
-        </p>
+        <p className="py-4 text-center text-sm text-muted">読み込み中...</p>
       )}
       {onLoadMore && (
         <InfiniteScrollTrigger

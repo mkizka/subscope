@@ -20,12 +20,21 @@ const statusLabel = {
 } as const;
 
 const statusClass = {
-  active: "badge badge-soft badge-success",
-  used: "badge badge-ghost",
-  expired: "badge badge-ghost",
+  active: "bg-brand-soft text-brand",
+  used: "bg-surface-2 text-muted",
+  expired: "bg-surface-2 text-muted",
 } as const;
 
 export function StatusBadge(props: Props) {
   const status = getStatus(props);
-  return <span className={statusClass[status]}>{statusLabel[status]}</span>;
+  return (
+    <span
+      className={`
+        shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold
+        ${statusClass[status]}
+      `}
+    >
+      {statusLabel[status]}
+    </span>
+  );
 }

@@ -1,4 +1,9 @@
-import { CheckIcon, CopyIcon, Trash2Icon } from "lucide-react";
+import {
+  CheckIcon,
+  CopyIcon,
+  LoaderCircleIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
@@ -43,7 +48,10 @@ function CopyButton({ code }: { code: string }) {
   return (
     <button
       type="button"
-      className="btn btn-square btn-ghost btn-xs"
+      className="
+        inline-flex size-6 items-center justify-center rounded-full
+        hover:bg-surface-2
+      "
       aria-label="コピー"
       onClick={() =>
         void navigator.clipboard.writeText(code).then(() => {
@@ -67,13 +75,16 @@ export function InviteCodeItems({
   deletingCode,
 }: RowsProps) {
   return codes.map((code) => (
-    <li key={code.code} className="list-row items-center">
-      <div className="min-w-0">
+    <li
+      key={code.code}
+      className="flex items-center gap-3 border-b border-line px-4 py-3"
+    >
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
           <span className="font-mono">{code.code}</span>
           {!code.usedAt && !isExpired(code) && <CopyButton code={code.code} />}
         </div>
-        <div className="text-sm text-base-content/60">
+        <div className="text-sm text-muted">
           {code.usedBy && (
             <>
               {code.usedBy.avatar ? (
@@ -85,7 +96,7 @@ export function InviteCodeItems({
               ) : (
                 <span
                   className="
-                    inline-block size-4 rounded-full bg-base-200
+                    inline-block size-4 rounded-full bg-surface-2
                     align-text-bottom
                   "
                 />
@@ -109,7 +120,11 @@ export function InviteCodeItems({
           {(open) => (
             <button
               type="button"
-              className="btn btn-square btn-ghost btn-sm"
+              className="
+                inline-flex size-8 items-center justify-center rounded-full
+                hover:bg-surface-2
+                disabled:opacity-50
+              "
               aria-label="削除"
               onClick={() =>
                 isExpired(code) ? onDeleteCode(code.code) : open()
@@ -117,9 +132,9 @@ export function InviteCodeItems({
               disabled={deletingCode === code.code}
             >
               {deletingCode === code.code ? (
-                <span className="loading loading-sm loading-spinner" />
+                <LoaderCircleIcon className="size-4 animate-spin" />
               ) : (
-                <Trash2Icon className="size-4 text-error" />
+                <Trash2Icon className="size-4 text-danger" />
               )}
             </button>
           )}
@@ -141,20 +156,29 @@ export function InviteCodeList({
 }: Props) {
   return (
     <div>
-      <div className="flex items-center justify-between p-4">
-        <h1 className="text-xl font-bold">招待コード</h1>
+      <div
+        className="
+          flex items-center justify-between border-b border-line px-4 py-3
+        "
+      >
+        <h1 className="text-lg font-bold">招待コード</h1>
         <button
           type="button"
-          className="btn btn-primary btn-sm"
+          className="
+            rounded-full bg-brand px-4 py-1.5 text-sm font-bold text-on-brand
+            disabled:opacity-50
+          "
           onClick={onCreateCode}
           disabled={isCreating}
         >
           {isCreating ? "作成中..." : "新規作成"}
         </button>
       </div>
-      <ul className="list" aria-label="招待コード">
+      <ul aria-label="招待コード">
         {codes.length === 0 ? (
-          <li className="py-8 text-center">招待コードはまだありません</li>
+          <li className="py-8 text-center text-muted">
+            招待コードはまだありません
+          </li>
         ) : (
           <InviteCodeItems
             codes={codes}
