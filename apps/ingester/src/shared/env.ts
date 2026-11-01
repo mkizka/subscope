@@ -11,10 +11,6 @@ const schema = z.object({
     .enum(["debug", "info", "warn", "error"])
     .default(match({ prod: "info", dev: "debug" })),
   PORT: z.coerce.number().default(3004),
-  TAP_URL: match({
-    prod: z.url(),
-    dev: z.url().default("http://localhost:2480"),
-  }),
   MODERATION_URL: z.url().default("wss://mod.bsky.app"),
   DISABLE_INGESTER: z.stringbool().default(false),
   REDIS_URL: z.url(),

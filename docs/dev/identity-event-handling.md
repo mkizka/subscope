@@ -8,21 +8,21 @@ Identity EventはAT Protocolにおいて、ユーザーのDIDドキュメント�
 
 - **変更内容は不明**: 何が変更されたかは示されず、IDの現在の状態が何であるかも保証されません
 - **ハンドル情報**: イベントには現在のハンドルが含まれる場合があります
-- **非同期処理**: Tapから受信後、BullMQジョブとして処理されます
+- **ackの送信**: Workerが処理を終えてからTapにackを送ります
 
 参考: https://atproto.com/ja/specs/sync
 
 ## 処理フロー
 
 ```
-Tap → Ingester → BullMQ Queue → Worker → UpsertIdentityUseCase → ActorRepository
+Tap → Worker(TapSubscriber) → UpsertIdentityUseCase → ActorRepository
 ```
 
-### 1. Ingester (HandleIdentityUseCase)
+### 1. Worker (TapSubscriber)
 
 - TapからIdentity Eventを受信
-- メトリクスを記録（ハンドル変更の有無、遅延時間）
-- BullMQの"identity"キューにジョブを追加
+- メトリクスを記録
+- UpsertIdentityUseCaseで処理し、終えたらTapにackを送る
 
 ### 2. Worker (UpsertIdentityUseCase)
 

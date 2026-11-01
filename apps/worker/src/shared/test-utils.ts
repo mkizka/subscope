@@ -37,6 +37,7 @@ export const testEnv = {
   REDIS_URL: "redis://localhost:6379",
   TAP_URL: "http://localhost:2480",
   MODERATION_URL: "https://mod.bsky.app",
+  TAP_CONCURRENCY: 64,
   COMMIT_WORKER_CONCURRENCY: 128,
   DATABASE_POOL_MAX: 32,
 } satisfies Env;

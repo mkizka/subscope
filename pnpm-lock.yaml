@@ -293,15 +293,6 @@ importers:
 
   apps/ingester:
     dependencies:
-      '@atproto/did':
-        specifier: 0.5.6
-        version: 0.5.6
-      '@atproto/lex':
-        specifier: 0.4.2
-        version: 0.4.2
-      '@atproto/tap':
-        specifier: 0.4.16
-        version: 0.4.16
       '@atproto/xrpc-server':
         specifier: 0.13.6
         version: 0.13.6(supports-color@7.2.0)
@@ -529,6 +520,9 @@ importers:
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
+      '@atproto/tap':
+        specifier: 0.4.16
+        version: 0.4.16
       '@gyaku/di':
         specifier: 5.0.0
         version: 5.0.0
