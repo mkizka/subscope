@@ -1,10 +1,16 @@
 import { clsx } from "clsx";
 import { type Ref, useId, useState } from "react";
 
+import { Avatar } from "@/app/components/ui/avatar";
 import { Button, buttonClass } from "@/app/components/ui/button";
 import { Dialog } from "@/app/components/ui/dialog";
 import { Input } from "@/app/components/ui/input";
-import { Textarea } from "@/app/components/ui/textarea";
+import {
+  formatRelativeTime,
+  type PostCardProps,
+  QuotedPost,
+} from "@/app/features/timeline/parts/post-card";
+import { useHydrated } from "@/app/lib/use-hydrated";
 
 export const MAX_POST_LENGTH = 300;
 export const MAX_IMAGES = 4;
@@ -20,12 +26,43 @@ export const REPLY_RULES = [
 
 export type ReplyRule = (typeof REPLY_RULES)[number]["rule"];
 
+export type ComposePost = Pick<
+  PostCardProps,
+  "authorAvatar" | "authorDisplayName" | "authorHandle" | "text" | "createdAt"
+>;
+
+const TITLES = { reply: "返信", quote: "引用" };
+
+function Author({
+  displayName,
+  handle,
+  createdAt,
+}: {
+  displayName?: string;
+  handle?: string;
+  createdAt?: string;
+}) {
+  const hydrated = useHydrated();
+  return (
+    <div className="flex items-baseline gap-2 text-label">
+      <span className="truncate font-bold">{displayName ?? handle}</span>
+      <span className="truncate text-muted">@{handle}</span>
+      {createdAt && hydrated && (
+        <span className="shrink-0 text-muted">
+          {formatRelativeTime(createdAt)}
+        </span>
+      )}
+    </div>
+  );
+}
+
 type Props = {
   ref?: Ref<HTMLDialogElement>;
   open?: boolean;
   isSubmitting: boolean;
   error?: string;
-  context?: string;
+  author?: { avatarUrl?: string; displayName?: string; handle?: string };
+  target?: { type: "reply" | "quote"; post: ComposePost };
   onCancel: () => void;
   onClose?: () => void;
   onSubmit: (formData: FormData) => void;
@@ -36,7 +73,8 @@ export function PostForm({
   open,
   isSubmitting,
   error,
-  context,
+  author,
+  target,
   onCancel,
   onClose,
   onSubmit,
@@ -51,7 +89,7 @@ export function PostForm({
     <Dialog
       ref={ref}
       open={open}
-      title={context ?? "新規投稿"}
+      title={target ? TITLES[target.type] : "新規投稿"}
       onClose={onClose}
       actions={
         <>
@@ -67,7 +105,7 @@ export function PostForm({
               length > MAX_POST_LENGTH
             }
           >
-            投稿
+            {target?.type === "reply" ? "返信" : "投稿"}
           </Button>
         </>
       }
@@ -86,43 +124,71 @@ export function PostForm({
           onSubmit(formData);
         }}
       >
-        <Textarea
-          placeholder="いまどうしてる？"
-          name="text"
-          aria-label="投稿内容"
-          rows={4}
-          autoFocus
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        {images.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {images.map(({ file, url }, i) => (
-              <div key={url} className="flex flex-col gap-1">
-                <img
-                  src={url}
-                  alt=""
-                  className="h-24 w-full rounded-xl object-cover"
-                />
-                <Input
-                  name="alt"
-                  aria-label={`画像${i + 1}のALT`}
-                  placeholder="ALT"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    setImages(images.filter((it) => it.file !== file))
-                  }
-                >
-                  削除
-                </Button>
-              </div>
-            ))}
-          </div>
+        {target?.type === "reply" && (
+          <article aria-label="返信先" className="flex gap-3">
+            <div className="flex flex-col items-center gap-1">
+              <Avatar src={target.post.authorAvatar} />
+              <div className="w-0.5 flex-1 bg-line" />
+            </div>
+            <div className="min-w-0 flex-1 pb-3">
+              <Author
+                displayName={target.post.authorDisplayName}
+                handle={target.post.authorHandle}
+                createdAt={target.post.createdAt}
+              />
+              <p className="line-clamp-3 wrap-break-word whitespace-pre-wrap">
+                {target.post.text}
+              </p>
+            </div>
+          </article>
         )}
+        <div className="flex gap-3">
+          <Avatar src={author?.avatarUrl} />
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            {author && (
+              <Author displayName={author.displayName} handle={author.handle} />
+            )}
+            <textarea
+              placeholder="いまどうしてる？"
+              name="text"
+              aria-label="投稿内容"
+              rows={4}
+              autoFocus
+              className="resize-none bg-transparent text-body outline-none"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+            {images.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {images.map(({ file, url }, i) => (
+                  <div key={url} className="flex flex-col gap-1">
+                    <img
+                      src={url}
+                      alt=""
+                      className="h-24 w-full rounded-xl object-cover"
+                    />
+                    <Input
+                      name="alt"
+                      aria-label={`画像${i + 1}のALT`}
+                      placeholder="ALT"
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        setImages(images.filter((it) => it.file !== file))
+                      }
+                    >
+                      削除
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {target?.type === "quote" && <QuotedPost quote={target.post} />}
+          </div>
+        </div>
         <fieldset
           className={`flex flex-wrap items-center gap-3 text-label text-muted`}
         >

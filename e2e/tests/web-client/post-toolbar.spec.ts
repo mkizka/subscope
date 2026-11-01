@@ -79,18 +79,20 @@ const composeCases = [
   {
     id: "post-toolbar-3",
     name: "返信",
+    submit: "返信",
     title: "返信ボタンで投稿欄が開き、投稿するとその投稿への返信になる",
     subjectOf: (record: PostRecord) => record.reply?.parent.uri,
   },
   {
     id: "post-toolbar-4",
     name: "引用",
+    submit: "投稿",
     title: "引用ボタンで投稿欄が開き、投稿するとその投稿を引用した投稿になる",
     subjectOf: (record: PostRecord) => record.embed?.record?.uri,
   },
 ];
 
-for (const { id, name, title, subjectOf } of composeCases) {
+for (const { id, name, submit, title, subjectOf } of composeCases) {
   test(`${id}: ${title}`, async ({ page, request }) => {
     const text = `${id}: 投稿`;
     const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
@@ -108,7 +110,10 @@ for (const { id, name, title, subjectOf } of composeCases) {
     await page
       .getByRole("textbox", { name: "投稿内容" })
       .fill(`${id}: ${name}`);
-    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: submit, exact: true })
+      .click();
 
     await expect
       .poll(async () => {
@@ -253,7 +258,10 @@ test("post-toolbar-8: 返信を投稿すると、再読み込みなしで返信�
   await page
     .getByRole("textbox", { name: "投稿内容" })
     .fill("post-toolbar-8: 返信");
-  await page.getByRole("button", { name: "投稿", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "返信", exact: true })
+    .click();
 
   await expect(post.getByTitle("1件の返信")).toHaveText("1");
 });
