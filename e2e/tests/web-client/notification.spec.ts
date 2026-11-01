@@ -191,11 +191,11 @@ test.describe("通知（PC）", () => {
       .getByRole("listitem")
       .first();
     await expect(notification).toHaveText("Bobさんにフォローされました");
-    await expect(notification).toHaveClass(/bg-base-200/);
+    await expect(notification).toHaveClass(/bg-brand-soft/);
 
     await expect(async () => {
       await page.reload();
-      await expect(notification).not.toHaveClass(/bg-base-200/, {
+      await expect(notification).not.toHaveClass(/bg-brand-soft/, {
         timeout: 1000,
       });
     }).toPass();

@@ -2,6 +2,8 @@ import { BellIcon, CircleUserIcon, HomeIcon, SearchIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 
+import { Badge } from "@/app/components/ui/badge";
+
 type Props = {
   profileId?: string;
   unreadCount: number;
@@ -21,7 +23,7 @@ function Tab({
       to={to}
       end
       className={({ isActive }) =>
-        `relative flex flex-col items-center gap-0.5 py-2 text-xs ${isActive ? "text-primary" : "text-base-content/70"}`
+        `relative flex flex-col items-center gap-1 py-2 text-caption ${isActive ? "font-bold text-ink" : "text-muted"}`
       }
     >
       {icon}
@@ -35,8 +37,8 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
     <nav
       aria-label="タブバー"
       className="
-        fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-base-300
-        bg-base-100
+        fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-line
+        bg-surface
         lg:hidden
       "
     >
@@ -49,13 +51,8 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
       <Tab to="/notifications" icon={<BellIcon className="size-6" />}>
         通知
         {unreadCount > 0 && (
-          <span
-            className="
-              absolute top-1 left-1/2 ml-1 rounded-full bg-primary px-1.5
-              text-[10px] text-primary-content
-            "
-          >
-            {unreadCount}
+          <span className="absolute top-1 left-1/2 ml-1">
+            <Badge variant="count">{unreadCount}</Badge>
           </span>
         )}
       </Tab>

@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import {
   BellIcon,
   CircleUserIcon,
@@ -14,6 +15,9 @@ import {
 import type { ReactNode } from "react";
 import { Form, NavLink } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+import { buttonClass } from "@/app/components/ui/button";
+import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -22,6 +26,11 @@ type Props = {
   handle?: string;
   isAdmin?: boolean;
 };
+
+const itemClass = `
+  flex items-center gap-3 rounded-xl px-3 py-2 text-body
+  hover:bg-surface-2
+`;
 
 function NavItem({
   to,
@@ -37,7 +46,9 @@ function NavItem({
       <NavLink
         to={to}
         end
-        className={({ isActive }) => (isActive ? "menu-active" : undefined)}
+        className={({ isActive }) =>
+          `${itemClass} ${isActive ? "bg-surface-2 font-bold" : ""}`
+        }
       >
         {icon}
         {children}
@@ -48,64 +59,74 @@ function NavItem({
 
 export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
   return (
-    <nav className="flex h-full flex-col">
-      <div className="p-4 text-lg font-bold text-primary">Subscope</div>
-      <ul className="menu w-full flex-1">
-        <NavItem to="/" icon={<HomeIcon className="size-4" />}>
+    <nav className="flex h-full flex-col p-4">
+      <div className="mb-2 flex items-center gap-2 px-3 text-title">
+        <img src="/favicon.svg" alt="" className="size-8" />
+        Subscope
+      </div>
+      <ul className="flex flex-1 flex-col gap-1">
+        <NavItem to="/" icon={<HomeIcon className="size-6" />}>
           ホーム
         </NavItem>
-        <NavItem to="/search" icon={<SearchIcon className="size-4" />}>
+        <NavItem to="/search" icon={<SearchIcon className="size-6" />}>
           検索
         </NavItem>
-        <NavItem to="/notifications" icon={<BellIcon className="size-4" />}>
+        <NavItem to="/notifications" icon={<BellIcon className="size-6" />}>
           通知
         </NavItem>
-        <NavItem to="/members" icon={<UsersIcon className="size-4" />}>
+        <NavItem to="/members" icon={<UsersIcon className="size-6" />}>
           メンバー
         </NavItem>
-        <NavItem to="/tracked-actors" icon={<RadarIcon className="size-4" />}>
+        <NavItem to="/tracked-actors" icon={<RadarIcon className="size-6" />}>
           追跡中のユーザー
         </NavItem>
         {profileId ? (
           <NavItem
             to={`/profile/${profileId}`}
-            icon={<CircleUserIcon className="size-4" />}
+            icon={<CircleUserIcon className="size-6" />}
           >
             プロフィール
           </NavItem>
         ) : (
           <li>
-            <a>
-              <CircleUserIcon className="size-4" />
+            <a className={itemClass}>
+              <CircleUserIcon className="size-6" />
               プロフィール
             </a>
           </li>
         )}
         <li className="mt-2">
-          <ComposeButton className="btn btn-primary">新規投稿</ComposeButton>
+          <ComposeButton className={clsx(buttonClass(), "w-full")}>
+            新規投稿
+          </ComposeButton>
         </li>
         {isAdmin && (
           <li className="mt-auto">
-            <h2 className="menu-title">サーバー管理</h2>
-            <ul>
+            <h2 className="px-3 py-2 text-caption text-muted">サーバー管理</h2>
+            <ul className="flex flex-col gap-1">
               <NavItem
                 to="/admin/subscribers"
-                icon={<UsersIcon className="size-4" />}
+                icon={<UsersIcon className="size-6" />}
               >
                 登録ユーザー
               </NavItem>
               <NavItem
                 to="/admin/invite-codes"
-                icon={<MailIcon className="size-4" />}
+                icon={<MailIcon className="size-6" />}
               >
                 招待コード
               </NavItem>
               <li>
-                <a href="/admin/bull-board" target="_blank" rel="noreferrer">
-                  <ListIcon className="size-4" />
+                <a
+                  href="/admin/bull-board"
+                  target="_blank"
+                  rel="noreferrer"
+                  className={itemClass}
+                >
+                  <ListIcon className="size-6" />
                   ジョブキュー
                   <ExternalLinkIcon
-                    className="size-3.5"
+                    className="size-4"
                     aria-hidden
                     data-testid="external-link-icon"
                   />
@@ -115,42 +136,24 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
           </li>
         )}
       </ul>
-      <div className="flex items-center gap-2 border-t border-base-300 p-4">
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt=""
-            className="size-8 rounded-full object-cover"
-          />
-        ) : (
-          <div className="size-8 rounded-full bg-base-300" />
-        )}
+      <div className="flex items-center gap-2 border-t border-line pt-4">
+        <Avatar src={avatarUrl} size="sm" />
         {handle && (
-          <span className="min-w-0 flex-1 truncate text-sm">@{handle}</span>
+          <span className="min-w-0 flex-1 truncate text-label text-muted">
+            @{handle}
+          </span>
         )}
-        <div className="dropdown dropdown-end dropdown-top ml-auto">
-          <button
-            type="button"
-            className="btn btn-square btn-ghost btn-sm"
-            aria-label="アカウントメニュー"
-          >
-            <EllipsisIcon className="size-4" />
+        <Menu
+          label="アカウントメニュー"
+          placement="top"
+          trigger={<EllipsisIcon className="size-4" />}
+        >
+          <button type="submit" form="logout-form" className={menuItemClass}>
+            <LogOutIcon className="size-4" />
+            ログアウト
           </button>
-          <ul
-            className="
-              menu dropdown-content z-10 w-40 rounded-box border border-base-300
-              bg-base-100 p-2 shadow-sm
-            "
-          >
-            <li>
-              <button type="submit" form="logout-form">
-                <LogOutIcon className="size-4" />
-                ログアウト
-              </button>
-            </li>
-          </ul>
-          <Form id="logout-form" method="post" action="/oauth/logout" />
-        </div>
+        </Menu>
+        <Form id="logout-form" method="post" action="/oauth/logout" />
       </div>
     </nav>
   );

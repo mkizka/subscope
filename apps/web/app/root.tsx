@@ -49,12 +49,10 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       {navigation.state === "loading" && (
-        <progress
-          className="
-            progress fixed inset-x-0 top-0 z-50 h-1 rounded-none
-            progress-primary
-          "
+        <div
+          role="progressbar"
           aria-label="読み込み中"
+          className="fixed inset-x-0 top-0 z-50 h-1 bg-brand"
         />
       )}
       <ComposeProvider>
