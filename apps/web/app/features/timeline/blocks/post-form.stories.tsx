@@ -11,6 +11,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    open: true,
     isSubmitting: false,
     onCancel: () => {},
     onSubmit: () => {},
