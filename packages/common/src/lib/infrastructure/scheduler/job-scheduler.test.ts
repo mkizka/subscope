@@ -108,31 +108,23 @@ describe("JobScheduler", () => {
   });
 
   describe("scheduleAggregatePostStats", () => {
-    test("aggregatePostStatsジョブをスケジュールする", async () => {
+    test("投稿のURIを集計待ちに追加してaggregatePostStatsジョブをスケジュールする", async () => {
       // arrange
       const uri = AtUri.make("did:plc:test", "app.bsky.feed.post", "test-rkey");
 
       // act
-      await jobScheduler.scheduleAggregatePostStats(uri, "reply");
+      await jobScheduler.scheduleAggregatePostStats(uri);
 
       // assert
-      const jobs = jobQueue.getJobs();
-      expect(jobs).toHaveLength(1);
-      expect(jobs[0]).toMatchObject({
-        queueName: "aggregatePostStats",
-        jobName: uri.toString(),
-        data: {
-          uri: uri.toString(),
-          type: "reply",
+      expect(jobQueue.getBatchItems("aggregatePostStats")).toEqual([
+        uri.toString(),
+      ]);
+      expect(jobQueue.getJobs()).toMatchObject([
+        {
+          queueName: "aggregatePostStats",
+          options: { delay: AGGREGATE_STATS_DELAY_MS },
         },
-        options: {
-          deduplication: {
-            id: `reply__${uri.toString()}`,
-            keepLastIfActive: true,
-          },
-          delay: AGGREGATE_STATS_DELAY_MS,
-        },
-      });
+      ]);
     });
   });
 

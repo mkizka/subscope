@@ -20,7 +20,6 @@ import { InMemoryListItemRepository } from "../infrastructure/repositories/list-
 import { InMemoryListRepository } from "../infrastructure/repositories/list-repository/list-repository.in-memory.js";
 import { InMemoryNotificationRepository } from "../infrastructure/repositories/notification-repository/notification-repository.in-memory.js";
 import { InMemoryPostRepository } from "../infrastructure/repositories/post-repository/post-repository.in-memory.js";
-import { InMemoryPostStatsRepository } from "../infrastructure/repositories/post-stats-repository/post-stats-repository.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/repositories/profile-repository/profile-repository.in-memory.js";
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.in-memory.js";
@@ -57,7 +56,6 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("listItemRepository", asClassArgs(InMemoryListItemRepository))
   .replaceService("notificationRepository", asClassArgs(InMemoryNotificationRepository))
   .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
-  .replaceService("postStatsRepository", asClassArgs(InMemoryPostStatsRepository))
   .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
   .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
   .replaceService("recordRevRepository", asClassArgs(InMemoryRecordRevRepository))

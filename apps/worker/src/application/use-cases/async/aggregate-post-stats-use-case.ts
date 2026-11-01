@@ -1,39 +1,33 @@
-import { AtUri } from "@atproto/syntax";
-import type { DatabaseClient } from "@repo/common/domain";
+import type { DatabaseClient, IJobQueue } from "@repo/common/domain";
 
-import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";
-import type { AggregatePostStatsCommand } from "./aggregate-post-stats-command.js";
+
+const BATCH_SIZE = 1000;
 
 export class AggregatePostStatsUseCase {
   constructor(
     private readonly postStatsRepository: IPostStatsRepository,
-    private readonly postRepository: IPostRepository,
+    private readonly jobQueue: IJobQueue,
     private readonly db: DatabaseClient,
   ) {}
 
-  async execute(command: AggregatePostStatsCommand) {
+  async execute() {
     const ctx = { db: this.db };
-    const uri = new AtUri(command.uri);
-
-    const postExists = await this.postRepository.exists(ctx, uri);
-    if (!postExists) {
-      await command.jobLogger.log(
-        `Skipping aggregation for ${command.uri} - post not found`,
+    for (;;) {
+      const uris = await this.jobQueue.popBatchItems(
+        "aggregatePostStats",
+        BATCH_SIZE,
       );
-      return;
-    }
-
-    if (command.type === "reply") {
-      await this.postStatsRepository.upsertReplyCount({ ctx, uri });
-    } else if (command.type === "repost") {
-      await this.postStatsRepository.upsertRepostCount({ ctx, uri });
-    } else if (command.type === "quote") {
-      await this.postStatsRepository.upsertQuoteCount({ ctx, uri });
-    } else if (command.type === "like") {
-      await this.postStatsRepository.upsertLikeCount({ ctx, uri });
-    } else {
-      await this.postStatsRepository.upsertAllCount({ ctx, uri });
+      if (uris.length === 0) return;
+      try {
+        await this.postStatsRepository.upsertMany({ ctx, uris });
+      } catch (error) {
+        await this.jobQueue.addBatchItems({
+          queueName: "aggregatePostStats",
+          items: uris,
+        });
+        throw error;
+      }
     }
   }
 }

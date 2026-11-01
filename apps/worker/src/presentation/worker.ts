@@ -4,7 +4,6 @@ import { Worker } from "bullmq";
 
 import { aggregateActorStatsCommandFactory } from "../application/use-cases/async/aggregate-actor-stats-command.js";
 import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
-import { aggregatePostStatsCommandFactory } from "../application/use-cases/async/aggregate-post-stats-command.js";
 import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
 import type { ResolveDidUseCase } from "../application/use-cases/async/resolve-did-use-case.js";
@@ -118,17 +117,9 @@ export class SyncWorker {
           },
         },
       ),
-      createWorker(
-        "aggregatePostStats",
-        async (job) => {
-          const command = aggregatePostStatsCommandFactory({
-            data: job.data,
-            jobLogger: createJobLogger(job),
-          });
-          await aggregatePostStatsUseCase.execute(command);
-        },
-        { concurrency: 16 },
-      ),
+      createWorker("aggregatePostStats", async () => {
+        await aggregatePostStatsUseCase.execute();
+      }),
       createWorker(
         "aggregateActorStats",
         async (job) => {

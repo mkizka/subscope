@@ -18,11 +18,6 @@ interface ScheduledSyncTapRepo {
   did: Did;
 }
 
-interface ScheduledAggregatePostStats {
-  uri: AtUri;
-  type: JobData["aggregatePostStats"]["type"];
-}
-
 interface ScheduledAggregateActorStats {
   did: Did;
   type: JobData["aggregateActorStats"]["type"];
@@ -32,7 +27,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
   private fetchRecordJobs: ScheduledFetchRecord[] = [];
   private resolveDidJobs: ScheduledResolveDid[] = [];
   private syncTapRepoJobs: ScheduledSyncTapRepo[] = [];
-  private aggregatePostStatsJobs: ScheduledAggregatePostStats[] = [];
+  private aggregatePostStatsUris: AtUri[] = [];
   private aggregateActorStatsJobs: ScheduledAggregateActorStats[] = [];
 
   async scheduleFetchRecord(
@@ -50,11 +45,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.syncTapRepoJobs.push({ did });
   }
 
-  async scheduleAggregatePostStats(
-    uri: AtUri,
-    type: JobData["aggregatePostStats"]["type"],
-  ): Promise<void> {
-    this.aggregatePostStatsJobs.push({ uri, type });
+  async scheduleAggregatePostStats(uri: AtUri): Promise<void> {
+    this.aggregatePostStatsUris.push(uri);
   }
 
   async scheduleAggregateActorStats(
@@ -76,8 +68,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     return this.syncTapRepoJobs;
   }
 
-  getAggregatePostStatsJobs(): readonly ScheduledAggregatePostStats[] {
-    return this.aggregatePostStatsJobs;
+  getAggregatePostStatsUris(): readonly AtUri[] {
+    return this.aggregatePostStatsUris;
   }
 
   getAggregateActorStatsJobs(): readonly ScheduledAggregateActorStats[] {
@@ -88,7 +80,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.fetchRecordJobs = [];
     this.resolveDidJobs = [];
     this.syncTapRepoJobs = [];
-    this.aggregatePostStatsJobs = [];
+    this.aggregatePostStatsUris = [];
     this.aggregateActorStatsJobs = [];
   }
 }

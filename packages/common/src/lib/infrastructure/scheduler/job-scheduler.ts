@@ -49,22 +49,11 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleAggregatePostStats(
-    uri: AtUri,
-    type: JobData["aggregatePostStats"]["type"],
-  ): Promise<void> {
-    const postUri = uri.toString();
-    await this.jobQueue.add({
+  async scheduleAggregatePostStats(uri: AtUri): Promise<void> {
+    await this.jobQueue.addBatchItems({
       queueName: "aggregatePostStats",
-      jobName: postUri,
-      data: {
-        uri: postUri,
-        type,
-      },
-      options: {
-        deduplication: { id: `${type}__${postUri}`, keepLastIfActive: true },
-        delay: AGGREGATE_STATS_DELAY_MS,
-      },
+      items: [uri.toString()],
+      options: { delay: AGGREGATE_STATS_DELAY_MS },
     });
   }
 
