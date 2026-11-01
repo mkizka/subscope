@@ -15,18 +15,27 @@ async function fetchMe(): Promise<MeResponse> {
   return response.json() as Promise<MeResponse>;
 }
 
-export function SideNavContainer() {
+export function useMe() {
   const { data } = useQuery({
     queryKey: ["me"],
     queryFn: fetchMe,
   });
+  if (!data) return undefined;
+  return {
+    ...data,
+    profileId: data.handle === "handle.invalid" ? data.did : data.handle,
+  };
+}
+
+export function SideNavContainer() {
+  const me = useMe();
 
   return (
     <SideNav
-      did={data?.did}
-      avatarUrl={data?.avatarUrl}
-      handle={data?.handle}
-      isAdmin={data?.isAdmin}
+      profileId={me?.profileId}
+      avatarUrl={me?.avatarUrl}
+      handle={me?.handle}
+      isAdmin={me?.isAdmin}
     />
   );
 }
