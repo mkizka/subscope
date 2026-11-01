@@ -92,6 +92,7 @@ export default defineRailway(() => {
       APPVIEW_URL: "https://${{Appview.RAILWAY_PUBLIC_DOMAIN}}",
       COOKIE_SECRET: preserve(),
       PRIVATE_KEY_ES256_B64: preserve(),
+      ADMIN_API_TOKEN: preserve(),
     },
   });
 

@@ -14,5 +14,6 @@
 2. トークンをGitHubリポジトリのシークレット `RAILWAY_TOKEN` に登録する
 3. `.railway/**` を変更するPRをマージしてapplyする(手元で `railway link` して `railway config apply` してもよい)
 4. Webの `COOKIE_SECRET` と `PRIVATE_KEY_ES256_B64` をダッシュボードで設定する(値の作り方は `apps/web/app/server/env.ts` のコメントを参照)
-5. Grafanaの `GF_SECURITY_ADMIN_PASSWORD` をダッシュボードで設定する(未設定だとGrafanaは起動しない)
-6. `railway.ts` の `domains` に書いたカスタムドメインのDNSレコードを、ダッシュボードの表示どおりに設定する
+5. 運用の調査でClaudeなどにジョブキューを読ませる場合は、Webの `ADMIN_API_TOKEN` をダッシュボードで設定する
+6. Grafanaの `GF_SECURITY_ADMIN_PASSWORD` をダッシュボードで設定する(未設定だとGrafanaは起動しない)
+7. `railway.ts` の `domains` に書いたカスタムドメインのDNSレコードを、ダッシュボードの表示どおりに設定する

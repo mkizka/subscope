@@ -14,6 +14,9 @@ const DEVELOPMENT_PRIVATE_KEY =
 const DEVELOPMENT_COOKIE_SECRET =
   "9k+IXwNgwmTlwte3xCOm+iy1qhUkKku7+wUpveFPe9y2";
 
+const DEVELOPMENT_ADMIN_API_TOKEN =
+  "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
+
 const schema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]),
@@ -42,6 +45,11 @@ const schema = z
     PRIVATE_KEY_ES256_B64: match({
       prod: z.string(),
       dev: z.string().default(DEVELOPMENT_PRIVATE_KEY),
+    }),
+    // openssl rand -base64 33
+    ADMIN_API_TOKEN: match({
+      prod: z.string().min(32).optional(),
+      dev: z.string().min(32).default(DEVELOPMENT_ADMIN_API_TOKEN),
     }),
     ATPROTO_PLC_URL: z.string().default("https://plc.directory"),
     ATPROTO_HANDLE_RESOLVER_URL: z.url().optional(),
