@@ -73,3 +73,17 @@ export const WithQuote: Story = {
     },
   },
 };
+
+export const WithExternal: Story = {
+  args: {
+    authorHandle: "frank.bsky.social",
+    authorDisplayName: "Frank",
+    text: "Subscopeのリポジトリです。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    external: {
+      uri: "https://github.com/mkizka/subscope",
+      title: "mkizka/subscope",
+      description: "省ストレージを目指したBluesky互換AppView",
+    },
+  },
+};

@@ -1,3 +1,4 @@
+import { view as externalView } from "@repo/client/lex/app/bsky/embed/external";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import {
   view as recordView,
@@ -31,6 +32,12 @@ export type TimelinePostDto = {
   likeCount?: number;
   createdAt?: string;
   images?: { thumb: string; fullsize: string; alt: string }[];
+  external?: {
+    uri: string;
+    title: string;
+    description: string;
+    thumb?: string;
+  };
   quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };
@@ -117,6 +124,7 @@ export function toTimelinePost({
     repostCount: post.repostCount,
     likeCount: post.likeCount,
     images: imagesView.matches(media) ? media.images : undefined,
+    external: externalView.matches(media) ? media.external : undefined,
     quote: viewRecord.matches(quoted)
       ? {
           authorDisplayName: quoted.author.displayName,

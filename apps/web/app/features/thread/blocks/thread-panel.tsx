@@ -6,6 +6,7 @@ import type { ComposeTarget } from "@/app/features/timeline/blocks/post-form-con
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import {
+  ExternalCard,
   PostCard,
   type PostCardProps,
   ProfileLink,
@@ -33,6 +34,7 @@ function FocusedPost({
   text,
   links,
   images,
+  external,
   quote,
   createdAt,
   replyCount,
@@ -80,6 +82,7 @@ function FocusedPost({
         {text && <RichText text={text} links={links} />}
       </p>
       {images && <PostImages images={images} />}
+      {external && <ExternalCard external={external} />}
       {quote && <QuotedPost quote={quote} />}
       {createdAt && (
         <time
