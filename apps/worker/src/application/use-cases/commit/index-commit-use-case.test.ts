@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
-import { actorFactory, subscriptionFactory } from "@repo/common/test";
+import { actorFactory, fakeCid, subscriptionFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -12,6 +12,7 @@ describe("IndexCommitUseCase", () => {
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
+  let likeRepo: TestServices["likeRepository"];
   let db: TestServices["db"];
   let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
@@ -21,6 +22,7 @@ describe("IndexCommitUseCase", () => {
     subscriptionRepo = services.subscriptionRepository;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
+    likeRepo = services.likeRepository;
     db = services.db;
     ctx = { db };
   });
@@ -148,14 +150,65 @@ describe("IndexCommitUseCase", () => {
       expect(
         await recordRepo.findByUri({ ctx, uri: postgate.uri }),
       ).not.toBeNull();
+      expect(
+        await recordRepo.findByUri({ ctx, uri: mismatched.uri }),
+      ).toBeNull();
       expect(jobLogger.log).toHaveBeenCalledWith(
-        expect.stringMatching(
-          new RegExp(
-            `^Record validation error: .*${mismatched.uri.toString()}$`,
-          ),
-        ),
+        "Indexing completed successfully.",
       );
     });
+
+    test.each([
+      { name: "いいねした人がサブスクライバー", liker: true, author: false },
+      { name: "投稿の作者がサブスクライバー", liker: false, author: true },
+      { name: "どちらもサブスクライバーでない", liker: false, author: false },
+    ])(
+      "index-11: いいねは、いいねした人かいいねされた投稿の作者がサブスクライバーのものだけ保存する($name)",
+      async ({ liker, author }) => {
+        // arrange
+        const likerActor = actorFactory();
+        const authorActor = actorFactory();
+        if (liker) {
+          subscriptionRepo.add(
+            subscriptionFactory({ actorDid: likerActor.did }),
+          );
+        }
+        if (author) {
+          subscriptionRepo.add(
+            subscriptionFactory({ actorDid: authorActor.did }),
+          );
+        }
+        const uri = new AtUri(`at://${likerActor.did}/app.bsky.feed.like/123`);
+        const record = Record.create({
+          uri,
+          cid: "cid123",
+          json: {
+            $type: "app.bsky.feed.like",
+            subject: {
+              uri: `at://${authorActor.did}/app.bsky.feed.post/123`,
+              cid: fakeCid(),
+            },
+            createdAt: new Date().toISOString(),
+          },
+        });
+
+        // act
+        await indexCommitUseCase.execute({
+          commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
+          live: true,
+          jobLogger,
+        });
+
+        // assert
+        expect(likeRepo.findByUri(uri) !== null).toBe(liker || author);
+        expect((await recordRepo.findByUri({ ctx, uri })) !== null).toBe(
+          liker || author,
+        );
+        expect(jobLogger.log).toHaveBeenCalledWith(
+          "Indexing completed successfully.",
+        );
+      },
+    );
   });
 
   describe("deleteオペレーション", () => {

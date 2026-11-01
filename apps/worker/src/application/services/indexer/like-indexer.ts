@@ -3,7 +3,7 @@ import type {
   IJobScheduler,
   Record,
 } from "@repo/common/domain";
-import { Like, RecordValidationError } from "@repo/common/domain";
+import { Like } from "@repo/common/domain";
 
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
@@ -18,20 +18,28 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
+  async shouldIndex({
+    ctx,
+    record,
+  }: {
+    ctx: AfterCommitContext;
+    record: Record;
+  }) {
+    const like = Like.from(record);
+    return (
+      (await this.subscriptionRepository.isSubscriber(ctx, like.actorDid)) ||
+      (await this.subscriptionRepository.isSubscriber(
+        ctx,
+        like.subjectUri.host,
+      ))
+    );
+  }
+
   async upsert({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = Like.from(record);
     const recipientDid = like.subjectUri.host;
     const isRecipientSubscriber =
       await this.subscriptionRepository.isSubscriber(ctx, recipientDid);
-    if (
-      !isRecipientSubscriber &&
-      !(await this.subscriptionRepository.isSubscriber(ctx, like.actorDid))
-    ) {
-      throw new RecordValidationError(
-        "like is neither by nor to a subscriber",
-        record.uri,
-      );
-    }
     await this.likeRepository.upsert({ ctx, like });
 
     if (recipientDid !== like.actorDid && isRecipientSubscriber) {

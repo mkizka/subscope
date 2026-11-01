@@ -1,5 +1,4 @@
 import { AtUri } from "@atproto/syntax";
-import { RecordValidationError } from "@repo/common/domain";
 import {
   actorFactory,
   fakeCid,
@@ -112,65 +111,6 @@ describe("LikeIndexer", () => {
       expect(notificationRepo.findAll()).toMatchObject(expected);
     });
   });
-
-  test.each([
-    {
-      name: "いいねした人がサブスクライバー",
-      liker: true,
-      author: false,
-      saved: true,
-    },
-    {
-      name: "投稿の作者がサブスクライバー",
-      liker: false,
-      author: true,
-      saved: true,
-    },
-    {
-      name: "どちらもサブスクライバーでない",
-      liker: false,
-      author: false,
-      saved: false,
-    },
-  ])(
-    "index-11: いいねは、いいねした人かいいねされた投稿の作者がサブスクライバーのものだけ保存する($name)",
-    async ({ liker, author, saved }) => {
-      // arrange
-      const likerActor = actorFactory();
-      const authorActor = actorFactory();
-      if (liker) {
-        subscriptionRepo.add(subscriptionFactory({ actorDid: likerActor.did }));
-      }
-      if (author) {
-        subscriptionRepo.add(
-          subscriptionFactory({ actorDid: authorActor.did }),
-        );
-      }
-      const record = recordFactory({
-        uri: `at://${likerActor.did}/app.bsky.feed.like/likerkey`,
-        json: {
-          $type: "app.bsky.feed.like",
-          subject: {
-            uri: `at://${authorActor.did}/app.bsky.feed.post/123`,
-            cid: fakeCid(),
-          },
-          createdAt: new Date().toISOString(),
-        },
-      });
-
-      // act
-      const result = likeIndexer.upsert({ ctx: { db, afterCommit }, record });
-
-      // assert
-      if (saved) {
-        await result;
-        expect(likeRepo.findByUri(record.uri)).not.toBeNull();
-      } else {
-        await expect(result).rejects.toThrow(RecordValidationError);
-        expect(likeRepo.findByUri(record.uri)).toBeNull();
-      }
-    },
-  );
 
   describe("afterAction", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
