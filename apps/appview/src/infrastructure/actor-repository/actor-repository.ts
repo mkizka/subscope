@@ -95,14 +95,19 @@ export class ActorRepository implements IActorRepository {
       return new Map();
     }
     const targets = this.db
-      .select({ ownerDid: schema.actors.did, targetDid: schema.actors.did })
+      .select({
+        ownerDid: sql<string>`${schema.actors.did}`.as("owner_did"),
+        targetDid: sql<string>`${schema.actors.did}`.as("target_did"),
+      })
       .from(schema.actors)
       .where(inArray(schema.actors.did, dids))
       .unionAll(
         this.db
           .select({
-            ownerDid: schema.follows.actorDid,
-            targetDid: schema.follows.subjectDid,
+            ownerDid: sql<string>`${schema.follows.actorDid}`.as("owner_did"),
+            targetDid: sql<string>`${schema.follows.subjectDid}`.as(
+              "target_did",
+            ),
           })
           .from(schema.follows)
           .where(inArray(schema.follows.actorDid, dids)),
