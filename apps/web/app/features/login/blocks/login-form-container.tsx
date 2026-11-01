@@ -29,7 +29,7 @@ export const LoginFormContainer = () => {
     <LoginForm
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.identifier, { type: "text" })}
-      fields={fields}
+      error={fields.identifier.errors?.[0]}
     />
   );
 };

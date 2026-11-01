@@ -1,6 +1,7 @@
 import { CheckIcon, CopyIcon, HomeIcon } from "lucide-react";
 import { useState } from "react";
 
+import { Button, buttonClass } from "@/app/components/ui/button";
 import { ErrorIcon } from "@/app/features/error/parts/error-icon";
 
 type Props = {
@@ -36,31 +37,23 @@ export function ErrorCard({ title, details, status, stack }: Props) {
           <pre className="overflow-x-auto rounded-xl bg-surface-2 p-4 text-caption">
             <code>{stack}</code>
           </pre>
-          <button
-            type="button"
-            className="
-              absolute top-2 right-2 rounded-full p-2
-              hover:bg-line
-            "
-            onClick={handleCopy}
-            aria-label="スタックトレースをコピー"
-          >
-            {copied ? (
-              <CheckIcon className="size-4" />
-            ) : (
-              <CopyIcon className="size-4" />
-            )}
-          </button>
+          <div className="absolute top-2 right-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              aria-label="スタックトレースをコピー"
+            >
+              {copied ? (
+                <CheckIcon className="size-4" />
+              ) : (
+                <CopyIcon className="size-4" />
+              )}
+            </Button>
+          </div>
         </div>
       )}
-      <a
-        href="/"
-        className="
-          mt-2 flex items-center gap-2 rounded-full bg-brand px-5 py-2.5
-          font-bold text-on-brand
-          hover:opacity-90
-        "
-      >
+      <a href="/" className={buttonClass()}>
         <HomeIcon className="size-4" />
         ホームに戻る
       </a>

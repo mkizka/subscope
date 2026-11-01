@@ -1,53 +1,25 @@
 import type { ComponentProps } from "react";
 import { Form } from "react-router";
 
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+
 type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
-  fields: {
-    inviteCode: {
-      id: string;
-    };
-  };
   error?: string;
 };
 
-export function InviteCodeForm({
-  formProps,
-  inputProps,
-  fields,
-  error,
-}: Props) {
+export function InviteCodeForm({ formProps, inputProps, error }: Props) {
   return (
     <Form method="post" className="flex flex-col gap-4" {...formProps}>
-      <div className="flex flex-col gap-2">
-        <label htmlFor={fields.inviteCode.id} className="text-label">
-          招待コード
-        </label>
-        <input
-          className="
-            rounded-full border border-line bg-transparent px-4 py-2.5
-            outline-none
-            focus:border-brand
-          "
-          placeholder="subsco-me-abcde"
-          {...inputProps}
-        />
-        {error && (
-          <p role="alert" className="text-label text-danger">
-            {error}
-          </p>
-        )}
-      </div>
-      <button
-        type="submit"
-        className="
-          rounded-full bg-brand py-3 font-bold text-on-brand
-          hover:opacity-90
-        "
-      >
-        登録する
-      </button>
+      <Input
+        label="招待コード"
+        placeholder="subsco-me-abcde"
+        error={error}
+        {...inputProps}
+      />
+      <Button type="submit">登録する</Button>
     </Form>
   );
 }
