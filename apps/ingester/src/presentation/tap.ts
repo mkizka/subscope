@@ -1,3 +1,5 @@
+import { setTimeout } from "node:timers/promises";
+
 import { asDid } from "@atproto/did";
 import { lexToJson } from "@atproto/lex";
 import type { RecordEvent, TapHandler } from "@atproto/tap";
@@ -5,6 +7,7 @@ import { SimpleIndexer, Tap } from "@atproto/tap";
 import type {
   CommitEventDto,
   IdentityEventDto,
+  IJobQueue,
   ILoggerManager,
 } from "@repo/common/domain";
 import { isSupportedCollection } from "@repo/common/utils";
@@ -13,16 +16,20 @@ import type { HandleCommitUseCase } from "../application/handle-commit-use-case.
 import type { HandleIdentityUseCase } from "../application/handle-identity-use-case.js";
 
 const MAX_IN_FLIGHT_EVENTS = 64;
+const MAX_PENDING_COMMIT_JOBS = 10_000;
+const PENDING_CHECK_INTERVAL_MS = 1_000;
 
 export class TapIngester {
   private readonly tap;
   private readonly indexer;
   private readonly logger;
+  private nextCapacityCheckAt = 0;
 
   constructor(
     loggerManager: ILoggerManager,
     private readonly handleCommitUseCase: HandleCommitUseCase,
     private readonly handleIdentityUseCase: HandleIdentityUseCase,
+    private readonly jobQueue: IJobQueue,
     private readonly tapUrl: string,
   ) {
     this.logger = loggerManager.createLogger("TapIngester");
@@ -87,10 +94,21 @@ export class TapIngester {
     };
   }
 
+  private async waitForQueueCapacity() {
+    if (Date.now() < this.nextCapacityCheckAt) return;
+    while (
+      (await this.jobQueue.countPending("commit")) >= MAX_PENDING_COMMIT_JOBS
+    ) {
+      await setTimeout(PENDING_CHECK_INTERVAL_MS);
+    }
+    this.nextCapacityCheckAt = Date.now() + PENDING_CHECK_INTERVAL_MS;
+  }
+
   private parallelHandler(): TapHandler {
     const inFlight = new Set<Promise<void>>();
     return {
       onEvent: async (evt, opts) => {
+        await this.waitForQueueCapacity();
         if (inFlight.size >= MAX_IN_FLIGHT_EVENTS) await Promise.race(inFlight);
         const task = this.indexer
           .onEvent(evt, opts)

@@ -53,6 +53,10 @@ export class InMemoryJobQueue implements IJobQueue {
     return items;
   }
 
+  async countPending(queueName: QueueName): Promise<number> {
+    return this.findByQueueName(queueName).length;
+  }
+
   getBatchItems(queueName: QueueName): readonly string[] {
     return [...(this.batchItems.get(queueName) ?? [])];
   }

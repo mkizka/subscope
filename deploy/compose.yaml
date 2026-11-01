@@ -44,6 +44,7 @@ services:
     restart: unless-stopped
     environment:
       TAP_DATABASE_URL: sqlite:///data/tap.db
+      TAP_OUTBOX_CAPACITY: 10000
     volumes:
       - tap_data:/data
   atblob:

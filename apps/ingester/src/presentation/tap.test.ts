@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import { once } from "node:events";
+import { setTimeout } from "node:timers/promises";
 
 import type { IJobQueue } from "@repo/common/domain";
 import { LoggerManager, MetricReporter } from "@repo/common/infrastructure";
@@ -45,6 +46,7 @@ describe("TapIngester", () => {
     addBatchItems: vi.fn(),
     popBatchItems: vi.fn(),
     getQueues: vi.fn(),
+    countPending: vi.fn().mockResolvedValue(0),
   } satisfies IJobQueue;
 
   const send = async (...events: { id: number }[]) => {
@@ -67,6 +69,7 @@ describe("TapIngester", () => {
       loggerManager,
       new HandleCommitUseCase(loggerManager, metricReporter, jobQueue),
       new HandleIdentityUseCase(loggerManager, metricReporter, jobQueue),
+      jobQueue,
       `http://localhost:${address.port}`,
     );
     void ingester.start();
@@ -204,5 +207,16 @@ describe("TapIngester", () => {
 
     finishFirst();
     await vi.waitFor(() => expect(acks).toEqual([2, 1]));
+  });
+
+  test("tap-9: commitキューで処理を待つジョブが1万件以上ある間は、Tapから次のイベントを読まない", async () => {
+    jobQueue.countPending.mockResolvedValue(10_000);
+
+    socket.send(JSON.stringify(recordEvent(1, {})));
+    await setTimeout(1_500);
+    expect(jobQueue.add).not.toHaveBeenCalled();
+
+    jobQueue.countPending.mockResolvedValue(9_999);
+    await vi.waitFor(() => expect(acks).toEqual([1]), { timeout: 3_000 });
   });
 });

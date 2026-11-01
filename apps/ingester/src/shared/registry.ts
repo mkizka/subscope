@@ -38,6 +38,6 @@ export const createIngesterRegistry = (env: Env) =>
     // presentation
     .service("metricsRouter", ["jobQueue", "metricReporter"], asFunctionArgs(metricsRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
-    .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "tapUrl"], asClassArgs(TapIngester))
+    .service("tapIngester", ["loggerManager", "handleCommitUseCase", "handleIdentityUseCase", "jobQueue", "tapUrl"], asClassArgs(TapIngester))
     .service("labelIngester", ["metricReporter", "jobQueue", "labelCursorStore", "moderationUrl"], asClassArgs(LabelIngester))
     .service("ingesterServer", ["loggerManager", "port", "disableIngester", "metricsRouter", "healthRouter", "tapIngester", "labelIngester"], asClassArgs(IngesterServer));

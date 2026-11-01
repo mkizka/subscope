@@ -49,6 +49,7 @@ export default defineRailway(() => {
     env: {
       TAP_DATABASE_URL: "sqlite:///data/tap.db",
       TAP_METRICS_LISTEN: ":6009",
+      TAP_OUTBOX_CAPACITY: "10000",
     },
   });
 
