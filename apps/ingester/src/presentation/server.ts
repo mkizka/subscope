@@ -4,7 +4,6 @@ import type { Router } from "express";
 import express from "express";
 
 import type { LabelIngester } from "./label.js";
-import type { TapIngester } from "./tap.js";
 
 export class IngesterServer {
   private readonly app: express.Express;
@@ -16,7 +15,6 @@ export class IngesterServer {
     private readonly disableIngester: boolean,
     metricsRouter: Router,
     healthRouter: Router,
-    private readonly tapIngester: TapIngester,
     private readonly labelIngester: LabelIngester,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
@@ -30,9 +28,6 @@ export class IngesterServer {
     this.app.listen(this.port, () => {
       this.logger.info(`Ingester server listening on port ${this.port}`);
       if (!this.disableIngester) {
-        this.tapIngester.start().catch((err: unknown) => {
-          this.logger.error({ err }, "Tap ingester threw");
-        });
         this.labelIngester.start().catch((err: unknown) => {
           this.logger.error({ err }, "Label ingester threw");
         });

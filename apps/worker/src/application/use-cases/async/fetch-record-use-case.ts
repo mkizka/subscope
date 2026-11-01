@@ -65,12 +65,14 @@ export class FetchRecordUseCase {
     const atUri = new AtUri(uri);
     const record = await this.recordFetcher.fetch(atUri);
     await this.transactionManager.transaction(async (ctx) => {
+      if (
+        !(await this.indexRecordService.shouldIndex({ ctx, record, jobLogger }))
+      ) {
+        return;
+      }
       await this.indexRecordService.upsert({
         ctx,
         record,
-        jobLogger,
-        // サブスクライバーでない、いいねしたアカウントのプロフィールなどルール外のレコードもインデックスする
-        force: true,
         live,
         depth: depth + 1,
       });

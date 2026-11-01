@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
+import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
+import { useCompose } from "@/app/features/timeline/blocks/post-form-container";
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import {
@@ -107,6 +109,35 @@ function ConnectedPost(props: PostCardProps) {
   );
 }
 
+function ReplyPrompt({ post }: { post: TimelinePost }) {
+  const me = useMe();
+  const openCompose = useCompose();
+  return (
+    <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+      <Avatar src={me?.avatarUrl} />
+      <button
+        type="button"
+        className="
+          flex-1 rounded-full bg-surface-2 px-4 py-2 text-left text-body
+          text-muted
+          hover:bg-line
+        "
+        onClick={() =>
+          openCompose({
+            type: "reply",
+            uri: post.uri,
+            cid: post.cid,
+            post,
+            root: post.replyRoot,
+          })
+        }
+      >
+        返信を書く
+      </button>
+    </div>
+  );
+}
+
 function BackButton() {
   const navigate = useNavigate();
   return (
@@ -140,6 +171,7 @@ export function ThreadView({ thread }: Props) {
         <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
       ))}
       <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
+      <ReplyPrompt post={thread.post} />
       {thread.replies.map((chain) =>
         chain.map((post, i) =>
           i < chain.length - 1 ? (

@@ -217,7 +217,10 @@ test.describe("スレッド", () => {
     await page
       .getByRole("textbox", { name: "投稿内容" })
       .fill("thread-9: 返信");
-    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "返信", exact: true })
+      .click();
 
     await expect(
       thread.getByRole("article").filter({ hasText: "thread-9: 返信" }),
@@ -253,5 +256,27 @@ test.describe("スレッド", () => {
 
     await expect(article).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollY);
+  });
+
+  test("thread-11: 選んだ投稿の直下に自分のアイコン付きの「返信を書く」欄を置き、押すとその投稿への返信の投稿欄を開く", async ({
+    page,
+  }) => {
+    const target = await post("thread-11: 投稿");
+
+    await openThread(page, target.uri, "thread-11: 投稿");
+    const thread = page.getByRole("region", { name: "スレッド" });
+    await thread.getByRole("button", { name: "返信を書く" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("article", { name: "返信先" })).toContainText(
+      "thread-11: 投稿",
+    );
+    await dialog
+      .getByRole("textbox", { name: "投稿内容" })
+      .fill("thread-11: 返信");
+    await dialog.getByRole("button", { name: "返信", exact: true }).click();
+
+    await expect(
+      thread.getByRole("article").filter({ hasText: "thread-11: 返信" }),
+    ).toBeVisible();
   });
 });

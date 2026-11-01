@@ -82,6 +82,7 @@ import { RepostRepository } from "../infrastructure/repositories/repost-reposito
 import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { WorkerServer } from "../presentation/server.js";
+import { TapSubscriber } from "../presentation/tap.js";
 import { SyncWorker } from "../presentation/worker.js";
 import type { Env } from "./env.js";
 
@@ -99,6 +100,7 @@ export const createWorkerRegistry = (env: Env) =>
     .value("tapUrl", env.TAP_URL)
     .value("moderationUrl", env.MODERATION_URL)
     .value("port", env.PORT)
+    .value("tapConcurrency", env.TAP_CONCURRENCY)
     .value("commitWorkerConcurrency", env.COMMIT_WORKER_CONCURRENCY)
     // infrastructure
     .service("loggerManager", ["logLevel"], asClassArgs(LoggerManager))
@@ -156,4 +158,5 @@ export const createWorkerRegistry = (env: Env) =>
     .service("syncWorker", ["upsertIdentityUseCase", "indexCommitUseCase", "resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "indexLabelUseCase", "redisUrl", "commitWorkerConcurrency"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
-    .service("workerServer", ["loggerManager", "syncWorker", "jobQueue", "healthRouter", "port"], asClassArgs(WorkerServer));
+    .service("tapSubscriber", ["loggerManager", "metricReporter", "indexCommitUseCase", "upsertIdentityUseCase", "tapUrl", "tapConcurrency"], asClassArgs(TapSubscriber))
+    .service("workerServer", ["loggerManager", "syncWorker", "tapSubscriber", "jobQueue", "healthRouter", "port"], asClassArgs(WorkerServer));
