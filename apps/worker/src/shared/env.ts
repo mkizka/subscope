@@ -21,7 +21,6 @@ const schema = z.object({
   }),
   MODERATION_URL: z.url().default("https://mod.bsky.app"),
   TAP_CONCURRENCY: z.coerce.number().default(64),
-  COMMIT_WORKER_CONCURRENCY: z.coerce.number().default(128),
   DATABASE_POOL_MAX: z.coerce.number().default(32),
 });
 

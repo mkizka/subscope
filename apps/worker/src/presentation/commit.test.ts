@@ -1,7 +1,9 @@
+import assert from "node:assert";
+
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
+import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
-import type { CommitEventDto } from "@repo/common/domain";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -14,9 +16,9 @@ import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
 import { createWorkerRegistry } from "../shared/registry.js";
 import { testEnv } from "../shared/test-utils.js";
+import { indexCommitCommandFactory } from "./tap.js";
 
 // prettier-ignore
 const services = await createWorkerRegistry(testEnv)
@@ -32,40 +34,43 @@ const services = await createWorkerRegistry(testEnv)
 
 describe("commit", () => {
   const { ctx } = testSetup;
-  const processCommit = (event: CommitEventDto) =>
-    services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
+  const processCommit = async (event: RecordEvent) => {
+    const command = indexCommitCommandFactory(event);
+    assert(command);
+    await services.indexCommitUseCase.execute(command);
+  };
 
-  const deleteEvent = (did: string, rev: string): CommitEventDto => ({
+  const deleteEvent = (did: string, rev: string): RecordEvent => ({
+    id: 1,
+    type: "record",
+    action: "delete",
     did: asDid(did),
+    rev,
+    collection: "app.bsky.feed.post",
+    rkey: "123",
     live: true,
-    commit: {
-      operation: "delete",
-      collection: "app.bsky.feed.post",
-      rkey: "123",
-      rev,
-    },
   });
 
   const postEvent = (
     did: string,
-    operation: "create" | "update",
-    rev: string | undefined,
+    action: "create" | "update",
+    rev: string,
     text: string,
-  ): CommitEventDto => ({
+  ): RecordEvent => ({
+    id: 1,
+    type: "record",
+    action,
     did: asDid(did),
-    live: true,
-    commit: {
-      operation,
-      collection: "app.bsky.feed.post",
-      rkey: "123",
-      rev,
-      cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
-      record: {
-        $type: "app.bsky.feed.post",
-        text,
-        createdAt: new Date().toISOString(),
-      },
+    rev,
+    collection: "app.bsky.feed.post",
+    rkey: "123",
+    cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
+    record: {
+      $type: "app.bsky.feed.post",
+      text,
+      createdAt: new Date().toISOString(),
     },
+    live: true,
   });
 
   const findPost = async (did: string) => {
@@ -105,20 +110,6 @@ describe("commit", () => {
     expect((await findPost(actor.did))?.text).toBe("new");
   });
 
-  test("index-7: revを持たないコミットは、revを比べずに処理する", async () => {
-    // arrange
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
-    await processCommit(deleteEvent(actor.did, "3bbbbbbbbbbbb"));
-
-    // act
-    await processCommit(postEvent(actor.did, "create", undefined, "new"));
-
-    // assert
-    expect((await findPost(actor.did))?.text).toBe("new");
-  });
-
   test("index-8: 処理済みのrevと同じrevのコミットは、もう一度処理する", async () => {
     // arrange
     const actor = await actorFactory(ctx.db)
@@ -140,23 +131,23 @@ describe("commit", () => {
 
     // act
     await processCommit({
+      id: 1,
+      type: "record",
+      action: "create",
       did: asDid(liker.did),
-      live: true,
-      commit: {
-        operation: "create",
-        collection: "app.bsky.feed.like",
-        rkey: "123",
-        rev: "3aaaaaaaaaaaa",
-        cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
-        record: {
-          $type: "app.bsky.feed.like",
-          subject: {
-            uri: `at://${liker.did}/app.bsky.feed.post/123`,
-            cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
-          },
-          createdAt: new Date().toISOString(),
+      rev: "3aaaaaaaaaaaa",
+      collection: "app.bsky.feed.like",
+      rkey: "123",
+      cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
+      record: {
+        $type: "app.bsky.feed.like",
+        subject: {
+          uri: `at://${liker.did}/app.bsky.feed.post/123`,
+          cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
         },
+        createdAt: new Date().toISOString(),
       },
+      live: true,
     });
 
     // assert

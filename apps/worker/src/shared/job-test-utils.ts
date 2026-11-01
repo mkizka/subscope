@@ -1,6 +1,9 @@
+import assert from "node:assert";
+
 import type { Did } from "@atproto/did";
+import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
-import type { CommitEventDto, JobData } from "@repo/common/domain";
+import type { JobData } from "@repo/common/domain";
 import { InMemoryJobScheduler } from "@repo/common/infrastructure";
 import {
   InMemoryDidCache,
@@ -10,8 +13,8 @@ import {
 } from "@repo/common/test";
 import { testSetup } from "@repo/test-utils";
 
-import { indexCommitCommandFactory } from "../application/use-cases/commit/index-commit-command.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
+import { indexCommitCommandFactory } from "../presentation/tap.js";
 import { createWorkerRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";
 
@@ -29,8 +32,10 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
 
 export const setupJobTest = async () => {
   const services = await jobTestRegistry.resolve();
-  const indexCommit = async (event: CommitEventDto) => {
-    await services.indexCommitUseCase.execute(indexCommitCommandFactory(event));
+  const indexCommit = async (event: RecordEvent) => {
+    const command = indexCommitCommandFactory(event);
+    assert(command);
+    await services.indexCommitUseCase.execute(command);
   };
   const runSyncTapRepoJobs = async () => {
     for (const { did } of services.jobScheduler.getSyncTapRepoJobs()) {

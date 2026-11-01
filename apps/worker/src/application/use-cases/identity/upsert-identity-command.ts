@@ -1,13 +1,9 @@
-import type { IdentityEventDto } from "@repo/common/domain";
+import type { Did } from "@atproto/did";
+import type { ActorStatus } from "@repo/common/domain";
+import type { Handle } from "@repo/common/utils";
 
-export const upsertIdentityCommandFactory = (event: IdentityEventDto) => {
-  return {
-    did: event.identity.did,
-    handle: event.identity.handle,
-    status: event.identity.status,
-  };
+export type UpsertIdentityCommand = {
+  did: Did;
+  handle?: Handle;
+  status: ActorStatus;
 };
-
-export type UpsertIdentityCommand = ReturnType<
-  typeof upsertIdentityCommandFactory
->;
