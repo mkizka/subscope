@@ -25,7 +25,6 @@ import type { ILabelCursorStore } from "../application/interfaces/external/label
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/repositories/actor-stats-repository.js";
-import type { IBackfillStatusRepository } from "../application/interfaces/repositories/backfill-status-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
 import type { IFollowRepository } from "../application/interfaces/repositories/follow-repository.js";
 import type { IGeneratorRepository } from "../application/interfaces/repositories/generator-repository.js";
@@ -69,7 +68,6 @@ import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolve
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
-import { BackfillStatusRepository } from "../infrastructure/repositories/backfill-status-repository/backfill-status-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
 import { FollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.js";
@@ -139,7 +137,6 @@ export const createWorkerRegistry = (env: Env) =>
     .service("subscriptionRepository", asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("feedItemRepository", asClassArgs<IFeedItemRepository>()(FeedItemRepository))
     .service("labelRepository", asClassArgs<ILabelRepository>()(LabelRepository))
-    .service("backfillStatusRepository", asClassArgs<IBackfillStatusRepository>()(BackfillStatusRepository))
     .service("notificationRepository", asClassArgs<INotificationRepository>()(NotificationRepository))
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
@@ -163,8 +160,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
     .service("indexLabelUseCase", ["labelRepository", "actorRepository", "db"], asClassArgs(IndexLabelUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "labelFetcher", "indexLabelUseCase", "jobScheduler", "db"], asClassArgs(SyncTapRepoUseCase))
-    .service("checkBackfillUseCase", ["tapClient", "subscriptionRepository", "followRepository", "backfillStatusRepository", "jobScheduler", "db"], asClassArgs(CheckBackfillUseCase))
-    .service("scheduleBackfillChecksUseCase", ["backfillStatusRepository", "jobScheduler", "db"], asClassArgs(ScheduleBackfillChecksUseCase))
+    .service("checkBackfillUseCase", ["tapClient", "subscriptionRepository", "followRepository", "actorRepository", "jobScheduler", "db"], asClassArgs(CheckBackfillUseCase))
+    .service("scheduleBackfillChecksUseCase", ["actorRepository", "jobScheduler", "db"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "redisUrl"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)
