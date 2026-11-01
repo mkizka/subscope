@@ -1,15 +1,27 @@
 import { asDid } from "@atproto/did";
 import { Client, lexToJson, XrpcResponseError } from "@atproto/lex";
 import type { AtUri } from "@atproto/syntax";
-import type { IDidResolver } from "@repo/common/domain";
-import type { IMetricReporter } from "@repo/common/domain";
-import { Record } from "@repo/common/domain";
+import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
+import { DidNotFoundError, Record } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
 import {
   type IRecordFetcher,
   RecordFetchError,
 } from "../../application/interfaces/external/record-fetcher.js";
+
+const UNRECOVERABLE_ERRORS = new Set([
+  "RecordNotFound",
+  "RepoNotFound",
+  "RepoDeactivated",
+  "RepoTakendown",
+]);
+
+const isUnrecoverable = (error: unknown) =>
+  error instanceof DidNotFoundError ||
+  (error instanceof XrpcResponseError &&
+    (UNRECOVERABLE_ERRORS.has(error.error) ||
+      error.message.startsWith("Could not find repo")));
 
 export class RecordFetcher implements IRecordFetcher {
   constructor(
@@ -18,7 +30,14 @@ export class RecordFetcher implements IRecordFetcher {
   ) {}
 
   async fetch(uri: AtUri): Promise<Record> {
-    const { body } = await this.getRecord(uri);
+    const { body } = await this.getRecord(uri).catch((error: unknown) => {
+      if (isUnrecoverable(error)) {
+        throw new RecordFetchError(
+          `Failed to fetch ${uri.toString()}: ${String(error)}`,
+        );
+      }
+      throw error;
+    });
     const record = Record.create({
       uri: body.uri,
       cid: required(body.cid),
@@ -38,12 +57,6 @@ export class RecordFetcher implements IRecordFetcher {
       });
     } catch (error) {
       this.metricReporter.increment("fetch_record_error_total");
-      if (
-        error instanceof XrpcResponseError &&
-        error.error === "RecordNotFound"
-      ) {
-        throw new RecordFetchError(`Record not found: ${uri.toString()}`);
-      }
       throw error;
     }
   }

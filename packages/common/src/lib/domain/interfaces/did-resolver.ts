@@ -16,3 +16,10 @@ export class DidResolutionError extends Error {
     this.name = "DidResolutionError";
   }
 }
+
+export class DidNotFoundError extends DidResolutionError {
+  constructor(did: string) {
+    super(did);
+    this.name = "DidNotFoundError";
+  }
+}

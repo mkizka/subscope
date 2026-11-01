@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 
 import {
-  DidResolutionError,
+  DidNotFoundError,
   type IDidResolver,
 } from "../../domain/interfaces/did-resolver.js";
 import type { Handle } from "../../utils/handle.js";
@@ -26,7 +26,7 @@ export class InMemoryDidResolver implements IDidResolver {
   async resolve(did: Did): Promise<ResolveResult> {
     const result = this.results.get(did);
     if (!result) {
-      throw new DidResolutionError(`No resolve result set for DID: ${did}`);
+      throw new DidNotFoundError(did);
     }
     return result;
   }
