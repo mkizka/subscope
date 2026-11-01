@@ -1,4 +1,3 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
 import { useFetcher } from "react-router";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
@@ -18,37 +17,26 @@ function OlderTimelineFeedContainer({
 }) {
   const fetcher = useFetcher<typeof loader>();
   const data = fetcher.data;
-  const distanceFromBottomRef = useRef(0);
-
-  useLayoutEffect(() => {
-    if (!data) return;
-    window.scrollTo(
-      0,
-      document.body.scrollHeight - distanceFromBottomRef.current,
-    );
-  }, [data]);
 
   if (!data) {
     return (
       <InfiniteScrollTrigger
-        onIntersect={() => {
-          distanceFromBottomRef.current =
-            document.body.scrollHeight - window.scrollY;
-          void fetcher.load(`/?${new URLSearchParams({ index: "", cursor })}`);
-        }}
+        onIntersect={() =>
+          void fetcher.load(`/?${new URLSearchParams({ index: "", cursor })}`)
+        }
         enabled={fetcher.state === "idle"}
       />
     );
   }
   return (
     <>
+      <TimelineFeed posts={data.posts} onCompose={onCompose} />
       {data.cursor && (
         <OlderTimelineFeedContainer
           cursor={data.cursor}
           onCompose={onCompose}
         />
       )}
-      <TimelineFeed posts={data.posts} onCompose={onCompose} />
     </>
   );
 }
@@ -60,16 +48,12 @@ type Props = {
 };
 
 export function TimelineFeedContainer({ posts, cursor, onCompose }: Props) {
-  useEffect(() => {
-    window.scrollTo(0, document.body.scrollHeight);
-  }, []);
-
   return (
     <>
+      <TimelineFeed posts={posts} onCompose={onCompose} />
       {cursor && (
         <OlderTimelineFeedContainer cursor={cursor} onCompose={onCompose} />
       )}
-      <TimelineFeed posts={posts} onCompose={onCompose} />
     </>
   );
 }
