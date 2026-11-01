@@ -32,7 +32,6 @@ export function InviteCodeFormContainer() {
     <InviteCodeForm
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.inviteCode, { type: "text" })}
-      fields={fields}
       error={(form.errors ?? fields.inviteCode.errors)?.[0]}
     />
   );

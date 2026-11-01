@@ -1,19 +1,16 @@
-import { AtSign } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Form } from "react-router";
+
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
 
 type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
-  fields: {
-    identifier: {
-      id: string;
-      errors?: string[];
-    };
-  };
+  error?: string;
 };
 
-export function LoginForm({ formProps, inputProps, fields }: Props) {
+export function LoginForm({ formProps, inputProps, error }: Props) {
   return (
     <Form
       action="/oauth/login"
@@ -21,27 +18,14 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
       className="flex flex-col gap-4"
       {...formProps}
     >
-      <fieldset className="fieldset">
-        <label htmlFor={fields.identifier.id} className="fieldset-legend">
-          ハンドル
-        </label>
-        <div className="input w-full">
-          <AtSign className="size-4 opacity-50" />
-          <input
-            placeholder="example.bsky.social"
-            autoComplete="username"
-            {...inputProps}
-          />
-        </div>
-        {fields.identifier.errors && (
-          <p role="alert" className="text-error">
-            {fields.identifier.errors[0]}
-          </p>
-        )}
-      </fieldset>
-      <button type="submit" className="btn btn-block btn-primary">
-        ログイン
-      </button>
+      <Input
+        label="ハンドル"
+        placeholder="example.bsky.social"
+        autoComplete="username"
+        error={error}
+        {...inputProps}
+      />
+      <Button type="submit">ログイン</Button>
     </Form>
   );
 }

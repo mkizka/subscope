@@ -1,6 +1,7 @@
 import { CheckIcon, CopyIcon, HomeIcon } from "lucide-react";
 import { useState } from "react";
 
+import { Button, buttonClass } from "@/app/components/ui/button";
 import { ErrorIcon } from "@/app/features/error/parts/error-icon";
 
 type Props = {
@@ -22,19 +23,24 @@ export function ErrorCard({ title, details, status, stack }: Props) {
   };
 
   return (
-    <div className="card w-full border border-base-300 bg-base-100">
-      <div className="card-body items-center text-center">
-        <ErrorIcon status={status} />
-        <h2 className="card-title text-2xl">{title}</h2>
-        <p className="text-sm text-base-content/70">{details}</p>
-        {stack && (
-          <div className="relative w-full text-left">
-            <pre className="overflow-x-auto rounded-box bg-base-200 p-4 text-xs">
-              <code>{stack}</code>
-            </pre>
-            <button
-              type="button"
-              className="btn absolute top-2 right-2 btn-square btn-ghost btn-sm"
+    <div
+      className="
+        flex w-full flex-col items-center gap-3 rounded-xl border border-line
+        p-6 text-center
+      "
+    >
+      <ErrorIcon status={status} />
+      <h2 className="text-title">{title}</h2>
+      <p className="text-label text-muted">{details}</p>
+      {stack && (
+        <div className="relative w-full text-left">
+          <pre className="overflow-x-auto rounded-xl bg-surface-2 p-4 text-caption">
+            <code>{stack}</code>
+          </pre>
+          <div className="absolute top-2 right-2">
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleCopy}
               aria-label="スタックトレースをコピー"
             >
@@ -43,17 +49,15 @@ export function ErrorCard({ title, details, status, stack }: Props) {
               ) : (
                 <CopyIcon className="size-4" />
               )}
-            </button>
+            </Button>
           </div>
-        )}
-        <div className="mt-2 card-actions">
-          <a href="/" className="btn btn-primary">
-            <HomeIcon className="size-4" />
-            ホームに戻る
-          </a>
         </div>
-        {status && <p className="text-xs text-base-content/50">{status}</p>}
-      </div>
+      )}
+      <a href="/" className={buttonClass()}>
+        <HomeIcon className="size-4" />
+        ホームに戻る
+      </a>
+      {status && <p className="text-caption text-muted">{status}</p>}
     </div>
   );
 }

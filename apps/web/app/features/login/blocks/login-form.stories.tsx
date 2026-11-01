@@ -10,11 +10,6 @@ const meta = {
       id: "identifier",
       name: "identifier",
     },
-    fields: {
-      identifier: {
-        id: "identifier",
-      },
-    },
   },
 } satisfies Meta<typeof LoginForm>;
 
@@ -26,11 +21,6 @@ export const Default: Story = {};
 
 export const WithError: Story = {
   args: {
-    fields: {
-      identifier: {
-        id: "identifier",
-        errors: ["有効なハンドルを入力してください"],
-      },
-    },
+    error: "有効なハンドルを入力してください",
   },
 };

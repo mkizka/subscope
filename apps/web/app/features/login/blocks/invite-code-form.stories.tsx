@@ -10,11 +10,6 @@ const meta = {
       id: "inviteCode",
       name: "inviteCode",
     },
-    fields: {
-      inviteCode: {
-        id: "inviteCode",
-      },
-    },
   },
 } satisfies Meta<typeof InviteCodeForm>;
 

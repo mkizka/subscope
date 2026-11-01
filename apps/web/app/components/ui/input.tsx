@@ -18,7 +18,11 @@ export function Input({ label, error, ...props }: Props) {
         aria-invalid={!!error}
         {...props}
       />
-      {error && <span className="text-label text-danger">{error}</span>}
+      {error && (
+        <span role="alert" className="text-label text-danger">
+          {error}
+        </span>
+      )}
     </label>
   );
 }
