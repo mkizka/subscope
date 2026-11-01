@@ -84,4 +84,29 @@ test.describe("画像の拡大表示", () => {
     await page.keyboard.press("Escape");
     await expect(viewer).toBeHidden();
   });
+
+  test("image-viewer-5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる", async ({
+    page,
+  }) => {
+    const viewer = await openViewer(page, "image-viewer-5: 投稿", [
+      "image-viewer-5: 画像1",
+      "image-viewer-5: 画像2",
+    ]);
+    const image = viewer.getByRole("img");
+    const swipe = async (dx: number) => {
+      const box = await image.boundingBox();
+      if (!box) throw new Error("画像が表示されていない");
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x + dx, y, { steps: 5 });
+      await page.mouse.up();
+    };
+
+    await swipe(-100);
+    await expect(image).toHaveAccessibleName("image-viewer-5: 画像2");
+    await swipe(100);
+    await expect(image).toHaveAccessibleName("image-viewer-5: 画像1");
+  });
 });

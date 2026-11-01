@@ -82,6 +82,10 @@ export class IndexRecordService {
     }
 
     const indexer = this.indexers[record.collection];
+    if (indexer.shouldIndex && !(await indexer.shouldIndex({ ctx, record }))) {
+      await jobLogger.log("Record does not match storage rules, skipping");
+      return;
+    }
     await this.indexActorService.upsert({
       ctx,
       did: record.actorDid,

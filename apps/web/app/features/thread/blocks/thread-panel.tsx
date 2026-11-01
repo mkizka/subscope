@@ -12,6 +12,7 @@ import {
   QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
 import { PostImages } from "@/app/features/timeline/parts/post-images";
+import { RichText } from "@/app/features/timeline/parts/rich-text";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 type Props = {
@@ -30,6 +31,7 @@ function FocusedPost({
   authorDisplayName,
   authorHandle,
   text,
+  links,
   images,
   quote,
   createdAt,
@@ -74,7 +76,9 @@ function FocusedPost({
           </div>
         </div>
       </ProfileLink>
-      <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">{text}</p>
+      <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">
+        {text && <RichText text={text} links={links} />}
+      </p>
       {images && <PostImages images={images} />}
       {quote && <QuotedPost quote={quote} />}
       {createdAt && (

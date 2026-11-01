@@ -10,12 +10,14 @@ import { Link, useSearchParams } from "react-router";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 import { type PostImage, PostImages } from "./post-images";
+import { RichText, type TextLink } from "./rich-text";
 
 export type PostCardProps = {
   authorAvatar?: string;
   authorDisplayName?: string;
   authorHandle: string;
   text?: string;
+  links?: TextLink[];
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
@@ -98,6 +100,7 @@ export function PostCard({
   authorDisplayName,
   authorHandle,
   text,
+  links,
   replyCount,
   repostCount,
   likeCount,
@@ -170,7 +173,9 @@ export function PostCard({
                 : "日時不明"}
             </span>
           </div>
-          <p className="wrap-break-word whitespace-pre-wrap">{text}</p>
+          <p className="wrap-break-word whitespace-pre-wrap">
+            {text && <RichText text={text} links={links} />}
+          </p>
           {images && <PostImages images={images} />}
           {quote && <QuotedPost quote={quote} />}
           {toolbar ?? (

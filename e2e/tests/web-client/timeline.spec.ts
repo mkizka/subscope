@@ -188,4 +188,42 @@ test.describe("タイムライン", () => {
     }).toPass();
     await expect(page.getByText("timeline-3: 返信")).toHaveCount(0);
   });
+
+  test("timeline-6: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする", async ({
+    page,
+  }) => {
+    const prefix = "timeline-6: 日本語のあと ";
+    const label = "example.com/timeline-6...";
+    const byteStart = new TextEncoder().encode(prefix).length;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: `${prefix}${label} 後ろ`,
+      facets: [
+        {
+          index: {
+            byteStart,
+            byteEnd: byteStart + new TextEncoder().encode(label).length,
+          },
+          features: [
+            {
+              $type: "app.bsky.richtext.facet#link",
+              uri: "https://example.com/timeline-6/full",
+            },
+          ],
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const link = page.getByRole("link", { name: label, exact: true });
+    await expect(async () => {
+      await page.reload();
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(link).toHaveAttribute(
+      "href",
+      "https://example.com/timeline-6/full",
+    );
+    await expect(link).toHaveAttribute("target", "_blank");
+  });
 });
