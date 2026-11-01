@@ -67,7 +67,7 @@ export class TapSubscriber {
 
   private async handleEvent(event: TapEvent) {
     if (event.type === "identity") {
-      this.metricReporter.increment("ingester_events_identity_total");
+      this.metricReporter.increment("worker_events_identity_total");
       await this.upsertIdentityUseCase.execute({
         did: event.did,
         handle: event.handle,
@@ -77,7 +77,7 @@ export class TapSubscriber {
     }
     const commitEvent = this.toCommitEvent(event);
     if (!commitEvent) return;
-    this.metricReporter.increment("ingester_events_commit_total", {
+    this.metricReporter.increment("worker_events_commit_total", {
       collection: commitEvent.commit.collection,
     });
     await this.indexCommitUseCase.execute(

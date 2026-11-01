@@ -6,7 +6,6 @@ export * from "./lib/infrastructure/job-queue/job-queue.js";
 export * from "./lib/infrastructure/keyv-redis/keyv-redis.js";
 export * from "./lib/infrastructure/logger/logger-manager.in-memory.js";
 export * from "./lib/infrastructure/logger/logger-manager.js";
-export * from "./lib/infrastructure/metric-reporter/metric-reporter.in-memory.js";
 export * from "./lib/infrastructure/metric-reporter/metric-reporter.js";
 export * from "./lib/infrastructure/scheduler/job-scheduler.in-memory.js";
 export * from "./lib/infrastructure/scheduler/job-scheduler.js";
