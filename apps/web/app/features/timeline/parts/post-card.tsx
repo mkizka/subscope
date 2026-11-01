@@ -4,8 +4,8 @@ import {
   MessageCircleIcon,
   RepeatIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
-import { Link } from "react-router";
+import type { ComponentProps, ReactNode } from "react";
+import { Link, useSearchParams } from "react-router";
 
 import { useHydrated } from "@/app/lib/use-hydrated";
 
@@ -55,6 +55,19 @@ function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
       <props.Icon className="size-3" />
       {props.count}
     </span>
+  );
+}
+
+export function ProfileLink({
+  handle,
+  ...props
+}: Omit<ComponentProps<typeof Link>, "to"> & { handle: string }) {
+  const [searchParams] = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  params.delete("thread");
+  params.set("profile", handle);
+  return (
+    <Link {...props} to={{ search: params.toString() }} preventScrollReset />
   );
 }
 
@@ -125,7 +138,11 @@ export function PostCard({
         </div>
       )}
       <div className="flex gap-3">
-        <div className="shrink-0">
+        <ProfileLink
+          handle={authorHandle}
+          aria-label={`${authorDisplayName ?? authorHandle}のプロフィール`}
+          className="relative shrink-0 self-start"
+        >
           {authorAvatar ? (
             <img
               src={authorAvatar}
@@ -135,12 +152,18 @@ export function PostCard({
           ) : (
             <div className="size-9 rounded-md bg-base-300" />
           )}
-        </div>
+        </ProfileLink>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="truncate font-bold">
+            <ProfileLink
+              handle={authorHandle}
+              className="
+                relative truncate font-bold
+                hover:underline
+              "
+            >
               {authorDisplayName ?? authorHandle}
-            </span>
+            </ProfileLink>
             <span className="shrink-0 text-xs text-base-content/60">
               {createdAt
                 ? hydrated && formatRelativeTime(createdAt)

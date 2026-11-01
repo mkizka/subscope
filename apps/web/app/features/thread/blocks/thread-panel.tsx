@@ -8,6 +8,7 @@ import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed"
 import {
   PostCard,
   type PostCardProps,
+  ProfileLink,
   QuotedPost,
 } from "@/app/features/timeline/parts/post-card";
 import { PostImages } from "@/app/features/timeline/parts/post-images";
@@ -48,7 +49,13 @@ function FocusedPost({
       aria-label="選んだ投稿"
       className="border-b border-base-300 px-4 pt-2 pb-3"
     >
-      <div className="flex items-center gap-3">
+      <ProfileLink
+        handle={authorHandle}
+        className="
+          flex w-fit items-center gap-3
+          hover:underline
+        "
+      >
         {authorAvatar ? (
           <img
             src={authorAvatar}
@@ -66,7 +73,7 @@ function FocusedPost({
             @{authorHandle}
           </div>
         </div>
-      </div>
+      </ProfileLink>
       <p className="mt-2 text-lg wrap-break-word whitespace-pre-wrap">{text}</p>
       {images && <PostImages images={images} />}
       {quote && <QuotedPost quote={quote} />}

@@ -244,4 +244,33 @@ test.describe("プロフィール", () => {
     await expect(button).not.toHaveAttribute("aria-disabled", "true");
     await expect(button).not.toHaveText(initial);
   });
+
+  test("profile-12: タイムラインとスレッドの投稿のアイコンか名前を選ぶと、右カラムに投稿者のプロフィールの簡易表示を開く", async ({
+    page,
+  }) => {
+    const text = `profile-12の投稿 ${Date.now()}`;
+    const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+    const panel = page.getByRole("region", { name: "プロフィール" });
+    const article = page.getByRole("main").getByRole("article").filter({
+      hasText: text,
+    });
+    await page.goto("/");
+    await expect(async () => {
+      await page.reload();
+      await expect(article).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await article.getByRole("link", { name: /のプロフィール$/ }).click();
+    await expect(panel.getByText("@alice.test")).toBeVisible();
+
+    await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
+    await page
+      .getByRole("article", { name: "選んだ投稿" })
+      .getByRole("link", { name: /@alice\.test/ })
+      .click();
+    await expect(panel.getByText("@alice.test")).toBeVisible();
+  });
 });
