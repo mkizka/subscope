@@ -43,6 +43,7 @@ test.describe("ジョブキュー", () => {
   }) => {
     const context = await request.newContext({
       baseURL,
+      storageState: { cookies: [], origins: [] },
       extraHTTPHeaders: { Authorization: `Bearer ${ADMIN_API_TOKEN}` },
     });
 
@@ -66,6 +67,7 @@ test.describe("ジョブキュー", () => {
   }) => {
     const context = await request.newContext({
       baseURL,
+      storageState: { cookies: [], origins: [] },
       extraHTTPHeaders: { Authorization: `Bearer ${ADMIN_API_TOKEN}` },
     });
 
