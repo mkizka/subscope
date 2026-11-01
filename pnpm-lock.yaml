@@ -369,6 +369,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@atproto/api':
+        specifier: 0.29.5
+        version: 0.29.5
       '@atproto/common-web':
         specifier: 0.5.15
         version: 0.5.15

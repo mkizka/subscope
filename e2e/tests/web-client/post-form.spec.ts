@@ -122,4 +122,48 @@ test.describe("投稿欄", () => {
     const { value }: { value: { text: string } } = await postRecord.json();
     expect(value.text).toBe(text);
   });
+
+  test("post-form-6: 本文のURLとハッシュタグには、その範囲にfacetsを付ける", async ({
+    page,
+    request,
+  }) => {
+    const text = `post-form-6: ${Date.now()} 日本語 example.com/post-form-6 #subscope`;
+    await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
+    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "いまどうしてる？" }),
+    ).toBeVisible();
+
+    const did = await resolveHandle("alice.test");
+    const posts = await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.listRecords`,
+      { params: { repo: did, collection: "app.bsky.feed.post", limit: 20 } },
+    );
+    const {
+      records,
+    }: { records: { value: { text: string; facets: unknown } }[] } =
+      await posts.json();
+    const post = records.find((record) => record.value.text === text);
+    const bytes = (s: string) => Buffer.byteLength(s);
+    const urlStart = bytes(text.slice(0, text.indexOf("example.com")));
+    const tagStart = bytes(text.slice(0, text.indexOf("#subscope")));
+    expect(post?.value.facets).toEqual([
+      {
+        index: {
+          byteStart: urlStart,
+          byteEnd: urlStart + bytes("example.com/post-form-6"),
+        },
+        features: [
+          {
+            $type: "app.bsky.richtext.facet#link",
+            uri: "https://example.com/post-form-6",
+          },
+        ],
+      },
+      {
+        index: { byteStart: tagStart, byteEnd: tagStart + bytes("#subscope") },
+        features: [{ $type: "app.bsky.richtext.facet#tag", tag: "subscope" }],
+      },
+    ]);
+  });
 });
