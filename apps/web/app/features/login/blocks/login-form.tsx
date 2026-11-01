@@ -21,25 +21,37 @@ export function LoginForm({ formProps, inputProps, fields }: Props) {
       className="flex flex-col gap-4"
       {...formProps}
     >
-      <fieldset className="fieldset">
-        <label htmlFor={fields.identifier.id} className="fieldset-legend">
+      <div className="flex flex-col gap-2">
+        <label htmlFor={fields.identifier.id} className="text-sm font-bold">
           ハンドル
         </label>
-        <div className="input w-full">
-          <AtSign className="size-4 opacity-50" />
+        <div
+          className="
+            flex items-center gap-2 rounded-full border border-line px-4 py-2.5
+            focus-within:border-brand
+          "
+        >
+          <AtSign className="size-4 text-muted" />
           <input
+            className="min-w-0 flex-1 bg-transparent outline-none"
             placeholder="example.bsky.social"
             autoComplete="username"
             {...inputProps}
           />
         </div>
         {fields.identifier.errors && (
-          <p role="alert" className="text-error">
+          <p role="alert" className="text-sm text-danger">
             {fields.identifier.errors[0]}
           </p>
         )}
-      </fieldset>
-      <button type="submit" className="btn btn-block btn-primary">
+      </div>
+      <button
+        type="submit"
+        className="
+          rounded-full bg-brand py-3 font-bold text-on-brand
+          hover:opacity-90
+        "
+      >
         ログイン
       </button>
     </Form>
