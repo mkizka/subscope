@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 import {
   createRecord,
@@ -22,6 +22,16 @@ const createList = async (name: string) => {
     createdAt: new Date().toISOString(),
   });
   return list.uri.split("/").at(-1);
+};
+
+const holdSubmit = async (page: Page) => {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/*", async (route) => {
+    if (route.request().method() !== "GET") await held;
+    await route.continue();
+  });
+  return release;
 };
 
 test.describe("リスト", () => {
@@ -194,5 +204,70 @@ test.describe("リスト", () => {
           value.list === `at://${alice}/app.bsky.graph.list/${rkey}`,
       ),
     ).toEqual([]);
+  });
+
+  test("list-9: リストの作成・保存ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test/lists");
+    const main = page.getByRole("main");
+    await main.getByText("新しいリスト").click();
+    await main.getByLabel("名前").fill(`list-9のリスト ${Date.now()}`);
+    const release = await holdSubmit(page);
+    const button = main.getByRole("button", { name: "作成する" });
+
+    await button.click();
+
+    await expect(button).toBeDisabled();
+    await expect(button.locator(".animate-spin")).toBeVisible();
+    release();
+    await expect(button).toBeEnabled();
+  });
+
+  test("list-10: リストの削除ボタンは、削除してリスト一覧に戻るまでスピナーを出して押せなくする", async ({
+    page,
+  }) => {
+    const rkey = await createList(`list-10のリスト ${Date.now()}`);
+    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    const main = page.getByRole("main");
+    const button = main.getByRole("button", { name: "削除する" });
+    await expect(async () => {
+      await page.reload();
+      await expect(button).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    const release = await holdSubmit(page);
+
+    await button.click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "削除する" })
+      .click();
+
+    await expect(button).toBeDisabled();
+    await expect(button.locator(".animate-spin")).toBeVisible();
+    release();
+    await expect(page).toHaveURL("/profile/alice.test/lists");
+  });
+
+  test("list-11: メンバーの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
+    page,
+  }) => {
+    const rkey = await createList(`list-11のリスト ${Date.now()}`);
+    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+    const main = page.getByRole("main");
+    const button = main.getByRole("button", { name: "追加する" });
+    await expect(async () => {
+      await page.reload();
+      await expect(button).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await main.getByLabel("ハンドル").fill("bob.test");
+    const release = await holdSubmit(page);
+
+    await button.click();
+
+    await expect(button).toBeDisabled();
+    await expect(button.locator(".animate-spin")).toBeVisible();
+    release();
+    await expect(button).toBeEnabled();
   });
 });
