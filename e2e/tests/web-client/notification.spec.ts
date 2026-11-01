@@ -168,10 +168,18 @@ test.describe("通知（PC）", () => {
       displayName: "Bob",
     });
     await follow("alice.test", "bob.test");
-    await createRecord("bob.test", "app.bsky.graph.follow", {
+    const { uri } = await createRecord("bob.test", "app.bsky.graph.follow", {
       subject: await resolveHandle("alice.test"),
       createdAt: new Date().toISOString(),
     });
+    await expect
+      .poll(async () => {
+        const res = await page.request.get("/api/notifications");
+        const { notifications }: { notifications: { uri: string }[] } =
+          await res.json();
+        return notifications[0]?.uri;
+      })
+      .toBe(uri);
 
     await page.goto("/");
 
@@ -179,13 +187,8 @@ test.describe("通知（PC）", () => {
       .getByRole("region", { name: "通知" })
       .getByRole("listitem")
       .first();
-    await expect(async () => {
-      await page.reload();
-      await expect(notification).toHaveText("Bobさんにフォローされました", {
-        timeout: 1000,
-      });
-      await expect(notification).toHaveClass(/bg-base-200/, { timeout: 1000 });
-    }).toPass();
+    await expect(notification).toHaveText("Bobさんにフォローされました");
+    await expect(notification).toHaveClass(/bg-base-200/);
 
     await expect(async () => {
       await page.reload();
