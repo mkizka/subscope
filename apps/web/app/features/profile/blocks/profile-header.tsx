@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
+import { ImageViewer } from "@/app/components/ui/image-viewer";
 
 type Props = {
   displayName?: string;
@@ -24,18 +25,35 @@ export function ProfileHeader({
   followersCount,
   action,
 }: Props) {
+  const [viewing, setViewing] = useState<string>();
   return (
     <section className="border-b border-line">
       {bannerUrl ? (
-        <img src={bannerUrl} alt="" className="h-32 w-full object-cover" />
+        <button
+          type="button"
+          aria-label="バナーを拡大"
+          className="block w-full cursor-zoom-in"
+          onClick={() => setViewing(bannerUrl)}
+        >
+          <img src={bannerUrl} alt="" className="h-32 w-full object-cover" />
+        </button>
       ) : (
         <div className="h-32 bg-surface-2" />
       )}
       <div className="flex flex-col gap-2 px-4 pb-4">
         <div className="flex items-end justify-between">
-          <span className="-mt-10 rounded-full border-4 border-surface">
+          <button
+            type="button"
+            aria-label="アイコンを拡大"
+            disabled={!avatarUrl}
+            className="
+              -mt-10 cursor-zoom-in rounded-full border-4 border-surface
+              disabled:cursor-default
+            "
+            onClick={() => setViewing(avatarUrl)}
+          >
             <Avatar src={avatarUrl} size="lg" />
-          </span>
+          </button>
           {action}
         </div>
         <div className="min-w-0">
@@ -56,6 +74,13 @@ export function ProfileHeader({
           </Link>
         </div>
       </div>
+      <ImageViewer
+        images={viewing ? [{ src: viewing, alt: "" }] : []}
+        index={viewing ? 0 : -1}
+        onIndexChange={(index) => {
+          if (index < 0) setViewing(undefined);
+        }}
+      />
     </section>
   );
 }
