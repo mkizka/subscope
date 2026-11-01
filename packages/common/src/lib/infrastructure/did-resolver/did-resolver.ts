@@ -1,7 +1,11 @@
 import type { DidCache, DidResolverOpts } from "@atproto/identity";
-import { DidResolver as AtprotoDidResolver } from "@atproto/identity";
+import {
+  DidNotFoundError as AtprotoDidNotFoundError,
+  DidResolver as AtprotoDidResolver,
+} from "@atproto/identity";
 
 import {
+  DidNotFoundError,
   DidResolutionError,
   type IDidResolver,
 } from "../../domain/interfaces/did-resolver.js";
@@ -50,6 +54,9 @@ export class DidResolver implements IDidResolver {
     } catch (error) {
       this.metricReporter.increment("resolve_did_error_total");
       this.logger.warn(error, `Failed to resolve DID: ${did}`);
+      if (error instanceof AtprotoDidNotFoundError) {
+        throw new DidNotFoundError(did);
+      }
       throw new DidResolutionError(did);
     }
   }
