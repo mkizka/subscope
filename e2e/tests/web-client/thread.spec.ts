@@ -195,7 +195,7 @@ test.describe("スレッド", () => {
     }
   });
 
-  test("thread-9: スレッドで返信ボタンを押すとスレッドの下に投稿欄が開き、投稿すると再読み込みなしでスレッドに返信を表示する", async ({
+  test("thread-9: スレッドで返信ボタンを押すと投稿欄が開き、投稿すると再読み込みなしでスレッドに返信を表示する", async ({
     page,
   }) => {
     const target = await post("thread-9: 投稿");
@@ -206,10 +206,10 @@ test.describe("スレッド", () => {
       .getByRole("article", { name: "選んだ投稿" })
       .getByRole("button", { name: "返信" })
       .click();
-    await thread
+    await page
       .getByRole("textbox", { name: "投稿内容" })
       .fill("thread-9: 返信");
-    await thread.getByRole("button", { name: "投稿", exact: true }).click();
+    await page.getByRole("button", { name: "投稿", exact: true }).click();
 
     await expect(
       thread.getByRole("article").filter({ hasText: "thread-9: 返信" }),

@@ -27,7 +27,6 @@ const meta = {
       ],
     },
     closeSearch: "",
-    onCompose: () => {},
   },
 } satisfies Meta<typeof ThreadPanel>;
 

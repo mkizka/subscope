@@ -2,7 +2,6 @@ import { XIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
-import type { ComposeTarget } from "@/app/features/timeline/blocks/post-form-container";
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import {
@@ -23,8 +22,6 @@ type Props = {
     replies: TimelinePost[][];
   } | null;
   closeSearch: string;
-  onCompose: (target: ComposeTarget) => void;
-  form?: ReactNode;
 };
 
 function FocusedPost({
@@ -123,10 +120,8 @@ function ConnectedPost(props: PostCardProps) {
   );
 }
 
-export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
-  const toolbar = (post: TimelinePost) => (
-    <PostToolbarContainer {...post} onCompose={onCompose} />
-  );
+export function ThreadPanel({ thread, closeSearch }: Props) {
+  const toolbar = (post: TimelinePost) => <PostToolbarContainer {...post} />;
   return (
     <section aria-label="スレッド" className="flex flex-col">
       <header
@@ -165,11 +160,6 @@ export function ThreadPanel({ thread, closeSearch, onCompose, form }: Props) {
             ),
           )}
         </>
-      )}
-      {form && (
-        <div className="sticky bottom-0 border-t border-base-300 bg-base-100 p-3">
-          {form}
-        </div>
       )}
     </section>
   );

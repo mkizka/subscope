@@ -1,4 +1,13 @@
-import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { PenSquareIcon } from "lucide-react";
+import {
+  createContext,
+  type ReactNode,
+  use,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
@@ -39,49 +48,103 @@ export type ComposeTarget = {
   onPosted?: () => void;
 };
 
-type Props = {
-  target?: ComposeTarget;
-  onClearTarget: () => void;
-};
+type OpenCompose = (target?: ComposeTarget) => void;
 
-export function PostFormContainer({ target, onClearTarget }: Props) {
+const ComposeContext = createContext<OpenCompose>(() => {});
+
+export const useCompose = () => use(ComposeContext);
+
+function PostFormDialogContainer({
+  target,
+  onClose,
+}: {
+  target?: ComposeTarget;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
   const fetcher = useFetcher<typeof action>();
-  const [posted, setPosted] = useState<{
-    uri: string;
-    target?: ComposeTarget;
-  }>();
-  const uri = fetcher.data && "uri" in fetcher.data && fetcher.data.uri;
-  if (uri && uri !== posted?.uri) {
-    setPosted({ uri, target });
-  }
-  useEffect(() => posted?.target?.onPosted?.(), [posted]);
-  const current = posted?.target === target ? undefined : target;
+  const queryClient = useQueryClient();
+  const uri =
+    fetcher.data && "uri" in fetcher.data ? fetcher.data.uri : undefined;
+
+  useEffect(() => ref.current?.showModal(), []);
+  useEffect(() => {
+    if (!uri) return;
+    target?.onPosted?.();
+    void queryClient.invalidateQueries({ queryKey: ["thread"] });
+    ref.current?.close();
+  }, [uri, target, queryClient]);
+
   return (
-    <PostForm
-      key={posted?.uri}
-      context={
-        current &&
-        `@${current.handle} ${current.type === "reply" ? "に返信" : "を引用"}`
-      }
-      onCancelContext={onClearTarget}
-      isSubmitting={fetcher.state !== "idle"}
-      error={
-        fetcher.data && "error" in fetcher.data ? fetcher.data.error : undefined
-      }
-      onSubmit={(formData) => {
-        if (current) {
-          formData.set("type", current.type);
-          formData.set("uri", current.uri);
-          formData.set("cid", current.cid);
-          formData.set("rootUri", current.root?.uri ?? "");
-          formData.set("rootCid", current.root?.cid ?? "");
-        }
-        return fetcher.submit(formData, {
-          method: "POST",
-          action: "/?index",
-          encType: "multipart/form-data",
-        });
-      }}
-    />
+    <dialog ref={ref} className="modal" aria-label="投稿" onClose={onClose}>
+      <div className="modal-box">
+        <PostForm
+          context={
+            target &&
+            `@${target.handle} ${target.type === "reply" ? "に返信" : "を引用"}`
+          }
+          onCancel={() => ref.current?.close()}
+          isSubmitting={fetcher.state !== "idle"}
+          error={
+            fetcher.data && "error" in fetcher.data
+              ? fetcher.data.error
+              : undefined
+          }
+          onSubmit={(formData) => {
+            if (target) {
+              formData.set("type", target.type);
+              formData.set("uri", target.uri);
+              formData.set("cid", target.cid);
+              formData.set("rootUri", target.root?.uri ?? "");
+              formData.set("rootCid", target.root?.cid ?? "");
+            }
+            return fetcher.submit(formData, {
+              method: "POST",
+              action: "/?index",
+              encType: "multipart/form-data",
+            });
+          }}
+        />
+      </div>
+      <form method="dialog" className="modal-backdrop">
+        <button type="submit">閉じる</button>
+      </form>
+    </dialog>
+  );
+}
+
+export function ComposeProvider({ children }: { children: ReactNode }) {
+  const [compose, setCompose] = useState<{ target?: ComposeTarget }>();
+  return (
+    <ComposeContext value={(target) => setCompose({ target })}>
+      {children}
+      {compose && (
+        <PostFormDialogContainer
+          target={compose.target}
+          onClose={() => setCompose(undefined)}
+        />
+      )}
+    </ComposeContext>
+  );
+}
+
+export function ComposeButton({
+  className,
+  children,
+}: {
+  className: string;
+  children?: ReactNode;
+}) {
+  const openCompose = useCompose();
+  return (
+    <button
+      type="button"
+      className={className}
+      aria-label="新規投稿"
+      onClick={() => openCompose()}
+    >
+      <PenSquareIcon className="size-5" />
+      {children}
+    </button>
   );
 }

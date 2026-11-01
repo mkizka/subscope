@@ -93,7 +93,7 @@ export function ListPage({
         ))}
       </div>
       {tab === "posts" ? (
-        <TimelineFeed posts={posts} onCompose={() => {}} />
+        <TimelineFeed posts={posts} />
       ) : (
         <>
           {isSelf && <AddListMemberForm listUri={uri} />}
