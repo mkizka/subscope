@@ -5,7 +5,6 @@ import {
   type PostCardProps,
 } from "@/app/features/timeline/parts/post-card";
 
-import type { ComposeTarget } from "./post-form-container";
 import { PostToolbarContainer } from "./post-toolbar-container";
 
 export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
@@ -19,10 +18,9 @@ export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
 
 type Props = {
   posts: TimelinePost[];
-  onCompose: (target: ComposeTarget) => void;
 };
 
-export function TimelineFeed({ posts, onCompose }: Props) {
+export function TimelineFeed({ posts }: Props) {
   const [searchParams] = useSearchParams();
   const threadSearch = (uri: string) => {
     const params = new URLSearchParams(searchParams);
@@ -42,7 +40,7 @@ export function TimelineFeed({ posts, onCompose }: Props) {
           key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
           {...post}
           threadSearch={threadSearch(post.uri)}
-          toolbar={<PostToolbarContainer {...post} onCompose={onCompose} />}
+          toolbar={<PostToolbarContainer {...post} />}
         />
       ))}
     </section>

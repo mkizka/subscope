@@ -6,7 +6,7 @@ import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
 import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";
 
-import type { ComposeTarget } from "./post-form-container";
+import { useCompose } from "./post-form-container";
 import type { TimelinePost } from "./timeline-feed";
 
 export const reactionSchema = z.object({
@@ -18,9 +18,7 @@ export const reactionSchema = z.object({
 
 export const deletePostSchema = z.object({ uri: z.string() });
 
-type Props = TimelinePost & {
-  onCompose: (target: ComposeTarget) => void;
-};
+type Props = TimelinePost;
 
 function useReaction(
   type: z.infer<typeof reactionSchema>["type"],
@@ -57,6 +55,7 @@ export function PostToolbarContainer(props: Props) {
     props.viewerRepost,
     props.repostCount,
   );
+  const openCompose = useCompose();
   const deleter = useFetcher<typeof deletePostAction>();
   const [minReplyCount, setMinReplyCount] = useState(0);
   const replyCount = Math.max(props.replyCount ?? 0, minReplyCount);
@@ -82,7 +81,7 @@ export function PostToolbarContainer(props: Props) {
           : undefined
       }
       onReply={() =>
-        props.onCompose({
+        openCompose({
           type: "reply",
           uri: props.uri,
           cid: props.cid,
@@ -92,7 +91,7 @@ export function PostToolbarContainer(props: Props) {
         })
       }
       onQuote={() =>
-        props.onCompose({
+        openCompose({
           type: "quote",
           uri: props.uri,
           cid: props.cid,

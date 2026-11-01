@@ -15,14 +15,14 @@ test.describe("投稿欄", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await expect(async () => {
-      await page.getByRole("button", { name: "いまどうしてる？" }).click();
+      await page.getByRole("button", { name: "新規投稿" }).click();
       await expect(page.getByRole("textbox", { name: "投稿内容" })).toBeVisible(
         { timeout: 1000 },
       );
     }).toPass();
   });
 
-  test("post-form-1: 畳んだ投稿欄はクリックで広がり、投稿した内容を再読み込みなしでタイムラインの一番下に表示する", async ({
+  test("post-form-1: 新規投稿ボタンで投稿欄を開き、投稿すると投稿欄を閉じて、投稿した内容を再読み込みなしでタイムラインに表示する", async ({
     page,
     request,
   }) => {
@@ -44,7 +44,10 @@ test.describe("投稿欄", () => {
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
 
-    await expect(page.getByText(/^post-form-1: /).last()).toHaveText(text);
+    await expect(
+      page.getByRole("textbox", { name: "投稿内容" }),
+    ).not.toBeVisible();
+    await expect(page.getByText(text)).toBeVisible();
   });
 
   test("post-form-2: 300字を超えると投稿できない", async ({ page }) => {
@@ -87,8 +90,8 @@ test.describe("投稿欄", () => {
     await page.getByRole("checkbox", { name: "メンションした人" }).check();
     await page.getByRole("button", { name: "投稿", exact: true }).click();
     await expect(
-      page.getByRole("button", { name: "いまどうしてる？" }),
-    ).toBeVisible();
+      page.getByRole("textbox", { name: "投稿内容" }),
+    ).not.toBeVisible();
 
     const did = await resolveHandle("alice.test");
     const threadgates = await request.get(
@@ -131,8 +134,8 @@ test.describe("投稿欄", () => {
     await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
     await expect(
-      page.getByRole("button", { name: "いまどうしてる？" }),
-    ).toBeVisible();
+      page.getByRole("textbox", { name: "投稿内容" }),
+    ).not.toBeVisible();
 
     const did = await resolveHandle("alice.test");
     const posts = await request.get(

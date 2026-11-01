@@ -13,6 +13,8 @@ import {
 import type { ReactNode } from "react";
 import { Form, NavLink } from "react-router";
 
+import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
+
 type Props = {
   did?: string;
   avatarUrl?: string;
@@ -77,6 +79,9 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
             </a>
           </li>
         )}
+        <li className="mt-2">
+          <ComposeButton className="btn btn-primary">新規投稿</ComposeButton>
+        </li>
         {isAdmin && (
           <li className="mt-auto">
             <h2 className="menu-title">サーバー管理</h2>
