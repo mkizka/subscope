@@ -39,7 +39,7 @@ test.describe("画像の拡大表示", () => {
       "src",
       /feed_fullsize/,
     );
-    expect(new URL(page.url()).searchParams.has("thread")).toBe(false);
+    expect(page.url()).not.toContain("/post/");
   });
 
   test("image-viewer-2: 画像が複数あるときは、前後の画像に切り替えられる", async ({
