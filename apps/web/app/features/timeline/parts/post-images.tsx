@@ -35,7 +35,7 @@ export function PostImages({ images }: { images: PostImage[] }) {
             <img
               src={image.thumb}
               alt={image.alt}
-              className="aspect-square w-full rounded-sm object-cover"
+              className="aspect-square w-full rounded-xl object-cover"
             />
           </button>
         ))}

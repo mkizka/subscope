@@ -7,6 +7,8 @@ import {
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+import { Badge } from "@/app/components/ui/badge";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 import { type PostImage, PostImages } from "./post-images";
@@ -57,12 +59,11 @@ function formatRelativeTime(dateString: string) {
 function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
   if (!props.count) return null;
   return (
-    <span
-      title={`${props.count}件の${props.label}`}
-      className="badge gap-1 badge-ghost badge-sm"
-    >
-      <props.Icon className="size-3" />
-      {props.count}
+    <span title={`${props.count}件の${props.label}`}>
+      <Badge>
+        <props.Icon className="mr-1 size-4" />
+        {props.count}
+      </Badge>
     </span>
   );
 }
@@ -73,16 +74,14 @@ export function QuotedPost({
   quote: NonNullable<PostCardProps["quote"]>;
 }) {
   return (
-    <blockquote className="mt-2 rounded-box border border-base-300 px-3 py-2">
-      <div className="flex items-baseline gap-2 text-sm">
+    <blockquote className="mt-2 rounded-xl border border-line px-3 py-2">
+      <div className="flex items-baseline gap-2 text-label">
         <span className="truncate font-bold">
           {quote.authorDisplayName ?? quote.authorHandle}
         </span>
-        <span className="truncate text-base-content/60">
-          @{quote.authorHandle}
-        </span>
+        <span className="truncate text-muted">@{quote.authorHandle}</span>
       </div>
-      <p className="text-sm wrap-break-word whitespace-pre-wrap">
+      <p className="text-label wrap-break-word whitespace-pre-wrap">
         {quote.text}
       </p>
     </blockquote>
@@ -100,25 +99,27 @@ export function ExternalCard({
       target="_blank"
       rel="noopener noreferrer"
       className="
-        relative mt-2 block overflow-hidden rounded-box border border-base-300
-        hover:bg-base-300
+        relative mt-2 block overflow-hidden rounded-xl border border-line
+        hover:bg-surface-2
       "
     >
       {external.thumb && (
         <img
           src={external.thumb}
           alt=""
-          className="aspect-[1.91/1] w-full object-cover"
+          className="aspect-video w-full object-cover"
         />
       )}
       <div className="px-3 py-2">
-        <div className="truncate text-xs text-base-content/60">
+        <div className="truncate text-caption text-muted">
           {URL.canParse(external.uri)
             ? new URL(external.uri).host
             : external.uri}
         </div>
-        <div className="line-clamp-2 text-sm font-bold">{external.title}</div>
-        <div className="line-clamp-2 text-sm">{external.description}</div>
+        <div className="line-clamp-2 text-label font-bold">
+          {external.title}
+        </div>
+        <div className="line-clamp-2 text-label">{external.description}</div>
       </div>
     </a>
   );
@@ -145,8 +146,8 @@ export function PostCard({
   return (
     <article
       className="
-        relative px-4 py-2
-        hover:bg-base-200
+        relative border-b border-line px-4 py-3
+        hover:bg-surface-2
       "
     >
       {threadPath && (
@@ -156,36 +157,24 @@ export function PostCard({
           className="absolute inset-0"
         />
       )}
-      {reasonRepost && (
-        <div
-          className="
-            mb-1 flex items-center gap-1 pl-12 text-xs text-base-content/70
-          "
-        >
-          <RepeatIcon className="size-3" />
-          <span>
-            {reasonRepost.byDisplayName ?? reasonRepost.byHandle}
-            がリポスト
-          </span>
-        </div>
-      )}
       <div className="flex gap-3">
         <ProfileLink
           handle={authorHandle}
           aria-label={authorDisplayName ?? authorHandle}
           className="relative shrink-0 self-start"
         >
-          {authorAvatar ? (
-            <img
-              src={authorAvatar}
-              alt=""
-              className="size-9 rounded-md object-cover"
-            />
-          ) : (
-            <div className="size-9 rounded-md bg-base-300" />
-          )}
+          <Avatar src={authorAvatar} />
         </ProfileLink>
         <div className="min-w-0 flex-1">
+          {reasonRepost && (
+            <div className="mb-1 flex items-center gap-1 text-caption text-muted">
+              <RepeatIcon className="size-4" />
+              <span>
+                {reasonRepost.byDisplayName ?? reasonRepost.byHandle}
+                がリポスト
+              </span>
+            </div>
+          )}
           <div className="flex items-baseline gap-2">
             <ProfileLink
               handle={authorHandle}
@@ -196,7 +185,7 @@ export function PostCard({
             >
               {authorDisplayName ?? authorHandle}
             </ProfileLink>
-            <span className="shrink-0 text-xs text-base-content/60">
+            <span className="shrink-0 text-label text-muted">
               {createdAt
                 ? hydrated && formatRelativeTime(createdAt)
                 : "日時不明"}
@@ -226,7 +215,7 @@ export function PostCard({
               {!!replyCount && (
                 <div
                   className="
-                    mt-1 flex items-center gap-1 text-sm font-bold text-primary
+                    mt-1 flex items-center gap-1 text-label font-bold text-brand
                   "
                 >
                   <MessageCircleIcon className="size-4" />

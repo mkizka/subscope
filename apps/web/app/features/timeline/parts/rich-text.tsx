@@ -56,7 +56,10 @@ export function RichText({
       <ProfileLink
         key={segment.start}
         handle={segment.did}
-        className="relative link link-primary"
+        className="
+          relative text-brand
+          hover:underline
+        "
       >
         {segment.text}
       </ProfileLink>
@@ -66,7 +69,10 @@ export function RichText({
         href={segment.uri}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative link link-primary"
+        className="
+          relative text-brand
+          hover:underline
+        "
       >
         {segment.text}
       </a>
