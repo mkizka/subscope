@@ -7,15 +7,19 @@ import {
   resolveHandle,
 } from "../../helpers/pds";
 
-const createList = async (name: string) => {
-  const bob = await resolveHandle("bob.test");
+const createEmptyList = async (name: string) => {
   await follow("alice.test", "bob.test");
-  const list = await createRecord("alice.test", "app.bsky.graph.list", {
+  return createRecord("alice.test", "app.bsky.graph.list", {
     purpose: "app.bsky.graph.defs#curatelist",
     name,
     description: `${name}の説明`,
     createdAt: new Date().toISOString(),
   });
+};
+
+const createList = async (name: string) => {
+  const bob = await resolveHandle("bob.test");
+  const list = await createEmptyList(name);
   await createRecord("alice.test", "app.bsky.graph.listitem", {
     subject: bob,
     list: list.uri,
@@ -194,5 +198,53 @@ test.describe("リスト", () => {
           value.list === `at://${alice}/app.bsky.graph.list/${rkey}`,
       ),
     ).toEqual([]);
+  });
+
+  test("list-7: 自分のリストの「メンバー」タブで、ハンドルを入力したユーザーをリストに追加する", async ({
+    page,
+  }) => {
+    const list = await createEmptyList(`list-7のリスト ${Date.now()}`);
+    const rkey = list.uri.split("/").at(-1);
+    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByLabel("ハンドル")).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await main.getByLabel("ハンドル").fill("bob.test");
+    const submitted = page.waitForResponse((res) =>
+      res.url().includes("/api/list-members"),
+    );
+    await main.getByRole("button", { name: "追加する" }).click();
+    await submitted;
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("@bob.test")).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
+  test("list-8: 自分のリストの「メンバー」タブで、メンバーをリストから削除する", async ({
+    page,
+  }) => {
+    const rkey = await createList(`list-8のリスト ${Date.now()}`);
+    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("@bob.test")).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    const submitted = page.waitForResponse((res) =>
+      res.url().includes("/api/list-members"),
+    );
+    await main.getByRole("button", { name: "削除", exact: true }).click();
+    await submitted;
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("@bob.test")).toBeHidden({ timeout: 1000 });
+    }).toPass();
   });
 });
