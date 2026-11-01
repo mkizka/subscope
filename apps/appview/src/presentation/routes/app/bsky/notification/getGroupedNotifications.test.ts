@@ -273,17 +273,13 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     // arrange
     const { client } = await setup();
 
-    // act
-    const peopleIFollow = client.call(getGroupedNotifications, {
-      feed: "people-i-follow",
-    });
-    const activity = client.call(getGroupedNotifications, {
-      feed: "activity",
-    });
-
-    // assert
+    // act & assert
     const error = { status: 501, error: "MethodNotImplemented" };
-    await expect(peopleIFollow).rejects.toMatchObject(error);
-    await expect(activity).rejects.toMatchObject(error);
+    await expect(
+      client.call(getGroupedNotifications, { feed: "people-i-follow" }),
+    ).rejects.toMatchObject(error);
+    await expect(
+      client.call(getGroupedNotifications, { feed: "activity" }),
+    ).rejects.toMatchObject(error);
   });
 });

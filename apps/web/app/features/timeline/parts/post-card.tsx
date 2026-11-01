@@ -24,6 +24,12 @@ export type PostCardProps = {
   likeCount?: number;
   createdAt?: string;
   images?: PostImage[];
+  external?: {
+    uri: string;
+    title: string;
+    description: string;
+    thumb?: string;
+  };
   quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
   reasonRepost?: {
     byDisplayName?: string;
@@ -83,6 +89,41 @@ export function QuotedPost({
   );
 }
 
+export function ExternalCard({
+  external,
+}: {
+  external: NonNullable<PostCardProps["external"]>;
+}) {
+  return (
+    <a
+      href={external.uri}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="
+        relative mt-2 block overflow-hidden rounded-box border border-base-300
+        hover:bg-base-300
+      "
+    >
+      {external.thumb && (
+        <img
+          src={external.thumb}
+          alt=""
+          className="aspect-[1.91/1] w-full object-cover"
+        />
+      )}
+      <div className="px-3 py-2">
+        <div className="truncate text-xs text-base-content/60">
+          {URL.canParse(external.uri)
+            ? new URL(external.uri).host
+            : external.uri}
+        </div>
+        <div className="line-clamp-2 text-sm font-bold">{external.title}</div>
+        <div className="line-clamp-2 text-sm">{external.description}</div>
+      </div>
+    </a>
+  );
+}
+
 export function PostCard({
   authorAvatar,
   authorDisplayName,
@@ -94,6 +135,7 @@ export function PostCard({
   likeCount,
   createdAt,
   images,
+  external,
   quote,
   reasonRepost,
   toolbar,
@@ -165,6 +207,7 @@ export function PostCard({
             {text && <RichText text={text} links={links} />}
           </p>
           {images && <PostImages images={images} />}
+          {external && <ExternalCard external={external} />}
           {quote && <QuotedPost quote={quote} />}
           {toolbar ?? (
             <>
