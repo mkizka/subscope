@@ -27,8 +27,7 @@ export const getTimelineUseCaseFactory = ({
         .map((post) => ({
           ...post,
           deletable: post.uri.startsWith(`at://${did}/`),
-        }))
-        .reverse(),
+        })),
       cursor: timeline.cursor,
     };
   },
