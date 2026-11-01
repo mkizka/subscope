@@ -32,6 +32,16 @@ export class IndexCommitUseCase {
 
   async doIndexCommit({ commit, live, jobLogger }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
+      if (
+        commit.operation !== "delete" &&
+        !(await this.indexRecordService.shouldIndex({
+          ctx,
+          record: commit.record,
+          jobLogger,
+        }))
+      ) {
+        return;
+      }
       const isNotOlder =
         commit.rev === undefined ||
         (await this.recordRevRepository.saveIfNotOlder({
@@ -49,7 +59,6 @@ export class IndexCommitUseCase {
           await this.indexRecordService.upsert({
             ctx,
             record: commit.record,
-            jobLogger,
             live,
             depth: 0,
           });
