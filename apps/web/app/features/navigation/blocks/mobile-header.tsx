@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { useRef } from "react";
 import { Form, Link } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
 import { ServerAbout } from "@/app/features/navigation/parts/server-about";
 
 type Props = {
@@ -43,13 +44,7 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
         className="flex size-10 items-center justify-center"
         onClick={() => ref.current?.showModal()}
       >
-        {avatarUrl && (
-          <img
-            src={avatarUrl}
-            alt=""
-            className="size-7 rounded-full bg-surface-2 object-cover"
-          />
-        )}
+        <Avatar src={avatarUrl} size="sm" />
       </button>
       <img src="/favicon.svg" alt="Subscope" className="mx-auto size-8" />
       <dialog

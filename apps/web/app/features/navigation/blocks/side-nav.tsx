@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import {
   BellIcon,
   CircleUserIcon,
@@ -14,6 +15,8 @@ import {
 import type { ReactNode } from "react";
 import { Form, NavLink } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+import { buttonClass } from "@/app/components/ui/button";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -92,13 +95,7 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
           </li>
         )}
         <li className="mt-2">
-          <ComposeButton
-            className="
-              flex h-10 w-full items-center justify-center gap-2 rounded-full
-              bg-brand text-label font-bold text-on-brand
-              hover:opacity-90
-            "
-          >
+          <ComposeButton className={clsx(buttonClass(), "w-full")}>
             新規投稿
           </ComposeButton>
         </li>
@@ -139,15 +136,7 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
         )}
       </ul>
       <div className="flex items-center gap-2 border-t border-line pt-4">
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt=""
-            className="size-7 rounded-full object-cover"
-          />
-        ) : (
-          <div className="size-7 rounded-full bg-surface-2" />
-        )}
+        <Avatar src={avatarUrl} size="sm" />
         {handle && (
           <span className="min-w-0 flex-1 truncate text-label text-muted">
             @{handle}
@@ -156,11 +145,7 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
         <button
           type="button"
           popoverTarget="account-menu"
-          className="
-            ml-auto flex size-10 items-center justify-center rounded-full
-            text-muted
-            hover:bg-surface-2
-          "
+          className={clsx(buttonClass({ variant: "ghost" }), "ml-auto")}
           aria-label="アカウントメニュー"
         >
           <EllipsisIcon className="size-4" />

@@ -2,6 +2,8 @@ import { BellIcon, CircleUserIcon, HomeIcon, SearchIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 
+import { Badge } from "@/app/components/ui/badge";
+
 type Props = {
   profileId?: string;
   unreadCount: number;
@@ -49,13 +51,8 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
       <Tab to="/notifications" icon={<BellIcon className="size-6" />}>
         通知
         {unreadCount > 0 && (
-          <span
-            className="
-              absolute top-1 left-1/2 ml-1 rounded-full bg-brand px-2
-              text-caption text-on-brand
-            "
-          >
-            {unreadCount}
+          <span className="absolute top-1 left-1/2 ml-1">
+            <Badge variant="count">{unreadCount}</Badge>
           </span>
         )}
       </Tab>

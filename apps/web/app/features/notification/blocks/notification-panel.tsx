@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { Avatar } from "@/app/components/ui/avatar";
 
 type Notification = {
   uri: string;
@@ -103,15 +104,7 @@ export function NotificationPanel({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  {notification.avatarUrl ? (
-                    <img
-                      src={notification.avatarUrl}
-                      alt=""
-                      className="size-7 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="size-7 rounded-full bg-surface-2" />
-                  )}
+                  <Avatar src={notification.avatarUrl} size="sm" />
                   <p className="mt-1">
                     <span className="font-bold">{notification.authorName}</span>
                     {reason?.label}
