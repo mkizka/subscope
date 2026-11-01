@@ -3,8 +3,9 @@ import type {
   IJobScheduler,
   Record,
 } from "@repo/common/domain";
-import { Like } from "@repo/common/domain";
+import { Like, RecordValidationError } from "@repo/common/domain";
 
+import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
@@ -15,18 +16,31 @@ export class LikeIndexer implements ICollectionIndexer {
     private readonly likeRepository: ILikeRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly followRepository: IFollowRepository,
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
   async upsert({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = Like.from(record);
+    const recipientDid = like.subjectUri.host;
+    const isRecipientSubscriber =
+      await this.subscriptionRepository.isSubscriber(ctx, recipientDid);
+    const shouldSave =
+      isRecipientSubscriber ||
+      (await this.subscriptionRepository.isSubscriber(ctx, like.actorDid)) ||
+      (await this.followRepository.isFollowedByAnySubscriber({
+        ctx,
+        subjectDid: recipientDid,
+      }));
+    if (!shouldSave) {
+      throw new RecordValidationError(
+        "like subject is not a tracked actor's post",
+        record.uri,
+      );
+    }
     await this.likeRepository.upsert({ ctx, like });
 
-    const recipientDid = like.subjectUri.host;
-    if (
-      recipientDid !== like.actorDid &&
-      (await this.subscriptionRepository.isSubscriber(ctx, recipientDid))
-    ) {
+    if (recipientDid !== like.actorDid && isRecipientSubscriber) {
       await this.notificationRepository.createMany({
         ctx,
         notifications: [
