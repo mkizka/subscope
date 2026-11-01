@@ -22,8 +22,8 @@ Server implementations are located under the apps directory.
 
 - web ... Web client and admin dashboard
 - appview ... AppView server that exposes the XRPC API and serves the `did:web` document
-- ingester ... Receives Tap events and adds jobs
-- worker ... Worker that indexes records into the database
+- ingester ... Receives labels and adds jobs
+- worker ... Worker that receives Tap events and indexes records into the database
 
 ## Deployment
 
