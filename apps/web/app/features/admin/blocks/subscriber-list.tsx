@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { Avatar } from "@/app/components/ui/avatar";
+import { Badge } from "@/app/components/ui/badge";
+import { Button } from "@/app/components/ui/button";
 import { formatDate } from "@/app/lib/format-date";
 
 export type BannedActor = {
@@ -30,15 +33,7 @@ function ProfileCell({
 }) {
   return (
     <>
-      {actor.avatar ? (
-        <img
-          src={actor.avatar}
-          alt=""
-          className="size-10 shrink-0 rounded-full"
-        />
-      ) : (
-        <div className="size-10 shrink-0 rounded-full bg-surface-2" />
-      )}
+      <Avatar src={actor.avatar} />
       <div className="min-w-0 flex-1">
         <div className="truncate font-bold">
           {actor.displayName ?? actor.handle}
@@ -91,34 +86,36 @@ export function SubscriberList({
     tab === "banned" ? bannedActors.length === 0 : subscribers.length === 0;
   return (
     <>
-      <div className="flex items-baseline gap-2 px-4 py-3">
-        <h1 className="text-title">登録ユーザー</h1>
-        {total !== undefined && (
-          <span className="text-label text-muted">{total}人</span>
-        )}
-      </div>
-      <div role="tablist" className="flex border-b border-line">
-        {(
-          [
-            ["subscribers", "登録ユーザー"],
-            ["banned", "BAN済み"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            className="
-              flex-1 py-2.5 text-label text-muted
-              aria-selected:font-bold aria-selected:text-ink
-              aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
-            "
-            onClick={() => onTabChange?.(value)}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="sticky top-0 border-b border-line bg-surface">
+        <div className="flex items-baseline gap-2 px-4 py-3">
+          <h1 className="text-title">登録ユーザー</h1>
+          {total !== undefined && (
+            <span className="text-label text-muted">{total}人</span>
+          )}
+        </div>
+        <div role="tablist" className="flex">
+          {(
+            [
+              ["subscribers", "登録ユーザー"],
+              ["banned", "BAN済み"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              role="tab"
+              aria-selected={tab === value}
+              className="
+                flex-1 py-2.5 text-label text-muted
+                aria-selected:font-bold aria-selected:text-ink
+                aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
+              "
+              onClick={() => onTabChange?.(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
       {!isLoading && isEmpty && (
         <p className="py-8 text-center text-label text-muted">
@@ -142,20 +139,18 @@ export function SubscriberList({
                 onConfirm={() => onUnban?.(actor.did)}
               >
                 {(open) => (
-                  <button
+                  <Button
                     type="button"
-                    className="
-                      inline-flex items-center gap-1 rounded-full border
-                      border-line px-3 py-1 text-label
-                      hover:bg-surface-2
-                      disabled:opacity-50
-                    "
-                    disabled={unbanningDid === actor.did}
+                    variant="secondary"
+                    size="sm"
+                    loading={unbanningDid === actor.did}
                     onClick={open}
                   >
-                    <UndoIcon className="size-4" />
+                    {unbanningDid !== actor.did && (
+                      <UndoIcon className="size-4" />
+                    )}
                     解除
-                  </button>
+                  </Button>
                 )}
               </ConfirmDialog>
             </li>
@@ -169,16 +164,7 @@ export function SubscriberList({
                 </div>
               </ProfileCell>
               {subscriber.isAdmin ? (
-                <span
-                  className="
-                    inline-flex shrink-0 items-center gap-1 rounded-full
-                    bg-brand-soft px-2.5 py-0.5 text-caption font-bold
-                    text-brand
-                  "
-                >
-                  <ShieldIcon className="size-3" />
-                  管理者
-                </span>
+                <Badge>管理者</Badge>
               ) : (
                 <ConfirmDialog
                   title={`@${subscriber.handle} を管理者にしますか？`}

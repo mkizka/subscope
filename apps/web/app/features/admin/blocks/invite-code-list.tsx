@@ -1,12 +1,9 @@
-import {
-  CheckIcon,
-  CopyIcon,
-  LoaderCircleIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { CheckIcon, CopyIcon, Trash2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
+import { Avatar } from "@/app/components/ui/avatar";
+import { Button } from "@/app/components/ui/button";
 import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 import { formatDate } from "@/app/lib/format-date";
 
@@ -46,12 +43,10 @@ function isExpired(code: InviteCode) {
 function CopyButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <button
+    <Button
       type="button"
-      className="
-        inline-flex size-6 items-center justify-center rounded-full
-        hover:bg-surface-2
-      "
+      variant="ghost"
+      size="sm"
       aria-label="コピー"
       onClick={() =>
         void navigator.clipboard.writeText(code).then(() => {
@@ -61,11 +56,11 @@ function CopyButton({ code }: { code: string }) {
       }
     >
       {copied ? (
-        <CheckIcon className="size-3.5" />
+        <CheckIcon className="size-4" />
       ) : (
-        <CopyIcon className="size-3.5" />
+        <CopyIcon className="size-4" />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -80,30 +75,17 @@ export function InviteCodeItems({
       className="flex items-center gap-3 border-b border-line px-4 py-3"
     >
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <span className="font-mono">{code.code}</span>
           {!code.usedAt && !isExpired(code) && <CopyButton code={code.code} />}
         </div>
+        {code.usedBy && (
+          <div className="flex items-center gap-2 py-1 text-label">
+            <Avatar src={code.usedBy.avatar} size="sm" />
+            {code.usedBy.displayName ?? code.usedBy.handle} が使用
+          </div>
+        )}
         <div className="text-label text-muted">
-          {code.usedBy && (
-            <>
-              {code.usedBy.avatar ? (
-                <img
-                  src={code.usedBy.avatar}
-                  alt=""
-                  className="inline size-4 rounded-full align-text-bottom"
-                />
-              ) : (
-                <span
-                  className="
-                    inline-block size-4 rounded-full bg-surface-2
-                    align-text-bottom
-                  "
-                />
-              )}{" "}
-              {code.usedBy.displayName ?? code.usedBy.handle} が使用・
-            </>
-          )}
           {formatDate(code.expiresAt)} まで有効・{formatDate(code.createdAt)}{" "}
           作成
         </div>
@@ -118,29 +100,23 @@ export function InviteCodeItems({
           onConfirm={() => onDeleteCode(code.code)}
         >
           {(open) => (
-            <button
+            <Button
               type="button"
-              className="
-                inline-flex size-8 items-center justify-center rounded-full
-                hover:bg-surface-2
-                disabled:opacity-50
-              "
+              variant="ghost"
               aria-label="削除"
               onClick={() =>
                 isExpired(code) ? onDeleteCode(code.code) : open()
               }
-              disabled={deletingCode === code.code}
+              loading={deletingCode === code.code}
             >
-              {deletingCode === code.code ? (
-                <LoaderCircleIcon className="size-4 animate-spin" />
-              ) : (
+              {deletingCode !== code.code && (
                 <Trash2Icon className="size-4 text-danger" />
               )}
-            </button>
+            </Button>
           )}
         </ConfirmDialog>
       ) : (
-        <span className="size-8" />
+        <span className="size-10" />
       )}
     </li>
   ));
@@ -158,21 +134,14 @@ export function InviteCodeList({
     <div>
       <div
         className="
-          flex items-center justify-between border-b border-line px-4 py-3
+          sticky top-0 flex items-center justify-between border-b border-line
+          bg-surface px-4 py-3
         "
       >
         <h1 className="text-title">招待コード</h1>
-        <button
-          type="button"
-          className="
-            rounded-full bg-brand px-4 py-1.5 text-label font-bold text-on-brand
-            disabled:opacity-50
-          "
-          onClick={onCreateCode}
-          disabled={isCreating}
-        >
-          {isCreating ? "作成中..." : "新規作成"}
-        </button>
+        <Button type="button" onClick={onCreateCode} loading={isCreating}>
+          新規作成
+        </Button>
       </div>
       <ul aria-label="招待コード">
         {codes.length === 0 ? (
