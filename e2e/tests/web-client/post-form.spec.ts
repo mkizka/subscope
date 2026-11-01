@@ -22,7 +22,7 @@ test.describe("投稿欄", () => {
     }).toPass();
   });
 
-  test("post-form-1: 新規投稿ボタンで投稿欄を開き、投稿すると投稿欄を閉じて、投稿した内容を再読み込みなしでタイムラインに表示する", async ({
+  test("post-form-1: 新規投稿ボタンで投稿欄を開き、投稿すると投稿欄を閉じて、投稿した内容を再読み込みなしでタイムラインの一番上に表示する", async ({
     page,
     request,
   }) => {
@@ -47,7 +47,7 @@ test.describe("投稿欄", () => {
     await expect(
       page.getByRole("textbox", { name: "投稿内容" }),
     ).not.toBeVisible();
-    await expect(page.getByText(text)).toBeVisible();
+    await expect(page.getByText(/^post-form-1: /).first()).toHaveText(text);
   });
 
   test("post-form-2: 300字を超えると投稿できない", async ({ page }) => {
