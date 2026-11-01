@@ -12,9 +12,9 @@ type Props = {
 export function MembersPage({ members, hasMore }: Props) {
   return (
     <ThreeColumnLayout>
-      <h1 className="border-b border-base-300 p-4 text-lg font-bold">
+      <h1 className="border-b border-line p-4 text-title">
         メンバー{" "}
-        <span className="font-normal text-base-content/60">
+        <span className="font-normal text-muted">
           {members.length}人{hasMore && "以上"}
         </span>
       </h1>
