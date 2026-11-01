@@ -91,7 +91,9 @@ test.describe("過去の投稿の取り込み状態", () => {
     await expect(page.getByText(IN_PROGRESS)).toBeVisible();
     await page.clock.fastForward(30_000);
 
-    const timelineResponse = page.waitForResponse("**/_root.data*");
+    const timelineResponse = page.waitForResponse((response) =>
+      new URL(response.url()).pathname.endsWith(".data"),
+    );
     await page.getByRole("button", { name: "更新する" }).click();
     await timelineResponse;
 
