@@ -217,7 +217,10 @@ test.describe("スレッド", () => {
     await page
       .getByRole("textbox", { name: "投稿内容" })
       .fill("thread-9: 返信");
-    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "返信", exact: true })
+      .click();
 
     await expect(
       thread.getByRole("article").filter({ hasText: "thread-9: 返信" }),

@@ -10,9 +10,11 @@ import {
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
+import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
 import type { action } from "@/app/routes/_index";
 
 import {
+  type ComposePost,
   countGraphemes,
   MAX_IMAGES,
   MAX_POST_LENGTH,
@@ -42,7 +44,7 @@ export type ComposeTarget = {
   type: "reply" | "quote";
   uri: string;
   cid: string;
-  handle: string;
+  post: ComposePost;
   root?: { uri: string; cid: string };
   onPosted?: () => void;
 };
@@ -61,6 +63,7 @@ function PostFormDialogContainer({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const me = useMe();
   const fetcher = useFetcher<typeof action>();
   const uri =
     fetcher.data && "uri" in fetcher.data ? fetcher.data.uri : undefined;
@@ -76,10 +79,8 @@ function PostFormDialogContainer({
     <PostForm
       ref={ref}
       onClose={onClose}
-      context={
-        target &&
-        `@${target.handle} ${target.type === "reply" ? "に返信" : "を引用"}`
-      }
+      author={me}
+      target={target}
       onCancel={() => ref.current?.close()}
       isSubmitting={fetcher.state !== "idle"}
       error={

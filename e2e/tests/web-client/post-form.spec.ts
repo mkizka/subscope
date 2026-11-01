@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
-import { PDS_URL, resolveHandle } from "../../helpers/pds";
+import { createRecord, PDS_URL, resolveHandle } from "../../helpers/pds";
 
 const image = (name: string) => ({
   name,
@@ -169,4 +169,47 @@ test.describe("投稿欄", () => {
       },
     ]);
   });
+
+  test("post-form-7: 入力欄に添えて、自分のアイコン・名前・ハンドルを表示する", async ({
+    page,
+  }) => {
+    await expect(page.getByRole("dialog")).toContainText("@alice.test");
+  });
+});
+
+const openComposeFrom = async (page: Page, text: string, button: string) => {
+  await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+  await page.goto("/");
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await post.getByRole("button", { name: button }).click();
+  return page.getByRole("dialog");
+};
+
+test("post-form-8: 返信するときは、自分の名前の上に返信先の投稿の投稿者名・ハンドル・本文を表示し、投稿ボタンを「返信」にする", async ({
+  page,
+}) => {
+  const text = `post-form-8: ${Date.now()}`;
+  const dialog = await openComposeFrom(page, text, "返信");
+
+  await expect(dialog.getByRole("article")).toContainText(text);
+  await expect(dialog.getByRole("article")).toContainText("@alice.test");
+  await expect(
+    dialog.getByRole("button", { name: "返信", exact: true }),
+  ).toBeVisible();
+});
+
+test("post-form-9: 引用するときは、入力欄の下に引用先の投稿の投稿者名と本文を枠で囲んで表示する", async ({
+  page,
+}) => {
+  const text = `post-form-9: ${Date.now()}`;
+  const dialog = await openComposeFrom(page, text, "引用");
+
+  await expect(dialog.getByRole("blockquote")).toContainText(text);
 });
