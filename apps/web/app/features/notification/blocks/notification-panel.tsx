@@ -70,13 +70,7 @@ export function NotificationPanel({
 }: Props) {
   return (
     <section aria-label="通知">
-      <h2
-        className="
-          sticky top-0 border-b border-line bg-surface px-4 py-3 text-title
-        "
-      >
-        通知
-      </h2>
+      <h2 className="border-b border-line px-4 py-3 text-title">通知</h2>
       {notifications.length === 0 ? (
         <p className="py-8 text-center text-label text-muted">
           通知はまだありません

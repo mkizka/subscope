@@ -1,4 +1,3 @@
-import { clsx } from "clsx";
 import type { ReactNode } from "react";
 
 import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tabs-container";
@@ -6,8 +5,6 @@ import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-h
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { ServerAbout } from "@/app/features/navigation/parts/server-about";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
-
-import { buttonClass } from "./ui/button";
 
 type Props = {
   children: ReactNode;
@@ -33,13 +30,12 @@ export const ThreeColumnLayout = ({ children }: Props) => {
         <MobileHeaderContainer />
         {children}
         <ComposeButton
-          className={clsx(
-            buttonClass(),
-            `
-              fixed right-4 bottom-20 z-10 size-14 shadow-lg
-              lg:hidden
-            `,
-          )}
+          className="
+            fixed right-4 bottom-20 z-10 flex size-14 items-center
+            justify-center rounded-full bg-brand text-on-brand shadow-lg
+            hover:opacity-90
+            lg:hidden
+          "
         />
         <BottomTabsContainer />
       </main>

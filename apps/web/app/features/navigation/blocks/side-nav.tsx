@@ -17,6 +17,7 @@ import { Form, NavLink } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { buttonClass } from "@/app/components/ui/button";
+import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -142,34 +143,16 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
             @{handle}
           </span>
         )}
-        <button
-          type="button"
-          popoverTarget="account-menu"
-          className={clsx(buttonClass({ variant: "ghost" }), "ml-auto")}
-          aria-label="アカウントメニュー"
+        <Menu
+          label="アカウントメニュー"
+          placement="top"
+          trigger={<EllipsisIcon className="size-4" />}
         >
-          <EllipsisIcon className="size-4" />
-        </button>
-        <div
-          id="account-menu"
-          popover="auto"
-          className="
-            inset-auto bottom-20 left-4 w-40 rounded-xl border border-line
-            bg-surface py-2 text-ink shadow-lg
-          "
-        >
-          <button
-            type="submit"
-            form="logout-form"
-            className="
-              flex w-full items-center gap-2 px-4 py-2 text-label
-              hover:bg-surface-2
-            "
-          >
+          <button type="submit" form="logout-form" className={menuItemClass}>
             <LogOutIcon className="size-4" />
             ログアウト
           </button>
-        </div>
+        </Menu>
         <Form id="logout-form" method="post" action="/oauth/logout" />
       </div>
     </nav>
