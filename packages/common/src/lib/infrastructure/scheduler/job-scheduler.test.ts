@@ -14,7 +14,7 @@ describe("JobScheduler", () => {
     jobQueue.clear();
   });
 
-  test("index-11: バックフィル(liveがfalse)のレコードから積むレコードの取得とハンドルの解決のジョブは、ライブのものより低い優先度で積む", async () => {
+  test("index-12: バックフィル(liveがfalse)のレコードから積むレコードの取得とハンドルの解決のジョブは、ライブのものより低い優先度で積む", async () => {
     // act
     for (const live of [false, true]) {
       const did = `did:plc:${live}` as const;
