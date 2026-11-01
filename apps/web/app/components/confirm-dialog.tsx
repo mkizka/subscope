@@ -1,5 +1,8 @@
 import { type ReactNode, useRef } from "react";
 
+import { Button } from "./ui/button";
+import { Dialog } from "./ui/dialog";
+
 type Props = {
   title: string;
   description: string;
@@ -21,27 +24,33 @@ export function ConfirmDialog({
   return (
     <>
       {children(() => ref.current?.showModal())}
-      <dialog ref={ref} className="modal" aria-label={title}>
-        <div className="modal-box">
-          <h3 className="text-lg font-bold">{title}</h3>
-          <p className="py-4">{description}</p>
-          <form method="dialog" className="modal-action">
-            <button type="submit" className="btn btn-ghost">
+      <Dialog
+        ref={ref}
+        title={title}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => ref.current?.close()}
+            >
               キャンセル
-            </button>
-            <button
-              type="submit"
-              className={danger ? "btn btn-error" : "btn btn-primary"}
-              onClick={onConfirm}
+            </Button>
+            <Button
+              type="button"
+              variant={danger ? "danger" : "primary"}
+              onClick={() => {
+                ref.current?.close();
+                onConfirm();
+              }}
             >
               {confirmLabel}
-            </button>
-          </form>
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button type="submit">閉じる</button>
-        </form>
-      </dialog>
+            </Button>
+          </>
+        }
+      >
+        <p>{description}</p>
+      </Dialog>
     </>
   );
 }

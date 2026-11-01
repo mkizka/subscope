@@ -73,40 +73,33 @@ function PostFormDialogContainer({
   }, [uri, target]);
 
   return (
-    <dialog ref={ref} className="modal" aria-label="投稿" onClose={onClose}>
-      <div className="modal-box">
-        <PostForm
-          context={
-            target &&
-            `@${target.handle} ${target.type === "reply" ? "に返信" : "を引用"}`
-          }
-          onCancel={() => ref.current?.close()}
-          isSubmitting={fetcher.state !== "idle"}
-          error={
-            fetcher.data && "error" in fetcher.data
-              ? fetcher.data.error
-              : undefined
-          }
-          onSubmit={(formData) => {
-            if (target) {
-              formData.set("type", target.type);
-              formData.set("uri", target.uri);
-              formData.set("cid", target.cid);
-              formData.set("rootUri", target.root?.uri ?? "");
-              formData.set("rootCid", target.root?.cid ?? "");
-            }
-            return fetcher.submit(formData, {
-              method: "POST",
-              action: "/?index",
-              encType: "multipart/form-data",
-            });
-          }}
-        />
-      </div>
-      <form method="dialog" className="modal-backdrop">
-        <button type="submit">閉じる</button>
-      </form>
-    </dialog>
+    <PostForm
+      ref={ref}
+      onClose={onClose}
+      context={
+        target &&
+        `@${target.handle} ${target.type === "reply" ? "に返信" : "を引用"}`
+      }
+      onCancel={() => ref.current?.close()}
+      isSubmitting={fetcher.state !== "idle"}
+      error={
+        fetcher.data && "error" in fetcher.data ? fetcher.data.error : undefined
+      }
+      onSubmit={(formData) => {
+        if (target) {
+          formData.set("type", target.type);
+          formData.set("uri", target.uri);
+          formData.set("cid", target.cid);
+          formData.set("rootUri", target.root?.uri ?? "");
+          formData.set("rootCid", target.root?.cid ?? "");
+        }
+        return fetcher.submit(formData, {
+          method: "POST",
+          action: "/?index",
+          encType: "multipart/form-data",
+        });
+      }}
+    />
   );
 }
 
