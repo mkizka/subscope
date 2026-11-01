@@ -250,7 +250,7 @@ Bluesky公式と同じく、PCは3カラム、スマホは1カラムにする。
 - 送信中: ボタンを無効にし、ラベルの前に lucide の `LoaderCircle` を `animate-spin` で出す
 - エラー: 入力欄の枠を `border-danger` にし、下に `text-label text-danger` で理由を出す
 - 空の一覧: `py-8 text-center text-label text-muted` で1文を出す
-- 動き: スピナー以外のアニメーションやトランジションは付けない
+- 動き: スピナーと読み込み中のプログレスバー（`animate-progress`）以外のアニメーションやトランジションは付けない
 
 ### 一覧
 
