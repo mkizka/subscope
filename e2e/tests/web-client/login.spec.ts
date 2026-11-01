@@ -73,6 +73,7 @@ test.describe("ログイン", () => {
     page,
   }) => {
     await login(page, "bob.test", "/login");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     await page.route("**/login.data", async (route) => {
       if (route.request().method() !== "POST") await route.continue();
     });
