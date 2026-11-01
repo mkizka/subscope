@@ -138,6 +138,7 @@ test.describe("画像の拡大表示", () => {
     const viewer = page.getByRole("dialog", { name: "画像の拡大表示" });
     await page.goto("/");
     await page.getByRole("link", { name: "プロフィール" }).click();
+    await expect(page).toHaveURL(/\/profile\//);
     await expect(async () => {
       await page.reload();
       await main
