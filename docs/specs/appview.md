@@ -306,7 +306,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.getSubscribers
 
-サブスクライバーのプロフィール、管理者かどうか、登録日時と、サブスクライバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
+サブスクライバーのプロフィール、管理者かどうか、登録日時、取り込み状態と、サブスクライバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
 
 - getSubscribers-1: 認証がないリクエストには401を返す
 - getSubscribers-2: 管理者でないアカウントからのリクエストには403を返す
@@ -314,6 +314,11 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getSubscribers-4: テイクダウンされたサブスクライバーも含める
 - getSubscribers-5: サブスクライバーごとに登録日時をsubscribedAtとして返す
 - getSubscribers-6: ページングに関係なくサブスクライバーの総数をtotalとして返す
+- getSubscribers-7: サブスクライバー本人とフォロー先の全員のバックフィルが完了していれば、backfillStatusをcompletedにする
+- getSubscribers-8: サブスクライバー本人とフォロー先に1人でもバックフィルがエラーのアカウントがいれば、backfillStatusをerrorにする
+- getSubscribers-9: completedでもerrorでもなければ、backfillStatusをinProgressにする
+
+バックフィルの状態はworkerがactorsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。状態をまだ確認していないアカウントは完了していないものとして扱う。
 
 ## me.subsco.admin.grantAdmin
 

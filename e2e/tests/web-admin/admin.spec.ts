@@ -208,6 +208,24 @@ test.describe("登録ユーザー", () => {
     );
   });
 
+  test("subscribers-9: 「登録ユーザー」タブの各行に、本人とフォロー先の過去の投稿の取り込み状態を「取り込み済み」「取り込み中」「取り込みエラー」のバッジで出す", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const aliceDid = await resolveHandle("alice.test");
+
+    await expect(async () => {
+      await page.goto("/admin/subscribers");
+      const row = page
+        .getByRole("main")
+        .getByRole("listitem")
+        .filter({ has: page.getByTitle(aliceDid) });
+      await expect(row.getByText("取り込み済み")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
   test("subscribers-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
     page,
   }) => {

@@ -21,7 +21,14 @@ export type BannedActor = {
 export type Subscriber = BannedActor & {
   isAdmin: boolean;
   subscribedAt: string;
+  backfillStatus: string;
 };
+
+function BackfillBadge({ status }: { status: string }) {
+  if (status === "completed") return <Badge>取り込み済み</Badge>;
+  if (status === "error") return <Badge variant="danger">取り込みエラー</Badge>;
+  return <Badge>取り込み中</Badge>;
+}
 
 const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";
 
@@ -151,7 +158,8 @@ export function SubscriberList({
           subscribers.map((subscriber) => (
             <li key={subscriber.did} className={rowClass}>
               <ProfileCell actor={subscriber}>
-                <div className="text-caption text-muted">
+                <div className="flex items-center gap-2 text-caption text-muted">
+                  <BackfillBadge status={subscriber.backfillStatus} />
                   {formatDate(subscriber.subscribedAt)} 登録
                 </div>
               </ProfileCell>

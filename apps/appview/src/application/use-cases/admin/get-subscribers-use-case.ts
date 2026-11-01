@@ -34,6 +34,10 @@ export class GetSubscribersUseCase {
     ]);
 
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
+    const backfillStatuses =
+      await this.actorRepository.findBackfillStatusesWithFollows(
+        paginationResult.items.map((sub) => asDid(sub.actorDid)),
+      );
     const subscribers = await Promise.all(
       paginationResult.items.map(async (sub) => {
         const did = asDid(sub.actorDid);
@@ -46,6 +50,7 @@ export class GetSubscribersUseCase {
             profile,
             isAdmin: actor?.isAdmin ?? false,
             subscribedAt: toDatetimeString(sub.createdAt),
+            backfillStatus: backfillStatuses.get(did) ?? "inProgress",
           }
         );
       }),

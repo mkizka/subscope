@@ -256,7 +256,7 @@ Bluesky公式と同じく、PCは3カラム、スマホは1カラムにする。
 | `Menu`   | `menu.tsx`   | `popover` 属性で作るメニュー。項目は `px-4 py-2 text-label`                                                                                                           |
 | `Tabs`   | `tabs.tsx`   | URLで切り替えるタブ。均等幅で、選択中は `text-ink font-bold` と下線                                                                                                   |
 | `Avatar` | `avatar.tsx` | 大きさは28px（ナビ・小さい一覧）、40px（投稿・ユーザー一覧）、80px（プロフィール）の3つ                                                                               |
-| `Badge`  | `badge.tsx`  | 件数は `brand` の塗り、状態は `surface-2` の塗り                                                                                                                      |
+| `Badge`  | `badge.tsx`  | 件数は `brand` の塗り、状態は `surface-2` の塗り、エラーの状態は `surface-2` の塗りに `danger` の文字                                                                 |
 
 - チェックボックス・ラジオ・セレクトはブラウザ標準の要素を使う。色は `app.css` の `accent-color` で `brand` になる
 - アイコンは lucide-react だけを使う。大きさはボタンや補足の中で `size-4`、投稿のアクションで `size-5`、ナビとタブで `size-6`

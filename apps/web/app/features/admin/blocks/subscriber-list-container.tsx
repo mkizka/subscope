@@ -96,10 +96,9 @@ export function SubscriberListContainer() {
     select: (data) => ({
       total: data.pages[0]?.total,
       subscribers: data.pages.flatMap((page) =>
-        page.subscribers.map(({ profile, isAdmin, subscribedAt }) => ({
+        page.subscribers.map(({ profile, ...subscriber }) => ({
           ...profile,
-          isAdmin,
-          subscribedAt,
+          ...subscriber,
         })),
       ),
     }),

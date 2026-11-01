@@ -1,7 +1,10 @@
 import type { Did } from "@atproto/did";
 import type { Actor, TransactionContext } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
+import type {
+  BackfillStatus,
+  IActorRepository,
+} from "../../application/interfaces/actor-repository.js";
 
 export class InMemoryActorRepository implements IActorRepository {
   private actors: Map<Did, Actor> = new Map();
@@ -40,5 +43,9 @@ export class InMemoryActorRepository implements IActorRepository {
       .sort()
       .slice(0, params.limit);
     return Promise.resolve(dids);
+  }
+
+  findBackfillStatusesWithFollows(): Promise<Map<Did, BackfillStatus>> {
+    return Promise.resolve(new Map<Did, BackfillStatus>());
   }
 }

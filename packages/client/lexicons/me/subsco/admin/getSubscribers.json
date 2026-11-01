@@ -44,7 +44,7 @@
     },
     "subscriber": {
       "type": "object",
-      "required": ["profile", "isAdmin", "subscribedAt"],
+      "required": ["profile", "isAdmin", "subscribedAt", "backfillStatus"],
       "properties": {
         "profile": {
           "type": "ref",
@@ -56,6 +56,10 @@
         "subscribedAt": {
           "type": "string",
           "format": "datetime"
+        },
+        "backfillStatus": {
+          "type": "string",
+          "knownValues": ["inProgress", "completed", "error"]
         }
       }
     }
