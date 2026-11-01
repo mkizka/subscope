@@ -21,7 +21,7 @@ function Tab({
       to={to}
       end
       className={({ isActive }) =>
-        `relative flex flex-col items-center gap-0.5 py-2 text-xs ${isActive ? "font-bold text-ink" : "text-muted"}`
+        `relative flex flex-col items-center gap-1 py-2 text-caption ${isActive ? "font-bold text-ink" : "text-muted"}`
       }
     >
       {icon}
@@ -51,8 +51,8 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
         {unreadCount > 0 && (
           <span
             className="
-              absolute top-1 left-1/2 ml-1 rounded-full bg-brand px-1.5
-              text-[10px] font-bold text-on-brand
+              absolute top-1 left-1/2 ml-1 rounded-full bg-brand px-2
+              text-caption text-on-brand
             "
           >
             {unreadCount}

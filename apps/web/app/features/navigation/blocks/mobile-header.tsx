@@ -20,7 +20,7 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
       to={to}
       onClick={close}
       className="
-        flex items-center gap-3 rounded-xl p-3
+        flex items-center gap-3 rounded-xl px-3 py-2 text-body
         hover:bg-surface-2
       "
     >
@@ -40,11 +40,15 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
       <button
         type="button"
         aria-label="メニューを開く"
-        className="size-9 overflow-hidden rounded-full bg-line"
+        className="flex size-10 items-center justify-center"
         onClick={() => ref.current?.showModal()}
       >
         {avatarUrl && (
-          <img src={avatarUrl} alt="" className="size-full object-cover" />
+          <img
+            src={avatarUrl}
+            alt=""
+            className="size-7 rounded-full bg-surface-2 object-cover"
+          />
         )}
       </button>
       <img src="/favicon.svg" alt="Subscope" className="mx-auto size-8" />
@@ -62,25 +66,25 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
           {profileId &&
             item(
               `/profile/${profileId}/lists`,
-              <ListIcon className="size-5" />,
+              <ListIcon className="size-6" />,
               "リスト",
             )}
-          {item("/members", <UsersIcon className="size-5" />, "メンバー")}
+          {item("/members", <UsersIcon className="size-6" />, "メンバー")}
           {isAdmin &&
             item(
               "/admin/subscribers",
-              <ShieldIcon className="size-5" />,
+              <ShieldIcon className="size-6" />,
               "サーバー管理",
             )}
           <Form method="post" action="/oauth/logout">
             <button
               type="submit"
               className="
-                flex w-full items-center gap-3 rounded-xl p-3
+                flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body
                 hover:bg-surface-2
               "
             >
-              <LogOutIcon className="size-5" />
+              <LogOutIcon className="size-6" />
               ログアウト
             </button>
           </Form>

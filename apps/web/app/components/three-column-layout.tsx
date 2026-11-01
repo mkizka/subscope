@@ -12,7 +12,7 @@ type Props = {
 
 export const ThreeColumnLayout = ({ children }: Props) => {
   return (
-    <div className="flex min-h-screen bg-surface text-ink">
+    <div className="flex min-h-screen justify-center bg-surface text-ink">
       <aside
         className="
           hidden w-60 shrink-0 border-r border-line
@@ -23,7 +23,7 @@ export const ThreeColumnLayout = ({ children }: Props) => {
       </aside>
       <main
         className="
-          min-w-0 flex-1 pb-16
+          w-full max-w-main min-w-0 pb-16
           lg:pb-0
         "
       >
@@ -46,9 +46,7 @@ export const ThreeColumnLayout = ({ children }: Props) => {
           lg:border-l
         "
       >
-        <div className="rounded-[14px] border border-line p-3.5 text-sm">
-          <ServerAbout />
-        </div>
+        <ServerAbout />
       </aside>
     </div>
   );

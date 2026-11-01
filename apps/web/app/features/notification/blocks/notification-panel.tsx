@@ -28,43 +28,37 @@ type Props = {
 
 const reasons: Record<
   string,
-  { label: string; name: string; icon: LucideIcon; color: string }
+  { label: string; name: string; icon: LucideIcon }
 > = {
   like: {
     label: "さんがいいねしました",
     name: "いいね",
     icon: HeartIcon,
-    color: "text-pink-500",
   },
   repost: {
     label: "さんがリポストしました",
     name: "リポスト",
     icon: Repeat2Icon,
-    color: "text-green-600",
   },
   follow: {
     label: "さんにフォローされました",
     name: "フォロー",
     icon: UserPlusIcon,
-    color: "text-sky-500",
   },
   reply: {
     label: "さんが返信しました",
     name: "返信",
     icon: MessageCircleIcon,
-    color: "text-brand",
   },
   quote: {
     label: "さんが引用しました",
     name: "引用",
     icon: QuoteIcon,
-    color: "text-brand",
   },
   mention: {
     label: "さんがメンションしました",
     name: "メンション",
     icon: AtSignIcon,
-    color: "text-brand",
   },
 };
 
@@ -75,11 +69,15 @@ export function NotificationPanel({
 }: Props) {
   return (
     <section aria-label="通知">
-      <h2 className="border-b border-line px-4 py-3.5 text-lg font-bold">
+      <h2
+        className="
+          sticky top-0 border-b border-line bg-surface px-4 py-3 text-title
+        "
+      >
         通知
       </h2>
       {notifications.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted">
+        <p className="py-8 text-center text-label text-muted">
           通知はまだありません
         </p>
       ) : (
@@ -100,7 +98,7 @@ export function NotificationPanel({
                     <Icon
                       role="img"
                       aria-label={reason.name}
-                      className={clsx("size-6", reason.color)}
+                      className="size-6 text-brand"
                     />
                   )}
                 </div>
@@ -112,14 +110,19 @@ export function NotificationPanel({
                       className="size-7 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="size-7 rounded-full bg-line" />
+                    <div className="size-7 rounded-full bg-surface-2" />
                   )}
                   <p className="mt-1">
                     <span className="font-bold">{notification.authorName}</span>
                     {reason?.label}
                   </p>
                   {notification.text && (
-                    <p className="mt-0.5 text-sm whitespace-pre-wrap text-muted">
+                    <p
+                      className="
+                        mt-1 text-label wrap-break-word whitespace-pre-wrap
+                        text-muted
+                      "
+                    >
                       {notification.text}
                     </p>
                   )}

@@ -52,7 +52,7 @@ export default function App() {
         <div
           role="progressbar"
           aria-label="読み込み中"
-          className="fixed inset-x-0 top-0 z-50 h-1 animate-pulse bg-brand"
+          className="fixed inset-x-0 top-0 z-50 h-1 bg-brand"
         />
       )}
       <ComposeProvider>
