@@ -14,6 +14,26 @@ describe("JobScheduler", () => {
     jobQueue.clear();
   });
 
+  test("index-12: バックフィル(liveがfalse)のレコードから積むレコードの取得とハンドルの解決のジョブは、ライブのものより低い優先度で積む", async () => {
+    // act
+    for (const live of [false, true]) {
+      const did = `did:plc:${live}` as const;
+      await jobScheduler.scheduleFetchRecord(
+        AtUri.make(did, "app.bsky.actor.profile", "self"),
+        { live, depth: 0 },
+      );
+      await jobScheduler.scheduleResolveDid(did, { live });
+    }
+
+    // assert
+    expect(jobQueue.getJobs().map((job) => job.options?.priority)).toEqual([
+      1,
+      1,
+      undefined,
+      undefined,
+    ]);
+  });
+
   describe("scheduleFetchRecord", () => {
     test("fetchRecordジョブをスケジュールする", async () => {
       // arrange
@@ -39,30 +59,6 @@ describe("JobScheduler", () => {
         },
       });
     });
-
-    test("live=trueの場合、priority指定なしでジョブをスケジュールする", async () => {
-      // arrange
-      const uri = AtUri.make("did:plc:test", "app.bsky.actor.profile", "self");
-
-      // act
-      await jobScheduler.scheduleFetchRecord(uri, { live: true, depth: 0 });
-
-      // assert
-      const jobs = jobQueue.getJobs();
-      expect(jobs).toHaveLength(1);
-      expect(jobs[0]).toMatchObject({
-        queueName: "fetchRecord",
-        jobName: uri.toString(),
-        data: {
-          uri: uri.toString(),
-          depth: 0,
-          live: true,
-        },
-        options: {
-          jobId: uri.toString(),
-        },
-      });
-    });
   });
 
   describe("scheduleResolveDid", () => {
@@ -71,7 +67,7 @@ describe("JobScheduler", () => {
       const did = "did:plc:test";
 
       // act
-      await jobScheduler.scheduleResolveDid(did);
+      await jobScheduler.scheduleResolveDid(did, { live: true });
 
       // assert
       const jobs = jobQueue.getJobs();

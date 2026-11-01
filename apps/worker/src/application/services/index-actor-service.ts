@@ -51,7 +51,9 @@ export class IndexActorService {
     }
 
     if (!actor.handle) {
-      ctx.afterCommit(() => this.jobScheduler.scheduleResolveDid(did));
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleResolveDid(did, { live }),
+      );
     }
 
     const profileExists = await this.profileRepository.exists({

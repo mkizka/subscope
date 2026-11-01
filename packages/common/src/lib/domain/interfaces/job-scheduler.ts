@@ -8,7 +8,7 @@ export interface IJobScheduler {
     uri: AtUri,
     options: { live: boolean; depth: number },
   ) => Promise<void>;
-  scheduleResolveDid: (did: Did) => Promise<void>;
+  scheduleResolveDid: (did: Did, options: { live: boolean }) => Promise<void>;
   scheduleSyncTapRepo: (did: Did) => Promise<void>;
   scheduleAggregatePostStats: (uri: AtUri) => Promise<void>;
   scheduleAggregateActorStats: (
