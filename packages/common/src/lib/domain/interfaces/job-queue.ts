@@ -12,12 +12,18 @@ type AggregateActorStatsData = {
   type: "follows" | "followers" | "posts";
 };
 
+type CheckBackfillData = {
+  did: Did;
+  attempt: number;
+};
+
 export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
   aggregatePostStats: null;
   aggregateActorStats: AggregateActorStatsData;
   syncTapRepo: Did;
+  checkBackfill: CheckBackfillData;
 };
 
 export type QueueName = keyof JobData;

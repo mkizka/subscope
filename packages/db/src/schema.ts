@@ -23,6 +23,9 @@ export const actors = pgTable(
       .$type<"active" | "deactivated" | "deleted" | "suspended" | "takendown">()
       .default("active")
       .notNull(),
+    backfillStatus: varchar({ length: 16 }).$type<
+      "inProgress" | "completed" | "error"
+    >(),
     indexedAt: timestamp().notNull(),
   },
   (table) => [index("handle_idx").on(table.handle)],

@@ -6,6 +6,14 @@ import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
 
+const CHECK_BACKFILL_DELAYS_MS = [
+  0,
+  10 * 1000,
+  60 * 1000,
+  5 * 60 * 1000,
+  10 * 60 * 1000,
+];
+
 export class JobScheduler implements IJobScheduler {
   constructor(private readonly jobQueue: IJobQueue) {}
 
@@ -50,6 +58,19 @@ export class JobScheduler implements IJobScheduler {
       queueName: "syncTapRepo",
       jobName: did,
       data: did,
+    });
+  }
+
+  async scheduleCheckBackfill(did: Did, attempt: number): Promise<void> {
+    await this.jobQueue.add({
+      queueName: "checkBackfill",
+      jobName: did,
+      data: { did, attempt },
+      options: {
+        deduplication: { id: did, keepLastIfActive: true },
+        delay:
+          CHECK_BACKFILL_DELAYS_MS[attempt] ?? CHECK_BACKFILL_DELAYS_MS.at(-1),
+      },
     });
   }
 

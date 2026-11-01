@@ -1,0 +1,1 @@
+ALTER TABLE "actors" ADD COLUMN "backfill_status" varchar(16);

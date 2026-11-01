@@ -1,5 +1,9 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient, ITapClient } from "@repo/common/domain";
+import type {
+  DatabaseClient,
+  IJobScheduler,
+  ITapClient,
+} from "@repo/common/domain";
 
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
@@ -13,6 +17,7 @@ export class SyncTapRepoUseCase {
     private readonly followRepository: IFollowRepository,
     private readonly labelFetcher: ILabelFetcher,
     private readonly indexLabelUseCase: IndexLabelUseCase,
+    private readonly jobScheduler: IJobScheduler,
     private readonly db: DatabaseClient,
   ) {}
 
@@ -26,6 +31,7 @@ export class SyncTapRepoUseCase {
       }));
     if (isTrackedActor) {
       await this.tapClient.addRepo(did);
+      await this.jobScheduler.scheduleCheckBackfill(did, 0);
       for (const label of await this.labelFetcher.fetchByActor(did)) {
         await this.indexLabelUseCase.execute(label);
       }

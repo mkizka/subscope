@@ -5,6 +5,7 @@ import { loggingMiddleware } from "@repo/common/utils";
 import express, { type Router } from "express";
 import promBundle from "express-prom-bundle";
 
+import type { ScheduleBackfillChecksUseCase } from "../application/use-cases/async/schedule-backfill-checks-use-case.js";
 import type { LabelSubscriber } from "./label-subscriber.js";
 import type { TapSubscriber } from "./tap.js";
 import type { SyncWorker } from "./worker.js";
@@ -20,6 +21,7 @@ export class WorkerServer {
     private readonly tapSubscriber: TapSubscriber,
     private readonly labelSubscriber: LabelSubscriber,
     private readonly jobQueue: IJobQueue,
+    private readonly scheduleBackfillChecksUseCase: ScheduleBackfillChecksUseCase,
     healthRouter: Router,
     private readonly port: number,
   ) {
@@ -38,6 +40,9 @@ export class WorkerServer {
       });
       this.labelSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Label subscriber threw");
+      });
+      this.scheduleBackfillChecksUseCase.execute().catch((err: unknown) => {
+        this.logger.error({ err }, "Failed to schedule backfill checks");
       });
       await this.syncWorker.start();
     });

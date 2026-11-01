@@ -19,6 +19,11 @@ interface ScheduledSyncTapRepo {
   did: Did;
 }
 
+interface ScheduledCheckBackfill {
+  did: Did;
+  attempt: number;
+}
+
 interface ScheduledAggregateActorStats {
   did: Did;
   type: JobData["aggregateActorStats"]["type"];
@@ -28,6 +33,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
   private fetchRecordJobs: ScheduledFetchRecord[] = [];
   private resolveDidJobs: ScheduledResolveDid[] = [];
   private syncTapRepoJobs: ScheduledSyncTapRepo[] = [];
+  private checkBackfillJobs: ScheduledCheckBackfill[] = [];
   private aggregatePostStatsUris: AtUri[] = [];
   private aggregateActorStatsJobs: ScheduledAggregateActorStats[] = [];
 
@@ -47,6 +53,10 @@ export class InMemoryJobScheduler implements IJobScheduler {
 
   async scheduleSyncTapRepo(did: Did): Promise<void> {
     this.syncTapRepoJobs.push({ did });
+  }
+
+  async scheduleCheckBackfill(did: Did, attempt: number): Promise<void> {
+    this.checkBackfillJobs.push({ did, attempt });
   }
 
   async scheduleAggregatePostStats(uri: AtUri): Promise<void> {
@@ -72,6 +82,10 @@ export class InMemoryJobScheduler implements IJobScheduler {
     return this.syncTapRepoJobs;
   }
 
+  getCheckBackfillJobs(): readonly ScheduledCheckBackfill[] {
+    return this.checkBackfillJobs;
+  }
+
   getAggregatePostStatsUris(): readonly AtUri[] {
     return this.aggregatePostStatsUris;
   }
@@ -84,6 +98,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.fetchRecordJobs = [];
     this.resolveDidJobs = [];
     this.syncTapRepoJobs = [];
+    this.checkBackfillJobs = [];
     this.aggregatePostStatsUris = [];
     this.aggregateActorStatsJobs = [];
   }

@@ -38,15 +38,29 @@ export const setupJobTest = async () => {
     await services.indexCommitUseCase.execute(command);
   };
   const runSyncTapRepoJobs = async () => {
-    for (const { did } of services.jobScheduler.getSyncTapRepoJobs()) {
+    const jobs = [...services.jobScheduler.getSyncTapRepoJobs()];
+    services.jobScheduler.clear();
+    for (const { did } of jobs) {
       await services.syncTapRepoUseCase.execute(did);
     }
+  };
+  const runCheckBackfillJobs = async () => {
+    const jobs = [...services.jobScheduler.getCheckBackfillJobs()];
     services.jobScheduler.clear();
+    for (const job of jobs) {
+      await services.checkBackfillUseCase.execute(job);
+    }
   };
   return {
     indexCommit,
     runSyncTapRepoJobs,
+    runCheckBackfillJobs,
+    scheduleBackfillChecks: () =>
+      services.scheduleBackfillChecksUseCase.execute(),
+    jobScheduler: services.jobScheduler,
     syncTapRepo: (did: Did) => services.syncTapRepoUseCase.execute(did),
+    checkBackfill: (did: Did, attempt = 0) =>
+      services.checkBackfillUseCase.execute({ did, attempt }),
     indexLabel: (label: LabelData) => services.indexLabelUseCase.execute(label),
     tapClient: services.tapClient,
     labelFetcher: services.labelFetcher,
