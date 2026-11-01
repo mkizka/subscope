@@ -27,6 +27,7 @@ test.describe("レイアウト", () => {
     page,
   }) => {
     await page.goto("/");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
 
     const nav = page.getByRole("navigation");
     await nav.getByRole("button", { name: "アカウントメニュー" }).click();
@@ -111,6 +112,7 @@ test.describe("レイアウト（モバイル）", () => {
     page,
   }) => {
     await page.goto("/");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
 
     await page.getByRole("button", { name: "メニューを開く" }).click();
     await page

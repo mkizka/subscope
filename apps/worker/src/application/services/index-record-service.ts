@@ -59,33 +59,46 @@ export class IndexRecordService {
     };
   }
 
-  async upsert({
+  private indexerFor(record: Record) {
+    if (!isSupportedCollection(record.collection)) {
+      throw new Error(`Unsupported collection: ${record.collection}`);
+    }
+    return this.indexers[record.collection];
+  }
+
+  async shouldIndex({
     ctx,
     record,
     jobLogger,
+  }: {
+    ctx: AfterCommitContext;
+    record: Record;
+    jobLogger: JobLogger;
+  }): Promise<boolean> {
+    const indexer = this.indexerFor(record);
+    if (!isValidRecord(record)) {
+      await jobLogger.log("Invalid record: null character found");
+      return false;
+    }
+    if (indexer.shouldIndex && !(await indexer.shouldIndex({ ctx, record }))) {
+      await jobLogger.log("Record does not match storage rules, skipping");
+      return false;
+    }
+    return true;
+  }
+
+  async upsert({
+    ctx,
+    record,
     live,
     depth,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    jobLogger: JobLogger;
-    force?: boolean;
     live: boolean;
     depth: number;
   }): Promise<void> {
-    if (!isSupportedCollection(record.collection)) {
-      throw new Error(`Unsupported collection: ${record.collection}`);
-    }
-    if (!isValidRecord(record)) {
-      await jobLogger.log("Invalid record: null character found");
-      return;
-    }
-
-    const indexer = this.indexers[record.collection];
-    if (indexer.shouldIndex && !(await indexer.shouldIndex({ ctx, record }))) {
-      await jobLogger.log("Record does not match storage rules, skipping");
-      return;
-    }
+    const indexer = this.indexerFor(record);
     await this.indexActorService.upsert({
       ctx,
       did: record.actorDid,

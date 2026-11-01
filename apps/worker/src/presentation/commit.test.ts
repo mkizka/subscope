@@ -135,4 +135,38 @@ describe("commit", () => {
     // assert
     expect((await findPost(actor.did))?.text).toBe("new");
   });
+
+  test("index-14: 保存しないレコードのコミットは、revを記録しない", async () => {
+    // arrange
+    const liker = await actorFactory(ctx.db).create();
+    const uri = AtUri.make(liker.did, "app.bsky.feed.like", "123");
+
+    // act
+    await processCommit({
+      did: asDid(liker.did),
+      live: true,
+      commit: {
+        operation: "create",
+        collection: "app.bsky.feed.like",
+        rkey: "123",
+        rev: "3aaaaaaaaaaaa",
+        cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
+        record: {
+          $type: "app.bsky.feed.like",
+          subject: {
+            uri: `at://${liker.did}/app.bsky.feed.post/123`,
+            cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
+          },
+          createdAt: new Date().toISOString(),
+        },
+      },
+    });
+
+    // assert
+    const revs = await ctx.db
+      .select()
+      .from(schema.recordRevs)
+      .where(eq(schema.recordRevs.uri, uri.toString()));
+    expect(revs).toEqual([]);
+  });
 });
