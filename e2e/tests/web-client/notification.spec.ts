@@ -38,13 +38,13 @@ test.describe("通知（PC）", () => {
     await follow("alice.test", "bob.test");
     await follow("bob.test", "alice.test");
 
-    await page.goto("/");
+    await page.goto("/notifications");
 
     await expect(async () => {
       await page.reload();
       await expect(
         page
-          .getByRole("complementary")
+          .getByRole("region", { name: "通知" })
           .getByText("Bobさんにフォローされました")
           .first(),
       ).toBeVisible({ timeout: 1000 });
@@ -77,9 +77,9 @@ test.describe("通知（PC）", () => {
       createdAt,
     });
 
-    await page.goto("/");
+    await page.goto("/notifications");
 
-    const panel = page.getByRole("complementary");
+    const panel = page.getByRole("region", { name: "通知" });
     await expect(async () => {
       await page.reload();
       for (const label of [
@@ -141,9 +141,9 @@ test.describe("通知（PC）", () => {
       createdAt,
     });
 
-    await page.goto("/");
+    await page.goto("/notifications");
 
-    const panel = page.getByRole("complementary");
+    const panel = page.getByRole("region", { name: "通知" });
     await expect(async () => {
       await page.reload();
       for (const [label, text] of [
@@ -181,7 +181,7 @@ test.describe("通知（PC）", () => {
       })
       .toBe(uri);
 
-    await page.goto("/");
+    await page.goto("/notifications");
 
     const notification = page
       .getByRole("region", { name: "通知" })
@@ -222,10 +222,10 @@ test.describe("通知（PC）", () => {
       });
     }
 
-    await page.goto("/");
+    await page.goto("/notifications");
 
     const replies = page
-      .getByRole("complementary")
+      .getByRole("region", { name: "通知" })
       .getByText(/^notification-4: リプライ/);
     await expect(async () => {
       await page.reload();
@@ -257,10 +257,10 @@ test.describe("通知（PC）", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await page.goto("/");
+    await page.goto("/notifications");
 
     const notification = page
-      .getByRole("complementary")
+      .getByRole("region", { name: "通知" })
       .getByRole("listitem")
       .filter({ hasText: "Bobさんにフォローされました" })
       .first();

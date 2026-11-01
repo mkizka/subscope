@@ -1,9 +1,8 @@
-import { MenuIcon, XIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { NotificationBellContainer } from "@/app/features/notification/blocks/notification-bell-container";
-import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -49,32 +48,18 @@ export const ThreeColumnLayout = ({ children }: Props) => {
             "
           />
         </main>
-        <input
-          id="notification-toggle"
-          type="checkbox"
-          className="peer hidden"
-        />
         <aside
+          aria-label="このサーバーについて"
           className="
-            hidden overflow-y-auto border-base-300
-            max-lg:peer-checked:fixed max-lg:peer-checked:inset-0
-            max-lg:peer-checked:z-20 max-lg:peer-checked:block
-            max-lg:peer-checked:bg-base-100
+            hidden border-base-300 p-4 text-sm
             lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
             lg:border-l
           "
         >
-          <label
-            htmlFor="notification-toggle"
-            aria-label="通知を閉じる"
-            className="
-              btn m-2 btn-square btn-ghost
-              lg:hidden
-            "
-          >
-            <XIcon />
-          </label>
-          <NotificationPanelContainer />
+          <h2 className="font-bold">このサーバーについて</h2>
+          <p className="mt-2 text-base-content/70">
+            Blueskyのアカウントで使える招待制のサーバーです。メンバーとそのフォロー先の投稿だけを保存します。
+          </p>
         </aside>
       </div>
       <div className="drawer-side z-30">
