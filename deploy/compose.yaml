@@ -44,6 +44,7 @@ services:
     restart: unless-stopped
     environment:
       TAP_DATABASE_URL: sqlite:///data/tap.db
+      TAP_COLLECTION_FILTERS: app.bsky.*
     volumes:
       - tap_data:/data
   atblob:
