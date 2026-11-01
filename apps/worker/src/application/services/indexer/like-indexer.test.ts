@@ -38,7 +38,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: liker.did }));
+      vi.spyOn(followRepo, "isFollowedByAnySubscriber").mockResolvedValue(true);
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
@@ -117,11 +117,11 @@ describe("LikeIndexer", () => {
 
   test.each([
     {
-      name: "いいねした人がサブスクライバー",
+      name: "いいねした人だけがサブスクライバー",
       liker: true,
       author: false,
       followee: false,
-      saved: true,
+      saved: false,
     },
     {
       name: "投稿の作者がサブスクライバー",
@@ -145,7 +145,7 @@ describe("LikeIndexer", () => {
       saved: false,
     },
   ])(
-    "index-11: いいねは、いいねした人がサブスクライバーか、いいねされた投稿の作者が追跡アクターのものだけ保存する($name)",
+    "index-11: いいねは、いいねされた投稿の作者が追跡アクターのものだけ保存する($name)",
     async ({ liker, author, followee, saved }) => {
       // arrange
       const likerActor = actorFactory();
@@ -192,7 +192,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: liker.did }));
+      vi.spyOn(followRepo, "isFollowedByAnySubscriber").mockResolvedValue(true);
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey456`,

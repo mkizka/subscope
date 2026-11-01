@@ -27,7 +27,6 @@ export class LikeIndexer implements ICollectionIndexer {
       await this.subscriptionRepository.isSubscriber(ctx, recipientDid);
     const shouldSave =
       isRecipientSubscriber ||
-      (await this.subscriptionRepository.isSubscriber(ctx, like.actorDid)) ||
       (await this.followRepository.isFollowedByAnySubscriber({
         ctx,
         subjectDid: recipientDid,
