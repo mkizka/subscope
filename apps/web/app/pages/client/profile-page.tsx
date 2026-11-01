@@ -40,7 +40,7 @@ export function ProfilePage({ follow, tabs, tab, posts, ...profile }: Props) {
             role="tab"
             aria-selected={tab === value}
             className="
-              flex-1 py-2.5 text-center text-sm text-muted
+              flex-1 py-3 text-center text-label text-muted
               aria-selected:font-bold aria-selected:text-ink
               aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
             "
@@ -51,7 +51,7 @@ export function ProfilePage({ follow, tabs, tab, posts, ...profile }: Props) {
         <Link
           to="lists"
           role="tab"
-          className="flex-1 py-2.5 text-center text-sm text-muted"
+          className="flex-1 py-3 text-center text-label text-muted"
         >
           リスト
         </Link>

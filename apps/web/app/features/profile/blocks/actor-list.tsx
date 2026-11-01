@@ -42,22 +42,22 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
                   className="size-10 shrink-0 rounded-full object-cover"
                 />
               ) : (
-                <div className="size-10 shrink-0 rounded-full bg-line" />
+                <div className="size-10 shrink-0 rounded-full bg-surface-2" />
               )}
               <div className="min-w-0 flex-1">
-                <p className="truncate font-bold">
+                <p className="truncate text-body font-bold">
                   {actor.displayName || profileId}
                 </p>
-                <p className="truncate text-sm text-muted">@{profileId}</p>
+                <p className="truncate text-label text-muted">@{profileId}</p>
                 {actor.description && (
-                  <p className="truncate text-sm">{actor.description}</p>
+                  <p className="truncate text-label">{actor.description}</p>
                 )}
               </div>
               {actor.isAdmin && (
                 <span
                   className="
                     flex shrink-0 items-center gap-1 rounded-full bg-brand-soft
-                    px-2 py-0.5 text-xs text-brand
+                    px-2 text-caption text-brand
                   "
                 >
                   <ShieldIcon className="size-3" />
@@ -67,7 +67,7 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
               {actor.subscriberFollowersCount !== undefined && (
                 <span
                   className="
-                    shrink-0 rounded-full border border-line px-2 py-0.5 text-xs
+                    shrink-0 rounded-full border border-line px-2 text-caption
                     text-muted
                   "
                 >

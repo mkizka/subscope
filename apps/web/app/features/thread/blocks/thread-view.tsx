@@ -47,7 +47,7 @@ function FocusedPost({
   return (
     <article
       aria-label="選んだ投稿"
-      className="border-b border-line px-4 pt-3.5 pb-2"
+      className="border-b border-line px-4 pt-3 pb-2"
     >
       <ProfileLink
         handle={authorHandle}
@@ -63,16 +63,16 @@ function FocusedPost({
             className="size-10 rounded-full object-cover"
           />
         ) : (
-          <div className="size-10 rounded-full bg-line" />
+          <div className="size-10 rounded-full bg-surface-2" />
         )}
         <div className="min-w-0">
-          <div className="truncate font-bold">
+          <div className="truncate text-body font-bold">
             {authorDisplayName ?? authorHandle}
           </div>
-          <div className="truncate text-sm text-muted">@{authorHandle}</div>
+          <div className="truncate text-label text-muted">@{authorHandle}</div>
         </div>
       </ProfileLink>
-      <p className="mt-2.5 text-lg/relaxed wrap-break-word whitespace-pre-wrap">
+      <p className="mt-3 text-body-lg wrap-break-word whitespace-pre-wrap">
         {text && <RichText text={text} links={links} />}
       </p>
       {images && <PostImages images={images} />}
@@ -81,7 +81,7 @@ function FocusedPost({
       {createdAt && (
         <time
           dateTime={createdAt}
-          className="mt-2 block border-b border-line py-2 text-sm text-muted"
+          className="mt-2 block border-b border-line py-2 text-label text-muted"
         >
           {hydrated &&
             new Date(createdAt).toLocaleString("ja-JP", {
@@ -91,7 +91,7 @@ function FocusedPost({
         </time>
       )}
       {counts.length > 0 && (
-        <div className="flex gap-4 border-b border-line py-2 text-sm text-muted">
+        <div className="flex gap-4 border-b border-line py-2 text-label text-muted">
           {counts.map(({ count, label }) => (
             <span key={label}>
               <b className="text-ink">{count}</b>件の{label}
@@ -107,7 +107,7 @@ function FocusedPost({
 function ConnectedPost(props: PostCardProps) {
   return (
     <div className="relative">
-      <div className="absolute top-12 -bottom-1 left-[33px] w-0.5 bg-line" />
+      <div className="absolute top-12 -bottom-1 left-8 w-0.5 bg-line" />
       <PostCard {...props} />
     </div>
   );
@@ -137,9 +137,14 @@ export function ThreadView({ thread }: Props) {
   const toolbar = (post: TimelinePost) => <PostToolbarContainer {...post} />;
   return (
     <section aria-label="スレッド" className="flex flex-col">
-      <header className="flex items-center gap-2.5 border-b border-line px-4 py-3">
+      <header
+        className="
+          sticky top-0 flex items-center gap-2 border-b border-line bg-surface
+          px-4 py-3
+        "
+      >
         <BackButton />
-        <h1 className="text-[17px] font-bold">スレッド</h1>
+        <h1 className="text-title">スレッド</h1>
       </header>
       {thread.ancestors.map((post) => (
         <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
