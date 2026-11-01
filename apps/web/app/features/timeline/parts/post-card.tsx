@@ -7,6 +7,8 @@ import {
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+import { Badge } from "@/app/components/ui/badge";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 import { type PostImage, PostImages } from "./post-images";
@@ -57,15 +59,11 @@ function formatRelativeTime(dateString: string) {
 function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
   if (!props.count) return null;
   return (
-    <span
-      title={`${props.count}件の${props.label}`}
-      className="
-        inline-flex items-center gap-1 rounded-full bg-surface-2 px-2
-        text-caption
-      "
-    >
-      <props.Icon className="size-3" />
-      {props.count}
+    <span title={`${props.count}件の${props.label}`}>
+      <Badge>
+        <props.Icon className="mr-1 size-4" />
+        {props.count}
+      </Badge>
     </span>
   );
 }
@@ -109,7 +107,7 @@ export function ExternalCard({
         <img
           src={external.thumb}
           alt=""
-          className="aspect-[1.91/1] w-full object-cover"
+          className="aspect-video w-full object-cover"
         />
       )}
       <div className="px-3 py-2">
@@ -165,20 +163,12 @@ export function PostCard({
           aria-label={authorDisplayName ?? authorHandle}
           className="relative shrink-0 self-start"
         >
-          {authorAvatar ? (
-            <img
-              src={authorAvatar}
-              alt=""
-              className="size-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="size-10 rounded-full bg-line" />
-          )}
+          <Avatar src={authorAvatar} />
         </ProfileLink>
         <div className="min-w-0 flex-1">
           {reasonRepost && (
             <div className="mb-1 flex items-center gap-1 text-caption text-muted">
-              <RepeatIcon className="size-3" />
+              <RepeatIcon className="size-4" />
               <span>
                 {reasonRepost.byDisplayName ?? reasonRepost.byHandle}
                 がリポスト

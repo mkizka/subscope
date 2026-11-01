@@ -40,14 +40,14 @@ function ToggleButton(props: {
       aria-pressed={props.pressed}
       aria-disabled={props.busy}
       className={`
-        inline-flex h-8 items-center gap-1 rounded-full px-2 text-label
+        inline-flex h-10 items-center gap-1 rounded-full px-2 text-label
         hover:bg-surface-2
         aria-disabled:cursor-not-allowed
         ${props.pressed ? "text-brand" : "text-muted"}
       `}
       onClick={props.onClick}
     >
-      <props.Icon className="size-4" />
+      <props.Icon className="size-5" />
       {!!props.count && (
         <span title={`${props.count}件の${props.label}`}>{props.count}</span>
       )}
@@ -71,7 +71,7 @@ export function PostToolbar({
   onDelete,
 }: Props) {
   return (
-    <div className="relative mt-1 -ml-2 flex gap-6">
+    <div className="relative mt-1 -ml-2 flex gap-8">
       <ToggleButton
         label="返信"
         Icon={MessageCircleIcon}
