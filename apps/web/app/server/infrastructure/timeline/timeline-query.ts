@@ -8,6 +8,7 @@ import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
+import { link } from "@repo/client/lex/app/bsky/richtext/facet";
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
@@ -24,6 +25,7 @@ export type TimelinePostDto = {
   authorDisplayName?: string;
   authorHandle: string;
   text?: string;
+  links?: { byteStart: number; byteEnd: number; uri: string }[];
   replyCount?: number;
   repostCount?: number;
   likeCount?: number;
@@ -100,6 +102,17 @@ export function toTimelinePost({
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
     text: maybeString(post.record.text),
+    links: postRecord.matches(post.record)
+      ? post.record.facets?.flatMap(({ index, features }) =>
+          features
+            .filter((feature) => link.matches(feature))
+            .map(({ uri }) => ({
+              byteStart: index.byteStart,
+              byteEnd: index.byteEnd,
+              uri,
+            })),
+        )
+      : undefined,
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
