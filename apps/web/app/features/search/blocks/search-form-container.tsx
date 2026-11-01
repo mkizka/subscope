@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from "@conform-to/react";
 import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
+import { useNavigation } from "react-router";
 import { z } from "zodV4";
 
 import { SearchForm } from "./search-form";
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export const SearchFormContainer = ({ q, tab }: Props) => {
+  const navigation = useNavigation();
   const [form, fields] = useForm({
     id: "search-form",
     defaultValue: { q },
@@ -29,6 +31,7 @@ export const SearchFormContainer = ({ q, tab }: Props) => {
       formProps={getFormProps(form)}
       inputProps={getInputProps(fields.q, { type: "search" })}
       tab={tab}
+      loading={navigation.formAction === "/search"}
     />
   );
 };
