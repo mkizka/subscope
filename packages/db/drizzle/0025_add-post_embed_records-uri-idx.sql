@@ -1,0 +1,1 @@
+CREATE INDEX "post_embed_records_uri_idx" ON "post_embed_records" USING btree ("uri");
