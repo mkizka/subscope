@@ -33,9 +33,7 @@ const jobTestRegistry = createWorkerRegistry(testEnv)
 export const setupJobTest = async () => {
   const services = await jobTestRegistry.resolve();
   const indexCommit = async (event: RecordEvent) => {
-    const command = indexCommitCommandFactory(event, {
-      log: () => Promise.resolve(0),
-    });
+    const command = indexCommitCommandFactory(event);
     assert(command);
     await services.indexCommitUseCase.execute(command);
   };

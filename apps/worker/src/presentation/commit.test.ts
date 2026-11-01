@@ -16,7 +16,6 @@ import { actorFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-import { InMemoryJobLogger } from "../shared/job-logger.in-memory.js";
 import { createWorkerRegistry } from "../shared/registry.js";
 import { testEnv } from "../shared/test-utils.js";
 import { indexCommitCommandFactory } from "./tap.js";
@@ -36,7 +35,7 @@ const services = await createWorkerRegistry(testEnv)
 describe("commit", () => {
   const { ctx } = testSetup;
   const processCommit = async (event: RecordEvent) => {
-    const command = indexCommitCommandFactory(event, new InMemoryJobLogger());
+    const command = indexCommitCommandFactory(event);
     assert(command);
     await services.indexCommitUseCase.execute(command);
   };

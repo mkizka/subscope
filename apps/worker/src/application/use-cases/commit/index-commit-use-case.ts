@@ -1,4 +1,5 @@
 import {
+  type ILoggerManager,
   type ITransactionManager,
   RecordValidationError,
 } from "@repo/common/domain";
@@ -8,36 +9,36 @@ import type { IndexRecordService } from "../../services/index-record-service.js"
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
 export class IndexCommitUseCase {
+  private readonly logger;
+
   constructor(
+    loggerManager: ILoggerManager,
     private readonly transactionManager: ITransactionManager,
     private readonly indexRecordService: IndexRecordService,
     private readonly recordRevRepository: IRecordRevRepository,
-  ) {}
+  ) {
+    this.logger = loggerManager.createLogger("IndexCommitUseCase");
+  }
 
   async execute(command: IndexCommitCommand) {
-    await command.jobLogger.log(
-      `Starting indexing for commit: ${command.commit.uri.toString()}`,
-    );
     try {
       await this.doIndexCommit(command);
-      await command.jobLogger.log("Indexing completed successfully.");
     } catch (error) {
       if (error instanceof RecordValidationError) {
-        await command.jobLogger.log(error.message);
+        this.logger.warn({ uri: command.commit.uri.toString() }, error.message);
         return;
       }
       throw error;
     }
   }
 
-  async doIndexCommit({ commit, live, jobLogger }: IndexCommitCommand) {
+  async doIndexCommit({ commit, live }: IndexCommitCommand) {
     await this.transactionManager.transaction(async (ctx) => {
       if (
         commit.operation !== "delete" &&
         !(await this.indexRecordService.shouldIndex({
           ctx,
           record: commit.record,
-          jobLogger,
         }))
       ) {
         return;
@@ -48,7 +49,6 @@ export class IndexCommitUseCase {
         rev: commit.rev,
       });
       if (!isNotOlder) {
-        await jobLogger.log(`Skipping stale commit: rev ${commit.rev}`);
         return;
       }
       switch (commit.operation) {

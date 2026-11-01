@@ -9,18 +9,15 @@ import { isSupportedCollection } from "@repo/common/utils";
 import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";
 import type { IndexCommitUseCase } from "../application/use-cases/commit/index-commit-use-case.js";
 import type { UpsertIdentityUseCase } from "../application/use-cases/identity/upsert-identity-use-case.js";
-import type { JobLogger } from "../shared/job.js";
 
 export const indexCommitCommandFactory = (
   event: RecordEvent,
-  jobLogger: JobLogger,
 ): IndexCommitCommand | null => {
   const uri = AtUri.make(event.did, event.collection, event.rkey);
   if (event.action === "delete") {
     return {
       commit: { operation: event.action, uri, rev: event.rev },
       live: event.live,
-      jobLogger,
     };
   }
   if (event.record === undefined || event.cid === undefined) {
@@ -38,13 +35,11 @@ export const indexCommitCommandFactory = (
       }),
     },
     live: event.live,
-    jobLogger,
   };
 };
 
 export class TapSubscriber {
   private readonly logger;
-  private readonly jobLogger;
 
   constructor(
     loggerManager: ILoggerManager,
@@ -55,12 +50,6 @@ export class TapSubscriber {
     private readonly tapConcurrency: number,
   ) {
     this.logger = loggerManager.createLogger("TapSubscriber");
-    this.jobLogger = {
-      log: (message: string) => {
-        this.logger.debug(message);
-        return Promise.resolve(0);
-      },
-    };
   }
 
   private async handleEvent(event: TapEvent) {
@@ -74,7 +63,7 @@ export class TapSubscriber {
       return;
     }
     if (!isSupportedCollection(event.collection)) return;
-    const command = indexCommitCommandFactory(event, this.jobLogger);
+    const command = indexCommitCommandFactory(event);
     if (!command) {
       this.logger.warn({ event }, "RecordEvent missing record or cid");
       return;
