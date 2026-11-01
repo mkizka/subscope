@@ -18,7 +18,7 @@ type Props = {
   isSubmitting: boolean;
   error?: string;
   context?: string;
-  onCancelContext?: () => void;
+  onCancel: () => void;
   onSubmit: (formData: FormData) => void;
 };
 
@@ -26,26 +26,13 @@ export function PostForm({
   isSubmitting,
   error,
   context,
-  onCancelContext,
+  onCancel,
   onSubmit,
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState("");
   const [allow, setAllow] = useState<ReplyRule[]>();
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const length = countGraphemes(text);
-
-  if (!isOpen && !context) {
-    return (
-      <button
-        type="button"
-        className="input w-full cursor-text text-base-content/60"
-        onClick={() => setIsOpen(true)}
-      >
-        いまどうしてる？
-      </button>
-    );
-  }
 
   return (
     <form
@@ -61,19 +48,18 @@ export function PostForm({
         onSubmit(formData);
       }}
     >
-      {context && (
-        <div className="flex items-center justify-between text-sm">
-          {context}
-          <button
-            type="button"
-            className="btn btn-ghost btn-xs"
-            onClick={onCancelContext}
-          >
-            やめる
-          </button>
-        </div>
-      )}
+      <div className="flex items-center gap-2 text-sm">
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={onCancel}
+        >
+          キャンセル
+        </button>
+        {context}
+      </div>
       <textarea
+        placeholder="いまどうしてる？"
         name="text"
         aria-label="投稿内容"
         className="textarea w-full"

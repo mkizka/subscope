@@ -8,6 +8,7 @@ import { NotificationBellContainer } from "@/app/features/notification/blocks/no
 import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
 import { ProfilePanelContainer } from "@/app/features/profile/blocks/profile-panel-container";
 import { ThreadPanelContainer } from "@/app/features/thread/blocks/thread-panel-container";
+import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
   children: ReactNode;
@@ -49,6 +50,12 @@ export const ThreeColumnLayout = ({ children }: Props) => {
             <NotificationBellContainer />
           </header>
           {children}
+          <ComposeButton
+            className="
+              btn fixed right-4 bottom-4 z-10 btn-circle btn-lg btn-primary
+              lg:hidden
+            "
+          />
         </main>
         <input
           id="notification-toggle"

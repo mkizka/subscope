@@ -12,6 +12,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { ComposeProvider } from "./features/timeline/blocks/post-form-container";
 import { ErrorPage } from "./pages/client/error-page";
 
 export const links: Route.LinksFunction = () => [
@@ -56,7 +57,9 @@ export default function App() {
           aria-label="読み込み中"
         />
       )}
-      <Outlet />
+      <ComposeProvider>
+        <Outlet />
+      </ComposeProvider>
     </QueryClientProvider>
   );
 }

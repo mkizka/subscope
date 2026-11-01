@@ -54,7 +54,7 @@ export function SearchPage({ q, tab, actors, posts }: Props) {
           )
         ) : posts.length > 0 ? (
           // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
-          <TimelineFeed posts={posts} onCompose={() => {}} />
+          <TimelineFeed posts={posts} />
         ) : (
           <NotFound>投稿が見つかりません</NotFound>
         ))}
