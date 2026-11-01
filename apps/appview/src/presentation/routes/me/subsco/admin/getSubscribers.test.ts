@@ -1,7 +1,9 @@
 import getSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import {
   actorFactory,
+  followFactory,
   labelFactory,
+  recordFactory,
   subscriptionFactory,
   testSetup,
 } from "@repo/test-utils";
@@ -121,5 +123,66 @@ describe("me.subsco.admin.getSubscribers", () => {
     // assert
     expect(res.subscribers).toHaveLength(1);
     expect(res.total).toBe(3);
+  });
+
+  const setupBackfill = async (
+    subscriberStatus: "inProgress" | "completed" | "error" | null,
+    followeeStatus: "inProgress" | "completed" | "error" | null,
+  ) => {
+    const { client, loginAs } = await setupApiTest();
+    const admin = await actorFactory(ctx.db)
+      .props({ isAdmin: () => true })
+      .create();
+    const subscriber = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .props({ backfillStatus: () => subscriberStatus })
+      .create();
+    await followFactory(ctx.db)
+      .vars({
+        record: () =>
+          recordFactory(ctx.db, "app.bsky.graph.follow")
+            .vars({ actor: () => subscriber })
+            .create(),
+        followee: () =>
+          actorFactory(ctx.db)
+            .props({ backfillStatus: () => followeeStatus })
+            .create(),
+      })
+      .create();
+    loginAs(admin.did);
+    return client;
+  };
+
+  test("getSubscribers-7: サブスクライバー本人とフォロー先の全員のバックフィルが完了していれば、backfillStatusをcompletedにする", async () => {
+    // arrange
+    const client = await setupBackfill("completed", "completed");
+
+    // act
+    const res = await client.call(getSubscribers);
+
+    // assert
+    expect(res.subscribers).toMatchObject([{ backfillStatus: "completed" }]);
+  });
+
+  test("getSubscribers-8: サブスクライバー本人とフォロー先に1人でもバックフィルがエラーのアカウントがいれば、backfillStatusをerrorにする", async () => {
+    // arrange
+    const client = await setupBackfill("inProgress", "error");
+
+    // act
+    const res = await client.call(getSubscribers);
+
+    // assert
+    expect(res.subscribers).toMatchObject([{ backfillStatus: "error" }]);
+  });
+
+  test("getSubscribers-9: completedでもerrorでもなければ、backfillStatusをinProgressにする", async () => {
+    // arrange
+    const client = await setupBackfill("completed", null);
+
+    // act
+    const res = await client.call(getSubscribers);
+
+    // assert
+    expect(res.subscribers).toMatchObject([{ backfillStatus: "inProgress" }]);
   });
 });

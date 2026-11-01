@@ -104,11 +104,13 @@ queryClient.setQueryData<{
           profile: alice,
           isAdmin: true,
           subscribedAt: "2024-01-01T00:00:00.000Z",
+          backfillStatus: "completed",
         },
         {
           profile: bob,
           isAdmin: false,
           subscribedAt: "2024-01-02T00:00:00.000Z",
+          backfillStatus: "inProgress",
         },
       ],
       total: 2,
