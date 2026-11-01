@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, request, test } from "@playwright/test";
 
 import {
   putRecord,
@@ -6,6 +6,8 @@ import {
   subscribeServer,
   uploadImage,
 } from "../../helpers/pds";
+
+const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
 test.describe("管理画面へのアクセス", () => {
   test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
@@ -34,6 +36,46 @@ test.describe("ジョブキュー", () => {
     await link.click();
     const popup = await popupPromise;
     await expect(popup).toHaveURL(/\/admin\/bull-board/);
+  });
+
+  test("bull-board-2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
+    baseURL,
+  }) => {
+    const context = await request.newContext({
+      baseURL,
+      extraHTTPHeaders: { Authorization: `Bearer ${ADMIN_API_TOKEN}` },
+    });
+
+    const response = await context.get(
+      "/admin/bull-board/api/queues?activeQueue=fetchRecord&status=failed",
+    );
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({
+      queues: expect.arrayContaining([
+        expect.objectContaining({
+          name: "fetchRecord",
+          counts: expect.any(Object),
+        }),
+      ]),
+    });
+  });
+
+  test("bull-board-3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
+    baseURL,
+  }) => {
+    const context = await request.newContext({
+      baseURL,
+      extraHTTPHeaders: { Authorization: `Bearer ${ADMIN_API_TOKEN}` },
+    });
+
+    const response = await context.put(
+      "/admin/bull-board/api/queues/fetchRecord/clean/completed",
+      { maxRedirects: 0 },
+    );
+
+    expect(response.status()).toBe(302);
+    expect(response.headers()["location"]).toBe("/login");
   });
 });
 

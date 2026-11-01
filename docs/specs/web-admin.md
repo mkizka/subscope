@@ -45,3 +45,7 @@
 `/admin/bull-board` で bull-board の画面を3カラムレイアウトの外にそのまま出す。
 
 - bull-board-1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く
+- bull-board-2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める
+- bull-board-3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない
+
+運用時にClaudeなどがジョブの件数や失敗理由を調べられるように、読み取り専用のトークンを用意する。例えば `/admin/bull-board/api/queues?activeQueue=fetchRecord&status=failed` で、各キューの件数と、fetchRecordの失敗したジョブの理由を返す。`ADMIN_API_TOKEN` を設定しなければトークンでは読めない。
