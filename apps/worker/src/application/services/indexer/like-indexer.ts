@@ -46,7 +46,7 @@ export class LikeIndexer implements ICollectionIndexer {
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = Like.from(record);
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregatePostStats(like.subjectUri, "like"),
+      this.jobScheduler.scheduleAggregatePostStats(like.subjectUri),
     );
   }
 }

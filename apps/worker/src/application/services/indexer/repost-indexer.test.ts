@@ -146,13 +146,8 @@ describe("RepostIndexer", () => {
       repostIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
-      const jobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(jobs).toContainEqual(
-        expect.objectContaining({
-          uri: post.uri,
-          type: "repost",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(post.uri);
     });
   });
 });

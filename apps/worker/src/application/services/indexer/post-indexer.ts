@@ -143,14 +143,14 @@ export class PostIndexer implements ICollectionIndexer {
       // 例：リポストをインデックス → fetchRecordジョブでリポスト対象をインデックス
       //    → このとき、リポスト数が0なので1にする必要がある
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleAggregatePostStats(post.uri, "all"),
+        this.jobScheduler.scheduleAggregatePostStats(post.uri),
       );
     }
 
     const replyParent = post.replyParent;
     if (replyParent) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleAggregatePostStats(replyParent.uri, "reply"),
+        this.jobScheduler.scheduleAggregatePostStats(replyParent.uri),
       );
     }
 
@@ -160,7 +160,7 @@ export class PostIndexer implements ICollectionIndexer {
     ) {
       const embedUri = post.embed.uri;
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleAggregatePostStats(embedUri, "quote"),
+        this.jobScheduler.scheduleAggregatePostStats(embedUri),
       );
     }
 

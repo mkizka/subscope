@@ -1,5 +1,6 @@
 import type { QueueOptions } from "bullmq";
 import { Queue } from "bullmq";
+import { Redis } from "ioredis";
 
 import type {
   IJobQueue,
@@ -36,8 +37,10 @@ export class JobQueue implements IJobQueue {
   private readonly queues: {
     [key in QueueName]: Queue;
   };
+  private readonly redis: Redis;
 
   constructor(redisUrl: string) {
+    this.redis = new Redis(redisUrl, { lazyConnect: true });
     const queueOptions = createQueueOptionsBuilder(redisUrl);
     this.queues = {
       resolveDid: new Queue("resolveDid", queueOptions(withRetry)),
@@ -73,6 +76,31 @@ export class JobQueue implements IJobQueue {
       // https://docs.bullmq.io/guide/jobs/job-ids
       jobId: options?.jobId?.replaceAll(":", "_"),
     });
+  }
+
+  async addBatchItems({
+    queueName,
+    items,
+    options,
+  }: {
+    queueName: QueueName;
+    items: string[];
+    options?: JobOptions;
+  }) {
+    await this.redis.sadd(`${queueName}:batch`, items);
+    await this.queues[queueName].add(queueName, null, {
+      ...options,
+      deduplication: { id: queueName, keepLastIfActive: true },
+    });
+  }
+
+  async popBatchItems(queueName: QueueName, count: number) {
+    return await this.redis.spop(`${queueName}:batch`, count);
+  }
+
+  async close() {
+    this.redis.disconnect();
+    await Promise.all(Object.values(this.queues).map((queue) => queue.close()));
   }
 
   getQueues() {

@@ -21,7 +21,12 @@ const label = (val: string) => ({
 describe("LabelIngester", () => {
   let server: WebSocketServer;
   let moderationUrl: string;
-  const jobQueue = { add: vi.fn(), getQueues: vi.fn() } satisfies IJobQueue;
+  const jobQueue = {
+    add: vi.fn(),
+    addBatchItems: vi.fn(),
+    popBatchItems: vi.fn(),
+    getQueues: vi.fn(),
+  } satisfies IJobQueue;
   const labelCursorStore = new InMemoryLabelCursorStore();
 
   const connect = async () => {

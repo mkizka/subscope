@@ -40,7 +40,12 @@ describe("TapIngester", () => {
   let server: WebSocketServer;
   let socket: WebSocket;
   let acks: number[];
-  const jobQueue = { add: vi.fn(), getQueues: vi.fn() } satisfies IJobQueue;
+  const jobQueue = {
+    add: vi.fn(),
+    addBatchItems: vi.fn(),
+    popBatchItems: vi.fn(),
+    getQueues: vi.fn(),
+  } satisfies IJobQueue;
 
   const send = async (...events: { id: number }[]) => {
     for (const event of events) socket.send(JSON.stringify(event));

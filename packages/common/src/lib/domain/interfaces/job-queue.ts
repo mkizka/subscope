@@ -9,11 +9,6 @@ type FetchRecordData = {
   live: boolean;
 };
 
-type AggregatePostStatsData = {
-  uri: string;
-  type: "reply" | "repost" | "quote" | "like" | "all";
-};
-
 type AggregateActorStatsData = {
   did: Did;
   type: "follows" | "followers" | "posts";
@@ -34,7 +29,7 @@ export type JobData = {
   fetchRecord: FetchRecordData;
   identity: IdentityEventDto;
   commit: CommitEventDto;
-  aggregatePostStats: AggregatePostStatsData;
+  aggregatePostStats: null;
   aggregateActorStats: AggregateActorStatsData;
   syncTapRepo: Did;
   label: LabelData;
@@ -59,4 +54,10 @@ export interface IJobQueue {
     data: JobData[T];
     options?: JobOptions;
   }) => Promise<void>;
+  addBatchItems: (params: {
+    queueName: QueueName;
+    items: string[];
+    options?: JobOptions;
+  }) => Promise<void>;
+  popBatchItems: (queueName: QueueName, count: number) => Promise<string[]>;
 }

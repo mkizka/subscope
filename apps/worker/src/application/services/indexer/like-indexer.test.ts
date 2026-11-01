@@ -136,13 +136,8 @@ describe("LikeIndexer", () => {
       likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
-      const jobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(jobs).toContainEqual(
-        expect.objectContaining({
-          uri: new AtUri(postUri),
-          type: "like",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(new AtUri(postUri));
     });
 
     test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", () => {
@@ -165,13 +160,8 @@ describe("LikeIndexer", () => {
       likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
-      const jobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(jobs).toContainEqual(
-        expect.objectContaining({
-          uri: new AtUri(postUri),
-          type: "like",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(new AtUri(postUri));
     });
 
     test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", () => {
@@ -195,13 +185,8 @@ describe("LikeIndexer", () => {
       likeIndexer.afterAction({ ctx: { db, afterCommit }, record });
 
       // assert
-      const jobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(jobs).toContainEqual(
-        expect.objectContaining({
-          uri: new AtUri(nonExistentPostUri),
-          type: "like",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(new AtUri(nonExistentPostUri));
     });
   });
 });

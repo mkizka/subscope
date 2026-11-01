@@ -24,7 +24,7 @@ describe("統計の集計", () => {
 
   afterAll(async () => {
     await queue.close();
-    await Promise.all(jobQueue.getQueues().map((q) => q.close()));
+    await jobQueue.close();
     await container.stop();
   });
 
@@ -38,8 +38,8 @@ describe("統計の集計", () => {
     const uri = AtUri.make("did:plc:aggregate1", "app.bsky.feed.post", "a");
 
     // act
-    await jobScheduler.scheduleAggregatePostStats(uri, "like");
-    await jobScheduler.scheduleAggregatePostStats(uri, "like");
+    await jobScheduler.scheduleAggregatePostStats(uri);
+    await jobScheduler.scheduleAggregatePostStats(uri);
 
     // assert
     expect(await queue.getDelayedCount()).toBe(1);
@@ -62,18 +62,35 @@ describe("統計の集計", () => {
     );
 
     // act
-    await jobScheduler.scheduleAggregatePostStats(uri, "like");
+    await jobScheduler.scheduleAggregatePostStats(uri);
     await runDelayedJob();
     await vi.waitFor(() => expect(runCount).toBe(1));
-    await jobScheduler.scheduleAggregatePostStats(uri, "like");
+    await jobScheduler.scheduleAggregatePostStats(uri);
     finishFirstJob(undefined);
     await runDelayedJob();
     await vi.waitFor(() => expect(runCount).toBe(2));
-    await jobScheduler.scheduleAggregatePostStats(uri, "like");
+    await jobScheduler.scheduleAggregatePostStats(uri);
     await runDelayedJob();
 
     // assert
     await vi.waitFor(() => expect(runCount).toBe(3));
     await worker.close();
+  });
+
+  test("aggregate-3: 投稿の集計ジョブが実行待ちの間に来た別の投稿のイベントも、そのジョブにまとめる", async () => {
+    // arrange
+    const uriA = AtUri.make("did:plc:aggregate3", "app.bsky.feed.post", "a");
+    const uriB = AtUri.make("did:plc:aggregate3", "app.bsky.feed.post", "b");
+
+    // act
+    await jobScheduler.scheduleAggregatePostStats(uriA);
+    await jobScheduler.scheduleAggregatePostStats(uriB);
+
+    // assert
+    expect(await queue.getDelayedCount()).toBe(1);
+    expect(await jobQueue.popBatchItems("aggregatePostStats", 1000)).toEqual(
+      expect.arrayContaining([uriA.toString(), uriB.toString()]),
+    );
+    await queue.obliterate({ force: true });
   });
 });

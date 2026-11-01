@@ -76,7 +76,7 @@ export class RepostIndexer implements ICollectionIndexer {
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const repost = Repost.from(record);
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregatePostStats(repost.subjectUri, "repost"),
+      this.jobScheduler.scheduleAggregatePostStats(repost.subjectUri),
     );
   }
 }

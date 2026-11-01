@@ -321,13 +321,8 @@ describe("PostIndexer", () => {
           type: "posts",
         }),
       );
-      const postStatsJobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(postStatsJobs).toContainEqual(
-        expect.objectContaining({
-          uri: record.uri,
-          type: "all",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(record.uri);
     });
 
     test("リプライの場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
@@ -374,13 +369,8 @@ describe("PostIndexer", () => {
           type: "posts",
         }),
       );
-      const postStatsJobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(postStatsJobs).toContainEqual(
-        expect.objectContaining({
-          uri: new AtUri(parentUri),
-          type: "reply",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(new AtUri(parentUri));
     });
 
     test("引用投稿の場合、quote集計ジョブがスケジュールされる", async () => {
@@ -417,13 +407,8 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const postStatsJobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(postStatsJobs).toContainEqual(
-        expect.objectContaining({
-          uri: new AtUri(quotedUri),
-          type: "quote",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(new AtUri(quotedUri));
     });
 
     test("親投稿が存在しない場合でも親投稿に対する集計ジョブがスケジュールされる", async () => {
@@ -469,13 +454,8 @@ describe("PostIndexer", () => {
           type: "posts",
         }),
       );
-      const postStatsJobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(postStatsJobs).toContainEqual(
-        expect.objectContaining({
-          uri: new AtUri(nonExistentParentUri),
-          type: "reply",
-        }),
-      );
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toContainEqual(new AtUri(nonExistentParentUri));
     });
 
     test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがactor_statsは更新する", async () => {
@@ -503,8 +483,8 @@ describe("PostIndexer", () => {
         }),
       );
 
-      const postStatsJobs = jobScheduler.getAggregatePostStatsJobs();
-      expect(postStatsJobs).toEqual([]);
+      const uris = jobScheduler.getAggregatePostStatsUris();
+      expect(uris).toEqual([]);
     });
   });
 });
