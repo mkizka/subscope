@@ -2,9 +2,9 @@ import { Subscription } from "@atproto/xrpc-server";
 import * as subscribeLabels from "@repo/client/lex/com/atproto/label/subscribeLabels";
 import type { IJobQueue, IMetricReporter } from "@repo/common/domain";
 
-import type { ILabelCursorStore } from "../application/interfaces/label-cursor-store.js";
+import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 
-export class LabelIngester {
+export class LabelSubscriber {
   private readonly subscription;
 
   constructor(
