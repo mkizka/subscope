@@ -1,4 +1,5 @@
 import {
+  BellIcon,
   CircleUserIcon,
   EllipsisIcon,
   ExternalLinkIcon,
@@ -57,6 +58,9 @@ export function SideNav({ did, avatarUrl, handle, isAdmin }: Props) {
         </NavItem>
         <NavItem to="/search" icon={<SearchIcon className="size-4" />}>
           検索
+        </NavItem>
+        <NavItem to="/notifications" icon={<BellIcon className="size-4" />}>
+          通知
         </NavItem>
         <NavItem to="/members" icon={<UsersIcon className="size-4" />}>
           メンバー
