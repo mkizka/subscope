@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+
 type Props = {
   displayName?: string;
   handle: string;
@@ -31,21 +33,9 @@ export function ProfileHeader({
       )}
       <div className="flex flex-col gap-2 px-4 pb-4">
         <div className="flex items-end justify-between">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt=""
-              className="
-                -mt-10 size-20 rounded-full border-4 border-surface object-cover
-              "
-            />
-          ) : (
-            <div
-              className="
-                -mt-10 size-20 rounded-full border-4 border-surface bg-surface-2
-              "
-            />
-          )}
+          <span className="-mt-10 rounded-full border-4 border-surface">
+            <Avatar src={avatarUrl} size="lg" />
+          </span>
           {action}
         </div>
         <div className="min-w-0">

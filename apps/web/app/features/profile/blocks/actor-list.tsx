@@ -2,6 +2,9 @@ import { ShieldIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+import { Badge } from "@/app/components/ui/badge";
+
 export type Actor = {
   did: string;
   handle: string;
@@ -35,15 +38,7 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
                 hover:bg-surface-2
               "
             >
-              {actor.avatarUrl ? (
-                <img
-                  src={actor.avatarUrl}
-                  alt=""
-                  className="size-10 shrink-0 rounded-full object-cover"
-                />
-              ) : (
-                <div className="size-10 shrink-0 rounded-full bg-surface-2" />
-              )}
+              <Avatar src={actor.avatarUrl} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-body font-bold">
                   {actor.displayName || profileId}
@@ -54,25 +49,15 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
                 )}
               </div>
               {actor.isAdmin && (
-                <span
-                  className="
-                    flex shrink-0 items-center gap-1 rounded-full bg-brand-soft
-                    px-2 text-caption text-brand
-                  "
-                >
-                  <ShieldIcon className="size-3" />
+                <Badge>
+                  <ShieldIcon className="mr-1 size-3" />
                   管理者
-                </span>
+                </Badge>
               )}
               {actor.subscriberFollowersCount !== undefined && (
-                <span
-                  className="
-                    shrink-0 rounded-full border border-line px-2 text-caption
-                    text-muted
-                  "
-                >
+                <Badge>
                   メンバー{actor.subscriberFollowersCount}人がフォロー
-                </span>
+                </Badge>
               )}
             </Link>
             {renderAction?.(actor)}

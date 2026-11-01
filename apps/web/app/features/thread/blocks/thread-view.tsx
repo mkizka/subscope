@@ -2,6 +2,8 @@ import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
 
+import { Avatar } from "@/app/components/ui/avatar";
+import { Button } from "@/app/components/ui/button";
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
 import {
@@ -56,15 +58,7 @@ function FocusedPost({
           hover:underline
         "
       >
-        {authorAvatar ? (
-          <img
-            src={authorAvatar}
-            alt=""
-            className="size-10 rounded-full object-cover"
-          />
-        ) : (
-          <div className="size-10 rounded-full bg-surface-2" />
-        )}
+        <Avatar src={authorAvatar} />
         <div className="min-w-0">
           <div className="truncate text-body font-bold">
             {authorDisplayName ?? authorHandle}
@@ -116,20 +110,16 @@ function ConnectedPost(props: PostCardProps) {
 function BackButton() {
   const navigate = useNavigate();
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       aria-label="戻る"
-      className="
-        rounded-full p-1.5
-        hover:bg-surface-2
-      "
       onClick={() =>
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         window.history.state?.idx > 0 ? navigate(-1) : navigate("/")
       }
     >
-      <ArrowLeftIcon className="size-5" />
-    </button>
+      <ArrowLeftIcon className="size-4" />
+    </Button>
   );
 }
 
