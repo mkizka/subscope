@@ -40,10 +40,10 @@ function ProfileCell({
         <div className="size-10 shrink-0 rounded-full bg-surface-2" />
       )}
       <div className="min-w-0 flex-1">
-        <div className="truncate font-medium">
+        <div className="truncate font-bold">
           {actor.displayName ?? actor.handle}
         </div>
-        <div className="truncate text-sm text-muted" title={actor.did}>
+        <div className="truncate text-label text-muted" title={actor.did}>
           @{actor.handle}
         </div>
         {children}
@@ -92,9 +92,9 @@ export function SubscriberList({
   return (
     <>
       <div className="flex items-baseline gap-2 px-4 py-3">
-        <h1 className="text-lg font-bold">登録ユーザー</h1>
+        <h1 className="text-title">登録ユーザー</h1>
         {total !== undefined && (
-          <span className="text-sm text-muted">{total}人</span>
+          <span className="text-label text-muted">{total}人</span>
         )}
       </div>
       <div role="tablist" className="flex border-b border-line">
@@ -110,7 +110,7 @@ export function SubscriberList({
             role="tab"
             aria-selected={tab === value}
             className="
-              flex-1 py-2.5 text-sm text-muted
+              flex-1 py-2.5 text-label text-muted
               aria-selected:font-bold aria-selected:text-ink
               aria-selected:shadow-[inset_0_-3px_0_var(--color-brand)]
             "
@@ -121,14 +121,14 @@ export function SubscriberList({
         ))}
       </div>
       {!isLoading && isEmpty && (
-        <p className="py-8 text-center text-muted">
+        <p className="py-8 text-center text-label text-muted">
           {tab === "banned"
             ? "BAN済みのアカウントはありません"
             : "登録アカウントはまだありません"}
         </p>
       )}
       {isLoading && (
-        <p className="py-8 text-center text-muted">読み込み中...</p>
+        <p className="py-8 text-center text-label text-muted">読み込み中...</p>
       )}
       <ul>
         {tab === "banned" &&
@@ -146,7 +146,7 @@ export function SubscriberList({
                     type="button"
                     className="
                       inline-flex items-center gap-1 rounded-full border
-                      border-line px-3 py-1 text-sm
+                      border-line px-3 py-1 text-label
                       hover:bg-surface-2
                       disabled:opacity-50
                     "
@@ -164,7 +164,7 @@ export function SubscriberList({
           subscribers.map((subscriber) => (
             <li key={subscriber.did} className={rowClass}>
               <ProfileCell actor={subscriber}>
-                <div className="text-xs text-muted">
+                <div className="text-caption text-muted">
                   {formatDate(subscriber.subscribedAt)} 登録
                 </div>
               </ProfileCell>
@@ -172,7 +172,8 @@ export function SubscriberList({
                 <span
                   className="
                     inline-flex shrink-0 items-center gap-1 rounded-full
-                    bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand
+                    bg-brand-soft px-2.5 py-0.5 text-caption font-bold
+                    text-brand
                   "
                 >
                   <ShieldIcon className="size-3" />
@@ -214,7 +215,7 @@ export function SubscriberList({
                               [&_button]:flex [&_button]:w-full
                               [&_button]:items-center [&_button]:gap-2
                               [&_button]:rounded-[10px] [&_button]:px-3
-                              [&_button]:py-2 [&_button]:text-sm
+                              [&_button]:py-2 [&_button]:text-label
                               [&_button:disabled]:opacity-50
                               [&_button:hover]:bg-surface-2
                             "
@@ -251,7 +252,7 @@ export function SubscriberList({
           ))}
       </ul>
       {isFetchingNextPage && (
-        <p className="py-4 text-center text-sm text-muted">読み込み中...</p>
+        <p className="py-4 text-center text-label text-muted">読み込み中...</p>
       )}
       {onLoadMore && (
         <InfiniteScrollTrigger

@@ -84,7 +84,7 @@ export function InviteCodeItems({
           <span className="font-mono">{code.code}</span>
           {!code.usedAt && !isExpired(code) && <CopyButton code={code.code} />}
         </div>
-        <div className="text-sm text-muted">
+        <div className="text-label text-muted">
           {code.usedBy && (
             <>
               {code.usedBy.avatar ? (
@@ -161,11 +161,11 @@ export function InviteCodeList({
           flex items-center justify-between border-b border-line px-4 py-3
         "
       >
-        <h1 className="text-lg font-bold">招待コード</h1>
+        <h1 className="text-title">招待コード</h1>
         <button
           type="button"
           className="
-            rounded-full bg-brand px-4 py-1.5 text-sm font-bold text-on-brand
+            rounded-full bg-brand px-4 py-1.5 text-label font-bold text-on-brand
             disabled:opacity-50
           "
           onClick={onCreateCode}
@@ -176,7 +176,7 @@ export function InviteCodeList({
       </div>
       <ul aria-label="招待コード">
         {codes.length === 0 ? (
-          <li className="py-8 text-center text-muted">
+          <li className="py-8 text-center text-label text-muted">
             招待コードはまだありません
           </li>
         ) : (
