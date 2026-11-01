@@ -8,9 +8,10 @@ type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
   error?: string;
+  loading: boolean;
 };
 
-export function LoginForm({ formProps, inputProps, error }: Props) {
+export function LoginForm({ formProps, inputProps, error, loading }: Props) {
   return (
     <Form
       action="/oauth/login"
@@ -25,7 +26,9 @@ export function LoginForm({ formProps, inputProps, error }: Props) {
         error={error}
         {...inputProps}
       />
-      <Button type="submit">ログイン</Button>
+      <Button type="submit" loading={loading}>
+        ログイン
+      </Button>
     </Form>
   );
 }
