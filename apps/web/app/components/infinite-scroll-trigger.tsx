@@ -20,7 +20,9 @@ export function InfiniteScrollTrigger({ onIntersect, enabled = true }: Props) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(handleIntersect);
+    const observer = new IntersectionObserver(handleIntersect, {
+      rootMargin: "0px 0px 200px 0px",
+    });
     observer.observe(el);
     return () => observer.disconnect();
   }, [handleIntersect]);
