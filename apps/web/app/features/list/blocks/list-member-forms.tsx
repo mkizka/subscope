@@ -2,6 +2,9 @@ import { isAtIdentifierString, isAtUriString } from "@atproto/syntax";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+
 export const addListMemberSchema = z.object({
   listUri: z.string().refine(isAtUriString),
   handle: z.string().trim().refine(isAtIdentifierString),
@@ -17,19 +20,18 @@ export function AddListMemberForm({ listUri }: { listUri: string }) {
     <fetcher.Form
       method="post"
       action="/api/list-members"
-      className="flex gap-2 border-b border-base-300 p-4"
+      className="flex gap-2 border-b border-line p-4"
     >
       <input type="hidden" name="listUri" value={listUri} />
-      <input
-        name="handle"
-        aria-label="ハンドル"
-        placeholder="alice.bsky.social"
-        className="input w-full"
-        required
-      />
-      <button type="submit" className="btn btn-primary">
-        追加する
-      </button>
+      <div className="flex-1">
+        <Input
+          name="handle"
+          aria-label="ハンドル"
+          placeholder="alice.bsky.social"
+          required
+        />
+      </div>
+      <Button type="submit">追加する</Button>
     </fetcher.Form>
   );
 }
@@ -43,9 +45,9 @@ export function RemoveListMemberButton({
   return (
     <fetcher.Form method="delete" action="/api/list-members">
       <input type="hidden" name="listItemUri" value={listItemUri} />
-      <button type="submit" className="btn btn-ghost btn-sm">
+      <Button type="submit" variant="secondary" size="sm">
         削除
-      </button>
+      </Button>
     </fetcher.Form>
   );
 }

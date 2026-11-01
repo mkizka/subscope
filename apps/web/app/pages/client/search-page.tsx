@@ -1,6 +1,5 @@
-import { Link } from "react-router";
-
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
+import { Tabs } from "@/app/components/ui/tabs";
 import {
   type Actor,
   ActorList,
@@ -19,32 +18,26 @@ type Props = {
 };
 
 const NotFound = ({ children }: { children: string }) => (
-  <p className="p-4 text-center text-base-content/60">{children}</p>
+  <p className="py-8 text-center text-label text-muted">{children}</p>
 );
 
 export function SearchPage({ q, tab, actors, posts }: Props) {
   return (
     <ThreeColumnLayout>
-      <h1 className="border-b border-base-300 p-4 text-lg font-bold">検索</h1>
+      <h1 className="border-b border-line p-4 text-title">検索</h1>
       <SearchFormContainer q={q} tab={tab} />
-      <div role="tablist" className="tabs tabs-border">
-        {(
+      <Tabs
+        tabs={(
           [
             ["actors", "ユーザー", {}],
             ["posts", "投稿", { tab: "posts" }],
           ] as const
-        ).map(([value, label, params]) => (
-          <Link
-            key={value}
-            to={`?${new URLSearchParams({ ...(q && { q }), ...params })}`}
-            role="tab"
-            aria-selected={tab === value}
-            className={tab === value ? "tab tab-active" : "tab"}
-          >
-            {label}
-          </Link>
-        ))}
-      </div>
+        ).map(([value, label, params]) => ({
+          to: `?${new URLSearchParams({ ...(q && { q }), ...params })}`,
+          label,
+          selected: tab === value,
+        }))}
+      />
       {q &&
         (tab === "actors" ? (
           actors.length > 0 ? (
