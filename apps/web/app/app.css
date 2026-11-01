@@ -1,27 +1,33 @@
 @import "tailwindcss";
-@import "@fontsource-variable/noto-sans-jp";
+@import "@fontsource/zen-maru-gothic/400.css";
+@import "@fontsource/zen-maru-gothic/500.css";
+@import "@fontsource/zen-maru-gothic/700.css";
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --color-primary: oklch(58.8% 0.15 40.1);
-  --color-primary-content: oklch(98% 0 0);
+  --color-base-100: color-mix(in srgb, #b8326b 7%, #fff);
+  --color-base-200: color-mix(in srgb, #b8326b 13%, #fff);
+  --color-base-300: color-mix(in srgb, #b8326b 22%, #fff);
+  --color-base-content: #17191c;
+  --color-primary: #b8326b;
+  --color-primary-content: #fff;
 }
 
 @plugin "daisyui/theme" {
   name: "dark";
   prefersdark: true;
-  --color-base-100: oklch(20% 0 0);
-  --color-base-200: oklch(17% 0 0);
-  --color-base-300: oklch(14% 0 0);
-  --color-base-content: oklch(95% 0 0);
-  --color-primary: oklch(67.9% 0.142 40.1);
-  --color-primary-content: oklch(15% 0 0);
+  --color-base-100: color-mix(in srgb, #e8709f 9%, #121314);
+  --color-base-200: color-mix(in srgb, #e8709f 5%, #0c0d0e);
+  --color-base-300: color-mix(in srgb, #e8709f 20%, #24262a);
+  --color-base-content: #eceef0;
+  --color-primary: #e8709f;
+  --color-primary-content: #17191c;
 }
 
 @theme {
-  --font-sans: "Noto Sans JP Variable", sans-serif;
+  --font-sans: "Zen Maru Gothic", sans-serif;
 }
 
 @layer base {
