@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { loader } from "@/app/routes/api.notifications.unread-count";
 
-import { NotificationBell } from "./notification-bell";
+import { BottomTabs } from "./bottom-tabs";
+import { useMe } from "./side-nav-container";
 
 type UnreadCountResponse = Awaited<ReturnType<typeof loader>>["data"];
 
@@ -15,11 +16,14 @@ async function fetchUnreadCount(): Promise<UnreadCountResponse> {
   return response.json() as Promise<UnreadCountResponse>;
 }
 
-export function NotificationBellContainer() {
+export function BottomTabsContainer() {
+  const me = useMe();
   const { data } = useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: fetchUnreadCount,
   });
 
-  return <NotificationBell unreadCount={data?.count ?? 0} />;
+  return (
+    <BottomTabs profileId={me?.profileId} unreadCount={data?.count ?? 0} />
+  );
 }

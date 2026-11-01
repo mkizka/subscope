@@ -1,8 +1,9 @@
-import { MenuIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tabs-container";
+import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
-import { NotificationBellContainer } from "@/app/features/notification/blocks/notification-bell-container";
+import { ServerAbout } from "@/app/features/navigation/parts/server-about";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -11,67 +12,41 @@ type Props = {
 
 export const ThreeColumnLayout = ({ children }: Props) => {
   return (
-    <div
-      className="
-        drawer
-        lg:drawer-open
-      "
-    >
-      <input id="side-nav-drawer" type="checkbox" className="drawer-toggle" />
-      <div
+    <div className="flex min-h-screen bg-base-100 text-base-content">
+      <aside
         className="
-          drawer-content flex min-h-screen bg-base-100 text-base-content
+          hidden w-60 shrink-0 border-r border-base-300 bg-base-200
+          lg:sticky lg:top-0 lg:block lg:h-screen
         "
       >
-        <main className="min-w-0 flex-1">
-          <header
-            className="
-              navbar sticky top-0 z-10 border-b border-base-300 bg-base-100
-              lg:hidden
-            "
-          >
-            <label
-              htmlFor="side-nav-drawer"
-              aria-label="メニューを開く"
-              className="btn btn-square btn-ghost"
-            >
-              <MenuIcon />
-            </label>
-            <div className="flex-1 font-bold text-primary">Subscope</div>
-            <NotificationBellContainer />
-          </header>
-          {children}
-          <ComposeButton
-            className="
-              btn fixed right-4 bottom-4 z-10 btn-circle btn-lg btn-primary
-              lg:hidden
-            "
-          />
-        </main>
-        <aside
-          aria-label="このサーバーについて"
+        <SideNavContainer />
+      </aside>
+      <main
+        className="
+          min-w-0 flex-1 pb-16
+          lg:pb-0
+        "
+      >
+        <MobileHeaderContainer />
+        {children}
+        <ComposeButton
           className="
-            hidden border-base-300 p-4 text-sm
-            lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
-            lg:border-l
+            btn fixed right-4 bottom-20 z-10 btn-circle btn-lg btn-primary
+            lg:hidden
           "
-        >
-          <h2 className="font-bold">このサーバーについて</h2>
-          <p className="mt-2 text-base-content/70">
-            Blueskyのアカウントで使える招待制のサーバーです。メンバーとそのフォロー先の投稿だけを保存します。
-          </p>
-        </aside>
-      </div>
-      <div className="drawer-side z-30">
-        <label
-          htmlFor="side-nav-drawer"
-          aria-label="メニューを閉じる"
-          className="drawer-overlay"
         />
-        <aside className="h-full w-60 border-r border-base-300 bg-base-200">
-          <SideNavContainer />
-        </aside>
-      </div>
+        <BottomTabsContainer />
+      </main>
+      <aside
+        aria-label="このサーバーについて"
+        className="
+          hidden border-base-300 p-4
+          lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
+          lg:border-l
+        "
+      >
+        <ServerAbout />
+      </aside>
     </div>
   );
 };

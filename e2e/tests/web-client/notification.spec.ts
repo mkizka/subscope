@@ -11,7 +11,7 @@ import {
 test.describe("通知", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
-  test("notification-6: モバイルでは、未読があるときヘッダーの🔔に未読数を表示する", async ({
+  test("notification-6: モバイルでは、未読があるとき下のタブの通知に未読数を表示する", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -21,9 +21,12 @@ test.describe("通知", () => {
 
     await expect(async () => {
       await page.reload();
-      await expect(page.getByLabel("通知を開く")).toHaveText(/^\d+$/, {
-        timeout: 1000,
-      });
+      await expect(
+        page
+          .getByRole("navigation", { name: "タブバー" })
+          .getByRole("link", { name: "通知" })
+          .getByText(/^\d+$/),
+      ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
 });
