@@ -15,7 +15,6 @@ import type { UpsertIdentityUseCase } from "../application/use-cases/identity/up
 
 export class TapSubscriber {
   private readonly logger;
-  private readonly jobLogger;
 
   constructor(
     loggerManager: ILoggerManager,
@@ -26,12 +25,6 @@ export class TapSubscriber {
     private readonly tapConcurrency: number,
   ) {
     this.logger = loggerManager.createLogger("TapSubscriber");
-    this.jobLogger = {
-      log: (message: string) => {
-        this.logger.debug(message);
-        return Promise.resolve(0);
-      },
-    };
   }
 
   private toCommitEvent(event: RecordEvent): CommitEventDto | null {
@@ -81,10 +74,7 @@ export class TapSubscriber {
       collection: commitEvent.commit.collection,
     });
     await this.indexCommitUseCase.execute(
-      indexCommitCommandFactory({
-        event: commitEvent,
-        jobLogger: this.jobLogger,
-      }),
+      indexCommitCommandFactory(commitEvent),
     );
   }
 

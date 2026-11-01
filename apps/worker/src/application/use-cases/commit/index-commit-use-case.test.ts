@@ -27,8 +27,6 @@ describe("IndexCommitUseCase", () => {
     ctx = { db };
   });
 
-  const jobLogger = { log: vi.fn() };
-
   describe("create/updateオペレーション", () => {
     test("index-1: 作成・更新されたレコードを保存する", async () => {
       // arrange
@@ -54,19 +52,12 @@ describe("IndexCommitUseCase", () => {
         rev: "3aaaaaaaaaaaa",
         record,
       };
-      const command: IndexCommitCommand = { commit, live: true, jobLogger };
+      const command: IndexCommitCommand = { commit, live: true };
 
       // act
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        `Starting indexing for commit: ${uri.toString()}`,
-      );
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        "Indexing completed successfully.",
-      );
-
       const savedPost = postRepo.findByUri(uri);
       expect(savedPost).not.toBeNull();
       expect(savedPost?.uri.toString()).toBe(uri.toString());
@@ -94,7 +85,6 @@ describe("IndexCommitUseCase", () => {
       const command: IndexCommitCommand = {
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
         live: true,
-        jobLogger,
       };
 
       // act
@@ -130,7 +120,6 @@ describe("IndexCommitUseCase", () => {
               record,
             },
             live: true,
-            jobLogger,
           },
         };
       };
@@ -153,9 +142,6 @@ describe("IndexCommitUseCase", () => {
       expect(
         await recordRepo.findByUri({ ctx, uri: mismatched.uri }),
       ).toBeNull();
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        "Indexing completed successfully.",
-      );
     });
 
     test.each([
@@ -196,16 +182,12 @@ describe("IndexCommitUseCase", () => {
         await indexCommitUseCase.execute({
           commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
           live: true,
-          jobLogger,
         });
 
         // assert
         expect(likeRepo.findByUri(uri) !== null).toBe(liker || author);
         expect((await recordRepo.findByUri({ ctx, uri })) !== null).toBe(
           liker || author,
-        );
-        expect(jobLogger.log).toHaveBeenCalledWith(
-          "Indexing completed successfully.",
         );
       },
     );
@@ -238,27 +220,18 @@ describe("IndexCommitUseCase", () => {
           record,
         },
         live: true,
-        jobLogger,
       };
       await indexCommitUseCase.execute(createCommand);
 
       const deleteCommand: IndexCommitCommand = {
         commit: { operation: "delete" as const, uri, rev: "3bbbbbbbbbbbb" },
         live: true,
-        jobLogger,
       };
 
       // act
       await indexCommitUseCase.execute(deleteCommand);
 
       // assert
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        `Starting indexing for commit: ${uri.toString()}`,
-      );
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        "Indexing completed successfully.",
-      );
-
       const deletedRecord = await recordRepo.findByUri({ ctx, uri });
       expect(deletedRecord).toBeNull();
     });
@@ -288,21 +261,13 @@ describe("IndexCommitUseCase", () => {
         rev: "3aaaaaaaaaaaa",
         record,
       };
-      const command: IndexCommitCommand = { commit, live: true, jobLogger };
+      const command: IndexCommitCommand = { commit, live: true };
 
       // act
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        `Starting indexing for commit: ${uri.toString()}`,
-      );
-      expect(jobLogger.log).toHaveBeenCalledWith(
-        expect.stringMatching(/Record validation error:/),
-      );
-      expect(jobLogger.log).not.toHaveBeenCalledWith(
-        "Indexing completed successfully.",
-      );
+      expect(postRepo.findByUri(uri)).toBeNull();
     });
 
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
@@ -322,7 +287,7 @@ describe("IndexCommitUseCase", () => {
         rev: "3aaaaaaaaaaaa",
         record,
       };
-      const command: IndexCommitCommand = { commit, live: true, jobLogger };
+      const command: IndexCommitCommand = { commit, live: true };
 
       // act & assert
       await expect(indexCommitUseCase.execute(command)).rejects.toThrow(

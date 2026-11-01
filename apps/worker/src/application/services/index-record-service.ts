@@ -6,7 +6,6 @@ import {
   type SupportedCollection,
 } from "@repo/common/utils";
 
-import type { JobLogger } from "../../shared/job.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "./index-actor-service.js";
@@ -69,22 +68,15 @@ export class IndexRecordService {
   async shouldIndex({
     ctx,
     record,
-    jobLogger,
   }: {
     ctx: AfterCommitContext;
     record: Record;
-    jobLogger: JobLogger;
   }): Promise<boolean> {
     const indexer = this.indexerFor(record);
     if (!isValidRecord(record)) {
-      await jobLogger.log("Invalid record: null character found");
       return false;
     }
-    if (indexer.shouldIndex && !(await indexer.shouldIndex({ ctx, record }))) {
-      await jobLogger.log("Record does not match storage rules, skipping");
-      return false;
-    }
-    return true;
+    return !indexer.shouldIndex || (await indexer.shouldIndex({ ctx, record }));
   }
 
   async upsert({

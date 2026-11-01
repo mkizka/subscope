@@ -2,15 +2,7 @@ import { AtUri } from "@atproto/syntax";
 import type { CommitEventDto } from "@repo/common/domain";
 import { Record } from "@repo/common/domain";
 
-import type { JobLogger } from "../../../shared/job.js";
-
-export const indexCommitCommandFactory = ({
-  event,
-  jobLogger,
-}: {
-  event: CommitEventDto;
-  jobLogger: JobLogger;
-}) => {
+export const indexCommitCommandFactory = (event: CommitEventDto) => {
   const uri = AtUri.make(event.did, event.commit.collection, event.commit.rkey);
   if (event.commit.operation === "delete") {
     return {
@@ -20,7 +12,6 @@ export const indexCommitCommandFactory = ({
         rev: event.commit.rev,
       },
       live: event.live,
-      jobLogger,
     };
   }
   return {
@@ -35,7 +26,6 @@ export const indexCommitCommandFactory = ({
       }),
     },
     live: event.live,
-    jobLogger,
   };
 };
 
