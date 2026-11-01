@@ -140,7 +140,7 @@ export function PostCard({
       <div className="flex gap-3">
         <ProfileLink
           handle={authorHandle}
-          aria-label={`${authorDisplayName ?? authorHandle}のプロフィール`}
+          aria-label={authorDisplayName ?? authorHandle}
           className="relative shrink-0 self-start"
         >
           {authorAvatar ? (

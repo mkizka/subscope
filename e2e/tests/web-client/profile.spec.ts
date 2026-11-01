@@ -263,7 +263,7 @@ test.describe("プロフィール", () => {
       await expect(article).toBeVisible({ timeout: 1000 });
     }).toPass();
 
-    await article.getByRole("link", { name: /のプロフィール$/ }).click();
+    await article.locator('a[href*="profile="]').first().click();
     await expect(panel.getByText("@alice.test")).toBeVisible();
 
     await page.goto(`/?${new URLSearchParams({ thread: uri })}`);
