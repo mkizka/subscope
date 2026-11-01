@@ -1,6 +1,6 @@
 import { isAtIdentifierString } from "@atproto/syntax";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { data, redirect, useSubmit } from "react-router";
+import { data, redirect, useNavigation, useSubmit } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { listSchema } from "@/app/features/list/blocks/list-form";
@@ -64,12 +64,14 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export default function List({ loaderData }: Route.ComponentProps) {
   const { list, ...rest } = loaderData;
   const submit = useSubmit();
+  const navigation = useNavigation();
   return (
     <ListPage
       uri={list.uri}
       name={list.name}
       description={list.description}
       {...rest}
+      deleting={navigation.formData?.get("intent") === "delete"}
       onDelete={() => submit({ intent: "delete" }, { method: "post" })}
     />
   );

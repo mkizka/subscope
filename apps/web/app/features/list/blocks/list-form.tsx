@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, useNavigation } from "react-router";
 import { z } from "zodV4";
 
 import { Button } from "@/app/components/ui/button";
@@ -17,6 +17,7 @@ type Props = {
 };
 
 export function ListForm({ summary, submitLabel, name, description }: Props) {
+  const navigation = useNavigation();
   return (
     <details className="border-b border-line">
       <summary
@@ -42,7 +43,9 @@ export function ListForm({ summary, submitLabel, name, description }: Props) {
           defaultValue={description}
         />
         <div className="self-end">
-          <Button type="submit">{submitLabel}</Button>
+          <Button type="submit" loading={navigation.formData?.has("name")}>
+            {submitLabel}
+          </Button>
         </div>
       </Form>
     </details>

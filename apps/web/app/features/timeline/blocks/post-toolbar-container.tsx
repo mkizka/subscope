@@ -85,7 +85,7 @@ export function PostToolbarContainer(props: Props) {
           type: "reply",
           uri: props.uri,
           cid: props.cid,
-          handle: props.authorHandle,
+          post: props,
           root: props.replyRoot,
           onPosted: () => setMinReplyCount(replyCount + 1),
         })
@@ -95,7 +95,7 @@ export function PostToolbarContainer(props: Props) {
           type: "quote",
           uri: props.uri,
           cid: props.cid,
-          handle: props.authorHandle,
+          post: props,
         })
       }
     />

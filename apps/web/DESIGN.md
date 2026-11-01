@@ -90,12 +90,6 @@ components:
     rounded: "{rounded.full}"
     height: 40px
     padding: 16px
-  textarea:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body}"
-    rounded: "{rounded.xl}"
-    padding: 12px
   list-item:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
@@ -254,16 +248,15 @@ Bluesky公式と同じく、PCは3カラム、スマホは1カラムにする。
 
 ### 一覧
 
-| 部品       | ファイル       | 使い方                                                                                                                                                                |
-| ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`   | `button.tsx`   | 種類は `primary`（塗り）、`secondary`（`line` の枠）、`ghost`（枠なし・アイコンだけ）、`danger`。大きさは高さ40pxと32px（`sm`）。`<Link>` には `buttonClass()` を使う |
-| `Input`    | `input.tsx`    | 1行の入力欄。ラベルは上に `text-label` で置く                                                                                                                         |
-| `Textarea` | `textarea.tsx` | 複数行の入力欄                                                                                                                                                        |
-| `Dialog`   | `dialog.tsx`   | `<dialog>` で作る。幅は最大512px、見出しは `text-heading`、ボタンは右寄せで主ボタンを右端に置く。暗幕のクリックで閉じる                                               |
-| `Menu`     | `menu.tsx`     | `popover` 属性で作るメニュー。項目は `px-4 py-2 text-label`                                                                                                           |
-| `Tabs`     | `tabs.tsx`     | URLで切り替えるタブ。均等幅で、選択中は `text-ink font-bold` と下線                                                                                                   |
-| `Avatar`   | `avatar.tsx`   | 大きさは28px（ナビ・小さい一覧）、40px（投稿・ユーザー一覧）、80px（プロフィール）の3つ                                                                               |
-| `Badge`    | `badge.tsx`    | 件数は `brand` の塗り、状態は `surface-2` の塗り                                                                                                                      |
+| 部品     | ファイル     | 使い方                                                                                                                                                                |
+| -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button` | `button.tsx` | 種類は `primary`（塗り）、`secondary`（`line` の枠）、`ghost`（枠なし・アイコンだけ）、`danger`。大きさは高さ40pxと32px（`sm`）。`<Link>` には `buttonClass()` を使う |
+| `Input`  | `input.tsx`  | 1行の入力欄。ラベルは上に `text-label` で置く                                                                                                                         |
+| `Dialog` | `dialog.tsx` | `<dialog>` で作る。幅は最大512px、見出しは `text-heading`、ボタンは右寄せで主ボタンを右端に置く。暗幕のクリックで閉じる                                               |
+| `Menu`   | `menu.tsx`   | `popover` 属性で作るメニュー。項目は `px-4 py-2 text-label`                                                                                                           |
+| `Tabs`   | `tabs.tsx`   | URLで切り替えるタブ。均等幅で、選択中は `text-ink font-bold` と下線                                                                                                   |
+| `Avatar` | `avatar.tsx` | 大きさは28px（ナビ・小さい一覧）、40px（投稿・ユーザー一覧）、80px（プロフィール）の3つ                                                                               |
+| `Badge`  | `badge.tsx`  | 件数は `brand` の塗り、状態は `surface-2` の塗り                                                                                                                      |
 
 - チェックボックス・ラジオ・セレクトはブラウザ標準の要素を使う。色は `app.css` の `accent-color` で `brand` になる
 - アイコンは lucide-react だけを使う。大きさはボタンや補足の中で `size-4`、投稿のアクションで `size-5`、ナビとタブで `size-6`

@@ -41,7 +41,7 @@ export type PostCardProps = {
   threadPath?: string;
 };
 
-function formatRelativeTime(dateString: string) {
+export function formatRelativeTime(dateString: string) {
   const now = Date.now();
   const date = new Date(dateString).getTime();
   const diffSeconds = Math.floor((now - date) / 1000);

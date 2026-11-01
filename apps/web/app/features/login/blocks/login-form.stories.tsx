@@ -10,6 +10,7 @@ const meta = {
       id: "identifier",
       name: "identifier",
     },
+    loading: false,
   },
 } satisfies Meta<typeof LoginForm>;
 
@@ -22,5 +23,11 @@ export const Default: Story = {};
 export const WithError: Story = {
   args: {
     error: "有効なハンドルを入力してください",
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    loading: true,
   },
 };

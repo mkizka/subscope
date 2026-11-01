@@ -265,7 +265,7 @@ describe("IndexCommitUseCase", () => {
   });
 
   describe("RecordValidationError", () => {
-    test("index-3: Lexiconのスキーマに合わないレコードはジョブを失敗させずにスキップする", async () => {
+    test("index-3: Lexiconのスキーマに合わないレコードはスキップする", async () => {
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);

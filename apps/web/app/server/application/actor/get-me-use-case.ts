@@ -6,6 +6,7 @@ export interface IGetMeUseCase {
   execute: (did: DidString) => Promise<{
     did: string;
     avatarUrl?: string;
+    displayName?: string;
     handle?: string;
     isAdmin: boolean;
   }>;
@@ -24,6 +25,7 @@ export const getMeUseCaseFactory = ({
     return {
       did,
       avatarUrl: profile?.avatar,
+      displayName: profile?.displayName,
       handle: profile?.handle,
       isAdmin,
     };

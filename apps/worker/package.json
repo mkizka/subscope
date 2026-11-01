@@ -19,6 +19,7 @@
     "@atproto/lex": "0.4.2",
     "@atproto/repo": "0.11.1",
     "@atproto/syntax": "0.7.7",
+    "@atproto/tap": "0.4.16",
     "@gyaku/di": "5.0.0",
     "@repo/client": "workspace:*",
     "@repo/common": "workspace:*",

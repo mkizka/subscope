@@ -5,7 +5,7 @@
 ## データフロー
 
 ```
-Tap → Ingester → BullMQ Queue → Worker(IndexCommitUseCase) → IndexRecordService → {RecordType}Indexer → {RecordType}Repository → Database
+Tap → Worker(TapSubscriber → IndexCommitUseCase) → IndexRecordService → {RecordType}Indexer → {RecordType}Repository → Database
 ```
 
 ## 手順
