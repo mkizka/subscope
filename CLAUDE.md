@@ -21,7 +21,7 @@ appsディレクトリ(アプリケーション)
 - `@repo/web`
   - Webクライアント・管理画面を提供するサーバー
   - React Router(framework mode)で実装
-  - デザインはdaisyUIを使用
+  - デザインはTailwind CSSと自前の色トークンで実装(daisyUIは撤去中)
 - `@repo/appview`
   - XRPC APIを提供するAppViewサーバー
   - PDS経由のクライアントリクエストはここに `atproto-proxy` ヘッダで転送される
