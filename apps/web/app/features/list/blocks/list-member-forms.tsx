@@ -31,7 +31,9 @@ export function AddListMemberForm({ listUri }: { listUri: string }) {
           required
         />
       </div>
-      <Button type="submit">追加する</Button>
+      <Button type="submit" loading={fetcher.state !== "idle"}>
+        追加する
+      </Button>
     </fetcher.Form>
   );
 }
@@ -45,7 +47,12 @@ export function RemoveListMemberButton({
   return (
     <fetcher.Form method="delete" action="/api/list-members">
       <input type="hidden" name="listItemUri" value={listItemUri} />
-      <Button type="submit" variant="secondary" size="sm">
+      <Button
+        type="submit"
+        variant="secondary"
+        size="sm"
+        loading={fetcher.state !== "idle"}
+      >
         削除
       </Button>
     </fetcher.Form>
