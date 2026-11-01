@@ -104,6 +104,7 @@ test.describe("ログイン", () => {
   }) => {
     await page.route("**/oauth/authorize**", () => {});
     await page.goto("/login");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     await page.getByLabel("ハンドル").fill("alice.test");
     await page.getByRole("button", { name: "ログイン" }).click();
 
