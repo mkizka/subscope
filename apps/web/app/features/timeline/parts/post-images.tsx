@@ -44,6 +44,7 @@ export function PostImages({ images }: { images: PostImage[] }) {
         open={index >= 0}
         index={index}
         close={() => setIndex(-1)}
+        on={{ view: ({ index }) => setIndex(index) }}
         slides={images.map((image) => ({
           src: image.fullsize,
           alt: image.alt,
