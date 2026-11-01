@@ -29,7 +29,10 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleResolveDid(did: Did): Promise<void> {
+  async scheduleResolveDid(
+    did: Did,
+    { live }: { live: boolean },
+  ): Promise<void> {
     const jobName = `at://${did}`;
     await this.jobQueue.add({
       queueName: "resolveDid",
@@ -37,6 +40,7 @@ export class JobScheduler implements IJobScheduler {
       data: did,
       options: {
         jobId: jobName,
+        priority: live ? undefined : 1,
       },
     });
   }

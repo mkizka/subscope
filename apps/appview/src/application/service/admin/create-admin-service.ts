@@ -27,7 +27,9 @@ export class CreateAdminService {
     await this.actorRepository.upsert({ ctx, actor });
 
     if (!actor.handle) {
-      ctx.afterCommit(() => this.jobScheduler.scheduleResolveDid(did));
+      ctx.afterCommit(() =>
+        this.jobScheduler.scheduleResolveDid(did, { live: true }),
+      );
     }
 
     const profileUri = AtUri.make(did, "app.bsky.actor.profile", "self");

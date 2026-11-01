@@ -12,6 +12,7 @@ interface ScheduledFetchRecord {
 
 interface ScheduledResolveDid {
   did: Did;
+  live: boolean;
 }
 
 interface ScheduledSyncTapRepo {
@@ -42,8 +43,11 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.fetchRecordJobs.push({ uri, live, depth });
   }
 
-  async scheduleResolveDid(did: Did): Promise<void> {
-    this.resolveDidJobs.push({ did });
+  async scheduleResolveDid(
+    did: Did,
+    { live }: { live: boolean },
+  ): Promise<void> {
+    this.resolveDidJobs.push({ did, live });
   }
 
   async scheduleSyncTapRepo(did: Did): Promise<void> {
