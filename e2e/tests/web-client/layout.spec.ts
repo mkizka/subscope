@@ -52,6 +52,7 @@ test.describe("レイアウト", () => {
     page,
   }) => {
     await page.goto("/");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     let release = () => {};
     const released = new Promise<void>((resolve) => (release = resolve));
     await page.route("**/members.data*", async (route) => {
