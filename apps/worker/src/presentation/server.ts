@@ -5,6 +5,7 @@ import { loggingMiddleware } from "@repo/common/utils";
 import express, { type Router } from "express";
 import promBundle from "express-prom-bundle";
 
+import type { LabelSubscriber } from "./label-subscriber.js";
 import type { TapSubscriber } from "./tap.js";
 import type { SyncWorker } from "./worker.js";
 
@@ -17,6 +18,7 @@ export class WorkerServer {
     loggerManager: ILoggerManager,
     private readonly syncWorker: SyncWorker,
     private readonly tapSubscriber: TapSubscriber,
+    private readonly labelSubscriber: LabelSubscriber,
     private readonly jobQueue: IJobQueue,
     healthRouter: Router,
     private readonly port: number,
@@ -33,6 +35,9 @@ export class WorkerServer {
       this.logger.info(`Worker server listening on port ${this.port}`);
       this.tapSubscriber.start().catch((err: unknown) => {
         this.logger.error({ err }, "Tap subscriber threw");
+      });
+      this.labelSubscriber.start().catch((err: unknown) => {
+        this.logger.error({ err }, "Label subscriber threw");
       });
       await this.syncWorker.start();
     });

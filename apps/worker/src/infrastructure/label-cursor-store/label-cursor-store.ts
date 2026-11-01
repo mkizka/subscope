@@ -1,7 +1,7 @@
 import { createKeyvRedis } from "@repo/common/infrastructure";
 import Keyv from "keyv";
 
-import type { ILabelCursorStore } from "../application/interfaces/label-cursor-store.js";
+import type { ILabelCursorStore } from "../../application/interfaces/external/label-cursor-store.js";
 
 export class LabelCursorStore implements ILabelCursorStore {
   private readonly keyv: Keyv<number>;

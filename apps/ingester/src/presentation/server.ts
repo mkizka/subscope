@@ -3,8 +3,6 @@ import { loggingMiddleware } from "@repo/common/utils";
 import type { Router } from "express";
 import express from "express";
 
-import type { LabelIngester } from "./label.js";
-
 export class IngesterServer {
   private readonly app: express.Express;
   private readonly logger: Logger;
@@ -12,10 +10,8 @@ export class IngesterServer {
   constructor(
     loggerManager: ILoggerManager,
     private readonly port: number,
-    private readonly disableIngester: boolean,
     metricsRouter: Router,
     healthRouter: Router,
-    private readonly labelIngester: LabelIngester,
   ) {
     this.logger = loggerManager.createLogger("IngesterServer");
     this.app = express();
@@ -27,11 +23,6 @@ export class IngesterServer {
   start() {
     this.app.listen(this.port, () => {
       this.logger.info(`Ingester server listening on port ${this.port}`);
-      if (!this.disableIngester) {
-        this.labelIngester.start().catch((err: unknown) => {
-          this.logger.error({ err }, "Label ingester threw");
-        });
-      }
     });
   }
 }
