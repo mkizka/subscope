@@ -23,4 +23,5 @@ export type PostDto = {
   replyRootUri: string | null;
   replyParentUri: string | null;
   indexedAt: Date;
+  sortAt: Date;
 };

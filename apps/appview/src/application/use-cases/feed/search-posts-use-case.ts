@@ -36,7 +36,7 @@ export class SearchPostsUseCase {
     const ctx = this.viewContextFactory.create();
     const posts = await Promise.all(
       paginationResult.items.map((post) =>
-        this.postViews.postView(post.uri.toString(), ctx),
+        this.postViews.postView(post.uri, ctx),
       ),
     );
 

@@ -36,7 +36,6 @@ import type { IListItemQuery } from "../application/interfaces/list-item-query.j
 import type { IListQuery } from "../application/interfaces/list-query.js";
 import type { INotificationQuery } from "../application/interfaces/notification-query.js";
 import type { IPostQuery } from "../application/interfaces/post-query.js";
-import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../application/interfaces/profile-query.js";
 import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
@@ -120,7 +119,6 @@ import { ListItemQuery } from "../infrastructure/list-item-query/list-item-query
 import { ListQuery } from "../infrastructure/list-query/list-query.js";
 import { NotificationQuery } from "../infrastructure/notification-query/notification-query.js";
 import { PostQuery } from "../infrastructure/post-query/post-query.js";
-import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
 import { ProfileRepository } from "../infrastructure/profile-repository/profile-repository.js";
@@ -212,7 +210,6 @@ export const createAppRegistry = (env: Env) =>
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationQuery", ["db"], asClassArgs<INotificationQuery>()(NotificationQuery))
-    .service("postRepository", ["db"], asClassArgs<IPostRepository>()(PostRepository))
     .service("generatorQuery", ["db"], asClassArgs<IGeneratorQuery>()(GeneratorQuery))
     .service("likeQuery", ["db"], asClassArgs<ILikeQuery>()(LikeQuery))
     .service("postQuery", ["db"], asClassArgs<IPostQuery>()(PostQuery))
@@ -236,7 +233,7 @@ export const createAppRegistry = (env: Env) =>
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
-    .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
+    .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
@@ -258,7 +255,7 @@ export const createAppRegistry = (env: Env) =>
     .service("searchActorsUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
     .service("searchActorsTypeaheadUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
-    .service("getPostThreadUseCase", ["postRepository", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
+    .service("getPostThreadUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationQuery", "subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(ListNotificationsUseCase))
