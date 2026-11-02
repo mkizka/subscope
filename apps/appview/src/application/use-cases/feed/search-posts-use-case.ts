@@ -1,6 +1,8 @@
 import type { $OutputBody } from "@repo/client/lex/app/bsky/feed/searchPosts";
 
-import type { PostSearchService } from "../../../application/service/search/post-search-service.js";
+import type { PostDto } from "../../dto/post-dto.js";
+import type { IPostQuery } from "../../interfaces/post-query.js";
+import { createCursorPaginator } from "../../utils/pagination.js";
 import type { PostViews } from "../../views/post-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
@@ -12,7 +14,7 @@ type SearchPostsParams = {
 
 export class SearchPostsUseCase {
   constructor(
-    private readonly searchService: PostSearchService,
+    private readonly postQuery: IPostQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly postViews: PostViews,
   ) {}
@@ -25,23 +27,26 @@ export class SearchPostsUseCase {
       };
     }
 
-    const cursor = params.cursor ? new Date(params.cursor) : undefined;
-
-    const paginationResult = await this.searchService.findPostsWithPagination({
-      query: params.q,
-      cursor,
+    const paginator = createCursorPaginator<PostDto>({
       limit: params.limit,
+      getCursor: (post) => post.sortAt.toISOString(),
     });
+    const posts = await this.postQuery.search({
+      query: params.q,
+      limit: paginator.queryLimit,
+      cursor: params.cursor ? new Date(params.cursor) : undefined,
+    });
+    const paginationResult = paginator.extractPage(posts);
 
     const ctx = this.viewContextFactory.create();
-    const posts = await Promise.all(
+    const postViews = await Promise.all(
       paginationResult.items.map((post) =>
         this.postViews.postView(post.uri, ctx),
       ),
     );
 
     return {
-      posts: posts.filter((post) => post !== undefined),
+      posts: postViews.filter((post) => post !== undefined),
       cursor: paginationResult.cursor,
     };
   }
