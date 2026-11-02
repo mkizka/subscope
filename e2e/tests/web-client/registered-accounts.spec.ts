@@ -88,4 +88,29 @@ test.describe("登録アカウント", () => {
       });
     }).toPass();
   });
+
+  test("registered-accounts-6: 登録アカウントの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/registered-accounts", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page
+      .getByRole("link", { name: "登録アカウント", exact: true })
+      .click();
+
+    await expect(
+      page.getByRole("heading", { name: "登録アカウント" }),
+    ).toBeVisible();
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
 });

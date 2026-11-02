@@ -17,8 +17,10 @@ import type { loader as notificationsLoader } from "@/app/routes/api.notificatio
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
+import type { loader as registeredAccountsLoader } from "@/app/routes/api.registered-accounts";
 import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
+import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
 
 type Data<T extends (...args: never) => unknown> =
   Awaited<ReturnType<T>> extends {
@@ -127,6 +129,32 @@ queryClient.setQueryData<{
   ],
   pageParams: [undefined],
 });
+
+queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
+  ["clientRegisteredAccounts"],
+  {
+    registeredAccounts: [
+      { ...alice, isAdmin: true },
+      { did: "did:plc:carol", handle: "handle.invalid", isAdmin: false },
+    ],
+    hasMore: false,
+  },
+);
+queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
+  ["trackedAccounts"],
+  {
+    total: 3,
+    actors: [
+      { ...bob, registeredFollowersCount: 3 },
+      { ...alice, registeredFollowersCount: 1 },
+      {
+        did: "did:plc:carol",
+        handle: "handle.invalid",
+        registeredFollowersCount: 0,
+      },
+    ],
+  },
+);
 
 queryClient.setQueryData<{
   pages: Data<typeof timelineLoader>[];

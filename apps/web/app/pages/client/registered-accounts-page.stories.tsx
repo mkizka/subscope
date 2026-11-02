@@ -4,22 +4,6 @@ import { RegisteredAccountsPage } from "./registered-accounts-page";
 
 const meta = {
   component: RegisteredAccountsPage,
-  args: {
-    registeredAccounts: [
-      {
-        did: "did:plc:alice",
-        handle: "alice.bsky.social",
-        displayName: "Alice",
-        description: "Blueskyを使っています。",
-        isAdmin: true,
-      },
-      {
-        did: "did:plc:carol",
-        handle: "handle.invalid",
-      },
-    ],
-    hasMore: false,
-  },
   parameters: {
     layout: "fullscreen",
   },
