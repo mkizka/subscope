@@ -13,13 +13,13 @@ const legacyRepositoryMethods = {
   IListItemRepository: "upsert",
   IListRepository: "upsert",
   INotificationRepository: "createMany",
-  IPostRepository: "exists|findReplyParentUri|upsert",
+  IPostRepository: "upsert",
   IPostStatsRepository: "upsertMany",
-  IProfileRepository: "exists|upsert",
+  IProfileRepository: "upsert",
   IRecordRepository: "findByUri|upsert",
-  IRepostRepository: "findRepostsByPost|upsert",
+  IRepostRepository: "upsert",
   ISubscriptionRepository:
-    "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|isSubscriber|updateSeenAt|upsert",
+    "count|countTrackedActors|findMany|findTrackedActors|isSubscriber|upsert",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({

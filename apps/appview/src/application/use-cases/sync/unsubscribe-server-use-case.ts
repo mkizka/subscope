@@ -23,7 +23,7 @@ export class UnsubscribeServerUseCase {
   ) {}
 
   async execute(params: UnsubscribeServerParams): Promise<void> {
-    const existingSubscription = await this.subscriptionRepository.findFirst(
+    const existingSubscription = await this.subscriptionRepository.find(
       params.actorDid,
     );
     if (!existingSubscription) {
