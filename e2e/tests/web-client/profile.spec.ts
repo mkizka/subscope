@@ -150,7 +150,7 @@ test.describe("プロフィール", () => {
         .getByRole("article")
         .filter({ hasText: "profile-16: " })
         .getByTestId("thread-line"),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
   });
 
   test("profile-8: 自分のプロフィールの「いいね」タブに、自分がいいねした投稿を表示する", async ({
