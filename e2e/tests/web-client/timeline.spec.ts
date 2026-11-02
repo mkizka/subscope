@@ -332,10 +332,10 @@ test.describe("タイムライン", () => {
     ).toHaveCount(2);
   });
 
-  test("timeline-14: 投稿には、投稿者の名前の隣にハンドルを表示する", async ({
+  test("timeline-15: 投稿には、投稿者の名前の隣にハンドルを表示する", async ({
     page,
   }) => {
-    const text = "timeline-14: 投稿";
+    const text = "timeline-15: 投稿";
     await createRecord("alice.test", "app.bsky.feed.post", {
       text,
       createdAt: new Date().toISOString(),
