@@ -188,7 +188,7 @@ describe("バックフィルの状態の確認", () => {
     expect(await findBackfillStatus(followee.did)).toBe("completed");
   });
 
-  test("backfill-2: Tapの状態が error のときはエラー、pending・desynchronized・resyncing のときは取り込み中、それ以外は完了として保存する", async () => {
+  test("backfill-2: Tapの状態が error のときはエラー、pending・desynchronized・resyncing のときは同期中、それ以外は完了として保存する", async () => {
     // arrange
     const { checkBackfill, tapClient } = await setupJobTest();
     const expected = {

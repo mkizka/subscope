@@ -1,8 +1,8 @@
 import { expect, type Page, test } from "@playwright/test";
 
-const IN_PROGRESS = "過去の投稿を取り込んでいます";
-const ERROR = "過去の投稿を取り込めていません";
-const DONE = "過去の投稿の取り込みが終わりました";
+const IN_PROGRESS = "過去の投稿を同期しています";
+const ERROR = "過去の投稿を同期できていません";
+const DONE = "過去の投稿の同期が終わりました";
 
 const mockBackfillStatus = async (
   page: Page,
@@ -15,8 +15,8 @@ const mockBackfillStatus = async (
   });
 };
 
-test.describe("過去の投稿の取り込み状態", () => {
-  test("backfillBanner-1: 自分の取り込み中は、「過去の投稿を取り込んでいます」の帯を出す", async ({
+test.describe("過去の投稿の同期状態", () => {
+  test("backfillBanner-1: 自分の同期中は、「過去の投稿を同期しています」の帯を出す", async ({
     page,
   }) => {
     await mockBackfillStatus(page, ["inProgress"]);
@@ -26,7 +26,7 @@ test.describe("過去の投稿の取り込み状態", () => {
     await expect(page.getByText(IN_PROGRESS)).toBeVisible();
   });
 
-  test("backfillBanner-2: 自分の取り込みがエラーなら、「過去の投稿を取り込めていません」の帯を出す", async ({
+  test("backfillBanner-2: 自分の同期がエラーなら、「過去の投稿を同期できていません」の帯を出す", async ({
     page,
   }) => {
     await mockBackfillStatus(page, ["error"]);
@@ -37,7 +37,7 @@ test.describe("過去の投稿の取り込み状態", () => {
     await expect(page.getByText(IN_PROGRESS)).toHaveCount(0);
   });
 
-  test("backfillBanner-3: 自分の取り込みが終わっていれば、帯を出さない", async ({
+  test("backfillBanner-3: 自分の同期が終わっていれば、帯を出さない", async ({
     page,
     request,
   }) => {
@@ -58,7 +58,7 @@ test.describe("過去の投稿の取り込み状態", () => {
     await expect(page.getByText(DONE)).toHaveCount(0);
   });
 
-  test("backfillBanner-4: 取り込み中かエラーの間は30秒ごとに状態を確認し直し、取り込みが終わったら「過去の投稿の取り込みが終わりました」の帯と「更新する」ボタンを出す", async ({
+  test("backfillBanner-4: 同期中かエラーの間は30秒ごとに状態を確認し直し、同期が終わったら「過去の投稿の同期が終わりました」の帯と「更新する」ボタンを出す", async ({
     page,
   }) => {
     await page.clock.install();

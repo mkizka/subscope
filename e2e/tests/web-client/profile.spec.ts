@@ -242,7 +242,7 @@ test.describe("プロフィール", () => {
     await expect(page).toHaveURL("/profile/alice.test");
   });
 
-  test("profile-13: 追跡中のユーザーの全体ページには、そのユーザーの過去の投稿の取り込み状態（取り込み中・取り込み済み・取り込みエラー）をハンドルの横に表示する", async ({
+  test("profile-13: 追跡中のユーザーの全体ページには、そのユーザーの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");
@@ -250,7 +250,7 @@ test.describe("プロフィール", () => {
     await expect(async () => {
       await page.reload();
       await expect(
-        page.getByRole("main").getByText("取り込み済み", { exact: true }),
+        page.getByRole("main").getByText("同期済み", { exact: true }),
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });

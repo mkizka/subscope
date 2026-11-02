@@ -3,9 +3,9 @@ import type { BackfillStatus } from "@repo/common/domain";
 import { Badge } from "@/app/components/ui/badge";
 
 const LABELS = {
-  inProgress: "取り込み中",
-  completed: "取り込み済み",
-  error: "取り込みエラー",
+  inProgress: "同期中",
+  completed: "同期済み",
+  error: "同期エラー",
 };
 
 export function BackfillStatusBadge({ status }: { status: BackfillStatus }) {

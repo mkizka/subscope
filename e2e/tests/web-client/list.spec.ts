@@ -323,7 +323,7 @@ test.describe("リスト", () => {
     await expect(button).toBeEnabled();
   });
 
-  test("list-12: 「メンバー」タブの追跡中のユーザーには、過去の投稿の取り込み状態を表示する", async ({
+  test("list-12: 「メンバー」タブの追跡中のユーザーには、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     const rkey = await createList(`list-12のリスト ${Date.now()}`);
@@ -333,7 +333,7 @@ test.describe("リスト", () => {
       .filter({ hasText: "@bob.test" });
     await expect(async () => {
       await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
-      await expect(bob.getByText("取り込み済み", { exact: true })).toBeVisible({
+      await expect(bob.getByText("同期済み", { exact: true })).toBeVisible({
         timeout: 1000,
       });
     }).toPass();

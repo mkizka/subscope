@@ -140,7 +140,7 @@ test.describe("検索", () => {
     await expect(button).toBeEnabled();
   });
 
-  test("search-8: ユーザーの検索結果には、過去の投稿の取り込み状態を表示する", async ({
+  test("search-8: ユーザーの検索結果には、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     const alice = page
@@ -149,9 +149,9 @@ test.describe("検索", () => {
       .filter({ hasText: "@alice.test" });
     await expect(async () => {
       await page.goto("/search?q=alice");
-      await expect(
-        alice.getByText("取り込み済み", { exact: true }),
-      ).toBeVisible({ timeout: 1000 });
+      await expect(alice.getByText("同期済み", { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
   });
 });

@@ -208,7 +208,7 @@ test.describe("登録ユーザー", () => {
     );
   });
 
-  test("subscribers-9: 「登録ユーザー」タブの各行に、本人の過去の投稿の取り込み状態を「取り込み済み」「取り込み中」「取り込みエラー」のバッジで出す", async ({
+  test("subscribers-9: 「登録ユーザー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -220,7 +220,7 @@ test.describe("登録ユーザー", () => {
         .getByRole("main")
         .getByRole("listitem")
         .filter({ has: page.getByTitle(aliceDid) });
-      await expect(row.getByText("取り込み済み")).toBeVisible({
+      await expect(row.getByText("同期済み")).toBeVisible({
         timeout: 1000,
       });
     }).toPass();

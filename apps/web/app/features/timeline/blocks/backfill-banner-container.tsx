@@ -11,7 +11,7 @@ type BackfillStatusResponse = Awaited<ReturnType<typeof loader>>["data"];
 async function fetchBackfillStatus(): Promise<BackfillStatusResponse> {
   const response = await fetch("/api/backfill-status");
   if (!response.ok) {
-    throw new Error("取り込み状態の取得に失敗しました");
+    throw new Error("同期状態の取得に失敗しました");
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return response.json() as Promise<BackfillStatusResponse>;
