@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
+import { useSearchParams } from "react-router";
 
+import { Tabs } from "@/app/components/ui/tabs";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle.$kind";
 
@@ -16,11 +18,14 @@ type Props = {
 };
 
 export function FollowListContainer({ handle, kind }: Props) {
+  const [searchParams] = useSearchParams();
+  const registered =
+    kind === "followers" && searchParams.get("filter") === "registered";
   const { data } = useQuery({
-    queryKey: ["follow-list", handle, kind],
+    queryKey: ["follow-list", handle, kind, registered],
     queryFn: () =>
       fetchJson<FollowListResponse>(
-        `/api/profile/${encodeURIComponent(handle)}/${kind}`,
+        `/api/profile/${encodeURIComponent(handle)}/${kind}${registered ? "?filter=registered" : ""}`,
       ),
     throwOnError: true,
   });
@@ -39,6 +44,18 @@ export function FollowListContainer({ handle, kind }: Props) {
           </>
         )}
       </h1>
+      {kind === "followers" && (
+        <Tabs
+          tabs={[
+            { to: ".", label: "すべて", selected: !registered },
+            {
+              to: "?filter=registered",
+              label: `登録アカウント${data?.registeredCount === undefined ? "" : ` ${data.registeredCount}`}`,
+              selected: registered,
+            },
+          ]}
+        />
+      )}
       {data ? (
         <AccountList accounts={data.accounts} />
       ) : (

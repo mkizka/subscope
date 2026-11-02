@@ -47,6 +47,7 @@ import {
 import { backfillQueryFactory } from "./infrastructure/backfill/backfill-query";
 import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
+import { followQueryFactory } from "./infrastructure/follow/follow-query";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { listCommandFactory } from "./infrastructure/list/list-command";
 import { listQueryFactory } from "./infrastructure/list/list-query";
@@ -164,11 +165,12 @@ export const di = await createRegistry()
     deleteInviteCodeUseCaseFactory,
   )
   .service("accountQuery", ["oauthClient"], accountQueryFactory)
+  .service("followQuery", ["db"], followQueryFactory)
   .service("getMeUseCase", ["accountQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["accountQuery"], getProfileUseCaseFactory)
   .service(
     "getFollowListUseCase",
-    ["accountQuery", "backfillQuery"],
+    ["accountQuery", "backfillQuery", "followQuery"],
     getFollowListUseCaseFactory,
   )
   .service(

@@ -9,7 +9,11 @@ import type { Route } from "./+types/api.profile.$handle.$kind";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
-export const loader = async ({ params, context }: Route.LoaderArgs) => {
+export const loader = async ({
+  params,
+  request,
+  context,
+}: Route.LoaderArgs) => {
   const { handle, kind } = params;
   if (
     !isAtIdentifierString(handle) ||
@@ -22,6 +26,9 @@ export const loader = async ({ params, context }: Route.LoaderArgs) => {
       context.get(didContext),
       handle,
       kind,
+      new URL(request.url).searchParams.get("filter") === "registered"
+        ? "registered"
+        : undefined,
     ),
   );
 };

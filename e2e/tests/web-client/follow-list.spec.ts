@@ -123,4 +123,53 @@ test.describe("フォロー・フォロワー", () => {
 
     await expect(bob).toBeVisible();
   });
+
+  test("follow-list-7: フォロワー一覧に「すべて」と「登録アカウント」のタブを表示し、「登録アカウント」には人数を添える", async ({
+    page,
+  }) => {
+    await page.goto("/profile/bob.test/followers");
+
+    await expect(page.getByRole("tab", { name: "すべて" })).toBeVisible();
+    await expect(
+      page.getByRole("tab", { name: /^登録アカウント \d+$/ }),
+    ).toBeVisible();
+  });
+
+  test("follow-list-8: 「登録アカウント」タブ（`?filter=registered`）には、そのアカウントをフォローしている登録アカウントだけを一覧表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/bob.test/followers");
+
+    await page.getByRole("tab", { name: /^登録アカウント/ }).click();
+
+    await expect(page).toHaveURL(
+      "/profile/bob.test/followers?filter=registered",
+    );
+    const alice = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Alice" });
+    await expect(async () => {
+      await page.reload();
+      await expect(alice).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
+  test("follow-list-9: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「登録アカウント」タブに移動する", async ({
+    page,
+  }) => {
+    const link = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Bob" })
+      .getByRole("link", { name: /^[1-9]\d*人からフォロー$/ });
+    await expect(async () => {
+      await page.goto("/accounts?tab=tracked");
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await link.click();
+
+    await expect(page).toHaveURL(/\/followers\?filter=registered$/);
+  });
 });

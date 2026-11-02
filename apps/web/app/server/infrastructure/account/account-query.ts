@@ -1,9 +1,10 @@
-import type { AtIdentifierString } from "@atproto/syntax";
+import { type AtIdentifierString, isAtIdentifierString } from "@atproto/syntax";
 import type {
   ProfileView,
   ProfileViewDetailed,
 } from "@repo/client/lex/app/bsky/actor/defs";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
+import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
 import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
@@ -38,9 +39,15 @@ export type AccountDto = {
 export type FollowListDto = {
   subject: AccountDto;
   accounts: AccountDto[];
+  registeredCount?: number;
 };
 
-const toAccount = (profile: ProfileView): AccountDto => ({
+const toAccount = (
+  profile: Pick<
+    ProfileView,
+    "did" | "handle" | "displayName" | "avatar" | "description"
+  >,
+): AccountDto => ({
   did: profile.did,
   handle: profile.handle,
   displayName: profile.displayName,
@@ -63,6 +70,7 @@ export interface IAccountQuery {
     account: AtIdentifierString,
     kind: "follows" | "followers",
   ) => Promise<FollowListDto>;
+  findProfiles: (did: string, dids: string[]) => Promise<AccountDto[]>;
   isAdmin: (did: string) => Promise<boolean>;
   searchActors: (did: string, q: string) => Promise<AccountDto[]>;
 }
@@ -108,6 +116,21 @@ export const accountQueryFactory = ({
         subject: toAccount(res.subject),
         accounts: accounts.map(toAccount),
       };
+    },
+    async findProfiles(did, dids) {
+      const agent = await restore(did);
+      const chunks = Array.from(
+        { length: Math.ceil(dids.length / 25) },
+        (_, i) => dids.slice(i * 25, (i + 1) * 25),
+      );
+      const results = await Promise.all(
+        chunks.map((actors) =>
+          agent.call(getProfiles, {
+            actors: actors.filter(isAtIdentifierString),
+          }),
+        ),
+      );
+      return results.flatMap(({ profiles }) => profiles.map(toAccount));
     },
     async isAdmin(did) {
       const agent = await restore(did);
