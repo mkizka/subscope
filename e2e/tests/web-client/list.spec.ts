@@ -373,4 +373,58 @@ test.describe("リスト", () => {
     }).toPass();
     await expect(main.getByText("list-13: aliceへの返信")).toHaveCount(0);
   });
+
+  test("list-14: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/lists/*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
+
+    await expect(page.getByRole("heading", { name: "リスト" })).toBeVisible();
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
+
+  test("list-15: リスト詳細を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    const name = `list-15のリスト ${Date.now()}`;
+    const rkey = await createList(name);
+    await page.goto("/profile/alice.test/lists");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/list/**", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await main.getByText(name, { exact: true }).click();
+
+    await expect(page).toHaveURL(`/profile/alice.test/lists/${rkey}`);
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+    await expect(main.getByRole("heading", { name })).toBeVisible();
+  });
 });

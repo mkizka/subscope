@@ -1,6 +1,5 @@
-import { isAtIdentifierString } from "@atproto/syntax";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { data, redirect, useNavigation, useSubmit } from "react-router";
+import { data, redirect } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { listSchema } from "@/app/features/list/blocks/list-form";
@@ -11,27 +10,6 @@ import { di } from "@/app/server/di";
 import type { Route } from "./+types/profile.$handle_.lists_.$rkey";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
-
-export const loader = async ({
-  params,
-  request,
-  context,
-}: Route.LoaderArgs) => {
-  if (!isAtIdentifierString(params.handle)) {
-    throw data("リストが見つかりません", { status: 404 });
-  }
-  const tab: "posts" | "members" =
-    new URL(request.url).searchParams.get("tab") === "members"
-      ? "members"
-      : "posts";
-  const result = await di.getListPageUseCase.execute(
-    context.get(didContext),
-    params.handle,
-    params.rkey,
-    tab,
-  );
-  return data({ ...result, tab });
-};
 
 export const action = async ({
   params,
@@ -57,22 +35,10 @@ export const action = async ({
   return null;
 };
 
-export function meta({ loaderData }: Route.MetaArgs) {
-  return [{ title: `${loaderData.list.name} - Subscope` }];
+export function meta() {
+  return [{ title: "リスト - Subscope" }];
 }
 
-export default function List({ loaderData }: Route.ComponentProps) {
-  const { list, ...rest } = loaderData;
-  const submit = useSubmit();
-  const navigation = useNavigation();
-  return (
-    <ListPage
-      uri={list.uri}
-      name={list.name}
-      description={list.description}
-      {...rest}
-      deleting={navigation.formData?.get("intent") === "delete"}
-      onDelete={() => submit({ intent: "delete" }, { method: "post" })}
-    />
-  );
+export default function List({ params }: Route.ComponentProps) {
+  return <ListPage handle={params.handle} rkey={params.rkey} />;
 }

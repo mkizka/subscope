@@ -1,14 +1,17 @@
 import "@/app/app.css";
 import "./preview.css";
 
-import { asDatetimeString } from "@atproto/syntax";
+import { asAtUriString, asDatetimeString } from "@atproto/syntax";
 import type { $OutputBody as SubscribersResponse } from "@repo/client/lex/me/subsco/admin/getSubscribers";
 import type { Preview } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";
 
+import ListDetailStories from "@/app/features/list/blocks/list-detail.stories";
 import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
 import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-codes";
+import type { loader as listLoader } from "@/app/routes/api.list.$handle.$rkey";
+import type { loader as listsLoader } from "@/app/routes/api.lists.$handle";
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
@@ -150,6 +153,40 @@ queryClient.setQueryData<{
   ],
   pageParams: [undefined],
 });
+queryClient.setQueryData<Data<typeof listsLoader>>(["lists", alice.handle], {
+  lists: [
+    {
+      uri: asAtUriString("at://did:plc:alice/app.bsky.graph.list/1"),
+      rkey: "1",
+      creatorDid: alice.did,
+      name: "友達",
+      description: "よく話す人たち",
+    },
+    {
+      uri: asAtUriString("at://did:plc:alice/app.bsky.graph.list/2"),
+      rkey: "2",
+      creatorDid: alice.did,
+      name: "ニュース",
+    },
+  ],
+  isSelf: true,
+});
+queryClient.setQueryData<Data<typeof listLoader>>(
+  ["list", alice.handle, "1", "posts"],
+  {
+    list: {
+      uri: asAtUriString(ListDetailStories.args.uri),
+      rkey: "1",
+      creatorDid: alice.did,
+      name: ListDetailStories.args.name,
+      description: ListDetailStories.args.description,
+    },
+    posts: ListDetailStories.args.posts,
+    members: ListDetailStories.args.members,
+    isSelf: true,
+  },
+);
+
 queryClient.setQueryData<Data<typeof followListLoader>>(
   ["follow-list", "alice.bsky.social", "follows"],
   {
