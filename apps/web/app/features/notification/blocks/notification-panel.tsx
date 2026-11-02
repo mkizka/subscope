@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { Avatar } from "@/app/components/ui/avatar";
 
 type Notification = {
@@ -25,6 +26,7 @@ type Props = {
   notifications: Notification[];
   onLoadMore: () => void;
   hasNextPage: boolean;
+  isLoading?: boolean;
 };
 
 const reasons: Record<
@@ -67,11 +69,14 @@ export function NotificationPanel({
   notifications,
   onLoadMore,
   hasNextPage,
+  isLoading,
 }: Props) {
   return (
     <section aria-label="通知">
       <h2 className="border-b border-line px-4 py-3 text-title">通知</h2>
-      {notifications.length === 0 ? (
+      {isLoading ? (
+        <LoadingSpinner label="読み込み中" />
+      ) : notifications.length === 0 ? (
         <p className="py-8 text-center text-label text-muted">
           通知はまだありません
         </p>
