@@ -86,13 +86,17 @@ export const di = await createRegistry()
     ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service("getMembersUseCase", ["subscopeQuery"], getMembersUseCaseFactory)
+  .service("backfillQuery", ["db"], backfillQueryFactory)
+  .service(
+    "getMembersUseCase",
+    ["subscopeQuery", "backfillQuery"],
+    getMembersUseCaseFactory,
+  )
   .service(
     "getTrackedActorsUseCase",
-    ["subscopeQuery"],
+    ["subscopeQuery", "backfillQuery"],
     getTrackedActorsUseCaseFactory,
   )
-  .service("backfillQuery", ["db"], backfillQueryFactory)
   .service(
     "getBackfillStatusUseCase",
     ["backfillQuery"],
@@ -166,7 +170,11 @@ export const di = await createRegistry()
   .service("actorQuery", ["oauthClient"], actorQueryFactory)
   .service("getMeUseCase", ["actorQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["actorQuery"], getProfileUseCaseFactory)
-  .service("getFollowListUseCase", ["actorQuery"], getFollowListUseCaseFactory)
+  .service(
+    "getFollowListUseCase",
+    ["actorQuery", "backfillQuery"],
+    getFollowListUseCaseFactory,
+  )
   .service(
     "getProfilePageUseCase",
     ["actorQuery", "backfillQuery"],

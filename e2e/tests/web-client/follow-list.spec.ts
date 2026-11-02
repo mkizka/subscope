@@ -67,4 +67,21 @@ test.describe("フォロー・フォロワー", () => {
       page.getByRole("main").getByRole("heading", { name: "Bob", exact: true }),
     ).toBeVisible();
   });
+
+  test("follow-list-4: 一覧の追跡中のユーザーには、過去の投稿の取り込み状態を表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test/follows");
+
+    const item = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Bob" });
+    await expect(async () => {
+      await page.reload();
+      await expect(item.getByText("取り込み済み", { exact: true })).toBeVisible(
+        { timeout: 1000 },
+      );
+    }).toPass();
+  });
 });

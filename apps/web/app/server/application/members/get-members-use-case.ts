@@ -1,3 +1,4 @@
+import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 import type {
   ISubscopeQuery,
   MembersDto,
@@ -9,8 +10,22 @@ export interface IGetMembersUseCase {
 
 export const getMembersUseCaseFactory = ({
   subscopeQuery,
+  backfillQuery,
 }: {
   subscopeQuery: ISubscopeQuery;
+  backfillQuery: IBackfillQuery;
 }): IGetMembersUseCase => ({
-  execute: () => subscopeQuery.findMembers(),
+  async execute() {
+    const result = await subscopeQuery.findMembers();
+    const statuses = await backfillQuery.findTrackedStatuses(
+      result.members.map((member) => member.did),
+    );
+    return {
+      ...result,
+      members: result.members.map((member) => ({
+        ...member,
+        backfillStatus: statuses[member.did],
+      })),
+    };
+  },
 });

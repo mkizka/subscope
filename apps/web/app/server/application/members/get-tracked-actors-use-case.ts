@@ -1,3 +1,4 @@
+import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 import type {
   ISubscopeQuery,
   TrackedActorsDto,
@@ -9,8 +10,22 @@ export interface IGetTrackedActorsUseCase {
 
 export const getTrackedActorsUseCaseFactory = ({
   subscopeQuery,
+  backfillQuery,
 }: {
   subscopeQuery: ISubscopeQuery;
+  backfillQuery: IBackfillQuery;
 }): IGetTrackedActorsUseCase => ({
-  execute: (did) => subscopeQuery.findTrackedActors(did),
+  async execute(did) {
+    const result = await subscopeQuery.findTrackedActors(did);
+    const statuses = await backfillQuery.findTrackedStatuses(
+      result.actors.map((actor) => actor.did),
+    );
+    return {
+      ...result,
+      actors: result.actors.map((actor) => ({
+        ...actor,
+        backfillStatus: statuses[actor.did],
+      })),
+    };
+  },
 });

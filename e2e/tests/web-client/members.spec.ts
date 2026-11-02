@@ -67,4 +67,21 @@ test.describe("メンバー", () => {
       .filter({ hasText: "Alice" });
     await expect(alice.getByText("管理者")).toBeVisible();
   });
+
+  test("members-5: 一覧のメンバーには、過去の投稿の取り込み状態を表示する", async ({
+    page,
+  }) => {
+    await page.goto("/members");
+
+    const item = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Alice" });
+    await expect(async () => {
+      await page.reload();
+      await expect(item.getByText("取り込み済み", { exact: true })).toBeVisible(
+        { timeout: 1000 },
+      );
+    }).toPass();
+  });
 });

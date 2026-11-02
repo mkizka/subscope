@@ -5,6 +5,7 @@ import getTrackedActors from "@repo/client/lex/me/subsco/server/getTrackedActors
 import getSubscriptionStatus, {
   subscribed,
 } from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import type { BackfillStatus } from "@repo/common/domain";
 
 import { env } from "@/app/server/env";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
@@ -17,6 +18,7 @@ export type MembersDto = {
     avatarUrl?: string;
     description?: string;
     isAdmin: boolean;
+    backfillStatus?: BackfillStatus;
   }[];
   hasMore: boolean;
 };
@@ -29,6 +31,7 @@ export type TrackedActorsDto = {
     displayName?: string;
     avatarUrl?: string;
     subscriberFollowersCount: number;
+    backfillStatus?: BackfillStatus;
   }[];
 };
 
