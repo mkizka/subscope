@@ -318,4 +318,53 @@ test.describe("スレッド", () => {
       await expect(focused).toContainText("thread-13: 投稿");
     }
   });
+
+  test("thread-14: スレッドを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    const target = await post("thread-14: 投稿");
+    await openThread(page, target.uri, "thread-14: 投稿");
+    await page.goto("/members");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/thread*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.goto(threadPath(target.uri));
+
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+    await expect(
+      page
+        .getByRole("region", { name: "スレッド" })
+        .getByText("thread-14: 投稿"),
+    ).toBeVisible();
+  });
+
+  test("thread-15: 一度表示したスレッドに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
+    page,
+  }) => {
+    const target = await post("thread-15: 投稿");
+    await openThread(page, target.uri, "thread-15: 投稿");
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "メンバー" })
+      .click();
+    await expect(page).toHaveURL("/members");
+    await page.route("**/api/thread*", () => {});
+
+    await page.goBack();
+
+    await expect(
+      page
+        .getByRole("region", { name: "スレッド" })
+        .getByText("thread-15: 投稿"),
+    ).toBeVisible();
+  });
 });
