@@ -167,7 +167,7 @@ test.describe("アカウント", () => {
     page,
   }) => {
     const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/api/registered-accounts", async (route) => {
+    await page.route(/\/api\/registered-accounts/, async (route) => {
       await released;
       await route.continue();
     });
