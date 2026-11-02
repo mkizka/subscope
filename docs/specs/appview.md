@@ -239,12 +239,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 指定したアクターをフォローしているアクターを返す。認証は任意。
 
 - getFollowers-1: 指定したアクターをsubjectに、そのフォロワーをfollowersにprofileViewで返す
+- getFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getFollows
 
 指定したアクターがフォローしているアクターを返す。認証は任意。
 
 - getFollows-1: 指定したアクターをsubjectに、そのフォロー先をfollowsにprofileViewで返す
+- getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getList
 
