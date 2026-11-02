@@ -1,9 +1,11 @@
+import type { BackfillStatus } from "@repo/common/domain";
 import { ShieldIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
+import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
 
 export type Actor = {
   did: string;
@@ -13,6 +15,7 @@ export type Actor = {
   description?: string;
   subscriberFollowersCount?: number;
   isAdmin?: boolean;
+  backfillStatus?: BackfillStatus;
 };
 
 type Props<T extends Actor> = {
@@ -53,6 +56,9 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
                   <ShieldIcon className="mr-1 size-3" />
                   管理者
                 </Badge>
+              )}
+              {actor.backfillStatus && (
+                <BackfillStatusBadge status={actor.backfillStatus} />
               )}
               {actor.subscriberFollowersCount !== undefined && (
                 <Badge>

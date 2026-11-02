@@ -10,6 +10,7 @@ import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
 import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
 import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
+import type { BackfillStatus } from "@repo/common/domain";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 import {
@@ -31,6 +32,7 @@ export type ActorDto = {
   displayName?: string;
   avatarUrl?: string;
   description?: string;
+  backfillStatus?: BackfillStatus;
 };
 
 export type FollowListDto = {
