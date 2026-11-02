@@ -7,6 +7,7 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
+import { InMemoryActorQuery } from "../infrastructure/actor-query/actor-query.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsQuery } from "../infrastructure/actor-stats-query/actor-stats-query.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
@@ -56,6 +57,7 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("profileQuery", asClassArgs(InMemoryProfileQuery))
   .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
+  .replaceService("actorQuery", asClassArgs(InMemoryActorQuery))
   .replaceService("actorStatsQuery", asClassArgs(InMemoryActorStatsQuery))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))

@@ -13,12 +13,14 @@ describe("UnsubscribeServerUseCase", () => {
   let unsubscribeServerUseCase: TestServices["unsubscribeServerUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  let ctx: { db: TestServices["db"] };
   let actorRepo: TestServices["actorRepository"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     unsubscribeServerUseCase = services.unsubscribeServerUseCase;
     subscriptionRepo = services.subscriptionRepository;
     inviteCodeRepo = services.inviteCodeRepository;
+    ctx = { db: services.db };
     actorRepo = services.actorRepository;
   });
 
@@ -44,7 +46,10 @@ describe("UnsubscribeServerUseCase", () => {
     // assert
     const result = await subscriptionRepo.findFirst(asDid(actor.did));
     expect(result).toBeNull();
-    const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
+    const updatedInviteCode = await inviteCodeRepo.find({
+      code: inviteCode.code,
+      ctx,
+    });
     expect(updatedInviteCode?.usedAt).not.toBeNull();
   });
 

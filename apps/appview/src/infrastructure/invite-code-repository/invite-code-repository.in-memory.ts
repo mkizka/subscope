@@ -13,7 +13,7 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     this.inviteCodes.clear();
   }
 
-  upsert(_params: {
+  save(_params: {
     inviteCode: InviteCode;
     ctx: TransactionContext;
   }): Promise<void> {
@@ -26,19 +26,10 @@ export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
     return Promise.resolve();
   }
 
-  findFirst(code: string): Promise<InviteCode | null> {
-    return Promise.resolve(this.inviteCodes.get(code) ?? null);
-  }
-
-  markAsUsed(params: {
+  find(params: {
     code: string;
     ctx: TransactionContext;
-  }): Promise<boolean> {
-    const inviteCode = this.inviteCodes.get(params.code);
-    if (!inviteCode?.canBeUsed()) {
-      return Promise.resolve(false);
-    }
-    inviteCode.markAsUsed();
-    return Promise.resolve(true);
+  }): Promise<InviteCode | null> {
+    return Promise.resolve(this.inviteCodes.get(params.code) ?? null);
   }
 }
