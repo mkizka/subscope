@@ -1,50 +1,52 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
-import { useFetcher } from "react-router";
+import type { ReactNode } from "react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import type { loader } from "@/app/routes/_index";
+import { fetchJson } from "@/app/lib/fetch-json";
+import type { loader } from "@/app/routes/api.timeline";
 
-import { TimelineFeed, type TimelinePost } from "./timeline-feed";
+import { TimelineFeed } from "./timeline-feed";
 
-function OlderTimelineFeedContainer({ cursor }: { cursor: string }) {
-  const fetcher = useFetcher<typeof loader>();
-  const data = fetcher.data;
+type TimelineResponse = Awaited<ReturnType<typeof loader>>["data"];
 
-  if (!data) {
-    return (
-      <div
-        role="status"
-        aria-label="続きを読み込み中"
-        className="flex justify-center py-6"
-      >
-        <LoaderCircle className="size-6 animate-spin text-muted" />
-        <InfiniteScrollTrigger
-          onIntersect={() =>
-            void fetcher.load(`/?${new URLSearchParams({ index: "", cursor })}`)
-          }
-          enabled={fetcher.state === "idle"}
-        />
-      </div>
-    );
-  }
+function Spinner({ label, children }: { label: string; children?: ReactNode }) {
   return (
-    <>
-      <TimelineFeed posts={data.posts} />
-      {data.cursor && <OlderTimelineFeedContainer cursor={data.cursor} />}
-    </>
+    <div role="status" aria-label={label} className="flex justify-center py-6">
+      <LoaderCircle className="size-6 animate-spin text-muted" />
+      {children}
+    </div>
   );
 }
 
-type Props = {
-  posts: TimelinePost[];
-  cursor?: string;
-};
+export function TimelineFeedContainer() {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["timeline"],
+      queryFn: ({ pageParam }) =>
+        fetchJson<TimelineResponse>(
+          `/api/timeline?${new URLSearchParams(pageParam ? { cursor: pageParam } : {})}`,
+        ),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.cursor,
+      throwOnError: true,
+    });
 
-export function TimelineFeedContainer({ posts, cursor }: Props) {
+  if (!data) {
+    return <Spinner label="読み込み中" />;
+  }
   return (
     <>
-      <TimelineFeed posts={posts} />
-      {cursor && <OlderTimelineFeedContainer cursor={cursor} />}
+      <TimelineFeed posts={data.pages.flatMap((page) => page.posts)} />
+      {hasNextPage && (
+        <Spinner label="続きを読み込み中">
+          <InfiniteScrollTrigger
+            onIntersect={() => void fetchNextPage()}
+            enabled={!isFetchingNextPage}
+          />
+        </Spinner>
+      )}
     </>
   );
 }

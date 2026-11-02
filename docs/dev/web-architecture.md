@@ -26,13 +26,15 @@
 
 ## 技術選定
 
-| 項目           | 採用                                                  |
-| -------------- | ----------------------------------------------------- |
-| フレームワーク | React Router (framework mode)                         |
-| データ取得     | loader / action、useLoaderData、useSubmit、useFetcher |
-| UI             | Tailwind CSS                                          |
-| アイコン       | lucide-react                                          |
+| 項目           | 採用                                                                |
+| -------------- | ------------------------------------------------------------------- |
+| フレームワーク | React Router (framework mode)                                       |
+| データ取得     | 読み込みは `/api/*` + TanStack Query、書き込みは action・useFetcher |
+| UI             | Tailwind CSS                                                        |
+| アイコン       | lucide-react                                                        |
 
+- 読み込みは画面の loader で待たず、Container が TanStack Query で `/api/*` から取る。遷移を待たせず、戻ったときにキャッシュを出すため
+  - action の後は root で全クエリを invalidate し、React Router の loader 再実行と同じく最新を取り直す
 - tRPC は使わない
 - API の型は React Router の型生成（`Route.ComponentProps` 等）を使う
 
