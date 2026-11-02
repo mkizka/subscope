@@ -12,6 +12,7 @@ import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
+import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
 type Data<T extends (...args: never) => unknown> =
@@ -147,6 +148,23 @@ queryClient.setQueryData<{
   ],
   pageParams: [undefined],
 });
+
+queryClient.setQueryData<Data<typeof profileLoader>>(
+  ["profile", "alice.bsky.social", ""],
+  {
+    profile: {
+      did: alice.did,
+      handle: alice.handle,
+      displayName: alice.displayName,
+      description: "Blueskyを使っています。",
+      followsCount: 120,
+      followersCount: 345,
+    },
+    isSelf: false,
+    posts: TimelineFeedStories.args.posts,
+    tab: "posts",
+  },
+);
 
 const preview: Preview = {
   decorators: [

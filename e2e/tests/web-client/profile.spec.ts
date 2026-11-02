@@ -254,4 +254,46 @@ test.describe("プロフィール", () => {
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
+
+  test("profile-14: プロフィールを開くと、プロフィールと投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/members");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/profile/*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.getByRole("link", { name: "プロフィール" }).click();
+
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+    await expect(
+      page.getByRole("main").getByText(/^\d+ フォロー$/),
+    ).toBeVisible();
+  });
+
+  test("profile-15: 一度表示したプロフィールに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+    const followers = page.getByRole("main").getByText(/^\d+ フォロワー$/);
+    await expect(followers).toBeVisible();
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "メンバー" })
+      .click();
+    await expect(page).toHaveURL("/members");
+    await page.route("**/api/profile/*", () => {});
+
+    await page.goBack();
+
+    await expect(followers).toBeVisible();
+  });
 });
