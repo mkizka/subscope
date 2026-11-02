@@ -3,8 +3,8 @@ import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getFollowers";
 import { required } from "@repo/common/utils";
 
 import type { FollowerDto } from "../../../application/dto/follow-dto.js";
-import type { IFollowQuery } from "../../../application/interfaces/follow-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { IFollowQuery } from "../../interfaces/queries/follow-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

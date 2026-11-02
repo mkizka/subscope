@@ -2,8 +2,8 @@ import { type Did } from "@atproto/did";
 import type * as AppBskyFeedGetAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
-import type { IAuthorFeedQuery } from "../../../application/interfaces/author-feed-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { IAuthorFeedQuery } from "../../interfaces/queries/author-feed-query.js";
 import type { FeedViews } from "../../views/feed-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

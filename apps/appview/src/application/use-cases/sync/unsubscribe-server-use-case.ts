@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { IJobScheduler } from "@repo/common/domain";
 
-import type { IFollowQuery } from "../../../application/interfaces/follow-query.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
+import type { IFollowQuery } from "../../interfaces/queries/follow-query.js";
 
 export class NotSubscribedError extends Error {
   constructor(message: string) {

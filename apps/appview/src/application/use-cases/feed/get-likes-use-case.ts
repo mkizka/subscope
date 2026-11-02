@@ -2,8 +2,8 @@ import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedGetLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 
 import type { SubjectLikeDto } from "../../../application/dto/like-dto.js";
-import type { ILikeQuery } from "../../../application/interfaces/like-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ILikeQuery } from "../../interfaces/queries/like-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

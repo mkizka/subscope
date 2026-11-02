@@ -7,19 +7,19 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
-import { InMemoryActorQuery } from "../infrastructure/actor-query/actor-query.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
-import { InMemoryActorStatsQuery } from "../infrastructure/actor-stats-query/actor-stats-query.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
-import { InMemoryFollowQuery } from "../infrastructure/follow-query/follow-query.in-memory.js";
-import { InMemoryGeneratorQuery } from "../infrastructure/generator-query/generator-query.in-memory.js";
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.in-memory.js";
-import { InMemoryLabelQuery } from "../infrastructure/label-query/label-query.in-memory.js";
-import { InMemoryLikeQuery } from "../infrastructure/like-query/like-query.in-memory.js";
-import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
-import { InMemoryNotificationQuery } from "../infrastructure/notification-query/notification-query.in-memory.js";
-import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
+import { InMemoryActorQuery } from "../infrastructure/queries/actor-query/actor-query.in-memory.js";
+import { InMemoryActorStatsQuery } from "../infrastructure/queries/actor-stats-query/actor-stats-query.in-memory.js";
+import { InMemoryFollowQuery } from "../infrastructure/queries/follow-query/follow-query.in-memory.js";
+import { InMemoryGeneratorQuery } from "../infrastructure/queries/generator-query/generator-query.in-memory.js";
+import { InMemoryLabelQuery } from "../infrastructure/queries/label-query/label-query.in-memory.js";
+import { InMemoryLikeQuery } from "../infrastructure/queries/like-query/like-query.in-memory.js";
+import { InMemoryListQuery } from "../infrastructure/queries/list-query/list-query.in-memory.js";
+import { InMemoryNotificationQuery } from "../infrastructure/queries/notification-query/notification-query.in-memory.js";
+import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import type { Env } from "./env.js";
