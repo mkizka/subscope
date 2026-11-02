@@ -1,11 +1,12 @@
 import { asDid } from "@atproto/did";
 import { toDatetimeString } from "@atproto/syntax";
 import type * as MeSubscoAdminGetSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
+import type { Subscription } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
 import type { IBackfillStatusQuery } from "../../../application/interfaces/backfill-status-query.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
-import type { SubscriptionService } from "../../../application/service/admin/subscription-service.js";
+import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
@@ -16,7 +17,6 @@ type GetSubscribersParams = {
 
 export class GetSubscribersUseCase {
   constructor(
-    private readonly subscriptionService: SubscriptionService,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
     private readonly actorRepository: IActorRepository,
@@ -27,13 +27,18 @@ export class GetSubscribersUseCase {
   async execute(
     params: GetSubscribersParams,
   ): Promise<MeSubscoAdminGetSubscribers.$OutputBody> {
-    const [paginationResult, total] = await Promise.all([
-      this.subscriptionService.findSubscribersWithPagination({
-        limit: params.limit,
+    const paginator = createCursorPaginator<Subscription>({
+      limit: params.limit,
+      getCursor: (sub) => sub.createdAt.toISOString(),
+    });
+    const [subscriptions, total] = await Promise.all([
+      this.subscriptionRepository.findMany({
+        limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
       this.subscriptionRepository.count(),
     ]);
+    const paginationResult = paginator.extractPage(subscriptions);
 
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
     const backfillStatuses = await this.backfillStatusQuery.findWithFollows(

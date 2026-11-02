@@ -106,7 +106,7 @@ Reactコンポーネントは以下の方針で実装しています。
 
 ## PRの作成
 
-PRを作成・更新する前に、必ず `pr-review` スキルで差分をレビューしてください。
+PRを作成・更新する前に、必ず `.claude/skills/pr-review/SKILL.md` の手順で差分をレビューしてください。
 
 ## 開発コマンド
 
@@ -118,10 +118,11 @@ pnpm all      # 型チェック、フォーマット、全テストを実行
 pnpm all:unit # 型チェック、フォーマット、unitテストを実行(Dockerが使えない環境向け)
 ```
 
-特定パッケージだけを対象にしたい場合は、コマンドの後ろに`--filter`オプションを付与してください。
+特定パッケージだけを対象にしたい場合は、型チェック・フォーマットには`--filter`、テストには`--project`を付与してください。`pnpm all --filter`はvitestに`--filter`が渡りエラーになります。
 
 ```bash
 pnpm typecheck --filter @repo/appview
+pnpm test run --project 'appview:*'
 ```
 
 特定のテストだけを対象にしたい場合は、allコマンドの後ろにテストファイル名を付与してください。
@@ -129,3 +130,5 @@ pnpm typecheck --filter @repo/appview
 ```bash
 pnpm all post-indexer
 ```
+
+turboが`Exec format error`で失敗する場合は、`npm i -g pnpm@12.15.0`で`package.json`の`packageManager`と同じバージョンのpnpmを入れてください。
