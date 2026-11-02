@@ -5,12 +5,10 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsTypeaheadUseCase", () => {
   let searchActorsTypeaheadUseCase: TestServices["searchActorsTypeaheadUseCase"];
-  let profileRepo: TestServices["profileRepository"];
   let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     searchActorsTypeaheadUseCase = services.searchActorsTypeaheadUseCase;
-    profileRepo = services.profileRepository;
     profileQuery = services.profileQuery;
   });
 
@@ -61,7 +59,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: "Unique Test User",
       handle: actor.handle ?? "unique.test",
     });
-    profileRepo.add(profile);
     profileQuery.add(profile);
 
     // act
@@ -88,7 +85,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: "User",
       handle: "searchablehandle.test",
     });
-    profileRepo.add(profile);
     profileQuery.add(profile);
 
     // act
@@ -120,7 +116,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: `UniqueLimit${uniqueId}User1`,
       indexedAt: new Date("2024-01-03T00:00:00.000Z"),
     });
-    profileRepo.add(profile1);
     profileQuery.add(profile1);
 
     const actor2 = actorFactory();
@@ -129,7 +124,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: `UniqueLimit${uniqueId}User2`,
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    profileRepo.add(profile2);
     profileQuery.add(profile2);
 
     const actor3 = actorFactory();
@@ -138,7 +132,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
       displayName: `UniqueLimit${uniqueId}User3`,
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    profileRepo.add(profile3);
     profileQuery.add(profile3);
 
     // act
@@ -169,7 +162,6 @@ describe("SearchActorsTypeaheadUseCase", () => {
       actorDid: actor.did,
       displayName: "Test User",
     });
-    profileRepo.add(profile);
     profileQuery.add(profile);
 
     // act

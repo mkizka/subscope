@@ -17,7 +17,7 @@ const legacyRepositoryMethods = {
   INotificationRepository: "createMany",
   IPostRepository: "exists|findReplyParentUri|upsert",
   IPostStatsRepository: "upsertMany",
-  IProfileRepository: "exists|searchActors|upsert",
+  IProfileRepository: "exists|upsert",
   IRecordRepository: "findByUri|upsert",
   IRepostRepository: "findRepostsByPost|upsert",
   ISubscriptionRepository:
