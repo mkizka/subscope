@@ -89,4 +89,29 @@ test.describe("追跡アカウント", () => {
       });
     }).toPass();
   });
+
+  test("tracked-accounts-6: 追跡アカウントの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/tracked-accounts", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page
+      .getByRole("link", { name: "追跡アカウント", exact: true })
+      .click();
+
+    await expect(
+      page.getByRole("heading", { name: "追跡アカウント" }),
+    ).toBeVisible();
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
 });

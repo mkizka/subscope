@@ -4,28 +4,6 @@ import { TrackedAccountsPage } from "./tracked-accounts-page";
 
 const meta = {
   component: TrackedAccountsPage,
-  args: {
-    total: 3,
-    accounts: [
-      {
-        did: "did:plc:bob",
-        handle: "bob.bsky.social",
-        displayName: "Bob",
-        registeredFollowersCount: 3,
-      },
-      {
-        did: "did:plc:alice",
-        handle: "alice.bsky.social",
-        displayName: "Alice",
-        registeredFollowersCount: 1,
-      },
-      {
-        did: "did:plc:carol",
-        handle: "handle.invalid",
-        registeredFollowersCount: 0,
-      },
-    ],
-  },
   parameters: {
     layout: "fullscreen",
   },
