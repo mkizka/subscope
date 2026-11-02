@@ -134,6 +134,55 @@ test.describe("タイムライン", () => {
     ).toBeAttached();
   });
 
+  test("timeline-11: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/members");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/timeline*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "ホーム" })
+      .click();
+
+    await expect(
+      page.getByRole("heading", { name: "フォロー中" }),
+    ).toBeVisible();
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
+
+  test("timeline-12: 一度表示したタイムラインに戻ると、読み込み直しを待たずに前回の投稿を表示する", async ({
+    page,
+    request,
+  }) => {
+    const text = `timeline-12: ${Date.now()}`;
+    await createPosts(request, [text]);
+    await expect(async () => {
+      await page.goto("/");
+      await expect(page.getByText(text)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "メンバー" })
+      .click();
+    await expect(page).toHaveURL("/members");
+    await page.route("**/api/timeline*", () => {});
+
+    await page.goBack();
+
+    await expect(page.getByText(text)).toBeVisible();
+  });
+
   test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
     page,
     request,

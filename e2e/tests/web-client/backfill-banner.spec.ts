@@ -86,8 +86,8 @@ test.describe("過去の投稿の同期状態", () => {
     await expect(page.getByText(IN_PROGRESS)).toBeVisible();
     await page.clock.fastForward(30_000);
 
-    const timelineResponse = page.waitForResponse((response) =>
-      new URL(response.url()).pathname.endsWith(".data"),
+    const timelineResponse = page.waitForResponse(
+      (response) => new URL(response.url()).pathname === "/api/timeline",
     );
     await page.getByRole("button", { name: "更新する" }).click();
     await timelineResponse;

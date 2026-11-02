@@ -7,9 +7,11 @@ import type { Preview } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";
 
+import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
+import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
 type Data<T extends (...args: never) => unknown> =
   Awaited<ReturnType<T>> extends {
@@ -116,6 +118,14 @@ queryClient.setQueryData<{
       total: 2,
     },
   ],
+  pageParams: [undefined],
+});
+
+queryClient.setQueryData<{
+  pages: Data<typeof timelineLoader>[];
+  pageParams: unknown[];
+}>(["timeline"], {
+  pages: [{ posts: TimelineFeedStories.args.posts }],
   pageParams: [undefined],
 });
 

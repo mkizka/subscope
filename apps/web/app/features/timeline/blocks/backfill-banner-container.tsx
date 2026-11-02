@@ -1,6 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useRevalidator } from "react-router";
 
 import type { loader } from "@/app/routes/api.backfill-status";
 
@@ -21,7 +20,7 @@ const isFinished = (data?: BackfillStatusResponse) =>
   data?.status === "completed";
 
 export function BackfillBannerContainer() {
-  const revalidator = useRevalidator();
+  const queryClient = useQueryClient();
   const [wasUnfinished, setWasUnfinished] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const { data } = useQuery({
@@ -38,7 +37,7 @@ export function BackfillBannerContainer() {
     <BackfillBanner
       status={data.status === "completed" ? "done" : data.status}
       onRefresh={() => {
-        void revalidator.revalidate();
+        void queryClient.invalidateQueries({ queryKey: ["timeline"] });
         setDismissed(true);
       }}
     />

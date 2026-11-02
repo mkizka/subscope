@@ -1,13 +1,14 @@
 import "./app.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useFetchers,
   useNavigation,
 } from "react-router";
 
@@ -40,6 +41,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   const [queryClient] = useState(() => new QueryClient());
   const navigation = useNavigation();
+  const submitting = [navigation, ...useFetchers()].some(
+    (submission) => submission.state === "submitting",
+  );
+  const wasSubmitting = useRef(false);
+
+  useEffect(() => {
+    if (wasSubmitting.current && !submitting) {
+      void queryClient.invalidateQueries();
+    }
+    wasSubmitting.current = submitting;
+  }, [submitting, queryClient]);
 
   useEffect(() => {
     // @ts-expect-error
