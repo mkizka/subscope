@@ -239,12 +239,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 指定したアクターをフォローしているアクターを返す。認証は任意。
 
 - getFollowers-1: 指定したアクターをsubjectに、そのフォロワーをfollowersにprofileViewで返す
+- getFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getFollows
 
 指定したアクターがフォローしているアクターを返す。認証は任意。
 
 - getFollows-1: 指定したアクターをsubjectに、そのフォロー先をfollowsにprofileViewで返す
+- getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getList
 
@@ -288,9 +290,11 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.sync.unsubscribeServer
 
-閲覧者のサブスクライバー登録を解除する。認証が必要。使った招待コードは使用済みのまま残る。登録していなければ400とNotSubscribedを返す。
+閲覧者のサブスクライバー登録を解除する。認証が必要。
 
 - unsubscribeServer-1: 本人とそのフォロイーのsyncTapRepoジョブを積む
+- unsubscribeServer-2: 登録を消し、使った招待コードは使用済みのまま残す
+- unsubscribeServer-3: 登録していなければ400とNotSubscribedを返す
 
 ## me.subsco.sync.getSubscriptionStatus
 
@@ -350,9 +354,10 @@ BANされたアクターのプロフィールを返す。管理者の認証が�
 
 ## me.subsco.admin.createInviteCode
 
-daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
+招待コードを作る。管理者の認証が必要。
 
 - createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする
+- createInviteCode-2: 有効期限はdaysToExpire日後にする
 
 ランダムな5文字は推測されないよう暗号論的乱数で作る。
 
