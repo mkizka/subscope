@@ -313,7 +313,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.verifyAccess
 
-閲覧者の管理画面へのアクセス権を返す。認証が必要。statusは管理者が未登録なら `needsSetup`、閲覧者が管理者なら `authorized`、それ以外は `unauthorized` になる。
+閲覧者の管理画面へのアクセス権を返す。認証が必要。
+
+- verifyAccess-1: 閲覧者が管理者ならstatusをauthorizedにする
+- verifyAccess-2: 閲覧者が管理者でなければstatusをunauthorizedにする
 
 ## me.subsco.admin.registerAdmin
 
