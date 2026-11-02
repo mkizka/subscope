@@ -87,7 +87,7 @@ export const di = await createRegistry()
     ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service("backfillQuery", ["db"], backfillQueryFactory)
+  .service("backfillQuery", backfillQueryFactory)
   .service(
     "getRegisteredAccountsUseCase",
     ["subscopeQuery", "backfillQuery"],
