@@ -25,20 +25,9 @@ export class InMemoryActorRepository implements IActorRepository {
     return this.actors.get(params.did) ?? null;
   }
 
-  async exists(params: {
-    ctx: TransactionContext;
-    did: Did;
-  }): Promise<boolean> {
-    return this.actors.has(params.did);
-  }
-
   async delete(params: { ctx: TransactionContext; did: Did }): Promise<void> {
     this.actors.delete(params.did);
   }
 
   async updateBackfillStatus(): Promise<void> {}
-
-  async findTrackedDidsWithoutBackfillStatus(): Promise<Did[]> {
-    return [];
-  }
 }

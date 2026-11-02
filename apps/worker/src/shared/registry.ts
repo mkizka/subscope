@@ -23,6 +23,7 @@ import {
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
+import type { IActorQuery } from "../application/interfaces/queries/actor-query.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
@@ -66,6 +67,7 @@ import { LabelFetcher } from "../infrastructure/fetchers/label-fetcher.js";
 import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
+import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
@@ -138,6 +140,7 @@ export const createWorkerRegistry = (env: Env) =>
     .service("feedItemRepository", asClassArgs<IFeedItemRepository>()(FeedItemRepository))
     .service("labelRepository", asClassArgs<ILabelRepository>()(LabelRepository))
     .service("notificationRepository", asClassArgs<INotificationRepository>()(NotificationRepository))
+    .service("actorQuery", asClassArgs<IActorQuery>()(ActorQuery))
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))
@@ -157,11 +160,11 @@ export const createWorkerRegistry = (env: Env) =>
     .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService", "recordRevRepository"], asClassArgs(IndexCommitUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
     .service("aggregatePostStatsUseCase", ["postStatsRepository", "jobQueue", "db"], asClassArgs(AggregatePostStatsUseCase))
-    .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorRepository", "db"], asClassArgs(AggregateActorStatsUseCase))
-    .service("indexLabelUseCase", ["labelRepository", "actorRepository", "db"], asClassArgs(IndexLabelUseCase))
+    .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorQuery", "db"], asClassArgs(AggregateActorStatsUseCase))
+    .service("indexLabelUseCase", ["labelRepository", "actorQuery", "db"], asClassArgs(IndexLabelUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "labelFetcher", "indexLabelUseCase", "jobScheduler", "db"], asClassArgs(SyncTapRepoUseCase))
     .service("checkBackfillUseCase", ["tapClient", "subscriptionRepository", "followRepository", "actorRepository", "jobScheduler", "db"], asClassArgs(CheckBackfillUseCase))
-    .service("scheduleBackfillChecksUseCase", ["actorRepository", "jobScheduler", "db"], asClassArgs(ScheduleBackfillChecksUseCase))
+    .service("scheduleBackfillChecksUseCase", ["actorQuery", "jobScheduler", "db"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "redisUrl"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)

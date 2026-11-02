@@ -1,8 +1,7 @@
 import { mkizka } from "@mkizka/eslint-config";
 
 const legacyRepositoryMethods = {
-  IActorRepository:
-    "exists|findTrackedDidsWithoutBackfillStatus|updateBackfillStatus",
+  IActorRepository: "updateBackfillStatus",
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFeedItemRepository: "upsert",
