@@ -6,6 +6,7 @@ import {
   likeFactory,
   listFactory,
   listItemFactory,
+  postEmbedImageFactory,
   postEmbedRecordFactory,
   postFactory,
   recordFactory,
@@ -398,6 +399,39 @@ describe("app.bsky.feed.getPosts", () => {
       {
         $type: "app.bsky.embed.record#view",
         record: { $type: "app.bsky.embed.record#viewRecord", uri: quoted.uri },
+      },
+    ]);
+  });
+  test("embed-1: gallery埋め込みの画像は、引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const quoted = await createPost();
+    const [gallery, quote] = await Promise.all([createPost(), createPost()]);
+    await postEmbedRecordFactory(ctx.db)
+      .vars({ post: () => quote, embeddedPost: () => quoted })
+      .create();
+    for (const post of [gallery, quote]) {
+      await postEmbedImageFactory(ctx.db)
+        .vars({ post: () => post })
+        .props({ position: () => 0, embedType: () => "gallery" as const })
+        .create();
+    }
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(gallery.uri), asAtUriString(quote.uri)],
+    });
+
+    // assert
+    const galleryView = {
+      $type: "app.bsky.embed.gallery#view",
+      items: [{ $type: "app.bsky.embed.gallery#viewImage" }],
+    };
+    expect(res.posts.map((post) => post.embed)).toMatchObject([
+      galleryView,
+      {
+        $type: "app.bsky.embed.recordWithMedia#view",
+        media: galleryView,
       },
     ]);
   });
