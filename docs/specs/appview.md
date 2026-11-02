@@ -283,10 +283,16 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.sync.subscribeServer
 
-閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。管理者は招待コードなしで登録でき、それ以外は有効期限内の未使用の招待コードが必要で、使った招待コードは使用済みになる。招待コードが無効なら400とInvalidInviteCodeを、登録済みなら400とAlreadySubscribedを返す。
+閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。
 
 - subscribeServer-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
 - subscribeServer-2: BANされたアカウントは登録せず、400とBannedを返す
+- subscribeServer-3: 管理者以外は、有効期限内の未使用の招待コードがなければ登録せず、400とInvalidInviteCodeを返す
+- subscribeServer-4: 登録済みのアカウントは登録せず、400とAlreadySubscribedを返す
+- subscribeServer-5: 管理者は招待コードなしで登録する
+- subscribeServer-6: 登録に使った招待コードを使用済みにする
+- subscribeServer-7: 登録したアカウントのsyncTapRepoジョブを積む
+- subscribeServer-8: DBにないアカウントも登録する
 
 ## me.subsco.sync.unsubscribeServer
 
