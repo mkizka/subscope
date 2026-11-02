@@ -10,7 +10,7 @@ export type Notification = {
 };
 
 export interface INotificationRepository {
-  createMany: (params: {
+  save: (params: {
     ctx: TransactionContext;
     notifications: Notification[];
   }) => Promise<void>;

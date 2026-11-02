@@ -13,7 +13,7 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
     this.generators.clear();
   }
 
-  async upsert({
+  async save({
     generator,
   }: {
     ctx: TransactionContext;

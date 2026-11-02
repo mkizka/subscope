@@ -3,15 +3,7 @@ import { mkizka } from "@mkizka/eslint-config";
 const legacyRepositoryMethods = {
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
-  IFeedItemRepository: "upsert",
-  IGeneratorRepository: "upsert",
-  ILabelRepository: "upsert",
-  ILikeRepository: "upsert",
-  IListItemRepository: "upsert",
-  IListRepository: "upsert",
-  INotificationRepository: "createMany",
   IPostStatsRepository: "upsertMany",
-  IRepostRepository: "upsert",
   ISubscriptionRepository:
     "count|countTrackedActors|findMany|findTrackedActors",
 };

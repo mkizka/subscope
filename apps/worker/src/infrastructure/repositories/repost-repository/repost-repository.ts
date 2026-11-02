@@ -5,7 +5,7 @@ import type { IRepostRepository } from "../../../application/interfaces/reposito
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class RepostRepository implements IRepostRepository {
-  async upsert({ ctx, repost }: { ctx: TransactionContext; repost: Repost }) {
+  async save({ ctx, repost }: { ctx: TransactionContext; repost: Repost }) {
     const data = {
       cid: repost.cid,
       actorDid: repost.actorDid,

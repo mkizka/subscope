@@ -16,7 +16,7 @@ export class InMemoryNotificationRepository implements INotificationRepository {
     return Array.from(this.notifications.values());
   }
 
-  async createMany({
+  async save({
     notifications,
   }: {
     ctx: TransactionContext;

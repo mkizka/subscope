@@ -5,7 +5,7 @@ import type { IListItemRepository } from "../../../application/interfaces/reposi
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ListItemRepository implements IListItemRepository {
-  async upsert({
+  async save({
     ctx,
     listItem,
   }: {

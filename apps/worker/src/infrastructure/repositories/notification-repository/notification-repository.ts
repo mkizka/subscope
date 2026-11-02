@@ -8,7 +8,7 @@ import type {
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class NotificationRepository implements INotificationRepository {
-  async createMany({
+  async save({
     ctx,
     notifications,
   }: {
