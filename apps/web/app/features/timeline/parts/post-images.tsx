@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { useState } from "react";
 
 import { ImageViewer } from "@/app/components/ui/image-viewer";
@@ -8,7 +9,12 @@ export function PostImages({ images }: { images: PostImage[] }) {
   const [index, setIndex] = useState(-1);
   return (
     <>
-      <div className="relative mt-2 grid grid-cols-2 gap-1">
+      <div
+        className={clsx(
+          "relative mt-2 grid gap-1",
+          images.length > 1 && "grid-cols-2",
+        )}
+      >
         {images.map((image, i) => (
           <button
             key={image.thumb}
@@ -19,7 +25,10 @@ export function PostImages({ images }: { images: PostImage[] }) {
             <img
               src={image.thumb}
               alt={image.alt}
-              className="aspect-square w-full rounded-xl object-cover"
+              className={clsx(
+                "w-full rounded-xl object-cover",
+                images.length > 1 ? "aspect-square" : "max-h-[80vh]",
+              )}
             />
           </button>
         ))}
