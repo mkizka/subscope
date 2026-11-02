@@ -3,6 +3,7 @@ import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
 import type { ListView } from "@repo/client/lex/app/bsky/graph/defs";
 import getList from "@repo/client/lex/app/bsky/graph/getList";
 import getLists from "@repo/client/lex/app/bsky/graph/getLists";
+import type { BackfillStatus } from "@repo/common/domain";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 import {
@@ -25,6 +26,7 @@ export type ListMemberDto = {
   displayName?: string;
   avatarUrl?: string;
   description?: string;
+  backfillStatus?: BackfillStatus;
 };
 
 export interface IListQuery {
