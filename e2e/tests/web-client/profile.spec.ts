@@ -255,7 +255,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-14: プロフィールを開くと、プロフィールと投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("profile-14: プロフィールを開くと、読み込みを待たずにハンドルとタブを表示し、投稿の場所には読み込み終えるまでスピナーを表示する", async ({
     page,
   }) => {
     await page.goto("/accounts");
@@ -272,6 +272,9 @@ test.describe("プロフィール", () => {
       exact: true,
     });
     await expect(spinner).toBeVisible();
+    const main = page.getByRole("main");
+    await expect(main.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(main.getByRole("tab", { name: "投稿" })).toBeVisible();
     release(undefined);
     await expect(spinner).toBeHidden();
     await expect(

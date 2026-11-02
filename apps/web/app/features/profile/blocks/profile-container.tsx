@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
 import { useSearchParams } from "react-router";
 
+import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { Tabs } from "@/app/components/ui/tabs";
 import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
@@ -34,34 +34,24 @@ export function ProfileContainer({ handle }: Props) {
     throwOnError: true,
   });
 
-  if (!data) {
-    return (
-      <div
-        role="status"
-        aria-label="読み込み中"
-        className="flex justify-center py-6"
-      >
-        <LoaderCircle className="size-6 animate-spin text-muted" />
-      </div>
-    );
-  }
-  const { profile, isSelf, backfillStatus, posts, tab } = data;
-  const tabs = isSelf
+  const tabs = data?.isSelf
     ? (["posts", "replies", "media", "likes"] as const)
     : (["posts", "replies", "media"] as const);
+  const { profile } = data ?? {};
   return (
     <>
       <ProfileHeader
-        displayName={profile.displayName}
-        handle={profile.handle}
-        avatarUrl={profile.avatar}
-        bannerUrl={profile.banner}
-        description={profile.description}
-        followsCount={profile.followsCount ?? 0}
-        followersCount={profile.followersCount ?? 0}
-        backfillStatus={backfillStatus}
+        displayName={profile?.displayName}
+        handle={profile?.handle ?? handle}
+        avatarUrl={profile?.avatar}
+        bannerUrl={profile?.banner}
+        description={profile?.description}
+        followsCount={profile && (profile.followsCount ?? 0)}
+        followersCount={profile && (profile.followersCount ?? 0)}
+        backfillStatus={data?.backfillStatus}
         action={
-          !isSelf && (
+          profile &&
+          !data?.isSelf && (
             <FollowButtonContainer
               did={profile.did}
               viewerFollowing={profile.viewer?.following}
@@ -74,13 +64,17 @@ export function ProfileContainer({ handle }: Props) {
           ...tabs.map((value) => ({
             to: value === "posts" ? "." : `?tab=${value}`,
             label: tabLabels[value],
-            selected: tab === value,
+            selected: (data?.tab ?? (tabParam || "posts")) === value,
           })),
           { to: "lists", label: "リスト", selected: false },
         ]}
       />
-      {/* ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ */}
-      <TimelineFeed posts={posts} />
+      {data ? (
+        // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
+        <TimelineFeed posts={data.posts} />
+      ) : (
+        <LoadingSpinner label="読み込み中" />
+      )}
     </>
   );
 }

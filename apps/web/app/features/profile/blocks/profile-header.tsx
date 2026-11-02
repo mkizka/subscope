@@ -12,8 +12,8 @@ type Props = {
   avatarUrl?: string;
   bannerUrl?: string;
   description?: string;
-  followsCount: number;
-  followersCount: number;
+  followsCount?: number;
+  followersCount?: number;
   backfillStatus?: BackfillStatus;
   action?: ReactNode;
 };
@@ -74,10 +74,16 @@ export function ProfileHeader({
         )}
         <div className="flex gap-4 text-label text-muted">
           <Link to={`/profile/${handle}/follows`} className="hover:underline">
-            <b className="text-ink">{followsCount}</b> フォロー
+            {followsCount !== undefined && (
+              <b className="text-ink">{followsCount}</b>
+            )}{" "}
+            フォロー
           </Link>
           <Link to={`/profile/${handle}/followers`} className="hover:underline">
-            <b className="text-ink">{followersCount}</b> フォロワー
+            {followersCount !== undefined && (
+              <b className="text-ink">{followersCount}</b>
+            )}{" "}
+            フォロワー
           </Link>
         </div>
       </div>
