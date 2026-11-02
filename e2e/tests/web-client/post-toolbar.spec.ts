@@ -180,16 +180,16 @@ test("post-toolbar-5: いいね・リポストのボタンは、押した結果�
   }
 });
 
-test("post-toolbar-6: 削除ボタンは自分の投稿にだけ表示する", async ({
+test("post-toolbar-6: 削除ボタンは、タイムラインでもスレッドでも自分の投稿にだけ表示する", async ({
   page,
 }) => {
   await follow("alice.test", "bob.test");
   const createdAt = new Date().toISOString();
-  await createRecord("alice.test", "app.bsky.feed.post", {
+  const mineRecord = await createRecord("alice.test", "app.bsky.feed.post", {
     text: "post-toolbar-6: 自分の投稿",
     createdAt,
   });
-  await createRecord("bob.test", "app.bsky.feed.post", {
+  const othersRecord = await createRecord("bob.test", "app.bsky.feed.post", {
     text: "post-toolbar-6: 他人の投稿",
     createdAt,
   });
@@ -208,6 +208,17 @@ test("post-toolbar-6: 削除ボタンは自分の投稿にだけ表示する", a
   }).toPass();
   await expect(mine.getByRole("button", { name: "削除" })).toBeVisible();
   await expect(others.getByRole("button", { name: "削除" })).toHaveCount(0);
+
+  const thread = page.getByRole("region", { name: "スレッド" });
+  await page.goto(
+    `/profile/alice.test/post/${mineRecord.uri.split("/").pop()}`,
+  );
+  await expect(thread.getByRole("button", { name: "削除" })).toBeVisible();
+  await page.goto(
+    `/profile/bob.test/post/${othersRecord.uri.split("/").pop()}`,
+  );
+  await expect(thread.getByText("post-toolbar-6: 他人の投稿")).toBeVisible();
+  await expect(thread.getByRole("button", { name: "削除" })).toHaveCount(0);
 });
 
 test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除すると再読み込みなしでタイムラインから投稿を消す", async ({

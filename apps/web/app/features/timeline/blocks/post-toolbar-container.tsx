@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
+import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
 import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
 import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";
@@ -16,9 +17,12 @@ export const reactionSchema = z.object({
   recordUri: z.string().optional(),
 });
 
-export const deletePostSchema = z.object({ uri: z.string() });
+export const deletePostSchema = z.object({
+  uri: z.string(),
+  redirectTo: z.literal("/").optional(),
+});
 
-type Props = TimelinePost;
+type Props = TimelinePost & { deleteRedirectTo?: "/" };
 
 function useReaction(
   type: z.infer<typeof reactionSchema>["type"],
@@ -56,6 +60,7 @@ export function PostToolbarContainer(props: Props) {
     props.repostCount,
   );
   const openCompose = useCompose();
+  const me = useMe();
   const deleter = useFetcher<typeof deletePostAction>();
   const [minReplyCount, setMinReplyCount] = useState(0);
   const replyCount = Math.max(props.replyCount ?? 0, minReplyCount);
@@ -72,10 +77,10 @@ export function PostToolbarContainer(props: Props) {
       onRepost={repost.toggle}
       deleteBusy={deleter.state !== "idle"}
       onDelete={
-        props.deletable
+        me && props.uri.startsWith(`at://${me.did}/`)
           ? () =>
               void deleter.submit(
-                { uri: props.uri },
+                { uri: props.uri, redirectTo: props.deleteRedirectTo ?? "" },
                 { method: "post", action: "/api/posts" },
               )
           : undefined

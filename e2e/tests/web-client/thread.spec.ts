@@ -279,4 +279,21 @@ test.describe("スレッド", () => {
       thread.getByRole("article").filter({ hasText: "thread-11: 返信" }),
     ).toBeVisible();
   });
+
+  test("thread-12: 選んだ投稿を削除すると、ホームに戻る", async ({ page }) => {
+    const target = await post("thread-12: 投稿");
+
+    await openThread(page, target.uri, "thread-12: 投稿");
+    await page
+      .getByRole("region", { name: "スレッド" })
+      .getByRole("button", { name: "削除" })
+      .click();
+    await page
+      .getByRole("dialog", { name: "投稿を削除" })
+      .getByRole("button", { name: "削除" })
+      .click();
+
+    await page.waitForURL("/");
+    await expect(page.getByText("thread-12: 投稿")).toHaveCount(0);
+  });
 });
