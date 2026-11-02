@@ -1,33 +1,35 @@
 import { expect, type Page, test } from "@playwright/test";
 
 const IN_PROGRESS = "過去の投稿を取り込んでいます";
-const ERROR = "一部のユーザーの過去の投稿を取り込めていません";
+const ERROR = "過去の投稿を取り込めていません";
 const DONE = "過去の投稿の取り込みが終わりました";
 
 const mockBackfillStatus = async (
   page: Page,
-  statuses: { inProgress: number; error: number }[],
+  statuses: ("inProgress" | "completed" | "error")[],
 ) => {
   await page.route("**/api/backfill-status", async (route) => {
-    await route.fulfill({ json: statuses.shift() ?? statuses.at(-1) });
+    await route.fulfill({
+      json: { status: statuses.shift() ?? statuses.at(-1) },
+    });
   });
 };
 
 test.describe("過去の投稿の取り込み状態", () => {
-  test("backfillBanner-1: 取り込み中の人がいる間は、「過去の投稿を取り込んでいます」の帯を出す", async ({
+  test("backfillBanner-1: 自分の取り込み中は、「過去の投稿を取り込んでいます」の帯を出す", async ({
     page,
   }) => {
-    await mockBackfillStatus(page, [{ inProgress: 2, error: 0 }]);
+    await mockBackfillStatus(page, ["inProgress"]);
 
     await page.goto("/");
 
     await expect(page.getByText(IN_PROGRESS)).toBeVisible();
   });
 
-  test("backfillBanner-2: 取り込みエラーの人がいれば、取り込み中の人がいても「一部のユーザーの過去の投稿を取り込めていません」の帯を出す", async ({
+  test("backfillBanner-2: 自分の取り込みがエラーなら、「過去の投稿を取り込めていません」の帯を出す", async ({
     page,
   }) => {
-    await mockBackfillStatus(page, [{ inProgress: 2, error: 1 }]);
+    await mockBackfillStatus(page, ["error"]);
 
     await page.goto("/");
 
@@ -35,13 +37,13 @@ test.describe("過去の投稿の取り込み状態", () => {
     await expect(page.getByText(IN_PROGRESS)).toHaveCount(0);
   });
 
-  test("backfillBanner-3: 全員の取り込みが終わっていれば、帯を出さない", async ({
+  test("backfillBanner-3: 自分の取り込みが終わっていれば、帯を出さない", async ({
     page,
     request,
   }) => {
     await expect(async () => {
       const response = await request.get("/api/backfill-status");
-      expect(await response.json()).toEqual({ inProgress: 0, error: 0 });
+      expect(await response.json()).toEqual({ status: "completed" });
     }).toPass();
 
     const statusResponse = page.waitForResponse("**/api/backfill-status");
@@ -56,15 +58,11 @@ test.describe("過去の投稿の取り込み状態", () => {
     await expect(page.getByText(DONE)).toHaveCount(0);
   });
 
-  test("backfillBanner-4: 取り込み中かエラーの間は30秒ごとに状態を確認し直し、全員の取り込みが終わったら「過去の投稿の取り込みが終わりました」の帯と「更新する」ボタンを出す", async ({
+  test("backfillBanner-4: 取り込み中かエラーの間は30秒ごとに状態を確認し直し、取り込みが終わったら「過去の投稿の取り込みが終わりました」の帯と「更新する」ボタンを出す", async ({
     page,
   }) => {
     await page.clock.install();
-    await mockBackfillStatus(page, [
-      { inProgress: 1, error: 0 },
-      { inProgress: 0, error: 1 },
-      { inProgress: 0, error: 0 },
-    ]);
+    await mockBackfillStatus(page, ["inProgress", "error", "completed"]);
 
     await page.goto("/");
     await expect(page.getByText(IN_PROGRESS)).toBeVisible();
@@ -83,10 +81,7 @@ test.describe("過去の投稿の取り込み状態", () => {
     page,
   }) => {
     await page.clock.install();
-    await mockBackfillStatus(page, [
-      { inProgress: 1, error: 0 },
-      { inProgress: 0, error: 0 },
-    ]);
+    await mockBackfillStatus(page, ["inProgress", "completed"]);
     await page.goto("/");
     await expect(page.getByText(IN_PROGRESS)).toBeVisible();
     await page.clock.fastForward(30_000);
