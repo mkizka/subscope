@@ -178,7 +178,10 @@ export function ThreadView({ thread }: Props) {
           threadPath={threadPath(post)}
         />
       ))}
-      <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
+      <FocusedPost
+        {...thread.post}
+        toolbar={<PostToolbarContainer {...thread.post} deleteRedirectTo="/" />}
+      />
       <ReplyPrompt post={thread.post} />
       {thread.replies.map((chain) =>
         chain.map((post, i) =>
