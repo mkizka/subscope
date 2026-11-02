@@ -1,27 +1,14 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { Tabs } from "@/app/components/ui/tabs";
-import {
-  type Account,
-  AccountList,
-} from "@/app/features/profile/blocks/account-list";
 import { SearchFormContainer } from "@/app/features/search/blocks/search-form-container";
-import {
-  TimelineFeed,
-  type TimelinePost,
-} from "@/app/features/timeline/blocks/timeline-feed";
+import { SearchResultsContainer } from "@/app/features/search/blocks/search-results-container";
 
 type Props = {
   q?: string;
   tab: "accounts" | "posts";
-  accounts: Account[];
-  posts: TimelinePost[];
 };
 
-const NotFound = ({ children }: { children: string }) => (
-  <p className="py-8 text-center text-label text-muted">{children}</p>
-);
-
-export function SearchPage({ q, tab, accounts, posts }: Props) {
+export function SearchPage({ q, tab }: Props) {
   return (
     <ThreeColumnLayout>
       <h1 className="border-b border-line p-4 text-title">検索</h1>
@@ -38,19 +25,7 @@ export function SearchPage({ q, tab, accounts, posts }: Props) {
           selected: tab === value,
         }))}
       />
-      {q &&
-        (tab === "accounts" ? (
-          accounts.length > 0 ? (
-            <AccountList accounts={accounts} />
-          ) : (
-            <NotFound>ユーザーが見つかりません</NotFound>
-          )
-        ) : posts.length > 0 ? (
-          // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
-          <TimelineFeed posts={posts} />
-        ) : (
-          <NotFound>投稿が見つかりません</NotFound>
-        ))}
+      {q && <SearchResultsContainer q={q} tab={tab} />}
     </ThreeColumnLayout>
   );
 }
