@@ -275,6 +275,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getLists-1: 指定したアカウントが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
+## me.subsco.graph.getRegisteredFollowers
+
+指定したアカウントをフォローしている登録アカウントをprofileViewで返す。認証は不要。limitとcursorでページングする。
+
+- getRegisteredFollowers-1: 指定したアカウントをフォローしている登録アカウントだけをfollowersにprofileViewで返す
+- getRegisteredFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getRegisteredFollowers-3: totalにはページングに関係なく登録アカウントのフォロワーの総数を入れる
+
 ## me.subsco.server.getRegisteredAccounts
 
 登録アカウントのプロフィールを返す。登録アカウントの一覧は公開情報とし、認証は不要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）アカウントだけを返す。

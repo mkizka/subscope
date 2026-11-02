@@ -111,6 +111,45 @@ export class RegistrationQuery implements IRegistrationQuery {
     return row?.total ?? 0;
   }
 
+  async findRegisteredFollowers(params: {
+    subjectDid: Did;
+    limit: number;
+    cursor?: string;
+  }): Promise<{ did: Did; sortAt: Date }[]> {
+    const { follows, registrations } = schema;
+    const rows = await this.db
+      .select({ did: follows.accountDid, sortAt: follows.sortAt })
+      .from(follows)
+      .innerJoin(
+        registrations,
+        eq(follows.accountDid, registrations.accountDid),
+      )
+      .where(
+        and(
+          eq(follows.subjectDid, params.subjectDid),
+          params.cursor
+            ? lt(follows.sortAt, new Date(params.cursor))
+            : undefined,
+        ),
+      )
+      .orderBy(desc(follows.sortAt))
+      .limit(params.limit);
+    return rows.map((row) => ({ ...row, did: asDid(row.did) }));
+  }
+
+  async countRegisteredFollowers(subjectDid: Did): Promise<number> {
+    const { follows, registrations } = schema;
+    const [row] = await this.db
+      .select({ total: count() })
+      .from(follows)
+      .innerJoin(
+        registrations,
+        eq(follows.accountDid, registrations.accountDid),
+      )
+      .where(eq(follows.subjectDid, subjectDid));
+    return row?.total ?? 0;
+  }
+
   async findTrackedBackfillStatuses(
     dids: Did[],
   ): Promise<{ did: Did; status: BackfillStatus }[]> {
