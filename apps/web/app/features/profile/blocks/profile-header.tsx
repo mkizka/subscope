@@ -1,8 +1,10 @@
+import type { BackfillStatus } from "@repo/common/domain";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
+import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
 
 type Props = {
   displayName?: string;
@@ -12,6 +14,7 @@ type Props = {
   description?: string;
   followsCount: number;
   followersCount: number;
+  backfillStatus?: BackfillStatus;
   action?: ReactNode;
 };
 
@@ -23,6 +26,7 @@ export function ProfileHeader({
   description,
   followsCount,
   followersCount,
+  backfillStatus,
   action,
 }: Props) {
   const [viewing, setViewing] = useState<string>();
@@ -58,7 +62,10 @@ export function ProfileHeader({
         </div>
         <div className="min-w-0">
           <h1 className="truncate text-title">{displayName || handle}</h1>
-          <p className="truncate text-label text-muted">@{handle}</p>
+          <div className="flex items-center gap-2">
+            <p className="truncate text-label text-muted">@{handle}</p>
+            {backfillStatus && <BackfillStatusBadge status={backfillStatus} />}
+          </div>
         </div>
         {description && (
           <p className="text-body wrap-break-word whitespace-pre-wrap">

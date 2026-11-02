@@ -241,4 +241,17 @@ test.describe("プロフィール", () => {
       .click();
     await expect(page).toHaveURL("/profile/alice.test");
   });
+
+  test("profile-13: 追跡中のユーザーの全体ページには、そのユーザーの過去の投稿の取り込み状態（取り込み中・取り込み済み・取り込みエラー）をハンドルの横に表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page.getByRole("main").getByText("取り込み済み", { exact: true }),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
 });

@@ -38,7 +38,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export default function Profile({ loaderData }: Route.ComponentProps) {
-  const { profile, isSelf, posts, tab } = loaderData;
+  const { profile, isSelf, backfillStatus, posts, tab } = loaderData;
   return (
     <ProfilePage
       displayName={profile.displayName}
@@ -48,6 +48,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       description={profile.description}
       followsCount={profile.followsCount ?? 0}
       followersCount={profile.followersCount ?? 0}
+      backfillStatus={backfillStatus}
       follow={
         isSelf
           ? undefined

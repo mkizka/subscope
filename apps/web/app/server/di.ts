@@ -169,7 +169,7 @@ export const di = await createRegistry()
   .service("getFollowListUseCase", ["actorQuery"], getFollowListUseCaseFactory)
   .service(
     "getProfilePageUseCase",
-    ["actorQuery"],
+    ["actorQuery", "backfillQuery"],
     getProfilePageUseCaseFactory,
   )
   .service(

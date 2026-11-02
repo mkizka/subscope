@@ -16,3 +16,11 @@ const meta = {
 export default meta;
 
 export const Default: StoryObj<typeof meta> = {};
+
+export const BackfillInProgress: StoryObj<typeof meta> = {
+  args: { backfillStatus: "inProgress" },
+};
+
+export const BackfillError: StoryObj<typeof meta> = {
+  args: { backfillStatus: "error" },
+};
