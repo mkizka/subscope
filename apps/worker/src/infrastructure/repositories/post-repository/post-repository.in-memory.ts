@@ -25,15 +25,4 @@ export class InMemoryPostRepository implements IPostRepository {
   async upsert(params: { ctx: TransactionContext; post: Post }): Promise<void> {
     this.posts.set(params.post.uri.toString(), params.post);
   }
-
-  async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
-    return this.posts.has(uri.toString());
-  }
-
-  async findReplyParentUri(
-    ctx: TransactionContext,
-    uri: AtUri,
-  ): Promise<AtUri | null> {
-    return this.posts.get(uri.toString())?.replyParent?.uri ?? null;
-  }
 }

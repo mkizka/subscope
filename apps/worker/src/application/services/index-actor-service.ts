@@ -9,13 +9,13 @@ import {
 } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
 
+import type { IProfileQuery } from "../interfaces/queries/profile-query.js";
 import type { IActorRepository } from "../interfaces/repositories/actor-repository.js";
-import type { IProfileRepository } from "../interfaces/repositories/profile-repository.js";
 
 export class IndexActorService {
   constructor(
     private readonly actorRepository: IActorRepository,
-    private readonly profileRepository: IProfileRepository,
+    private readonly profileQuery: IProfileQuery,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
@@ -56,7 +56,7 @@ export class IndexActorService {
       );
     }
 
-    const profileExists = await this.profileRepository.exists({
+    const profileExists = await this.profileQuery.exists({
       ctx,
       actorDid: did,
     });
