@@ -152,7 +152,10 @@ test.describe("タイムライン", () => {
     await expect(
       page.getByRole("heading", { name: "フォロー中" }),
     ).toBeVisible();
-    const spinner = page.getByRole("status", { name: "読み込み中" });
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
     await expect(spinner).toBeVisible();
     release(undefined);
     await expect(spinner).toBeHidden();
