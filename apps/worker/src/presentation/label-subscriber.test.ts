@@ -2,7 +2,10 @@ import assert from "node:assert";
 import { once } from "node:events";
 
 import { MessageFrame } from "@atproto/xrpc-server";
-import { MetricReporter } from "@repo/common/infrastructure";
+import {
+  MetricReporter,
+  TransactionManager,
+} from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -36,7 +39,11 @@ describe("モデレーションサービスからのラベル受信", () => {
     );
     const subscriber = new LabelSubscriber(
       new MetricReporter(),
-      new IndexLabelUseCase(new LabelRepository(), new ActorQuery(), ctx.db),
+      new IndexLabelUseCase(
+        new LabelRepository(),
+        new ActorQuery(),
+        new TransactionManager(ctx.db),
+      ),
       labelCursorStore,
       moderationUrl,
     );

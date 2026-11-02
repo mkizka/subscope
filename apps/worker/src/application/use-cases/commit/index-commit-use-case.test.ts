@@ -58,7 +58,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      const savedPost = postRepo.findByUri(uri);
+      const savedPost = await postRepo.find({ ctx, uri });
       expect(savedPost).not.toBeNull();
       expect(savedPost?.uri.toString()).toBe(uri.toString());
       expect(savedPost?.cid).toBe("cid123");
@@ -91,7 +91,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(postRepo.findByUri(uri)).not.toBeNull();
+      expect(await postRepo.find({ ctx, uri })).not.toBeNull();
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
@@ -181,7 +181,9 @@ describe("IndexCommitUseCase", () => {
         });
 
         // assert
-        expect(likeRepo.findByUri(uri) !== null).toBe(liker || author);
+        expect((await likeRepo.find({ ctx, uri })) !== null).toBe(
+          liker || author,
+        );
         expect((await recordRepo.find({ ctx, uri })) !== null).toBe(
           liker || author,
         );
@@ -263,7 +265,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(postRepo.findByUri(uri)).toBeNull();
+      expect(await postRepo.find({ ctx, uri })).toBeNull();
     });
 
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {

@@ -14,7 +14,12 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     this.feedItems.clear();
   }
 
-  findByUri(uri: AtUri): FeedItem | null {
+  async find({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<FeedItem | null> {
     return this.feedItems.get(uri.toString()) ?? null;
   }
 
