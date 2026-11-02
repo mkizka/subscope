@@ -2,6 +2,7 @@ import { type APIRequestContext, expect, test } from "@playwright/test";
 
 import {
   createRecord,
+  follow,
   PDS_URL,
   putRecord,
   resolveHandle,
@@ -139,15 +140,16 @@ test.describe("タイムライン", () => {
     await expect(notReacted.getByTitle(/リポスト/)).toHaveCount(0);
   });
 
-  test("timeline-3: リプライはタイムラインに含めず、親投稿に返信の件数を表示する", async ({
+  test("timeline-3: 返信先かスレッドの起点が他人の投稿であるリプライは含めず、親投稿に返信の件数を表示する", async ({
     page,
   }) => {
+    await follow("alice.test", "bob.test");
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {});
     const parent = await createRecord("alice.test", "app.bsky.feed.post", {
       text: "timeline-3: 親投稿",
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("bob.test", "app.bsky.feed.post", {
       text: "timeline-3: 返信",
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
@@ -165,6 +167,39 @@ test.describe("タイムライン", () => {
       });
     }).toPass();
     await expect(page.getByText("timeline-3: 返信")).toHaveCount(0);
+  });
+
+  test("timeline-8: 返信先とスレッドの起点がどちらも投稿者自身の投稿であるリプライは含める", async ({
+    page,
+  }) => {
+    const root = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-8: 起点",
+      createdAt: new Date().toISOString(),
+    });
+    const parent = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-8: 1つ目の返信",
+      reply: { root, parent: root },
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-8: 2つ目の返信",
+      reply: { root, parent },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByText(/^timeline-8: /)).toHaveText(
+        [
+          "timeline-8: 2つ目の返信",
+          "timeline-8: 1つ目の返信",
+          "timeline-8: 起点",
+        ],
+        { timeout: 1000 },
+      );
+    }).toPass();
   });
 
   test("timeline-6: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする", async ({

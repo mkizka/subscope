@@ -20,12 +20,6 @@ export const getTimelineUseCaseFactory = ({
 }): IGetTimelineUseCase => ({
   async execute(did, cursor) {
     if (!(await timelineQuery.isSubscribed(did))) return null;
-    const timeline = await timelineQuery.findPosts(did, cursor);
-    return {
-      posts: timeline.posts.filter(
-        (post) => post.reasonRepost || !post.replyRoot,
-      ),
-      cursor: timeline.cursor,
-    };
+    return timelineQuery.findPosts(did, cursor);
   },
 });

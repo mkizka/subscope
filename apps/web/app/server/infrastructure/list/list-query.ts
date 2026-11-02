@@ -7,6 +7,7 @@ import type { BackfillStatus } from "@repo/common/domain";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 import {
+  isShownInFeed,
   type TimelinePostDto,
   toTimelinePost,
 } from "@/app/server/infrastructure/timeline/timeline-query";
@@ -89,7 +90,7 @@ export const listQueryFactory = ({
     async findPosts(did, listUri) {
       const agent = await restore(did);
       const { feed } = await agent.call(getListFeed, { list: listUri });
-      return feed.map(toTimelinePost);
+      return feed.filter(isShownInFeed).map(toTimelinePost);
     },
   };
 };
