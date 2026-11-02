@@ -22,7 +22,6 @@ import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-r
 import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
-import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryPostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/profile-query/profile-query.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
@@ -59,7 +58,6 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))
   .replaceService("notificationQuery", asClassArgs(InMemoryNotificationQuery))
-  .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
   .replaceService("generatorQuery", asClassArgs(InMemoryGeneratorQuery))
   .replaceService("likeQuery", asClassArgs(InMemoryLikeQuery))
   .replaceService("postQuery", asClassArgs(InMemoryPostQuery))

@@ -1,13 +1,12 @@
-import type { Post } from "@repo/common/domain";
-
-import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
+import type { PostDto } from "../../../application/dto/post-dto.js";
+import type { IPostQuery } from "../../../application/interfaces/post-query.js";
 import {
   createCursorPaginator,
   type Page,
 } from "../../../application/utils/pagination.js";
 
 export class PostSearchService {
-  constructor(private readonly postRepository: IPostRepository) {}
+  constructor(private readonly postQuery: IPostQuery) {}
 
   async findPostsWithPagination({
     query,
@@ -17,16 +16,16 @@ export class PostSearchService {
     query: string;
     cursor?: Date;
     limit: number;
-  }): Promise<Page<Post>> {
-    const paginator = createCursorPaginator<Post>({
+  }): Promise<Page<PostDto>> {
+    const paginator = createCursorPaginator<PostDto>({
       limit,
       getCursor: (post) => post.sortAt.toISOString(),
     });
 
-    const posts = await this.postRepository.search({
+    const posts = await this.postQuery.search({
       query,
       limit: paginator.queryLimit,
-      cursor: cursor?.toISOString(),
+      cursor,
     });
 
     return paginator.extractPage(posts);
