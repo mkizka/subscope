@@ -1,5 +1,6 @@
 import type { Did } from "@atproto/did";
-import { Subscription, type TransactionContext } from "@repo/common/domain";
+import type { Subscription } from "@repo/common/domain";
+import { type TransactionContext } from "@repo/common/domain";
 
 import type { ISubscriptionRepository } from "../../application/interfaces/subscription-repository.js";
 
@@ -46,16 +47,8 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     throw new Error("Not implemented");
   }
 
-  findFirst(actorDid: Did): Promise<Subscription | null> {
+  find(actorDid: Did): Promise<Subscription | null> {
     return Promise.resolve(this.subscriptions.get(actorDid) ?? null);
-  }
-
-  existsByInviteCode(inviteCode: string): Promise<boolean> {
-    return Promise.resolve(
-      Array.from(this.subscriptions.values()).some(
-        (sub) => sub.inviteCode === inviteCode,
-      ),
-    );
   }
 
   save(_params: {
@@ -63,22 +56,6 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     ctx: TransactionContext;
   }): Promise<void> {
     this.subscriptions.set(_params.subscription.actorDid, _params.subscription);
-    return Promise.resolve();
-  }
-
-  updateSeenAt(actorDid: Did, seenAt: Date): Promise<void> {
-    const subscription = this.subscriptions.get(actorDid);
-    if (subscription) {
-      this.subscriptions.set(
-        actorDid,
-        new Subscription({
-          actorDid: subscription.actorDid,
-          inviteCode: subscription.inviteCode,
-          seenAt,
-          createdAt: subscription.createdAt,
-        }),
-      );
-    }
     return Promise.resolve();
   }
 

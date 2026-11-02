@@ -1,13 +1,9 @@
-import type { Repost } from "@repo/common/domain";
-
-import type { IRepostRepository } from "../../../application/interfaces/repost-repository.js";
-import {
-  createCursorPaginator,
-  type Page,
-} from "../../../application/utils/pagination.js";
+import type { RepostDto } from "../../dto/repost-dto.js";
+import type { IRepostQuery } from "../../interfaces/repost-query.js";
+import { createCursorPaginator, type Page } from "../../utils/pagination.js";
 
 export class RepostService {
-  constructor(private readonly repostRepository: IRepostRepository) {}
+  constructor(private readonly repostQuery: IRepostQuery) {}
 
   async findRepostsWithPagination({
     subjectUri,
@@ -17,13 +13,13 @@ export class RepostService {
     subjectUri: string;
     cursor?: Date;
     limit: number;
-  }): Promise<Page<Repost>> {
-    const paginator = createCursorPaginator<Repost>({
+  }): Promise<Page<RepostDto>> {
+    const paginator = createCursorPaginator<RepostDto>({
       limit,
       getCursor: (repost) => repost.sortAt.toISOString(),
     });
 
-    const reposts = await this.repostRepository.findRepostsByPost({
+    const reposts = await this.repostQuery.findBySubject({
       subjectUri,
       limit: paginator.queryLimit,
       cursor,

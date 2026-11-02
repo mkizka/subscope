@@ -25,7 +25,6 @@ import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-build
 import type { IAuthorFeedQuery } from "../application/interfaces/author-feed-query.js";
 import type { IBackfillStatusQuery } from "../application/interfaces/backfill-status-query.js";
 import type { IFollowQuery } from "../application/interfaces/follow-query.js";
-import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
@@ -37,10 +36,8 @@ import type { INotificationQuery } from "../application/interfaces/notification-
 import type { IPostQuery } from "../application/interfaces/post-query.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../application/interfaces/profile-query.js";
-import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostQuery } from "../application/interfaces/repost-query.js";
-import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
@@ -107,7 +104,6 @@ import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-b
 import { AuthorFeedQuery } from "../infrastructure/author-feed-query/author-feed-query.js";
 import { BackfillStatusQuery } from "../infrastructure/backfill-status-query/backfill-status-query.js";
 import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
-import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
@@ -119,10 +115,8 @@ import { NotificationQuery } from "../infrastructure/notification-query/notifica
 import { PostQuery } from "../infrastructure/post-query/post-query.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
-import { ProfileRepository } from "../infrastructure/profile-repository/profile-repository.js";
 import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostQuery } from "../infrastructure/repost-query/repost-query.js";
-import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import { TimelineQuery } from "../infrastructure/timeline-query/timeline-query.js";
 import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.js";
@@ -198,7 +192,6 @@ export const createAppRegistry = (env: Env) =>
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
-    .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
     .service("backfillStatusQuery", ["db"], asClassArgs<IBackfillStatusQuery>()(BackfillStatusQuery))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
@@ -214,9 +207,7 @@ export const createAppRegistry = (env: Env) =>
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
     .service("timelineQuery", ["db"], asClassArgs<ITimelineQuery>()(TimelineQuery))
     .service("authorFeedQuery", ["db"], asClassArgs<IAuthorFeedQuery>()(AuthorFeedQuery))
-    .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
-    .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
@@ -227,17 +218,17 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
+    .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeQuery"], asClassArgs(LikeService))
-    .service("repostService", ["repostRepository"], asClassArgs(RepostService))
+    .service("repostService", ["repostQuery"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
-    .service("followService", ["followRepository"], asClassArgs(FollowService))
+    .service("followService", ["followQuery"], asClassArgs(FollowService))
     .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
@@ -280,10 +271,10 @@ export const createAppRegistry = (env: Env) =>
     .service("getTrackedActorsUseCase", ["subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
-    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followRepository", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
+    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followQuery", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
     .service("unbanActorUseCase", ["db", "actorRepository"], asClassArgs(UnbanActorUseCase))
     .service("banSubscriberUseCase", ["transactionManager", "actorRepository", "unsubscribeServerUseCase"], asClassArgs(BanSubscriberUseCase))
-    .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
+    .service("updateSeenUseCase", ["transactionManager", "subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))
     .service("getProfile", ["getProfileUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfile))

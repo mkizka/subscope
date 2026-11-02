@@ -1,14 +1,14 @@
 import type { Did } from "@atproto/did";
 import type { Follow } from "@repo/common/domain";
 
-import type { IFollowRepository } from "../../../application/interfaces/follow-repository.js";
+import type { IFollowQuery } from "../../../application/interfaces/follow-query.js";
 import {
   createCursorPaginator,
   type Page,
 } from "../../../application/utils/pagination.js";
 
 export class FollowService {
-  constructor(private readonly followRepository: IFollowRepository) {}
+  constructor(private readonly followQuery: IFollowQuery) {}
 
   async findFollowsWithPagination({
     actorDid,
@@ -24,7 +24,7 @@ export class FollowService {
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const follows = await this.followRepository.findFollows({
+    const follows = await this.followQuery.findActorFollows({
       actorDid,
       limit: paginator.queryLimit,
       cursor,
@@ -47,7 +47,7 @@ export class FollowService {
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const followers = await this.followRepository.findFollowers({
+    const followers = await this.followQuery.findActorFollowers({
       actorDid,
       limit: paginator.queryLimit,
       cursor,

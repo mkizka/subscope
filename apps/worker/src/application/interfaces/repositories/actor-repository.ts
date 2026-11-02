@@ -4,9 +4,9 @@ import type { Actor, TransactionContext } from "@repo/common/domain";
 export type BackfillStatus = "inProgress" | "completed" | "error";
 
 export interface IActorRepository {
-  upsert: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
+  save: (params: { ctx: TransactionContext; actor: Actor }) => Promise<void>;
 
-  findByDid: (params: {
+  find: (params: {
     ctx: TransactionContext;
     did: Did;
   }) => Promise<Actor | null>;

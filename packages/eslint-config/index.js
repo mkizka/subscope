@@ -2,12 +2,11 @@ import { mkizka } from "@mkizka/eslint-config";
 
 const legacyRepositoryMethods = {
   IActorRepository:
-    "exists|findByDid|findTrackedDidsWithoutBackfillStatus|updateBackfillStatus|upsert",
+    "exists|findTrackedDidsWithoutBackfillStatus|updateBackfillStatus",
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFeedItemRepository: "upsert",
-  IFollowRepository:
-    "findFolloweeDids|findFollowers|findFollows|isFollowedByAnySubscriber|upsert",
+  IFollowRepository: "isFollowedByAnySubscriber|upsert",
   IGeneratorRepository: "upsert",
   IInviteCodeRepository: "findAll|findByCode|markAsUsed",
   ILabelRepository: "upsert",
@@ -15,13 +14,13 @@ const legacyRepositoryMethods = {
   IListItemRepository: "upsert",
   IListRepository: "upsert",
   INotificationRepository: "createMany",
-  IPostRepository: "exists|findReplyParentUri|upsert",
+  IPostRepository: "upsert",
   IPostStatsRepository: "upsertMany",
-  IProfileRepository: "exists|searchActors|upsert",
+  IProfileRepository: "upsert",
   IRecordRepository: "findByUri|upsert",
-  IRepostRepository: "findRepostsByPost|upsert",
+  IRepostRepository: "upsert",
   ISubscriptionRepository:
-    "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|isSubscriber|updateSeenAt|upsert",
+    "count|countTrackedActors|findMany|findTrackedActors|isSubscriber|upsert",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({

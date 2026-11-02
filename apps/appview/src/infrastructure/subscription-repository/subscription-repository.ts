@@ -113,7 +113,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     );
   }
 
-  async findFirst(actorDid: Did): Promise<Subscription | null> {
+  async find(actorDid: Did): Promise<Subscription | null> {
     const [row] = await this.db
       .select()
       .from(schema.subscriptions)
@@ -132,16 +132,6 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     });
   }
 
-  async existsByInviteCode(inviteCode: string): Promise<boolean> {
-    const [row] = await this.db
-      .select()
-      .from(schema.subscriptions)
-      .where(eq(schema.subscriptions.inviteCode, inviteCode))
-      .limit(1);
-
-    return !!row;
-  }
-
   async save({
     subscription,
     ctx,
@@ -154,22 +144,17 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       .values({
         actorDid: subscription.actorDid,
         inviteCode: subscription.inviteCode,
+        seenAt: subscription.seenAt,
         createdAt: subscription.createdAt,
       })
       .onConflictDoUpdate({
         target: schema.subscriptions.actorDid,
         set: {
           inviteCode: subscription.inviteCode,
+          seenAt: subscription.seenAt,
           createdAt: subscription.createdAt,
         },
       });
-  }
-
-  async updateSeenAt(actorDid: Did, seenAt: Date): Promise<void> {
-    await this.db
-      .update(schema.subscriptions)
-      .set({ seenAt })
-      .where(eq(schema.subscriptions.actorDid, actorDid));
   }
 
   async delete(actorDid: Did): Promise<void> {

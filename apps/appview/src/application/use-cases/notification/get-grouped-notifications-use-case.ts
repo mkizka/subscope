@@ -90,7 +90,7 @@ export class GetGroupedNotificationsUseCase {
           this.notificationViews.group(group, ctx),
         ),
       ),
-      this.subscriptionRepository.findFirst(params.viewerDid),
+      this.subscriptionRepository.find(params.viewerDid),
     ]);
     const groups = views.filter((view) => view !== undefined);
 
