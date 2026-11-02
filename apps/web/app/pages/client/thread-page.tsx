@@ -1,12 +1,15 @@
-import type { ComponentProps } from "react";
-
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { ThreadView } from "@/app/features/thread/blocks/thread-view";
+import { ThreadViewContainer } from "@/app/features/thread/blocks/thread-view-container";
 
-export function ThreadPage(props: ComponentProps<typeof ThreadView>) {
+type Props = {
+  handle: string;
+  rkey: string;
+};
+
+export function ThreadPage(props: Props) {
   return (
     <ThreeColumnLayout>
-      <ThreadView {...props} />
+      <ThreadViewContainer {...props} />
     </ThreeColumnLayout>
   );
 }
