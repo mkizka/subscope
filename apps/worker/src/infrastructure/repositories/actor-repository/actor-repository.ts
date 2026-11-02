@@ -6,16 +6,14 @@ import { Actor as ActorDomain } from "@repo/common/domain";
 import { type ActorInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type {
-  BackfillStatus,
-  IActorRepository,
-} from "../../../application/interfaces/repositories/actor-repository.js";
+import type { IActorRepository } from "../../../application/interfaces/repositories/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
   async save({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
       status: actor.status,
+      backfillStatus: actor.backfillStatus,
     } satisfies ActorInsert;
     await ctx.db
       .insert(schema.actors)
@@ -45,26 +43,12 @@ export class ActorRepository implements IActorRepository {
       isAdmin: row.isAdmin,
       isBanned: row.isBanned,
       status: row.status,
+      backfillStatus: row.backfillStatus,
       indexedAt: row.indexedAt,
     });
   }
 
   async delete({ ctx, did }: { ctx: TransactionContext; did: Did }) {
     await ctx.db.delete(schema.actors).where(eq(schema.actors.did, did));
-  }
-
-  async updateBackfillStatus({
-    ctx,
-    did,
-    status,
-  }: {
-    ctx: TransactionContext;
-    did: Did;
-    status: BackfillStatus;
-  }) {
-    await ctx.db
-      .update(schema.actors)
-      .set({ backfillStatus: status })
-      .where(eq(schema.actors.did, did));
   }
 }

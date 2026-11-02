@@ -28,6 +28,4 @@ export class InMemoryActorRepository implements IActorRepository {
   async delete(params: { ctx: TransactionContext; did: Did }): Promise<void> {
     this.actors.delete(params.did);
   }
-
-  async updateBackfillStatus(): Promise<void> {}
 }
