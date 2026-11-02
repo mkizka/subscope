@@ -6,7 +6,7 @@ import type {
 import { FeedItem, Repost } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
-import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
+import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
@@ -18,7 +18,7 @@ export class RepostIndexer implements ICollectionIndexer {
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postQuery: IPostQuery,
     private readonly jobScheduler: IJobScheduler,
-    private readonly subscriptionQuery: ISubscriptionQuery,
+    private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
@@ -42,7 +42,7 @@ export class RepostIndexer implements ICollectionIndexer {
     const recipientDid = repost.subjectUri.host;
     if (
       recipientDid !== repost.actorDid &&
-      (await this.subscriptionQuery.isSubscriber(ctx, recipientDid))
+      (await this.registrationQuery.isRegistered(ctx, recipientDid))
     ) {
       await this.notificationRepository.save({
         ctx,

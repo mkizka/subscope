@@ -45,7 +45,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-5: 全体ページのフォローボタンでそのユーザーをフォローし、もう一度押すと外す", async ({
+  test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -144,7 +144,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-9: 他のユーザーのプロフィールには「いいね」タブを出さない", async ({
+  test("profile-9: 他のアカウントのプロフィールには「いいね」タブを出さない", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -242,7 +242,7 @@ test.describe("プロフィール", () => {
     await expect(page).toHaveURL("/profile/alice.test");
   });
 
-  test("profile-13: 追跡中のユーザーの全体ページには、そのユーザーの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
+  test("profile-13: 追跡アカウントの全体ページには、そのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");

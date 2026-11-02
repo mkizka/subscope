@@ -99,7 +99,7 @@ describe("統計の集計", () => {
     await queue.obliterate({ force: true });
   });
 
-  test("aggregate-4: アクターの集計ジョブは、フォロー・フォロワー・投稿のどのイベントから積まれてもアクターごとに1つにまとめる", async () => {
+  test("aggregate-4: アカウントの集計ジョブは、フォロー・フォロワー・投稿のどのイベントから積まれてもアカウントごとに1つにまとめる", async () => {
     // arrange
     const did = "did:plc:aggregate4";
 

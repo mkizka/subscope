@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.listRegisteredAccounts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a list of registered accounts profiles.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["registeredAccounts", "total"],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "total": {
+              "type": "integer"
+            },
+            "registeredAccounts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#registeredAccount"
+              }
+            }
+          }
+        }
+      }
+    },
+    "registeredAccount": {
+      "type": "object",
+      "required": ["profile", "isAdmin", "registeredAt", "backfillStatus"],
+      "properties": {
+        "profile": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "isAdmin": {
+          "type": "boolean"
+        },
+        "registeredAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "backfillStatus": {
+          "type": "string",
+          "knownValues": ["inProgress", "completed", "error"]
+        }
+      }
+    }
+  }
+}

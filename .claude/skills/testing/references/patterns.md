@@ -96,14 +96,14 @@ const record = recordFactory({
   uri: `at://${replier.did}/app.bsky.feed.post/reply123`,
   json: {
     $type: "app.bsky.feed.post",
-    text: "reply to subscriber",
+    text: "reply to registered account",
     reply: {
       parent: {
-        uri: `at://${subscriberDid}/app.bsky.feed.post/original123`,
+        uri: `at://${registeredAccountDid}/app.bsky.feed.post/original123`,
         cid: fakeCid(),
       },
       root: {
-        uri: `at://${subscriberDid}/app.bsky.feed.post/original123`,
+        uri: `at://${registeredAccountDid}/app.bsky.feed.post/original123`,
         cid: fakeCid(),
       },
     },

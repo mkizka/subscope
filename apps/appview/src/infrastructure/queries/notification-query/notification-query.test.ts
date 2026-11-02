@@ -15,7 +15,7 @@ describe("NotificationQuery", () => {
     test("受信者の通知をcursorより古いものから新しい順に返し、seenAt以前のものを既読にする", async () => {
       // arrange
       const recipient = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
+        .use((t) => t.registeredAccount())
         .create();
       const author = await actorFactory(ctx.db).create();
       const notify = async (sortAt: string) => {
@@ -35,9 +35,9 @@ describe("NotificationQuery", () => {
       const unread = await notify("2024-01-03T00:00:00.000Z");
       await notify("2024-01-05T00:00:00.000Z");
       await ctx.db
-        .update(schema.subscriptions)
+        .update(schema.registrations)
         .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-        .where(eq(schema.subscriptions.actorDid, recipient.did));
+        .where(eq(schema.registrations.actorDid, recipient.did));
 
       // act
       const result = await notificationQuery.findNotifications({
@@ -58,7 +58,7 @@ describe("NotificationQuery", () => {
     test("受信者の通知のうちseenAtより新しいものの数を返す", async () => {
       // arrange
       const recipient = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
+        .use((t) => t.registeredAccount())
         .create();
       const author = await actorFactory(ctx.db).create();
       for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-05"]) {
@@ -74,9 +74,9 @@ describe("NotificationQuery", () => {
         });
       }
       await ctx.db
-        .update(schema.subscriptions)
+        .update(schema.registrations)
         .set({ seenAt: new Date("2024-01-02") })
-        .where(eq(schema.subscriptions.actorDid, recipient.did));
+        .where(eq(schema.registrations.actorDid, recipient.did));
 
       // act
       const result = await notificationQuery.countUnread(asDid(recipient.did));

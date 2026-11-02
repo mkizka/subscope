@@ -1,7 +1,7 @@
 import {
   actorFactory,
   inviteCodeFactory,
-  subscriptionFactory,
+  registrationFactory,
   testSetup,
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
@@ -102,7 +102,7 @@ describe("InviteCodeQuery", () => {
       // arrange
       const actor = await actorFactory(ctx.db).create();
       const inviteCode = await inviteCodeFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
+      await registrationFactory(ctx.db)
         .vars({
           actor: () => actor,
           inviteCode: () => inviteCode,

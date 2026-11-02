@@ -1,43 +1,43 @@
-import getSubscriptionStatus from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import getRegistrationStatus from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
-describe("me.subsco.sync.getSubscriptionStatus", () => {
+describe("me.subsco.sync.getRegistrationStatus", () => {
   const { ctx } = testSetup;
 
-  test("getSubscriptionStatus-1: 閲覧者がサブスクライバーならisSubscriberをtrueにする", async () => {
+  test("getRegistrationStatus-1: 閲覧者がサブスクライバーならisRegisteredをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
-    loginAs(subscriber.did);
+    loginAs(registeredAccount.did);
 
     // act
-    const result = await client.call(getSubscriptionStatus);
+    const result = await client.call(getRegistrationStatus);
 
     // assert
     expect(result).toEqual({
-      $type: "me.subsco.sync.getSubscriptionStatus#subscribed",
-      isSubscriber: true,
+      $type: "me.subsco.sync.getRegistrationStatus#subscribed",
+      isRegistered: true,
     });
   });
 
-  test("getSubscriptionStatus-2: 閲覧者がサブスクライバーでなければisSubscriberをfalseにする", async () => {
+  test("getRegistrationStatus-2: 閲覧者がサブスクライバーでなければisRegisteredをfalseにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const actor = await actorFactory(ctx.db).create();
     loginAs(actor.did);
 
     // act
-    const result = await client.call(getSubscriptionStatus);
+    const result = await client.call(getRegistrationStatus);
 
     // assert
     expect(result).toEqual({
-      $type: "me.subsco.sync.getSubscriptionStatus#notSubscribed",
-      isSubscriber: false,
+      $type: "me.subsco.sync.getRegistrationStatus#notRegistered",
+      isRegistered: false,
     });
   });
 });

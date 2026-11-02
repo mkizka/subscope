@@ -33,14 +33,14 @@ export const backfillQueryFactory = ({
     }
     const trackedDids = union(
       db
-        .select({ did: schema.subscriptions.actorDid })
-        .from(schema.subscriptions),
+        .select({ did: schema.registrations.actorDid })
+        .from(schema.registrations),
       db
         .select({ did: schema.follows.subjectDid })
         .from(schema.follows)
         .innerJoin(
-          schema.subscriptions,
-          eq(schema.follows.actorDid, schema.subscriptions.actorDid),
+          schema.registrations,
+          eq(schema.follows.actorDid, schema.registrations.actorDid),
         ),
     );
     const rows = await db

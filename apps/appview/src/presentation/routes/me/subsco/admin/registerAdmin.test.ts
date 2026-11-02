@@ -12,7 +12,7 @@ describe("me.subsco.admin.registerAdmin", () => {
   const { ctx } = testSetup;
   const requesterDid = asDid("did:plc:requester");
 
-  test("registerAdmin-1: 閲覧者を管理者にし、サブスクライバーにする", async () => {
+  test("registerAdmin-1: 閲覧者を管理者にし、登録アカウントにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     loginAs(requesterDid);
@@ -26,11 +26,11 @@ describe("me.subsco.admin.registerAdmin", () => {
       .from(schema.actors)
       .where(eq(schema.actors.did, requesterDid));
     expect(actor?.isAdmin).toBe(true);
-    const subscriptions = await ctx.db
+    const registrations = await ctx.db
       .select()
-      .from(schema.subscriptions)
-      .where(eq(schema.subscriptions.actorDid, requesterDid));
-    expect(subscriptions).toHaveLength(1);
+      .from(schema.registrations)
+      .where(eq(schema.registrations.actorDid, requesterDid));
+    expect(registrations).toHaveLength(1);
   });
 
   test("registerAdmin-2: 既に管理者がいれば、400とAdminAlreadyExistsを返す", async () => {

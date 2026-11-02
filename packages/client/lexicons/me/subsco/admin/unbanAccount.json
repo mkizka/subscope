@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.admin.unbanAccount",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Allow a banned account to register again",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "did": {
+              "type": "string",
+              "format": "did"
+            }
+          },
+          "required": ["did"]
+        }
+      },
+      "errors": [
+        {
+          "name": "AdminRequired"
+        },
+        {
+          "name": "NotBanned"
+        }
+      ]
+    }
+  }
+}

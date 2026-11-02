@@ -1,14 +1,14 @@
 import { XrpcResponseError } from "@atproto/lex";
 import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
-import subscribeServer from "@repo/client/lex/me/subsco/sync/subscribeServer";
+import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
-export type SubscribeResult = "subscribed" | "invalidInviteCode" | "failed";
+export type RegisterResult = "registered" | "invalidInviteCode" | "failed";
 
 export interface ISubscopeCommand {
   registerAdmin: (did: string) => Promise<void>;
-  subscribe: (did: string, inviteCode: string) => Promise<SubscribeResult>;
+  subscribe: (did: string, inviteCode: string) => Promise<RegisterResult>;
 }
 
 export const subscopeCommandFactory = ({
@@ -30,15 +30,15 @@ export const subscopeCommandFactory = ({
     },
     async subscribe(did, inviteCode) {
       try {
-        await (await restore(did)).call(subscribeServer, { inviteCode });
-        return "subscribed";
+        await (await restore(did)).call(registerAccount, { inviteCode });
+        return "registered";
       } catch (e) {
         if (e instanceof XrpcResponseError) {
           switch (e.error) {
             case "InvalidInviteCode":
               return "invalidInviteCode";
-            case "AlreadySubscribed":
-              return "subscribed";
+            case "AlreadyRegistered":
+              return "registered";
           }
         }
         return "failed";

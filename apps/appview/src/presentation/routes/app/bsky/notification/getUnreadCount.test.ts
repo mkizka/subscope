@@ -24,7 +24,7 @@ describe("app.bsky.notification.getUnreadCount", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     const author = await actorFactory(ctx.db).create();
     for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-04"]) {
@@ -40,9 +40,9 @@ describe("app.bsky.notification.getUnreadCount", () => {
       });
     }
     await ctx.db
-      .update(schema.subscriptions)
+      .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02") })
-      .where(eq(schema.subscriptions.actorDid, viewer.did));
+      .where(eq(schema.registrations.actorDid, viewer.did));
     loginAs(viewer.did);
 
     // act
@@ -56,7 +56,7 @@ describe("app.bsky.notification.getUnreadCount", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     const author = await actorFactory(ctx.db).create();
     for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-04"]) {
@@ -72,9 +72,9 @@ describe("app.bsky.notification.getUnreadCount", () => {
       });
     }
     await ctx.db
-      .update(schema.subscriptions)
+      .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02") })
-      .where(eq(schema.subscriptions.actorDid, viewer.did));
+      .where(eq(schema.registrations.actorDid, viewer.did));
     loginAs(viewer.did);
 
     // act

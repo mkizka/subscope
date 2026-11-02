@@ -39,7 +39,7 @@ const holdSubmit = async (page: Page) => {
 };
 
 test.describe("リスト", () => {
-  test("list-1: プロフィール全体ページの「リスト」から、そのユーザーが作成したリスト（名前、説明）を一覧表示する", async ({
+  test("list-1: プロフィール全体ページの「リスト」から、そのアカウントが作成したリスト（名前、説明）を一覧表示する", async ({
     page,
   }) => {
     const name = `list-1のリスト ${Date.now()}`;
@@ -98,7 +98,7 @@ test.describe("リスト", () => {
     ]);
   });
 
-  test("list-3: リスト詳細の「メンバー」タブで、リストに追加されたユーザーを一覧表示する", async ({
+  test("list-3: リスト詳細の「メンバー」タブで、リストに追加されたアカウントを一覧表示する", async ({
     page,
   }) => {
     const rkey = await createList(`list-3のリスト ${Date.now()}`);
@@ -210,7 +210,7 @@ test.describe("リスト", () => {
     ).toEqual([]);
   });
 
-  test("list-7: 自分のリストの「メンバー」タブで、ハンドルを入力したユーザーをリストに追加する", async ({
+  test("list-7: 自分のリストの「メンバー」タブで、ハンドルを入力したアカウントをリストに追加する", async ({
     page,
   }) => {
     const list = await createEmptyList(`list-7のリスト ${Date.now()}`);
@@ -323,7 +323,7 @@ test.describe("リスト", () => {
     await expect(button).toBeEnabled();
   });
 
-  test("list-12: 「メンバー」タブの追跡中のユーザーには、過去の投稿の同期状態を表示する", async ({
+  test("list-12: 「メンバー」タブの追跡アカウントには、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     const rkey = await createList(`list-12のリスト ${Date.now()}`);

@@ -1,0 +1,108 @@
+import { asDid } from "@atproto/did";
+import { Registration } from "@repo/common/domain";
+import {
+  actorFactory,
+  inviteCodeFactory,
+  registrationFactory,
+  testSetup,
+} from "@repo/test-utils";
+import { describe, expect, test } from "vitest";
+
+import { RegistrationRepository } from "./registration-repository.js";
+
+describe("RegistrationRepository", () => {
+  const { ctx } = testSetup;
+
+  const registrationRepository = new RegistrationRepository(ctx.db);
+
+  describe("find", () => {
+    test("登録が存在しない場合、nullを返す", async () => {
+      // arrange
+      const nonExistentDid = asDid("did:plc:notfound123");
+
+      // act
+      const result = await registrationRepository.find(nonExistentDid);
+
+      // assert
+      expect(result).toBeNull();
+    });
+
+    test("登録が存在する場合、Registrationを返す", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const registration = await registrationFactory(ctx.db)
+        .vars({ actor: () => actor })
+        .create();
+
+      // act
+      const result = await registrationRepository.find(
+        asDid(registration.actorDid),
+      );
+
+      // assert
+      expect(result).toMatchObject({
+        actorDid: registration.actorDid,
+        inviteCode: registration.inviteCode,
+      });
+    });
+  });
+
+  describe("save", () => {
+    test("登録を保存できる", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const inviteCode = await inviteCodeFactory(ctx.db).create();
+      const registration = new Registration({
+        actorDid: actor.did,
+        inviteCode: inviteCode.code,
+        createdAt: new Date(),
+      });
+
+      // act
+      await ctx.db.transaction(async (tx) => {
+        await registrationRepository.save({
+          registration,
+          ctx: { db: tx },
+        });
+      });
+
+      // assert
+      const saved = await registrationRepository.find(
+        asDid(registration.actorDid),
+      );
+      expect(saved).toMatchObject({
+        actorDid: registration.actorDid,
+        inviteCode: registration.inviteCode,
+      });
+    });
+  });
+
+  describe("delete", () => {
+    test("登録を削除できる", async () => {
+      // arrange
+      const actor = await actorFactory(ctx.db).create();
+      const registration = await registrationFactory(ctx.db)
+        .vars({ actor: () => actor })
+        .create();
+
+      // act
+      await registrationRepository.delete(asDid(registration.actorDid));
+
+      // assert
+      const deleted = await registrationRepository.find(
+        asDid(registration.actorDid),
+      );
+      expect(deleted).toBeNull();
+    });
+
+    test("存在しない登録を削除してもエラーにならない", async () => {
+      // arrange
+      const nonExistentDid = asDid("did:plc:notfound123");
+
+      // act & assert
+      await expect(
+        registrationRepository.delete(nonExistentDid),
+      ).resolves.not.toThrow();
+    });
+  });
+});

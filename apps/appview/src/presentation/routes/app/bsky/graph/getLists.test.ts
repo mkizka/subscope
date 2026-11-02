@@ -24,7 +24,7 @@ describe("app.bsky.graph.getLists", () => {
       .props({ purpose: () => purpose })
       .create();
 
-  test("getLists-1: 指定したアクターが作成したリストをlistViewで返す", async () => {
+  test("getLists-1: 指定したアカウントが作成したリストをlistViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)

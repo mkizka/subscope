@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
-import { actorFactory, fakeCid, subscriptionFactory } from "@repo/common/test";
+import { actorFactory, fakeCid, registrationFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -9,7 +9,7 @@ import type { IndexCommitCommand } from "./index-commit-command.js";
 describe("IndexCommitUseCase", () => {
   let indexCommitUseCase: TestServices["indexCommitUseCase"];
   let actorRepo: TestServices["actorRepository"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let registrationQuery: TestServices["registrationQuery"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
@@ -19,7 +19,7 @@ describe("IndexCommitUseCase", () => {
     const services = await testRegistry.resolve();
     indexCommitUseCase = services.indexCommitUseCase;
     actorRepo = services.actorRepository;
-    subscriptionQuery = services.subscriptionQuery;
+    registrationQuery = services.registrationQuery;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
@@ -33,8 +33,8 @@ describe("IndexCommitUseCase", () => {
       const actor = actorFactory();
       actorRepo.add(actor);
 
-      const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionQuery.add(subscription);
+      const registration = registrationFactory({ actorDid: actor.did });
+      registrationQuery.add(registration);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -66,7 +66,7 @@ describe("IndexCommitUseCase", () => {
       expect(savedPost?.text).toBe("Hello world");
     });
 
-    test("index-10: レコードの作成者やフォロー先などのアクターは、すでに保存済みでハンドルと状態が変わらなければ更新しない", async () => {
+    test("index-10: レコードの作成者やフォロー先などのアカウントは、すでに保存済みでハンドルと状態が変わらなければ更新しない", async () => {
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);
@@ -141,23 +141,23 @@ describe("IndexCommitUseCase", () => {
     });
 
     test.each([
-      { name: "いいねした人がサブスクライバー", liker: true, author: false },
-      { name: "投稿の作者がサブスクライバー", liker: false, author: true },
-      { name: "どちらもサブスクライバーでない", liker: false, author: false },
+      { name: "いいねした人が登録アカウント", liker: true, author: false },
+      { name: "投稿の作者が登録アカウント", liker: false, author: true },
+      { name: "どちらも登録アカウントでない", liker: false, author: false },
     ])(
-      "index-11: いいねは、いいねした人かいいねされた投稿の作者がサブスクライバーのものだけ保存する($name)",
+      "index-11: いいねは、いいねした人かいいねされた投稿の作者が登録アカウントのものだけ保存する($name)",
       async ({ liker, author }) => {
         // arrange
         const likerActor = actorFactory();
         const authorActor = actorFactory();
         if (liker) {
-          subscriptionQuery.add(
-            subscriptionFactory({ actorDid: likerActor.did }),
+          registrationQuery.add(
+            registrationFactory({ actorDid: likerActor.did }),
           );
         }
         if (author) {
-          subscriptionQuery.add(
-            subscriptionFactory({ actorDid: authorActor.did }),
+          registrationQuery.add(
+            registrationFactory({ actorDid: authorActor.did }),
           );
         }
         const uri = new AtUri(`at://${likerActor.did}/app.bsky.feed.like/123`);
@@ -197,8 +197,8 @@ describe("IndexCommitUseCase", () => {
       const actor = actorFactory();
       actorRepo.add(actor);
 
-      const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionQuery.add(subscription);
+      const registration = registrationFactory({ actorDid: actor.did });
+      registrationQuery.add(registration);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -241,8 +241,8 @@ describe("IndexCommitUseCase", () => {
       const actor = actorFactory();
       actorRepo.add(actor);
 
-      const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionQuery.add(subscription);
+      const registration = registrationFactory({ actorDid: actor.did });
+      registrationQuery.add(registration);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({

@@ -12,12 +12,11 @@ test.describe("レイアウト", () => {
       "page",
     );
 
-    await nav.getByRole("link", { name: "メンバー" }).click();
+    await nav.getByRole("link", { name: "登録アカウント" }).click();
 
-    await expect(nav.getByRole("link", { name: "メンバー" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    await expect(
+      nav.getByRole("link", { name: "登録アカウント" }),
+    ).toHaveAttribute("aria-current", "page");
     await expect(nav.getByRole("link", { name: "ホーム" })).not.toHaveAttribute(
       "aria-current",
     );
@@ -49,14 +48,14 @@ test.describe("レイアウト", () => {
     }).toPass();
   });
 
-  test("layout-5: 右カラムに、このサーバーがメンバーとそのフォロー先の投稿だけを保存することを表示する", async ({
+  test("layout-5: 右カラムに、このサーバーが登録アカウントとそのフォロー先の投稿だけを保存することを表示する", async ({
     page,
   }) => {
     await page.goto("/");
 
     await expect(
       page.getByRole("complementary", { name: "このサーバーについて" }),
-    ).toContainText("メンバーとそのフォロー先の投稿だけを保存します");
+    ).toContainText("登録アカウントとそのフォロー先の投稿だけを保存します");
   });
 
   test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
@@ -66,14 +65,14 @@ test.describe("レイアウト", () => {
     await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     let release = () => {};
     const released = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/members.data*", async (route) => {
+    await page.route("**/registered-accounts.data*", async (route) => {
       await released;
       await route.continue();
     });
 
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "メンバー" })
+      .getByRole("link", { name: "登録アカウント" })
       .click();
 
     const progress = page.getByRole("progressbar", { name: "読み込み中" });

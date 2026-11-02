@@ -55,9 +55,9 @@ export const actorFactory = (db: Database) =>
             .create();
         },
       }),
-      subscriber: () => ({
+      registeredAccount: () => ({
         after: async (actor) => {
-          await subscriptionFactory(db)
+          await registrationFactory(db)
             .vars({ actor: () => actor })
             .create();
         },
@@ -337,7 +337,7 @@ export const repostFeedItemFactory = (db: Database) =>
       sortAt: async ({ vars }) => (await vars.repost).createdAt,
     });
 
-export const subscriptionFactory = (db: Database) =>
+export const registrationFactory = (db: Database) =>
   factory
     .define(
       {
@@ -351,7 +351,7 @@ export const subscriptionFactory = (db: Database) =>
           inviteCode: () => inviteCodeFactory(db).create(),
         },
       },
-      (props) => create(db, schema.subscriptions, props),
+      (props) => create(db, schema.registrations, props),
     )
     .props({
       actorDid: async ({ vars }) => (await vars.actor).did,

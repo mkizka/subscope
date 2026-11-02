@@ -15,7 +15,7 @@ test.describe("フォロー・フォロワー", () => {
     await page.goto("/");
   });
 
-  test("follow-list-1: プロフィール全体ページのフォロー数から、中央カラムにそのユーザーのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("follow-list-1: プロフィール全体ページのフォロー数から、中央カラムにそのアカウントのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");
@@ -34,7 +34,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(bob.getByText("@bob.test")).toBeVisible();
   });
 
-  test("follow-list-2: プロフィール全体ページのフォロワー数から、中央カラムにそのユーザーのフォロワー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("follow-list-2: プロフィール全体ページのフォロワー数から、中央カラムにそのアカウントのフォロワー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.goto("/profile/bob.test");
@@ -55,7 +55,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(alice.getByText("@alice.test")).toBeVisible();
   });
 
-  test("follow-list-3: 一覧のユーザーを選ぶと、そのユーザーのプロフィール全体ページに移動する", async ({
+  test("follow-list-3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test/follows");
@@ -68,7 +68,7 @@ test.describe("フォロー・フォロワー", () => {
     ).toBeVisible();
   });
 
-  test("follow-list-4: 一覧の追跡中のユーザーには、過去の投稿の同期状態を表示する", async ({
+  test("follow-list-4: 一覧の追跡アカウントには、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test/follows");

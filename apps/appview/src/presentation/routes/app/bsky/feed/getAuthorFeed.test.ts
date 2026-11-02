@@ -16,7 +16,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getAuthorFeed", () => {
   const { ctx } = testSetup;
 
-  test("getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す", async () => {
+  test("getAuthorFeed-1: 指定したアカウントの投稿をfeedViewPostで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await actorFactory(ctx.db)
@@ -96,7 +96,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
       .create();
   };
 
-  test("getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアクター自身の投稿だけを返し、リポストは含めない", async () => {
+  test("getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアカウント自身の投稿だけを返し、リポストは含めない", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await actorFactory(ctx.db)
@@ -142,7 +142,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     expect(res.feed).toMatchObject([{ post: { uri: rootPost.uri } }]);
   });
 
-  test("getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアクター自身の投稿であるものだけを含める", async () => {
+  test("getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアカウント自身の投稿であるものだけを含める", async () => {
     // arrange
     const { client } = await setupApiTest();
     const author = await actorFactory(ctx.db)

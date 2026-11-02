@@ -1,18 +1,18 @@
 import type { DidString } from "@atproto/syntax";
-import banSubscriber from "@repo/client/lex/me/subsco/admin/banSubscriber";
+import banAccount from "@repo/client/lex/me/subsco/admin/banAccount";
 import createInviteCode, {
   type $OutputBody as CreateInviteCodeOutput,
 } from "@repo/client/lex/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
 import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
-import unbanActor from "@repo/client/lex/me/subsco/admin/unbanActor";
+import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export interface IAdminCommand {
-  banSubscriber: (did: string, target: DidString) => Promise<void>;
+  banAccount: (did: string, target: DidString) => Promise<void>;
   grantAdmin: (did: string, target: DidString) => Promise<void>;
-  unbanActor: (did: string, target: DidString) => Promise<void>;
+  unbanAccount: (did: string, target: DidString) => Promise<void>;
   createInviteCode: (did: string) => Promise<CreateInviteCodeOutput>;
   deleteInviteCode: (did: string, code: string) => Promise<void>;
 }
@@ -31,17 +31,17 @@ export const adminCommandFactory = ({
   };
 
   return {
-    async banSubscriber(did, target) {
+    async banAccount(did, target) {
       const agent = await restore(did);
-      await agent.call(banSubscriber, { did: target });
+      await agent.call(banAccount, { did: target });
     },
     async grantAdmin(did, target) {
       const agent = await restore(did);
       await agent.call(grantAdmin, { did: target });
     },
-    async unbanActor(did, target) {
+    async unbanAccount(did, target) {
       const agent = await restore(did);
-      await agent.call(unbanActor, { did: target });
+      await agent.call(unbanAccount, { did: target });
     },
     async createInviteCode(did) {
       const agent = await restore(did);

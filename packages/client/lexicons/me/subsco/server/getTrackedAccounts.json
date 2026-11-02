@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.server.getTrackedAccounts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get tracked accounts ordered by the number of registered accounts following them.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "cursor": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["trackedAccounts", "total"],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "total": {
+              "type": "integer"
+            },
+            "trackedAccounts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#trackedAccount"
+              }
+            }
+          }
+        }
+      }
+    },
+    "trackedAccount": {
+      "type": "object",
+      "required": ["profile", "registeredFollowersCount"],
+      "properties": {
+        "profile": {
+          "type": "ref",
+          "ref": "app.bsky.actor.defs#profileView"
+        },
+        "registeredFollowersCount": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

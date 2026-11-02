@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Create a new invitation code for subscribing to the AppView service",
+      "description": "Create a new invitation code for registering with the AppView service",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -27,7 +27,7 @@
           "properties": {
             "code": {
               "type": "string",
-              "description": "Generated invitation code for subscribing to the AppView"
+              "description": "Generated invitation code for registering with the AppView"
             },
             "expiresAt": {
               "type": "string",

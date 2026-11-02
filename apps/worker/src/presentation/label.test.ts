@@ -10,7 +10,7 @@ const src = "did:plc:ar7c4by46qjdydhdevvrndac";
 describe("ラベルの保存", () => {
   const { ctx } = testSetup;
 
-  test("label-1: 保存済みのアクターと、そのアクターのレコードに付いたラベルを保存する", async () => {
+  test("label-1: 保存済みのアカウントと、そのアカウントのレコードに付いたラベルを保存する", async () => {
     // arrange
     const { indexLabel } = await setupJobTest();
     const actor = await actorFactory(ctx.db).create();
@@ -38,7 +38,7 @@ describe("ラベルの保存", () => {
     ]);
   });
 
-  test("label-2: 保存していないアクターへのラベルは保存しない", async () => {
+  test("label-2: 保存していないアカウントへのラベルは保存しない", async () => {
     // arrange
     const { indexLabel } = await setupJobTest();
 
@@ -74,21 +74,28 @@ describe("ラベルの保存", () => {
     expect(labels).toHaveLength(0);
   });
 
-  test("label-4: Tapに登録したアカウントに付いているラベルをモデレーションサービスの queryLabels で取り寄せて保存する", async () => {
+  test("label-4: Tapに追加したアカウントに付いているラベルをモデレーションサービスの queryLabels で取り寄せて保存する", async () => {
     // arrange
     const { syncTapRepo, labelFetcher } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
     const cts = "2026-01-01T00:00:00.000Z";
-    labelFetcher.add({ src, uri: subscriber.did, val: "!takedown", cts });
+    labelFetcher.add({
+      src,
+      uri: registeredAccount.did,
+      val: "!takedown",
+      cts,
+    });
     labelFetcher.add({ src, uri: "did:plc:other", val: "!takedown", cts });
 
     // act
-    await syncTapRepo(asDid(subscriber.did));
+    await syncTapRepo(asDid(registeredAccount.did));
 
     // assert
     const labels = await ctx.db.select().from(schema.labels);
-    expect(labels).toEqual([expect.objectContaining({ uri: subscriber.did })]);
+    expect(labels).toEqual([
+      expect.objectContaining({ uri: registeredAccount.did }),
+    ]);
   });
 });

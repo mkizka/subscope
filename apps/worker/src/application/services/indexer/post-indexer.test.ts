@@ -3,7 +3,7 @@ import {
   actorFactory,
   postFactory,
   recordFactory,
-  subscriptionFactory,
+  registrationFactory,
 } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
@@ -19,7 +19,7 @@ describe("PostIndexer", () => {
   let postRepo: TestServices["postRepository"];
   let feedItemRepo: TestServices["feedItemRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let registrationQuery: TestServices["registrationQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe("PostIndexer", () => {
     postRepo = services.postRepository;
     feedItemRepo = services.feedItemRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionQuery = services.subscriptionQuery;
+    registrationQuery = services.registrationQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -177,8 +177,8 @@ describe("PostIndexer", () => {
       // arrange
       const quoted = actorFactory();
       const mentioned = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: quoted.did }));
-      subscriptionQuery.add(subscriptionFactory({ actorDid: mentioned.did }));
+      registrationQuery.add(registrationFactory({ actorDid: quoted.did }));
+      registrationQuery.add(registrationFactory({ actorDid: mentioned.did }));
       const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
       const record = recordFactory({
         uri: `at://${actorFactory().did}/app.bsky.feed.post/notify`,
@@ -209,8 +209,8 @@ describe("PostIndexer", () => {
       // arrange
       const mentioned = actorFactory();
       const quoted = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: mentioned.did }));
-      subscriptionQuery.add(subscriptionFactory({ actorDid: quoted.did }));
+      registrationQuery.add(registrationFactory({ actorDid: mentioned.did }));
+      registrationQuery.add(registrationFactory({ actorDid: quoted.did }));
       const author = actorFactory();
       const cid = await randomCid();
       const postRecord = (rkey: string, did: string, withMention: boolean) => {
@@ -249,7 +249,7 @@ describe("PostIndexer", () => {
       const ancestors = [];
       for (let i = 0; i < 5; i++) {
         const actor = actorFactory();
-        subscriptionQuery.add(subscriptionFactory({ actorDid: actor.did }));
+        registrationQuery.add(registrationFactory({ actorDid: actor.did }));
         const { post } = postFactory({
           actorDid: actor.did,
           uri: `at://${actor.did}/app.bsky.feed.post/ancestor${i}`,

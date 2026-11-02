@@ -46,116 +46,126 @@ const unfollowEvent = (actorDid: string, subjectDid: string): RecordEvent => ({
 describe("Tapへの登録", () => {
   const { ctx } = testSetup;
 
-  test("tap-1: サブスクライバーがフォローしたアカウントをTapに登録する", async () => {
+  test("tap-1: 登録アカウントがフォローしたアカウントをTapに追加する", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
     const followee = await actorFactory(ctx.db).create();
 
     // act
-    await indexCommit(await followEvent(subscriber.did, followee.did));
+    await indexCommit(await followEvent(registeredAccount.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("tap-2: サブスクライバー以外のフォローではTapに登録しない", async () => {
+  test("tap-2: 登録アカウント以外のフォローではTapに追加しない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const nonSubscriber = await actorFactory(ctx.db).create();
+    const nonRegisteredAccount = await actorFactory(ctx.db).create();
     const followee = await actorFactory(ctx.db).create();
 
     // act
-    await indexCommit(await followEvent(nonSubscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // assert
-    expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
-  });
-
-  test("tap-3: サブスクライバーがフォローを外したアカウントは、追跡アクターでなくなればTapから外す", async () => {
-    // arrange
-    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
-    const followee = await actorFactory(ctx.db).create();
-    await indexCommit(await followEvent(subscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // act
-    await indexCommit(unfollowEvent(subscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // assert
-    expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
-  });
-
-  test("tap-4: 他のサブスクライバーがフォローしているアカウントはTapから外さない", async () => {
-    // arrange
-    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
-    const otherSubscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
-    const followee = await actorFactory(ctx.db).create();
-    await indexCommit(await followEvent(subscriber.did, followee.did));
-    await indexCommit(await followEvent(otherSubscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // act
-    await indexCommit(unfollowEvent(subscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // assert
-    expect(tapClient.getRegisteredDids()).toContain(followee.did);
-  });
-
-  test("tap-5: サブスクライバー以外がフォローを外してもTapから外さない", async () => {
-    // arrange
-    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
-    const nonSubscriber = await actorFactory(ctx.db).create();
-    const followee = await actorFactory(ctx.db).create();
-    await indexCommit(await followEvent(subscriber.did, followee.did));
-    await indexCommit(await followEvent(nonSubscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // act
-    await indexCommit(unfollowEvent(nonSubscriber.did, followee.did));
-    await runSyncTapRepoJobs();
-
-    // assert
-    expect(tapClient.getRegisteredDids()).toContain(followee.did);
-  });
-
-  test("tap-6: サブスクライバーは、フォローを外されてもTapから外さない", async () => {
-    // arrange
-    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
-    const followedSubscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
-      .create();
     await indexCommit(
-      await followEvent(subscriber.did, followedSubscriber.did),
+      await followEvent(nonRegisteredAccount.did, followee.did),
+    );
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
+  });
+
+  test("tap-3: 登録アカウントがフォローを外したアカウントは、追跡アカウントでなくなればTapから外す", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    const followee = await actorFactory(ctx.db).create();
+    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // act
+    await indexCommit(unfollowEvent(registeredAccount.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
+  });
+
+  test("tap-4: 他の登録アカウントがフォローしているアカウントはTapから外さない", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    const otherRegisteredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    const followee = await actorFactory(ctx.db).create();
+    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    await indexCommit(
+      await followEvent(otherRegisteredAccount.did, followee.did),
     );
     await runSyncTapRepoJobs();
 
     // act
-    await indexCommit(unfollowEvent(subscriber.did, followedSubscriber.did));
+    await indexCommit(unfollowEvent(registeredAccount.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).toContain(followedSubscriber.did);
+    expect(tapClient.getRegisteredDids()).toContain(followee.did);
+  });
+
+  test("tap-5: 登録アカウント以外がフォローを外してもTapから外さない", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    const nonRegisteredAccount = await actorFactory(ctx.db).create();
+    const followee = await actorFactory(ctx.db).create();
+    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    await indexCommit(
+      await followEvent(nonRegisteredAccount.did, followee.did),
+    );
+    await runSyncTapRepoJobs();
+
+    // act
+    await indexCommit(unfollowEvent(nonRegisteredAccount.did, followee.did));
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(tapClient.getRegisteredDids()).toContain(followee.did);
+  });
+
+  test("tap-6: 登録アカウントは、フォローを外されてもTapから外さない", async () => {
+    // arrange
+    const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    const followedRegisteredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    await indexCommit(
+      await followEvent(registeredAccount.did, followedRegisteredAccount.did),
+    );
+    await runSyncTapRepoJobs();
+
+    // act
+    await indexCommit(
+      unfollowEvent(registeredAccount.did, followedRegisteredAccount.did),
+    );
+    await runSyncTapRepoJobs();
+
+    // assert
+    expect(tapClient.getRegisteredDids()).toContain(
+      followedRegisteredAccount.did,
+    );
   });
 });
 
@@ -170,17 +180,17 @@ describe("バックフィルの状態の確認", () => {
     return actor?.backfillStatus;
   };
 
-  test("backfill-1: Tapに登録したアカウントのバックフィルの状態を確認する", async () => {
+  test("backfill-1: Tapに追加したアカウントのバックフィルの状態を確認する", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, runCheckBackfillJobs } =
       await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
     const followee = await actorFactory(ctx.db).create();
 
     // act
-    await indexCommit(await followEvent(subscriber.did, followee.did));
+    await indexCommit(await followEvent(registeredAccount.did, followee.did));
     await runSyncTapRepoJobs();
     await runCheckBackfillJobs();
 
@@ -205,12 +215,12 @@ describe("バックフィルの状態の確認", () => {
 
     // act
     for (const state of Object.keys(expected)) {
-      const subscriber = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
+      const registeredAccount = await actorFactory(ctx.db)
+        .use((t) => t.registeredAccount())
         .create();
-      tapClient.setRepoState(asDid(subscriber.did), state);
-      await checkBackfill(asDid(subscriber.did));
-      actual[state] = await findBackfillStatus(subscriber.did);
+      tapClient.setRepoState(asDid(registeredAccount.did), state);
+      await checkBackfill(asDid(registeredAccount.did));
+      actual[state] = await findBackfillStatus(registeredAccount.did);
     }
 
     // assert
@@ -220,10 +230,10 @@ describe("バックフィルの状態の確認", () => {
   test("backfill-3: 完了でなければ、間隔を伸ばしながら確認を続ける", async () => {
     // arrange
     const { checkBackfill, tapClient, jobScheduler } = await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
-    const did = asDid(subscriber.did);
+    const did = asDid(registeredAccount.did);
 
     // act
     tapClient.setRepoState(did, "pending");
@@ -238,7 +248,7 @@ describe("バックフィルの状態の確認", () => {
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
   });
 
-  test("backfill-4: 追跡アクターでなくなったアカウントは確認しない", async () => {
+  test("backfill-4: 追跡アカウントでなくなったアカウントは確認しない", async () => {
     // arrange
     const { checkBackfill, jobScheduler } = await setupJobTest();
     const actor = await actorFactory(ctx.db).create();
@@ -251,17 +261,17 @@ describe("バックフィルの状態の確認", () => {
     expect(jobScheduler.getCheckBackfillJobs()).toEqual([]);
   });
 
-  test("backfill-5: 起動時に、状態をまだ確認していない追跡アクターを確認する", async () => {
+  test("backfill-5: 起動時に、状態をまだ確認していない追跡アカウントを確認する", async () => {
     // arrange
     const { indexCommit, scheduleBackfillChecks, jobScheduler } =
       await setupJobTest();
-    const subscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const registeredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
     const followee = await actorFactory(ctx.db).create();
-    await indexCommit(await followEvent(subscriber.did, followee.did));
-    const checkedSubscriber = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    const checkedRegisteredAccount = await actorFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .props({ backfillStatus: () => "completed" })
       .create();
     const untracked = await actorFactory(ctx.db).create();
@@ -273,9 +283,9 @@ describe("バックフィルの状態の確認", () => {
     // assert
     const dids = jobScheduler.getCheckBackfillJobs().map((job) => job.did);
     expect(dids).toEqual(
-      expect.arrayContaining([subscriber.did, followee.did]),
+      expect.arrayContaining([registeredAccount.did, followee.did]),
     );
-    expect(dids).not.toContain(checkedSubscriber.did);
+    expect(dids).not.toContain(checkedRegisteredAccount.did);
     expect(dids).not.toContain(untracked.did);
   });
 });

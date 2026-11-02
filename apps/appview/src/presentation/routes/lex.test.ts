@@ -42,7 +42,7 @@ describe("lexRouter", () => {
   const auth = { authorization: "Bearer token" };
 
   test("認証がない場合、401エラーを返す", async () => {
-    const res = await fetch(`${baseUrl}/me.subsco.sync.getSubscriptionStatus`);
+    const res = await fetch(`${baseUrl}/me.subsco.sync.getRegistrationStatus`);
 
     expect(res.status).toBe(401);
     expect(await res.json()).toMatchObject({
@@ -51,20 +51,20 @@ describe("lexRouter", () => {
     });
   });
 
-  test("getSubscriptionStatusはlexiconに沿ったレスポンスを返す", async () => {
-    const res = await fetch(`${baseUrl}/me.subsco.sync.getSubscriptionStatus`, {
+  test("getRegistrationStatusはlexiconに沿ったレスポンスを返す", async () => {
+    const res = await fetch(`${baseUrl}/me.subsco.sync.getRegistrationStatus`, {
       headers: auth,
     });
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
-      $type: "me.subsco.sync.getSubscriptionStatus#notSubscribed",
-      isSubscriber: false,
+      $type: "me.subsco.sync.getRegistrationStatus#notRegistered",
+      isRegistered: false,
     });
   });
 
-  test("subscribeServerのユースケースエラーはエラー名を持つ400エラーになる", async () => {
-    const res = await fetch(`${baseUrl}/me.subsco.sync.subscribeServer`, {
+  test("registerAccountのユースケースエラーはエラー名を持つ400エラーになる", async () => {
+    const res = await fetch(`${baseUrl}/me.subsco.sync.registerAccount`, {
       method: "POST",
       headers: { ...auth, "content-type": "application/json" },
       body: JSON.stringify({ inviteCode: "invalid" }),
@@ -77,14 +77,14 @@ describe("lexRouter", () => {
     });
   });
 
-  test("unsubscribeServerのユースケースエラーはエラー名を持つ400エラーになる", async () => {
-    const res = await fetch(`${baseUrl}/me.subsco.sync.unsubscribeServer`, {
+  test("unregisterAccountのユースケースエラーはエラー名を持つ400エラーになる", async () => {
+    const res = await fetch(`${baseUrl}/me.subsco.sync.unregisterAccount`, {
       method: "POST",
       headers: auth,
     });
 
     expect(res.status).toBe(400);
-    expect(await res.json()).toMatchObject({ error: "NotSubscribed" });
+    expect(await res.json()).toMatchObject({ error: "NotRegistered" });
   });
 
   test("getUnreadCountは未読数を返す", async () => {

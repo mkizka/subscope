@@ -36,7 +36,7 @@ const createPosts = async (request: APIRequestContext, texts: string[]) => {
 };
 
 test.describe("タイムライン", () => {
-  test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しいものほど上に並べる", async ({
+  test("timeline-1: 自分とフォロー先の投稿を、新しいものほど上に並べる", async ({
     page,
     request,
   }) => {
@@ -296,7 +296,7 @@ test.describe("タイムライン", () => {
     await expect(link).toHaveAttribute("target", "_blank");
   });
 
-  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、そのユーザーのプロフィール全体ページへのリンクにする", async ({
+  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、そのアカウントのプロフィール全体ページへのリンクにする", async ({
     page,
   }) => {
     const prefix = "timeline-7: こんにちは ";

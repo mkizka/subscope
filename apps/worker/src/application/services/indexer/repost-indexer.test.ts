@@ -4,7 +4,7 @@ import {
   fakeCid,
   postFactory,
   recordFactory,
-  subscriptionFactory,
+  registrationFactory,
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -20,7 +20,7 @@ describe("RepostIndexer", () => {
   let feedItemRepo: TestServices["feedItemRepository"];
   let postRepo: TestServices["postRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let registrationQuery: TestServices["registrationQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -30,7 +30,7 @@ describe("RepostIndexer", () => {
     feedItemRepo = services.feedItemRepository;
     postRepo = services.postRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionQuery = services.subscriptionQuery;
+    registrationQuery = services.registrationQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -93,7 +93,7 @@ describe("RepostIndexer", () => {
       // arrange
       const reposter = actorFactory();
       const author = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: author.did }));
+      registrationQuery.add(registrationFactory({ actorDid: author.did }));
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
       const record = recordFactory({
         uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,

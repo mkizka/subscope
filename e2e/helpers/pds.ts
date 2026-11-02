@@ -102,12 +102,12 @@ export const follow = async (handle: string, subjectHandle: string) => {
   });
 };
 
-export const subscribeServer = async (handle: string, inviteCode: string) => {
+export const registerAccount = async (handle: string, inviteCode: string) => {
   const { accessJwt } = await xrpc<{ accessJwt: string }>(
     "com.atproto.server.createSession",
     { identifier: handle, password: "password" },
   );
-  const lxm = "me.subsco.sync.subscribeServer";
+  const lxm = "me.subsco.sync.registerAccount";
   const serviceAuth = await fetch(
     `${PDS_URL}/xrpc/com.atproto.server.getServiceAuth?aud=did:web:localhost%253A3001&lxm=${lxm}`,
     { headers: { authorization: `Bearer ${accessJwt}` } },
@@ -123,7 +123,7 @@ export const subscribeServer = async (handle: string, inviteCode: string) => {
     body: JSON.stringify({ inviteCode }),
   });
   const body = await response.text();
-  if (!response.ok && !body.includes("AlreadySubscribed")) {
+  if (!response.ok && !body.includes("AlreadyRegistered")) {
     throw new Error(`${lxm} failed: ${body}`);
   }
 };

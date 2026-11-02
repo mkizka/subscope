@@ -3,7 +3,7 @@ import {
   actorFactory,
   fakeCid,
   recordFactory,
-  subscriptionFactory,
+  registrationFactory,
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -17,7 +17,7 @@ describe("LikeIndexer", () => {
   let likeIndexer: TestServices["likeIndexer"];
   let likeRepo: TestServices["likeRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let registrationQuery: TestServices["registrationQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe("LikeIndexer", () => {
     likeIndexer = services.likeIndexer;
     likeRepo = services.likeRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionQuery = services.subscriptionQuery;
+    registrationQuery = services.registrationQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -35,7 +35,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: liker.did }));
+      registrationQuery.add(registrationFactory({ actorDid: liker.did }));
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
@@ -68,29 +68,29 @@ describe("LikeIndexer", () => {
     test.each([
       {
         name: "notify-1: 通知はサブスクライバー宛てにだけ作る",
-        isSubscriber: false,
+        isRegistered: false,
         isSelf: false,
         expected: [],
       },
       {
         name: "notify-2: 自分自身の操作では通知を作らない",
-        isSubscriber: true,
+        isRegistered: true,
         isSelf: true,
         expected: [],
       },
       {
         name: "notify-3: いいねされた投稿の作者に like の通知を作る",
-        isSubscriber: true,
+        isRegistered: true,
         isSelf: false,
         expected: [{ reason: "like" }],
       },
-    ])("$name", async ({ isSubscriber, isSelf, expected }) => {
+    ])("$name", async ({ isRegistered, isSelf, expected }) => {
       // arrange
       const liker = actorFactory();
       const author = isSelf ? liker : actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: liker.did }));
-      if (isSubscriber) {
-        subscriptionQuery.add(subscriptionFactory({ actorDid: author.did }));
+      registrationQuery.add(registrationFactory({ actorDid: liker.did }));
+      if (isRegistered) {
+        registrationQuery.add(registrationFactory({ actorDid: author.did }));
       }
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
@@ -117,7 +117,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: liker.did }));
+      registrationQuery.add(registrationFactory({ actorDid: liker.did }));
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey456`,

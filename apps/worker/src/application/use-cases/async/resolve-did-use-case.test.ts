@@ -57,7 +57,7 @@ describe("ResolveDidUseCase", () => {
     expect(actor?.handle).toBe("handle.invalid");
   });
 
-  test("resolveDid-3: すでに handle.invalid 以外のハンドルを持つアクターのハンドルは上書きしない", async () => {
+  test("resolveDid-3: すでに handle.invalid 以外のハンドルを持つアカウントのハンドルは上書きしない", async () => {
     // arrange
     const actor = actorFactory({ handle: asHandle("old.test") });
     actorRepository.add(actor);
