@@ -45,7 +45,6 @@ import type { ITokenVerifier } from "../application/interfaces/token-verifier.js
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
-import { LikeService } from "../application/service/graph/like-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
 import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
@@ -222,7 +221,6 @@ export const createAppRegistry = (env: Env) =>
     .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
-    .service("likeService", ["likeQuery"], asClassArgs(LikeService))
     .service("repostService", ["repostQuery"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
@@ -250,7 +248,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getActorLikesUseCase", ["likeQuery", "viewContextFactory", "feedViews"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedQuery", "viewContextFactory", "feedViews"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["viewContextFactory", "generatorViews"], asClassArgs(GetFeedGeneratorsUseCase))
-    .service("getLikesUseCase", ["likeService", "viewContextFactory", "profileViews"], asClassArgs(GetLikesUseCase))
+    .service("getLikesUseCase", ["likeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetLikesUseCase))
     .service("getListFeedUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetListFeedUseCase))
     .service("getRepostedByUseCase", ["repostService", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
