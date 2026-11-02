@@ -13,6 +13,7 @@ import type { loader as notificationsLoader } from "@/app/routes/api.notificatio
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
+import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
 type Data<T extends (...args: never) => unknown> =
@@ -147,6 +148,34 @@ queryClient.setQueryData<Data<typeof followListLoader>>(
         description: "Bobの自己紹介",
       },
       { did: "did:plc:carol", handle: "handle.invalid" },
+    ],
+  },
+);
+
+const threadPost = (uri: string, text: string) => ({
+  uri,
+  cid: "bafyexample",
+  authorDisplayName: "Alice",
+  authorHandle: alice.handle,
+  text,
+  createdAt: new Date().toISOString(),
+});
+
+queryClient.setQueryData<Data<typeof threadLoader>>(
+  ["thread", alice.handle, "selected"],
+  {
+    ancestors: [threadPost("at://a/1", "親投稿です")],
+    post: {
+      ...threadPost("at://a/2", "選んだ投稿です"),
+      replyCount: 1,
+      repostCount: 1,
+      likeCount: 8,
+    },
+    replies: [
+      [
+        threadPost("at://a/3", "返信です"),
+        threadPost("at://a/4", "返信への返信です"),
+      ],
     ],
   },
 );
