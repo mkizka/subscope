@@ -302,7 +302,7 @@ test.describe("招待コード", () => {
   test("invite-codes-9: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
     page,
   }) => {
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/admin/api/invite-codes*", async (route) => {
       await released;
