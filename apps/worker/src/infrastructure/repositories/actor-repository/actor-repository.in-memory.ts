@@ -36,8 +36,6 @@ export class InMemoryActorRepository implements IActorRepository {
     this.actors.delete(params.did);
   }
 
-  async updateBackfillStatus(): Promise<void> {}
-
   async findTrackedDidsWithoutBackfillStatus(): Promise<Did[]> {
     return [];
   }
