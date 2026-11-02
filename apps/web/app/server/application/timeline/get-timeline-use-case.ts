@@ -8,7 +8,7 @@ export interface IGetTimelineUseCase {
     did: string,
     cursor?: string,
   ) => Promise<{
-    posts: (TimelinePostDto & { deletable: boolean })[];
+    posts: TimelinePostDto[];
     cursor?: string;
   } | null>;
 }
@@ -20,13 +20,6 @@ export const getTimelineUseCaseFactory = ({
 }): IGetTimelineUseCase => ({
   async execute(did, cursor) {
     if (!(await timelineQuery.isSubscribed(did))) return null;
-    const timeline = await timelineQuery.findPosts(did, cursor);
-    return {
-      posts: timeline.posts.map((post) => ({
-        ...post,
-        deletable: post.uri.startsWith(`at://${did}/`),
-      })),
-      cursor: timeline.cursor,
-    };
+    return timelineQuery.findPosts(did, cursor);
   },
 });
