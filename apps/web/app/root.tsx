@@ -1,7 +1,7 @@
 import "./app.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Links,
   Meta,
@@ -41,16 +41,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   const [queryClient] = useState(() => new QueryClient());
   const navigation = useNavigation();
-  const revalidating = [navigation, ...useFetchers()].some(
-    (submission) =>
-      submission.state === "loading" &&
-      submission.formMethod !== undefined &&
-      submission.formMethod !== "GET",
+  const submitting = [navigation, ...useFetchers()].some(
+    (submission) => submission.state === "submitting",
   );
+  const wasSubmitting = useRef(false);
 
   useEffect(() => {
-    if (revalidating) void queryClient.invalidateQueries();
-  }, [revalidating, queryClient]);
+    if (wasSubmitting.current && !submitting) {
+      void queryClient.invalidateQueries();
+    }
+    wasSubmitting.current = submitting;
+  }, [submitting, queryClient]);
 
   useEffect(() => {
     // @ts-expect-error
