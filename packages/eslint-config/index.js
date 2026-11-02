@@ -4,9 +4,7 @@ const legacyRepositoryMethods = {
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFeedItemRepository: "upsert",
-  IFollowRepository: "isFollowedByAnySubscriber|upsert",
   IGeneratorRepository: "upsert",
-  IInviteCodeRepository: "findByCode|markAsUsed",
   ILabelRepository: "upsert",
   ILikeRepository: "upsert",
   IListItemRepository: "upsert",
@@ -15,7 +13,7 @@ const legacyRepositoryMethods = {
   IPostStatsRepository: "upsertMany",
   IRepostRepository: "upsert",
   ISubscriptionRepository:
-    "count|countTrackedActors|findMany|findTrackedActors|isSubscriber|upsert",
+    "count|countTrackedActors|findMany|findTrackedActors",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({
