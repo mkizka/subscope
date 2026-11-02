@@ -26,7 +26,7 @@ export class PostEmbedImage {
     this.aspectRatio = params.aspectRatio;
   }
 
-  static from(images: Image[]) {
+  static from(images: Omit<Image, "$type">[]) {
     return images.map((image, index) => {
       return new PostEmbedImage({
         cid: getBlobCidString(image.image),

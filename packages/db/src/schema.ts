@@ -317,6 +317,10 @@ export const postEmbedImages = pgTable(
       .references(() => posts.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
     position: integer().notNull(),
+    embedType: varchar({ length: 16 })
+      .$type<"images" | "gallery">()
+      .default("images")
+      .notNull(),
     alt: text().notNull(),
     aspectRatioWidth: integer(),
     aspectRatioHeight: integer(),

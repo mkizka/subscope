@@ -1,12 +1,14 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import external from "@repo/client/lex/app/bsky/embed/external";
+import gallery from "@repo/client/lex/app/bsky/embed/gallery";
 import images from "@repo/client/lex/app/bsky/embed/images";
 import embedRecord from "@repo/client/lex/app/bsky/embed/record";
 import recordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
 
 import type { Record } from "../record/record.js";
 import { PostEmbedExternal } from "./embed-external.js";
+import { PostEmbedGallery } from "./embed-gallery.js";
 import { PostEmbedImage } from "./embed-images.js";
 import { PostEmbedRecord } from "./embed-record.js";
 import { PostEmbedRecordWithMedia } from "./embed-record-with-media.js";
@@ -36,6 +38,7 @@ export type PostParams = {
   embed:
     | PostEmbedExternal
     | PostEmbedImage[]
+    | PostEmbedGallery
     | PostEmbedRecord
     | PostEmbedRecordWithMedia
     | null;
@@ -54,6 +57,7 @@ export class Post {
   readonly embed:
     | PostEmbedExternal
     | PostEmbedImage[]
+    | PostEmbedGallery
     | PostEmbedRecord
     | PostEmbedRecordWithMedia
     | null;
@@ -118,6 +122,9 @@ export class Post {
       }
       if (images.isTypeOf(parsed.embed)) {
         return PostEmbedImage.from(parsed.embed.images);
+      }
+      if (gallery.isTypeOf(parsed.embed)) {
+        return PostEmbedGallery.from(parsed.embed);
       }
       if (external.isTypeOf(parsed.embed)) {
         return PostEmbedExternal.from(parsed.embed.external);

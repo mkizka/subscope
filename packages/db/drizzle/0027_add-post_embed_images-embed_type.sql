@@ -1,0 +1,1 @@
+ALTER TABLE "post_embed_images" ADD COLUMN "embed_type" varchar(16) DEFAULT 'images' NOT NULL;
