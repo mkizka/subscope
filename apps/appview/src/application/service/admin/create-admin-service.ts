@@ -21,10 +21,10 @@ export class CreateAdminService {
     ctx: AfterCommitContext;
     did: Did;
   }): Promise<void> {
-    const existingActor = await this.actorRepository.findByDid(did);
+    const existingActor = await this.actorRepository.find(did);
     const actor = existingActor ?? Actor.create({ did });
     actor.promoteToAdmin();
-    await this.actorRepository.upsert({ ctx, actor });
+    await this.actorRepository.save({ ctx, actor });
 
     if (!actor.handle) {
       ctx.afterCommit(() =>

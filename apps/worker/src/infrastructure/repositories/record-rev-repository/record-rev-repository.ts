@@ -6,7 +6,7 @@ import { lte } from "drizzle-orm";
 import type { IRecordRevRepository } from "../../../application/interfaces/repositories/record-rev-repository.js";
 
 export class RecordRevRepository implements IRecordRevRepository {
-  async saveIfNotOlder({
+  async save({
     ctx,
     uri,
     rev,

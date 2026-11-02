@@ -119,7 +119,7 @@ describe("lexRouter", () => {
   });
 
   test("registerAdminのユースケースエラーはエラー名を持つ400エラーになる", async () => {
-    services.actorRepository.add(actorFactory({ isAdmin: true }));
+    services.actorQuery.add(actorFactory({ isAdmin: true }));
 
     const res = await fetch(`${baseUrl}/me.subsco.admin.registerAdmin`, {
       method: "POST",
