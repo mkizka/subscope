@@ -17,12 +17,12 @@ export class UnbanActorUseCase {
   ) {}
 
   async execute(params: { did: Did }): Promise<void> {
-    const actor = await this.actorRepository.findByDid(params.did);
+    const actor = await this.actorRepository.find(params.did);
     if (!actor?.isBanned) {
       throw new NotBannedError("Actor is not banned");
     }
 
     actor.unban();
-    await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
+    await this.actorRepository.save({ ctx: { db: this.db }, actor });
   }
 }

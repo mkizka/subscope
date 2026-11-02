@@ -10,12 +10,14 @@ const now = new Date("2025-01-01T00:00:00Z");
 describe("RegisterAdminUseCase", () => {
   let registerAdminUseCase: TestServices["registerAdminUseCase"];
   let actorRepo: TestServices["actorRepository"];
+  let actorQuery: TestServices["actorQuery"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     registerAdminUseCase = services.registerAdminUseCase;
     actorRepo = services.actorRepository;
+    actorQuery = services.actorQuery;
     subscriptionRepo = services.subscriptionRepository;
     jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
@@ -33,7 +35,7 @@ describe("RegisterAdminUseCase", () => {
     });
 
     // assert
-    const updatedActor = await actorRepo.findByDid(requester.did);
+    const updatedActor = await actorRepo.find(requester.did);
     expect(updatedActor?.isAdmin).toBe(true);
     const subscription = await subscriptionRepo.find(asDid(requester.did));
     expect(subscription).toMatchObject({
@@ -48,7 +50,7 @@ describe("RegisterAdminUseCase", () => {
   test("管理者が既に存在する場合、AdminAlreadyExistsErrorをスローする", async () => {
     // arrange
     const admin = actorFactory({ isAdmin: true });
-    actorRepo.add(admin);
+    actorQuery.add(admin);
 
     const requester = actorFactory({ isAdmin: false });
     actorRepo.add(requester);
@@ -71,7 +73,7 @@ describe("RegisterAdminUseCase", () => {
     });
 
     // assert
-    const createdActor = await actorRepo.findByDid(nonExistentDid);
+    const createdActor = await actorRepo.find(nonExistentDid);
     expect(createdActor).not.toBeNull();
     expect(createdActor?.isAdmin).toBe(true);
   });

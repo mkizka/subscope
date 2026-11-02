@@ -165,7 +165,7 @@ describe("SubscribeServerUseCase", () => {
     });
 
     // assert
-    const savedActor = await actorRepo.findByDid(did);
+    const savedActor = await actorRepo.find(did);
     expect(savedActor).toMatchObject({
       did,
       handle: null,
