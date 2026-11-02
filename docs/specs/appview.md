@@ -311,6 +311,9 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 閲覧者がサブスクライバーかどうかを返す。認証が必要。
 
+- getSubscriptionStatus-1: 閲覧者がサブスクライバーならisSubscriberをtrueにする
+- getSubscriptionStatus-2: 閲覧者がサブスクライバーでなければisSubscriberをfalseにする
+
 ## me.subsco.admin.verifyAccess
 
 閲覧者の管理画面へのアクセス権を返す。認証が必要。
