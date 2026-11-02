@@ -64,7 +64,7 @@ describe("RepostIndexer", () => {
       });
 
       // assert
-      const repost = repostRepo.findByUri(record.uri);
+      const repost = await repostRepo.find({ ctx, uri: record.uri });
       expect(repost).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -72,7 +72,7 @@ describe("RepostIndexer", () => {
         subjectUri: new AtUri(subjectUri),
       });
 
-      const feedItem = feedItemRepo.findByUri(record.uri);
+      const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "repost",
