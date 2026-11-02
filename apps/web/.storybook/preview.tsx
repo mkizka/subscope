@@ -11,6 +11,7 @@ import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.st
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
+import type { loader as searchLoader } from "@/app/routes/api.search";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
 type Data<T extends (...args: never) => unknown> =
@@ -128,6 +129,29 @@ queryClient.setQueryData<{
   pages: [{ posts: TimelineFeedStories.args.posts }],
   pageParams: [undefined],
 });
+
+const searchQuery = (
+  tab: "actors" | "posts",
+  q: string,
+  result: Partial<Data<typeof searchLoader>>,
+) =>
+  queryClient.setQueryData<Data<typeof searchLoader>>(["search", tab, q], {
+    actors: [],
+    posts: [],
+    ...result,
+  });
+searchQuery("actors", "alice", {
+  actors: [
+    {
+      ...alice,
+      handle: "alice.bsky.social",
+      description: "Blueskyを使っています。",
+    },
+  ],
+});
+searchQuery("actors", "nobody", {});
+searchQuery("posts", "alice", { posts: TimelineFeedStories.args.posts });
+searchQuery("posts", "nobody", {});
 
 const preview: Preview = {
   decorators: [
