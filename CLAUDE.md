@@ -79,6 +79,8 @@ Reactコンポーネントは以下の方針で実装しています。
   - docs/dev/lexicon-implementation.md
 - Identity Event処理
   - docs/dev/identity-event-handling.md
+- リポジトリとクエリサービスの使い分け
+  - docs/dev/repository-and-query.md
 - appviewのビュー生成(ViewContext、*Views)
   - docs/dev/view-pipeline.md
 - Railwayへのデプロイ(IaC)
