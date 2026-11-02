@@ -1,4 +1,8 @@
 import { view as externalView } from "@repo/client/lex/app/bsky/embed/external";
+import {
+  view as galleryView,
+  viewImage as galleryViewImage,
+} from "@repo/client/lex/app/bsky/embed/gallery";
 import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
 import {
   view as recordView,
@@ -144,7 +148,17 @@ export function toTimelinePost({
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
-    images: imagesView.matches(media) ? media.images : undefined,
+    images: imagesView.matches(media)
+      ? media.images
+      : galleryView.matches(media)
+        ? media.items
+            .filter((item) => galleryViewImage.matches(item))
+            .map(({ thumbnail, fullsize, alt }) => ({
+              thumb: thumbnail,
+              fullsize,
+              alt,
+            }))
+        : undefined,
     external: externalView.matches(media) ? media.external : undefined,
     quote: viewRecord.matches(quoted)
       ? {
