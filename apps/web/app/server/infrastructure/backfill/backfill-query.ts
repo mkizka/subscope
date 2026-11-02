@@ -1,11 +1,15 @@
-import type { DatabaseClient } from "@repo/common/domain";
+import type { BackfillStatus, DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { count, eq, inArray, or } from "drizzle-orm";
+import { and, count, eq, inArray, or } from "drizzle-orm";
+import { union } from "drizzle-orm/pg-core";
 
 export type BackfillStatusDto = { inProgress: number; error: number };
 
 export interface IBackfillQuery {
   countUnfinished: (did: string) => Promise<BackfillStatusDto>;
+  findTrackedStatuses: (
+    dids: string[],
+  ) => Promise<Record<string, BackfillStatus>>;
 }
 
 export const backfillQueryFactory = ({
@@ -31,5 +35,34 @@ export const backfillQueryFactory = ({
       inProgress: countOf("inProgress") + countOf(null),
       error: countOf("error"),
     };
+  },
+  async findTrackedStatuses(dids) {
+    if (dids.length === 0) {
+      return {};
+    }
+    const trackedDids = union(
+      db
+        .select({ did: schema.subscriptions.actorDid })
+        .from(schema.subscriptions),
+      db
+        .select({ did: schema.follows.subjectDid })
+        .from(schema.follows)
+        .innerJoin(
+          schema.subscriptions,
+          eq(schema.follows.actorDid, schema.subscriptions.actorDid),
+        ),
+    );
+    const rows = await db
+      .select({ did: schema.actors.did, status: schema.actors.backfillStatus })
+      .from(schema.actors)
+      .where(
+        and(
+          inArray(schema.actors.did, dids),
+          inArray(schema.actors.did, trackedDids),
+        ),
+      );
+    return Object.fromEntries(
+      rows.map((row) => [row.did, row.status ?? "inProgress"]),
+    );
   },
 });
