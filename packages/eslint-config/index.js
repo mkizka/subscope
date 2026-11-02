@@ -1,5 +1,39 @@
 import { mkizka } from "@mkizka/eslint-config";
 
+const legacyRepositoryMethods = {
+  IActorRepository:
+    "exists|findBannedDids|findByDid|findTrackedDidsWithoutBackfillStatus|hasAnyAdmin|updateBackfillStatus|upsert",
+  IActorStatsRepository:
+    "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
+  IFeedItemRepository: "upsert",
+  IFollowRepository:
+    "findFolloweeDids|findFollowers|findFollows|isFollowedByAnySubscriber|upsert",
+  IGeneratorRepository: "upsert",
+  IInviteCodeRepository: "findAll|findByCode|findFirst|markAsUsed|upsert",
+  ILabelRepository: "upsert",
+  ILikeRepository: "findMany|upsert",
+  IListItemRepository: "upsert",
+  IListRepository: "upsert",
+  INotificationRepository: "createMany",
+  IPostRepository:
+    "exists|findByUri|findByUris|findMany|findReplies|findReplyParentUri|search|upsert",
+  IPostStatsRepository: "upsertMany",
+  IProfileRepository: "exists|searchActors|upsert",
+  IRecordRepository: "findByUri|upsert",
+  IRecordRevRepository: "saveIfNotOlder",
+  IRepostRepository: "findRepostsByPost|upsert",
+  ISubscriptionRepository:
+    "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|isSubscriber|updateSeenAt|upsert",
+};
+
+const repositoryMethodRule = (interfaceName, allowed) => ({
+  selector: `TSInterfaceDeclaration[id.name=${interfaceName}] > TSInterfaceBody > [key.name!=/^(${allowed})$/]`,
+  message:
+    "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
+});
+
+const legacyNames = Object.keys(legacyRepositoryMethods).join("|");
+
 export const config = [
   ...mkizka,
   {
@@ -12,6 +46,13 @@ export const config = [
           message:
             "DIの配線にアロー関数を書かないでください。必ずクラスを作成し、asClassArgsで登録してください。",
         },
+        repositoryMethodRule(
+          `/^(?!(${legacyNames})$)I\\w*Repository$/`,
+          "find|save|delete",
+        ),
+        ...Object.entries(legacyRepositoryMethods).map(([name, methods]) =>
+          repositoryMethodRule(`"${name}"`, `find|save|delete|${methods}`),
+        ),
       ],
     },
   },
