@@ -8,6 +8,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useFetchers,
   useNavigation,
 } from "react-router";
 
@@ -40,6 +41,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   const [queryClient] = useState(() => new QueryClient());
   const navigation = useNavigation();
+  const revalidating = [navigation, ...useFetchers()].some(
+    (submission) =>
+      submission.state === "loading" &&
+      submission.formMethod !== undefined &&
+      submission.formMethod !== "GET",
+  );
+
+  useEffect(() => {
+    if (revalidating) void queryClient.invalidateQueries();
+  }, [revalidating, queryClient]);
 
   useEffect(() => {
     // @ts-expect-error

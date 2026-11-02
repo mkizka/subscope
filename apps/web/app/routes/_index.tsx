@@ -1,5 +1,5 @@
 import { parseWithZod } from "@conform-to/zod/v4";
-import { data, redirect } from "react-router";
+import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { postSchema } from "@/app/features/timeline/blocks/post-form-container";
@@ -20,22 +20,6 @@ export function meta() {
 }
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
-
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const cursor = new URL(request.url).searchParams.get("cursor") ?? undefined;
-  const timeline = await di.getTimelineUseCase
-    .execute(context.get(didContext), cursor)
-    .catch((e: unknown) => {
-      di.loggerManager
-        .createLogger("_index")
-        .error(e, "Failed to get timeline");
-      throw data("タイムラインの取得に失敗しました", { status: 500 });
-    });
-  if (!timeline) {
-    throw redirect("/login");
-  }
-  return data(timeline);
-};
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const submission = parseWithZod(await request.formData(), {
@@ -69,6 +53,6 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   }
 };
 
-export default function Home({ loaderData }: Route.ComponentProps) {
-  return <TimelinePage posts={loaderData.posts} cursor={loaderData.cursor} />;
+export default function Home() {
+  return <TimelinePage />;
 }
