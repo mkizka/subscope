@@ -18,6 +18,7 @@ import type { loader as unreadCountLoader } from "@/app/routes/api.notifications
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
 import type { loader as registeredAccountsLoader } from "@/app/routes/api.registered-accounts";
+import type { loader as searchLoader } from "@/app/routes/api.search";
 import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
@@ -164,6 +165,28 @@ queryClient.setQueryData<{
   pageParams: [undefined],
 });
 
+const searchQuery = (
+  tab: "accounts" | "posts",
+  q: string,
+  result: Partial<Data<typeof searchLoader>>,
+) =>
+  queryClient.setQueryData<Data<typeof searchLoader>>(["search", tab, q], {
+    accounts: [],
+    posts: [],
+    ...result,
+  });
+searchQuery("accounts", "alice", {
+  accounts: [
+    {
+      ...alice,
+      handle: "alice.bsky.social",
+      description: "Blueskyを使っています。",
+    },
+  ],
+});
+searchQuery("accounts", "nobody", {});
+searchQuery("posts", "alice", { posts: TimelineFeedStories.args.posts });
+searchQuery("posts", "nobody", {});
 queryClient.setQueryData<{
   pages: Data<typeof inviteCodesLoader>[];
   pageParams: unknown[];
