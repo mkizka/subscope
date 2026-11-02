@@ -20,7 +20,7 @@ import { InMemoryLikeQuery } from "../infrastructure/queries/like-query/like-que
 import { InMemoryListQuery } from "../infrastructure/queries/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/queries/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
-import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
+import { InMemoryRegistrationRepository } from "../infrastructure/registration-repository/registration-repository.in-memory.js";
 import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import type { Env } from "./env.js";
 import { createAppRegistry } from "./registry.js";
@@ -53,7 +53,7 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("listQuery", asClassArgs(InMemoryListQuery))
   .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
-  .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
+  .replaceService("registrationRepository", asClassArgs(InMemoryRegistrationRepository))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
   .replaceService("assetUrlBuilder", asClassArgs(InMemoryAssetUrlBuilder))
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))

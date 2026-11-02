@@ -88,7 +88,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(foundActor?.handle).toBe("alice.test");
   });
 
-  test("account-1: アカウントの状態をアクターに保存する", async () => {
+  test("account-1: アカウントの状態をアカウントに保存する", async () => {
     // arrange
     const actor = actorFactory();
     actorRepo.add(actor);
@@ -105,7 +105,7 @@ describe("UpsertIdentityUseCase", () => {
     expect(foundActor?.status).toBe("takendown");
   });
 
-  test("account-2: 状態が deleted のアカウントは、アクターを削除する", async () => {
+  test("account-2: 状態が deleted のアカウントは、アカウントを削除する", async () => {
     // arrange
     const actor = actorFactory();
     actorRepo.add(actor);

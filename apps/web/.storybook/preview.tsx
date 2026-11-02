@@ -2,7 +2,7 @@ import "@/app/app.css";
 import "./preview.css";
 
 import { asAtUriString, asDatetimeString } from "@atproto/syntax";
-import type { $OutputBody as SubscribersResponse } from "@repo/client/lex/me/subsco/admin/getSubscribers";
+import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 import type { Preview } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";
@@ -103,22 +103,22 @@ queryClient.setQueryData<{
   pageParams: [undefined],
 });
 queryClient.setQueryData<{
-  pages: SubscribersResponse[];
+  pages: RegisteredAccountsResponse[];
   pageParams: unknown[];
-}>(["subscribers"], {
+}>(["registeredAccounts"], {
   pages: [
     {
-      subscribers: [
+      registeredAccounts: [
         {
           profile: alice,
           isAdmin: true,
-          subscribedAt: "2024-01-01T00:00:00.000Z",
+          registeredAt: "2024-01-01T00:00:00.000Z",
           backfillStatus: "completed",
         },
         {
           profile: bob,
           isAdmin: false,
-          subscribedAt: "2024-01-02T00:00:00.000Z",
+          registeredAt: "2024-01-02T00:00:00.000Z",
           backfillStatus: "inProgress",
         },
       ],

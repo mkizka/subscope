@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.sync.unregisterAccount",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Unregister the account from the server",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["success"],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the unregistration was successful"
+            },
+            "message": {
+              "type": "string",
+              "description": "Optional message about the unregistration status"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotRegistered",
+          "description": "The user is not registered with this server"
+        }
+      ]
+    }
+  }
+}

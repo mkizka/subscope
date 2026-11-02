@@ -12,7 +12,7 @@ import {
 } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
-import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
+import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type {
   INotificationRepository,
@@ -28,7 +28,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postRepository: IPostRepository,
     private readonly postQuery: IPostQuery,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly subscriptionQuery: ISubscriptionQuery,
+    private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationRepository: INotificationRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
@@ -104,7 +104,7 @@ export class PostIndexer implements ICollectionIndexer {
         !candidate ||
         candidate.recipientDid === post.actorDid ||
         notifications.has(candidate.recipientDid) ||
-        !(await this.subscriptionQuery.isSubscriber(
+        !(await this.registrationQuery.isRegistered(
           ctx,
           candidate.recipientDid,
         ))

@@ -85,7 +85,7 @@ describe("app.bsky.feed.getTimeline", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getTimeline-2: 閲覧者本人とフォロイーの投稿・リポストを含める", async () => {
+  test("getTimeline-2: 閲覧者本人とフォロー先の投稿・リポストを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createActor();
@@ -119,7 +119,7 @@ describe("app.bsky.feed.getTimeline", () => {
     );
   });
 
-  test("getTimeline-3: フォロイー以外の投稿・リポストは含めない", async () => {
+  test("getTimeline-3: フォロー先以外の投稿・リポストは含めない", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await createActor();

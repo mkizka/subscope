@@ -27,8 +27,8 @@ export type FollowInsert = Omit<
   "uri" | "indexedAt" | "sortAt"
 >;
 
-export type SubscriptionInsert = Omit<
-  InferInsertModel<typeof schema.subscriptions>,
+export type RegistrationInsert = Omit<
+  InferInsertModel<typeof schema.registrations>,
   "uri" | "indexedAt"
 >;
 

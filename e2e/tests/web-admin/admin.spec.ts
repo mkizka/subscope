@@ -2,21 +2,23 @@ import { expect, type Page, request, test } from "@playwright/test";
 
 import {
   putRecord,
+  registerAccount,
   resolveHandle,
-  subscribeServer,
   uploadImage,
 } from "../../helpers/pds";
 
 const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録ユーザー」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await page.goto("/");
 
     const nav = page.getByRole("navigation");
-    await expect(nav.getByRole("link", { name: "登録ユーザー" })).toBeVisible();
+    await expect(
+      nav.getByRole("link", { name: "アカウント管理" }),
+    ).toBeVisible();
     await expect(nav.getByRole("link", { name: "招待コード" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
   });
@@ -81,14 +83,14 @@ test.describe("ジョブキュー", () => {
   });
 });
 
-test.describe("登録ユーザー", () => {
-  test("subscribers-1: サブスクライバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
+test.describe("登録アカウント", () => {
+  test("admin-accounts-1: 登録アカウントを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
 
     const row = page
       .getByRole("main")
@@ -98,25 +100,25 @@ test.describe("登録ユーザー", () => {
     await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
   });
 
-  test("subscribers-4: 見出しの横に登録ユーザーの人数を出す", async ({
+  test("admin-accounts-4: 見出しの横に登録アカウントの人数を出す", async ({
     page,
   }) => {
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
 
     await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
   });
 
-  test("subscribers-3: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
+  test("admin-accounts-3: 管理者でない登録アカウントを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await page.goto("/");
     const response = await page.request.post("/admin/api/invite-codes");
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
-    await subscribeServer("bob.test", code);
+    await registerAccount("bob.test", code);
     const bobDid = await resolveHandle("bob.test");
 
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
 
     const row = page
       .getByRole("main")
@@ -133,7 +135,7 @@ test.describe("登録ユーザー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("subscribers-2: 管理者でないサブスクライバーを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("admin-accounts-2: 管理者でない登録アカウントを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -142,10 +144,10 @@ test.describe("登録ユーザー", () => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       return ((await response.json()) as { code: string }).code;
     };
-    await subscribeServer("dave.test", await createInviteCode());
+    await registerAccount("dave.test", await createInviteCode());
     const daveDid = await resolveHandle("dave.test");
 
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
 
     const row = page
       .getByRole("main")
@@ -161,27 +163,29 @@ test.describe("登録ユーザー", () => {
 
     await expect(row).toHaveCount(0);
     await expect(
-      subscribeServer("dave.test", await createInviteCode()),
+      registerAccount("dave.test", await createInviteCode()),
     ).rejects.toThrow("Banned");
   });
 
-  const banSubscriber = async (page: Page, handle: string) => {
+  const banAccount = async (page: Page, handle: string) => {
     const response = await page.request.post("/admin/api/invite-codes");
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
-    await subscribeServer(handle, code);
+    await registerAccount(handle, code);
     const did = await resolveHandle(handle);
-    await page.request.delete("/admin/api/subscribers", { data: { did } });
+    await page.request.delete("/admin/api/registered-accounts", {
+      data: { did },
+    });
     return did;
   };
 
-  test("subscribers-5: 「登録ユーザー」「BAN済み」のタブで一覧を切り替える", async ({
+  test("admin-accounts-5: 「登録アカウント」「BAN済み」のタブで一覧を切り替える", async ({
     page,
   }) => {
     await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
     await page.getByRole("tab", { name: "BAN済み" }).click();
 
     await expect(page.getByRole("tab", { name: "BAN済み" })).toHaveAttribute(
@@ -190,15 +194,15 @@ test.describe("登録ユーザー", () => {
     );
     await expect(page.getByTitle(aliceDid)).toHaveCount(0);
 
-    await page.getByRole("tab", { name: "登録ユーザー" }).click();
+    await page.getByRole("tab", { name: "登録アカウント" }).click();
 
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
 
-  test("subscribers-8: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
+  test("admin-accounts-8: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
     page,
   }) => {
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
     await page.getByRole("tab", { name: "BAN済み" }).click();
     await page.reload();
 
@@ -208,14 +212,14 @@ test.describe("登録ユーザー", () => {
     );
   });
 
-  test("subscribers-9: 「登録ユーザー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
+  test("admin-accounts-9: 「登録アカウント」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
     page,
   }) => {
     await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
     await expect(async () => {
-      await page.goto("/admin/subscribers");
+      await page.goto("/admin/registered-accounts");
       const row = page
         .getByRole("main")
         .getByRole("listitem")
@@ -226,13 +230,13 @@ test.describe("登録ユーザー", () => {
     }).toPass();
   });
 
-  test("subscribers-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
+  test("admin-accounts-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
     page,
   }) => {
     await page.goto("/");
-    const graceDid = await banSubscriber(page, "grace.test");
+    const graceDid = await banAccount(page, "grace.test");
 
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
 
     const row = page
       .getByRole("main")
@@ -243,13 +247,13 @@ test.describe("登録ユーザー", () => {
     await expect(row.getByTitle(graceDid)).toBeVisible();
   });
 
-  test("subscribers-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+  test("admin-accounts-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
     page,
   }) => {
     await page.goto("/");
-    const frankDid = await banSubscriber(page, "frank.test");
+    const frankDid = await banAccount(page, "frank.test");
 
-    await page.goto("/admin/subscribers");
+    await page.goto("/admin/registered-accounts");
     await page.getByRole("tab", { name: "BAN済み" }).click();
 
     const row = page
@@ -266,7 +270,7 @@ test.describe("登録ユーザー", () => {
     const response = await page.request.post("/admin/api/invite-codes");
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
-    await subscribeServer("frank.test", code);
+    await registerAccount("frank.test", code);
   });
 });
 
@@ -384,7 +388,7 @@ test.describe("招待コード", () => {
   }) => {
     await page.goto("/");
     const code = await createInviteCode(page);
-    await subscribeServer("carol.test", code);
+    await registerAccount("carol.test", code);
 
     await page.goto("/admin/invite-codes");
     const row = inviteCodeRows(page).filter({ hasText: code });
@@ -402,7 +406,7 @@ test.describe("招待コード", () => {
     });
     await page.goto("/");
     const code = await createInviteCode(page);
-    await subscribeServer("erin.test", code);
+    await registerAccount("erin.test", code);
 
     const row = inviteCodeRows(page).filter({ hasText: code });
     await expect(async () => {

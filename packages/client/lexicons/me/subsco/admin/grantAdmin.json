@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Grant admin to a subscriber",
+      "description": "Grant admin to a registered account",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -13,7 +13,7 @@
             "did": {
               "type": "string",
               "format": "did",
-              "description": "The DID of the subscriber to grant admin"
+              "description": "The DID of the registered account to grant admin"
             }
           },
           "required": ["did"]
@@ -24,7 +24,7 @@
           "name": "AdminRequired"
         },
         {
-          "name": "NotSubscribed"
+          "name": "NotRegistered"
         }
       ]
     }

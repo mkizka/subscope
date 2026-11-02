@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.sync.registerAccount",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Register the account with the server using an invitation code",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "inviteCode": {
+              "type": "string",
+              "description": "Invitation code provided by the AppView server"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["success"],
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "description": "Whether the registration was successful"
+            },
+            "message": {
+              "type": "string",
+              "description": "Optional message about the registration status"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidInviteCode",
+          "description": "The provided invite code is invalid or has been used"
+        },
+        {
+          "name": "AlreadyRegistered",
+          "description": "The user is already registered with this server"
+        },
+        {
+          "name": "Banned",
+          "description": "The user is banned from this server"
+        }
+      ]
+    }
+  }
+}

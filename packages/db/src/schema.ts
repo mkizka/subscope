@@ -142,7 +142,7 @@ export const actorStats = pgTable("actor_stats", {
   postsCount: integer().notNull().default(0),
 });
 
-export const subscriptions = pgTable("subscriptions", {
+export const registrations = pgTable("registrations", {
   actorDid: varchar({ length: 256 })
     .primaryKey()
     .references(() => actors.did, { onDelete: "cascade" }),

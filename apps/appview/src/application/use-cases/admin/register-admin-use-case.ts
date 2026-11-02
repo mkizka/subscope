@@ -2,10 +2,10 @@ import type { Did } from "@atproto/did";
 import {
   type IJobScheduler,
   type ITransactionManager,
-  Subscription,
+  Registration,
 } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
+import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
 import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
 
@@ -24,7 +24,7 @@ export class RegisterAdminUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
     private readonly actorQuery: IActorQuery,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly registrationRepository: IRegistrationRepository,
     private readonly createAdminService: CreateAdminService,
     private readonly jobScheduler: IJobScheduler,
   ) {}
@@ -41,11 +41,11 @@ export class RegisterAdminUseCase {
         did: params.requesterDid,
       });
 
-      const subscription = new Subscription({
+      const registration = new Registration({
         actorDid: params.requesterDid,
         createdAt: new Date(),
       });
-      await this.subscriptionRepository.save({ ctx, subscription });
+      await this.registrationRepository.save({ ctx, registration });
     });
 
     await this.jobScheduler.scheduleSyncTapRepo(params.requesterDid);

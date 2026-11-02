@@ -89,7 +89,7 @@ describe("ActorRepository", () => {
     });
   });
 
-  test("index-13: アクターを保存するときは、管理者権限を書き換えない", async () => {
+  test("index-13: アカウントを保存するときは、管理者権限を書き換えない", async () => {
     // arrange
     const actor = await actorFactory(ctx.db).create();
     const staleActor = Actor.reconstruct({

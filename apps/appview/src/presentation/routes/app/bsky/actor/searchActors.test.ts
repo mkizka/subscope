@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.actor.searchActors", () => {
   const { ctx } = testSetup;
 
-  test("searchActors-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewで返す", async () => {
+  test("searchActors-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアカウントをprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
@@ -27,7 +27,7 @@ describe("app.bsky.actor.searchActors", () => {
     ]);
   });
 
-  test("searchActors-2: ハンドルが検索語に部分一致するアクターも返す", async () => {
+  test("searchActors-2: ハンドルが検索語に部分一致するアカウントも返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
@@ -56,7 +56,7 @@ describe("app.bsky.actor.searchActors", () => {
     expect(res.actors).toEqual([]);
   });
 
-  test("searchActors-4: cursorを指定すると、前のページに含めなかったアクターを返す", async () => {
+  test("searchActors-4: cursorを指定すると、前のページに含めなかったアカウントを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actors = await Promise.all(

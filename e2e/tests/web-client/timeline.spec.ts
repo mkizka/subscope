@@ -36,7 +36,7 @@ const createPosts = async (request: APIRequestContext, texts: string[]) => {
 };
 
 test.describe("タイムライン", () => {
-  test("timeline-1: 自分とフォロー中のユーザーの投稿を、新しいものほど上に並べる", async ({
+  test("timeline-1: 自分とフォロー先の投稿を、新しいものほど上に並べる", async ({
     page,
     request,
   }) => {
@@ -137,7 +137,7 @@ test.describe("タイムライン", () => {
   test("timeline-11: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
     page,
   }) => {
-    await page.goto("/members");
+    await page.goto("/registered-accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/timeline*", async (route) => {
       await released;
@@ -173,9 +173,9 @@ test.describe("タイムライン", () => {
     }).toPass();
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "メンバー" })
+      .getByRole("link", { name: "登録アカウント" })
       .click();
-    await expect(page).toHaveURL("/members");
+    await expect(page).toHaveURL("/registered-accounts");
     await page.route("**/api/timeline*", () => {});
 
     await page.goBack();
@@ -345,7 +345,7 @@ test.describe("タイムライン", () => {
     await expect(link).toHaveAttribute("target", "_blank");
   });
 
-  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、そのユーザーのプロフィール全体ページへのリンクにする", async ({
+  test("timeline-7: 本文のうちfacetsでメンションが付いた範囲は、そのアカウントのプロフィール全体ページへのリンクにする", async ({
     page,
   }) => {
     const prefix = "timeline-7: こんにちは ";

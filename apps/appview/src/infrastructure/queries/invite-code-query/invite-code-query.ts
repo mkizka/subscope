@@ -19,12 +19,12 @@ export class InviteCodeQuery implements IInviteCodeQuery {
         expiresAt: schema.inviteCodes.expiresAt,
         usedAt: schema.inviteCodes.usedAt,
         createdAt: schema.inviteCodes.createdAt,
-        usedByDid: schema.subscriptions.actorDid,
+        usedByDid: schema.registrations.actorDid,
       })
       .from(schema.inviteCodes)
       .leftJoin(
-        schema.subscriptions,
-        eq(schema.inviteCodes.code, schema.subscriptions.inviteCode),
+        schema.registrations,
+        eq(schema.inviteCodes.code, schema.registrations.inviteCode),
       )
       .where(
         params.cursor

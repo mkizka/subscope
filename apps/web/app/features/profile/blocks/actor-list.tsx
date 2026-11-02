@@ -13,7 +13,7 @@ export type Actor = {
   displayName?: string;
   avatarUrl?: string;
   description?: string;
-  subscriberFollowersCount?: number;
+  registeredFollowersCount?: number;
   isAdmin?: boolean;
   backfillStatus?: BackfillStatus;
 };
@@ -60,9 +60,9 @@ export function ActorList<T extends Actor>({ actors, renderAction }: Props<T>) {
               {actor.backfillStatus && (
                 <BackfillStatusBadge status={actor.backfillStatus} />
               )}
-              {actor.subscriberFollowersCount !== undefined && (
+              {actor.registeredFollowersCount !== undefined && (
                 <Badge>
-                  メンバー{actor.subscriberFollowersCount}人がフォロー
+                  登録アカウント{actor.registeredFollowersCount}人がフォロー
                 </Badge>
               )}
             </Link>

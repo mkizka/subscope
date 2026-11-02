@@ -14,7 +14,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.graph.getList", () => {
   const { ctx } = testSetup;
 
-  test("getList-1: 指定したリストのlistViewと、リストに追加されたアクターのprofileViewをitemsで返す", async () => {
+  test("getList-1: 指定したリストのlistViewと、リストに追加されたアカウントのprofileViewをitemsで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const creator = await actorFactory(ctx.db)

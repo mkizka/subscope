@@ -1,24 +1,24 @@
-import getBannedActors, {
-  type $OutputBody as GetBannedActorsOutput,
-} from "@repo/client/lex/me/subsco/admin/getBannedActors";
+import getBannedAccounts, {
+  type $OutputBody as GetBannedAccountsOutput,
+} from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
 import getInviteCodes, {
   type $OutputBody as GetInviteCodesOutput,
 } from "@repo/client/lex/me/subsco/admin/getInviteCodes";
-import getSubscribers, {
-  type $OutputBody as GetSubscribersOutput,
-} from "@repo/client/lex/me/subsco/admin/getSubscribers";
+import listRegisteredAccounts, {
+  type $OutputBody as ListRegisteredAccountsOutput,
+} from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export interface IAdminQuery {
-  getSubscribers: (
+  listRegisteredAccounts: (
     did: string,
     cursor?: string,
-  ) => Promise<GetSubscribersOutput>;
-  getBannedActors: (
+  ) => Promise<ListRegisteredAccountsOutput>;
+  getBannedAccounts: (
     did: string,
     cursor?: string,
-  ) => Promise<GetBannedActorsOutput>;
+  ) => Promise<GetBannedAccountsOutput>;
   getInviteCodes: (
     did: string,
     cursor?: string,
@@ -39,13 +39,13 @@ export const adminQueryFactory = ({
   };
 
   return {
-    async getSubscribers(did, cursor) {
+    async listRegisteredAccounts(did, cursor) {
       const agent = await restore(did);
-      return agent.call(getSubscribers, { limit: 20, cursor });
+      return agent.call(listRegisteredAccounts, { limit: 20, cursor });
     },
-    async getBannedActors(did, cursor) {
+    async getBannedAccounts(did, cursor) {
       const agent = await restore(did);
-      return agent.call(getBannedActors, { limit: 20, cursor });
+      return agent.call(getBannedAccounts, { limit: 20, cursor });
     },
     async getInviteCodes(did, cursor) {
       const agent = await restore(did);

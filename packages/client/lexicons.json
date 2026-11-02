@@ -78,22 +78,22 @@
     "com.atproto.repo.strongRef",
     "com.atproto.sync.getBlob",
     "com.atproto.sync.getRepo",
-    "me.subsco.admin.banSubscriber",
+    "me.subsco.admin.banAccount",
     "me.subsco.admin.createInviteCode",
     "me.subsco.admin.deleteInviteCode",
-    "me.subsco.admin.getBannedActors",
+    "me.subsco.admin.getBannedAccounts",
     "me.subsco.admin.getInviteCodes",
-    "me.subsco.admin.getSubscribers",
     "me.subsco.admin.grantAdmin",
+    "me.subsco.admin.listRegisteredAccounts",
     "me.subsco.admin.registerAdmin",
-    "me.subsco.admin.unbanActor",
+    "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
-    "me.subsco.server.getMembers",
+    "me.subsco.server.getRegisteredAccounts",
     "me.subsco.server.getSetupStatus",
-    "me.subsco.server.getTrackedActors",
-    "me.subsco.sync.getSubscriptionStatus",
-    "me.subsco.sync.subscribeServer",
-    "me.subsco.sync.unsubscribeServer"
+    "me.subsco.server.getTrackedAccounts",
+    "me.subsco.sync.getRegistrationStatus",
+    "me.subsco.sync.registerAccount",
+    "me.subsco.sync.unregisterAccount"
   ],
   "resolutions": {
     "app.bsky.actor.defs": {
@@ -344,69 +344,69 @@
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.sync.getRepo",
       "cid": "bafyreieyt5x6wf4pgcn56tb2724uplmwcqjivkubmi25km3xrvroz6dw5q"
     },
-    "me.subsco.admin.banSubscriber": {
-      "uri": "file://./lexicons/me/subsco/admin/banSubscriber.json",
-      "cid": "bafyreibu3tp2asfio5g5s5y23ruhysvikbphi5eh36q4cht6fq77f5yzde"
+    "me.subsco.admin.banAccount": {
+      "uri": "file://./lexicons/me/subsco/admin/banAccount.json",
+      "cid": "bafyreih4fbox62m5h3pjzsr4b2wcccwp2u6xzn33a6327b7trnom2o4mza"
     },
     "me.subsco.admin.createInviteCode": {
       "uri": "file://./lexicons/me/subsco/admin/createInviteCode.json",
-      "cid": "bafyreieaenfblshoxk5s72tudpmfqmlsls76vqgj5bl4hrvylzpjtbh4cy"
+      "cid": "bafyreids2axxkxogbokrtdwlqba5zamq5zp4g5km5at3pykldfeuuy44ji"
     },
     "me.subsco.admin.deleteInviteCode": {
       "uri": "file://./lexicons/me/subsco/admin/deleteInviteCode.json",
       "cid": "bafyreifh5jqpyvvp45rhvmkt33yojwdok6zc2cy5cpci3kiebfhkefaw5i"
     },
-    "me.subsco.admin.getBannedActors": {
-      "uri": "file://./lexicons/me/subsco/admin/getBannedActors.json",
-      "cid": "bafyreiflckky5auyphr6njwfrrf4iorkyk47ay4hehfrxrlzvjypdzwxmy"
+    "me.subsco.admin.getBannedAccounts": {
+      "uri": "file://./lexicons/me/subsco/admin/getBannedAccounts.json",
+      "cid": "bafyreiay53g3764rfb2se6sq5mjedfzg5xgwd4vlnrqqu6swqvanadsvma"
     },
     "me.subsco.admin.getInviteCodes": {
       "uri": "file://./lexicons/me/subsco/admin/getInviteCodes.json",
       "cid": "bafyreibuqqttk42fvohuom5axi4myelti4risi4fuwe6zj4h342qtgttma"
     },
-    "me.subsco.admin.getSubscribers": {
-      "uri": "file://./lexicons/me/subsco/admin/getSubscribers.json",
-      "cid": "bafyreihjhxkjxmbyi7vnlwzw23t4zbwyjwcrct43cngaqj7y2fptjk3om4"
-    },
     "me.subsco.admin.grantAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/grantAdmin.json",
-      "cid": "bafyreicl6ljof5pslyrh3tw7sotbsvtjl7o4newvxeiyfpxxiyr677liza"
+      "cid": "bafyreifslkhaelc2garrsbjufp6lw53ay2t3peyawmz37pcpk5uhe6muta"
+    },
+    "me.subsco.admin.listRegisteredAccounts": {
+      "uri": "file://./lexicons/me/subsco/admin/listRegisteredAccounts.json",
+      "cid": "bafyreidmnquz2wimqxmd4cw4mul62glgtlw2wbylbdjv3vv7ztxddzgqa4"
     },
     "me.subsco.admin.registerAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/registerAdmin.json",
       "cid": "bafyreidh653anvtfbwrnl3frr2vcs6ycc4p2dj4ii23rp4ahcdjpruh4a4"
     },
-    "me.subsco.admin.unbanActor": {
-      "uri": "file://./lexicons/me/subsco/admin/unbanActor.json",
-      "cid": "bafyreiddl7kjfrpbc5logj4h4efdo5rqftsyo7l33nkox2dliloqiquysm"
+    "me.subsco.admin.unbanAccount": {
+      "uri": "file://./lexicons/me/subsco/admin/unbanAccount.json",
+      "cid": "bafyreiducxmp2knqgny57mwtci2ipzrep2j3vkjxnfjnqkdn4mpesydqmq"
     },
     "me.subsco.admin.verifyAccess": {
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
     },
-    "me.subsco.server.getMembers": {
-      "uri": "file://./lexicons/me/subsco/server/getMembers.json",
-      "cid": "bafyreidlwstpnjufwgnj5add3sox5phflt4lpryuht4vzrofuzlczkjouq"
+    "me.subsco.server.getRegisteredAccounts": {
+      "uri": "file://./lexicons/me/subsco/server/getRegisteredAccounts.json",
+      "cid": "bafyreihpbvsgctqgdxxder6zrusdfrfescp5i3qvslmntjqo7qmldfnevm"
     },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
       "cid": "bafyreiaml7lvp3tih3gcbfaxmpuc4eelqgpxy23ld7gzrejeqtu5ytqb2q"
     },
-    "me.subsco.server.getTrackedActors": {
-      "uri": "file://./lexicons/me/subsco/server/getTrackedActors.json",
-      "cid": "bafyreigy6eoevmqjqmhlhidfbiejur3m744rl7lfbf5fpuvofdeeblh4cu"
+    "me.subsco.server.getTrackedAccounts": {
+      "uri": "file://./lexicons/me/subsco/server/getTrackedAccounts.json",
+      "cid": "bafyreidaqopyfp3ebuc5wkuff7xudbyf57a6temejjzvbxmp5otrydwwyy"
     },
-    "me.subsco.sync.getSubscriptionStatus": {
-      "uri": "file://./lexicons/me/subsco/sync/getSubscriptionStatus.json",
-      "cid": "bafyreiefudujewymkue6oc5sh5s6ujyhouynglq3znrpgqw3b7ua55yuwu"
+    "me.subsco.sync.getRegistrationStatus": {
+      "uri": "file://./lexicons/me/subsco/sync/getRegistrationStatus.json",
+      "cid": "bafyreifevmts4z4kehmol32mw4fxciyrvlr2do2o3kryiixyxyhibaeire"
     },
-    "me.subsco.sync.subscribeServer": {
-      "uri": "file://./lexicons/me/subsco/sync/subscribeServer.json",
-      "cid": "bafyreid7pocepkz6u2knadb6i5tcieduzpm52zku35ypz4g6fuk72vcs3a"
+    "me.subsco.sync.registerAccount": {
+      "uri": "file://./lexicons/me/subsco/sync/registerAccount.json",
+      "cid": "bafyreiblgognp3zu44am42hft2dhe5bvqzbyqcwab7jhl253foshple63e"
     },
-    "me.subsco.sync.unsubscribeServer": {
-      "uri": "file://./lexicons/me/subsco/sync/unsubscribeServer.json",
-      "cid": "bafyreicedakf7f5kd6ce3e5yqbglubq5h6343sg2mig453znylqjtu7k2q"
+    "me.subsco.sync.unregisterAccount": {
+      "uri": "file://./lexicons/me/subsco/sync/unregisterAccount.json",
+      "cid": "bafyreib6j7exj6vryrgk5m5hwlo33hgmxrgaxz4ba4ra5tol6hvssxput4"
     }
   }
 }

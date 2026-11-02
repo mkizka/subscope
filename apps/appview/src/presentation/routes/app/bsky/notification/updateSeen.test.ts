@@ -27,7 +27,7 @@ describe("app.bsky.notification.updateSeen", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     const author = await actorFactory(ctx.db).create();
     for (const sortAt of ["2024-01-01", "2024-01-03"]) {

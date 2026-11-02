@@ -7,7 +7,7 @@ import type {
   NotificationReason,
 } from "../../dto/notification-dto.js";
 import type { INotificationQuery } from "../../interfaces/queries/notification-query.js";
-import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
+import type { IRegistrationRepository } from "../../interfaces/registration-repository.js";
 import {
   ITEMS_PER_GROUP,
   type NotificationViews,
@@ -44,7 +44,7 @@ const groupKey = (item: NotificationDto) => {
 export class GetGroupedNotificationsUseCase {
   constructor(
     private readonly notificationQuery: INotificationQuery,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly registrationRepository: IRegistrationRepository,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly notificationViews: NotificationViews,
   ) {}
@@ -84,20 +84,20 @@ export class GetGroupedNotificationsUseCase {
     const hasMore = consumed < items.length || items.length === queryLimit;
 
     const ctx = this.viewContextFactory.create({ viewerDid: params.viewerDid });
-    const [views, subscription] = await Promise.all([
+    const [views, registration] = await Promise.all([
       Promise.all(
         [...grouped.values()].map((group) =>
           this.notificationViews.group(group, ctx),
         ),
       ),
-      this.subscriptionRepository.find(params.viewerDid),
+      this.registrationRepository.find(params.viewerDid),
     ]);
     const groups = views.filter((view) => view !== undefined);
 
     return {
       cursor: hasMore && last ? last.sortAt.toISOString() : undefined,
-      seenAt: subscription?.seenAt
-        ? toDatetimeString(subscription.seenAt)
+      seenAt: registration?.seenAt
+        ? toDatetimeString(registration.seenAt)
         : undefined,
       groups: groups.map(({ group }) => group),
       relatedViews: [

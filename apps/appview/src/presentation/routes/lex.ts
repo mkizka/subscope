@@ -27,22 +27,22 @@ import type { GetUnreadCount } from "./app/bsky/notification/getUnreadCount.js";
 import type { ListNotifications } from "./app/bsky/notification/listNotifications.js";
 import type { UpdateSeen } from "./app/bsky/notification/updateSeen.js";
 import type { GetPostThreadV2 } from "./app/bsky/unspecced/getPostThreadV2.js";
-import type { BanSubscriber } from "./me/subsco/admin/banSubscriber.js";
+import type { BanAccount } from "./me/subsco/admin/banAccount.js";
 import type { CreateInviteCode } from "./me/subsco/admin/createInviteCode.js";
 import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
-import type { GetBannedActors } from "./me/subsco/admin/getBannedActors.js";
+import type { GetBannedAccounts } from "./me/subsco/admin/getBannedAccounts.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
-import type { GetSubscribers } from "./me/subsco/admin/getSubscribers.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
+import type { ListRegisteredAccounts } from "./me/subsco/admin/listRegisteredAccounts.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
-import type { UnbanActor } from "./me/subsco/admin/unbanActor.js";
+import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
-import type { GetMembers } from "./me/subsco/server/getMembers.js";
+import type { GetRegisteredAccounts } from "./me/subsco/server/getRegisteredAccounts.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
-import type { GetTrackedActors } from "./me/subsco/server/getTrackedActors.js";
-import type { GetSubscriptionStatus } from "./me/subsco/sync/getSubscriptionStatus.js";
-import type { SubscribeServer } from "./me/subsco/sync/subscribeServer.js";
-import type { UnsubscribeServer } from "./me/subsco/sync/unsubscribeServer.js";
+import type { GetTrackedAccounts } from "./me/subsco/server/getTrackedAccounts.js";
+import type { GetRegistrationStatus } from "./me/subsco/sync/getRegistrationStatus.js";
+import type { RegisterAccount } from "./me/subsco/sync/registerAccount.js";
+import type { UnregisterAccount } from "./me/subsco/sync/unregisterAccount.js";
 
 export const lexRouterFactory = (
   getPostThread: GetPostThread,
@@ -59,27 +59,27 @@ export const lexRouterFactory = (
   listNotifications: ListNotifications,
   getGroupedNotifications: GetGroupedNotifications,
   updateSeen: UpdateSeen,
-  getSubscriptionStatus: GetSubscriptionStatus,
-  subscribeServer: SubscribeServer,
-  unsubscribeServer: UnsubscribeServer,
-  banSubscriber: BanSubscriber,
-  unbanActor: UnbanActor,
+  getRegistrationStatus: GetRegistrationStatus,
+  registerAccount: RegisterAccount,
+  unregisterAccount: UnregisterAccount,
+  banAccount: BanAccount,
+  unbanAccount: UnbanAccount,
   createInviteCode: CreateInviteCode,
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
   grantAdmin: GrantAdmin,
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
-  getMembers: GetMembers,
+  getRegisteredAccounts: GetRegisteredAccounts,
   getSetupStatus: GetSetupStatus,
-  getTrackedActors: GetTrackedActors,
+  getTrackedAccounts: GetTrackedAccounts,
   getPreferences: GetPreferences,
   getProfile: GetProfile,
   getProfiles: GetProfiles,
   searchActors: SearchActors,
   searchActorsTypeahead: SearchActorsTypeahead,
-  getSubscribers: GetSubscribers,
-  getBannedActors: GetBannedActors,
+  listRegisteredAccounts: ListRegisteredAccounts,
+  getBannedAccounts: GetBannedAccounts,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
   getFeedGenerators: GetFeedGenerators,
@@ -102,27 +102,27 @@ export const lexRouterFactory = (
     listNotifications,
     getGroupedNotifications,
     updateSeen,
-    getSubscriptionStatus,
-    subscribeServer,
-    unsubscribeServer,
-    banSubscriber,
-    unbanActor,
+    getRegistrationStatus,
+    registerAccount,
+    unregisterAccount,
+    banAccount,
+    unbanAccount,
     createInviteCode,
     deleteInviteCode,
     getInviteCodes,
     grantAdmin,
     registerAdmin,
     verifyAccess,
-    getMembers,
+    getRegisteredAccounts,
     getSetupStatus,
-    getTrackedActors,
+    getTrackedAccounts,
     getPreferences,
     getProfile,
     getProfiles,
     searchActors,
     searchActorsTypeahead,
-    getSubscribers,
-    getBannedActors,
+    listRegisteredAccounts,
+    getBannedAccounts,
     getLikes,
     getRepostedBy,
     getFeedGenerators,

@@ -2,7 +2,7 @@ import type { AfterCommitContext } from "@repo/common/domain";
 import {
   actorFactory,
   recordFactory,
-  subscriptionFactory,
+  registrationFactory,
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -16,7 +16,7 @@ describe("FollowIndexer", () => {
   let followIndexer: TestServices["followIndexer"];
   let followRepo: TestServices["followRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let registrationQuery: TestServices["registrationQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   let ctx: AfterCommitContext;
@@ -25,7 +25,7 @@ describe("FollowIndexer", () => {
     followIndexer = services.followIndexer;
     followRepo = services.followRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionQuery = services.subscriptionQuery;
+    registrationQuery = services.registrationQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
     ctx = { db, afterCommit };
@@ -66,7 +66,7 @@ describe("FollowIndexer", () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: followee.did }));
+      registrationQuery.add(registrationFactory({ actorDid: followee.did }));
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
         json: {

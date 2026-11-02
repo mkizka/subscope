@@ -20,14 +20,14 @@ export class ActorQuery implements IActorQuery {
   async findTrackedDidsWithoutBackfillStatus(ctx: TransactionContext) {
     const trackedDids = union(
       ctx.db
-        .select({ did: schema.subscriptions.actorDid })
-        .from(schema.subscriptions),
+        .select({ did: schema.registrations.actorDid })
+        .from(schema.registrations),
       ctx.db
         .select({ did: schema.follows.subjectDid })
         .from(schema.follows)
         .innerJoin(
-          schema.subscriptions,
-          eq(schema.follows.actorDid, schema.subscriptions.actorDid),
+          schema.registrations,
+          eq(schema.follows.actorDid, schema.registrations.actorDid),
         ),
     );
     const rows = await ctx.db

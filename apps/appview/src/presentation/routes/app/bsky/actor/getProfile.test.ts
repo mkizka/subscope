@@ -8,7 +8,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.actor.getProfile", () => {
   const { ctx } = testSetup;
 
-  test("getProfile-1: 指定したアクターのprofileViewDetailedを返す", async () => {
+  test("getProfile-1: 指定したアカウントのprofileViewDetailedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db)
@@ -31,7 +31,7 @@ describe("app.bsky.actor.getProfile", () => {
     });
   });
 
-  test("getProfile-2: 保存されていないアクターには400を返す", async () => {
+  test("getProfile-2: 保存されていないアカウントには400を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 
@@ -44,7 +44,7 @@ describe("app.bsky.actor.getProfile", () => {
     await expect(promise).rejects.toMatchObject({ status: 400 });
   });
 
-  test("getProfile-3: プロフィールレコードがないアクターには、DIDとハンドルだけのprofileViewDetailedを返す", async () => {
+  test("getProfile-3: プロフィールレコードがないアカウントには、DIDとハンドルだけのprofileViewDetailedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const actor = await actorFactory(ctx.db).create();

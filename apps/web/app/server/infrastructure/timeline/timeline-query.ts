@@ -14,9 +14,9 @@ import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
 import { link, mention } from "@repo/client/lex/app/bsky/richtext/facet";
-import getSubscriptionStatus, {
-  subscribed,
-} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import getRegistrationStatus, {
+  registered,
+} from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
@@ -54,7 +54,7 @@ export type TimelinePostDto = {
 };
 
 export interface ITimelineQuery {
-  isSubscribed: (did: string) => Promise<boolean>;
+  isRegistered: (did: string) => Promise<boolean>;
   findPosts: (
     did: string,
     cursor?: string,
@@ -73,9 +73,9 @@ export const timelineQueryFactory = ({
     return agent;
   };
   return {
-    async isSubscribed(did) {
+    async isRegistered(did) {
       const agent = await restore(did);
-      return subscribed.isTypeOf(await agent.call(getSubscriptionStatus));
+      return registered.isTypeOf(await agent.call(getRegistrationStatus));
     },
     async findPosts(did, cursor) {
       const agent = await restore(did);

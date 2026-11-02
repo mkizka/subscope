@@ -24,7 +24,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     const author = await actorFactory(ctx.db)
       .use((t) => t.withProfile({}))
@@ -45,9 +45,9 @@ describe("app.bsky.notification.listNotifications", () => {
     const read = await notify("2024-01-01T00:00:00.000Z");
     const unread = await notify("2024-01-03T00:00:00.000Z");
     await ctx.db
-      .update(schema.subscriptions)
+      .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.subscriptions.actorDid, viewer.did));
+      .where(eq(schema.registrations.actorDid, viewer.did));
     loginAs(viewer.did);
 
     // act
@@ -64,7 +64,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     const author = await actorFactory(ctx.db)
       .use((t) => t.withProfile({}))
@@ -85,9 +85,9 @@ describe("app.bsky.notification.listNotifications", () => {
     const read = await notify("2024-01-01T00:00:00.000Z");
     const unread = await notify("2024-01-03T00:00:00.000Z");
     await ctx.db
-      .update(schema.subscriptions)
+      .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.subscriptions.actorDid, viewer.did));
+      .where(eq(schema.registrations.actorDid, viewer.did));
     loginAs(viewer.did);
 
     // act
@@ -104,7 +104,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     const author = await actorFactory(ctx.db)
       .use((t) => t.withProfile({}))
@@ -139,12 +139,12 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+      .use((t) => t.registeredAccount())
       .create();
     await ctx.db
-      .update(schema.subscriptions)
+      .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.subscriptions.actorDid, viewer.did));
+      .where(eq(schema.registrations.actorDid, viewer.did));
     loginAs(viewer.did);
 
     // act

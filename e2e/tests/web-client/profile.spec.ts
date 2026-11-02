@@ -45,7 +45,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-5: 全体ページのフォローボタンでそのユーザーをフォローし、もう一度押すと外す", async ({
+  test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -144,7 +144,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-9: 他のユーザーのプロフィールには「いいね」タブを出さない", async ({
+  test("profile-9: 他のアカウントのプロフィールには「いいね」タブを出さない", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -242,7 +242,7 @@ test.describe("プロフィール", () => {
     await expect(page).toHaveURL("/profile/alice.test");
   });
 
-  test("profile-13: 追跡中のユーザーの全体ページには、そのユーザーの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
+  test("profile-13: 追跡アカウントの全体ページには、そのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");
@@ -258,7 +258,7 @@ test.describe("プロフィール", () => {
   test("profile-14: プロフィールを開くと、プロフィールと投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
     page,
   }) => {
-    await page.goto("/members");
+    await page.goto("/registered-accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/profile/*", async (route) => {
       await released;
@@ -287,9 +287,9 @@ test.describe("プロフィール", () => {
     await expect(followers).toBeVisible();
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "メンバー" })
+      .getByRole("link", { name: "登録アカウント" })
       .click();
-    await expect(page).toHaveURL("/members");
+    await expect(page).toHaveURL("/registered-accounts");
     await page.route("**/api/profile/*", () => {});
 
     await page.goBack();
