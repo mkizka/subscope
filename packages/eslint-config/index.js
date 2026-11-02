@@ -6,8 +6,7 @@ const legacyRepositoryMethods = {
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFeedItemRepository: "upsert",
-  IFollowRepository:
-    "findFolloweeDids|findFollowers|findFollows|isFollowedByAnySubscriber|upsert",
+  IFollowRepository: "isFollowedByAnySubscriber|upsert",
   IGeneratorRepository: "upsert",
   IInviteCodeRepository: "findAll|findByCode|findFirst|markAsUsed|upsert",
   ILabelRepository: "upsert",

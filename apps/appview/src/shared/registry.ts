@@ -24,7 +24,6 @@ import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-build
 import type { IAuthorFeedQuery } from "../application/interfaces/author-feed-query.js";
 import type { IBackfillStatusQuery } from "../application/interfaces/backfill-status-query.js";
 import type { IFollowQuery } from "../application/interfaces/follow-query.js";
-import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
@@ -107,7 +106,6 @@ import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-b
 import { AuthorFeedQuery } from "../infrastructure/author-feed-query/author-feed-query.js";
 import { BackfillStatusQuery } from "../infrastructure/backfill-status-query/backfill-status-query.js";
 import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
-import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
@@ -219,7 +217,6 @@ export const createAppRegistry = (env: Env) =>
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
-    .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
@@ -240,7 +237,7 @@ export const createAppRegistry = (env: Env) =>
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
-    .service("followService", ["followRepository"], asClassArgs(FollowService))
+    .service("followService", ["followQuery"], asClassArgs(FollowService))
     .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
@@ -283,7 +280,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getTrackedActorsUseCase", ["subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
-    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followRepository", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
+    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followQuery", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
     .service("unbanActorUseCase", ["db", "actorRepository"], asClassArgs(UnbanActorUseCase))
     .service("banSubscriberUseCase", ["transactionManager", "actorRepository", "unsubscribeServerUseCase"], asClassArgs(BanSubscriberUseCase))
     .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))

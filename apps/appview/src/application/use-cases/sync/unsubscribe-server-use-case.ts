@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { IJobScheduler } from "@repo/common/domain";
 
-import type { IFollowRepository } from "../../../application/interfaces/follow-repository.js";
+import type { IFollowQuery } from "../../../application/interfaces/follow-query.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
 
 export class NotSubscribedError extends Error {
@@ -18,7 +18,7 @@ type UnsubscribeServerParams = {
 export class UnsubscribeServerUseCase {
   constructor(
     private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly followRepository: IFollowRepository,
+    private readonly followQuery: IFollowQuery,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
@@ -32,7 +32,7 @@ export class UnsubscribeServerUseCase {
 
     await this.subscriptionRepository.delete(params.actorDid);
 
-    const followeeDids = await this.followRepository.findFolloweeDids(
+    const followeeDids = await this.followQuery.findFolloweeDids(
       params.actorDid,
     );
     for (const did of [params.actorDid, ...followeeDids]) {
