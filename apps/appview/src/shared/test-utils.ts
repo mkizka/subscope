@@ -15,10 +15,10 @@ import { InMemoryBackfillStatusQuery } from "../infrastructure/backfill-status-q
 import { InMemoryFollowQuery } from "../infrastructure/follow-query/follow-query.in-memory.js";
 import { InMemoryGeneratorQuery } from "../infrastructure/generator-query/generator-query.in-memory.js";
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
+import { InMemoryInviteCodeQuery } from "../infrastructure/invite-code-query/invite-code-query.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLabelQuery } from "../infrastructure/label-query/label-query.in-memory.js";
 import { InMemoryLikeQuery } from "../infrastructure/like-query/like-query.in-memory.js";
-import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-repository.in-memory.js";
 import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
@@ -60,10 +60,10 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("likeQuery", asClassArgs(InMemoryLikeQuery))
   .replaceService("postQuery", asClassArgs(InMemoryPostQuery))
   .replaceService("postStatsQuery", asClassArgs(InMemoryPostStatsQuery))
-  .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
   .replaceService("repostQuery", asClassArgs(InMemoryRepostQuery))
   .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("listQuery", asClassArgs(InMemoryListQuery))
+  .replaceService("inviteCodeQuery", asClassArgs(InMemoryInviteCodeQuery))
   .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
   .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))

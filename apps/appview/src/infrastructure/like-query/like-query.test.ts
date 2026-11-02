@@ -3,6 +3,7 @@ import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
   likeFactory,
+  postFactory,
   recordFactory,
   testSetup,
 } from "@repo/test-utils";
@@ -99,6 +100,36 @@ describe("LikeQuery", () => {
           actorDid: actor.did,
           sortAt: oldLike.sortAt,
         },
+      ]);
+    });
+  });
+
+  describe("findSubjectLikes", () => {
+    test("指定された投稿へのいいねだけを、cursorより前からsortAtの降順でlimit件まで返す", async () => {
+      // arrange
+      const post = await postFactory(ctx.db).create();
+      const createLike = (createdAt: string) =>
+        likeFactory(ctx.db)
+          .vars({ subject: () => post })
+          .props({ createdAt: () => new Date(createdAt) })
+          .create();
+      await createLike("2024-01-01T01:00:00.000Z");
+      const middleLike = await createLike("2024-01-01T02:00:00.000Z");
+      const newLike = await createLike("2024-01-01T03:00:00.000Z");
+      await createLike("2024-01-01T04:00:00.000Z");
+      await likeFactory(ctx.db).create();
+
+      // act
+      const result = await likeQuery.findSubjectLikes({
+        subjectUri: post.uri,
+        limit: 2,
+        cursor: new Date("2024-01-01T03:30:00.000Z"),
+      });
+
+      // assert
+      expect(result.map((like) => like.uri.toString())).toEqual([
+        newLike.uri,
+        middleLike.uri,
       ]);
     });
   });
