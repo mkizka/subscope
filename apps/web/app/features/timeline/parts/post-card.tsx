@@ -210,6 +210,9 @@ export function PostCard({
             >
               {authorDisplayName ?? authorHandle}
             </ProfileLink>
+            <span className="min-w-0 truncate text-label text-muted">
+              @{authorHandle}
+            </span>
             <span className="shrink-0 text-label text-muted">
               {createdAt
                 ? hydrated && formatRelativeTime(createdAt)

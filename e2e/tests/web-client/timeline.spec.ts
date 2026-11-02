@@ -336,6 +336,25 @@ test.describe("タイムライン", () => {
     ).toHaveCount(2);
   });
 
+  test("timeline-15: 投稿には、投稿者の名前の隣にハンドルを表示する", async ({
+    page,
+  }) => {
+    const text = "timeline-15: 投稿";
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const article = page.getByRole("article").filter({ hasText: text });
+    await expect(async () => {
+      await page.reload();
+      await expect(article.getByText("@alice.test")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
   test("timeline-14: リポストした人の表示は、投稿者のアイコンより上の行に出す", async ({
     page,
   }) => {
