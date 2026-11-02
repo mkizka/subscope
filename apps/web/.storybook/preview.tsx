@@ -11,6 +11,7 @@ import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.st
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
+import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
 type Data<T extends (...args: never) => unknown> =
@@ -128,6 +129,26 @@ queryClient.setQueryData<{
   pages: [{ posts: TimelineFeedStories.args.posts }],
   pageParams: [undefined],
 });
+
+queryClient.setQueryData<Data<typeof followListLoader>>(
+  ["follow-list", "alice.bsky.social", "follows"],
+  {
+    subject: {
+      did: "did:plc:alice",
+      handle: "alice.bsky.social",
+      displayName: "Alice",
+    },
+    actors: [
+      {
+        did: "did:plc:bob",
+        handle: "bob.bsky.social",
+        displayName: "Bob",
+        description: "Bobの自己紹介",
+      },
+      { did: "did:plc:carol", handle: "handle.invalid" },
+    ],
+  },
+);
 
 const preview: Preview = {
   decorators: [
