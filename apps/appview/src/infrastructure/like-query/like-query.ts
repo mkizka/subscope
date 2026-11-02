@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { asAtUriString, type AtUri } from "@atproto/syntax";
-import type { DatabaseClient } from "@repo/common/domain";
+import { type DatabaseClient, Like } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
@@ -68,5 +68,27 @@ export class LikeQuery implements ILikeQuery {
       actorDid,
       sortAt: row.sortAt,
     }));
+  }
+
+  async findSubjectLikes({
+    subjectUri,
+    limit,
+    cursor,
+  }: {
+    subjectUri: string;
+    limit: number;
+    cursor?: Date;
+  }): Promise<Like[]> {
+    const filters = [eq(schema.likes.subjectUri, subjectUri)];
+    if (cursor) {
+      filters.push(lt(schema.likes.sortAt, cursor));
+    }
+    const rows = await this.db
+      .select()
+      .from(schema.likes)
+      .where(and(...filters))
+      .orderBy(desc(schema.likes.sortAt))
+      .limit(limit);
+    return rows.map((row) => new Like(row));
   }
 }

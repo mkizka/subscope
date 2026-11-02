@@ -18,7 +18,7 @@ export class InMemoryRecordRepository implements IRecordRepository {
     return Array.from(this.records.values());
   }
 
-  async findByUri({
+  async find({
     uri,
   }: {
     ctx: TransactionContext;
@@ -27,7 +27,7 @@ export class InMemoryRecordRepository implements IRecordRepository {
     return this.records.get(uri.toString()) ?? null;
   }
 
-  async upsert({
+  async save({
     record,
   }: {
     ctx: TransactionContext;

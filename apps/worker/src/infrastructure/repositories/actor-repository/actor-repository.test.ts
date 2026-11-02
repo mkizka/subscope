@@ -115,33 +115,6 @@ describe("ActorRepository", () => {
     expect(result?.isAdmin).toBe(true);
   });
 
-  describe("exists", () => {
-    test("アクターが存在しない場合、falseを返す", async () => {
-      // arrange
-      const did = asDid("did:plc:notexist");
-
-      // act
-      const result = await actorRepository.exists({ ctx, did });
-
-      // assert
-      expect(result).toBe(false);
-    });
-
-    test("アクターが存在する場合、trueを返す", async () => {
-      // arrange
-      const actor = await actorFactory(ctx.db).create();
-
-      // act
-      const result = await actorRepository.exists({
-        ctx,
-        did: asDid(actor.did),
-      });
-
-      // assert
-      expect(result).toBe(true);
-    });
-  });
-
   describe("delete", () => {
     test("アクターを削除する", async () => {
       // arrange

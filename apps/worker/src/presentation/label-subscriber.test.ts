@@ -11,7 +11,7 @@ import { WebSocketServer } from "ws";
 
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.in-memory.js";
-import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
+import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
 import { LabelRepository } from "../infrastructure/repositories/label-repository/label-repository.js";
 import { LabelSubscriber } from "./label-subscriber.js";
 
@@ -36,11 +36,7 @@ describe("モデレーションサービスからのラベル受信", () => {
     );
     const subscriber = new LabelSubscriber(
       new MetricReporter(),
-      new IndexLabelUseCase(
-        new LabelRepository(),
-        new ActorRepository(),
-        ctx.db,
-      ),
+      new IndexLabelUseCase(new LabelRepository(), new ActorQuery(), ctx.db),
       labelCursorStore,
       moderationUrl,
     );

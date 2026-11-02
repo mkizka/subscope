@@ -13,7 +13,7 @@ import type { IPostRepository } from "../../../application/interfaces/repositori
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class PostRepository implements IPostRepository {
-  async upsert({ ctx, post }: { ctx: TransactionContext; post: Post }) {
+  async save({ ctx, post }: { ctx: TransactionContext; post: Post }) {
     const postUri = post.uri.toString();
     const data = {
       cid: post.cid,
