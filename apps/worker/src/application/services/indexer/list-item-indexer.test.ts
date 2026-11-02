@@ -29,13 +29,17 @@ describe("ListItemIndexer", () => {
     });
 
     // assert
-    expect(listItemRepository.findByUri(record.uri)).toMatchObject({
+    expect(
+      await listItemRepository.find({ ctx: { db }, uri: record.uri }),
+    ).toMatchObject({
       actorDid: actor.did,
       subjectDid: subject.did,
     });
-    expect(listItemRepository.findByUri(record.uri)?.listUri.toString()).toBe(
-      listUri,
-    );
+    expect(
+      (
+        await listItemRepository.find({ ctx: { db }, uri: record.uri })
+      )?.listUri.toString(),
+    ).toBe(listUri);
     expect(
       await actorRepository.find({ ctx: { db }, did: subject.did }),
     ).not.toBeNull();

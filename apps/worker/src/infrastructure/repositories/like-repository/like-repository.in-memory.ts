@@ -18,7 +18,12 @@ export class InMemoryLikeRepository implements ILikeRepository {
     return Array.from(this.likes.values());
   }
 
-  findByUri(uri: AtUri): Like | null {
+  async find({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Like | null> {
     return this.likes.get(uri.toString()) ?? null;
   }
 

@@ -18,7 +18,12 @@ export class InMemoryPostRepository implements IPostRepository {
     return Array.from(this.posts.values());
   }
 
-  findByUri(uri: AtUri): Post | null {
+  async find({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Post | null> {
     return this.posts.get(uri.toString()) ?? null;
   }
 

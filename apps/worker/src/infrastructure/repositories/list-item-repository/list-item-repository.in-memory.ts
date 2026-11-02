@@ -6,7 +6,12 @@ import type { IListItemRepository } from "../../../application/interfaces/reposi
 export class InMemoryListItemRepository implements IListItemRepository {
   private listItems: Map<string, ListItem> = new Map();
 
-  findByUri(uri: AtUri): ListItem | null {
+  async find({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<ListItem | null> {
     return this.listItems.get(uri.toString()) ?? null;
   }
 

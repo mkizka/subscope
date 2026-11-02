@@ -10,7 +10,12 @@ export class InMemoryListRepository implements IListRepository {
     this.lists.set(list.uri.toString(), list);
   }
 
-  findByUri(uri: AtUri): List | null {
+  async find({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<List | null> {
     return this.lists.get(uri.toString()) ?? null;
   }
 
