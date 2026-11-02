@@ -33,6 +33,7 @@ export type TimelinePostDto = {
   viewerLike?: string;
   viewerRepost?: string;
   replyRoot?: { uri: string; cid: string };
+  replyParentUri?: string;
   authorAvatar?: string;
   authorDisplayName?: string;
   authorHandle: string;
@@ -128,6 +129,9 @@ export function toTimelinePost({
     viewerRepost: post.viewer?.repost,
     replyRoot: postRecord.matches(post.record)
       ? post.record.reply?.root
+      : undefined,
+    replyParentUri: postRecord.matches(post.record)
+      ? post.record.reply?.parent.uri
       : undefined,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
