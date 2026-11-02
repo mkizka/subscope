@@ -1,4 +1,5 @@
 import type {
+  BackfillStatus,
   DatabaseClient,
   IJobScheduler,
   ITapClient,
@@ -6,10 +7,7 @@ import type {
 } from "@repo/common/domain";
 
 import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
-import type {
-  BackfillStatus,
-  IActorRepository,
-} from "../../interfaces/repositories/actor-repository.js";
+import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
 
 const IN_PROGRESS_STATES = ["pending", "desynchronized", "resyncing"];
 
@@ -36,8 +34,13 @@ export class CheckBackfillUseCase {
     if (!isTrackedActor) {
       return;
     }
+    const actor = await this.actorRepository.find({ ctx, did });
+    if (!actor) {
+      return;
+    }
     const status = toBackfillStatus(await this.tapClient.getRepoState(did));
-    await this.actorRepository.updateBackfillStatus({ ctx, did, status });
+    actor.updateBackfillStatus(status);
+    await this.actorRepository.save({ ctx, actor });
     if (status !== "completed") {
       await this.jobScheduler.scheduleCheckBackfill(did, attempt + 1);
     }

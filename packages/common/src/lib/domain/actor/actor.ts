@@ -6,12 +6,15 @@ import { asHandle } from "../../utils/handle.js";
 export type ActorStatus =
   "active" | "deactivated" | "deleted" | "suspended" | "takendown";
 
+export type BackfillStatus = "inProgress" | "completed" | "error";
+
 export type ActorParams = {
   did: string;
   handle: string | null;
   isAdmin: boolean;
   isBanned: boolean;
   status?: ActorStatus;
+  backfillStatus?: BackfillStatus | null;
   indexedAt: Date;
 };
 
@@ -21,6 +24,7 @@ export class Actor {
   private _isAdmin: boolean;
   private _isBanned: boolean;
   private _status: ActorStatus;
+  private _backfillStatus: BackfillStatus | null;
   readonly indexedAt: Date;
 
   private constructor(params: ActorParams) {
@@ -29,6 +33,7 @@ export class Actor {
     this._isAdmin = params.isAdmin;
     this._isBanned = params.isBanned;
     this._status = params.status ?? "active";
+    this._backfillStatus = params.backfillStatus ?? null;
     this.indexedAt = params.indexedAt;
   }
 
@@ -60,6 +65,14 @@ export class Actor {
 
   get status(): ActorStatus {
     return this._status;
+  }
+
+  get backfillStatus(): BackfillStatus | null {
+    return this._backfillStatus;
+  }
+
+  updateBackfillStatus(backfillStatus: BackfillStatus): void {
+    this._backfillStatus = backfillStatus;
   }
 
   updateStatus(status: ActorStatus): void {

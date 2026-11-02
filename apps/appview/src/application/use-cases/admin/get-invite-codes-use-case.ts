@@ -1,13 +1,15 @@
 import { toDatetimeString } from "@atproto/syntax";
 import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 
-import type { InviteCodeService } from "../../../application/service/admin/invite-code-service.js";
+import type { InviteCodeDto } from "../../../application/dto/invite-code-dto.js";
+import type { IInviteCodeQuery } from "../../../application/interfaces/invite-code-query.js";
+import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetInviteCodesUseCase {
   constructor(
-    private readonly inviteCodeService: InviteCodeService,
+    private readonly inviteCodeQuery: IInviteCodeQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -16,15 +18,20 @@ export class GetInviteCodesUseCase {
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody> {
-    const paginationResult =
-      await this.inviteCodeService.findInviteCodesWithPagination({
+    const paginator = createCursorPaginator<InviteCodeDto>({
+      limit: params.limit,
+      getCursor: (item) => item.createdAt.toISOString(),
+    });
+    const page = paginator.extractPage(
+      await this.inviteCodeQuery.findAll({
+        limit: paginator.queryLimit,
         cursor: params.cursor,
-        limit: params.limit,
-      });
+      }),
+    );
 
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
     const codes = await Promise.all(
-      paginationResult.items.map(async (item) => ({
+      page.items.map(async (item) => ({
         code: item.code,
         expiresAt: toDatetimeString(item.expiresAt),
         createdAt: toDatetimeString(item.createdAt),
@@ -35,6 +42,6 @@ export class GetInviteCodesUseCase {
       })),
     );
 
-    return { cursor: paginationResult.cursor, codes };
+    return { cursor: page.cursor, codes };
   }
 }
