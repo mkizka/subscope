@@ -5,11 +5,11 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetInviteCodesUseCase", () => {
   let getInviteCodesUseCase: TestServices["getInviteCodesUseCase"];
-  let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  let inviteCodeQuery: TestServices["inviteCodeQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getInviteCodesUseCase = services.getInviteCodesUseCase;
-    inviteCodeRepo = services.inviteCodeRepository;
+    inviteCodeQuery = services.inviteCodeQuery;
   });
 
   test("招待コードが存在する場合、招待コード一覧を返す", async () => {
@@ -18,13 +18,13 @@ describe("GetInviteCodesUseCase", () => {
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
       expiresAt: new Date("2024-01-08T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode1);
+    inviteCodeQuery.add(inviteCode1);
 
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
       expiresAt: new Date("2024-01-09T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode2);
+    inviteCodeQuery.add(inviteCode2);
 
     // act
     const result = await getInviteCodesUseCase.execute({
@@ -55,7 +55,7 @@ describe("GetInviteCodesUseCase", () => {
 
   test("limitを指定した場合、指定した件数の招待コードを返す", async () => {
     // arrange
-    inviteCodeRepo.add(
+    inviteCodeQuery.add(
       inviteCodeFactory({
         createdAt: new Date("2024-01-01T00:00:00.000Z"),
       }),
@@ -63,11 +63,11 @@ describe("GetInviteCodesUseCase", () => {
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode2);
+    inviteCodeQuery.add(inviteCode2);
     const inviteCode3 = inviteCodeFactory({
       createdAt: new Date("2024-01-03T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode3);
+    inviteCodeQuery.add(inviteCode3);
 
     // act
     const result = await getInviteCodesUseCase.execute({
@@ -101,12 +101,12 @@ describe("GetInviteCodesUseCase", () => {
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode1);
+    inviteCodeQuery.add(inviteCode1);
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode2);
-    inviteCodeRepo.add(
+    inviteCodeQuery.add(inviteCode2);
+    inviteCodeQuery.add(
       inviteCodeFactory({
         createdAt: new Date("2024-01-03T00:00:00.000Z"),
       }),
@@ -138,19 +138,19 @@ describe("GetInviteCodesUseCase", () => {
     const inviteCode1 = inviteCodeFactory({
       createdAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode1);
+    inviteCodeQuery.add(inviteCode1);
     const inviteCode2 = inviteCodeFactory({
       createdAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode2);
+    inviteCodeQuery.add(inviteCode2);
     const inviteCode3 = inviteCodeFactory({
       createdAt: new Date("2024-01-03T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode3);
+    inviteCodeQuery.add(inviteCode3);
     const inviteCode4 = inviteCodeFactory({
       createdAt: new Date("2024-01-04T00:00:00.000Z"),
     });
-    inviteCodeRepo.add(inviteCode4);
+    inviteCodeQuery.add(inviteCode4);
 
     // act - 1ページ目
     const page1 = await getInviteCodesUseCase.execute({

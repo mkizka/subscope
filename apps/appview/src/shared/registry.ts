@@ -27,6 +27,7 @@ import type { IFollowQuery } from "../application/interfaces/follow-query.js";
 import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
+import type { IInviteCodeQuery } from "../application/interfaces/invite-code-query.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 import type { ILabelQuery } from "../application/interfaces/label-query.js";
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
@@ -46,7 +47,6 @@ import type { ISubscriptionRepository } from "../application/interfaces/subscrip
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
-import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
 import { FollowService } from "../application/service/graph/follow-service.js";
@@ -110,6 +110,7 @@ import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
 import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
+import { InviteCodeQuery } from "../infrastructure/invite-code-query/invite-code-query.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
 import { LabelQuery } from "../infrastructure/label-query/label-query.js";
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
@@ -223,6 +224,7 @@ export const createAppRegistry = (env: Env) =>
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
+    .service("inviteCodeQuery", ["db"], asClassArgs<IInviteCodeQuery>()(InviteCodeQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("subscriptionRepository", ["db"], asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("tokenVerifier", ["didResolver", "serviceDid"], asClassArgs<ITokenVerifier>()(TokenVerifier))
@@ -231,7 +233,6 @@ export const createAppRegistry = (env: Env) =>
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
-    .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
@@ -273,7 +274,7 @@ export const createAppRegistry = (env: Env) =>
     .service("createInviteCodeUseCase", ["db", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["db", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
-    .service("getInviteCodesUseCase", ["inviteCodeService", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
+    .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
     .service("getSubscribersUseCase", ["subscriptionService", "viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
     .service("grantAdminUseCase", ["db", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorRepository", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
