@@ -84,4 +84,43 @@ test.describe("フォロー・フォロワー", () => {
       });
     }).toPass();
   });
+
+  test("follow-list-5: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/profile/*/follows", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.getByRole("link", { name: /^\d+ フォロー$/ }).click();
+
+    await expect(page.getByRole("heading", { name: "フォロー" })).toBeVisible();
+    const spinner = page.getByRole("status", { name: "読み込み中" });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
+
+  test("follow-list-6: 一度表示した一覧に戻ると、読み込み直しを待たずに前回の一覧を表示する", async ({
+    page,
+  }) => {
+    const bob = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Bob" });
+    await expect(async () => {
+      await page.goto("/profile/alice.test/follows");
+      await expect(bob).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await bob.getByRole("link").click();
+    await expect(page).toHaveURL(/\/profile\/(?!alice\.test)[^/]+$/);
+    await page.route("**/api/profile/*/follows", () => {});
+
+    await page.goBack();
+
+    await expect(bob).toBeVisible();
+  });
 });
