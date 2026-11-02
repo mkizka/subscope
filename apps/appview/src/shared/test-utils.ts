@@ -20,8 +20,6 @@ import { InMemoryLikeQuery } from "../infrastructure/like-query/like-query.in-me
 import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
-import { InMemoryProfileQuery } from "../infrastructure/profile-query/profile-query.in-memory.js";
-import { InMemoryRecordQuery } from "../infrastructure/record-query/record-query.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import type { Env } from "./env.js";
@@ -43,13 +41,11 @@ export const testEnv = {
 export const testRegistry = createAppRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
-  .replaceService("profileQuery", asClassArgs(InMemoryProfileQuery))
   .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
   .replaceService("actorQuery", asClassArgs(InMemoryActorQuery))
   .replaceService("actorStatsQuery", asClassArgs(InMemoryActorStatsQuery))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
-  .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))
   .replaceService("notificationQuery", asClassArgs(InMemoryNotificationQuery))
   .replaceService("generatorQuery", asClassArgs(InMemoryGeneratorQuery))
   .replaceService("likeQuery", asClassArgs(InMemoryLikeQuery))
