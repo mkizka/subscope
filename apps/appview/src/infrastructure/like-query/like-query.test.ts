@@ -127,9 +127,17 @@ describe("LikeQuery", () => {
       });
 
       // assert
-      expect(result.map((like) => like.uri.toString())).toEqual([
-        newLike.uri,
-        middleLike.uri,
+      expect(result).toEqual([
+        {
+          actorDid: newLike.actorDid,
+          createdAt: newLike.createdAt,
+          sortAt: newLike.sortAt,
+        },
+        {
+          actorDid: middleLike.actorDid,
+          createdAt: middleLike.createdAt,
+          sortAt: middleLike.sortAt,
+        },
       ]);
     });
   });

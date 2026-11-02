@@ -1,9 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
-import type { Like } from "@repo/common/domain";
 
 import type { FeedItemDto } from "../dto/feed-item-dto.js";
-import type { LikeDto } from "../dto/like-dto.js";
+import type { LikeDto, SubjectLikeDto } from "../dto/like-dto.js";
 
 export interface ILikeQuery {
   findViewerLikes: (params: {
@@ -21,5 +20,5 @@ export interface ILikeQuery {
     subjectUri: string;
     limit: number;
     cursor?: Date;
-  }) => Promise<Like[]>;
+  }) => Promise<SubjectLikeDto[]>;
 }

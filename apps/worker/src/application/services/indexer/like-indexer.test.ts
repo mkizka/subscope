@@ -17,7 +17,7 @@ describe("LikeIndexer", () => {
   let likeIndexer: TestServices["likeIndexer"];
   let likeRepo: TestServices["likeRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let subscriptionQuery: TestServices["subscriptionQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe("LikeIndexer", () => {
     likeIndexer = services.likeIndexer;
     likeRepo = services.likeRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionRepo = services.subscriptionRepository;
+    subscriptionQuery = services.subscriptionQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -35,7 +35,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: liker.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: liker.did }));
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
@@ -88,9 +88,9 @@ describe("LikeIndexer", () => {
       // arrange
       const liker = actorFactory();
       const author = isSelf ? liker : actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: liker.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: liker.did }));
       if (isSubscriber) {
-        subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
+        subscriptionQuery.add(subscriptionFactory({ actorDid: author.did }));
       }
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
@@ -117,7 +117,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: liker.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: liker.did }));
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey456`,

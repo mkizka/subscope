@@ -1,7 +1,7 @@
 import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedGetLikes from "@repo/client/lex/app/bsky/feed/getLikes";
-import type { Like } from "@repo/common/domain";
 
+import type { SubjectLikeDto } from "../../../application/dto/like-dto.js";
 import type { ILikeQuery } from "../../../application/interfaces/like-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -17,7 +17,7 @@ export class GetLikesUseCase {
   async execute(
     params: AppBskyFeedGetLikes.$Params,
   ): Promise<AppBskyFeedGetLikes.$OutputBody> {
-    const paginator = createCursorPaginator<Like>({
+    const paginator = createCursorPaginator<SubjectLikeDto>({
       limit: params.limit,
       getCursor: (like) => like.sortAt.toISOString(),
     });

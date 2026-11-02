@@ -6,3 +6,13 @@ export type FollowDto = {
   actorDid: Did;
   subjectDid: Did;
 };
+
+export type FolloweeDto = {
+  subjectDid: Did;
+  sortAt: Date;
+};
+
+export type FollowerDto = {
+  actorDid: Did;
+  sortAt: Date;
+};
