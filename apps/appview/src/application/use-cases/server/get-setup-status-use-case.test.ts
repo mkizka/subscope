@@ -5,11 +5,11 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetSetupStatusUseCase", () => {
   let getSetupStatusUseCase: TestServices["getSetupStatusUseCase"];
-  let actorRepo: TestServices["actorRepository"];
+  let actorQuery: TestServices["actorQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getSetupStatusUseCase = services.getSetupStatusUseCase;
-    actorRepo = services.actorRepository;
+    actorQuery = services.actorQuery;
   });
 
   test("管理者が存在しない場合、initializedがfalseを返す", async () => {
@@ -23,7 +23,7 @@ describe("GetSetupStatusUseCase", () => {
   test("管理者が存在する場合、initializedがtrueを返す", async () => {
     // arrange
     const admin = actorFactory({ isAdmin: true });
-    actorRepo.add(admin);
+    actorQuery.add(admin);
 
     // act
     const result = await getSetupStatusUseCase.execute();

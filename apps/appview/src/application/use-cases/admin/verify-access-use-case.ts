@@ -12,7 +12,7 @@ export class VerifyAccessUseCase {
   async execute(
     params: VerifyAccessParams,
   ): Promise<{ status: "authorized" | "unauthorized" }> {
-    const actor = await this.actorRepository.findByDid(params.requesterDid);
+    const actor = await this.actorRepository.find(params.requesterDid);
     if (actor?.isAdmin) {
       return { status: "authorized" };
     }
