@@ -11,6 +11,7 @@ import {
   PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 
+import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type {
   INotificationRepository,
@@ -25,6 +26,7 @@ const REPLY_NOTIFICATION_DEPTH = 4;
 export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
+    private readonly postQuery: IPostQuery,
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly notificationRepository: INotificationRepository,
@@ -52,7 +54,7 @@ export class PostIndexer implements ICollectionIndexer {
 
     const embedUri = post.getEmbedRecordUri();
     if (embedUri) {
-      const embedExists = await this.postRepository.exists(ctx, embedUri);
+      const embedExists = await this.postQuery.exists(ctx, embedUri);
       if (!embedExists) {
         ctx.afterCommit(() =>
           this.jobScheduler.scheduleFetchRecord(embedUri, { live, depth }),
@@ -74,7 +76,7 @@ export class PostIndexer implements ICollectionIndexer {
     for (
       let uri = post.replyParent?.uri ?? null;
       uri && replySubjects.length < REPLY_NOTIFICATION_DEPTH;
-      uri = await this.postRepository.findReplyParentUri(ctx, uri)
+      uri = await this.postQuery.findReplyParentUri(ctx, uri)
     ) {
       replySubjects.push(uri);
     }

@@ -39,7 +39,7 @@ describe("ResolveDidUseCase", () => {
     await resolveDidUseCase.execute(did);
 
     // assert
-    const actor = await actorRepository.findByDid({ ctx, did });
+    const actor = await actorRepository.find({ ctx, did });
     expect(actor?.handle).toBe("alice.test");
   });
 
@@ -53,7 +53,7 @@ describe("ResolveDidUseCase", () => {
     await resolveDidUseCase.execute(did);
 
     // assert
-    const actor = await actorRepository.findByDid({ ctx, did });
+    const actor = await actorRepository.find({ ctx, did });
     expect(actor?.handle).toBe("handle.invalid");
   });
 
@@ -68,7 +68,7 @@ describe("ResolveDidUseCase", () => {
     await resolveDidUseCase.execute(actor.did);
 
     // assert
-    const saved = await actorRepository.findByDid({ ctx, did: actor.did });
+    const saved = await actorRepository.find({ ctx, did: actor.did });
     expect(saved?.handle).toBe("old.test");
   });
 });
