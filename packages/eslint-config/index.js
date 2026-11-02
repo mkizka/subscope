@@ -2,24 +2,22 @@ import { mkizka } from "@mkizka/eslint-config";
 
 const legacyRepositoryMethods = {
   IActorRepository:
-    "exists|findBannedDids|findByDid|findTrackedDidsWithoutBackfillStatus|hasAnyAdmin|updateBackfillStatus|upsert",
+    "exists|findByDid|findTrackedDidsWithoutBackfillStatus|updateBackfillStatus|upsert",
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFeedItemRepository: "upsert",
   IFollowRepository: "findFolloweeDids|findFollowers|findFollows",
   IGeneratorRepository: "upsert",
-  IInviteCodeRepository: "findAll|findFirst|markAsUsed|upsert",
+  IInviteCodeRepository: "findAll",
   ILabelRepository: "upsert",
   ILikeRepository: "findMany|upsert",
   IListItemRepository: "upsert",
   IListRepository: "upsert",
   INotificationRepository: "createMany",
-  IPostRepository:
-    "exists|findByUri|findByUris|findMany|findReplies|findReplyParentUri|search|upsert",
+  IPostRepository: "exists|findReplyParentUri|upsert",
   IPostStatsRepository: "upsertMany",
   IProfileRepository: "exists|searchActors|upsert",
   IRecordRepository: "findByUri|upsert",
-  IRecordRevRepository: "saveIfNotOlder",
   IRepostRepository: "findRepostsByPost|upsert",
   ISubscriptionRepository:
     "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|updateSeenAt",

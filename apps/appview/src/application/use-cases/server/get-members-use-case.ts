@@ -30,7 +30,7 @@ export class GetMembersUseCase {
     const ctx = this.viewContextFactory.create();
     const [profiles, actors] = await Promise.all([
       Promise.all(dids.map((did) => this.profileViews.view(did, ctx))),
-      Promise.all(dids.map((did) => this.actorRepository.findByDid(did))),
+      Promise.all(dids.map((did) => this.actorRepository.find(did))),
     ]);
     const adminDids = new Set(
       actors.filter((actor) => actor?.isAdmin).map((actor) => actor?.did),

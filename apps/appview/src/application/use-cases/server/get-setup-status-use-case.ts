@@ -1,10 +1,10 @@
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IActorQuery } from "../../../application/interfaces/actor-query.js";
 
 export class GetSetupStatusUseCase {
-  constructor(private readonly actorRepository: IActorRepository) {}
+  constructor(private readonly actorQuery: IActorQuery) {}
 
   async execute(): Promise<{ initialized: boolean }> {
-    const hasAnyAdmin = await this.actorRepository.hasAnyAdmin();
+    const hasAnyAdmin = await this.actorQuery.hasAnyAdmin();
     return { initialized: hasAnyAdmin };
   }
 }
