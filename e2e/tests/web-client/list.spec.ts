@@ -126,7 +126,11 @@ test.describe("リスト", () => {
     await main.getByText("新しいリスト").click();
     await main.getByLabel("名前").fill(name);
     await main.getByLabel("説明").fill(`${name}の説明`);
+    const submitted = page.waitForResponse(
+      (res) => res.request().method() === "POST",
+    );
     await main.getByRole("button", { name: "作成する" }).click();
+    await submitted;
 
     await expect(async () => {
       await page.reload();
