@@ -10,14 +10,14 @@ import {
 const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「登録アカウント」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await page.goto("/");
 
     const nav = page.getByRole("navigation");
     await expect(
-      nav.getByRole("link", { name: "登録アカウント" }),
+      nav.getByRole("link", { name: "アカウント管理" }),
     ).toBeVisible();
     await expect(nav.getByRole("link", { name: "招待コード" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();

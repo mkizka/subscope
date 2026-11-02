@@ -112,7 +112,7 @@ export function AdminNavMenu({ onNavigate }: { onNavigate?: () => void }) {
           icon={<UsersIcon className="size-6" />}
           {...p}
         >
-          登録アカウント
+          アカウント管理
         </Item>
         <Item
           to="/admin/invite-codes"

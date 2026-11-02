@@ -31,7 +31,7 @@ test.describe("ログイン", () => {
     await expect(
       page
         .getByRole("navigation")
-        .getByRole("link", { name: "登録アカウント" }),
+        .getByRole("link", { name: "アカウント管理" }),
     ).toBeVisible();
   });
 
