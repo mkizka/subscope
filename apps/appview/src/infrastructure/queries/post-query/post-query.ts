@@ -13,17 +13,26 @@ type SelectPost = typeof schema.posts.$inferSelect & {
   embedRecord: typeof schema.postEmbedRecords.$inferSelect | null;
 };
 
+const toImageDtos = (
+  images: SelectPost["embedImages"],
+  embedType: "images" | "gallery",
+) =>
+  images
+    .filter((image) => image.embedType === embedType)
+    .map((image) => ({
+      cid: image.cid,
+      alt: image.alt,
+      aspectRatio:
+        image.aspectRatioWidth && image.aspectRatioHeight
+          ? { width: image.aspectRatioWidth, height: image.aspectRatioHeight }
+          : undefined,
+    }));
+
 const toPostDto = (post: SelectPost): PostDto => ({
   uri: asAtUriString(post.uri),
   actorDid: asDid(post.actorDid),
-  embedImages: post.embedImages.map((image) => ({
-    cid: image.cid,
-    alt: image.alt,
-    aspectRatio:
-      image.aspectRatioWidth && image.aspectRatioHeight
-        ? { width: image.aspectRatioWidth, height: image.aspectRatioHeight }
-        : undefined,
-  })),
+  embedImages: toImageDtos(post.embedImages, "images"),
+  embedGallery: toImageDtos(post.embedImages, "gallery"),
   embedExternal: post.embedExternal && {
     uri: post.embedExternal.uri,
     title: post.embedExternal.title,

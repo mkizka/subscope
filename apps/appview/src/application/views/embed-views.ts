@@ -6,6 +6,7 @@ import {
   type UriString,
 } from "@atproto/syntax";
 import type * as AppBskyEmbedExternal from "@repo/client/lex/app/bsky/embed/external";
+import type * as AppBskyEmbedGallery from "@repo/client/lex/app/bsky/embed/gallery";
 import type * as AppBskyEmbedImages from "@repo/client/lex/app/bsky/embed/images";
 import type * as AppBskyEmbedRecord from "@repo/client/lex/app/bsky/embed/record";
 import type * as AppBskyEmbedRecordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
@@ -57,6 +58,9 @@ export class EmbedViews {
   private mediaView(post: PostDto) {
     if (post.embedImages.length > 0) {
       return this.imagesView(post.embedImages, post.actorDid);
+    }
+    if (post.embedGallery.length > 0) {
+      return this.galleryView(post.embedGallery, post.actorDid);
     }
     if (post.embedExternal) {
       return this.externalView(post.embedExternal, post.actorDid);
@@ -175,6 +179,25 @@ export class EmbedViews {
         thumb: this.assetUrlBuilder.getFeedThumbnailUrl(actorDid, image.cid),
         fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(actorDid, image.cid),
         aspectRatio: image.aspectRatio,
+      })),
+    };
+  }
+
+  private galleryView(
+    images: PostEmbedImageDto[],
+    actorDid: string,
+  ): $Typed<AppBskyEmbedGallery.View> {
+    return {
+      $type: "app.bsky.embed.gallery#view",
+      items: images.map((image) => ({
+        $type: "app.bsky.embed.gallery#viewImage" as const,
+        alt: image.alt,
+        thumbnail: this.assetUrlBuilder.getFeedThumbnailUrl(
+          actorDid,
+          image.cid,
+        ),
+        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(actorDid, image.cid),
+        aspectRatio: image.aspectRatio ?? { width: 1, height: 1 },
       })),
     };
   }

@@ -61,6 +61,12 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 - postgate-1: postgateのembeddingRulesにdisableRuleがある投稿は、投稿者以外の閲覧者のviewer.embeddingDisabledをtrueにする
 - postgate-2: 引用された投稿のpostgateのdetachedEmbeddingUrisに引用した投稿が含まれる場合、引用をviewDetachedにする
 
+## 埋め込み
+
+投稿に埋め込まれた画像・リンクカード・引用を、postViewのembedに公式AppViewと同じ形で返す。
+
+- embed-1: gallery埋め込みの画像は、引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す
+
 ## フィード
 
 getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPostで返す。

@@ -41,6 +41,7 @@ describe("PostQuery", () => {
           uri: post.uri,
           actorDid: post.actorDid,
           embedImages: [],
+          embedGallery: [],
           embedExternal: null,
           embedRecordUri: null,
           replyRootUri: null,

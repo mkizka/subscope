@@ -366,6 +366,7 @@ export const postEmbedImageFactory = (db: Database) =>
           postUri: later<string>(),
           cid: () => randomCid(),
           position: () => faker.number.int({ min: 0, max: 3 }),
+          embedType: () => "images",
           alt: () => faker.lorem.sentence(),
           aspectRatioWidth: () => faker.number.int({ min: 100, max: 2000 }),
           aspectRatioHeight: () => faker.number.int({ min: 100, max: 2000 }),
