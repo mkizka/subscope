@@ -44,8 +44,6 @@ import type { ITimelineQuery } from "../application/interfaces/timeline-query.js
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
-import { SubscriptionService } from "../application/service/admin/subscription-service.js";
-import { RepostService } from "../application/service/feed/repost-service.js";
 import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
@@ -223,10 +221,8 @@ export const createAppRegistry = (env: Env) =>
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
-    .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
-    .service("repostService", ["repostQuery"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
@@ -256,7 +252,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getFeedGeneratorsUseCase", ["viewContextFactory", "generatorViews"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "viewContextFactory", "profileViews"], asClassArgs(GetLikesUseCase))
     .service("getListFeedUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetListFeedUseCase))
-    .service("getRepostedByUseCase", ["repostService", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
+    .service("getRepostedByUseCase", ["repostQuery", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followService", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followService", "viewContextFactory", "profileViews"], asClassArgs(GetFollowersUseCase))
     .service("getListUseCase", ["listQuery", "viewContextFactory", "listViews", "profileViews"], asClassArgs(GetListUseCase))
@@ -265,11 +261,11 @@ export const createAppRegistry = (env: Env) =>
     .service("deleteInviteCodeUseCase", ["db", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeService", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
-    .service("getSubscribersUseCase", ["subscriptionService", "viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
+    .service("getSubscribersUseCase", ["viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
     .service("grantAdminUseCase", ["db", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorQuery", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["actorRepository"], asClassArgs(VerifyAccessUseCase))
-    .service("getMembersUseCase", ["subscriptionService", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetMembersUseCase))
+    .service("getMembersUseCase", ["subscriptionRepository", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetMembersUseCase))
     .service("getSetupStatusUseCase", ["actorQuery"], asClassArgs(GetSetupStatusUseCase))
     .service("getTrackedActorsUseCase", ["subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
