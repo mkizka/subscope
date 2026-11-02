@@ -10,12 +10,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetLikesUseCase", () => {
   let getLikesUseCase: TestServices["getLikesUseCase"];
-  let likeRepo: TestServices["likeRepository"];
+  let likeQuery: TestServices["likeQuery"];
   let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getLikesUseCase = services.getLikesUseCase;
-    likeRepo = services.likeRepository;
+    likeQuery = services.likeQuery;
     profileQuery = services.profileQuery;
   });
 
@@ -39,7 +39,7 @@ describe("GetLikesUseCase", () => {
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepo.add(like);
+    likeQuery.add(like);
 
     // act
     const result = await getLikesUseCase.execute({
@@ -103,7 +103,7 @@ describe("GetLikesUseCase", () => {
         subjectUri: post.uri.toString(),
         subjectCid: post.cid,
       });
-      likeRepo.add(like);
+      likeQuery.add(like);
     }
 
     // act
@@ -153,7 +153,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    likeRepo.add(firstLike);
+    likeQuery.add(firstLike);
 
     const secondLike = likeFactory({
       actorDid: secondLiker.did,
@@ -162,7 +162,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepo.add(secondLike);
+    likeQuery.add(secondLike);
 
     const thirdLike = likeFactory({
       actorDid: thirdLiker.did,
@@ -171,7 +171,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T03:00:00.000Z"),
       indexedAt: new Date("2024-01-01T03:00:00.000Z"),
     });
-    likeRepo.add(thirdLike);
+    likeQuery.add(thirdLike);
 
     // act - 最初のページ（limit=2）
     const firstPage = await getLikesUseCase.execute({
@@ -236,7 +236,7 @@ describe("GetLikesUseCase", () => {
       subjectUri: post.uri.toString(),
       subjectCid: post.cid,
     });
-    likeRepo.add(like);
+    likeQuery.add(like);
 
     // act - limit=0
     const zeroLimitResult = await getLikesUseCase.execute({
@@ -326,7 +326,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
       indexedAt: new Date("2024-01-01T01:30:00.000Z"),
     });
-    likeRepo.add(earlyLike);
+    likeQuery.add(earlyLike);
 
     const latestLike = likeFactory({
       actorDid: latestLiker.did,
@@ -335,7 +335,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T03:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:30:00.000Z"),
     });
-    likeRepo.add(latestLike);
+    likeQuery.add(latestLike);
 
     const middleLike = likeFactory({
       actorDid: middleLiker.did,
@@ -344,7 +344,7 @@ describe("GetLikesUseCase", () => {
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
       indexedAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    likeRepo.add(middleLike);
+    likeQuery.add(middleLike);
 
     // act
     const result = await getLikesUseCase.execute({

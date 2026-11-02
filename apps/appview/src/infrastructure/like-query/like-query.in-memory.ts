@@ -1,14 +1,15 @@
 import type { Did } from "@atproto/did";
-import type { AtUri } from "@atproto/syntax";
+import { asAtUriString, type AtUri } from "@atproto/syntax";
+import type { Like } from "@repo/common/domain";
 
 import type { FeedItemDto } from "../../application/dto/feed-item-dto.js";
 import type { LikeDto } from "../../application/dto/like-dto.js";
 import type { ILikeQuery } from "../../application/interfaces/like-query.js";
 
 export class InMemoryLikeQuery implements ILikeQuery {
-  private likes: (LikeDto & { actorDid: Did })[] = [];
+  private likes: Like[] = [];
 
-  add(like: LikeDto & { actorDid: Did }): void {
+  add(like: Like): void {
     this.likes.push(like);
   }
 
@@ -19,18 +20,43 @@ export class InMemoryLikeQuery implements ILikeQuery {
     viewerDid: Did;
     subjectUris: AtUri[];
   }): Promise<LikeDto[]> {
-    const uris: string[] = subjectUris.map((uri) => uri.toString());
+    const uris = subjectUris.map((uri) => uri.toString());
     return Promise.resolve(
       this.likes
         .filter(
           (like) =>
-            like.actorDid === viewerDid && uris.includes(like.subjectUri),
+            like.actorDid === viewerDid &&
+            uris.includes(like.subjectUri.toString()),
         )
-        .map(({ uri, subjectUri }) => ({ uri, subjectUri })),
+        .map((like) => ({
+          uri: asAtUriString(like.uri.toString()),
+          subjectUri: asAtUriString(like.subjectUri.toString()),
+        })),
     );
   }
 
   findActorLikeFeedItems(): Promise<FeedItemDto[]> {
     throw new Error("Not implemented");
+  }
+
+  findSubjectLikes({
+    subjectUri,
+    limit,
+    cursor,
+  }: {
+    subjectUri: string;
+    limit: number;
+    cursor?: Date;
+  }): Promise<Like[]> {
+    return Promise.resolve(
+      this.likes
+        .filter(
+          (like) =>
+            like.subjectUri.toString() === subjectUri &&
+            (!cursor || like.sortAt < cursor),
+        )
+        .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
+        .slice(0, limit),
+    );
   }
 }

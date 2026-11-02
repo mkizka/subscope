@@ -22,7 +22,7 @@ export class InMemoryPostRepository implements IPostRepository {
     return this.posts.get(uri.toString()) ?? null;
   }
 
-  async upsert(params: { ctx: TransactionContext; post: Post }): Promise<void> {
+  async save(params: { ctx: TransactionContext; post: Post }): Promise<void> {
     this.posts.set(params.post.uri.toString(), params.post);
   }
 }

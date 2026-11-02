@@ -1,13 +1,13 @@
 import type { Like } from "@repo/common/domain";
 
-import type { ILikeRepository } from "../../../application/interfaces/like-repository.js";
+import type { ILikeQuery } from "../../../application/interfaces/like-query.js";
 import {
   createCursorPaginator,
   type Page,
 } from "../../../application/utils/pagination.js";
 
 export class LikeService {
-  constructor(private readonly likeRepository: ILikeRepository) {}
+  constructor(private readonly likeQuery: ILikeQuery) {}
 
   async findLikesWithPagination({
     subjectUri,
@@ -23,7 +23,7 @@ export class LikeService {
       getCursor: (like) => like.sortAt.toISOString(),
     });
 
-    const likes = await this.likeRepository.findMany({
+    const likes = await this.likeQuery.findSubjectLikes({
       subjectUri,
       limit: paginator.queryLimit,
       cursor,
