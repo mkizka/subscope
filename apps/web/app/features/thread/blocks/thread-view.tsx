@@ -170,7 +170,10 @@ export function ThreadView({ thread }: Props) {
       {thread.ancestors.map((post) => (
         <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
       ))}
-      <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
+      <FocusedPost
+        {...thread.post}
+        toolbar={<PostToolbarContainer {...thread.post} deleteRedirectTo="/" />}
+      />
       <ReplyPrompt post={thread.post} />
       {thread.replies.map((chain) =>
         chain.map((post, i) =>
