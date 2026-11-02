@@ -12,10 +12,10 @@ test.describe("レイアウト", () => {
       "page",
     );
 
-    await nav.getByRole("link", { name: "登録アカウント" }).click();
+    await nav.getByRole("link", { name: "アカウント", exact: true }).click();
 
     await expect(
-      nav.getByRole("link", { name: "登録アカウント" }),
+      nav.getByRole("link", { name: "アカウント", exact: true }),
     ).toHaveAttribute("aria-current", "page");
     await expect(nav.getByRole("link", { name: "ホーム" })).not.toHaveAttribute(
       "aria-current",
@@ -65,14 +65,14 @@ test.describe("レイアウト", () => {
     await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     let release = () => {};
     const released = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/registered-accounts.data*", async (route) => {
+    await page.route("**/accounts.data*", async (route) => {
       await released;
       await route.continue();
     });
 
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "登録アカウント" })
+      .getByRole("link", { name: "アカウント", exact: true })
       .click();
 
     const progress = page.getByRole("progressbar", { name: "読み込み中" });

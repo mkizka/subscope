@@ -6,7 +6,6 @@ import {
   ListIcon,
   ListTodoIcon,
   MailIcon,
-  RadarIcon,
   SearchIcon,
   UsersIcon,
 } from "lucide-react";
@@ -65,19 +64,8 @@ export function NavMenu({
       <Item to="/notifications" icon={<BellIcon className="size-6" />} {...p}>
         通知
       </Item>
-      <Item
-        to="/registered-accounts"
-        icon={<UsersIcon className="size-6" />}
-        {...p}
-      >
-        登録アカウント
-      </Item>
-      <Item
-        to="/tracked-accounts"
-        icon={<RadarIcon className="size-6" />}
-        {...p}
-      >
-        追跡アカウント
+      <Item to="/accounts" icon={<UsersIcon className="size-6" />} {...p}>
+        アカウント
       </Item>
       {profileId && (
         <>
