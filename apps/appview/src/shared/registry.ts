@@ -39,6 +39,7 @@ import type { IPostStatsQuery } from "../application/interfaces/post-stats-query
 import type { IProfileQuery } from "../application/interfaces/profile-query.js";
 import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostQuery } from "../application/interfaces/repost-query.js";
+import type { ISubscriptionQuery } from "../application/interfaces/subscription-query.js";
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
@@ -112,6 +113,7 @@ import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-qu
 import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
 import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostQuery } from "../infrastructure/repost-query/repost-query.js";
+import { SubscriptionQuery } from "../infrastructure/subscription-query/subscription-query.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import { TimelineQuery } from "../infrastructure/timeline-query/timeline-query.js";
 import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.js";
@@ -208,6 +210,7 @@ export const createAppRegistry = (env: Env) =>
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
     .service("inviteCodeQuery", ["db"], asClassArgs<IInviteCodeQuery>()(InviteCodeQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
+    .service("subscriptionQuery", ["db"], asClassArgs<ISubscriptionQuery>()(SubscriptionQuery))
     .service("subscriptionRepository", ["db"], asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("tokenVerifier", ["didResolver", "serviceDid"], asClassArgs<ITokenVerifier>()(TokenVerifier))
     .service("assetUrlBuilder", ["blobProxyUrl"], asClassArgs<IAssetUrlBuilder>()(AssetUrlBuilder))
@@ -251,13 +254,13 @@ export const createAppRegistry = (env: Env) =>
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
-    .service("getSubscribersUseCase", ["viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
+    .service("getSubscribersUseCase", ["viewContextFactory", "profileViews", "actorRepository", "subscriptionQuery", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorQuery", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["actorRepository"], asClassArgs(VerifyAccessUseCase))
-    .service("getMembersUseCase", ["subscriptionRepository", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetMembersUseCase))
+    .service("getMembersUseCase", ["subscriptionQuery", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetMembersUseCase))
     .service("getSetupStatusUseCase", ["actorQuery"], asClassArgs(GetSetupStatusUseCase))
-    .service("getTrackedActorsUseCase", ["subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
+    .service("getTrackedActorsUseCase", ["subscriptionQuery", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
     .service("unsubscribeServerUseCase", ["subscriptionRepository", "followQuery", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))

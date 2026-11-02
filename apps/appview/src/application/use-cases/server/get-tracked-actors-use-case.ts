@@ -1,14 +1,14 @@
 import type { Did } from "@atproto/did";
 import type * as MeSubscoServerGetTrackedActors from "@repo/client/lex/me/subsco/server/getTrackedActors";
 
-import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
+import type { ISubscriptionQuery } from "../../../application/interfaces/subscription-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetTrackedActorsUseCase {
   constructor(
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -25,11 +25,11 @@ export class GetTrackedActorsUseCase {
       getCursor: (item) => `${item.subscriberFollowersCount}::${item.did}`,
     });
     const [items, total] = await Promise.all([
-      this.subscriptionRepository.findTrackedActors({
+      this.subscriptionQuery.findTrackedActors({
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
-      this.subscriptionRepository.countTrackedActors(),
+      this.subscriptionQuery.countTrackedActors(),
     ]);
     const page = paginator.extractPage(items);
 

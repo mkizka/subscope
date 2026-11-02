@@ -12,8 +12,6 @@ const legacyRepositoryMethods = {
   INotificationRepository: "createMany",
   IPostStatsRepository: "upsertMany",
   IRepostRepository: "upsert",
-  ISubscriptionRepository:
-    "count|countTrackedActors|findMany|findTrackedActors",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({
