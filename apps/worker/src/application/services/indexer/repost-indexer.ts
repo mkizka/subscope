@@ -6,10 +6,10 @@ import type {
 import { FeedItem, Repost } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
+import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
 export class RepostIndexer implements ICollectionIndexer {
@@ -18,7 +18,7 @@ export class RepostIndexer implements ICollectionIndexer {
     private readonly feedItemRepository: IFeedItemRepository,
     private readonly postQuery: IPostQuery,
     private readonly jobScheduler: IJobScheduler,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
@@ -42,7 +42,7 @@ export class RepostIndexer implements ICollectionIndexer {
     const recipientDid = repost.subjectUri.host;
     if (
       recipientDid !== repost.actorDid &&
-      (await this.subscriptionRepository.isSubscriber(ctx, recipientDid))
+      (await this.subscriptionQuery.isSubscriber(ctx, recipientDid))
     ) {
       await this.notificationRepository.createMany({
         ctx,

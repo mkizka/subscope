@@ -5,9 +5,9 @@ import type {
 } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
+import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 import type { IndexActorService } from "../index-actor-service.js";
 
@@ -16,7 +16,7 @@ export class FollowIndexer implements ICollectionIndexer {
     private readonly followRepository: IFollowRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly indexActorService: IndexActorService,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
@@ -35,9 +35,9 @@ export class FollowIndexer implements ICollectionIndexer {
       did: follow.subjectDid,
       live,
     });
-    await this.followRepository.upsert({ ctx, follow });
+    await this.followRepository.save({ ctx, follow });
 
-    const isFollowerSubscriber = await this.subscriptionRepository.isSubscriber(
+    const isFollowerSubscriber = await this.subscriptionQuery.isSubscriber(
       ctx,
       follow.actorDid,
     );
@@ -49,7 +49,7 @@ export class FollowIndexer implements ICollectionIndexer {
 
     if (
       follow.subjectDid !== follow.actorDid &&
-      (await this.subscriptionRepository.isSubscriber(ctx, follow.subjectDid))
+      (await this.subscriptionQuery.isSubscriber(ctx, follow.subjectDid))
     ) {
       await this.notificationRepository.createMany({
         ctx,
@@ -89,7 +89,7 @@ export class FollowIndexer implements ICollectionIndexer {
 
     if (
       action === "delete" &&
-      (await this.subscriptionRepository.isSubscriber(ctx, follow.actorDid))
+      (await this.subscriptionQuery.isSubscriber(ctx, follow.actorDid))
     ) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),

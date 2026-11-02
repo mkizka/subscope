@@ -26,17 +26,10 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.delete(uri.toString());
   }
 
-  async upsert(params: {
+  async save(params: {
     ctx: TransactionContext;
     follow: Follow;
   }): Promise<void> {
     this.follows.set(params.follow.uri.toString(), params.follow);
-  }
-
-  async isFollowedByAnySubscriber(_params: {
-    ctx: TransactionContext;
-    subjectDid: string;
-  }): Promise<boolean> {
-    return false;
   }
 }

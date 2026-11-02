@@ -1,11 +1,14 @@
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
 import { asAtUriString, type AtUri } from "@atproto/syntax";
-import { type DatabaseClient, Like } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt } from "drizzle-orm";
 
 import type { FeedItemDto } from "../../application/dto/feed-item-dto.js";
-import type { LikeDto } from "../../application/dto/like-dto.js";
+import type {
+  LikeDto,
+  SubjectLikeDto,
+} from "../../application/dto/like-dto.js";
 import type { ILikeQuery } from "../../application/interfaces/like-query.js";
 
 export class LikeQuery implements ILikeQuery {
@@ -78,17 +81,21 @@ export class LikeQuery implements ILikeQuery {
     subjectUri: string;
     limit: number;
     cursor?: Date;
-  }): Promise<Like[]> {
+  }): Promise<SubjectLikeDto[]> {
     const filters = [eq(schema.likes.subjectUri, subjectUri)];
     if (cursor) {
       filters.push(lt(schema.likes.sortAt, cursor));
     }
     const rows = await this.db
-      .select()
+      .select({
+        actorDid: schema.likes.actorDid,
+        createdAt: schema.likes.createdAt,
+        sortAt: schema.likes.sortAt,
+      })
       .from(schema.likes)
       .where(and(...filters))
       .orderBy(desc(schema.likes.sortAt))
       .limit(limit);
-    return rows.map((row) => new Like(row));
+    return rows.map((row) => ({ ...row, actorDid: asDid(row.actorDid) }));
   }
 }
