@@ -32,7 +32,12 @@ export type PostCardProps = {
     description: string;
     thumb?: string;
   };
-  quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
+  quote?: {
+    authorDisplayName?: string;
+    authorHandle: string;
+    text?: string;
+    images?: PostImage[];
+  };
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
@@ -84,6 +89,7 @@ export function QuotedPost({
       <p className="text-label wrap-break-word whitespace-pre-wrap">
         {quote.text}
       </p>
+      {quote.images && <PostImages images={quote.images} />}
     </blockquote>
   );
 }
