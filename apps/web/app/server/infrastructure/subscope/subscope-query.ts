@@ -25,7 +25,7 @@ export type MembersDto = {
 
 export type TrackedAccountsDto = {
   total: number;
-  actors: {
+  accounts: {
     did: string;
     handle: string;
     displayName?: string;
@@ -93,7 +93,7 @@ export const subscopeQueryFactory = ({
       ).call(getTrackedAccounts, { limit: 100 });
       return {
         total,
-        actors: trackedAccounts.map(
+        accounts: trackedAccounts.map(
           ({ profile, registeredFollowersCount }) => ({
             did: profile.did,
             handle: profile.handle,

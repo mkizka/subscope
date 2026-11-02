@@ -41,7 +41,7 @@ export class RepostIndexer implements ICollectionIndexer {
 
     const recipientDid = repost.subjectUri.host;
     if (
-      recipientDid !== repost.actorDid &&
+      recipientDid !== repost.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, recipientDid))
     ) {
       await this.notificationRepository.save({
@@ -50,7 +50,7 @@ export class RepostIndexer implements ICollectionIndexer {
           {
             recordUri: repost.uri.toString(),
             recipientDid,
-            authorDid: repost.actorDid,
+            authorDid: repost.accountDid,
             reason: "repost",
             reasonSubject: repost.subjectUri.toString(),
             sortAt: repost.sortAt,

@@ -14,7 +14,7 @@ export class ListItemRepository implements IListItemRepository {
   }) {
     const data = {
       cid: listItem.cid,
-      actorDid: listItem.actorDid,
+      accountDid: listItem.accountDid,
       listUri: listItem.listUri.toString(),
       subjectDid: listItem.subjectDid,
       createdAt: sanitizeDate(listItem.createdAt),

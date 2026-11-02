@@ -10,5 +10,5 @@ export interface IJobScheduler {
   scheduleSyncTapRepo: (did: Did) => Promise<void>;
   scheduleCheckBackfill: (did: Did, attempt: number) => Promise<void>;
   scheduleAggregatePostStats: (uri: AtUri) => Promise<void>;
-  scheduleAggregateActorStats: (did: Did) => Promise<void>;
+  scheduleAggregateAccountStats: (did: Did) => Promise<void>;
 }

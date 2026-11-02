@@ -8,21 +8,21 @@ import type { ProfileDto } from "../../../application/dto/profile-dto.js";
 import type { IProfileQuery } from "../../../application/interfaces/queries/profile-query.js";
 
 const toDto = ({
-  actor,
+  account,
   profile,
 }: {
-  actor: typeof schema.actors.$inferSelect;
+  account: typeof schema.accounts.$inferSelect;
   profile: typeof schema.profiles.$inferSelect | null;
 }): ProfileDto => ({
-  actorDid: asDid(actor.did),
-  handle: isValidHandle(actor.handle) ? actor.handle : null,
+  accountDid: asDid(account.did),
+  handle: isValidHandle(account.handle) ? account.handle : null,
   displayName: profile?.displayName ?? null,
   description: profile?.description ?? null,
   avatarCid: profile?.avatarCid ?? null,
   bannerCid: profile?.bannerCid ?? null,
   createdAt: profile?.createdAt ?? null,
-  indexedAt: profile?.indexedAt ?? actor.indexedAt,
-  status: actor.status,
+  indexedAt: profile?.indexedAt ?? account.indexedAt,
+  status: account.status,
 });
 
 export class ProfileQuery implements IProfileQuery {
@@ -30,13 +30,13 @@ export class ProfileQuery implements IProfileQuery {
 
   async findByDids(dids: Did[]): Promise<ProfileDto[]> {
     const rows = await this.db
-      .select({ actor: schema.actors, profile: schema.profiles })
-      .from(schema.actors)
+      .select({ account: schema.accounts, profile: schema.profiles })
+      .from(schema.accounts)
       .leftJoin(
         schema.profiles,
-        eq(schema.actors.did, schema.profiles.actorDid),
+        eq(schema.accounts.did, schema.profiles.accountDid),
       )
-      .where(inArray(schema.actors.did, dids));
+      .where(inArray(schema.accounts.did, dids));
     return rows.map(toDto);
   }
 
@@ -47,14 +47,17 @@ export class ProfileQuery implements IProfileQuery {
   }): Promise<ProfileDto[]> {
     const pattern = `%${params.query.replace(/[%_]/g, "\\$&")}%`;
     const rows = await this.db
-      .select({ actor: schema.actors, profile: schema.profiles })
+      .select({ account: schema.accounts, profile: schema.profiles })
       .from(schema.profiles)
-      .innerJoin(schema.actors, eq(schema.profiles.actorDid, schema.actors.did))
+      .innerJoin(
+        schema.accounts,
+        eq(schema.profiles.accountDid, schema.accounts.did),
+      )
       .where(
         and(
           or(
             ilike(schema.profiles.displayName, pattern),
-            ilike(schema.actors.handle, pattern),
+            ilike(schema.accounts.handle, pattern),
           ),
           params.cursor && lt(schema.profiles.indexedAt, params.cursor),
         ),

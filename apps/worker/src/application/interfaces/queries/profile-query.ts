@@ -4,6 +4,6 @@ import type { TransactionContext } from "@repo/common/domain";
 export interface IProfileQuery {
   exists: (params: {
     ctx: TransactionContext;
-    actorDid: Did;
+    accountDid: Did;
   }) => Promise<boolean>;
 }

@@ -18,13 +18,13 @@ export const getTrackedAccountsUseCaseFactory = ({
   async execute(did) {
     const result = await subscopeQuery.findTrackedAccounts(did);
     const statuses = await backfillQuery.findTrackedStatuses(
-      result.actors.map((actor) => actor.did),
+      result.accounts.map((account) => account.did),
     );
     return {
       ...result,
-      actors: result.actors.map((actor) => ({
-        ...actor,
-        backfillStatus: statuses[actor.did],
+      accounts: result.accounts.map((account) => ({
+        ...account,
+        backfillStatus: statuses[account.did],
       })),
     };
   },

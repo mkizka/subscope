@@ -6,9 +6,9 @@ const meta = {
   component: SearchPage,
   args: {
     q: "alice",
-    tab: "actors",
+    tab: "accounts",
     posts: [],
-    actors: [
+    accounts: [
       {
         did: "did:plc:alice",
         handle: "alice.bsky.social",
@@ -27,7 +27,7 @@ export default meta;
 export const Default: StoryObj<typeof meta> = {};
 
 export const NotFound: StoryObj<typeof meta> = {
-  args: { actors: [] },
+  args: { accounts: [] },
 };
 
 export const Posts: StoryObj<typeof meta> = {
@@ -51,5 +51,5 @@ export const PostsNotFound: StoryObj<typeof meta> = {
 };
 
 export const Empty: StoryObj<typeof meta> = {
-  args: { q: undefined, actors: [] },
+  args: { q: undefined, accounts: [] },
 };

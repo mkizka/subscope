@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   recordFactory,
   repostFactory,
@@ -17,7 +17,7 @@ describe("app.bsky.feed.getRepostedBy", () => {
   test("getRepostedBy-1: 指定した投稿をリポストしたアカウントをprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const post = await postFactory(ctx.db).create();
@@ -25,7 +25,7 @@ describe("app.bsky.feed.getRepostedBy", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.repost")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         subject: () => post,
       })
@@ -39,7 +39,7 @@ describe("app.bsky.feed.getRepostedBy", () => {
     // assert
     expect(res).toMatchObject({
       uri: post.uri,
-      repostedBy: [{ did: actor.did }],
+      repostedBy: [{ did: account.did }],
     });
   });
 
@@ -48,22 +48,22 @@ describe("app.bsky.feed.getRepostedBy", () => {
     const { client } = await setupApiTest();
     const post = await postFactory(ctx.db).create();
     const create = async (date: Date) => {
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       await repostFactory(ctx.db)
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.feed.repost")
-              .vars({ actor: () => actor })
+              .vars({ account: () => account })
               .create(),
           subject: () => post,
         })
         .props({ createdAt: () => date, indexedAt: () => date })
         .create();
-      return actor;
+      return account;
     };
-    const oldActor = await create(new Date("2024-01-01"));
-    const middleActor = await create(new Date("2024-01-02"));
-    const newActor = await create(new Date("2024-01-03"));
+    const oldAccount = await create(new Date("2024-01-01"));
+    const middleAccount = await create(new Date("2024-01-02"));
+    const newAccount = await create(new Date("2024-01-03"));
 
     // act
     const firstPage = await client.call(getRepostedBy, {
@@ -78,9 +78,9 @@ describe("app.bsky.feed.getRepostedBy", () => {
 
     // assert
     expect(firstPage.repostedBy.map((a) => a.did)).toEqual([
-      newActor.did,
-      middleActor.did,
+      newAccount.did,
+      middleAccount.did,
     ]);
-    expect(secondPage.repostedBy.map((a) => a.did)).toEqual([oldActor.did]);
+    expect(secondPage.repostedBy.map((a) => a.did)).toEqual([oldAccount.did]);
   });
 });

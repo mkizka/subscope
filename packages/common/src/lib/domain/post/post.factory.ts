@@ -24,7 +24,7 @@ export function postFactory(params?: Partial<PostParams>) {
   const post = new Post({
     uri: params?.uri ?? fakeAtUri({ collection: "app.bsky.feed.post" }),
     cid: params?.cid ?? fakeCid(),
-    actorDid: params?.actorDid ?? fakeDid(),
+    accountDid: params?.accountDid ?? fakeDid(),
     text: params?.text ?? fakeText(),
     replyRoot: normalizeRef(params?.replyRoot),
     replyParent: normalizeRef(params?.replyParent),

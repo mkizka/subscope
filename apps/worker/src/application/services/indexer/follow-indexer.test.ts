@@ -1,6 +1,6 @@
 import type { AfterCommitContext } from "@repo/common/domain";
 import {
-  actorFactory,
+  accountFactory,
   recordFactory,
   registrationFactory,
 } from "@repo/common/test";
@@ -34,8 +34,8 @@ describe("FollowIndexer", () => {
   describe("upsert", () => {
     test("フォローレコードを正しく保存する", async () => {
       // arrange
-      const follower = actorFactory();
-      const followee = actorFactory();
+      const follower = accountFactory();
+      const followee = accountFactory();
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey123`,
         json: {
@@ -57,16 +57,16 @@ describe("FollowIndexer", () => {
       expect(follow).toMatchObject({
         uri: record.uri,
         cid: record.cid,
-        actorDid: follower.did,
+        accountDid: follower.did,
         subjectDid: followee.did,
       });
     });
 
     test("notify-5: フォローされたアカウントに follow の通知を作る", async () => {
       // arrange
-      const follower = actorFactory();
-      const followee = actorFactory();
-      registrationQuery.add(registrationFactory({ actorDid: followee.did }));
+      const follower = accountFactory();
+      const followee = accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: followee.did }));
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
         json: {
@@ -95,8 +95,8 @@ describe("FollowIndexer", () => {
   describe("afterAction", () => {
     test("フォロー作成時にfollows/followers集計ジョブがスケジュールされる", async () => {
       // arrange
-      const follower = actorFactory();
-      const followee = actorFactory();
+      const follower = accountFactory();
+      const followee = accountFactory();
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey789`,
         json: {
@@ -115,7 +115,7 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record, action: "upsert" });
 
       // assert
-      expect(jobScheduler.getAggregateActorStatsDids()).toEqual([
+      expect(jobScheduler.getAggregateAccountStatsDids()).toEqual([
         follower.did,
         followee.did,
       ]);

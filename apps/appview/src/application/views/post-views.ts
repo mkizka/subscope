@@ -34,7 +34,7 @@ export class PostViews {
     const [record, author, stats, viewer, embed, gate, postgate, labels] =
       await Promise.all([
         ctx.record(uri),
-        this.profileViews.basic(post.actorDid, ctx),
+        this.profileViews.basic(post.accountDid, ctx),
         ctx.stats(uri),
         ctx.viewerPostState(uri),
         this.embedViews.embedView(post, ctx),
@@ -65,7 +65,7 @@ export class PostViews {
         like: viewer.like?.uri,
         replyDisabled,
         embeddingDisabled:
-          postgate && this.embeddingDisabled(post.actorDid, postgate, ctx),
+          postgate && this.embeddingDisabled(post.accountDid, postgate, ctx),
       },
       threadgate,
       labels: [...toLabelViews(labels), ...toSelfLabelViews(record)],

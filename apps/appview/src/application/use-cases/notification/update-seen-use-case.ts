@@ -9,9 +9,9 @@ export class UpdateSeenUseCase {
     private readonly registrationRepository: IRegistrationRepository,
   ) {}
 
-  async execute(params: { actorDid: Did; seenAt: Date }): Promise<void> {
+  async execute(params: { accountDid: Did; seenAt: Date }): Promise<void> {
     const registration = await this.registrationRepository.find(
-      params.actorDid,
+      params.accountDid,
     );
     if (!registration) {
       return;
@@ -20,7 +20,7 @@ export class UpdateSeenUseCase {
       await this.registrationRepository.save({
         ctx,
         registration: new Registration({
-          actorDid: registration.actorDid,
+          accountDid: registration.accountDid,
           inviteCode: registration.inviteCode,
           seenAt: params.seenAt,
           createdAt: registration.createdAt,

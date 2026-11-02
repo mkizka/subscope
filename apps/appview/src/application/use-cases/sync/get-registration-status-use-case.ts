@@ -3,7 +3,7 @@ import type { Did } from "@atproto/did";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 
 type GetRegistrationStatusParams = {
-  actorDid: Did;
+  accountDid: Did;
 };
 
 export class GetRegistrationStatusUseCase {
@@ -13,7 +13,7 @@ export class GetRegistrationStatusUseCase {
 
   async execute(params: GetRegistrationStatusParams) {
     const registration = await this.registrationRepository.find(
-      params.actorDid,
+      params.accountDid,
     );
 
     if (!registration) {

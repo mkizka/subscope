@@ -18,12 +18,12 @@ import {
   TransactionManager,
 } from "@repo/common/infrastructure";
 
-import type { IActorRepository } from "../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../application/interfaces/account-repository.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
-import type { IActorQuery } from "../application/interfaces/queries/actor-query.js";
-import type { IActorStatsQuery } from "../application/interfaces/queries/actor-stats-query.js";
+import type { IAccountQuery } from "../application/interfaces/queries/account-query.js";
+import type { IAccountStatsQuery } from "../application/interfaces/queries/account-stats-query.js";
 import type { IAuthorFeedQuery } from "../application/interfaces/queries/author-feed-query.js";
 import type { IFollowQuery } from "../application/interfaces/queries/follow-query.js";
 import type { IGeneratorQuery } from "../application/interfaces/queries/generator-query.js";
@@ -91,12 +91,12 @@ import { PostViews } from "../application/views/post-views.js";
 import { ProfileViews } from "../application/views/profile-views.js";
 import { ViewContextFactory } from "../application/views/view-context.js";
 import { AtUriService } from "../domain/service/at-uri-service.js";
-import { ActorRepository } from "../infrastructure/actor-repository/actor-repository.js";
+import { AccountRepository } from "../infrastructure/account-repository/account-repository.js";
 import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
-import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
-import { ActorStatsQuery } from "../infrastructure/queries/actor-stats-query/actor-stats-query.js";
+import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
+import { AccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.js";
 import { AuthorFeedQuery } from "../infrastructure/queries/author-feed-query/author-feed-query.js";
 import { FollowQuery } from "../infrastructure/queries/follow-query/follow-query.js";
 import { GeneratorQuery } from "../infrastructure/queries/generator-query/generator-query.js";
@@ -189,9 +189,9 @@ export const createAppRegistry = (env: Env) =>
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
-    .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
-    .service("actorQuery", ["db"], asClassArgs<IActorQuery>()(ActorQuery))
-    .service("actorStatsQuery", ["db"], asClassArgs<IActorStatsQuery>()(ActorStatsQuery))
+    .service("accountRepository", ["db"], asClassArgs<IAccountRepository>()(AccountRepository))
+    .service("accountQuery", ["db"], asClassArgs<IAccountQuery>()(AccountQuery))
+    .service("accountStatsQuery", ["db"], asClassArgs<IAccountStatsQuery>()(AccountStatsQuery))
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationQuery", ["db"], asClassArgs<INotificationQuery>()(NotificationQuery))
@@ -213,12 +213,12 @@ export const createAppRegistry = (env: Env) =>
     .service("assetUrlBuilder", ["blobProxyUrl"], asClassArgs<IAssetUrlBuilder>()(AssetUrlBuilder))
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
-    .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
+    .service("createAdminService", ["accountRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
-    .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
+    .service("adminMiddleware", ["authVerifierMiddleware", "accountRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
-    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
+    .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "accountStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
     .service("embedViews", ["profileViews", "generatorViews", "assetUrlBuilder"], asClassArgs(EmbedViews))
@@ -249,20 +249,20 @@ export const createAppRegistry = (env: Env) =>
     .service("getListsUseCase", ["listQuery", "viewContextFactory", "listViews"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["transactionManager", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
-    .service("getBannedAccountsUseCase", ["actorQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedAccountsUseCase))
+    .service("getBannedAccountsUseCase", ["accountQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedAccountsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
-    .service("listRegisteredAccountsUseCase", ["viewContextFactory", "profileViews", "actorRepository", "registrationQuery"], asClassArgs(ListRegisteredAccountsUseCase))
-    .service("grantAdminUseCase", ["transactionManager", "actorRepository", "registrationRepository"], asClassArgs(GrantAdminUseCase))
-    .service("registerAdminUseCase", ["transactionManager", "actorQuery", "registrationRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
-    .service("verifyAccessUseCase", ["actorRepository"], asClassArgs(VerifyAccessUseCase))
-    .service("getRegisteredAccountsUseCase", ["registrationQuery", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetRegisteredAccountsUseCase))
-    .service("getSetupStatusUseCase", ["actorQuery"], asClassArgs(GetSetupStatusUseCase))
+    .service("listRegisteredAccountsUseCase", ["viewContextFactory", "profileViews", "accountRepository", "registrationQuery"], asClassArgs(ListRegisteredAccountsUseCase))
+    .service("grantAdminUseCase", ["transactionManager", "accountRepository", "registrationRepository"], asClassArgs(GrantAdminUseCase))
+    .service("registerAdminUseCase", ["transactionManager", "accountQuery", "registrationRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
+    .service("verifyAccessUseCase", ["accountRepository"], asClassArgs(VerifyAccessUseCase))
+    .service("getRegisteredAccountsUseCase", ["registrationQuery", "accountRepository", "viewContextFactory", "profileViews"], asClassArgs(GetRegisteredAccountsUseCase))
+    .service("getSetupStatusUseCase", ["accountQuery"], asClassArgs(GetSetupStatusUseCase))
     .service("getTrackedAccountsUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedAccountsUseCase))
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
-    .service("registerAccountUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "registrationRepository", "jobScheduler"], asClassArgs(RegisterAccountUseCase))
+    .service("registerAccountUseCase", ["transactionManager", "accountRepository", "inviteCodeRepository", "registrationRepository", "jobScheduler"], asClassArgs(RegisterAccountUseCase))
     .service("unregisterAccountUseCase", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(UnregisterAccountUseCase))
-    .service("unbanAccountUseCase", ["transactionManager", "actorRepository"], asClassArgs(UnbanAccountUseCase))
-    .service("banAccountUseCase", ["transactionManager", "actorRepository", "unregisterAccountUseCase"], asClassArgs(BanAccountUseCase))
+    .service("unbanAccountUseCase", ["transactionManager", "accountRepository"], asClassArgs(UnbanAccountUseCase))
+    .service("banAccountUseCase", ["transactionManager", "accountRepository", "unregisterAccountUseCase"], asClassArgs(BanAccountUseCase))
     .service("updateSeenUseCase", ["transactionManager", "registrationRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))

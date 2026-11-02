@@ -7,7 +7,7 @@ type FetchRecordData = {
   live: boolean;
 };
 
-type AggregateActorStatsData = {
+type AggregateAccountStatsData = {
   did: Did;
 };
 
@@ -20,7 +20,7 @@ export type JobData = {
   resolveDid: Did;
   fetchRecord: FetchRecordData;
   aggregatePostStats: null;
-  aggregateActorStats: AggregateActorStatsData;
+  aggregateAccountStats: AggregateAccountStatsData;
   syncTapRepo: Did;
   checkBackfill: CheckBackfillData;
 };

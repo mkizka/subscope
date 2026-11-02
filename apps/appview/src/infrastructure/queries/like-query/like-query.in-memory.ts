@@ -28,7 +28,7 @@ export class InMemoryLikeQuery implements ILikeQuery {
       this.likes
         .filter(
           (like) =>
-            like.actorDid === viewerDid &&
+            like.accountDid === viewerDid &&
             uris.includes(like.subjectUri.toString()),
         )
         .map((like) => ({
@@ -38,7 +38,7 @@ export class InMemoryLikeQuery implements ILikeQuery {
     );
   }
 
-  findActorLikeFeedItems(): Promise<FeedItemDto[]> {
+  findAccountLikeFeedItems(): Promise<FeedItemDto[]> {
     throw new Error("Not implemented");
   }
 
@@ -60,8 +60,8 @@ export class InMemoryLikeQuery implements ILikeQuery {
         )
         .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
         .slice(0, limit)
-        .map(({ actorDid, createdAt, sortAt }) => ({
-          actorDid,
+        .map(({ accountDid, createdAt, sortAt }) => ({
+          accountDid,
           createdAt,
           sortAt,
         })),

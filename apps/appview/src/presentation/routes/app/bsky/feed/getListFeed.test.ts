@@ -1,7 +1,7 @@
 import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
 import { schema } from "@repo/db";
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   postFeedItemFactory,
   recordFactory,
@@ -15,21 +15,21 @@ describe("app.bsky.feed.getListFeed", () => {
   const { ctx } = testSetup;
 
   const createPost = async () => {
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const post = await postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
       })
       .create();
     await postFeedItemFactory(ctx.db)
       .vars({ post: () => post })
       .create();
-    return { actor, post };
+    return { account, post };
   };
 
   test("getListFeed-1: リストのメンバーの投稿だけをfeedViewPostで返す", async () => {
@@ -45,9 +45,9 @@ describe("app.bsky.feed.getListFeed", () => {
     await ctx.db.insert(schema.listItems).values({
       uri: listItemRecord.uri,
       cid: listItemRecord.cid,
-      actorDid: listItemRecord.actorDid,
+      accountDid: listItemRecord.accountDid,
       listUri,
-      subjectDid: member.actor.did,
+      subjectDid: member.account.did,
       createdAt: new Date(),
       indexedAt: new Date(),
     });
@@ -57,7 +57,7 @@ describe("app.bsky.feed.getListFeed", () => {
 
     // assert
     expect(res.feed).toMatchObject([
-      { post: { uri: member.post.uri, author: { did: member.actor.did } } },
+      { post: { uri: member.post.uri, author: { did: member.account.did } } },
     ]);
   });
 });

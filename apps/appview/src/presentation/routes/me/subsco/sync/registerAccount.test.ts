@@ -1,6 +1,6 @@
 import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
 import { schema } from "@repo/db";
-import { actorFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -11,7 +11,7 @@ describe("me.subsco.sync.registerAccount", () => {
 
   const findRegistration = (did: string) =>
     ctx.db.query.registrations.findFirst({
-      where: eq(schema.registrations.actorDid, did),
+      where: eq(schema.registrations.accountDid, did),
     });
 
   test("registerAccount-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す", async () => {
@@ -20,9 +20,9 @@ describe("me.subsco.sync.registerAccount", () => {
     const inviteCode = await inviteCodeFactory(ctx.db).create();
     const clients = await Promise.all(
       [0, 1, 2].map(async () => {
-        const actor = await actorFactory(ctx.db).create();
+        const account = await accountFactory(ctx.db).create();
         const client = createClient();
-        loginAs(actor.did, client);
+        loginAs(account.did, client);
         return client;
       }),
     );
@@ -45,11 +45,11 @@ describe("me.subsco.sync.registerAccount", () => {
   test("registerAccount-2: BANされたアカウントは登録せず、400とBannedを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .props({ isBanned: () => true })
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
-    loginAs(actor.did);
+    loginAs(account.did);
 
     // act
     const promise = client.call(registerAccount, {
@@ -89,9 +89,9 @@ describe("me.subsco.sync.registerAccount", () => {
     async ({ code }) => {
       // arrange
       const { client, loginAs } = await setupApiTest();
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const inviteCode = await code();
-      loginAs(actor.did);
+      loginAs(account.did);
 
       // act
       const promise = client.call(registerAccount, { inviteCode });
@@ -101,18 +101,18 @@ describe("me.subsco.sync.registerAccount", () => {
         status: 400,
         error: "InvalidInviteCode",
       });
-      expect(await findRegistration(actor.did)).toBeUndefined();
+      expect(await findRegistration(account.did)).toBeUndefined();
     },
   );
 
   test("registerAccount-4: 登録済みのアカウントは登録せず、400とAlreadyRegisteredを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
-    loginAs(actor.did);
+    loginAs(account.did);
 
     // act
     const promise = client.call(registerAccount, {
@@ -129,7 +129,7 @@ describe("me.subsco.sync.registerAccount", () => {
   test("registerAccount-5: 管理者は招待コードなしで登録する", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);
@@ -146,9 +146,9 @@ describe("me.subsco.sync.registerAccount", () => {
   test("registerAccount-6: 登録に使った招待コードを使用済みにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
-    loginAs(actor.did);
+    loginAs(account.did);
 
     // act
     await client.call(registerAccount, { inviteCode: inviteCode.code });
@@ -163,15 +163,15 @@ describe("me.subsco.sync.registerAccount", () => {
   test("registerAccount-7: 登録したアカウントのsyncTapRepoジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
-    loginAs(actor.did);
+    loginAs(account.did);
 
     // act
     await client.call(registerAccount, { inviteCode: inviteCode.code });
 
     // assert
-    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: actor.did }]);
+    expect(jobScheduler.getSyncTapRepoJobs()).toEqual([{ did: account.did }]);
   });
 
   test("registerAccount-8: DBにないアカウントも登録する", async () => {

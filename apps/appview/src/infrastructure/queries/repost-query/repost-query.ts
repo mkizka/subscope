@@ -9,7 +9,7 @@ import type { IRepostQuery } from "../../../application/interfaces/queries/repos
 
 const columns = {
   uri: schema.reposts.uri,
-  actorDid: schema.reposts.actorDid,
+  accountDid: schema.reposts.accountDid,
   subjectUri: schema.reposts.subjectUri,
   indexedAt: schema.reposts.indexedAt,
   sortAt: schema.reposts.sortAt,
@@ -17,13 +17,13 @@ const columns = {
 
 const toRepostDto = (row: {
   uri: string;
-  actorDid: string;
+  accountDid: string;
   subjectUri: string;
   indexedAt: Date;
   sortAt: Date;
 }): RepostDto => ({
   uri: asAtUriString(row.uri),
-  actorDid: asDid(row.actorDid),
+  accountDid: asDid(row.accountDid),
   subjectUri: asAtUriString(row.subjectUri),
   indexedAt: row.indexedAt,
   sortAt: row.sortAt,
@@ -63,7 +63,7 @@ export class RepostQuery implements IRepostQuery {
       .from(schema.reposts)
       .where(
         and(
-          eq(schema.reposts.actorDid, viewerDid),
+          eq(schema.reposts.accountDid, viewerDid),
           inArray(
             schema.reposts.subjectUri,
             subjectUris.map((uri) => uri.toString()),

@@ -27,7 +27,7 @@ export class LikeIndexer implements ICollectionIndexer {
   }) {
     const like = Like.from(record);
     return (
-      (await this.registrationQuery.isRegistered(ctx, like.actorDid)) ||
+      (await this.registrationQuery.isRegistered(ctx, like.accountDid)) ||
       (await this.registrationQuery.isRegistered(ctx, like.subjectUri.host))
     );
   }
@@ -39,14 +39,14 @@ export class LikeIndexer implements ICollectionIndexer {
       await this.registrationQuery.isRegistered(ctx, recipientDid);
     await this.likeRepository.save({ ctx, like });
 
-    if (recipientDid !== like.actorDid && isRecipientRegisteredAccount) {
+    if (recipientDid !== like.accountDid && isRecipientRegisteredAccount) {
       await this.notificationRepository.save({
         ctx,
         notifications: [
           {
             recordUri: like.uri.toString(),
             recipientDid,
-            authorDid: like.actorDid,
+            authorDid: like.accountDid,
             reason: "like",
             reasonSubject: like.subjectUri.toString(),
             sortAt: like.sortAt,

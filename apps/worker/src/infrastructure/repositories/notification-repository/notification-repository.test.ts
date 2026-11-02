@@ -1,5 +1,5 @@
 import { schema } from "@repo/db";
-import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { NotificationRepository } from "./notification-repository.js";
@@ -12,10 +12,10 @@ describe("NotificationRepository", () => {
   describe("save", () => {
     test("通知を保存し、同じレコードと受信者の組み合わせは無視する", async () => {
       // arrange
-      const author = await actorFactory(ctx.db).create();
-      const recipient = await actorFactory(ctx.db).create();
+      const author = await accountFactory(ctx.db).create();
+      const recipient = await accountFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => author })
+        .vars({ account: () => author })
         .create();
       const notification = {
         recordUri: record.uri,

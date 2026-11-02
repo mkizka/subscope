@@ -7,7 +7,7 @@ import {
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
-import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
+import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 
 export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {
@@ -23,14 +23,14 @@ type RegisterAdminParams = {
 export class RegisterAdminUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly actorQuery: IActorQuery,
+    private readonly accountQuery: IAccountQuery,
     private readonly registrationRepository: IRegistrationRepository,
     private readonly createAdminService: CreateAdminService,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
   async execute(params: RegisterAdminParams): Promise<void> {
-    const hasAnyAdmin = await this.actorQuery.hasAnyAdmin();
+    const hasAnyAdmin = await this.accountQuery.hasAnyAdmin();
     if (hasAnyAdmin) {
       throw new AdminAlreadyExistsError("Admin already exists");
     }
@@ -42,7 +42,7 @@ export class RegisterAdminUseCase {
       });
 
       const registration = new Registration({
-        actorDid: params.requesterDid,
+        accountDid: params.requesterDid,
         createdAt: new Date(),
       });
       await this.registrationRepository.save({ ctx, registration });

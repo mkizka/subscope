@@ -34,7 +34,7 @@ export class NotificationQuery implements INotificationQuery {
       .innerJoin(records, eq(records.uri, notifications.recordUri))
       .leftJoin(
         registrations,
-        eq(registrations.actorDid, notifications.recipientDid),
+        eq(registrations.accountDid, notifications.recipientDid),
       )
       .where(
         and(
@@ -61,7 +61,7 @@ export class NotificationQuery implements INotificationQuery {
       .from(notifications)
       .leftJoin(
         registrations,
-        eq(registrations.actorDid, notifications.recipientDid),
+        eq(registrations.accountDid, notifications.recipientDid),
       )
       .where(
         and(

@@ -10,7 +10,7 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 type Filter = AppBskyFeedGetAuthorFeed.$Params["filter"];
 
 type GetAuthorFeedParams = {
-  actorDid: Did;
+  accountDid: Did;
   limit: number;
   filter: Filter;
   includePins: boolean;
@@ -52,7 +52,7 @@ export class GetAuthorFeedUseCase {
     });
 
     const feedItems = await this.findFeedItems(params.filter, {
-      actorDid: params.actorDid,
+      accountDid: params.accountDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
     });
@@ -71,7 +71,7 @@ export class GetAuthorFeedUseCase {
 
   private findFeedItems(
     filter: Filter,
-    params: { actorDid: Did; limit: number; cursor?: Date },
+    params: { accountDid: Did; limit: number; cursor?: Date },
   ): Promise<FeedItemDto[]> {
     switch (filter) {
       case "posts_no_replies":

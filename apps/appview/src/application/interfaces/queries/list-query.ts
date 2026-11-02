@@ -4,8 +4,8 @@ import type { AtUri } from "@atproto/syntax";
 import type { ListDto, ListItemDto } from "../../dto/list-dto.js";
 
 export interface IListQuery {
-  findByActor: (params: {
-    actorDid: Did;
+  findByAccount: (params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
     purposes?: string[];

@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
-import { actorFactory } from "@repo/common/test";
+import { accountFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -8,14 +8,14 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("ResolveDidUseCase", () => {
   let resolveDidUseCase: TestServices["resolveDidUseCase"];
-  let actorRepository: TestServices["actorRepository"];
+  let accountRepository: TestServices["accountRepository"];
   let didResolver: TestServices["didResolver"];
   let handleResolver: TestServices["handleResolver"];
   let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     resolveDidUseCase = services.resolveDidUseCase;
-    actorRepository = services.actorRepository;
+    accountRepository = services.accountRepository;
     didResolver = services.didResolver;
     handleResolver = services.handleResolver;
     ctx = { db: services.db };
@@ -39,8 +39,8 @@ describe("ResolveDidUseCase", () => {
     await resolveDidUseCase.execute(did);
 
     // assert
-    const actor = await actorRepository.find({ ctx, did });
-    expect(actor?.handle).toBe("alice.test");
+    const account = await accountRepository.find({ ctx, did });
+    expect(account?.handle).toBe("alice.test");
   });
 
   test("resolveDid-2: ハンドルが同じDIDに解決できないときは handle.invalid を保存する", async () => {
@@ -53,22 +53,22 @@ describe("ResolveDidUseCase", () => {
     await resolveDidUseCase.execute(did);
 
     // assert
-    const actor = await actorRepository.find({ ctx, did });
-    expect(actor?.handle).toBe("handle.invalid");
+    const account = await accountRepository.find({ ctx, did });
+    expect(account?.handle).toBe("handle.invalid");
   });
 
   test("resolveDid-3: すでに handle.invalid 以外のハンドルを持つアカウントのハンドルは上書きしない", async () => {
     // arrange
-    const actor = actorFactory({ handle: asHandle("old.test") });
-    actorRepository.add(actor);
-    setDidDocument(actor.did, "alice.test");
-    handleResolver.add(asHandle("alice.test"), actor.did);
+    const account = accountFactory({ handle: asHandle("old.test") });
+    accountRepository.add(account);
+    setDidDocument(account.did, "alice.test");
+    handleResolver.add(asHandle("alice.test"), account.did);
 
     // act
-    await resolveDidUseCase.execute(actor.did);
+    await resolveDidUseCase.execute(account.did);
 
     // assert
-    const saved = await actorRepository.find({ ctx, did: actor.did });
+    const saved = await accountRepository.find({ ctx, did: account.did });
     expect(saved?.handle).toBe("old.test");
   });
 });

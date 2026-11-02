@@ -40,7 +40,7 @@ export class RegistrationQuery implements IRegistrationQuery {
     return rows.map(
       (row) =>
         new Registration({
-          actorDid: row.actorDid,
+          accountDid: row.accountDid,
           inviteCode: row.inviteCode,
           seenAt: row.seenAt,
           createdAt: row.createdAt,
@@ -59,52 +59,52 @@ export class RegistrationQuery implements IRegistrationQuery {
     limit: number;
     cursor?: string;
   }): Promise<{ did: Did; registeredFollowersCount: number }[]> {
-    const { actors, follows, registrations } = schema;
-    const registeredFollowersCount = countDistinct(registrations.actorDid);
+    const { accounts, follows, registrations } = schema;
+    const registeredFollowersCount = countDistinct(registrations.accountDid);
     const cursor = params.cursor?.split("::");
 
     const rows = await this.db
-      .select({ did: actors.did, registeredFollowersCount })
-      .from(actors)
-      .leftJoin(follows, eq(follows.subjectDid, actors.did))
-      .leftJoin(registrations, eq(registrations.actorDid, follows.actorDid))
+      .select({ did: accounts.did, registeredFollowersCount })
+      .from(accounts)
+      .leftJoin(follows, eq(follows.subjectDid, accounts.did))
+      .leftJoin(registrations, eq(registrations.accountDid, follows.accountDid))
       .where(this.isTrackedAccount())
-      .groupBy(actors.did)
+      .groupBy(accounts.did)
       .having(
         cursor
           ? or(
               lt(registeredFollowersCount, Number(cursor[0])),
               and(
                 eq(registeredFollowersCount, Number(cursor[0])),
-                gt(actors.did, cursor[1] ?? ""),
+                gt(accounts.did, cursor[1] ?? ""),
               ),
             )
           : undefined,
       )
-      .orderBy(desc(registeredFollowersCount), asc(actors.did))
+      .orderBy(desc(registeredFollowersCount), asc(accounts.did))
       .limit(params.limit);
 
     return rows.map((row) => ({ ...row, did: asDid(row.did) }));
   }
 
   async countTrackedAccounts(): Promise<number> {
-    const { actors, follows, registrations } = schema;
+    const { accounts, follows, registrations } = schema;
     const [row] = await this.db
-      .select({ total: countDistinct(actors.did) })
-      .from(actors)
-      .leftJoin(follows, eq(follows.subjectDid, actors.did))
-      .leftJoin(registrations, eq(registrations.actorDid, follows.actorDid))
+      .select({ total: countDistinct(accounts.did) })
+      .from(accounts)
+      .leftJoin(follows, eq(follows.subjectDid, accounts.did))
+      .leftJoin(registrations, eq(registrations.accountDid, follows.accountDid))
       .where(this.isTrackedAccount());
     return row?.total ?? 0;
   }
 
   private isTrackedAccount() {
-    const { actors, registrations } = schema;
+    const { accounts, registrations } = schema;
     return or(
-      isNotNull(registrations.actorDid),
+      isNotNull(registrations.accountDid),
       inArray(
-        actors.did,
-        this.db.select({ did: registrations.actorDid }).from(registrations),
+        accounts.did,
+        this.db.select({ did: registrations.accountDid }).from(registrations),
       ),
     );
   }

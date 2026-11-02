@@ -12,7 +12,7 @@ import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/queries/profile-query/profile-query.in-memory.js";
 import { InMemoryRegistrationQuery } from "../infrastructure/queries/registration-query/registration-query.in-memory.js";
-import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
+import { InMemoryAccountRepository } from "../infrastructure/repositories/account-repository/account-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
@@ -45,7 +45,7 @@ export const testEnv = {
 export const testRegistry = createWorkerRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
-  .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
+  .replaceService("accountRepository", asClassArgs(InMemoryAccountRepository))
   .replaceService("feedItemRepository", asClassArgs(InMemoryFeedItemRepository))
   .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
   .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))

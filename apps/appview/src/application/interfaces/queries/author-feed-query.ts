@@ -1,7 +1,7 @@
 import type { FeedItemDto } from "../../dto/feed-item-dto.js";
 
 type FindParams = {
-  actorDid: string;
+  accountDid: string;
   limit: number;
   cursor?: Date;
 };

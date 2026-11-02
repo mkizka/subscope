@@ -1,6 +1,6 @@
 import getTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAccounts";
 import {
-  actorFactory,
+  accountFactory,
   followFactory,
   recordFactory,
   testSetup,
@@ -12,25 +12,25 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.server.getTrackedAccounts", () => {
   const { ctx } = testSetup;
 
-  const createActor = () =>
-    actorFactory(ctx.db)
+  const createAccount = () =>
+    accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
 
   const createRegisteredAccount = () =>
-    actorFactory(ctx.db)
+    accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .use((t) => t.registeredAccount())
       .create();
 
-  type Actor = Awaited<ReturnType<typeof createActor>>;
+  type Account = Awaited<ReturnType<typeof createAccount>>;
 
-  const follow = (follower: Actor, followee: Actor) =>
+  const follow = (follower: Account, followee: Account) =>
     followFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => follower })
+            .vars({ account: () => follower })
             .create(),
         followee: () => followee,
       })
@@ -40,9 +40,9 @@ describe("me.subsco.server.getTrackedAccounts", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const registeredAccount = await createRegisteredAccount();
-    const followee = await createActor();
-    const other = await createActor();
-    const otherFollowee = await createActor();
+    const followee = await createAccount();
+    const other = await createAccount();
+    const otherFollowee = await createAccount();
     await follow(registeredAccount, followee);
     await follow(other, otherFollowee);
     loginAs(registeredAccount.did);
@@ -61,8 +61,8 @@ describe("me.subsco.server.getTrackedAccounts", () => {
     const { client, loginAs } = await setupApiTest();
     const registeredAccount1 = await createRegisteredAccount();
     const registeredAccount2 = await createRegisteredAccount();
-    const followedByOne = await createActor();
-    const followedByTwo = await createActor();
+    const followedByOne = await createAccount();
+    const followedByTwo = await createAccount();
     await follow(registeredAccount1, followedByOne);
     await follow(registeredAccount1, followedByTwo);
     await follow(registeredAccount2, followedByTwo);
@@ -86,8 +86,8 @@ describe("me.subsco.server.getTrackedAccounts", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const registeredAccount = await createRegisteredAccount();
-    await follow(registeredAccount, await createActor());
-    await follow(registeredAccount, await createActor());
+    await follow(registeredAccount, await createAccount());
+    await follow(registeredAccount, await createAccount());
     loginAs(registeredAccount.did);
 
     // act

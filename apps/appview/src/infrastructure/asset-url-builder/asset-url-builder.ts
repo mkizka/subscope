@@ -6,19 +6,19 @@ export class AssetUrlBuilder implements IAssetUrlBuilder {
   constructor(private readonly blobProxyUrl: UriString) {}
 
   // TODO: avatar,bunnerが使われていないので確認
-  getAvatarThumbnailUrl(actorDid: string, cid: string): UriString {
-    return `${this.blobProxyUrl}/img/avatar_thumbnail/plain/${actorDid}/${cid}`;
+  getAvatarThumbnailUrl(accountDid: string, cid: string): UriString {
+    return `${this.blobProxyUrl}/img/avatar_thumbnail/plain/${accountDid}/${cid}`;
   }
 
-  getBannerUrl(actorDid: string, cid: string): UriString {
-    return `${this.blobProxyUrl}/img/banner/plain/${actorDid}/${cid}`;
+  getBannerUrl(accountDid: string, cid: string): UriString {
+    return `${this.blobProxyUrl}/img/banner/plain/${accountDid}/${cid}`;
   }
 
-  getFeedThumbnailUrl(actorDid: string, cid: string): UriString {
-    return `${this.blobProxyUrl}/img/feed_thumbnail/plain/${actorDid}/${cid}`;
+  getFeedThumbnailUrl(accountDid: string, cid: string): UriString {
+    return `${this.blobProxyUrl}/img/feed_thumbnail/plain/${accountDid}/${cid}`;
   }
 
-  getFeedFullsizeUrl(actorDid: string, cid: string): UriString {
-    return `${this.blobProxyUrl}/img/feed_fullsize/plain/${actorDid}/${cid}`;
+  getFeedFullsizeUrl(accountDid: string, cid: string): UriString {
+    return `${this.blobProxyUrl}/img/feed_fullsize/plain/${accountDid}/${cid}`;
   }
 }

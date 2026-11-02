@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { schema } from "@repo/db";
-import { actorFactory, labelFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, labelFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupJobTest } from "../shared/job-test-utils.js";
@@ -13,13 +13,13 @@ describe("ラベルの保存", () => {
   test("label-1: 保存済みのアカウントと、そのアカウントのレコードに付いたラベルを保存する", async () => {
     // arrange
     const { indexLabel } = await setupJobTest();
-    const actor = await actorFactory(ctx.db).create();
-    const postUri = `at://${actor.did}/app.bsky.feed.post/3l3qo2vuowo2b`;
+    const account = await accountFactory(ctx.db).create();
+    const postUri = `at://${account.did}/app.bsky.feed.post/3l3qo2vuowo2b`;
 
     // act
     await indexLabel({
       src,
-      uri: actor.did,
+      uri: account.did,
       val: "!takedown",
       cts: "2026-01-01T00:00:00.000Z",
     });
@@ -33,8 +33,8 @@ describe("ラベルの保存", () => {
     // assert
     const labels = await ctx.db.select().from(schema.labels);
     expect(labels).toEqual([
-      expect.objectContaining({ uri: actor.did, actorDid: actor.did }),
-      expect.objectContaining({ uri: postUri, actorDid: actor.did }),
+      expect.objectContaining({ uri: account.did, accountDid: account.did }),
+      expect.objectContaining({ uri: postUri, accountDid: account.did }),
     ]);
   });
 
@@ -77,7 +77,7 @@ describe("ラベルの保存", () => {
   test("label-4: Tapに追加したアカウントに付いているラベルをモデレーションサービスの queryLabels で取り寄せて保存する", async () => {
     // arrange
     const { syncTapRepo, labelFetcher } = await setupJobTest();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     const cts = "2026-01-01T00:00:00.000Z";

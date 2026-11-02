@@ -1,18 +1,18 @@
-import { actorFactory, recordFactory } from "@repo/common/test";
+import { accountFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
 import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
 
 describe("ListItemIndexer", () => {
-  test("リスト項目レコードを保存し、対象アクターを作成する", async () => {
+  test("リスト項目レコードを保存し、対象アカウントを作成する", async () => {
     // arrange
-    const { listItemIndexer, listItemRepository, actorRepository, db } =
+    const { listItemIndexer, listItemRepository, accountRepository, db } =
       await testRegistry.resolve();
-    const actor = actorFactory();
-    const subject = actorFactory();
-    const listUri = `at://${actor.did}/app.bsky.graph.list/listrkey123`;
+    const account = accountFactory();
+    const subject = accountFactory();
+    const listUri = `at://${account.did}/app.bsky.graph.list/listrkey123`;
     const record = recordFactory({
-      uri: `at://${actor.did}/app.bsky.graph.listitem/itemrkey123`,
+      uri: `at://${account.did}/app.bsky.graph.listitem/itemrkey123`,
       json: {
         $type: "app.bsky.graph.listitem",
         list: listUri,
@@ -32,7 +32,7 @@ describe("ListItemIndexer", () => {
     expect(
       await listItemRepository.find({ ctx: { db }, uri: record.uri }),
     ).toMatchObject({
-      actorDid: actor.did,
+      accountDid: account.did,
       subjectDid: subject.did,
     });
     expect(
@@ -41,7 +41,7 @@ describe("ListItemIndexer", () => {
       )?.listUri.toString(),
     ).toBe(listUri);
     expect(
-      await actorRepository.find({ ctx: { db }, did: subject.did }),
+      await accountRepository.find({ ctx: { db }, did: subject.did }),
     ).not.toBeNull();
   });
 });

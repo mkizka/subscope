@@ -1,4 +1,8 @@
-import { actorFactory, registrationFactory, testSetup } from "@repo/test-utils";
+import {
+  accountFactory,
+  registrationFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { RegistrationQuery } from "./registration-query.js";
@@ -19,17 +23,17 @@ describe("RegistrationQuery", () => {
 
     test("登録が存在する場合、createdAtの降順で返す", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
       const registration1 = await registrationFactory(ctx.db)
-        .vars({ actor: () => actor1 })
+        .vars({ account: () => account1 })
         .props({
           createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
         })
         .create();
 
-      const actor2 = await actorFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
       const registration2 = await registrationFactory(ctx.db)
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .props({
           createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
         })
@@ -40,17 +44,17 @@ describe("RegistrationQuery", () => {
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.actorDid).toBe(registration2.actorDid);
-      expect(result[1]?.actorDid).toBe(registration1.actorDid);
+      expect(result[0]?.accountDid).toBe(registration2.accountDid);
+      expect(result[1]?.accountDid).toBe(registration1.accountDid);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actors = await actorFactory(ctx.db).createList(3);
+      const accounts = await accountFactory(ctx.db).createList(3);
       await Promise.all(
-        actors.map((actor) =>
+        accounts.map((account) =>
           registrationFactory(ctx.db)
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         ),
       );
@@ -64,17 +68,17 @@ describe("RegistrationQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前の登録を返す", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
       const registration1 = await registrationFactory(ctx.db)
-        .vars({ actor: () => actor1 })
+        .vars({ account: () => account1 })
         .props({
           createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
         })
         .create();
 
-      const actor2 = await actorFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
       await registrationFactory(ctx.db)
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .props({
           createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
         })
@@ -90,7 +94,7 @@ describe("RegistrationQuery", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.actorDid).toBe(registration1.actorDid);
+      expect(result[0]?.accountDid).toBe(registration1.accountDid);
     });
   });
 });

@@ -20,7 +20,7 @@ export class UnregisterAccount {
       handler: async ({ credentials }) => {
         try {
           await this.unregisterAccountUseCase.execute({
-            actorDid: asDid(credentials.did),
+            accountDid: asDid(credentials.did),
           });
 
           return {

@@ -2,7 +2,7 @@
 import { AtUri } from "@atproto/syntax";
 import { factory, later } from "@factory-js/factory";
 import { faker } from "@faker-js/faker";
-import type { ActorStatus } from "@repo/common/domain";
+import type { AccountStatus } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
@@ -23,7 +23,7 @@ const fakeAtUri = ({ did, collection }: { did?: string; collection: string }) =>
     faker.string.alphanumeric({ length: 13, casing: "lower" }),
   ).toString();
 
-export const actorFactory = (db: Database) =>
+export const accountFactory = (db: Database) =>
   factory
     .define(
       {
@@ -33,19 +33,19 @@ export const actorFactory = (db: Database) =>
           indexedAt: () => faker.date.recent(),
           isAdmin: () => false,
           isBanned: () => false,
-          status: (): ActorStatus => "active",
+          status: (): AccountStatus => "active",
           backfillStatus: () =>
             null as "inProgress" | "completed" | "error" | null,
         },
         vars: {},
       },
-      (props) => create(db, schema.actors, props),
+      (props) => create(db, schema.accounts, props),
     )
     .traits({
       withProfile: (params: { displayName?: string }) => ({
-        after: async (actor) => {
+        after: async (account) => {
           const record = await recordFactory(db, "app.bsky.actor.profile")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create();
           await profileFactory(db)
             .vars({ record: () => record })
@@ -56,9 +56,9 @@ export const actorFactory = (db: Database) =>
         },
       }),
       registeredAccount: () => ({
-        after: async (actor) => {
+        after: async (account) => {
           await registrationFactory(db)
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create();
         },
       }),
@@ -71,13 +71,13 @@ export const recordFactory = (db: Database, collection: string) =>
         props: {
           uri: later<string>(),
           cid: () => randomCid(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           json: () => ({ $type: collection }),
           indexedAt: () => faker.date.recent(),
         },
         vars: {
-          actorDid: () => null as string | null,
-          actor: () => actorFactory(db).create(),
+          accountDid: () => null as string | null,
+          account: () => accountFactory(db).create(),
         },
       },
       (props) => create(db, schema.records, props),
@@ -85,11 +85,11 @@ export const recordFactory = (db: Database, collection: string) =>
     .props({
       uri: async ({ vars }) =>
         fakeAtUri({
-          did: (await vars.actorDid) ?? (await vars.actor).did,
+          did: (await vars.accountDid) ?? (await vars.account).did,
           collection,
         }),
-      actorDid: async ({ vars }) =>
-        (await vars.actorDid) ?? (await vars.actor).did,
+      accountDid: async ({ vars }) =>
+        (await vars.accountDid) ?? (await vars.account).did,
     });
 
 export const postFactory = (db: Database) =>
@@ -99,7 +99,7 @@ export const postFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           text: () => faker.lorem.sentence(),
           replyRootUri: () => null as string | null,
           replyRootCid: () => null as string | null,
@@ -118,7 +118,7 @@ export const postFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
     })
     .traits({
       asReplyTo: (
@@ -162,7 +162,7 @@ export const profileFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           avatarCid: () => randomCid(),
           bannerCid: () => randomCid(),
           description: () => faker.lorem.sentence(),
@@ -179,7 +179,7 @@ export const profileFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
     });
 
 export const followFactory = (db: Database) =>
@@ -189,14 +189,14 @@ export const followFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           subjectDid: later<string>(),
           createdAt: () => faker.date.recent(),
           indexedAt: () => faker.date.recent(),
         },
         vars: {
           record: () => recordFactory(db, "app.bsky.graph.follow").create(),
-          followee: () => actorFactory(db).create(),
+          followee: () => accountFactory(db).create(),
         },
       },
       (props) => create(db, schema.follows, props),
@@ -204,7 +204,7 @@ export const followFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
       subjectDid: async ({ vars }) => (await vars.followee).did,
     });
 
@@ -215,7 +215,7 @@ export const likeFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           subjectUri: later<string>(),
           subjectCid: later<string>(),
           createdAt: () => faker.date.recent(),
@@ -231,29 +231,29 @@ export const likeFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
       subjectUri: async ({ vars }) => (await vars.subject).uri,
       subjectCid: async ({ vars }) => (await vars.subject).cid,
     });
 
-export const actorStatsFactory = (db: Database) =>
+export const accountStatsFactory = (db: Database) =>
   factory
     .define(
       {
         props: {
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           followsCount: () => 0,
           followersCount: () => 0,
           postsCount: () => 0,
         },
         vars: {
-          actor: () => actorFactory(db).create(),
+          account: () => accountFactory(db).create(),
         },
       },
-      (props) => create(db, schema.actorStats, props),
+      (props) => create(db, schema.accountStats, props),
     )
     .props({
-      actorDid: async ({ vars }) => (await vars.actor).did,
+      accountDid: async ({ vars }) => (await vars.account).did,
     });
 
 export const repostFactory = (db: Database) =>
@@ -263,7 +263,7 @@ export const repostFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           subjectUri: later<string>(),
           subjectCid: later<string>(),
           createdAt: () => faker.date.recent(),
@@ -279,7 +279,7 @@ export const repostFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
       subjectUri: async ({ vars }) => (await vars.subject).uri,
       subjectCid: async ({ vars }) => (await vars.subject).cid,
     });
@@ -293,7 +293,7 @@ export const postFeedItemFactory = (db: Database) =>
           cid: later<string>(),
           type: () => "post" as const,
           subjectUri: () => null,
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           sortAt: later<Date>(),
           indexedAt: () => faker.date.recent(),
         },
@@ -306,7 +306,7 @@ export const postFeedItemFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.post).uri,
       cid: async ({ vars }) => (await vars.post).cid,
-      actorDid: async ({ vars }) => (await vars.post).actorDid,
+      accountDid: async ({ vars }) => (await vars.post).accountDid,
       sortAt: async ({ vars }) => (await vars.post).createdAt,
     });
 
@@ -319,7 +319,7 @@ export const repostFeedItemFactory = (db: Database) =>
           cid: later<string>(),
           type: () => "repost" as const,
           subjectUri: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           sortAt: later<Date>(),
           indexedAt: () => faker.date.recent(),
         },
@@ -332,7 +332,7 @@ export const repostFeedItemFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.repost).uri,
       cid: async ({ vars }) => (await vars.repost).cid,
-      actorDid: async ({ vars }) => (await vars.repost).actorDid,
+      accountDid: async ({ vars }) => (await vars.repost).accountDid,
       subjectUri: async ({ vars }) => (await vars.repost).subjectUri,
       sortAt: async ({ vars }) => (await vars.repost).createdAt,
     });
@@ -342,19 +342,19 @@ export const registrationFactory = (db: Database) =>
     .define(
       {
         props: {
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           inviteCode: later<string>(),
           createdAt: () => faker.date.recent(),
         },
         vars: {
-          actor: () => actorFactory(db).create(),
+          account: () => accountFactory(db).create(),
           inviteCode: () => inviteCodeFactory(db).create(),
         },
       },
       (props) => create(db, schema.registrations, props),
     )
     .props({
-      actorDid: async ({ vars }) => (await vars.actor).did,
+      accountDid: async ({ vars }) => (await vars.account).did,
       inviteCode: async ({ vars }) => (await vars.inviteCode).code,
     });
 
@@ -431,7 +431,7 @@ export const generatorFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           did: () => fakeDid(),
           displayName: () => faker.company.name(),
           description: () => faker.lorem.sentence() as string | null,
@@ -448,7 +448,7 @@ export const generatorFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
     });
 
 export const listFactory = (db: Database) =>
@@ -458,7 +458,7 @@ export const listFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           purpose: () => "app.bsky.graph.defs#curatelist",
           name: () => faker.lorem.words(),
           description: () => faker.lorem.sentence() as string | null,
@@ -475,7 +475,7 @@ export const listFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
     });
 
 export const listItemFactory = (db: Database) =>
@@ -485,7 +485,7 @@ export const listItemFactory = (db: Database) =>
         props: {
           uri: later<string>(),
           cid: later<string>(),
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           listUri: later<string>(),
           subjectDid: later<string>(),
           createdAt: () => faker.date.recent(),
@@ -494,7 +494,7 @@ export const listItemFactory = (db: Database) =>
         vars: {
           record: () => recordFactory(db, "app.bsky.graph.listitem").create(),
           list: () => listFactory(db).create(),
-          subject: () => actorFactory(db).create(),
+          subject: () => accountFactory(db).create(),
         },
       },
       (props) => create(db, schema.listItems, props),
@@ -502,7 +502,7 @@ export const listItemFactory = (db: Database) =>
     .props({
       uri: async ({ vars }) => (await vars.record).uri,
       cid: async ({ vars }) => (await vars.record).cid,
-      actorDid: async ({ vars }) => (await vars.record).actorDid,
+      accountDid: async ({ vars }) => (await vars.record).accountDid,
       listUri: async ({ vars }) => (await vars.list).uri,
       subjectDid: async ({ vars }) => (await vars.subject).did,
     });
@@ -529,18 +529,18 @@ export const labelFactory = (db: Database) =>
           src: () => "did:plc:ar7c4by46qjdydhdevvrndac",
           uri: later<string>(),
           val: () => "!takedown",
-          actorDid: later<string>(),
+          accountDid: later<string>(),
           cid: () => null as string | null,
           cts: () => faker.date.recent(),
           exp: () => null as Date | null,
         },
         vars: {
-          actor: () => actorFactory(db).create(),
+          account: () => accountFactory(db).create(),
         },
       },
       (props) => create(db, schema.labels, props),
     )
     .props({
-      uri: async ({ vars }) => (await vars.actor).did,
-      actorDid: async ({ vars }) => (await vars.actor).did,
+      uri: async ({ vars }) => (await vars.account).did,
+      accountDid: async ({ vars }) => (await vars.account).did,
     });

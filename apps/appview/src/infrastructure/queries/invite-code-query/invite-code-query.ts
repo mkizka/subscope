@@ -19,7 +19,7 @@ export class InviteCodeQuery implements IInviteCodeQuery {
         expiresAt: schema.inviteCodes.expiresAt,
         usedAt: schema.inviteCodes.usedAt,
         createdAt: schema.inviteCodes.createdAt,
-        usedByDid: schema.registrations.actorDid,
+        usedByDid: schema.registrations.accountDid,
       })
       .from(schema.inviteCodes)
       .leftJoin(

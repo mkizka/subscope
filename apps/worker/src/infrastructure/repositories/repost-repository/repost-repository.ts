@@ -8,7 +8,7 @@ export class RepostRepository implements IRepostRepository {
   async save({ ctx, repost }: { ctx: TransactionContext; repost: Repost }) {
     const data = {
       cid: repost.cid,
-      actorDid: repost.actorDid,
+      accountDid: repost.accountDid,
       subjectUri: repost.subjectUri.toString(),
       subjectCid: repost.subjectCid,
       createdAt: sanitizeDate(repost.createdAt),

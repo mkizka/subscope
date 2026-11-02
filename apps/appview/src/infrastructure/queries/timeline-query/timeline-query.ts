@@ -29,7 +29,7 @@ export class TimelineQuery implements ITimelineQuery {
         uri: schema.feedItems.uri,
         sortAt: schema.feedItems.sortAt,
         type: schema.feedItems.type,
-        actorDid: schema.feedItems.actorDid,
+        accountDid: schema.feedItems.accountDid,
         subjectUri: schema.feedItems.subjectUri,
       })
       .from(schema.feedItems)
@@ -42,8 +42,8 @@ export class TimelineQuery implements ITimelineQuery {
               .from(schema.follows)
               .where(
                 and(
-                  eq(schema.follows.actorDid, viewerDid),
-                  eq(schema.follows.subjectDid, schema.feedItems.actorDid),
+                  eq(schema.follows.accountDid, viewerDid),
+                  eq(schema.follows.subjectDid, schema.feedItems.accountDid),
                 ),
               ),
           ),
@@ -55,11 +55,11 @@ export class TimelineQuery implements ITimelineQuery {
             uri: schema.feedItems.uri,
             sortAt: schema.feedItems.sortAt,
             type: schema.feedItems.type,
-            actorDid: schema.feedItems.actorDid,
+            accountDid: schema.feedItems.accountDid,
             subjectUri: schema.feedItems.subjectUri,
           })
           .from(schema.feedItems)
-          .where(and(...filters, eq(schema.feedItems.actorDid, viewerDid))),
+          .where(and(...filters, eq(schema.feedItems.accountDid, viewerDid))),
       )
       .orderBy(desc(sql`"sort_at"`))
       .limit(limit);
@@ -94,7 +94,7 @@ export class TimelineQuery implements ITimelineQuery {
               .where(
                 and(
                   eq(schema.listItems.listUri, listUri),
-                  eq(schema.listItems.subjectDid, schema.feedItems.actorDid),
+                  eq(schema.listItems.subjectDid, schema.feedItems.accountDid),
                 ),
               ),
           ),
@@ -111,12 +111,12 @@ const toFeedItemDto = (item: {
   uri: string;
   type: FeedItemDto["type"];
   subjectUri: string | null;
-  actorDid: string;
+  accountDid: string;
   sortAt: Date;
 }): FeedItemDto => ({
   uri: asAtUriString(item.uri),
   type: item.type,
   subjectUri: item.subjectUri ? asAtUriString(item.subjectUri) : null,
-  actorDid: asDid(item.actorDid),
+  accountDid: asDid(item.accountDid),
   sortAt: item.sortAt,
 });

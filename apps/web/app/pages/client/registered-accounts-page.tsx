@@ -1,11 +1,11 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import {
-  type Actor,
-  ActorList,
-} from "@/app/features/profile/blocks/actor-list";
+  type Account,
+  AccountList,
+} from "@/app/features/profile/blocks/account-list";
 
 type Props = {
-  registeredAccounts: Actor[];
+  registeredAccounts: Account[];
   hasMore: boolean;
 };
 
@@ -18,7 +18,7 @@ export function RegisteredAccountsPage({ registeredAccounts, hasMore }: Props) {
           {registeredAccounts.length}人{hasMore && "以上"}
         </span>
       </h1>
-      <ActorList actors={registeredAccounts} />
+      <AccountList accounts={registeredAccounts} />
     </ThreeColumnLayout>
   );
 }

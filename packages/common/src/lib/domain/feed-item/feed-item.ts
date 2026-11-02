@@ -11,7 +11,7 @@ export type FeedItemParams = {
   cid: string;
   type: FeedType;
   subjectUri: string | null;
-  actorDid: Did;
+  accountDid: Did;
   sortAt: Date;
 };
 
@@ -20,7 +20,7 @@ export class FeedItem {
   readonly cid: string;
   readonly type: FeedType;
   readonly subjectUri: string | null;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly sortAt: Date;
 
   constructor(params: FeedItemParams) {
@@ -28,7 +28,7 @@ export class FeedItem {
     this.cid = params.cid;
     this.type = params.type;
     this.subjectUri = params.subjectUri;
-    this.actorDid = params.actorDid;
+    this.accountDid = params.accountDid;
     this.sortAt = params.sortAt;
   }
 
@@ -38,7 +38,7 @@ export class FeedItem {
       cid: post.cid,
       type: "post",
       subjectUri: null,
-      actorDid: post.actorDid,
+      accountDid: post.accountDid,
       sortAt: post.sortAt,
     });
   }
@@ -49,7 +49,7 @@ export class FeedItem {
       cid: repost.cid,
       type: "repost",
       subjectUri: repost.subjectUri.toString(),
-      actorDid: repost.actorDid,
+      accountDid: repost.accountDid,
       sortAt: repost.sortAt,
     });
   }

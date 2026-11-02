@@ -18,7 +18,7 @@ export class GeneratorViews {
   ): Promise<$Typed<AppBskyFeedDefs.GeneratorView> | undefined> {
     const generator = await ctx.generator(uri);
     const creator =
-      generator && (await this.profileViews.view(generator.actorDid, ctx));
+      generator && (await this.profileViews.view(generator.accountDid, ctx));
     if (!generator || !creator) {
       return undefined;
     }
@@ -32,7 +32,7 @@ export class GeneratorViews {
       description: generator.description ?? undefined,
       avatar: generator.avatarCid
         ? this.assetUrlBuilder.getAvatarThumbnailUrl(
-            generator.actorDid,
+            generator.accountDid,
             generator.avatarCid,
           )
         : undefined,

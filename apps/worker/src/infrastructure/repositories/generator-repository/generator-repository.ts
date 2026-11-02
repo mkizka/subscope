@@ -14,7 +14,7 @@ export class GeneratorRepository implements IGeneratorRepository {
   }) {
     const data = {
       cid: generator.cid,
-      actorDid: generator.actorDid,
+      accountDid: generator.accountDid,
       did: generator.did,
       displayName: generator.displayName,
       description: generator.description,

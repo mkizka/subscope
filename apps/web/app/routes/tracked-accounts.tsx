@@ -21,6 +21,9 @@ export function meta() {
 
 export default function TrackedAccounts({ loaderData }: Route.ComponentProps) {
   return (
-    <TrackedAccountsPage actors={loaderData.actors} total={loaderData.total} />
+    <TrackedAccountsPage
+      accounts={loaderData.accounts}
+      total={loaderData.total}
+    />
   );
 }

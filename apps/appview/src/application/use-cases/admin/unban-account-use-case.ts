@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { ITransactionManager } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 
 export class NotBannedError extends Error {
   constructor(message: string) {
@@ -13,18 +13,18 @@ export class NotBannedError extends Error {
 export class UnbanAccountUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly actorRepository: IActorRepository,
+    private readonly accountRepository: IAccountRepository,
   ) {}
 
   async execute(params: { did: Did }): Promise<void> {
-    const actor = await this.actorRepository.find(params.did);
-    if (!actor?.isBanned) {
-      throw new NotBannedError("Actor is not banned");
+    const account = await this.accountRepository.find(params.did);
+    if (!account?.isBanned) {
+      throw new NotBannedError("Account is not banned");
     }
 
-    actor.unban();
+    account.unban();
     await this.transactionManager.transaction((ctx) =>
-      this.actorRepository.save({ ctx, actor }),
+      this.accountRepository.save({ ctx, account }),
     );
   }
 }

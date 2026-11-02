@@ -9,7 +9,7 @@ export function profileFactory(params?: Partial<ProfileParams>): Profile {
       params?.uri ??
       fakeAtUri({ did: defaultDid, collection: "app.bsky.actor.profile" }),
     cid: params?.cid ?? fakeCid(),
-    actorDid: params?.actorDid ?? defaultDid,
+    accountDid: params?.accountDid ?? defaultDid,
     avatarCid: params?.avatarCid ?? null,
     bannerCid: params?.bannerCid ?? null,
     description: params?.description ?? null,

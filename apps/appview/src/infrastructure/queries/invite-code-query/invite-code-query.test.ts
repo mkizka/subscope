@@ -1,5 +1,5 @@
 import {
-  actorFactory,
+  accountFactory,
   inviteCodeFactory,
   registrationFactory,
   testSetup,
@@ -100,11 +100,11 @@ describe("InviteCodeQuery", () => {
 
     test("使用済みの招待コードの場合、usedByDidを含む", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const inviteCode = await inviteCodeFactory(ctx.db).create();
       await registrationFactory(ctx.db)
         .vars({
-          actor: () => actor,
+          account: () => account,
           inviteCode: () => inviteCode,
         })
         .create();
@@ -116,7 +116,7 @@ describe("InviteCodeQuery", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         code: inviteCode.code,
-        usedByDid: actor.did,
+        usedByDid: account.did,
       });
     });
   });

@@ -8,7 +8,7 @@ export class FollowRepository implements IFollowRepository {
   async save({ ctx, follow }: { ctx: TransactionContext; follow: Follow }) {
     const data = {
       cid: follow.cid,
-      actorDid: follow.actorDid,
+      accountDid: follow.accountDid,
       subjectDid: follow.subjectDid,
       createdAt: sanitizeDate(follow.createdAt),
     } satisfies FollowInsert;

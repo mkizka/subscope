@@ -31,7 +31,7 @@ export class SyncTapRepoUseCase {
     if (isTrackedAccount) {
       await this.tapClient.addRepo(did);
       await this.jobScheduler.scheduleCheckBackfill(did, 0);
-      for (const label of await this.labelFetcher.fetchByActor(did)) {
+      for (const label of await this.labelFetcher.fetchByAccount(did)) {
         await this.indexLabelUseCase.execute(label);
       }
     } else {

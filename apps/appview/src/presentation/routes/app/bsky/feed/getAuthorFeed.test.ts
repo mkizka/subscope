@@ -1,6 +1,6 @@
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import {
-  actorFactory,
+  accountFactory,
   postEmbedImageFactory,
   postFactory,
   postFeedItemFactory,
@@ -19,7 +19,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
   test("getAuthorFeed-1: 指定したアカウントの投稿をfeedViewPostで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .use((t) => t.withProfile({}))
       .create();
@@ -27,7 +27,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => author })
+            .vars({ account: () => author })
             .create(),
       })
       .create();
@@ -59,18 +59,20 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     await expect(promise).rejects.toMatchObject({ status: 400 });
   });
 
-  type Actor = Awaited<ReturnType<ReturnType<typeof actorFactory>["create"]>>;
+  type Account = Awaited<
+    ReturnType<ReturnType<typeof accountFactory>["create"]>
+  >;
   type Post = Awaited<ReturnType<ReturnType<typeof postFactory>["create"]>>;
 
   const createPost = async (
-    author: Actor,
+    author: Account,
     reply?: { parent: Post; root: Post },
   ) => {
     const post = await postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => author })
+            .vars({ account: () => author })
             .create(),
       })
       .use((t) => (reply ? t.asReplyTo(reply.parent, reply.root) : {}))
@@ -81,12 +83,12 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     return post;
   };
 
-  const createRepost = async (author: Actor, subject: Post) => {
+  const createRepost = async (author: Account, subject: Post) => {
     const repost = await repostFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.repost")
-            .vars({ actor: () => author })
+            .vars({ account: () => author })
             .create(),
         subject: () => subject,
       })
@@ -99,7 +101,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
   test("getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアカウント自身の投稿だけを返し、リポストは含めない", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
     const mediaPost = await createPost(author);
@@ -126,7 +128,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
   test("getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
     const rootPost = await createPost(author);
@@ -145,10 +147,10 @@ describe("app.bsky.feed.getAuthorFeed", () => {
   test("getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアカウント自身の投稿であるものだけを含める", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
-    const other = await actorFactory(ctx.db).create();
+    const other = await accountFactory(ctx.db).create();
     const rootPost = await createPost(author);
     const selfReply = await createPost(author, {
       parent: rootPost,
@@ -177,7 +179,7 @@ describe("app.bsky.feed.getAuthorFeed", () => {
   test("getAuthorFeed-6: filterがposts_with_videoのとき、501とMethodNotImplementedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    await actorFactory(ctx.db)
+    await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
 

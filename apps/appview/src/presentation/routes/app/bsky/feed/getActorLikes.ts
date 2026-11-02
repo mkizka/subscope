@@ -16,12 +16,12 @@ export class GetActorLikes {
     router.add(getActorLikes, {
       auth: (ctx) => this.authVerifierMiddleware.optionalAuth(ctx),
       handler: async ({ params, credentials: viewerDid }) => {
-        const actorDid = await this.handleMiddleware.resolveHandleOrDid(
+        const accountDid = await this.handleMiddleware.resolveHandleOrDid(
           params.actor,
         );
 
         const body = await this.getActorLikesUseCase.execute({
-          actorDid,
+          accountDid,
           limit: params.limit,
           cursor: params.cursor ? new Date(params.cursor) : undefined,
           viewerDid: viewerDid ?? undefined,

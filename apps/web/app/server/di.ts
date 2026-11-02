@@ -1,11 +1,11 @@
 import { createRegistry } from "@gyaku/di";
 
+import { getFollowListUseCaseFactory } from "./application/accounts/get-follow-list-use-case";
+import { getMeUseCaseFactory } from "./application/accounts/get-me-use-case";
+import { getProfilePageUseCaseFactory } from "./application/accounts/get-profile-page-use-case";
+import { getProfileUseCaseFactory } from "./application/accounts/get-profile-use-case";
 import { getRegisteredAccountsUseCaseFactory } from "./application/accounts/get-registered-accounts-use-case";
 import { getTrackedAccountsUseCaseFactory } from "./application/accounts/get-tracked-accounts-use-case";
-import { getFollowListUseCaseFactory } from "./application/actor/get-follow-list-use-case";
-import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
-import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
-import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
 import { banAccountUseCaseFactory } from "./application/admin/ban-account-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
@@ -35,7 +35,7 @@ import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getBackfillStatusUseCaseFactory } from "./application/timeline/get-backfill-status-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
-import { actorQueryFactory } from "./infrastructure/actor/actor-query";
+import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
@@ -163,22 +163,22 @@ export const di = await createRegistry()
     ["adminCommand"],
     deleteInviteCodeUseCaseFactory,
   )
-  .service("actorQuery", ["oauthClient"], actorQueryFactory)
-  .service("getMeUseCase", ["actorQuery"], getMeUseCaseFactory)
-  .service("getProfileUseCase", ["actorQuery"], getProfileUseCaseFactory)
+  .service("accountQuery", ["oauthClient"], accountQueryFactory)
+  .service("getMeUseCase", ["accountQuery"], getMeUseCaseFactory)
+  .service("getProfileUseCase", ["accountQuery"], getProfileUseCaseFactory)
   .service(
     "getFollowListUseCase",
-    ["actorQuery", "backfillQuery"],
+    ["accountQuery", "backfillQuery"],
     getFollowListUseCaseFactory,
   )
   .service(
     "getProfilePageUseCase",
-    ["actorQuery", "backfillQuery"],
+    ["accountQuery", "backfillQuery"],
     getProfilePageUseCaseFactory,
   )
   .service(
     "searchUseCase",
-    ["actorQuery", "timelineQuery", "backfillQuery"],
+    ["accountQuery", "timelineQuery", "backfillQuery"],
     searchUseCaseFactory,
   )
   .service("followCommand", ["oauthClient"], followCommandFactory)
@@ -195,7 +195,7 @@ export const di = await createRegistry()
   .service("listCommand", ["oauthClient"], listCommandFactory)
   .service(
     "getListsPageUseCase",
-    ["listQuery", "actorQuery"],
+    ["listQuery", "accountQuery"],
     getListsPageUseCaseFactory,
   )
   .service(
@@ -208,7 +208,7 @@ export const di = await createRegistry()
   .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
   .service(
     "addListMemberUseCase",
-    ["actorQuery", "listCommand"],
+    ["accountQuery", "listCommand"],
     addListMemberUseCaseFactory,
   )
   .service(

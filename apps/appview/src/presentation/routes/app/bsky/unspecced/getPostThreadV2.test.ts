@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getPostThreadV2 from "@repo/client/lex/app/bsky/unspecced/getPostThreadV2";
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   recordFactory,
   testSetup,
@@ -14,14 +14,14 @@ describe("app.bsky.unspecced.getPostThreadV2", () => {
   const { ctx } = testSetup;
 
   const setupThread = async () => {
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const createPost = () =>
       postFactory(ctx.db).vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => author })
+            .vars({ account: () => author })
             .create(),
       });
     const root = await createPost().create();

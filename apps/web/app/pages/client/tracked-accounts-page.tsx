@@ -1,15 +1,15 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import {
-  type Actor,
-  ActorList,
-} from "@/app/features/profile/blocks/actor-list";
+  type Account,
+  AccountList,
+} from "@/app/features/profile/blocks/account-list";
 
 type Props = {
-  actors: Actor[];
+  accounts: Account[];
   total: number;
 };
 
-export function TrackedAccountsPage({ actors, total }: Props) {
+export function TrackedAccountsPage({ accounts, total }: Props) {
   return (
     <ThreeColumnLayout>
       <div className="flex items-baseline gap-2 border-b border-line p-4">
@@ -23,7 +23,7 @@ export function TrackedAccountsPage({ actors, total }: Props) {
       >
         登録アカウントとそのフォロー先です。このサーバーはこの人たちの投稿だけを保存します。
       </p>
-      <ActorList actors={actors} />
+      <AccountList accounts={accounts} />
     </ThreeColumnLayout>
   );
 }

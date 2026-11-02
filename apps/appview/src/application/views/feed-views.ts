@@ -73,7 +73,7 @@ export class FeedViews {
   ): Promise<$Typed<AppBskyFeedDefs.ReasonRepost> | undefined> {
     const [repost, by] = await Promise.all([
       ctx.repost(item.uri),
-      this.profileViews.basic(item.actorDid, ctx),
+      this.profileViews.basic(item.accountDid, ctx),
     ]);
     if (!repost || !by) {
       return undefined;

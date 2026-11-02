@@ -35,7 +35,7 @@ export class RecordRepository implements IRecordRepository {
   async save({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const data = {
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       json: record.json,
     } satisfies RecordInsert;
     await ctx.db

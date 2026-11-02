@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
-  actorFactory,
+  accountFactory,
   labelFactory,
   postEmbedRecordFactory,
   postFactory,
@@ -27,11 +27,11 @@ describe("ラベル", () => {
     profileJson = { $type: "app.bsky.actor.profile" },
     postJson = { $type: "app.bsky.feed.post" },
   }: { profileJson?: Json; postJson?: Json } = {}) => {
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const profileRecord = await recordFactory(ctx.db, "app.bsky.actor.profile")
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .props({
-        uri: () => `at://${actor.did}/app.bsky.actor.profile/self`,
+        uri: () => `at://${account.did}/app.bsky.actor.profile/self`,
         json: () => profileJson,
       })
       .create();
@@ -39,13 +39,13 @@ describe("ラベル", () => {
       .vars({ record: () => profileRecord })
       .create();
     const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .props({ json: () => postJson })
       .create();
     const post = await postFactory(ctx.db)
       .vars({ record: () => postRecord })
       .create();
-    return { actor, profileRecord, post, postRecord };
+    return { account, profileRecord, post, postRecord };
   };
 
   const fetchPost = async (uri: string) => {
@@ -56,9 +56,9 @@ describe("ラベル", () => {
 
   test("labels-1: プロフィールのビューの labels に、そのアカウントのDIDに付いたラベルを含める", async () => {
     // arrange
-    const { actor, post } = await createPost();
+    const { account, post } = await createPost();
     const label = await labelFactory(ctx.db)
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .props({ val: () => "spam" })
       .create();
 
@@ -69,7 +69,7 @@ describe("ラベル", () => {
     expect(res?.author.labels).toEqual([
       {
         src: label.src,
-        uri: actor.did,
+        uri: account.did,
         val: "spam",
         cts: label.cts.toISOString(),
       },
@@ -78,9 +78,9 @@ describe("ラベル", () => {
 
   test("labels-2: 投稿のビューの labels に、その投稿に付いたラベルを含める", async () => {
     // arrange
-    const { actor, post } = await createPost();
+    const { account, post } = await createPost();
     const label = await labelFactory(ctx.db)
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .props({ uri: () => post.uri, val: () => "porn" })
       .create();
 
@@ -100,9 +100,9 @@ describe("ラベル", () => {
 
   test("labels-3: プロフィールのビューの labels に、プロフィールレコードに付いたラベルを含める", async () => {
     // arrange
-    const { actor, profileRecord, post } = await createPost();
+    const { account, profileRecord, post } = await createPost();
     const label = await labelFactory(ctx.db)
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .props({ uri: () => profileRecord.uri, val: () => "porn" })
       .create();
 
@@ -122,7 +122,7 @@ describe("ラベル", () => {
 
   test("labels-4: プロフィールのビューの labels に、プロフィールレコードのセルフラベルを含める", async () => {
     // arrange
-    const { actor, profileRecord, post } = await createPost({
+    const { account, profileRecord, post } = await createPost({
       profileJson: {
         $type: "app.bsky.actor.profile",
         labels: selfLabels("!no-unauthenticated"),
@@ -136,7 +136,7 @@ describe("ラベル", () => {
     // assert
     expect(res?.author.labels).toEqual([
       {
-        src: actor.did,
+        src: account.did,
         uri: profileRecord.uri,
         cid: profileRecord.cid,
         val: "!no-unauthenticated",
@@ -147,7 +147,7 @@ describe("ラベル", () => {
 
   test("labels-5: 投稿のビューの labels に、投稿レコードのセルフラベルを含める", async () => {
     // arrange
-    const { actor, post, postRecord } = await createPost({
+    const { account, post, postRecord } = await createPost({
       postJson: {
         $type: "app.bsky.feed.post",
         text: "",
@@ -162,7 +162,7 @@ describe("ラベル", () => {
     // assert
     expect(res?.labels).toEqual([
       {
-        src: actor.did,
+        src: account.did,
         uri: post.uri,
         cid: postRecord.cid,
         val: "nudity",
@@ -173,13 +173,13 @@ describe("ラベル", () => {
 
   test("labels-6: 引用された投稿のビューの labels に、その投稿に付いたラベルを含める", async () => {
     // arrange
-    const { actor, post: quoted } = await createPost();
+    const { account, post: quoted } = await createPost();
     const { post } = await createPost();
     await postEmbedRecordFactory(ctx.db)
       .vars({ post: () => post, embeddedPost: () => quoted })
       .create();
     const label = await labelFactory(ctx.db)
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .props({ uri: () => quoted.uri, val: () => "porn" })
       .create();
 

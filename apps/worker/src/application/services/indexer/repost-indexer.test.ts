@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import {
-  actorFactory,
+  accountFactory,
   fakeCid,
   postFactory,
   recordFactory,
@@ -39,8 +39,8 @@ describe("RepostIndexer", () => {
     test("リポストレコードを正しく保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const reposter = actorFactory();
-      const author = actorFactory();
+      const reposter = accountFactory();
+      const author = accountFactory();
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
 
       const record = recordFactory({
@@ -68,7 +68,7 @@ describe("RepostIndexer", () => {
       expect(repost).toMatchObject({
         uri: record.uri,
         cid: record.cid,
-        actorDid: reposter.did,
+        accountDid: reposter.did,
         subjectUri: new AtUri(subjectUri),
       });
 
@@ -76,7 +76,7 @@ describe("RepostIndexer", () => {
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "repost",
-        actorDid: reposter.did,
+        accountDid: reposter.did,
         subjectUri: subjectUri,
       });
 
@@ -91,9 +91,9 @@ describe("RepostIndexer", () => {
 
     test("notify-4: リポストされた投稿の作者に repost の通知を作る", async () => {
       // arrange
-      const reposter = actorFactory();
-      const author = actorFactory();
-      registrationQuery.add(registrationFactory({ actorDid: author.did }));
+      const reposter = accountFactory();
+      const author = accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: author.did }));
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
       const record = recordFactory({
         uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,

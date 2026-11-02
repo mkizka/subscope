@@ -1,5 +1,5 @@
 import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
-import { actorFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -10,7 +10,7 @@ describe("me.subsco.admin.deleteInviteCode", () => {
   test("deleteInviteCode-1: 存在しない招待コードには400とInviteCodeNotFoundを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);
@@ -30,7 +30,7 @@ describe("me.subsco.admin.deleteInviteCode", () => {
   test("deleteInviteCode-2: 使用済みの招待コードには400とInviteCodeAlreadyUsedを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);

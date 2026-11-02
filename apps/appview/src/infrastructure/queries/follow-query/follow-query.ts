@@ -15,32 +15,32 @@ export class FollowQuery implements IFollowQuery {
   constructor(private readonly db: DatabaseClient) {}
 
   async findFollows(params: {
-    actorDids: Did[];
+    accountDids: Did[];
     subjectDids: Did[];
   }): Promise<FollowDto[]> {
-    if (params.actorDids.length === 0 || params.subjectDids.length === 0) {
+    if (params.accountDids.length === 0 || params.subjectDids.length === 0) {
       return [];
     }
     const follows = await this.db.query.follows.findMany({
       where: and(
-        inArray(schema.follows.actorDid, params.actorDids),
+        inArray(schema.follows.accountDid, params.accountDids),
         inArray(schema.follows.subjectDid, params.subjectDids),
       ),
     });
     return follows.map((follow) => ({
       uri: asAtUriString(follow.uri),
-      actorDid: asDid(follow.actorDid),
+      accountDid: asDid(follow.accountDid),
       subjectDid: asDid(follow.subjectDid),
     }));
   }
 
-  async findActorFollows(params: {
-    actorDid: Did;
+  async findAccountFollows(params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }): Promise<FolloweeDto[]> {
     const results = await this.findPage(
-      eq(schema.follows.actorDid, params.actorDid),
+      eq(schema.follows.accountDid, params.accountDid),
       params,
     );
     return results.map((result) => ({
@@ -49,26 +49,26 @@ export class FollowQuery implements IFollowQuery {
     }));
   }
 
-  async findActorFollowers(params: {
-    actorDid: Did;
+  async findAccountFollowers(params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }): Promise<FollowerDto[]> {
     const results = await this.findPage(
-      eq(schema.follows.subjectDid, params.actorDid),
+      eq(schema.follows.subjectDid, params.accountDid),
       params,
     );
     return results.map((result) => ({
-      actorDid: asDid(result.actorDid),
+      accountDid: asDid(result.accountDid),
       sortAt: result.sortAt,
     }));
   }
 
-  async findFolloweeDids(actorDid: Did): Promise<Did[]> {
+  async findFolloweeDids(accountDid: Did): Promise<Did[]> {
     const results = await this.db
       .select({ subjectDid: schema.follows.subjectDid })
       .from(schema.follows)
-      .where(eq(schema.follows.actorDid, actorDid));
+      .where(eq(schema.follows.accountDid, accountDid));
     return results.map((result) => asDid(result.subjectDid));
   }
 

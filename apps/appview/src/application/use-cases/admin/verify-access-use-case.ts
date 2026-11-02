@@ -1,19 +1,19 @@
 import type { Did } from "@atproto/did";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 
 type VerifyAccessParams = {
   requesterDid: Did;
 };
 
 export class VerifyAccessUseCase {
-  constructor(private readonly actorRepository: IActorRepository) {}
+  constructor(private readonly accountRepository: IAccountRepository) {}
 
   async execute(
     params: VerifyAccessParams,
   ): Promise<{ status: "authorized" | "unauthorized" }> {
-    const actor = await this.actorRepository.find(params.requesterDid);
-    if (actor?.isAdmin) {
+    const account = await this.accountRepository.find(params.requesterDid);
+    if (account?.isAdmin) {
       return { status: "authorized" };
     }
 

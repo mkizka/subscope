@@ -30,7 +30,7 @@ const toImageDtos = (
 
 const toPostDto = (post: SelectPost): PostDto => ({
   uri: asAtUriString(post.uri),
-  actorDid: asDid(post.actorDid),
+  accountDid: asDid(post.accountDid),
   embedImages: toImageDtos(post.embedImages, "images"),
   embedGallery: toImageDtos(post.embedImages, "gallery"),
   embedExternal: post.embedExternal && {

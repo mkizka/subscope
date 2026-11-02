@@ -4,7 +4,7 @@ import { data } from "react-router";
 import { didContext } from "@/app/context/did";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
-import type { ProfileTab } from "@/app/server/infrastructure/actor/actor-query";
+import type { ProfileTab } from "@/app/server/infrastructure/account/account-query";
 
 import type { Route } from "./+types/api.profile.$handle";
 

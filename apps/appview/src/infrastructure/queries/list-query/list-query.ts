@@ -13,13 +13,13 @@ import type { IListQuery } from "../../../application/interfaces/queries/list-qu
 export class ListQuery implements IListQuery {
   constructor(private readonly db: DatabaseClient) {}
 
-  async findByActor(params: {
-    actorDid: Did;
+  async findByAccount(params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
     purposes?: string[];
   }): Promise<ListDto[]> {
-    const filters = [eq(schema.lists.actorDid, params.actorDid)];
+    const filters = [eq(schema.lists.accountDid, params.accountDid)];
     if (params.cursor) {
       filters.push(lt(schema.lists.createdAt, new Date(params.cursor)));
     }
@@ -81,7 +81,7 @@ export class ListQuery implements IListQuery {
 const toListDto = (list: typeof schema.lists.$inferSelect): ListDto => ({
   uri: asAtUriString(list.uri),
   cid: list.cid,
-  actorDid: asDid(list.actorDid),
+  accountDid: asDid(list.accountDid),
   name: list.name,
   purpose: list.purpose,
   description: list.description,

@@ -34,7 +34,7 @@ describe("GeneratorQuery", () => {
         {
           uri: generator.uri,
           cid: generator.cid,
-          actorDid: generator.actorDid,
+          accountDid: generator.accountDid,
           did: generator.did,
           displayName: generator.displayName,
           description: generator.description || null,

@@ -1,7 +1,7 @@
 import getGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
 import { schema } from "@repo/db";
 import {
-  actorFactory,
+  accountFactory,
   generatorFactory,
   postFactory,
   recordFactory,
@@ -19,11 +19,11 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
 
   const setup = async () => {
     const api = await setupApiTest();
-    const viewer = await actorFactory(ctx.db)
+    const viewer = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     const createAuthor = () =>
-      actorFactory(ctx.db)
+      accountFactory(ctx.db)
         .use((t) => t.withProfile({}))
         .create();
     const notify = async (params: {
@@ -37,7 +37,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.feed.post")
-              .vars({ actor: () => author })
+              .vars({ account: () => author })
               .create(),
         })
         .create();
@@ -56,7 +56,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.feed.post")
-              .vars({ actor: () => viewer })
+              .vars({ account: () => viewer })
               .create(),
         })
         .create();
@@ -120,7 +120,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.generator")
-            .vars({ actor: () => viewer })
+            .vars({ account: () => viewer })
             .create(),
       })
       .create();
@@ -231,7 +231,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
     await ctx.db
       .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-03T00:00:00.000Z") })
-      .where(eq(schema.registrations.actorDid, viewer.did));
+      .where(eq(schema.registrations.accountDid, viewer.did));
 
     // act
     const res = await client.call(getGroupedNotifications);

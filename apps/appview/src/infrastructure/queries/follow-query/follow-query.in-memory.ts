@@ -20,32 +20,32 @@ export class InMemoryFollowQuery implements IFollowQuery {
   }
 
   findFollows(params: {
-    actorDids: Did[];
+    accountDids: Did[];
     subjectDids: Did[];
   }): Promise<FollowDto[]> {
     return Promise.resolve(
       this.follows
         .filter(
           (follow) =>
-            params.actorDids.includes(follow.actorDid) &&
+            params.accountDids.includes(follow.accountDid) &&
             params.subjectDids.includes(follow.subjectDid),
         )
         .map((follow) => ({
           uri: follow.uri.toString(),
-          actorDid: follow.actorDid,
+          accountDid: follow.accountDid,
           subjectDid: follow.subjectDid,
         })),
     );
   }
 
-  findActorFollows(params: {
-    actorDid: Did;
+  findAccountFollows(params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }): Promise<FolloweeDto[]> {
     return Promise.resolve(
       this.findPage(
-        (follow) => follow.actorDid === params.actorDid,
+        (follow) => follow.accountDid === params.accountDid,
         params,
       ).map((follow) => ({
         subjectDid: follow.subjectDid,
@@ -54,23 +54,26 @@ export class InMemoryFollowQuery implements IFollowQuery {
     );
   }
 
-  findActorFollowers(params: {
-    actorDid: Did;
+  findAccountFollowers(params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }): Promise<FollowerDto[]> {
     return Promise.resolve(
       this.findPage(
-        (follow) => follow.subjectDid === params.actorDid,
+        (follow) => follow.subjectDid === params.accountDid,
         params,
-      ).map((follow) => ({ actorDid: follow.actorDid, sortAt: follow.sortAt })),
+      ).map((follow) => ({
+        accountDid: follow.accountDid,
+        sortAt: follow.sortAt,
+      })),
     );
   }
 
-  findFolloweeDids(actorDid: Did): Promise<Did[]> {
+  findFolloweeDids(accountDid: Did): Promise<Did[]> {
     return Promise.resolve(
       this.follows
-        .filter((follow) => follow.actorDid === actorDid)
+        .filter((follow) => follow.accountDid === accountDid)
         .map((follow) => follow.subjectDid),
     );
   }

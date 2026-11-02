@@ -7,7 +7,7 @@ import type { Record } from "../record/record.js";
 export type ProfileParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   avatarCid?: string | null;
   bannerCid?: string | null;
   description?: string | null;
@@ -19,7 +19,7 @@ export type ProfileParams = {
 export class Profile {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly avatarCid: string | null;
   readonly bannerCid: string | null;
   readonly description: string | null;
@@ -30,7 +30,7 @@ export class Profile {
   constructor(params: ProfileParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.avatarCid = params.avatarCid ?? null;
     this.bannerCid = params.bannerCid ?? null;
     this.description = params.description ?? null;
@@ -44,7 +44,7 @@ export class Profile {
     return new Profile({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       avatarCid: getBlobCidString(parsed.avatar) ?? null,
       bannerCid: getBlobCidString(parsed.banner) ?? null,
       description: parsed.description,

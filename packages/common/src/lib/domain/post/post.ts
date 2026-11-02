@@ -30,7 +30,7 @@ const getStrongRef = (ref: { uri: string; cid: string } | undefined) => {
 export type PostParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   text: string;
   replyRoot?: StrongRef | null;
   replyParent?: StrongRef | null;
@@ -49,7 +49,7 @@ export type PostParams = {
 export class Post {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly text: string;
   readonly replyRoot: StrongRef | null;
   readonly replyParent: StrongRef | null;
@@ -67,7 +67,7 @@ export class Post {
   constructor(params: PostParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.text = params.text;
     this.replyRoot = params.replyRoot ?? null;
     this.replyParent = params.replyParent ?? null;
@@ -141,7 +141,7 @@ export class Post {
     return new Post({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       text: parsed.text,
       replyRoot: getStrongRef(parsed.reply?.root),
       replyParent: getStrongRef(parsed.reply?.parent),

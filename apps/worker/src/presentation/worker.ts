@@ -2,8 +2,8 @@ import type { JobData } from "@repo/common/domain";
 import type { BackoffStrategy, Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 
-import { aggregateActorStatsCommandFactory } from "../application/use-cases/async/aggregate-actor-stats-command.js";
-import type { AggregateActorStatsUseCase } from "../application/use-cases/async/aggregate-actor-stats-use-case.js";
+import { aggregateAccountStatsCommandFactory } from "../application/use-cases/async/aggregate-account-stats-command.js";
+import type { AggregateAccountStatsUseCase } from "../application/use-cases/async/aggregate-account-stats-use-case.js";
 import type { AggregatePostStatsUseCase } from "../application/use-cases/async/aggregate-post-stats-use-case.js";
 import type { CheckBackfillUseCase } from "../application/use-cases/async/check-backfill-use-case.js";
 import type { FetchRecordUseCase } from "../application/use-cases/async/fetch-record-use-case.js";
@@ -40,7 +40,7 @@ export class SyncWorker {
     resolveDidUseCase: ResolveDidUseCase,
     fetchRecordUseCase: FetchRecordUseCase,
     aggregatePostStatsUseCase: AggregatePostStatsUseCase,
-    aggregateActorStatsUseCase: AggregateActorStatsUseCase,
+    aggregateAccountStatsUseCase: AggregateAccountStatsUseCase,
     syncTapRepoUseCase: SyncTapRepoUseCase,
     checkBackfillUseCase: CheckBackfillUseCase,
     redisUrl: string,
@@ -97,13 +97,13 @@ export class SyncWorker {
         await aggregatePostStatsUseCase.execute();
       }),
       createWorker(
-        "aggregateActorStats",
+        "aggregateAccountStats",
         async (job) => {
-          const command = aggregateActorStatsCommandFactory({
+          const command = aggregateAccountStatsCommandFactory({
             data: job.data,
             jobLogger: createJobLogger(job),
           });
-          await aggregateActorStatsUseCase.execute(command);
+          await aggregateAccountStatsUseCase.execute(command);
         },
         { concurrency: 16 },
       ),

@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getFeedGenerators from "@repo/client/lex/app/bsky/feed/getFeedGenerators";
 import {
-  actorFactory,
+  accountFactory,
   generatorFactory,
   recordFactory,
   testSetup,
@@ -16,14 +16,14 @@ describe("app.bsky.feed.getFeedGenerators", () => {
   test("getFeedGenerators-1: 指定したフィードジェネレーターをgeneratorViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const creator = await actorFactory(ctx.db)
+    const creator = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const generator = await generatorFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.generator")
-            .vars({ actor: () => creator })
+            .vars({ account: () => creator })
             .create(),
       })
       .create();

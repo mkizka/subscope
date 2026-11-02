@@ -13,7 +13,7 @@ import {
   InMemoryTapClient,
 } from "@repo/common/test";
 import { schema } from "@repo/db";
-import { actorFactory, randomCid, testSetup } from "@repo/test-utils";
+import { accountFactory, randomCid, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -85,49 +85,59 @@ describe("commit", () => {
 
   test("index-5: 削除したレコードは、削除より古いrevのコミットで復活させない", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    await processCommit(deleteEvent(actor.did, "3bbbbbbbbbbbb"));
+    await processCommit(deleteEvent(account.did, "3bbbbbbbbbbbb"));
 
     // act
-    await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "old"));
+    await processCommit(
+      postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
+    );
 
     // assert
-    expect(await findPost(actor.did)).toBeNull();
+    expect(await findPost(account.did)).toBeNull();
   });
 
   test("index-6: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    await processCommit(postEvent(actor.did, "update", "3bbbbbbbbbbbb", "new"));
+    await processCommit(
+      postEvent(account.did, "update", "3bbbbbbbbbbbb", "new"),
+    );
 
     // act
-    await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "old"));
+    await processCommit(
+      postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
+    );
 
     // assert
-    expect((await findPost(actor.did))?.text).toBe("new");
+    expect((await findPost(account.did))?.text).toBe("new");
   });
 
   test("index-8: 処理済みのrevと同じrevのコミットは、もう一度処理する", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "old"));
+    await processCommit(
+      postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
+    );
 
     // act
-    await processCommit(postEvent(actor.did, "create", "3aaaaaaaaaaaa", "new"));
+    await processCommit(
+      postEvent(account.did, "create", "3aaaaaaaaaaaa", "new"),
+    );
 
     // assert
-    expect((await findPost(actor.did))?.text).toBe("new");
+    expect((await findPost(account.did))?.text).toBe("new");
   });
 
   test("index-14: 保存しないレコードのコミットは、revを記録しない", async () => {
     // arrange
-    const liker = await actorFactory(ctx.db).create();
+    const liker = await accountFactory(ctx.db).create();
     const uri = AtUri.make(liker.did, "app.bsky.feed.like", "123");
 
     // act
@@ -161,7 +171,7 @@ describe("commit", () => {
 
   test("index-15: 投稿のgallery埋め込み(引用のmediaにあるものを含む)の画像を、images埋め込みと区別して保存する", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     const imageCid = await randomCid();
@@ -182,7 +192,7 @@ describe("commit", () => {
       ],
     };
     const embedPostEvent = (rkey: string, embed: LexValue): RecordEvent => ({
-      ...postEvent(actor.did, "create", "3aaaaaaaaaaaa", "gallery"),
+      ...postEvent(account.did, "create", "3aaaaaaaaaaaa", "gallery"),
       rkey,
       record: {
         $type: "app.bsky.feed.post",
@@ -200,7 +210,7 @@ describe("commit", () => {
         record: {
           $type: "app.bsky.embed.record",
           record: {
-            uri: AtUri.make(actor.did, "app.bsky.feed.post", "1").toString(),
+            uri: AtUri.make(account.did, "app.bsky.feed.post", "1").toString(),
             cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
           },
         },
@@ -224,11 +234,11 @@ describe("commit", () => {
     expect(images).toEqual([
       {
         ...expected,
-        postUri: AtUri.make(actor.did, "app.bsky.feed.post", "1").toString(),
+        postUri: AtUri.make(account.did, "app.bsky.feed.post", "1").toString(),
       },
       {
         ...expected,
-        postUri: AtUri.make(actor.did, "app.bsky.feed.post", "2").toString(),
+        postUri: AtUri.make(account.did, "app.bsky.feed.post", "2").toString(),
       },
     ]);
   });

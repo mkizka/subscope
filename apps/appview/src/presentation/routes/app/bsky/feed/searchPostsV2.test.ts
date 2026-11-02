@@ -1,6 +1,6 @@
 import searchPostsV2 from "@repo/client/lex/app/bsky/feed/searchPostsV2";
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   recordFactory,
   testSetup,
@@ -15,14 +15,14 @@ describe("app.bsky.feed.searchPostsV2", () => {
   test("searchPostsV2-1: 本文がqueryに一致する投稿をpostViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const post = await postFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => author })
+            .vars({ account: () => author })
             .create(),
       })
       .props({ text: () => "searchPostsV2で探す投稿" })

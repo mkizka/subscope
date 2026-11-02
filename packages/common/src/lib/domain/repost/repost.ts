@@ -6,7 +6,7 @@ import type { Record } from "../record/record.js";
 export type RepostParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   subjectUri: AtUri | string;
   subjectCid: string;
   createdAt: Date;
@@ -16,7 +16,7 @@ export type RepostParams = {
 export class Repost {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly subjectUri: AtUri;
   readonly subjectCid: string;
   readonly createdAt: Date;
@@ -25,7 +25,7 @@ export class Repost {
   constructor(params: RepostParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.subjectUri = new AtUri(params.subjectUri.toString());
     this.subjectCid = params.subjectCid;
     this.createdAt = params.createdAt;
@@ -37,7 +37,7 @@ export class Repost {
     return new Repost({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       subjectUri: parsed.subject.uri,
       subjectCid: parsed.subject.cid,
       createdAt: new Date(parsed.createdAt),

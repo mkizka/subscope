@@ -6,7 +6,7 @@ const meta = {
   component: TrackedAccountsPage,
   args: {
     total: 3,
-    actors: [
+    accounts: [
       {
         did: "did:plc:bob",
         handle: "bob.bsky.social",

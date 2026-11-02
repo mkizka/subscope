@@ -195,7 +195,7 @@ queryClient.setQueryData<Data<typeof followListLoader>>(
       handle: "alice.bsky.social",
       displayName: "Alice",
     },
-    actors: [
+    accounts: [
       {
         did: "did:plc:bob",
         handle: "bob.bsky.social",

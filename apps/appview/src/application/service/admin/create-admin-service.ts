@@ -1,16 +1,16 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
-  Actor,
+  Account,
   type AfterCommitContext,
   type IJobScheduler,
 } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 
 export class CreateAdminService {
   constructor(
-    private readonly actorRepository: IActorRepository,
+    private readonly accountRepository: IAccountRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
@@ -21,12 +21,12 @@ export class CreateAdminService {
     ctx: AfterCommitContext;
     did: Did;
   }): Promise<void> {
-    const existingActor = await this.actorRepository.find(did);
-    const actor = existingActor ?? Actor.create({ did });
-    actor.promoteToAdmin();
-    await this.actorRepository.save({ ctx, actor });
+    const existingAccount = await this.accountRepository.find(did);
+    const account = existingAccount ?? Account.create({ did });
+    account.promoteToAdmin();
+    await this.accountRepository.save({ ctx, account });
 
-    if (!actor.handle) {
+    if (!account.handle) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleResolveDid(did, { live: true }),
       );

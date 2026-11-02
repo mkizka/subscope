@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import type * as MeSubscoServerGetRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
 import type { Registration } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -16,7 +16,7 @@ type GetRegisteredAccountsParams = {
 export class GetRegisteredAccountsUseCase {
   constructor(
     private readonly registrationQuery: IRegistrationQuery,
-    private readonly actorRepository: IActorRepository,
+    private readonly accountRepository: IAccountRepository,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -34,14 +34,16 @@ export class GetRegisteredAccountsUseCase {
         cursor: params.cursor,
       }),
     );
-    const dids = page.items.map((sub) => asDid(sub.actorDid));
+    const dids = page.items.map((sub) => asDid(sub.accountDid));
     const ctx = this.viewContextFactory.create();
-    const [profiles, actors] = await Promise.all([
+    const [profiles, accounts] = await Promise.all([
       Promise.all(dids.map((did) => this.profileViews.view(did, ctx))),
-      Promise.all(dids.map((did) => this.actorRepository.find(did))),
+      Promise.all(dids.map((did) => this.accountRepository.find(did))),
     ]);
     const adminDids = new Set(
-      actors.filter((actor) => actor?.isAdmin).map((actor) => actor?.did),
+      accounts
+        .filter((account) => account?.isAdmin)
+        .map((account) => account?.did),
     );
 
     return {

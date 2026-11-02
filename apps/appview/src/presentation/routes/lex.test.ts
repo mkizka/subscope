@@ -2,7 +2,7 @@ import assert from "node:assert";
 import { once } from "node:events";
 
 import { asDid } from "@atproto/did";
-import { actorFactory } from "@repo/common/test";
+import { accountFactory } from "@repo/common/test";
 import express from "express";
 import {
   afterAll,
@@ -119,7 +119,7 @@ describe("lexRouter", () => {
   });
 
   test("registerAdminのユースケースエラーはエラー名を持つ400エラーになる", async () => {
-    services.actorQuery.add(actorFactory({ isAdmin: true }));
+    services.accountQuery.add(accountFactory({ isAdmin: true }));
 
     const res = await fetch(`${baseUrl}/me.subsco.admin.registerAdmin`, {
       method: "POST",

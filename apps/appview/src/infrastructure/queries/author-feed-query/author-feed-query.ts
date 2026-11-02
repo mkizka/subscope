@@ -18,7 +18,7 @@ import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import type { IAuthorFeedQuery } from "../../../application/interfaces/queries/author-feed-query.js";
 
 type FindParams = {
-  actorDid: string;
+  accountDid: string;
   cursor?: Date;
   limit: number;
 };
@@ -27,10 +27,10 @@ export class AuthorFeedQuery implements IAuthorFeedQuery {
   constructor(private readonly db: DatabaseClient) {}
 
   async findFeedItems(
-    { actorDid, cursor, limit }: FindParams,
+    { accountDid, cursor, limit }: FindParams,
     condition?: SQL,
   ): Promise<FeedItemDto[]> {
-    const filters = [eq(schema.feedItems.actorDid, actorDid), condition];
+    const filters = [eq(schema.feedItems.accountDid, accountDid), condition];
     if (cursor) {
       filters.push(lt(schema.feedItems.sortAt, cursor));
     }
@@ -40,7 +40,7 @@ export class AuthorFeedQuery implements IAuthorFeedQuery {
         uri: schema.feedItems.uri,
         sortAt: schema.feedItems.sortAt,
         type: schema.feedItems.type,
-        actorDid: schema.feedItems.actorDid,
+        accountDid: schema.feedItems.accountDid,
         subjectUri: schema.feedItems.subjectUri,
       })
       .from(schema.feedItems)
@@ -53,7 +53,7 @@ export class AuthorFeedQuery implements IAuthorFeedQuery {
       uri: asAtUriString(item.uri),
       type: item.type,
       subjectUri: item.subjectUri ? asAtUriString(item.subjectUri) : null,
-      actorDid: asDid(item.actorDid),
+      accountDid: asDid(item.accountDid),
       sortAt: item.sortAt,
     }));
   }
@@ -84,7 +84,7 @@ export class AuthorFeedQuery implements IAuthorFeedQuery {
   }
 
   findFeedItemsWithAuthorThreads(params: FindParams): Promise<FeedItemDto[]> {
-    const authorUri = `at://${params.actorDid}/%`;
+    const authorUri = `at://${params.accountDid}/%`;
     return this.findFeedItems(
       params,
       or(

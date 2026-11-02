@@ -23,7 +23,7 @@ export class RegisterAccount {
         try {
           await this.registerAccountUseCase.execute({
             code: input.body.inviteCode,
-            actorDid: asDid(credentials.did),
+            accountDid: asDid(credentials.did),
           });
 
           return {

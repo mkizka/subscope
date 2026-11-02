@@ -57,13 +57,13 @@ export class EmbedViews {
 
   private mediaView(post: PostDto) {
     if (post.embedImages.length > 0) {
-      return this.imagesView(post.embedImages, post.actorDid);
+      return this.imagesView(post.embedImages, post.accountDid);
     }
     if (post.embedGallery.length > 0) {
-      return this.galleryView(post.embedGallery, post.actorDid);
+      return this.galleryView(post.embedGallery, post.accountDid);
     }
     if (post.embedExternal) {
-      return this.externalView(post.embedExternal, post.actorDid);
+      return this.externalView(post.embedExternal, post.accountDid);
     }
     return undefined;
   }
@@ -126,7 +126,7 @@ export class EmbedViews {
     }
     const [record, author, stats, embed, labels] = await Promise.all([
       ctx.record(uri),
-      this.profileViews.basic(post.actorDid, ctx),
+      this.profileViews.basic(post.accountDid, ctx),
       ctx.stats(uri),
       this.embedView(post, ctx, depth),
       ctx.labelsOf(uri),
@@ -152,7 +152,7 @@ export class EmbedViews {
 
   private externalView(
     embed: PostEmbedExternalDto,
-    actorDid: string,
+    accountDid: string,
   ): $Typed<AppBskyEmbedExternal.View> {
     return {
       $type: "app.bsky.embed.external#view",
@@ -162,7 +162,7 @@ export class EmbedViews {
         title: embed.title,
         description: embed.description,
         thumb: embed.thumbCid
-          ? this.assetUrlBuilder.getFeedThumbnailUrl(actorDid, embed.thumbCid)
+          ? this.assetUrlBuilder.getFeedThumbnailUrl(accountDid, embed.thumbCid)
           : undefined,
       },
     };
@@ -170,14 +170,17 @@ export class EmbedViews {
 
   private imagesView(
     images: PostEmbedImageDto[],
-    actorDid: string,
+    accountDid: string,
   ): $Typed<AppBskyEmbedImages.View> {
     return {
       $type: "app.bsky.embed.images#view",
       images: images.map((image) => ({
         alt: image.alt,
-        thumb: this.assetUrlBuilder.getFeedThumbnailUrl(actorDid, image.cid),
-        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(actorDid, image.cid),
+        thumb: this.assetUrlBuilder.getFeedThumbnailUrl(accountDid, image.cid),
+        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(
+          accountDid,
+          image.cid,
+        ),
         aspectRatio: image.aspectRatio,
       })),
     };
@@ -185,7 +188,7 @@ export class EmbedViews {
 
   private galleryView(
     images: PostEmbedImageDto[],
-    actorDid: string,
+    accountDid: string,
   ): $Typed<AppBskyEmbedGallery.View> {
     return {
       $type: "app.bsky.embed.gallery#view",
@@ -193,10 +196,13 @@ export class EmbedViews {
         $type: "app.bsky.embed.gallery#viewImage" as const,
         alt: image.alt,
         thumbnail: this.assetUrlBuilder.getFeedThumbnailUrl(
-          actorDid,
+          accountDid,
           image.cid,
         ),
-        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(actorDid, image.cid),
+        fullsize: this.assetUrlBuilder.getFeedFullsizeUrl(
+          accountDid,
+          image.cid,
+        ),
         aspectRatio: image.aspectRatio ?? { width: 1, height: 1 },
       })),
     };

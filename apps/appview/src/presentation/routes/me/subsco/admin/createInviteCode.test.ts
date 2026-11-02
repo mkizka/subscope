@@ -1,5 +1,5 @@
 import createInviteCode from "@repo/client/lex/me/subsco/admin/createInviteCode";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, testSetup } from "@repo/test-utils";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -14,7 +14,7 @@ describe("me.subsco.admin.createInviteCode", () => {
   test("createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);
@@ -34,7 +34,7 @@ describe("me.subsco.admin.createInviteCode", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);

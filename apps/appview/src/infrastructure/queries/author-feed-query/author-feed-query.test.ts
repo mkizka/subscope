@@ -1,5 +1,5 @@
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   postFeedItemFactory,
   recordFactory,
@@ -17,13 +17,13 @@ describe("AuthorFeedQuery", () => {
   const authorFeedQuery = new AuthorFeedQuery(ctx.db);
 
   describe("findFeedItems", () => {
-    test("指定されたアクターの投稿がない場合、空の配列を返す", async () => {
+    test("指定されたアカウントの投稿がない場合、空の配列を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -31,11 +31,11 @@ describe("AuthorFeedQuery", () => {
       expect(result).toEqual([]);
     });
 
-    test("指定されたアクターの投稿がある場合、フィードアイテムのリストを返す", async () => {
+    test("指定されたアカウントの投稿がある場合、フィードアイテムのリストを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => postRecord })
@@ -46,7 +46,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -55,15 +55,15 @@ describe("AuthorFeedQuery", () => {
       expect(result[0]).toMatchObject({
         uri: feedItem.uri,
         type: "post",
-        actorDid: actor.did,
+        accountDid: account.did,
       });
     });
 
     test("複数の投稿がある場合、sortAtの降順で返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -76,7 +76,7 @@ describe("AuthorFeedQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -90,7 +90,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -102,9 +102,9 @@ describe("AuthorFeedQuery", () => {
 
     test("リポストも含めて返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const repost = await repostFactory(ctx.db)
         .vars({ record: () => repostRecord })
@@ -115,7 +115,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -124,17 +124,17 @@ describe("AuthorFeedQuery", () => {
       expect(result[0]).toMatchObject({
         uri: feedItem.uri,
         type: "repost",
-        actorDid: actor.did,
+        accountDid: account.did,
       });
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       await Promise.all(
         Array.from({ length: 3 }).map(async () => {
           const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create();
           const post = await postFactory(ctx.db)
             .vars({ record: () => postRecord })
@@ -147,7 +147,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 2,
       });
 
@@ -157,9 +157,9 @@ describe("AuthorFeedQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前のフィードアイテムを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -172,7 +172,7 @@ describe("AuthorFeedQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -188,7 +188,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor.did,
+        accountDid: account.did,
         cursor: cursorDate,
         limit: 10,
       });
@@ -198,13 +198,13 @@ describe("AuthorFeedQuery", () => {
       expect(result[0]?.uri).toBe(feedItem1.uri);
     });
 
-    test("異なるアクターの投稿は含まれない", async () => {
+    test("異なるアカウントの投稿は含まれない", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
-      const actor2 = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
 
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => postRecord })
@@ -215,7 +215,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItems({
-        actorDid: actor1.did,
+        accountDid: account1.did,
         limit: 10,
       });
 
@@ -225,13 +225,13 @@ describe("AuthorFeedQuery", () => {
   });
 
   describe("findFeedItemsWithoutReplies", () => {
-    test("指定されたアクターの投稿がない場合、空の配列を返す", async () => {
+    test("指定されたアカウントの投稿がない場合、空の配列を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -241,10 +241,10 @@ describe("AuthorFeedQuery", () => {
 
     test("リプライでない投稿のみ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
 
       const rootRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const rootPost = await postFactory(ctx.db)
         .vars({ record: () => rootRecord })
@@ -254,7 +254,7 @@ describe("AuthorFeedQuery", () => {
         .create();
 
       const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const replyPost = await postFactory(ctx.db)
         .vars({ record: () => replyRecord })
@@ -271,7 +271,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -282,9 +282,9 @@ describe("AuthorFeedQuery", () => {
 
     test("リポストを含めて返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const repost = await repostFactory(ctx.db)
         .vars({ record: () => repostRecord })
@@ -295,7 +295,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -304,15 +304,15 @@ describe("AuthorFeedQuery", () => {
       expect(result[0]).toMatchObject({
         uri: feedItem.uri,
         type: "repost",
-        actorDid: actor.did,
+        accountDid: account.did,
       });
     });
 
     test("複数の投稿がある場合、sortAtの降順で返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -325,7 +325,7 @@ describe("AuthorFeedQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -339,7 +339,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 10,
       });
 
@@ -351,11 +351,11 @@ describe("AuthorFeedQuery", () => {
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       await Promise.all(
         Array.from({ length: 3 }).map(async () => {
           const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create();
           const post = await postFactory(ctx.db)
             .vars({ record: () => postRecord })
@@ -368,7 +368,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor.did,
+        accountDid: account.did,
         limit: 2,
       });
 
@@ -378,9 +378,9 @@ describe("AuthorFeedQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前のフィードアイテムを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -393,7 +393,7 @@ describe("AuthorFeedQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -409,7 +409,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor.did,
+        accountDid: account.did,
         cursor: cursorDate,
         limit: 10,
       });
@@ -419,13 +419,13 @@ describe("AuthorFeedQuery", () => {
       expect(result[0]?.uri).toBe(feedItem1.uri);
     });
 
-    test("異なるアクターの投稿は含まれない", async () => {
+    test("異なるアカウントの投稿は含まれない", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
-      const actor2 = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
 
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => postRecord })
@@ -436,7 +436,7 @@ describe("AuthorFeedQuery", () => {
 
       // act
       const result = await authorFeedQuery.findFeedItemsWithoutReplies({
-        actorDid: actor1.did,
+        accountDid: account1.did,
         limit: 10,
       });
 

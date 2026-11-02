@@ -10,7 +10,7 @@ export class InMemoryLabelFetcher implements ILabelFetcher {
     this.labels.push(label);
   }
 
-  async fetchByActor(did: Did) {
+  async fetchByAccount(did: Did) {
     return this.labels.filter((label) => label.uri === did);
   }
 }

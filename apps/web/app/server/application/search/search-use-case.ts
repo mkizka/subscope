@@ -1,7 +1,7 @@
 import type {
-  ActorDto,
-  IActorQuery,
-} from "@/app/server/infrastructure/actor/actor-query";
+  AccountDto,
+  IAccountQuery,
+} from "@/app/server/infrastructure/account/account-query";
 import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 import type {
   ITimelineQuery,
@@ -12,31 +12,31 @@ export interface ISearchUseCase {
   execute: (
     did: string,
     q: string,
-    tab: "actors" | "posts",
-  ) => Promise<{ actors: ActorDto[]; posts: TimelinePostDto[] }>;
+    tab: "accounts" | "posts",
+  ) => Promise<{ accounts: AccountDto[]; posts: TimelinePostDto[] }>;
 }
 
 export const searchUseCaseFactory = ({
-  actorQuery,
+  accountQuery,
   timelineQuery,
   backfillQuery,
 }: {
-  actorQuery: IActorQuery;
+  accountQuery: IAccountQuery;
   backfillQuery: IBackfillQuery;
   timelineQuery: ITimelineQuery;
 }): ISearchUseCase => ({
   async execute(did, q, tab) {
     if (tab === "posts") {
-      return { actors: [], posts: await timelineQuery.searchPosts(did, q) };
+      return { accounts: [], posts: await timelineQuery.searchPosts(did, q) };
     }
-    const actors = await actorQuery.searchActors(did, q);
+    const accounts = await accountQuery.searchActors(did, q);
     const statuses = await backfillQuery.findTrackedStatuses(
-      actors.map((actor) => actor.did),
+      accounts.map((account) => account.did),
     );
     return {
-      actors: actors.map((actor) => ({
-        ...actor,
-        backfillStatus: statuses[actor.did],
+      accounts: accounts.map((account) => ({
+        ...account,
+        backfillStatus: statuses[account.did],
       })),
       posts: [],
     };

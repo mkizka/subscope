@@ -3,7 +3,7 @@ import type { AtUriString } from "@atproto/syntax";
 
 export type RepostDto = {
   uri: AtUriString;
-  actorDid: Did;
+  accountDid: Did;
   subjectUri: AtUriString;
   indexedAt: Date;
   sortAt: Date;
