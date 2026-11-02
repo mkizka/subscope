@@ -73,7 +73,7 @@ export class SubscribeServerUseCase {
 
   async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
     const existingSubscription =
-      await this.subscriptionRepository.findFirst(actorDid);
+      await this.subscriptionRepository.find(actorDid);
     if (existingSubscription) {
       throw new AlreadySubscribedError("Already subscribed to this server");
     }

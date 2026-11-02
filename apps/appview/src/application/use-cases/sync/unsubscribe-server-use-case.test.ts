@@ -42,7 +42,7 @@ describe("UnsubscribeServerUseCase", () => {
     });
 
     // assert
-    const result = await subscriptionRepo.findFirst(asDid(actor.did));
+    const result = await subscriptionRepo.find(asDid(actor.did));
     expect(result).toBeNull();
     const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
     expect(updatedInviteCode?.usedAt).not.toBeNull();

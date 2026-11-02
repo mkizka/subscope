@@ -35,7 +35,7 @@ describe("RegisterAdminUseCase", () => {
     // assert
     const updatedActor = await actorRepo.findByDid(requester.did);
     expect(updatedActor?.isAdmin).toBe(true);
-    const subscription = await subscriptionRepo.findFirst(asDid(requester.did));
+    const subscription = await subscriptionRepo.find(asDid(requester.did));
     expect(subscription).toMatchObject({
       actorDid: requester.did,
       createdAt: now,

@@ -13,9 +13,7 @@ export class GrantAdminUseCase {
   ) {}
 
   async execute(params: { did: Did }): Promise<void> {
-    const subscription = await this.subscriptionRepository.findFirst(
-      params.did,
-    );
+    const subscription = await this.subscriptionRepository.find(params.did);
     const actor = await this.actorRepository.findByDid(params.did);
     if (!subscription || !actor) {
       throw new NotSubscribedError("Not subscribed to this server");
