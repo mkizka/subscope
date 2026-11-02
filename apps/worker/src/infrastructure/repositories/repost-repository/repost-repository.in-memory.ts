@@ -23,7 +23,7 @@ export class InMemoryRepostRepository implements IRepostRepository {
     return this.reposts.get(uri.toString()) ?? null;
   }
 
-  async upsert({
+  async save({
     repost,
   }: {
     ctx: TransactionContext;

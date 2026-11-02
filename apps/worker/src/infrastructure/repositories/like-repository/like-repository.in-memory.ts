@@ -27,7 +27,7 @@ export class InMemoryLikeRepository implements ILikeRepository {
     return this.likes.get(uri.toString()) ?? null;
   }
 
-  async upsert(params: { ctx: TransactionContext; like: Like }): Promise<void> {
+  async save(params: { ctx: TransactionContext; like: Like }): Promise<void> {
     this.likes.set(params.like.uri.toString(), params.like);
   }
 }
