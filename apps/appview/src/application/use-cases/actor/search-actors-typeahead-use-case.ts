@@ -1,7 +1,7 @@
 import { type Did } from "@atproto/did";
 import type * as AppBskyActorSearchActorsTypeahead from "@repo/client/lex/app/bsky/actor/searchActorsTypeahead";
 
-import type { ProfileSearchService } from "../../../application/service/search/profile-search-service.js";
+import type { IProfileQuery } from "../../interfaces/profile-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
@@ -13,7 +13,7 @@ type SearchActorsTypeaheadParams = {
 
 export class SearchActorsTypeaheadUseCase {
   constructor(
-    private readonly profileSearchService: ProfileSearchService,
+    private readonly profileQuery: IProfileQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -27,7 +27,7 @@ export class SearchActorsTypeaheadUseCase {
       };
     }
 
-    const profiles = await this.profileSearchService.findActorsTypeahead({
+    const profiles = await this.profileQuery.search({
       query: params.query,
       limit: params.limit,
     });

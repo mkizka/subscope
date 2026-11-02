@@ -26,12 +26,12 @@ import type { ILabelFetcher } from "../application/interfaces/external/label-fet
 import type { IActorQuery } from "../application/interfaces/queries/actor-query.js";
 import type { IPostQuery } from "../application/interfaces/queries/post-query.js";
 import type { IProfileQuery } from "../application/interfaces/queries/profile-query.js";
+import type { ISubscriptionQuery } from "../application/interfaces/queries/subscription-query.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
 import type { IActorStatsRepository } from "../application/interfaces/repositories/actor-stats-repository.js";
 import type { IFeedItemRepository } from "../application/interfaces/repositories/feed-item-repository.js";
 import type { IFollowRepository } from "../application/interfaces/repositories/follow-repository.js";
 import type { IGeneratorRepository } from "../application/interfaces/repositories/generator-repository.js";
-import type { IInviteCodeRepository } from "../application/interfaces/repositories/invite-code-repository.js";
 import type { ILabelRepository } from "../application/interfaces/repositories/label-repository.js";
 import type { ILikeRepository } from "../application/interfaces/repositories/like-repository.js";
 import type { IListItemRepository } from "../application/interfaces/repositories/list-item-repository.js";
@@ -43,7 +43,6 @@ import type { IProfileRepository } from "../application/interfaces/repositories/
 import type { IRecordRepository } from "../application/interfaces/repositories/record-repository.js";
 import type { IRecordRevRepository } from "../application/interfaces/repositories/record-rev-repository.js";
 import type { IRepostRepository } from "../application/interfaces/repositories/repost-repository.js";
-import type { ISubscriptionRepository } from "../application/interfaces/repositories/subscription-repository.js";
 import { IndexActorService } from "../application/services/index-actor-service.js";
 import { IndexRecordService } from "../application/services/index-record-service.js";
 import { FollowIndexer } from "../application/services/indexer/follow-indexer.js";
@@ -72,12 +71,12 @@ import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cur
 import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
 import { PostQuery } from "../infrastructure/queries/post-query/post-query.js";
 import { ProfileQuery } from "../infrastructure/queries/profile-query/profile-query.js";
+import { SubscriptionQuery } from "../infrastructure/queries/subscription-query/subscription-query.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
 import { ActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.js";
 import { FeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.js";
 import { FollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.js";
 import { GeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.js";
-import { InviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.js";
 import { LabelRepository } from "../infrastructure/repositories/label-repository/label-repository.js";
 import { LikeRepository } from "../infrastructure/repositories/like-repository/like-repository.js";
 import { ListItemRepository } from "../infrastructure/repositories/list-item-repository/list-item-repository.js";
@@ -89,7 +88,6 @@ import { ProfileRepository } from "../infrastructure/repositories/profile-reposi
 import { RecordRepository } from "../infrastructure/repositories/record-repository/record-repository.js";
 import { RecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
-import { SubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.js";
 import { LabelSubscriber } from "../presentation/label-subscriber.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { WorkerServer } from "../presentation/server.js";
@@ -127,7 +125,6 @@ export const createWorkerRegistry = (env: Env) =>
     .service("labelFetcher", ["moderationUrl"], asClassArgs<ILabelFetcher>()(LabelFetcher))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
     .service("actorRepository", asClassArgs<IActorRepository>()(ActorRepository))
-    .service("inviteCodeRepository", asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("actorStatsRepository", asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
     .service("profileRepository", asClassArgs<IProfileRepository>()(ProfileRepository))
     .service("postRepository", asClassArgs<IPostRepository>()(PostRepository))
@@ -143,34 +140,34 @@ export const createWorkerRegistry = (env: Env) =>
     .service("likeRepository", asClassArgs<ILikeRepository>()(LikeRepository))
     .service("postStatsRepository", asClassArgs<IPostStatsRepository>()(PostStatsRepository))
     .service("repostRepository", asClassArgs<IRepostRepository>()(RepostRepository))
-    .service("subscriptionRepository", asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
+    .service("subscriptionQuery", asClassArgs<ISubscriptionQuery>()(SubscriptionQuery))
     .service("feedItemRepository", asClassArgs<IFeedItemRepository>()(FeedItemRepository))
     .service("labelRepository", asClassArgs<ILabelRepository>()(LabelRepository))
     .service("notificationRepository", asClassArgs<INotificationRepository>()(NotificationRepository))
     // application(service)
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("profileIndexer", ["profileRepository"], asClassArgs(ProfileIndexer))
-    .service("postIndexer", ["postRepository", "postQuery", "feedItemRepository", "subscriptionRepository", "notificationRepository", "jobScheduler"], asClassArgs(PostIndexer))
+    .service("postIndexer", ["postRepository", "postQuery", "feedItemRepository", "subscriptionQuery", "notificationRepository", "jobScheduler"], asClassArgs(PostIndexer))
     .service("indexActorService", ["actorRepository", "profileQuery", "jobScheduler"], asClassArgs(IndexActorService))
-    .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionRepository", "notificationRepository"], asClassArgs(FollowIndexer))
+    .service("followIndexer", ["followRepository", "jobScheduler", "indexActorService", "subscriptionQuery", "notificationRepository"], asClassArgs(FollowIndexer))
     .service("generatorIndexer", ["generatorRepository"], asClassArgs(GeneratorIndexer))
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
     .service("listItemIndexer", ["listItemRepository", "indexActorService"], asClassArgs(ListItemIndexer))
     .service("gateIndexer", asClassArgs(GateIndexer))
-    .service("likeIndexer", ["likeRepository", "jobScheduler", "subscriptionRepository", "notificationRepository"], asClassArgs(LikeIndexer))
-    .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "subscriptionRepository", "notificationRepository"], asClassArgs(RepostIndexer))
+    .service("likeIndexer", ["likeRepository", "jobScheduler", "subscriptionQuery", "notificationRepository"], asClassArgs(LikeIndexer))
+    .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "subscriptionQuery", "notificationRepository"], asClassArgs(RepostIndexer))
     .service("indexRecordService", ["recordRepository", "indexActorService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
-    .service("resolveDidUseCase", ["didResolver", "handleResolver", "actorRepository", "db"], asClassArgs(ResolveDidUseCase))
+    .service("resolveDidUseCase", ["didResolver", "handleResolver", "actorRepository", "transactionManager"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexActorService", "resolveDidUseCase"], asClassArgs(UpsertIdentityUseCase))
     .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService", "recordRevRepository"], asClassArgs(IndexCommitUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
-    .service("aggregatePostStatsUseCase", ["postStatsRepository", "jobQueue", "db"], asClassArgs(AggregatePostStatsUseCase))
-    .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorQuery", "db"], asClassArgs(AggregateActorStatsUseCase))
-    .service("indexLabelUseCase", ["labelRepository", "actorQuery", "db"], asClassArgs(IndexLabelUseCase))
-    .service("syncTapRepoUseCase", ["tapClient", "subscriptionRepository", "followRepository", "labelFetcher", "indexLabelUseCase", "jobScheduler", "db"], asClassArgs(SyncTapRepoUseCase))
-    .service("checkBackfillUseCase", ["tapClient", "subscriptionRepository", "followRepository", "actorRepository", "jobScheduler", "db"], asClassArgs(CheckBackfillUseCase))
-    .service("scheduleBackfillChecksUseCase", ["actorQuery", "jobScheduler", "db"], asClassArgs(ScheduleBackfillChecksUseCase))
+    .service("aggregatePostStatsUseCase", ["postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
+    .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorQuery", "transactionManager"], asClassArgs(AggregateActorStatsUseCase))
+    .service("indexLabelUseCase", ["labelRepository", "actorQuery", "transactionManager"], asClassArgs(IndexLabelUseCase))
+    .service("syncTapRepoUseCase", ["tapClient", "subscriptionQuery", "labelFetcher", "indexLabelUseCase", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
+    .service("checkBackfillUseCase", ["tapClient", "subscriptionQuery", "actorRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
+    .service("scheduleBackfillChecksUseCase", ["actorQuery", "jobScheduler", "transactionManager"], asClassArgs(ScheduleBackfillChecksUseCase))
     .service("syncWorker", ["resolveDidUseCase", "fetchRecordUseCase", "aggregatePostStatsUseCase", "aggregateActorStatsUseCase", "syncTapRepoUseCase", "checkBackfillUseCase", "redisUrl"], asClassArgs(SyncWorker))
     // presentation
     .service("healthRouter", ["nodeEnv", "logLevel", "port"], healthRouterFactory)

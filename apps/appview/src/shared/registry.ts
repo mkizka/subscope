@@ -43,11 +43,7 @@ import type { ISubscriptionRepository } from "../application/interfaces/subscrip
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
-import { SubscriptionService } from "../application/service/admin/subscription-service.js";
-import { RepostService } from "../application/service/feed/repost-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
-import { PostSearchService } from "../application/service/search/post-search-service.js";
-import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
 import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
 import { GetProfilesUseCase } from "../application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "../application/use-cases/actor/search-actors-typeahead-use-case.js";
@@ -219,11 +215,7 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
-    .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
-    .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeQuery"], asClassArgs(LikeService))
-    .service("repostService", ["repostQuery"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
@@ -239,39 +231,39 @@ export const createAppRegistry = (env: Env) =>
     // use-cases
     .service("getProfileUseCase", ["viewContextFactory", "profileViews"], asClassArgs(GetProfileUseCase))
     .service("getProfilesUseCase", ["viewContextFactory", "profileViews"], asClassArgs(GetProfilesUseCase))
-    .service("searchActorsUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
-    .service("searchActorsTypeaheadUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
+    .service("searchActorsUseCase", ["profileQuery", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
+    .service("searchActorsTypeaheadUseCase", ["profileQuery", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
     .service("getPostThreadUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationQuery", "subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(ListNotificationsUseCase))
-    .service("searchPostsUseCase", ["searchService", "viewContextFactory", "postViews"], asClassArgs(SearchPostsUseCase))
+    .service("searchPostsUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(SearchPostsUseCase))
     .service("getActorLikesUseCase", ["likeQuery", "viewContextFactory", "feedViews"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedQuery", "viewContextFactory", "feedViews"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["viewContextFactory", "generatorViews"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeService", "viewContextFactory", "profileViews"], asClassArgs(GetLikesUseCase))
     .service("getListFeedUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetListFeedUseCase))
-    .service("getRepostedByUseCase", ["repostService", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
+    .service("getRepostedByUseCase", ["repostQuery", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
     .service("getFollowersUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowersUseCase))
     .service("getListUseCase", ["listQuery", "viewContextFactory", "listViews", "profileViews"], asClassArgs(GetListUseCase))
     .service("getListsUseCase", ["listQuery", "viewContextFactory", "listViews"], asClassArgs(GetListsUseCase))
-    .service("createInviteCodeUseCase", ["db", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
-    .service("deleteInviteCodeUseCase", ["db", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
+    .service("createInviteCodeUseCase", ["transactionManager", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
+    .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
-    .service("getSubscribersUseCase", ["subscriptionService", "viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
-    .service("grantAdminUseCase", ["db", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
+    .service("getSubscribersUseCase", ["viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
+    .service("grantAdminUseCase", ["transactionManager", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorQuery", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["actorRepository"], asClassArgs(VerifyAccessUseCase))
-    .service("getMembersUseCase", ["subscriptionService", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetMembersUseCase))
+    .service("getMembersUseCase", ["subscriptionRepository", "actorRepository", "viewContextFactory", "profileViews"], asClassArgs(GetMembersUseCase))
     .service("getSetupStatusUseCase", ["actorQuery"], asClassArgs(GetSetupStatusUseCase))
     .service("getTrackedActorsUseCase", ["subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
     .service("unsubscribeServerUseCase", ["subscriptionRepository", "followQuery", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
-    .service("unbanActorUseCase", ["db", "actorRepository"], asClassArgs(UnbanActorUseCase))
+    .service("unbanActorUseCase", ["transactionManager", "actorRepository"], asClassArgs(UnbanActorUseCase))
     .service("banSubscriberUseCase", ["transactionManager", "actorRepository", "unsubscribeServerUseCase"], asClassArgs(BanSubscriberUseCase))
     .service("updateSeenUseCase", ["transactionManager", "subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation

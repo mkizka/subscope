@@ -19,7 +19,7 @@ describe("PostIndexer", () => {
   let postRepo: TestServices["postRepository"];
   let feedItemRepo: TestServices["feedItemRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let subscriptionQuery: TestServices["subscriptionQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe("PostIndexer", () => {
     postRepo = services.postRepository;
     feedItemRepo = services.feedItemRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionRepo = services.subscriptionRepository;
+    subscriptionQuery = services.subscriptionQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -56,7 +56,7 @@ describe("PostIndexer", () => {
       });
 
       // assert
-      const post = postRepo.findByUri(record.uri);
+      const post = await postRepo.find({ ctx, uri: record.uri });
       expect(post).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -64,7 +64,7 @@ describe("PostIndexer", () => {
         text: "test post",
       });
 
-      const feedItem = feedItemRepo.findByUri(record.uri);
+      const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "post",
@@ -160,10 +160,10 @@ describe("PostIndexer", () => {
       });
 
       // assert
-      const post = postRepo.findByUri(record.uri);
+      const post = await postRepo.find({ ctx, uri: record.uri });
       expect(post?.createdAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
 
-      const feedItem = feedItemRepo.findByUri(record.uri);
+      const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem?.sortAt).toEqual(new Date("0000-01-01T00:00:00.000Z"));
     });
 
@@ -177,8 +177,8 @@ describe("PostIndexer", () => {
       // arrange
       const quoted = actorFactory();
       const mentioned = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: quoted.did }));
-      subscriptionRepo.add(subscriptionFactory({ actorDid: mentioned.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: quoted.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: mentioned.did }));
       const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
       const record = recordFactory({
         uri: `at://${actorFactory().did}/app.bsky.feed.post/notify`,
@@ -209,8 +209,8 @@ describe("PostIndexer", () => {
       // arrange
       const mentioned = actorFactory();
       const quoted = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: mentioned.did }));
-      subscriptionRepo.add(subscriptionFactory({ actorDid: quoted.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: mentioned.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: quoted.did }));
       const author = actorFactory();
       const cid = await randomCid();
       const postRecord = (rkey: string, did: string, withMention: boolean) => {
@@ -249,7 +249,7 @@ describe("PostIndexer", () => {
       const ancestors = [];
       for (let i = 0; i < 5; i++) {
         const actor = actorFactory();
-        subscriptionRepo.add(subscriptionFactory({ actorDid: actor.did }));
+        subscriptionQuery.add(subscriptionFactory({ actorDid: actor.did }));
         const { post } = postFactory({
           actorDid: actor.did,
           uri: `at://${actor.did}/app.bsky.feed.post/ancestor${i}`,

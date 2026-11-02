@@ -3,11 +3,9 @@ import { mkizka } from "@mkizka/eslint-config";
 const legacyRepositoryMethods = {
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
-  IFollowRepository: "isFollowedByAnySubscriber|upsert",
-  IInviteCodeRepository: "findByCode|markAsUsed",
   IPostStatsRepository: "upsertMany",
   ISubscriptionRepository:
-    "count|countTrackedActors|findMany|findTrackedActors|isSubscriber|upsert",
+    "count|countTrackedActors|findMany|findTrackedActors",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({

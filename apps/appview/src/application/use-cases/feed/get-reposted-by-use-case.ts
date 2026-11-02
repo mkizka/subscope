@@ -1,12 +1,14 @@
 import type * as AppBskyFeedGetRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
 
-import type { RepostService } from "../../../application/service/feed/repost-service.js";
+import type { RepostDto } from "../../../application/dto/repost-dto.js";
+import type { IRepostQuery } from "../../../application/interfaces/repost-query.js";
+import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetRepostedByUseCase {
   constructor(
-    private readonly repostService: RepostService,
+    private readonly repostQuery: IRepostQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -14,14 +16,16 @@ export class GetRepostedByUseCase {
   async execute(
     params: AppBskyFeedGetRepostedBy.$Params,
   ): Promise<AppBskyFeedGetRepostedBy.$OutputBody> {
-    const cursor = params.cursor ? new Date(params.cursor) : undefined;
-
-    const paginationResult = await this.repostService.findRepostsWithPagination(
-      {
+    const paginator = createCursorPaginator<RepostDto>({
+      limit: params.limit,
+      getCursor: (repost) => repost.sortAt.toISOString(),
+    });
+    const paginationResult = paginator.extractPage(
+      await this.repostQuery.findBySubject({
         subjectUri: params.uri,
-        cursor,
-        limit: params.limit,
-      },
+        limit: paginator.queryLimit,
+        cursor: params.cursor ? new Date(params.cursor) : undefined,
+      }),
     );
 
     const ctx = this.viewContextFactory.create();

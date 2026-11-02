@@ -16,7 +16,7 @@ describe("FollowIndexer", () => {
   let followIndexer: TestServices["followIndexer"];
   let followRepo: TestServices["followRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let subscriptionQuery: TestServices["subscriptionQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   let ctx: AfterCommitContext;
@@ -25,7 +25,7 @@ describe("FollowIndexer", () => {
     followIndexer = services.followIndexer;
     followRepo = services.followRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionRepo = services.subscriptionRepository;
+    subscriptionQuery = services.subscriptionQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
     ctx = { db, afterCommit };
@@ -53,7 +53,7 @@ describe("FollowIndexer", () => {
       });
 
       // assert
-      const follow = followRepo.findByUri(record.uri);
+      const follow = await followRepo.find({ ctx, uri: record.uri });
       expect(follow).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -66,7 +66,7 @@ describe("FollowIndexer", () => {
       // arrange
       const follower = actorFactory();
       const followee = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: followee.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: followee.did }));
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
         json: {

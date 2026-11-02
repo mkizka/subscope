@@ -1,4 +1,4 @@
-import type { DatabaseClient } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/domain";
 
 import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
@@ -8,38 +8,40 @@ export class AggregateActorStatsUseCase {
   constructor(
     private readonly actorStatsRepository: IActorStatsRepository,
     private readonly actorQuery: IActorQuery,
-    private readonly db: DatabaseClient,
+    private readonly transactionManager: ITransactionManager,
   ) {}
 
   async execute(command: AggregateActorStatsCommand) {
-    const ctx = { db: this.db };
-
-    const actorExists = await this.actorQuery.exists({
-      ctx,
-      did: command.did,
-    });
+    const actorExists = await this.transactionManager.transaction(
+      async (ctx) => {
+        const exists = await this.actorQuery.exists({
+          ctx,
+          did: command.did,
+        });
+        if (!exists) return false;
+        if (command.type === "follows") {
+          await this.actorStatsRepository.upsertFollowsCount({
+            ctx,
+            actorDid: command.did,
+          });
+        } else if (command.type === "followers") {
+          await this.actorStatsRepository.upsertFollowersCount({
+            ctx,
+            actorDid: command.did,
+          });
+        } else {
+          await this.actorStatsRepository.upsertPostsCount({
+            ctx,
+            actorDid: command.did,
+          });
+        }
+        return true;
+      },
+    );
     if (!actorExists) {
       await command.jobLogger.log(
         `Skipping aggregation for ${command.did} - actor not found`,
       );
-      return;
-    }
-
-    if (command.type === "follows") {
-      await this.actorStatsRepository.upsertFollowsCount({
-        ctx,
-        actorDid: command.did,
-      });
-    } else if (command.type === "followers") {
-      await this.actorStatsRepository.upsertFollowersCount({
-        ctx,
-        actorDid: command.did,
-      });
-    } else {
-      await this.actorStatsRepository.upsertPostsCount({
-        ctx,
-        actorDid: command.did,
-      });
     }
   }
 }

@@ -1,7 +1,6 @@
 import type { Did } from "@atproto/did";
-import type { Follow } from "@repo/common/domain";
 
-import type { FollowDto } from "../dto/follow-dto.js";
+import type { FollowDto, FolloweeDto, FollowerDto } from "../dto/follow-dto.js";
 
 export interface IFollowQuery {
   findFollows: (params: {
@@ -12,11 +11,11 @@ export interface IFollowQuery {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }) => Promise<Follow[]>;
+  }) => Promise<FolloweeDto[]>;
   findActorFollowers: (params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }) => Promise<Follow[]>;
+  }) => Promise<FollowerDto[]>;
   findFolloweeDids: (actorDid: Did) => Promise<Did[]>;
 }

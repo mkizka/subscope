@@ -42,4 +42,45 @@ describe("app.bsky.feed.getRepostedBy", () => {
       repostedBy: [{ did: actor.did }],
     });
   });
+
+  test("getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const post = await postFactory(ctx.db).create();
+    const create = async (date: Date) => {
+      const actor = await actorFactory(ctx.db).create();
+      await repostFactory(ctx.db)
+        .vars({
+          record: () =>
+            recordFactory(ctx.db, "app.bsky.feed.repost")
+              .vars({ actor: () => actor })
+              .create(),
+          subject: () => post,
+        })
+        .props({ createdAt: () => date, indexedAt: () => date })
+        .create();
+      return actor;
+    };
+    const oldActor = await create(new Date("2024-01-01"));
+    const middleActor = await create(new Date("2024-01-02"));
+    const newActor = await create(new Date("2024-01-03"));
+
+    // act
+    const firstPage = await client.call(getRepostedBy, {
+      uri: asAtUriString(post.uri),
+      limit: 2,
+    });
+    const secondPage = await client.call(getRepostedBy, {
+      uri: asAtUriString(post.uri),
+      limit: 2,
+      cursor: firstPage.cursor,
+    });
+
+    // assert
+    expect(firstPage.repostedBy.map((a) => a.did)).toEqual([
+      newActor.did,
+      middleActor.did,
+    ]);
+    expect(secondPage.repostedBy.map((a) => a.did)).toEqual([oldActor.did]);
+  });
 });

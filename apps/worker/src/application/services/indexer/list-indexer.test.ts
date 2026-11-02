@@ -22,7 +22,9 @@ describe("ListIndexer", () => {
     await listIndexer.upsert({ ctx: { db }, record });
 
     // assert
-    expect(listRepository.findByUri(record.uri)).toMatchObject({
+    expect(
+      await listRepository.find({ ctx: { db }, uri: record.uri }),
+    ).toMatchObject({
       actorDid: actor.did,
       purpose: "app.bsky.graph.defs#curatelist",
       name: "テストリスト",
