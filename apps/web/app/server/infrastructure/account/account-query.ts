@@ -23,7 +23,7 @@ import {
 export type ProfileTab = "posts" | "replies" | "media" | "likes";
 
 const filters = {
-  posts: "posts_no_replies",
+  posts: "posts_and_author_threads",
   replies: "posts_with_replies",
   media: "posts_with_media",
 } as const;

@@ -96,7 +96,11 @@ test.describe("プロフィール", () => {
   test("profile-7: 全体ページの「投稿」タブではリプライを除いた投稿を、「リプライ」タブではリプライを含めた投稿を表示する", async ({
     page,
   }) => {
-    const parent = await createRecord("alice.test", "app.bsky.feed.post", {
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: `profile-7の投稿 ${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    });
+    const parent = await createRecord("bob.test", "app.bsky.feed.post", {
       text: `profile-7の親 ${Date.now()}`,
       createdAt: new Date().toISOString(),
     });
@@ -115,7 +119,7 @@ test.describe("プロフィール", () => {
 
     await main.getByRole("tab", { name: "投稿" }).click();
 
-    await expect(main.getByText(/^profile-7の親/).first()).toBeVisible();
+    await expect(main.getByText(/^profile-7の投稿/).first()).toBeVisible();
     await expect(main.getByText(reply)).toHaveCount(0);
   });
 
@@ -144,6 +148,36 @@ test.describe("プロフィール", () => {
     await expect(main).toContainText(
       new RegExp(`${parentText}[\\s\\S]*${reply}`),
     );
+  });
+
+  test("profile-16: 全体ページの「投稿」タブでは、自分の投稿への自分のリプライ(スレッド)を含め、timeline-13と同じく線で繋げる", async ({
+    page,
+  }) => {
+    const root = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "profile-16: 起点",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "profile-16: 返信",
+      reply: { root, parent: root },
+      createdAt: new Date().toISOString(),
+    });
+    await page.goto("/profile/alice.test");
+    const main = page.getByRole("main");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(/^profile-16: /)).toHaveText(
+        ["profile-16: 起点", "profile-16: 返信"],
+        { timeout: 1000 },
+      );
+    }).toPass();
+    await expect(
+      main
+        .getByRole("article")
+        .filter({ hasText: "profile-16: " })
+        .getByTestId("thread-line"),
+    ).toHaveCount(2);
   });
 
   test("profile-8: 自分のプロフィールの「いいね」タブに、自分がいいねした投稿を表示する", async ({
