@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react";
 import { useFetcher } from "react-router";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
@@ -11,12 +12,19 @@ function OlderTimelineFeedContainer({ cursor }: { cursor: string }) {
 
   if (!data) {
     return (
-      <InfiniteScrollTrigger
-        onIntersect={() =>
-          void fetcher.load(`/?${new URLSearchParams({ index: "", cursor })}`)
-        }
-        enabled={fetcher.state === "idle"}
-      />
+      <div
+        role="status"
+        aria-label="続きを読み込み中"
+        className="flex justify-center py-6"
+      >
+        <LoaderCircle className="size-6 animate-spin text-muted" />
+        <InfiniteScrollTrigger
+          onIntersect={() =>
+            void fetcher.load(`/?${new URLSearchParams({ index: "", cursor })}`)
+          }
+          enabled={fetcher.state === "idle"}
+        />
+      </div>
     );
   }
   return (
