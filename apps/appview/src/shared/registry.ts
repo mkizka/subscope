@@ -27,10 +27,10 @@ import type { IBackfillStatusQuery } from "../application/interfaces/backfill-st
 import type { IFollowQuery } from "../application/interfaces/follow-query.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
+import type { IInviteCodeQuery } from "../application/interfaces/invite-code-query.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 import type { ILabelQuery } from "../application/interfaces/label-query.js";
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
-import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 import type { IListItemQuery } from "../application/interfaces/list-item-query.js";
 import type { IListQuery } from "../application/interfaces/list-query.js";
 import type { INotificationQuery } from "../application/interfaces/notification-query.js";
@@ -43,10 +43,8 @@ import type { ISubscriptionRepository } from "../application/interfaces/subscrip
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
-import { InviteCodeService } from "../application/service/admin/invite-code-service.js";
 import { SubscriptionService } from "../application/service/admin/subscription-service.js";
 import { RepostService } from "../application/service/feed/repost-service.js";
-import { FollowService } from "../application/service/graph/follow-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
 import { PostSearchService } from "../application/service/search/post-search-service.js";
 import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
@@ -107,10 +105,10 @@ import { BackfillStatusQuery } from "../infrastructure/backfill-status-query/bac
 import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
+import { InviteCodeQuery } from "../infrastructure/invite-code-query/invite-code-query.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
 import { LabelQuery } from "../infrastructure/label-query/label-query.js";
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
-import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
 import { ListItemQuery } from "../infrastructure/list-item-query/list-item-query.js";
 import { ListQuery } from "../infrastructure/list-query/list-query.js";
 import { NotificationQuery } from "../infrastructure/notification-query/notification-query.js";
@@ -209,11 +207,11 @@ export const createAppRegistry = (env: Env) =>
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
     .service("timelineQuery", ["db"], asClassArgs<ITimelineQuery>()(TimelineQuery))
     .service("authorFeedQuery", ["db"], asClassArgs<IAuthorFeedQuery>()(AuthorFeedQuery))
-    .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
+    .service("inviteCodeQuery", ["db"], asClassArgs<IInviteCodeQuery>()(InviteCodeQuery))
     .service("inviteCodeRepository", ["db"], asClassArgs<IInviteCodeRepository>()(InviteCodeRepository))
     .service("subscriptionRepository", ["db"], asClassArgs<ISubscriptionRepository>()(SubscriptionRepository))
     .service("tokenVerifier", ["didResolver", "serviceDid"], asClassArgs<ITokenVerifier>()(TokenVerifier))
@@ -222,16 +220,14 @@ export const createAppRegistry = (env: Env) =>
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
     .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
-    .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
-    .service("likeService", ["likeRepository"], asClassArgs(LikeService))
+    .service("likeService", ["likeQuery"], asClassArgs(LikeService))
     .service("repostService", ["repostQuery"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
-    .service("followService", ["followQuery"], asClassArgs(FollowService))
     .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
@@ -257,14 +253,14 @@ export const createAppRegistry = (env: Env) =>
     .service("getLikesUseCase", ["likeService", "viewContextFactory", "profileViews"], asClassArgs(GetLikesUseCase))
     .service("getListFeedUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetListFeedUseCase))
     .service("getRepostedByUseCase", ["repostService", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
-    .service("getFollowsUseCase", ["followService", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
-    .service("getFollowersUseCase", ["followService", "viewContextFactory", "profileViews"], asClassArgs(GetFollowersUseCase))
+    .service("getFollowsUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
+    .service("getFollowersUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowersUseCase))
     .service("getListUseCase", ["listQuery", "viewContextFactory", "listViews", "profileViews"], asClassArgs(GetListUseCase))
     .service("getListsUseCase", ["listQuery", "viewContextFactory", "listViews"], asClassArgs(GetListsUseCase))
     .service("createInviteCodeUseCase", ["transactionManager", "inviteCodeRepository", "publicUrl"], asClassArgs(CreateInviteCodeUseCase))
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
-    .service("getInviteCodesUseCase", ["inviteCodeService", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
+    .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
     .service("getSubscribersUseCase", ["subscriptionService", "viewContextFactory", "profileViews", "actorRepository", "subscriptionRepository", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorQuery", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))

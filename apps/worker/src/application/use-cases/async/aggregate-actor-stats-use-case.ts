@@ -1,20 +1,20 @@
 import type { ITransactionManager } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
+import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
 import type { IActorStatsRepository } from "../../interfaces/repositories/actor-stats-repository.js";
 import type { AggregateActorStatsCommand } from "./aggregate-actor-stats-command.js";
 
 export class AggregateActorStatsUseCase {
   constructor(
     private readonly actorStatsRepository: IActorStatsRepository,
-    private readonly actorRepository: IActorRepository,
+    private readonly actorQuery: IActorQuery,
     private readonly transactionManager: ITransactionManager,
   ) {}
 
   async execute(command: AggregateActorStatsCommand) {
     const actorExists = await this.transactionManager.transaction(
       async (ctx) => {
-        const exists = await this.actorRepository.exists({
+        const exists = await this.actorQuery.exists({
           ctx,
           did: command.did,
         });

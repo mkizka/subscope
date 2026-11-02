@@ -1,7 +1,7 @@
 import type { Profile, TransactionContext } from "@repo/common/domain";
 
 export interface IProfileRepository {
-  upsert: (params: {
+  save: (params: {
     ctx: TransactionContext;
     profile: Profile;
   }) => Promise<void>;

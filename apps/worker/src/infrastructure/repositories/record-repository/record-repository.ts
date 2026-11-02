@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
-  async findByUri({
+  async find({
     ctx,
     uri,
   }: {
@@ -32,7 +32,7 @@ export class RecordRepository implements IRecordRepository {
     });
   }
 
-  async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
+  async save({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const data = {
       cid: record.cid,
       actorDid: record.actorDid,
