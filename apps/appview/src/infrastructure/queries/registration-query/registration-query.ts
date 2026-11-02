@@ -9,6 +9,7 @@ import {
   desc,
   eq,
   gt,
+  ilike,
   inArray,
   isNotNull,
   lt,
@@ -23,16 +24,17 @@ export class RegistrationQuery implements IRegistrationQuery {
   async findMany(params: {
     limit: number;
     cursor?: string;
+    q?: string;
   }): Promise<Registration[]> {
-    const filters = [];
-
-    if (params.cursor) {
-      const cursorDate = new Date(params.cursor);
-      filters.push(lt(schema.registrations.createdAt, cursorDate));
-    }
-
     const rows = await this.db.query.registrations.findMany({
-      where: filters.length > 0 ? filters[0] : undefined,
+      where: and(
+        params.cursor
+          ? lt(schema.registrations.createdAt, new Date(params.cursor))
+          : undefined,
+        params.q
+          ? inArray(schema.registrations.accountDid, this.matching(params.q))
+          : undefined,
+      ),
       orderBy: (registrations, { desc }) => [desc(registrations.createdAt)],
       limit: params.limit,
     });
@@ -58,6 +60,7 @@ export class RegistrationQuery implements IRegistrationQuery {
   async findTrackedAccounts(params: {
     limit: number;
     cursor?: string;
+    q?: string;
   }): Promise<{ did: Did; registeredFollowersCount: number }[]> {
     const { accounts, follows, registrations } = schema;
     const registeredFollowersCount = countDistinct(registrations.accountDid);
@@ -68,7 +71,12 @@ export class RegistrationQuery implements IRegistrationQuery {
       .from(accounts)
       .leftJoin(follows, eq(follows.subjectDid, accounts.did))
       .leftJoin(registrations, eq(registrations.accountDid, follows.accountDid))
-      .where(this.isTrackedAccount())
+      .where(
+        and(
+          this.isTrackedAccount(),
+          params.q ? inArray(accounts.did, this.matching(params.q)) : undefined,
+        ),
+      )
       .groupBy(accounts.did)
       .having(
         cursor
@@ -96,6 +104,21 @@ export class RegistrationQuery implements IRegistrationQuery {
       .leftJoin(registrations, eq(registrations.accountDid, follows.accountDid))
       .where(this.isTrackedAccount());
     return row?.total ?? 0;
+  }
+
+  private matching(q: string) {
+    const { accounts, profiles } = schema;
+    const pattern = `%${q.replace(/[\\%_]/g, "\\$&")}%`;
+    return this.db
+      .select({ did: accounts.did })
+      .from(accounts)
+      .leftJoin(profiles, eq(profiles.accountDid, accounts.did))
+      .where(
+        or(
+          ilike(profiles.displayName, pattern),
+          ilike(accounts.handle, pattern),
+        ),
+      );
   }
 
   private isTrackedAccount() {

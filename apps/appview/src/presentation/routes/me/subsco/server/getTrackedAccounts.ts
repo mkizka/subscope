@@ -17,6 +17,7 @@ export class GetTrackedAccounts {
         const result = await this.getTrackedAccountsUseCase.execute({
           limit: params.limit,
           cursor: params.cursor,
+          q: params.q,
         });
 
         return { body: result };

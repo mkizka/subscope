@@ -11,6 +11,7 @@ import type { ViewContextFactory } from "../../views/view-context.js";
 type GetRegisteredAccountsParams = {
   limit: number;
   cursor?: string;
+  q?: string;
 };
 
 export class GetRegisteredAccountsUseCase {
@@ -32,6 +33,7 @@ export class GetRegisteredAccountsUseCase {
       await this.registrationQuery.findMany({
         limit: paginator.queryLimit,
         cursor: params.cursor,
+        q: params.q,
       }),
     );
     const dids = page.items.map((sub) => asDid(sub.accountDid));

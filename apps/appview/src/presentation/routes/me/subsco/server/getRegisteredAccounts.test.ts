@@ -57,4 +57,29 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
       ]),
     );
   });
+
+  test("getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含む登録アカウントだけを返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const byName = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .use((t) => t.withProfile({ displayName: "Needle Name" }))
+      .create();
+    const byHandle = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .props({ handle: () => "needle.test" })
+      .create();
+    await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .use((t) => t.withProfile({ displayName: "Other" }))
+      .create();
+
+    // act
+    const res = await client.call(getRegisteredAccounts, { q: "NEEDLE" });
+
+    // assert
+    expect(res.registeredAccounts.map((a) => a.profile.did).sort()).toEqual(
+      [byName.did, byHandle.did].sort(),
+    );
+  });
 });

@@ -97,4 +97,23 @@ describe("me.subsco.server.getTrackedAccounts", () => {
     expect(res.trackedAccounts).toHaveLength(1);
     expect(res.total).toBe(3);
   });
+
+  test("getTrackedAccounts-4: qを指定すると、表示名またはハンドルにqを含む追跡アカウントだけを返す。totalはqに関係なく総数のままにする", async () => {
+    // arrange
+    const { client, loginAs } = await setupApiTest();
+    const registeredAccount = await createRegisteredAccount();
+    const match = await accountFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Needle Name" }))
+      .create();
+    await follow(registeredAccount, match);
+    await follow(registeredAccount, await createAccount());
+    loginAs(registeredAccount.did);
+
+    // act
+    const res = await client.call(getTrackedAccounts, { q: "needle" });
+
+    // assert
+    expect(res.trackedAccounts.map((a) => a.profile.did)).toEqual([match.did]);
+    expect(res.total).toBe(3);
+  });
 });

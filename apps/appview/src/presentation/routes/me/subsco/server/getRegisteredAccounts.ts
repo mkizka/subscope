@@ -13,6 +13,7 @@ export class GetRegisteredAccounts {
       const result = await this.getRegisteredAccountsUseCase.execute({
         limit: params.limit,
         cursor: params.cursor,
+        q: params.q,
       });
       return { body: result };
     });

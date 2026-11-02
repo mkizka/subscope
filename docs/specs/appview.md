@@ -277,10 +277,11 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.server.getRegisteredAccounts
 
-登録アカウントのプロフィールを返す。登録アカウントの一覧は公開情報とし、認証は不要。limitとcursorでページングする。
+登録アカウントのプロフィールを返す。登録アカウントの一覧は公開情報とし、認証は不要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）アカウントだけを返す。
 
 - getRegisteredAccounts-1: 登録アカウントごとにprofileViewを返す
 - getRegisteredAccounts-2: 登録アカウントごとに管理者かどうかを返す
+- getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含む登録アカウントだけを返す
 
 ## me.subsco.server.getSetupStatus
 
@@ -291,11 +292,12 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.server.getTrackedAccounts
 
-追跡アカウントのprofileViewと、その追跡アカウントをフォローしている登録アカウントの数、追跡アカウントの総数を返す。認証が必要。limitとcursorでページングする。
+追跡アカウントのprofileViewと、その追跡アカウントをフォローしている登録アカウントの数、追跡アカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）追跡アカウントだけを返す。
 
 - getTrackedAccounts-1: 登録アカウントとそのフォロー先を返し、それ以外のアカウントは含めない
 - getTrackedAccounts-2: フォローしている登録アカウントが多い順に並べる
 - getTrackedAccounts-3: totalにはページングに関係なく追跡アカウントの総数を入れる
+- getTrackedAccounts-4: qを指定すると、表示名またはハンドルにqを含む追跡アカウントだけを返す。totalはqに関係なく総数のままにする
 
 ## me.subsco.sync.registerAccount
 

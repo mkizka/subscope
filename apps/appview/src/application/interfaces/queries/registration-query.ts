@@ -5,11 +5,13 @@ export interface IRegistrationQuery {
   findMany: (params: {
     limit: number;
     cursor?: string;
+    q?: string;
   }) => Promise<Registration[]>;
   count: () => Promise<number>;
   findTrackedAccounts: (params: {
     limit: number;
     cursor?: string;
+    q?: string;
   }) => Promise<{ did: Did; registeredFollowersCount: number }[]>;
   countTrackedAccounts: () => Promise<number>;
 }
