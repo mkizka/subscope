@@ -11,8 +11,6 @@ export class InMemoryLabelFetcher implements ILabelFetcher {
   }
 
   async fetchByActor(did: Did) {
-    return this.labels.filter(
-      (label) => label.uri === did || label.uri.startsWith(`at://${did}/`),
-    );
+    return this.labels.filter((label) => label.uri === did);
   }
 }
