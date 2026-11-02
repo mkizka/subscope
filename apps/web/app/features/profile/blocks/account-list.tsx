@@ -72,7 +72,11 @@ export function AccountList<T extends Account>({
                 <BackfillStatusBadge status={account.backfillStatus} />
               )}
               {account.registeredFollowersCount !== undefined && (
-                <Badge>{account.registeredFollowersCount}人からフォロー</Badge>
+                <Link to={`/profile/${profileId}/followers?filter=registered`}>
+                  <Badge>
+                    {account.registeredFollowersCount}人からフォロー
+                  </Badge>
+                </Link>
               )}
             </div>
           </li>
