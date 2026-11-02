@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { RegisteredAccountsPage } from "./registered-accounts-page";
+import { AccountsPage } from "./accounts-page";
 
 const meta = {
-  component: RegisteredAccountsPage,
+  component: AccountsPage,
   parameters: {
     layout: "fullscreen",
   },
-} satisfies Meta<typeof RegisteredAccountsPage>;
+} satisfies Meta<typeof AccountsPage>;
 
 export default meta;
 

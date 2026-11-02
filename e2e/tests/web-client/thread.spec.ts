@@ -324,7 +324,7 @@ test.describe("スレッド", () => {
   }) => {
     const target = await post("thread-14: 投稿");
     await openThread(page, target.uri, "thread-14: 投稿");
-    await page.goto("/registered-accounts");
+    await page.goto("/accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/thread*", async (route) => {
       await released;
@@ -354,9 +354,9 @@ test.describe("スレッド", () => {
     await openThread(page, target.uri, "thread-15: 投稿");
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "登録アカウント" })
+      .getByRole("link", { name: "アカウント", exact: true })
       .click();
-    await expect(page).toHaveURL("/registered-accounts");
+    await expect(page).toHaveURL("/accounts");
     await page.route("**/api/thread*", () => {});
 
     await page.goBack();

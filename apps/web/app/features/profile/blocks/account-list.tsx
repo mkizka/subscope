@@ -53,21 +53,28 @@ export function AccountList<T extends Account>({
                 {account.description && (
                   <p className="truncate text-label">{account.description}</p>
                 )}
+                <div
+                  className="
+                    mt-1 flex flex-wrap gap-1
+                    empty:hidden
+                  "
+                >
+                  {account.isAdmin && (
+                    <Badge>
+                      <ShieldIcon className="mr-1 size-3" />
+                      管理者
+                    </Badge>
+                  )}
+                  {account.backfillStatus && (
+                    <BackfillStatusBadge status={account.backfillStatus} />
+                  )}
+                  {account.registeredFollowersCount !== undefined && (
+                    <Badge>
+                      {account.registeredFollowersCount}人からフォロー
+                    </Badge>
+                  )}
+                </div>
               </div>
-              {account.isAdmin && (
-                <Badge>
-                  <ShieldIcon className="mr-1 size-3" />
-                  管理者
-                </Badge>
-              )}
-              {account.backfillStatus && (
-                <BackfillStatusBadge status={account.backfillStatus} />
-              )}
-              {account.registeredFollowersCount !== undefined && (
-                <Badge>
-                  登録アカウント{account.registeredFollowersCount}人がフォロー
-                </Badge>
-              )}
             </Link>
             {renderAction?.(account)}
           </li>
