@@ -1,4 +1,4 @@
-import type { IActorQuery } from "../../../application/interfaces/actor-query.js";
+import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
 
 export class GetSetupStatusUseCase {
   constructor(private readonly actorQuery: IActorQuery) {}

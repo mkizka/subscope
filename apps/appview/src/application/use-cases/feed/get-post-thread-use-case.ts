@@ -5,8 +5,8 @@ import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type * as AppBskyFeedGetPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 
 import type { PostDto } from "../../../application/dto/post-dto.js";
-import type { IPostQuery } from "../../../application/interfaces/post-query.js";
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
+import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { PostViews } from "../../views/post-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

@@ -5,9 +5,9 @@ import {
   Subscription,
 } from "@repo/common/domain";
 
-import type { IActorQuery } from "../../../application/interfaces/actor-query.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
+import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
 
 export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {

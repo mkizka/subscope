@@ -1,7 +1,7 @@
 import type { $OutputBody } from "@repo/client/lex/app/bsky/feed/searchPosts";
 
 import type { PostDto } from "../../dto/post-dto.js";
-import type { IPostQuery } from "../../interfaces/post-query.js";
+import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
 import type { PostViews } from "../../views/post-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";

@@ -2,8 +2,8 @@ import { toDatetimeString } from "@atproto/syntax";
 import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 
 import type { InviteCodeDto } from "../../../application/dto/invite-code-dto.js";
-import type { IInviteCodeQuery } from "../../../application/interfaces/invite-code-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { IInviteCodeQuery } from "../../interfaces/queries/invite-code-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

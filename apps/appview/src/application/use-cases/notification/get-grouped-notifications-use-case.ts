@@ -6,7 +6,7 @@ import type {
   NotificationDto,
   NotificationReason,
 } from "../../dto/notification-dto.js";
-import type { INotificationQuery } from "../../interfaces/notification-query.js";
+import type { INotificationQuery } from "../../interfaces/queries/notification-query.js";
 import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
 import {
   ITEMS_PER_GROUP,

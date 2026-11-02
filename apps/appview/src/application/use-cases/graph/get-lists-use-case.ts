@@ -2,8 +2,8 @@ import type { Did } from "@atproto/did";
 import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getLists";
 
 import type { ListDto } from "../../../application/dto/list-dto.js";
-import type { IListQuery } from "../../../application/interfaces/list-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { IListQuery } from "../../interfaces/queries/list-query.js";
 import type { ListViews } from "../../views/list-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

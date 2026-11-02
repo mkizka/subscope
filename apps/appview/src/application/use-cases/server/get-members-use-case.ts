@@ -3,7 +3,7 @@ import type * as MeSubscoServerGetMembers from "@repo/client/lex/me/subsco/serve
 import type { Subscription } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
-import type { ISubscriptionQuery } from "../../../application/interfaces/subscription-query.js";
+import type { ISubscriptionQuery } from "../../../application/interfaces/queries/subscription-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";

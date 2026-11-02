@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type * as MeSubscoServerGetTrackedActors from "@repo/client/lex/me/subsco/server/getTrackedActors";
 
-import type { ISubscriptionQuery } from "../../../application/interfaces/subscription-query.js";
+import type { ISubscriptionQuery } from "../../../application/interfaces/queries/subscription-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";

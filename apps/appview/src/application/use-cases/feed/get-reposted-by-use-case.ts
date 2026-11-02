@@ -1,8 +1,8 @@
 import type * as AppBskyFeedGetRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
 
 import type { RepostDto } from "../../../application/dto/repost-dto.js";
-import type { IRepostQuery } from "../../../application/interfaces/repost-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { IRepostQuery } from "../../interfaces/queries/repost-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
