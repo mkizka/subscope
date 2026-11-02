@@ -3,6 +3,7 @@ import { toDatetimeString } from "@atproto/syntax";
 import type * as MeSubscoAdminGetSubscribers from "@repo/client/lex/me/subsco/admin/getSubscribers";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IBackfillStatusQuery } from "../../../application/interfaces/backfill-status-query.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
 import type { SubscriptionService } from "../../../application/service/admin/subscription-service.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -20,6 +21,7 @@ export class GetSubscribersUseCase {
     private readonly profileViews: ProfileViews,
     private readonly actorRepository: IActorRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly backfillStatusQuery: IBackfillStatusQuery,
   ) {}
 
   async execute(
@@ -34,10 +36,9 @@ export class GetSubscribersUseCase {
     ]);
 
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
-    const backfillStatuses =
-      await this.actorRepository.findBackfillStatusesWithFollows(
-        paginationResult.items.map((sub) => asDid(sub.actorDid)),
-      );
+    const backfillStatuses = await this.backfillStatusQuery.findWithFollows(
+      paginationResult.items.map((sub) => asDid(sub.actorDid)),
+    );
     const subscribers = await Promise.all(
       paginationResult.items.map(async (sub) => {
         const did = asDid(sub.actorDid);
