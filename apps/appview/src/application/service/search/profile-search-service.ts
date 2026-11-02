@@ -1,13 +1,12 @@
-import type { ProfileDetailed } from "@repo/common/domain";
-
-import type { IProfileRepository } from "../../../application/interfaces/profile-repository.js";
+import type { ProfileDto } from "../../../application/dto/profile-dto.js";
+import type { IProfileQuery } from "../../../application/interfaces/profile-query.js";
 import {
   createCursorPaginator,
   type Page,
 } from "../../../application/utils/pagination.js";
 
 export class ProfileSearchService {
-  constructor(private readonly profileRepository: IProfileRepository) {}
+  constructor(private readonly profileQuery: IProfileQuery) {}
 
   async findActorsWithPagination({
     query,
@@ -17,16 +16,16 @@ export class ProfileSearchService {
     query: string;
     cursor?: Date;
     limit: number;
-  }): Promise<Page<ProfileDetailed>> {
-    const paginator = createCursorPaginator<ProfileDetailed>({
+  }): Promise<Page<ProfileDto>> {
+    const paginator = createCursorPaginator<ProfileDto>({
       limit,
       getCursor: (item) => item.indexedAt.toISOString(),
     });
 
-    const profiles = await this.profileRepository.searchActors({
+    const profiles = await this.profileQuery.search({
       query,
       limit: paginator.queryLimit,
-      cursor: cursor?.toISOString(),
+      cursor,
     });
 
     return paginator.extractPage(profiles);
@@ -38,10 +37,7 @@ export class ProfileSearchService {
   }: {
     query: string;
     limit: number;
-  }): Promise<ProfileDetailed[]> {
-    return await this.profileRepository.searchActors({
-      query,
-      limit,
-    });
+  }): Promise<ProfileDto[]> {
+    return await this.profileQuery.search({ query, limit });
   }
 }
