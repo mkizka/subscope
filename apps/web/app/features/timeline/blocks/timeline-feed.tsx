@@ -17,6 +17,9 @@ type Props = {
   posts: TimelinePost[];
 };
 
+export const threadPath = (post: TimelinePost) =>
+  `/profile/${post.authorHandle}/post/${post.uri.split("/").pop()}`;
+
 export function TimelineFeed({ posts }: Props) {
   return (
     <section>
@@ -29,7 +32,7 @@ export function TimelineFeed({ posts }: Props) {
         <PostCard
           key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
           {...post}
-          threadPath={`/profile/${post.authorHandle}/post/${post.uri.split("/").pop()}`}
+          threadPath={threadPath(post)}
           toolbar={<PostToolbarContainer {...post} />}
         />
       ))}

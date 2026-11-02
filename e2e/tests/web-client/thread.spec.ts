@@ -296,4 +296,26 @@ test.describe("スレッド", () => {
     await page.waitForURL("/");
     await expect(page.getByText("thread-12: 投稿")).toHaveCount(0);
   });
+
+  test("thread-13: スレッドの親投稿や返信を選ぶと、その投稿のスレッドを開く", async ({
+    page,
+  }) => {
+    const parent = await post("thread-13: 親");
+    const target = await post("thread-13: 投稿", parent);
+    await post("thread-13: 返信", target);
+
+    await openThread(page, target.uri, "thread-13: 返信");
+    const thread = page.getByRole("region", { name: "スレッド" });
+    const focused = thread.getByRole("article", { name: "選んだ投稿" });
+    for (const text of ["thread-13: 親", "thread-13: 返信"]) {
+      await thread
+        .getByRole("article")
+        .filter({ hasText: text })
+        .getByRole("link", { name: "スレッドを開く" })
+        .click();
+      await expect(focused).toContainText(text);
+      await page.goBack();
+      await expect(focused).toContainText("thread-13: 投稿");
+    }
+  });
 });
