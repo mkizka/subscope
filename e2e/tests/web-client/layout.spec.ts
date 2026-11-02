@@ -122,4 +122,23 @@ test.describe("レイアウト（モバイル）", () => {
 
     await expect(page).toHaveURL("/login");
   });
+
+  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べる", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/");
+    const sideNav = page.getByRole("navigation").getByRole("link");
+    await expect(sideNav.filter({ hasText: "プロフィール" })).toBeVisible();
+    const pcItems = await sideNav.allTextContents();
+
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.getByRole("button", { name: "メニューを開く" }).click();
+    const drawerItems = await page
+      .getByRole("dialog", { name: "メニュー" })
+      .getByRole("link")
+      .allTextContents();
+
+    expect(drawerItems).toEqual(pcItems);
+  });
 });
