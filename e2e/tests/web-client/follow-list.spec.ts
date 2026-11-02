@@ -154,4 +154,19 @@ test.describe("フォロー・フォロワー", () => {
       await expect(alice).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
+
+  test("follow-list-9: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「登録アカウント」タブに移動する", async ({
+    page,
+  }) => {
+    await page.goto("/accounts?tab=tracked");
+
+    await page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "Bob" })
+      .getByRole("link", { name: /^[1-9]\d*人からフォロー$/ })
+      .click();
+
+    await expect(page).toHaveURL(/\/followers\?filter=registered$/);
+  });
 });

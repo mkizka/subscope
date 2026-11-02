@@ -35,7 +35,7 @@ export function AccountList<T extends Account>({
         return (
           <li
             key={account.did}
-            className="flex items-center border-b border-line pr-2"
+            className="flex flex-wrap items-center border-b border-line pr-2"
           >
             <Link
               to={`/profile/${profileId}`}
@@ -53,30 +53,28 @@ export function AccountList<T extends Account>({
                 {account.description && (
                   <p className="truncate text-label">{account.description}</p>
                 )}
-                <div
-                  className="
-                    mt-1 flex flex-wrap gap-1
-                    empty:hidden
-                  "
-                >
-                  {account.isAdmin && (
-                    <Badge>
-                      <ShieldIcon className="mr-1 size-3" />
-                      管理者
-                    </Badge>
-                  )}
-                  {account.backfillStatus && (
-                    <BackfillStatusBadge status={account.backfillStatus} />
-                  )}
-                  {account.registeredFollowersCount !== undefined && (
-                    <Badge>
-                      {account.registeredFollowersCount}人からフォロー
-                    </Badge>
-                  )}
-                </div>
               </div>
             </Link>
             {renderAction?.(account)}
+            <div
+              className="
+                -mt-2 flex w-full flex-wrap gap-1 pb-3 pl-17
+                empty:hidden
+              "
+            >
+              {account.isAdmin && (
+                <Badge>
+                  <ShieldIcon className="mr-1 size-3" />
+                  管理者
+                </Badge>
+              )}
+              {account.backfillStatus && (
+                <BackfillStatusBadge status={account.backfillStatus} />
+              )}
+              {account.registeredFollowersCount !== undefined && (
+                <Badge>{account.registeredFollowersCount}人からフォロー</Badge>
+              )}
+            </div>
           </li>
         );
       })}
