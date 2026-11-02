@@ -3,7 +3,10 @@ import { asAtUriString, type AtUri } from "@atproto/syntax";
 import type { Like } from "@repo/common/domain";
 
 import type { FeedItemDto } from "../../application/dto/feed-item-dto.js";
-import type { LikeDto } from "../../application/dto/like-dto.js";
+import type {
+  LikeDto,
+  SubjectLikeDto,
+} from "../../application/dto/like-dto.js";
 import type { ILikeQuery } from "../../application/interfaces/like-query.js";
 
 export class InMemoryLikeQuery implements ILikeQuery {
@@ -47,7 +50,7 @@ export class InMemoryLikeQuery implements ILikeQuery {
     subjectUri: string;
     limit: number;
     cursor?: Date;
-  }): Promise<Like[]> {
+  }): Promise<SubjectLikeDto[]> {
     return Promise.resolve(
       this.likes
         .filter(
@@ -56,7 +59,12 @@ export class InMemoryLikeQuery implements ILikeQuery {
             (!cursor || like.sortAt < cursor),
         )
         .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
-        .slice(0, limit),
+        .slice(0, limit)
+        .map(({ actorDid, createdAt, sortAt }) => ({
+          actorDid,
+          createdAt,
+          sortAt,
+        })),
     );
   }
 }

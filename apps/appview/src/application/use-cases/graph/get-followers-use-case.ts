@@ -1,8 +1,8 @@
-import { asDid, type Did } from "@atproto/did";
+import type { Did } from "@atproto/did";
 import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getFollowers";
-import type { Follow } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
+import type { FollowerDto } from "../../../application/dto/follow-dto.js";
 import type { IFollowQuery } from "../../../application/interfaces/follow-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -20,7 +20,7 @@ export class GetFollowersUseCase {
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody> {
-    const paginator = createCursorPaginator<Follow>({
+    const paginator = createCursorPaginator<FollowerDto>({
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),
     });
@@ -36,9 +36,7 @@ export class GetFollowersUseCase {
     const [subject, followers] = await Promise.all([
       this.profileViews.view(params.actorDid, ctx),
       Promise.all(
-        page.items.map((item) =>
-          this.profileViews.view(asDid(item.actorDid), ctx),
-        ),
+        page.items.map((item) => this.profileViews.view(item.actorDid, ctx)),
       ),
     ]);
 
