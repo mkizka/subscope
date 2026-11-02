@@ -11,7 +11,7 @@
     {
       "id": 1,
       "type": "row",
-      "title": "DID解決",
+      "title": "Tap",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -24,7 +24,7 @@
     {
       "id": 2,
       "type": "timeseries",
-      "title": "リクエスト",
+      "title": "Firehose",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -47,16 +47,25 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (job) (rate(resolve_did_request_total[5m]))",
-          "legendFormat": "{{job}}",
+          "expr": "rate(tap_firehose_events_received_total[5m])",
+          "legendFormat": "受信",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(tap_firehose_events_processed_total[5m])",
+          "legendFormat": "処理",
+          "refId": "B"
         }
       ]
     },
     {
       "id": 3,
       "type": "timeseries",
-      "title": "エラー",
+      "title": "Workerへの配信",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -79,16 +88,25 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (job) (rate(resolve_did_error_total[5m]))",
-          "legendFormat": "{{job}}",
+          "expr": "rate(tap_events_delivered_total[5m])",
+          "legendFormat": "配信",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(tap_events_acked_total[5m])",
+          "legendFormat": "ack",
+          "refId": "B"
         }
       ]
     },
     {
       "id": 4,
       "type": "timeseries",
-      "title": "キャッシュ",
+      "title": "リシンク",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -111,8 +129,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (job) (rate(resolve_did_cache_hit_total[5m]))",
-          "legendFormat": "hit {{job}}",
+          "expr": "rate(tap_resyncs_started_total[5m])",
+          "legendFormat": "開始",
           "refId": "A"
         },
         {
@@ -120,16 +138,25 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (job) (rate(resolve_did_cache_miss_total[5m]))",
-          "legendFormat": "miss {{job}}",
+          "expr": "rate(tap_resyncs_completed_total[5m])",
+          "legendFormat": "完了",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "rate(tap_resyncs_failed_total[5m])",
+          "legendFormat": "失敗",
+          "refId": "C"
         }
       ]
     },
     {
       "id": 5,
       "type": "row",
-      "title": "Ingester",
+      "title": "Worker",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -142,7 +169,7 @@
     {
       "id": 6,
       "type": "timeseries",
-      "title": "コミットイベント",
+      "title": "コミット",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -174,7 +201,7 @@
     {
       "id": 7,
       "type": "timeseries",
-      "title": "アイデンティティイベント",
+      "title": "アイデンティティ・ラベル",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -198,15 +225,24 @@
             "uid": "prometheus"
           },
           "expr": "sum(rate(worker_events_identity_total[5m]))",
-          "legendFormat": "identity",
+          "legendFormat": "アイデンティティ",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(rate(worker_events_label_total[5m]))",
+          "legendFormat": "ラベル",
+          "refId": "B"
         }
       ]
     },
     {
       "id": 8,
       "type": "timeseries",
-      "title": "ラベル",
+      "title": "レコード取得",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -229,8 +265,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(ingester_labels_labels_total[5m])",
-          "legendFormat": "labels",
+          "expr": "sum(rate(fetch_record_request_total[5m]))",
+          "legendFormat": "リクエスト",
           "refId": "A"
         },
         {
@@ -238,8 +274,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(ingester_labels_info_total[5m])",
-          "legendFormat": "info",
+          "expr": "sum(rate(fetch_record_error_total[5m]))",
+          "legendFormat": "エラー",
           "refId": "B"
         }
       ]
@@ -247,7 +283,7 @@
     {
       "id": 9,
       "type": "row",
-      "title": "Worker",
+      "title": "DID解決",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -260,14 +296,14 @@
     {
       "id": 10,
       "type": "timeseries",
-      "title": "レコード取得",
+      "title": "リクエスト",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
         "y": 19
       },
@@ -283,8 +319,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(fetch_record_request_total[5m])",
-          "legendFormat": "request",
+          "expr": "sum by (job) (rate(resolve_did_request_total[5m]))",
+          "legendFormat": "リクエスト {{job}}",
           "refId": "A"
         },
         {
@@ -292,16 +328,50 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(fetch_record_error_total[5m])",
-          "legendFormat": "error",
+          "expr": "sum by (job) (rate(resolve_did_error_total[5m]))",
+          "legendFormat": "エラー {{job}}",
           "refId": "B"
         }
       ]
     },
     {
       "id": 11,
+      "type": "timeseries",
+      "title": "キャッシュヒット率",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (job) (rate(resolve_did_cache_hit_total[5m])) / (sum by (job) (rate(resolve_did_cache_hit_total[5m])) + sum by (job) (rate(resolve_did_cache_miss_total[5m])))",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 12,
       "type": "row",
-      "title": "キュー",
+      "title": "Appview",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -312,116 +382,7 @@
       "panels": []
     },
     {
-      "id": 12,
-      "type": "timeseries",
-      "title": "待機中のジョブ",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 28
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum by (queue) (bullmq_job_count{state=~\"waiting|prioritized|delayed\"})",
-          "legendFormat": "{{queue}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 13,
-      "type": "timeseries",
-      "title": "処理中のジョブ",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 28
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum by (queue) (bullmq_job_count{state=\"active\"})",
-          "legendFormat": "{{queue}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "type": "timeseries",
-      "title": "失敗したジョブ",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 28
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum by (queue) (bullmq_job_count{state=\"failed\"})",
-          "legendFormat": "{{queue}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 15,
-      "type": "row",
-      "title": "HTTP",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 36
-      },
-      "panels": []
-    },
-    {
-      "id": 16,
       "type": "timeseries",
       "title": "リクエスト",
       "datasource": {
@@ -430,9 +391,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 12,
         "x": 0,
-        "y": 37
+        "y": 28
       },
       "fieldConfig": {
         "defaults": {
@@ -446,14 +407,14 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (job, status_code) (rate(http_request_duration_seconds_count[5m]))",
-          "legendFormat": "{{job}} {{status_code}}",
+          "expr": "sum by (status_code) (rate(http_request_duration_seconds_count{job=\"appview\"}[5m]))",
+          "legendFormat": "{{status_code}}",
           "refId": "A"
         }
       ]
     },
     {
-      "id": 17,
+      "id": 14,
       "type": "timeseries",
       "title": "レイテンシ(p95)",
       "datasource": {
@@ -462,9 +423,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 37
+        "w": 12,
+        "x": 12,
+        "y": 28
       },
       "fieldConfig": {
         "defaults": {
@@ -478,154 +439,9 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum by (job, le) (rate(http_request_duration_seconds_bucket[5m])))",
-          "legendFormat": "{{job}}",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{job=\"appview\"}[5m])))",
+          "legendFormat": "p95",
           "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 18,
-      "type": "row",
-      "title": "Tap",
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 45
-      },
-      "panels": []
-    },
-    {
-      "id": 19,
-      "type": "timeseries",
-      "title": "Firehose",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 46
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ops"
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_firehose_events_received_total[5m])",
-          "legendFormat": "received",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_firehose_events_processed_total[5m])",
-          "legendFormat": "processed",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 20,
-      "type": "timeseries",
-      "title": "配信",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 46
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ops"
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_events_delivered_total[5m])",
-          "legendFormat": "delivered",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_events_acked_total[5m])",
-          "legendFormat": "acked",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 21,
-      "type": "timeseries",
-      "title": "リシンク",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 46
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ops"
-        },
-        "overrides": []
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_resyncs_started_total[5m])",
-          "legendFormat": "started",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_resyncs_completed_total[5m])",
-          "legendFormat": "completed",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "rate(tap_resyncs_failed_total[5m])",
-          "legendFormat": "failed",
-          "refId": "C"
         }
       ]
     }
