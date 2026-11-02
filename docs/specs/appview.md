@@ -354,9 +354,10 @@ BANされたアクターのプロフィールを返す。管理者の認証が�
 
 ## me.subsco.admin.createInviteCode
 
-daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
+招待コードを作る。管理者の認証が必要。
 
 - createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする
+- createInviteCode-2: 有効期限はdaysToExpire日後にする
 
 ランダムな5文字は推測されないよう暗号論的乱数で作る。
 
