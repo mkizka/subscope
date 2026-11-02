@@ -79,7 +79,10 @@ export const timelineQueryFactory = ({
         limit: 20,
         cursor,
       });
-      return { posts: feed.map(toTimelinePost), cursor: next };
+      return {
+        posts: feed.filter(isShownInFeed).map(toTimelinePost),
+        cursor: next,
+      };
     },
     async searchPosts(did, q) {
       const agent = await restore(did);
@@ -91,6 +94,16 @@ export const timelineQueryFactory = ({
 
 const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
+
+export function isShownInFeed({ post, reason }: FeedViewPost) {
+  if (reason || !postRecord.matches(post.record) || !post.record.reply) {
+    return true;
+  }
+  const { root, parent } = post.record.reply;
+  return [root, parent].every((ref) =>
+    ref.uri.startsWith(`at://${post.author.did}/`),
+  );
+}
 
 export function toTimelinePost({
   post,

@@ -338,4 +338,39 @@ test.describe("リスト", () => {
       });
     }).toPass();
   });
+
+  test("list-13: リストのメンバーの投稿は、タイムラインと同じ規則でリプライを絞り込む", async ({
+    page,
+  }) => {
+    const rkey = await createList(`list-13のリスト ${Date.now()}`);
+    const alicePost = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "list-13: aliceの投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("bob.test", "app.bsky.feed.post", {
+      text: "list-13: aliceへの返信",
+      reply: { root: alicePost, parent: alicePost },
+      createdAt: new Date().toISOString(),
+    });
+    const root = await createRecord("bob.test", "app.bsky.feed.post", {
+      text: "list-13: bobの投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("bob.test", "app.bsky.feed.post", {
+      text: "list-13: bob自身への返信",
+      reply: { root, parent: root },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto(`/profile/alice.test/lists/${rkey}`);
+
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("list-13: bob自身への返信")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    await expect(main.getByText("list-13: aliceへの返信")).toHaveCount(0);
+  });
 });

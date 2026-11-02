@@ -22,12 +22,10 @@ export const getTimelineUseCaseFactory = ({
     if (!(await timelineQuery.isSubscribed(did))) return null;
     const timeline = await timelineQuery.findPosts(did, cursor);
     return {
-      posts: timeline.posts
-        .filter((post) => post.reasonRepost || !post.replyRoot)
-        .map((post) => ({
-          ...post,
-          deletable: post.uri.startsWith(`at://${did}/`),
-        })),
+      posts: timeline.posts.map((post) => ({
+        ...post,
+        deletable: post.uri.startsWith(`at://${did}/`),
+      })),
       cursor: timeline.cursor,
     };
   },
