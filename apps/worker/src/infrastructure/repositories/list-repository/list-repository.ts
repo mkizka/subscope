@@ -5,7 +5,7 @@ import type { IListRepository } from "../../../application/interfaces/repositori
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ListRepository implements IListRepository {
-  async upsert({ ctx, list }: { ctx: TransactionContext; list: List }) {
+  async save({ ctx, list }: { ctx: TransactionContext; list: List }) {
     const data = {
       cid: list.cid,
       actorDid: list.actorDid,

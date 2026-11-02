@@ -9,7 +9,7 @@ describe("NotificationRepository", () => {
 
   const notificationRepository = new NotificationRepository();
 
-  describe("createMany", () => {
+  describe("save", () => {
     test("通知を保存し、同じレコードと受信者の組み合わせは無視する", async () => {
       // arrange
       const author = await actorFactory(ctx.db).create();
@@ -26,7 +26,7 @@ describe("NotificationRepository", () => {
       };
 
       // act
-      await notificationRepository.createMany({
+      await notificationRepository.save({
         ctx,
         notifications: [
           { ...notification, reason: "mention" },

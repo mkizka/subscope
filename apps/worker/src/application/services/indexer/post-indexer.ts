@@ -46,7 +46,7 @@ export class PostIndexer implements ICollectionIndexer {
     await this.postRepository.upsert({ ctx, post });
 
     const feedItem = FeedItem.fromPost(post);
-    await this.feedItemRepository.upsert({ ctx, feedItem });
+    await this.feedItemRepository.save({ ctx, feedItem });
 
     await this.createNotifications(ctx, record, post);
 
@@ -116,7 +116,7 @@ export class PostIndexer implements ICollectionIndexer {
         sortAt: post.sortAt,
       });
     }
-    await this.notificationRepository.createMany({
+    await this.notificationRepository.save({
       ctx,
       notifications: [...notifications.values()],
     });

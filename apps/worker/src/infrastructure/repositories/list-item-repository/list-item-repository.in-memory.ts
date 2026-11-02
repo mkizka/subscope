@@ -10,7 +10,7 @@ export class InMemoryListItemRepository implements IListItemRepository {
     return this.listItems.get(uri.toString()) ?? null;
   }
 
-  async upsert({
+  async save({
     listItem,
   }: {
     ctx: TransactionContext;

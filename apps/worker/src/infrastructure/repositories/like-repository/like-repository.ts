@@ -5,7 +5,7 @@ import type { ILikeRepository } from "../../../application/interfaces/repositori
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class LikeRepository implements ILikeRepository {
-  async upsert({ ctx, like }: { ctx: TransactionContext; like: Like }) {
+  async save({ ctx, like }: { ctx: TransactionContext; like: Like }) {
     const data = {
       cid: like.cid,
       actorDid: like.actorDid,

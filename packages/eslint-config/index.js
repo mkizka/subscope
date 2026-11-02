@@ -5,23 +5,17 @@ const legacyRepositoryMethods = {
     "exists|findBannedDids|findByDid|findTrackedDidsWithoutBackfillStatus|hasAnyAdmin|updateBackfillStatus|upsert",
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
-  IFeedItemRepository: "upsert",
   IFollowRepository:
     "findFolloweeDids|findFollowers|findFollows|isFollowedByAnySubscriber|upsert",
-  IGeneratorRepository: "upsert",
   IInviteCodeRepository: "findAll|findByCode|findFirst|markAsUsed|upsert",
-  ILabelRepository: "upsert",
-  ILikeRepository: "findMany|upsert",
-  IListItemRepository: "upsert",
-  IListRepository: "upsert",
-  INotificationRepository: "createMany",
+  ILikeRepository: "findMany",
   IPostRepository:
     "exists|findByUri|findByUris|findMany|findReplies|findReplyParentUri|search|upsert",
   IPostStatsRepository: "upsertMany",
   IProfileRepository: "exists|searchActors|upsert",
   IRecordRepository: "findByUri|upsert",
   IRecordRevRepository: "saveIfNotOlder",
-  IRepostRepository: "findRepostsByPost|upsert",
+  IRepostRepository: "findRepostsByPost",
   ISubscriptionRepository:
     "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|isSubscriber|updateSeenAt|upsert",
 };

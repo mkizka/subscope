@@ -34,17 +34,17 @@ export class RepostIndexer implements ICollectionIndexer {
     depth: number;
   }) {
     const repost = Repost.from(record);
-    await this.repostRepository.upsert({ ctx, repost });
+    await this.repostRepository.save({ ctx, repost });
 
     const feedItem = FeedItem.fromRepost(repost);
-    await this.feedItemRepository.upsert({ ctx, feedItem });
+    await this.feedItemRepository.save({ ctx, feedItem });
 
     const recipientDid = repost.subjectUri.host;
     if (
       recipientDid !== repost.actorDid &&
       (await this.subscriptionRepository.isSubscriber(ctx, recipientDid))
     ) {
-      await this.notificationRepository.createMany({
+      await this.notificationRepository.save({
         ctx,
         notifications: [
           {

@@ -26,6 +26,6 @@ export class ListItemIndexer implements ICollectionIndexer {
       did: listItem.subjectDid,
       live,
     });
-    await this.listItemRepository.upsert({ ctx, listItem });
+    await this.listItemRepository.save({ ctx, listItem });
   }
 }

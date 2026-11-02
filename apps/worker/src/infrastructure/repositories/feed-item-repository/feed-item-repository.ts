@@ -5,7 +5,7 @@ import type { IFeedItemRepository } from "../../../application/interfaces/reposi
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FeedItemRepository implements IFeedItemRepository {
-  async upsert({
+  async save({
     ctx,
     feedItem,
   }: {

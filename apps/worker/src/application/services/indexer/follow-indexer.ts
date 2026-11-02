@@ -51,7 +51,7 @@ export class FollowIndexer implements ICollectionIndexer {
       follow.subjectDid !== follow.actorDid &&
       (await this.subscriptionRepository.isSubscriber(ctx, follow.subjectDid))
     ) {
-      await this.notificationRepository.createMany({
+      await this.notificationRepository.save({
         ctx,
         notifications: [
           {

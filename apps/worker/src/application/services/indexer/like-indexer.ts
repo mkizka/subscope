@@ -40,10 +40,10 @@ export class LikeIndexer implements ICollectionIndexer {
     const recipientDid = like.subjectUri.host;
     const isRecipientSubscriber =
       await this.subscriptionRepository.isSubscriber(ctx, recipientDid);
-    await this.likeRepository.upsert({ ctx, like });
+    await this.likeRepository.save({ ctx, like });
 
     if (recipientDid !== like.actorDid && isRecipientSubscriber) {
-      await this.notificationRepository.createMany({
+      await this.notificationRepository.save({
         ctx,
         notifications: [
           {

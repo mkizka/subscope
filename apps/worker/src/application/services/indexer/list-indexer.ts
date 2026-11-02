@@ -9,6 +9,6 @@ export class ListIndexer implements ICollectionIndexer {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const list = List.from(record);
-    await this.listRepository.upsert({ ctx, list });
+    await this.listRepository.save({ ctx, list });
   }
 }

@@ -12,7 +12,7 @@ export type LabelData = {
 };
 
 export interface ILabelRepository {
-  upsert: (params: {
+  save: (params: {
     ctx: TransactionContext;
     label: LabelData;
     actorDid: Did;

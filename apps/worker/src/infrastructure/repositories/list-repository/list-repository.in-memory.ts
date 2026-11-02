@@ -18,12 +18,7 @@ export class InMemoryListRepository implements IListRepository {
     this.lists.clear();
   }
 
-  async upsert({
-    list,
-  }: {
-    ctx: TransactionContext;
-    list: List;
-  }): Promise<void> {
+  async save({ list }: { ctx: TransactionContext; list: List }): Promise<void> {
     this.lists.set(list.uri.toString(), list);
   }
 }
