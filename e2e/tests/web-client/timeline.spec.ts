@@ -324,7 +324,12 @@ test.describe("タイムライン", () => {
         { timeout: 1000 },
       );
     }).toPass();
-    await expect(page.getByTestId("thread-line")).toHaveCount(2);
+    await expect(
+      page
+        .getByRole("article")
+        .filter({ hasText: "timeline-13: " })
+        .getByTestId("thread-line"),
+    ).toHaveCount(2);
   });
 
   test("timeline-6: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする", async ({
