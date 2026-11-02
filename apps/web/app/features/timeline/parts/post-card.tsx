@@ -183,6 +183,14 @@ export function PostCard({
           className="absolute inset-0"
         />
       )}
+      {reasonRepost && (
+        <div className="mb-1 flex gap-3 text-caption text-muted">
+          <RepeatIcon className="size-4 w-10 shrink-0" />
+          <span className="truncate">
+            {reasonRepost.byDisplayName ?? reasonRepost.byHandle}がリポスト
+          </span>
+        </div>
+      )}
       <div className="flex gap-3">
         <ProfileLink
           handle={authorHandle}
@@ -192,15 +200,6 @@ export function PostCard({
           <Avatar src={authorAvatar} />
         </ProfileLink>
         <div className="min-w-0 flex-1">
-          {reasonRepost && (
-            <div className="mb-1 flex items-center gap-1 text-caption text-muted">
-              <RepeatIcon className="size-4" />
-              <span>
-                {reasonRepost.byDisplayName ?? reasonRepost.byHandle}
-                がリポスト
-              </span>
-            </div>
-          )}
           <div className="flex items-baseline gap-2">
             <ProfileLink
               handle={authorHandle}
