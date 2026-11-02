@@ -44,7 +44,7 @@ export class GetSubscribersUseCase {
         const did = asDid(sub.actorDid);
         const [profile, actor] = await Promise.all([
           this.profileViews.view(did, ctx),
-          this.actorRepository.findByDid(did),
+          this.actorRepository.find(did),
         ]);
         return (
           profile && {

@@ -14,31 +14,12 @@ export class InMemoryActorRepository implements IActorRepository {
     this.actors.clear();
   }
 
-  findByDid(did: Did): Promise<Actor | null> {
+  find(did: Did): Promise<Actor | null> {
     return Promise.resolve(this.actors.get(did) ?? null);
   }
 
-  upsert(params: { ctx: TransactionContext; actor: Actor }): Promise<void> {
+  save(params: { ctx: TransactionContext; actor: Actor }): Promise<void> {
     this.actors.set(params.actor.did, params.actor);
     return Promise.resolve();
-  }
-
-  hasAnyAdmin(): Promise<boolean> {
-    for (const actor of this.actors.values()) {
-      if (actor.isAdmin) {
-        return Promise.resolve(true);
-      }
-    }
-    return Promise.resolve(false);
-  }
-
-  findBannedDids(params: { limit: number; cursor?: string }): Promise<Did[]> {
-    const dids = [...this.actors.values()]
-      .filter((actor) => actor.isBanned)
-      .map((actor) => actor.did)
-      .filter((did) => !params.cursor || did > params.cursor)
-      .sort()
-      .slice(0, params.limit);
-    return Promise.resolve(dids);
   }
 }
