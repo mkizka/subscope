@@ -88,6 +88,7 @@
     "me.subsco.admin.registerAdmin",
     "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
+    "me.subsco.graph.getRegisteredFollowers",
     "me.subsco.server.getRegisteredAccounts",
     "me.subsco.server.getSetupStatus",
     "me.subsco.server.getTrackedAccounts",
@@ -384,6 +385,10 @@
     "me.subsco.admin.verifyAccess": {
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
+    },
+    "me.subsco.graph.getRegisteredFollowers": {
+      "uri": "file://./lexicons/me/subsco/graph/getRegisteredFollowers.json",
+      "cid": "bafyreifw5b5s22p5fbpjyxsp34o2ffmyt6qobue3gyjhilq4tc5ajbnwdi"
     },
     "me.subsco.server.getRegisteredAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getRegisteredAccounts.json",
