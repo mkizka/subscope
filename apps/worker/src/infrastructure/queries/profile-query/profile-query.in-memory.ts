@@ -9,10 +9,10 @@ export class InMemoryProfileQuery implements IProfileQuery {
 
   async exists(params: {
     ctx: TransactionContext;
-    actorDid: Did;
+    accountDid: Did;
   }): Promise<boolean> {
     return this.profileRepository
       .findAll()
-      .some((profile) => profile.actorDid === params.actorDid);
+      .some((profile) => profile.accountDid === params.accountDid);
   }
 }

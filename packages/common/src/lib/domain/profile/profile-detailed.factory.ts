@@ -9,7 +9,7 @@ export function profileDetailedFactory(
   const baseProfile = profileFactory(params);
 
   return new ProfileDetailed({
-    actorDid: baseProfile.actorDid,
+    accountDid: baseProfile.accountDid,
     avatarCid: baseProfile.avatarCid,
     bannerCid: baseProfile.bannerCid,
     description: baseProfile.description,

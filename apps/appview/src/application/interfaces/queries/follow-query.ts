@@ -8,18 +8,18 @@ import type {
 
 export interface IFollowQuery {
   findFollows: (params: {
-    actorDids: Did[];
+    accountDids: Did[];
     subjectDids: Did[];
   }) => Promise<FollowDto[]>;
-  findActorFollows: (params: {
-    actorDid: Did;
+  findAccountFollows: (params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }) => Promise<FolloweeDto[]>;
-  findActorFollowers: (params: {
-    actorDid: Did;
+  findAccountFollowers: (params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }) => Promise<FollowerDto[]>;
-  findFolloweeDids: (actorDid: Did) => Promise<Did[]>;
+  findFolloweeDids: (accountDid: Did) => Promise<Did[]>;
 }

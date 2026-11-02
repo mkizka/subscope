@@ -12,8 +12,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const actors = pgTable(
-  "actors",
+export const accounts = pgTable(
+  "accounts",
   {
     did: varchar({ length: 256 }).primaryKey(),
     handle: varchar({ length: 256 }),
@@ -34,9 +34,9 @@ export const actors = pgTable(
 export const records = pgTable("records", {
   uri: varchar({ length: 256 }).primaryKey(),
   cid: varchar({ length: 256 }).notNull(),
-  actorDid: varchar({ length: 256 })
+  accountDid: varchar({ length: 256 })
     .notNull()
-    .references(() => actors.did, { onDelete: "cascade" }),
+    .references(() => accounts.did, { onDelete: "cascade" }),
   json: jsonb().notNull(),
   indexedAt: timestamp().notNull(),
 });
@@ -53,12 +53,12 @@ export const follows = pgTable(
       .primaryKey()
       .references(() => records.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     subjectDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().notNull(),
     sortAt: timestamp()
@@ -66,8 +66,8 @@ export const follows = pgTable(
       .notNull(),
   },
   (table) => [
-    index("follows_actor_subject_idx").on(table.actorDid, table.subjectDid),
-    index("follows_subject_actor_idx").on(table.subjectDid, table.actorDid),
+    index("follows_account_subject_idx").on(table.accountDid, table.subjectDid),
+    index("follows_subject_account_idx").on(table.subjectDid, table.accountDid),
   ],
 );
 
@@ -78,9 +78,9 @@ export const profiles = pgTable(
       .primaryKey()
       .references(() => records.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     avatarCid: varchar({ length: 256 }),
     bannerCid: varchar({ length: 256 }),
     description: text(),
@@ -88,7 +88,7 @@ export const profiles = pgTable(
     createdAt: timestamp(), // 他のLexiconと違いprofilesのcreatedAtはnullable
     indexedAt: timestamp().notNull(),
   },
-  (table) => [index("profiles_actor_idx").on(table.actorDid)],
+  (table) => [index("profiles_account_idx").on(table.accountDid)],
 );
 
 export const posts = pgTable(
@@ -98,9 +98,9 @@ export const posts = pgTable(
       .primaryKey()
       .references(() => records.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     text: text().notNull(),
     replyRootUri: varchar({ length: 256 }),
     replyRootCid: varchar({ length: 256 }),
@@ -114,7 +114,7 @@ export const posts = pgTable(
       .notNull(),
   },
   (table) => [
-    index("posts_actor_did_idx").on(table.actorDid),
+    index("posts_account_did_idx").on(table.accountDid),
     index("posts_sort_at_idx").on(table.sortAt),
     index("posts_reply_parent_sort_idx").on(
       table.replyParentUri,
@@ -133,19 +133,19 @@ export const postStats = pgTable("post_stats", {
   quoteCount: integer().notNull().default(0),
 });
 
-export const actorStats = pgTable("actor_stats", {
-  actorDid: varchar({ length: 256 })
+export const accountStats = pgTable("account_stats", {
+  accountDid: varchar({ length: 256 })
     .primaryKey()
-    .references(() => actors.did, { onDelete: "cascade" }),
+    .references(() => accounts.did, { onDelete: "cascade" }),
   followsCount: integer().notNull().default(0),
   followersCount: integer().notNull().default(0),
   postsCount: integer().notNull().default(0),
 });
 
-export const subscriptions = pgTable("subscriptions", {
-  actorDid: varchar({ length: 256 })
+export const registrations = pgTable("registrations", {
+  accountDid: varchar({ length: 256 })
     .primaryKey()
-    .references(() => actors.did, { onDelete: "cascade" }),
+    .references(() => accounts.did, { onDelete: "cascade" }),
   inviteCode: varchar({ length: 256 }).references(() => inviteCodes.code),
   seenAt: timestamp(),
   createdAt: timestamp().notNull(),
@@ -156,9 +156,9 @@ export const generators = pgTable("generators", {
     .primaryKey()
     .references(() => records.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
-  actorDid: varchar({ length: 256 })
+  accountDid: varchar({ length: 256 })
     .notNull()
-    .references(() => actors.did, { onDelete: "cascade" }),
+    .references(() => accounts.did, { onDelete: "cascade" }),
   did: varchar({ length: 256 }).notNull(),
   displayName: varchar({ length: 256 }).notNull(),
   description: text(),
@@ -172,9 +172,9 @@ export const lists = pgTable("lists", {
     .primaryKey()
     .references(() => records.uri, { onDelete: "cascade" }),
   cid: varchar({ length: 256 }).notNull(),
-  actorDid: varchar({ length: 256 })
+  accountDid: varchar({ length: 256 })
     .notNull()
-    .references(() => actors.did, { onDelete: "cascade" }),
+    .references(() => accounts.did, { onDelete: "cascade" }),
   purpose: varchar({ length: 256 }).notNull(),
   name: varchar({ length: 256 }).notNull(),
   description: text(),
@@ -190,13 +190,13 @@ export const listItems = pgTable(
       .primaryKey()
       .references(() => records.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     listUri: varchar({ length: 256 }).notNull(),
     subjectDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     createdAt: timestamp().notNull(),
     indexedAt: timestamp().notNull(),
   },
@@ -213,9 +213,9 @@ export const likes = pgTable(
       .primaryKey()
       .references(() => records.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     subjectUri: varchar({ length: 256 }).notNull(),
     subjectCid: varchar({ length: 256 }).notNull(),
     createdAt: timestamp().notNull(),
@@ -225,7 +225,7 @@ export const likes = pgTable(
       .notNull(),
   },
   (table) => [
-    index("likes_actor_sort_idx").on(table.actorDid, table.sortAt.desc()),
+    index("likes_account_sort_idx").on(table.accountDid, table.sortAt.desc()),
     index("likes_subject_sort_idx").on(table.subjectUri, table.sortAt.desc()),
   ],
 );
@@ -237,9 +237,9 @@ export const reposts = pgTable(
       .primaryKey()
       .references(() => records.uri, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     subjectUri: varchar({ length: 256 }).notNull(),
     subjectCid: varchar({ length: 256 }).notNull(),
     createdAt: timestamp().notNull(),
@@ -270,10 +270,10 @@ export const notifications = pgTable(
       .references(() => records.uri, { onDelete: "cascade" }),
     recipientDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     authorDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     reason: varchar({ length: 32, enum: notificationReason }).notNull(),
     reasonSubject: varchar({ length: 256 }),
     sortAt: timestamp().notNull(),
@@ -298,14 +298,17 @@ export const feedItems = pgTable(
     cid: varchar({ length: 256 }).notNull(),
     type: varchar({ length: 20, enum: feedType }).notNull(),
     subjectUri: varchar({ length: 256 }),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     sortAt: timestamp().notNull(),
   },
   (table) => [
     index("feed_items_sort_at_idx").on(table.sortAt),
-    index("feed_items_actor_sort_idx").on(table.actorDid, table.sortAt.desc()),
+    index("feed_items_account_sort_idx").on(
+      table.accountDid,
+      table.sortAt.desc(),
+    ),
   ],
 );
 
@@ -351,22 +354,22 @@ export const postEmbedRecords = pgTable(
   (table) => [index("post_embed_records_uri_idx").on(table.uri)],
 );
 
-export const actorsRelations = relations(actors, ({ one, many }) => ({
+export const accountsRelations = relations(accounts, ({ one, many }) => ({
   profile: one(profiles, {
-    fields: [actors.did],
-    references: [profiles.actorDid],
+    fields: [accounts.did],
+    references: [profiles.accountDid],
   }),
   posts: many(posts),
-  stats: one(actorStats, {
-    fields: [actors.did],
-    references: [actorStats.actorDid],
+  stats: one(accountStats, {
+    fields: [accounts.did],
+    references: [accountStats.accountDid],
   }),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
-  actor: one(actors, {
-    fields: [posts.actorDid],
-    references: [actors.did],
+  account: one(accounts, {
+    fields: [posts.accountDid],
+    references: [accounts.did],
   }),
   embedImages: many(postEmbedImages),
   embedExternal: one(postEmbedExternals, {
@@ -384,9 +387,9 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 }));
 
 export const profilesRelations = relations(profiles, ({ one }) => ({
-  user: one(actors, {
-    fields: [profiles.actorDid],
-    references: [actors.did],
+  user: one(accounts, {
+    fields: [profiles.accountDid],
+    references: [accounts.did],
   }),
 }));
 
@@ -426,9 +429,9 @@ export const labels = pgTable(
     src: varchar({ length: 256 }).notNull(),
     uri: varchar({ length: 256 }).notNull(),
     val: varchar({ length: 128 }).notNull(),
-    actorDid: varchar({ length: 256 })
+    accountDid: varchar({ length: 256 })
       .notNull()
-      .references(() => actors.did, { onDelete: "cascade" }),
+      .references(() => accounts.did, { onDelete: "cascade" }),
     cid: varchar({ length: 256 }),
     cts: timestamp().notNull(),
     exp: timestamp(),
@@ -475,9 +478,9 @@ export const postStatsRelations = relations(postStats, ({ one }) => ({
   }),
 }));
 
-export const actorStatsRelations = relations(actorStats, ({ one }) => ({
-  actor: one(actors, {
-    fields: [actorStats.actorDid],
-    references: [actors.did],
+export const accountStatsRelations = relations(accountStats, ({ one }) => ({
+  account: one(accounts, {
+    fields: [accountStats.accountDid],
+    references: [accounts.did],
   }),
 }));

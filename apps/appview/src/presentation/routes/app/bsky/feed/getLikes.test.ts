@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 import {
-  actorFactory,
+  accountFactory,
   likeFactory,
   postFactory,
   recordFactory,
@@ -14,10 +14,10 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getLikes", () => {
   const { ctx } = testSetup;
 
-  test("getLikes-1: 指定した投稿にいいねしたアクターをprofileViewで返す", async () => {
+  test("getLikes-1: 指定した投稿にいいねしたアカウントをprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const post = await postFactory(ctx.db).create();
@@ -25,7 +25,7 @@ describe("app.bsky.feed.getLikes", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.like")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         subject: () => post,
       })
@@ -37,7 +37,7 @@ describe("app.bsky.feed.getLikes", () => {
     // assert
     expect(res).toMatchObject({
       uri: post.uri,
-      likes: [{ actor: { did: actor.did } }],
+      likes: [{ actor: { did: account.did } }],
     });
   });
 
@@ -46,22 +46,22 @@ describe("app.bsky.feed.getLikes", () => {
     const { client } = await setupApiTest();
     const post = await postFactory(ctx.db).create();
     const create = async (date: Date) => {
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       await likeFactory(ctx.db)
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.feed.like")
-              .vars({ actor: () => actor })
+              .vars({ account: () => account })
               .create(),
           subject: () => post,
         })
         .props({ createdAt: () => date, indexedAt: () => date })
         .create();
-      return actor;
+      return account;
     };
-    const oldActor = await create(new Date("2024-01-01"));
-    const middleActor = await create(new Date("2024-01-02"));
-    const newActor = await create(new Date("2024-01-03"));
+    const oldAccount = await create(new Date("2024-01-01"));
+    const middleAccount = await create(new Date("2024-01-02"));
+    const newAccount = await create(new Date("2024-01-03"));
 
     // act
     const firstPage = await client.call(getLikes, {
@@ -76,9 +76,9 @@ describe("app.bsky.feed.getLikes", () => {
 
     // assert
     expect(firstPage.likes.map((l) => l.actor.did)).toEqual([
-      newActor.did,
-      middleActor.did,
+      newAccount.did,
+      middleAccount.did,
     ]);
-    expect(secondPage.likes.map((l) => l.actor.did)).toEqual([oldActor.did]);
+    expect(secondPage.likes.map((l) => l.actor.did)).toEqual([oldAccount.did]);
   });
 });

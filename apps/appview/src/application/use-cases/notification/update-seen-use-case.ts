@@ -1,29 +1,29 @@
 import type { Did } from "@atproto/did";
-import { type ITransactionManager, Subscription } from "@repo/common/domain";
+import { type ITransactionManager, Registration } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
+import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 
 export class UpdateSeenUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly registrationRepository: IRegistrationRepository,
   ) {}
 
-  async execute(params: { actorDid: Did; seenAt: Date }): Promise<void> {
-    const subscription = await this.subscriptionRepository.find(
-      params.actorDid,
+  async execute(params: { accountDid: Did; seenAt: Date }): Promise<void> {
+    const registration = await this.registrationRepository.find(
+      params.accountDid,
     );
-    if (!subscription) {
+    if (!registration) {
       return;
     }
     await this.transactionManager.transaction(async (ctx) => {
-      await this.subscriptionRepository.save({
+      await this.registrationRepository.save({
         ctx,
-        subscription: new Subscription({
-          actorDid: subscription.actorDid,
-          inviteCode: subscription.inviteCode,
+        registration: new Registration({
+          accountDid: registration.accountDid,
+          inviteCode: registration.inviteCode,
           seenAt: params.seenAt,
-          createdAt: subscription.createdAt,
+          createdAt: registration.createdAt,
         }),
       });
     });

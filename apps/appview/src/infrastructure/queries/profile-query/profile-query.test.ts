@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import {
-  actorFactory,
+  accountFactory,
   profileFactory,
   recordFactory,
   testSetup,
@@ -15,7 +15,7 @@ describe("ProfileQuery", () => {
   const profileQuery = new ProfileQuery(ctx.db);
 
   describe("findByDids", () => {
-    test("存在しないアクターは含めない", async () => {
+    test("存在しないアカウントは含めない", async () => {
       // act
       const result = await profileQuery.findByDids([asDid("did:plc:notfound")]);
 
@@ -23,54 +23,54 @@ describe("ProfileQuery", () => {
       expect(result).toEqual([]);
     });
 
-    test("プロフィールのあるアクターは、プロフィールをアクターの情報と一緒に返す", async () => {
+    test("プロフィールのあるアカウントは、プロフィールをアカウントの情報と一緒に返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
+      const account = await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Test User" }))
         .create();
 
       // act
-      const result = await profileQuery.findByDids([asDid(actor.did)]);
+      const result = await profileQuery.findByDids([asDid(account.did)]);
 
       // assert
       expect(result).toEqual([
         expect.objectContaining({
-          actorDid: actor.did,
-          handle: actor.handle,
+          accountDid: account.did,
+          handle: account.handle,
           displayName: "Test User",
-          status: actor.status,
+          status: account.status,
         }),
       ]);
     });
 
-    test("プロフィールのないアクターは、プロフィールの項目を空にしてアクターの取り込み日時で返す", async () => {
+    test("プロフィールのないアカウントは、プロフィールの項目を空にしてアカウントの取り込み日時で返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
 
       // act
-      const result = await profileQuery.findByDids([asDid(actor.did)]);
+      const result = await profileQuery.findByDids([asDid(account.did)]);
 
       // assert
       expect(result).toEqual([
         {
-          actorDid: actor.did,
-          handle: actor.handle,
+          accountDid: account.did,
+          handle: account.handle,
           displayName: null,
           description: null,
           avatarCid: null,
           bannerCid: null,
           createdAt: null,
-          indexedAt: actor.indexedAt,
-          status: actor.status,
+          indexedAt: account.indexedAt,
+          status: account.status,
         },
       ]);
     });
   });
 
   describe("search", () => {
-    test("検索クエリに一致するアクターがない場合、空の配列を返す", async () => {
+    test("検索クエリに一致するアカウントがない場合、空の配列を返す", async () => {
       // arrange
-      await actorFactory(ctx.db)
+      await accountFactory(ctx.db)
         .props({
           handle: () => "alice.test",
         })
@@ -87,9 +87,9 @@ describe("ProfileQuery", () => {
       expect(result).toEqual([]);
     });
 
-    test("displayNameが検索クエリに一致する場合、そのアクターを返す", async () => {
+    test("displayNameが検索クエリに一致する場合、そのアカウントを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
+      const account = await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Alice Smith" }))
         .create();
 
@@ -102,14 +102,14 @@ describe("ProfileQuery", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        actorDid: actor.did,
+        accountDid: account.did,
         displayName: "Alice Smith",
       });
     });
 
-    test("handleが検索クエリに一致する場合、そのアクターを返す", async () => {
+    test("handleが検索クエリに一致する場合、そのアカウントを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
+      const account = await accountFactory(ctx.db)
         .props({
           handle: () => "alice.test",
         })
@@ -125,14 +125,14 @@ describe("ProfileQuery", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        actorDid: actor.did,
+        accountDid: account.did,
         handle: "alice.test",
       });
     });
 
     test("検索クエリは大文字小文字を区別しない", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
+      const account = await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Alice Smith" }))
         .create();
 
@@ -145,16 +145,16 @@ describe("ProfileQuery", () => {
       // assert
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
-        actorDid: actor.did,
+        accountDid: account.did,
         displayName: "Alice Smith",
       });
     });
 
-    test("複数のアクターが一致する場合、indexedAtの降順で返す", async () => {
+    test("複数のアカウントが一致する場合、indexedAtの降順で返す", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
       const record1 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-        .vars({ actor: () => actor1 })
+        .vars({ account: () => account1 })
         .create();
       await profileFactory(ctx.db)
         .vars({ record: () => record1 })
@@ -164,9 +164,9 @@ describe("ProfileQuery", () => {
         })
         .create();
 
-      const actor2 = await actorFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
       const record2 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .create();
       await profileFactory(ctx.db)
         .vars({ record: () => record2 })
@@ -184,19 +184,19 @@ describe("ProfileQuery", () => {
 
       // assert
       expect(result).toHaveLength(2);
-      expect(result[0]?.actorDid).toBe(actor2.did);
-      expect(result[1]?.actorDid).toBe(actor1.did);
+      expect(result[0]?.accountDid).toBe(account2.did);
+      expect(result[1]?.accountDid).toBe(account1.did);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      await actorFactory(ctx.db)
+      await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Alice One" }))
         .create();
-      await actorFactory(ctx.db)
+      await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Alice Two" }))
         .create();
-      await actorFactory(ctx.db)
+      await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Alice Three" }))
         .create();
 
@@ -210,11 +210,11 @@ describe("ProfileQuery", () => {
       expect(result).toHaveLength(2);
     });
 
-    test("cursorパラメータが指定された場合、そのカーソル以前のアクターを返す", async () => {
+    test("cursorパラメータが指定された場合、そのカーソル以前のアカウントを返す", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
       const record1 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-        .vars({ actor: () => actor1 })
+        .vars({ account: () => account1 })
         .create();
       await profileFactory(ctx.db)
         .vars({ record: () => record1 })
@@ -224,9 +224,9 @@ describe("ProfileQuery", () => {
         })
         .create();
 
-      const actor2 = await actorFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
       const record2 = await recordFactory(ctx.db, "app.bsky.actor.profile")
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .create();
       await profileFactory(ctx.db)
         .vars({ record: () => record2 })
@@ -247,15 +247,15 @@ describe("ProfileQuery", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.actorDid).toBe(actor1.did);
+      expect(result[0]?.accountDid).toBe(account1.did);
     });
 
     test("検索クエリに含まれるワイルドカード文字はエスケープされる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
+      const account = await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "100% Good" }))
         .create();
-      await actorFactory(ctx.db)
+      await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "200% Good" }))
         .create();
 
@@ -267,12 +267,12 @@ describe("ProfileQuery", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.actorDid).toBe(actor.did);
+      expect(result[0]?.accountDid).toBe(account.did);
     });
 
     test("部分一致で検索できる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db)
+      const account = await accountFactory(ctx.db)
         .use((t) => t.withProfile({ displayName: "Alice Smith Johnson" }))
         .create();
 
@@ -284,7 +284,7 @@ describe("ProfileQuery", () => {
 
       // assert
       expect(result).toHaveLength(1);
-      expect(result[0]?.actorDid).toBe(actor.did);
+      expect(result[0]?.accountDid).toBe(account.did);
     });
   });
 });

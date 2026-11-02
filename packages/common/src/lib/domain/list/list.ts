@@ -7,7 +7,7 @@ import type { Record } from "../record/record.js";
 export type ListParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   purpose: string;
   name: string;
   description?: string;
@@ -19,7 +19,7 @@ export type ListParams = {
 export class List {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly purpose: string;
   readonly name: string;
   readonly description?: string;
@@ -30,7 +30,7 @@ export class List {
   constructor(params: ListParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.purpose = params.purpose;
     this.name = params.name;
     this.description = params.description;
@@ -44,7 +44,7 @@ export class List {
     return new List({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       purpose: parsed.purpose,
       name: parsed.name,
       description: parsed.description,

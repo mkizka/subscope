@@ -6,7 +6,6 @@ import {
   ListIcon,
   ListTodoIcon,
   MailIcon,
-  RadarIcon,
   SearchIcon,
   UsersIcon,
 } from "lucide-react";
@@ -65,11 +64,8 @@ export function NavMenu({
       <Item to="/notifications" icon={<BellIcon className="size-6" />} {...p}>
         通知
       </Item>
-      <Item to="/members" icon={<UsersIcon className="size-6" />} {...p}>
-        メンバー
-      </Item>
-      <Item to="/tracked-actors" icon={<RadarIcon className="size-6" />} {...p}>
-        追跡中のユーザー
+      <Item to="/accounts" icon={<UsersIcon className="size-6" />} {...p}>
+        アカウント
       </Item>
       {profileId && (
         <>
@@ -100,11 +96,11 @@ export function AdminNavMenu({ onNavigate }: { onNavigate?: () => void }) {
       <h2 className="px-3 py-2 text-caption text-muted">サーバー管理</h2>
       <ul className="flex flex-col gap-1">
         <Item
-          to="/admin/subscribers"
+          to="/admin/registered-accounts"
           icon={<UsersIcon className="size-6" />}
           {...p}
         >
-          登録ユーザー
+          アカウント管理
         </Item>
         <Item
           to="/admin/invite-codes"

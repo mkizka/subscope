@@ -8,7 +8,7 @@ export class ListRepository implements IListRepository {
   async save({ ctx, list }: { ctx: TransactionContext; list: List }) {
     const data = {
       cid: list.cid,
-      actorDid: list.actorDid,
+      accountDid: list.accountDid,
       purpose: list.purpose,
       name: list.name,
       description: list.description,

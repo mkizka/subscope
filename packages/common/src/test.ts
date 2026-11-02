@@ -1,4 +1,4 @@
-export * from "./lib/domain/actor/actor.factory.js";
+export * from "./lib/domain/account/account.factory.js";
 export * from "./lib/domain/feed-item/feed-item.factory.js";
 export * from "./lib/domain/follow/follow.factory.js";
 export * from "./lib/domain/generator/generator.factory.js";
@@ -8,8 +8,8 @@ export * from "./lib/domain/post/post.factory.js";
 export * from "./lib/domain/profile/profile.factory.js";
 export * from "./lib/domain/profile/profile-detailed.factory.js";
 export * from "./lib/domain/record/record.factory.js";
+export * from "./lib/domain/registration/registration.factory.js";
 export * from "./lib/domain/repost/repost.factory.js";
-export * from "./lib/domain/subscription/subscription.factory.js";
 export * from "./lib/infrastructure/did-cache/did-cache.in-memory.js";
 export * from "./lib/infrastructure/did-resolver/did-resolver.in-memory.js";
 export * from "./lib/infrastructure/job-queue/job-queue.in-memory.js";

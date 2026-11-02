@@ -26,7 +26,7 @@ export class GeneratorQuery implements IGeneratorQuery {
     return generators.map((generator) => ({
       uri: asAtUriString(generator.uri),
       cid: generator.cid,
-      actorDid: asDid(generator.actorDid),
+      accountDid: asDid(generator.accountDid),
       did: asDid(generator.did),
       displayName: generator.displayName,
       description: generator.description || null,

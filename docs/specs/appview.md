@@ -32,7 +32,7 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## ラベラーの指定
 
-クライアントが `atproto-accept-labelers` ヘッダーで指定したラベラー（モデレーションサービス）のラベルだけを labels に載せる。公式クライアントは、ユーザーが登録したラベラーをこのヘッダーで送る。今はgetPostsだけが対応する。
+クライアントが `atproto-accept-labelers` ヘッダーで指定したラベラー（モデレーションサービス）のラベルだけを labels に載せる。公式クライアントは、アカウントが登録したラベラーをこのヘッダーで送る。今はgetPostsだけが対応する。
 
 - labelers-1: labels には、`atproto-accept-labelers` ヘッダーで指定されたラベラーが付けたラベルだけを含める
 - labelers-2: `atproto-accept-labelers` ヘッダーがないか不正な場合は、すべてのラベラーのラベルを labels に含める
@@ -77,35 +77,35 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 
 ## app.bsky.actor.getProfile
 
-指定したアクターの詳細なプロフィールを返す。認証は任意。
+指定したアカウントの詳細なプロフィールを返す。認証は任意。
 
-- getProfile-1: 指定したアクターのprofileViewDetailedを返す
-- getProfile-2: 保存されていないアクターには400を返す
-- getProfile-3: プロフィールレコードがないアクターには、DIDとハンドルだけのprofileViewDetailedを返す
+- getProfile-1: 指定したアカウントのprofileViewDetailedを返す
+- getProfile-2: 保存されていないアカウントには400を返す
+- getProfile-3: プロフィールレコードがないアカウントには、DIDとハンドルだけのprofileViewDetailedを返す
 - getProfile-4: テイクダウンされたアカウントと、状態が takendown か suspended のアカウントには400とAccountTakedownを返す
 - getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す
 
 ## app.bsky.actor.getProfiles
 
-指定した複数アクターの詳細なプロフィールを返す。認証は任意。
+指定した複数アカウントの詳細なプロフィールを返す。認証は任意。
 
-- getProfiles-1: DIDとハンドルのどちらでも指定でき、見つかったアクターだけを指定した順に返す
+- getProfiles-1: DIDとハンドルのどちらでも指定でき、見つかったアカウントだけを指定した順に返す
 
 ## app.bsky.actor.searchActors
 
-表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
+表示名またはハンドルが検索語に部分一致するアカウントを返す。認証は任意。
 
-- searchActors-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewで返す
-- searchActors-2: ハンドルが検索語に部分一致するアクターも返す
+- searchActors-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアカウントをprofileViewで返す
+- searchActors-2: ハンドルが検索語に部分一致するアカウントも返す
 - searchActors-3: 空白だけの検索語には何も返さない
-- searchActors-4: cursorを指定すると、前のページに含めなかったアクターを返す
+- searchActors-4: cursorを指定すると、前のページに含めなかったアカウントを返す
 
 ## app.bsky.actor.searchActorsTypeahead
 
-入力補完用に、表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
+入力補完用に、表示名またはハンドルが検索語に部分一致するアカウントを返す。認証は任意。
 
-- searchActorsTypeahead-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewBasicで返す
-- searchActorsTypeahead-2: ハンドルが検索語に部分一致するアクターも返す
+- searchActorsTypeahead-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアカウントをprofileViewBasicで返す
+- searchActorsTypeahead-2: ハンドルが検索語に部分一致するアカウントも返す
 - searchActorsTypeahead-3: 空白だけの検索語には何も返さない
 
 ## app.bsky.actor.getPreferences
@@ -119,8 +119,8 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 閲覧者のホームタイムラインを返す。認証が必要。
 
 - getTimeline-1: 認証がないリクエストには401を返す
-- getTimeline-2: 閲覧者本人とフォロイーの投稿・リポストを含める
-- getTimeline-3: フォロイー以外の投稿・リポストは含めない
+- getTimeline-2: 閲覧者本人とフォロー先の投稿・リポストを含める
+- getTimeline-3: フォロー先以外の投稿・リポストは含めない
 - getTimeline-4: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 - getTimeline-5: 投稿者にプロフィールレコードがなくても投稿を含め、authorはDIDとハンドルだけにする
 
@@ -132,22 +132,22 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 
 ## app.bsky.feed.getActorLikes
 
-指定したアクターがいいねした投稿を新しい順に返す。認証は任意。
+指定したアカウントがいいねした投稿を新しい順に返す。認証は任意。
 
-- getActorLikes-1: 指定したアクターがいいねした投稿をfeedViewPostで返す
+- getActorLikes-1: 指定したアカウントがいいねした投稿をfeedViewPostで返す
 
 ## app.bsky.feed.getLikes
 
 指定した投稿へのいいねを新しい順に返す。認証は任意。
 
-- getLikes-1: 指定した投稿にいいねしたアクターをprofileViewで返す
+- getLikes-1: 指定した投稿にいいねしたアカウントをprofileViewで返す
 - getLikes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getRepostedBy
 
-指定した投稿をリポストしたアクターを新しい順に返す。認証は任意。
+指定した投稿をリポストしたアカウントを新しい順に返す。認証は任意。
 
-- getRepostedBy-1: 指定した投稿をリポストしたアクターをprofileViewで返す
+- getRepostedBy-1: 指定した投稿をリポストしたアカウントをprofileViewで返す
 - getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getFeedGenerators
@@ -195,13 +195,13 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## app.bsky.feed.getAuthorFeed
 
-指定したアクターの投稿とリポストを新しい順に返す。認証は任意。
+指定したアカウントの投稿とリポストを新しい順に返す。認証は任意。
 
-- getAuthorFeed-1: 指定したアクターの投稿をfeedViewPostで返す
+- getAuthorFeed-1: 指定したアカウントの投稿をfeedViewPostで返す
 - getAuthorFeed-2: 解決できないハンドルには400を返す
-- getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアクター自身の投稿だけを返し、リポストは含めない
+- getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアカウント自身の投稿だけを返し、リポストは含めない
 - getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない
-- getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアクター自身の投稿であるものだけを含める
+- getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアカウント自身の投稿であるものだけを含める
 - getAuthorFeed-6: filterがposts_with_videoのとき、501とMethodNotImplementedを返す
 
 動画の埋め込みはインデックスしていないため、posts_with_videoには対応しない。
@@ -227,7 +227,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getGroupedNotifications-3: フィードジェネレーターへのいいねは、フィードジェネレーターごとに1つのグループにまとめる
 - getGroupedNotifications-4: フォローは1つのグループにまとめる
 - getGroupedNotifications-5: 返信・引用・メンションはまとめずに1件ずつ返す
-- getGroupedNotifications-6: relatedViewsに、グループが参照するアクターと投稿とフィードジェネレーターのビューを返す
+- getGroupedNotifications-6: relatedViewsに、グループが参照するアカウントと投稿とフィードジェネレーターのビューを返す
 - getGroupedNotifications-7: グループの中で最新の通知が既読時刻以前なら、グループを既読にする
 - getGroupedNotifications-8: feedにconversationsを指定すると返信・引用・メンションだけを、followersを指定するとフォローだけを返す
 - getGroupedNotifications-9: feedにpeople-i-followかactivityを指定すると、501とMethodNotImplementedを返す
@@ -249,38 +249,47 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## app.bsky.graph.getFollowers
 
-指定したアクターをフォローしているアクターを返す。認証は任意。
+指定したアカウントをフォローしているアカウントを返す。認証は任意。
 
-- getFollowers-1: 指定したアクターをsubjectに、そのフォロワーをfollowersにprofileViewで返す
+- getFollowers-1: 指定したアカウントをsubjectに、そのフォロワーをfollowersにprofileViewで返す
 - getFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getFollows
 
-指定したアクターがフォローしているアクターを返す。認証は任意。
+指定したアカウントがフォローしているアカウントを返す。認証は任意。
 
-- getFollows-1: 指定したアクターをsubjectに、そのフォロー先をfollowsにprofileViewで返す
+- getFollows-1: 指定したアカウントをsubjectに、そのフォロー先をfollowsにprofileViewで返す
 - getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getList
 
-指定したリストとそのリストに追加されたアクターを返す。認証は任意。
+指定したリストとそのリストに追加されたアカウントを返す。認証は任意。
 
-- getList-1: 指定したリストのlistViewと、リストに追加されたアクターのprofileViewをitemsで返す
+- getList-1: 指定したリストのlistViewと、リストに追加されたアカウントのprofileViewをitemsで返す
 - getList-2: 保存されていないリストには400を返す
 
 ## app.bsky.graph.getLists
 
-指定したアクターが作成したリストを返す。認証は任意。
+指定したアカウントが作成したリストを返す。認証は任意。
 
-- getLists-1: 指定したアクターが作成したリストをlistViewで返す
+- getLists-1: 指定したアカウントが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
-## me.subsco.server.getMembers
+## me.subsco.graph.getRegisteredFollowers
 
-サーバーのメンバー（サブスクライバー）のプロフィールを返す。メンバー一覧は公開情報とし、認証は不要。limitとcursorでページングする。
+指定したアカウントをフォローしている登録アカウントをprofileViewで返す。認証は不要。limitとcursorでページングする。
 
-- getMembers-1: メンバーごとにprofileViewを返す
-- getMembers-2: メンバーごとに管理者かどうかを返す
+- getRegisteredFollowers-1: 指定したアカウントをフォローしている登録アカウントだけをfollowersにprofileViewで返す
+- getRegisteredFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getRegisteredFollowers-3: totalにはページングに関係なく登録アカウントのフォロワーの総数を入れる
+
+## me.subsco.server.getRegisteredAccounts
+
+登録アカウントのプロフィールを返す。登録アカウントの一覧は公開情報とし、認証は不要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）アカウントだけを返す。
+
+- getRegisteredAccounts-1: 登録アカウントごとにprofileViewを返す
+- getRegisteredAccounts-2: 登録アカウントごとに管理者かどうかを返す
+- getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含む登録アカウントだけを返す
 
 ## me.subsco.server.getSetupStatus
 
@@ -289,41 +298,50 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getSetupStatus-1: 管理者が未登録ならinitializedをfalseにする
 - getSetupStatus-2: 管理者が登録済みならinitializedをtrueにする
 
-## me.subsco.server.getTrackedActors
+## me.subsco.server.getTrackedAccounts
 
-追跡アクターのprofileViewと、その追跡アクターをフォローしているサブスクライバーの数、追跡アクターの総数を返す。認証が必要。limitとcursorでページングする。
+追跡アカウントのprofileViewと、その追跡アカウントをフォローしている登録アカウントの数、追跡アカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）追跡アカウントだけを返す。
 
-- getTrackedActors-1: サブスクライバーとそのフォロイーを返し、それ以外のアクターは含めない
-- getTrackedActors-2: フォローしているサブスクライバーが多い順に並べる
-- getTrackedActors-3: totalにはページングに関係なく追跡アクターの総数を入れる
+- getTrackedAccounts-1: 登録アカウントとそのフォロー先を返し、それ以外のアカウントは含めない
+- getTrackedAccounts-2: フォローしている登録アカウントが多い順に並べる
+- getTrackedAccounts-3: totalにはページングに関係なく追跡アカウントの総数を入れる
+- getTrackedAccounts-4: qを指定すると、表示名またはハンドルにqを含む追跡アカウントだけを返す。totalはqに関係なく総数のままにする
 
-## me.subsco.sync.subscribeServer
+## me.subsco.sync.registerAccount
 
-閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。
+閲覧者を登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。
 
-- subscribeServer-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
-- subscribeServer-2: BANされたアカウントは登録せず、400とBannedを返す
-- subscribeServer-3: 管理者以外は、有効期限内の未使用の招待コードがなければ登録せず、400とInvalidInviteCodeを返す
-- subscribeServer-4: 登録済みのアカウントは登録せず、400とAlreadySubscribedを返す
-- subscribeServer-5: 管理者は招待コードなしで登録する
-- subscribeServer-6: 登録に使った招待コードを使用済みにする
-- subscribeServer-7: 登録したアカウントのsyncTapRepoジョブを積む
-- subscribeServer-8: DBにないアカウントも登録する
+- registerAccount-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
+- registerAccount-2: BANされたアカウントは登録せず、400とBannedを返す
+- registerAccount-3: 管理者以外は、有効期限内の未使用の招待コードがなければ登録せず、400とInvalidInviteCodeを返す
+- registerAccount-4: 登録済みのアカウントは登録せず、400とAlreadyRegisteredを返す
+- registerAccount-5: 管理者は招待コードなしで登録する
+- registerAccount-6: 登録に使った招待コードを使用済みにする
+- registerAccount-7: 登録したアカウントのsyncTapRepoジョブを積む
+- registerAccount-8: DBにないアカウントも登録する
 
-## me.subsco.sync.unsubscribeServer
+## me.subsco.sync.unregisterAccount
 
-閲覧者のサブスクライバー登録を解除する。認証が必要。
+閲覧者の登録を解除する。認証が必要。
 
-- unsubscribeServer-1: 本人とそのフォロイーのsyncTapRepoジョブを積む
-- unsubscribeServer-2: 登録を消し、使った招待コードは使用済みのまま残す
-- unsubscribeServer-3: 登録していなければ400とNotSubscribedを返す
+- unregisterAccount-1: 本人とそのフォロー先のsyncTapRepoジョブを積む
+- unregisterAccount-2: 登録を消し、使った招待コードは使用済みのまま残す
+- unregisterAccount-3: 登録していなければ400とNotRegisteredを返す
 
-## me.subsco.sync.getSubscriptionStatus
+## me.subsco.sync.getBackfillStatuses
 
-閲覧者がサブスクライバーかどうかを返す。認証が必要。
+指定したdidのうち、追跡アカウント（登録アカウントとそのフォロー先）のbackfillStatusを返す。認証は不要。didsは最大100件まで指定できる。
 
-- getSubscriptionStatus-1: 閲覧者がサブスクライバーならisSubscriberをtrueにする
-- getSubscriptionStatus-2: 閲覧者がサブスクライバーでなければisSubscriberをfalseにする
+- getBackfillStatuses-1: 追跡アカウントのbackfillStatusを返し、追跡アカウント以外は含めない
+- getBackfillStatuses-2: backfillStatusが未設定のアカウントはinProgressとして返す
+- getBackfillStatuses-3: 認証がなくてもbackfillStatusを返す
+
+## me.subsco.sync.getRegistrationStatus
+
+閲覧者が登録アカウントかどうかを返す。認証が必要。
+
+- getRegistrationStatus-1: 閲覧者が登録アカウントならisRegisteredをtrueにする
+- getRegistrationStatus-2: 閲覧者が登録アカウントでなければisRegisteredをfalseにする
 
 ## me.subsco.admin.verifyAccess
 
@@ -336,54 +354,54 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 管理者が未登録のとき、閲覧者を最初の管理者として登録する。認証が必要。
 
-- registerAdmin-1: 閲覧者を管理者にし、サブスクライバーにする
+- registerAdmin-1: 閲覧者を管理者にし、登録アカウントにする
 - registerAdmin-2: 既に管理者がいれば、400とAdminAlreadyExistsを返す
 - registerAdmin-3: 閲覧者のsyncTapRepoジョブを積む
 - registerAdmin-4: 閲覧者のプロフィールのfetchRecordジョブを積む
 - registerAdmin-5: 閲覧者のハンドルが未取得ならresolveDidジョブを積む
 
-## me.subsco.admin.getSubscribers
+## me.subsco.admin.listRegisteredAccounts
 
-サブスクライバーのプロフィール、管理者かどうか、登録日時、同期状態と、サブスクライバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
+登録アカウントのプロフィール、管理者かどうか、登録日時、同期状態と、登録アカウントの総数を返す。管理者の認証が必要。limitとcursorでページングする。
 
-- getSubscribers-1: 認証がないリクエストには401を返す
-- getSubscribers-2: 管理者でないアカウントからのリクエストには403を返す
-- getSubscribers-3: サブスクライバーごとにprofileViewと管理者かどうかを返す
-- getSubscribers-4: テイクダウンされたサブスクライバーも含める
-- getSubscribers-5: サブスクライバーごとに登録日時をsubscribedAtとして返す
-- getSubscribers-6: ページングに関係なくサブスクライバーの総数をtotalとして返す
-- getSubscribers-7: フォロー先の状態にかかわらず、サブスクライバー本人のバックフィルの状態をbackfillStatusとして返す
-- getSubscribers-8: サブスクライバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
+- listRegisteredAccounts-1: 認証がないリクエストには401を返す
+- listRegisteredAccounts-2: 管理者でないアカウントからのリクエストには403を返す
+- listRegisteredAccounts-3: 登録アカウントごとにprofileViewと管理者かどうかを返す
+- listRegisteredAccounts-4: テイクダウンされた登録アカウントも含める
+- listRegisteredAccounts-5: 登録アカウントごとに登録日時をregisteredAtとして返す
+- listRegisteredAccounts-6: ページングに関係なく登録アカウントの総数をtotalとして返す
+- listRegisteredAccounts-7: フォロー先の状態にかかわらず、登録アカウント本人のバックフィルの状態をbackfillStatusとして返す
+- listRegisteredAccounts-8: 登録アカウント本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
 
-バックフィルの状態はworkerがactorsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
+バックフィルの状態はworkerがaccountsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
 
 ## me.subsco.admin.grantAdmin
 
-指定したサブスクライバーを管理者にする。管理者の認証が必要。
+指定した登録アカウントを管理者にする。管理者の認証が必要。
 
-- grantAdmin-1: 指定したサブスクライバーを管理者にする
-- grantAdmin-2: サブスクライバーでないアクターには400とNotSubscribedを返す
+- grantAdmin-1: 指定した登録アカウントを管理者にする
+- grantAdmin-2: 登録アカウントでないアカウントには400とNotRegisteredを返す
 
-## me.subsco.admin.banSubscriber
+## me.subsco.admin.banAccount
 
-サブスクライバーの登録を解除し、BANする。管理者の認証が必要。登録していなければ400とNotSubscribedを返す。
+登録アカウントの登録を解除し、BANする。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
 
-- banSubscriber-1: 管理者はBANせず、400とCannotBanAdminを返す
-- banSubscriber-2: 本人とそのフォロイーのsyncTapRepoジョブを積む
+- banAccount-1: 管理者はBANせず、400とCannotBanAdminを返す
+- banAccount-2: 本人とそのフォロー先のsyncTapRepoジョブを積む
 
-## me.subsco.admin.getBannedActors
+## me.subsco.admin.getBannedAccounts
 
-BANされたアクターのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
+BANされたアカウントのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
 
-- getBannedActors-1: BANされたアクターのprofileViewを返す
-- getBannedActors-2: BANされていないアクターは含めない
+- getBannedAccounts-1: BANされたアカウントのprofileViewを返す
+- getBannedAccounts-2: BANされていないアカウントは含めない
 
-## me.subsco.admin.unbanActor
+## me.subsco.admin.unbanAccount
 
-アカウントのBANを解除する。管理者の認証が必要。サブスクライバーには戻さず、本人が改めて登録する。
+アカウントのBANを解除する。管理者の認証が必要。登録アカウントには戻さず、本人が改めて登録する。
 
-- unbanActor-1: BANを解除したアカウントは招待コードで再登録できる
-- unbanActor-2: BANされていないアカウントには400とNotBannedを返す
+- unbanAccount-1: BANを解除したアカウントは招待コードで再登録できる
+- unbanAccount-2: BANされていないアカウントには400とNotBannedを返す
 
 ## me.subsco.admin.createInviteCode
 
@@ -396,10 +414,10 @@ BANされたアクターのプロフィールを返す。管理者の認証が�
 
 ## me.subsco.admin.getInviteCodes
 
-招待コードを、使用日時と使用したアクターとともに返す。管理者の認証が必要。limitとcursorでページングする。
+招待コードを、使用日時と使用したアカウントとともに返す。管理者の認証が必要。limitとcursorでページングする。
 
-- getInviteCodes-1: 使用済みの招待コードには使用したアクターのprofileViewを含める
-- getInviteCodes-2: 使用したアクターがテイクダウンされていてもprofileViewを含める
+- getInviteCodes-1: 使用済みの招待コードには使用したアカウントのprofileViewを含める
+- getInviteCodes-2: 使用したアカウントがテイクダウンされていてもprofileViewを含める
 
 ## me.subsco.admin.deleteInviteCode
 

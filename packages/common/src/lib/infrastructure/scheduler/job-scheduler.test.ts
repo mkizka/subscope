@@ -143,19 +143,19 @@ describe("JobScheduler", () => {
     });
   });
 
-  describe("scheduleAggregateActorStats", () => {
-    test("aggregateActorStatsジョブをスケジュールする", async () => {
+  describe("scheduleAggregateAccountStats", () => {
+    test("aggregateAccountStatsジョブをスケジュールする", async () => {
       // arrange
       const did = "did:plc:test";
 
       // act
-      await jobScheduler.scheduleAggregateActorStats(did);
+      await jobScheduler.scheduleAggregateAccountStats(did);
 
       // assert
       const jobs = jobQueue.getJobs();
       expect(jobs).toHaveLength(1);
       expect(jobs[0]).toMatchObject({
-        queueName: "aggregateActorStats",
+        queueName: "aggregateAccountStats",
         jobName: did,
         data: { did },
         options: {

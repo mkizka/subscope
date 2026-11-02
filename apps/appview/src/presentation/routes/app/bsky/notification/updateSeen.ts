@@ -15,7 +15,7 @@ export class UpdateSeen {
       auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials, input }) => {
         await this.updateSeenUseCase.execute({
-          actorDid: credentials.did,
+          accountDid: credentials.did,
           seenAt: new Date(input.body.seenAt),
         });
         return {};

@@ -39,7 +39,7 @@ const holdSubmit = async (page: Page) => {
 };
 
 test.describe("リスト", () => {
-  test("list-1: プロフィール全体ページの「リスト」から、そのユーザーが作成したリスト（名前、説明）を一覧表示する", async ({
+  test("list-1: プロフィール全体ページの「リスト」から、そのアカウントが作成したリスト（名前、説明）を一覧表示する", async ({
     page,
   }) => {
     const name = `list-1のリスト ${Date.now()}`;
@@ -98,7 +98,7 @@ test.describe("リスト", () => {
     ]);
   });
 
-  test("list-3: リスト詳細の「メンバー」タブで、リストに追加されたユーザーを一覧表示する", async ({
+  test("list-3: リスト詳細の「メンバー」タブで、リストに追加されたアカウントを一覧表示する", async ({
     page,
   }) => {
     const rkey = await createList(`list-3のリスト ${Date.now()}`);
@@ -126,7 +126,11 @@ test.describe("リスト", () => {
     await main.getByText("新しいリスト").click();
     await main.getByLabel("名前").fill(name);
     await main.getByLabel("説明").fill(`${name}の説明`);
+    const submitted = page.waitForResponse(
+      (res) => res.request().method() === "POST",
+    );
     await main.getByRole("button", { name: "作成する" }).click();
+    await submitted;
 
     await expect(async () => {
       await page.reload();
@@ -154,7 +158,11 @@ test.describe("リスト", () => {
     await main.getByText("編集する").click();
     await main.getByLabel("名前").fill(name);
     await main.getByLabel("説明").fill(`${name}の説明`);
+    const submitted = page.waitForResponse(
+      (res) => res.request().method() === "POST",
+    );
     await main.getByRole("button", { name: "保存する" }).click();
+    await submitted;
 
     await expect(async () => {
       await page.reload();
@@ -210,7 +218,7 @@ test.describe("リスト", () => {
     ).toEqual([]);
   });
 
-  test("list-7: 自分のリストの「メンバー」タブで、ハンドルを入力したユーザーをリストに追加する", async ({
+  test("list-7: 自分のリストの「メンバー」タブで、ハンドルを入力したアカウントをリストに追加する", async ({
     page,
   }) => {
     const list = await createEmptyList(`list-7のリスト ${Date.now()}`);
@@ -323,7 +331,7 @@ test.describe("リスト", () => {
     await expect(button).toBeEnabled();
   });
 
-  test("list-12: 「メンバー」タブの追跡中のユーザーには、過去の投稿の同期状態を表示する", async ({
+  test("list-12: 「メンバー」タブの追跡アカウントには、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     const rkey = await createList(`list-12のリスト ${Date.now()}`);
@@ -372,5 +380,59 @@ test.describe("リスト", () => {
       });
     }).toPass();
     await expect(main.getByText("list-13: aliceへの返信")).toHaveCount(0);
+  });
+
+  test("list-14: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/lists/*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
+
+    await expect(page.getByRole("heading", { name: "リスト" })).toBeVisible();
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
+
+  test("list-15: リスト詳細を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    const name = `list-15のリスト ${Date.now()}`;
+    const rkey = await createList(name);
+    await page.goto("/profile/alice.test/lists");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/list/**", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await main.getByText(name, { exact: true }).click();
+
+    await expect(page).toHaveURL(`/profile/alice.test/lists/${rkey}`);
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+    await expect(main.getByRole("heading", { name })).toBeVisible();
   });
 });

@@ -9,7 +9,7 @@ export class ProfileRepository implements IProfileRepository {
   async save({ ctx, profile }: { ctx: TransactionContext; profile: Profile }) {
     const profileData = {
       cid: profile.cid,
-      actorDid: profile.actorDid,
+      accountDid: profile.accountDid,
       avatarCid: profile.avatarCid,
       bannerCid: profile.bannerCid,
       description: profile.description,

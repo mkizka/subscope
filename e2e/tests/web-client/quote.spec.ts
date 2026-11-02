@@ -66,4 +66,37 @@ test.describe("引用投稿", () => {
       "quote-2: 引用される投稿",
     );
   });
+
+  test("quote-3: 引用される投稿に付いた画像を、引用した投稿の中に表示する", async ({
+    page,
+  }) => {
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-3: 引用される投稿",
+      embed: {
+        $type: "app.bsky.embed.images",
+        images: [
+          { image: await uploadImage("alice.test"), alt: "quote-3: 画像" },
+        ],
+      },
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-3: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-3: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
+      await expect(quote).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(
+      quote.getByRole("img", { name: "quote-3: 画像" }),
+    ).toBeVisible();
+  });
 });

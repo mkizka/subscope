@@ -15,7 +15,7 @@ export class GetProfiles {
   handle(router: LexRouter) {
     router.add(getProfiles, async ({ params }) => {
       const handleOrDids = params.actors.filter(
-        (actor) => isDid(actor) || isHandle(actor),
+        (account) => isDid(account) || isHandle(account),
       );
       const dids =
         await this.handleMiddleware.resolveHandleOrDids(handleOrDids);

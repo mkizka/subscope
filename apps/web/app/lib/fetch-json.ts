@@ -1,5 +1,8 @@
-export async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
+export async function fetchJson<T>(
+  url: string,
+  init?: RequestInit,
+): Promise<T> {
+  const response = await fetch(url, init);
   if (response.redirected) {
     window.location.assign(response.url);
   }

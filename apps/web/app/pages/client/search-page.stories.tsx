@@ -6,7 +6,7 @@ const meta = {
   component: SearchPage,
   args: {
     q: "alice",
-    tab: "actors",
+    tab: "accounts",
   },
   parameters: {
     layout: "fullscreen",

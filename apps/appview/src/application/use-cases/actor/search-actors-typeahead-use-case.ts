@@ -35,12 +35,14 @@ export class SearchActorsTypeaheadUseCase {
     const ctx = this.viewContextFactory.create({
       viewerDid: params.viewerDid,
     });
-    const actors = await Promise.all(
-      profiles.map((profile) => this.profileViews.basic(profile.actorDid, ctx)),
+    const accounts = await Promise.all(
+      profiles.map((profile) =>
+        this.profileViews.basic(profile.accountDid, ctx),
+      ),
     );
 
     return {
-      actors: actors.filter((actor) => actor !== undefined),
+      actors: accounts.filter((account) => account !== undefined),
     };
   }
 }

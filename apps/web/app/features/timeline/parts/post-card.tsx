@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import {
   HeartIcon,
   type LucideIcon,
@@ -32,13 +33,20 @@ export type PostCardProps = {
     description: string;
     thumb?: string;
   };
-  quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
+  quote?: {
+    authorDisplayName?: string;
+    authorHandle: string;
+    text?: string;
+    images?: PostImage[];
+  };
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
   };
   toolbar?: ReactNode;
   threadPath?: string;
+  connectedAbove?: boolean;
+  connectedBelow?: boolean;
 };
 
 export function formatRelativeTime(dateString: string) {
@@ -84,6 +92,7 @@ export function QuotedPost({
       <p className="text-label wrap-break-word whitespace-pre-wrap">
         {quote.text}
       </p>
+      {quote.images && <PostImages images={quote.images} />}
     </blockquote>
   );
 }
@@ -141,15 +150,32 @@ export function PostCard({
   reasonRepost,
   toolbar,
   threadPath,
+  connectedAbove,
+  connectedBelow,
 }: PostCardProps) {
   const hydrated = useHydrated();
   return (
     <article
-      className="
-        relative border-b border-line px-4 py-3
-        hover:bg-surface-2
-      "
+      className={clsx(
+        `
+          relative border-line px-4 py-3
+          hover:bg-surface-2
+        `,
+        !connectedBelow && "border-b",
+      )}
     >
+      {connectedAbove && (
+        <span
+          data-testid="thread-line"
+          className="absolute top-0 left-[35px] h-3 w-0.5 bg-line"
+        />
+      )}
+      {connectedBelow && (
+        <span
+          data-testid="thread-line"
+          className="absolute top-[52px] bottom-0 left-[35px] w-0.5 bg-line"
+        />
+      )}
       {threadPath && (
         <Link
           to={threadPath}

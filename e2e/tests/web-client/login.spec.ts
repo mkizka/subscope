@@ -29,11 +29,13 @@ test.describe("ログイン", () => {
     await login(page);
 
     await expect(
-      page.getByRole("navigation").getByRole("link", { name: "登録ユーザー" }),
+      page
+        .getByRole("navigation")
+        .getByRole("link", { name: "アカウント管理" }),
     ).toBeVisible();
   });
 
-  test("login-4: サブスクライバーでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
+  test("login-4: 登録アカウントでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
     page,
   }) => {
     await login(page, "bob.test", "/login");
@@ -84,7 +86,7 @@ test.describe("ログイン", () => {
     await expect(page.getByRole("button", { name: "登録する" })).toBeDisabled();
   });
 
-  test("login-6: 有効な招待コードを入力すると、サブスクライバーとして登録してタイムラインに移動する", async ({
+  test("login-6: 有効な招待コードを入力すると、登録アカウントとして登録してタイムラインに移動する", async ({
     page,
     browser,
   }) => {

@@ -1,18 +1,27 @@
 import "@/app/app.css";
 import "./preview.css";
 
-import { asDatetimeString } from "@atproto/syntax";
-import type { $OutputBody as SubscribersResponse } from "@repo/client/lex/me/subsco/admin/getSubscribers";
+import { asAtUriString, asDatetimeString } from "@atproto/syntax";
+import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 import type { Preview } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";
 
+import ListDetailStories from "@/app/features/list/blocks/list-detail.stories";
 import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
+import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-codes";
+import type { loader as listLoader } from "@/app/routes/api.list.$handle.$rkey";
+import type { loader as listsLoader } from "@/app/routes/api.lists.$handle";
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
+import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
+import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
+import type { loader as registeredAccountsLoader } from "@/app/routes/api.registered-accounts";
 import type { loader as searchLoader } from "@/app/routes/api.search";
+import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
+import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
 
 type Data<T extends (...args: never) => unknown> =
   Awaited<ReturnType<T>> extends {
@@ -97,22 +106,22 @@ queryClient.setQueryData<{
   pageParams: [undefined],
 });
 queryClient.setQueryData<{
-  pages: SubscribersResponse[];
+  pages: RegisteredAccountsResponse[];
   pageParams: unknown[];
-}>(["subscribers"], {
+}>(["registeredAccounts"], {
   pages: [
     {
-      subscribers: [
+      registeredAccounts: [
         {
           profile: alice,
           isAdmin: true,
-          subscribedAt: "2024-01-01T00:00:00.000Z",
+          registeredAt: "2024-01-01T00:00:00.000Z",
           backfillStatus: "completed",
         },
         {
           profile: bob,
           isAdmin: false,
-          subscribedAt: "2024-01-02T00:00:00.000Z",
+          registeredAt: "2024-01-02T00:00:00.000Z",
           backfillStatus: "inProgress",
         },
       ],
@@ -121,6 +130,32 @@ queryClient.setQueryData<{
   ],
   pageParams: [undefined],
 });
+
+queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
+  ["clientRegisteredAccounts"],
+  {
+    registeredAccounts: [
+      { ...alice, isAdmin: true },
+      { did: "did:plc:carol", handle: "handle.invalid", isAdmin: false },
+    ],
+    hasMore: false,
+  },
+);
+queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
+  ["trackedAccounts"],
+  {
+    total: 3,
+    accounts: [
+      { ...bob, registeredFollowersCount: 3 },
+      { ...alice, registeredFollowersCount: 1 },
+      {
+        did: "did:plc:carol",
+        handle: "handle.invalid",
+        registeredFollowersCount: 0,
+      },
+    ],
+  },
+);
 
 queryClient.setQueryData<{
   pages: Data<typeof timelineLoader>[];
@@ -131,17 +166,17 @@ queryClient.setQueryData<{
 });
 
 const searchQuery = (
-  tab: "actors" | "posts",
+  tab: "accounts" | "posts",
   q: string,
   result: Partial<Data<typeof searchLoader>>,
 ) =>
   queryClient.setQueryData<Data<typeof searchLoader>>(["search", tab, q], {
-    actors: [],
+    accounts: [],
     posts: [],
     ...result,
   });
-searchQuery("actors", "alice", {
-  actors: [
+searchQuery("accounts", "alice", {
+  accounts: [
     {
       ...alice,
       handle: "alice.bsky.social",
@@ -149,9 +184,124 @@ searchQuery("actors", "alice", {
     },
   ],
 });
-searchQuery("actors", "nobody", {});
+searchQuery("accounts", "nobody", {});
 searchQuery("posts", "alice", { posts: TimelineFeedStories.args.posts });
 searchQuery("posts", "nobody", {});
+queryClient.setQueryData<{
+  pages: Data<typeof inviteCodesLoader>[];
+  pageParams: unknown[];
+}>(["inviteCodes"], {
+  pages: [
+    {
+      codes: [
+        {
+          code: "abc-123-def",
+          expiresAt: "2099-12-31T23:59:59.000Z",
+          createdAt: "2025-01-01T00:00:00.000Z",
+        },
+      ],
+    },
+  ],
+  pageParams: [undefined],
+});
+queryClient.setQueryData<Data<typeof listsLoader>>(["lists", alice.handle], {
+  lists: [
+    {
+      uri: asAtUriString("at://did:plc:alice/app.bsky.graph.list/1"),
+      rkey: "1",
+      creatorDid: alice.did,
+      name: "友達",
+      description: "よく話す人たち",
+    },
+    {
+      uri: asAtUriString("at://did:plc:alice/app.bsky.graph.list/2"),
+      rkey: "2",
+      creatorDid: alice.did,
+      name: "ニュース",
+    },
+  ],
+  isSelf: true,
+});
+queryClient.setQueryData<Data<typeof listLoader>>(
+  ["list", alice.handle, "1", "posts"],
+  {
+    list: {
+      uri: asAtUriString(ListDetailStories.args.uri),
+      rkey: "1",
+      creatorDid: alice.did,
+      name: ListDetailStories.args.name,
+      description: ListDetailStories.args.description,
+    },
+    posts: ListDetailStories.args.posts,
+    members: ListDetailStories.args.members,
+    isSelf: true,
+  },
+);
+
+queryClient.setQueryData<Data<typeof followListLoader>>(
+  ["follow-list", "alice.bsky.social", "follows"],
+  {
+    subject: {
+      did: "did:plc:alice",
+      handle: "alice.bsky.social",
+      displayName: "Alice",
+    },
+    accounts: [
+      {
+        did: "did:plc:bob",
+        handle: "bob.bsky.social",
+        displayName: "Bob",
+        description: "Bobの自己紹介",
+      },
+      { did: "did:plc:carol", handle: "handle.invalid" },
+    ],
+  },
+);
+
+const threadPost = (uri: string, text: string) => ({
+  uri,
+  cid: "bafyexample",
+  authorDisplayName: "Alice",
+  authorHandle: alice.handle,
+  text,
+  createdAt: new Date().toISOString(),
+});
+
+queryClient.setQueryData<Data<typeof threadLoader>>(
+  ["thread", alice.handle, "selected"],
+  {
+    ancestors: [threadPost("at://a/1", "親投稿です")],
+    post: {
+      ...threadPost("at://a/2", "選んだ投稿です"),
+      replyCount: 1,
+      repostCount: 1,
+      likeCount: 8,
+    },
+    replies: [
+      [
+        threadPost("at://a/3", "返信です"),
+        threadPost("at://a/4", "返信への返信です"),
+      ],
+    ],
+  },
+);
+
+queryClient.setQueryData<Data<typeof profileLoader>>(
+  ["profile", "alice.bsky.social", ""],
+  {
+    profile: {
+      did: alice.did,
+      handle: alice.handle,
+      displayName: alice.displayName,
+      description: "Blueskyを使っています。",
+      followsCount: 120,
+      followersCount: 345,
+    },
+    isSelf: false,
+    posts: TimelineFeedStories.args.posts,
+    tab: "posts",
+  },
+);
 
 const preview: Preview = {
   decorators: [

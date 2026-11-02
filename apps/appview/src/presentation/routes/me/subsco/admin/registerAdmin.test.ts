@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
 import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -12,7 +12,7 @@ describe("me.subsco.admin.registerAdmin", () => {
   const { ctx } = testSetup;
   const requesterDid = asDid("did:plc:requester");
 
-  test("registerAdmin-1: 閲覧者を管理者にし、サブスクライバーにする", async () => {
+  test("registerAdmin-1: 閲覧者を管理者にし、登録アカウントにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     loginAs(requesterDid);
@@ -21,22 +21,22 @@ describe("me.subsco.admin.registerAdmin", () => {
     await client.call(registerAdmin);
 
     // assert
-    const [actor] = await ctx.db
+    const [account] = await ctx.db
       .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, requesterDid));
-    expect(actor?.isAdmin).toBe(true);
-    const subscriptions = await ctx.db
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, requesterDid));
+    expect(account?.isAdmin).toBe(true);
+    const registrations = await ctx.db
       .select()
-      .from(schema.subscriptions)
-      .where(eq(schema.subscriptions.actorDid, requesterDid));
-    expect(subscriptions).toHaveLength(1);
+      .from(schema.registrations)
+      .where(eq(schema.registrations.accountDid, requesterDid));
+    expect(registrations).toHaveLength(1);
   });
 
   test("registerAdmin-2: 既に管理者がいれば、400とAdminAlreadyExistsを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    await actorFactory(ctx.db)
+    await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(requesterDid);

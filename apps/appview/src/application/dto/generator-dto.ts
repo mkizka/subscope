@@ -4,7 +4,7 @@ import type { AtUriString } from "@atproto/syntax";
 export type GeneratorDto = {
   uri: AtUriString;
   cid: string;
-  actorDid: Did;
+  accountDid: Did;
   did: Did;
   displayName: string;
   description: string | null;

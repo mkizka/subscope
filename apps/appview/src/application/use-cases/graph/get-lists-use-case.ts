@@ -15,7 +15,7 @@ export class GetListsUseCase {
   ) {}
 
   async execute(params: {
-    actorDid: Did;
+    accountDid: Did;
     limit: number;
     cursor?: string;
     purposes?: string[];
@@ -25,8 +25,8 @@ export class GetListsUseCase {
       getCursor: (list) => list.createdAt.toISOString(),
     });
 
-    const lists = await this.listQuery.findByActor({
-      actorDid: params.actorDid,
+    const lists = await this.listQuery.findByAccount({
+      accountDid: params.accountDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
       purposes: params.purposes?.map(

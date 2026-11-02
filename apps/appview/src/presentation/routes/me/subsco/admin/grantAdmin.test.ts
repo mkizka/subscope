@@ -1,7 +1,11 @@
 import { asDid } from "@atproto/did";
 import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
 import { schema } from "@repo/db";
-import { actorFactory, subscriptionFactory, testSetup } from "@repo/test-utils";
+import {
+  accountFactory,
+  registrationFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -10,42 +14,42 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.grantAdmin", () => {
   const { ctx } = testSetup;
 
-  test("grantAdmin-1: 指定したサブスクライバーを管理者にする", async () => {
+  test("grantAdmin-1: 指定した登録アカウントを管理者にする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);
-    const subscription = await subscriptionFactory(ctx.db).create();
+    const registration = await registrationFactory(ctx.db).create();
 
     // act
-    await client.call(grantAdmin, { did: asDid(subscription.actorDid) });
+    await client.call(grantAdmin, { did: asDid(registration.accountDid) });
 
     // assert
-    const [actor] = await ctx.db
+    const [account] = await ctx.db
       .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, subscription.actorDid));
-    expect(actor?.isAdmin).toBe(true);
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, registration.accountDid));
+    expect(account?.isAdmin).toBe(true);
   });
 
-  test("grantAdmin-2: サブスクライバーでないアクターには400とNotSubscribedを返す", async () => {
+  test("grantAdmin-2: 登録アカウントでないアカウントには400とNotRegisteredを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     loginAs(admin.did);
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
 
     // act
-    const promise = client.call(grantAdmin, { did: asDid(actor.did) });
+    const promise = client.call(grantAdmin, { did: asDid(account.did) });
 
     // assert
     await expect(promise).rejects.toMatchObject({
       status: 400,
-      error: "NotSubscribed",
+      error: "NotRegistered",
     });
   });
 });

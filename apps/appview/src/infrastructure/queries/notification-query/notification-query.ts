@@ -18,7 +18,7 @@ export class NotificationQuery implements INotificationQuery {
     cursor?: Date;
     reasons?: NotificationReason[];
   }): Promise<NotificationDto[]> {
-    const { notifications, records, subscriptions } = schema;
+    const { notifications, records, registrations } = schema;
     const rows = await this.db
       .select({
         recordUri: notifications.recordUri,
@@ -28,13 +28,13 @@ export class NotificationQuery implements INotificationQuery {
         reason: notifications.reason,
         reasonSubject: notifications.reasonSubject,
         sortAt: notifications.sortAt,
-        seenAt: subscriptions.seenAt,
+        seenAt: registrations.seenAt,
       })
       .from(notifications)
       .innerJoin(records, eq(records.uri, notifications.recordUri))
       .leftJoin(
-        subscriptions,
-        eq(subscriptions.actorDid, notifications.recipientDid),
+        registrations,
+        eq(registrations.accountDid, notifications.recipientDid),
       )
       .where(
         and(
@@ -55,13 +55,13 @@ export class NotificationQuery implements INotificationQuery {
   }
 
   async countUnread(recipientDid: Did, seenAt?: Date): Promise<number> {
-    const { notifications, subscriptions } = schema;
+    const { notifications, registrations } = schema;
     const [row] = await this.db
       .select({ count: count() })
       .from(notifications)
       .leftJoin(
-        subscriptions,
-        eq(subscriptions.actorDid, notifications.recipientDid),
+        registrations,
+        eq(registrations.accountDid, notifications.recipientDid),
       )
       .where(
         and(
@@ -69,8 +69,8 @@ export class NotificationQuery implements INotificationQuery {
           seenAt
             ? gt(notifications.sortAt, seenAt)
             : or(
-                isNull(subscriptions.seenAt),
-                gt(notifications.sortAt, subscriptions.seenAt),
+                isNull(registrations.seenAt),
+                gt(notifications.sortAt, registrations.seenAt),
               ),
         ),
       );

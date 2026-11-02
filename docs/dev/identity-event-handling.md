@@ -2,7 +2,7 @@
 
 ## 概要
 
-Identity EventはAT Protocolにおいて、ユーザーのDIDドキュメントまたはハンドルに変更があった可能性があることを通知するイベントです。このプロジェクトではデータベースサイズを最小化するため、必要なactorのみを選択的に保存します。
+Identity EventはAT Protocolにおいて、アカウントのDIDドキュメントまたはハンドルに変更があった可能性があることを通知するイベントです。このプロジェクトではデータベースサイズを最小化するため、必要なアカウントのみを選択的に保存します。
 
 ## Identity Eventの特徴
 
@@ -15,7 +15,7 @@ Identity EventはAT Protocolにおいて、ユーザーのDIDドキュメント�
 ## 処理フロー
 
 ```
-Tap → Worker(TapSubscriber) → UpsertIdentityUseCase → ActorRepository
+Tap → Worker(TapSubscriber) → UpsertIdentityUseCase → AccountRepository
 ```
 
 ### 1. Worker (TapSubscriber)
@@ -26,24 +26,24 @@ Tap → Worker(TapSubscriber) → UpsertIdentityUseCase → ActorRepository
 
 ### 2. Worker (UpsertIdentityUseCase)
 
-Identity Eventの処理時、以下の条件でactorの保存を決定：
+Identity Eventの処理時、以下の条件でアカウントの保存を決定：
 
 #### 保存条件
 
-actorは以下のいずれかの条件を満たす場合のみデータベースに保存されます：
+アカウントは以下のいずれかの条件を満たす場合のみデータベースに保存されます：
 
-1. **Subscriberである**: 該当するDIDがsubscribersテーブルに存在する
-2. **Subscriberのフォロワーがいる**: 該当するDIDをフォローしているsubscriberが存在する
+1. **登録アカウントである**: 該当するDIDがregistrationsテーブルに存在する
+2. **登録アカウントのフォロワーがいる**: 該当するDIDをフォローしている登録アカウントが存在する
 
 #### 処理の詳細
 
 1. ハンドルが含まれないイベントは無視
-2. `shouldIndexActor`メソッドで保存条件をチェック
-3. 条件を満たす場合のみ、ActorRepositoryを通じてデータベースを更新
+2. `shouldIndexAccount`メソッドで保存条件をチェック
+3. 条件を満たす場合のみ、AccountRepositoryを通じてデータベースを更新
 
 ## データベーススキーマ
 
-### actorsテーブル
+### accountsテーブル
 
 ```typescript
 {
@@ -55,5 +55,5 @@ actorは以下のいずれかの条件を満たす場合のみデータベース
 
 ## 実装上の注意点
 
-- Identity Eventは頻繁に発生するため、不要なactorの保存を避けることでデータベースサイズを抑制
-- actorはIdentity Event以外にも、他のレコード（post, follow等）のインデックス時に間接的に作成される場合がある
+- Identity Eventは頻繁に発生するため、不要なアカウントの保存を避けることでデータベースサイズを抑制
+- アカウントはIdentity Event以外にも、他のレコード（post, follow等）のインデックス時に間接的に作成される場合がある

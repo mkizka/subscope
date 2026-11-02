@@ -45,7 +45,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-5: 全体ページのフォローボタンでそのユーザーをフォローし、もう一度押すと外す", async ({
+  test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -144,7 +144,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-9: 他のユーザーのプロフィールには「いいね」タブを出さない", async ({
+  test("profile-9: 他のアカウントのプロフィールには「いいね」タブを出さない", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
@@ -242,7 +242,7 @@ test.describe("プロフィール", () => {
     await expect(page).toHaveURL("/profile/alice.test");
   });
 
-  test("profile-13: 追跡中のユーザーの全体ページには、そのユーザーの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
+  test("profile-13: 追跡アカウントの全体ページには、そのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");
@@ -253,5 +253,50 @@ test.describe("プロフィール", () => {
         page.getByRole("main").getByText("同期済み", { exact: true }),
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
+  });
+
+  test("profile-14: プロフィールを開くと、読み込みを待たずにハンドルとタブを表示し、投稿の場所には読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/accounts");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/profile/*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.getByRole("link", { name: "プロフィール" }).click();
+
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    const main = page.getByRole("main");
+    await expect(main.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(main.getByRole("tab", { name: "投稿" })).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+    await expect(
+      page.getByRole("main").getByText(/^\d+ フォロー$/),
+    ).toBeVisible();
+  });
+
+  test("profile-15: 一度表示したプロフィールに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+    const followers = page.getByRole("main").getByText(/^\d+ フォロワー$/);
+    await expect(followers).toBeVisible();
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "アカウント", exact: true })
+      .click();
+    await expect(page).toHaveURL("/accounts");
+    await page.route("**/api/profile/*", () => {});
+
+    await page.goBack();
+
+    await expect(followers).toBeVisible();
   });
 });

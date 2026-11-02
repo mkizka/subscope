@@ -16,7 +16,7 @@ export class GetFollowersUseCase {
   ) {}
 
   async execute(params: {
-    actorDid: Did;
+    accountDid: Did;
     limit: number;
     cursor?: string;
   }): Promise<$OutputBody> {
@@ -25,8 +25,8 @@ export class GetFollowersUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
     const page = paginator.extractPage(
-      await this.followQuery.findActorFollowers({
-        actorDid: params.actorDid,
+      await this.followQuery.findAccountFollowers({
+        accountDid: params.accountDid,
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
@@ -34,9 +34,9 @@ export class GetFollowersUseCase {
 
     const ctx = this.viewContextFactory.create();
     const [subject, followers] = await Promise.all([
-      this.profileViews.view(params.actorDid, ctx),
+      this.profileViews.view(params.accountDid, ctx),
       Promise.all(
-        page.items.map((item) => this.profileViews.view(item.actorDid, ctx)),
+        page.items.map((item) => this.profileViews.view(item.accountDid, ctx)),
       ),
     ]);
 

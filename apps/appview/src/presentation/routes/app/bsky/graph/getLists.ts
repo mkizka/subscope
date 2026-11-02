@@ -12,12 +12,12 @@ export class GetLists {
 
   handle(router: LexRouter) {
     router.add(getLists, async ({ params }) => {
-      const actorDid = await this.handleMiddleware.resolveHandleOrDid(
+      const accountDid = await this.handleMiddleware.resolveHandleOrDid(
         params.actor,
       );
 
       const result = await this.getListsUseCase.execute({
-        actorDid,
+        accountDid,
         limit: params.limit,
         cursor: params.cursor,
         purposes: params.purposes,

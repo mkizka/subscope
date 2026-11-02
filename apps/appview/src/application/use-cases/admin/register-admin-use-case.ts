@@ -2,12 +2,12 @@ import type { Did } from "@atproto/did";
 import {
   type IJobScheduler,
   type ITransactionManager,
-  Subscription,
+  Registration,
 } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
+import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
-import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
+import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 
 export class AdminAlreadyExistsError extends Error {
   constructor(message: string) {
@@ -23,14 +23,14 @@ type RegisterAdminParams = {
 export class RegisterAdminUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly actorQuery: IActorQuery,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly accountQuery: IAccountQuery,
+    private readonly registrationRepository: IRegistrationRepository,
     private readonly createAdminService: CreateAdminService,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
   async execute(params: RegisterAdminParams): Promise<void> {
-    const hasAnyAdmin = await this.actorQuery.hasAnyAdmin();
+    const hasAnyAdmin = await this.accountQuery.hasAnyAdmin();
     if (hasAnyAdmin) {
       throw new AdminAlreadyExistsError("Admin already exists");
     }
@@ -41,11 +41,11 @@ export class RegisterAdminUseCase {
         did: params.requesterDid,
       });
 
-      const subscription = new Subscription({
-        actorDid: params.requesterDid,
+      const registration = new Registration({
+        accountDid: params.requesterDid,
         createdAt: new Date(),
       });
-      await this.subscriptionRepository.save({ ctx, subscription });
+      await this.registrationRepository.save({ ctx, registration });
     });
 
     await this.jobScheduler.scheduleSyncTapRepo(params.requesterDid);

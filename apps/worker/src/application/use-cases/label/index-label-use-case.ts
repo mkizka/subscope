@@ -2,7 +2,7 @@ import { isDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import type { ITransactionManager } from "@repo/common/domain";
 
-import type { IActorQuery } from "../../interfaces/queries/actor-query.js";
+import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 import type {
   ILabelRepository,
   LabelData,
@@ -11,7 +11,7 @@ import type {
 export class IndexLabelUseCase {
   constructor(
     private readonly labelRepository: ILabelRepository,
-    private readonly actorQuery: IActorQuery,
+    private readonly accountQuery: IAccountQuery,
     private readonly transactionManager: ITransactionManager,
   ) {}
 
@@ -24,10 +24,10 @@ export class IndexLabelUseCase {
       const did = label.uri.startsWith("at://")
         ? new AtUri(label.uri).host
         : label.uri;
-      if (!isDid(did) || !(await this.actorQuery.exists({ ctx, did }))) {
+      if (!isDid(did) || !(await this.accountQuery.exists({ ctx, did }))) {
         return;
       }
-      await this.labelRepository.save({ ctx, label, actorDid: did });
+      await this.labelRepository.save({ ctx, label, accountDid: did });
     });
   }
 }

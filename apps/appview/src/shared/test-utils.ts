@@ -7,12 +7,12 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
-import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
+import { InMemoryAccountRepository } from "../infrastructure/account-repository/account-repository.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryInviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.in-memory.js";
-import { InMemoryActorQuery } from "../infrastructure/queries/actor-query/actor-query.in-memory.js";
-import { InMemoryActorStatsQuery } from "../infrastructure/queries/actor-stats-query/actor-stats-query.in-memory.js";
+import { InMemoryAccountQuery } from "../infrastructure/queries/account-query/account-query.in-memory.js";
+import { InMemoryAccountStatsQuery } from "../infrastructure/queries/account-stats-query/account-stats-query.in-memory.js";
 import { InMemoryFollowQuery } from "../infrastructure/queries/follow-query/follow-query.in-memory.js";
 import { InMemoryGeneratorQuery } from "../infrastructure/queries/generator-query/generator-query.in-memory.js";
 import { InMemoryLabelQuery } from "../infrastructure/queries/label-query/label-query.in-memory.js";
@@ -20,7 +20,7 @@ import { InMemoryLikeQuery } from "../infrastructure/queries/like-query/like-que
 import { InMemoryListQuery } from "../infrastructure/queries/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/queries/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
-import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
+import { InMemoryRegistrationRepository } from "../infrastructure/registration-repository/registration-repository.in-memory.js";
 import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import type { Env } from "./env.js";
 import { createAppRegistry } from "./registry.js";
@@ -42,9 +42,9 @@ export const testRegistry = createAppRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
   .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
-  .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
-  .replaceService("actorQuery", asClassArgs(InMemoryActorQuery))
-  .replaceService("actorStatsQuery", asClassArgs(InMemoryActorStatsQuery))
+  .replaceService("accountRepository", asClassArgs(InMemoryAccountRepository))
+  .replaceService("accountQuery", asClassArgs(InMemoryAccountQuery))
+  .replaceService("accountStatsQuery", asClassArgs(InMemoryAccountStatsQuery))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("notificationQuery", asClassArgs(InMemoryNotificationQuery))
   .replaceService("generatorQuery", asClassArgs(InMemoryGeneratorQuery))
@@ -53,7 +53,7 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("listQuery", asClassArgs(InMemoryListQuery))
   .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
-  .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
+  .replaceService("registrationRepository", asClassArgs(InMemoryRegistrationRepository))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
   .replaceService("assetUrlBuilder", asClassArgs(InMemoryAssetUrlBuilder))
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))

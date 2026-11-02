@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { schema } from "@repo/db";
-import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -14,13 +14,13 @@ describe("NotificationQuery", () => {
   describe("findNotifications", () => {
     test("受信者の通知をcursorより古いものから新しい順に返し、seenAt以前のものを既読にする", async () => {
       // arrange
-      const recipient = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
+      const recipient = await accountFactory(ctx.db)
+        .use((t) => t.registeredAccount())
         .create();
-      const author = await actorFactory(ctx.db).create();
+      const author = await accountFactory(ctx.db).create();
       const notify = async (sortAt: string) => {
         const record = await recordFactory(ctx.db, "app.bsky.feed.like")
-          .vars({ actor: () => author })
+          .vars({ account: () => author })
           .create();
         await ctx.db.insert(schema.notifications).values({
           recordUri: record.uri,
@@ -35,9 +35,9 @@ describe("NotificationQuery", () => {
       const unread = await notify("2024-01-03T00:00:00.000Z");
       await notify("2024-01-05T00:00:00.000Z");
       await ctx.db
-        .update(schema.subscriptions)
+        .update(schema.registrations)
         .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-        .where(eq(schema.subscriptions.actorDid, recipient.did));
+        .where(eq(schema.registrations.accountDid, recipient.did));
 
       // act
       const result = await notificationQuery.findNotifications({
@@ -57,13 +57,13 @@ describe("NotificationQuery", () => {
   describe("countUnread", () => {
     test("受信者の通知のうちseenAtより新しいものの数を返す", async () => {
       // arrange
-      const recipient = await actorFactory(ctx.db)
-        .use((t) => t.subscriber())
+      const recipient = await accountFactory(ctx.db)
+        .use((t) => t.registeredAccount())
         .create();
-      const author = await actorFactory(ctx.db).create();
+      const author = await accountFactory(ctx.db).create();
       for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-05"]) {
         const record = await recordFactory(ctx.db, "app.bsky.feed.like")
-          .vars({ actor: () => author })
+          .vars({ account: () => author })
           .create();
         await ctx.db.insert(schema.notifications).values({
           recordUri: record.uri,
@@ -74,9 +74,9 @@ describe("NotificationQuery", () => {
         });
       }
       await ctx.db
-        .update(schema.subscriptions)
+        .update(schema.registrations)
         .set({ seenAt: new Date("2024-01-02") })
-        .where(eq(schema.subscriptions.actorDid, recipient.did));
+        .where(eq(schema.registrations.accountDid, recipient.did));
 
       // act
       const result = await notificationQuery.countUnread(asDid(recipient.did));

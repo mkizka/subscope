@@ -7,7 +7,7 @@ import { Input } from "@/app/components/ui/input";
 type Props = {
   formProps: ComponentProps<typeof Form>;
   inputProps: ComponentProps<"input">;
-  tab: "actors" | "posts";
+  tab: "accounts" | "posts";
   loading: boolean;
 };
 

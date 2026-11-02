@@ -1,17 +1,19 @@
 import { createRegistry } from "@gyaku/di";
 
-import { getFollowListUseCaseFactory } from "./application/actor/get-follow-list-use-case";
-import { getMeUseCaseFactory } from "./application/actor/get-me-use-case";
-import { getProfilePageUseCaseFactory } from "./application/actor/get-profile-page-use-case";
-import { getProfileUseCaseFactory } from "./application/actor/get-profile-use-case";
-import { banSubscriberUseCaseFactory } from "./application/admin/ban-subscriber-use-case";
+import { getFollowListUseCaseFactory } from "./application/accounts/get-follow-list-use-case";
+import { getMeUseCaseFactory } from "./application/accounts/get-me-use-case";
+import { getProfilePageUseCaseFactory } from "./application/accounts/get-profile-page-use-case";
+import { getProfileUseCaseFactory } from "./application/accounts/get-profile-use-case";
+import { getRegisteredAccountsUseCaseFactory } from "./application/accounts/get-registered-accounts-use-case";
+import { getTrackedAccountsUseCaseFactory } from "./application/accounts/get-tracked-accounts-use-case";
+import { banAccountUseCaseFactory } from "./application/admin/ban-account-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
-import { getBannedActorsUseCaseFactory } from "./application/admin/get-banned-actors-use-case";
+import { getBannedAccountsUseCaseFactory } from "./application/admin/get-banned-accounts-use-case";
 import { getInviteCodesUseCaseFactory } from "./application/admin/get-invite-codes-use-case";
-import { getSubscribersUseCaseFactory } from "./application/admin/get-subscribers-use-case";
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
-import { unbanActorUseCaseFactory } from "./application/admin/unban-actor-use-case";
+import { listRegisteredAccountsUseCaseFactory } from "./application/admin/list-registered-accounts-use-case";
+import { unbanAccountUseCaseFactory } from "./application/admin/unban-account-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
 import { createListUseCaseFactory } from "./application/list/create-list-use-case";
@@ -22,9 +24,7 @@ import { removeListMemberUseCaseFactory } from "./application/list/remove-list-m
 import { updateListUseCaseFactory } from "./application/list/update-list-use-case";
 import { getLoginStepUseCaseFactory } from "./application/login/get-login-step-use-case";
 import { oauthCallbackUseCaseFactory } from "./application/login/oauth-callback-use-case";
-import { subscribeServerUseCaseFactory } from "./application/login/subscribe-server-use-case";
-import { getMembersUseCaseFactory } from "./application/members/get-members-use-case";
-import { getTrackedActorsUseCaseFactory } from "./application/members/get-tracked-actors-use-case";
+import { registerAccountUseCaseFactory } from "./application/login/register-account-use-case";
 import { countUnreadNotificationsUseCaseFactory } from "./application/notification/count-unread-notifications-use-case";
 import { getNotificationsUseCaseFactory } from "./application/notification/get-notifications-use-case";
 import { markNotificationsSeenUseCaseFactory } from "./application/notification/mark-notifications-seen-use-case";
@@ -35,7 +35,7 @@ import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getBackfillStatusUseCaseFactory } from "./application/timeline/get-backfill-status-use-case";
 import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
-import { actorQueryFactory } from "./infrastructure/actor/actor-query";
+import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
 import { cookieSessionStorageFactory } from "./infrastructure/auth/cookie-session-storage";
@@ -47,6 +47,7 @@ import {
 import { backfillQueryFactory } from "./infrastructure/backfill/backfill-query";
 import { dbFactory } from "./infrastructure/db/db";
 import { followCommandFactory } from "./infrastructure/follow/follow-command";
+import { followQueryFactory } from "./infrastructure/follow/follow-query";
 import { jobQueueFactory } from "./infrastructure/job-queue/job-queue";
 import { listCommandFactory } from "./infrastructure/list/list-command";
 import { listQueryFactory } from "./infrastructure/list/list-query";
@@ -77,25 +78,25 @@ export const di = await createRegistry()
   .service("subscopeCommand", ["oauthClient"], subscopeCommandFactory)
   .service("getLoginStepUseCase", ["subscopeQuery"], getLoginStepUseCaseFactory)
   .service(
-    "subscribeServerUseCase",
+    "registerAccountUseCase",
     ["subscopeCommand"],
-    subscribeServerUseCaseFactory,
+    registerAccountUseCaseFactory,
   )
   .service(
     "oauthCallbackUseCase",
     ["oauthClient", "subscopeQuery", "subscopeCommand", "loggerManager"],
     oauthCallbackUseCaseFactory,
   )
-  .service("backfillQuery", ["db"], backfillQueryFactory)
+  .service("backfillQuery", backfillQueryFactory)
   .service(
-    "getMembersUseCase",
+    "getRegisteredAccountsUseCase",
     ["subscopeQuery", "backfillQuery"],
-    getMembersUseCaseFactory,
+    getRegisteredAccountsUseCaseFactory,
   )
   .service(
-    "getTrackedActorsUseCase",
+    "getTrackedAccountsUseCase",
     ["subscopeQuery", "backfillQuery"],
-    getTrackedActorsUseCaseFactory,
+    getTrackedAccountsUseCaseFactory,
   )
   .service(
     "getBackfillStatusUseCase",
@@ -136,22 +137,18 @@ export const di = await createRegistry()
   .service("adminQuery", ["oauthClient"], adminQueryFactory)
   .service("adminCommand", ["oauthClient"], adminCommandFactory)
   .service(
-    "getSubscribersUseCase",
+    "listRegisteredAccountsUseCase",
     ["adminQuery"],
-    getSubscribersUseCaseFactory,
+    listRegisteredAccountsUseCaseFactory,
   )
-  .service(
-    "banSubscriberUseCase",
-    ["adminCommand"],
-    banSubscriberUseCaseFactory,
-  )
+  .service("banAccountUseCase", ["adminCommand"], banAccountUseCaseFactory)
   .service("grantAdminUseCase", ["adminCommand"], grantAdminUseCaseFactory)
   .service(
-    "getBannedActorsUseCase",
+    "getBannedAccountsUseCase",
     ["adminQuery"],
-    getBannedActorsUseCaseFactory,
+    getBannedAccountsUseCaseFactory,
   )
-  .service("unbanActorUseCase", ["adminCommand"], unbanActorUseCaseFactory)
+  .service("unbanAccountUseCase", ["adminCommand"], unbanAccountUseCaseFactory)
   .service(
     "getInviteCodesUseCase",
     ["adminQuery"],
@@ -167,22 +164,23 @@ export const di = await createRegistry()
     ["adminCommand"],
     deleteInviteCodeUseCaseFactory,
   )
-  .service("actorQuery", ["oauthClient"], actorQueryFactory)
-  .service("getMeUseCase", ["actorQuery"], getMeUseCaseFactory)
-  .service("getProfileUseCase", ["actorQuery"], getProfileUseCaseFactory)
+  .service("accountQuery", ["oauthClient"], accountQueryFactory)
+  .service("followQuery", followQueryFactory)
+  .service("getMeUseCase", ["accountQuery"], getMeUseCaseFactory)
+  .service("getProfileUseCase", ["accountQuery"], getProfileUseCaseFactory)
   .service(
     "getFollowListUseCase",
-    ["actorQuery", "backfillQuery"],
+    ["accountQuery", "backfillQuery", "followQuery"],
     getFollowListUseCaseFactory,
   )
   .service(
     "getProfilePageUseCase",
-    ["actorQuery", "backfillQuery"],
+    ["accountQuery", "backfillQuery"],
     getProfilePageUseCaseFactory,
   )
   .service(
     "searchUseCase",
-    ["actorQuery", "timelineQuery", "backfillQuery"],
+    ["accountQuery", "timelineQuery", "backfillQuery"],
     searchUseCaseFactory,
   )
   .service("followCommand", ["oauthClient"], followCommandFactory)
@@ -199,7 +197,7 @@ export const di = await createRegistry()
   .service("listCommand", ["oauthClient"], listCommandFactory)
   .service(
     "getListsPageUseCase",
-    ["listQuery", "actorQuery"],
+    ["listQuery", "accountQuery"],
     getListsPageUseCaseFactory,
   )
   .service(
@@ -212,7 +210,7 @@ export const di = await createRegistry()
   .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
   .service(
     "addListMemberUseCase",
-    ["actorQuery", "listCommand"],
+    ["accountQuery", "listCommand"],
     addListMemberUseCaseFactory,
   )
   .service(

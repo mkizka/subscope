@@ -7,7 +7,7 @@ export function feedItemFactory(params?: Partial<FeedItemParams>): FeedItem {
     cid: params?.cid ?? fakeCid(),
     type: params?.type ?? "post",
     subjectUri: params?.subjectUri ?? null,
-    actorDid: params?.actorDid ?? fakeDid(),
+    accountDid: params?.accountDid ?? fakeDid(),
     sortAt: params?.sortAt ?? fakeDate(),
   });
 }

@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import {
-  actorFactory,
+  accountFactory,
   labelFactory,
   postFactory,
   recordFactory,
@@ -23,8 +23,8 @@ describe("ラベラーの指定", () => {
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
             .vars({
-              actor: () =>
-                actorFactory(ctx.db)
+              account: () =>
+                accountFactory(ctx.db)
                   .use((t) => t.withProfile({}))
                   .create(),
             })
@@ -33,7 +33,7 @@ describe("ラベラーの指定", () => {
       .create();
 
   const createLabel = (
-    post: { uri: string; actorDid: string },
+    post: { uri: string; accountDid: string },
     src: string,
     val: string,
   ) =>
@@ -41,7 +41,7 @@ describe("ラベラーの指定", () => {
       .props({
         src: () => src,
         uri: () => post.uri,
-        actorDid: () => post.actorDid,
+        accountDid: () => post.accountDid,
         val: () => val,
       })
       .create();

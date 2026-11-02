@@ -19,8 +19,8 @@ export class InMemoryListQuery implements IListQuery {
     this.items.push(item);
   }
 
-  findByActor(params: {
-    actorDid: Did;
+  findByAccount(params: {
+    accountDid: Did;
     limit: number;
     cursor?: string;
     purposes?: string[];
@@ -28,7 +28,7 @@ export class InMemoryListQuery implements IListQuery {
     const cursor = params.cursor && new Date(params.cursor);
     return Promise.resolve(
       this.lists
-        .filter((list) => list.actorDid === params.actorDid)
+        .filter((list) => list.accountDid === params.accountDid)
         .filter((list) => !cursor || list.createdAt < cursor)
         .filter(
           (list) => !params.purposes || params.purposes.includes(list.purpose),

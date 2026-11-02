@@ -11,7 +11,7 @@ import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timel
 export interface IGetListPageUseCase {
   execute: (
     did: string,
-    actor: AtIdentifierString,
+    account: AtIdentifierString,
     rkey: string,
     tab: "posts" | "members",
   ) => Promise<{
@@ -29,8 +29,8 @@ export const getListPageUseCaseFactory = ({
   listQuery: IListQuery;
   backfillQuery: IBackfillQuery;
 }): IGetListPageUseCase => ({
-  async execute(did, actor, rkey, tab) {
-    const { list, members } = await listQuery.findList(did, actor, rkey);
+  async execute(did, account, rkey, tab) {
+    const { list, members } = await listQuery.findList(did, account, rkey);
     const [posts, statuses] = await Promise.all([
       tab === "posts" ? listQuery.findPosts(did, list.uri) : [],
       backfillQuery.findTrackedStatuses(members.map((member) => member.did)),

@@ -5,18 +5,18 @@ import type {
 } from "@repo/common/domain";
 import { Follow } from "@repo/common/domain";
 
-import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
+import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { IndexActorService } from "../index-actor-service.js";
+import type { IndexAccountService } from "../index-account-service.js";
 
 export class FollowIndexer implements ICollectionIndexer {
   constructor(
     private readonly followRepository: IFollowRepository,
     private readonly jobScheduler: IJobScheduler,
-    private readonly indexActorService: IndexActorService,
-    private readonly subscriptionQuery: ISubscriptionQuery,
+    private readonly indexAccountService: IndexAccountService,
+    private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
@@ -30,26 +30,24 @@ export class FollowIndexer implements ICollectionIndexer {
     live: boolean;
   }) {
     const follow = Follow.from(record);
-    await this.indexActorService.upsert({
+    await this.indexAccountService.upsert({
       ctx,
       did: follow.subjectDid,
       live,
     });
     await this.followRepository.save({ ctx, follow });
 
-    const isFollowerSubscriber = await this.subscriptionQuery.isSubscriber(
-      ctx,
-      follow.actorDid,
-    );
-    if (isFollowerSubscriber) {
+    const isFollowerRegisteredAccount =
+      await this.registrationQuery.isRegistered(ctx, follow.accountDid);
+    if (isFollowerRegisteredAccount) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );
     }
 
     if (
-      follow.subjectDid !== follow.actorDid &&
-      (await this.subscriptionQuery.isSubscriber(ctx, follow.subjectDid))
+      follow.subjectDid !== follow.accountDid &&
+      (await this.registrationQuery.isRegistered(ctx, follow.subjectDid))
     ) {
       await this.notificationRepository.save({
         ctx,
@@ -57,7 +55,7 @@ export class FollowIndexer implements ICollectionIndexer {
           {
             recordUri: follow.uri.toString(),
             recipientDid: follow.subjectDid,
-            authorDid: follow.actorDid,
+            authorDid: follow.accountDid,
             reason: "follow",
             reasonSubject: null,
             sortAt: follow.sortAt,
@@ -78,15 +76,15 @@ export class FollowIndexer implements ICollectionIndexer {
   }): Promise<void> {
     const follow = Follow.from(record);
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateActorStats(follow.actorDid),
+      this.jobScheduler.scheduleAggregateAccountStats(follow.accountDid),
     );
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateActorStats(follow.subjectDid),
+      this.jobScheduler.scheduleAggregateAccountStats(follow.subjectDid),
     );
 
     if (
       action === "delete" &&
-      (await this.subscriptionQuery.isSubscriber(ctx, follow.actorDid))
+      (await this.registrationQuery.isRegistered(ctx, follow.accountDid))
     ) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),

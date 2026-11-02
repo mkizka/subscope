@@ -5,7 +5,7 @@ export function repostFactory(params?: Partial<RepostParams>): Repost {
   return new Repost({
     uri: params?.uri ?? fakeAtUri({ collection: "app.bsky.feed.repost" }),
     cid: params?.cid ?? fakeCid(),
-    actorDid: params?.actorDid ?? fakeDid(),
+    accountDid: params?.accountDid ?? fakeDid(),
     subjectUri:
       params?.subjectUri ?? fakeAtUri({ collection: "app.bsky.feed.post" }),
     subjectCid: params?.subjectCid ?? fakeCid(),

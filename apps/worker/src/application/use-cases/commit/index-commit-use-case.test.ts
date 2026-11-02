@@ -1,6 +1,10 @@
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
-import { actorFactory, fakeCid, subscriptionFactory } from "@repo/common/test";
+import {
+  accountFactory,
+  fakeCid,
+  registrationFactory,
+} from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -8,8 +12,8 @@ import type { IndexCommitCommand } from "./index-commit-command.js";
 
 describe("IndexCommitUseCase", () => {
   let indexCommitUseCase: TestServices["indexCommitUseCase"];
-  let actorRepo: TestServices["actorRepository"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let accountRepo: TestServices["accountRepository"];
+  let registrationQuery: TestServices["registrationQuery"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
@@ -18,8 +22,8 @@ describe("IndexCommitUseCase", () => {
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     indexCommitUseCase = services.indexCommitUseCase;
-    actorRepo = services.actorRepository;
-    subscriptionQuery = services.subscriptionQuery;
+    accountRepo = services.accountRepository;
+    registrationQuery = services.registrationQuery;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
@@ -30,13 +34,13 @@ describe("IndexCommitUseCase", () => {
   describe("create/updateオペレーション", () => {
     test("index-1: 作成・更新されたレコードを保存する", async () => {
       // arrange
-      const actor = actorFactory();
-      actorRepo.add(actor);
+      const account = accountFactory();
+      accountRepo.add(account);
 
-      const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionQuery.add(subscription);
+      const registration = registrationFactory({ accountDid: account.did });
+      registrationQuery.add(registration);
 
-      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({
         uri,
         cid: "cid123",
@@ -62,17 +66,17 @@ describe("IndexCommitUseCase", () => {
       expect(savedPost).not.toBeNull();
       expect(savedPost?.uri.toString()).toBe(uri.toString());
       expect(savedPost?.cid).toBe("cid123");
-      expect(savedPost?.actorDid).toBe(actor.did);
+      expect(savedPost?.accountDid).toBe(account.did);
       expect(savedPost?.text).toBe("Hello world");
     });
 
-    test("index-10: レコードの作成者やフォロー先などのアクターは、すでに保存済みでハンドルと状態が変わらなければ更新しない", async () => {
+    test("index-10: レコードの作成者やフォロー先などのアカウントは、すでに保存済みでハンドルと状態が変わらなければ更新しない", async () => {
       // arrange
-      const actor = actorFactory();
-      actorRepo.add(actor);
-      const saveSpy = vi.spyOn(actorRepo, "save");
+      const account = accountFactory();
+      accountRepo.add(account);
+      const saveSpy = vi.spyOn(accountRepo, "save");
 
-      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({
         uri,
         cid: "cid123",
@@ -97,16 +101,16 @@ describe("IndexCommitUseCase", () => {
 
     test("index-9: threadgate と postgate は、同じアカウントで同じrkeyの投稿を対象とするものだけ保存する", async () => {
       // arrange
-      const actor = actorFactory();
-      actorRepo.add(actor);
+      const account = accountFactory();
+      accountRepo.add(account);
       const gate = (collection: string, rkey: string, postRkey: string) => {
-        const uri = new AtUri(`at://${actor.did}/${collection}/${rkey}`);
+        const uri = new AtUri(`at://${account.did}/${collection}/${rkey}`);
         const record = Record.create({
           uri,
           cid: "cid123",
           json: {
             $type: collection,
-            post: `at://${actor.did}/app.bsky.feed.post/${postRkey}`,
+            post: `at://${account.did}/app.bsky.feed.post/${postRkey}`,
             createdAt: new Date().toISOString(),
           },
         });
@@ -141,33 +145,35 @@ describe("IndexCommitUseCase", () => {
     });
 
     test.each([
-      { name: "いいねした人がサブスクライバー", liker: true, author: false },
-      { name: "投稿の作者がサブスクライバー", liker: false, author: true },
-      { name: "どちらもサブスクライバーでない", liker: false, author: false },
+      { name: "いいねした人が登録アカウント", liker: true, author: false },
+      { name: "投稿の作者が登録アカウント", liker: false, author: true },
+      { name: "どちらも登録アカウントでない", liker: false, author: false },
     ])(
-      "index-11: いいねは、いいねした人かいいねされた投稿の作者がサブスクライバーのものだけ保存する($name)",
+      "index-11: いいねは、いいねした人かいいねされた投稿の作者が登録アカウントのものだけ保存する($name)",
       async ({ liker, author }) => {
         // arrange
-        const likerActor = actorFactory();
-        const authorActor = actorFactory();
+        const likerAccount = accountFactory();
+        const authorAccount = accountFactory();
         if (liker) {
-          subscriptionQuery.add(
-            subscriptionFactory({ actorDid: likerActor.did }),
+          registrationQuery.add(
+            registrationFactory({ accountDid: likerAccount.did }),
           );
         }
         if (author) {
-          subscriptionQuery.add(
-            subscriptionFactory({ actorDid: authorActor.did }),
+          registrationQuery.add(
+            registrationFactory({ accountDid: authorAccount.did }),
           );
         }
-        const uri = new AtUri(`at://${likerActor.did}/app.bsky.feed.like/123`);
+        const uri = new AtUri(
+          `at://${likerAccount.did}/app.bsky.feed.like/123`,
+        );
         const record = Record.create({
           uri,
           cid: "cid123",
           json: {
             $type: "app.bsky.feed.like",
             subject: {
-              uri: `at://${authorActor.did}/app.bsky.feed.post/123`,
+              uri: `at://${authorAccount.did}/app.bsky.feed.post/123`,
               cid: fakeCid(),
             },
             createdAt: new Date().toISOString(),
@@ -194,13 +200,13 @@ describe("IndexCommitUseCase", () => {
   describe("deleteオペレーション", () => {
     test("index-2: 削除されたレコードを削除する", async () => {
       // arrange
-      const actor = actorFactory();
-      actorRepo.add(actor);
+      const account = accountFactory();
+      accountRepo.add(account);
 
-      const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionQuery.add(subscription);
+      const registration = registrationFactory({ accountDid: account.did });
+      registrationQuery.add(registration);
 
-      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({
         uri,
         cid: "cid123",
@@ -238,13 +244,13 @@ describe("IndexCommitUseCase", () => {
   describe("RecordValidationError", () => {
     test("index-3: Lexiconのスキーマに合わないレコードはスキップする", async () => {
       // arrange
-      const actor = actorFactory();
-      actorRepo.add(actor);
+      const account = accountFactory();
+      accountRepo.add(account);
 
-      const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionQuery.add(subscription);
+      const registration = registrationFactory({ accountDid: account.did });
+      registrationQuery.add(registration);
 
-      const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
+      const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({
         uri,
         cid: "cid123",

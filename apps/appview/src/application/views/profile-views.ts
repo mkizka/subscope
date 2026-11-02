@@ -44,14 +44,17 @@ export class ProfileViews {
     }
     const [basic, stats] = await Promise.all([
       this.toBasic(profile, ctx),
-      ctx.actorStats(did),
+      ctx.accountStats(did),
     ]);
     return {
       ...basic,
       $type: "app.bsky.actor.defs#profileViewDetailed",
       description: profile.description ?? undefined,
       banner: profile.bannerCid
-        ? this.assetUrlBuilder.getBannerUrl(profile.actorDid, profile.bannerCid)
+        ? this.assetUrlBuilder.getBannerUrl(
+            profile.accountDid,
+            profile.bannerCid,
+          )
         : undefined,
       followersCount: stats?.followersCount ?? 0,
       followsCount: stats?.followsCount ?? 0,
@@ -65,24 +68,24 @@ export class ProfileViews {
     ctx: ViewContext,
   ): Promise<AppBskyActorDefs.ProfileViewBasic> {
     const profileUri = AtUri.make(
-      profile.actorDid,
+      profile.accountDid,
       "app.bsky.actor.profile",
       "self",
     ).toString();
     const [viewerState, didLabels, profileLabels, record] = await Promise.all([
-      ctx.viewerState(profile.actorDid),
-      ctx.labelsOf(profile.actorDid),
+      ctx.viewerState(profile.accountDid),
+      ctx.labelsOf(profile.accountDid),
       ctx.labelsOf(profileUri),
       ctx.record(profileUri),
     ]);
     return {
       $type: "app.bsky.actor.defs#profileViewBasic",
-      did: profile.actorDid,
+      did: profile.accountDid,
       handle: profile.handle ?? "handle.invalid",
       displayName: profile.displayName ?? undefined,
       avatar: profile.avatarCid
         ? this.assetUrlBuilder.getAvatarThumbnailUrl(
-            profile.actorDid,
+            profile.accountDid,
             profile.avatarCid,
           )
         : undefined,

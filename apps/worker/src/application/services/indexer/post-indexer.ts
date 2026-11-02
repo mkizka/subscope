@@ -12,7 +12,7 @@ import {
 } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
-import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
+import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type {
   INotificationRepository,
@@ -28,7 +28,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postRepository: IPostRepository,
     private readonly postQuery: IPostQuery,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly subscriptionQuery: ISubscriptionQuery,
+    private readonly registrationQuery: IRegistrationQuery,
     private readonly notificationRepository: INotificationRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
@@ -102,9 +102,9 @@ export class PostIndexer implements ICollectionIndexer {
     for (const candidate of candidates) {
       if (
         !candidate ||
-        candidate.recipientDid === post.actorDid ||
+        candidate.recipientDid === post.accountDid ||
         notifications.has(candidate.recipientDid) ||
-        !(await this.subscriptionQuery.isSubscriber(
+        !(await this.registrationQuery.isRegistered(
           ctx,
           candidate.recipientDid,
         ))
@@ -114,7 +114,7 @@ export class PostIndexer implements ICollectionIndexer {
       notifications.set(candidate.recipientDid, {
         ...candidate,
         recordUri: post.uri.toString(),
-        authorDid: post.actorDid,
+        authorDid: post.accountDid,
         sortAt: post.sortAt,
       });
     }
@@ -136,7 +136,7 @@ export class PostIndexer implements ICollectionIndexer {
     const post = Post.from(record);
 
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateActorStats(post.actorDid),
+      this.jobScheduler.scheduleAggregateAccountStats(post.accountDid),
     );
 
     // 削除時にafterActionが呼ばれる場合は投稿が存在しないのでupsertに限定

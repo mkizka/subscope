@@ -1,9 +1,9 @@
 import { AtUri } from "@atproto/syntax";
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   recordFactory,
-  subscriptionFactory,
+  registrationFactory,
 } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
@@ -19,7 +19,7 @@ describe("PostIndexer", () => {
   let postRepo: TestServices["postRepository"];
   let feedItemRepo: TestServices["feedItemRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionQuery: TestServices["subscriptionQuery"];
+  let registrationQuery: TestServices["registrationQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe("PostIndexer", () => {
     postRepo = services.postRepository;
     feedItemRepo = services.feedItemRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionQuery = services.subscriptionQuery;
+    registrationQuery = services.registrationQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -37,7 +37,7 @@ describe("PostIndexer", () => {
     test("投稿レコードを正しく保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const author = actorFactory();
+      const author = accountFactory();
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey123`,
         json: {
@@ -60,7 +60,7 @@ describe("PostIndexer", () => {
       expect(post).toMatchObject({
         uri: record.uri,
         cid: record.cid,
-        actorDid: author.did,
+        accountDid: author.did,
         text: "test post",
       });
 
@@ -68,7 +68,7 @@ describe("PostIndexer", () => {
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "post",
-        actorDid: author.did,
+        accountDid: author.did,
         subjectUri: null,
       });
     });
@@ -76,7 +76,7 @@ describe("PostIndexer", () => {
     test("embedにレコードが含まれる場合、fetchRecordジョブが追加される", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const author = actorFactory();
+      const author = accountFactory();
       const embedCid = await randomCid();
       const embedUri = "at://did:plc:embeduser/app.bsky.feed.post/embedpost";
       const record = recordFactory({
@@ -116,7 +116,7 @@ describe("PostIndexer", () => {
     test("embedがない場合、fetchRecordジョブは追加されない", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const author = actorFactory();
+      const author = accountFactory();
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey789`,
         json: {
@@ -141,7 +141,7 @@ describe("PostIndexer", () => {
     test("無効な日付（0000-01-01）の投稿でもエラーなく保存される", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const author = actorFactory();
+      const author = accountFactory();
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey000`,
         json: {
@@ -175,13 +175,13 @@ describe("PostIndexer", () => {
     test("notify-7: 引用された投稿の作者に quote の、メンションされたアカウントに mention の通知を作る", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const quoted = actorFactory();
-      const mentioned = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: quoted.did }));
-      subscriptionQuery.add(subscriptionFactory({ actorDid: mentioned.did }));
+      const quoted = accountFactory();
+      const mentioned = accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: quoted.did }));
+      registrationQuery.add(registrationFactory({ accountDid: mentioned.did }));
       const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
       const record = recordFactory({
-        uri: `at://${actorFactory().did}/app.bsky.feed.post/notify`,
+        uri: `at://${accountFactory().did}/app.bsky.feed.post/notify`,
         json: {
           $type: "app.bsky.feed.post",
           text: "@",
@@ -207,11 +207,11 @@ describe("PostIndexer", () => {
     test("notify-8: 1つの投稿から同じ相手への通知は mention > quote > reply の優先順で1件にする", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const mentioned = actorFactory();
-      const quoted = actorFactory();
-      subscriptionQuery.add(subscriptionFactory({ actorDid: mentioned.did }));
-      subscriptionQuery.add(subscriptionFactory({ actorDid: quoted.did }));
-      const author = actorFactory();
+      const mentioned = accountFactory();
+      const quoted = accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: mentioned.did }));
+      registrationQuery.add(registrationFactory({ accountDid: quoted.did }));
+      const author = accountFactory();
       const cid = await randomCid();
       const postRecord = (rkey: string, did: string, withMention: boolean) => {
         const subject = { uri: `at://${did}/app.bsky.feed.post/subject`, cid };
@@ -248,11 +248,11 @@ describe("PostIndexer", () => {
       // arrange
       const ancestors = [];
       for (let i = 0; i < 5; i++) {
-        const actor = actorFactory();
-        subscriptionQuery.add(subscriptionFactory({ actorDid: actor.did }));
+        const account = accountFactory();
+        registrationQuery.add(registrationFactory({ accountDid: account.did }));
         const { post } = postFactory({
-          actorDid: actor.did,
-          uri: `at://${actor.did}/app.bsky.feed.post/ancestor${i}`,
+          accountDid: account.did,
+          uri: `at://${account.did}/app.bsky.feed.post/ancestor${i}`,
           replyParent: ancestors[0] && {
             uri: ancestors[0].uri,
             cid: ancestors[0].cid,
@@ -264,7 +264,7 @@ describe("PostIndexer", () => {
       const [parent] = ancestors;
       assert(parent);
       const record = recordFactory({
-        uri: `at://${actorFactory().did}/app.bsky.feed.post/reply`,
+        uri: `at://${accountFactory().did}/app.bsky.feed.post/reply`,
         json: {
           $type: "app.bsky.feed.post",
           text: "reply",
@@ -282,7 +282,7 @@ describe("PostIndexer", () => {
       // assert
       expect(notificationRepo.findAll()).toMatchObject(
         ancestors.slice(0, 4).map((ancestor) => ({
-          recipientDid: ancestor.actorDid,
+          recipientDid: ancestor.accountDid,
           reason: "reply",
           reasonSubject: ancestor.uri.toString(),
         })),
@@ -291,10 +291,10 @@ describe("PostIndexer", () => {
   });
 
   describe("afterAction", () => {
-    test("投稿時にpost_statsとactorの投稿数の集計がスケジュールされる", async () => {
+    test("投稿時にpost_statsとaccountの投稿数の集計がスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const author = actorFactory();
+      const author = accountFactory();
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/postkey111`,
         json: {
@@ -314,7 +314,7 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+      expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
         author.did,
       );
       const uris = jobScheduler.getAggregatePostStatsUris();
@@ -324,11 +324,11 @@ describe("PostIndexer", () => {
     test("リプライの場合、親投稿に対してreply集計ジョブがスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const parentAuthor = actorFactory();
+      const parentAuthor = accountFactory();
       const parentUri = `at://${parentAuthor.did}/app.bsky.feed.post/parentpost`;
       const parentCid = await randomCid();
 
-      const replier = actorFactory();
+      const replier = accountFactory();
       const record = recordFactory({
         uri: `at://${replier.did}/app.bsky.feed.post/replypost`,
         json: {
@@ -358,7 +358,7 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+      expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
         replier.did,
       );
       const uris = jobScheduler.getAggregatePostStatsUris();
@@ -368,13 +368,13 @@ describe("PostIndexer", () => {
     test("引用投稿の場合、quote集計ジョブがスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const quotedAuthor = actorFactory();
+      const quotedAuthor = accountFactory();
       const quotedUri = `at://${quotedAuthor.did}/app.bsky.feed.post/quotedpost`;
       const quotedCid = await randomCid();
 
-      const quotingActor = actorFactory();
+      const quotingAccount = accountFactory();
       const record = recordFactory({
-        uri: `at://${quotingActor.did}/app.bsky.feed.post/quotepost`,
+        uri: `at://${quotingAccount.did}/app.bsky.feed.post/quotepost`,
         json: {
           $type: "app.bsky.feed.post",
           text: "This is a quote post",
@@ -406,7 +406,7 @@ describe("PostIndexer", () => {
     test("親投稿が存在しない場合でも親投稿に対する集計ジョブがスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const replier = actorFactory();
+      const replier = accountFactory();
       const nonExistentParentUri =
         "at://did:plc:nonexistent/app.bsky.feed.post/parent";
       const nonExistentParentCid = await randomCid();
@@ -439,17 +439,17 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+      expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
         replier.did,
       );
       const uris = jobScheduler.getAggregatePostStatsUris();
       expect(uris).toContainEqual(new AtUri(nonExistentParentUri));
     });
 
-    test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがactor_statsは更新する", async () => {
+    test("投稿の削除時に呼ばれたafterActioの場合、post_statsは更新しないがaccount_statsは更新する", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const author = actorFactory();
+      const author = accountFactory();
       const record = recordFactory({
         uri: `at://${author.did}/app.bsky.feed.post/deletedpost`,
         json: {
@@ -463,7 +463,7 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "delete", ctx, record });
 
       // assert
-      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+      expect(jobScheduler.getAggregateAccountStatsDids()).toContainEqual(
         author.did,
       );
 

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { SubscriberListContainer } from "@/app/features/admin/blocks/subscriber-list-container";
+import { RegisteredAccountListContainer } from "@/app/features/admin/blocks/registered-account-list-container";
 
 import { AdminPage } from "./admin-page";
 
@@ -14,8 +14,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Subscribers: Story = {
+export const RegisteredAccounts: Story = {
   args: {
-    children: <SubscriberListContainer />,
+    children: <RegisteredAccountListContainer />,
   },
 };

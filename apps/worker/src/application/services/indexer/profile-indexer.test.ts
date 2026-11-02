@@ -1,4 +1,4 @@
-import { actorFactory, fakeCid, recordFactory } from "@repo/common/test";
+import { accountFactory, fakeCid, recordFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
@@ -18,11 +18,11 @@ describe("ProfileIndexer", () => {
     test("プロフィールレコードを正しく保存する", async () => {
       const ctx = { db };
       // arrange
-      const actor = actorFactory();
+      const account = accountFactory();
       const avatarCid = fakeCid();
       const bannerCid = fakeCid();
       const record = recordFactory({
-        uri: `at://${actor.did}/app.bsky.actor.profile/self`,
+        uri: `at://${account.did}/app.bsky.actor.profile/self`,
         json: {
           $type: "app.bsky.actor.profile",
           displayName: "Test User",
@@ -55,7 +55,7 @@ describe("ProfileIndexer", () => {
       expect(profile).toMatchObject({
         uri: record.uri,
         cid: record.cid,
-        actorDid: actor.did,
+        accountDid: account.did,
         displayName: "Test User",
         description: "Test description",
         avatarCid,

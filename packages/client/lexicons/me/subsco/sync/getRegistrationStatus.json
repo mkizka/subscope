@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.sync.getRegistrationStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the registration status for the authenticated user",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "union",
+          "refs": ["#registered", "#notRegistered"]
+        }
+      }
+    },
+    "registered": {
+      "type": "object",
+      "required": ["isRegistered"],
+      "properties": {
+        "isRegistered": {
+          "type": "boolean",
+          "const": true,
+          "description": "The user is registered"
+        }
+      }
+    },
+    "notRegistered": {
+      "type": "object",
+      "required": ["isRegistered"],
+      "properties": {
+        "isRegistered": {
+          "type": "boolean",
+          "const": false,
+          "description": "The user is not registered"
+        }
+      }
+    }
+  }
+}

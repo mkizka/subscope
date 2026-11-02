@@ -1,4 +1,4 @@
-import { actorFactory } from "@repo/common/test";
+import { accountFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -7,7 +7,7 @@ import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 
 describe("UpsertIdentityUseCase", () => {
   let upsertIdentityUseCase: TestServices["upsertIdentityUseCase"];
-  let actorRepo: TestServices["actorRepository"];
+  let accountRepo: TestServices["accountRepository"];
   let db: TestServices["db"];
   let didResolver: TestServices["didResolver"];
   let handleResolver: TestServices["handleResolver"];
@@ -15,7 +15,7 @@ describe("UpsertIdentityUseCase", () => {
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     upsertIdentityUseCase = services.upsertIdentityUseCase;
-    actorRepo = services.actorRepository;
+    accountRepo = services.accountRepository;
     db = services.db;
     didResolver = services.didResolver;
     handleResolver = services.handleResolver;
@@ -34,22 +34,22 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.find({
+    const foundAccount = await accountRepo.find({
       ctx,
       did: command.did,
     });
-    expect(foundActor).toBeNull();
+    expect(foundAccount).toBeNull();
   });
 
-  test("ハンドルがある場合はactorを保存する", async () => {
+  test("ハンドルがある場合はaccountを保存する", async () => {
     // arrange
-    const actor = actorFactory({
+    const account = accountFactory({
       handle: "old-handle.bsky.social",
     });
-    actorRepo.add(actor);
+    accountRepo.add(account);
 
     const command: UpsertIdentityCommand = {
-      did: actor.did,
+      did: account.did,
       handle: "new-handle.bsky.social",
       status: "active",
     };
@@ -58,67 +58,67 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.find({
+    const foundAccount = await accountRepo.find({
       ctx,
       did: command.did,
     });
-    expect(foundActor).not.toBeNull();
-    expect(foundActor?.handle).toBe(command.handle);
+    expect(foundAccount).not.toBeNull();
+    expect(foundAccount?.handle).toBe(command.handle);
   });
 
   test("resolveDid-4: Tapのidentityイベントのハンドルが handle.invalid のときは、DIDドキュメントからハンドルを解決し直す", async () => {
     // arrange
-    const actor = actorFactory();
-    didResolver.setResolveResult(actor.did, {
+    const account = accountFactory();
+    didResolver.setResolveResult(account.did, {
       handle: asHandle("alice.test"),
       signingKey: "test-key",
       pds: new URL("https://example.com"),
     });
-    handleResolver.add(asHandle("alice.test"), actor.did);
+    handleResolver.add(asHandle("alice.test"), account.did);
 
     // act
     await upsertIdentityUseCase.execute({
-      did: actor.did,
+      did: account.did,
       handle: asHandle("handle.invalid"),
       status: "active",
     });
 
     // assert
-    const foundActor = await actorRepo.find({ ctx, did: actor.did });
-    expect(foundActor?.handle).toBe("alice.test");
+    const foundAccount = await accountRepo.find({ ctx, did: account.did });
+    expect(foundAccount?.handle).toBe("alice.test");
   });
 
-  test("account-1: アカウントの状態をアクターに保存する", async () => {
+  test("account-1: アカウントの状態をアカウントに保存する", async () => {
     // arrange
-    const actor = actorFactory();
-    actorRepo.add(actor);
+    const account = accountFactory();
+    accountRepo.add(account);
 
     // act
     await upsertIdentityUseCase.execute({
-      did: actor.did,
+      did: account.did,
       handle: asHandle("alice.test"),
       status: "takendown",
     });
 
     // assert
-    const foundActor = await actorRepo.find({ ctx, did: actor.did });
-    expect(foundActor?.status).toBe("takendown");
+    const foundAccount = await accountRepo.find({ ctx, did: account.did });
+    expect(foundAccount?.status).toBe("takendown");
   });
 
-  test("account-2: 状態が deleted のアカウントは、アクターを削除する", async () => {
+  test("account-2: 状態が deleted のアカウントは、アカウントを削除する", async () => {
     // arrange
-    const actor = actorFactory();
-    actorRepo.add(actor);
+    const account = accountFactory();
+    accountRepo.add(account);
 
     // act
     await upsertIdentityUseCase.execute({
-      did: actor.did,
+      did: account.did,
       handle: asHandle("alice.test"),
       status: "deleted",
     });
 
     // assert
-    const foundActor = await actorRepo.find({ ctx, did: actor.did });
-    expect(foundActor).toBeNull();
+    const foundAccount = await accountRepo.find({ ctx, did: account.did });
+    expect(foundAccount).toBeNull();
   });
 });

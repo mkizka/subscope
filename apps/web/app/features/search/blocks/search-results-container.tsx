@@ -10,7 +10,7 @@ type SearchResponse = Awaited<ReturnType<typeof loader>>["data"];
 
 type Props = {
   q: string;
-  tab: "actors" | "posts";
+  tab: "accounts" | "posts";
 };
 
 export function SearchResultsContainer({ q, tab }: Props) {
@@ -34,5 +34,7 @@ export function SearchResultsContainer({ q, tab }: Props) {
       </div>
     );
   }
-  return <SearchResults tab={tab} actors={data.actors} posts={data.posts} />;
+  return (
+    <SearchResults tab={tab} accounts={data.accounts} posts={data.posts} />
+  );
 }

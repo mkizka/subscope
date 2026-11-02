@@ -4,7 +4,7 @@ import type { AtUriString } from "@atproto/syntax";
 export type ListDto = {
   uri: AtUriString;
   cid: string;
-  actorDid: Did;
+  accountDid: Did;
   name: string;
   purpose: string;
   description: string | null;

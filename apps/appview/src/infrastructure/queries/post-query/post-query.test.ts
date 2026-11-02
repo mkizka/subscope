@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import {
-  actorFactory,
+  accountFactory,
   postEmbedExternalFactory,
   postEmbedImageFactory,
   postEmbedRecordFactory,
@@ -39,7 +39,7 @@ describe("PostQuery", () => {
       expect(result).toEqual([
         {
           uri: post.uri,
-          actorDid: post.actorDid,
+          accountDid: post.accountDid,
           embedImages: [],
           embedGallery: [],
           embedExternal: null,
@@ -97,9 +97,9 @@ describe("PostQuery", () => {
   describe("findReplies", () => {
     test("リプライが存在しない場合、空の配列を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => record })
@@ -114,16 +114,16 @@ describe("PostQuery", () => {
 
     test("リプライが存在する場合、sortAtの昇順で返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const parentPost = await postFactory(ctx.db)
         .vars({ record: () => parentRecord })
         .create();
 
       const replyRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const reply1 = await postFactory(ctx.db)
         .vars({ record: () => replyRecord1 })
@@ -137,7 +137,7 @@ describe("PostQuery", () => {
         .create();
 
       const replyRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const reply2 = await postFactory(ctx.db)
         .vars({ record: () => replyRecord2 })
@@ -161,9 +161,9 @@ describe("PostQuery", () => {
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const parentPost = await postFactory(ctx.db)
         .vars({ record: () => parentRecord })
@@ -172,7 +172,7 @@ describe("PostQuery", () => {
       const replyRecords = await Promise.all(
         Array.from({ length: 3 }, () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         ),
       );
@@ -199,23 +199,23 @@ describe("PostQuery", () => {
 
     test("異なる投稿へのリプライは含まれない", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const parentRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const parentPost1 = await postFactory(ctx.db)
         .vars({ record: () => parentRecord1 })
         .create();
 
       const parentRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const parentPost2 = await postFactory(ctx.db)
         .vars({ record: () => parentRecord2 })
         .create();
 
       const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await postFactory(ctx.db)
         .vars({ record: () => replyRecord })
@@ -238,9 +238,9 @@ describe("PostQuery", () => {
   describe("search", () => {
     test("検索クエリに一致する投稿がない場合、空の配列を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await postFactory(ctx.db)
         .vars({ record: () => record })
@@ -261,9 +261,9 @@ describe("PostQuery", () => {
 
     test("検索クエリに一致する投稿がある場合、その投稿を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => record })
@@ -285,9 +285,9 @@ describe("PostQuery", () => {
 
     test("検索クエリは大文字小文字を区別しない", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => record })
@@ -309,16 +309,16 @@ describe("PostQuery", () => {
 
     test("リプライ投稿は検索結果に含まれない", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const parentRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const parentPost = await postFactory(ctx.db)
         .vars({ record: () => parentRecord })
         .create();
 
       const replyRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await postFactory(ctx.db)
         .vars({ record: () => replyRecord })
@@ -343,11 +343,11 @@ describe("PostQuery", () => {
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const records = await Promise.all(
         Array.from({ length: 3 }, () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         ),
       );
@@ -374,9 +374,9 @@ describe("PostQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前の投稿を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => record1 })
@@ -387,7 +387,7 @@ describe("PostQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await postFactory(ctx.db)
         .vars({ record: () => record2 })
@@ -413,9 +413,9 @@ describe("PostQuery", () => {
 
     test("検索クエリに含まれるワイルドカード文字はエスケープされる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const record1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => record1 })
@@ -425,7 +425,7 @@ describe("PostQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await postFactory(ctx.db)
         .vars({ record: () => record2 })

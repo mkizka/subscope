@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getList from "@repo/client/lex/app/bsky/graph/getList";
 import {
-  actorFactory,
+  accountFactory,
   listFactory,
   listItemFactory,
   recordFactory,
@@ -14,21 +14,21 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.graph.getList", () => {
   const { ctx } = testSetup;
 
-  test("getList-1: 指定したリストのlistViewと、リストに追加されたアクターのprofileViewをitemsで返す", async () => {
+  test("getList-1: 指定したリストのlistViewと、リストに追加されたアカウントのprofileViewをitemsで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const creator = await actorFactory(ctx.db)
+    const creator = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const list = await listFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.list")
-            .vars({ actorDid: () => creator.did })
+            .vars({ accountDid: () => creator.did })
             .create(),
       })
       .create();
-    const subject = await actorFactory(ctx.db)
+    const subject = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const listItem = await listItemFactory(ctx.db)

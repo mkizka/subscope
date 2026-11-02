@@ -12,7 +12,7 @@ export const searchSchema = z.object({
 
 type Props = {
   q?: string;
-  tab: "actors" | "posts";
+  tab: "accounts" | "posts";
 };
 
 export const SearchFormContainer = ({ q, tab }: Props) => {

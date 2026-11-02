@@ -29,7 +29,7 @@ export class InMemoryJobScheduler implements IJobScheduler {
   private syncTapRepoJobs: ScheduledSyncTapRepo[] = [];
   private checkBackfillJobs: ScheduledCheckBackfill[] = [];
   private aggregatePostStatsUris: AtUri[] = [];
-  private aggregateActorStatsDids: Did[] = [];
+  private aggregateAccountStatsDids: Did[] = [];
 
   async scheduleFetchRecord(
     uri: AtUri,
@@ -57,8 +57,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.aggregatePostStatsUris.push(uri);
   }
 
-  async scheduleAggregateActorStats(did: Did): Promise<void> {
-    this.aggregateActorStatsDids.push(did);
+  async scheduleAggregateAccountStats(did: Did): Promise<void> {
+    this.aggregateAccountStatsDids.push(did);
   }
 
   getFetchRecordJobs(): readonly ScheduledFetchRecord[] {
@@ -81,8 +81,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     return this.aggregatePostStatsUris;
   }
 
-  getAggregateActorStatsDids(): readonly Did[] {
-    return this.aggregateActorStatsDids;
+  getAggregateAccountStatsDids(): readonly Did[] {
+    return this.aggregateAccountStatsDids;
   }
 
   clear(): void {
@@ -91,6 +91,6 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.syncTapRepoJobs = [];
     this.checkBackfillJobs = [];
     this.aggregatePostStatsUris = [];
-    this.aggregateActorStatsDids = [];
+    this.aggregateAccountStatsDids = [];
   }
 }

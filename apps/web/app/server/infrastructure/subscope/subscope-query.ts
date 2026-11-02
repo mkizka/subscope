@@ -1,17 +1,17 @@
 import { Client } from "@atproto/lex";
-import getMembers from "@repo/client/lex/me/subsco/server/getMembers";
+import getRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
 import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
-import getTrackedActors from "@repo/client/lex/me/subsco/server/getTrackedActors";
-import getSubscriptionStatus, {
-  subscribed,
-} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import getTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAccounts";
+import getRegistrationStatus, {
+  registered,
+} from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 import type { BackfillStatus } from "@repo/common/domain";
 
 import { env } from "@/app/server/env";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export type MembersDto = {
-  members: {
+  registeredAccounts: {
     did: string;
     handle: string;
     displayName?: string;
@@ -23,23 +23,23 @@ export type MembersDto = {
   hasMore: boolean;
 };
 
-export type TrackedActorsDto = {
+export type TrackedAccountsDto = {
   total: number;
-  actors: {
+  accounts: {
     did: string;
     handle: string;
     displayName?: string;
     avatarUrl?: string;
-    subscriberFollowersCount: number;
+    registeredFollowersCount: number;
     backfillStatus?: BackfillStatus;
   }[];
 };
 
 export interface ISubscopeQuery {
   isInitialized: () => Promise<boolean>;
-  isSubscribed: (did: string) => Promise<boolean>;
-  findMembers: () => Promise<MembersDto>;
-  findTrackedActors: (did: string) => Promise<TrackedActorsDto>;
+  isRegistered: (did: string) => Promise<boolean>;
+  findMembers: (q?: string) => Promise<MembersDto>;
+  findTrackedAccounts: (did: string, q?: string) => Promise<TrackedAccountsDto>;
 }
 
 export const subscopeQueryFactory = ({
@@ -62,17 +62,21 @@ export const subscopeQueryFactory = ({
       const { initialized } = await publicClient.call(getSetupStatus);
       return initialized;
     },
-    async isSubscribed(did) {
-      const response = await (await restore(did)).call(getSubscriptionStatus);
-      return subscribed.isTypeOf(response);
+    async isRegistered(did) {
+      const response = await (await restore(did)).call(getRegistrationStatus);
+      return registered.isTypeOf(response);
     },
-    async findMembers() {
+    async findMembers(q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-      const { members, cursor } = await publicClient.call(getMembers, {
-        limit: 100,
-      });
+      const { registeredAccounts, cursor } = await publicClient.call(
+        getRegisteredAccounts,
+        {
+          limit: 100,
+          q,
+        },
+      );
       return {
-        members: members.map(({ profile, isAdmin }) => ({
+        registeredAccounts: registeredAccounts.map(({ profile, isAdmin }) => ({
           did: profile.did,
           handle: profile.handle,
           displayName: profile.displayName,
@@ -83,20 +87,22 @@ export const subscopeQueryFactory = ({
         hasMore: cursor !== undefined,
       };
     },
-    async findTrackedActors(did) {
+    async findTrackedAccounts(did, q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-      const { trackedActors, total } = await (
+      const { trackedAccounts, total } = await (
         await restore(did)
-      ).call(getTrackedActors, { limit: 100 });
+      ).call(getTrackedAccounts, { limit: 100, q });
       return {
         total,
-        actors: trackedActors.map(({ profile, subscriberFollowersCount }) => ({
-          did: profile.did,
-          handle: profile.handle,
-          displayName: profile.displayName,
-          avatarUrl: profile.avatar,
-          subscriberFollowersCount,
-        })),
+        accounts: trackedAccounts.map(
+          ({ profile, registeredFollowersCount }) => ({
+            did: profile.did,
+            handle: profile.handle,
+            displayName: profile.displayName,
+            avatarUrl: profile.avatar,
+            registeredFollowersCount,
+          }),
+        ),
       };
     },
   };

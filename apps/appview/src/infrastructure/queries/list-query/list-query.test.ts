@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
-  actorFactory,
+  accountFactory,
   listFactory,
   listItemFactory,
   recordFactory,
@@ -16,9 +16,9 @@ describe("ListQuery", () => {
 
   const listQuery = new ListQuery(ctx.db);
 
-  test("findByActor: 指定したアクターと用途のリストのうち、カーソルより古いものを新しい順に返す", async () => {
+  test("findByAccount: 指定したアカウントと用途のリストのうち、カーソルより古いものを新しい順に返す", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const listAt = (
       createdAt: string,
       purpose = "app.bsky.graph.defs#curatelist",
@@ -27,7 +27,7 @@ describe("ListQuery", () => {
         .vars({
           record: () =>
             recordFactory(ctx.db, "app.bsky.graph.list")
-              .vars({ actor: () => actor })
+              .vars({ account: () => account })
               .create(),
         })
         .props({
@@ -44,8 +44,8 @@ describe("ListQuery", () => {
     ]);
 
     // act
-    const result = await listQuery.findByActor({
-      actorDid: asDid(actor.did),
+    const result = await listQuery.findByAccount({
+      accountDid: asDid(account.did),
       limit: 10,
       cursor: "2024-01-03T00:00:00.000Z",
       purposes: ["app.bsky.graph.defs#curatelist"],

@@ -6,7 +6,7 @@ import type { Record } from "../record/record.js";
 export type ListItemParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   listUri: AtUri | string;
   subjectDid: string;
   createdAt: Date;
@@ -16,7 +16,7 @@ export type ListItemParams = {
 export class ListItem {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly listUri: AtUri;
   readonly subjectDid: Did;
   readonly createdAt: Date;
@@ -25,7 +25,7 @@ export class ListItem {
   constructor(params: ListItemParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.listUri = new AtUri(params.listUri.toString());
     this.subjectDid = asDid(params.subjectDid);
     this.createdAt = params.createdAt;
@@ -37,7 +37,7 @@ export class ListItem {
     return new ListItem({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       listUri: parsed.list,
       subjectDid: parsed.subject,
       createdAt: new Date(parsed.createdAt),

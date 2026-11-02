@@ -29,7 +29,7 @@ export class LikeQuery implements ILikeQuery {
       .from(schema.likes)
       .where(
         and(
-          eq(schema.likes.actorDid, viewerDid),
+          eq(schema.likes.accountDid, viewerDid),
           inArray(
             schema.likes.subjectUri,
             subjectUris.map((uri) => uri.toString()),
@@ -42,16 +42,16 @@ export class LikeQuery implements ILikeQuery {
     }));
   }
 
-  async findActorLikeFeedItems({
-    actorDid,
+  async findAccountLikeFeedItems({
+    accountDid,
     limit,
     cursor,
   }: {
-    actorDid: Did;
+    accountDid: Did;
     limit: number;
     cursor?: Date;
   }): Promise<FeedItemDto[]> {
-    const filters = [eq(schema.likes.actorDid, actorDid)];
+    const filters = [eq(schema.likes.accountDid, accountDid)];
     if (cursor) {
       filters.push(lt(schema.likes.sortAt, cursor));
     }
@@ -68,7 +68,7 @@ export class LikeQuery implements ILikeQuery {
       uri: asAtUriString(row.subjectUri),
       type: "post",
       subjectUri: null,
-      actorDid,
+      accountDid,
       sortAt: row.sortAt,
     }));
   }
@@ -88,7 +88,7 @@ export class LikeQuery implements ILikeQuery {
     }
     const rows = await this.db
       .select({
-        actorDid: schema.likes.actorDid,
+        accountDid: schema.likes.accountDid,
         createdAt: schema.likes.createdAt,
         sortAt: schema.likes.sortAt,
       })
@@ -96,6 +96,6 @@ export class LikeQuery implements ILikeQuery {
       .where(and(...filters))
       .orderBy(desc(schema.likes.sortAt))
       .limit(limit);
-    return rows.map((row) => ({ ...row, actorDid: asDid(row.actorDid) }));
+    return rows.map((row) => ({ ...row, accountDid: asDid(row.accountDid) }));
   }
 }

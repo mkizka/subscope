@@ -4,16 +4,16 @@
 
 Repository層のテストで実DBを使用する場合に使用。
 
-### actorFactory
+### accountFactory
 
 ```typescript
-import { actorFactory } from "@repo/test-utils";
+import { accountFactory } from "@repo/test-utils";
 
 // 基本的な使い方
-const actor = await actorFactory(ctx.db).create();
+const account = await accountFactory(ctx.db).create();
 
 // カスタマイズ
-const actor = await actorFactory(ctx.db)
+const account = await accountFactory(ctx.db)
   .vars({ handle: () => "custom.bsky.social" })
   .create();
 ```
@@ -26,7 +26,7 @@ import { recordFactory } from "@repo/test-utils";
 // 基本的な投稿
 const record = await recordFactory(ctx.db, "app.bsky.feed.post")
   .vars({
-    actor: () => actor,
+    account: () => account,
     text: () => "custom text",
   })
   .create();
@@ -42,7 +42,7 @@ import { profileFactory } from "@repo/test-utils";
 
 const profile = await profileFactory(ctx.db)
   .vars({
-    actor: () => actor,
+    account: () => account,
     displayName: () => "Test User",
   })
   .create();
@@ -52,12 +52,12 @@ const profile = await profileFactory(ctx.db)
 
 Application/Domain層のテストでインメモリリポジトリを使用する場合。
 
-### actorFactory（インメモリ版）
+### accountFactory（インメモリ版）
 
 ```typescript
-import { actorFactory } from "@repo/common/test";
+import { accountFactory } from "@repo/common/test";
 
-const actor = actorFactory({
+const account = accountFactory({
   did: "did:plc:test123",
   handle: "test.bsky.social",
 });
@@ -69,7 +69,7 @@ const actor = actorFactory({
 import { profileDetailedFactory } from "@repo/common/test";
 
 const profile = profileDetailedFactory({
-  actorDid: actor.did,
+  accountDid: account.did,
   displayName: "Test User",
   description: "Test description",
 });
@@ -81,7 +81,7 @@ const profile = profileDetailedFactory({
 import { recordFactory } from "@repo/common/test";
 
 const record = recordFactory({
-  uri: `at://${actor.did}/app.bsky.feed.post/postkey123`,
+  uri: `at://${account.did}/app.bsky.feed.post/postkey123`,
   json: {
     $type: "app.bsky.feed.post",
     text: "test post",

@@ -30,9 +30,9 @@ describe("UseCase名", () => {
 
   test("テストケース名", async () => {
     // arrange
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const record = await recordFactory(ctx.db, "app.bsky.feed.post")
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .create();
 
     // act & assert
@@ -45,7 +45,7 @@ describe("UseCase名", () => {
 `@repo/common/test`のファクトリ関数を使用:
 
 ```typescript
-import { actorFactory, profileDetailedFactory } from "@repo/common/test";
+import { accountFactory, profileDetailedFactory } from "@repo/common/test";
 import { testInjector } from "../../../shared/test-utils.js";
 
 describe("Service名", () => {
@@ -54,9 +54,9 @@ describe("Service名", () => {
 
   test("テストケース名", async () => {
     // arrange
-    const actor = actorFactory({ handle: "test.bsky.social" });
+    const account = accountFactory({ handle: "test.bsky.social" });
     const profile = profileDetailedFactory({
-      actorDid: actor.did,
+      accountDid: account.did,
       displayName: "Test User",
     });
     profileRepo.add(profile);
@@ -96,14 +96,14 @@ const record = recordFactory({
   uri: `at://${replier.did}/app.bsky.feed.post/reply123`,
   json: {
     $type: "app.bsky.feed.post",
-    text: "reply to subscriber",
+    text: "reply to registered account",
     reply: {
       parent: {
-        uri: `at://${subscriberDid}/app.bsky.feed.post/original123`,
+        uri: `at://${registeredAccountDid}/app.bsky.feed.post/original123`,
         cid: fakeCid(),
       },
       root: {
-        uri: `at://${subscriberDid}/app.bsky.feed.post/original123`,
+        uri: `at://${registeredAccountDid}/app.bsky.feed.post/original123`,
         cid: fakeCid(),
       },
     },

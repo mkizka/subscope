@@ -26,7 +26,7 @@ test.describe("検索", () => {
     });
   });
 
-  test("search-1: 左カラムの「検索」から開いた検索欄で検索すると、表示名またはハンドルが検索語に部分一致するユーザー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("search-1: 左カラムの「検索」から開いた検索欄で検索すると、表示名またはハンドルが検索語に部分一致するアカウント（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.goto("/");
@@ -49,7 +49,7 @@ test.describe("検索", () => {
     await expect(alice.getByText("Blueskyを使っています")).toBeVisible();
   });
 
-  test("search-2: 一覧のユーザーを選ぶと、そのユーザーのプロフィール全体ページに移動する", async ({
+  test("search-2: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     const link = page.getByRole("main").getByRole("link", { name: /^Alice/ });
@@ -68,7 +68,7 @@ test.describe("検索", () => {
     ).toBeVisible();
   });
 
-  test("search-3: 一致するユーザーがいないときは「ユーザーが見つかりません」と表示する", async ({
+  test("search-3: 一致するアカウントがないときは「ユーザーが見つかりません」と表示する", async ({
     page,
   }) => {
     await page.goto("/search?q=nobody-matches-this");
@@ -139,7 +139,7 @@ test.describe("検索", () => {
     await expect(button).toBeEnabled();
   });
 
-  test("search-8: ユーザーの検索結果には、過去の投稿の同期状態を表示する", async ({
+  test("search-8: アカウントの検索結果には、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     const alice = page

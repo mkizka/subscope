@@ -7,7 +7,7 @@ import type { Record } from "../record/record.js";
 export type GeneratorParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   did: string;
   displayName: string;
   description?: string;
@@ -19,7 +19,7 @@ export type GeneratorParams = {
 export class Generator {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly did: Did;
   readonly displayName: string;
   readonly description?: string;
@@ -30,7 +30,7 @@ export class Generator {
   constructor(params: GeneratorParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.did = asDid(params.did);
     this.displayName = params.displayName;
     this.description = params.description;
@@ -44,7 +44,7 @@ export class Generator {
     return new Generator({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       did: parsed.did,
       displayName: parsed.displayName,
       description: parsed.description,

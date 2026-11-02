@@ -7,7 +7,7 @@ export function generatorFactory(params?: Partial<GeneratorParams>): Generator {
   return new Generator({
     uri: params?.uri ?? fakeAtUri({ collection: "app.bsky.feed.generator" }),
     cid: params?.cid ?? fakeCid(),
-    actorDid: params?.actorDid ?? fakeDid(),
+    accountDid: params?.accountDid ?? fakeDid(),
     did: params?.did ?? fakeDid(),
     displayName: params?.displayName ?? faker.lorem.words(3),
     description: params?.description,

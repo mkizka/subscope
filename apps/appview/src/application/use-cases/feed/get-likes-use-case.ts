@@ -33,13 +33,13 @@ export class GetLikesUseCase {
     const likes = await Promise.all(
       page.items.map(
         async (like): Promise<AppBskyFeedGetLikes.Like | undefined> => {
-          const actor = await this.profileViews.view(like.actorDid, ctx);
+          const account = await this.profileViews.view(like.accountDid, ctx);
           return (
-            actor && {
+            account && {
               $type: "app.bsky.feed.getLikes#like",
               indexedAt: toDatetimeString(like.sortAt), // TODO: indexedAtに修正
               createdAt: toDatetimeString(like.createdAt),
-              actor,
+              actor: account,
             }
           );
         },

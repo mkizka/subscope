@@ -14,9 +14,9 @@ import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/lex/app/bsky/feed/post";
 import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
 import { link, mention } from "@repo/client/lex/app/bsky/richtext/facet";
-import getSubscriptionStatus, {
-  subscribed,
-} from "@repo/client/lex/me/subsco/sync/getSubscriptionStatus";
+import getRegistrationStatus, {
+  registered,
+} from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
@@ -33,6 +33,7 @@ export type TimelinePostDto = {
   viewerLike?: string;
   viewerRepost?: string;
   replyRoot?: { uri: string; cid: string };
+  replyParentUri?: string;
   authorAvatar?: string;
   authorDisplayName?: string;
   authorHandle: string;
@@ -49,12 +50,17 @@ export type TimelinePostDto = {
     description: string;
     thumb?: string;
   };
-  quote?: { authorDisplayName?: string; authorHandle: string; text?: string };
+  quote?: {
+    authorDisplayName?: string;
+    authorHandle: string;
+    text?: string;
+    images?: { thumb: string; fullsize: string; alt: string }[];
+  };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };
 
 export interface ITimelineQuery {
-  isSubscribed: (did: string) => Promise<boolean>;
+  isRegistered: (did: string) => Promise<boolean>;
   findPosts: (
     did: string,
     cursor?: string,
@@ -73,9 +79,9 @@ export const timelineQueryFactory = ({
     return agent;
   };
   return {
-    async isSubscribed(did) {
+    async isRegistered(did) {
       const agent = await restore(did);
-      return subscribed.isTypeOf(await agent.call(getSubscriptionStatus));
+      return registered.isTypeOf(await agent.call(getRegistrationStatus));
     },
     async findPosts(did, cursor) {
       const agent = await restore(did);
@@ -109,13 +115,29 @@ export function isShownInFeed({ post, reason }: FeedViewPost) {
   );
 }
 
+function mediaOf(embed: unknown) {
+  return recordWithMediaView.matches(embed) ? embed.media : embed;
+}
+
+function toImages(media: unknown) {
+  return imagesView.matches(media)
+    ? media.images
+    : galleryView.matches(media)
+      ? media.items
+          .filter((item) => galleryViewImage.matches(item))
+          .map(({ thumbnail, fullsize, alt }) => ({
+            thumb: thumbnail,
+            fullsize,
+            alt,
+          }))
+      : undefined;
+}
+
 export function toTimelinePost({
   post,
   reason,
 }: FeedViewPost): TimelinePostDto {
-  const media = recordWithMediaView.matches(post.embed)
-    ? post.embed.media
-    : post.embed;
+  const media = mediaOf(post.embed);
   const quoted = recordWithMediaView.matches(post.embed)
     ? post.embed.record.record
     : recordView.matches(post.embed)
@@ -128,6 +150,9 @@ export function toTimelinePost({
     viewerRepost: post.viewer?.repost,
     replyRoot: postRecord.matches(post.record)
       ? post.record.reply?.root
+      : undefined,
+    replyParentUri: postRecord.matches(post.record)
+      ? post.record.reply?.parent.uri
       : undefined,
     authorAvatar: post.author.avatar,
     authorDisplayName: post.author.displayName,
@@ -148,23 +173,14 @@ export function toTimelinePost({
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
-    images: imagesView.matches(media)
-      ? media.images
-      : galleryView.matches(media)
-        ? media.items
-            .filter((item) => galleryViewImage.matches(item))
-            .map(({ thumbnail, fullsize, alt }) => ({
-              thumb: thumbnail,
-              fullsize,
-              alt,
-            }))
-        : undefined,
+    images: toImages(media),
     external: externalView.matches(media) ? media.external : undefined,
     quote: viewRecord.matches(quoted)
       ? {
           authorDisplayName: quoted.author.displayName,
           authorHandle: quoted.author.handle,
           text: maybeString(quoted.value.text),
+          images: toImages(mediaOf(quoted.embeds?.[0])),
         }
       : undefined,
     createdAt: maybeString(post.record.createdAt),

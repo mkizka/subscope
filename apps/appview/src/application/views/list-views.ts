@@ -32,7 +32,8 @@ export class ListViews {
     ctx: ViewContext,
   ): Promise<AppBskyGraphDefs.ListView | undefined> {
     const list = await ctx.list(uri);
-    const creator = list && (await this.profileViews.view(list.actorDid, ctx));
+    const creator =
+      list && (await this.profileViews.view(list.accountDid, ctx));
     if (!list || !creator) {
       return undefined;
     }
@@ -51,7 +52,7 @@ export class ListViews {
       purpose: list.purpose,
       avatar: list.avatarCid
         ? this.assetUrlBuilder.getAvatarThumbnailUrl(
-            list.actorDid,
+            list.accountDid,
             list.avatarCid,
           )
         : undefined,

@@ -1,0 +1,45 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
+
+import { ListDetail } from "./list-detail";
+
+const meta = {
+  component: ListDetail,
+  args: {
+    uri: "at://did:plc:alice/app.bsky.graph.list/1",
+    name: "友達",
+    description: "よく話す人たち",
+    tab: "posts",
+    isSelf: true,
+    onDelete: fn(),
+    posts: [
+      {
+        uri: "at://did:plc:bob/app.bsky.feed.post/1",
+        cid: "bafyreia",
+        authorHandle: "bob.bsky.social",
+        authorDisplayName: "Bob",
+        text: "こんにちは！",
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+      },
+    ],
+    members: [
+      {
+        listItemUri: "at://did:plc:alice/app.bsky.graph.listitem/1",
+        did: "did:plc:bob",
+        handle: "bob.bsky.social",
+        displayName: "Bob",
+      },
+    ],
+  },
+  parameters: {
+    layout: "fullscreen",
+  },
+} satisfies Meta<typeof ListDetail>;
+
+export default meta;
+
+export const Default: StoryObj<typeof meta> = {};
+
+export const Members: StoryObj<typeof meta> = {
+  args: { tab: "members" },
+};

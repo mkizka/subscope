@@ -1,6 +1,6 @@
 import { asAtIdentifierString } from "@atproto/syntax";
 import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -8,13 +8,13 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.actor.getProfiles", () => {
   const { ctx } = testSetup;
 
-  test("getProfiles-1: DIDとハンドルのどちらでも指定でき、見つかったアクターだけを指定した順に返す", async () => {
+  test("getProfiles-1: DIDとハンドルのどちらでも指定でき、見つかったアカウントだけを指定した順に返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const alice = await actorFactory(ctx.db)
+    const alice = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
-    const bob = await actorFactory(ctx.db)
+    const bob = await accountFactory(ctx.db)
       .props({ handle: () => "bob.test" })
       .use((t) => t.withProfile({}))
       .create();

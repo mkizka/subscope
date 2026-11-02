@@ -15,7 +15,7 @@ export function meta() {
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const agent = await getAgent(request);
   const step = await di.getLoginStepUseCase.execute(agent?.assertDid ?? null);
-  if (step === "subscribed") {
+  if (step === "registered") {
     throw redirect("/");
   }
   return data({ step });
@@ -33,12 +33,12 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return data(submission.reply(), { status: 400 });
   }
 
-  const result = await di.subscribeServerUseCase.execute(
+  const result = await di.registerAccountUseCase.execute(
     agent.assertDid,
     submission.value.inviteCode,
   );
   switch (result) {
-    case "subscribed":
+    case "registered":
       return redirect("/");
     case "invalidInviteCode":
       return data(

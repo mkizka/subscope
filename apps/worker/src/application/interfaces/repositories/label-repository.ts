@@ -15,7 +15,7 @@ export interface ILabelRepository {
   save: (params: {
     ctx: TransactionContext;
     label: LabelData;
-    actorDid: Did;
+    accountDid: Did;
   }) => Promise<void>;
   delete: (params: {
     ctx: TransactionContext;

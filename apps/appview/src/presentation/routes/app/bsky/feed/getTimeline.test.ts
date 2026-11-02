@@ -1,6 +1,6 @@
 import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 import {
-  actorFactory,
+  accountFactory,
   followFactory,
   postFactory,
   postFeedItemFactory,
@@ -16,19 +16,21 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("app.bsky.feed.getTimeline", () => {
   const { ctx } = testSetup;
 
-  type Actor = Awaited<ReturnType<ReturnType<typeof actorFactory>["create"]>>;
+  type Account = Awaited<
+    ReturnType<ReturnType<typeof accountFactory>["create"]>
+  >;
 
-  const createActor = () =>
-    actorFactory(ctx.db)
+  const createAccount = () =>
+    accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
 
-  const follow = (actor: Actor, followee: Actor) =>
+  const follow = (account: Account, followee: Account) =>
     followFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         followee: () => followee,
       })
@@ -37,7 +39,7 @@ describe("app.bsky.feed.getTimeline", () => {
   type ReplyTo = { uri: string; cid: string };
 
   const createPost = async (
-    actor: Actor,
+    account: Account,
     createdAt = new Date(),
     replyTo?: [parent: ReplyTo, root?: ReplyTo],
   ) => {
@@ -46,7 +48,7 @@ describe("app.bsky.feed.getTimeline", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
       })
       .props({ createdAt: () => createdAt })
@@ -57,13 +59,13 @@ describe("app.bsky.feed.getTimeline", () => {
     return post;
   };
 
-  const createRepost = async (actor: Actor) => {
-    const subject = await createPost(await createActor());
+  const createRepost = async (account: Account) => {
+    const subject = await createPost(await createAccount());
     const repost = await repostFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.repost")
-            .vars({ actor: () => actor })
+            .vars({ account: () => account })
             .create(),
         subject: () => subject,
       })
@@ -85,11 +87,11 @@ describe("app.bsky.feed.getTimeline", () => {
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("getTimeline-2: 閲覧者本人とフォロイーの投稿・リポストを含める", async () => {
+  test("getTimeline-2: 閲覧者本人とフォロー先の投稿・リポストを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
-    const followee = await createActor();
+    const viewer = await createAccount();
+    const followee = await createAccount();
     await follow(viewer, followee);
     const ownPost = await createPost(viewer);
     const followeePost = await createPost(followee);
@@ -119,11 +121,11 @@ describe("app.bsky.feed.getTimeline", () => {
     );
   });
 
-  test("getTimeline-3: フォロイー以外の投稿・リポストは含めない", async () => {
+  test("getTimeline-3: フォロー先以外の投稿・リポストは含めない", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
-    const stranger = await createActor();
+    const viewer = await createAccount();
+    const stranger = await createAccount();
     await createPost(stranger);
     await createRepost(stranger);
     loginAs(viewer.did);
@@ -138,7 +140,7 @@ describe("app.bsky.feed.getTimeline", () => {
   test("getTimeline-4: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
+    const viewer = await createAccount();
     const oldPost = await createPost(viewer, new Date("2024-01-01"));
     const middlePost = await createPost(viewer, new Date("2024-01-02"));
     const newPost = await createPost(viewer, new Date("2024-01-03"));
@@ -162,8 +164,8 @@ describe("app.bsky.feed.getTimeline", () => {
   test("getTimeline-5: 投稿者にプロフィールレコードがなくても投稿を含め、authorはDIDとハンドルだけにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
-    const followee = await actorFactory(ctx.db).create();
+    const viewer = await createAccount();
+    const followee = await accountFactory(ctx.db).create();
     await follow(viewer, followee);
     const post = await createPost(followee);
     loginAs(viewer.did);
@@ -185,7 +187,7 @@ describe("app.bsky.feed.getTimeline", () => {
   test("feedViewPost-1: リプライには、スレッドの起点と親の投稿をreplyに含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
+    const viewer = await createAccount();
     const root = await createPost(viewer, new Date("2024-01-01"));
     const parent = await createPost(viewer, new Date("2024-01-02"), [root]);
     await createPost(viewer, new Date("2024-01-03"), [parent, root]);
@@ -208,7 +210,7 @@ describe("app.bsky.feed.getTimeline", () => {
   test("feedViewPost-2: 起点や親の投稿が見つからない場合、replyのその投稿をnotFoundPostにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
+    const viewer = await createAccount();
     const missing = {
       uri: `at://${viewer.did}/app.bsky.feed.post/missing`,
       cid: "bafyreimissing",
@@ -233,7 +235,7 @@ describe("app.bsky.feed.getTimeline", () => {
   test("feedViewPost-3: リポストには、リポストしたアカウントとリポストの日時をreasonに含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await createActor();
+    const viewer = await createAccount();
     const repost = await createRepost(viewer);
     loginAs(viewer.did);
 

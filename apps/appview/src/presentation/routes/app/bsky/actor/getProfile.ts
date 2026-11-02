@@ -24,7 +24,7 @@ export class GetProfile {
         if (!isDid(params.actor) && !isHandle(params.actor)) {
           throw new LexServerError(400, {
             error: "InvalidRequest",
-            message: "Invalid actor",
+            message: "Invalid account",
           });
         }
 

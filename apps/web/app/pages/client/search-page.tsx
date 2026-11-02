@@ -5,7 +5,7 @@ import { SearchResultsContainer } from "@/app/features/search/blocks/search-resu
 
 type Props = {
   q?: string;
-  tab: "actors" | "posts";
+  tab: "accounts" | "posts";
 };
 
 export function SearchPage({ q, tab }: Props) {
@@ -16,7 +16,7 @@ export function SearchPage({ q, tab }: Props) {
       <Tabs
         tabs={(
           [
-            ["actors", "ユーザー", {}],
+            ["accounts", "ユーザー", {}],
             ["posts", "投稿", { tab: "posts" }],
           ] as const
         ).map(([value, label, params]) => ({

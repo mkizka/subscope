@@ -18,7 +18,7 @@ export class PostRepository implements IPostRepository {
     const postUri = post.uri.toString();
     const data = {
       cid: post.cid,
-      actorDid: post.actorDid,
+      accountDid: post.accountDid,
       text: post.text,
       replyRootUri: post.replyRoot?.uri.toString(),
       replyRootCid: post.replyRoot?.cid,

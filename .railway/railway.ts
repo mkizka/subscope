@@ -118,6 +118,7 @@ export default defineRailway(() => {
     volumeMounts: { "/prometheus": prometheusData },
   });
 
+  const grafanaData = volume("grafana-data", { region, sizeMB: 500 });
   const grafana = service("Grafana", {
     source: github("mkizka/subscope", {
       branch: "main",
@@ -126,6 +127,7 @@ export default defineRailway(() => {
     build: { watchPatterns: ["/.railway/grafana/**/*"] },
     replicas: { [region]: 1 },
     domains: ["grafana.subsco.me"],
+    volumeMounts: { "/var/lib/grafana": grafanaData },
     env: {
       GF_SECURITY_ADMIN_PASSWORD: preserve(),
     },
@@ -143,6 +145,7 @@ export default defineRailway(() => {
       worker,
       prometheusData,
       prometheus,
+      grafanaData,
       grafana,
     ],
   });

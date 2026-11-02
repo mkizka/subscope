@@ -6,7 +6,7 @@ import type { Record } from "../record/record.js";
 export type FollowParams = {
   uri: AtUri | string;
   cid: string;
-  actorDid: string;
+  accountDid: string;
   subjectDid: string;
   createdAt: Date;
   indexedAt: Date;
@@ -15,7 +15,7 @@ export type FollowParams = {
 export class Follow {
   readonly uri: AtUri;
   readonly cid: string;
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly subjectDid: Did;
   readonly createdAt: Date;
   readonly indexedAt: Date;
@@ -23,7 +23,7 @@ export class Follow {
   constructor(params: FollowParams) {
     this.uri = new AtUri(params.uri.toString());
     this.cid = params.cid;
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.subjectDid = asDid(params.subjectDid);
     this.createdAt = params.createdAt;
     this.indexedAt = params.indexedAt;
@@ -38,7 +38,7 @@ export class Follow {
     return new Follow({
       uri: record.uri,
       cid: record.cid,
-      actorDid: record.actorDid,
+      accountDid: record.accountDid,
       subjectDid: parsed.subject,
       createdAt: new Date(parsed.createdAt),
       indexedAt: record.indexedAt,

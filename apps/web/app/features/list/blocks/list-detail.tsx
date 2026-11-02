@@ -1,0 +1,106 @@
+import { ConfirmDialog } from "@/app/components/confirm-dialog";
+import { Button } from "@/app/components/ui/button";
+import { Tabs } from "@/app/components/ui/tabs";
+import {
+  type Account,
+  AccountList,
+} from "@/app/features/profile/blocks/account-list";
+import {
+  TimelineFeed,
+  type TimelinePost,
+} from "@/app/features/timeline/blocks/timeline-feed";
+
+import { ListForm } from "./list-form";
+import { AddListMemberForm, RemoveListMemberButton } from "./list-member-forms";
+
+type Props = {
+  uri: string;
+  name: string;
+  description?: string;
+  tab: "posts" | "members";
+  posts: TimelinePost[];
+  members: (Account & { listItemUri: string })[];
+  isSelf: boolean;
+  deleting?: boolean;
+  onDelete: () => void;
+};
+
+export function ListDetail({
+  uri,
+  name,
+  description,
+  tab,
+  posts,
+  members,
+  isSelf,
+  deleting,
+  onDelete,
+}: Props) {
+  return (
+    <>
+      <section className="flex flex-col gap-2 border-b border-line p-4">
+        <h1 className="text-title">{name}</h1>
+        {description && (
+          <p className="wrap-break-word whitespace-pre-wrap">{description}</p>
+        )}
+      </section>
+      {isSelf && (
+        <>
+          <ListForm
+            summary="編集する"
+            submitLabel="保存する"
+            name={name}
+            description={description}
+          />
+          <ConfirmDialog
+            title={`「${name}」を削除しますか？`}
+            description="リストとそのメンバー登録が削除され、元に戻せません。"
+            confirmLabel="削除する"
+            danger
+            onConfirm={onDelete}
+          >
+            {(open) => (
+              <div className="m-4">
+                <Button
+                  variant="danger"
+                  size="sm"
+                  loading={deleting}
+                  onClick={open}
+                >
+                  削除する
+                </Button>
+              </div>
+            )}
+          </ConfirmDialog>
+        </>
+      )}
+      <Tabs
+        tabs={[
+          { to: ".", label: "投稿", selected: tab === "posts" },
+          {
+            to: "?tab=members",
+            label: "メンバー",
+            selected: tab === "members",
+          },
+        ]}
+      />
+      {tab === "posts" ? (
+        <TimelineFeed posts={posts} />
+      ) : (
+        <>
+          {isSelf && <AddListMemberForm listUri={uri} />}
+          <AccountList
+            accounts={members}
+            renderAction={
+              isSelf
+                ? (member) => (
+                    <RemoveListMemberButton listItemUri={member.listItemUri} />
+                  )
+                : undefined
+            }
+          />
+        </>
+      )}
+    </>
+  );
+}

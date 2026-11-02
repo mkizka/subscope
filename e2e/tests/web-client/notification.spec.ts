@@ -277,4 +277,27 @@ test.describe("通知（PC）", () => {
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
+
+  test("notification-8: 通知の読み込み中は「通知はまだありません」を表示せず、読み込みが終わって0件のときだけ表示する", async ({
+    page,
+  }) => {
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/api/notifications?*", async (route) => {
+      await gate;
+      await route.fulfill({
+        json: { notifications: [], subjectTexts: {} },
+      });
+    });
+
+    await page.goto("/notifications");
+
+    const region = page.getByRole("region", { name: "通知" });
+    await expect(region.getByRole("status")).toBeVisible();
+    await expect(region.getByText("通知はまだありません")).toBeHidden();
+
+    release();
+
+    await expect(region.getByText("通知はまだありません")).toBeVisible();
+  });
 });

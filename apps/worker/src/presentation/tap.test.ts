@@ -10,7 +10,7 @@ import {
   InMemoryTapClient,
 } from "@repo/common/test";
 import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
@@ -94,7 +94,7 @@ describe("Tapからのイベント受信", () => {
   };
 
   const findPosts = (did: string) =>
-    ctx.db.select().from(schema.posts).where(eq(schema.posts.actorDid, did));
+    ctx.db.select().from(schema.posts).where(eq(schema.posts.accountDid, did));
 
   afterEach(async () => {
     vi.restoreAllMocks();
@@ -105,16 +105,16 @@ describe("Tapからのイベント受信", () => {
   test("channel-1: recordイベントはインデックスを、identityイベントはアカウントの状態の保存を終えてからTapにackする", async () => {
     // arrange
     await connect();
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
 
     // act
-    send(recordEvent(1, actor.did), {
+    send(recordEvent(1, account.did), {
       id: 2,
       type: "identity",
       identity: {
-        did: actor.did,
+        did: account.did,
         handle: "alice.test",
         is_active: false,
         status: "takendown",
@@ -123,23 +123,23 @@ describe("Tapからのイベント受信", () => {
 
     // assert
     await vi.waitFor(() => expect(acks.toSorted()).toEqual([1, 2]));
-    expect(await findPosts(actor.did)).toHaveLength(1);
+    expect(await findPosts(account.did)).toHaveLength(1);
     const [found] = await ctx.db
       .select()
-      .from(schema.actors)
-      .where(eq(schema.actors.did, actor.did));
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, account.did));
     expect(found?.status).toBe("takendown");
   });
 
   test("channel-2: サポートしないコレクションのrecordイベントは保存せずにackする", async () => {
     // arrange
     await connect();
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
 
     // act
-    send(recordEvent(1, actor.did, { collection: "com.example.unknown" }));
+    send(recordEvent(1, account.did, { collection: "com.example.unknown" }));
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([1]));
@@ -149,15 +149,15 @@ describe("Tapからのイベント受信", () => {
   test("channel-3: DBに保存できなかったイベントはackしない", async () => {
     // arrange
     await connect();
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
     vi.spyOn(services.transactionManager, "transaction").mockRejectedValueOnce(
       new Error("db down"),
     );
 
     // act
-    send(recordEvent(1, actor.did), recordEvent(2, actor.did));
+    send(recordEvent(1, account.did), recordEvent(2, account.did));
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([2]));
@@ -166,27 +166,27 @@ describe("Tapからのイベント受信", () => {
   test("channel-4: スキーマに合わないレコードなど、処理しないと決めたイベントはackする", async () => {
     // arrange
     await connect();
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
 
     // act
     send(
-      recordEvent(1, actor.did, {
+      recordEvent(1, account.did, {
         record: { $type: "app.bsky.feed.post", text: "no createdAt" },
       }),
     );
 
     // assert
     await vi.waitFor(() => expect(acks).toEqual([1]));
-    expect(await findPosts(actor.did)).toEqual([]);
+    expect(await findPosts(account.did)).toEqual([]);
   });
 
   test("channel-5: 処理中のイベントがTAP_CONCURRENCY件に達したら、空くまで次のイベントを読まない", async () => {
     // arrange
     await connect(1);
-    const actor = await actorFactory(ctx.db)
-      .use((t) => t.subscriber())
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
       .create();
     const blocker = Promise.withResolvers<never>();
     const transaction = vi
@@ -194,7 +194,7 @@ describe("Tapからのイベント受信", () => {
       .mockImplementationOnce(() => blocker.promise);
 
     // act
-    send(recordEvent(1, actor.did), recordEvent(2, actor.did));
+    send(recordEvent(1, account.did), recordEvent(2, account.did));
     await vi.waitFor(() => expect(transaction).toHaveBeenCalledOnce());
     await new Promise((resolve) => setTimeout(resolve, 200));
 
