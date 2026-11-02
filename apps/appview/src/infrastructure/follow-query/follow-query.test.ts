@@ -1,5 +1,4 @@
 import { asDid } from "@atproto/did";
-import { AtUri } from "@atproto/syntax";
 import {
   actorFactory,
   followFactory,
@@ -89,13 +88,9 @@ describe("FollowQuery", () => {
       });
 
       // assert
-      expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({
-        uri: new AtUri(follow.uri),
-        cid: follow.cid,
-        actorDid: actor.did,
-        subjectDid: followee.did,
-      });
+      expect(result).toEqual([
+        { subjectDid: followee.did, sortAt: follow.sortAt },
+      ]);
     });
 
     test("複数のフォローがある場合、sortAtの降順で返す", async () => {
@@ -107,7 +102,7 @@ describe("FollowQuery", () => {
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => actor })
         .create();
-      const follow1 = await followFactory(ctx.db)
+      await followFactory(ctx.db)
         .vars({
           record: () => record1,
           followee: () => followee1,
@@ -120,7 +115,7 @@ describe("FollowQuery", () => {
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => actor })
         .create();
-      const follow2 = await followFactory(ctx.db)
+      await followFactory(ctx.db)
         .vars({
           record: () => record2,
           followee: () => followee2,
@@ -137,10 +132,9 @@ describe("FollowQuery", () => {
       });
 
       // assert
-      expect(result).toHaveLength(2);
       expect(result).toEqual([
-        expect.objectContaining({ uri: new AtUri(follow2.uri) }),
-        expect.objectContaining({ uri: new AtUri(follow1.uri) }),
+        expect.objectContaining({ subjectDid: followee2.did }),
+        expect.objectContaining({ subjectDid: followee1.did }),
       ]);
     });
 
@@ -200,7 +194,7 @@ describe("FollowQuery", () => {
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => actor })
         .create();
-      const follow1 = await followFactory(ctx.db)
+      await followFactory(ctx.db)
         .vars({
           record: () => record1,
           followee: () => followee1,
@@ -233,10 +227,9 @@ describe("FollowQuery", () => {
       });
 
       // assert
-      expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({
-        uri: new AtUri(follow1.uri),
-      });
+      expect(result).toEqual([
+        expect.objectContaining({ subjectDid: followee1.did }),
+      ]);
     });
 
     test("他のアクターのフォローは含まれない", async () => {
@@ -303,13 +296,9 @@ describe("FollowQuery", () => {
       });
 
       // assert
-      expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({
-        uri: new AtUri(follow.uri),
-        cid: follow.cid,
-        actorDid: follower.did,
-        subjectDid: actor.did,
-      });
+      expect(result).toEqual([
+        { actorDid: follower.did, sortAt: follow.sortAt },
+      ]);
     });
 
     test("複数のフォロワーがある場合、sortAtの降順で返す", async () => {
@@ -321,7 +310,7 @@ describe("FollowQuery", () => {
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => follower1 })
         .create();
-      const follow1 = await followFactory(ctx.db)
+      await followFactory(ctx.db)
         .vars({
           record: () => record1,
           followee: () => actor,
@@ -334,7 +323,7 @@ describe("FollowQuery", () => {
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => follower2 })
         .create();
-      const follow2 = await followFactory(ctx.db)
+      await followFactory(ctx.db)
         .vars({
           record: () => record2,
           followee: () => actor,
@@ -351,10 +340,9 @@ describe("FollowQuery", () => {
       });
 
       // assert
-      expect(result).toHaveLength(2);
       expect(result).toEqual([
-        expect.objectContaining({ uri: new AtUri(follow2.uri) }),
-        expect.objectContaining({ uri: new AtUri(follow1.uri) }),
+        expect.objectContaining({ actorDid: follower2.did }),
+        expect.objectContaining({ actorDid: follower1.did }),
       ]);
     });
 
@@ -400,7 +388,7 @@ describe("FollowQuery", () => {
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
         .vars({ actor: () => follower1 })
         .create();
-      const follow1 = await followFactory(ctx.db)
+      await followFactory(ctx.db)
         .vars({
           record: () => record1,
           followee: () => actor,
@@ -433,10 +421,9 @@ describe("FollowQuery", () => {
       });
 
       // assert
-      expect(result).toHaveLength(1);
-      expect(result[0]).toMatchObject({
-        uri: new AtUri(follow1.uri),
-      });
+      expect(result).toEqual([
+        expect.objectContaining({ actorDid: follower1.did }),
+      ]);
     });
 
     test("他のアクターのフォロワーは含まれない", async () => {

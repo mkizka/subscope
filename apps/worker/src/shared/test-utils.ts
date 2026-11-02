@@ -11,12 +11,12 @@ import {
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/queries/post-query/post-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/queries/profile-query/profile-query.in-memory.js";
+import { InMemorySubscriptionQuery } from "../infrastructure/queries/subscription-query/subscription-query.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
-import { InMemoryInviteCodeRepository } from "../infrastructure/repositories/invite-code-repository/invite-code-repository.in-memory.js";
 import { InMemoryLikeRepository } from "../infrastructure/repositories/like-repository/like-repository.in-memory.js";
 import { InMemoryListItemRepository } from "../infrastructure/repositories/list-item-repository/list-item-repository.in-memory.js";
 import { InMemoryListRepository } from "../infrastructure/repositories/list-repository/list-repository.in-memory.js";
@@ -26,7 +26,6 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
-import { InMemorySubscriptionRepository } from "../infrastructure/repositories/subscription-repository/subscription-repository.in-memory.js";
 import type { Env } from "./env.js";
 import { createWorkerRegistry } from "./registry.js";
 
@@ -52,7 +51,6 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("feedItemRepository", asClassArgs(InMemoryFeedItemRepository))
   .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
   .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))
-  .replaceService("inviteCodeRepository", asClassArgs(InMemoryInviteCodeRepository))
   .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
   .replaceService("listRepository", asClassArgs(InMemoryListRepository))
   .replaceService("listItemRepository", asClassArgs(InMemoryListItemRepository))
@@ -64,7 +62,7 @@ export const testRegistry = createWorkerRegistry(testEnv)
   .replaceService("recordRepository", asClassArgs(InMemoryRecordRepository))
   .replaceService("recordRevRepository", asClassArgs(InMemoryRecordRevRepository))
   .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
-  .replaceService("subscriptionRepository", asClassArgs(InMemorySubscriptionRepository))
+  .replaceService("subscriptionQuery", asClassArgs(InMemorySubscriptionQuery))
   .replaceService("transactionManager", asClassArgs(InMemoryTransactionManager))
   .replaceService("tapClient", asClassArgs(InMemoryTapClient))
   .replaceService("jobQueue", asClassArgs(InMemoryJobQueue))

@@ -9,7 +9,7 @@ import type { IndexCommitCommand } from "./index-commit-command.js";
 describe("IndexCommitUseCase", () => {
   let indexCommitUseCase: TestServices["indexCommitUseCase"];
   let actorRepo: TestServices["actorRepository"];
-  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let subscriptionQuery: TestServices["subscriptionQuery"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
@@ -19,7 +19,7 @@ describe("IndexCommitUseCase", () => {
     const services = await testRegistry.resolve();
     indexCommitUseCase = services.indexCommitUseCase;
     actorRepo = services.actorRepository;
-    subscriptionRepo = services.subscriptionRepository;
+    subscriptionQuery = services.subscriptionQuery;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
@@ -34,7 +34,7 @@ describe("IndexCommitUseCase", () => {
       actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepo.add(subscription);
+      subscriptionQuery.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -151,12 +151,12 @@ describe("IndexCommitUseCase", () => {
         const likerActor = actorFactory();
         const authorActor = actorFactory();
         if (liker) {
-          subscriptionRepo.add(
+          subscriptionQuery.add(
             subscriptionFactory({ actorDid: likerActor.did }),
           );
         }
         if (author) {
-          subscriptionRepo.add(
+          subscriptionQuery.add(
             subscriptionFactory({ actorDid: authorActor.did }),
           );
         }
@@ -198,7 +198,7 @@ describe("IndexCommitUseCase", () => {
       actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepo.add(subscription);
+      subscriptionQuery.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -242,7 +242,7 @@ describe("IndexCommitUseCase", () => {
       actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepo.add(subscription);
+      subscriptionQuery.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
