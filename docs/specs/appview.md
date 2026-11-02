@@ -90,12 +90,17 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
 
 - searchActors-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewで返す
+- searchActors-2: ハンドルが検索語に部分一致するアクターも返す
+- searchActors-3: 空白だけの検索語には何も返さない
+- searchActors-4: cursorを指定すると、前のページに含めなかったアクターを返す
 
 ## app.bsky.actor.searchActorsTypeahead
 
 入力補完用に、表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
 
 - searchActorsTypeahead-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewBasicで返す
+- searchActorsTypeahead-2: ハンドルが検索語に部分一致するアクターも返す
+- searchActorsTypeahead-3: 空白だけの検索語には何も返さない
 
 ## app.bsky.actor.getPreferences
 
