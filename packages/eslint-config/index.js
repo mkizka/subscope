@@ -11,7 +11,7 @@ const legacyRepositoryMethods = {
   IGeneratorRepository: "upsert",
   IInviteCodeRepository: "findAll|findByCode|findFirst|markAsUsed|upsert",
   ILabelRepository: "upsert",
-  ILikeRepository: "findMany|upsert",
+  ILikeRepository: "upsert",
   IListItemRepository: "upsert",
   IListRepository: "upsert",
   INotificationRepository: "createMany",

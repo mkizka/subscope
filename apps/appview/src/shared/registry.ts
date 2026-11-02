@@ -30,7 +30,6 @@ import type { IHandleResolver } from "../application/interfaces/handle-resolver.
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
 import type { ILabelQuery } from "../application/interfaces/label-query.js";
 import type { ILikeQuery } from "../application/interfaces/like-query.js";
-import type { ILikeRepository } from "../application/interfaces/like-repository.js";
 import type { IListItemQuery } from "../application/interfaces/list-item-query.js";
 import type { IListQuery } from "../application/interfaces/list-query.js";
 import type { INotificationQuery } from "../application/interfaces/notification-query.js";
@@ -113,7 +112,6 @@ import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolve
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
 import { LabelQuery } from "../infrastructure/label-query/label-query.js";
 import { LikeQuery } from "../infrastructure/like-query/like-query.js";
-import { LikeRepository } from "../infrastructure/like-repository/like-repository.js";
 import { ListItemQuery } from "../infrastructure/list-item-query/list-item-query.js";
 import { ListQuery } from "../infrastructure/list-query/list-query.js";
 import { NotificationQuery } from "../infrastructure/notification-query/notification-query.js";
@@ -216,7 +214,6 @@ export const createAppRegistry = (env: Env) =>
     .service("postStatsQuery", ["db"], asClassArgs<IPostStatsQuery>()(PostStatsQuery))
     .service("timelineQuery", ["db"], asClassArgs<ITimelineQuery>()(TimelineQuery))
     .service("authorFeedQuery", ["db"], asClassArgs<IAuthorFeedQuery>()(AuthorFeedQuery))
-    .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
     .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
@@ -234,7 +231,7 @@ export const createAppRegistry = (env: Env) =>
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
-    .service("likeService", ["likeRepository"], asClassArgs(LikeService))
+    .service("likeService", ["likeQuery"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
