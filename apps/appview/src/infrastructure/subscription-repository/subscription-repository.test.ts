@@ -101,13 +101,13 @@ describe("SubscriptionRepository", () => {
     });
   });
 
-  describe("findFirst", () => {
+  describe("find", () => {
     test("サブスクリプションが存在しない場合、nullを返す", async () => {
       // arrange
       const nonExistentDid = asDid("did:plc:notfound123");
 
       // act
-      const result = await subscriptionRepository.findFirst(nonExistentDid);
+      const result = await subscriptionRepository.find(nonExistentDid);
 
       // assert
       expect(result).toBeNull();
@@ -121,7 +121,7 @@ describe("SubscriptionRepository", () => {
         .create();
 
       // act
-      const result = await subscriptionRepository.findFirst(
+      const result = await subscriptionRepository.find(
         asDid(subscription.actorDid),
       );
 
@@ -130,40 +130,6 @@ describe("SubscriptionRepository", () => {
         actorDid: subscription.actorDid,
         inviteCode: subscription.inviteCode,
       });
-    });
-  });
-
-  describe("existsByInviteCode", () => {
-    test("招待コードが使用されていない場合、falseを返す", async () => {
-      // arrange
-      const nonExistentCode = "nonexistent-code";
-
-      // act
-      const result =
-        await subscriptionRepository.existsByInviteCode(nonExistentCode);
-
-      // assert
-      expect(result).toBe(false);
-    });
-
-    test("招待コードが使用されている場合、trueを返す", async () => {
-      // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const inviteCode = await inviteCodeFactory(ctx.db).create();
-      await subscriptionFactory(ctx.db)
-        .vars({
-          actor: () => actor,
-          inviteCode: () => inviteCode,
-        })
-        .create();
-
-      // act
-      const result = await subscriptionRepository.existsByInviteCode(
-        inviteCode.code,
-      );
-
-      // assert
-      expect(result).toBe(true);
     });
   });
 
@@ -187,7 +153,7 @@ describe("SubscriptionRepository", () => {
       });
 
       // assert
-      const saved = await subscriptionRepository.findFirst(
+      const saved = await subscriptionRepository.find(
         asDid(subscription.actorDid),
       );
       expect(saved).toMatchObject({
@@ -209,7 +175,7 @@ describe("SubscriptionRepository", () => {
       await subscriptionRepository.delete(asDid(subscription.actorDid));
 
       // assert
-      const deleted = await subscriptionRepository.findFirst(
+      const deleted = await subscriptionRepository.find(
         asDid(subscription.actorDid),
       );
       expect(deleted).toBeNull();

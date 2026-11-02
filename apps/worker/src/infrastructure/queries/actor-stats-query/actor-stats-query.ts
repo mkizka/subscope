@@ -3,7 +3,7 @@ import { schema } from "@repo/db";
 import { count, eq } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 
-import type { IActorStatsQuery } from "../../application/interfaces/queries/actor-stats-query.js";
+import type { IActorStatsQuery } from "../../../application/interfaces/queries/actor-stats-query.js";
 
 export class ActorStatsQuery implements IActorStatsQuery {
   async countStats({

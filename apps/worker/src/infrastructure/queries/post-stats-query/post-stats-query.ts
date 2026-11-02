@@ -3,7 +3,7 @@ import { schema } from "@repo/db";
 import { count, inArray } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 
-import type { IPostStatsQuery } from "../../application/interfaces/queries/post-stats-query.js";
+import type { IPostStatsQuery } from "../../../application/interfaces/queries/post-stats-query.js";
 
 export class PostStatsQuery implements IPostStatsQuery {
   async countStats({ ctx, uris }: { ctx: TransactionContext; uris: string[] }) {

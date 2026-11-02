@@ -1,3 +1,5 @@
+import { asAtUriString } from "@atproto/syntax";
+import type { Repost } from "@repo/common/domain";
 import {
   actorFactory,
   postFactory,
@@ -8,14 +10,22 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
+const toRepostDto = (repost: Repost) => ({
+  uri: asAtUriString(repost.uri.toString()),
+  actorDid: repost.actorDid,
+  subjectUri: asAtUriString(repost.subjectUri.toString()),
+  indexedAt: repost.indexedAt,
+  sortAt: repost.sortAt,
+});
+
 describe("GetRepostedByUseCase", () => {
   let getRepostedByUseCase: TestServices["getRepostedByUseCase"];
-  let repostRepo: TestServices["repostRepository"];
+  let repostQuery: TestServices["repostQuery"];
   let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getRepostedByUseCase = services.getRepostedByUseCase;
-    repostRepo = services.repostRepository;
+    repostQuery = services.repostQuery;
     profileQuery = services.profileQuery;
   });
 
@@ -58,7 +68,7 @@ describe("GetRepostedByUseCase", () => {
       subjectUri: originalPost.uri.toString(),
       subjectCid: originalPost.cid,
     });
-    repostRepo.add(repost);
+    repostQuery.add(toRepostDto(repost));
 
     // act
     const result = await getRepostedByUseCase.execute({
@@ -99,7 +109,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(firstRepost);
+    repostQuery.add(toRepostDto(firstRepost));
 
     const secondReposter = actorFactory();
     const secondProfile = profileDetailedFactory({
@@ -114,7 +124,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(secondRepost);
+    repostQuery.add(toRepostDto(secondRepost));
 
     // act
     const result = await getRepostedByUseCase.execute({
@@ -160,7 +170,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(firstRepost);
+    repostQuery.add(toRepostDto(firstRepost));
 
     const secondReposter = actorFactory();
     const secondProfile = profileDetailedFactory({
@@ -175,7 +185,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(secondRepost);
+    repostQuery.add(toRepostDto(secondRepost));
 
     // act
     const result = await getRepostedByUseCase.execute({
@@ -217,7 +227,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T02:00:00.000Z"),
     });
-    repostRepo.add(firstRepost);
+    repostQuery.add(toRepostDto(firstRepost));
 
     const secondReposter = actorFactory();
     const secondProfile = profileDetailedFactory({
@@ -232,7 +242,7 @@ describe("GetRepostedByUseCase", () => {
       subjectCid: originalPost.cid,
       createdAt: new Date("2024-01-01T01:00:00.000Z"),
     });
-    repostRepo.add(secondRepost);
+    repostQuery.add(toRepostDto(secondRepost));
 
     // act - 最初のページ
     const firstPage = await getRepostedByUseCase.execute({
