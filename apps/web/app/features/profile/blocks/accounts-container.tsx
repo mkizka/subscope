@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router";
 import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { Button } from "@/app/components/ui/button";
 import { Dialog } from "@/app/components/ui/dialog";
+import { Input } from "@/app/components/ui/input";
 import { Tabs } from "@/app/components/ui/tabs";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader as registeredLoader } from "@/app/routes/api.registered-accounts";
@@ -17,7 +18,8 @@ type RegisteredResponse = Awaited<ReturnType<typeof registeredLoader>>["data"];
 type TrackedResponse = Awaited<ReturnType<typeof trackedLoader>>["data"];
 
 export function AccountsContainer() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
+  const q = params.get("q") ?? "";
   const tracked = params.get("tab") === "tracked";
   const helpRef = useRef<HTMLDialogElement>(null);
 
@@ -34,9 +36,14 @@ export function AccountsContainer() {
   const registered = registeredQuery.data;
   const trackedData = trackedQuery.data;
 
-  const accounts: Account[] | undefined = tracked
-    ? trackedData?.accounts
-    : registered?.registeredAccounts;
+  const keyword = q.trim().toLowerCase();
+  const accounts: Account[] | undefined = (
+    tracked ? trackedData?.accounts : registered?.registeredAccounts
+  )?.filter(
+    (account) =>
+      account.handle.toLowerCase().includes(keyword) ||
+      account.displayName?.toLowerCase().includes(keyword),
+  );
 
   return (
     <>
@@ -55,6 +62,25 @@ export function AccountsContainer() {
           },
         ]}
       />
+      <div className="border-b border-line p-4">
+        <Input
+          type="search"
+          aria-label="アカウントを検索"
+          placeholder="名前・ハンドルで検索"
+          value={q}
+          onChange={(e) =>
+            setParams(
+              (prev) => {
+                const next = new URLSearchParams(prev);
+                if (e.target.value) next.set("q", e.target.value);
+                else next.delete("q");
+                return next;
+              },
+              { replace: true },
+            )
+          }
+        />
+      </div>
       {tracked && (
         <>
           <button
@@ -87,7 +113,9 @@ export function AccountsContainer() {
           </Dialog>
         </>
       )}
-      {accounts ? (
+      {accounts?.length === 0 ? (
+        <p className="p-4 text-muted">アカウントが見つかりません</p>
+      ) : accounts ? (
         <AccountList accounts={accounts} />
       ) : (
         <LoadingSpinner label="読み込み中" />

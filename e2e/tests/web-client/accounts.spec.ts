@@ -188,4 +188,29 @@ test.describe("アカウント", () => {
     release(undefined);
     await expect(spinner).toBeHidden();
   });
+
+  test("accounts-12: タブの下の検索欄に入力すると、選んでいるタブの一覧を、名前またはハンドルの部分一致で絞り込む。検索語は `?q=` に残し、そのURLを開くと同じ検索語で絞り込む", async ({
+    page,
+  }) => {
+    await page.goto("/accounts");
+    await expect(items(page).filter({ hasText: "Alice" })).toBeVisible();
+
+    await page.getByRole("searchbox", { name: "アカウントを検索" }).fill("ALI");
+
+    await expect(page).toHaveURL("/accounts?q=ALI");
+    await expect(items(page).filter({ hasText: "Alice" })).toBeVisible();
+    await expect(items(page).filter({ hasText: "Bob" })).toBeHidden();
+
+    await page.reload();
+    await expect(items(page).filter({ hasText: "Alice" })).toBeVisible();
+    await expect(items(page).filter({ hasText: "Bob" })).toBeHidden();
+  });
+
+  test("accounts-13: 絞り込んだ結果が0件のときは「アカウントが見つかりません」と表示する", async ({
+    page,
+  }) => {
+    await page.goto("/accounts?q=zzzzzz");
+
+    await expect(page.getByText("アカウントが見つかりません")).toBeVisible();
+  });
 });
