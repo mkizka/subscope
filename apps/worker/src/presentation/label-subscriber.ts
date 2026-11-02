@@ -30,13 +30,11 @@ export class LabelSubscriber {
   async start() {
     for await (const message of this.subscription) {
       if (subscribeLabels.labels.$isTypeOf(message)) {
-        this.metricReporter.increment("ingester_labels_labels_total");
+        this.metricReporter.increment("worker_events_label_total");
         for (const label of message.labels) {
           await this.indexLabelUseCase.execute(label);
         }
         await this.labelCursorStore.setCursor(this.moderationUrl, message.seq);
-      } else if (subscribeLabels.info.$isTypeOf(message)) {
-        this.metricReporter.increment("ingester_labels_info_total");
       }
     }
   }
