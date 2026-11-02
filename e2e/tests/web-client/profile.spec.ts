@@ -119,11 +119,11 @@ test.describe("プロフィール", () => {
     await expect(main.getByText(reply)).toHaveCount(0);
   });
 
-  test("profile-16: 「リプライ」タブでは、返信先の投稿が一覧にない場合、リプライの上に返信先を表示して線で繋げる", async ({
+  test("profile-17: 「リプライ」タブでは、返信先の投稿が一覧にない場合、リプライの上に返信先を表示して線で繋げる", async ({
     page,
   }) => {
-    const parentText = `profile-16の親 ${Date.now()}`;
-    const reply = `profile-16のリプライ ${Date.now()}`;
+    const parentText = `profile-17の親 ${Date.now()}`;
+    const reply = `profile-17のリプライ ${Date.now()}`;
     const parent = await createRecord("bob.test", "app.bsky.feed.post", {
       text: parentText,
       createdAt: new Date().toISOString(),
