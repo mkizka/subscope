@@ -242,7 +242,7 @@ test.describe("スレッド", () => {
       await page.reload();
       await expect(article).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await article.evaluate((el) => el.scrollIntoView());
+    await article.evaluate((el) => el.scrollIntoView({ block: "center" }));
     const scrollY = await page.evaluate(() => window.scrollY);
     expect(scrollY).toBeGreaterThan(0);
 
