@@ -70,7 +70,7 @@ describe("IndexCommitUseCase", () => {
       // arrange
       const actor = actorFactory();
       actorRepo.add(actor);
-      const upsertSpy = vi.spyOn(actorRepo, "upsert");
+      const saveSpy = vi.spyOn(actorRepo, "save");
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -92,7 +92,7 @@ describe("IndexCommitUseCase", () => {
 
       // assert
       expect(postRepo.findByUri(uri)).not.toBeNull();
-      expect(upsertSpy).not.toHaveBeenCalled();
+      expect(saveSpy).not.toHaveBeenCalled();
     });
 
     test("index-9: threadgate と postgate は、同じアカウントで同じrkeyの投稿を対象とするものだけ保存する", async () => {

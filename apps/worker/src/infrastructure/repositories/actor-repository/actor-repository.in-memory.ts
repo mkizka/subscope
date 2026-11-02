@@ -14,14 +14,11 @@ export class InMemoryActorRepository implements IActorRepository {
     this.actors.clear();
   }
 
-  async upsert(params: {
-    ctx: TransactionContext;
-    actor: Actor;
-  }): Promise<void> {
+  async save(params: { ctx: TransactionContext; actor: Actor }): Promise<void> {
     this.actors.set(params.actor.did, params.actor);
   }
 
-  async findByDid(params: {
+  async find(params: {
     ctx: TransactionContext;
     did: Did;
   }): Promise<Actor | null> {
