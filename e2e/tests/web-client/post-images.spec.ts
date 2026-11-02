@@ -29,4 +29,30 @@ test.describe("投稿画像", () => {
       .boundingBox();
     expect(image?.width).toBe(body?.width);
   });
+
+  test("post-images-2: gallery埋め込み(app.bsky.embed.gallery)の画像も、すべて並べて表示する", async ({
+    page,
+  }) => {
+    const text = `post-images-2: ${Date.now()}`;
+    const image = await uploadImage("alice.test");
+    const items = Array.from({ length: 6 }, () => ({
+      $type: "app.bsky.embed.gallery#image",
+      image,
+      alt: text,
+      aspectRatio: { width: 1, height: 1 },
+    }));
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text,
+      embed: { $type: "app.bsky.embed.gallery", items },
+      createdAt: new Date().toISOString(),
+    });
+    const post = page.getByRole("article").filter({ hasText: text });
+    await page.goto("/");
+    await expect(async () => {
+      await page.reload();
+      await expect(post).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await expect(post.getByRole("img", { name: text })).toHaveCount(6);
+  });
 });

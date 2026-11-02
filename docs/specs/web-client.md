@@ -121,6 +121,7 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 投稿に付いた画像を、本文の下に並べて表示する。
 
 - post-images-1: 画像が1枚のときは、投稿の幅いっぱいに表示する
+- post-images-2: gallery埋め込み(app.bsky.embed.gallery)の画像も、すべて並べて表示する
 
 ## 画像の拡大表示
 
