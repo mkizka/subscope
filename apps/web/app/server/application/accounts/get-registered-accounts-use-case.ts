@@ -5,7 +5,7 @@ import type {
 } from "@/app/server/infrastructure/subscope/subscope-query";
 
 export interface IGetRegisteredAccountsUseCase {
-  execute: () => Promise<MembersDto>;
+  execute: (q?: string) => Promise<MembersDto>;
 }
 
 export const getRegisteredAccountsUseCaseFactory = ({
@@ -15,8 +15,8 @@ export const getRegisteredAccountsUseCaseFactory = ({
   subscopeQuery: ISubscopeQuery;
   backfillQuery: IBackfillQuery;
 }): IGetRegisteredAccountsUseCase => ({
-  async execute() {
-    const result = await subscopeQuery.findMembers();
+  async execute(q) {
+    const result = await subscopeQuery.findMembers(q);
     const statuses = await backfillQuery.findTrackedStatuses(
       result.registeredAccounts.map(
         (registeredAccount) => registeredAccount.did,

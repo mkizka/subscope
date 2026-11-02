@@ -38,8 +38,8 @@ export type TrackedAccountsDto = {
 export interface ISubscopeQuery {
   isInitialized: () => Promise<boolean>;
   isRegistered: (did: string) => Promise<boolean>;
-  findMembers: () => Promise<MembersDto>;
-  findTrackedAccounts: (did: string) => Promise<TrackedAccountsDto>;
+  findMembers: (q?: string) => Promise<MembersDto>;
+  findTrackedAccounts: (did: string, q?: string) => Promise<TrackedAccountsDto>;
 }
 
 export const subscopeQueryFactory = ({
@@ -66,12 +66,13 @@ export const subscopeQueryFactory = ({
       const response = await (await restore(did)).call(getRegistrationStatus);
       return registered.isTypeOf(response);
     },
-    async findMembers() {
+    async findMembers(q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
       const { registeredAccounts, cursor } = await publicClient.call(
         getRegisteredAccounts,
         {
           limit: 100,
+          q,
         },
       );
       return {
@@ -86,11 +87,11 @@ export const subscopeQueryFactory = ({
         hasMore: cursor !== undefined,
       };
     },
-    async findTrackedAccounts(did) {
+    async findTrackedAccounts(did, q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
       const { trackedAccounts, total } = await (
         await restore(did)
-      ).call(getTrackedAccounts, { limit: 100 });
+      ).call(getTrackedAccounts, { limit: 100, q });
       return {
         total,
         accounts: trackedAccounts.map(
