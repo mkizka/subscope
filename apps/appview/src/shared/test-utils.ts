@@ -7,6 +7,7 @@ import {
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
+import { InMemoryActorQuery } from "../infrastructure/actor-query/actor-query.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/actor-repository/actor-repository.in-memory.js";
 import { InMemoryActorStatsQuery } from "../infrastructure/actor-stats-query/actor-stats-query.in-memory.js";
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
@@ -21,7 +22,6 @@ import { InMemoryLikeQuery } from "../infrastructure/like-query/like-query.in-me
 import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
-import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryPostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/profile-query/profile-query.in-memory.js";
 import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
@@ -54,11 +54,11 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("profileQuery", asClassArgs(InMemoryProfileQuery))
   .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
+  .replaceService("actorQuery", asClassArgs(InMemoryActorQuery))
   .replaceService("actorStatsQuery", asClassArgs(InMemoryActorStatsQuery))
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))
   .replaceService("notificationQuery", asClassArgs(InMemoryNotificationQuery))
-  .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
   .replaceService("generatorQuery", asClassArgs(InMemoryGeneratorQuery))
   .replaceService("likeQuery", asClassArgs(InMemoryLikeQuery))
   .replaceService("postQuery", asClassArgs(InMemoryPostQuery))

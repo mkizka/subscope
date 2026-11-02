@@ -1,14 +1,14 @@
 import type { Did } from "@atproto/did";
 import type * as MeSubscoAdminGetBannedActors from "@repo/client/lex/me/subsco/admin/getBannedActors";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IActorQuery } from "../../../application/interfaces/actor-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetBannedActorsUseCase {
   constructor(
-    private readonly actorRepository: IActorRepository,
+    private readonly actorQuery: IActorQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -22,7 +22,7 @@ export class GetBannedActorsUseCase {
       getCursor: (did) => did,
     });
     const page = paginator.extractPage(
-      await this.actorRepository.findBannedDids({
+      await this.actorQuery.findBannedDids({
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),

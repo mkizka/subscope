@@ -16,7 +16,7 @@ export class CreateInviteCodeUseCase {
   }): Promise<{ code: string; expiresAt: DatetimeString }> {
     const inviteCode = InviteCode.generate(this.publicUrl, params.daysToExpire);
 
-    await this.inviteCodeRepository.upsert({
+    await this.inviteCodeRepository.save({
       inviteCode,
       ctx: { db: this.db },
     });
