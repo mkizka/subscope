@@ -17,7 +17,7 @@ export function PostImages({ images }: { images: PostImage[] }) {
       >
         {images.map((image, i) => (
           <button
-            key={`${i}:${image.thumb}`}
+            key={image.thumb}
             type="button"
             className="cursor-zoom-in"
             onClick={() => setIndex(i)}
