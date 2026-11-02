@@ -11,6 +11,7 @@ export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   viewerLike?: string;
   viewerRepost?: string;
   replyRoot?: { uri: string; cid: string };
+  replyParentUri?: string;
 };
 
 type Props = {
@@ -20,6 +21,19 @@ type Props = {
 export const threadPath = (post: TimelinePost) =>
   `/profile/${post.authorHandle}/post/${post.uri.split("/").pop()}`;
 
+function groupSelfThreads(posts: TimelinePost[]) {
+  const groups: TimelinePost[][] = [];
+  for (const post of posts) {
+    const last = groups.at(-1);
+    if (last && last.at(-1)?.replyParentUri === post.uri) {
+      last.push(post);
+    } else {
+      groups.push([post]);
+    }
+  }
+  return groups.map((group) => [...group].reverse());
+}
+
 export function TimelineFeed({ posts }: Props) {
   return (
     <section>
@@ -28,14 +42,18 @@ export function TimelineFeed({ posts }: Props) {
           タイムラインに投稿がありません
         </p>
       )}
-      {posts.map((post) => (
-        <PostCard
-          key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
-          {...post}
-          threadPath={threadPath(post)}
-          toolbar={<PostToolbarContainer {...post} />}
-        />
-      ))}
+      {groupSelfThreads(posts).map((group) =>
+        group.map((post, i) => (
+          <PostCard
+            key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
+            {...post}
+            connectedAbove={i > 0}
+            connectedBelow={i < group.length - 1}
+            threadPath={threadPath(post)}
+            toolbar={<PostToolbarContainer {...post} />}
+          />
+        )),
+      )}
     </section>
   );
 }

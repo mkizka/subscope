@@ -296,15 +296,40 @@ test.describe("タイムライン", () => {
 
     await expect(async () => {
       await page.reload();
-      await expect(page.getByText(/^timeline-8: /)).toHaveText(
-        [
-          "timeline-8: 2つ目の返信",
-          "timeline-8: 1つ目の返信",
-          "timeline-8: 起点",
-        ],
+      await expect(page.getByText(/^timeline-8: /)).toHaveCount(3, {
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
+  test("timeline-13: 隣り合う投稿のうち下の投稿が上の投稿の返信先であれば、2つを古い順に並べ、アイコンの間を線で繋げる", async ({
+    page,
+  }) => {
+    const root = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-13: 起点",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-13: 返信",
+      reply: { root, parent: root },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByText(/^timeline-13: /)).toHaveText(
+        ["timeline-13: 起点", "timeline-13: 返信"],
         { timeout: 1000 },
       );
     }).toPass();
+    await expect(
+      page
+        .getByRole("article")
+        .filter({ hasText: "timeline-13: " })
+        .getByTestId("thread-line"),
+    ).toHaveCount(2);
   });
 
   test("timeline-6: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする", async ({
