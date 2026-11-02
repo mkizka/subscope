@@ -25,7 +25,6 @@ import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-build
 import type { IAuthorFeedQuery } from "../application/interfaces/author-feed-query.js";
 import type { IBackfillStatusQuery } from "../application/interfaces/backfill-status-query.js";
 import type { IFollowQuery } from "../application/interfaces/follow-query.js";
-import type { IFollowRepository } from "../application/interfaces/follow-repository.js";
 import type { IGeneratorQuery } from "../application/interfaces/generator-query.js";
 import type { IHandleResolver } from "../application/interfaces/handle-resolver.js";
 import type { IInviteCodeRepository } from "../application/interfaces/invite-code-repository.js";
@@ -36,10 +35,8 @@ import type { IListItemQuery } from "../application/interfaces/list-item-query.j
 import type { IListQuery } from "../application/interfaces/list-query.js";
 import type { INotificationQuery } from "../application/interfaces/notification-query.js";
 import type { IPostQuery } from "../application/interfaces/post-query.js";
-import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../application/interfaces/profile-query.js";
-import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostQuery } from "../application/interfaces/repost-query.js";
 import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
@@ -109,7 +106,6 @@ import { AssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-b
 import { AuthorFeedQuery } from "../infrastructure/author-feed-query/author-feed-query.js";
 import { BackfillStatusQuery } from "../infrastructure/backfill-status-query/backfill-status-query.js";
 import { FollowQuery } from "../infrastructure/follow-query/follow-query.js";
-import { FollowRepository } from "../infrastructure/follow-repository/follow-repository.js";
 import { GeneratorQuery } from "../infrastructure/generator-query/generator-query.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { InviteCodeRepository } from "../infrastructure/invite-code-repository/invite-code-repository.js";
@@ -120,10 +116,8 @@ import { ListItemQuery } from "../infrastructure/list-item-query/list-item-query
 import { ListQuery } from "../infrastructure/list-query/list-query.js";
 import { NotificationQuery } from "../infrastructure/notification-query/notification-query.js";
 import { PostQuery } from "../infrastructure/post-query/post-query.js";
-import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
-import { ProfileRepository } from "../infrastructure/profile-repository/profile-repository.js";
 import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostQuery } from "../infrastructure/repost-query/repost-query.js";
 import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
@@ -202,7 +196,6 @@ export const createAppRegistry = (env: Env) =>
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
-    .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
     .service("backfillStatusQuery", ["db"], asClassArgs<IBackfillStatusQuery>()(BackfillStatusQuery))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
@@ -212,7 +205,6 @@ export const createAppRegistry = (env: Env) =>
     .service("handleResolver", ["db"], asClassArgs<IHandleResolver>()(HandleResolver))
     .service("recordQuery", ["db"], asClassArgs<IRecordQuery>()(RecordQuery))
     .service("notificationQuery", ["db"], asClassArgs<INotificationQuery>()(NotificationQuery))
-    .service("postRepository", ["db"], asClassArgs<IPostRepository>()(PostRepository))
     .service("generatorQuery", ["db"], asClassArgs<IGeneratorQuery>()(GeneratorQuery))
     .service("likeQuery", ["db"], asClassArgs<ILikeQuery>()(LikeQuery))
     .service("postQuery", ["db"], asClassArgs<IPostQuery>()(PostQuery))
@@ -222,7 +214,6 @@ export const createAppRegistry = (env: Env) =>
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
     .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
-    .service("followRepository", ["db"], asClassArgs<IFollowRepository>()(FollowRepository))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
     .service("listQuery", ["db"], asClassArgs<IListQuery>()(ListQuery))
@@ -233,17 +224,17 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
+    .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
-    .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
+    .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
     .service("repostService", ["repostRepository"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
     .service("handleMiddleware", ["handleResolver", "loggerManager"], asClassArgs(HandleMiddleware))
-    .service("followService", ["followRepository"], asClassArgs(FollowService))
+    .service("followService", ["followQuery"], asClassArgs(FollowService))
     .service("viewContextFactory", ["profileQuery", "labelQuery", "followQuery", "postQuery", "recordQuery", "postStatsQuery", "likeQuery", "repostQuery", "generatorQuery", "actorStatsQuery", "listQuery", "listItemQuery"], asClassArgs(ViewContextFactory))
     .service("profileViews", ["assetUrlBuilder"], asClassArgs(ProfileViews))
     .service("generatorViews", ["profileViews", "assetUrlBuilder"], asClassArgs(GeneratorViews))
@@ -258,7 +249,7 @@ export const createAppRegistry = (env: Env) =>
     .service("searchActorsUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
     .service("searchActorsTypeaheadUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
-    .service("getPostThreadUseCase", ["postRepository", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
+    .service("getPostThreadUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationQuery", "subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(ListNotificationsUseCase))
@@ -286,7 +277,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getTrackedActorsUseCase", ["subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedActorsUseCase))
     .service("getSubscriptionStatusUseCase", ["subscriptionRepository"], asClassArgs(GetSubscriptionStatusUseCase))
     .service("subscribeServerUseCase", ["transactionManager", "actorRepository", "inviteCodeRepository", "subscriptionRepository", "jobScheduler"], asClassArgs(SubscribeServerUseCase))
-    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followRepository", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
+    .service("unsubscribeServerUseCase", ["subscriptionRepository", "followQuery", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
     .service("unbanActorUseCase", ["db", "actorRepository"], asClassArgs(UnbanActorUseCase))
     .service("banSubscriberUseCase", ["transactionManager", "actorRepository", "unsubscribeServerUseCase"], asClassArgs(BanSubscriberUseCase))
     .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))

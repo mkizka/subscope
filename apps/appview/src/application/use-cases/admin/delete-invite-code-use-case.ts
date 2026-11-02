@@ -23,7 +23,11 @@ export class DeleteInviteCodeUseCase {
   ) {}
 
   async execute(params: { code: string }): Promise<void> {
-    const inviteCode = await this.inviteCodeRepository.findFirst(params.code);
+    const ctx = { db: this.db };
+    const inviteCode = await this.inviteCodeRepository.find({
+      code: params.code,
+      ctx,
+    });
 
     if (!inviteCode) {
       throw new InviteCodeNotFoundError("Invite code not found");
@@ -33,9 +37,6 @@ export class DeleteInviteCodeUseCase {
       throw new InviteCodeAlreadyUsedError("Invite code already used");
     }
 
-    await this.inviteCodeRepository.delete({
-      code: params.code,
-      ctx: { db: this.db },
-    });
+    await this.inviteCodeRepository.delete({ code: params.code, ctx });
   }
 }

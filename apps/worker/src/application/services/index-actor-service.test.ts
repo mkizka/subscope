@@ -39,7 +39,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: testDid });
+      const actor = await actorRepo.find({ ctx, did: testDid });
       expect(actor).toMatchObject({
         did: testDid,
         handle: testHandle,
@@ -75,7 +75,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.find({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: newHandle,
       });
@@ -101,7 +101,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.find({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: existingHandle,
       });
@@ -128,7 +128,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.find({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: newHandle,
       });
@@ -147,7 +147,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: newDid });
+      const actor = await actorRepo.find({ ctx, did: newDid });
       expect(actor).toMatchObject({
         did: newDid,
         handle: null,
@@ -178,7 +178,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({
+      const actor = await actorRepo.find({
         ctx,
         did: existingDidNoHandle,
       });
@@ -212,7 +212,7 @@ describe("IndexActorService", () => {
       });
 
       // assert
-      const actor = await actorRepo.findByDid({ ctx, did: existingDid });
+      const actor = await actorRepo.find({ ctx, did: existingDid });
       expect(actor).toMatchObject({
         handle: existingHandle,
       });

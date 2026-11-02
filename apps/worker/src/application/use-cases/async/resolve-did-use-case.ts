@@ -14,7 +14,7 @@ export class ResolveDidUseCase {
   ) {}
 
   async execute(did: Did) {
-    const existingActor = await this.actorRepository.findByDid({
+    const existingActor = await this.actorRepository.find({
       ctx: { db: this.db },
       did,
     });
@@ -28,7 +28,7 @@ export class ResolveDidUseCase {
     const actor = existingActor ?? Actor.create({ did });
     actor.updateHandle(resolvedDid === did ? handle : "handle.invalid");
 
-    await this.actorRepository.upsert({
+    await this.actorRepository.save({
       ctx: { db: this.db },
       actor,
     });

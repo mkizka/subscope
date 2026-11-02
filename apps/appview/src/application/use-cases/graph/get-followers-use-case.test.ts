@@ -10,12 +10,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("GetFollowersUseCase", () => {
   let getFollowersUseCase: TestServices["getFollowersUseCase"];
-  let followRepo: TestServices["followRepository"];
+  let followQuery: TestServices["followQuery"];
   let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     getFollowersUseCase = services.getFollowersUseCase;
-    followRepo = services.followRepository;
+    followQuery = services.followQuery;
     profileQuery = services.profileQuery;
   });
 
@@ -41,7 +41,7 @@ describe("GetFollowersUseCase", () => {
       actorDid: follower.did,
       subjectDid: actor.did,
     });
-    followRepo.add(follow);
+    followQuery.add(follow);
 
     // act
     const result = await getFollowersUseCase.execute({
@@ -117,7 +117,7 @@ describe("GetFollowersUseCase", () => {
         actorDid: follower.did,
         subjectDid: actor.did,
       });
-      followRepo.add(follow);
+      followQuery.add(follow);
     }
 
     // act
@@ -161,7 +161,7 @@ describe("GetFollowersUseCase", () => {
         createdAt: new Date(baseTime.getTime() + (i + 1) * 1000),
         indexedAt: new Date(baseTime.getTime() + (i + 1) * 1100),
       });
-      followRepo.add(follow);
+      followQuery.add(follow);
     });
 
     // act - 最初のページを取得
@@ -237,7 +237,7 @@ describe("GetFollowersUseCase", () => {
       createdAt: new Date(baseTime.getTime() + 1000),
       indexedAt: new Date(baseTime.getTime() + 1100),
     });
-    followRepo.add(follow1);
+    followQuery.add(follow1);
 
     const follower2 = actorFactory();
     const follower2Profile = profileDetailedFactory({
@@ -252,7 +252,7 @@ describe("GetFollowersUseCase", () => {
       createdAt: new Date(baseTime.getTime() + 2000),
       indexedAt: new Date(baseTime.getTime() + 2100),
     });
-    followRepo.add(follow2);
+    followQuery.add(follow2);
 
     const follower3 = actorFactory();
     const follower3Profile = profileDetailedFactory({
@@ -267,7 +267,7 @@ describe("GetFollowersUseCase", () => {
       createdAt: new Date(baseTime.getTime() + 3000),
       indexedAt: new Date(baseTime.getTime() + 3100),
     });
-    followRepo.add(follow3);
+    followQuery.add(follow3);
 
     // act
     const result = await getFollowersUseCase.execute({

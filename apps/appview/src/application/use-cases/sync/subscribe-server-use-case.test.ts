@@ -18,6 +18,7 @@ describe("SubscribeServerUseCase", () => {
   let subscribeServerUseCase: TestServices["subscribeServerUseCase"];
   let subscriptionRepo: TestServices["subscriptionRepository"];
   let inviteCodeRepo: TestServices["inviteCodeRepository"];
+  let ctx: { db: TestServices["db"] };
   let actorRepo: TestServices["actorRepository"];
   let jobScheduler: TestServices["jobScheduler"];
   beforeEach(async () => {
@@ -25,6 +26,7 @@ describe("SubscribeServerUseCase", () => {
     subscribeServerUseCase = services.subscribeServerUseCase;
     subscriptionRepo = services.subscriptionRepository;
     inviteCodeRepo = services.inviteCodeRepository;
+    ctx = { db: services.db };
     actorRepo = services.actorRepository;
     jobScheduler = services.jobScheduler;
     vi.useFakeTimers();
@@ -52,7 +54,10 @@ describe("SubscribeServerUseCase", () => {
       actorDid: actor.did,
       inviteCode: inviteCode.code,
     });
-    const updatedInviteCode = await inviteCodeRepo.findFirst(inviteCode.code);
+    const updatedInviteCode = await inviteCodeRepo.find({
+      code: inviteCode.code,
+      ctx,
+    });
     expect(updatedInviteCode?.usedAt).toEqual(now);
     expect(jobScheduler.getSyncTapRepoJobs()).toContainEqual(
       expect.objectContaining({ did: asDid(actor.did) }),
