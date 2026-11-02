@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";
 
 import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
+import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-codes";
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
@@ -126,6 +127,24 @@ queryClient.setQueryData<{
   pageParams: unknown[];
 }>(["timeline"], {
   pages: [{ posts: TimelineFeedStories.args.posts }],
+  pageParams: [undefined],
+});
+
+queryClient.setQueryData<{
+  pages: Data<typeof inviteCodesLoader>[];
+  pageParams: unknown[];
+}>(["inviteCodes"], {
+  pages: [
+    {
+      codes: [
+        {
+          code: "abc-123-def",
+          expiresAt: "2099-12-31T23:59:59.000Z",
+          createdAt: "2025-01-01T00:00:00.000Z",
+        },
+      ],
+    },
+  ],
   pageParams: [undefined],
 });
 

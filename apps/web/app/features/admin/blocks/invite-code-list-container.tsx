@@ -1,92 +1,73 @@
-import { useFetcher } from "react-router";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import type { loader } from "@/app/routes/admin.invite-codes";
+import { fetchJson } from "@/app/lib/fetch-json";
+import type { loader } from "@/app/routes/admin.api.invite-codes";
 
-import {
-  type InviteCode,
-  InviteCodeItems,
-  InviteCodeList,
-} from "./invite-code-list";
+import { InviteCodeList } from "./invite-code-list";
 
-type DeleteProps = {
-  onDeleteCode: (code: string) => void;
-  deletingCode: string | null;
-};
+type InviteCodesResponse = Awaited<ReturnType<typeof loader>>["data"];
 
-function OlderInviteCodeItemsContainer({
-  cursor,
-  ...deleteProps
-}: DeleteProps & { cursor: string }) {
-  const fetcher = useFetcher<typeof loader>();
+const apiUrl = "/admin/api/invite-codes";
 
-  if (!fetcher.data) {
-    return (
-      <li className="p-4 text-center text-muted">
-        {fetcher.state !== "idle" && "読み込み中..."}
-        <InfiniteScrollTrigger
-          onIntersect={() =>
-            void fetcher.load(
-              `/admin/invite-codes?${new URLSearchParams({ cursor })}`,
-            )
-          }
-          enabled={fetcher.state === "idle"}
-        />
-      </li>
-    );
-  }
-  return (
-    <>
-      <InviteCodeItems codes={fetcher.data.codes} {...deleteProps} />
-      {fetcher.data.cursor && (
-        <OlderInviteCodeItemsContainer
-          cursor={fetcher.data.cursor}
-          {...deleteProps}
-        />
-      )}
-    </>
-  );
-}
-
-type Props = {
-  codes: InviteCode[];
-  cursor?: string;
-};
-
-export function InviteCodeListContainer({ codes, cursor }: Props) {
-  const createFetcher = useFetcher();
-  const deleteFetcher = useFetcher();
-  const deleteProps = {
-    onDeleteCode: (code: string) =>
-      void deleteFetcher.submit(
-        { code },
-        {
-          method: "DELETE",
-          action: "/admin/api/invite-codes",
-          encType: "application/json",
-        },
-      ),
-    deletingCode:
-      deleteFetcher.state === "idle"
-        ? null
-        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          (deleteFetcher.json as { code: string }).code,
-  };
+export function InviteCodeListContainer() {
+  const queryClient = useQueryClient();
+  const onSuccess = () =>
+    queryClient.invalidateQueries({ queryKey: ["inviteCodes"] });
+  const createMutation = useMutation({
+    mutationFn: () => fetchJson(apiUrl, { method: "POST" }),
+    onSuccess,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: (code: string) =>
+      fetchJson(apiUrl, {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ code }),
+      }),
+    onSuccess,
+  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["inviteCodes"],
+      queryFn: ({ pageParam }) =>
+        fetchJson<InviteCodesResponse>(
+          `${apiUrl}?${new URLSearchParams(pageParam ? { cursor: pageParam } : {})}`,
+        ),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.cursor,
+      throwOnError: true,
+    });
 
   return (
     <InviteCodeList
-      codes={codes}
-      onCreateCode={() =>
-        void createFetcher.submit(null, {
-          method: "POST",
-          action: "/admin/api/invite-codes",
-        })
-      }
-      isCreating={createFetcher.state !== "idle"}
-      {...deleteProps}
+      codes={data?.pages.flatMap((page) => page.codes) ?? []}
+      onCreateCode={() => createMutation.mutate()}
+      isCreating={createMutation.isPending}
+      onDeleteCode={deleteMutation.mutate}
+      deletingCode={deleteMutation.isPending ? deleteMutation.variables : null}
+      isLoading={!data}
     >
-      {cursor && (
-        <OlderInviteCodeItemsContainer cursor={cursor} {...deleteProps} />
+      {(!data || hasNextPage) && (
+        <li
+          role="status"
+          aria-label={data ? "続きを読み込み中" : "読み込み中"}
+          className="flex justify-center py-6"
+        >
+          <LoaderCircle className="size-6 animate-spin text-muted" />
+          {data && (
+            <InfiniteScrollTrigger
+              onIntersect={() => void fetchNextPage()}
+              enabled={!isFetchingNextPage}
+            />
+          )}
+        </li>
       )}
     </InviteCodeList>
   );

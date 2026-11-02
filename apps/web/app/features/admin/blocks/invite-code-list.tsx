@@ -29,6 +29,7 @@ type RowsProps = {
 type Props = RowsProps & {
   onCreateCode: () => void;
   isCreating: boolean;
+  isLoading?: boolean;
   children?: ReactNode;
 };
 
@@ -126,6 +127,7 @@ export function InviteCodeList({
   codes,
   onCreateCode,
   isCreating,
+  isLoading,
   onDeleteCode,
   deletingCode,
   children,
@@ -144,7 +146,7 @@ export function InviteCodeList({
         </Button>
       </div>
       <ul aria-label="招待コード">
-        {codes.length === 0 ? (
+        {!isLoading && codes.length === 0 ? (
           <li className="py-8 text-center text-label text-muted">
             招待コードはまだありません
           </li>
