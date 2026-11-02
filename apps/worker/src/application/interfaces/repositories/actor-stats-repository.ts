@@ -1,18 +1,15 @@
 import type { TransactionContext } from "@repo/common/domain";
 
+export interface ActorStats {
+  actorDid: string;
+  followsCount: number;
+  followersCount: number;
+  postsCount: number;
+}
+
 export interface IActorStatsRepository {
-  upsertFollowsCount: (params: {
+  save: (params: {
     ctx: TransactionContext;
-    actorDid: string;
-  }) => Promise<void>;
-
-  upsertFollowersCount: (params: {
-    ctx: TransactionContext;
-    actorDid: string;
-  }) => Promise<void>;
-
-  upsertPostsCount: (params: {
-    ctx: TransactionContext;
-    actorDid: string;
+    stats: ActorStats;
   }) => Promise<void>;
 }
