@@ -130,12 +130,14 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 指定した投稿へのいいねを新しい順に返す。認証は任意。
 
 - getLikes-1: 指定した投稿にいいねしたアクターをprofileViewで返す
+- getLikes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getRepostedBy
 
 指定した投稿をリポストしたアクターを新しい順に返す。認証は任意。
 
 - getRepostedBy-1: 指定した投稿をリポストしたアクターをprofileViewで返す
+- getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getFeedGenerators
 
