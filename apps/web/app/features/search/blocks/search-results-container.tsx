@@ -18,7 +18,7 @@ export function SearchResultsContainer({ q, tab }: Props) {
     queryKey: ["search", tab, q],
     queryFn: () =>
       fetchJson<SearchResponse>(
-        `/api/search?${new URLSearchParams({ q, tab })}`,
+        `/api/search?${new URLSearchParams({ q, ...(tab === "posts" && { tab }) })}`,
       ),
     throwOnError: true,
   });
