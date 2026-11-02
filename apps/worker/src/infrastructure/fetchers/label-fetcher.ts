@@ -17,7 +17,7 @@ export class LabelFetcher implements ILabelFetcher {
     let cursor: string | undefined;
     do {
       const res = await this.client.call(queryLabels, {
-        uriPatterns: [did, `at://${did}/*`],
+        uriPatterns: [did],
         limit: 250,
         cursor,
       });
