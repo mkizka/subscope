@@ -2,6 +2,7 @@ import type {
   ActorDto,
   IActorQuery,
 } from "@/app/server/infrastructure/actor/actor-query";
+import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 import type {
   ITimelineQuery,
   TimelinePostDto,
@@ -18,13 +19,26 @@ export interface ISearchUseCase {
 export const searchUseCaseFactory = ({
   actorQuery,
   timelineQuery,
+  backfillQuery,
 }: {
   actorQuery: IActorQuery;
+  backfillQuery: IBackfillQuery;
   timelineQuery: ITimelineQuery;
 }): ISearchUseCase => ({
   async execute(did, q, tab) {
-    return tab === "posts"
-      ? { actors: [], posts: await timelineQuery.searchPosts(did, q) }
-      : { actors: await actorQuery.searchActors(did, q), posts: [] };
+    if (tab === "posts") {
+      return { actors: [], posts: await timelineQuery.searchPosts(did, q) };
+    }
+    const actors = await actorQuery.searchActors(did, q);
+    const statuses = await backfillQuery.findTrackedStatuses(
+      actors.map((actor) => actor.did),
+    );
+    return {
+      actors: actors.map((actor) => ({
+        ...actor,
+        backfillStatus: statuses[actor.did],
+      })),
+      posts: [],
+    };
   },
 });

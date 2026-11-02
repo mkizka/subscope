@@ -182,7 +182,7 @@ export const di = await createRegistry()
   )
   .service(
     "searchUseCase",
-    ["actorQuery", "timelineQuery"],
+    ["actorQuery", "timelineQuery", "backfillQuery"],
     searchUseCaseFactory,
   )
   .service("followCommand", ["oauthClient"], followCommandFactory)
@@ -202,7 +202,11 @@ export const di = await createRegistry()
     ["listQuery", "actorQuery"],
     getListsPageUseCaseFactory,
   )
-  .service("getListPageUseCase", ["listQuery"], getListPageUseCaseFactory)
+  .service(
+    "getListPageUseCase",
+    ["listQuery", "backfillQuery"],
+    getListPageUseCaseFactory,
+  )
   .service("createListUseCase", ["listCommand"], createListUseCaseFactory)
   .service("updateListUseCase", ["listCommand"], updateListUseCaseFactory)
   .service("deleteListUseCase", ["listCommand"], deleteListUseCaseFactory)
