@@ -6,7 +6,7 @@ import type {
 } from "@repo/common/domain";
 import { InviteCode as InviteCodeDomain } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, desc, eq, gt, isNull, lt } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 
 import type { InviteCodeDto } from "../../application/dto/invite-code-dto.js";
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
@@ -14,7 +14,7 @@ import type { IInviteCodeRepository } from "../../application/interfaces/invite-
 export class InviteCodeRepository implements IInviteCodeRepository {
   constructor(private readonly db: DatabaseClient) {}
 
-  async upsert({
+  async save({
     inviteCode,
     ctx,
   }: {
@@ -92,12 +92,18 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     }));
   }
 
-  async findFirst(code: string): Promise<InviteCode | null> {
-    const [row] = await this.db
+  async find({
+    code,
+    ctx,
+  }: {
+    code: string;
+    ctx: TransactionContext;
+  }): Promise<InviteCode | null> {
+    const [row] = await ctx.db
       .select()
       .from(schema.inviteCodes)
       .where(eq(schema.inviteCodes.code, code))
-      .limit(1);
+      .for("update");
 
     if (!row) {
       return null;
@@ -109,27 +115,5 @@ export class InviteCodeRepository implements IInviteCodeRepository {
       usedAt: row.usedAt,
       createdAt: row.createdAt,
     });
-  }
-
-  async markAsUsed({
-    code,
-    ctx,
-  }: {
-    code: string;
-    ctx: TransactionContext;
-  }): Promise<boolean> {
-    const now = new Date();
-    const rows = await ctx.db
-      .update(schema.inviteCodes)
-      .set({ usedAt: now })
-      .where(
-        and(
-          eq(schema.inviteCodes.code, code),
-          isNull(schema.inviteCodes.usedAt),
-          gt(schema.inviteCodes.expiresAt, now),
-        ),
-      )
-      .returning({ code: schema.inviteCodes.code });
-    return rows.length > 0;
   }
 }
