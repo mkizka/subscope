@@ -7,19 +7,24 @@ export type PostImage = { thumb: string; fullsize: string; alt: string };
 
 export function PostImages({ images }: { images: PostImage[] }) {
   const [index, setIndex] = useState(-1);
+  const scrollable = images.length >= 5;
   return (
     <>
       <div
         className={clsx(
-          "relative mt-2 grid gap-1",
-          images.length > 1 && "grid-cols-2",
+          "relative mt-2 gap-1",
+          scrollable ? "flex snap-x snap-mandatory overflow-x-auto" : "grid",
+          !scrollable && images.length > 1 && "grid-cols-2",
         )}
       >
         {images.map((image, i) => (
           <button
             key={image.thumb}
             type="button"
-            className="cursor-zoom-in"
+            className={clsx(
+              "cursor-zoom-in",
+              scrollable && "w-2/5 shrink-0 snap-start",
+            )}
             onClick={() => setIndex(i)}
           >
             <img

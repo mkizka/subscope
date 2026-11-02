@@ -133,6 +133,7 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 
 - post-images-1: 画像が1枚のときは、投稿の幅いっぱいに表示する
 - post-images-2: gallery埋め込み(app.bsky.embed.gallery)の画像も、すべて並べて表示する
+- post-images-3: 画像が5枚以上のときは、横スクロールで表示する
 
 ## 画像の拡大表示
 
