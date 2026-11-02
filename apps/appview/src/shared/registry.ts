@@ -25,7 +25,6 @@ import type { IInviteCodeRepository } from "../application/interfaces/invite-cod
 import type { IActorQuery } from "../application/interfaces/queries/actor-query.js";
 import type { IActorStatsQuery } from "../application/interfaces/queries/actor-stats-query.js";
 import type { IAuthorFeedQuery } from "../application/interfaces/queries/author-feed-query.js";
-import type { IBackfillStatusQuery } from "../application/interfaces/queries/backfill-status-query.js";
 import type { IFollowQuery } from "../application/interfaces/queries/follow-query.js";
 import type { IGeneratorQuery } from "../application/interfaces/queries/generator-query.js";
 import type { IInviteCodeQuery } from "../application/interfaces/queries/invite-code-query.js";
@@ -99,7 +98,6 @@ import { InviteCodeRepository } from "../infrastructure/invite-code-repository/i
 import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
 import { ActorStatsQuery } from "../infrastructure/queries/actor-stats-query/actor-stats-query.js";
 import { AuthorFeedQuery } from "../infrastructure/queries/author-feed-query/author-feed-query.js";
-import { BackfillStatusQuery } from "../infrastructure/queries/backfill-status-query/backfill-status-query.js";
 import { FollowQuery } from "../infrastructure/queries/follow-query/follow-query.js";
 import { GeneratorQuery } from "../infrastructure/queries/generator-query/generator-query.js";
 import { InviteCodeQuery } from "../infrastructure/queries/invite-code-query/invite-code-query.js";
@@ -189,7 +187,6 @@ export const createAppRegistry = (env: Env) =>
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
-    .service("backfillStatusQuery", ["db"], asClassArgs<IBackfillStatusQuery>()(BackfillStatusQuery))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
     .service("actorRepository", ["db"], asClassArgs<IActorRepository>()(ActorRepository))
@@ -254,7 +251,7 @@ export const createAppRegistry = (env: Env) =>
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedActorsUseCase", ["actorQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedActorsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
-    .service("getSubscribersUseCase", ["viewContextFactory", "profileViews", "actorRepository", "subscriptionQuery", "backfillStatusQuery"], asClassArgs(GetSubscribersUseCase))
+    .service("getSubscribersUseCase", ["viewContextFactory", "profileViews", "actorRepository", "subscriptionQuery"], asClassArgs(GetSubscribersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "actorRepository", "subscriptionRepository"], asClassArgs(GrantAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "actorQuery", "subscriptionRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["actorRepository"], asClassArgs(VerifyAccessUseCase))

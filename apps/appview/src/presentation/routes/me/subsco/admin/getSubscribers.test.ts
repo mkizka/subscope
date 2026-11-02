@@ -153,9 +153,9 @@ describe("me.subsco.admin.getSubscribers", () => {
     return client;
   };
 
-  test("getSubscribers-7: サブスクライバー本人とフォロー先の全員のバックフィルが完了していれば、backfillStatusをcompletedにする", async () => {
+  test("getSubscribers-7: フォロー先の状態にかかわらず、サブスクライバー本人のバックフィルの状態をbackfillStatusとして返す", async () => {
     // arrange
-    const client = await setupBackfill("completed", "completed");
+    const client = await setupBackfill("completed", "error");
 
     // act
     const res = await client.call(getSubscribers);
@@ -164,20 +164,9 @@ describe("me.subsco.admin.getSubscribers", () => {
     expect(res.subscribers).toMatchObject([{ backfillStatus: "completed" }]);
   });
 
-  test("getSubscribers-8: サブスクライバー本人とフォロー先に1人でもバックフィルがエラーのアカウントがいれば、backfillStatusをerrorにする", async () => {
+  test("getSubscribers-8: サブスクライバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする", async () => {
     // arrange
-    const client = await setupBackfill("inProgress", "error");
-
-    // act
-    const res = await client.call(getSubscribers);
-
-    // assert
-    expect(res.subscribers).toMatchObject([{ backfillStatus: "error" }]);
-  });
-
-  test("getSubscribers-9: completedでもerrorでもなければ、backfillStatusをinProgressにする", async () => {
-    // arrange
-    const client = await setupBackfill("completed", null);
+    const client = await setupBackfill(null, "completed");
 
     // act
     const res = await client.call(getSubscribers);
