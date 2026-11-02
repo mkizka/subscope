@@ -1,8 +1,8 @@
 import type { Subscription, TransactionContext } from "@repo/common/domain";
 
-import type { ISubscriptionRepository } from "../../../application/interfaces/repositories/subscription-repository.js";
+import type { ISubscriptionQuery } from "../../../application/interfaces/queries/subscription-query.js";
 
-export class InMemorySubscriptionRepository implements ISubscriptionRepository {
+export class InMemorySubscriptionQuery implements ISubscriptionQuery {
   private subscriptions: Map<string, Subscription> = new Map();
 
   add(subscription: Subscription): void {
@@ -13,19 +13,17 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     this.subscriptions.clear();
   }
 
-  async upsert({
-    subscription,
-  }: {
-    ctx: TransactionContext;
-    subscription: Subscription;
-  }): Promise<void> {
-    this.subscriptions.set(subscription.actorDid, subscription);
-  }
-
   async isSubscriber(
     _ctx: TransactionContext,
     actorDid: string,
   ): Promise<boolean> {
     return this.subscriptions.has(actorDid);
+  }
+
+  async isFollowedByAnySubscriber(
+    _ctx: TransactionContext,
+    _subjectDid: string,
+  ): Promise<boolean> {
+    return false;
   }
 }

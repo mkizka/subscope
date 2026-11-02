@@ -6,10 +6,9 @@ const legacyRepositoryMethods = {
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFeedItemRepository: "upsert",
-  IFollowRepository:
-    "findFolloweeDids|findFollowers|findFollows|isFollowedByAnySubscriber|upsert",
+  IFollowRepository: "findFolloweeDids|findFollowers|findFollows",
   IGeneratorRepository: "upsert",
-  IInviteCodeRepository: "findAll|findByCode|findFirst|markAsUsed|upsert",
+  IInviteCodeRepository: "findAll|findFirst|markAsUsed|upsert",
   ILabelRepository: "upsert",
   ILikeRepository: "findMany|upsert",
   IListItemRepository: "upsert",
@@ -23,7 +22,7 @@ const legacyRepositoryMethods = {
   IRecordRevRepository: "saveIfNotOlder",
   IRepostRepository: "findRepostsByPost|upsert",
   ISubscriptionRepository:
-    "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|isSubscriber|updateSeenAt|upsert",
+    "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|updateSeenAt",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({

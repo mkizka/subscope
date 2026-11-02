@@ -5,12 +5,11 @@ import type {
   JobData,
 } from "@repo/common/domain";
 
+import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type {
   BackfillStatus,
   IActorRepository,
 } from "../../interfaces/repositories/actor-repository.js";
-import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 
 const IN_PROGRESS_STATES = ["pending", "desynchronized", "resyncing"];
 
@@ -23,8 +22,7 @@ const toBackfillStatus = (tapState: string): BackfillStatus => {
 export class CheckBackfillUseCase {
   constructor(
     private readonly tapClient: ITapClient,
-    private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly followRepository: IFollowRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly actorRepository: IActorRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly db: DatabaseClient,
@@ -33,11 +31,8 @@ export class CheckBackfillUseCase {
   async execute({ did, attempt }: JobData["checkBackfill"]) {
     const ctx = { db: this.db };
     const isTrackedActor =
-      (await this.subscriptionRepository.isSubscriber(ctx, did)) ||
-      (await this.followRepository.isFollowedByAnySubscriber({
-        ctx,
-        subjectDid: did,
-      }));
+      (await this.subscriptionQuery.isSubscriber(ctx, did)) ||
+      (await this.subscriptionQuery.isFollowedByAnySubscriber(ctx, did));
     if (!isTrackedActor) {
       return;
     }

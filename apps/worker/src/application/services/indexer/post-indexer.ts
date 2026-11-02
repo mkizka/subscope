@@ -11,13 +11,13 @@ import {
   PostEmbedRecordWithMedia,
 } from "@repo/common/domain";
 
+import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type {
   INotificationRepository,
   Notification,
 } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
@@ -26,7 +26,7 @@ export class PostIndexer implements ICollectionIndexer {
   constructor(
     private readonly postRepository: IPostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly notificationRepository: INotificationRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
@@ -102,7 +102,7 @@ export class PostIndexer implements ICollectionIndexer {
         !candidate ||
         candidate.recipientDid === post.actorDid ||
         notifications.has(candidate.recipientDid) ||
-        !(await this.subscriptionRepository.isSubscriber(
+        !(await this.subscriptionQuery.isSubscriber(
           ctx,
           candidate.recipientDid,
         ))
