@@ -10,4 +10,10 @@ export interface IRepostQuery {
     viewerDid: Did;
     subjectUris: AtUri[];
   }) => Promise<RepostDto[]>;
+
+  findBySubject: (params: {
+    subjectUri: string;
+    limit: number;
+    cursor?: Date;
+  }) => Promise<RepostDto[]>;
 }

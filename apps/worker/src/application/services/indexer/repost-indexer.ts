@@ -5,10 +5,10 @@ import type {
 } from "@repo/common/domain";
 import { FeedItem, Repost } from "@repo/common/domain";
 
+import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
-import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
@@ -16,7 +16,7 @@ export class RepostIndexer implements ICollectionIndexer {
   constructor(
     private readonly repostRepository: IRepostRepository,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly postRepository: IPostRepository,
+    private readonly postQuery: IPostQuery,
     private readonly jobScheduler: IJobScheduler,
     private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly notificationRepository: INotificationRepository,
@@ -59,10 +59,7 @@ export class RepostIndexer implements ICollectionIndexer {
       });
     }
 
-    const subjectExists = await this.postRepository.exists(
-      ctx,
-      repost.subjectUri,
-    );
+    const subjectExists = await this.postQuery.exists(ctx, repost.subjectUri);
     if (!subjectExists) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleFetchRecord(repost.subjectUri, {
