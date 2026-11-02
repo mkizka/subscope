@@ -40,6 +40,7 @@ import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetRegisteredAccounts } from "./me/subsco/server/getRegisteredAccounts.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 import type { GetTrackedAccounts } from "./me/subsco/server/getTrackedAccounts.js";
+import type { GetBackfillStatuses } from "./me/subsco/sync/getBackfillStatuses.js";
 import type { GetRegistrationStatus } from "./me/subsco/sync/getRegistrationStatus.js";
 import type { RegisterAccount } from "./me/subsco/sync/registerAccount.js";
 import type { UnregisterAccount } from "./me/subsco/sync/unregisterAccount.js";
@@ -60,6 +61,7 @@ export const lexRouterFactory = (
   getGroupedNotifications: GetGroupedNotifications,
   updateSeen: UpdateSeen,
   getRegistrationStatus: GetRegistrationStatus,
+  getBackfillStatuses: GetBackfillStatuses,
   registerAccount: RegisterAccount,
   unregisterAccount: UnregisterAccount,
   banAccount: BanAccount,
@@ -103,6 +105,7 @@ export const lexRouterFactory = (
     getGroupedNotifications,
     updateSeen,
     getRegistrationStatus,
+    getBackfillStatuses,
     registerAccount,
     unregisterAccount,
     banAccount,
