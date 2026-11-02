@@ -6,13 +6,7 @@ import type { IProfileRepository } from "../../../application/interfaces/reposit
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async upsert({
-    ctx,
-    profile,
-  }: {
-    ctx: TransactionContext;
-    profile: Profile;
-  }) {
+  async save({ ctx, profile }: { ctx: TransactionContext; profile: Profile }) {
     const profileData = {
       cid: profile.cid,
       actorDid: profile.actorDid,

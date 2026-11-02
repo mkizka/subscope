@@ -28,4 +28,33 @@ describe("app.bsky.actor.searchActorsTypeahead", () => {
       { did: actor.did, displayName: "Zqx Alice" },
     ]);
   });
+
+  test("searchActorsTypeahead-2: ハンドルが検索語に部分一致するアクターも返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const actor = await actorFactory(ctx.db)
+      .props({ handle: () => "zqx-carol.test" })
+      .use((t) => t.withProfile({ displayName: "Carol" }))
+      .create();
+
+    // act
+    const res = await client.call(searchActorsTypeahead, { q: "zqx" });
+
+    // assert
+    expect(res.actors).toMatchObject([{ did: actor.did }]);
+  });
+
+  test("searchActorsTypeahead-3: 空白だけの検索語には何も返さない", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    await actorFactory(ctx.db)
+      .use((t) => t.withProfile({ displayName: "Zqx Alice" }))
+      .create();
+
+    // act
+    const res = await client.call(searchActorsTypeahead, { q: " " });
+
+    // assert
+    expect(res.actors).toEqual([]);
+  });
 });

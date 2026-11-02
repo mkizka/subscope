@@ -9,7 +9,7 @@ import type { IndexCommitCommand } from "./index-commit-command.js";
 describe("IndexCommitUseCase", () => {
   let indexCommitUseCase: TestServices["indexCommitUseCase"];
   let actorRepo: TestServices["actorRepository"];
-  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let subscriptionQuery: TestServices["subscriptionQuery"];
   let postRepo: TestServices["postRepository"];
   let recordRepo: TestServices["recordRepository"];
   let likeRepo: TestServices["likeRepository"];
@@ -19,7 +19,7 @@ describe("IndexCommitUseCase", () => {
     const services = await testRegistry.resolve();
     indexCommitUseCase = services.indexCommitUseCase;
     actorRepo = services.actorRepository;
-    subscriptionRepo = services.subscriptionRepository;
+    subscriptionQuery = services.subscriptionQuery;
     postRepo = services.postRepository;
     recordRepo = services.recordRepository;
     likeRepo = services.likeRepository;
@@ -34,7 +34,7 @@ describe("IndexCommitUseCase", () => {
       actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepo.add(subscription);
+      subscriptionQuery.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -58,7 +58,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      const savedPost = postRepo.findByUri(uri);
+      const savedPost = await postRepo.find({ ctx, uri });
       expect(savedPost).not.toBeNull();
       expect(savedPost?.uri.toString()).toBe(uri.toString());
       expect(savedPost?.cid).toBe("cid123");
@@ -91,7 +91,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(postRepo.findByUri(uri)).not.toBeNull();
+      expect(await postRepo.find({ ctx, uri })).not.toBeNull();
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
@@ -134,14 +134,10 @@ describe("IndexCommitUseCase", () => {
 
       // assert
       expect(
-        await recordRepo.findByUri({ ctx, uri: threadgate.uri }),
+        await recordRepo.find({ ctx, uri: threadgate.uri }),
       ).not.toBeNull();
-      expect(
-        await recordRepo.findByUri({ ctx, uri: postgate.uri }),
-      ).not.toBeNull();
-      expect(
-        await recordRepo.findByUri({ ctx, uri: mismatched.uri }),
-      ).toBeNull();
+      expect(await recordRepo.find({ ctx, uri: postgate.uri })).not.toBeNull();
+      expect(await recordRepo.find({ ctx, uri: mismatched.uri })).toBeNull();
     });
 
     test.each([
@@ -155,12 +151,12 @@ describe("IndexCommitUseCase", () => {
         const likerActor = actorFactory();
         const authorActor = actorFactory();
         if (liker) {
-          subscriptionRepo.add(
+          subscriptionQuery.add(
             subscriptionFactory({ actorDid: likerActor.did }),
           );
         }
         if (author) {
-          subscriptionRepo.add(
+          subscriptionQuery.add(
             subscriptionFactory({ actorDid: authorActor.did }),
           );
         }
@@ -185,8 +181,10 @@ describe("IndexCommitUseCase", () => {
         });
 
         // assert
-        expect(likeRepo.findByUri(uri) !== null).toBe(liker || author);
-        expect((await recordRepo.findByUri({ ctx, uri })) !== null).toBe(
+        expect((await likeRepo.find({ ctx, uri })) !== null).toBe(
+          liker || author,
+        );
+        expect((await recordRepo.find({ ctx, uri })) !== null).toBe(
           liker || author,
         );
       },
@@ -200,7 +198,7 @@ describe("IndexCommitUseCase", () => {
       actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepo.add(subscription);
+      subscriptionQuery.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -232,7 +230,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(deleteCommand);
 
       // assert
-      const deletedRecord = await recordRepo.findByUri({ ctx, uri });
+      const deletedRecord = await recordRepo.find({ ctx, uri });
       expect(deletedRecord).toBeNull();
     });
   });
@@ -244,7 +242,7 @@ describe("IndexCommitUseCase", () => {
       actorRepo.add(actor);
 
       const subscription = subscriptionFactory({ actorDid: actor.did });
-      subscriptionRepo.add(subscription);
+      subscriptionQuery.add(subscription);
 
       const uri = new AtUri(`at://${actor.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -267,7 +265,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(command);
 
       // assert
-      expect(postRepo.findByUri(uri)).toBeNull();
+      expect(await postRepo.find({ ctx, uri })).toBeNull();
     });
 
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {

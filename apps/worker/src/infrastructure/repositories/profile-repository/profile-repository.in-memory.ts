@@ -14,11 +14,16 @@ export class InMemoryProfileRepository implements IProfileRepository {
     this.profiles.clear();
   }
 
-  findByUri(uri: AtUri): Profile | null {
+  async find({
+    uri,
+  }: {
+    ctx: TransactionContext;
+    uri: AtUri;
+  }): Promise<Profile | null> {
     return this.profiles.get(uri.toString()) ?? null;
   }
 
-  async upsert(params: {
+  async save(params: {
     ctx: TransactionContext;
     profile: Profile;
   }): Promise<void> {

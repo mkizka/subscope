@@ -9,6 +9,6 @@ export class ProfileIndexer implements ICollectionIndexer {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const profile = Profile.from(record);
-    await this.profileRepository.upsert({ ctx, profile });
+    await this.profileRepository.save({ ctx, profile });
   }
 }

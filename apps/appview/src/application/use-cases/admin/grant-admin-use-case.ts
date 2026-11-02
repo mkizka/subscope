@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
@@ -7,7 +7,7 @@ import { NotSubscribedError } from "../../../application/use-cases/sync/unsubscr
 
 export class GrantAdminUseCase {
   constructor(
-    private readonly db: DatabaseClient,
+    private readonly transactionManager: ITransactionManager,
     private readonly actorRepository: IActorRepository,
     private readonly subscriptionRepository: ISubscriptionRepository,
   ) {}
@@ -20,6 +20,8 @@ export class GrantAdminUseCase {
     }
 
     actor.promoteToAdmin();
-    await this.actorRepository.save({ ctx: { db: this.db }, actor });
+    await this.transactionManager.transaction((ctx) =>
+      this.actorRepository.save({ ctx, actor }),
+    );
   }
 }

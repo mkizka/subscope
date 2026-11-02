@@ -12,13 +12,13 @@ import {
 } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
+import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type {
   INotificationRepository,
   Notification,
 } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
@@ -28,7 +28,7 @@ export class PostIndexer implements ICollectionIndexer {
     private readonly postRepository: IPostRepository,
     private readonly postQuery: IPostQuery,
     private readonly feedItemRepository: IFeedItemRepository,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly notificationRepository: INotificationRepository,
     private readonly jobScheduler: IJobScheduler,
   ) {}
@@ -45,7 +45,7 @@ export class PostIndexer implements ICollectionIndexer {
     depth: number;
   }) {
     const post = Post.from(record);
-    await this.postRepository.upsert({ ctx, post });
+    await this.postRepository.save({ ctx, post });
 
     const feedItem = FeedItem.fromPost(post);
     await this.feedItemRepository.upsert({ ctx, feedItem });
@@ -104,7 +104,7 @@ export class PostIndexer implements ICollectionIndexer {
         !candidate ||
         candidate.recipientDid === post.actorDid ||
         notifications.has(candidate.recipientDid) ||
-        !(await this.subscriptionRepository.isSubscriber(
+        !(await this.subscriptionQuery.isSubscriber(
           ctx,
           candidate.recipientDid,
         ))

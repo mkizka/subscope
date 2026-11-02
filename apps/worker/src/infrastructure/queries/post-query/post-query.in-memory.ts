@@ -8,13 +8,15 @@ export class InMemoryPostQuery implements IPostQuery {
   constructor(private readonly postRepository: InMemoryPostRepository) {}
 
   async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
-    return this.postRepository.findByUri(uri) !== null;
+    return (await this.postRepository.find({ ctx, uri })) !== null;
   }
 
   async findReplyParentUri(
     ctx: TransactionContext,
     uri: AtUri,
   ): Promise<AtUri | null> {
-    return this.postRepository.findByUri(uri)?.replyParent?.uri ?? null;
+    return (
+      (await this.postRepository.find({ ctx, uri }))?.replyParent?.uri ?? null
+    );
   }
 }

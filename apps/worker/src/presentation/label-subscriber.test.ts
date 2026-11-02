@@ -2,7 +2,10 @@ import assert from "node:assert";
 import { once } from "node:events";
 
 import { MessageFrame } from "@atproto/xrpc-server";
-import { MetricReporter } from "@repo/common/infrastructure";
+import {
+  MetricReporter,
+  TransactionManager,
+} from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
 import { actorFactory, testSetup } from "@repo/test-utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -11,7 +14,7 @@ import { WebSocketServer } from "ws";
 
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.in-memory.js";
-import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
+import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
 import { LabelRepository } from "../infrastructure/repositories/label-repository/label-repository.js";
 import { LabelSubscriber } from "./label-subscriber.js";
 
@@ -38,8 +41,8 @@ describe("モデレーションサービスからのラベル受信", () => {
       new MetricReporter(),
       new IndexLabelUseCase(
         new LabelRepository(),
-        new ActorRepository(),
-        ctx.db,
+        new ActorQuery(),
+        new TransactionManager(ctx.db),
       ),
       labelCursorStore,
       moderationUrl,

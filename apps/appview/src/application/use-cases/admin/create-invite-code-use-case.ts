@@ -1,12 +1,11 @@
 import { type DatetimeString, toDatetimeString } from "@atproto/syntax";
-import type { DatabaseClient } from "@repo/common/domain";
-import { InviteCode } from "@repo/common/domain";
+import { InviteCode, type ITransactionManager } from "@repo/common/domain";
 
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 
 export class CreateInviteCodeUseCase {
   constructor(
-    private readonly db: DatabaseClient,
+    private readonly transactionManager: ITransactionManager,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly publicUrl: string,
   ) {}
@@ -16,10 +15,9 @@ export class CreateInviteCodeUseCase {
   }): Promise<{ code: string; expiresAt: DatetimeString }> {
     const inviteCode = InviteCode.generate(this.publicUrl, params.daysToExpire);
 
-    await this.inviteCodeRepository.save({
-      inviteCode,
-      ctx: { db: this.db },
-    });
+    await this.transactionManager.transaction((ctx) =>
+      this.inviteCodeRepository.save({ inviteCode, ctx }),
+    );
 
     return {
       code: inviteCode.code,

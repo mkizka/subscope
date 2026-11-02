@@ -11,30 +11,12 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     this.subscriptions.set(subscription.actorDid, subscription);
   }
 
-  clear(): void {
-    this.subscriptions.clear();
-  }
-
-  findMany(params: {
-    limit: number;
-    cursor?: string;
-  }): Promise<Subscription[]> {
-    let subscriptions = Array.from(this.subscriptions.values());
-
-    subscriptions = subscriptions.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
-
-    if (params.cursor) {
-      const cursorDate = new Date(params.cursor);
-      subscriptions = subscriptions.filter((sub) => sub.createdAt < cursorDate);
-    }
-
-    return Promise.resolve(subscriptions.slice(0, params.limit));
+  findMany(): Promise<Subscription[]> {
+    throw new Error("Not implemented");
   }
 
   count(): Promise<number> {
-    return Promise.resolve(this.subscriptions.size);
+    throw new Error("Not implemented");
   }
 
   findTrackedActors(): Promise<

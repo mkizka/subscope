@@ -20,7 +20,7 @@ describe("RepostIndexer", () => {
   let feedItemRepo: TestServices["feedItemRepository"];
   let postRepo: TestServices["postRepository"];
   let jobScheduler: TestServices["jobScheduler"];
-  let subscriptionRepo: TestServices["subscriptionRepository"];
+  let subscriptionQuery: TestServices["subscriptionQuery"];
   let notificationRepo: TestServices["notificationRepository"];
   let db: TestServices["db"];
   beforeEach(async () => {
@@ -30,7 +30,7 @@ describe("RepostIndexer", () => {
     feedItemRepo = services.feedItemRepository;
     postRepo = services.postRepository;
     jobScheduler = services.jobScheduler;
-    subscriptionRepo = services.subscriptionRepository;
+    subscriptionQuery = services.subscriptionQuery;
     notificationRepo = services.notificationRepository;
     db = services.db;
   });
@@ -64,7 +64,7 @@ describe("RepostIndexer", () => {
       });
 
       // assert
-      const repost = repostRepo.findByUri(record.uri);
+      const repost = await repostRepo.find({ ctx, uri: record.uri });
       expect(repost).toMatchObject({
         uri: record.uri,
         cid: record.cid,
@@ -72,7 +72,7 @@ describe("RepostIndexer", () => {
         subjectUri: new AtUri(subjectUri),
       });
 
-      const feedItem = feedItemRepo.findByUri(record.uri);
+      const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
         uri: record.uri,
         type: "repost",
@@ -93,7 +93,7 @@ describe("RepostIndexer", () => {
       // arrange
       const reposter = actorFactory();
       const author = actorFactory();
-      subscriptionRepo.add(subscriptionFactory({ actorDid: author.did }));
+      subscriptionQuery.add(subscriptionFactory({ actorDid: author.did }));
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
       const record = recordFactory({
         uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,

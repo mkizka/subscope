@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { DatabaseClient } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
 
@@ -12,7 +12,7 @@ export class NotBannedError extends Error {
 
 export class UnbanActorUseCase {
   constructor(
-    private readonly db: DatabaseClient,
+    private readonly transactionManager: ITransactionManager,
     private readonly actorRepository: IActorRepository,
   ) {}
 
@@ -23,6 +23,8 @@ export class UnbanActorUseCase {
     }
 
     actor.unban();
-    await this.actorRepository.save({ ctx: { db: this.db }, actor });
+    await this.transactionManager.transaction((ctx) =>
+      this.actorRepository.save({ ctx, actor }),
+    );
   }
 }

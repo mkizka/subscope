@@ -1,13 +1,15 @@
 import { toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedGetLikes from "@repo/client/lex/app/bsky/feed/getLikes";
 
-import type { LikeService } from "../../../application/service/graph/like-service.js";
+import type { SubjectLikeDto } from "../../../application/dto/like-dto.js";
+import type { ILikeQuery } from "../../../application/interfaces/like-query.js";
+import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
 export class GetLikesUseCase {
   constructor(
-    private readonly likeService: LikeService,
+    private readonly likeQuery: ILikeQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
   ) {}
@@ -15,17 +17,21 @@ export class GetLikesUseCase {
   async execute(
     params: AppBskyFeedGetLikes.$Params,
   ): Promise<AppBskyFeedGetLikes.$OutputBody> {
-    const cursor = params.cursor ? new Date(params.cursor) : undefined;
-
-    const paginationResult = await this.likeService.findLikesWithPagination({
-      subjectUri: params.uri,
-      cursor,
+    const paginator = createCursorPaginator<SubjectLikeDto>({
       limit: params.limit,
+      getCursor: (like) => like.sortAt.toISOString(),
     });
+    const page = paginator.extractPage(
+      await this.likeQuery.findSubjectLikes({
+        subjectUri: params.uri,
+        limit: paginator.queryLimit,
+        cursor: params.cursor ? new Date(params.cursor) : undefined,
+      }),
+    );
 
     const ctx = this.viewContextFactory.create();
     const likes = await Promise.all(
-      paginationResult.items.map(
+      page.items.map(
         async (like): Promise<AppBskyFeedGetLikes.Like | undefined> => {
           const actor = await this.profileViews.view(like.actorDid, ctx);
           return (
@@ -43,7 +49,7 @@ export class GetLikesUseCase {
     return {
       uri: params.uri,
       cid: params.cid,
-      cursor: paginationResult.cursor,
+      cursor: page.cursor,
       likes: likes.filter((like) => like !== undefined),
     };
   }

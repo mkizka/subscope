@@ -90,12 +90,17 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
 
 - searchActors-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewで返す
+- searchActors-2: ハンドルが検索語に部分一致するアクターも返す
+- searchActors-3: 空白だけの検索語には何も返さない
+- searchActors-4: cursorを指定すると、前のページに含めなかったアクターを返す
 
 ## app.bsky.actor.searchActorsTypeahead
 
 入力補完用に、表示名またはハンドルが検索語に部分一致するアクターを返す。認証は任意。
 
 - searchActorsTypeahead-1: 表示名が検索語に大文字・小文字を区別せず部分一致するアクターをprofileViewBasicで返す
+- searchActorsTypeahead-2: ハンドルが検索語に部分一致するアクターも返す
+- searchActorsTypeahead-3: 空白だけの検索語には何も返さない
 
 ## app.bsky.actor.getPreferences
 
@@ -130,12 +135,14 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 指定した投稿へのいいねを新しい順に返す。認証は任意。
 
 - getLikes-1: 指定した投稿にいいねしたアクターをprofileViewで返す
+- getLikes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getRepostedBy
 
 指定した投稿をリポストしたアクターを新しい順に返す。認証は任意。
 
 - getRepostedBy-1: 指定した投稿をリポストしたアクターをprofileViewで返す
+- getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getFeedGenerators
 
@@ -239,12 +246,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 指定したアクターをフォローしているアクターを返す。認証は任意。
 
 - getFollowers-1: 指定したアクターをsubjectに、そのフォロワーをfollowersにprofileViewで返す
+- getFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getFollows
 
 指定したアクターがフォローしているアクターを返す。認証は任意。
 
 - getFollows-1: 指定したアクターをsubjectに、そのフォロー先をfollowsにprofileViewで返す
+- getFollows-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.graph.getList
 
@@ -269,7 +278,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.server.getSetupStatus
 
-サーバーの初期設定が済んでいるかを返す。認証は不要。管理者が登録済みなら initialized を true にする。
+サーバーの初期設定が済んでいるかを返す。認証は不要。
+
+- getSetupStatus-1: 管理者が未登録ならinitializedをfalseにする
+- getSetupStatus-2: 管理者が登録済みならinitializedをtrueにする
 
 ## me.subsco.server.getTrackedActors
 
@@ -281,24 +293,38 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.sync.subscribeServer
 
-閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。管理者は招待コードなしで登録でき、それ以外は有効期限内の未使用の招待コードが必要で、使った招待コードは使用済みになる。招待コードが無効なら400とInvalidInviteCodeを、登録済みなら400とAlreadySubscribedを返す。
+閲覧者をサブスクライバーとして登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。
 
 - subscribeServer-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
 - subscribeServer-2: BANされたアカウントは登録せず、400とBannedを返す
+- subscribeServer-3: 管理者以外は、有効期限内の未使用の招待コードがなければ登録せず、400とInvalidInviteCodeを返す
+- subscribeServer-4: 登録済みのアカウントは登録せず、400とAlreadySubscribedを返す
+- subscribeServer-5: 管理者は招待コードなしで登録する
+- subscribeServer-6: 登録に使った招待コードを使用済みにする
+- subscribeServer-7: 登録したアカウントのsyncTapRepoジョブを積む
+- subscribeServer-8: DBにないアカウントも登録する
 
 ## me.subsco.sync.unsubscribeServer
 
-閲覧者のサブスクライバー登録を解除する。認証が必要。使った招待コードは使用済みのまま残る。登録していなければ400とNotSubscribedを返す。
+閲覧者のサブスクライバー登録を解除する。認証が必要。
 
 - unsubscribeServer-1: 本人とそのフォロイーのsyncTapRepoジョブを積む
+- unsubscribeServer-2: 登録を消し、使った招待コードは使用済みのまま残す
+- unsubscribeServer-3: 登録していなければ400とNotSubscribedを返す
 
 ## me.subsco.sync.getSubscriptionStatus
 
 閲覧者がサブスクライバーかどうかを返す。認証が必要。
 
+- getSubscriptionStatus-1: 閲覧者がサブスクライバーならisSubscriberをtrueにする
+- getSubscriptionStatus-2: 閲覧者がサブスクライバーでなければisSubscriberをfalseにする
+
 ## me.subsco.admin.verifyAccess
 
-閲覧者の管理画面へのアクセス権を返す。認証が必要。statusは管理者が未登録なら `needsSetup`、閲覧者が管理者なら `authorized`、それ以外は `unauthorized` になる。
+閲覧者の管理画面へのアクセス権を返す。認証が必要。
+
+- verifyAccess-1: 閲覧者が管理者ならstatusをauthorizedにする
+- verifyAccess-2: 閲覧者が管理者でなければstatusをunauthorizedにする
 
 ## me.subsco.admin.registerAdmin
 
@@ -350,9 +376,10 @@ BANされたアクターのプロフィールを返す。管理者の認証が�
 
 ## me.subsco.admin.createInviteCode
 
-daysToExpire日後に期限が切れる招待コードを作る。管理者の認証が必要。
+招待コードを作る。管理者の認証が必要。
 
 - createInviteCode-1: コードは公開URLのホスト名の「.」を「-」に置き換え、「-」と英小文字・数字のランダムな5文字を続けたものにする
+- createInviteCode-2: 有効期限はdaysToExpire日後にする
 
 ランダムな5文字は推測されないよう暗号論的乱数で作る。
 
