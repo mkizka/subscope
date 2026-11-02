@@ -12,7 +12,7 @@ export class AdminMiddleware {
   async requireAdmin(ctx: { request: Request }) {
     const credentials = await this.authVerifierMiddleware.loginRequired(ctx);
 
-    const actor = await this.actorRepository.findByDid(credentials.did);
+    const actor = await this.actorRepository.find(credentials.did);
     if (!actor?.isAdmin) {
       throw new LexServerError(403, {
         error: "Forbidden",

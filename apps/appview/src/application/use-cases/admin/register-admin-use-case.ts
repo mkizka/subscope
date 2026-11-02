@@ -5,7 +5,7 @@ import {
   Subscription,
 } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IActorQuery } from "../../../application/interfaces/actor-query.js";
 import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
 
@@ -23,14 +23,14 @@ type RegisterAdminParams = {
 export class RegisterAdminUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly actorRepository: IActorRepository,
+    private readonly actorQuery: IActorQuery,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly createAdminService: CreateAdminService,
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
   async execute(params: RegisterAdminParams): Promise<void> {
-    const hasAnyAdmin = await this.actorRepository.hasAnyAdmin();
+    const hasAnyAdmin = await this.actorQuery.hasAnyAdmin();
     if (hasAnyAdmin) {
       throw new AdminAlreadyExistsError("Admin already exists");
     }

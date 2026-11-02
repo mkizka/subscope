@@ -78,7 +78,7 @@ export class SubscribeServerUseCase {
       throw new AlreadySubscribedError("Already subscribed to this server");
     }
 
-    const existingActor = await this.actorRepository.findByDid(actorDid);
+    const existingActor = await this.actorRepository.find(actorDid);
     if (existingActor?.isBanned) {
       throw new BannedError("Banned from this server");
     }
@@ -92,7 +92,7 @@ export class SubscribeServerUseCase {
         const actor = Actor.create({
           did: actorDid,
         });
-        await this.actorRepository.upsert({ ctx, actor });
+        await this.actorRepository.save({ ctx, actor });
       }
 
       const subscription = new Subscription({

@@ -43,12 +43,12 @@ export class IndexCommitUseCase {
       ) {
         return;
       }
-      const isNotOlder = await this.recordRevRepository.saveIfNotOlder({
+      const isSaved = await this.recordRevRepository.save({
         ctx,
         uri: commit.uri,
         rev: commit.rev,
       });
-      if (!isNotOlder) {
+      if (!isSaved) {
         return;
       }
       switch (commit.operation) {
