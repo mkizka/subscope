@@ -130,12 +130,14 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 指定した投稿へのいいねを新しい順に返す。認証は任意。
 
 - getLikes-1: 指定した投稿にいいねしたアクターをprofileViewで返す
+- getLikes-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getRepostedBy
 
 指定した投稿をリポストしたアクターを新しい順に返す。認証は任意。
 
 - getRepostedBy-1: 指定した投稿をリポストしたアクターをprofileViewで返す
+- getRepostedBy-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
 
 ## app.bsky.feed.getFeedGenerators
 
@@ -311,7 +313,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.verifyAccess
 
-閲覧者の管理画面へのアクセス権を返す。認証が必要。statusは管理者が未登録なら `needsSetup`、閲覧者が管理者なら `authorized`、それ以外は `unauthorized` になる。
+閲覧者の管理画面へのアクセス権を返す。認証が必要。
+
+- verifyAccess-1: 閲覧者が管理者ならstatusをauthorizedにする
+- verifyAccess-2: 閲覧者が管理者でなければstatusをunauthorizedにする
 
 ## me.subsco.admin.registerAdmin
 
