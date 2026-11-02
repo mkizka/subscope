@@ -271,7 +271,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.server.getSetupStatus
 
-サーバーの初期設定が済んでいるかを返す。認証は不要。管理者が登録済みなら initialized を true にする。
+サーバーの初期設定が済んでいるかを返す。認証は不要。
+
+- getSetupStatus-1: 管理者が未登録ならinitializedをfalseにする
+- getSetupStatus-2: 管理者が登録済みならinitializedをtrueにする
 
 ## me.subsco.server.getTrackedActors
 

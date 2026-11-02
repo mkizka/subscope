@@ -6,15 +6,13 @@ import type {
 } from "@repo/common/domain";
 
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
-import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
-import type { ISubscriptionRepository } from "../../interfaces/repositories/subscription-repository.js";
+import type { ISubscriptionQuery } from "../../interfaces/queries/subscription-query.js";
 import type { IndexLabelUseCase } from "../label/index-label-use-case.js";
 
 export class SyncTapRepoUseCase {
   constructor(
     private readonly tapClient: ITapClient,
-    private readonly subscriptionRepository: ISubscriptionRepository,
-    private readonly followRepository: IFollowRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly labelFetcher: ILabelFetcher,
     private readonly indexLabelUseCase: IndexLabelUseCase,
     private readonly jobScheduler: IJobScheduler,
@@ -24,11 +22,8 @@ export class SyncTapRepoUseCase {
   async execute(did: Did) {
     const isTrackedActor = await this.transactionManager.transaction(
       async (ctx) =>
-        (await this.subscriptionRepository.isSubscriber(ctx, did)) ||
-        (await this.followRepository.isFollowedByAnySubscriber({
-          ctx,
-          subjectDid: did,
-        })),
+        (await this.subscriptionQuery.isSubscriber(ctx, did)) ||
+        (await this.subscriptionQuery.isFollowedByAnySubscriber(ctx, did)),
     );
     if (isTrackedActor) {
       await this.tapClient.addRepo(did);

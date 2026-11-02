@@ -7,12 +7,12 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
-import { FollowRepository } from "./follow-repository.js";
+import { SubscriptionQuery } from "./subscription-query.js";
 
-describe("FollowRepository", () => {
+describe("SubscriptionQuery", () => {
   const { ctx } = testSetup;
 
-  const followRepository = new FollowRepository();
+  const subscriptionQuery = new SubscriptionQuery();
 
   describe("isFollowedByAnySubscriber", () => {
     test("サブスクライバーからフォローされている場合、trueを返す", async () => {
@@ -35,10 +35,10 @@ describe("FollowRepository", () => {
         .create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await subscriptionQuery.isFollowedByAnySubscriber(
         ctx,
-        subjectDid: followee.did,
-      });
+        followee.did,
+      );
 
       // assert
       expect(result).toBe(true);
@@ -60,10 +60,10 @@ describe("FollowRepository", () => {
         .create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await subscriptionQuery.isFollowedByAnySubscriber(
         ctx,
-        subjectDid: followee.did,
-      });
+        followee.did,
+      );
 
       // assert
       expect(result).toBe(false);
@@ -74,10 +74,10 @@ describe("FollowRepository", () => {
       const followee = await actorFactory(ctx.db).create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await subscriptionQuery.isFollowedByAnySubscriber(
         ctx,
-        subjectDid: followee.did,
-      });
+        followee.did,
+      );
 
       // assert
       expect(result).toBe(false);
@@ -114,10 +114,10 @@ describe("FollowRepository", () => {
         .create();
 
       // act
-      const result = await followRepository.isFollowedByAnySubscriber({
+      const result = await subscriptionQuery.isFollowedByAnySubscriber(
         ctx,
-        subjectDid: followee.did,
-      });
+        followee.did,
+      );
 
       // assert
       expect(result).toBe(true);
