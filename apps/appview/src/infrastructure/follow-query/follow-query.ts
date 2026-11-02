@@ -1,11 +1,14 @@
 import { asDid, type Did } from "@atproto/did";
 import { asAtUriString } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
-import { Follow } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { and, desc, eq, inArray, lt, type SQL } from "drizzle-orm";
 
-import type { FollowDto } from "../../application/dto/follow-dto.js";
+import type {
+  FollowDto,
+  FolloweeDto,
+  FollowerDto,
+} from "../../application/dto/follow-dto.js";
 import type { IFollowQuery } from "../../application/interfaces/follow-query.js";
 
 export class FollowQuery implements IFollowQuery {
@@ -31,23 +34,34 @@ export class FollowQuery implements IFollowQuery {
     }));
   }
 
-  findActorFollows(params: {
+  async findActorFollows(params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }): Promise<Follow[]> {
-    return this.findPage(eq(schema.follows.actorDid, params.actorDid), params);
+  }): Promise<FolloweeDto[]> {
+    const results = await this.findPage(
+      eq(schema.follows.actorDid, params.actorDid),
+      params,
+    );
+    return results.map((result) => ({
+      subjectDid: asDid(result.subjectDid),
+      sortAt: result.sortAt,
+    }));
   }
 
-  findActorFollowers(params: {
+  async findActorFollowers(params: {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }): Promise<Follow[]> {
-    return this.findPage(
+  }): Promise<FollowerDto[]> {
+    const results = await this.findPage(
       eq(schema.follows.subjectDid, params.actorDid),
       params,
     );
+    return results.map((result) => ({
+      actorDid: asDid(result.actorDid),
+      sortAt: result.sortAt,
+    }));
   }
 
   async findFolloweeDids(actorDid: Did): Promise<Did[]> {
@@ -58,11 +72,8 @@ export class FollowQuery implements IFollowQuery {
     return results.map((result) => asDid(result.subjectDid));
   }
 
-  private async findPage(
-    filter: SQL,
-    params: { limit: number; cursor?: string },
-  ): Promise<Follow[]> {
-    const results = await this.db.query.follows.findMany({
+  private findPage(filter: SQL, params: { limit: number; cursor?: string }) {
+    return this.db.query.follows.findMany({
       where: and(
         filter,
         params.cursor
@@ -72,6 +83,5 @@ export class FollowQuery implements IFollowQuery {
       orderBy: [desc(schema.follows.sortAt)],
       limit: params.limit,
     });
-    return results.map((result) => new Follow(result));
   }
 }

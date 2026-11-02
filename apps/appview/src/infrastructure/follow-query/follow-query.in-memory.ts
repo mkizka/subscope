@@ -1,7 +1,11 @@
 import type { Did } from "@atproto/did";
 import type { Follow } from "@repo/common/domain";
 
-import type { FollowDto } from "../../application/dto/follow-dto.js";
+import type {
+  FollowDto,
+  FolloweeDto,
+  FollowerDto,
+} from "../../application/dto/follow-dto.js";
 import type { IFollowQuery } from "../../application/interfaces/follow-query.js";
 
 export class InMemoryFollowQuery implements IFollowQuery {
@@ -38,10 +42,15 @@ export class InMemoryFollowQuery implements IFollowQuery {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }): Promise<Follow[]> {
-    return this.findPage(
-      (follow) => follow.actorDid === params.actorDid,
-      params,
+  }): Promise<FolloweeDto[]> {
+    return Promise.resolve(
+      this.findPage(
+        (follow) => follow.actorDid === params.actorDid,
+        params,
+      ).map((follow) => ({
+        subjectDid: follow.subjectDid,
+        sortAt: follow.sortAt,
+      })),
     );
   }
 
@@ -49,10 +58,12 @@ export class InMemoryFollowQuery implements IFollowQuery {
     actorDid: Did;
     limit: number;
     cursor?: string;
-  }): Promise<Follow[]> {
-    return this.findPage(
-      (follow) => follow.subjectDid === params.actorDid,
-      params,
+  }): Promise<FollowerDto[]> {
+    return Promise.resolve(
+      this.findPage(
+        (follow) => follow.subjectDid === params.actorDid,
+        params,
+      ).map((follow) => ({ actorDid: follow.actorDid, sortAt: follow.sortAt })),
     );
   }
 
@@ -67,14 +78,12 @@ export class InMemoryFollowQuery implements IFollowQuery {
   private findPage(
     filter: (follow: Follow) => boolean,
     params: { limit: number; cursor?: string },
-  ): Promise<Follow[]> {
+  ): Follow[] {
     const cursor = params.cursor ? new Date(params.cursor) : undefined;
-    return Promise.resolve(
-      this.follows
-        .filter(filter)
-        .filter((follow) => !cursor || follow.sortAt < cursor)
-        .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
-        .slice(0, params.limit),
-    );
+    return this.follows
+      .filter(filter)
+      .filter((follow) => !cursor || follow.sortAt < cursor)
+      .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
+      .slice(0, params.limit);
   }
 }
