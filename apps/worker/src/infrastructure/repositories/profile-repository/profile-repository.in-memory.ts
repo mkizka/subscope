@@ -1,4 +1,3 @@
-import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { Profile, TransactionContext } from "@repo/common/domain";
 
@@ -26,12 +25,7 @@ export class InMemoryProfileRepository implements IProfileRepository {
     this.profiles.set(params.profile.uri.toString(), params.profile);
   }
 
-  async exists(params: {
-    ctx: TransactionContext;
-    actorDid: Did;
-  }): Promise<boolean> {
-    return Array.from(this.profiles.values()).some(
-      (profile) => profile.actorDid === params.actorDid,
-    );
+  findAll(): Profile[] {
+    return Array.from(this.profiles.values());
   }
 }

@@ -12,7 +12,7 @@ export class GetSubscriptionStatusUseCase {
   ) {}
 
   async execute(params: GetSubscriptionStatusParams) {
-    const subscription = await this.subscriptionRepository.findFirst(
+    const subscription = await this.subscriptionRepository.find(
       params.actorDid,
     );
 
