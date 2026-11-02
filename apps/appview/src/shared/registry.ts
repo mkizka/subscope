@@ -38,7 +38,6 @@ import type { IPostQuery } from "../application/interfaces/post-query.js";
 import type { IPostRepository } from "../application/interfaces/post-repository.js";
 import type { IPostStatsQuery } from "../application/interfaces/post-stats-query.js";
 import type { IProfileQuery } from "../application/interfaces/profile-query.js";
-import type { IProfileRepository } from "../application/interfaces/profile-repository.js";
 import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostQuery } from "../application/interfaces/repost-query.js";
 import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
@@ -121,7 +120,6 @@ import { PostQuery } from "../infrastructure/post-query/post-query.js";
 import { PostRepository } from "../infrastructure/post-repository/post-repository.js";
 import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
-import { ProfileRepository } from "../infrastructure/profile-repository/profile-repository.js";
 import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostQuery } from "../infrastructure/repost-query/repost-query.js";
 import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
@@ -200,7 +198,6 @@ export const createAppRegistry = (env: Env) =>
     .service("didCache", ["redisUrl", "metricReporter"], asClassArgs<IDidCache>()(RedisDidCache))
     .service("didResolver", ["plcUrl", "loggerManager", "didCache", "metricReporter"], asClassArgs<IDidResolver>()(DidResolver))
     .service("jobQueue", ["redisUrl"], asClassArgs<IJobQueue>()(JobQueue))
-    .service("profileRepository", ["db"], asClassArgs<IProfileRepository>()(ProfileRepository))
     .service("backfillStatusQuery", ["db"], asClassArgs<IBackfillStatusQuery>()(BackfillStatusQuery))
     .service("profileQuery", ["db"], asClassArgs<IProfileQuery>()(ProfileQuery))
     .service("labelQuery", ["db"], asClassArgs<ILabelQuery>()(LabelQuery))
@@ -230,7 +227,7 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("profileSearchService", ["profileRepository"], asClassArgs(ProfileSearchService))
+    .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
     .service("inviteCodeService", ["inviteCodeRepository"], asClassArgs(InviteCodeService))
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postRepository"], asClassArgs(PostSearchService))
