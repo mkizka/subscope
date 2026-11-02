@@ -7,7 +7,10 @@ import { Button } from "@/app/components/ui/button";
 import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
 import { useCompose } from "@/app/features/timeline/blocks/post-form-container";
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
-import type { TimelinePost } from "@/app/features/timeline/blocks/timeline-feed";
+import {
+  threadPath,
+  type TimelinePost,
+} from "@/app/features/timeline/blocks/timeline-feed";
 import {
   ExternalCard,
   PostCard,
@@ -168,16 +171,31 @@ export function ThreadView({ thread }: Props) {
         <h1 className="text-title">スレッド</h1>
       </header>
       {thread.ancestors.map((post) => (
-        <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
+        <ConnectedPost
+          key={post.uri}
+          {...post}
+          toolbar={toolbar(post)}
+          threadPath={threadPath(post)}
+        />
       ))}
       <FocusedPost {...thread.post} toolbar={toolbar(thread.post)} />
       <ReplyPrompt post={thread.post} />
       {thread.replies.map((chain) =>
         chain.map((post, i) =>
           i < chain.length - 1 ? (
-            <ConnectedPost key={post.uri} {...post} toolbar={toolbar(post)} />
+            <ConnectedPost
+              key={post.uri}
+              {...post}
+              toolbar={toolbar(post)}
+              threadPath={threadPath(post)}
+            />
           ) : (
-            <PostCard key={post.uri} {...post} toolbar={toolbar(post)} />
+            <PostCard
+              key={post.uri}
+              {...post}
+              toolbar={toolbar(post)}
+              threadPath={threadPath(post)}
+            />
           ),
         ),
       )}
