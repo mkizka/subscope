@@ -20,7 +20,7 @@ const legacyRepositoryMethods = {
   IRecordRepository: "findByUri|upsert",
   IRepostRepository: "findRepostsByPost|upsert",
   ISubscriptionRepository:
-    "count|countTrackedActors|existsByInviteCode|findFirst|findMany|findTrackedActors|isSubscriber|updateSeenAt|upsert",
+    "count|countTrackedActors|findMany|findTrackedActors|isSubscriber|upsert",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({

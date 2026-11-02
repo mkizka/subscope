@@ -47,9 +47,7 @@ describe("SubscribeServerUseCase", () => {
     });
 
     // assert
-    const savedSubscription = await subscriptionRepo.findFirst(
-      asDid(actor.did),
-    );
+    const savedSubscription = await subscriptionRepo.find(asDid(actor.did));
     expect(savedSubscription).toMatchObject({
       actorDid: actor.did,
       inviteCode: inviteCode.code,
@@ -179,7 +177,7 @@ describe("SubscribeServerUseCase", () => {
       indexedAt: now,
     });
 
-    const savedSubscription = await subscriptionRepo.findFirst(did);
+    const savedSubscription = await subscriptionRepo.find(did);
     expect(savedSubscription).toMatchObject({
       actorDid: did,
       inviteCode: inviteCode.code,
@@ -201,9 +199,7 @@ describe("SubscribeServerUseCase", () => {
     });
 
     // assert
-    const savedSubscription = await subscriptionRepo.findFirst(
-      asDid(admin.did),
-    );
+    const savedSubscription = await subscriptionRepo.find(asDid(admin.did));
     expect(savedSubscription).toMatchObject({
       actorDid: admin.did,
       inviteCode: null,

@@ -280,7 +280,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unsubscribeServerUseCase", ["subscriptionRepository", "followQuery", "jobScheduler"], asClassArgs(UnsubscribeServerUseCase))
     .service("unbanActorUseCase", ["db", "actorRepository"], asClassArgs(UnbanActorUseCase))
     .service("banSubscriberUseCase", ["transactionManager", "actorRepository", "unsubscribeServerUseCase"], asClassArgs(BanSubscriberUseCase))
-    .service("updateSeenUseCase", ["subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
+    .service("updateSeenUseCase", ["transactionManager", "subscriptionRepository"], asClassArgs(UpdateSeenUseCase))
     // presentation
     .service("getPreferences", asClassArgs(GetPreferences))
     .service("getProfile", ["getProfileUseCase", "handleMiddleware", "authVerifierMiddleware"], asClassArgs(GetProfile))

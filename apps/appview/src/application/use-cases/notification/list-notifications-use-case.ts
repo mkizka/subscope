@@ -45,7 +45,7 @@ export class ListNotificationsUseCase {
           this.profileViews.view(asDid(item.authorDid), ctx),
         ),
       ),
-      this.subscriptionRepository.findFirst(params.viewerDid),
+      this.subscriptionRepository.find(params.viewerDid),
     ]);
 
     return {
