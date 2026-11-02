@@ -42,6 +42,7 @@ describe("GetPostsUseCase", () => {
         replyRootUri: null,
         replyParentUri: null,
         indexedAt: post.indexedAt,
+        sortAt: post.sortAt,
       });
       recordRepo.add(record);
       return post;

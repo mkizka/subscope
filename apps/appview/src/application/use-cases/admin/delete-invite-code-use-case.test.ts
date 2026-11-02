@@ -6,10 +6,12 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 describe("DeleteInviteCodeUseCase", () => {
   let useCase: TestServices["deleteInviteCodeUseCase"];
   let inviteCodeRepository: TestServices["inviteCodeRepository"];
+  let ctx: { db: TestServices["db"] };
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     useCase = services.deleteInviteCodeUseCase;
     inviteCodeRepository = services.inviteCodeRepository;
+    ctx = { db: services.db };
   });
 
   test("未使用の招待コードの場合、削除できる", async () => {
@@ -21,7 +23,7 @@ describe("DeleteInviteCodeUseCase", () => {
     await useCase.execute({ code: "test-abc12" });
 
     // assert
-    const result = await inviteCodeRepository.findFirst("test-abc12");
+    const result = await inviteCodeRepository.find({ code: "test-abc12", ctx });
     expect(result).toBeNull();
   });
 

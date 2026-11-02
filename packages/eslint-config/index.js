@@ -7,10 +7,9 @@ const legacyRepositoryMethods = {
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IFollowRepository:
     "findFolloweeDids|findFollowers|findFollows|isFollowedByAnySubscriber|upsert",
-  IInviteCodeRepository: "findAll|findByCode|findFirst|markAsUsed|upsert",
+  IInviteCodeRepository: "findAll|findByCode|markAsUsed",
   ILikeRepository: "findMany",
-  IPostRepository:
-    "exists|findByUri|findByUris|findMany|findReplies|findReplyParentUri|search|upsert",
+  IPostRepository: "exists|findReplyParentUri|upsert",
   IPostStatsRepository: "upsertMany",
   IProfileRepository: "exists|searchActors|upsert",
   IRecordRepository: "findByUri|upsert",
