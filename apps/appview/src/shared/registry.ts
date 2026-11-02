@@ -79,6 +79,7 @@ import { UpdateSeenUseCase } from "../application/use-cases/notification/update-
 import { GetRegisteredAccountsUseCase } from "../application/use-cases/server/get-registered-accounts-use-case.js";
 import { GetSetupStatusUseCase } from "../application/use-cases/server/get-setup-status-use-case.js";
 import { GetTrackedAccountsUseCase } from "../application/use-cases/server/get-tracked-accounts-use-case.js";
+import { GetBackfillStatusesUseCase } from "../application/use-cases/sync/get-backfill-statuses-use-case.js";
 import { GetRegistrationStatusUseCase } from "../application/use-cases/sync/get-registration-status-use-case.js";
 import { RegisterAccountUseCase } from "../application/use-cases/sync/register-account-use-case.js";
 import { UnregisterAccountUseCase } from "../application/use-cases/sync/unregister-account-use-case.js";
@@ -158,6 +159,7 @@ import { VerifyAccess } from "../presentation/routes/me/subsco/admin/verifyAcces
 import { GetRegisteredAccounts } from "../presentation/routes/me/subsco/server/getRegisteredAccounts.js";
 import { GetSetupStatus } from "../presentation/routes/me/subsco/server/getSetupStatus.js";
 import { GetTrackedAccounts } from "../presentation/routes/me/subsco/server/getTrackedAccounts.js";
+import { GetBackfillStatuses } from "../presentation/routes/me/subsco/sync/getBackfillStatuses.js";
 import { GetRegistrationStatus } from "../presentation/routes/me/subsco/sync/getRegistrationStatus.js";
 import { RegisterAccount } from "../presentation/routes/me/subsco/sync/registerAccount.js";
 import { UnregisterAccount } from "../presentation/routes/me/subsco/sync/unregisterAccount.js";
@@ -258,6 +260,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getRegisteredAccountsUseCase", ["registrationQuery", "accountRepository", "viewContextFactory", "profileViews"], asClassArgs(GetRegisteredAccountsUseCase))
     .service("getSetupStatusUseCase", ["accountQuery"], asClassArgs(GetSetupStatusUseCase))
     .service("getTrackedAccountsUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetTrackedAccountsUseCase))
+    .service("getBackfillStatusesUseCase", ["registrationQuery"], asClassArgs(GetBackfillStatusesUseCase))
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
     .service("registerAccountUseCase", ["transactionManager", "accountRepository", "inviteCodeRepository", "registrationRepository", "jobScheduler"], asClassArgs(RegisterAccountUseCase))
     .service("unregisterAccountUseCase", ["registrationRepository", "followQuery", "jobScheduler"], asClassArgs(UnregisterAccountUseCase))
@@ -302,13 +305,14 @@ export const createAppRegistry = (env: Env) =>
     .service("getRegisteredAccounts", ["getRegisteredAccountsUseCase"], asClassArgs(GetRegisteredAccounts))
     .service("getSetupStatus", ["getSetupStatusUseCase"], asClassArgs(GetSetupStatus))
     .service("getTrackedAccounts", ["getTrackedAccountsUseCase", "authVerifierMiddleware"], asClassArgs(GetTrackedAccounts))
+    .service("getBackfillStatuses", ["getBackfillStatusesUseCase"], asClassArgs(GetBackfillStatuses))
     .service("getRegistrationStatus", ["getRegistrationStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetRegistrationStatus))
     .service("registerAccount", ["registerAccountUseCase", "authVerifierMiddleware"], asClassArgs(RegisterAccount))
     .service("unregisterAccount", ["unregisterAccountUseCase", "authVerifierMiddleware"], asClassArgs(UnregisterAccount))
     .service("unbanAccount", ["unbanAccountUseCase", "adminMiddleware"], asClassArgs(UnbanAccount))
     .service("banAccount", ["banAccountUseCase", "adminMiddleware"], asClassArgs(BanAccount))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getRegisteredAccounts", "getSetupStatus", "getTrackedAccounts", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listRegisteredAccounts", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "registerAdmin", "verifyAccess", "getRegisteredAccounts", "getSetupStatus", "getTrackedAccounts", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listRegisteredAccounts", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap

@@ -91,6 +91,7 @@
     "me.subsco.server.getRegisteredAccounts",
     "me.subsco.server.getSetupStatus",
     "me.subsco.server.getTrackedAccounts",
+    "me.subsco.sync.getBackfillStatuses",
     "me.subsco.sync.getRegistrationStatus",
     "me.subsco.sync.registerAccount",
     "me.subsco.sync.unregisterAccount"
@@ -395,6 +396,10 @@
     "me.subsco.server.getTrackedAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getTrackedAccounts.json",
       "cid": "bafyreidgtkjkiacn25c2bsk74tcgdlagc7x5qzmofoohmvud2pj2ewhbse"
+    },
+    "me.subsco.sync.getBackfillStatuses": {
+      "uri": "file://./lexicons/me/subsco/sync/getBackfillStatuses.json",
+      "cid": "bafyreigsuu272wusyxpsw24lkmudsdjp2rionlf3utat6gkxbtkbv3ft6y"
     },
     "me.subsco.sync.getRegistrationStatus": {
       "uri": "file://./lexicons/me/subsco/sync/getRegistrationStatus.json",

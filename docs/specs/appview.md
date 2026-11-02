@@ -320,6 +320,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - unregisterAccount-2: 登録を消し、使った招待コードは使用済みのまま残す
 - unregisterAccount-3: 登録していなければ400とNotRegisteredを返す
 
+## me.subsco.sync.getBackfillStatuses
+
+指定したdidのうち、追跡アカウント（登録アカウントとそのフォロー先）のbackfillStatusを返す。認証は不要。didsは最大100件まで指定できる。
+
+- getBackfillStatuses-1: 追跡アカウントのbackfillStatusを返し、追跡アカウント以外は含めない
+- getBackfillStatuses-2: backfillStatusが未設定のアカウントはinProgressとして返す
+- getBackfillStatuses-3: 認証がなくてもbackfillStatusを返す
+
 ## me.subsco.sync.getRegistrationStatus
 
 閲覧者が登録アカウントかどうかを返す。認証が必要。
