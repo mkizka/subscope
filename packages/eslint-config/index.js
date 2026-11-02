@@ -8,7 +8,7 @@ const legacyRepositoryMethods = {
   IFeedItemRepository: "upsert",
   IFollowRepository: "isFollowedByAnySubscriber|upsert",
   IGeneratorRepository: "upsert",
-  IInviteCodeRepository: "findAll|findByCode|markAsUsed",
+  IInviteCodeRepository: "findByCode|markAsUsed",
   ILabelRepository: "upsert",
   ILikeRepository: "findMany|upsert",
   IListItemRepository: "upsert",
