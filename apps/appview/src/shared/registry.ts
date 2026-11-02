@@ -44,8 +44,6 @@ import type { ITimelineQuery } from "../application/interfaces/timeline-query.js
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
 import { CreateAdminService } from "../application/service/admin/create-admin-service.js";
 import { LikeService } from "../application/service/graph/like-service.js";
-import { PostSearchService } from "../application/service/search/post-search-service.js";
-import { ProfileSearchService } from "../application/service/search/profile-search-service.js";
 import { GetProfileUseCase } from "../application/use-cases/actor/get-profile-use-case.js";
 import { GetProfilesUseCase } from "../application/use-cases/actor/get-profiles-use-case.js";
 import { SearchActorsTypeaheadUseCase } from "../application/use-cases/actor/search-actors-typeahead-use-case.js";
@@ -217,8 +215,6 @@ export const createAppRegistry = (env: Env) =>
     // application
     .service("jobScheduler", ["jobQueue"], asClassArgs<IJobScheduler>()(JobScheduler))
     .service("createAdminService", ["actorRepository", "jobScheduler"], asClassArgs(CreateAdminService))
-    .service("profileSearchService", ["profileQuery"], asClassArgs(ProfileSearchService))
-    .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeQuery"], asClassArgs(LikeService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
@@ -235,14 +231,14 @@ export const createAppRegistry = (env: Env) =>
     // use-cases
     .service("getProfileUseCase", ["viewContextFactory", "profileViews"], asClassArgs(GetProfileUseCase))
     .service("getProfilesUseCase", ["viewContextFactory", "profileViews"], asClassArgs(GetProfilesUseCase))
-    .service("searchActorsUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
-    .service("searchActorsTypeaheadUseCase", ["profileSearchService", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
+    .service("searchActorsUseCase", ["profileQuery", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsUseCase))
+    .service("searchActorsTypeaheadUseCase", ["profileQuery", "viewContextFactory", "profileViews"], asClassArgs(SearchActorsTypeaheadUseCase))
     .service("getPostsUseCase", ["viewContextFactory", "postViews"], asClassArgs(GetPostsUseCase))
     .service("getPostThreadUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(GetPostThreadUseCase))
     .service("getPostThreadV2UseCase", ["getPostThreadUseCase"], asClassArgs(GetPostThreadV2UseCase))
     .service("getTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetTimelineUseCase))
     .service("listNotificationsUseCase", ["notificationQuery", "subscriptionRepository", "viewContextFactory", "profileViews"], asClassArgs(ListNotificationsUseCase))
-    .service("searchPostsUseCase", ["searchService", "viewContextFactory", "postViews"], asClassArgs(SearchPostsUseCase))
+    .service("searchPostsUseCase", ["postQuery", "viewContextFactory", "postViews"], asClassArgs(SearchPostsUseCase))
     .service("getActorLikesUseCase", ["likeQuery", "viewContextFactory", "feedViews"], asClassArgs(GetActorLikesUseCase))
     .service("getAuthorFeedUseCase", ["authorFeedQuery", "viewContextFactory", "feedViews"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["viewContextFactory", "generatorViews"], asClassArgs(GetFeedGeneratorsUseCase))
