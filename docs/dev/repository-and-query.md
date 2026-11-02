@@ -26,4 +26,4 @@ DTOは用途ごとに分け、呼び出し側が使う項目だけを持たせ�
 
 ## lintルール
 
-`I*Repository` に `find`・`save`・`delete` 以外のメソッドを書くと、ESLint(`no-restricted-syntax`)がエラーにする。既存の違反は `packages/eslint-config/index.js` の `legacyRepositoryMethods` に許可しており、移行が終わったものから消していく。
+`I*Repository` に `find`・`save`・`delete` 以外のメソッドを書くと、ESLint(`no-restricted-syntax`)がエラーにする。

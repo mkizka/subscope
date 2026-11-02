@@ -24,7 +24,9 @@ import type { IHandleResolver } from "../application/interfaces/external/handle-
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
 import type { IActorQuery } from "../application/interfaces/queries/actor-query.js";
+import type { IActorStatsQuery } from "../application/interfaces/queries/actor-stats-query.js";
 import type { IPostQuery } from "../application/interfaces/queries/post-query.js";
+import type { IPostStatsQuery } from "../application/interfaces/queries/post-stats-query.js";
 import type { IProfileQuery } from "../application/interfaces/queries/profile-query.js";
 import type { ISubscriptionQuery } from "../application/interfaces/queries/subscription-query.js";
 import type { IActorRepository } from "../application/interfaces/repositories/actor-repository.js";
@@ -69,7 +71,9 @@ import { RecordFetcher } from "../infrastructure/fetchers/record-fetcher.js";
 import { HandleResolver } from "../infrastructure/handle-resolver/handle-resolver.js";
 import { LabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.js";
 import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
+import { ActorStatsQuery } from "../infrastructure/queries/actor-stats-query/actor-stats-query.js";
 import { PostQuery } from "../infrastructure/queries/post-query/post-query.js";
+import { PostStatsQuery } from "../infrastructure/queries/post-stats-query/post-stats-query.js";
 import { ProfileQuery } from "../infrastructure/queries/profile-query/profile-query.js";
 import { SubscriptionQuery } from "../infrastructure/queries/subscription-query/subscription-query.js";
 import { ActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.js";
@@ -124,6 +128,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("labelCursorStore", ["redisUrl"], asClassArgs<ILabelCursorStore>()(LabelCursorStore))
     .service("labelFetcher", ["moderationUrl"], asClassArgs<ILabelFetcher>()(LabelFetcher))
     .service("recordFetcher", ["didResolver", "metricReporter"], asClassArgs(RecordFetcher))
+    .service("actorStatsQuery", asClassArgs<IActorStatsQuery>()(ActorStatsQuery))
+    .service("postStatsQuery", asClassArgs<IPostStatsQuery>()(PostStatsQuery))
     .service("actorRepository", asClassArgs<IActorRepository>()(ActorRepository))
     .service("actorStatsRepository", asClassArgs<IActorStatsRepository>()(ActorStatsRepository))
     .service("profileRepository", asClassArgs<IProfileRepository>()(ProfileRepository))
@@ -162,8 +168,8 @@ export const createWorkerRegistry = (env: Env) =>
     .service("upsertIdentityUseCase", ["transactionManager", "indexActorService", "resolveDidUseCase"], asClassArgs(UpsertIdentityUseCase))
     .service("indexCommitUseCase", ["loggerManager", "transactionManager", "indexRecordService", "recordRevRepository"], asClassArgs(IndexCommitUseCase))
     .service("fetchRecordUseCase", ["recordFetcher", "transactionManager", "indexRecordService"], asClassArgs(FetchRecordUseCase))
-    .service("aggregatePostStatsUseCase", ["postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
-    .service("aggregateActorStatsUseCase", ["actorStatsRepository", "actorQuery", "transactionManager"], asClassArgs(AggregateActorStatsUseCase))
+    .service("aggregatePostStatsUseCase", ["postStatsQuery", "postStatsRepository", "jobQueue", "transactionManager"], asClassArgs(AggregatePostStatsUseCase))
+    .service("aggregateActorStatsUseCase", ["actorStatsQuery", "actorStatsRepository", "actorQuery", "transactionManager"], asClassArgs(AggregateActorStatsUseCase))
     .service("indexLabelUseCase", ["labelRepository", "actorQuery", "transactionManager"], asClassArgs(IndexLabelUseCase))
     .service("syncTapRepoUseCase", ["tapClient", "subscriptionQuery", "labelFetcher", "indexLabelUseCase", "jobScheduler", "transactionManager"], asClassArgs(SyncTapRepoUseCase))
     .service("checkBackfillUseCase", ["tapClient", "subscriptionQuery", "actorRepository", "jobScheduler", "transactionManager"], asClassArgs(CheckBackfillUseCase))
