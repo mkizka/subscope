@@ -332,6 +332,36 @@ test.describe("タイムライン", () => {
     ).toHaveCount(2);
   });
 
+  test("timeline-14: リポストした人の表示は、投稿者のアイコンより上の行に出す", async ({
+    page,
+  }) => {
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {});
+    const subject = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-14: 投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.repost", {
+      subject,
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+
+    const reposted = page
+      .getByRole("article")
+      .filter({ hasText: "がリポスト" })
+      .first();
+    await expect(async () => {
+      await page.reload();
+      await expect(reposted).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    const top = async (locator: typeof reposted) =>
+      (await locator.boundingBox())?.y ?? 0;
+    expect(await top(reposted.getByText("がリポスト"))).toBeLessThan(
+      await top(reposted.getByRole("link", { name: "Alice" }).first()),
+    );
+  });
+
   test("timeline-6: 本文のうちfacetsでリンクが付いた範囲は、そのURLを新しいタブで開くリンクにする", async ({
     page,
   }) => {
