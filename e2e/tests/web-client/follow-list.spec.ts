@@ -158,14 +158,17 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-9: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「登録アカウント」タブに移動する", async ({
     page,
   }) => {
-    await page.goto("/accounts?tab=tracked");
-
-    await page
+    const link = page
       .getByRole("main")
       .getByRole("listitem")
       .filter({ hasText: "Bob" })
-      .getByRole("link", { name: /^[1-9]\d*人からフォロー$/ })
-      .click();
+      .getByRole("link", { name: /^[1-9]\d*人からフォロー$/ });
+    await expect(async () => {
+      await page.goto("/accounts?tab=tracked");
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await link.click();
 
     await expect(page).toHaveURL(/\/followers\?filter=registered$/);
   });
