@@ -1,6 +1,6 @@
 import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 import {
-  actorFactory,
+  accountFactory,
   labelFactory,
   registrationFactory,
   testSetup,
@@ -15,7 +15,7 @@ describe("me.subsco.admin.getInviteCodes", () => {
   test("getInviteCodes-1: 使用済みの招待コードには使用したアカウントのprofileViewを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
     const registration = await registrationFactory(ctx.db).create();
@@ -28,7 +28,7 @@ describe("me.subsco.admin.getInviteCodes", () => {
     expect(res.codes).toMatchObject([
       {
         code: registration.inviteCode,
-        usedBy: { did: registration.actorDid },
+        usedBy: { did: registration.accountDid },
       },
     ]);
   });
@@ -36,15 +36,15 @@ describe("me.subsco.admin.getInviteCodes", () => {
   test("getInviteCodes-2: 使用したアカウントがテイクダウンされていてもprofileViewを含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const registration = await registrationFactory(ctx.db)
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .create();
     await labelFactory(ctx.db)
-      .vars({ actor: () => actor })
+      .vars({ account: () => account })
       .create();
     loginAs(admin.did);
 
@@ -55,7 +55,7 @@ describe("me.subsco.admin.getInviteCodes", () => {
     expect(res.codes).toMatchObject([
       {
         code: registration.inviteCode,
-        usedBy: { did: actor.did },
+        usedBy: { did: account.did },
       },
     ]);
   });

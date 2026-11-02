@@ -1,6 +1,6 @@
 import { asAtIdentifierString } from "@atproto/syntax";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
-import { actorFactory, labelFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, labelFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -11,19 +11,19 @@ describe("app.bsky.actor.getProfile", () => {
   test("getProfile-1: 指定したアカウントのprofileViewDetailedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Alice" }))
       .create();
 
     // act
     const res = await client.call(getProfile, {
-      actor: asAtIdentifierString(actor.did),
+      actor: asAtIdentifierString(account.did),
     });
 
     // assert
     expect(res).toMatchObject({
-      did: actor.did,
-      handle: actor.handle,
+      did: account.did,
+      handle: account.handle,
       displayName: "Alice",
       followersCount: 0,
       followsCount: 0,
@@ -47,17 +47,17 @@ describe("app.bsky.actor.getProfile", () => {
   test("getProfile-3: プロフィールレコードがないアカウントには、DIDとハンドルだけのprofileViewDetailedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
 
     // act
     const res = await client.call(getProfile, {
-      actor: asAtIdentifierString(actor.did),
+      actor: asAtIdentifierString(account.did),
     });
 
     // assert
     expect(res).toMatchObject({
-      did: actor.did,
-      handle: actor.handle,
+      did: account.did,
+      handle: account.handle,
     });
     expect(res.displayName).toBeUndefined();
   });
@@ -66,16 +66,16 @@ describe("app.bsky.actor.getProfile", () => {
     // arrange
     const { client } = await setupApiTest();
     const label = await labelFactory(ctx.db).create();
-    const takendown = await actorFactory(ctx.db)
+    const takendown = await accountFactory(ctx.db)
       .props({ status: () => "takendown" })
       .create();
-    const suspended = await actorFactory(ctx.db)
+    const suspended = await accountFactory(ctx.db)
       .props({ status: () => "suspended" })
       .create();
 
     // act
-    const promises = [label.actorDid, takendown.did, suspended.did].map((did) =>
-      client.call(getProfile, { actor: asAtIdentifierString(did) }),
+    const promises = [label.accountDid, takendown.did, suspended.did].map(
+      (did) => client.call(getProfile, { actor: asAtIdentifierString(did) }),
     );
 
     // assert
@@ -92,13 +92,13 @@ describe("app.bsky.actor.getProfile", () => {
   test("getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const actor = await actorFactory(ctx.db)
+    const account = await accountFactory(ctx.db)
       .props({ status: () => "deactivated" })
       .create();
 
     // act
     const promise = client.call(getProfile, {
-      actor: asAtIdentifierString(actor.did),
+      actor: asAtIdentifierString(account.did),
     });
 
     // assert

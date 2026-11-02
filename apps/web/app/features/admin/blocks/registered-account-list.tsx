@@ -35,21 +35,21 @@ const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";
 export type RegisteredAccountTab = "registeredAccounts" | "banned";
 
 function ProfileCell({
-  actor,
+  account,
   children,
 }: {
-  actor: BannedAccount;
+  account: BannedAccount;
   children?: ReactNode;
 }) {
   return (
     <>
-      <Avatar src={actor.avatar} />
+      <Avatar src={account.avatar} />
       <div className="min-w-0 flex-1">
         <div className="truncate font-bold">
-          {actor.displayName ?? actor.handle}
+          {account.displayName ?? account.handle}
         </div>
-        <div className="truncate text-label text-muted" title={actor.did}>
-          @{actor.handle}
+        <div className="truncate text-label text-muted" title={account.did}>
+          @{account.handle}
         </div>
         {children}
       </div>
@@ -130,24 +130,24 @@ export function RegisteredAccountList({
       )}
       <ul>
         {tab === "banned" &&
-          bannedAccounts.map((actor) => (
-            <li key={actor.did} className={rowClass}>
-              <ProfileCell actor={actor} />
+          bannedAccounts.map((account) => (
+            <li key={account.did} className={rowClass}>
+              <ProfileCell account={account} />
               <ConfirmDialog
-                title={`@${actor.handle} のBANを解除しますか？`}
+                title={`@${account.handle} のBANを解除しますか？`}
                 description="解除すると、招待コードで再登録できるようになります。"
                 confirmLabel="解除する"
-                onConfirm={() => onUnban?.(actor.did)}
+                onConfirm={() => onUnban?.(account.did)}
               >
                 {(open) => (
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
-                    loading={unbanningDid === actor.did}
+                    loading={unbanningDid === account.did}
                     onClick={open}
                   >
-                    {unbanningDid !== actor.did && (
+                    {unbanningDid !== account.did && (
                       <UndoIcon className="size-4" />
                     )}
                     解除
@@ -159,7 +159,7 @@ export function RegisteredAccountList({
         {tab === "registeredAccounts" &&
           registeredAccounts.map((registeredAccount) => (
             <li key={registeredAccount.did} className={rowClass}>
-              <ProfileCell actor={registeredAccount}>
+              <ProfileCell account={registeredAccount}>
                 <div className="flex items-center gap-2 text-caption text-muted">
                   <BackfillBadge status={registeredAccount.backfillStatus} />
                   {formatDate(registeredAccount.registeredAt)} 登録

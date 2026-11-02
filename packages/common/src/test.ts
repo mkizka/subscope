@@ -1,4 +1,4 @@
-export * from "./lib/domain/actor/actor.factory.js";
+export * from "./lib/domain/account/account.factory.js";
 export * from "./lib/domain/feed-item/feed-item.factory.js";
 export * from "./lib/domain/follow/follow.factory.js";
 export * from "./lib/domain/generator/generator.factory.js";

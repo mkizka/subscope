@@ -15,7 +15,7 @@ export class GetActorLikesUseCase {
   ) {}
 
   async execute(params: {
-    actorDid: Did;
+    accountDid: Did;
     limit: number;
     cursor?: Date;
     viewerDid?: Did;
@@ -25,8 +25,8 @@ export class GetActorLikesUseCase {
       getCursor: (item) => item.sortAt.toISOString(),
     });
 
-    const feedItems = await this.likeQuery.findActorLikeFeedItems({
-      actorDid: params.actorDid,
+    const feedItems = await this.likeQuery.findAccountLikeFeedItems({
+      accountDid: params.accountDid,
       limit: paginator.queryLimit,
       cursor: params.cursor,
     });

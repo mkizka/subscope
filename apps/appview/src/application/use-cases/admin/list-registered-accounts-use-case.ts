@@ -3,7 +3,7 @@ import { toDatetimeString } from "@atproto/syntax";
 import type * as MeSubscoAdminListRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 import type { Registration } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -18,7 +18,7 @@ export class ListRegisteredAccountsUseCase {
   constructor(
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
-    private readonly actorRepository: IActorRepository,
+    private readonly accountRepository: IAccountRepository,
     private readonly registrationQuery: IRegistrationQuery,
   ) {}
 
@@ -41,17 +41,17 @@ export class ListRegisteredAccountsUseCase {
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
     const registeredAccounts = await Promise.all(
       paginationResult.items.map(async (sub) => {
-        const did = asDid(sub.actorDid);
-        const [profile, actor] = await Promise.all([
+        const did = asDid(sub.accountDid);
+        const [profile, account] = await Promise.all([
           this.profileViews.view(did, ctx),
-          this.actorRepository.find(did),
+          this.accountRepository.find(did),
         ]);
         return (
           profile && {
             profile,
-            isAdmin: actor?.isAdmin ?? false,
+            isAdmin: account?.isAdmin ?? false,
             registeredAt: toDatetimeString(sub.createdAt),
-            backfillStatus: actor?.backfillStatus ?? "inProgress",
+            backfillStatus: account?.backfillStatus ?? "inProgress",
           }
         );
       }),

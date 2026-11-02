@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
-  actorFactory,
+  accountFactory,
   likeFactory,
   postFactory,
   recordFactory,
@@ -30,13 +30,13 @@ describe("LikeQuery", () => {
 
     test("指定されたビューアーのいいねだけを、いいねのURIと対象のURIで返す", async () => {
       // arrange
-      const viewer = await actorFactory(ctx.db).create();
+      const viewer = await accountFactory(ctx.db).create();
       const [viewerLike, otherLike] = await Promise.all([
         likeFactory(ctx.db)
           .vars({
             record: () =>
               recordFactory(ctx.db, "app.bsky.feed.like")
-                .vars({ actor: () => viewer })
+                .vars({ account: () => viewer })
                 .create(),
           })
           .create(),
@@ -58,16 +58,16 @@ describe("LikeQuery", () => {
     });
   });
 
-  describe("findActorLikeFeedItems", () => {
-    test("指定されたアクターのいいねだけを、cursorより前からsortAtの降順で投稿のフィードアイテムとして返す", async () => {
+  describe("findAccountLikeFeedItems", () => {
+    test("指定されたアカウントのいいねだけを、cursorより前からsortAtの降順で投稿のフィードアイテムとして返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const createLike = (createdAt: string) =>
         likeFactory(ctx.db)
           .vars({
             record: () =>
               recordFactory(ctx.db, "app.bsky.feed.like")
-                .vars({ actor: () => actor })
+                .vars({ account: () => account })
                 .create(),
           })
           .props({ createdAt: () => new Date(createdAt) })
@@ -78,8 +78,8 @@ describe("LikeQuery", () => {
       await likeFactory(ctx.db).create();
 
       // act
-      const result = await likeQuery.findActorLikeFeedItems({
-        actorDid: asDid(actor.did),
+      const result = await likeQuery.findAccountLikeFeedItems({
+        accountDid: asDid(account.did),
         limit: 10,
         cursor: new Date("2024-01-01T02:30:00.000Z"),
       });
@@ -90,14 +90,14 @@ describe("LikeQuery", () => {
           uri: newLike.subjectUri,
           type: "post",
           subjectUri: null,
-          actorDid: actor.did,
+          accountDid: account.did,
           sortAt: newLike.sortAt,
         },
         {
           uri: oldLike.subjectUri,
           type: "post",
           subjectUri: null,
-          actorDid: actor.did,
+          accountDid: account.did,
           sortAt: oldLike.sortAt,
         },
       ]);
@@ -129,12 +129,12 @@ describe("LikeQuery", () => {
       // assert
       expect(result).toEqual([
         {
-          actorDid: newLike.actorDid,
+          accountDid: newLike.accountDid,
           createdAt: newLike.createdAt,
           sortAt: newLike.sortAt,
         },
         {
-          actorDid: middleLike.actorDid,
+          accountDid: middleLike.accountDid,
           createdAt: middleLike.createdAt,
           sortAt: middleLike.sortAt,
         },

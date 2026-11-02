@@ -7,14 +7,14 @@ import {
   TransactionManager,
 } from "@repo/common/infrastructure";
 import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, testSetup } from "@repo/test-utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { WebSocket } from "ws";
 import { WebSocketServer } from "ws";
 
 import { IndexLabelUseCase } from "../application/use-cases/label/index-label-use-case.js";
 import { InMemoryLabelCursorStore } from "../infrastructure/label-cursor-store/label-cursor-store.in-memory.js";
-import { ActorQuery } from "../infrastructure/queries/actor-query/actor-query.js";
+import { AccountQuery } from "../infrastructure/queries/account-query/account-query.js";
 import { LabelRepository } from "../infrastructure/repositories/label-repository/label-repository.js";
 import { LabelSubscriber } from "./label-subscriber.js";
 
@@ -41,7 +41,7 @@ describe("モデレーションサービスからのラベル受信", () => {
       new MetricReporter(),
       new IndexLabelUseCase(
         new LabelRepository(),
-        new ActorQuery(),
+        new AccountQuery(),
         new TransactionManager(ctx.db),
       ),
       labelCursorStore,
@@ -68,9 +68,12 @@ describe("モデレーションサービスからのラベル受信", () => {
   });
 
   test("subscribeLabels-1: 受け取ったラベルを1件ずつ保存する", async () => {
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     const [socket] = await connect();
-    const labels = [label(actor.did, "!takedown"), label(actor.did, "spam")];
+    const labels = [
+      label(account.did, "!takedown"),
+      label(account.did, "spam"),
+    ];
     socket.send(
       new MessageFrame({ seq: 1, labels }, { type: "#labels" }).toBytes(),
     );
@@ -78,8 +81,8 @@ describe("モデレーションサービスからのラベル受信", () => {
     await vi.waitFor(async () => {
       const saved = await ctx.db.select().from(schema.labels);
       expect(saved).toEqual([
-        expect.objectContaining({ uri: actor.did, val: "!takedown" }),
-        expect.objectContaining({ uri: actor.did, val: "spam" }),
+        expect.objectContaining({ uri: account.did, val: "!takedown" }),
+        expect.objectContaining({ uri: account.did, val: "spam" }),
       ]);
     });
   });

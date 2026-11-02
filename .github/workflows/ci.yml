@@ -81,7 +81,7 @@ jobs:
           merge-multiple: true
       - run: pnpm --filter @repo/e2e exec playwright merge-reports --reporter html ./blob-report
       - name: Upload Report
-        if: always() && (github.ref == 'refs/heads/main' || github.actor == 'mkizka')
+        if: always() && (github.ref == 'refs/heads/main' || github.account == 'mkizka')
         run: |
           REPORT_S3_PATH="playwright-report/${{ github.ref == 'refs/heads/main' && 'main' || github.sha }}"
           aws s3 cp e2e/playwright-report "s3://subscope/$REPORT_S3_PATH" --recursive
@@ -92,7 +92,7 @@ jobs:
           AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
           AWS_DEFAULT_REGION: auto
       - name: Comment on PR
-        if: always() && github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        if: always() && github.ref != 'refs/heads/main' && github.account == 'mkizka'
         run: |
           MARKER="<!-- e2e-report -->"
           BODY="$MARKER
@@ -125,7 +125,7 @@ jobs:
       - run: pnpm i
       - run: pnpm --filter @repo/web exec storybook build
       - name: Upload Storybook
-        if: github.ref == 'refs/heads/main' || github.actor == 'mkizka'
+        if: github.ref == 'refs/heads/main' || github.account == 'mkizka'
         run: |
           STORYBOOK_S3_PATH="storybook/${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.number) }}"
           aws s3 cp apps/web/storybook-static "s3://subscope/$STORYBOOK_S3_PATH" --recursive
@@ -136,7 +136,7 @@ jobs:
           AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
           AWS_DEFAULT_REGION: auto
       - name: Comment on PR
-        if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        if: github.ref != 'refs/heads/main' && github.account == 'mkizka'
         run: |
           MARKER="<!-- storybook -->"
           BODY="$MARKER

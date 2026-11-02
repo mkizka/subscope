@@ -14,30 +14,30 @@ export class HandleResolver implements IHandleResolver {
   constructor(private readonly db: DatabaseClient) {}
 
   async resolve(handle: Handle): Promise<Did> {
-    const [actor] = await this.db
+    const [account] = await this.db
       .select({
-        did: schema.actors.did,
+        did: schema.accounts.did,
       })
-      .from(schema.actors)
-      .where(eq(schema.actors.handle, handle))
+      .from(schema.accounts)
+      .where(eq(schema.accounts.handle, handle))
       .limit(1);
-    if (!actor) {
+    if (!account) {
       throw new HandleResolutionError(handle);
     }
-    return asDid(actor.did);
+    return asDid(account.did);
   }
 
   async resolveMany(handles: Handle[]) {
-    const actors = await this.db
+    const accounts = await this.db
       .select({
-        did: schema.actors.did,
-        handle: schema.actors.handle,
+        did: schema.accounts.did,
+        handle: schema.accounts.handle,
       })
-      .from(schema.actors)
-      .where(inArray(schema.actors.handle, handles));
-    return actors.reduce<Record<Handle, Did>>((acc, actor) => {
+      .from(schema.accounts)
+      .where(inArray(schema.accounts.handle, handles));
+    return accounts.reduce<Record<Handle, Did>>((acc, account) => {
       // ハンドルで検索したのでハンドルは持っているはず
-      acc[asHandle(required(actor.handle))] = asDid(actor.did);
+      acc[asHandle(required(account.handle))] = asDid(account.did);
       return acc;
     }, {});
   }

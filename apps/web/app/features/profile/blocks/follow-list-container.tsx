@@ -4,7 +4,7 @@ import { LoaderCircle } from "lucide-react";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle.$kind";
 
-import { ActorList } from "./actor-list";
+import { AccountList } from "./account-list";
 
 type FollowListResponse = Awaited<ReturnType<typeof loader>>["data"];
 
@@ -40,7 +40,7 @@ export function FollowListContainer({ handle, kind }: Props) {
         )}
       </h1>
       {data ? (
-        <ActorList actors={data.actors} />
+        <AccountList accounts={data.accounts} />
       ) : (
         <div
           role="status"

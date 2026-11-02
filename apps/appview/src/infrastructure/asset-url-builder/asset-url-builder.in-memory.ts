@@ -5,19 +5,19 @@ import type { IAssetUrlBuilder } from "../../application/interfaces/asset-url-bu
 export class InMemoryAssetUrlBuilder implements IAssetUrlBuilder {
   private readonly baseUrl = "http://test-image-proxy.example.com";
 
-  getAvatarThumbnailUrl(actorDid: string, cid: string): UriString {
-    return `${this.baseUrl}/img/avatar_thumbnail/plain/${actorDid}/${cid}`;
+  getAvatarThumbnailUrl(accountDid: string, cid: string): UriString {
+    return `${this.baseUrl}/img/avatar_thumbnail/plain/${accountDid}/${cid}`;
   }
 
-  getBannerUrl(actorDid: string, cid: string): UriString {
-    return `${this.baseUrl}/img/banner/plain/${actorDid}/${cid}`;
+  getBannerUrl(accountDid: string, cid: string): UriString {
+    return `${this.baseUrl}/img/banner/plain/${accountDid}/${cid}`;
   }
 
-  getFeedThumbnailUrl(actorDid: string, cid: string): UriString {
-    return `${this.baseUrl}/img/feed_thumbnail/plain/${actorDid}/${cid}`;
+  getFeedThumbnailUrl(accountDid: string, cid: string): UriString {
+    return `${this.baseUrl}/img/feed_thumbnail/plain/${accountDid}/${cid}`;
   }
 
-  getFeedFullsizeUrl(actorDid: string, cid: string): UriString {
-    return `${this.baseUrl}/img/feed_fullsize/plain/${actorDid}/${cid}`;
+  getFeedFullsizeUrl(accountDid: string, cid: string): UriString {
+    return `${this.baseUrl}/img/feed_fullsize/plain/${accountDid}/${cid}`;
   }
 }

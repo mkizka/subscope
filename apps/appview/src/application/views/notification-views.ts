@@ -44,7 +44,7 @@ export class NotificationViews {
     const subjectUri = head.reasonSubject
       ? asAtUriString(head.reasonSubject)
       : undefined;
-    const [actors, subject, post] = await Promise.all([
+    const [accounts, subject, post] = await Promise.all([
       Promise.all(
         items
           .slice(0, ITEMS_PER_GROUP)
@@ -60,10 +60,10 @@ export class NotificationViews {
     ]);
     const kind = this.kind(
       head,
-      actors.map((actor) => ({ actor: actor.did })),
+      accounts.map((account) => ({ actor: account.did })),
       { subjectUri, subject, post },
     );
-    if (actors.length === 0 || !kind) {
+    if (accounts.length === 0 || !kind) {
       return undefined;
     }
     return {
@@ -75,9 +75,9 @@ export class NotificationViews {
         indexedAt: toDatetimeString(head.sortAt),
       },
       relatedViews: [
-        ...actors.map((actor): [string, RelatedView] => [
-          actor.did,
-          { ...actor, $type: "app.bsky.actor.defs#profileViewBasic" },
+        ...accounts.map((account): [string, RelatedView] => [
+          account.did,
+          { ...account, $type: "app.bsky.actor.defs#profileViewBasic" },
         ]),
         ...[subject, post]
           .filter(defined)

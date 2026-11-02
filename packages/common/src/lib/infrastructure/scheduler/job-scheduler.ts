@@ -82,9 +82,9 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleAggregateActorStats(did: Did): Promise<void> {
+  async scheduleAggregateAccountStats(did: Did): Promise<void> {
     await this.jobQueue.add({
-      queueName: "aggregateActorStats",
+      queueName: "aggregateAccountStats",
       jobName: did,
       data: { did },
       options: {

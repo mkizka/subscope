@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import type { ActorStatsDto } from "../dto/actor-stats-dto.js";
+import type { AccountStatsDto } from "../dto/account-stats-dto.js";
 import type { FollowDto } from "../dto/follow-dto.js";
 import type { GeneratorDto } from "../dto/generator-dto.js";
 import type { LabelDto } from "../dto/label-dto.js";
@@ -13,7 +13,7 @@ import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { RepostDto } from "../dto/repost-dto.js";
-import type { IActorStatsQuery } from "../interfaces/queries/actor-stats-query.js";
+import type { IAccountStatsQuery } from "../interfaces/queries/account-stats-query.js";
 import type { IFollowQuery } from "../interfaces/queries/follow-query.js";
 import type { IGeneratorQuery } from "../interfaces/queries/generator-query.js";
 import {
@@ -46,7 +46,7 @@ type Repositories = {
   likeQuery: ILikeQuery;
   repostQuery: IRepostQuery;
   generatorQuery: IGeneratorQuery;
-  actorStatsQuery: IActorStatsQuery;
+  accountStatsQuery: IAccountStatsQuery;
   listQuery: IListQuery;
   listItemQuery: IListItemQuery;
 };
@@ -65,7 +65,7 @@ export class ViewContext {
   private readonly viewerReposts: Batch<string, RepostDto>;
   private readonly reposts: Batch<string, RepostDto>;
   private readonly generators: Batch<string, GeneratorDto>;
-  private readonly actorStatsBatch: Batch<Did, ActorStatsDto>;
+  private readonly accountStatsBatch: Batch<Did, AccountStatsDto>;
   private readonly lists: Batch<string, ListDto>;
   private readonly viewerListItems: Batch<string, ListItemDto>;
 
@@ -77,7 +77,7 @@ export class ViewContext {
     const none = () => Promise.resolve([]);
     this.profiles = Batch.one(
       (dids) => repos.profileQuery.findByDids(dids),
-      (profile) => profile.actorDid,
+      (profile) => profile.accountDid,
     );
     this.labels = Batch.many(
       (subjects) => repos.labelQuery.findBySubjects(subjects),
@@ -87,7 +87,7 @@ export class ViewContext {
       viewerDid
         ? (subjectDids) =>
             repos.followQuery.findFollows({
-              actorDids: [viewerDid],
+              accountDids: [viewerDid],
               subjectDids,
             })
         : none,
@@ -95,13 +95,13 @@ export class ViewContext {
     );
     this.followedBy = Batch.one(
       viewerDid
-        ? (actorDids) =>
+        ? (accountDids) =>
             repos.followQuery.findFollows({
-              actorDids,
+              accountDids,
               subjectDids: [viewerDid],
             })
         : none,
-      (follow) => follow.actorDid,
+      (follow) => follow.accountDid,
     );
     this.posts = Batch.one(
       (uris) => repos.postQuery.findByUris(toAtUris(uris)),
@@ -143,9 +143,9 @@ export class ViewContext {
       (uris) => repos.generatorQuery.findByUris(toAtUris(uris)),
       (generator) => generator.uri,
     );
-    this.actorStatsBatch = Batch.one(
-      (dids) => repos.actorStatsQuery.findStats(dids),
-      (stats) => stats.actorDid,
+    this.accountStatsBatch = Batch.one(
+      (dids) => repos.accountStatsQuery.findStats(dids),
+      (stats) => stats.accountDid,
     );
     this.lists = Batch.one(
       (uris) => repos.listQuery.findByUris(toAtUris(uris)),
@@ -203,7 +203,7 @@ export class ViewContext {
     if (!post || !visible) {
       return undefined;
     }
-    return (await this.profile(post.actorDid)) ? post : undefined;
+    return (await this.profile(post.accountDid)) ? post : undefined;
   }
 
   async labelsOf(subject: string) {
@@ -230,8 +230,8 @@ export class ViewContext {
     return this.generators.load(uri);
   }
 
-  actorStats(did: Did) {
-    return this.actorStatsBatch.load(did);
+  accountStats(did: Did) {
+    return this.accountStatsBatch.load(did);
   }
 
   async viewerState(did: Did) {
@@ -272,7 +272,7 @@ export class ViewContextFactory {
     likeQuery: ILikeQuery,
     repostQuery: IRepostQuery,
     generatorQuery: IGeneratorQuery,
-    actorStatsQuery: IActorStatsQuery,
+    accountStatsQuery: IAccountStatsQuery,
     listQuery: IListQuery,
     listItemQuery: IListItemQuery,
   ) {
@@ -286,7 +286,7 @@ export class ViewContextFactory {
       likeQuery,
       repostQuery,
       generatorQuery,
-      actorStatsQuery,
+      accountStatsQuery,
       listQuery,
       listItemQuery,
     };

@@ -1,7 +1,7 @@
 import unregisterAccount from "@repo/client/lex/me/subsco/sync/unregisterAccount";
 import { schema } from "@repo/db";
 import {
-  actorFactory,
+  accountFactory,
   followFactory,
   inviteCodeFactory,
   recordFactory,
@@ -19,15 +19,15 @@ describe("me.subsco.sync.unregisterAccount", () => {
   test("unregisterAccount-1: 本人とそのフォロー先のsyncTapRepoジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    const followee = await actorFactory(ctx.db).create();
+    const followee = await accountFactory(ctx.db).create();
     await followFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => registeredAccount })
+            .vars({ account: () => registeredAccount })
             .create(),
         followee: () => followee,
       })
@@ -54,7 +54,7 @@ describe("me.subsco.sync.unregisterAccount", () => {
     const registration = await registrationFactory(ctx.db)
       .vars({ inviteCode: () => inviteCode })
       .create();
-    loginAs(registration.actorDid);
+    loginAs(registration.accountDid);
 
     // act
     await client.call(unregisterAccount);
@@ -63,7 +63,7 @@ describe("me.subsco.sync.unregisterAccount", () => {
     const registrations = await ctx.db
       .select()
       .from(schema.registrations)
-      .where(eq(schema.registrations.actorDid, registration.actorDid));
+      .where(eq(schema.registrations.accountDid, registration.accountDid));
     expect(registrations).toEqual([]);
     const [savedInviteCode] = await ctx.db
       .select()
@@ -75,8 +75,8 @@ describe("me.subsco.sync.unregisterAccount", () => {
   test("unregisterAccount-3: 登録していなければ400とNotRegisteredを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const actor = await actorFactory(ctx.db).create();
-    loginAs(actor.did);
+    const account = await accountFactory(ctx.db).create();
+    loginAs(account.did);
 
     // act
     const promise = client.call(unregisterAccount);

@@ -4,7 +4,7 @@ import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.registered-accounts";
 
-import { ActorList } from "./actor-list";
+import { AccountList } from "./account-list";
 
 type RegisteredAccountsResponse = Awaited<ReturnType<typeof loader>>["data"];
 
@@ -27,7 +27,7 @@ export function RegisteredAccountsContainer() {
         )}
       </h1>
       {data ? (
-        <ActorList actors={data.registeredAccounts} />
+        <AccountList accounts={data.registeredAccounts} />
       ) : (
         <LoadingSpinner label="読み込み中" />
       )}

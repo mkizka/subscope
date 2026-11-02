@@ -2,8 +2,8 @@ import type { InferInsertModel } from "drizzle-orm";
 
 import type * as schema from "./schema.js";
 
-export type ActorInsert = Omit<
-  InferInsertModel<typeof schema.actors>,
+export type AccountInsert = Omit<
+  InferInsertModel<typeof schema.accounts>,
   "did" | "indexedAt"
 >;
 

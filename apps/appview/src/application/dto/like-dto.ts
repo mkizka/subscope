@@ -7,7 +7,7 @@ export type LikeDto = {
 };
 
 export type SubjectLikeDto = {
-  actorDid: Did;
+  accountDid: Did;
   createdAt: Date;
   sortAt: Date;
 };

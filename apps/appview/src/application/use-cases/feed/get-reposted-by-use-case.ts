@@ -31,7 +31,7 @@ export class GetRepostedByUseCase {
     const ctx = this.viewContextFactory.create();
     const repostedBy = await Promise.all(
       paginationResult.items.map((repost) =>
-        this.profileViews.view(repost.actorDid, ctx),
+        this.profileViews.view(repost.accountDid, ctx),
       ),
     );
 

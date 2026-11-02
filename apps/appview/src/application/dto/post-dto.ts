@@ -16,7 +16,7 @@ export type PostEmbedExternalDto = {
 
 export type PostDto = {
   uri: AtUriString;
-  actorDid: Did;
+  accountDid: Did;
   embedImages: PostEmbedImageDto[];
   embedGallery: PostEmbedImageDto[];
   embedExternal: PostEmbedExternalDto | null;

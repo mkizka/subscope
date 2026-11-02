@@ -12,7 +12,7 @@ export class NotRegisteredError extends Error {
 }
 
 type UnregisterAccountParams = {
-  actorDid: Did;
+  accountDid: Did;
 };
 
 export class UnregisterAccountUseCase {
@@ -24,18 +24,18 @@ export class UnregisterAccountUseCase {
 
   async execute(params: UnregisterAccountParams): Promise<void> {
     const existingRegistration = await this.registrationRepository.find(
-      params.actorDid,
+      params.accountDid,
     );
     if (!existingRegistration) {
       throw new NotRegisteredError("Not registered with this server");
     }
 
-    await this.registrationRepository.delete(params.actorDid);
+    await this.registrationRepository.delete(params.accountDid);
 
     const followeeDids = await this.followQuery.findFolloweeDids(
-      params.actorDid,
+      params.accountDid,
     );
-    for (const did of [params.actorDid, ...followeeDids]) {
+    for (const did of [params.accountDid, ...followeeDids]) {
       await this.jobScheduler.scheduleSyncTapRepo(did);
     }
   }

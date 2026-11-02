@@ -1,13 +1,13 @@
 import type { Did } from "@atproto/did";
 import {
-  Actor,
+  Account,
   type IJobScheduler,
   type ITransactionManager,
   Registration,
   type TransactionContext,
 } from "@repo/common/domain";
 
-import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
+import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 
@@ -33,14 +33,14 @@ export class BannedError extends Error {
 }
 
 type RegisterAccountParams = {
-  actorDid: Did;
+  accountDid: Did;
   code?: string;
 };
 
 export class RegisterAccountUseCase {
   constructor(
     private readonly transactionManager: ITransactionManager,
-    private readonly actorRepository: IActorRepository,
+    private readonly accountRepository: IAccountRepository,
     private readonly inviteCodeRepository: IInviteCodeRepository,
     private readonly registrationRepository: IRegistrationRepository,
     private readonly jobScheduler: IJobScheduler,
@@ -69,38 +69,38 @@ export class RegisterAccountUseCase {
     await this.inviteCodeRepository.save({ inviteCode, ctx });
   }
 
-  async execute({ actorDid, code }: RegisterAccountParams): Promise<void> {
+  async execute({ accountDid, code }: RegisterAccountParams): Promise<void> {
     const existingRegistration =
-      await this.registrationRepository.find(actorDid);
+      await this.registrationRepository.find(accountDid);
     if (existingRegistration) {
       throw new AlreadyRegisteredError("Already registered with this server");
     }
 
-    const existingActor = await this.actorRepository.find(actorDid);
-    if (existingActor?.isBanned) {
+    const existingAccount = await this.accountRepository.find(accountDid);
+    if (existingAccount?.isBanned) {
       throw new BannedError("Banned from this server");
     }
 
     await this.transactionManager.transaction(async (ctx) => {
-      if (!existingActor?.isAdmin) {
+      if (!existingAccount?.isAdmin) {
         await this.useInviteCode(code, ctx);
       }
 
-      if (!existingActor) {
-        const actor = Actor.create({
-          did: actorDid,
+      if (!existingAccount) {
+        const account = Account.create({
+          did: accountDid,
         });
-        await this.actorRepository.save({ ctx, actor });
+        await this.accountRepository.save({ ctx, account });
       }
 
       const registration = new Registration({
-        actorDid,
+        accountDid,
         inviteCode: code,
         createdAt: new Date(),
       });
       await this.registrationRepository.save({ ctx, registration });
     });
 
-    await this.jobScheduler.scheduleSyncTapRepo(actorDid);
+    await this.jobScheduler.scheduleSyncTapRepo(accountDid);
   }
 }

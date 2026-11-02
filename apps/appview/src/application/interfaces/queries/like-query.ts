@@ -10,8 +10,8 @@ export interface ILikeQuery {
     subjectUris: AtUri[];
   }) => Promise<LikeDto[]>;
 
-  findActorLikeFeedItems: (params: {
-    actorDid: Did;
+  findAccountLikeFeedItems: (params: {
+    accountDid: Did;
     limit: number;
     cursor?: Date;
   }) => Promise<FeedItemDto[]>;

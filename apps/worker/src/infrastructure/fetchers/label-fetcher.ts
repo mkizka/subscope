@@ -12,7 +12,7 @@ export class LabelFetcher implements ILabelFetcher {
     this.client = new Client(moderationUrl);
   }
 
-  async fetchByActor(did: Did) {
+  async fetchByAccount(did: Did) {
     const labels: LabelData[] = [];
     let cursor: string | undefined;
     do {

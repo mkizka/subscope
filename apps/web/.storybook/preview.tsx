@@ -144,7 +144,7 @@ queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
   ["trackedAccounts"],
   {
     total: 3,
-    actors: [
+    accounts: [
       { ...bob, registeredFollowersCount: 3 },
       { ...alice, registeredFollowersCount: 1 },
       {
@@ -223,7 +223,7 @@ queryClient.setQueryData<Data<typeof followListLoader>>(
       handle: "alice.bsky.social",
       displayName: "Alice",
     },
-    actors: [
+    accounts: [
       {
         did: "did:plc:bob",
         handle: "bob.bsky.social",

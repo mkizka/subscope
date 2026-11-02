@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import {
-  actorFactory,
+  accountFactory,
   fakeCid,
   recordFactory,
   registrationFactory,
@@ -34,8 +34,8 @@ describe("LikeIndexer", () => {
     test("いいねレコードを正しく保存する", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const liker = actorFactory();
-      registrationQuery.add(registrationFactory({ actorDid: liker.did }));
+      const liker = accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: liker.did }));
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
@@ -60,7 +60,7 @@ describe("LikeIndexer", () => {
       expect(like).toMatchObject({
         uri: record.uri,
         cid: record.cid,
-        actorDid: liker.did,
+        accountDid: liker.did,
         subjectUri: new AtUri(postUri),
       });
     });
@@ -86,11 +86,11 @@ describe("LikeIndexer", () => {
       },
     ])("$name", async ({ isRegistered, isSelf, expected }) => {
       // arrange
-      const liker = actorFactory();
-      const author = isSelf ? liker : actorFactory();
-      registrationQuery.add(registrationFactory({ actorDid: liker.did }));
+      const liker = accountFactory();
+      const author = isSelf ? liker : accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: liker.did }));
       if (isRegistered) {
-        registrationQuery.add(registrationFactory({ actorDid: author.did }));
+        registrationQuery.add(registrationFactory({ accountDid: author.did }));
       }
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
@@ -116,8 +116,8 @@ describe("LikeIndexer", () => {
     test("いいね追加の場合、対象投稿に対してlike集計ジョブがスケジュールされる", async () => {
       const ctx = { db, afterCommit };
       // arrange
-      const liker = actorFactory();
-      registrationQuery.add(registrationFactory({ actorDid: liker.did }));
+      const liker = accountFactory();
+      registrationQuery.add(registrationFactory({ accountDid: liker.did }));
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey456`,
@@ -145,7 +145,7 @@ describe("LikeIndexer", () => {
 
     test("いいね削除の場合も、対象投稿に対してlike集計ジョブがスケジュールされる", () => {
       // arrange
-      const liker = actorFactory();
+      const liker = accountFactory();
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey789";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey789`,
@@ -169,7 +169,7 @@ describe("LikeIndexer", () => {
 
     test("対象の投稿が存在しない場合でも集計ジョブがスケジュールされる", () => {
       // arrange
-      const liker = actorFactory();
+      const liker = accountFactory();
       const nonExistentPostUri =
         "at://did:plc:nonexistent/app.bsky.feed.post/999";
       const record = recordFactory({

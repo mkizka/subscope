@@ -50,11 +50,11 @@ export class GetFollows {
 
   handle(router: LexRouter) {
     router.add(getFollows, async ({ params }) => {
-      const actorDid = await this.handleMiddleware.resolveHandleOrDid(
-        params.actor,
+      const accountDid = await this.handleMiddleware.resolveHandleOrDid(
+        params.account,
       );
       const result = await this.getFollowsUseCase.execute({
-        actorDid,
+        accountDid,
         limit: params.limit,
         cursor: params.cursor,
       });
@@ -73,7 +73,7 @@ export class GetFollows {
 ```typescript
 const { client } = await setupApiTest();
 const res = await client.call(getFollows, {
-  actor: asAtIdentifierString(actor.did),
+  account: asAtIdentifierString(account.did),
 });
 ```
 

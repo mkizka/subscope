@@ -1,7 +1,7 @@
 import { asAtUriString } from "@atproto/syntax";
 import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 import {
-  actorFactory,
+  accountFactory,
   postFactory,
   recordFactory,
   testSetup,
@@ -16,14 +16,14 @@ describe("app.bsky.feed.getPostThread", () => {
   test("getPostThread-1: 指定した投稿の親投稿とリプライをthreadViewPostに含める", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const createPost = () =>
       postFactory(ctx.db).vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => author })
+            .vars({ account: () => author })
             .create(),
       });
     const root = await createPost().create();

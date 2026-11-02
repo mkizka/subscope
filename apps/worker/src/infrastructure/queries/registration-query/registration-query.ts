@@ -7,12 +7,12 @@ import type { IRegistrationQuery } from "../../../application/interfaces/queries
 export class RegistrationQuery implements IRegistrationQuery {
   async isRegistered(
     ctx: TransactionContext,
-    actorDid: string,
+    accountDid: string,
   ): Promise<boolean> {
     const result = await ctx.db
-      .select({ actorDid: schema.registrations.actorDid })
+      .select({ accountDid: schema.registrations.accountDid })
       .from(schema.registrations)
-      .where(eq(schema.registrations.actorDid, actorDid))
+      .where(eq(schema.registrations.accountDid, accountDid))
       .limit(1);
 
     return result.length > 0;
@@ -23,11 +23,11 @@ export class RegistrationQuery implements IRegistrationQuery {
     subjectDid: string,
   ): Promise<boolean> {
     const result = await ctx.db
-      .select({ actorDid: schema.follows.actorDid })
+      .select({ accountDid: schema.follows.accountDid })
       .from(schema.follows)
       .innerJoin(
         schema.registrations,
-        eq(schema.follows.actorDid, schema.registrations.actorDid),
+        eq(schema.follows.accountDid, schema.registrations.accountDid),
       )
       .where(eq(schema.follows.subjectDid, subjectDid))
       .limit(1);

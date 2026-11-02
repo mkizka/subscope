@@ -11,7 +11,7 @@ describe("統計の集計", () => {
   let jobQueue: JobQueue;
   let jobScheduler: JobScheduler;
   let queue: Queue;
-  let actorQueue: Queue;
+  let accountQueue: Queue;
 
   beforeAll(async () => {
     container = await new GenericContainer("redis:7-alpine")
@@ -21,14 +21,14 @@ describe("統計の集計", () => {
     jobQueue = new JobQueue(redisUrl);
     jobScheduler = new JobScheduler(jobQueue);
     queue = new Queue("aggregatePostStats", { connection: { url: redisUrl } });
-    actorQueue = new Queue("aggregateActorStats", {
+    accountQueue = new Queue("aggregateAccountStats", {
       connection: { url: redisUrl },
     });
   });
 
   afterAll(async () => {
     await queue.close();
-    await actorQueue.close();
+    await accountQueue.close();
     await jobQueue.close();
     await container.stop();
   });
@@ -104,11 +104,11 @@ describe("統計の集計", () => {
     const did = "did:plc:aggregate4";
 
     // act
-    await jobScheduler.scheduleAggregateActorStats(did);
-    await jobScheduler.scheduleAggregateActorStats(did);
+    await jobScheduler.scheduleAggregateAccountStats(did);
+    await jobScheduler.scheduleAggregateAccountStats(did);
 
     // assert
-    expect(await actorQueue.getDelayedCount()).toBe(1);
-    await actorQueue.obliterate({ force: true });
+    expect(await accountQueue.getDelayedCount()).toBe(1);
+    await accountQueue.obliterate({ force: true });
   });
 });

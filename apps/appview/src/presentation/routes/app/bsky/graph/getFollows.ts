@@ -12,12 +12,12 @@ export class GetFollows {
 
   handle(router: LexRouter) {
     router.add(getFollows, async ({ params }) => {
-      const actorDid = await this.handleMiddleware.resolveHandleOrDid(
+      const accountDid = await this.handleMiddleware.resolveHandleOrDid(
         params.actor,
       );
 
       const result = await this.getFollowsUseCase.execute({
-        actorDid,
+        accountDid,
         limit: params.limit,
         cursor: params.cursor,
       });

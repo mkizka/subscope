@@ -12,11 +12,11 @@ export class LabelRepository implements ILabelRepository {
   async save({
     ctx,
     label,
-    actorDid,
+    accountDid,
   }: {
     ctx: TransactionContext;
     label: LabelData;
-    actorDid: Did;
+    accountDid: Did;
   }) {
     const data = {
       cid: label.cid ?? null,
@@ -29,7 +29,7 @@ export class LabelRepository implements ILabelRepository {
         src: label.src,
         uri: label.uri,
         val: label.val,
-        actorDid,
+        accountDid,
         ...data,
       })
       .onConflictDoUpdate({

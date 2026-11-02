@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import { Registration } from "@repo/common/domain";
 import {
-  actorFactory,
+  accountFactory,
   inviteCodeFactory,
   registrationFactory,
   testSetup,
@@ -29,19 +29,19 @@ describe("RegistrationRepository", () => {
 
     test("登録が存在する場合、Registrationを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const registration = await registrationFactory(ctx.db)
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
 
       // act
       const result = await registrationRepository.find(
-        asDid(registration.actorDid),
+        asDid(registration.accountDid),
       );
 
       // assert
       expect(result).toMatchObject({
-        actorDid: registration.actorDid,
+        accountDid: registration.accountDid,
         inviteCode: registration.inviteCode,
       });
     });
@@ -50,10 +50,10 @@ describe("RegistrationRepository", () => {
   describe("save", () => {
     test("登録を保存できる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const inviteCode = await inviteCodeFactory(ctx.db).create();
       const registration = new Registration({
-        actorDid: actor.did,
+        accountDid: account.did,
         inviteCode: inviteCode.code,
         createdAt: new Date(),
       });
@@ -68,10 +68,10 @@ describe("RegistrationRepository", () => {
 
       // assert
       const saved = await registrationRepository.find(
-        asDid(registration.actorDid),
+        asDid(registration.accountDid),
       );
       expect(saved).toMatchObject({
-        actorDid: registration.actorDid,
+        accountDid: registration.accountDid,
         inviteCode: registration.inviteCode,
       });
     });
@@ -80,17 +80,17 @@ describe("RegistrationRepository", () => {
   describe("delete", () => {
     test("登録を削除できる", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
       const registration = await registrationFactory(ctx.db)
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
 
       // act
-      await registrationRepository.delete(asDid(registration.actorDid));
+      await registrationRepository.delete(asDid(registration.accountDid));
 
       // assert
       const deleted = await registrationRepository.find(
-        asDid(registration.actorDid),
+        asDid(registration.accountDid),
       );
       expect(deleted).toBeNull();
     });

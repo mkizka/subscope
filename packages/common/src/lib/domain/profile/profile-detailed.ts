@@ -2,10 +2,10 @@ import { asDid, type Did } from "@atproto/did";
 
 import type { Handle } from "../../utils/handle.js";
 import { asHandle } from "../../utils/handle.js";
-import type { ActorStatus } from "../actor/actor.js";
+import type { AccountStatus } from "../account/account.js";
 
 export type ProfileDetailedParams = {
-  actorDid: string;
+  accountDid: string;
   handle: string | null;
   avatarCid?: string | null;
   bannerCid?: string | null;
@@ -13,11 +13,11 @@ export type ProfileDetailedParams = {
   displayName?: string | null;
   createdAt?: Date | string | null;
   indexedAt: Date | string;
-  status?: ActorStatus;
+  status?: AccountStatus;
 };
 
 export class ProfileDetailed {
-  readonly actorDid: Did;
+  readonly accountDid: Did;
   readonly handle: Handle | null;
   readonly avatarCid: string | null;
   readonly bannerCid: string | null;
@@ -25,10 +25,10 @@ export class ProfileDetailed {
   readonly displayName: string | null;
   readonly createdAt: Date | null;
   readonly indexedAt: Date;
-  readonly status: ActorStatus;
+  readonly status: AccountStatus;
 
   constructor(params: ProfileDetailedParams) {
-    this.actorDid = asDid(params.actorDid);
+    this.accountDid = asDid(params.accountDid);
     this.handle = params.handle ? asHandle(params.handle) : null;
     this.avatarCid = params.avatarCid ?? null;
     this.bannerCid = params.bannerCid ?? null;

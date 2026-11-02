@@ -1,6 +1,6 @@
 import listRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 import {
-  actorFactory,
+  accountFactory,
   followFactory,
   labelFactory,
   recordFactory,
@@ -28,7 +28,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
   test("listRegisteredAccounts-2: 管理者でないアカウントからのリクエストには403を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await actorFactory(ctx.db).create();
+    const viewer = await accountFactory(ctx.db).create();
     loginAs(viewer.did);
 
     // act
@@ -41,10 +41,10 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
   test("listRegisteredAccounts-3: 登録アカウントごとにprofileViewと管理者かどうかを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     loginAs(admin.did);
@@ -61,14 +61,14 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
   test("listRegisteredAccounts-4: テイクダウンされた登録アカウントも含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     await labelFactory(ctx.db)
-      .vars({ actor: () => registeredAccount })
+      .vars({ account: () => registeredAccount })
       .create();
     loginAs(admin.did);
 
@@ -84,12 +84,12 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
   test("listRegisteredAccounts-5: 登録アカウントごとに登録日時をregisteredAtとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await actorFactory(ctx.db).create();
+    const registeredAccount = await accountFactory(ctx.db).create();
     await registrationFactory(ctx.db)
-      .vars({ actor: () => registeredAccount })
+      .vars({ account: () => registeredAccount })
       .props({ createdAt: () => new Date("2024-01-01T00:00:00.000Z") })
       .create();
     loginAs(admin.did);
@@ -109,10 +109,10 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
   test("listRegisteredAccounts-6: ページングに関係なく登録アカウントの総数をtotalとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    await actorFactory(ctx.db)
+    await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .createList(3);
     loginAs(admin.did);
@@ -130,10 +130,10 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     followeeStatus: "inProgress" | "completed" | "error" | null,
   ) => {
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .props({ backfillStatus: () => registeredAccountStatus })
       .create();
@@ -141,10 +141,10 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => registeredAccount })
+            .vars({ account: () => registeredAccount })
             .create(),
         followee: () =>
-          actorFactory(ctx.db)
+          accountFactory(ctx.db)
             .props({ backfillStatus: () => followeeStatus })
             .create(),
       })

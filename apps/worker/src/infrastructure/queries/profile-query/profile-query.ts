@@ -8,15 +8,15 @@ import type { IProfileQuery } from "../../../application/interfaces/queries/prof
 export class ProfileQuery implements IProfileQuery {
   async exists({
     ctx,
-    actorDid,
+    accountDid,
   }: {
     ctx: TransactionContext;
-    actorDid: Did;
+    accountDid: Did;
   }): Promise<boolean> {
     const result = await ctx.db
       .select({ uri: schema.profiles.uri })
       .from(schema.profiles)
-      .where(eq(schema.profiles.actorDid, actorDid))
+      .where(eq(schema.profiles.accountDid, accountDid))
       .limit(1);
     return result.length > 0;
   }

@@ -2,9 +2,9 @@ import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { Button } from "@/app/components/ui/button";
 import { Tabs } from "@/app/components/ui/tabs";
 import {
-  type Actor,
-  ActorList,
-} from "@/app/features/profile/blocks/actor-list";
+  type Account,
+  AccountList,
+} from "@/app/features/profile/blocks/account-list";
 import {
   TimelineFeed,
   type TimelinePost,
@@ -19,7 +19,7 @@ type Props = {
   description?: string;
   tab: "posts" | "members";
   posts: TimelinePost[];
-  members: (Actor & { listItemUri: string })[];
+  members: (Account & { listItemUri: string })[];
   isSelf: boolean;
   deleting?: boolean;
   onDelete: () => void;
@@ -89,8 +89,8 @@ export function ListDetail({
       ) : (
         <>
           {isSelf && <AddListMemberForm listUri={uri} />}
-          <ActorList
-            actors={members}
+          <AccountList
+            accounts={members}
             renderAction={
               isSelf
                 ? (member) => (

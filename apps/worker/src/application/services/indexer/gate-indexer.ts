@@ -12,7 +12,7 @@ export class GateIndexer implements ICollectionIndexer {
     );
     const postUri = new AtUri(gate.post);
     return Promise.resolve(
-      postUri.host === record.actorDid &&
+      postUri.host === record.accountDid &&
         postUri.collection === "app.bsky.feed.post" &&
         postUri.rkey === record.uri.rkey,
     );

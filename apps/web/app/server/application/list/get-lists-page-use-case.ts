@@ -1,6 +1,6 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 
-import type { IActorQuery } from "@/app/server/infrastructure/actor/actor-query";
+import type { IAccountQuery } from "@/app/server/infrastructure/account/account-query";
 import type {
   IListQuery,
   ListDto,
@@ -9,21 +9,21 @@ import type {
 export interface IGetListsPageUseCase {
   execute: (
     did: string,
-    actor: AtIdentifierString,
+    account: AtIdentifierString,
   ) => Promise<{ lists: ListDto[]; isSelf: boolean }>;
 }
 
 export const getListsPageUseCaseFactory = ({
   listQuery,
-  actorQuery,
+  accountQuery,
 }: {
   listQuery: IListQuery;
-  actorQuery: IActorQuery;
+  accountQuery: IAccountQuery;
 }): IGetListsPageUseCase => ({
-  async execute(did, actor) {
+  async execute(did, account) {
     const [lists, profile] = await Promise.all([
-      listQuery.findLists(did, actor),
-      actorQuery.findProfile(did, actor),
+      listQuery.findLists(did, account),
+      accountQuery.findProfile(did, account),
     ]);
     return { lists, isSelf: profile.did === did };
   },

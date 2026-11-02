@@ -31,10 +31,10 @@ export type ListMemberDto = {
 };
 
 export interface IListQuery {
-  findLists: (did: string, actor: AtIdentifierString) => Promise<ListDto[]>;
+  findLists: (did: string, account: AtIdentifierString) => Promise<ListDto[]>;
   findList: (
     did: string,
-    actor: AtIdentifierString,
+    account: AtIdentifierString,
     rkey: string,
   ) => Promise<{ list: ListDto; members: ListMemberDto[] }>;
   findPosts: (
@@ -62,18 +62,18 @@ export const listQueryFactory = ({
     return agent;
   };
   return {
-    async findLists(did, actor) {
+    async findLists(did, account) {
       const agent = await restore(did);
       const { lists } = await agent.call(getLists, {
-        actor,
+        actor: account,
         purposes: ["curatelist"],
       });
       return lists.map(toList);
     },
-    async findList(did, actor, rkey) {
+    async findList(did, account, rkey) {
       const agent = await restore(did);
       const { list, items } = await agent.call(getList, {
-        list: `at://${actor}/app.bsky.graph.list/${rkey}`,
+        list: `at://${account}/app.bsky.graph.list/${rkey}`,
       });
       return {
         list: toList(list),

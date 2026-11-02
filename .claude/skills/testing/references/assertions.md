@@ -25,7 +25,7 @@ expect(result).toMatchObject({
 配列内に特定の要素が含まれることを検証する場合:
 
 ```typescript
-expect(actorStatsJobs).toEqual(
+expect(accountStatsJobs).toEqual(
   expect.arrayContaining([
     expect.objectContaining({
       data: {

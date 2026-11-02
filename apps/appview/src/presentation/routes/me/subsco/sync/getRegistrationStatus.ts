@@ -15,7 +15,7 @@ export class GetRegistrationStatus {
       auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ credentials }) => {
         const result = await this.getRegistrationStatusUseCase.execute({
-          actorDid: credentials.did,
+          accountDid: credentials.did,
         });
 
         return {

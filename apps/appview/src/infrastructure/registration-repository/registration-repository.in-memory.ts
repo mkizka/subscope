@@ -8,23 +8,26 @@ export class InMemoryRegistrationRepository implements IRegistrationRepository {
   private registrations: Map<string, Registration> = new Map();
 
   add(registration: Registration): void {
-    this.registrations.set(registration.actorDid, registration);
+    this.registrations.set(registration.accountDid, registration);
   }
 
-  find(actorDid: Did): Promise<Registration | null> {
-    return Promise.resolve(this.registrations.get(actorDid) ?? null);
+  find(accountDid: Did): Promise<Registration | null> {
+    return Promise.resolve(this.registrations.get(accountDid) ?? null);
   }
 
   save(_params: {
     registration: Registration;
     ctx: TransactionContext;
   }): Promise<void> {
-    this.registrations.set(_params.registration.actorDid, _params.registration);
+    this.registrations.set(
+      _params.registration.accountDid,
+      _params.registration,
+    );
     return Promise.resolve();
   }
 
-  delete(actorDid: Did): Promise<void> {
-    this.registrations.delete(actorDid);
+  delete(accountDid: Did): Promise<void> {
+    this.registrations.delete(accountDid);
     return Promise.resolve();
   }
 }

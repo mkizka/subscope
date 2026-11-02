@@ -1,7 +1,7 @@
 import { asDid } from "@atproto/did";
 import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
 import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
-import { actorFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -12,10 +12,10 @@ describe("me.subsco.admin.unbanAccount", () => {
   test("unbanAccount-1: BANを解除したアカウントは招待コードで再登録できる", async () => {
     // arrange
     const { client, createClient, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const banned = await actorFactory(ctx.db)
+    const banned = await accountFactory(ctx.db)
       .props({ isBanned: () => true })
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
@@ -35,14 +35,14 @@ describe("me.subsco.admin.unbanAccount", () => {
   test("unbanAccount-2: BANされていないアカウントには400とNotBannedを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const actor = await actorFactory(ctx.db).create();
+    const account = await accountFactory(ctx.db).create();
     loginAs(admin.did);
 
     // act
-    const promise = client.call(unbanAccount, { did: asDid(actor.did) });
+    const promise = client.call(unbanAccount, { did: asDid(account.did) });
 
     // assert
     await expect(promise).rejects.toMatchObject({

@@ -8,7 +8,7 @@ import {
 
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
-import type { IndexActorService } from "./index-actor-service.js";
+import type { IndexAccountService } from "./index-account-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";
 import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
@@ -33,7 +33,7 @@ export class IndexRecordService {
 
   constructor(
     private readonly recordRepository: IRecordRepository,
-    private readonly indexActorService: IndexActorService,
+    private readonly indexAccountService: IndexAccountService,
     postIndexer: PostIndexer,
     profileIndexer: ProfileIndexer,
     followIndexer: FollowIndexer,
@@ -91,9 +91,9 @@ export class IndexRecordService {
     depth: number;
   }): Promise<void> {
     const indexer = this.indexerFor(record);
-    await this.indexActorService.upsert({
+    await this.indexAccountService.upsert({
       ctx,
-      did: record.actorDid,
+      did: record.accountDid,
       live,
     });
     await this.recordRepository.save({ ctx, record });

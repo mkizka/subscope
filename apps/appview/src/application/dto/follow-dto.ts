@@ -3,7 +3,7 @@ import type { AtUriString } from "@atproto/syntax";
 
 export type FollowDto = {
   uri: AtUriString;
-  actorDid: Did;
+  accountDid: Did;
   subjectDid: Did;
 };
 
@@ -13,6 +13,6 @@ export type FolloweeDto = {
 };
 
 export type FollowerDto = {
-  actorDid: Did;
+  accountDid: Did;
   sortAt: Date;
 };

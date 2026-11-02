@@ -16,7 +16,7 @@ export class FeedItemRepository implements IFeedItemRepository {
       cid: feedItem.cid,
       type: feedItem.type,
       subjectUri: feedItem.subjectUri,
-      actorDid: feedItem.actorDid,
+      accountDid: feedItem.accountDid,
       sortAt: sanitizeDate(feedItem.sortAt),
     } satisfies FeedItemInsert;
     await ctx.db

@@ -355,7 +355,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - listRegisteredAccounts-7: フォロー先の状態にかかわらず、登録アカウント本人のバックフィルの状態をbackfillStatusとして返す
 - listRegisteredAccounts-8: 登録アカウント本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
 
-バックフィルの状態はworkerがactorsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
+バックフィルの状態はworkerがaccountsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
 
 ## me.subsco.admin.grantAdmin
 

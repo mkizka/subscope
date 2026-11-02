@@ -12,11 +12,11 @@ import type { IRegistrationRepository } from "../../application/interfaces/regis
 export class RegistrationRepository implements IRegistrationRepository {
   constructor(private readonly db: DatabaseClient) {}
 
-  async find(actorDid: Did): Promise<Registration | null> {
+  async find(accountDid: Did): Promise<Registration | null> {
     const [row] = await this.db
       .select()
       .from(schema.registrations)
-      .where(eq(schema.registrations.actorDid, actorDid))
+      .where(eq(schema.registrations.accountDid, accountDid))
       .limit(1);
 
     if (!row) {
@@ -24,7 +24,7 @@ export class RegistrationRepository implements IRegistrationRepository {
     }
 
     return new Registration({
-      actorDid: row.actorDid,
+      accountDid: row.accountDid,
       inviteCode: row.inviteCode,
       seenAt: row.seenAt,
       createdAt: row.createdAt,
@@ -41,13 +41,13 @@ export class RegistrationRepository implements IRegistrationRepository {
     await ctx.db
       .insert(schema.registrations)
       .values({
-        actorDid: registration.actorDid,
+        accountDid: registration.accountDid,
         inviteCode: registration.inviteCode,
         seenAt: registration.seenAt,
         createdAt: registration.createdAt,
       })
       .onConflictDoUpdate({
-        target: schema.registrations.actorDid,
+        target: schema.registrations.accountDid,
         set: {
           inviteCode: registration.inviteCode,
           seenAt: registration.seenAt,
@@ -56,9 +56,9 @@ export class RegistrationRepository implements IRegistrationRepository {
       });
   }
 
-  async delete(actorDid: Did): Promise<void> {
+  async delete(accountDid: Did): Promise<void> {
     await this.db
       .delete(schema.registrations)
-      .where(eq(schema.registrations.actorDid, actorDid));
+      .where(eq(schema.registrations.accountDid, accountDid));
   }
 }

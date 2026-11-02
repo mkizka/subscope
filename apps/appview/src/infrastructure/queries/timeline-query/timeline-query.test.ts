@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import {
-  actorFactory,
+  accountFactory,
   followFactory,
   postFactory,
   postFeedItemFactory,
@@ -19,11 +19,11 @@ describe("TimelineQuery", () => {
   const timelineQuery = new TimelineQuery(ctx.db);
 
   describe("findFeedItems", () => {
-    test("フォロー中のアクターがいない場合、ビューアー自身の投稿のみ返す", async () => {
+    test("フォロー中のアカウントがいない場合、ビューアー自身の投稿のみ返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
       const viewerRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       const viewerPost = await postFactory(ctx.db)
         .vars({ record: () => viewerRecord })
@@ -32,9 +32,9 @@ describe("TimelineQuery", () => {
         .vars({ post: () => viewerPost })
         .create();
 
-      const otherActor = await actorFactory(ctx.db).create();
+      const otherAccount = await accountFactory(ctx.db).create();
       const otherRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => otherActor })
+        .vars({ account: () => otherAccount })
         .create();
       const otherPost = await postFactory(ctx.db)
         .vars({ record: () => otherRecord })
@@ -45,7 +45,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -53,27 +53,27 @@ describe("TimelineQuery", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         uri: feedItem.uri,
-        actorDid: viewerActor.did,
+        accountDid: viewerAccount.did,
       });
     });
 
-    test("フォロー中のアクターの投稿を返す", async () => {
+    test("フォロー中のアカウントの投稿を返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount = await accountFactory(ctx.db).create();
 
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord,
-          followee: () => followedActor,
+          followee: () => followedAccount,
         })
         .create();
 
       const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const post = await postFactory(ctx.db)
         .vars({ record: () => postRecord })
@@ -84,7 +84,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -92,27 +92,27 @@ describe("TimelineQuery", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toMatchObject({
         uri: feedItem.uri,
-        actorDid: followedActor.did,
+        accountDid: followedAccount.did,
       });
     });
 
-    test("フォロー中のアクターの投稿とビューアー自身の投稿の両方を返す", async () => {
+    test("フォロー中のアカウントの投稿とビューアー自身の投稿の両方を返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount = await accountFactory(ctx.db).create();
 
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord,
-          followee: () => followedActor,
+          followee: () => followedAccount,
         })
         .create();
 
       const viewerPostRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       const viewerPost = await postFactory(ctx.db)
         .vars({ record: () => viewerPostRecord })
@@ -125,7 +125,7 @@ describe("TimelineQuery", () => {
         ctx.db,
         "app.bsky.feed.post",
       )
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const followedPost = await postFactory(ctx.db)
         .vars({ record: () => followedPostRecord })
@@ -136,7 +136,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -146,13 +146,13 @@ describe("TimelineQuery", () => {
       expect(result.map((r) => r.uri)).toContain(followedFeedItem.uri);
     });
 
-    test("フォローしていないアクターの投稿は含まれない", async () => {
+    test("フォローしていないアカウントの投稿は含まれない", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const otherActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const otherAccount = await accountFactory(ctx.db).create();
 
       const otherPostRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => otherActor })
+        .vars({ account: () => otherAccount })
         .create();
       const otherPost = await postFactory(ctx.db)
         .vars({ record: () => otherPostRecord })
@@ -163,7 +163,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -171,34 +171,34 @@ describe("TimelineQuery", () => {
       expect(result).toEqual([]);
     });
 
-    test("複数のフォロー中のアクターの投稿を返す", async () => {
+    test("複数のフォロー中のアカウントの投稿を返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor1 = await actorFactory(ctx.db).create();
-      const followedActor2 = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount1 = await accountFactory(ctx.db).create();
+      const followedAccount2 = await accountFactory(ctx.db).create();
 
       const followRecord1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord1,
-          followee: () => followedActor1,
+          followee: () => followedAccount1,
         })
         .create();
 
       const followRecord2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord2,
-          followee: () => followedActor2,
+          followee: () => followedAccount2,
         })
         .create();
 
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor1 })
+        .vars({ account: () => followedAccount1 })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -208,7 +208,7 @@ describe("TimelineQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor2 })
+        .vars({ account: () => followedAccount2 })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -219,7 +219,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -231,21 +231,21 @@ describe("TimelineQuery", () => {
 
     test("リポストも含めて返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount = await accountFactory(ctx.db).create();
 
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord,
-          followee: () => followedActor,
+          followee: () => followedAccount,
         })
         .create();
 
       const repostRecord = await recordFactory(ctx.db, "app.bsky.feed.repost")
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const repost = await repostFactory(ctx.db)
         .vars({ record: () => repostRecord })
@@ -256,7 +256,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -265,27 +265,27 @@ describe("TimelineQuery", () => {
       expect(result[0]).toMatchObject({
         uri: feedItem.uri,
         type: "repost",
-        actorDid: followedActor.did,
+        accountDid: followedAccount.did,
       });
     });
 
     test("sortAtの降順で返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount = await accountFactory(ctx.db).create();
 
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord,
-          followee: () => followedActor,
+          followee: () => followedAccount,
         })
         .create();
 
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -298,7 +298,7 @@ describe("TimelineQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -312,7 +312,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 10,
       });
 
@@ -324,23 +324,23 @@ describe("TimelineQuery", () => {
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount = await accountFactory(ctx.db).create();
 
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord,
-          followee: () => followedActor,
+          followee: () => followedAccount,
         })
         .create();
 
       await Promise.all(
         Array.from({ length: 3 }).map(async () => {
           const postRecord = await recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: () => followedActor })
+            .vars({ account: () => followedAccount })
             .create();
           const post = await postFactory(ctx.db)
             .vars({ record: () => postRecord })
@@ -353,7 +353,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         limit: 2,
       });
 
@@ -363,21 +363,21 @@ describe("TimelineQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前のフィードアイテムを返す", async () => {
       // arrange
-      const viewerActor = await actorFactory(ctx.db).create();
-      const followedActor = await actorFactory(ctx.db).create();
+      const viewerAccount = await accountFactory(ctx.db).create();
+      const followedAccount = await accountFactory(ctx.db).create();
 
       const followRecord = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => viewerActor })
+        .vars({ account: () => viewerAccount })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => followRecord,
-          followee: () => followedActor,
+          followee: () => followedAccount,
         })
         .create();
 
       const postRecord1 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const post1 = await postFactory(ctx.db)
         .vars({ record: () => postRecord1 })
@@ -390,7 +390,7 @@ describe("TimelineQuery", () => {
         .create();
 
       const postRecord2 = await recordFactory(ctx.db, "app.bsky.feed.post")
-        .vars({ actor: () => followedActor })
+        .vars({ account: () => followedAccount })
         .create();
       const post2 = await postFactory(ctx.db)
         .vars({ record: () => postRecord2 })
@@ -406,7 +406,7 @@ describe("TimelineQuery", () => {
 
       // act
       const result = await timelineQuery.findFeedItems({
-        viewerDid: asDid(viewerActor.did),
+        viewerDid: asDid(viewerAccount.did),
         cursor: cursorDate,
         limit: 10,
       });

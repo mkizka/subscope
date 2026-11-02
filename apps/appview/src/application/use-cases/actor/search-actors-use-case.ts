@@ -45,15 +45,15 @@ export class SearchActorsUseCase {
     const ctx = this.viewContextFactory.create({
       viewerDid: params.viewerDid,
     });
-    const actors = await Promise.all(
+    const accounts = await Promise.all(
       result.items.map((profile) =>
-        this.profileViews.view(profile.actorDid, ctx),
+        this.profileViews.view(profile.accountDid, ctx),
       ),
     );
 
     return {
       cursor: result.cursor,
-      actors: actors.filter((actor) => actor !== undefined),
+      actors: accounts.filter((account) => account !== undefined),
     };
   }
 }

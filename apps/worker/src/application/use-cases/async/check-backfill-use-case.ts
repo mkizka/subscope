@@ -7,7 +7,7 @@ import type {
 } from "@repo/common/domain";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
-import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
+import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
 
 const IN_PROGRESS_STATES = ["pending", "desynchronized", "resyncing"];
 
@@ -21,28 +21,30 @@ export class CheckBackfillUseCase {
   constructor(
     private readonly tapClient: ITapClient,
     private readonly registrationQuery: IRegistrationQuery,
-    private readonly actorRepository: IActorRepository,
+    private readonly accountRepository: IAccountRepository,
     private readonly jobScheduler: IJobScheduler,
     private readonly transactionManager: ITransactionManager,
   ) {}
 
   async execute({ did, attempt }: JobData["checkBackfill"]) {
-    const actor = await this.transactionManager.transaction(async (ctx) => {
+    const account = await this.transactionManager.transaction(async (ctx) => {
       const isTrackedAccount =
         (await this.registrationQuery.isRegistered(ctx, did)) ||
         (await this.registrationQuery.isFollowedByAnyRegisteredAccount(
           ctx,
           did,
         ));
-      return isTrackedAccount ? this.actorRepository.find({ ctx, did }) : null;
+      return isTrackedAccount
+        ? this.accountRepository.find({ ctx, did })
+        : null;
     });
-    if (!actor) {
+    if (!account) {
       return;
     }
     const status = toBackfillStatus(await this.tapClient.getRepoState(did));
-    actor.updateBackfillStatus(status);
+    account.updateBackfillStatus(status);
     await this.transactionManager.transaction((ctx) =>
-      this.actorRepository.save({ ctx, actor }),
+      this.accountRepository.save({ ctx, account }),
     );
     if (status !== "completed") {
       await this.jobScheduler.scheduleCheckBackfill(did, attempt + 1);

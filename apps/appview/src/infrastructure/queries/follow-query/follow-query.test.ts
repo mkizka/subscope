@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import {
-  actorFactory,
+  accountFactory,
   followFactory,
   recordFactory,
   testSetup,
@@ -15,28 +15,28 @@ describe("FollowQuery", () => {
   const followQuery = new FollowQuery(ctx.db);
 
   describe("findFollows", () => {
-    test("actorDidsとsubjectDidsの両方に当てはまるフォローだけを返す", async () => {
+    test("accountDidsとsubjectDidsの両方に当てはまるフォローだけを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const target = await actorFactory(ctx.db).create();
-      const other = await actorFactory(ctx.db).create();
-      const createFollow = (from: typeof actor, to: typeof actor) =>
+      const account = await accountFactory(ctx.db).create();
+      const target = await accountFactory(ctx.db).create();
+      const other = await accountFactory(ctx.db).create();
+      const createFollow = (from: typeof account, to: typeof account) =>
         followFactory(ctx.db)
           .vars({
             record: () =>
               recordFactory(ctx.db, "app.bsky.graph.follow")
-                .vars({ actor: () => from })
+                .vars({ account: () => from })
                 .create(),
             followee: () => to,
           })
           .create();
-      const follow = await createFollow(actor, target);
-      await createFollow(actor, other);
-      await createFollow(target, actor);
+      const follow = await createFollow(account, target);
+      await createFollow(account, other);
+      await createFollow(target, account);
 
       // act
       const result = await followQuery.findFollows({
-        actorDids: [asDid(actor.did)],
+        accountDids: [asDid(account.did)],
         subjectDids: [asDid(target.did)],
       });
 
@@ -44,21 +44,21 @@ describe("FollowQuery", () => {
       expect(result).toEqual([
         {
           uri: follow.uri,
-          actorDid: actor.did,
+          accountDid: account.did,
           subjectDid: target.did,
         },
       ]);
     });
   });
 
-  describe("findActorFollows", () => {
+  describe("findAccountFollows", () => {
     test("フォローがない場合、空の配列を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
 
       // act
-      const result = await followQuery.findActorFollows({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollows({
+        accountDid: asDid(account.did),
         limit: 10,
       });
 
@@ -68,11 +68,11 @@ describe("FollowQuery", () => {
 
     test("フォローがある場合、フォロー一覧を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const followee = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const followee = await accountFactory(ctx.db).create();
 
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       const follow = await followFactory(ctx.db)
         .vars({
@@ -82,8 +82,8 @@ describe("FollowQuery", () => {
         .create();
 
       // act
-      const result = await followQuery.findActorFollows({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollows({
+        accountDid: asDid(account.did),
         limit: 10,
       });
 
@@ -95,12 +95,12 @@ describe("FollowQuery", () => {
 
     test("複数のフォローがある場合、sortAtの降順で返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const followee1 = await actorFactory(ctx.db).create();
-      const followee2 = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const followee1 = await accountFactory(ctx.db).create();
+      const followee2 = await accountFactory(ctx.db).create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -113,7 +113,7 @@ describe("FollowQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -126,8 +126,8 @@ describe("FollowQuery", () => {
         .create();
 
       // act
-      const result = await followQuery.findActorFollows({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollows({
+        accountDid: asDid(account.did),
         limit: 10,
       });
 
@@ -140,13 +140,13 @@ describe("FollowQuery", () => {
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const followee1 = await actorFactory(ctx.db).create();
-      const followee2 = await actorFactory(ctx.db).create();
-      const followee3 = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const followee1 = await accountFactory(ctx.db).create();
+      const followee2 = await accountFactory(ctx.db).create();
+      const followee3 = await accountFactory(ctx.db).create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -156,7 +156,7 @@ describe("FollowQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -166,7 +166,7 @@ describe("FollowQuery", () => {
         .create();
 
       const record3 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -176,8 +176,8 @@ describe("FollowQuery", () => {
         .create();
 
       // act
-      const result = await followQuery.findActorFollows({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollows({
+        accountDid: asDid(account.did),
         limit: 2,
       });
 
@@ -187,12 +187,12 @@ describe("FollowQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前のフォローを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const followee1 = await actorFactory(ctx.db).create();
-      const followee2 = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const followee1 = await accountFactory(ctx.db).create();
+      const followee2 = await accountFactory(ctx.db).create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -205,7 +205,7 @@ describe("FollowQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -220,8 +220,8 @@ describe("FollowQuery", () => {
       const cursorDate = new Date("2024-01-01T01:30:00.000Z");
 
       // act
-      const result = await followQuery.findActorFollows({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollows({
+        accountDid: asDid(account.did),
         limit: 10,
         cursor: cursorDate.toISOString(),
       });
@@ -232,14 +232,14 @@ describe("FollowQuery", () => {
       ]);
     });
 
-    test("他のアクターのフォローは含まれない", async () => {
+    test("他のアカウントのフォローは含まれない", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
-      const actor2 = await actorFactory(ctx.db).create();
-      const followee = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
+      const followee = await accountFactory(ctx.db).create();
 
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => actor2 })
+        .vars({ account: () => account2 })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -249,8 +249,8 @@ describe("FollowQuery", () => {
         .create();
 
       // act
-      const result = await followQuery.findActorFollows({
-        actorDid: asDid(actor1.did),
+      const result = await followQuery.findAccountFollows({
+        accountDid: asDid(account1.did),
         limit: 10,
       });
 
@@ -259,14 +259,14 @@ describe("FollowQuery", () => {
     });
   });
 
-  describe("findActorFollowers", () => {
+  describe("findAccountFollowers", () => {
     test("フォロワーがない場合、空の配列を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
 
       // act
-      const result = await followQuery.findActorFollowers({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollowers({
+        accountDid: asDid(account.did),
         limit: 10,
       });
 
@@ -276,44 +276,44 @@ describe("FollowQuery", () => {
 
     test("フォロワーがある場合、フォロワー一覧を返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const follower = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const follower = await accountFactory(ctx.db).create();
 
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower })
+        .vars({ account: () => follower })
         .create();
       const follow = await followFactory(ctx.db)
         .vars({
           record: () => record,
-          followee: () => actor,
+          followee: () => account,
         })
         .create();
 
       // act
-      const result = await followQuery.findActorFollowers({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollowers({
+        accountDid: asDid(account.did),
         limit: 10,
       });
 
       // assert
       expect(result).toEqual([
-        { actorDid: follower.did, sortAt: follow.sortAt },
+        { accountDid: follower.did, sortAt: follow.sortAt },
       ]);
     });
 
     test("複数のフォロワーがある場合、sortAtの降順で返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const follower1 = await actorFactory(ctx.db).create();
-      const follower2 = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const follower1 = await accountFactory(ctx.db).create();
+      const follower2 = await accountFactory(ctx.db).create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower1 })
+        .vars({ account: () => follower1 })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => record1,
-          followee: () => actor,
+          followee: () => account,
         })
         .props({
           createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
@@ -321,12 +321,12 @@ describe("FollowQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower2 })
+        .vars({ account: () => follower2 })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => record2,
-          followee: () => actor,
+          followee: () => account,
         })
         .props({
           createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
@@ -334,27 +334,27 @@ describe("FollowQuery", () => {
         .create();
 
       // act
-      const result = await followQuery.findActorFollowers({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollowers({
+        accountDid: asDid(account.did),
         limit: 10,
       });
 
       // assert
       expect(result).toEqual([
-        expect.objectContaining({ actorDid: follower2.did }),
-        expect.objectContaining({ actorDid: follower1.did }),
+        expect.objectContaining({ accountDid: follower2.did }),
+        expect.objectContaining({ accountDid: follower1.did }),
       ]);
     });
 
     test("limitパラメータが指定された場合、その件数だけ返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const followers = await actorFactory(ctx.db).createList(3);
+      const account = await accountFactory(ctx.db).create();
+      const followers = await accountFactory(ctx.db).createList(3);
 
       const records = await Promise.all(
         followers.map((follower) =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ actor: () => follower })
+            .vars({ account: () => follower })
             .create(),
         ),
       );
@@ -363,15 +363,15 @@ describe("FollowQuery", () => {
           followFactory(ctx.db)
             .vars({
               record: () => record,
-              followee: () => actor,
+              followee: () => account,
             })
             .create(),
         ),
       );
 
       // act
-      const result = await followQuery.findActorFollowers({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollowers({
+        accountDid: asDid(account.did),
         limit: 2,
       });
 
@@ -381,17 +381,17 @@ describe("FollowQuery", () => {
 
     test("cursorパラメータが指定された場合、そのカーソル以前のフォロワーを返す", async () => {
       // arrange
-      const actor = await actorFactory(ctx.db).create();
-      const follower1 = await actorFactory(ctx.db).create();
-      const follower2 = await actorFactory(ctx.db).create();
+      const account = await accountFactory(ctx.db).create();
+      const follower1 = await accountFactory(ctx.db).create();
+      const follower2 = await accountFactory(ctx.db).create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower1 })
+        .vars({ account: () => follower1 })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => record1,
-          followee: () => actor,
+          followee: () => account,
         })
         .props({
           createdAt: () => new Date("2024-01-01T01:00:00.000Z"),
@@ -399,12 +399,12 @@ describe("FollowQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower2 })
+        .vars({ account: () => follower2 })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => record2,
-          followee: () => actor,
+          followee: () => account,
         })
         .props({
           createdAt: () => new Date("2024-01-01T02:00:00.000Z"),
@@ -414,37 +414,37 @@ describe("FollowQuery", () => {
       const cursorDate = new Date("2024-01-01T01:30:00.000Z");
 
       // act
-      const result = await followQuery.findActorFollowers({
-        actorDid: asDid(actor.did),
+      const result = await followQuery.findAccountFollowers({
+        accountDid: asDid(account.did),
         limit: 10,
         cursor: cursorDate.toISOString(),
       });
 
       // assert
       expect(result).toEqual([
-        expect.objectContaining({ actorDid: follower1.did }),
+        expect.objectContaining({ accountDid: follower1.did }),
       ]);
     });
 
-    test("他のアクターのフォロワーは含まれない", async () => {
+    test("他のアカウントのフォロワーは含まれない", async () => {
       // arrange
-      const actor1 = await actorFactory(ctx.db).create();
-      const actor2 = await actorFactory(ctx.db).create();
-      const follower = await actorFactory(ctx.db).create();
+      const account1 = await accountFactory(ctx.db).create();
+      const account2 = await accountFactory(ctx.db).create();
+      const follower = await accountFactory(ctx.db).create();
 
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => follower })
+        .vars({ account: () => follower })
         .create();
       await followFactory(ctx.db)
         .vars({
           record: () => record,
-          followee: () => actor2,
+          followee: () => account2,
         })
         .create();
 
       // act
-      const result = await followQuery.findActorFollowers({
-        actorDid: asDid(actor1.did),
+      const result = await followQuery.findAccountFollowers({
+        accountDid: asDid(account1.did),
         limit: 10,
       });
 

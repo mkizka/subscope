@@ -5,6 +5,6 @@ export type FeedItemDto = {
   uri: AtUriString;
   type: "post" | "repost";
   subjectUri: AtUriString | null;
-  actorDid: Did;
+  accountDid: Did;
   sortAt: Date;
 };

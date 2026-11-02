@@ -21,9 +21,9 @@ export const backfillQueryFactory = ({
 }): IBackfillQuery => ({
   async findStatus(did) {
     const [row] = await db
-      .select({ status: schema.actors.backfillStatus })
-      .from(schema.actors)
-      .where(eq(schema.actors.did, did))
+      .select({ status: schema.accounts.backfillStatus })
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, did))
       .limit(1);
     return { status: row?.status ?? "inProgress" };
   },
@@ -33,23 +33,26 @@ export const backfillQueryFactory = ({
     }
     const trackedDids = union(
       db
-        .select({ did: schema.registrations.actorDid })
+        .select({ did: schema.registrations.accountDid })
         .from(schema.registrations),
       db
         .select({ did: schema.follows.subjectDid })
         .from(schema.follows)
         .innerJoin(
           schema.registrations,
-          eq(schema.follows.actorDid, schema.registrations.actorDid),
+          eq(schema.follows.accountDid, schema.registrations.accountDid),
         ),
     );
     const rows = await db
-      .select({ did: schema.actors.did, status: schema.actors.backfillStatus })
-      .from(schema.actors)
+      .select({
+        did: schema.accounts.did,
+        status: schema.accounts.backfillStatus,
+      })
+      .from(schema.accounts)
       .where(
         and(
-          inArray(schema.actors.did, dids),
-          inArray(schema.actors.did, trackedDids),
+          inArray(schema.accounts.did, dids),
+          inArray(schema.accounts.did, trackedDids),
         ),
       );
     return Object.fromEntries(

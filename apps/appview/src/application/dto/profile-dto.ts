@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import type { HandleString } from "@atproto/syntax";
 
 export type ProfileDto = {
-  actorDid: Did;
+  accountDid: Did;
   handle: HandleString | null;
   displayName: string | null;
   description: string | null;

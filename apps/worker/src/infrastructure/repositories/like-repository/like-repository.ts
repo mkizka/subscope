@@ -8,7 +8,7 @@ export class LikeRepository implements ILikeRepository {
   async save({ ctx, like }: { ctx: TransactionContext; like: Like }) {
     const data = {
       cid: like.cid,
-      actorDid: like.actorDid,
+      accountDid: like.accountDid,
       subjectUri: like.subjectUri.toString(),
       subjectCid: like.subjectCid,
       createdAt: sanitizeDate(like.createdAt),

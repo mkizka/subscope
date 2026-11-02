@@ -55,7 +55,7 @@ export class Record {
     });
   }
 
-  get actorDid() {
+  get accountDid() {
     return asDid(this.uri.host);
   }
 

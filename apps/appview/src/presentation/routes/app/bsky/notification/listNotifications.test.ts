@@ -1,6 +1,6 @@
 import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
 import { schema } from "@repo/db";
-import { actorFactory, recordFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -23,15 +23,15 @@ describe("app.bsky.notification.listNotifications", () => {
   test("listNotifications-2: 閲覧者宛ての通知を新しい順に返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await actorFactory(ctx.db)
+    const viewer = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const notify = async (sortAt: string) => {
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => author })
+        .vars({ account: () => author })
         .create();
       await ctx.db.insert(schema.notifications).values({
         recordUri: record.uri,
@@ -47,7 +47,7 @@ describe("app.bsky.notification.listNotifications", () => {
     await ctx.db
       .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.registrations.actorDid, viewer.did));
+      .where(eq(schema.registrations.accountDid, viewer.did));
     loginAs(viewer.did);
 
     // act
@@ -63,15 +63,15 @@ describe("app.bsky.notification.listNotifications", () => {
   test("listNotifications-3: 既読時刻以前の通知は既読にし、それより後の通知は未読にする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await actorFactory(ctx.db)
+    const viewer = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const notify = async (sortAt: string) => {
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => author })
+        .vars({ account: () => author })
         .create();
       await ctx.db.insert(schema.notifications).values({
         recordUri: record.uri,
@@ -87,7 +87,7 @@ describe("app.bsky.notification.listNotifications", () => {
     await ctx.db
       .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.registrations.actorDid, viewer.did));
+      .where(eq(schema.registrations.accountDid, viewer.did));
     loginAs(viewer.did);
 
     // act
@@ -103,15 +103,15 @@ describe("app.bsky.notification.listNotifications", () => {
   test("listNotifications-4: reasonsを指定すると、その種類の通知だけを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await actorFactory(ctx.db)
+    const viewer = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    const author = await actorFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
     const notify = async (reason: "follow" | "like") => {
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ actor: () => author })
+        .vars({ account: () => author })
         .create();
       await ctx.db.insert(schema.notifications).values({
         recordUri: record.uri,
@@ -138,13 +138,13 @@ describe("app.bsky.notification.listNotifications", () => {
   test("listNotifications-5: seenAtに閲覧者の既読時刻を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const viewer = await actorFactory(ctx.db)
+    const viewer = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
     await ctx.db
       .update(schema.registrations)
       .set({ seenAt: new Date("2024-01-02T00:00:00.000Z") })
-      .where(eq(schema.registrations.actorDid, viewer.did));
+      .where(eq(schema.registrations.accountDid, viewer.did));
     loginAs(viewer.did);
 
     // act

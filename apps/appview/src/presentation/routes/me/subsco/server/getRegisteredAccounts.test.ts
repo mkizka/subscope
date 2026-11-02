@@ -1,5 +1,5 @@
 import getRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -10,10 +10,10 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
   test("getRegisteredAccounts-1: 登録アカウントごとにprofileViewを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
-    await actorFactory(ctx.db).create();
+    await accountFactory(ctx.db).create();
 
     // act
     const res = await client.call(getRegisteredAccounts);
@@ -32,11 +32,11 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
   test("getRegisteredAccounts-2: 登録アカウントごとに管理者かどうかを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const admin = await actorFactory(ctx.db)
+    const admin = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await actorFactory(ctx.db)
+    const registeredAccount = await accountFactory(ctx.db)
       .use((t) => t.registeredAccount())
       .create();
 

@@ -3,7 +3,7 @@ import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 import { schema } from "@repo/db";
 import {
-  actorFactory,
+  accountFactory,
   labelFactory,
   postFactory,
   recordFactory,
@@ -17,8 +17,8 @@ import { setupApiTest } from "../../shared/api-test-utils.js";
 describe("テイクダウン", () => {
   const { ctx } = testSetup;
 
-  const createActor = () =>
-    actorFactory(ctx.db)
+  const createAccount = () =>
+    accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
       .create();
 
@@ -27,7 +27,7 @@ describe("テイクダウン", () => {
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.feed.post")
-            .vars({ actor: createActor })
+            .vars({ account: createAccount })
             .create(),
       })
       .create();
@@ -52,28 +52,28 @@ describe("テイクダウン", () => {
     "takedown-1: `!takedown` か `!suspend` のラベルが付いたアカウントと投稿は応答に含めない(%s)",
     async (val) => {
       // arrange
-      const actor = await createActor();
-      const visibleActor = await createActor();
+      const account = await createAccount();
+      const visibleAccount = await createAccount();
       const post = await createPost();
       const visiblePost = await createPost();
       await labelFactory(ctx.db)
-        .vars({ actor: () => actor })
+        .vars({ account: () => account })
         .props({ val: () => val })
         .create();
       await labelFactory(ctx.db)
         .props({
           uri: () => post.uri,
-          actorDid: () => post.actorDid,
+          accountDid: () => post.accountDid,
           val: () => val,
         })
         .create();
 
       // act
-      const dids = await fetchProfileDids([actor.did, visibleActor.did]);
+      const dids = await fetchProfileDids([account.did, visibleAccount.did]);
       const uris = await fetchPostUris([post.uri, visiblePost.uri]);
 
       // assert
-      expect(dids).toEqual([visibleActor.did]);
+      expect(dids).toEqual([visibleAccount.did]);
       expect(uris).toEqual([visiblePost.uri]);
     },
   );
@@ -83,7 +83,7 @@ describe("テイクダウン", () => {
     const post = await createPost();
     const visiblePost = await createPost();
     await labelFactory(ctx.db)
-      .props({ uri: () => post.actorDid, actorDid: () => post.actorDid })
+      .props({ uri: () => post.accountDid, accountDid: () => post.accountDid })
       .create();
 
     // act
@@ -100,19 +100,19 @@ describe("テイクダウン", () => {
       const post = await createPost();
       const visiblePost = await createPost();
       await ctx.db
-        .update(schema.actors)
+        .update(schema.accounts)
         .set({ status })
-        .where(eq(schema.actors.did, post.actorDid));
+        .where(eq(schema.accounts.did, post.accountDid));
 
       // act
       const dids = await fetchProfileDids([
-        post.actorDid,
-        visiblePost.actorDid,
+        post.accountDid,
+        visiblePost.accountDid,
       ]);
       const uris = await fetchPostUris([post.uri, visiblePost.uri]);
 
       // assert
-      expect(dids).toEqual([visiblePost.actorDid]);
+      expect(dids).toEqual([visiblePost.accountDid]);
       expect(uris).toEqual([visiblePost.uri]);
     },
   );
@@ -123,7 +123,7 @@ describe("テイクダウン", () => {
     await labelFactory(ctx.db)
       .props({
         uri: () => post.uri,
-        actorDid: () => post.actorDid,
+        accountDid: () => post.accountDid,
         exp: () => new Date(Date.now() - 1000),
       })
       .create();

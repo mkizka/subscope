@@ -49,8 +49,8 @@ export class JobQueue implements IJobQueue {
         "aggregatePostStats",
         queueOptions(withRetry),
       ),
-      aggregateActorStats: new Queue(
-        "aggregateActorStats",
+      aggregateAccountStats: new Queue(
+        "aggregateAccountStats",
         queueOptions(withRetry),
       ),
       syncTapRepo: new Queue("syncTapRepo", queueOptions(withRetry)),

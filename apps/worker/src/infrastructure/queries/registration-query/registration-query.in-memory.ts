@@ -6,7 +6,7 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
   private registrations: Map<string, Registration> = new Map();
 
   add(registration: Registration): void {
-    this.registrations.set(registration.actorDid, registration);
+    this.registrations.set(registration.accountDid, registration);
   }
 
   clear(): void {
@@ -15,9 +15,9 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
 
   async isRegistered(
     _ctx: TransactionContext,
-    actorDid: string,
+    accountDid: string,
   ): Promise<boolean> {
-    return this.registrations.has(actorDid);
+    return this.registrations.has(accountDid);
   }
 
   async isFollowedByAnyRegisteredAccount(
