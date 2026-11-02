@@ -154,7 +154,11 @@ test.describe("リスト", () => {
     await main.getByText("編集する").click();
     await main.getByLabel("名前").fill(name);
     await main.getByLabel("説明").fill(`${name}の説明`);
+    const submitted = page.waitForResponse(
+      (res) => res.request().method() === "POST",
+    );
     await main.getByRole("button", { name: "保存する" }).click();
+    await submitted;
 
     await expect(async () => {
       await page.reload();
