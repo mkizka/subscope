@@ -1,25 +1,25 @@
-import type { DatabaseClient } from "@repo/common/domain";
-import { schema } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { Client } from "@atproto/lex";
+import type { AtIdentifierString } from "@atproto/syntax";
+import getRegisteredFollowers from "@repo/client/lex/me/subsco/graph/getRegisteredFollowers";
+
+import { env } from "@/app/server/env";
 
 export interface IFollowQuery {
-  findRegisteredFollowerDids: (subjectDid: string) => Promise<string[]>;
+  findRegisteredFollowers: (
+    subject: AtIdentifierString,
+    limit: number,
+  ) => Promise<{ total: number; dids: string[] }>;
 }
 
-export const followQueryFactory = ({
-  db,
-}: {
-  db: DatabaseClient;
-}): IFollowQuery => ({
-  async findRegisteredFollowerDids(subjectDid) {
-    const rows = await db
-      .select({ did: schema.follows.accountDid })
-      .from(schema.follows)
-      .innerJoin(
-        schema.registrations,
-        eq(schema.follows.accountDid, schema.registrations.accountDid),
-      )
-      .where(eq(schema.follows.subjectDid, subjectDid));
-    return rows.map((row) => row.did);
-  },
-});
+export const followQueryFactory = (): IFollowQuery => {
+  const publicClient = new Client(env.APPVIEW_URL);
+  return {
+    async findRegisteredFollowers(subject, limit) {
+      const { total, followers } = await publicClient.call(
+        getRegisteredFollowers,
+        { actor: subject, limit },
+      );
+      return { total, dids: followers.map((follower) => follower.did) };
+    },
+  };
+};

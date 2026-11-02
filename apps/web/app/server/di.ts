@@ -165,7 +165,7 @@ export const di = await createRegistry()
     deleteInviteCodeUseCaseFactory,
   )
   .service("accountQuery", ["oauthClient"], accountQueryFactory)
-  .service("followQuery", ["db"], followQueryFactory)
+  .service("followQuery", followQueryFactory)
   .service("getMeUseCase", ["accountQuery"], getMeUseCaseFactory)
   .service("getProfileUseCase", ["accountQuery"], getProfileUseCaseFactory)
   .service(

@@ -28,14 +28,15 @@ export const getFollowListUseCaseFactory = ({
   async execute(did, account, kind, filter) {
     let list = await accountQuery.findFollowList(did, account, kind);
     if (kind === "followers") {
-      const dids = await followQuery.findRegisteredFollowerDids(
-        list.subject.did,
+      const { total, dids } = await followQuery.findRegisteredFollowers(
+        account,
+        filter === "registered" ? 100 : 1,
       );
       list = {
         ...list,
-        registeredCount: dids.length,
+        registeredCount: total,
         ...(filter === "registered" && {
-          accounts: await accountQuery.findProfiles(did, dids.slice(0, 100)),
+          accounts: await accountQuery.findProfiles(did, dids),
         }),
       };
     }

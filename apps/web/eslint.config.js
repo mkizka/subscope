@@ -17,7 +17,6 @@ export default defineConfig(
     ignores: [
       "app/server/infrastructure/db/db.ts",
       "app/server/infrastructure/auth/oauth-storage.ts",
-      "app/server/infrastructure/follow/follow-query.ts",
     ],
     rules: {
       "no-restricted-imports": [
