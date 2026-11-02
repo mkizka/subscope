@@ -6,6 +6,7 @@ import type {
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
+import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
 import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
 import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
@@ -40,6 +41,18 @@ export type FollowListDto = {
   subject: AccountDto;
   accounts: AccountDto[];
   registeredCount?: number;
+};
+
+const withReplyParents = (feed: FeedViewPost[]) => {
+  const seen = new Set(feed.map(({ post }) => post.uri));
+  return feed.flatMap((item) => {
+    const parent = item.reply?.parent;
+    if (!parent || !("record" in parent) || seen.has(parent.uri)) {
+      return [toTimelinePost(item)];
+    }
+    seen.add(parent.uri);
+    return [toTimelinePost({ post: parent }), toTimelinePost(item)];
+  });
 };
 
 const toAccount = (
@@ -101,7 +114,9 @@ export const accountQueryFactory = ({
               limit: 20,
               filter: filters[tab],
             });
-      return feed.map(toTimelinePost);
+      return tab === "replies"
+        ? withReplyParents(feed)
+        : feed.map(toTimelinePost);
     },
     async findFollowList(did, account, kind) {
       const agent = await restore(did);

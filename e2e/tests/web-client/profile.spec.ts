@@ -123,6 +123,33 @@ test.describe("プロフィール", () => {
     await expect(main.getByText(reply)).toHaveCount(0);
   });
 
+  test("profile-17: 「リプライ」タブでは、返信先の投稿が一覧にない場合、リプライの上に返信先を表示して線で繋げる", async ({
+    page,
+  }) => {
+    const parentText = `profile-17の親 ${Date.now()}`;
+    const reply = `profile-17のリプライ ${Date.now()}`;
+    const parent = await createRecord("bob.test", "app.bsky.feed.post", {
+      text: parentText,
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: reply,
+      reply: { root: parent, parent },
+      createdAt: new Date().toISOString(),
+    });
+    await page.goto("/profile/alice.test?tab=replies");
+    const main = page.getByRole("main");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(reply)).toBeVisible({ timeout: 1000 });
+    }).toPass();
+
+    await expect(main).toContainText(
+      new RegExp(`${parentText}[\\s\\S]*${reply}`),
+    );
+  });
+
   test("profile-16: 全体ページの「投稿」タブでは、自分の投稿への自分のリプライ(スレッド)を含め、timeline-13と同じく線で繋げる", async ({
     page,
   }) => {
