@@ -26,7 +26,7 @@ const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
 
 export function NotificationPanelContainer() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
       queryKey: ["notifications"],
       queryFn: ({ pageParam }) => fetchNotifications(pageParam),
@@ -70,6 +70,7 @@ export function NotificationPanelContainer() {
         notifications={notifications}
         onLoadMore={fetchNextPage}
         hasNextPage={hasNextPage && !isFetchingNextPage}
+        isLoading={isLoading}
       />
     </div>
   );
