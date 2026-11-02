@@ -96,14 +96,14 @@ export class IndexRecordService {
       did: record.actorDid,
       live,
     });
-    await this.recordRepository.upsert({ ctx, record });
+    await this.recordRepository.save({ ctx, record });
 
     await indexer.upsert({ ctx, record, live, depth });
     await indexer.afterAction?.({ ctx, record, action: "upsert" });
   }
 
   async delete({ ctx, uri }: { ctx: AfterCommitContext; uri: AtUri }) {
-    const existingRecord = await this.recordRepository.findByUri({ ctx, uri });
+    const existingRecord = await this.recordRepository.find({ ctx, uri });
 
     await this.recordRepository.delete({ ctx, uri });
 

@@ -19,7 +19,7 @@ export class InMemoryProfileRepository implements IProfileRepository {
     return this.profiles.get(uri.toString()) ?? null;
   }
 
-  async upsert(params: {
+  async save(params: {
     ctx: TransactionContext;
     profile: Profile;
   }): Promise<void> {

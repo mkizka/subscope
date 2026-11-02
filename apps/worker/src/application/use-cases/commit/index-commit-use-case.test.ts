@@ -134,14 +134,10 @@ describe("IndexCommitUseCase", () => {
 
       // assert
       expect(
-        await recordRepo.findByUri({ ctx, uri: threadgate.uri }),
+        await recordRepo.find({ ctx, uri: threadgate.uri }),
       ).not.toBeNull();
-      expect(
-        await recordRepo.findByUri({ ctx, uri: postgate.uri }),
-      ).not.toBeNull();
-      expect(
-        await recordRepo.findByUri({ ctx, uri: mismatched.uri }),
-      ).toBeNull();
+      expect(await recordRepo.find({ ctx, uri: postgate.uri })).not.toBeNull();
+      expect(await recordRepo.find({ ctx, uri: mismatched.uri })).toBeNull();
     });
 
     test.each([
@@ -186,7 +182,7 @@ describe("IndexCommitUseCase", () => {
 
         // assert
         expect(likeRepo.findByUri(uri) !== null).toBe(liker || author);
-        expect((await recordRepo.findByUri({ ctx, uri })) !== null).toBe(
+        expect((await recordRepo.find({ ctx, uri })) !== null).toBe(
           liker || author,
         );
       },
@@ -232,7 +228,7 @@ describe("IndexCommitUseCase", () => {
       await indexCommitUseCase.execute(deleteCommand);
 
       // assert
-      const deletedRecord = await recordRepo.findByUri({ ctx, uri });
+      const deletedRecord = await recordRepo.find({ ctx, uri });
       expect(deletedRecord).toBeNull();
     });
   });

@@ -43,7 +43,7 @@ export class PostIndexer implements ICollectionIndexer {
     depth: number;
   }) {
     const post = Post.from(record);
-    await this.postRepository.upsert({ ctx, post });
+    await this.postRepository.save({ ctx, post });
 
     const feedItem = FeedItem.fromPost(post);
     await this.feedItemRepository.upsert({ ctx, feedItem });
