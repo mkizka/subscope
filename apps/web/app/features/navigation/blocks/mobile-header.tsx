@@ -1,9 +1,13 @@
-import { ListIcon, LogOutIcon, ShieldIcon, UsersIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { LogOutIcon } from "lucide-react";
 import { useRef } from "react";
-import { Form, Link } from "react-router";
+import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
+import {
+  AdminNavMenu,
+  navItemClass,
+  NavMenu,
+} from "@/app/features/navigation/parts/nav-menu";
 import { ServerAbout } from "@/app/features/navigation/parts/server-about";
 
 type Props = {
@@ -15,20 +19,6 @@ type Props = {
 export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const close = () => ref.current?.close();
-
-  const item = (to: string, icon: ReactNode, label: string) => (
-    <Link
-      to={to}
-      onClick={close}
-      className="
-        flex items-center gap-3 rounded-xl px-3 py-2 text-body
-        hover:bg-surface-2
-      "
-    >
-      {icon}
-      {label}
-    </Link>
-  );
 
   return (
     <header
@@ -57,27 +47,16 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
         onClick={(e) => e.target === e.currentTarget && close()}
       >
         <ServerAbout />
-        <nav className="mt-4 flex flex-col border-t border-line pt-4">
-          {profileId &&
-            item(
-              `/profile/${profileId}/lists`,
-              <ListIcon className="size-6" />,
-              "リスト",
-            )}
-          {item("/members", <UsersIcon className="size-6" />, "メンバー")}
-          {isAdmin &&
-            item(
-              "/admin/subscribers",
-              <ShieldIcon className="size-6" />,
-              "サーバー管理",
-            )}
+        <nav className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
+          <NavMenu profileId={profileId} onNavigate={close} />
+          {isAdmin && <AdminNavMenu onNavigate={close} />}
           <Form method="post" action="/oauth/logout">
             <button
               type="submit"
-              className="
-                flex w-full items-center gap-3 rounded-xl px-3 py-2 text-body
-                hover:bg-surface-2
-              "
+              className={`
+                ${navItemClass}
+                w-full
+              `}
             >
               <LogOutIcon className="size-6" />
               ログアウト
