@@ -5,24 +5,40 @@ import type {
   IAccountQuery,
 } from "@/app/server/infrastructure/account/account-query";
 import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
+import type { IFollowQuery } from "@/app/server/infrastructure/follow/follow-query";
 
 export interface IGetFollowListUseCase {
   execute: (
     did: string,
     account: AtIdentifierString,
     kind: "follows" | "followers",
+    filter?: "registered",
   ) => Promise<FollowListDto>;
 }
 
 export const getFollowListUseCaseFactory = ({
   accountQuery,
   backfillQuery,
+  followQuery,
 }: {
   accountQuery: IAccountQuery;
   backfillQuery: IBackfillQuery;
+  followQuery: IFollowQuery;
 }): IGetFollowListUseCase => ({
-  async execute(did, account, kind) {
-    const list = await accountQuery.findFollowList(did, account, kind);
+  async execute(did, account, kind, filter) {
+    let list = await accountQuery.findFollowList(did, account, kind);
+    if (kind === "followers") {
+      const dids = await followQuery.findRegisteredFollowerDids(
+        list.subject.did,
+      );
+      list = {
+        ...list,
+        registeredCount: dids.length,
+        ...(filter === "registered" && {
+          accounts: await accountQuery.findProfiles(did, dids.slice(0, 100)),
+        }),
+      };
+    }
     const statuses = await backfillQuery.findTrackedStatuses(
       list.accounts.map((item) => item.did),
     );
