@@ -11,7 +11,6 @@ export const aggregateActorStatsCommandFactory = ({
 }) => {
   return {
     did: data.did,
-    type: data.type,
     jobLogger,
   };
 };

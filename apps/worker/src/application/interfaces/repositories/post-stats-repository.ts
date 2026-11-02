@@ -1,8 +1,16 @@
 import type { TransactionContext } from "@repo/common/domain";
 
+export interface PostStats {
+  postUri: string;
+  likeCount: number;
+  repostCount: number;
+  replyCount: number;
+  quoteCount: number;
+}
+
 export interface IPostStatsRepository {
-  upsertMany: (params: {
+  save: (params: {
     ctx: TransactionContext;
-    uris: string[];
+    stats: PostStats[];
   }) => Promise<void>;
 }

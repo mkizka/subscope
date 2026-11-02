@@ -10,7 +10,6 @@ import {
 
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryActorRepository } from "../infrastructure/repositories/actor-repository/actor-repository.in-memory.js";
-import { InMemoryActorStatsRepository } from "../infrastructure/repositories/actor-stats-repository/actor-stats-repository.in-memory.js";
 import { InMemoryFeedItemRepository } from "../infrastructure/repositories/feed-item-repository/feed-item-repository.in-memory.js";
 import { InMemoryFollowRepository } from "../infrastructure/repositories/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorRepository } from "../infrastructure/repositories/generator-repository/generator-repository.in-memory.js";
@@ -46,7 +45,6 @@ export const testRegistry = createWorkerRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
   .replaceService("actorRepository", asClassArgs(InMemoryActorRepository))
-  .replaceService("actorStatsRepository", asClassArgs(InMemoryActorStatsRepository))
   .replaceService("feedItemRepository", asClassArgs(InMemoryFeedItemRepository))
   .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
   .replaceService("generatorRepository", asClassArgs(InMemoryGeneratorRepository))
