@@ -1,12 +1,14 @@
 import type { BackfillStatus, DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { and, count, eq, inArray, or } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";
 
-export type BackfillStatusDto = { inProgress: number; error: number };
+export type BackfillStatusDto = {
+  status: "inProgress" | "completed" | "error";
+};
 
 export interface IBackfillQuery {
-  countUnfinished: (did: string) => Promise<BackfillStatusDto>;
+  findStatus: (did: string) => Promise<BackfillStatusDto>;
   findTrackedStatuses: (
     dids: string[],
   ) => Promise<Record<string, BackfillStatus>>;
@@ -17,24 +19,13 @@ export const backfillQueryFactory = ({
 }: {
   db: DatabaseClient;
 }): IBackfillQuery => ({
-  async countUnfinished(did) {
-    const followees = db
-      .select({ did: schema.follows.subjectDid })
-      .from(schema.follows)
-      .where(eq(schema.follows.actorDid, did));
-    const rows = await db
-      .select({ status: schema.actors.backfillStatus, count: count() })
+  async findStatus(did) {
+    const [row] = await db
+      .select({ status: schema.actors.backfillStatus })
       .from(schema.actors)
-      .where(
-        or(eq(schema.actors.did, did), inArray(schema.actors.did, followees)),
-      )
-      .groupBy(schema.actors.backfillStatus);
-    const countOf = (status: "inProgress" | "error" | null) =>
-      rows.find((row) => row.status === status)?.count ?? 0;
-    return {
-      inProgress: countOf("inProgress") + countOf(null),
-      error: countOf("error"),
-    };
+      .where(eq(schema.actors.did, did))
+      .limit(1);
+    return { status: row?.status ?? "inProgress" };
   },
   async findTrackedStatuses(dids) {
     if (dids.length === 0) {

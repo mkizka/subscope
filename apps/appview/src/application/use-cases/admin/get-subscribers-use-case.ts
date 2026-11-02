@@ -6,7 +6,6 @@ import type { Subscription } from "@repo/common/domain";
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
 import type { ISubscriptionQuery } from "../../../application/interfaces/queries/subscription-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
-import type { IBackfillStatusQuery } from "../../interfaces/queries/backfill-status-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
@@ -21,7 +20,6 @@ export class GetSubscribersUseCase {
     private readonly profileViews: ProfileViews,
     private readonly actorRepository: IActorRepository,
     private readonly subscriptionQuery: ISubscriptionQuery,
-    private readonly backfillStatusQuery: IBackfillStatusQuery,
   ) {}
 
   async execute(
@@ -41,9 +39,6 @@ export class GetSubscribersUseCase {
     const paginationResult = paginator.extractPage(subscriptions);
 
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
-    const backfillStatuses = await this.backfillStatusQuery.findWithFollows(
-      paginationResult.items.map((sub) => asDid(sub.actorDid)),
-    );
     const subscribers = await Promise.all(
       paginationResult.items.map(async (sub) => {
         const did = asDid(sub.actorDid);
@@ -56,7 +51,7 @@ export class GetSubscribersUseCase {
             profile,
             isAdmin: actor?.isAdmin ?? false,
             subscribedAt: toDatetimeString(sub.createdAt),
-            backfillStatus: backfillStatuses.get(did) ?? "inProgress",
+            backfillStatus: actor?.backfillStatus ?? "inProgress",
           }
         );
       }),

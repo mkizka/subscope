@@ -346,11 +346,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getSubscribers-4: テイクダウンされたサブスクライバーも含める
 - getSubscribers-5: サブスクライバーごとに登録日時をsubscribedAtとして返す
 - getSubscribers-6: ページングに関係なくサブスクライバーの総数をtotalとして返す
-- getSubscribers-7: サブスクライバー本人とフォロー先の全員のバックフィルが完了していれば、backfillStatusをcompletedにする
-- getSubscribers-8: サブスクライバー本人とフォロー先に1人でもバックフィルがエラーのアカウントがいれば、backfillStatusをerrorにする
-- getSubscribers-9: completedでもerrorでもなければ、backfillStatusをinProgressにする
+- getSubscribers-7: フォロー先の状態にかかわらず、サブスクライバー本人のバックフィルの状態をbackfillStatusとして返す
+- getSubscribers-8: サブスクライバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
 
-バックフィルの状態はworkerがactorsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。状態をまだ確認していないアカウントは完了していないものとして扱う。
+バックフィルの状態はworkerがactorsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
 
 ## me.subsco.admin.grantAdmin
 

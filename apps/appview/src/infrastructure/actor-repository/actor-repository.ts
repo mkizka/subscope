@@ -39,6 +39,7 @@ export class ActorRepository implements IActorRepository {
         handle: schema.actors.handle,
         isAdmin: schema.actors.isAdmin,
         isBanned: schema.actors.isBanned,
+        backfillStatus: schema.actors.backfillStatus,
         indexedAt: schema.actors.indexedAt,
       })
       .from(schema.actors)
@@ -54,6 +55,7 @@ export class ActorRepository implements IActorRepository {
       handle: row.handle,
       isAdmin: row.isAdmin,
       isBanned: row.isBanned,
+      backfillStatus: row.backfillStatus,
       indexedAt: row.indexedAt,
     });
   }

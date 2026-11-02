@@ -18,7 +18,7 @@ async function fetchBackfillStatus(): Promise<BackfillStatusResponse> {
 }
 
 const isFinished = (data?: BackfillStatusResponse) =>
-  data?.inProgress === 0 && data.error === 0;
+  data?.status === "completed";
 
 export function BackfillBannerContainer() {
   const revalidator = useRevalidator();
@@ -36,9 +36,7 @@ export function BackfillBannerContainer() {
 
   return (
     <BackfillBanner
-      status={
-        data.error > 0 ? "error" : data.inProgress > 0 ? "inProgress" : "done"
-      }
+      status={data.status === "completed" ? "done" : data.status}
       onRefresh={() => {
         void revalidator.revalidate();
         setDismissed(true);

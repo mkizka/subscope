@@ -12,5 +12,5 @@ export const getBackfillStatusUseCaseFactory = ({
 }: {
   backfillQuery: IBackfillQuery;
 }): IGetBackfillStatusUseCase => ({
-  execute: (did) => backfillQuery.countUnfinished(did),
+  execute: (did) => backfillQuery.findStatus(did),
 });
