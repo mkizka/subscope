@@ -16,6 +16,10 @@
           },
           "cursor": {
             "type": "string"
+          },
+          "q": {
+            "type": "string",
+            "description": "Filter accounts whose display name or handle contains this text."
           }
         }
       },

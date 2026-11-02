@@ -386,7 +386,7 @@
     },
     "me.subsco.server.getRegisteredAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getRegisteredAccounts.json",
-      "cid": "bafyreihpbvsgctqgdxxder6zrusdfrfescp5i3qvslmntjqo7qmldfnevm"
+      "cid": "bafyreic3x64hor5t6wz4f4pi3c5nj2yz3ptcqlqulg5lnv2jqgiwnosfue"
     },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
@@ -394,7 +394,7 @@
     },
     "me.subsco.server.getTrackedAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getTrackedAccounts.json",
-      "cid": "bafyreidaqopyfp3ebuc5wkuff7xudbyf57a6temejjzvbxmp5otrydwwyy"
+      "cid": "bafyreidgtkjkiacn25c2bsk74tcgdlagc7x5qzmofoohmvud2pj2ewhbse"
     },
     "me.subsco.sync.getRegistrationStatus": {
       "uri": "file://./lexicons/me/subsco/sync/getRegistrationStatus.json",

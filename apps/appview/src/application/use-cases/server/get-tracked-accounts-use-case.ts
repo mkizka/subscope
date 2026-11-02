@@ -16,6 +16,7 @@ export class GetTrackedAccountsUseCase {
   async execute(params: {
     limit: number;
     cursor?: string;
+    q?: string;
   }): Promise<MeSubscoServerGetTrackedAccounts.$OutputBody> {
     const paginator = createCursorPaginator<{
       did: Did;
@@ -28,6 +29,7 @@ export class GetTrackedAccountsUseCase {
       this.registrationQuery.findTrackedAccounts({
         limit: paginator.queryLimit,
         cursor: params.cursor,
+        q: params.q,
       }),
       this.registrationQuery.countTrackedAccounts(),
     ]);
