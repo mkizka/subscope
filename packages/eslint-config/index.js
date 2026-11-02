@@ -18,7 +18,7 @@ const legacyRepositoryMethods = {
   IPostStatsRepository: "upsertMany",
   IProfileRepository: "exists|upsert",
   IRecordRepository: "findByUri|upsert",
-  IRepostRepository: "findRepostsByPost|upsert",
+  IRepostRepository: "upsert",
   ISubscriptionRepository:
     "count|countTrackedActors|findMany|findTrackedActors|isSubscriber|upsert",
 };

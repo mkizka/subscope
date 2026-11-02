@@ -39,7 +39,6 @@ import type { IPostStatsQuery } from "../application/interfaces/post-stats-query
 import type { IProfileQuery } from "../application/interfaces/profile-query.js";
 import type { IRecordQuery } from "../application/interfaces/record-query.js";
 import type { IRepostQuery } from "../application/interfaces/repost-query.js";
-import type { IRepostRepository } from "../application/interfaces/repost-repository.js";
 import type { ISubscriptionRepository } from "../application/interfaces/subscription-repository.js";
 import type { ITimelineQuery } from "../application/interfaces/timeline-query.js";
 import type { ITokenVerifier } from "../application/interfaces/token-verifier.js";
@@ -120,7 +119,6 @@ import { PostStatsQuery } from "../infrastructure/post-stats-query/post-stats-qu
 import { ProfileQuery } from "../infrastructure/profile-query/profile-query.js";
 import { RecordQuery } from "../infrastructure/record-query/record-query.js";
 import { RepostQuery } from "../infrastructure/repost-query/repost-query.js";
-import { RepostRepository } from "../infrastructure/repost-repository/repost-repository.js";
 import { SubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.js";
 import { TimelineQuery } from "../infrastructure/timeline-query/timeline-query.js";
 import { TokenVerifier } from "../infrastructure/token-verifier/token-verifier.js";
@@ -212,7 +210,6 @@ export const createAppRegistry = (env: Env) =>
     .service("timelineQuery", ["db"], asClassArgs<ITimelineQuery>()(TimelineQuery))
     .service("authorFeedQuery", ["db"], asClassArgs<IAuthorFeedQuery>()(AuthorFeedQuery))
     .service("likeRepository", ["db"], asClassArgs<ILikeRepository>()(LikeRepository))
-    .service("repostRepository", ["db"], asClassArgs<IRepostRepository>()(RepostRepository))
     .service("repostQuery", ["db"], asClassArgs<IRepostQuery>()(RepostQuery))
     .service("followQuery", ["db"], asClassArgs<IFollowQuery>()(FollowQuery))
     .service("listItemQuery", ["db"], asClassArgs<IListItemQuery>()(ListItemQuery))
@@ -229,7 +226,7 @@ export const createAppRegistry = (env: Env) =>
     .service("subscriptionService", ["subscriptionRepository"], asClassArgs(SubscriptionService))
     .service("searchService", ["postQuery"], asClassArgs(PostSearchService))
     .service("likeService", ["likeRepository"], asClassArgs(LikeService))
-    .service("repostService", ["repostRepository"], asClassArgs(RepostService))
+    .service("repostService", ["repostQuery"], asClassArgs(RepostService))
     .service("authVerifierMiddleware", ["tokenVerifier"], asClassArgs(AuthVerifierMiddleware))
     .service("adminMiddleware", ["authVerifierMiddleware", "actorRepository"], asClassArgs(AdminMiddleware))
     .service("atUriService", ["handleResolver"], asClassArgs(AtUriService))
