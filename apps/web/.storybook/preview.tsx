@@ -9,6 +9,7 @@ import { createRoutesStub } from "react-router";
 
 import ListDetailStories from "@/app/features/list/blocks/list-detail.stories";
 import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
+import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-codes";
 import type { loader as listLoader } from "@/app/routes/api.list.$handle.$rkey";
 import type { loader as listsLoader } from "@/app/routes/api.lists.$handle";
 import type { loader as meLoader } from "@/app/routes/api.me";
@@ -135,6 +136,23 @@ queryClient.setQueryData<{
   pageParams: [undefined],
 });
 
+queryClient.setQueryData<{
+  pages: Data<typeof inviteCodesLoader>[];
+  pageParams: unknown[];
+}>(["inviteCodes"], {
+  pages: [
+    {
+      codes: [
+        {
+          code: "abc-123-def",
+          expiresAt: "2099-12-31T23:59:59.000Z",
+          createdAt: "2025-01-01T00:00:00.000Z",
+        },
+      ],
+    },
+  ],
+  pageParams: [undefined],
+});
 queryClient.setQueryData<Data<typeof listsLoader>>(["lists", alice.handle], {
   lists: [
     {
