@@ -10,13 +10,13 @@ describe("ActorRepository", () => {
 
   const actorRepository = new ActorRepository(ctx.db);
 
-  describe("findByDid", () => {
+  describe("find", () => {
     test("アクターが存在しない場合、nullを返す", async () => {
       // arrange
       const did = asDid("did:plc:xxx");
 
       // act
-      const result = await actorRepository.findByDid(did);
+      const result = await actorRepository.find(did);
 
       // assert
       expect(result).toBeNull();
@@ -27,7 +27,7 @@ describe("ActorRepository", () => {
       const actor = await actorFactory(ctx.db).create();
 
       // act
-      const result = await actorRepository.findByDid(asDid(actor.did));
+      const result = await actorRepository.find(asDid(actor.did));
 
       // assert
       const expected = Actor.reconstruct({
@@ -41,7 +41,7 @@ describe("ActorRepository", () => {
     });
   });
 
-  describe("upsert", () => {
+  describe("save", () => {
     test("新規アクターの場合、アクターを挿入する", async () => {
       // arrange
       const did = asDid("did:plc:newactor123");
@@ -54,10 +54,10 @@ describe("ActorRepository", () => {
       });
 
       // act
-      await actorRepository.upsert({ ctx, actor: newActor });
+      await actorRepository.save({ ctx, actor: newActor });
 
       // assert
-      const result = await actorRepository.findByDid(did);
+      const result = await actorRepository.find(did);
       expect(result).toEqual(newActor);
     });
 
@@ -74,10 +74,10 @@ describe("ActorRepository", () => {
       });
 
       // act
-      await actorRepository.upsert({ ctx, actor: updatedActor });
+      await actorRepository.save({ ctx, actor: updatedActor });
 
       // assert
-      const result = await actorRepository.findByDid(asDid(actor.did));
+      const result = await actorRepository.find(asDid(actor.did));
       expect(result).toEqual(updatedActor);
     });
   });

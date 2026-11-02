@@ -6,14 +6,14 @@ import {
   type TransactionContext,
 } from "@repo/common/domain";
 import { type ActorInsert, schema } from "@repo/db";
-import { and, asc, eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { IActorRepository } from "../../application/interfaces/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
   constructor(private readonly db: DatabaseClient) {}
 
-  async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
+  async save({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
       isAdmin: actor.isAdmin,
@@ -32,7 +32,7 @@ export class ActorRepository implements IActorRepository {
       });
   }
 
-  async findByDid(did: Did): Promise<Actor | null> {
+  async find(did: Did): Promise<Actor | null> {
     const [row] = await this.db
       .select({
         did: schema.actors.did,
@@ -56,32 +56,5 @@ export class ActorRepository implements IActorRepository {
       isBanned: row.isBanned,
       indexedAt: row.indexedAt,
     });
-  }
-
-  async hasAnyAdmin(): Promise<boolean> {
-    const rows = await this.db
-      .select({ did: schema.actors.did })
-      .from(schema.actors)
-      .where(eq(schema.actors.isAdmin, true))
-      .limit(1);
-    return rows.length > 0;
-  }
-
-  async findBannedDids(params: {
-    limit: number;
-    cursor?: string;
-  }): Promise<Did[]> {
-    const rows = await this.db
-      .select({ did: schema.actors.did })
-      .from(schema.actors)
-      .where(
-        and(
-          eq(schema.actors.isBanned, true),
-          params.cursor ? gt(schema.actors.did, params.cursor) : undefined,
-        ),
-      )
-      .orderBy(asc(schema.actors.did))
-      .limit(params.limit);
-    return rows.map((row) => asDid(row.did));
   }
 }
