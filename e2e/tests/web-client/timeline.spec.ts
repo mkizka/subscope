@@ -302,11 +302,15 @@ test.describe("タイムライン", () => {
     }).toPass();
   });
 
-  test("timeline-13: 隣り合う投稿のうち下の投稿が上の投稿の返信先であれば、2つを古い順に並べ、アイコンの間を線で繋げる", async ({
+  test("timeline-13: 一覧の中に返信先の投稿があれば、間に別の投稿があっても返信先を上にして古い順に並べ、アイコンの間を線で繋げる", async ({
     page,
   }) => {
     const root = await createRecord("alice.test", "app.bsky.feed.post", {
       text: "timeline-13: 起点",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-13: 間の投稿",
       createdAt: new Date().toISOString(),
     });
     await createRecord("alice.test", "app.bsky.feed.post", {
@@ -320,7 +324,7 @@ test.describe("タイムライン", () => {
     await expect(async () => {
       await page.reload();
       await expect(page.getByText(/^timeline-13: /)).toHaveText(
-        ["timeline-13: 起点", "timeline-13: 返信"],
+        ["timeline-13: 起点", "timeline-13: 返信", "timeline-13: 間の投稿"],
         { timeout: 1000 },
       );
     }).toPass();

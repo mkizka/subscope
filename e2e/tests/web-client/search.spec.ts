@@ -124,7 +124,7 @@ test.describe("検索", () => {
     await page.goto("/search");
     let release = () => {};
     const held = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/search.data?*", async (route) => {
+    await page.route("**/api/search*", async (route) => {
       await held;
       await route.continue();
     });
@@ -136,7 +136,6 @@ test.describe("検索", () => {
     await expect(button).toBeDisabled();
     await expect(button.locator(".animate-spin")).toBeVisible();
     release();
-    await expect(page).toHaveURL("/search?q=alice");
     await expect(button).toBeEnabled();
   });
 
@@ -153,5 +152,51 @@ test.describe("検索", () => {
         timeout: 1000,
       });
     }).toPass();
+  });
+
+  test("search-9: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/search");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/search*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.getByRole("searchbox", { name: "検索語" }).fill("alice");
+    await page.getByRole("button", { name: "検索" }).click();
+
+    await expect(page).toHaveURL("/search?q=alice");
+    const spinner = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+  });
+
+  test("search-10: 一度表示した検索結果に戻ると、読み込み直しを待たずに前回の結果を表示する", async ({
+    page,
+  }) => {
+    const alice = page
+      .getByRole("main")
+      .getByRole("listitem")
+      .filter({ hasText: "@alice.test" });
+    await expect(async () => {
+      await page.goto("/search?q=alice");
+      await expect(alice).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "アカウント", exact: true })
+      .click();
+    await expect(page).toHaveURL("/accounts");
+    await page.route("**/api/search*", () => {});
+
+    await page.goBack();
+
+    await expect(alice).toBeVisible();
   });
 });
