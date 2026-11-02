@@ -4,7 +4,7 @@ import type * as MeSubscoAdminGetSubscribers from "@repo/client/lex/me/subsco/ad
 import type { Subscription } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
-import type { ISubscriptionRepository } from "../../../application/interfaces/subscription-repository.js";
+import type { ISubscriptionQuery } from "../../../application/interfaces/queries/subscription-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { IBackfillStatusQuery } from "../../interfaces/queries/backfill-status-query.js";
 import type { ProfileViews } from "../../views/profile-views.js";
@@ -20,7 +20,7 @@ export class GetSubscribersUseCase {
     private readonly viewContextFactory: ViewContextFactory,
     private readonly profileViews: ProfileViews,
     private readonly actorRepository: IActorRepository,
-    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionQuery: ISubscriptionQuery,
     private readonly backfillStatusQuery: IBackfillStatusQuery,
   ) {}
 
@@ -32,11 +32,11 @@ export class GetSubscribersUseCase {
       getCursor: (sub) => sub.createdAt.toISOString(),
     });
     const [subscriptions, total] = await Promise.all([
-      this.subscriptionRepository.findMany({
+      this.subscriptionQuery.findMany({
         limit: paginator.queryLimit,
         cursor: params.cursor,
       }),
-      this.subscriptionRepository.count(),
+      this.subscriptionQuery.count(),
     ]);
     const paginationResult = paginator.extractPage(subscriptions);
 

@@ -1,18 +1,5 @@
 import { mkizka } from "@mkizka/eslint-config";
 
-const legacyRepositoryMethods = {
-  ISubscriptionRepository:
-    "count|countTrackedActors|findMany|findTrackedActors",
-};
-
-const repositoryMethodRule = (interfaceName, allowed) => ({
-  selector: `TSInterfaceDeclaration[id.name=${interfaceName}] > TSInterfaceBody > [key.name!=/^(${allowed})$/]`,
-  message:
-    "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
-});
-
-const legacyNames = Object.keys(legacyRepositoryMethods).join("|");
-
 export const config = [
   ...mkizka,
   {
@@ -25,13 +12,12 @@ export const config = [
           message:
             "DIの配線にアロー関数を書かないでください。必ずクラスを作成し、asClassArgsで登録してください。",
         },
-        repositoryMethodRule(
-          `/^(?!(${legacyNames})$)I\\w*Repository$/`,
-          "find|save|delete",
-        ),
-        ...Object.entries(legacyRepositoryMethods).map(([name, methods]) =>
-          repositoryMethodRule(`"${name}"`, `find|save|delete|${methods}`),
-        ),
+        {
+          selector:
+            "TSInterfaceDeclaration[id.name=/^I\\w*Repository$/] > TSInterfaceBody > [key.name!=/^(find|save|delete)$/]",
+          message:
+            "リポジトリのメソッドはfind・save・deleteのみにしてください。読み取りはクエリサービスに書いてください(docs/dev/repository-and-query.md)。",
+        },
       ],
     },
   },
