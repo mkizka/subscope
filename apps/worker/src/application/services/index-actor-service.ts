@@ -32,7 +32,7 @@ export class IndexActorService {
     status?: ActorStatus;
     live: boolean;
   }): Promise<void> {
-    const existingActor = await this.actorRepository.findByDid({ ctx, did });
+    const existingActor = await this.actorRepository.find({ ctx, did });
     const actor = existingActor ?? Actor.create({ did });
     const changed =
       !existingActor ||
@@ -47,7 +47,7 @@ export class IndexActorService {
     }
 
     if (changed) {
-      await this.actorRepository.upsert({ ctx, actor });
+      await this.actorRepository.save({ ctx, actor });
     }
 
     if (!actor.handle) {
