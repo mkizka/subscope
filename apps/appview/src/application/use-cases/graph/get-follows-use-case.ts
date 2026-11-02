@@ -36,9 +36,7 @@ export class GetFollowsUseCase {
     const [subject, follows] = await Promise.all([
       this.profileViews.view(params.actorDid, ctx),
       Promise.all(
-        page.items.map((item) =>
-          this.profileViews.view(item.subjectDid, ctx),
-        ),
+        page.items.map((item) => this.profileViews.view(item.subjectDid, ctx)),
       ),
     ]);
 

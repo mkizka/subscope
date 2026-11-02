@@ -36,9 +36,7 @@ export class GetFollowersUseCase {
     const [subject, followers] = await Promise.all([
       this.profileViews.view(params.actorDid, ctx),
       Promise.all(
-        page.items.map((item) =>
-          this.profileViews.view(item.actorDid, ctx),
-        ),
+        page.items.map((item) => this.profileViews.view(item.actorDid, ctx)),
       ),
     ]);
 
