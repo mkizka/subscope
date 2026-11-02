@@ -328,7 +328,13 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.registerAdmin
 
-管理者が未登録のとき、閲覧者を管理者として登録し、サブスクライバーにもする。認証が必要。既に管理者がいる場合は400とAdminAlreadyExistsを返す。
+管理者が未登録のとき、閲覧者を最初の管理者として登録する。認証が必要。
+
+- registerAdmin-1: 閲覧者を管理者にし、サブスクライバーにする
+- registerAdmin-2: 既に管理者がいれば、400とAdminAlreadyExistsを返す
+- registerAdmin-3: 閲覧者のsyncTapRepoジョブを積む
+- registerAdmin-4: 閲覧者のプロフィールのfetchRecordジョブを積む
+- registerAdmin-5: 閲覧者のハンドルが未取得ならresolveDidジョブを積む
 
 ## me.subsco.admin.getSubscribers
 

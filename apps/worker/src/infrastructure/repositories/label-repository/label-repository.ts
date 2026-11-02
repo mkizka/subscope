@@ -9,7 +9,7 @@ import type {
 } from "../../../application/interfaces/repositories/label-repository.js";
 
 export class LabelRepository implements ILabelRepository {
-  async upsert({
+  async save({
     ctx,
     label,
     actorDid,

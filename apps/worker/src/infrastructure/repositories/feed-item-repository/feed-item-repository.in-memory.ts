@@ -23,7 +23,7 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     return this.feedItems.get(uri.toString()) ?? null;
   }
 
-  async upsert({
+  async save({
     feedItem,
   }: {
     ctx: TransactionContext;

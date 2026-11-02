@@ -5,7 +5,7 @@ import type { IGeneratorRepository } from "../../../application/interfaces/repos
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class GeneratorRepository implements IGeneratorRepository {
-  async upsert({
+  async save({
     ctx,
     generator,
   }: {

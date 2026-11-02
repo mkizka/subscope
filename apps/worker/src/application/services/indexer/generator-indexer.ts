@@ -9,6 +9,6 @@ export class GeneratorIndexer implements ICollectionIndexer {
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const generator = Generator.from(record);
-    await this.generatorRepository.upsert({ ctx, generator });
+    await this.generatorRepository.save({ ctx, generator });
   }
 }

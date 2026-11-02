@@ -27,7 +27,7 @@ export class IndexLabelUseCase {
       if (!isDid(did) || !(await this.actorQuery.exists({ ctx, did }))) {
         return;
       }
-      await this.labelRepository.upsert({ ctx, label, actorDid: did });
+      await this.labelRepository.save({ ctx, label, actorDid: did });
     });
   }
 }
