@@ -5,12 +5,10 @@ import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 
 describe("SearchActorsUseCase", () => {
   let searchActorsUseCase: TestServices["searchActorsUseCase"];
-  let profileRepo: TestServices["profileRepository"];
   let profileQuery: TestServices["profileQuery"];
   beforeEach(async () => {
     const services = await testRegistry.resolve();
     searchActorsUseCase = services.searchActorsUseCase;
-    profileRepo = services.profileRepository;
     profileQuery = services.profileQuery;
   });
 
@@ -64,7 +62,6 @@ describe("SearchActorsUseCase", () => {
       displayName: "Test User 検索対象",
       handle: "match.test",
     });
-    profileRepo.add(matchProfile);
     profileQuery.add(matchProfile);
 
     const noMatchActor = actorFactory();
@@ -73,7 +70,6 @@ describe("SearchActorsUseCase", () => {
       displayName: "Different Name",
       handle: "nomatch.test",
     });
-    profileRepo.add(noMatchProfile);
     profileQuery.add(noMatchProfile);
 
     // act
@@ -102,7 +98,6 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor.did,
       displayName: "No Match User",
     });
-    profileRepo.add(profile);
     profileQuery.add(profile);
 
     // act
@@ -125,7 +120,6 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor1.did,
       displayName: "Limit Test User 1",
     });
-    profileRepo.add(profile1);
     profileQuery.add(profile1);
 
     const actor2 = actorFactory();
@@ -133,7 +127,6 @@ describe("SearchActorsUseCase", () => {
       actorDid: actor2.did,
       displayName: "Limit Test User 2",
     });
-    profileRepo.add(profile2);
     profileQuery.add(profile2);
 
     // act
@@ -156,7 +149,6 @@ describe("SearchActorsUseCase", () => {
       handle: "user1.test",
       indexedAt: new Date("2024-01-01T00:00:00.000Z"),
     });
-    profileRepo.add(profile1);
     profileQuery.add(profile1);
 
     const actor2 = actorFactory();
@@ -166,7 +158,6 @@ describe("SearchActorsUseCase", () => {
       handle: "user2.test",
       indexedAt: new Date("2024-01-02T00:00:00.000Z"),
     });
-    profileRepo.add(profile2);
     profileQuery.add(profile2);
 
     // act - 最初のページ
@@ -216,7 +207,6 @@ describe("SearchActorsUseCase", () => {
       displayName: "テスト User",
       handle: "different.handle.com",
     });
-    profileRepo.add(displayNameProfile);
     profileQuery.add(displayNameProfile);
 
     const handleActor = actorFactory();
@@ -225,7 +215,6 @@ describe("SearchActorsUseCase", () => {
       displayName: "Different Name",
       handle: "testhandle.example.com",
     });
-    profileRepo.add(handleProfile);
     profileQuery.add(handleProfile);
 
     // act - displayNameで検索

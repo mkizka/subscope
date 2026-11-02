@@ -19,4 +19,12 @@ export class InMemoryPostQuery implements IPostQuery {
       uris.flatMap((uri) => this.posts.get(uri.toString()) ?? []),
     );
   }
+
+  findReplies(): Promise<PostDto[]> {
+    throw new Error("Not implemented");
+  }
+
+  search(): Promise<PostDto[]> {
+    throw new Error("Not implemented");
+  }
 }

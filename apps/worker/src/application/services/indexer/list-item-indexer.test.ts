@@ -37,7 +37,7 @@ describe("ListItemIndexer", () => {
       listUri,
     );
     expect(
-      await actorRepository.findByDid({ ctx: { db }, did: subject.did }),
+      await actorRepository.find({ ctx: { db }, did: subject.did }),
     ).not.toBeNull();
   });
 });

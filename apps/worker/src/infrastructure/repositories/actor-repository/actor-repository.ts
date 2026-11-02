@@ -13,7 +13,7 @@ import type {
 } from "../../../application/interfaces/repositories/actor-repository.js";
 
 export class ActorRepository implements IActorRepository {
-  async upsert({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
+  async save({ ctx, actor }: { ctx: TransactionContext; actor: Actor }) {
     const data = {
       handle: actor.handle,
       status: actor.status,
@@ -31,7 +31,7 @@ export class ActorRepository implements IActorRepository {
       });
   }
 
-  async findByDid({ ctx, did }: { ctx: TransactionContext; did: Did }) {
+  async find({ ctx, did }: { ctx: TransactionContext; did: Did }) {
     const [row] = await ctx.db
       .select()
       .from(schema.actors)
@@ -51,7 +51,7 @@ export class ActorRepository implements IActorRepository {
   }
 
   async exists({ ctx, did }: { ctx: TransactionContext; did: Did }) {
-    const actor = await this.findByDid({ ctx, did });
+    const actor = await this.find({ ctx, did });
     return actor !== null;
   }
 

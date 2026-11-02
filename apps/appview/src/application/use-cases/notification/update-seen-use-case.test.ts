@@ -26,7 +26,7 @@ describe("UpdateSeenUseCase", () => {
     });
 
     // assert
-    const result = await subscriptionRepo.findFirst(subscription.actorDid);
+    const result = await subscriptionRepo.find(subscription.actorDid);
     expect(result?.seenAt).toEqual(seenAt);
   });
 });

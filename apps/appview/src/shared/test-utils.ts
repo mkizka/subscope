@@ -13,7 +13,6 @@ import { InMemoryActorStatsQuery } from "../infrastructure/actor-stats-query/act
 import { InMemoryAssetUrlBuilder } from "../infrastructure/asset-url-builder/asset-url-builder.in-memory.js";
 import { InMemoryBackfillStatusQuery } from "../infrastructure/backfill-status-query/backfill-status-query.in-memory.js";
 import { InMemoryFollowQuery } from "../infrastructure/follow-query/follow-query.in-memory.js";
-import { InMemoryFollowRepository } from "../infrastructure/follow-repository/follow-repository.in-memory.js";
 import { InMemoryGeneratorQuery } from "../infrastructure/generator-query/generator-query.in-memory.js";
 import { InMemoryHandleResolver } from "../infrastructure/handle-resolver/handle-resolver.in-memory.js";
 import { InMemoryInviteCodeQuery } from "../infrastructure/invite-code-query/invite-code-query.in-memory.js";
@@ -24,13 +23,10 @@ import { InMemoryLikeRepository } from "../infrastructure/like-repository/like-r
 import { InMemoryListQuery } from "../infrastructure/list-query/list-query.in-memory.js";
 import { InMemoryNotificationQuery } from "../infrastructure/notification-query/notification-query.in-memory.js";
 import { InMemoryPostQuery } from "../infrastructure/post-query/post-query.in-memory.js";
-import { InMemoryPostRepository } from "../infrastructure/post-repository/post-repository.in-memory.js";
 import { InMemoryPostStatsQuery } from "../infrastructure/post-stats-query/post-stats-query.in-memory.js";
 import { InMemoryProfileQuery } from "../infrastructure/profile-query/profile-query.in-memory.js";
-import { InMemoryProfileRepository } from "../infrastructure/profile-repository/profile-repository.in-memory.js";
 import { InMemoryRecordQuery } from "../infrastructure/record-query/record-query.in-memory.js";
 import { InMemoryRepostQuery } from "../infrastructure/repost-query/repost-query.in-memory.js";
-import { InMemoryRepostRepository } from "../infrastructure/repost-repository/repost-repository.in-memory.js";
 import { InMemorySubscriptionRepository } from "../infrastructure/subscription-repository/subscription-repository.in-memory.js";
 import { InMemoryTokenVerifier } from "../infrastructure/token-verifier/token-verifier.in-memory.js";
 import type { Env } from "./env.js";
@@ -52,7 +48,6 @@ export const testEnv = {
 export const testRegistry = createAppRegistry(testEnv)
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   .replaceValue("db", {} as never)
-  .replaceService("profileRepository", asClassArgs(InMemoryProfileRepository))
   .replaceService("backfillStatusQuery", asClassArgs(InMemoryBackfillStatusQuery))
   .replaceService("profileQuery", asClassArgs(InMemoryProfileQuery))
   .replaceService("labelQuery", asClassArgs(InMemoryLabelQuery))
@@ -62,15 +57,12 @@ export const testRegistry = createAppRegistry(testEnv)
   .replaceService("handleResolver", asClassArgs(InMemoryHandleResolver))
   .replaceService("recordQuery", asClassArgs(InMemoryRecordQuery))
   .replaceService("notificationQuery", asClassArgs(InMemoryNotificationQuery))
-  .replaceService("postRepository", asClassArgs(InMemoryPostRepository))
   .replaceService("generatorQuery", asClassArgs(InMemoryGeneratorQuery))
   .replaceService("likeQuery", asClassArgs(InMemoryLikeQuery))
   .replaceService("postQuery", asClassArgs(InMemoryPostQuery))
   .replaceService("postStatsQuery", asClassArgs(InMemoryPostStatsQuery))
   .replaceService("likeRepository", asClassArgs(InMemoryLikeRepository))
-  .replaceService("repostRepository", asClassArgs(InMemoryRepostRepository))
   .replaceService("repostQuery", asClassArgs(InMemoryRepostQuery))
-  .replaceService("followRepository", asClassArgs(InMemoryFollowRepository))
   .replaceService("followQuery", asClassArgs(InMemoryFollowQuery))
   .replaceService("listQuery", asClassArgs(InMemoryListQuery))
   .replaceService("inviteCodeQuery", asClassArgs(InMemoryInviteCodeQuery))

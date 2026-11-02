@@ -1,4 +1,3 @@
-import { AtUri } from "@atproto/syntax";
 import {
   type Post,
   PostEmbedExternal,
@@ -149,27 +148,5 @@ export class PostRepository implements IPostRepository {
     } else if (embedRecordWithMedia.media instanceof PostEmbedExternal) {
       await this.upsertEmbedExternal(ctx, postUri, embedRecordWithMedia.media);
     }
-  }
-
-  async exists(ctx: TransactionContext, uri: AtUri): Promise<boolean> {
-    const result = await ctx.db
-      .select({ uri: schema.posts.uri })
-      .from(schema.posts)
-      .where(eq(schema.posts.uri, uri.toString()))
-      .limit(1);
-
-    return result.length > 0;
-  }
-
-  async findReplyParentUri(
-    ctx: TransactionContext,
-    uri: AtUri,
-  ): Promise<AtUri | null> {
-    const [post] = await ctx.db
-      .select({ replyParentUri: schema.posts.replyParentUri })
-      .from(schema.posts)
-      .where(eq(schema.posts.uri, uri.toString()))
-      .limit(1);
-    return post?.replyParentUri ? new AtUri(post.replyParentUri) : null;
   }
 }

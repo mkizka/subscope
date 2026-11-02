@@ -34,7 +34,7 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.findByDid({
+    const foundActor = await actorRepo.find({
       ctx,
       did: command.did,
     });
@@ -58,7 +58,7 @@ describe("UpsertIdentityUseCase", () => {
     await upsertIdentityUseCase.execute(command);
 
     // assert
-    const foundActor = await actorRepo.findByDid({
+    const foundActor = await actorRepo.find({
       ctx,
       did: command.did,
     });
@@ -84,7 +84,7 @@ describe("UpsertIdentityUseCase", () => {
     });
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    const foundActor = await actorRepo.find({ ctx, did: actor.did });
     expect(foundActor?.handle).toBe("alice.test");
   });
 
@@ -101,7 +101,7 @@ describe("UpsertIdentityUseCase", () => {
     });
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    const foundActor = await actorRepo.find({ ctx, did: actor.did });
     expect(foundActor?.status).toBe("takendown");
   });
 
@@ -118,7 +118,7 @@ describe("UpsertIdentityUseCase", () => {
     });
 
     // assert
-    const foundActor = await actorRepo.findByDid({ ctx, did: actor.did });
+    const foundActor = await actorRepo.find({ ctx, did: actor.did });
     expect(foundActor).toBeNull();
   });
 });
