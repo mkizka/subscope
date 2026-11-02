@@ -149,7 +149,7 @@ describe("JobScheduler", () => {
       const did = "did:plc:test";
 
       // act
-      await jobScheduler.scheduleAggregateActorStats(did, "posts");
+      await jobScheduler.scheduleAggregateActorStats(did);
 
       // assert
       const jobs = jobQueue.getJobs();
@@ -157,12 +157,9 @@ describe("JobScheduler", () => {
       expect(jobs[0]).toMatchObject({
         queueName: "aggregateActorStats",
         jobName: did,
-        data: {
-          did,
-          type: "posts",
-        },
+        data: { did },
         options: {
-          deduplication: { id: `posts__${did}`, keepLastIfActive: true },
+          deduplication: { id: did, keepLastIfActive: true },
           delay: AGGREGATE_STATS_DELAY_MS,
         },
       });

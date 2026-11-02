@@ -136,7 +136,7 @@ export class PostIndexer implements ICollectionIndexer {
     const post = Post.from(record);
 
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateActorStats(post.actorDid, "posts"),
+      this.jobScheduler.scheduleAggregateActorStats(post.actorDid),
     );
 
     // 削除時にafterActionが呼ばれる場合は投稿が存在しないのでupsertに限定

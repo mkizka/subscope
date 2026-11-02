@@ -9,7 +9,6 @@ type FetchRecordData = {
 
 type AggregateActorStatsData = {
   did: Did;
-  type: "follows" | "followers" | "posts";
 };
 
 type CheckBackfillData = {
