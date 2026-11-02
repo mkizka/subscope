@@ -6,7 +6,7 @@ import type { IRecordRevRepository } from "../../../application/interfaces/repos
 export class InMemoryRecordRevRepository implements IRecordRevRepository {
   private revs: Map<string, string> = new Map();
 
-  async saveIfNotOlder({
+  async save({
     uri,
     rev,
   }: {

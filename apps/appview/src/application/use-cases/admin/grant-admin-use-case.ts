@@ -16,12 +16,12 @@ export class GrantAdminUseCase {
     const subscription = await this.subscriptionRepository.findFirst(
       params.did,
     );
-    const actor = await this.actorRepository.findByDid(params.did);
+    const actor = await this.actorRepository.find(params.did);
     if (!subscription || !actor) {
       throw new NotSubscribedError("Not subscribed to this server");
     }
 
     actor.promoteToAdmin();
-    await this.actorRepository.upsert({ ctx: { db: this.db }, actor });
+    await this.actorRepository.save({ ctx: { db: this.db }, actor });
   }
 }

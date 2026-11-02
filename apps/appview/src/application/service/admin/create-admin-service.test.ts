@@ -28,7 +28,7 @@ describe("CreateAdminService", () => {
     );
 
     // assert
-    const savedActor = await actorRepo.findByDid(did);
+    const savedActor = await actorRepo.find(did);
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did,
@@ -63,7 +63,7 @@ describe("CreateAdminService", () => {
     );
 
     // assert
-    const savedActor = await actorRepo.findByDid(existingActor.did);
+    const savedActor = await actorRepo.find(existingActor.did);
     expect(savedActor).toEqual(
       Actor.reconstruct({
         did: existingActor.did,

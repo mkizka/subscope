@@ -25,7 +25,7 @@ export class BanSubscriberUseCase {
   ] as const;
 
   async execute(params: { did: Did }): Promise<void> {
-    const actor = await this.actorRepository.findByDid(params.did);
+    const actor = await this.actorRepository.find(params.did);
     if (!actor) {
       throw new NotSubscribedError("Not subscribed to this server");
     }
@@ -36,7 +36,7 @@ export class BanSubscriberUseCase {
     await this.unsubscribeServerUseCase.execute({ actorDid: params.did });
     actor.ban();
     await this.transactionManager.transaction((ctx) =>
-      this.actorRepository.upsert({ ctx, actor }),
+      this.actorRepository.save({ ctx, actor }),
     );
   }
 }
