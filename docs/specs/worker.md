@@ -83,10 +83,10 @@ threadgate と postgate は専用のテーブルを持たず、レコードのJS
 
 ## バックフィルの状態の確認
 
-Tapに登録した追跡アクターの過去のレコードをTapが取り込み終えたかを、Tapの `/info/:did` で確認してアクターに保存する。webはこれを読んで、サブスクライバーにバックフィルが終わったかを知らせる。
+Tapに登録した追跡アクターの過去のレコードをTapが同期し終えたかを、Tapの `/info/:did` で確認してアクターに保存する。webはこれを読んで、サブスクライバーにバックフィルが終わったかを知らせる。
 
 - backfill-1: Tapに登録したアカウントのバックフィルの状態を確認する
-- backfill-2: Tapの状態が error のときはエラー、pending・desynchronized・resyncing のときは取り込み中、それ以外は完了として保存する
+- backfill-2: Tapの状態が error のときはエラー、pending・desynchronized・resyncing のときは同期中、それ以外は完了として保存する
 - backfill-3: 完了でなければ、間隔を伸ばしながら確認を続ける
 - backfill-4: 追跡アクターでなくなったアカウントは確認しない
 - backfill-5: 起動時に、状態をまだ確認していない追跡アクターを確認する

@@ -16,9 +16,9 @@ const ICONS = {
 
 const MESSAGES = {
   inProgress:
-    "過去の投稿を取り込んでいます。終わるまで一部の投稿が表示されません",
-  error: "過去の投稿を取り込めていません。自動で再試行しています",
-  done: "過去の投稿の取り込みが終わりました",
+    "過去の投稿を同期しています。終わるまで一部の投稿が表示されません",
+  error: "過去の投稿を同期できていません。自動で再試行しています",
+  done: "過去の投稿の同期が終わりました",
 };
 
 export function BackfillBanner({ status, onRefresh }: Props) {

@@ -25,9 +25,9 @@ export type Subscriber = BannedActor & {
 };
 
 function BackfillBadge({ status }: { status: string }) {
-  if (status === "completed") return <Badge>取り込み済み</Badge>;
-  if (status === "error") return <Badge variant="danger">取り込みエラー</Badge>;
-  return <Badge>取り込み中</Badge>;
+  if (status === "completed") return <Badge>同期済み</Badge>;
+  if (status === "error") return <Badge variant="danger">同期エラー</Badge>;
+  return <Badge>同期中</Badge>;
 }
 
 const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";

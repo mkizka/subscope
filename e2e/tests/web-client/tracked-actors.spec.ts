@@ -71,7 +71,7 @@ test.describe("追跡中のユーザー", () => {
     await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
   });
 
-  test("tracked-actors-5: 一覧のユーザーには、過去の投稿の取り込み状態を表示する", async ({
+  test("tracked-actors-5: 一覧のユーザーには、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
     await page.goto("/tracked-actors");
@@ -82,9 +82,9 @@ test.describe("追跡中のユーザー", () => {
       .filter({ hasText: "Alice" });
     await expect(async () => {
       await page.reload();
-      await expect(item.getByText("取り込み済み", { exact: true })).toBeVisible(
-        { timeout: 1000 },
-      );
+      await expect(item.getByText("同期済み", { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
   });
 });
