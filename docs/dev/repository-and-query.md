@@ -18,6 +18,12 @@
 
 DTOは用途ごとに分け、呼び出し側が使う項目だけを持たせる。1つのDTOに項目を足していくと、使わない項目のために読み取りが重くなる。
 
+## トランザクション
+
+ユースケースはリポジトリやクエリサービスに渡す `ctx` を、読み取りだけや1回書くだけでも `transactionManager.transaction` で作る。`DatabaseClient` を受け取って `{ db }` を直接作らない。書き方を1つにしておけば、あとで書き込みが増えても包み直さずに済む。
+
+外部への通信(DID解決やTapへの問い合わせなど)はトランザクションの外で行い、その前後の読み書きをそれぞれ別のトランザクションにする。
+
 ## lintルール
 
 `I*Repository` に `find`・`save`・`delete` 以外のメソッドを書くと、ESLint(`no-restricted-syntax`)がエラーにする。既存の違反は `packages/eslint-config/index.js` の `legacyRepositoryMethods` に許可しており、移行が終わったものから消していく。

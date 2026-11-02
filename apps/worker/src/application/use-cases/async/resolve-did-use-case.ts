@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import type { IDidResolver } from "@repo/common/domain";
-import { Actor, type DatabaseClient } from "@repo/common/domain";
+import { Actor, type ITransactionManager } from "@repo/common/domain";
 
 import type { IHandleResolver } from "../../interfaces/external/handle-resolver.js";
 import type { IActorRepository } from "../../interfaces/repositories/actor-repository.js";
@@ -10,14 +10,13 @@ export class ResolveDidUseCase {
     private readonly didResolver: IDidResolver,
     private readonly handleResolver: IHandleResolver,
     private readonly actorRepository: IActorRepository,
-    private readonly db: DatabaseClient,
+    private readonly transactionManager: ITransactionManager,
   ) {}
 
   async execute(did: Did) {
-    const existingActor = await this.actorRepository.find({
-      ctx: { db: this.db },
-      did,
-    });
+    const existingActor = await this.transactionManager.transaction((ctx) =>
+      this.actorRepository.find({ ctx, did }),
+    );
     if (existingActor?.handle && existingActor.handle !== "handle.invalid") {
       return;
     }
@@ -28,9 +27,8 @@ export class ResolveDidUseCase {
     const actor = existingActor ?? Actor.create({ did });
     actor.updateHandle(resolvedDid === did ? handle : "handle.invalid");
 
-    await this.actorRepository.save({
-      ctx: { db: this.db },
-      actor,
-    });
+    await this.transactionManager.transaction((ctx) =>
+      this.actorRepository.save({ ctx, actor }),
+    );
   }
 }
