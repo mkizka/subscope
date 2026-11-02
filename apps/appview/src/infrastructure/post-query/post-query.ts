@@ -2,7 +2,7 @@ import { asDid } from "@atproto/did";
 import { asAtUriString, type AtUri } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
-import { inArray } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNull, lt } from "drizzle-orm";
 
 import type { PostDto } from "../../application/dto/post-dto.js";
 import type { IPostQuery } from "../../application/interfaces/post-query.js";
@@ -34,7 +34,16 @@ const toPostDto = (post: SelectPost): PostDto => ({
   replyRootUri: post.replyRootUri,
   replyParentUri: post.replyParentUri,
   indexedAt: post.indexedAt,
+  sortAt: post.sortAt,
 });
+
+const withEmbeds = {
+  embedImages: {
+    orderBy: asc(schema.postEmbedImages.position),
+  },
+  embedExternal: true,
+  embedRecord: true,
+} as const;
 
 export class PostQuery implements IPostQuery {
   constructor(private readonly db: DatabaseClient) {}
@@ -45,13 +54,36 @@ export class PostQuery implements IPostQuery {
         schema.posts.uri,
         uris.map((uri) => uri.toString()),
       ),
-      with: {
-        embedImages: {
-          orderBy: (embedImages, { asc }) => [asc(embedImages.position)],
-        },
-        embedExternal: true,
-        embedRecord: true,
-      },
+      with: withEmbeds,
+    });
+    return posts.map(toPostDto);
+  }
+
+  async findReplies(uri: AtUri, limit?: number): Promise<PostDto[]> {
+    const posts = await this.db.query.posts.findMany({
+      where: eq(schema.posts.replyParentUri, uri.toString()),
+      orderBy: asc(schema.posts.sortAt),
+      limit,
+      with: withEmbeds,
+    });
+    return posts.map(toPostDto);
+  }
+
+  async search(params: {
+    query: string;
+    limit: number;
+    cursor?: Date;
+  }): Promise<PostDto[]> {
+    const escapedQuery = params.query.replace(/[%_]/g, "\\$&");
+    const posts = await this.db.query.posts.findMany({
+      where: and(
+        ilike(schema.posts.text, `%${escapedQuery}%`),
+        isNull(schema.posts.replyParentUri),
+        params.cursor && lt(schema.posts.sortAt, params.cursor),
+      ),
+      orderBy: desc(schema.posts.sortAt),
+      limit: params.limit,
+      with: withEmbeds,
     });
     return posts.map(toPostDto);
   }

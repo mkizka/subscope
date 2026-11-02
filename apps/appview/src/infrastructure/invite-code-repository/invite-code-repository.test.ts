@@ -122,13 +122,16 @@ describe("InviteCodeRepository", () => {
     });
   });
 
-  describe("findFirst", () => {
+  describe("find", () => {
     test("招待コードが存在しない場合、nullを返す", async () => {
       // arrange
       const nonExistentCode = "nonexistent-code";
 
       // act
-      const result = await inviteCodeRepository.findFirst(nonExistentCode);
+      const result = await inviteCodeRepository.find({
+        code: nonExistentCode,
+        ctx,
+      });
 
       // assert
       expect(result).toBeNull();
@@ -139,7 +142,10 @@ describe("InviteCodeRepository", () => {
       const inviteCode = await inviteCodeFactory(ctx.db).create();
 
       // act
-      const result = await inviteCodeRepository.findFirst(inviteCode.code);
+      const result = await inviteCodeRepository.find({
+        code: inviteCode.code,
+        ctx,
+      });
 
       // assert
       expect(result).toMatchObject({
@@ -150,7 +156,7 @@ describe("InviteCodeRepository", () => {
     });
   });
 
-  describe("upsert", () => {
+  describe("save", () => {
     test("新規招待コードを作成できる", async () => {
       // arrange
       const inviteCode = new InviteCode({
@@ -161,14 +167,17 @@ describe("InviteCodeRepository", () => {
 
       // act
       await ctx.db.transaction(async (tx) => {
-        await inviteCodeRepository.upsert({
+        await inviteCodeRepository.save({
           inviteCode,
           ctx: { db: tx },
         });
       });
 
       // assert
-      const saved = await inviteCodeRepository.findFirst(inviteCode.code);
+      const saved = await inviteCodeRepository.find({
+        code: inviteCode.code,
+        ctx,
+      });
       expect(saved).toMatchObject({
         code: inviteCode.code,
         expiresAt: inviteCode.expiresAt,
@@ -192,16 +201,17 @@ describe("InviteCodeRepository", () => {
 
       // act
       await ctx.db.transaction(async (tx) => {
-        await inviteCodeRepository.upsert({
+        await inviteCodeRepository.save({
           inviteCode: updatedInviteCode,
           ctx: { db: tx },
         });
       });
 
       // assert
-      const saved = await inviteCodeRepository.findFirst(
-        existingInviteCode.code,
-      );
+      const saved = await inviteCodeRepository.find({
+        code: existingInviteCode.code,
+        ctx,
+      });
       expect(saved).toMatchObject({
         code: existingInviteCode.code,
         usedAt: updatedInviteCode.usedAt,

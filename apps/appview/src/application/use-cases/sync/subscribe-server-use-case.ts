@@ -1,10 +1,10 @@
 import type { Did } from "@atproto/did";
-import type { InviteCode } from "@repo/common/domain";
 import {
   Actor,
   type IJobScheduler,
   type ITransactionManager,
   Subscription,
+  type TransactionContext,
 } from "@repo/common/domain";
 
 import type { IActorRepository } from "../../../application/interfaces/actor-repository.js";
@@ -46,19 +46,16 @@ export class SubscribeServerUseCase {
     private readonly jobScheduler: IJobScheduler,
   ) {}
 
-  private async validateInviteCode(
+  private async useInviteCode(
     code: string | undefined,
-    isAdmin: boolean = false,
-  ): Promise<InviteCode | null> {
-    if (isAdmin) {
-      return null;
-    }
+    ctx: TransactionContext,
+  ): Promise<void> {
     if (!code) {
       // 将来的には設定から招待コード不要にも出来るようにする
       throw new InvalidInviteCodeError("Invite code is required");
     }
 
-    const inviteCode = await this.inviteCodeRepository.findFirst(code);
+    const inviteCode = await this.inviteCodeRepository.find({ code, ctx });
 
     if (!inviteCode) {
       throw new InvalidInviteCodeError("Invalid invite code");
@@ -68,7 +65,8 @@ export class SubscribeServerUseCase {
         "Invite code has expired or already been used",
       );
     }
-    return inviteCode;
+    inviteCode.markAsUsed();
+    await this.inviteCodeRepository.save({ inviteCode, ctx });
   }
 
   async execute({ actorDid, code }: SubscribeServerParams): Promise<void> {
@@ -78,21 +76,21 @@ export class SubscribeServerUseCase {
       throw new AlreadySubscribedError("Already subscribed to this server");
     }
 
-    const existingActor = await this.actorRepository.findByDid(actorDid);
+    const existingActor = await this.actorRepository.find(actorDid);
     if (existingActor?.isBanned) {
       throw new BannedError("Banned from this server");
     }
-    const inviteCode = await this.validateInviteCode(
-      code,
-      existingActor?.isAdmin,
-    );
 
     await this.transactionManager.transaction(async (ctx) => {
+      if (!existingActor?.isAdmin) {
+        await this.useInviteCode(code, ctx);
+      }
+
       if (!existingActor) {
         const actor = Actor.create({
           did: actorDid,
         });
-        await this.actorRepository.upsert({ ctx, actor });
+        await this.actorRepository.save({ ctx, actor });
       }
 
       const subscription = new Subscription({
@@ -101,18 +99,6 @@ export class SubscribeServerUseCase {
         createdAt: new Date(),
       });
       await this.subscriptionRepository.save({ ctx, subscription });
-
-      if (
-        inviteCode &&
-        !(await this.inviteCodeRepository.markAsUsed({
-          ctx,
-          code: inviteCode.code,
-        }))
-      ) {
-        throw new InvalidInviteCodeError(
-          "Invite code has expired or already been used",
-        );
-      }
     });
 
     await this.jobScheduler.scheduleSyncTapRepo(actorDid);
