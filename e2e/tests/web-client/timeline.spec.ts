@@ -54,12 +54,12 @@ test.describe("タイムライン", () => {
     }).toPass();
   });
 
-  test("timeline-4: 下までスクロールすると、続きの古い投稿を読み込む", async ({
+  test("timeline-4: 一番下の2画面分手前までスクロールすると、続きの古い投稿を読み込む", async ({
     page,
     request,
   }) => {
     const texts = Array.from(
-      { length: 25 },
+      { length: 55 },
       (_, i) => `timeline-4: 投稿${i + 1}`,
     );
     await createPosts(request, texts);
@@ -67,15 +67,71 @@ test.describe("タイムライン", () => {
     const oldestPost = page.getByText("timeline-4: 投稿1", { exact: true });
     await expect(async () => {
       await page.goto("/");
-      await expect(page.getByText("timeline-4: 投稿25")).toBeVisible({
+      await expect(page.getByText("timeline-4: 投稿55")).toBeVisible({
         timeout: 1000,
       });
     }).toPass();
     await expect(oldestPost).toHaveCount(0);
 
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.evaluate(() =>
+      window.scrollTo(0, document.body.scrollHeight - window.innerHeight * 2.5),
+    );
 
     await expect(oldestPost).toBeAttached();
+  });
+
+  test("timeline-9: 投稿は1回に50件ずつ読み込む", async ({ page, request }) => {
+    const texts = Array.from(
+      { length: 55 },
+      (_, i) => `timeline-9: 投稿${i + 1}`,
+    );
+    await createPosts(request, texts);
+
+    await expect(async () => {
+      await page.goto("/");
+      await expect(page.getByText("timeline-9: 投稿55")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+
+    await expect(
+      page.getByText("timeline-9: 投稿6", { exact: true }),
+    ).toBeAttached();
+    await expect(
+      page.getByText("timeline-9: 投稿5", { exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test("timeline-10: 続きの古い投稿を読み込み終えるまで、一覧の下にスピナーを表示する", async ({
+    page,
+    request,
+  }) => {
+    const texts = Array.from(
+      { length: 51 },
+      (_, i) => `timeline-10: 投稿${i + 1}`,
+    );
+    await createPosts(request, texts);
+
+    await expect(async () => {
+      await page.goto("/");
+      await expect(page.getByText("timeline-10: 投稿51")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route(/cursor=/, async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+
+    const spinner = page.getByRole("status", { name: "続きを読み込み中" });
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(
+      page.getByText("timeline-10: 投稿1", { exact: true }),
+    ).toBeAttached();
   });
 
   test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({

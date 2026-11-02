@@ -76,7 +76,7 @@ export const timelineQueryFactory = ({
     async findPosts(did, cursor) {
       const agent = await restore(did);
       const { feed, cursor: next } = await agent.call(getTimeline, {
-        limit: 20,
+        limit: 50,
         cursor,
       });
       return {
