@@ -1,11 +1,11 @@
 import type { Did } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
-import type { AtUri } from "@atproto/syntax";
+import { AtUri } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
 import type * as AppBskyFeedGetPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
-import type { Post } from "@repo/common/domain";
 
-import type { IPostRepository } from "../../../application/interfaces/post-repository.js";
+import type { PostDto } from "../../../application/dto/post-dto.js";
+import type { IPostQuery } from "../../../application/interfaces/post-query.js";
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import type { PostViews } from "../../views/post-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
@@ -24,7 +24,7 @@ export class PostNotFoundError extends Error {
 
 export class GetPostThreadUseCase {
   constructor(
-    private readonly postRepository: IPostRepository,
+    private readonly postQuery: IPostQuery,
     private readonly viewContextFactory: ViewContextFactory,
     private readonly postViews: PostViews,
   ) {}
@@ -36,9 +36,9 @@ export class GetPostThreadUseCase {
     viewerDid?: Did;
   }): Promise<AppBskyFeedGetPostThread.$OutputBody> {
     // 1. ターゲット投稿を取得
-    const targetPost = await this.postRepository.findByUri(
+    const [targetPost] = await this.postQuery.findByUris([
       params.uri.getValue(),
-    );
+    ]);
     if (!targetPost) {
       throw new PostNotFoundError(params.uri.getValue());
     }
@@ -57,9 +57,9 @@ export class GetPostThreadUseCase {
     );
 
     // 4. ターゲット投稿のPostViewを確認
-    const targetPostView = postViewMap.get(targetPost.uri.toString());
+    const targetPostView = postViewMap.get(targetPost.uri);
     if (!targetPostView) {
-      throw new PostNotFoundError(targetPost.uri);
+      throw new PostNotFoundError(params.uri.getValue());
     }
 
     // 5. スレッド構造を構築して返す
@@ -76,13 +76,13 @@ export class GetPostThreadUseCase {
   }
 
   private async collectThreadData(params: {
-    targetPost: Post;
+    targetPost: PostDto;
     parentHeight: number;
     replyDepth: number;
   }): Promise<{
-    parentPosts: Post[];
+    parentPosts: PostDto[];
     allPostUris: Set<string>;
-    replyTree: Map<string, Post[]>;
+    replyTree: Map<string, PostDto[]>;
   }> {
     const { targetPost, parentHeight, replyDepth } = params;
 
@@ -121,12 +121,12 @@ export class GetPostThreadUseCase {
     postViewMap,
     replyTree,
   }: {
-    targetPost: Post;
+    targetPost: PostDto;
     targetPostView: PostView;
-    parentPosts: Post[];
+    parentPosts: PostDto[];
     replyDepth: number;
     postViewMap: Map<string, PostView>;
-    replyTree: Map<string, Post[]>;
+    replyTree: Map<string, PostDto[]>;
   }): ThreadViewPost {
     const parentThread = this.buildParentThread(parentPosts, postViewMap);
     const replyThreads = this.buildReplyThreads(
@@ -145,16 +145,16 @@ export class GetPostThreadUseCase {
   }
 
   private async collectParentChain(
-    post: Post,
+    post: PostDto,
     remainingHeight: number,
-  ): Promise<Post[]> {
-    if (!post.replyParent || remainingHeight <= 0) {
+  ): Promise<PostDto[]> {
+    if (!post.replyParentUri || remainingHeight <= 0) {
       return [];
     }
 
-    const parentPost = await this.postRepository.findByUri(
-      post.replyParent.uri,
-    );
+    const [parentPost] = await this.postQuery.findByUris([
+      new AtUri(post.replyParentUri),
+    ]);
     if (!parentPost) {
       return [];
     }
@@ -170,19 +170,19 @@ export class GetPostThreadUseCase {
   // 各リプライについてリプライのuriをキーとし、リプライへのリプライの配列を値とするMapを返す
   // buildReplyThreadsでリプライスレッドを再構築する際に使用する
   private async collectReplyTree(
-    post: Post,
+    post: PostDto,
     remainingDepth: number,
-    structure: Map<string, Post[]> = new Map(),
-  ): Promise<Map<string, Post[]>> {
+    structure: Map<string, PostDto[]> = new Map(),
+  ): Promise<Map<string, PostDto[]>> {
     if (remainingDepth <= 0) {
       return structure;
     }
 
-    const directReplies = await this.postRepository.findReplies(
-      post.uri,
+    const directReplies = await this.postQuery.findReplies(
+      new AtUri(post.uri),
       MAX_REPLIES_PER_POST,
     );
-    structure.set(post.uri.toString(), directReplies);
+    structure.set(post.uri, directReplies);
 
     await Promise.all(
       directReplies.map((reply) =>
@@ -198,25 +198,25 @@ export class GetPostThreadUseCase {
     parentPosts,
     replyTree,
   }: {
-    targetPost: Post;
-    parentPosts: Post[];
-    replyTree: Map<string, Post[]>;
+    targetPost: PostDto;
+    parentPosts: PostDto[];
+    replyTree: Map<string, PostDto[]>;
   }): Set<string> {
     const uris = new Set<string>();
-    uris.add(targetPost.uri.toString());
+    uris.add(targetPost.uri);
 
     for (const post of parentPosts) {
-      uris.add(post.uri.toString());
+      uris.add(post.uri);
     }
 
     for (const replies of replyTree.values()) {
-      replies.forEach((reply) => uris.add(reply.uri.toString()));
+      replies.forEach((reply) => uris.add(reply.uri));
     }
     return uris;
   }
 
   private buildParentThread(
-    parentPosts: Post[],
+    parentPosts: PostDto[],
     postViewMap: Map<string, PostView>,
   ): ThreadViewPost | undefined {
     if (parentPosts.length === 0) {
@@ -225,7 +225,7 @@ export class GetPostThreadUseCase {
 
     const threadViews = parentPosts
       .map((post) => {
-        const postView = postViewMap.get(post.uri.toString());
+        const postView = postViewMap.get(post.uri);
         if (!postView) return null;
 
         return {
@@ -247,20 +247,20 @@ export class GetPostThreadUseCase {
   }
 
   private buildReplyThreads(
-    post: Post,
+    post: PostDto,
     remainingDepth: number,
     postViewMap: Map<string, PostView>,
-    replyTree: Map<string, Post[]>,
+    replyTree: Map<string, PostDto[]>,
   ): ThreadViewPost[] {
     if (remainingDepth <= 0) {
       return [];
     }
 
-    const directReplies = replyTree.get(post.uri.toString()) ?? [];
+    const directReplies = replyTree.get(post.uri) ?? [];
 
     return directReplies
       .map((reply) => {
-        const postView = postViewMap.get(reply.uri.toString());
+        const postView = postViewMap.get(reply.uri);
         if (!postView) return null;
 
         const nestedReplies = this.buildReplyThreads(

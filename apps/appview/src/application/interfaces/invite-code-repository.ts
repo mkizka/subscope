@@ -3,7 +3,11 @@ import type { InviteCode, TransactionContext } from "@repo/common/domain";
 import type { InviteCodeDto } from "../../application/dto/invite-code-dto.js";
 
 export interface IInviteCodeRepository {
-  upsert: (params: {
+  find: (params: {
+    code: string;
+    ctx: TransactionContext;
+  }) => Promise<InviteCode | null>;
+  save: (params: {
     inviteCode: InviteCode;
     ctx: TransactionContext;
   }) => Promise<void>;
@@ -12,9 +16,4 @@ export interface IInviteCodeRepository {
     limit: number;
     cursor?: string;
   }) => Promise<InviteCodeDto[]>;
-  findFirst: (code: string) => Promise<InviteCode | null>;
-  markAsUsed: (params: {
-    code: string;
-    ctx: TransactionContext;
-  }) => Promise<boolean>;
 }
