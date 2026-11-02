@@ -13,18 +13,21 @@ import type { PostStatsDto } from "../dto/post-stats-dto.js";
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";
 import type { RepostDto } from "../dto/repost-dto.js";
-import type { IActorStatsQuery } from "../interfaces/actor-stats-query.js";
-import type { IFollowQuery } from "../interfaces/follow-query.js";
-import type { IGeneratorQuery } from "../interfaces/generator-query.js";
-import { type ILabelQuery, isTakendown } from "../interfaces/label-query.js";
-import type { ILikeQuery } from "../interfaces/like-query.js";
-import type { IListItemQuery } from "../interfaces/list-item-query.js";
-import type { IListQuery } from "../interfaces/list-query.js";
-import type { IPostQuery } from "../interfaces/post-query.js";
-import type { IPostStatsQuery } from "../interfaces/post-stats-query.js";
-import type { IProfileQuery } from "../interfaces/profile-query.js";
-import type { IRecordQuery } from "../interfaces/record-query.js";
-import type { IRepostQuery } from "../interfaces/repost-query.js";
+import type { IActorStatsQuery } from "../interfaces/queries/actor-stats-query.js";
+import type { IFollowQuery } from "../interfaces/queries/follow-query.js";
+import type { IGeneratorQuery } from "../interfaces/queries/generator-query.js";
+import {
+  type ILabelQuery,
+  isTakendown,
+} from "../interfaces/queries/label-query.js";
+import type { ILikeQuery } from "../interfaces/queries/like-query.js";
+import type { IListItemQuery } from "../interfaces/queries/list-item-query.js";
+import type { IListQuery } from "../interfaces/queries/list-query.js";
+import type { IPostQuery } from "../interfaces/queries/post-query.js";
+import type { IPostStatsQuery } from "../interfaces/queries/post-stats-query.js";
+import type { IProfileQuery } from "../interfaces/queries/profile-query.js";
+import type { IRecordQuery } from "../interfaces/queries/record-query.js";
+import type { IRepostQuery } from "../interfaces/queries/repost-query.js";
 import { Batch } from "./batch.js";
 
 export type Viewer = {

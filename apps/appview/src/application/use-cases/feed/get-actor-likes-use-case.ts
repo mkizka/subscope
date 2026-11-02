@@ -2,8 +2,8 @@ import type { Did } from "@atproto/did";
 import type * as AppBskyFeedGetActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
-import type { ILikeQuery } from "../../../application/interfaces/like-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ILikeQuery } from "../../interfaces/queries/like-query.js";
 import type { FeedViews } from "../../views/feed-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

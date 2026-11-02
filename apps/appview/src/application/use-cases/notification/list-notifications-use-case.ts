@@ -6,7 +6,7 @@ import {
   isNotificationReason,
   type NotificationDto,
 } from "../../dto/notification-dto.js";
-import type { INotificationQuery } from "../../interfaces/notification-query.js";
+import type { INotificationQuery } from "../../interfaces/queries/notification-query.js";
 import type { ISubscriptionRepository } from "../../interfaces/subscription-repository.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";

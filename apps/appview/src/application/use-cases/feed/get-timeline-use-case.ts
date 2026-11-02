@@ -2,8 +2,8 @@ import type { Did } from "@atproto/did";
 import type * as AppBskyFeedGetTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
-import type { ITimelineQuery } from "../../../application/interfaces/timeline-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { ITimelineQuery } from "../../interfaces/queries/timeline-query.js";
 import type { FeedViews } from "../../views/feed-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

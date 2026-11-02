@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 
-import type { INotificationQuery } from "../../interfaces/notification-query.js";
+import type { INotificationQuery } from "../../interfaces/queries/notification-query.js";
 
 export class GetUnreadCountUseCase {
   constructor(private readonly notificationQuery: INotificationQuery) {}
