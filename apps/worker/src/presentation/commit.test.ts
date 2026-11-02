@@ -1,6 +1,7 @@
 import assert from "node:assert";
 
 import { asDid } from "@atproto/did";
+import type { LexValue } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 import type { RecordEvent } from "@atproto/tap";
 import { asClassArgs } from "@gyaku/di";
@@ -12,7 +13,7 @@ import {
   InMemoryTapClient,
 } from "@repo/common/test";
 import { schema } from "@repo/db";
-import { actorFactory, testSetup } from "@repo/test-utils";
+import { actorFactory, randomCid, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -156,5 +157,79 @@ describe("commit", () => {
       .from(schema.recordRevs)
       .where(eq(schema.recordRevs.uri, uri.toString()));
     expect(revs).toEqual([]);
+  });
+
+  test("index-15: 投稿のgallery埋め込み(引用のmediaにあるものを含む)の画像を、images埋め込みと区別して保存する", async () => {
+    // arrange
+    const actor = await actorFactory(ctx.db)
+      .use((t) => t.subscriber())
+      .create();
+    const imageCid = await randomCid();
+    const galleryEmbed = {
+      $type: "app.bsky.embed.gallery",
+      items: [
+        {
+          $type: "app.bsky.embed.gallery#image",
+          image: {
+            $type: "blob",
+            ref: { $link: imageCid },
+            mimeType: "image/jpeg",
+            size: 1000,
+          },
+          alt: "alt",
+          aspectRatio: { width: 4, height: 3 },
+        },
+      ],
+    };
+    const embedPostEvent = (rkey: string, embed: LexValue): RecordEvent => ({
+      ...postEvent(actor.did, "create", "3aaaaaaaaaaaa", "gallery"),
+      rkey,
+      record: {
+        $type: "app.bsky.feed.post",
+        text: "gallery",
+        embed,
+        createdAt: new Date().toISOString(),
+      },
+    });
+
+    // act
+    await processCommit(embedPostEvent("1", galleryEmbed));
+    await processCommit(
+      embedPostEvent("2", {
+        $type: "app.bsky.embed.recordWithMedia",
+        record: {
+          $type: "app.bsky.embed.record",
+          record: {
+            uri: AtUri.make(actor.did, "app.bsky.feed.post", "1").toString(),
+            cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
+          },
+        },
+        media: galleryEmbed,
+      }),
+    );
+
+    // assert
+    const images = await ctx.db
+      .select()
+      .from(schema.postEmbedImages)
+      .orderBy(schema.postEmbedImages.postUri);
+    const expected = {
+      cid: imageCid,
+      position: 0,
+      embedType: "gallery",
+      alt: "alt",
+      aspectRatioWidth: 4,
+      aspectRatioHeight: 3,
+    };
+    expect(images).toEqual([
+      {
+        ...expected,
+        postUri: AtUri.make(actor.did, "app.bsky.feed.post", "1").toString(),
+      },
+      {
+        ...expected,
+        postUri: AtUri.make(actor.did, "app.bsky.feed.post", "2").toString(),
+      },
+    ]);
   });
 });

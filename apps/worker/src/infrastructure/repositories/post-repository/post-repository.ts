@@ -1,6 +1,7 @@
 import {
   type Post,
   PostEmbedExternal,
+  PostEmbedGallery,
   type PostEmbedImage,
   PostEmbedRecord,
   PostEmbedRecordWithMedia,
@@ -40,7 +41,14 @@ export class PostRepository implements IPostRepository {
 
     if (post.embed) {
       if (Array.isArray(post.embed)) {
-        await this.upsertEmbedImages(ctx, postUri, post.embed);
+        await this.upsertEmbedImages(ctx, postUri, post.embed, "images");
+      } else if (post.embed instanceof PostEmbedGallery) {
+        await this.upsertEmbedImages(
+          ctx,
+          postUri,
+          post.embed.images,
+          "gallery",
+        );
       } else if (post.embed instanceof PostEmbedExternal) {
         await this.upsertEmbedExternal(ctx, postUri, post.embed);
       } else if (post.embed instanceof PostEmbedRecord) {
@@ -55,6 +63,7 @@ export class PostRepository implements IPostRepository {
     ctx: TransactionContext,
     postUri: string,
     embedImages: PostEmbedImage[],
+    embedType: "images" | "gallery",
   ) {
     // 添付画像には一意なIDがないので、既存の画像を削除してから新しい画像を挿入
     await ctx.db
@@ -67,6 +76,7 @@ export class PostRepository implements IPostRepository {
           postUri,
           cid: image.cid,
           position: index,
+          embedType,
           alt: image.alt,
           aspectRatioWidth: image.aspectRatio?.width,
           aspectRatioHeight: image.aspectRatio?.height,
@@ -144,7 +154,19 @@ export class PostRepository implements IPostRepository {
 
     // media部分を保存
     if (Array.isArray(embedRecordWithMedia.media)) {
-      await this.upsertEmbedImages(ctx, postUri, embedRecordWithMedia.media);
+      await this.upsertEmbedImages(
+        ctx,
+        postUri,
+        embedRecordWithMedia.media,
+        "images",
+      );
+    } else if (embedRecordWithMedia.media instanceof PostEmbedGallery) {
+      await this.upsertEmbedImages(
+        ctx,
+        postUri,
+        embedRecordWithMedia.media.images,
+        "gallery",
+      );
     } else if (embedRecordWithMedia.media instanceof PostEmbedExternal) {
       await this.upsertEmbedExternal(ctx, postUri, embedRecordWithMedia.media);
     }
