@@ -15,6 +15,7 @@ import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as notificationsLoader } from "@/app/routes/api.notifications";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
+import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
 import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
@@ -165,6 +166,26 @@ queryClient.setQueryData<Data<typeof listLoader>>(
     posts: ListDetailStories.args.posts,
     members: ListDetailStories.args.members,
     isSelf: true,
+  },
+);
+
+queryClient.setQueryData<Data<typeof followListLoader>>(
+  ["follow-list", "alice.bsky.social", "follows"],
+  {
+    subject: {
+      did: "did:plc:alice",
+      handle: "alice.bsky.social",
+      displayName: "Alice",
+    },
+    actors: [
+      {
+        did: "did:plc:bob",
+        handle: "bob.bsky.social",
+        displayName: "Bob",
+        description: "Bobの自己紹介",
+      },
+      { did: "did:plc:carol", handle: "handle.invalid" },
+    ],
   },
 );
 
