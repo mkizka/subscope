@@ -1,8 +1,6 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { JobData } from "./job-queue.js";
-
 export interface IJobScheduler {
   scheduleFetchRecord: (
     uri: AtUri,
@@ -12,8 +10,5 @@ export interface IJobScheduler {
   scheduleSyncTapRepo: (did: Did) => Promise<void>;
   scheduleCheckBackfill: (did: Did, attempt: number) => Promise<void>;
   scheduleAggregatePostStats: (uri: AtUri) => Promise<void>;
-  scheduleAggregateActorStats: (
-    did: Did,
-    type: JobData["aggregateActorStats"]["type"],
-  ) => Promise<void>;
+  scheduleAggregateActorStats: (did: Did) => Promise<void>;
 }

@@ -314,12 +314,8 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
-      expect(actorStatsJobs).toContainEqual(
-        expect.objectContaining({
-          did: author.did,
-          type: "posts",
-        }),
+      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+        author.did,
       );
       const uris = jobScheduler.getAggregatePostStatsUris();
       expect(uris).toContainEqual(record.uri);
@@ -362,12 +358,8 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
-      expect(actorStatsJobs).toContainEqual(
-        expect.objectContaining({
-          did: replier.did,
-          type: "posts",
-        }),
+      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+        replier.did,
       );
       const uris = jobScheduler.getAggregatePostStatsUris();
       expect(uris).toContainEqual(new AtUri(parentUri));
@@ -447,12 +439,8 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "upsert", ctx, record });
 
       // assert
-      const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
-      expect(actorStatsJobs).toContainEqual(
-        expect.objectContaining({
-          did: replier.did,
-          type: "posts",
-        }),
+      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+        replier.did,
       );
       const uris = jobScheduler.getAggregatePostStatsUris();
       expect(uris).toContainEqual(new AtUri(nonExistentParentUri));
@@ -475,12 +463,8 @@ describe("PostIndexer", () => {
       await postIndexer.afterAction({ action: "delete", ctx, record });
 
       // assert
-      const actorStatsJobs = jobScheduler.getAggregateActorStatsJobs();
-      expect(actorStatsJobs).toContainEqual(
-        expect.objectContaining({
-          did: author.did,
-          type: "posts",
-        }),
+      expect(jobScheduler.getAggregateActorStatsDids()).toContainEqual(
+        author.did,
       );
 
       const uris = jobScheduler.getAggregatePostStatsUris();

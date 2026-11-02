@@ -78,13 +78,10 @@ export class FollowIndexer implements ICollectionIndexer {
   }): Promise<void> {
     const follow = Follow.from(record);
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateActorStats(follow.actorDid, "follows"),
+      this.jobScheduler.scheduleAggregateActorStats(follow.actorDid),
     );
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregateActorStats(
-        follow.subjectDid,
-        "followers",
-      ),
+      this.jobScheduler.scheduleAggregateActorStats(follow.subjectDid),
     );
 
     if (

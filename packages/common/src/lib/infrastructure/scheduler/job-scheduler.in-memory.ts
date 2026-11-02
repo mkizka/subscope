@@ -1,7 +1,6 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { JobData } from "../../domain/interfaces/job-queue.js";
 import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
 
 interface ScheduledFetchRecord {
@@ -24,18 +23,13 @@ interface ScheduledCheckBackfill {
   attempt: number;
 }
 
-interface ScheduledAggregateActorStats {
-  did: Did;
-  type: JobData["aggregateActorStats"]["type"];
-}
-
 export class InMemoryJobScheduler implements IJobScheduler {
   private fetchRecordJobs: ScheduledFetchRecord[] = [];
   private resolveDidJobs: ScheduledResolveDid[] = [];
   private syncTapRepoJobs: ScheduledSyncTapRepo[] = [];
   private checkBackfillJobs: ScheduledCheckBackfill[] = [];
   private aggregatePostStatsUris: AtUri[] = [];
-  private aggregateActorStatsJobs: ScheduledAggregateActorStats[] = [];
+  private aggregateActorStatsDids: Did[] = [];
 
   async scheduleFetchRecord(
     uri: AtUri,
@@ -63,11 +57,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.aggregatePostStatsUris.push(uri);
   }
 
-  async scheduleAggregateActorStats(
-    did: Did,
-    type: JobData["aggregateActorStats"]["type"],
-  ): Promise<void> {
-    this.aggregateActorStatsJobs.push({ did, type });
+  async scheduleAggregateActorStats(did: Did): Promise<void> {
+    this.aggregateActorStatsDids.push(did);
   }
 
   getFetchRecordJobs(): readonly ScheduledFetchRecord[] {
@@ -90,8 +81,8 @@ export class InMemoryJobScheduler implements IJobScheduler {
     return this.aggregatePostStatsUris;
   }
 
-  getAggregateActorStatsJobs(): readonly ScheduledAggregateActorStats[] {
-    return this.aggregateActorStatsJobs;
+  getAggregateActorStatsDids(): readonly Did[] {
+    return this.aggregateActorStatsDids;
   }
 
   clear(): void {
@@ -100,6 +91,6 @@ export class InMemoryJobScheduler implements IJobScheduler {
     this.syncTapRepoJobs = [];
     this.checkBackfillJobs = [];
     this.aggregatePostStatsUris = [];
-    this.aggregateActorStatsJobs = [];
+    this.aggregateActorStatsDids = [];
   }
 }

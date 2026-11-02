@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { IJobQueue, JobData } from "../../domain/interfaces/job-queue.js";
+import type { IJobQueue } from "../../domain/interfaces/job-queue.js";
 import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
@@ -82,19 +82,13 @@ export class JobScheduler implements IJobScheduler {
     });
   }
 
-  async scheduleAggregateActorStats(
-    did: Did,
-    type: JobData["aggregateActorStats"]["type"],
-  ): Promise<void> {
+  async scheduleAggregateActorStats(did: Did): Promise<void> {
     await this.jobQueue.add({
       queueName: "aggregateActorStats",
       jobName: did,
-      data: {
-        did,
-        type,
-      },
+      data: { did },
       options: {
-        deduplication: { id: `${type}__${did}`, keepLastIfActive: true },
+        deduplication: { id: did, keepLastIfActive: true },
         delay: AGGREGATE_STATS_DELAY_MS,
       },
     });

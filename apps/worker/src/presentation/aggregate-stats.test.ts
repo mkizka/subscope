@@ -11,6 +11,7 @@ describe("統計の集計", () => {
   let jobQueue: JobQueue;
   let jobScheduler: JobScheduler;
   let queue: Queue;
+  let actorQueue: Queue;
 
   beforeAll(async () => {
     container = await new GenericContainer("redis:7-alpine")
@@ -20,10 +21,14 @@ describe("統計の集計", () => {
     jobQueue = new JobQueue(redisUrl);
     jobScheduler = new JobScheduler(jobQueue);
     queue = new Queue("aggregatePostStats", { connection: { url: redisUrl } });
+    actorQueue = new Queue("aggregateActorStats", {
+      connection: { url: redisUrl },
+    });
   });
 
   afterAll(async () => {
     await queue.close();
+    await actorQueue.close();
     await jobQueue.close();
     await container.stop();
   });
@@ -92,5 +97,18 @@ describe("統計の集計", () => {
       expect.arrayContaining([uriA.toString(), uriB.toString()]),
     );
     await queue.obliterate({ force: true });
+  });
+
+  test("aggregate-4: アクターの集計ジョブは、フォロー・フォロワー・投稿のどのイベントから積まれてもアクターごとに1つにまとめる", async () => {
+    // arrange
+    const did = "did:plc:aggregate4";
+
+    // act
+    await jobScheduler.scheduleAggregateActorStats(did);
+    await jobScheduler.scheduleAggregateActorStats(did);
+
+    // assert
+    expect(await actorQueue.getDelayedCount()).toBe(1);
+    await actorQueue.obliterate({ force: true });
   });
 });

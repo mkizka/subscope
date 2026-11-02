@@ -115,19 +115,10 @@ describe("FollowIndexer", () => {
       await followIndexer.afterAction({ ctx, record, action: "upsert" });
 
       // assert
-      const jobs = jobScheduler.getAggregateActorStatsJobs();
-      expect(jobs).toContainEqual(
-        expect.objectContaining({
-          did: follower.did,
-          type: "follows",
-        }),
-      );
-      expect(jobs).toContainEqual(
-        expect.objectContaining({
-          did: followee.did,
-          type: "followers",
-        }),
-      );
+      expect(jobScheduler.getAggregateActorStatsDids()).toEqual([
+        follower.did,
+        followee.did,
+      ]);
     });
   });
 });
