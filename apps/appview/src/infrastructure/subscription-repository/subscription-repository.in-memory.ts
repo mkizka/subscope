@@ -11,24 +11,6 @@ export class InMemorySubscriptionRepository implements ISubscriptionRepository {
     this.subscriptions.set(subscription.actorDid, subscription);
   }
 
-  findMany(): Promise<Subscription[]> {
-    throw new Error("Not implemented");
-  }
-
-  count(): Promise<number> {
-    throw new Error("Not implemented");
-  }
-
-  findTrackedActors(): Promise<
-    { did: Did; subscriberFollowersCount: number }[]
-  > {
-    throw new Error("Not implemented");
-  }
-
-  countTrackedActors(): Promise<number> {
-    throw new Error("Not implemented");
-  }
-
   find(actorDid: Did): Promise<Subscription | null> {
     return Promise.resolve(this.subscriptions.get(actorDid) ?? null);
   }

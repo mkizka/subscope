@@ -4,8 +4,6 @@ const legacyRepositoryMethods = {
   IActorStatsRepository:
     "upsertFollowersCount|upsertFollowsCount|upsertPostsCount",
   IPostStatsRepository: "upsertMany",
-  ISubscriptionRepository:
-    "count|countTrackedActors|findMany|findTrackedActors",
 };
 
 const repositoryMethodRule = (interfaceName, allowed) => ({
