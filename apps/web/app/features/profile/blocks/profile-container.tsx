@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 
 import { Tabs } from "@/app/components/ui/tabs";
@@ -21,9 +22,10 @@ const tabLabels = {
 
 type Props = {
   handle: string;
+  listsTab?: ReactNode;
 };
 
-export function ProfileContainer({ handle }: Props) {
+export function ProfileContainer({ handle, listsTab }: Props) {
   const tabParam = useSearchParams()[0].get("tab") ?? "";
   const { data, isPlaceholderData } = useQuery({
     queryKey: ["profile", handle, tabParam],
@@ -65,21 +67,30 @@ export function ProfileContainer({ handle }: Props) {
       <Tabs
         tabs={[
           ...tabs.map((value) => ({
-            to: value === "posts" ? "." : `?tab=${value}`,
+            to:
+              value === "posts"
+                ? `/profile/${handle}`
+                : `/profile/${handle}?tab=${value}`,
             label: tabLabels[value],
             selected:
+              !listsTab &&
               ((isPlaceholderData ? undefined : data?.tab) ??
                 (tabParam || "posts")) === value,
           })),
-          { to: "lists", label: "リスト", selected: false },
+          {
+            to: `/profile/${handle}/lists`,
+            label: "リスト",
+            selected: !!listsTab,
+          },
         ]}
       />
-      {data && !isPlaceholderData ? (
-        // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
-        <TimelineFeed posts={data.posts} />
-      ) : (
-        <PostsSkeleton />
-      )}
+      {listsTab ??
+        (data && !isPlaceholderData ? (
+          // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
+          <TimelineFeed posts={data.posts} />
+        ) : (
+          <PostsSkeleton />
+        ))}
     </>
   );
 }

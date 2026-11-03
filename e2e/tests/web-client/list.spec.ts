@@ -435,4 +435,31 @@ test.describe("リスト", () => {
     await expect(spinner).toBeHidden();
     await expect(main.getByRole("heading", { name })).toBeVisible();
   });
+
+  test("list-16: リスト一覧は、プロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示する", async ({
+    page,
+  }) => {
+    const name = `list-16のリスト ${Date.now()}`;
+    await createList(name);
+    await page.goto("/profile/alice.test/lists");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    await expect(main.getByRole("tab", { name: "リスト" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await page.goto("/profile/bob.test/lists");
+
+    await expect(main.getByText("@bob.test")).toBeVisible();
+    await expect(
+      page.getByRole("status", { name: "読み込み中", exact: true }),
+    ).toBeHidden();
+    await expect(main.getByText(name, { exact: true })).toBeHidden();
+  });
 });
