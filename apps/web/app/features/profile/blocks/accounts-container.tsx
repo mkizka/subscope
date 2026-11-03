@@ -3,7 +3,7 @@ import { InfoIcon } from "lucide-react";
 import { useRef } from "react";
 import { useSearchParams } from "react-router";
 
-import { LoadingSpinner } from "@/app/components/loading-spinner";
+import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { Button } from "@/app/components/ui/button";
 import { Dialog } from "@/app/components/ui/dialog";
 import { Input } from "@/app/components/ui/input";
@@ -125,7 +125,7 @@ export function AccountsContainer() {
           </p>
         )
       ) : (
-        <LoadingSpinner label="読み込み中" />
+        <RowsSkeleton />
       )}
     </>
   );

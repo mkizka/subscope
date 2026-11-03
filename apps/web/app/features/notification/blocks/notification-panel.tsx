@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import { LoadingSpinner } from "@/app/components/loading-spinner";
+import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { Avatar } from "@/app/components/ui/avatar";
 
 type Notification = {
@@ -75,7 +75,7 @@ export function NotificationPanel({
     <section aria-label="通知">
       <h2 className="border-b border-line px-4 py-3 text-title">通知</h2>
       {isLoading ? (
-        <LoadingSpinner label="読み込み中" />
+        <RowsSkeleton />
       ) : notifications.length === 0 ? (
         <p className="py-8 text-center text-label text-muted">
           通知はまだありません

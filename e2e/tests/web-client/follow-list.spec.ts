@@ -85,7 +85,7 @@ test.describe("フォロー・フォロワー", () => {
     }).toPass();
   });
 
-  test("follow-list-5: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("follow-list-5: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");
@@ -98,10 +98,10 @@ test.describe("フォロー・フォロワー", () => {
     await page.getByRole("link", { name: /^\d+ フォロー$/ }).click();
 
     await expect(page.getByRole("heading", { name: "フォロー" })).toBeVisible();
-    const spinner = page.getByRole("status", { name: "読み込み中" });
-    await expect(spinner).toBeVisible();
+    const skeleton = page.getByRole("status", { name: "読み込み中" });
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
   });
 
   test("follow-list-6: 一度表示した一覧に戻ると、読み込み直しを待たずに前回の一覧を表示する", async ({

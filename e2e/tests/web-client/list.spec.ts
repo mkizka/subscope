@@ -382,7 +382,7 @@ test.describe("リスト", () => {
     await expect(main.getByText("list-13: aliceへの返信")).toHaveCount(0);
   });
 
-  test("list-14: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("list-14: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     await page.goto("/profile/alice.test");
@@ -395,16 +395,16 @@ test.describe("リスト", () => {
     await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
 
     await expect(page.getByRole("heading", { name: "リスト" })).toBeVisible();
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
   });
 
-  test("list-15: リスト詳細を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("list-15: リスト詳細を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     const name = `list-15のリスト ${Date.now()}`;
@@ -426,13 +426,13 @@ test.describe("リスト", () => {
     await main.getByText(name, { exact: true }).click();
 
     await expect(page).toHaveURL(`/profile/alice.test/lists/${rkey}`);
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
     await expect(main.getByRole("heading", { name })).toBeVisible();
   });
 });

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigation, useSearchParams, useSubmit } from "react-router";
 
-import { LoadingSpinner } from "@/app/components/loading-spinner";
+import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.list.$handle.$rkey";
 
@@ -29,7 +29,7 @@ export function ListDetailContainer({ handle, rkey }: Props) {
   });
 
   if (!data) {
-    return <LoadingSpinner label="読み込み中" />;
+    return <RowsSkeleton />;
   }
   const { list, ...rest } = data;
   return (
