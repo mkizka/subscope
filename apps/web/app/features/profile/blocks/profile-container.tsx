@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
+import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
-import { PostsSkeleton } from "@/app/features/profile/parts/posts-skeleton";
 import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
