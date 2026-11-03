@@ -120,11 +120,11 @@ test.describe("リスト", () => {
     await expect(main.getByText("@bob.test")).toBeVisible();
   });
 
-  test("list-4: 自分のリスト一覧で、名前と説明を入力してリストを作成する", async ({
+  test("list-4: 「リスト」の管理画面（`/lists`）で、名前と説明を入力してリストを作成する", async ({
     page,
   }) => {
     const name = `list-4のリスト ${Date.now()}`;
-    await page.goto("/alice.test/lists");
+    await page.goto("/lists");
     const main = page.getByRole("main");
 
     await main.getByText("新しいリスト").click();
@@ -273,7 +273,7 @@ test.describe("リスト", () => {
   test("list-9: リストの作成・保存ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
     page,
   }) => {
-    await page.goto("/alice.test/lists");
+    await page.goto("/lists");
     const main = page.getByRole("main");
     await main.getByText("新しいリスト").click();
     await main.getByLabel("名前").fill(`list-9のリスト ${Date.now()}`);
@@ -442,7 +442,7 @@ test.describe("リスト", () => {
     await expect(main.getByRole("heading", { name })).toBeVisible();
   });
 
-  test("list-16: リスト一覧は、プロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示する", async ({
+  test("list-16: リスト一覧は、プロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示し、自分のプロフィールでも作成フォームは表示しない", async ({
     page,
   }) => {
     const name = `list-16のリスト ${Date.now()}`;
@@ -459,6 +459,7 @@ test.describe("リスト", () => {
       "aria-selected",
       "true",
     );
+    await expect(main.getByText("新しいリスト")).toBeHidden();
 
     await page.goto("/bob.test/lists");
 
@@ -467,5 +468,27 @@ test.describe("リスト", () => {
       page.getByRole("status", { name: "読み込み中", exact: true }),
     ).toBeHidden();
     await expect(main.getByText(name, { exact: true })).toBeHidden();
+  });
+
+  test("list-17: サイドメニューの「リスト」から、自分のリストの管理画面（`/lists`）を開き、自分のリストを一覧表示する", async ({
+    page,
+  }) => {
+    const name = `list-17のリスト ${Date.now()}`;
+    await createList(name);
+    await page.goto("/");
+
+    await page
+      .getByRole("link", { name: "リスト", exact: true })
+      .first()
+      .click();
+
+    await expect(page).toHaveURL("/lists");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
   });
 });

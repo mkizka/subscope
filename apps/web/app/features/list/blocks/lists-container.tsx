@@ -4,7 +4,6 @@ import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.lists.$handle";
 
-import { ListForm } from "./list-form";
 import { ListLinks } from "./list-links";
 
 type ListsResponse = Awaited<ReturnType<typeof loader>>["data"];
@@ -19,12 +18,5 @@ export function ListsContainer({ handle }: { handle: string }) {
   if (!data) {
     return <LoadingSpinner label="読み込み中" />;
   }
-  return (
-    <>
-      {data.isSelf && (
-        <ListForm summary="新しいリスト" submitLabel="作成する" />
-      )}
-      <ListLinks lists={data.lists} />
-    </>
-  );
+  return <ListLinks handle={handle} lists={data.lists} />;
 }
