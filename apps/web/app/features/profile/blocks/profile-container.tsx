@@ -50,6 +50,7 @@ export function ProfileContainer({ handle }: Props) {
         avatarUrl={profile?.avatar}
         bannerUrl={profile?.banner}
         description={profile?.description}
+        links={profile?.links}
         followsCount={profile && (profile.followsCount ?? 0)}
         followersCount={profile && (profile.followersCount ?? 0)}
         backfillStatus={data?.backfillStatus}
