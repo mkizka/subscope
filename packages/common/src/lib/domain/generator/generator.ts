@@ -2,6 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
 export type GeneratorParams = {
@@ -40,11 +41,11 @@ export class Generator {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.feed.generator");
+    const parsed = validateRecord("app.bsky.feed.generator", record);
     return new Generator({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       did: parsed.did,
       displayName: parsed.displayName,
       description: parsed.description,

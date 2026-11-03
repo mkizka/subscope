@@ -84,6 +84,8 @@ getTimeline、getAuthorFeed、getActorLikes、getListFeed は投稿をfeedViewPo
 - getProfile-3: プロフィールレコードがないアカウントには、DIDとハンドルだけのprofileViewDetailedを返す
 - getProfile-4: テイクダウンされたアカウントと、状態が takendown か suspended のアカウントには400とAccountTakedownを返す
 - getProfile-5: 状態が deactivated のアカウントには400とAccountDeactivatedを返す
+- getProfile-6: プロフィールレコードのlinksが指す app.bsky.actor.link レコードを、linksの順にprofileLinkViewで返す
+- getProfile-7: 保存されていないリンクとテイクダウンされたリンクは、linksに含めない
 
 ## app.bsky.actor.getProfiles
 

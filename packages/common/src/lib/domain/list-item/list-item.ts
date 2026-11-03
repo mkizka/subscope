@@ -1,6 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
 type ListItemParams = {
@@ -33,11 +34,11 @@ export class ListItem {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.graph.listitem");
+    const parsed = validateRecord("app.bsky.graph.listitem", record);
     return new ListItem({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       listUri: parsed.list,
       subjectDid: parsed.subject,
       createdAt: new Date(parsed.createdAt),

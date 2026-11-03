@@ -1,8 +1,12 @@
 import { asDid } from "@atproto/did";
 import { Client, lexToJson, XrpcResponseError } from "@atproto/lex";
-import type { AtUri } from "@atproto/syntax";
-import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
-import { DidNotFoundError, Record } from "@repo/common/domain";
+import { AtUri } from "@atproto/syntax";
+import type {
+  IDidResolver,
+  IMetricReporter,
+  Record,
+} from "@repo/common/domain";
+import { DidNotFoundError } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
 import {
@@ -38,12 +42,12 @@ export class RecordFetcher implements IRecordFetcher {
       }
       throw error;
     });
-    const record = Record.create({
-      uri: body.uri,
+    return {
+      uri: new AtUri(body.uri),
       cid: required(body.cid),
       json: lexToJson(body.value),
-    });
-    return record;
+      indexedAt: new Date(),
+    };
   }
 
   private async getRecord(uri: AtUri) {
