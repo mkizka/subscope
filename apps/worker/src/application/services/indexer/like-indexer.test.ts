@@ -1,10 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import {
-  accountFactory,
-  fakeCid,
-  recordFactory,
-  registrationFactory,
-} from "@repo/common/test";
+import { accountFactory, fakeCid, recordFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import {
@@ -35,7 +30,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: liker.did }));
+      registrationQuery.add(liker.did);
       const postUri = "at://did:plc:other/app.bsky.feed.post/123";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey123`,
@@ -88,9 +83,9 @@ describe("LikeIndexer", () => {
       // arrange
       const liker = accountFactory();
       const author = isSelf ? liker : accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: liker.did }));
+      registrationQuery.add(liker.did);
       if (isRegistered) {
-        registrationQuery.add(registrationFactory({ accountDid: author.did }));
+        registrationQuery.add(author.did);
       }
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey`,
@@ -117,7 +112,7 @@ describe("LikeIndexer", () => {
       const ctx = { db, afterCommit };
       // arrange
       const liker = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: liker.did }));
+      registrationQuery.add(liker.did);
       const postUri = "at://did:plc:post-author/app.bsky.feed.post/postkey456";
       const record = recordFactory({
         uri: `at://${liker.did}/app.bsky.feed.like/likerkey456`,

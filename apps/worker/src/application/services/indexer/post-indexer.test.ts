@@ -1,10 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import {
-  accountFactory,
-  postFactory,
-  recordFactory,
-  registrationFactory,
-} from "@repo/common/test";
+import { accountFactory, postFactory, recordFactory } from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
 
@@ -177,8 +172,8 @@ describe("PostIndexer", () => {
       // arrange
       const quoted = accountFactory();
       const mentioned = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: quoted.did }));
-      registrationQuery.add(registrationFactory({ accountDid: mentioned.did }));
+      registrationQuery.add(quoted.did);
+      registrationQuery.add(mentioned.did);
       const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
       const record = recordFactory({
         uri: `at://${accountFactory().did}/app.bsky.feed.post/notify`,
@@ -209,8 +204,8 @@ describe("PostIndexer", () => {
       // arrange
       const mentioned = accountFactory();
       const quoted = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: mentioned.did }));
-      registrationQuery.add(registrationFactory({ accountDid: quoted.did }));
+      registrationQuery.add(mentioned.did);
+      registrationQuery.add(quoted.did);
       const author = accountFactory();
       const cid = await randomCid();
       const postRecord = (rkey: string, did: string, withMention: boolean) => {
@@ -249,7 +244,7 @@ describe("PostIndexer", () => {
       const ancestors = [];
       for (let i = 0; i < 5; i++) {
         const account = accountFactory();
-        registrationQuery.add(registrationFactory({ accountDid: account.did }));
+        registrationQuery.add(account.did);
         const { post } = postFactory({
           accountDid: account.did,
           uri: `at://${account.did}/app.bsky.feed.post/ancestor${i}`,

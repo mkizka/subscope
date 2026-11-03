@@ -1,4 +1,6 @@
-import type { InviteCode, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+
+import type { InviteCode } from "../../domain/models/invite-code.js";
 
 export interface IInviteCodeRepository {
   find: (params: {

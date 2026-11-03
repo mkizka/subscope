@@ -5,7 +5,7 @@ import { AtUri } from "@atproto/syntax";
 import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
-export type ListParams = {
+type ListParams = {
   uri: AtUri | string;
   cid: string;
   accountDid: string;
