@@ -1,4 +1,3 @@
-export * from "./lib/domain/account/account.factory.js";
 export * from "./lib/domain/feed-item/feed-item.factory.js";
 export * from "./lib/domain/follow/follow.factory.js";
 export * from "./lib/domain/generator/generator.factory.js";
@@ -6,7 +5,6 @@ export * from "./lib/domain/invite-code/invite-code.factory.js";
 export * from "./lib/domain/like/like.factory.js";
 export * from "./lib/domain/post/post.factory.js";
 export * from "./lib/domain/profile/profile.factory.js";
-export * from "./lib/domain/profile/profile-detailed.factory.js";
 export * from "./lib/domain/record/record.factory.js";
 export * from "./lib/domain/registration/registration.factory.js";
 export * from "./lib/domain/repost/repost.factory.js";

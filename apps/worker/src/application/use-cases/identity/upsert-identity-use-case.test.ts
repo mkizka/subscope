@@ -1,7 +1,7 @@
-import { accountFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { UpsertIdentityCommand } from "./upsert-identity-command.js";
 

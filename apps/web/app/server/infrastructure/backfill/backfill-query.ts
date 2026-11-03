@@ -1,8 +1,8 @@
 import { Client } from "@atproto/lex";
 import { isValidDid } from "@atproto/syntax";
 import getBackfillStatuses from "@repo/client/lex/me/subsco/sync/getBackfillStatuses";
-import type { BackfillStatus } from "@repo/common/domain";
 
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 import { env } from "@/app/server/env";
 
 const isBackfillStatus = (status: string): status is BackfillStatus =>

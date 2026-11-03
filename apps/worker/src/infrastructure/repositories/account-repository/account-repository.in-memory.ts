@@ -1,7 +1,8 @@
 import type { Did } from "@atproto/did";
-import type { Account, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IAccountRepository } from "../../../application/interfaces/repositories/account-repository.js";
+import type { Account } from "../../../domain/account.js";
 
 export class InMemoryAccountRepository implements IAccountRepository {
   private accounts: Map<Did, Account> = new Map();

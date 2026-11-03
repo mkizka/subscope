@@ -1,6 +1,5 @@
 import { AtUri } from "@atproto/syntax";
 import {
-  accountFactory,
   postFactory,
   recordFactory,
   registrationFactory,
@@ -8,6 +7,7 @@ import {
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,

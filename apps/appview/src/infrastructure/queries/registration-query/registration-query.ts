@@ -1,9 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
-import {
-  type BackfillStatus,
-  type DatabaseClient,
-  Registration,
-} from "@repo/common/domain";
+import { type DatabaseClient, Registration } from "@repo/common/domain";
+import { type BackfillStatus } from "@repo/db";
 import { schema } from "@repo/db";
 import {
   and,

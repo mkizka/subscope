@@ -1,12 +1,12 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 import {
-  Account,
   type AfterCommitContext,
   type IJobScheduler,
 } from "@repo/common/domain";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
+import { Account } from "../../../domain/models/account.js";
 
 export class CreateAdminService {
   constructor(

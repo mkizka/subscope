@@ -1,10 +1,10 @@
 import type {
-  BackfillStatus,
   IJobScheduler,
   ITapClient,
   ITransactionManager,
   JobData,
 } from "@repo/common/domain";
+import type { BackfillStatus } from "@repo/db";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";

@@ -1,5 +1,4 @@
-import type { BackfillStatus } from "@repo/common/domain";
-
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 
 export type BackfillStatusDto = {

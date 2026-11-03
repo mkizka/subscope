@@ -1,7 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { IDidResolver } from "@repo/common/domain";
-import { Account, type ITransactionManager } from "@repo/common/domain";
+import { type ITransactionManager } from "@repo/common/domain";
 
+import { Account } from "../../../domain/account.js";
 import type { IHandleResolver } from "../../interfaces/external/handle-resolver.js";
 import type { IAccountRepository } from "../../interfaces/repositories/account-repository.js";
 

@@ -42,10 +42,11 @@ describe("UseCase名", () => {
 
 ### B. インメモリ実装（Application/Domain層）
 
-`@repo/common/test`のファクトリ関数を使用:
+`@repo/common/test`や各アプリのdomainのファクトリ関数を使用:
 
 ```typescript
-import { accountFactory, profileDetailedFactory } from "@repo/common/test";
+import { accountFactory } from "../../../domain/account.factory.js";
+import { profileFactory } from "@repo/common/test";
 import { testInjector } from "../../../shared/test-utils.js";
 
 describe("Service名", () => {
@@ -55,7 +56,7 @@ describe("Service名", () => {
   test("テストケース名", async () => {
     // arrange
     const account = accountFactory({ handle: "test.bsky.social" });
-    const profile = profileDetailedFactory({
+    const profile = profileFactory({
       accountDid: account.did,
       displayName: "Test User",
     });

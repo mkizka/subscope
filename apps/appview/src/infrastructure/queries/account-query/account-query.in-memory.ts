@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { Account } from "@repo/common/domain";
 
 import type { IAccountQuery } from "../../../application/interfaces/queries/account-query.js";
+import type { Account } from "../../../domain/models/account.js";
 
 export class InMemoryAccountQuery implements IAccountQuery {
   private accounts: Map<Did, Account> = new Map();

@@ -1,10 +1,16 @@
-import type { InferInsertModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 import type * as schema from "./schema.js";
 
 export type AccountInsert = Omit<
   InferInsertModel<typeof schema.accounts>,
   "did" | "indexedAt"
+>;
+
+export type AccountStatus = InferSelectModel<typeof schema.accounts>["status"];
+
+export type BackfillStatus = NonNullable<
+  InferSelectModel<typeof schema.accounts>["backfillStatus"]
 >;
 
 export type PostInsert = Omit<

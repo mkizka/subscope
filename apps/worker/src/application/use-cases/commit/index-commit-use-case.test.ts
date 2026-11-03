@@ -1,12 +1,9 @@
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
-import {
-  accountFactory,
-  fakeCid,
-  registrationFactory,
-} from "@repo/common/test";
+import { fakeCid, registrationFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
 import type { IndexCommitCommand } from "./index-commit-command.js";
 
