@@ -4,7 +4,6 @@ import type {
   Record,
   TransactionContext,
 } from "@repo/common/domain";
-import { FeedItem } from "@repo/common/domain";
 import { validateRecord } from "@repo/common/utils";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
@@ -22,6 +21,7 @@ import {
   parsePost,
   type Post,
 } from "../../models/post.js";
+import { feedItemFromPost } from "../../record-parsers.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
 
@@ -49,14 +49,7 @@ export class PostIndexer implements ICollectionIndexer {
     const post = parsePost(record);
     await this.postRepository.save({ ctx, post });
 
-    const feedItem = new FeedItem({
-      uri: post.uri,
-      cid: post.cid,
-      type: "post",
-      subjectUri: null,
-      accountDid: post.accountDid,
-      sortAt: getSortAt(post),
-    });
+    const feedItem = feedItemFromPost(post);
     await this.feedItemRepository.save({ ctx, feedItem });
 
     await this.createNotifications(ctx, record, post);

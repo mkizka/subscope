@@ -1,12 +1,13 @@
-import type { Generator, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
+import type { GeneratorRow } from "../../../application/record-parsers.js";
 
 export class InMemoryGeneratorRepository implements IGeneratorRepository {
-  private generators: Map<string, Generator> = new Map();
+  private generators: Map<string, GeneratorRow> = new Map();
 
-  add(generator: Generator): void {
-    this.generators.set(generator.uri.toString(), generator);
+  add(generator: GeneratorRow): void {
+    this.generators.set(generator.uri, generator);
   }
 
   clear(): void {
@@ -17,8 +18,8 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
     generator,
   }: {
     ctx: TransactionContext;
-    generator: Generator;
+    generator: GeneratorRow;
   }): Promise<void> {
-    this.generators.set(generator.uri.toString(), generator);
+    this.generators.set(generator.uri, generator);
   }
 }

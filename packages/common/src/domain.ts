@@ -1,6 +1,3 @@
-export * from "./lib/domain/feed-item/feed-item.js";
-export * from "./lib/domain/follow/follow.js";
-export * from "./lib/domain/generator/generator.js";
 export * from "./lib/domain/interfaces/did-cache.js";
 export * from "./lib/domain/interfaces/did-resolver.js";
 export * from "./lib/domain/interfaces/job-queue.js";
@@ -8,9 +5,4 @@ export * from "./lib/domain/interfaces/job-scheduler.js";
 export * from "./lib/domain/interfaces/logger.js";
 export * from "./lib/domain/interfaces/metric.js";
 export * from "./lib/domain/interfaces/transaction.js";
-export * from "./lib/domain/like/like.js";
-export * from "./lib/domain/list/list.js";
-export * from "./lib/domain/list-item/list-item.js";
-export * from "./lib/domain/profile/profile.js";
 export * from "./lib/domain/record/record.js";
-export * from "./lib/domain/repost/repost.js";

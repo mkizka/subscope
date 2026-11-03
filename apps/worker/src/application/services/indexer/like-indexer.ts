@@ -1,14 +1,15 @@
+import { AtUri } from "@atproto/syntax";
 import type {
   AfterCommitContext,
   IJobScheduler,
   Record,
 } from "@repo/common/domain";
-import { Like } from "@repo/common/domain";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import { parseLike, sortAt } from "../../record-parsers.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
@@ -25,16 +26,19 @@ export class LikeIndexer implements ICollectionIndexer {
     ctx: AfterCommitContext;
     record: Record;
   }) {
-    const like = Like.from(record);
+    const like = parseLike(record);
     return (
       (await this.registrationQuery.isRegistered(ctx, like.accountDid)) ||
-      (await this.registrationQuery.isRegistered(ctx, like.subjectUri.host))
+      (await this.registrationQuery.isRegistered(
+        ctx,
+        new AtUri(like.subjectUri).host,
+      ))
     );
   }
 
   async upsert({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const like = Like.from(record);
-    const recipientDid = like.subjectUri.host;
+    const like = parseLike(record);
+    const recipientDid = new AtUri(like.subjectUri).host;
     const isRecipientRegisteredAccount =
       await this.registrationQuery.isRegistered(ctx, recipientDid);
     await this.likeRepository.save({ ctx, like });
@@ -44,12 +48,12 @@ export class LikeIndexer implements ICollectionIndexer {
         ctx,
         notifications: [
           {
-            recordUri: like.uri.toString(),
+            recordUri: like.uri,
             recipientDid,
             authorDid: like.accountDid,
             reason: "like",
-            reasonSubject: like.subjectUri.toString(),
-            sortAt: like.sortAt,
+            reasonSubject: like.subjectUri,
+            sortAt: sortAt(like),
           },
         ],
       });
@@ -57,9 +61,9 @@ export class LikeIndexer implements ICollectionIndexer {
   }
 
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const like = Like.from(record);
+    const like = parseLike(record);
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregatePostStats(like.subjectUri),
+      this.jobScheduler.scheduleAggregatePostStats(new AtUri(like.subjectUri)),
     );
   }
 }
