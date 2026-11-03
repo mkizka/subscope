@@ -4,7 +4,6 @@ import {
   InMemoryDidCache,
   InMemoryDidResolver,
   InMemoryJobQueue,
-  InMemoryTapClient,
   InMemoryTransactionManager,
 } from "@repo/common/test";
 
@@ -25,6 +24,7 @@ import { InMemoryProfileRepository } from "../infrastructure/repositories/profil
 import { InMemoryRecordRepository } from "../infrastructure/repositories/record-repository/record-repository.in-memory.js";
 import { InMemoryRecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.in-memory.js";
 import { InMemoryRepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.in-memory.js";
+import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import type { Env } from "./env.js";
 import { createWorkerRegistry } from "./registry.js";
 
