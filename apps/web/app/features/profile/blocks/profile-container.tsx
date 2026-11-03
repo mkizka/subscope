@@ -69,8 +69,8 @@ export function ProfileContainer({ handle, listsTab }: Props) {
           ...tabs.map((value) => ({
             to:
               value === "posts"
-                ? `/profile/${handle}`
-                : `/profile/${handle}?tab=${value}`,
+                ? `/${handle}`
+                : `/${handle}?tab=${value}`,
             label: tabLabels[value],
             selected:
               !listsTab &&
@@ -78,7 +78,7 @@ export function ProfileContainer({ handle, listsTab }: Props) {
                 (tabParam || "posts")) === value,
           })),
           {
-            to: `/profile/${handle}/lists`,
+            to: `/${handle}/lists`,
             label: "リスト",
             selected: !!listsTab,
           },

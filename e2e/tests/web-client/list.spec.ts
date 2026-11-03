@@ -447,7 +447,7 @@ test.describe("リスト", () => {
   }) => {
     const name = `list-16のリスト ${Date.now()}`;
     await createList(name);
-    await page.goto("/profile/alice.test/lists");
+    await page.goto("/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -460,7 +460,7 @@ test.describe("リスト", () => {
       "true",
     );
 
-    await page.goto("/profile/bob.test/lists");
+    await page.goto("/bob.test/lists");
 
     await expect(main.getByText("@bob.test")).toBeVisible();
     await expect(
