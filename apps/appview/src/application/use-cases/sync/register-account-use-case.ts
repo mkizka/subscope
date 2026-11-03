@@ -3,13 +3,13 @@ import {
   Account,
   type IJobScheduler,
   type ITransactionManager,
-  Registration,
   type TransactionContext,
 } from "@repo/common/domain";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
+import { Registration } from "../../../domain/models/registration.js";
 
 export class InvalidInviteCodeError extends Error {
   constructor(message: string) {

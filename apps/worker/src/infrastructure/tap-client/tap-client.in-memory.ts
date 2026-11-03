@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 
-import type { ITapClient } from "../../domain/interfaces/tap-client.js";
+import type { ITapClient } from "../../application/interfaces/external/tap-client.js";
 
 export class InMemoryTapClient implements ITapClient {
   private readonly registeredDids = new Set<Did>();

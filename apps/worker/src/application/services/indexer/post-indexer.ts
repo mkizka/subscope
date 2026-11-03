@@ -4,12 +4,7 @@ import type {
   Record,
   TransactionContext,
 } from "@repo/common/domain";
-import {
-  FeedItem,
-  Post,
-  PostEmbedRecord,
-  PostEmbedRecordWithMedia,
-} from "@repo/common/domain";
+import { FeedItem } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -20,6 +15,12 @@ import type {
 } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import {
+  getEmbedRecordUri,
+  getSortAt,
+  parsePost,
+  type Post,
+} from "../../models/post.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
 
@@ -44,15 +45,22 @@ export class PostIndexer implements ICollectionIndexer {
     live: boolean;
     depth: number;
   }) {
-    const post = Post.from(record);
+    const post = parsePost(record);
     await this.postRepository.save({ ctx, post });
 
-    const feedItem = FeedItem.fromPost(post);
+    const feedItem = new FeedItem({
+      uri: post.uri,
+      cid: post.cid,
+      type: "post",
+      subjectUri: null,
+      accountDid: post.accountDid,
+      sortAt: getSortAt(post),
+    });
     await this.feedItemRepository.save({ ctx, feedItem });
 
     await this.createNotifications(ctx, record, post);
 
-    const embedUri = post.getEmbedRecordUri();
+    const embedUri = getEmbedRecordUri(post);
     if (embedUri) {
       const embedExists = await this.postQuery.exists(ctx, embedUri);
       if (!embedExists) {
@@ -68,7 +76,7 @@ export class PostIndexer implements ICollectionIndexer {
     record: Record,
     post: Post,
   ) {
-    const quoteUri = post.getEmbedRecordUri();
+    const quoteUri = getEmbedRecordUri(post);
     const mentionDids = (record.validate("app.bsky.feed.post").facets ?? [])
       .flatMap((facet) => facet.features)
       .flatMap((feature) => ("did" in feature ? [feature.did] : []));
@@ -115,7 +123,7 @@ export class PostIndexer implements ICollectionIndexer {
         ...candidate,
         recordUri: post.uri.toString(),
         authorDid: post.accountDid,
-        sortAt: post.sortAt,
+        sortAt: getSortAt(post),
       });
     }
     await this.notificationRepository.save({
@@ -133,7 +141,7 @@ export class PostIndexer implements ICollectionIndexer {
     record: Record;
     action: "upsert" | "delete";
   }): Promise<void> {
-    const post = Post.from(record);
+    const post = parsePost(record);
 
     ctx.afterCommit(() =>
       this.jobScheduler.scheduleAggregateAccountStats(post.accountDid),
@@ -157,8 +165,8 @@ export class PostIndexer implements ICollectionIndexer {
     }
 
     if (
-      post.embed instanceof PostEmbedRecord ||
-      post.embed instanceof PostEmbedRecordWithMedia
+      post.embed?.type === "record" ||
+      post.embed?.type === "recordWithMedia"
     ) {
       const embedUri = post.embed.uri;
       ctx.afterCommit(() =>

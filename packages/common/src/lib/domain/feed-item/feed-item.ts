@@ -1,10 +1,9 @@
 import type { Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
-import type { Post } from "../post/post.js";
 import type { Repost } from "../repost/repost.js";
 
-export type FeedType = "post" | "repost";
+type FeedType = "post" | "repost";
 
 export type FeedItemParams = {
   uri: AtUri | string;
@@ -30,17 +29,6 @@ export class FeedItem {
     this.subjectUri = params.subjectUri;
     this.accountDid = params.accountDid;
     this.sortAt = params.sortAt;
-  }
-
-  static fromPost(post: Post): FeedItem {
-    return new FeedItem({
-      uri: post.uri,
-      cid: post.cid,
-      type: "post",
-      subjectUri: null,
-      accountDid: post.accountDid,
-      sortAt: post.sortAt,
-    });
   }
 
   static fromRepost(repost: Repost): FeedItem {

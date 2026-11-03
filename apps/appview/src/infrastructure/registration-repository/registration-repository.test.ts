@@ -1,5 +1,4 @@
 import { asDid } from "@atproto/did";
-import { Registration } from "@repo/common/domain";
 import {
   accountFactory,
   inviteCodeFactory,
@@ -8,6 +7,7 @@ import {
 } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { Registration } from "../../domain/models/registration.js";
 import { RegistrationRepository } from "./registration-repository.js";
 
 describe("RegistrationRepository", () => {

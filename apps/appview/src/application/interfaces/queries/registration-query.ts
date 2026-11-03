@@ -1,5 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { BackfillStatus, Registration } from "@repo/common/domain";
+import type { BackfillStatus } from "@repo/common/domain";
+
+import type { Registration } from "../../../domain/models/registration.js";
 
 export interface IRegistrationQuery {
   findMany: (params: {
