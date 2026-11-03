@@ -14,15 +14,19 @@ export function SplashContainer() {
   );
 
   useEffect(() => {
-    if (isPending || phase !== "shown") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPhase("gone");
-      return;
-    }
-    setPhase("leaving");
+    if (isPending) return;
+    setPhase((current) => {
+      if (current !== "shown") return current;
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      return reduced.matches ? "gone" : "leaving";
+    });
+  }, [isPending]);
+
+  useEffect(() => {
+    if (phase !== "leaving") return;
     const timer = setTimeout(() => setPhase("gone"), FADE_MS);
     return () => clearTimeout(timer);
-  }, [isPending, phase]);
+  }, [phase]);
 
   return phase === "gone" ? null : <Splash leaving={phase === "leaving"} />;
 }

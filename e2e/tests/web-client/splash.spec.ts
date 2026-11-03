@@ -14,7 +14,9 @@ test.describe("起動時のスプラッシュ", () => {
     await page.goto("/");
 
     const splash = page.getByText("読み込み中", { exact: true });
-    await expect(page.getByText("Subscope", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Subscope", { exact: true }).first(),
+    ).toBeVisible();
     const box = await splash.locator("..").boundingBox();
     const viewport = page.viewportSize();
     expect(box?.width).toBe(viewport?.width);
