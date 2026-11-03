@@ -7,8 +7,10 @@ import images from "@repo/client/lex/app/bsky/embed/images";
 import embedRecord from "@repo/client/lex/app/bsky/embed/record";
 import recordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
 import type { Record } from "@repo/common/domain";
+import { validateRecord } from "@repo/common/utils";
 
-const validatePost = (record: Record) => record.validate("app.bsky.feed.post");
+const validatePost = (record: Record) =>
+  validateRecord("app.bsky.feed.post", record);
 
 type RawEmbed = NonNullable<ReturnType<typeof validatePost>["embed"]>;
 
@@ -132,7 +134,7 @@ export function parsePost(record: Record): Post {
   return {
     uri: new AtUri(record.uri.toString()),
     cid: record.cid,
-    accountDid: asDid(record.accountDid),
+    accountDid: asDid(record.uri.host),
     text: parsed.text,
     replyRoot: toStrongRef(parsed.reply?.root),
     replyParent: toStrongRef(parsed.reply?.parent),
