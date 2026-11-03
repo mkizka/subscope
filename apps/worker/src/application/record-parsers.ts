@@ -1,7 +1,9 @@
 import type { Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
-import type { Post, Record } from "@repo/common/domain";
+import type { Record } from "@repo/common/domain";
 import type { schema } from "@repo/db";
+
+import { getSortAt, type Post } from "./models/post.js";
 
 type DidFields = { accountDid: Did; subjectDid: Did };
 
@@ -106,7 +108,7 @@ export function feedItemFromPost(post: Post): FeedItemRow {
     type: "post",
     subjectUri: null,
     accountDid: post.accountDid,
-    sortAt: post.sortAt,
+    sortAt: getSortAt(post),
   };
 }
 

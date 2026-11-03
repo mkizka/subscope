@@ -1,19 +1,11 @@
 import { asDid } from "@atproto/did";
+import { Tap } from "@atproto/tap";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { TapClient } from "./tap-client.js";
 
-const mockAddRepos = vi.fn();
-const mockRemoveRepos = vi.fn();
-
-vi.mock("@atproto/tap", () => ({
-  Tap: vi.fn(function () {
-    return {
-      addRepos: mockAddRepos,
-      removeRepos: mockRemoveRepos,
-    };
-  }),
-}));
+const mockAddRepos = vi.spyOn(Tap.prototype, "addRepos");
+const mockRemoveRepos = vi.spyOn(Tap.prototype, "removeRepos");
 
 describe("TapClient", () => {
   const tapUrl = "https://tap.example.com";
