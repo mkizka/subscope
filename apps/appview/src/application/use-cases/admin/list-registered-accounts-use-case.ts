@@ -1,11 +1,11 @@
 import { asDid } from "@atproto/did";
 import { toDatetimeString } from "@atproto/syntax";
 import type * as MeSubscoAdminListRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
-import type { Registration } from "@repo/common/domain";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
+import type { Registration } from "../../../domain/models/registration.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 

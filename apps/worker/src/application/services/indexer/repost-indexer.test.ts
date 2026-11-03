@@ -4,7 +4,6 @@ import {
   fakeCid,
   postFactory,
   recordFactory,
-  registrationFactory,
 } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -93,7 +92,7 @@ describe("RepostIndexer", () => {
       // arrange
       const reposter = accountFactory();
       const author = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: author.did }));
+      registrationQuery.add(author.did);
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
       const record = recordFactory({
         uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,

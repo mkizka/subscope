@@ -1,7 +1,8 @@
 import { type DatetimeString, toDatetimeString } from "@atproto/syntax";
-import { InviteCode, type ITransactionManager } from "@repo/common/domain";
+import { type ITransactionManager } from "@repo/common/domain";
 
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
+import { InviteCode } from "../../../domain/models/invite-code.js";
 
 export class CreateInviteCodeUseCase {
   constructor(
