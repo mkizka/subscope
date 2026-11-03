@@ -6,6 +6,7 @@ import {
 import { LoaderCircle } from "lucide-react";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { Skeleton } from "@/app/components/ui/skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/admin.api.invite-codes";
 
@@ -54,19 +55,34 @@ export function InviteCodeListContainer() {
       deletingCode={deleteMutation.isPending ? deleteMutation.variables : null}
       isLoading={!data}
     >
-      {(!data || hasNextPage) && (
+      {!data && (
+        <li role="status" aria-label="読み込み中">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 border-b border-line px-4 py-3"
+            >
+              <div className="flex flex-1 flex-col gap-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3.5 w-48" />
+              </div>
+              <Skeleton className="h-5 w-12" />
+              <span className="size-10" />
+            </div>
+          ))}
+        </li>
+      )}
+      {data && hasNextPage && (
         <li
           role="status"
-          aria-label={data ? "続きを読み込み中" : "読み込み中"}
+          aria-label="続きを読み込み中"
           className="flex justify-center py-6"
         >
           <LoaderCircle className="size-6 animate-spin text-muted" />
-          {data && (
-            <InfiniteScrollTrigger
-              onIntersect={() => void fetchNextPage()}
-              enabled={!isFetchingNextPage}
-            />
-          )}
+          <InfiniteScrollTrigger
+            onIntersect={() => void fetchNextPage()}
+            enabled={!isFetchingNextPage}
+          />
         </li>
       )}
     </InviteCodeList>

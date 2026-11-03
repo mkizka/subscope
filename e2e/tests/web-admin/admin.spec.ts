@@ -299,7 +299,7 @@ test.describe("招待コード", () => {
     await expect(rows.nth(1)).toContainText(older);
   });
 
-  test("invite-codes-9: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("invite-codes-9: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
@@ -317,13 +317,13 @@ test.describe("招待コード", () => {
     await expect(
       page.getByRole("heading", { name: "招待コード" }),
     ).toBeVisible();
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
   });
 
   test("invite-codes-2: 一覧の下までスクロールすると続きを読み込む", async ({
