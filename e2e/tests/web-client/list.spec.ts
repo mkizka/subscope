@@ -113,6 +113,10 @@ test.describe("リスト", () => {
 
     await main.getByRole("tab", { name: "メンバー" }).click();
 
+    await expect(main.getByRole("tab", { name: "メンバー" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     await expect(main.getByText("@bob.test")).toBeVisible();
   });
 
