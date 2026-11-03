@@ -1,3 +1,4 @@
+import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/domain";
 import type { Record } from "@repo/common/domain";
@@ -59,10 +60,10 @@ export class IndexRecordService {
   }
 
   private indexerFor(record: Record) {
-    if (!isSupportedCollection(record.collection)) {
-      throw new Error(`Unsupported collection: ${record.collection}`);
+    if (!isSupportedCollection(record.uri.collection)) {
+      throw new Error(`Unsupported collection: ${record.uri.collection}`);
     }
-    return this.indexers[record.collection];
+    return this.indexers[record.uri.collection];
   }
 
   async shouldIndex({
@@ -93,7 +94,7 @@ export class IndexRecordService {
     const indexer = this.indexerFor(record);
     await this.indexAccountService.upsert({
       ctx,
-      did: record.accountDid,
+      did: asDid(record.uri.host),
       live,
     });
     await this.recordRepository.save({ ctx, record });
@@ -107,8 +108,11 @@ export class IndexRecordService {
 
     await this.recordRepository.delete({ ctx, uri });
 
-    if (existingRecord && isSupportedCollection(existingRecord.collection)) {
-      const indexer = this.indexers[existingRecord.collection];
+    if (
+      existingRecord &&
+      isSupportedCollection(existingRecord.uri.collection)
+    ) {
+      const indexer = this.indexers[existingRecord.uri.collection];
       await indexer.afterAction?.({
         ctx,
         record: existingRecord,

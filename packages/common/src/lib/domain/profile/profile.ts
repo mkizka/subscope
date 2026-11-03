@@ -2,6 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
 export type ProfileParams = {
@@ -40,11 +41,11 @@ export class Profile {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.actor.profile");
+    const parsed = validateRecord("app.bsky.actor.profile", record);
     return new Profile({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       avatarCid: getBlobCidString(parsed.avatar) ?? null,
       bannerCid: getBlobCidString(parsed.banner) ?? null,
       description: parsed.description,

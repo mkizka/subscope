@@ -6,6 +6,7 @@ import images from "@repo/client/lex/app/bsky/embed/images";
 import embedRecord from "@repo/client/lex/app/bsky/embed/record";
 import recordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 import { PostEmbedExternal } from "./embed-external.js";
 import { PostEmbedGallery } from "./embed-gallery.js";
@@ -114,7 +115,7 @@ export class Post {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.feed.post");
+    const parsed = validateRecord("app.bsky.feed.post", record);
 
     const embed = (() => {
       if (!parsed.embed) {
@@ -141,7 +142,7 @@ export class Post {
     return new Post({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       text: parsed.text,
       replyRoot: getStrongRef(parsed.reply?.root),
       replyParent: getStrongRef(parsed.reply?.parent),

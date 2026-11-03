@@ -1,6 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
 export type LikeParams = {
@@ -33,11 +34,11 @@ export class Like {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.feed.like");
+    const parsed = validateRecord("app.bsky.feed.like", record);
     return new Like({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       subjectUri: parsed.subject.uri,
       subjectCid: parsed.subject.cid,
       createdAt: new Date(parsed.createdAt),

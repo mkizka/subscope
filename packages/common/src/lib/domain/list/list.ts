@@ -2,6 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
 export type ListParams = {
@@ -40,11 +41,11 @@ export class List {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.graph.list");
+    const parsed = validateRecord("app.bsky.graph.list", record);
     return new List({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       purpose: parsed.purpose,
       name: parsed.name,
       description: parsed.description,

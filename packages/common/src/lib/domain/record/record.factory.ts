@@ -1,5 +1,7 @@
+import { AtUri } from "@atproto/syntax";
+
 import { fakeAtUri, fakeCid } from "../../utils/fake.js";
-import { Record } from "./record.js";
+import type { Record } from "./record.js";
 
 export type RecordFactoryParams = {
   uri: string;
@@ -9,11 +11,12 @@ export type RecordFactoryParams = {
 };
 
 export function recordFactory(params?: Partial<RecordFactoryParams>): Record {
-  return Record.reconstruct({
-    uri:
+  return {
+    uri: new AtUri(
       params?.uri ?? fakeAtUri({ collection: "app.bsky.feed.post" }).toString(),
+    ),
     cid: params?.cid ?? fakeCid(),
     json: params?.json ?? {},
     indexedAt: params?.indexedAt ?? new Date(),
-  });
+  };
 }

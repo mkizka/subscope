@@ -1,6 +1,7 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
 
+import { validateRecord } from "../../utils/record.js";
 import type { Record } from "../record/record.js";
 
 export type FollowParams = {
@@ -34,11 +35,11 @@ export class Follow {
   }
 
   static from(record: Record) {
-    const parsed = record.validate("app.bsky.graph.follow");
+    const parsed = validateRecord("app.bsky.graph.follow", record);
     return new Follow({
       uri: record.uri,
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: record.uri.host,
       subjectDid: parsed.subject,
       createdAt: new Date(parsed.createdAt),
       indexedAt: record.indexedAt,

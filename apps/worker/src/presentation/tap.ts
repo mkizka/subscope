@@ -3,7 +3,6 @@ import { AtUri } from "@atproto/syntax";
 import type { RecordEvent, TapEvent } from "@atproto/tap";
 import { Tap } from "@atproto/tap";
 import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
-import { Record } from "@repo/common/domain";
 import { isSupportedCollection } from "@repo/common/utils";
 
 import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";
@@ -28,11 +27,12 @@ export const indexCommitCommandFactory = (
       operation: event.action,
       uri,
       rev: event.rev,
-      record: Record.create({
+      record: {
         uri,
         cid: event.cid,
         json: lexToJson(event.record),
-      }),
+        indexedAt: new Date(),
+      },
     },
     live: event.live,
   };
