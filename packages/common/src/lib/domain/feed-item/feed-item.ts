@@ -3,7 +3,7 @@ import { AtUri } from "@atproto/syntax";
 
 import type { Repost } from "../repost/repost.js";
 
-export type FeedType = "post" | "repost";
+type FeedType = "post" | "repost";
 
 export type FeedItemParams = {
   uri: AtUri | string;

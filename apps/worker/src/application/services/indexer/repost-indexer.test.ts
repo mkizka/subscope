@@ -1,10 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import {
-  accountFactory,
-  fakeCid,
-  recordFactory,
-  registrationFactory,
-} from "@repo/common/test";
+import { accountFactory, fakeCid, recordFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import {
@@ -93,7 +88,7 @@ describe("RepostIndexer", () => {
       // arrange
       const reposter = accountFactory();
       const author = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: author.did }));
+      registrationQuery.add(author.did);
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
       const record = recordFactory({
         uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,

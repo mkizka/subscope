@@ -1,7 +1,8 @@
 import type { Did } from "@atproto/did";
-import { type ITransactionManager, Registration } from "@repo/common/domain";
+import { type ITransactionManager } from "@repo/common/domain";
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
+import { Registration } from "../../../domain/models/registration.js";
 
 export class UpdateSeenUseCase {
   constructor(

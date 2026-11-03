@@ -2,11 +2,11 @@ import type { Did } from "@atproto/did";
 import {
   type IJobScheduler,
   type ITransactionManager,
-  Registration,
 } from "@repo/common/domain";
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
+import { Registration } from "../../../domain/models/registration.js";
 import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 
 export class AdminAlreadyExistsError extends Error {
