@@ -1,4 +1,4 @@
-import { Skeleton } from "@/app/components/ui/skeleton";
+import { Skeleton } from "./ui/skeleton";
 
 const rows = [
   ["w-2/5", "w-11/12", "w-3/4"],

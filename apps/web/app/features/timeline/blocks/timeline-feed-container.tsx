@@ -2,6 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
 import { LoadingSpinner } from "@/app/components/loading-spinner";
+import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.timeline";
 
@@ -24,7 +25,7 @@ export function TimelineFeedContainer() {
     });
 
   if (!data) {
-    return <LoadingSpinner label="読み込み中" />;
+    return <PostsSkeleton />;
   }
   return (
     <>
