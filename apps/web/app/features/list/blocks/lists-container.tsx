@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { LoadingSpinner } from "@/app/components/loading-spinner";
+import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.lists.$handle";
 
@@ -16,7 +16,7 @@ export function ListsContainer({ handle }: { handle: string }) {
   });
 
   if (!data) {
-    return <LoadingSpinner label="読み込み中" />;
+    return <RowsSkeleton />;
   }
   return <ListLinks handle={handle} lists={data.lists} />;
 }

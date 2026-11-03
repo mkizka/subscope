@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
 import { useSearchParams } from "react-router";
 
+import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle.$kind";
@@ -56,17 +56,7 @@ export function FollowListContainer({ handle, kind }: Props) {
           ]}
         />
       )}
-      {data ? (
-        <AccountList accounts={data.accounts} />
-      ) : (
-        <div
-          role="status"
-          aria-label="読み込み中"
-          className="flex justify-center py-6"
-        >
-          <LoaderCircle className="size-6 animate-spin text-muted" />
-        </div>
-      )}
+      {data ? <AccountList accounts={data.accounts} /> : <RowsSkeleton />}
     </>
   );
 }

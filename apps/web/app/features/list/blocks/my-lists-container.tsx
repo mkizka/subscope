@@ -1,4 +1,4 @@
-import { LoadingSpinner } from "@/app/components/loading-spinner";
+import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
 
 import { ListForm } from "./list-form";
@@ -14,7 +14,7 @@ export function MyListsContainer() {
       {me?.profileId ? (
         <ListsContainer handle={me.profileId} />
       ) : (
-        <LoadingSpinner label="読み込み中" />
+        <RowsSkeleton />
       )}
     </>
   );
