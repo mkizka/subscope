@@ -45,6 +45,39 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
+  test("profile-20: プロフィールの自己紹介の下に、プロフィールに設定されたリンクを表示する。表示名（なければドメイン）を選ぶと、リンク先を新しいタブで開く", async ({
+    page,
+  }) => {
+    const link = await createRecord("alice.test", "app.bsky.actor.link", {
+      url: "https://example.com/profile-20",
+      title: "profile-20のリンク",
+      createdAt: new Date().toISOString(),
+    });
+    const noTitle = await createRecord("alice.test", "app.bsky.actor.link", {
+      url: "https://example.org/profile-20",
+      createdAt: new Date().toISOString(),
+    });
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+      links: [link, noTitle],
+    });
+
+    await page.goto("/alice.test");
+
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        main.getByRole("link", { name: "profile-20のリンク" }),
+      ).toHaveAttribute("href", "https://example.com/profile-20", {
+        timeout: 1000,
+      });
+    }).toPass();
+    await expect(
+      main.getByRole("link", { name: "example.org" }),
+    ).toHaveAttribute("target", "_blank");
+  });
+
   test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
     page,
   }) => {
