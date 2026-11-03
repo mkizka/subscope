@@ -62,7 +62,7 @@ test.describe("フォロー・フォロワー", () => {
 
     await page.getByRole("main").getByRole("link", { name: /^Bob/ }).click();
 
-    await expect(page).toHaveURL(/\/(?!alice\.test)[^/]+$/);
+    await expect(page).toHaveURL(/\/(?!alice\.)[^/]+\.test$/);
     await expect(
       page.getByRole("main").getByRole("heading", { name: "Bob", exact: true }),
     ).toBeVisible();
@@ -116,7 +116,7 @@ test.describe("フォロー・フォロワー", () => {
       await expect(bob).toBeVisible({ timeout: 1000 });
     }).toPass();
     await bob.getByRole("link").click();
-    await expect(page).toHaveURL(/\/(?!alice\.test)[^/]+$/);
+    await expect(page).toHaveURL(/\/(?!alice\.)[^/]+\.test$/);
     await page.route("**/api/profile/*/follows", () => {});
 
     await page.goBack();

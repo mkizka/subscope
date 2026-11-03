@@ -27,7 +27,7 @@ test.describe("プロフィール", () => {
 
     await page.getByRole("link", { name: "プロフィール" }).click();
 
-    await expect(page).toHaveURL(/\//);
+    await expect(page).toHaveURL(/\/alice\.test$/);
     const main = page.getByRole("main");
     await expect(main.getByRole("heading", { name: "Alice" })).toBeVisible();
     await expect(main.getByText(/^@/).first()).toBeVisible();
