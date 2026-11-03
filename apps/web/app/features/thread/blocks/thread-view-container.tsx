@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
 
+import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.thread";
 
@@ -24,15 +24,7 @@ export function ThreadViewContainer({ handle, rkey }: Props) {
   });
 
   if (!data) {
-    return (
-      <div
-        role="status"
-        aria-label="読み込み中"
-        className="flex justify-center py-6"
-      >
-        <LoaderCircle className="size-6 animate-spin text-muted" />
-      </div>
-    );
+    return <PostsSkeleton />;
   }
   return <ThreadView thread={data} />;
 }

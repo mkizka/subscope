@@ -154,7 +154,7 @@ test.describe("検索", () => {
     }).toPass();
   });
 
-  test("search-9: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("search-9: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     await page.goto("/search");
@@ -168,13 +168,13 @@ test.describe("検索", () => {
     await page.getByRole("button", { name: "検索" }).click();
 
     await expect(page).toHaveURL("/search?q=alice");
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
   });
 
   test("search-10: 一度表示した検索結果に戻ると、読み込み直しを待たずに前回の結果を表示する", async ({
