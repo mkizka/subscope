@@ -316,9 +316,12 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-14: プロフィールを開くと、読み込みを待たずにハンドルとタブを表示し、投稿の場所には読み込み終えるまでスピナーを表示する", async ({
+  test("profile-14: プロフィールを開くと、読み込みを待たずにハンドルとタブを表示し、表示名・自己紹介・フォロー数・フォロワー数・投稿の場所には読み込み終えるまで灰色の骨組み（スケルトン）を表示する", async ({
     page,
   }) => {
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
     await page.goto("/accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/profile/*", async (route) => {
@@ -328,19 +331,20 @@ test.describe("プロフィール", () => {
 
     await page.getByRole("link", { name: "プロフィール" }).click();
 
-    const spinner = page.getByRole("status", {
+    const main = page.getByRole("main");
+    const skeleton = main.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
-    const main = page.getByRole("main");
-    await expect(main.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(skeleton).toBeVisible();
+    await expect(main.getByText(/^@/).first()).toBeVisible();
     await expect(main.getByRole("tab", { name: "投稿" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 1 })).not.toHaveText(/\S/);
+    await expect(main.getByText(/^\d+ フォロー$/)).toBeHidden();
     release(undefined);
-    await expect(spinner).toBeHidden();
-    await expect(
-      page.getByRole("main").getByText(/^\d+ フォロー$/),
-    ).toBeVisible();
+    await expect(skeleton).toBeHidden();
+    await expect(main.getByRole("heading", { name: "Alice" })).toBeVisible();
+    await expect(main.getByText(/^\d+ フォロー$/)).toBeVisible();
   });
 
   test("profile-15: 一度表示したプロフィールに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
