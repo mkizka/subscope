@@ -1,5 +1,4 @@
 import { AtUri } from "@atproto/syntax";
-import { Record } from "@repo/common/domain";
 import { accountFactory, fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -36,7 +35,7 @@ describe("IndexCommitUseCase", () => {
       registrationQuery.add(account.did);
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
-      const record = Record.create({
+      const record = {
         uri,
         cid: "cid123",
         json: {
@@ -44,7 +43,8 @@ describe("IndexCommitUseCase", () => {
           text: "Hello world",
           createdAt: new Date().toISOString(),
         },
-      });
+        indexedAt: new Date(),
+      };
       const commit = {
         operation: "create" as const,
         uri,
@@ -72,7 +72,7 @@ describe("IndexCommitUseCase", () => {
       const saveSpy = vi.spyOn(accountRepo, "save");
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
-      const record = Record.create({
+      const record = {
         uri,
         cid: "cid123",
         json: {
@@ -80,7 +80,8 @@ describe("IndexCommitUseCase", () => {
           text: "Hello world",
           createdAt: new Date().toISOString(),
         },
-      });
+        indexedAt: new Date(),
+      };
       const command: IndexCommitCommand = {
         commit: { operation: "create", uri, rev: "3aaaaaaaaaaaa", record },
         live: true,
@@ -100,7 +101,7 @@ describe("IndexCommitUseCase", () => {
       accountRepo.add(account);
       const gate = (collection: string, rkey: string, postRkey: string) => {
         const uri = new AtUri(`at://${account.did}/${collection}/${rkey}`);
-        const record = Record.create({
+        const record = {
           uri,
           cid: "cid123",
           json: {
@@ -108,7 +109,8 @@ describe("IndexCommitUseCase", () => {
             post: `at://${account.did}/app.bsky.feed.post/${postRkey}`,
             createdAt: new Date().toISOString(),
           },
-        });
+          indexedAt: new Date(),
+        };
         return {
           uri,
           command: {
@@ -158,7 +160,7 @@ describe("IndexCommitUseCase", () => {
         const uri = new AtUri(
           `at://${likerAccount.did}/app.bsky.feed.like/123`,
         );
-        const record = Record.create({
+        const record = {
           uri,
           cid: "cid123",
           json: {
@@ -169,7 +171,8 @@ describe("IndexCommitUseCase", () => {
             },
             createdAt: new Date().toISOString(),
           },
-        });
+          indexedAt: new Date(),
+        };
 
         // act
         await indexCommitUseCase.execute({
@@ -197,7 +200,7 @@ describe("IndexCommitUseCase", () => {
       registrationQuery.add(account.did);
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
-      const record = Record.create({
+      const record = {
         uri,
         cid: "cid123",
         json: {
@@ -205,7 +208,8 @@ describe("IndexCommitUseCase", () => {
           text: "To be deleted",
           createdAt: new Date().toISOString(),
         },
-      });
+        indexedAt: new Date(),
+      };
       const createCommand: IndexCommitCommand = {
         commit: {
           operation: "create" as const,
@@ -240,14 +244,15 @@ describe("IndexCommitUseCase", () => {
       registrationQuery.add(account.did);
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
-      const record = Record.create({
+      const record = {
         uri,
         cid: "cid123",
         json: {
           $type: "app.bsky.feed.post",
           // createdAtがないため、バリデーションエラーになる想定
         },
-      });
+        indexedAt: new Date(),
+      };
       const commit = {
         operation: "create" as const,
         uri,
@@ -266,14 +271,15 @@ describe("IndexCommitUseCase", () => {
     test("RecordValidationError以外のエラーが発生した場合、エラーを再スローする", async () => {
       // arrange
       const uri = new AtUri("at://did:plc:example/unsupported.collection/123");
-      const record = Record.create({
+      const record = {
         uri,
         cid: "cid123",
         json: {
           $type: "unsupported.collection",
           text: "Hello world",
         },
-      });
+        indexedAt: new Date(),
+      };
       const commit = {
         operation: "create" as const,
         uri,

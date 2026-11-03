@@ -1,6 +1,7 @@
-import type { Did } from "@atproto/did";
+import { asDid, type Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
 import type { Record } from "@repo/common/domain";
+import { validateRecord } from "@repo/common/utils";
 import type { schema } from "@repo/db";
 
 import { getSortAt, type Post } from "./models/post.js";
@@ -22,12 +23,12 @@ export const sortAt = (row: { createdAt: Date; indexedAt: Date }) =>
 const base = (record: Record) => ({
   uri: record.uri.toString(),
   cid: record.cid,
-  accountDid: record.accountDid,
+  accountDid: asDid(record.uri.host),
   indexedAt: record.indexedAt,
 });
 
 export function parseFollow(record: Record): FollowRow {
-  const parsed = record.validate("app.bsky.graph.follow");
+  const parsed = validateRecord("app.bsky.graph.follow", record);
   return {
     ...base(record),
     subjectDid: parsed.subject,
@@ -36,7 +37,7 @@ export function parseFollow(record: Record): FollowRow {
 }
 
 export function parseLike(record: Record): LikeRow {
-  const parsed = record.validate("app.bsky.feed.like");
+  const parsed = validateRecord("app.bsky.feed.like", record);
   return {
     ...base(record),
     subjectUri: parsed.subject.uri,
@@ -46,7 +47,7 @@ export function parseLike(record: Record): LikeRow {
 }
 
 export function parseRepost(record: Record): RepostRow {
-  const parsed = record.validate("app.bsky.feed.repost");
+  const parsed = validateRecord("app.bsky.feed.repost", record);
   return {
     ...base(record),
     subjectUri: parsed.subject.uri,
@@ -56,7 +57,7 @@ export function parseRepost(record: Record): RepostRow {
 }
 
 export function parseList(record: Record): ListRow {
-  const parsed = record.validate("app.bsky.graph.list");
+  const parsed = validateRecord("app.bsky.graph.list", record);
   return {
     ...base(record),
     purpose: parsed.purpose,
@@ -68,7 +69,7 @@ export function parseList(record: Record): ListRow {
 }
 
 export function parseListItem(record: Record): ListItemRow {
-  const parsed = record.validate("app.bsky.graph.listitem");
+  const parsed = validateRecord("app.bsky.graph.listitem", record);
   return {
     ...base(record),
     listUri: parsed.list,
@@ -78,7 +79,7 @@ export function parseListItem(record: Record): ListItemRow {
 }
 
 export function parseGenerator(record: Record): GeneratorRow {
-  const parsed = record.validate("app.bsky.feed.generator");
+  const parsed = validateRecord("app.bsky.feed.generator", record);
   return {
     ...base(record),
     did: parsed.did,
@@ -90,7 +91,7 @@ export function parseGenerator(record: Record): GeneratorRow {
 }
 
 export function parseProfile(record: Record): ProfileRow {
-  const parsed = record.validate("app.bsky.actor.profile");
+  const parsed = validateRecord("app.bsky.actor.profile", record);
   return {
     ...base(record),
     avatarCid: getBlobCidString(parsed.avatar) ?? null,

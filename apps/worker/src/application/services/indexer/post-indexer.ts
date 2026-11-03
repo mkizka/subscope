@@ -4,6 +4,7 @@ import type {
   Record,
   TransactionContext,
 } from "@repo/common/domain";
+import { validateRecord } from "@repo/common/utils";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -70,7 +71,9 @@ export class PostIndexer implements ICollectionIndexer {
     post: Post,
   ) {
     const quoteUri = getEmbedRecordUri(post);
-    const mentionDids = (record.validate("app.bsky.feed.post").facets ?? [])
+    const mentionDids = (
+      validateRecord("app.bsky.feed.post", record).facets ?? []
+    )
       .flatMap((facet) => facet.features)
       .flatMap((feature) => ("did" in feature ? [feature.did] : []));
     const replySubjects = [];
