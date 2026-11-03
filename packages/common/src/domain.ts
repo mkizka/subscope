@@ -1,4 +1,3 @@
-export * from "./lib/domain/account/account.js";
 export * from "./lib/domain/interfaces/did-cache.js";
 export * from "./lib/domain/interfaces/did-resolver.js";
 export * from "./lib/domain/interfaces/job-queue.js";

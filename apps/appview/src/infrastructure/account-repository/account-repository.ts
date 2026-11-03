@@ -1,7 +1,6 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
 import {
-  Account,
   type DatabaseClient,
   type TransactionContext,
 } from "@repo/common/domain";
@@ -9,6 +8,7 @@ import { type AccountInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IAccountRepository } from "../../application/interfaces/account-repository.js";
+import { Account } from "../../domain/models/account.js";
 
 export class AccountRepository implements IAccountRepository {
   constructor(private readonly db: DatabaseClient) {}

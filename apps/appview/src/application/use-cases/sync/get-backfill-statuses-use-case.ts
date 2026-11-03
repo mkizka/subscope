@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { BackfillStatus } from "@repo/common/domain";
+import type { BackfillStatus } from "@repo/db";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 

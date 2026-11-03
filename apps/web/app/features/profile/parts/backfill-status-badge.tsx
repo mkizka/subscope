@@ -1,6 +1,5 @@
-import type { BackfillStatus } from "@repo/common/domain";
-
 import { Badge } from "@/app/components/ui/badge";
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 const LABELS = {
   inProgress: "同期中",

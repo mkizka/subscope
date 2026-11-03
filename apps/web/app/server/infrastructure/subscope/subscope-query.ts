@@ -5,8 +5,8 @@ import getTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAcco
 import getRegistrationStatus, {
   registered,
 } from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
-import type { BackfillStatus } from "@repo/common/domain";
 
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 import { env } from "@/app/server/env";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

@@ -1,10 +1,10 @@
 import { asDid } from "@atproto/did";
-import { Account } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
+import { Account } from "../../../domain/account.js";
 import { AccountRepository } from "./account-repository.js";
 
 describe("AccountRepository", () => {
@@ -37,8 +37,6 @@ describe("AccountRepository", () => {
       const expected = Account.reconstruct({
         did: account.did,
         handle: account.handle,
-        isAdmin: account.isAdmin,
-        isBanned: account.isBanned,
         indexedAt: account.indexedAt,
       });
       expect(result).toEqual(expected);
@@ -52,8 +50,6 @@ describe("AccountRepository", () => {
       const newAccount = Account.reconstruct({
         did: did,
         handle: "newactor.test",
-        isAdmin: false,
-        isBanned: false,
         indexedAt: new Date(),
       });
 
@@ -72,8 +68,6 @@ describe("AccountRepository", () => {
       const updatedAccount = Account.reconstruct({
         did: account.did,
         handle: "updated.test",
-        isAdmin: false,
-        isBanned: false,
         indexedAt: account.indexedAt,
       });
 
@@ -95,8 +89,6 @@ describe("AccountRepository", () => {
     const staleAccount = Account.reconstruct({
       did: account.did,
       handle: "updated.test",
-      isAdmin: false,
-      isBanned: false,
       indexedAt: account.indexedAt,
     });
     await ctx.db
@@ -108,11 +100,11 @@ describe("AccountRepository", () => {
     await accountRepository.save({ ctx, account: staleAccount });
 
     // assert
-    const result = await accountRepository.find({
-      ctx,
-      did: asDid(account.did),
-    });
-    expect(result?.isAdmin).toBe(true);
+    const [row] = await ctx.db
+      .select()
+      .from(schema.accounts)
+      .where(eq(schema.accounts.did, account.did));
+    expect(row?.isAdmin).toBe(true);
   });
 
   describe("delete", () => {

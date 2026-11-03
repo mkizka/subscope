@@ -1,9 +1,9 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import { accountFactory } from "@repo/common/test";
 import { asHandle } from "@repo/common/utils";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,

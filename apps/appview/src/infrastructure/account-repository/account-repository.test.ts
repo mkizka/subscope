@@ -1,8 +1,8 @@
 import { asDid } from "@atproto/did";
-import { Account } from "@repo/common/domain";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { Account } from "../../domain/models/account.js";
 import { AccountRepository } from "./account-repository.js";
 
 describe("AccountRepository", () => {

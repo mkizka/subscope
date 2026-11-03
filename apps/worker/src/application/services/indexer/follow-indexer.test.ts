@@ -1,7 +1,8 @@
 import type { AfterCommitContext } from "@repo/common/domain";
-import { accountFactory, recordFactory } from "@repo/common/test";
+import { recordFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,

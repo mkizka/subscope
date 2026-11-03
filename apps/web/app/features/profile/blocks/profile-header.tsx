@@ -1,5 +1,4 @@
 import type { ProfileLinkView } from "@repo/client/lex/app/bsky/actor/defs";
-import type { BackfillStatus } from "@repo/common/domain";
 import { Link as LinkIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
@@ -8,6 +7,7 @@ import { Avatar } from "@/app/components/ui/avatar";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 type Props = {
   loading?: boolean;

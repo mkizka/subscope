@@ -55,23 +55,12 @@ Application/Domain層のテストでインメモリリポジトリを使用す�
 ### accountFactory（インメモリ版）
 
 ```typescript
-import { accountFactory } from "@repo/common/test";
+// apps/worker/src/domain/account.factory.ts, apps/appview/src/domain/models/account.factory.ts
+import { accountFactory } from "<各アプリのdomain>/account.factory.js";
 
 const account = accountFactory({
   did: "did:plc:test123",
   handle: "test.bsky.social",
-});
-```
-
-### profileDetailedFactory
-
-```typescript
-import { profileDetailedFactory } from "@repo/common/test";
-
-const profile = profileDetailedFactory({
-  accountDid: account.did,
-  displayName: "Test User",
-  description: "Test description",
 });
 ```
 

@@ -1,6 +1,5 @@
 import type { Did } from "@atproto/did";
 import {
-  Account,
   type IJobScheduler,
   type ITransactionManager,
   type TransactionContext,
@@ -9,6 +8,7 @@ import {
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
+import { Account } from "../../../domain/models/account.js";
 import { Registration } from "../../../domain/models/registration.js";
 
 export class InvalidInviteCodeError extends Error {
