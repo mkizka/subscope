@@ -163,7 +163,7 @@ test.describe("アカウント", () => {
     await expect(page).toHaveURL("/accounts?tab=tracked");
   });
 
-  test("accounts-11: アカウントの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("accounts-11: アカウントの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     const { promise: released, resolve: release } = Promise.withResolvers();
@@ -180,13 +180,13 @@ test.describe("アカウント", () => {
     await expect(
       page.getByRole("heading", { name: "アカウント" }),
     ).toBeVisible();
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
   });
 
   test("accounts-12: タブの下の検索欄に入力すると、選んでいるタブの全件から表示名・ハンドルの部分一致で絞り込み、検索語を `?q=` に入れる", async ({
