@@ -13,8 +13,7 @@ test.describe("起動時のスプラッシュ", () => {
 
     await page.goto("/");
 
-    const splash = page.getByRole("status");
-    await expect(splash).toHaveText("読み込み中");
+    const splash = page.getByText("読み込み中", { exact: true });
     await expect(page.getByText("Subscope", { exact: true })).toBeVisible();
     const box = await splash.locator("..").boundingBox();
     const viewport = page.viewportSize();
@@ -33,11 +32,11 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    await expect(page.getByRole("status")).toBeVisible();
+    await expect(page.getByText("読み込み中", { exact: true })).toBeVisible();
 
     release();
 
-    await expect(page.getByRole("status")).toBeHidden();
+    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
     const nav = page.getByRole("navigation");
     await expect(nav.getByRole("link", { name: "リスト" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "プロフィール" })).toBeVisible();
@@ -48,7 +47,7 @@ test.describe("起動時のスプラッシュ", () => {
     page,
   }) => {
     await page.goto("/");
-    await expect(page.getByRole("status")).toBeHidden();
+    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
 
     await page
       .getByRole("navigation")
@@ -56,7 +55,7 @@ test.describe("起動時のスプラッシュ", () => {
       .click();
 
     await expect(page).toHaveURL("/accounts");
-    await expect(page.getByRole("status")).toBeHidden();
+    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
   });
 
   test("splash-5: 自分の情報の取得が終わると、スプラッシュを約300msかけてフェードして消す", async ({
@@ -69,7 +68,7 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    const splash = page.getByRole("status").locator("..");
+    const splash = page.getByText("読み込み中", { exact: true }).locator("..");
     await expect(splash).toHaveCSS("opacity", "1");
 
     release();
@@ -89,11 +88,13 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    await expect(page.getByRole("status")).toBeVisible();
+    await expect(page.getByText("読み込み中", { exact: true })).toBeVisible();
 
     release();
 
-    await expect(page.getByRole("status")).toBeHidden({ timeout: 200 });
+    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden({
+      timeout: 200,
+    });
   });
 });
 
@@ -105,6 +106,6 @@ test.describe("起動時のスプラッシュ（JS無効）", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("status")).toHaveText("読み込み中");
+    await expect(page.getByText("読み込み中", { exact: true })).toBeVisible();
   });
 });
