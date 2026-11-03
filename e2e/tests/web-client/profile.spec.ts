@@ -347,6 +347,40 @@ test.describe("プロフィール", () => {
     await expect(main.getByText(/^\d+ フォロー$/)).toBeVisible();
   });
 
+  test("profile-18: タブを切り替えると、ヘッダーとタブはそのままにして、投稿の場所だけ読み込み終えるまでスケルトンを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/profile/alice.test");
+    const main = page.getByRole("main");
+    const followers = main.getByText(/^\d+ フォロワー$/);
+    await expect(followers).toBeVisible();
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route(
+      (url) =>
+        url.pathname.startsWith("/api/profile/") &&
+        url.searchParams.get("tab") === "media",
+      async (route) => {
+        await released;
+        await route.continue();
+      },
+    );
+
+    await main.getByRole("tab", { name: "メディア" }).click();
+
+    const skeleton = main.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(skeleton).toBeVisible();
+    await expect(followers).toBeVisible();
+    await expect(main.getByRole("tab", { name: "メディア" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    release(undefined);
+    await expect(skeleton).toBeHidden();
+  });
+
   test("profile-15: 一度表示したプロフィールに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
     page,
   }) => {

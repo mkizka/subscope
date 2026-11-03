@@ -25,12 +25,14 @@ type Props = {
 
 export function ProfileContainer({ handle }: Props) {
   const tabParam = useSearchParams()[0].get("tab") ?? "";
-  const { data } = useQuery({
+  const { data, isPlaceholderData } = useQuery({
     queryKey: ["profile", handle, tabParam],
     queryFn: () =>
       fetchJson<ProfileResponse>(
         `/api/profile/${handle}?${new URLSearchParams({ tab: tabParam })}`,
       ),
+    placeholderData: (previous, previousQuery) =>
+      previousQuery?.queryKey[1] === handle ? previous : undefined,
     throwOnError: true,
   });
 
@@ -65,12 +67,14 @@ export function ProfileContainer({ handle }: Props) {
           ...tabs.map((value) => ({
             to: value === "posts" ? "." : `?tab=${value}`,
             label: tabLabels[value],
-            selected: (data?.tab ?? (tabParam || "posts")) === value,
+            selected:
+              ((isPlaceholderData ? undefined : data?.tab) ??
+                (tabParam || "posts")) === value,
           })),
           { to: "lists", label: "リスト", selected: false },
         ]}
       />
-      {data ? (
+      {data && !isPlaceholderData ? (
         // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
         <TimelineFeed posts={data.posts} />
       ) : (
