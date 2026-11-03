@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import { Tap } from "@atproto/tap";
 
-import type { ITapClient } from "../../domain/interfaces/tap-client.js";
+import type { ITapClient } from "../../application/interfaces/external/tap-client.js";
 
 export class TapClient implements ITapClient {
   private tap: Tap;

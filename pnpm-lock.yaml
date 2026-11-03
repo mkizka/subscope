@@ -599,9 +599,6 @@ importers:
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
-      '@atproto/tap':
-        specifier: 0.4.16
-        version: 0.4.16
       '@keyv/redis':
         specifier: 6.1.0
         version: 6.1.0(@opentelemetry/api@1.10.0)(keyv@6.1.0)

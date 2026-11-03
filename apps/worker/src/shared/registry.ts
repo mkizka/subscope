@@ -4,7 +4,6 @@ import type {
   IDidResolver,
   IJobQueue,
   IJobScheduler,
-  ITapClient,
   ITransactionManager,
 } from "@repo/common/domain";
 import {
@@ -16,13 +15,13 @@ import {
   LoggerManager,
   MetricReporter,
   RedisDidCache,
-  TapClient,
   TransactionManager,
 } from "@repo/common/infrastructure";
 
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
+import type { ITapClient } from "../application/interfaces/external/tap-client.js";
 import type { IAccountQuery } from "../application/interfaces/queries/account-query.js";
 import type { IAccountStatsQuery } from "../application/interfaces/queries/account-stats-query.js";
 import type { IPostQuery } from "../application/interfaces/queries/post-query.js";
@@ -92,6 +91,7 @@ import { ProfileRepository } from "../infrastructure/repositories/profile-reposi
 import { RecordRepository } from "../infrastructure/repositories/record-repository/record-repository.js";
 import { RecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
+import { TapClient } from "../infrastructure/tap-client/tap-client.js";
 import { LabelSubscriber } from "../presentation/label-subscriber.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { WorkerServer } from "../presentation/server.js";
