@@ -4,7 +4,6 @@ import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.lists.$handle";
 
-import { ListForm } from "./list-form";
 import { ListLinks } from "./list-links";
 
 type ListsResponse = Awaited<ReturnType<typeof loader>>["data"];
@@ -19,12 +18,5 @@ export function ListsContainer({ handle }: { handle: string }) {
   if (!data) {
     return <RowsSkeleton />;
   }
-  return (
-    <>
-      {data.isSelf && (
-        <ListForm summary="新しいリスト" submitLabel="作成する" />
-      )}
-      <ListLinks lists={data.lists} />
-    </>
-  );
+  return <ListLinks handle={handle} lists={data.lists} />;
 }
