@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Subscope
-description: 木苺の赤をアクセントにした、線で区切る丸ゴシックのBluesky互換クライアント
+description: 木苺の赤をアクセントにした、線で区切る角ゴシックのBluesky互換クライアント
 colors:
   surface: "color-mix(in srgb, #b8326b 7%, #fff)"
   surface-2: "color-mix(in srgb, #b8326b 13%, #fff)"
@@ -14,32 +14,32 @@ colors:
   danger: "#c62828"
 typography:
   title:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.4
   heading:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 18px
     fontWeight: 700
     lineHeight: 1.4
   body-lg:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.6
   body:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.4
   caption:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.4
@@ -178,7 +178,7 @@ Blueskyが使えなくなったときに、同じ会話をそのまま続けら�
 
 ## Typography
 
-フォントは丸ゴシックの Zen Maru Gothic だけを使い、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
+フォントは角ゴシックの Zen Kaku Gothic New だけを使い、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
 
 | 名前      | 大きさ | 太さ | 行の高さ | 使う場所                               |
 | --------- | ------ | ---- | -------- | -------------------------------------- |

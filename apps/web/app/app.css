@@ -1,8 +1,8 @@
 @import "tailwindcss";
-@import "@fontsource/zen-maru-gothic/400.css";
-@import "@fontsource/zen-maru-gothic/700.css";
+@import "@fontsource/zen-kaku-gothic-new/400.css";
+@import "@fontsource/zen-kaku-gothic-new/700.css";
 @theme static {
-  --font-sans: "Zen Maru Gothic", sans-serif;
+  --font-sans: "Zen Kaku Gothic New", sans-serif;
   --color-surface: color-mix(in srgb, #b8326b 7%, #fff);
   --color-surface-2: color-mix(in srgb, #b8326b 13%, #fff);
   --color-line: color-mix(in srgb, #b8326b 22%, #fff);
