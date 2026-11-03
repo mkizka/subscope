@@ -35,14 +35,14 @@ export function AccountList<T extends Account>({
         return (
           <li
             key={account.did}
-            className="flex flex-wrap items-center border-b border-line pr-2"
+            className="
+              flex flex-wrap items-center border-b border-line pr-2
+              hover:bg-surface-2
+            "
           >
             <Link
               to={`/profile/${profileId}`}
-              className="
-                flex min-w-0 flex-1 items-center gap-3 px-4 py-3
-                hover:bg-surface-2
-              "
+              className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3"
             >
               <Avatar src={account.avatarUrl} />
               <div className="min-w-0 flex-1">
