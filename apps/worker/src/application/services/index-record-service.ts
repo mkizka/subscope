@@ -13,6 +13,7 @@ import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";
 import type { GeneratorIndexer } from "./indexer/generator-indexer.js";
 import type { LikeIndexer } from "./indexer/like-indexer.js";
+import type { LinkIndexer } from "./indexer/link-indexer.js";
 import type { ListIndexer } from "./indexer/list-indexer.js";
 import type { ListItemIndexer } from "./indexer/list-item-indexer.js";
 import type { PostIndexer } from "./indexer/post-indexer.js";
@@ -43,12 +44,14 @@ export class IndexRecordService {
     listIndexer: ListIndexer,
     listItemIndexer: ListItemIndexer,
     gateIndexer: GateIndexer,
+    linkIndexer: LinkIndexer,
   ) {
     this.indexers = {
       "app.bsky.feed.post": postIndexer,
       "app.bsky.feed.generator": generatorIndexer,
       "app.bsky.feed.repost": repostIndexer,
       "app.bsky.actor.profile": profileIndexer,
+      "app.bsky.actor.link": linkIndexer,
       "app.bsky.graph.follow": followIndexer,
       "app.bsky.feed.like": likeIndexer,
       "app.bsky.graph.list": listIndexer,

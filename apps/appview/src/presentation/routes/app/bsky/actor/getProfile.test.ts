@@ -1,6 +1,12 @@
 import { asAtIdentifierString } from "@atproto/syntax";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
-import { accountFactory, labelFactory, testSetup } from "@repo/test-utils";
+import {
+  accountFactory,
+  labelFactory,
+  profileFactory,
+  recordFactory,
+  testSetup,
+} from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
@@ -106,5 +112,80 @@ describe("app.bsky.actor.getProfile", () => {
       status: 400,
       error: "AccountDeactivated",
     });
+  });
+
+  const createLink = (
+    account: Awaited<ReturnType<ReturnType<typeof accountFactory>["create"]>>,
+    url: string,
+  ) =>
+    recordFactory(ctx.db, "app.bsky.actor.link")
+      .vars({ account: () => account })
+      .props({
+        json: () => ({
+          $type: "app.bsky.actor.link",
+          url,
+          createdAt: new Date().toISOString(),
+        }),
+      })
+      .create();
+
+  const createProfileWithLinks = async (
+    account: Awaited<ReturnType<ReturnType<typeof accountFactory>["create"]>>,
+    links: { uri: string; cid: string }[],
+  ) => {
+    const record = await recordFactory(ctx.db, "app.bsky.actor.profile")
+      .vars({ account: () => account })
+      .props({ json: () => ({ $type: "app.bsky.actor.profile", links }) })
+      .create();
+    await profileFactory(ctx.db)
+      .vars({ record: () => record })
+      .create();
+  };
+
+  test("getProfile-6: プロフィールレコードのlinksが指す app.bsky.actor.link レコードを、linksの順にprofileLinkViewで返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const account = await accountFactory(ctx.db).create();
+    const first = await createLink(account, "https://example.com/first");
+    const second = await createLink(account, "https://example.com/second");
+    await createProfileWithLinks(account, [second, first]);
+
+    // act
+    const res = await client.call(getProfile, {
+      actor: asAtIdentifierString(account.did),
+    });
+
+    // assert
+    expect(res.links?.map((link) => link.url)).toEqual([
+      "https://example.com/second",
+      "https://example.com/first",
+    ]);
+    expect(res.links?.[0]).toMatchObject({ uri: second.uri, cid: second.cid });
+  });
+
+  test("getProfile-7: 保存されていないリンクとテイクダウンされたリンクは、linksに含めない", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const account = await accountFactory(ctx.db).create();
+    const visible = await createLink(account, "https://example.com/visible");
+    const takendown = await createLink(account, "https://example.com/hidden");
+    await labelFactory(ctx.db)
+      .props({ uri: () => takendown.uri, accountDid: () => account.did })
+      .create();
+    const missing = {
+      uri: `at://${account.did}/app.bsky.actor.link/missing`,
+      cid: visible.cid,
+    };
+    await createProfileWithLinks(account, [missing, takendown, visible]);
+
+    // act
+    const res = await client.call(getProfile, {
+      actor: asAtIdentifierString(account.did),
+    });
+
+    // assert
+    expect(res.links?.map((link) => link.url)).toEqual([
+      "https://example.com/visible",
+    ]);
   });
 });
