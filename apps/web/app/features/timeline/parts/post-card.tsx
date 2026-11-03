@@ -34,6 +34,7 @@ export type PostCardProps = {
     thumb?: string;
   };
   quote?: {
+    authorAvatar?: string;
     authorDisplayName?: string;
     authorHandle: string;
     text?: string;
@@ -83,7 +84,8 @@ export function QuotedPost({
 }) {
   return (
     <blockquote className="mt-2 rounded-xl border border-line px-3 py-2">
-      <div className="flex items-baseline gap-2 text-label">
+      <div className="flex items-center gap-2 text-label">
+        <Avatar src={quote.authorAvatar} size="sm" />
         <span className="truncate font-bold">
           {quote.authorDisplayName ?? quote.authorHandle}
         </span>

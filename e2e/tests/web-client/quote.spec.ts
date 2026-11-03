@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, uploadImage } from "../../helpers/pds";
+import { createRecord, putRecord, uploadImage } from "../../helpers/pds";
 
 test.describe("引用投稿", () => {
   test("quote-1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する", async ({
@@ -98,5 +98,34 @@ test.describe("引用投稿", () => {
     await expect(
       quote.getByRole("img", { name: "quote-3: 画像" }),
     ).toBeVisible();
+  });
+
+  test("quote-4: 引用されている投稿の投稿者のアバターを、引用した投稿の中に表示する", async ({
+    page,
+  }) => {
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      avatar: await uploadImage("alice.test"),
+    });
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-4: 引用される投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-4: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-4: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
+      await expect(quote.locator('img[src*="/img/avatar"]')).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
   });
 });
