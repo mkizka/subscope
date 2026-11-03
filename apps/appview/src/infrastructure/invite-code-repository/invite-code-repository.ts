@@ -1,13 +1,9 @@
-import type {
-  DatabaseClient,
-  InviteCode,
-  TransactionContext,
-} from "@repo/common/domain";
-import { InviteCode as InviteCodeDomain } from "@repo/common/domain";
+import type { DatabaseClient, TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
+import { InviteCode as InviteCodeDomain } from "../../domain/models/invite-code.js";
 
 export class InviteCodeRepository implements IInviteCodeRepository {
   constructor(private readonly db: DatabaseClient) {}
@@ -16,7 +12,7 @@ export class InviteCodeRepository implements IInviteCodeRepository {
     inviteCode,
     ctx,
   }: {
-    inviteCode: InviteCode;
+    inviteCode: InviteCodeDomain;
     ctx: TransactionContext;
   }): Promise<void> {
     await ctx.db
@@ -54,7 +50,7 @@ export class InviteCodeRepository implements IInviteCodeRepository {
   }: {
     code: string;
     ctx: TransactionContext;
-  }): Promise<InviteCode | null> {
+  }): Promise<InviteCodeDomain | null> {
     const [row] = await ctx.db
       .select()
       .from(schema.inviteCodes)

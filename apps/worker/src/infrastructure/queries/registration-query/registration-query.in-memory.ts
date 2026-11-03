@@ -1,12 +1,12 @@
-import type { Registration, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 
 export class InMemoryRegistrationQuery implements IRegistrationQuery {
-  private registrations: Map<string, Registration> = new Map();
+  private registrations: Set<string> = new Set();
 
-  add(registration: Registration): void {
-    this.registrations.set(registration.accountDid, registration);
+  add(accountDid: string): void {
+    this.registrations.add(accountDid);
   }
 
   clear(): void {

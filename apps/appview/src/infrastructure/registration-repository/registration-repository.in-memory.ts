@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
-import type { Registration } from "@repo/common/domain";
 import { type TransactionContext } from "@repo/common/domain";
 
 import type { IRegistrationRepository } from "../../application/interfaces/registration-repository.js";
+import type { Registration } from "../../domain/models/registration.js";
 
 export class InMemoryRegistrationRepository implements IRegistrationRepository {
   private registrations: Map<string, Registration> = new Map();
