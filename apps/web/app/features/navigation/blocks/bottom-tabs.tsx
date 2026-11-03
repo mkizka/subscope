@@ -57,7 +57,7 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
         )}
       </Tab>
       <Tab
-        to={profileId ? `/profile/${profileId}` : "/"}
+        to={profileId ? `/${profileId}` : "/"}
         icon={<CircleUserIcon className="size-6" />}
       >
         プロフィール

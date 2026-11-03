@@ -88,7 +88,7 @@ export function ProfileHeader({
           </p>
         )}
         <div className="flex gap-4 text-label text-muted">
-          <Link to={`/profile/${handle}/follows`} className="hover:underline">
+          <Link to={`/${handle}/follows`} className="hover:underline">
             {loading ? (
               <Skeleton className="h-3.5 w-7 align-middle" />
             ) : (
@@ -96,7 +96,7 @@ export function ProfileHeader({
             )}{" "}
             フォロー
           </Link>
-          <Link to={`/profile/${handle}/followers`} className="hover:underline">
+          <Link to={`/${handle}/followers`} className="hover:underline">
             {loading ? (
               <Skeleton className="h-3.5 w-7 align-middle" />
             ) : (

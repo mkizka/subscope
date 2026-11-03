@@ -70,14 +70,14 @@ export function NavMenu({
       {profileId && (
         <>
           <Item
-            to={`/profile/${profileId}/lists`}
+            to={`/${profileId}/lists`}
             icon={<ListIcon className="size-6" />}
             {...p}
           >
             リスト
           </Item>
           <Item
-            to={`/profile/${profileId}`}
+            to={`/${profileId}`}
             icon={<CircleUserIcon className="size-6" />}
             {...p}
           >

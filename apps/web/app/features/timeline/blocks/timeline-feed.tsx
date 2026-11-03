@@ -19,7 +19,7 @@ type Props = {
 };
 
 export const threadPath = (post: TimelinePost) =>
-  `/profile/${post.authorHandle}/post/${post.uri.split("/").pop()}`;
+  `/${post.authorHandle}/post/${post.uri.split("/").pop()}`;
 
 function groupThreads(posts: TimelinePost[]) {
   const byUri = new Map<string, number>();

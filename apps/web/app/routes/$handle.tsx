@@ -1,7 +1,7 @@
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ProfilePage } from "@/app/pages/client/profile-page";
 
-import type { Route } from "./+types/profile.$handle";
+import type { Route } from "./+types/$handle";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 

@@ -60,7 +60,7 @@ test.describe("検索", () => {
 
     await link.click();
 
-    await expect(page).toHaveURL("/profile/alice.test");
+    await expect(page).toHaveURL("/alice.test");
     await expect(
       page
         .getByRole("main")

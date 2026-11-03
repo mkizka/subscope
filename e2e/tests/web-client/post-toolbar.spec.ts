@@ -210,13 +210,9 @@ test("post-toolbar-6: 削除ボタンは、タイムラインでもスレッド�
   await expect(others.getByRole("button", { name: "削除" })).toHaveCount(0);
 
   const thread = page.getByRole("region", { name: "スレッド" });
-  await page.goto(
-    `/profile/alice.test/post/${mineRecord.uri.split("/").pop()}`,
-  );
+  await page.goto(`/alice.test/post/${mineRecord.uri.split("/").pop()}`);
   await expect(thread.getByRole("button", { name: "削除" })).toBeVisible();
-  await page.goto(
-    `/profile/bob.test/post/${othersRecord.uri.split("/").pop()}`,
-  );
+  await page.goto(`/bob.test/post/${othersRecord.uri.split("/").pop()}`);
   await expect(thread.getByText("post-toolbar-6: 他人の投稿")).toBeVisible();
   await expect(thread.getByRole("button", { name: "削除" })).toHaveCount(0);
 });

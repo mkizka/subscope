@@ -456,8 +456,6 @@ test.describe("タイムライン", () => {
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
     await link.click();
-    await expect(page).toHaveURL(
-      `/profile/${await resolveHandle("alice.test")}`,
-    );
+    await expect(page).toHaveURL(`/${await resolveHandle("alice.test")}`);
   });
 });
