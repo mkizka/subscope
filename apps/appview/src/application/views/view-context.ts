@@ -218,6 +218,14 @@ export class ViewContext {
     return this.records.load(uri);
   }
 
+  async visibleRecord(uri: string) {
+    const [record, visible] = await Promise.all([
+      this.records.load(uri),
+      this.isVisible(uri),
+    ]);
+    return visible ? record : undefined;
+  }
+
   stats(uri: string) {
     return this.postStats.load(uri);
   }
