@@ -1,5 +1,6 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { ListsContainer } from "@/app/features/list/blocks/lists-container";
+import { ProfileContainer } from "@/app/features/profile/blocks/profile-container";
 
 type Props = {
   handle: string;
@@ -8,8 +9,10 @@ type Props = {
 export function ListsPage({ handle }: Props) {
   return (
     <ThreeColumnLayout>
-      <h1 className="border-b border-line p-4 text-title">リスト</h1>
-      <ListsContainer handle={handle} />
+      <ProfileContainer
+        handle={handle}
+        listsTab={<ListsContainer handle={handle} />}
+      />
     </ThreeColumnLayout>
   );
 }

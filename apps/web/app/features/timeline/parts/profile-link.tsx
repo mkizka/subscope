@@ -5,5 +5,5 @@ export function ProfileLink({
   handle,
   ...props
 }: Omit<ComponentProps<typeof Link>, "to"> & { handle: string }) {
-  return <Link {...props} to={`/profile/${handle}`} />;
+  return <Link {...props} to={`/${handle}`} />;
 }

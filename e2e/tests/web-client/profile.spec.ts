@@ -27,7 +27,7 @@ test.describe("プロフィール", () => {
 
     await page.getByRole("link", { name: "プロフィール" }).click();
 
-    await expect(page).toHaveURL(/\/profile\//);
+    await expect(page).toHaveURL(/\/alice\.test$/);
     const main = page.getByRole("main");
     await expect(main.getByRole("heading", { name: "Alice" })).toBeVisible();
     await expect(main.getByText(/^@/).first()).toBeVisible();
@@ -56,7 +56,7 @@ test.describe("プロフィール", () => {
       );
       return (await res.text()).includes(bob);
     };
-    await page.goto(`/profile/${bob}`);
+    await page.goto(`/${bob}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -110,7 +110,7 @@ test.describe("プロフィール", () => {
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/profile/alice.test?tab=replies");
+    await page.goto("/alice.test?tab=replies");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -137,7 +137,7 @@ test.describe("プロフィール", () => {
       reply: { root: parent, parent },
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/profile/alice.test?tab=replies");
+    await page.goto("/alice.test?tab=replies");
     const main = page.getByRole("main");
 
     await expect(async () => {
@@ -162,7 +162,7 @@ test.describe("プロフィール", () => {
       reply: { root, parent: root },
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
 
     await expect(async () => {
@@ -193,12 +193,12 @@ test.describe("プロフィール", () => {
       subject,
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
 
     await main.getByRole("tab", { name: "いいね" }).click();
 
-    await expect(page).toHaveURL("/profile/alice.test?tab=likes");
+    await expect(page).toHaveURL("/alice.test?tab=likes");
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(text)).toBeVisible({ timeout: 1000 });
@@ -209,7 +209,7 @@ test.describe("プロフィール", () => {
     page,
   }) => {
     await follow("alice.test", "bob.test");
-    await page.goto("/profile/bob.test");
+    await page.goto("/bob.test");
 
     const main = page.getByRole("main");
     await expect(main.getByRole("tab", { name: "リプライ" })).toBeVisible();
@@ -233,7 +233,7 @@ test.describe("プロフィール", () => {
       text,
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/profile/alice.test?tab=media");
+    await page.goto("/alice.test?tab=media");
     const main = page.getByRole("main");
 
     await expect(async () => {
@@ -248,7 +248,7 @@ test.describe("プロフィール", () => {
   }) => {
     await follow("alice.test", "bob.test");
     const bob = await resolveHandle("bob.test");
-    await page.goto(`/profile/${bob}`);
+    await page.goto(`/${bob}`);
     const button = page
       .getByRole("main")
       .getByRole("button", { name: /^フォロー/ });
@@ -292,21 +292,21 @@ test.describe("プロフィール", () => {
       await expect(article).toBeVisible({ timeout: 1000 });
     }).toPass();
 
-    await article.locator('a[href="/profile/alice.test"]').first().click();
-    await expect(page).toHaveURL("/profile/alice.test");
+    await article.locator('a[href="/alice.test"]').first().click();
+    await expect(page).toHaveURL("/alice.test");
 
-    await page.goto(`/profile/alice.test/post/${uri.split("/").pop()}`);
+    await page.goto(`/alice.test/post/${uri.split("/").pop()}`);
     await page
       .getByRole("article", { name: "選んだ投稿" })
       .getByRole("link", { name: /@alice\.test/ })
       .click();
-    await expect(page).toHaveURL("/profile/alice.test");
+    await expect(page).toHaveURL("/alice.test");
   });
 
   test("profile-13: 追跡アカウントの全体ページには、そのアカウントの過去の投稿の同期状態（同期中・同期済み・同期エラー）をハンドルの横に表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
 
     await expect(async () => {
       await page.reload();
@@ -350,7 +350,7 @@ test.describe("プロフィール", () => {
   test("profile-18: タブを切り替えると、ヘッダーとタブはそのままにして、投稿の場所だけ読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
     const main = page.getByRole("main");
     const followers = main.getByText(/^\d+ フォロワー$/);
     await expect(followers).toBeVisible();
@@ -384,7 +384,7 @@ test.describe("プロフィール", () => {
   test("profile-15: 一度表示したプロフィールに戻ると、読み込み直しを待たずに前回の内容を表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
     const followers = page.getByRole("main").getByText(/^\d+ フォロワー$/);
     await expect(followers).toBeVisible();
     await page

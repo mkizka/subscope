@@ -7,7 +7,7 @@ import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ListPage } from "@/app/pages/client/list-page";
 import { di } from "@/app/server/di";
 
-import type { Route } from "./+types/profile.$handle_.lists_.$rkey";
+import type { Route } from "./+types/$handle_.lists_.$rkey";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
@@ -19,7 +19,7 @@ export const action = async ({
   const formData = await request.formData();
   if (formData.get("intent") === "delete") {
     await di.deleteListUseCase.execute(context.get(didContext), params.rkey);
-    return redirect(`/profile/${params.handle}/lists`);
+    return redirect(`/${params.handle}/lists`);
   }
   const submission = parseWithZod(formData, {
     schema: listSchema,

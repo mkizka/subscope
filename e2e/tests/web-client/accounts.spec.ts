@@ -70,7 +70,7 @@ test.describe("アカウント", () => {
       .getByRole("link", { name: /^Alice/ })
       .click();
 
-    await expect(page).toHaveURL(/\/profile\/[^/]+$/);
+    await expect(page).toHaveURL(/\/alice\.test$/);
     await expect(
       page
         .getByRole("main")

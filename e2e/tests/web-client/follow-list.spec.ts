@@ -18,11 +18,11 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-1: プロフィール全体ページのフォロー数から、中央カラムにそのアカウントのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
 
     await page.getByRole("link", { name: /^\d+ フォロー$/ }).click();
 
-    await expect(page).toHaveURL("/profile/alice.test/follows");
+    await expect(page).toHaveURL("/alice.test/follows");
     const bob = page
       .getByRole("main")
       .getByRole("listitem")
@@ -37,11 +37,11 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-2: プロフィール全体ページのフォロワー数から、中央カラムにそのアカウントのフォロワー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/bob.test");
+    await page.goto("/bob.test");
 
     await page.getByRole("link", { name: /^\d+ フォロワー$/ }).click();
 
-    await expect(page).toHaveURL("/profile/bob.test/followers");
+    await expect(page).toHaveURL("/bob.test/followers");
     const alice = page
       .getByRole("main")
       .getByRole("listitem")
@@ -58,11 +58,11 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test/follows");
+    await page.goto("/alice.test/follows");
 
     await page.getByRole("main").getByRole("link", { name: /^Bob/ }).click();
 
-    await expect(page).toHaveURL(/\/profile\/(?!alice\.test)[^/]+$/);
+    await expect(page).toHaveURL(/\/(?!alice\.)[^/]+\.test$/);
     await expect(
       page.getByRole("main").getByRole("heading", { name: "Bob", exact: true }),
     ).toBeVisible();
@@ -71,7 +71,7 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-4: 一覧の追跡アカウントには、過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test/follows");
+    await page.goto("/alice.test/follows");
 
     const item = page
       .getByRole("main")
@@ -88,7 +88,7 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-5: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/profile/*/follows", async (route) => {
       await released;
@@ -112,11 +112,11 @@ test.describe("フォロー・フォロワー", () => {
       .getByRole("listitem")
       .filter({ hasText: "Bob" });
     await expect(async () => {
-      await page.goto("/profile/alice.test/follows");
+      await page.goto("/alice.test/follows");
       await expect(bob).toBeVisible({ timeout: 1000 });
     }).toPass();
     await bob.getByRole("link").click();
-    await expect(page).toHaveURL(/\/profile\/(?!alice\.test)[^/]+$/);
+    await expect(page).toHaveURL(/\/(?!alice\.)[^/]+\.test$/);
     await page.route("**/api/profile/*/follows", () => {});
 
     await page.goBack();
@@ -127,7 +127,7 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-7: フォロワー一覧に「すべて」と「登録アカウント」のタブを表示し、「登録アカウント」には人数を添える", async ({
     page,
   }) => {
-    await page.goto("/profile/bob.test/followers");
+    await page.goto("/bob.test/followers");
 
     await expect(page.getByRole("tab", { name: "すべて" })).toBeVisible();
     await expect(
@@ -138,13 +138,11 @@ test.describe("フォロー・フォロワー", () => {
   test("follow-list-8: 「登録アカウント」タブ（`?filter=registered`）には、そのアカウントをフォローしている登録アカウントだけを一覧表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/bob.test/followers");
+    await page.goto("/bob.test/followers");
 
     await page.getByRole("tab", { name: /^登録アカウント/ }).click();
 
-    await expect(page).toHaveURL(
-      "/profile/bob.test/followers?filter=registered",
-    );
+    await expect(page).toHaveURL("/bob.test/followers?filter=registered");
     const alice = page
       .getByRole("main")
       .getByRole("listitem")

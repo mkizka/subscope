@@ -44,11 +44,11 @@ test.describe("リスト", () => {
   }) => {
     const name = `list-1のリスト ${Date.now()}`;
     await createList(name);
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
 
     await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
 
-    await expect(page).toHaveURL("/profile/alice.test/lists");
+    await expect(page).toHaveURL("/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -74,7 +74,7 @@ test.describe("リスト", () => {
         createdAt: new Date().toISOString(),
       });
     }
-    await page.goto("/profile/alice.test/lists");
+    await page.goto("/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -85,7 +85,7 @@ test.describe("リスト", () => {
 
     await main.getByText(name, { exact: true }).click();
 
-    await expect(page).toHaveURL(`/profile/alice.test/lists/${rkey}`);
+    await expect(page).toHaveURL(`/alice.test/lists/${rkey}`);
     await expect(main.getByRole("heading", { name })).toBeVisible();
     await expect(main.getByText(`${name}の説明`)).toBeVisible();
     await expect(async () => {
@@ -102,7 +102,7 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-3のリスト ${Date.now()}`);
-    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -113,6 +113,10 @@ test.describe("リスト", () => {
 
     await main.getByRole("tab", { name: "メンバー" }).click();
 
+    await expect(main.getByRole("tab", { name: "メンバー" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     await expect(main.getByText("@bob.test")).toBeVisible();
   });
 
@@ -120,7 +124,7 @@ test.describe("リスト", () => {
     page,
   }) => {
     const name = `list-4のリスト ${Date.now()}`;
-    await page.goto("/profile/alice.test/lists");
+    await page.goto("/alice.test/lists");
     const main = page.getByRole("main");
 
     await main.getByText("新しいリスト").click();
@@ -148,7 +152,7 @@ test.describe("リスト", () => {
   }) => {
     const rkey = await createList(`list-5のリスト ${Date.now()}`);
     const name = `list-5の編集後 ${Date.now()}`;
-    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -181,7 +185,7 @@ test.describe("リスト", () => {
     const name = `list-6のリスト ${Date.now()}`;
     const rkey = await createList(name);
     const alice = await resolveHandle("alice.test");
-    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -196,7 +200,7 @@ test.describe("リスト", () => {
       .getByRole("button", { name: "削除する" })
       .click();
 
-    await expect(page).toHaveURL("/profile/alice.test/lists");
+    await expect(page).toHaveURL("/alice.test/lists");
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(name, { exact: true })).toBeHidden({
@@ -223,7 +227,7 @@ test.describe("リスト", () => {
   }) => {
     const list = await createEmptyList(`list-7のリスト ${Date.now()}`);
     const rkey = list.uri.split("/").at(-1);
-    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+    await page.goto(`/alice.test/lists/${rkey}?tab=members`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -247,7 +251,7 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-8のリスト ${Date.now()}`);
-    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+    await page.goto(`/alice.test/lists/${rkey}?tab=members`);
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -269,7 +273,7 @@ test.describe("リスト", () => {
   test("list-9: リストの作成・保存ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test/lists");
+    await page.goto("/alice.test/lists");
     const main = page.getByRole("main");
     await main.getByText("新しいリスト").click();
     await main.getByLabel("名前").fill(`list-9のリスト ${Date.now()}`);
@@ -288,7 +292,7 @@ test.describe("リスト", () => {
     page,
   }) => {
     const rkey = await createList(`list-10のリスト ${Date.now()}`);
-    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
     const button = main.getByRole("button", { name: "削除する" });
     await expect(async () => {
@@ -306,14 +310,14 @@ test.describe("リスト", () => {
     await expect(button).toBeDisabled();
     await expect(button.locator(".animate-spin")).toBeVisible();
     release();
-    await expect(page).toHaveURL("/profile/alice.test/lists");
+    await expect(page).toHaveURL("/alice.test/lists");
   });
 
   test("list-11: メンバーの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
     page,
   }) => {
     const rkey = await createList(`list-11のリスト ${Date.now()}`);
-    await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+    await page.goto(`/alice.test/lists/${rkey}?tab=members`);
     const main = page.getByRole("main");
     const button = main.getByRole("button", { name: "追加する" });
     await expect(async () => {
@@ -340,7 +344,7 @@ test.describe("リスト", () => {
       .getByRole("listitem")
       .filter({ hasText: "@bob.test" });
     await expect(async () => {
-      await page.goto(`/profile/alice.test/lists/${rkey}?tab=members`);
+      await page.goto(`/alice.test/lists/${rkey}?tab=members`);
       await expect(bob.getByText("同期済み", { exact: true })).toBeVisible({
         timeout: 1000,
       });
@@ -370,7 +374,7 @@ test.describe("リスト", () => {
       createdAt: new Date().toISOString(),
     });
 
-    await page.goto(`/profile/alice.test/lists/${rkey}`);
+    await page.goto(`/alice.test/lists/${rkey}`);
 
     const main = page.getByRole("main");
     await expect(async () => {
@@ -385,7 +389,7 @@ test.describe("リスト", () => {
   test("list-14: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
-    await page.goto("/profile/alice.test");
+    await page.goto("/alice.test");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/lists/*", async (route) => {
       await released;
@@ -394,7 +398,9 @@ test.describe("リスト", () => {
 
     await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
 
-    await expect(page.getByRole("heading", { name: "リスト" })).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("tab", { name: "リスト" }),
+    ).toHaveAttribute("aria-selected", "true");
     const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
@@ -409,7 +415,7 @@ test.describe("リスト", () => {
   }) => {
     const name = `list-15のリスト ${Date.now()}`;
     const rkey = await createList(name);
-    await page.goto("/profile/alice.test/lists");
+    await page.goto("/alice.test/lists");
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
@@ -425,7 +431,7 @@ test.describe("リスト", () => {
 
     await main.getByText(name, { exact: true }).click();
 
-    await expect(page).toHaveURL(`/profile/alice.test/lists/${rkey}`);
+    await expect(page).toHaveURL(`/alice.test/lists/${rkey}`);
     const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
@@ -434,5 +440,32 @@ test.describe("リスト", () => {
     release(undefined);
     await expect(skeleton).toBeHidden();
     await expect(main.getByRole("heading", { name })).toBeVisible();
+  });
+
+  test("list-16: リスト一覧は、プロフィールのヘッダーとタブの下に、表示中のアカウントが作成したリストだけを表示する", async ({
+    page,
+  }) => {
+    const name = `list-16のリスト ${Date.now()}`;
+    await createList(name);
+    await page.goto("/profile/alice.test/lists");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText(name, { exact: true })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    await expect(main.getByRole("tab", { name: "リスト" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await page.goto("/profile/bob.test/lists");
+
+    await expect(main.getByText("@bob.test")).toBeVisible();
+    await expect(
+      page.getByRole("status", { name: "読み込み中", exact: true }),
+    ).toBeHidden();
+    await expect(main.getByText(name, { exact: true })).toBeHidden();
   });
 });

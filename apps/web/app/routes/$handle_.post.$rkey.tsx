@@ -1,7 +1,7 @@
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { ThreadPage } from "@/app/pages/client/thread-page";
 
-import type { Route } from "./+types/profile.$handle_.post.$rkey";
+import type { Route } from "./+types/$handle_.post.$rkey";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
