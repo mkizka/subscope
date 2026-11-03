@@ -1,10 +1,11 @@
-export function Splash() {
+export function Splash({ leaving }: { leaving: boolean }) {
   return (
     <div
-      className="
+      className={`
         fixed inset-0 z-50 flex flex-col items-center justify-center gap-4
-        bg-surface text-ink
-      "
+        bg-surface text-ink transition-opacity duration-300
+        ${leaving ? "pointer-events-none opacity-0" : ""}
+      `}
     >
       <div
         aria-hidden="true"

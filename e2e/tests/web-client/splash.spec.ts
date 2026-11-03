@@ -58,4 +58,53 @@ test.describe("起動時のスプラッシュ", () => {
     await expect(page).toHaveURL("/accounts");
     await expect(page.getByRole("status")).toBeHidden();
   });
+
+  test("splash-5: 自分の情報の取得が終わると、スプラッシュを約300msかけてフェードして消す", async ({
+    page,
+  }) => {
+    let release = () => {};
+    const released = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/api/me", async (route) => {
+      await released;
+      await route.continue();
+    });
+    await page.goto("/");
+    const splash = page.getByRole("status").locator("..");
+    await expect(splash).toHaveCSS("opacity", "1");
+
+    release();
+
+    await expect(splash).toHaveCSS("opacity", /^0\./);
+    await expect(splash).toBeHidden();
+  });
+
+  test("splash-6: prefers-reduced-motionが有効なときは、フェードせずにスプラッシュを消す", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    let release = () => {};
+    const released = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/api/me", async (route) => {
+      await released;
+      await route.continue();
+    });
+    await page.goto("/");
+    await expect(page.getByRole("status")).toBeVisible();
+
+    release();
+
+    await expect(page.getByRole("status")).toBeHidden({ timeout: 200 });
+  });
+});
+
+test.describe("起動時のスプラッシュ（JS無効）", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("splash-4: JSが読み込まれる前から、サーバーが返すHTMLにスプラッシュを含める", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await expect(page.getByRole("status")).toHaveText("読み込み中");
+  });
 });
