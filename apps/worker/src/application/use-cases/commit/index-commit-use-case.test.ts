@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
 import { Record } from "@repo/common/domain";
-import { fakeCid, registrationFactory } from "@repo/common/test";
+import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
@@ -34,8 +34,7 @@ describe("IndexCommitUseCase", () => {
       const account = accountFactory();
       accountRepo.add(account);
 
-      const registration = registrationFactory({ accountDid: account.did });
-      registrationQuery.add(registration);
+      registrationQuery.add(account.did);
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -152,14 +151,10 @@ describe("IndexCommitUseCase", () => {
         const likerAccount = accountFactory();
         const authorAccount = accountFactory();
         if (liker) {
-          registrationQuery.add(
-            registrationFactory({ accountDid: likerAccount.did }),
-          );
+          registrationQuery.add(likerAccount.did);
         }
         if (author) {
-          registrationQuery.add(
-            registrationFactory({ accountDid: authorAccount.did }),
-          );
+          registrationQuery.add(authorAccount.did);
         }
         const uri = new AtUri(
           `at://${likerAccount.did}/app.bsky.feed.like/123`,
@@ -200,8 +195,7 @@ describe("IndexCommitUseCase", () => {
       const account = accountFactory();
       accountRepo.add(account);
 
-      const registration = registrationFactory({ accountDid: account.did });
-      registrationQuery.add(registration);
+      registrationQuery.add(account.did);
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({
@@ -244,8 +238,7 @@ describe("IndexCommitUseCase", () => {
       const account = accountFactory();
       accountRepo.add(account);
 
-      const registration = registrationFactory({ accountDid: account.did });
-      registrationQuery.add(registration);
+      registrationQuery.add(account.did);
 
       const uri = new AtUri(`at://${account.did}/app.bsky.feed.post/123`);
       const record = Record.create({

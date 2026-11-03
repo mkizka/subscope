@@ -1,5 +1,5 @@
 import type { AfterCommitContext } from "@repo/common/domain";
-import { recordFactory, registrationFactory } from "@repo/common/test";
+import { recordFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
@@ -63,7 +63,7 @@ describe("FollowIndexer", () => {
       // arrange
       const follower = accountFactory();
       const followee = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: followee.did }));
+      registrationQuery.add(followee.did);
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
         json: {

@@ -36,5 +36,3 @@ export const fakeAtUri = ({
 export const fakeText = () => faker.lorem.sentence();
 
 export const fakeDate = () => faker.date.recent();
-
-export const fakeFutureDate = () => faker.date.future();
