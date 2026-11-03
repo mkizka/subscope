@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import { fakeCid, postFactory, recordFactory } from "@repo/common/test";
+import { fakeCid, recordFactory } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
@@ -8,6 +8,7 @@ import {
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
+import { postFactory } from "../../models/post.factory.js";
 
 describe("RepostIndexer", () => {
   let repostIndexer: TestServices["repostIndexer"];

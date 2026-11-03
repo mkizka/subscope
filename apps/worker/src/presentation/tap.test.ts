@@ -7,7 +7,6 @@ import {
   InMemoryDidCache,
   InMemoryDidResolver,
   InMemoryJobQueue,
-  InMemoryTapClient,
 } from "@repo/common/test";
 import { schema } from "@repo/db";
 import { accountFactory, testSetup } from "@repo/test-utils";
@@ -17,6 +16,7 @@ import type { WebSocket } from "ws";
 import { WebSocketServer } from "ws";
 import { z } from "zod";
 
+import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import { createWorkerRegistry } from "../shared/registry.js";
 import { testEnv } from "../shared/test-utils.js";
 import { TapSubscriber } from "./tap.js";

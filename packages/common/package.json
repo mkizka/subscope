@@ -21,7 +21,6 @@
     "@atproto/identity": "0.5.20",
     "@atproto/lex": "0.4.2",
     "@atproto/syntax": "0.7.7",
-    "@atproto/tap": "0.4.16",
     "@keyv/redis": "6.1.0",
     "@repo/client": "workspace:*",
     "@repo/db": "workspace:*",
