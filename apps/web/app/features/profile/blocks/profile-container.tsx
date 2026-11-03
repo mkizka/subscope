@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ReactNode } from "react";
-import { useSearchParams } from "react-router";
+import { useOutlet, useSearchParams } from "react-router";
 
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
@@ -22,10 +21,10 @@ const tabLabels = {
 
 type Props = {
   handle: string;
-  listsTab?: ReactNode;
 };
 
-export function ProfileContainer({ handle, listsTab }: Props) {
+export function ProfileContainer({ handle }: Props) {
+  const listsTab = useOutlet();
   const tabParam = useSearchParams()[0].get("tab") ?? "";
   const { data, isPlaceholderData } = useQuery({
     queryKey: ["profile", handle, tabParam],
