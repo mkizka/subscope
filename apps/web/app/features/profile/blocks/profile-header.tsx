@@ -1,4 +1,6 @@
+import type { ProfileLinkView } from "@repo/client/lex/app/bsky/actor/defs";
 import type { BackfillStatus } from "@repo/common/domain";
+import { Link as LinkIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 
@@ -14,6 +16,7 @@ type Props = {
   avatarUrl?: string;
   bannerUrl?: string;
   description?: string;
+  links?: ProfileLinkView[];
   followsCount?: number;
   followersCount?: number;
   backfillStatus?: BackfillStatus;
@@ -27,6 +30,7 @@ export function ProfileHeader({
   avatarUrl,
   bannerUrl,
   description,
+  links,
   followsCount,
   followersCount,
   backfillStatus,
@@ -86,6 +90,32 @@ export function ProfileHeader({
           <p className="text-body wrap-break-word whitespace-pre-wrap">
             {description}
           </p>
+        )}
+        {links && links.length > 0 && (
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-label">
+            {links.map((link) => (
+              <li key={link.uri} className="min-w-0">
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+                    flex items-center gap-1 text-brand
+                    hover:underline
+                  "
+                >
+                  {link.icon ? (
+                    <img src={link.icon} alt="" className="size-4 rounded-xs" />
+                  ) : (
+                    <LinkIcon className="size-4 shrink-0" />
+                  )}
+                  <span className="truncate">
+                    {link.title || new URL(link.url).hostname}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
         )}
         <div className="flex gap-4 text-label text-muted">
           <Link to={`/${handle}/follows`} className="hover:underline">
