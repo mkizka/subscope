@@ -1,6 +1,6 @@
 export type Handle = `${string}.${string}`;
 
-export function assertHandle(input: unknown): asserts input is Handle {
+function assertHandle(input: unknown): asserts input is Handle {
   if (typeof input !== "string") {
     throw new Error(`Expected handle to be a string, but got ${String(input)}`);
   }
