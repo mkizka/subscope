@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tabs-container";
 import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
+import { SplashContainer } from "@/app/features/navigation/blocks/splash-container";
 import { ServerAbout } from "@/app/features/navigation/parts/server-about";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
@@ -13,6 +14,7 @@ type Props = {
 export const ThreeColumnLayout = ({ children }: Props) => {
   return (
     <div className="flex min-h-screen justify-center bg-surface text-ink">
+      <SplashContainer />
       <aside
         className="
           hidden w-60 shrink-0 border-r border-line
