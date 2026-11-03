@@ -394,7 +394,9 @@ test.describe("リスト", () => {
 
     await page.getByRole("main").getByRole("tab", { name: "リスト" }).click();
 
-    await expect(page.getByRole("heading", { name: "リスト" })).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("tab", { name: "リスト" }),
+    ).toHaveAttribute("aria-selected", "true");
     const spinner = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
