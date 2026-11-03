@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { Follow } from "@repo/common/domain";
+import type { AtUriString } from "@atproto/syntax";
 
 import type {
   FollowDto,
@@ -7,6 +7,13 @@ import type {
   FollowerDto,
 } from "../../../application/dto/follow-dto.js";
 import type { IFollowQuery } from "../../../application/interfaces/queries/follow-query.js";
+
+type Follow = {
+  uri: AtUriString;
+  accountDid: Did;
+  subjectDid: Did;
+  sortAt: Date;
+};
 
 export class InMemoryFollowQuery implements IFollowQuery {
   private follows: Follow[] = [];
@@ -31,7 +38,7 @@ export class InMemoryFollowQuery implements IFollowQuery {
             params.subjectDids.includes(follow.subjectDid),
         )
         .map((follow) => ({
-          uri: follow.uri.toString(),
+          uri: follow.uri,
           accountDid: follow.accountDid,
           subjectDid: follow.subjectDid,
         })),

@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import { getBlobCidString, isPlainObject } from "@atproto/lex";
 import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
-import { Record } from "@repo/common/domain";
+import { validateRecord } from "@repo/common/utils";
 
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
@@ -100,7 +100,7 @@ export class ProfileViews {
           if (!record) {
             return [];
           }
-          const parsed = Record.create(record).validate("app.bsky.actor.link");
+          const parsed = validateRecord("app.bsky.actor.link", record);
           const iconCid = getBlobCidString(parsed.icon);
           return [
             {

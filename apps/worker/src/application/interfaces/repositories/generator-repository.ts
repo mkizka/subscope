@@ -1,8 +1,10 @@
-import type { Generator, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+
+import type { GeneratorRow } from "../../record-parsers.js";
 
 export interface IGeneratorRepository {
   save: (params: {
     ctx: TransactionContext;
-    generator: Generator;
+    generator: GeneratorRow;
   }) => Promise<void>;
 }

@@ -53,7 +53,7 @@ describe("ProfileIndexer", () => {
       // assert
       const profile = await profileRepo.find({ ctx, uri: record.uri });
       expect(profile).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         cid: record.cid,
         accountDid: account.did,
         displayName: "Test User",

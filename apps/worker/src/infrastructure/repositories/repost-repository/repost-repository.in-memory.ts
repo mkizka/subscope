@@ -1,13 +1,14 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Repost, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IRepostRepository } from "../../../application/interfaces/repositories/repost-repository.js";
+import type { RepostRow } from "../../../application/record-parsers.js";
 
 export class InMemoryRepostRepository implements IRepostRepository {
-  private reposts: Map<string, Repost> = new Map();
+  private reposts: Map<string, RepostRow> = new Map();
 
-  add(repost: Repost): void {
-    this.reposts.set(repost.uri.toString(), repost);
+  add(repost: RepostRow): void {
+    this.reposts.set(repost.uri, repost);
   }
 
   clear(): void {
@@ -19,7 +20,7 @@ export class InMemoryRepostRepository implements IRepostRepository {
   }: {
     ctx: TransactionContext;
     uri: AtUri;
-  }): Promise<Repost | null> {
+  }): Promise<RepostRow | null> {
     return this.reposts.get(uri.toString()) ?? null;
   }
 
@@ -27,8 +28,8 @@ export class InMemoryRepostRepository implements IRepostRepository {
     repost,
   }: {
     ctx: TransactionContext;
-    repost: Repost;
+    repost: RepostRow;
   }): Promise<void> {
-    this.reposts.set(repost.uri.toString(), repost);
+    this.reposts.set(repost.uri, repost);
   }
 }

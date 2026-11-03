@@ -62,7 +62,7 @@ describe("PostIndexer", () => {
 
       const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         type: "post",
         accountDid: author.did,
         subjectUri: null,

@@ -61,15 +61,15 @@ describe("RepostIndexer", () => {
       // assert
       const repost = await repostRepo.find({ ctx, uri: record.uri });
       expect(repost).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         cid: record.cid,
         accountDid: reposter.did,
-        subjectUri: new AtUri(subjectUri),
+        subjectUri: subjectUri,
       });
 
       const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         type: "repost",
         accountDid: reposter.did,
         subjectUri: subjectUri,
