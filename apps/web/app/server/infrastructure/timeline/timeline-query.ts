@@ -51,6 +51,7 @@ export type TimelinePostDto = {
     thumb?: string;
   };
   quote?: {
+    authorAvatar?: string;
     authorDisplayName?: string;
     authorHandle: string;
     text?: string;
@@ -177,6 +178,7 @@ export function toTimelinePost({
     external: externalView.matches(media) ? media.external : undefined,
     quote: viewRecord.matches(quoted)
       ? {
+          authorAvatar: quoted.author.avatar,
           authorDisplayName: quoted.author.displayName,
           authorHandle: quoted.author.handle,
           text: maybeString(quoted.value.text),
