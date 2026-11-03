@@ -1,13 +1,14 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Profile, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IProfileRepository } from "../../../application/interfaces/repositories/profile-repository.js";
+import type { ProfileRow } from "../../../application/record-parsers.js";
 
 export class InMemoryProfileRepository implements IProfileRepository {
-  private profiles: Map<string, Profile> = new Map();
+  private profiles: Map<string, ProfileRow> = new Map();
 
-  add(profile: Profile): void {
-    this.profiles.set(profile.uri.toString(), profile);
+  add(profile: ProfileRow): void {
+    this.profiles.set(profile.uri, profile);
   }
 
   clear(): void {
@@ -19,18 +20,18 @@ export class InMemoryProfileRepository implements IProfileRepository {
   }: {
     ctx: TransactionContext;
     uri: AtUri;
-  }): Promise<Profile | null> {
+  }): Promise<ProfileRow | null> {
     return this.profiles.get(uri.toString()) ?? null;
   }
 
   async save(params: {
     ctx: TransactionContext;
-    profile: Profile;
+    profile: ProfileRow;
   }): Promise<void> {
-    this.profiles.set(params.profile.uri.toString(), params.profile);
+    this.profiles.set(params.profile.uri, params.profile);
   }
 
-  findAll(): Profile[] {
+  findAll(): ProfileRow[] {
     return Array.from(this.profiles.values());
   }
 }

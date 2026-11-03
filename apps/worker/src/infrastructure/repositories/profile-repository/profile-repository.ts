@@ -1,31 +1,26 @@
 import type { TransactionContext } from "@repo/common/domain";
-import type { Profile } from "@repo/common/domain";
-import { type ProfileInsert, schema } from "@repo/db";
+import { schema } from "@repo/db";
 
 import type { IProfileRepository } from "../../../application/interfaces/repositories/profile-repository.js";
+import type { ProfileRow } from "../../../application/record-parsers.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ProfileRepository implements IProfileRepository {
-  async save({ ctx, profile }: { ctx: TransactionContext; profile: Profile }) {
-    const profileData = {
-      cid: profile.cid,
-      accountDid: profile.accountDid,
-      avatarCid: profile.avatarCid,
-      bannerCid: profile.bannerCid,
-      description: profile.description,
-      displayName: profile.displayName,
-      createdAt: profile.createdAt ? sanitizeDate(profile.createdAt) : null,
-    } satisfies ProfileInsert;
+  async save({
+    ctx,
+    profile,
+  }: {
+    ctx: TransactionContext;
+    profile: ProfileRow;
+  }) {
+    const { uri, indexedAt, ...rest } = profile;
+    const data = {
+      ...rest,
+      createdAt: rest.createdAt ? sanitizeDate(rest.createdAt) : null,
+    };
     await ctx.db
       .insert(schema.profiles)
-      .values({
-        uri: profile.uri.toString(),
-        indexedAt: profile.indexedAt,
-        ...profileData,
-      })
-      .onConflictDoUpdate({
-        target: schema.profiles.uri,
-        set: profileData,
-      });
+      .values({ uri, indexedAt, ...data })
+      .onConflictDoUpdate({ target: schema.profiles.uri, set: data });
   }
 }

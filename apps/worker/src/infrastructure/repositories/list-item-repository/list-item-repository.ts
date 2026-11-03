@@ -1,7 +1,8 @@
-import type { ListItem, TransactionContext } from "@repo/common/domain";
-import { type ListItemInsert, schema } from "@repo/db";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
 import type { IListItemRepository } from "../../../application/interfaces/repositories/list-item-repository.js";
+import type { ListItemRow } from "../../../application/record-parsers.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ListItemRepository implements IListItemRepository {
@@ -10,25 +11,16 @@ export class ListItemRepository implements IListItemRepository {
     listItem,
   }: {
     ctx: TransactionContext;
-    listItem: ListItem;
+    listItem: ListItemRow;
   }) {
+    const { uri, indexedAt, ...rest } = listItem;
     const data = {
-      cid: listItem.cid,
-      accountDid: listItem.accountDid,
-      listUri: listItem.listUri.toString(),
-      subjectDid: listItem.subjectDid,
-      createdAt: sanitizeDate(listItem.createdAt),
-    } satisfies ListItemInsert;
+      ...rest,
+      createdAt: sanitizeDate(rest.createdAt),
+    };
     await ctx.db
       .insert(schema.listItems)
-      .values({
-        uri: listItem.uri.toString(),
-        indexedAt: listItem.indexedAt,
-        ...data,
-      })
-      .onConflictDoUpdate({
-        target: schema.listItems.uri,
-        set: data,
-      });
+      .values({ uri, indexedAt, ...data })
+      .onConflictDoUpdate({ target: schema.listItems.uri, set: data });
   }
 }

@@ -1,8 +1,10 @@
-import type { FeedItem, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+
+import type { FeedItemRow } from "../../record-parsers.js";
 
 export interface IFeedItemRepository {
   save: (params: {
     ctx: TransactionContext;
-    feedItem: FeedItem;
+    feedItem: FeedItemRow;
   }) => Promise<void>;
 }

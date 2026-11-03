@@ -1,9 +1,9 @@
+import { AtUri } from "@atproto/syntax";
 import type {
   AfterCommitContext,
   IJobScheduler,
   Record,
 } from "@repo/common/domain";
-import { FeedItem, Repost } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -11,6 +11,11 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import {
+  feedItemFromRepost,
+  parseRepost,
+  sortAt,
+} from "../../record-parsers.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
@@ -33,13 +38,14 @@ export class RepostIndexer implements ICollectionIndexer {
     live: boolean;
     depth: number;
   }) {
-    const repost = Repost.from(record);
+    const repost = parseRepost(record);
     await this.repostRepository.save({ ctx, repost });
 
-    const feedItem = FeedItem.fromRepost(repost);
+    const feedItem = feedItemFromRepost(repost);
     await this.feedItemRepository.save({ ctx, feedItem });
 
-    const recipientDid = repost.subjectUri.host;
+    const subjectUri = new AtUri(repost.subjectUri);
+    const recipientDid = subjectUri.host;
     if (
       recipientDid !== repost.accountDid &&
       (await this.registrationQuery.isRegistered(ctx, recipientDid))
@@ -48,21 +54,21 @@ export class RepostIndexer implements ICollectionIndexer {
         ctx,
         notifications: [
           {
-            recordUri: repost.uri.toString(),
+            recordUri: repost.uri,
             recipientDid,
             authorDid: repost.accountDid,
             reason: "repost",
-            reasonSubject: repost.subjectUri.toString(),
-            sortAt: repost.sortAt,
+            reasonSubject: repost.subjectUri,
+            sortAt: sortAt(repost),
           },
         ],
       });
     }
 
-    const subjectExists = await this.postQuery.exists(ctx, repost.subjectUri);
+    const subjectExists = await this.postQuery.exists(ctx, subjectUri);
     if (!subjectExists) {
       ctx.afterCommit(() =>
-        this.jobScheduler.scheduleFetchRecord(repost.subjectUri, {
+        this.jobScheduler.scheduleFetchRecord(subjectUri, {
           live,
           depth,
         }),
@@ -71,9 +77,11 @@ export class RepostIndexer implements ICollectionIndexer {
   }
 
   afterAction({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
-    const repost = Repost.from(record);
+    const repost = parseRepost(record);
     ctx.afterCommit(() =>
-      this.jobScheduler.scheduleAggregatePostStats(repost.subjectUri),
+      this.jobScheduler.scheduleAggregatePostStats(
+        new AtUri(repost.subjectUri),
+      ),
     );
   }
 }

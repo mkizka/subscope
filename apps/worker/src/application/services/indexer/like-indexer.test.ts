@@ -58,10 +58,10 @@ describe("LikeIndexer", () => {
       // assert
       const like = await likeRepo.find({ ctx, uri: record.uri });
       expect(like).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         cid: record.cid,
         accountDid: liker.did,
-        subjectUri: new AtUri(postUri),
+        subjectUri: postUri,
       });
     });
 

@@ -55,7 +55,7 @@ describe("FollowIndexer", () => {
       // assert
       const follow = await followRepo.find({ ctx, uri: record.uri });
       expect(follow).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         cid: record.cid,
         accountDid: follower.did,
         subjectDid: followee.did,

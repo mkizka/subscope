@@ -1,7 +1,8 @@
-import type { FeedItem, TransactionContext } from "@repo/common/domain";
-import { type FeedItemInsert, schema } from "@repo/db";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
 import type { IFeedItemRepository } from "../../../application/interfaces/repositories/feed-item-repository.js";
+import type { FeedItemRow } from "../../../application/record-parsers.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FeedItemRepository implements IFeedItemRepository {
@@ -10,24 +11,12 @@ export class FeedItemRepository implements IFeedItemRepository {
     feedItem,
   }: {
     ctx: TransactionContext;
-    feedItem: FeedItem;
+    feedItem: FeedItemRow;
   }): Promise<void> {
-    const data = {
-      cid: feedItem.cid,
-      type: feedItem.type,
-      subjectUri: feedItem.subjectUri,
-      accountDid: feedItem.accountDid,
-      sortAt: sanitizeDate(feedItem.sortAt),
-    } satisfies FeedItemInsert;
+    const data = { ...feedItem, sortAt: sanitizeDate(feedItem.sortAt) };
     await ctx.db
       .insert(schema.feedItems)
-      .values({
-        uri: feedItem.uri.toString(),
-        ...data,
-      })
-      .onConflictDoUpdate({
-        target: schema.feedItems.uri,
-        set: data,
-      });
+      .values(data)
+      .onConflictDoUpdate({ target: schema.feedItems.uri, set: data });
   }
 }
