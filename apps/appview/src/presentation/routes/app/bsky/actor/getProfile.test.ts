@@ -135,7 +135,10 @@ describe("app.bsky.actor.getProfile", () => {
   ) => {
     const record = await recordFactory(ctx.db, "app.bsky.actor.profile")
       .vars({ account: () => account })
-      .props({ json: () => ({ $type: "app.bsky.actor.profile", links }) })
+      .props({
+        uri: () => `at://${account.did}/app.bsky.actor.profile/self`,
+        json: () => ({ $type: "app.bsky.actor.profile", links }),
+      })
       .create();
     await profileFactory(ctx.db)
       .vars({ record: () => record })
