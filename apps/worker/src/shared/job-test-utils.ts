@@ -8,12 +8,12 @@ import {
   InMemoryDidCache,
   InMemoryDidResolver,
   InMemoryJobQueue,
-  InMemoryTapClient,
 } from "@repo/common/test";
 import { testSetup } from "@repo/test-utils";
 
 import type { LabelData } from "../application/interfaces/repositories/label-repository.js";
 import { InMemoryLabelFetcher } from "../infrastructure/fetchers/label-fetcher.in-memory.js";
+import { InMemoryTapClient } from "../infrastructure/tap-client/tap-client.in-memory.js";
 import { indexCommitCommandFactory } from "../presentation/tap.js";
 import { createWorkerRegistry } from "./registry.js";
 import { testEnv } from "./test-utils.js";

@@ -72,11 +72,25 @@ test.describe("起動時のスプラッシュ", () => {
     await page.goto("/");
     const splash = page.getByText("読み込み中", { exact: true }).locator("..");
     await expect(splash).toHaveCSS("opacity", "1");
+    await page.evaluate(() => {
+      Object.assign(window, { faded: false });
+      new MutationObserver(() => {
+        if (document.querySelector(".opacity-0")) {
+          Object.assign(window, { faded: true });
+        }
+      }).observe(document.body, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+      });
+    });
 
     release();
 
-    await expect(splash).toHaveCSS("opacity", /^0\./);
     await expect(splash).toBeHidden();
+    expect(
+      await page.evaluate(() => Reflect.get(window, "faded") === true),
+    ).toBe(true);
   });
 
   test("splash-6: prefers-reduced-motionが有効なときは、フェードせずにスプラッシュを消す", async ({
