@@ -90,13 +90,27 @@ test.describe("起動時のスプラッシュ", () => {
       await route.continue();
     });
     await page.goto("/");
-    await expect(page.getByText("読み込み中", { exact: true })).toBeVisible();
+    const status = page.getByText("読み込み中", { exact: true });
+    await expect(status).toBeVisible();
+    await page.evaluate(() => {
+      Object.assign(window, { faded: false });
+      new MutationObserver(() => {
+        if (document.querySelector(".opacity-0")) {
+          Object.assign(window, { faded: true });
+        }
+      }).observe(document.body, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+      });
+    });
 
     release();
 
-    await expect(page.getByText("読み込み中", { exact: true })).toBeHidden({
-      timeout: 200,
-    });
+    await expect(status).toBeHidden();
+    expect(
+      await page.evaluate(() => Reflect.get(window, "faded") === true),
+    ).toBe(false);
   });
 });
 
