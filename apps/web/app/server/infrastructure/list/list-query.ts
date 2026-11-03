@@ -18,6 +18,7 @@ export type ListDto = {
   creatorDid: string;
   name: string;
   description?: string;
+  avatarUrl?: string;
 };
 
 export type ListMemberDto = {
@@ -49,6 +50,7 @@ const toList = (list: ListView): ListDto => ({
   creatorDid: list.creator.did,
   name: list.name,
   description: list.description,
+  avatarUrl: list.avatar,
 });
 
 export const listQueryFactory = ({

@@ -5,6 +5,7 @@ import {
   follow,
   PDS_URL,
   resolveHandle,
+  uploadImage,
 } from "../../helpers/pds";
 
 const createEmptyList = async (name: string) => {
@@ -470,10 +471,37 @@ test.describe("リスト", () => {
     await expect(main.getByText(name, { exact: true })).toBeHidden();
   });
 
-  test("list-17: サイドメニューの「リスト」から、自分のリストの管理画面（`/lists`）を開き、自分のリストを一覧表示する", async ({
+  test("list-17: リスト一覧の各行の左に、リストのアバター画像を表示し、未設定ならリストのアイコンを表示する", async ({
     page,
   }) => {
     const name = `list-17のリスト ${Date.now()}`;
+    const avatar = await uploadImage("alice.test");
+    await follow("alice.test", "bob.test");
+    await createRecord("alice.test", "app.bsky.graph.list", {
+      purpose: "app.bsky.graph.defs#curatelist",
+      name,
+      avatar,
+      createdAt: new Date().toISOString(),
+    });
+    const plain = `list-17のアイコンなし ${Date.now()}`;
+    await createEmptyList(plain);
+    await page.goto("/alice.test/lists");
+    const main = page.getByRole("main");
+    const row = (text: string) =>
+      main.getByRole("link").filter({ hasText: text });
+
+    await expect(async () => {
+      await page.reload();
+      await expect(row(name).locator("img")).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(row(plain).locator("img")).toBeHidden();
+    await expect(row(plain).locator("svg")).toBeVisible();
+  });
+
+  test("list-18: サイドメニューの「リスト」から、自分のリストの管理画面（`/lists`）を開き、自分のリストを一覧表示する", async ({
+    page,
+  }) => {
+    const name = `list-18のリスト ${Date.now()}`;
     await createList(name);
     await page.goto("/");
 

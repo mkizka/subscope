@@ -1,9 +1,13 @@
+import { ListIcon } from "lucide-react";
 import { Link } from "react-router";
+
+import { Avatar } from "@/app/components/ui/avatar";
 
 export type ListSummary = {
   rkey: string;
   name: string;
   description?: string;
+  avatarUrl?: string;
 };
 
 type Props = {
@@ -26,10 +30,14 @@ export function ListLinks({ handle, lists }: Props) {
           <Link
             to={`/${handle}/lists/${list.rkey}`}
             className="
-              block border-b border-line px-4 py-3
+              flex items-center gap-3 border-b border-line px-4 py-3
               hover:bg-surface-2
             "
           >
+            <Avatar
+              src={list.avatarUrl}
+              icon={<ListIcon className="size-5" />}
+            />
             <div className="min-w-0">
               <p className="truncate text-heading">{list.name}</p>
               {list.description && (
