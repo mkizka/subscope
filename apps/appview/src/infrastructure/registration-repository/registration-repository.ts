@@ -1,13 +1,13 @@
 import type { Did } from "@atproto/did";
 import {
   type DatabaseClient,
-  Registration,
   type TransactionContext,
 } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IRegistrationRepository } from "../../application/interfaces/registration-repository.js";
+import { Registration } from "../../domain/models/registration.js";
 
 export class RegistrationRepository implements IRegistrationRepository {
   constructor(private readonly db: DatabaseClient) {}

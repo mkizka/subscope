@@ -1,9 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
-import {
-  type BackfillStatus,
-  type DatabaseClient,
-  Registration,
-} from "@repo/common/domain";
+import { type BackfillStatus, type DatabaseClient } from "@repo/common/domain";
 import { schema } from "@repo/db";
 import {
   and,
@@ -22,6 +18,7 @@ import {
 import { union } from "drizzle-orm/pg-core";
 
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
+import { Registration } from "../../../domain/models/registration.js";
 
 export class RegistrationQuery implements IRegistrationQuery {
   constructor(private readonly db: DatabaseClient) {}

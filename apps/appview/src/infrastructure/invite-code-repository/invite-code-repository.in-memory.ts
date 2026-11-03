@@ -1,6 +1,7 @@
-import type { InviteCode, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
+import type { InviteCode } from "../../domain/models/invite-code.js";
 
 export class InMemoryInviteCodeRepository implements IInviteCodeRepository {
   private inviteCodes: Map<string, InviteCode> = new Map();
