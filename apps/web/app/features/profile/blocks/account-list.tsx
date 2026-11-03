@@ -41,7 +41,7 @@ export function AccountList<T extends Account>({
             "
           >
             <Link
-              to={`/profile/${profileId}`}
+              to={`/${profileId}`}
               className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3"
             >
               <Avatar src={account.avatarUrl} />
@@ -72,7 +72,7 @@ export function AccountList<T extends Account>({
                 <BackfillStatusBadge status={account.backfillStatus} />
               )}
               {account.registeredFollowersCount !== undefined && (
-                <Link to={`/profile/${profileId}/followers?filter=registered`}>
+                <Link to={`/${profileId}/followers?filter=registered`}>
                   <Badge>
                     {account.registeredFollowersCount}人からフォロー
                   </Badge>

@@ -2,8 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { createRecord } from "../../helpers/pds";
 
-const threadPath = (uri: string) =>
-  `/profile/alice.test/post/${uri.split("/").pop()}`;
+const threadPath = (uri: string) => `/alice.test/post/${uri.split("/").pop()}`;
 
 const post = (text: string, parent?: { uri: string; cid: string }) =>
   createRecord("alice.test", "app.bsky.feed.post", {
@@ -38,7 +37,7 @@ test.describe("スレッド", () => {
     }).toPass();
     await article.getByRole("link", { name: "スレッドを開く" }).click();
 
-    await expect(page).toHaveURL(/\/profile\/alice\.test\/post\/\w+$/);
+    await expect(page).toHaveURL(/\/alice\.test\/post\/\w+$/);
     await expect(
       page.getByRole("region", { name: "スレッド" }).getByText(text),
     ).toBeVisible();
@@ -64,7 +63,7 @@ test.describe("スレッド", () => {
     ]);
   });
 
-  test("thread-3: /profile/ハンドル/post/rkey を開くと、その投稿のスレッドを表示する", async ({
+  test("thread-3: /ハンドル/post/rkey を開くと、その投稿のスレッドを表示する", async ({
     page,
   }) => {
     const text = "thread-3: 投稿";

@@ -3,7 +3,7 @@ import { data } from "react-router";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { FollowListPage } from "@/app/pages/client/follow-list-page";
 
-import type { Route } from "./+types/profile.$handle_.$kind";
+import type { Route } from "./+types/$handle_.$kind";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
