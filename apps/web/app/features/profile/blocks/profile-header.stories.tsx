@@ -24,3 +24,13 @@ export const BackfillInProgress: StoryObj<typeof meta> = {
 export const BackfillError: StoryObj<typeof meta> = {
   args: { backfillStatus: "error" },
 };
+
+export const Loading: StoryObj<typeof meta> = {
+  args: {
+    loading: true,
+    displayName: undefined,
+    description: undefined,
+    followsCount: undefined,
+    followersCount: undefined,
+  },
+};

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
-import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { Tabs } from "@/app/components/ui/tabs";
+import { PostsSkeleton } from "@/app/features/profile/parts/posts-skeleton";
 import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
@@ -41,6 +41,7 @@ export function ProfileContainer({ handle }: Props) {
   return (
     <>
       <ProfileHeader
+        loading={!data}
         displayName={profile?.displayName}
         handle={profile?.handle ?? handle}
         avatarUrl={profile?.avatar}
@@ -73,7 +74,7 @@ export function ProfileContainer({ handle }: Props) {
         // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
         <TimelineFeed posts={data.posts} />
       ) : (
-        <LoadingSpinner label="読み込み中" />
+        <PostsSkeleton />
       )}
     </>
   );

@@ -4,9 +4,11 @@ import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
+import { Skeleton } from "@/app/components/ui/skeleton";
 import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
 
 type Props = {
+  loading?: boolean;
   displayName?: string;
   handle: string;
   avatarUrl?: string;
@@ -19,6 +21,7 @@ type Props = {
 };
 
 export function ProfileHeader({
+  loading,
   displayName,
   handle,
   avatarUrl,
@@ -61,12 +64,24 @@ export function ProfileHeader({
           {action}
         </div>
         <div className="min-w-0">
-          <h1 className="truncate text-title">{displayName || handle}</h1>
+          <h1 className="truncate text-title">
+            {loading ? (
+              <Skeleton className="h-5 w-40 align-middle" />
+            ) : (
+              displayName || handle
+            )}
+          </h1>
           <div className="flex items-center gap-2">
             <p className="truncate text-label text-muted">@{handle}</p>
             {backfillStatus && <BackfillStatusBadge status={backfillStatus} />}
           </div>
         </div>
+        {loading && (
+          <div className="flex flex-col gap-2 py-1">
+            <Skeleton className="h-3.5 w-full" />
+            <Skeleton className="h-3.5 w-2/3" />
+          </div>
+        )}
         {description && (
           <p className="text-body wrap-break-word whitespace-pre-wrap">
             {description}
@@ -74,13 +89,17 @@ export function ProfileHeader({
         )}
         <div className="flex gap-4 text-label text-muted">
           <Link to={`/profile/${handle}/follows`} className="hover:underline">
-            {followsCount !== undefined && (
+            {loading ? (
+              <Skeleton className="h-3.5 w-7 align-middle" />
+            ) : (
               <b className="text-ink">{followsCount}</b>
             )}{" "}
             フォロー
           </Link>
           <Link to={`/profile/${handle}/followers`} className="hover:underline">
-            {followersCount !== undefined && (
+            {loading ? (
+              <Skeleton className="h-3.5 w-7 align-middle" />
+            ) : (
               <b className="text-ink">{followersCount}</b>
             )}{" "}
             フォロワー
