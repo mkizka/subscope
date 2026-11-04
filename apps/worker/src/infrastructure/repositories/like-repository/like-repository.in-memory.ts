@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
+import type { Like } from "../../../application/dto/like.js";
 import type { ILikeRepository } from "../../../application/interfaces/repositories/like-repository.js";
-import type { Like } from "../../../application/models/like.js";
 
 export class InMemoryLikeRepository implements ILikeRepository {
   private likes: Map<string, Like> = new Map();

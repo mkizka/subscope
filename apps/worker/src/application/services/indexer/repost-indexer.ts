@@ -1,16 +1,16 @@
 import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
 
+import { feedItemFromRepost } from "../../dto/feed-item.js";
+import type { Record } from "../../dto/record.js";
+import { parseRepost } from "../../dto/repost.js";
+import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import { feedItemFromRepost } from "../../models/feed-item.js";
-import type { Record } from "../../models/record.js";
-import { parseRepost } from "../../models/repost.js";
-import { getSortAt } from "../../models/sort-at.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(

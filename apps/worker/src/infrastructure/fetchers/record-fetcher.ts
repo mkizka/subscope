@@ -5,11 +5,11 @@ import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
 import { DidNotFoundError } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
+import type { Record } from "../../application/dto/record.js";
 import {
   type IRecordFetcher,
   RecordFetchError,
 } from "../../application/interfaces/external/record-fetcher.js";
-import type { Record } from "../../application/models/record.js";
 
 const UNRECOVERABLE_ERRORS = new Set([
   "RecordNotFound",

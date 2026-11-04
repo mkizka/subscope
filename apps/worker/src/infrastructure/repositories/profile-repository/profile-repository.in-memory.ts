@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
+import type { Profile } from "../../../application/dto/profile.js";
 import type { IProfileRepository } from "../../../application/interfaces/repositories/profile-repository.js";
-import type { Profile } from "../../../application/models/profile.js";
 
 export class InMemoryProfileRepository implements IProfileRepository {
   private profiles: Map<string, Profile> = new Map();

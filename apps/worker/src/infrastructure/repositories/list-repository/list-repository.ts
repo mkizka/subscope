@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
+import type { List } from "../../../application/dto/list.js";
 import type { IListRepository } from "../../../application/interfaces/repositories/list-repository.js";
-import type { List } from "../../../application/models/list.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ListRepository implements IListRepository {

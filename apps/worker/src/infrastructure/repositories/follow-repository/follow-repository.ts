@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
+import type { Follow } from "../../../application/dto/follow.js";
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
-import type { Follow } from "../../../application/models/follow.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FollowRepository implements IFollowRepository {

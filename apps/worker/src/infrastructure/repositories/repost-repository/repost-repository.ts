@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
+import type { Repost } from "../../../application/dto/repost.js";
 import type { IRepostRepository } from "../../../application/interfaces/repositories/repost-repository.js";
-import type { Repost } from "../../../application/models/repost.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class RepostRepository implements IRepostRepository {

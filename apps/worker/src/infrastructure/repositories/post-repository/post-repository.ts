@@ -3,13 +3,13 @@ import type { TransactionContext } from "@repo/common/domain";
 import { type PostInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
-import type { IPostRepository } from "../../../application/interfaces/repositories/post-repository.js";
 import type {
   EmbedImage,
   EmbedMedia,
   Post,
   PostEmbed,
-} from "../../../application/models/post.js";
+} from "../../../application/dto/post.js";
+import type { IPostRepository } from "../../../application/interfaces/repositories/post-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class PostRepository implements IPostRepository {

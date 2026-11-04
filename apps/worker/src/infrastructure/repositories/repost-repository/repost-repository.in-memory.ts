@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
+import type { Repost } from "../../../application/dto/repost.js";
 import type { IRepostRepository } from "../../../application/interfaces/repositories/repost-repository.js";
-import type { Repost } from "../../../application/models/repost.js";
 
 export class InMemoryRepostRepository implements IRepostRepository {
   private reposts: Map<string, Repost> = new Map();

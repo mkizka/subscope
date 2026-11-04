@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
+import type { FeedItem } from "../../../application/dto/feed-item.js";
 import type { IFeedItemRepository } from "../../../application/interfaces/repositories/feed-item-repository.js";
-import type { FeedItem } from "../../../application/models/feed-item.js";
 
 export class InMemoryFeedItemRepository implements IFeedItemRepository {
   private feedItems: Map<string, FeedItem> = new Map();

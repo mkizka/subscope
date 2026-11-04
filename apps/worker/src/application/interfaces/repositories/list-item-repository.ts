@@ -1,6 +1,6 @@
 import type { TransactionContext } from "@repo/common/domain";
 
-import type { ListItem } from "../../models/list-item.js";
+import type { ListItem } from "../../dto/list-item.js";
 
 export interface IListItemRepository {
   save: (params: {

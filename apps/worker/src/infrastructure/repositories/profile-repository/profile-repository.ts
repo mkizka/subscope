@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
+import type { Profile } from "../../../application/dto/profile.js";
 import type { IProfileRepository } from "../../../application/interfaces/repositories/profile-repository.js";
-import type { Profile } from "../../../application/models/profile.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ProfileRepository implements IProfileRepository {

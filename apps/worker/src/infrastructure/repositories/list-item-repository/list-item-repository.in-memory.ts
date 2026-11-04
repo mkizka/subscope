@@ -1,8 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
+import type { ListItem } from "../../../application/dto/list-item.js";
 import type { IListItemRepository } from "../../../application/interfaces/repositories/list-item-repository.js";
-import type { ListItem } from "../../../application/models/list-item.js";
 
 export class InMemoryListItemRepository implements IListItemRepository {
   private listItems: Map<string, ListItem> = new Map();
