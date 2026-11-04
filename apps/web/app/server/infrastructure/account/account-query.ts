@@ -14,7 +14,7 @@ import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
 import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import {
   type TimelinePostDto,
   toTimelinePost,
