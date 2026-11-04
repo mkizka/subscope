@@ -1,10 +1,8 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 
+import type { ListDto } from "@/app/server/application/dto/list";
+import type { IListQuery } from "@/app/server/application/interfaces/list-query";
 import type { IAccountQuery } from "@/app/server/infrastructure/account/account-query";
-import type {
-  IListQuery,
-  ListDto,
-} from "@/app/server/infrastructure/list/list-query";
 
 export interface IGetListsPageUseCase {
   execute: (
