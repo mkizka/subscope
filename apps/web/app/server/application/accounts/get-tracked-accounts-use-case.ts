@@ -1,8 +1,6 @@
+import type { TrackedAccountsDto } from "@/app/server/application/dto/tracked-accounts-dto";
+import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
 import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
-import type {
-  ISubscopeQuery,
-  TrackedAccountsDto,
-} from "@/app/server/infrastructure/subscope/subscope-query";
 
 export interface IGetTrackedAccountsUseCase {
   execute: (did: string, q?: string) => Promise<TrackedAccountsDto>;

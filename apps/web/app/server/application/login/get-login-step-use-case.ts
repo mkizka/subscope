@@ -1,4 +1,4 @@
-import type { ISubscopeQuery } from "@/app/server/infrastructure/subscope/subscope-query";
+import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
 
 export interface IGetLoginStepUseCase {
   execute: (
