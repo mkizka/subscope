@@ -18,56 +18,12 @@ import getRegistrationStatus, {
   registered,
 } from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
+import type {
+  TextLinkDto,
+  TimelinePostDto,
+} from "@/app/server/application/dto/timeline-post-dto";
+import type { ITimelineQuery } from "@/app/server/application/interfaces/timeline-query";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-type TextLinkDto = {
-  byteStart: number;
-  byteEnd: number;
-  uri?: string;
-  did?: string;
-};
-
-export type TimelinePostDto = {
-  uri: string;
-  cid: string;
-  viewerLike?: string;
-  viewerRepost?: string;
-  replyRoot?: { uri: string; cid: string };
-  replyParentUri?: string;
-  authorAvatar?: string;
-  authorDisplayName?: string;
-  authorHandle: string;
-  text?: string;
-  links?: TextLinkDto[];
-  replyCount?: number;
-  repostCount?: number;
-  likeCount?: number;
-  createdAt?: string;
-  images?: { thumb: string; fullsize: string; alt: string }[];
-  external?: {
-    uri: string;
-    title: string;
-    description: string;
-    thumb?: string;
-  };
-  quote?: {
-    authorAvatar?: string;
-    authorDisplayName?: string;
-    authorHandle: string;
-    text?: string;
-    images?: { thumb: string; fullsize: string; alt: string }[];
-  };
-  reasonRepost?: { byDisplayName?: string; byHandle: string };
-};
-
-export interface ITimelineQuery {
-  isRegistered: (did: string) => Promise<boolean>;
-  findPosts: (
-    did: string,
-    cursor?: string,
-  ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
-  searchPosts: (did: string, q: string) => Promise<TimelinePostDto[]>;
-}
 
 export const timelineQueryFactory = ({
   oauthClient,

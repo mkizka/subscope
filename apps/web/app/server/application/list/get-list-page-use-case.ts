@@ -1,12 +1,12 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import type {
   IListQuery,
   ListDto,
   ListMemberDto,
 } from "@/app/server/infrastructure/list/list-query";
-import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export interface IGetListPageUseCase {
   execute: (

@@ -1,5 +1,5 @@
 import type { BackfillStatus } from "@/app/lib/backfill-status";
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 
 export type BackfillStatusDto = {
   status: BackfillStatus;

@@ -5,11 +5,9 @@ import {
 } from "@repo/client/lex/app/bsky/feed/defs";
 import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-import {
-  type TimelinePostDto,
-  toTimelinePost,
-} from "@/app/server/infrastructure/timeline/timeline-query";
+import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export interface IThreadQuery {
   findThread: (

@@ -1,4 +1,4 @@
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import type {
   ISubscopeQuery,
   MembersDto,

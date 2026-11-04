@@ -1,12 +1,10 @@
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
+import type { ITimelineQuery } from "@/app/server/application/interfaces/timeline-query";
 import type {
   AccountDto,
   IAccountQuery,
 } from "@/app/server/infrastructure/account/account-query";
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
-import type {
-  ITimelineQuery,
-  TimelinePostDto,
-} from "@/app/server/infrastructure/timeline/timeline-query";
 
 export interface ISearchUseCase {
   execute: (

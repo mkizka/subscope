@@ -5,10 +5,10 @@ import getList from "@repo/client/lex/app/bsky/graph/getList";
 import getLists from "@repo/client/lex/app/bsky/graph/getLists";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 import {
   isShownInFeed,
-  type TimelinePostDto,
   toTimelinePost,
 } from "@/app/server/infrastructure/timeline/timeline-query";
 

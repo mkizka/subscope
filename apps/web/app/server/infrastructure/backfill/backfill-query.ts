@@ -3,16 +3,11 @@ import { isValidDid } from "@atproto/syntax";
 import getBackfillStatuses from "@repo/client/lex/me/subsco/sync/getBackfillStatuses";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import { env } from "@/app/server/env";
 
 const isBackfillStatus = (status: string): status is BackfillStatus =>
   status === "inProgress" || status === "completed" || status === "error";
-
-export interface IBackfillQuery {
-  findTrackedStatuses: (
-    dids: string[],
-  ) => Promise<Record<string, BackfillStatus>>;
-}
 
 export const backfillQueryFactory = (): IBackfillQuery => {
   const publicClient = new Client(env.APPVIEW_URL);
