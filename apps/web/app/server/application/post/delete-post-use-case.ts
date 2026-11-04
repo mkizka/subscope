@@ -1,7 +1,7 @@
 import { setTimeout } from "node:timers/promises";
 
-import type { IPostCommand } from "@/app/server/infrastructure/post/post-command";
-import type { IPostQuery } from "@/app/server/infrastructure/post/post-query";
+import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
+import type { IPostQuery } from "@/app/server/application/interfaces/post-query";
 
 export interface IDeletePostUseCase {
   execute: (did: string, uri: string) => Promise<void>;

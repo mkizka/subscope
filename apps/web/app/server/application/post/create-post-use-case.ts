@@ -1,10 +1,8 @@
 import { setTimeout } from "node:timers/promises";
 
-import type {
-  IPostCommand,
-  NewPost,
-} from "@/app/server/infrastructure/post/post-command";
-import type { IPostQuery } from "@/app/server/infrastructure/post/post-query";
+import type { NewPost } from "@/app/server/application/dto/new-post";
+import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
+import type { IPostQuery } from "@/app/server/application/interfaces/post-query";
 
 export interface ICreatePostUseCase {
   execute: (did: string, post: NewPost) => Promise<string>;
