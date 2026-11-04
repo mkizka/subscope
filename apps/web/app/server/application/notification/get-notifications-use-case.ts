@@ -1,6 +1,6 @@
 import type { Notification } from "@repo/client/lex/app/bsky/notification/listNotifications";
 
-import type { INotificationQuery } from "@/app/server/infrastructure/notification/notification-query";
+import type { INotificationQuery } from "@/app/server/application/interfaces/notification-query";
 
 export interface IGetNotificationsUseCase {
   execute: (
