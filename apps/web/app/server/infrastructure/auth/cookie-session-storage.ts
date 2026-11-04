@@ -1,5 +1,6 @@
 import { createCookieSessionStorage } from "react-router";
 
+import type { ICookieSessionStorage } from "@/app/server/application/interfaces/cookie-session-storage";
 import { env } from "@/app/server/env";
 
 const storage = createCookieSessionStorage<{ did: string }>({
@@ -12,13 +13,6 @@ const storage = createCookieSessionStorage<{ did: string }>({
     sameSite: "lax",
   },
 });
-
-export interface ICookieSessionStorage {
-  getDid: (cookieHeader: string | null) => Promise<string | null>;
-  // 戻り値は Set-Cookie ヘッダーの値
-  commit: (cookieHeader: string | null, did: string) => Promise<string>;
-  destroy: (cookieHeader: string | null) => Promise<string>;
-}
 
 export const cookieSessionStorageFactory = (): ICookieSessionStorage => ({
   async getDid(cookieHeader) {

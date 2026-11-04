@@ -3,7 +3,7 @@ import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCoun
 import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
 
 import type { INotificationQuery } from "@/app/server/application/interfaces/notification-query";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export const notificationQueryFactory = ({
   oauthClient,

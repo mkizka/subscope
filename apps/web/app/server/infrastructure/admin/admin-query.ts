@@ -8,7 +8,7 @@ import listRegisteredAccounts, {
   type $OutputBody as ListRegisteredAccountsOutput,
 } from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export interface IAdminQuery {
   listRegisteredAccounts: (

@@ -21,11 +21,9 @@ Lexicon定義ファイルは手動で作成しないでください。
 
 - `packages/db/src/schema.ts` にテーブルを追加し、マイグレーションを作成
 
-### 3. ドメインモデル
+### 3. DTO
 
-- `packages/common/src/lib/domain/{record-type}/{record-type}.ts` にドメインモデル（`Follow.from(record)`のようなファクトリ）を作成
-- テスト用ファクトリ `{record-type}.factory.ts` を作成
-- `packages/common/src/domain.ts` と `packages/common/src/test.ts` からexport
+- `apps/worker/src/application/dto/{record-type}.ts` に、DBに依存しないプレーンな型と、Tapのレコードから変換する `parse{RecordType}(record)` を作成
 - `packages/common/src/lib/utils/collection.ts` の`SupportedCollectionMap`と`SUPPORTED_COLLECTIONS`に追加
 
 ### 4. Repository

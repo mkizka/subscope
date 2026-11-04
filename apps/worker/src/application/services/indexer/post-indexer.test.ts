@@ -8,8 +8,8 @@ import {
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
-import { postFactory } from "../../models/post.factory.js";
-import { recordFactory } from "../../models/record.factory.js";
+import { postFactory } from "../../dto/post.factory.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("PostIndexer", () => {
   let postIndexer: TestServices["postIndexer"];

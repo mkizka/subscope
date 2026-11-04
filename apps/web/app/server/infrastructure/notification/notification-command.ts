@@ -1,7 +1,7 @@
 import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
 
 import type { INotificationCommand } from "@/app/server/application/interfaces/notification-command";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export const notificationCommandFactory = ({
   oauthClient,

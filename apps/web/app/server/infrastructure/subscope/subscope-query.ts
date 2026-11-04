@@ -6,9 +6,9 @@ import getRegistrationStatus, {
   registered,
 } from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
 import { env } from "@/app/server/env";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export const subscopeQueryFactory = ({
   oauthClient,

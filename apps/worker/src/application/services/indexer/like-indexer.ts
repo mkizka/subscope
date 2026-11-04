@@ -1,12 +1,13 @@
 import { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
 
+import { parseLike } from "../../dto/like.js";
+import type { Record } from "../../dto/record.js";
+import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { Record } from "../../models/record.js";
-import { parseLike, sortAt } from "../../record-parsers.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
@@ -50,7 +51,7 @@ export class LikeIndexer implements ICollectionIndexer {
             authorDid: like.accountDid,
             reason: "like",
             reasonSubject: like.subjectUri,
-            sortAt: sortAt(like),
+            sortAt: getSortAt(like),
           },
         ],
       });

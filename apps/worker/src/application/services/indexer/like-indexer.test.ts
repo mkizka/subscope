@@ -8,7 +8,7 @@ import {
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
-import { recordFactory } from "../../models/record.factory.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("LikeIndexer", () => {
   let likeIndexer: TestServices["likeIndexer"];

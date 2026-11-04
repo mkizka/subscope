@@ -2,8 +2,8 @@ import { XrpcResponseError } from "@atproto/lex";
 import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
 import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
 
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { ISubscopeCommand } from "@/app/server/application/interfaces/subscope-command";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export const subscopeCommandFactory = ({
   oauthClient,

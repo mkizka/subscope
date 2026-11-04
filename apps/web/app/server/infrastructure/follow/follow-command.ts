@@ -1,7 +1,7 @@
 import { AtUri, currentDatetimeString } from "@atproto/syntax";
 import follow from "@repo/client/lex/app/bsky/graph/follow";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export interface IFollowCommand {
   create: (did: string, subject: `did:${string}:${string}`) => Promise<string>;

@@ -6,9 +6,9 @@ import {
   type SupportedCollection,
 } from "@repo/common/utils";
 
+import type { Record } from "../dto/record.js";
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
-import type { Record } from "../models/record.js";
 import type { IndexAccountService } from "./index-account-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";
