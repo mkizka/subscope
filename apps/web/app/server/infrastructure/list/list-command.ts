@@ -6,7 +6,7 @@ import {
 import list from "@repo/client/lex/app/bsky/graph/list";
 import listitem from "@repo/client/lex/app/bsky/graph/listitem";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 type ListInput = { name: string; description?: string };
 

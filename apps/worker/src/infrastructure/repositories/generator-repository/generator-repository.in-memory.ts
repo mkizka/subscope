@@ -1,12 +1,12 @@
 import type { TransactionContext } from "@repo/common/domain";
 
+import type { Generator } from "../../../application/dto/generator.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
-import type { GeneratorRow } from "../../../application/record-parsers.js";
 
 export class InMemoryGeneratorRepository implements IGeneratorRepository {
-  private generators: Map<string, GeneratorRow> = new Map();
+  private generators: Map<string, Generator> = new Map();
 
-  add(generator: GeneratorRow): void {
+  add(generator: Generator): void {
     this.generators.set(generator.uri, generator);
   }
 
@@ -18,7 +18,7 @@ export class InMemoryGeneratorRepository implements IGeneratorRepository {
     generator,
   }: {
     ctx: TransactionContext;
-    generator: GeneratorRow;
+    generator: Generator;
   }): Promise<void> {
     this.generators.set(generator.uri, generator);
   }

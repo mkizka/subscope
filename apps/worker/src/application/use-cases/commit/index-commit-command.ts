@@ -1,6 +1,6 @@
 import type { AtUri } from "@atproto/syntax";
 
-import type { Record } from "../../models/record.js";
+import type { Record } from "../../dto/record.js";
 
 export type IndexCommitCommand = {
   commit:

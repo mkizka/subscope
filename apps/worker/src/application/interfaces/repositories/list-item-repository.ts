@@ -1,10 +1,10 @@
 import type { TransactionContext } from "@repo/common/domain";
 
-import type { ListItemRow } from "../../record-parsers.js";
+import type { ListItem } from "../../dto/list-item.js";
 
 export interface IListItemRepository {
   save: (params: {
     ctx: TransactionContext;
-    listItem: ListItemRow;
+    listItem: ListItem;
   }) => Promise<void>;
 }

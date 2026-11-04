@@ -1,12 +1,12 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
+import type { List } from "../../../application/dto/list.js";
 import type { IListRepository } from "../../../application/interfaces/repositories/list-repository.js";
-import type { ListRow } from "../../../application/record-parsers.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class ListRepository implements IListRepository {
-  async save({ ctx, list }: { ctx: TransactionContext; list: ListRow }) {
+  async save({ ctx, list }: { ctx: TransactionContext; list: List }) {
     const { uri, indexedAt, ...rest } = list;
     const data = {
       ...rest,

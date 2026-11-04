@@ -5,7 +5,7 @@ import {
 } from "@repo/client/lex/app/bsky/feed/defs";
 import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import {
   type TimelinePostDto,
   toTimelinePost,

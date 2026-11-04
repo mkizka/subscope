@@ -12,7 +12,7 @@ import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
 import type { AccountDto } from "@/app/server/application/dto/account";
 import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-query";
 
 const filters = {
