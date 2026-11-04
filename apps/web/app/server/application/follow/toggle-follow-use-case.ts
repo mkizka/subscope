@@ -1,4 +1,4 @@
-import type { IFollowCommand } from "@/app/server/infrastructure/follow/follow-command";
+import type { IFollowCommand } from "@/app/server/application/interfaces/follow-command";
 
 export interface IToggleFollowUseCase {
   execute: (

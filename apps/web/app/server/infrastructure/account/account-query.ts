@@ -1,8 +1,5 @@
-import { type AtIdentifierString, isAtIdentifierString } from "@atproto/syntax";
-import type {
-  ProfileView,
-  ProfileViewDetailed,
-} from "@repo/client/lex/app/bsky/actor/defs";
+import { isAtIdentifierString } from "@atproto/syntax";
+import type { ProfileView } from "@repo/client/lex/app/bsky/actor/defs";
 import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
 import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
 import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
@@ -13,35 +10,16 @@ import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
 import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
 import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
-import type { BackfillStatus } from "@/app/lib/backfill-status";
+import type { AccountDto } from "@/app/server/application/dto/account";
+import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
-import {
-  type TimelinePostDto,
-  toTimelinePost,
-} from "@/app/server/infrastructure/timeline/timeline-query";
-
-export type ProfileTab = "posts" | "replies" | "media" | "likes";
+import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-query";
 
 const filters = {
   posts: "posts_and_author_threads",
   replies: "posts_with_replies",
   media: "posts_with_media",
 } as const;
-
-export type AccountDto = {
-  did: string;
-  handle: string;
-  displayName?: string;
-  avatarUrl?: string;
-  description?: string;
-  backfillStatus?: BackfillStatus;
-};
-
-export type FollowListDto = {
-  subject: AccountDto;
-  accounts: AccountDto[];
-  registeredCount?: number;
-};
 
 const withReplyParents = (feed: FeedViewPost[]) => {
   const seen = new Set(feed.map(({ post }) => post.uri));
@@ -67,26 +45,6 @@ const toAccount = (
   avatarUrl: profile.avatar,
   description: profile.description,
 });
-
-export interface IAccountQuery {
-  findProfile: (
-    did: string,
-    account: AtIdentifierString,
-  ) => Promise<ProfileViewDetailed>;
-  findPosts: (
-    did: string,
-    account: AtIdentifierString,
-    tab: ProfileTab,
-  ) => Promise<TimelinePostDto[]>;
-  findFollowList: (
-    did: string,
-    account: AtIdentifierString,
-    kind: "follows" | "followers",
-  ) => Promise<FollowListDto>;
-  findProfiles: (did: string, dids: string[]) => Promise<AccountDto[]>;
-  isAdmin: (did: string) => Promise<boolean>;
-  searchActors: (did: string, q: string) => Promise<AccountDto[]>;
-}
 
 export const accountQueryFactory = ({
   oauthClient,

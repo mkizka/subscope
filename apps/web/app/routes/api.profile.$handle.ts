@@ -3,8 +3,8 @@ import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
+import type { ProfileTab } from "@/app/server/application/dto/account";
 import { di } from "@/app/server/di";
-import type { ProfileTab } from "@/app/server/infrastructure/account/account-query";
 
 import type { Route } from "./+types/api.profile.$handle";
 
