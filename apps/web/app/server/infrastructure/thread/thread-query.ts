@@ -5,7 +5,7 @@ import {
 import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 
 import type { IThreadQuery } from "@/app/server/application/interfaces/thread-query";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export const threadQueryFactory = ({

@@ -1,11 +1,12 @@
 import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
 
+import { parseFollow } from "../../dto/follow.js";
+import type { Record } from "../../dto/record.js";
+import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import type { Record } from "../../models/record.js";
-import { parseFollow, sortAt } from "../../record-parsers.js";
 import type { IndexAccountService } from "../index-account-service.js";
 
 export class FollowIndexer implements ICollectionIndexer {
@@ -55,7 +56,7 @@ export class FollowIndexer implements ICollectionIndexer {
             authorDid: follow.accountDid,
             reason: "follow",
             reasonSubject: null,
-            sortAt: sortAt(follow),
+            sortAt: getSortAt(follow),
           },
         ],
       });

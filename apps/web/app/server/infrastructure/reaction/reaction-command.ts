@@ -3,7 +3,7 @@ import like from "@repo/client/lex/app/bsky/feed/like";
 import repost from "@repo/client/lex/app/bsky/feed/repost";
 
 import type { IReactionCommand } from "@/app/server/application/interfaces/reaction-command";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 const schemas = { like, repost };
 

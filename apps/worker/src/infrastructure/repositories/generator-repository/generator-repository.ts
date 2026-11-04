@@ -1,8 +1,8 @@
 import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
+import type { Generator } from "../../../application/dto/generator.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
-import type { GeneratorRow } from "../../../application/record-parsers.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class GeneratorRepository implements IGeneratorRepository {
@@ -11,7 +11,7 @@ export class GeneratorRepository implements IGeneratorRepository {
     generator,
   }: {
     ctx: TransactionContext;
-    generator: GeneratorRow;
+    generator: Generator;
   }) {
     const { uri, indexedAt, ...rest } = generator;
     const data = {
