@@ -1,7 +1,5 @@
-import type {
-  AccountDto,
-  IAccountQuery,
-} from "@/app/server/infrastructure/account/account-query";
+import type { AccountDto } from "@/app/server/application/dto/account";
+import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
 import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 import type {
   ITimelineQuery,
