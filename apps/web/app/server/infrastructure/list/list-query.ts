@@ -5,7 +5,7 @@ import getList from "@repo/client/lex/app/bsky/graph/getList";
 import getLists from "@repo/client/lex/app/bsky/graph/getLists";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import {
   isShownInFeed,
   type TimelinePostDto,

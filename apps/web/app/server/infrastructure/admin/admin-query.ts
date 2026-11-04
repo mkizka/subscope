@@ -3,7 +3,7 @@ import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
 import listRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 
 import type { IAdminQuery } from "@/app/server/application/interfaces/admin-query";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export const adminQueryFactory = ({
   oauthClient,

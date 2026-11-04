@@ -1,6 +1,6 @@
 import type { ILoggerManager } from "@repo/common/domain";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { ISubscopeCommand } from "@/app/server/infrastructure/subscope/subscope-command";
 import type { ISubscopeQuery } from "@/app/server/infrastructure/subscope/subscope-query";
 

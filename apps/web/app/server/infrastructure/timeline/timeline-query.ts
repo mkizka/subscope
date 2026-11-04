@@ -18,7 +18,7 @@ import getRegistrationStatus, {
   registered,
 } from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 type TextLinkDto = {
   byteStart: number;

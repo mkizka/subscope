@@ -51,10 +51,6 @@ export type Post = {
   indexedAt: Date;
 };
 
-export function getSortAt(post: Pick<Post, "createdAt" | "indexedAt">) {
-  return post.indexedAt < post.createdAt ? post.indexedAt : post.createdAt;
-}
-
 /**
  * embedのURIがインデックス可能なコレクションの場合そのURIを返す。
  * アプリケーション層でPostのインデックス時にこのURIのレコードもインデックスする。

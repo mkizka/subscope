@@ -5,7 +5,7 @@ import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
 import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
 
 import type { IAdminCommand } from "@/app/server/application/interfaces/admin-command";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export const adminCommandFactory = ({
   oauthClient,

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { afterCommit, testRegistry } from "../../../shared/test-utils.js";
-import { recordFactory } from "../../models/record.factory.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("ListItemIndexer", () => {
   test("リスト項目レコードを保存し、対象アカウントを作成する", async () => {
