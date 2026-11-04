@@ -2,7 +2,7 @@ import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
 import like from "@repo/client/lex/app/bsky/feed/like";
 import repost from "@repo/client/lex/app/bsky/feed/repost";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 type ReactionType = "like" | "repost";
 

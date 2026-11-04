@@ -7,8 +7,8 @@ import getRegistrationStatus, {
 } from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { env } from "@/app/server/env";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export type MembersDto = {
   registeredAccounts: {
