@@ -1,26 +1,9 @@
-import {
-  AtUri,
-  type AtUriString,
-  currentDatetimeString,
-} from "@atproto/syntax";
+import { AtUri, currentDatetimeString } from "@atproto/syntax";
 import list from "@repo/client/lex/app/bsky/graph/list";
 import listitem from "@repo/client/lex/app/bsky/graph/listitem";
 
+import type { IListCommand } from "@/app/server/application/interfaces/list-command";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
-
-type ListInput = { name: string; description?: string };
-
-export interface IListCommand {
-  create: (did: string, input: ListInput) => Promise<void>;
-  update: (did: string, rkey: string, input: ListInput) => Promise<void>;
-  addMember: (
-    did: string,
-    listUri: AtUriString,
-    subject: `did:${string}:${string}`,
-  ) => Promise<void>;
-  removeMember: (did: string, listItemUri: string) => Promise<void>;
-  delete: (did: string, rkey: string) => Promise<void>;
-}
 
 export const listCommandFactory = ({
   oauthClient,

@@ -6,41 +6,9 @@ import getRegistrationStatus, {
   registered,
 } from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
 
-import type { BackfillStatus } from "@/app/lib/backfill-status";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
+import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
 import { env } from "@/app/server/env";
-
-export type MembersDto = {
-  registeredAccounts: {
-    did: string;
-    handle: string;
-    displayName?: string;
-    avatarUrl?: string;
-    description?: string;
-    isAdmin: boolean;
-    backfillStatus?: BackfillStatus;
-  }[];
-  hasMore: boolean;
-};
-
-export type TrackedAccountsDto = {
-  total: number;
-  accounts: {
-    did: string;
-    handle: string;
-    displayName?: string;
-    avatarUrl?: string;
-    registeredFollowersCount: number;
-    backfillStatus?: BackfillStatus;
-  }[];
-};
-
-export interface ISubscopeQuery {
-  isInitialized: () => Promise<boolean>;
-  isRegistered: (did: string) => Promise<boolean>;
-  findMembers: (q?: string) => Promise<MembersDto>;
-  findTrackedAccounts: (did: string, q?: string) => Promise<TrackedAccountsDto>;
-}
 
 export const subscopeQueryFactory = ({
   oauthClient,

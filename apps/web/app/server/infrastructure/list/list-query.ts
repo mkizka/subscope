@@ -1,48 +1,16 @@
-import { type AtIdentifierString, AtUri } from "@atproto/syntax";
+import { AtUri } from "@atproto/syntax";
 import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
 import type { ListView } from "@repo/client/lex/app/bsky/graph/defs";
 import getList from "@repo/client/lex/app/bsky/graph/getList";
 import getLists from "@repo/client/lex/app/bsky/graph/getLists";
 
-import type { BackfillStatus } from "@/app/lib/backfill-status";
-import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
+import type { ListDto } from "@/app/server/application/dto/list";
+import type { IListQuery } from "@/app/server/application/interfaces/list-query";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import {
   isShownInFeed,
   toTimelinePost,
 } from "@/app/server/infrastructure/timeline/timeline-query";
-
-export type ListDto = {
-  uri: ListView["uri"];
-  rkey: string;
-  creatorDid: string;
-  name: string;
-  description?: string;
-  avatarUrl?: string;
-};
-
-export type ListMemberDto = {
-  listItemUri: string;
-  did: string;
-  handle: string;
-  displayName?: string;
-  avatarUrl?: string;
-  description?: string;
-  backfillStatus?: BackfillStatus;
-};
-
-export interface IListQuery {
-  findLists: (did: string, account: AtIdentifierString) => Promise<ListDto[]>;
-  findList: (
-    did: string,
-    account: AtIdentifierString,
-    rkey: string,
-  ) => Promise<{ list: ListDto; members: ListMemberDto[] }>;
-  findPosts: (
-    did: string,
-    listUri: ListDto["uri"],
-  ) => Promise<TimelinePostDto[]>;
-}
 
 const toList = (list: ListView): ListDto => ({
   uri: list.uri,

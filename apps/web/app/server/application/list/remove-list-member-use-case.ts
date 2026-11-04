@@ -1,4 +1,4 @@
-import type { IListCommand } from "@/app/server/infrastructure/list/list-command";
+import type { IListCommand } from "@/app/server/application/interfaces/list-command";
 
 export interface IRemoveListMemberUseCase {
   execute: IListCommand["removeMember"];

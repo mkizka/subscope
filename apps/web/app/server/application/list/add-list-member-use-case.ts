@@ -1,7 +1,7 @@
 import type { AtIdentifierString, AtUriString } from "@atproto/syntax";
 
 import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
-import type { IListCommand } from "@/app/server/infrastructure/list/list-command";
+import type { IListCommand } from "@/app/server/application/interfaces/list-command";
 
 export interface IAddListMemberUseCase {
   execute: (
