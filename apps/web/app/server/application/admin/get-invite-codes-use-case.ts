@@ -1,4 +1,4 @@
-import type { IAdminQuery } from "@/app/server/infrastructure/admin/admin-query";
+import type { IAdminQuery } from "@/app/server/application/interfaces/admin-query";
 
 export const getInviteCodesUseCaseFactory =
   ({ adminQuery }: { adminQuery: IAdminQuery }) =>

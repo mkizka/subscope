@@ -1,21 +1,11 @@
-import type { DidString } from "@atproto/syntax";
 import banAccount from "@repo/client/lex/me/subsco/admin/banAccount";
-import createInviteCode, {
-  type $OutputBody as CreateInviteCodeOutput,
-} from "@repo/client/lex/me/subsco/admin/createInviteCode";
+import createInviteCode from "@repo/client/lex/me/subsco/admin/createInviteCode";
 import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
 import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
 import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
 
+import type { IAdminCommand } from "@/app/server/application/interfaces/admin-command";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-export interface IAdminCommand {
-  banAccount: (did: string, target: DidString) => Promise<void>;
-  grantAdmin: (did: string, target: DidString) => Promise<void>;
-  unbanAccount: (did: string, target: DidString) => Promise<void>;
-  createInviteCode: (did: string) => Promise<CreateInviteCodeOutput>;
-  deleteInviteCode: (did: string, code: string) => Promise<void>;
-}
 
 export const adminCommandFactory = ({
   oauthClient,
