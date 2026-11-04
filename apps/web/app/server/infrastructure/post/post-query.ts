@@ -1,11 +1,8 @@
 import { asAtUriString } from "@atproto/syntax";
 import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
 
+import type { IPostQuery } from "@/app/server/application/interfaces/post-query";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-export interface IPostQuery {
-  exists: (did: string, uri: string) => Promise<boolean>;
-}
 
 export const postQueryFactory = ({
   oauthClient,

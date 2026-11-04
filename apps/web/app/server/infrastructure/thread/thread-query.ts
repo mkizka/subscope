@@ -1,26 +1,12 @@
-import type { AtUriString } from "@atproto/syntax";
 import {
   type ThreadViewPost,
   threadViewPost,
 } from "@repo/client/lex/app/bsky/feed/defs";
 import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
 
+import type { IThreadQuery } from "@/app/server/application/interfaces/thread-query";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-import {
-  type TimelinePostDto,
-  toTimelinePost,
-} from "@/app/server/infrastructure/timeline/timeline-query";
-
-export interface IThreadQuery {
-  findThread: (
-    did: string,
-    uri: AtUriString,
-  ) => Promise<{
-    ancestors: TimelinePostDto[];
-    post: TimelinePostDto;
-    replies: TimelinePostDto[][];
-  } | null>;
-}
+import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export const threadQueryFactory = ({
   oauthClient,

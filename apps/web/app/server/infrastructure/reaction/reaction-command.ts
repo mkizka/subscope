@@ -2,18 +2,8 @@ import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
 import like from "@repo/client/lex/app/bsky/feed/like";
 import repost from "@repo/client/lex/app/bsky/feed/repost";
 
+import type { IReactionCommand } from "@/app/server/application/interfaces/reaction-command";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-type ReactionType = "like" | "repost";
-
-export interface IReactionCommand {
-  create: (
-    did: string,
-    type: ReactionType,
-    subject: { uri: string; cid: string },
-  ) => Promise<string>;
-  delete: (did: string, type: ReactionType, uri: string) => Promise<void>;
-}
 
 const schemas = { like, repost };
 

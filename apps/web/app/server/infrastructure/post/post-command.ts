@@ -6,22 +6,9 @@ import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
 import * as facet from "@repo/client/lex/app/bsky/richtext/facet";
 
 import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
+import type { PostRef } from "@/app/server/application/dto/new-post";
+import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-type PostRef = { uri: string; cid: string };
-
-export type NewPost = {
-  text: string;
-  images: { file: File; alt: string }[];
-  reply?: { root: PostRef; parent: PostRef };
-  quote?: PostRef;
-  allow?: ReplyRule[];
-};
-
-export interface IPostCommand {
-  create: (did: string, post: NewPost) => Promise<string>;
-  delete: (did: string, uri: string) => Promise<void>;
-}
 
 const THREADGATE_RULES = {
   follower: { $type: "app.bsky.feed.threadgate#followerRule" },
