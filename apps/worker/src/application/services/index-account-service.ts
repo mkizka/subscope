@@ -6,8 +6,8 @@ import {
   type TransactionContext,
 } from "@repo/common/domain";
 import type { Handle } from "@repo/common/utils";
-import { type AccountStatus } from "@repo/db";
 
+import type { AccountStatus } from "../../domain/account.js";
 import { Account } from "../../domain/account.js";
 import type { IProfileQuery } from "../interfaces/queries/profile-query.js";
 import type { IAccountRepository } from "../interfaces/repositories/account-repository.js";
