@@ -2,8 +2,8 @@ import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
 import like from "@repo/client/lex/app/bsky/feed/like";
 import repost from "@repo/client/lex/app/bsky/feed/repost";
 
-import type { IReactionCommand } from "@/app/server/application/interfaces/reaction-command";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
+import type { IReactionCommand } from "@/app/server/application/interfaces/reaction-command";
 
 const schemas = { like, repost };
 

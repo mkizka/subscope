@@ -7,8 +7,8 @@ import * as facet from "@repo/client/lex/app/bsky/richtext/facet";
 
 import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
 import type { PostRef } from "@/app/server/application/dto/new-post";
-import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
+import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
 
 const THREADGATE_RULES = {
   follower: { $type: "app.bsky.feed.threadgate#followerRule" },
