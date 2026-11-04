@@ -5,6 +5,10 @@ import type {
 } from "@repo/common/domain";
 import { validateRecord } from "@repo/common/utils";
 
+import { feedItemFromPost } from "../../dto/feed-item.js";
+import { getEmbedRecordUri, parsePost, type Post } from "../../dto/post.js";
+import type { Record } from "../../dto/record.js";
+import { getSortAt } from "../../dto/sort-at.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFeedItemRepository } from "../../interfaces/repositories/feed-item-repository.js";
@@ -14,14 +18,6 @@ import type {
 } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import {
-  getEmbedRecordUri,
-  getSortAt,
-  parsePost,
-  type Post,
-} from "../../models/post.js";
-import type { Record } from "../../models/record.js";
-import { feedItemFromPost } from "../../record-parsers.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
 

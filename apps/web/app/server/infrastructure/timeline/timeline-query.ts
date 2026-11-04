@@ -22,8 +22,8 @@ import type {
   TextLinkDto,
   TimelinePostDto,
 } from "@/app/server/application/dto/timeline-post-dto";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { ITimelineQuery } from "@/app/server/application/interfaces/timeline-query";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 
 export const timelineQueryFactory = ({
   oauthClient,

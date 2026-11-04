@@ -15,7 +15,7 @@ import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { toTimelinePost } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export type ProfileTab = "posts" | "replies" | "media" | "likes";

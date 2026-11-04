@@ -6,7 +6,7 @@ import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
 import * as facet from "@repo/client/lex/app/bsky/richtext/facet";
 
 import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 type PostRef = { uri: string; cid: string };
 
