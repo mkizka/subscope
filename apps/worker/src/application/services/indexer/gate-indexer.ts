@@ -1,9 +1,9 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { Record } from "@repo/common/domain";
 import { validateRecord } from "@repo/common/utils";
 
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { Record } from "../../models/record.js";
 
 export class GateIndexer implements ICollectionIndexer {
   shouldIndex({ record }: { record: Record }) {

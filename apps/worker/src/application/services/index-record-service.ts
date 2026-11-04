@@ -1,7 +1,6 @@
 import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { AfterCommitContext } from "@repo/common/domain";
-import type { Record } from "@repo/common/domain";
 import {
   isSupportedCollection,
   type SupportedCollection,
@@ -9,6 +8,7 @@ import {
 
 import type { IRecordRepository } from "../interfaces/repositories/record-repository.js";
 import type { ICollectionIndexer } from "../interfaces/services/index-collection-service.js";
+import type { Record } from "../models/record.js";
 import type { IndexAccountService } from "./index-account-service.js";
 import type { FollowIndexer } from "./indexer/follow-indexer.js";
 import type { GateIndexer } from "./indexer/gate-indexer.js";

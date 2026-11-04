@@ -1,9 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import type {
-  AfterCommitContext,
-  IJobScheduler,
-  Record,
-} from "@repo/common/domain";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
 
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
@@ -11,6 +7,7 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { Record } from "../../models/record.js";
 import {
   feedItemFromRepost,
   parseRepost,

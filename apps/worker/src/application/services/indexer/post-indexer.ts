@@ -1,7 +1,6 @@
 import type {
   AfterCommitContext,
   IJobScheduler,
-  Record,
   TransactionContext,
 } from "@repo/common/domain";
 import { validateRecord } from "@repo/common/utils";
@@ -21,6 +20,7 @@ import {
   parsePost,
   type Post,
 } from "../../models/post.js";
+import type { Record } from "../../models/record.js";
 import { feedItemFromPost } from "../../record-parsers.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
