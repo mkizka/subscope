@@ -31,4 +31,4 @@ DTOは用途ごとに分け、呼び出し側が使う項目だけを持たせ�
 
 `I*Repository` に `find`・`save`・`delete` 以外のメソッドを書くと、ESLint(`no-restricted-syntax`)がエラーにする。
 
-`domain`・`application` から `infrastructure`・`presentation`・`@repo/db` をimportすると、ESLint(`no-restricted-imports`)がエラーにする。既知の違反は `packages/eslint-config/index.js` に例外として列挙している。
+`domain`・`application` から `infrastructure`・`presentation`・`@repo/db` をimportすると、ESLint(`no-restricted-imports`)がエラーにする。webの `app/server/application` も同じルールの対象とする。既知の違反は `packages/eslint-config/index.js` に例外として列挙している。

@@ -28,7 +28,10 @@ export const config = [
     },
   },
   {
-    files: ["**/src/{domain,application}/**/*.ts"],
+    files: [
+      "**/src/{domain,application}/**/*.ts",
+      "**/app/server/application/**/*.ts",
+    ],
     ignores: ["**/*.test.ts", "**/*.in-memory.ts"],
     rules: {
       "no-restricted-imports": [
