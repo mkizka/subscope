@@ -1,6 +1,6 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 
-import type { IAccountQuery } from "@/app/server/infrastructure/account/account-query";
+import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
 import type {
   IListQuery,
   ListDto,

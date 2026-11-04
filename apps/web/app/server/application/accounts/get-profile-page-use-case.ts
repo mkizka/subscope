@@ -2,12 +2,10 @@ import type { AtIdentifierString } from "@atproto/syntax";
 import type { ProfileViewDetailed } from "@repo/client/lex/app/bsky/actor/defs";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
+import type { ProfileTab } from "@/app/server/application/dto/account";
 import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
+import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
 import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
-import type {
-  IAccountQuery,
-  ProfileTab,
-} from "@/app/server/infrastructure/account/account-query";
 
 export interface IGetProfilePageUseCase {
   execute: (

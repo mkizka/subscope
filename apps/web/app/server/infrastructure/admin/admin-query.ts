@@ -1,29 +1,9 @@
-import getBannedAccounts, {
-  type $OutputBody as GetBannedAccountsOutput,
-} from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
-import getInviteCodes, {
-  type $OutputBody as GetInviteCodesOutput,
-} from "@repo/client/lex/me/subsco/admin/getInviteCodes";
-import listRegisteredAccounts, {
-  type $OutputBody as ListRegisteredAccountsOutput,
-} from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
+import getBannedAccounts from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
+import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
+import listRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
 
+import type { IAdminQuery } from "@/app/server/application/interfaces/admin-query";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
-
-export interface IAdminQuery {
-  listRegisteredAccounts: (
-    did: string,
-    cursor?: string,
-  ) => Promise<ListRegisteredAccountsOutput>;
-  getBannedAccounts: (
-    did: string,
-    cursor?: string,
-  ) => Promise<GetBannedAccountsOutput>;
-  getInviteCodes: (
-    did: string,
-    cursor?: string,
-  ) => Promise<GetInviteCodesOutput>;
-}
 
 export const adminQueryFactory = ({
   oauthClient,
