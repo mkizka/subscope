@@ -1,11 +1,7 @@
 import { asDid } from "@atproto/did";
 import { Client, lexToJson, XrpcResponseError } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import type {
-  IDidResolver,
-  IMetricReporter,
-  Record,
-} from "@repo/common/domain";
+import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
 import { DidNotFoundError } from "@repo/common/domain";
 import { required } from "@repo/common/utils";
 
@@ -13,6 +9,7 @@ import {
   type IRecordFetcher,
   RecordFetchError,
 } from "../../application/interfaces/external/record-fetcher.js";
+import type { Record } from "../../application/models/record.js";
 
 const UNRECOVERABLE_ERRORS = new Set([
   "RecordNotFound",

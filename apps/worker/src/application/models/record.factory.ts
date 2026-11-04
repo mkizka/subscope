@@ -1,6 +1,6 @@
 import { AtUri } from "@atproto/syntax";
+import { fakeAtUri, fakeCid } from "@repo/common/test";
 
-import { fakeAtUri, fakeCid } from "../../utils/fake.js";
 import type { Record } from "./record.js";
 
 export type RecordFactoryParams = {

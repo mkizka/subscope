@@ -1,13 +1,10 @@
-import type {
-  AfterCommitContext,
-  IJobScheduler,
-  Record,
-} from "@repo/common/domain";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import type { Record } from "../../models/record.js";
 import { parseFollow, sortAt } from "../../record-parsers.js";
 import type { IndexAccountService } from "../index-account-service.js";
 

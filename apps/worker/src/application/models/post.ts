@@ -6,8 +6,9 @@ import gallery, { image } from "@repo/client/lex/app/bsky/embed/gallery";
 import images from "@repo/client/lex/app/bsky/embed/images";
 import embedRecord from "@repo/client/lex/app/bsky/embed/record";
 import recordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
-import type { Record } from "@repo/common/domain";
 import { validateRecord } from "@repo/common/utils";
+
+import type { Record } from "./record.js";
 
 const validatePost = (record: Record) =>
   validateRecord("app.bsky.feed.post", record);

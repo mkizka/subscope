@@ -6,10 +6,10 @@ import {
   fakeDate,
   fakeDid,
   fakeText,
-  recordFactory,
 } from "@repo/common/test";
 
 import type { Post } from "./post.js";
+import { recordFactory } from "./record.factory.js";
 
 type PostParams = Partial<
   Omit<Post, "uri" | "accountDid" | "replyRoot" | "replyParent"> & {

@@ -1,8 +1,9 @@
-import { fakeCid, recordFactory } from "@repo/common/test";
+import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";
 import { testRegistry, type TestServices } from "../../../shared/test-utils.js";
+import { recordFactory } from "../../models/record.factory.js";
 
 describe("ProfileIndexer", () => {
   let profileIndexer: TestServices["profileIndexer"];

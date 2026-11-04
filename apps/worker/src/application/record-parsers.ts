@@ -1,10 +1,10 @@
 import { asDid, type Did } from "@atproto/did";
 import { getBlobCidString } from "@atproto/lex";
-import type { Record } from "@repo/common/domain";
 import { validateRecord } from "@repo/common/utils";
 import type { schema } from "@repo/db";
 
 import { getSortAt, type Post } from "./models/post.js";
+import type { Record } from "./models/record.js";
 
 type DidFields = { accountDid: Did; subjectDid: Did };
 

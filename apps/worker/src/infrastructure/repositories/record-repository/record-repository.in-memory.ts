@@ -1,7 +1,8 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
 import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
+import type { Record } from "../../../application/models/record.js";
 
 export class InMemoryRecordRepository implements IRecordRepository {
   private records: Map<string, Record> = new Map();
