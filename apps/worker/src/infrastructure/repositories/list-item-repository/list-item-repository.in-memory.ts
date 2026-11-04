@@ -2,17 +2,17 @@ import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
 import type { IListItemRepository } from "../../../application/interfaces/repositories/list-item-repository.js";
-import type { ListItemRow } from "../../../application/record-parsers.js";
+import type { ListItem } from "../../../application/models/list-item.js";
 
 export class InMemoryListItemRepository implements IListItemRepository {
-  private listItems: Map<string, ListItemRow> = new Map();
+  private listItems: Map<string, ListItem> = new Map();
 
   async find({
     uri,
   }: {
     ctx: TransactionContext;
     uri: AtUri;
-  }): Promise<ListItemRow | null> {
+  }): Promise<ListItem | null> {
     return this.listItems.get(uri.toString()) ?? null;
   }
 
@@ -20,7 +20,7 @@ export class InMemoryListItemRepository implements IListItemRepository {
     listItem,
   }: {
     ctx: TransactionContext;
-    listItem: ListItemRow;
+    listItem: ListItem;
   }): Promise<void> {
     this.listItems.set(listItem.uri, listItem);
   }

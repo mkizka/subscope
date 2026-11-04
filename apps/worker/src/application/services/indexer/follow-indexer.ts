@@ -4,8 +4,9 @@ import type { IRegistrationQuery } from "../../interfaces/queries/registration-q
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import { parseFollow } from "../../models/follow.js";
 import type { Record } from "../../models/record.js";
-import { parseFollow, sortAt } from "../../record-parsers.js";
+import { getSortAt } from "../../models/sort-at.js";
 import type { IndexAccountService } from "../index-account-service.js";
 
 export class FollowIndexer implements ICollectionIndexer {
@@ -55,7 +56,7 @@ export class FollowIndexer implements ICollectionIndexer {
             authorDid: follow.accountDid,
             reason: "follow",
             reasonSubject: null,
-            sortAt: sortAt(follow),
+            sortAt: getSortAt(follow),
           },
         ],
       });

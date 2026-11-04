@@ -1,7 +1,7 @@
 import type { TransactionContext } from "@repo/common/domain";
 
-import type { LikeRow } from "../../record-parsers.js";
+import type { Like } from "../../models/like.js";
 
 export interface ILikeRepository {
-  save: (params: { ctx: TransactionContext; like: LikeRow }) => Promise<void>;
+  save: (params: { ctx: TransactionContext; like: Like }) => Promise<void>;
 }

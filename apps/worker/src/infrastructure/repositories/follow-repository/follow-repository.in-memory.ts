@@ -2,12 +2,12 @@ import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
-import type { FollowRow } from "../../../application/record-parsers.js";
+import type { Follow } from "../../../application/models/follow.js";
 
 export class InMemoryFollowRepository implements IFollowRepository {
-  private follows: Map<string, FollowRow> = new Map();
+  private follows: Map<string, Follow> = new Map();
 
-  add(follow: FollowRow): void {
+  add(follow: Follow): void {
     this.follows.set(follow.uri, follow);
   }
 
@@ -15,7 +15,7 @@ export class InMemoryFollowRepository implements IFollowRepository {
     this.follows.clear();
   }
 
-  findAll(): FollowRow[] {
+  findAll(): Follow[] {
     return Array.from(this.follows.values());
   }
 
@@ -24,7 +24,7 @@ export class InMemoryFollowRepository implements IFollowRepository {
   }: {
     ctx: TransactionContext;
     uri: AtUri;
-  }): Promise<FollowRow | null> {
+  }): Promise<Follow | null> {
     return this.follows.get(uri.toString()) ?? null;
   }
 
@@ -34,7 +34,7 @@ export class InMemoryFollowRepository implements IFollowRepository {
 
   async save(params: {
     ctx: TransactionContext;
-    follow: FollowRow;
+    follow: Follow;
   }): Promise<void> {
     this.follows.set(params.follow.uri, params.follow);
   }

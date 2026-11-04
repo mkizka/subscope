@@ -1,10 +1,10 @@
 import type { TransactionContext } from "@repo/common/domain";
 
-import type { ProfileRow } from "../../record-parsers.js";
+import type { Profile } from "../../models/profile.js";
 
 export interface IProfileRepository {
   save: (params: {
     ctx: TransactionContext;
-    profile: ProfileRow;
+    profile: Profile;
   }) => Promise<void>;
 }

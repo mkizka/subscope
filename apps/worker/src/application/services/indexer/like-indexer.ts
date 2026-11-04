@@ -5,8 +5,9 @@ import type { IRegistrationQuery } from "../../interfaces/queries/registration-q
 import type { ILikeRepository } from "../../interfaces/repositories/like-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import { parseLike } from "../../models/like.js";
 import type { Record } from "../../models/record.js";
-import { parseLike, sortAt } from "../../record-parsers.js";
+import { getSortAt } from "../../models/sort-at.js";
 
 export class LikeIndexer implements ICollectionIndexer {
   constructor(
@@ -50,7 +51,7 @@ export class LikeIndexer implements ICollectionIndexer {
             authorDid: like.accountDid,
             reason: "like",
             reasonSubject: like.subjectUri,
-            sortAt: sortAt(like),
+            sortAt: getSortAt(like),
           },
         ],
       });

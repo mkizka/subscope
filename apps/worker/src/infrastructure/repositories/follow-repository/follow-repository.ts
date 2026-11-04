@@ -2,11 +2,11 @@ import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
-import type { FollowRow } from "../../../application/record-parsers.js";
+import type { Follow } from "../../../application/models/follow.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FollowRepository implements IFollowRepository {
-  async save({ ctx, follow }: { ctx: TransactionContext; follow: FollowRow }) {
+  async save({ ctx, follow }: { ctx: TransactionContext; follow: Follow }) {
     const { uri, indexedAt, ...rest } = follow;
     const data = {
       ...rest,

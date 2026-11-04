@@ -2,12 +2,12 @@ import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
 
 import type { IListRepository } from "../../../application/interfaces/repositories/list-repository.js";
-import type { ListRow } from "../../../application/record-parsers.js";
+import type { List } from "../../../application/models/list.js";
 
 export class InMemoryListRepository implements IListRepository {
-  private lists: Map<string, ListRow> = new Map();
+  private lists: Map<string, List> = new Map();
 
-  add(list: ListRow): void {
+  add(list: List): void {
     this.lists.set(list.uri, list);
   }
 
@@ -16,7 +16,7 @@ export class InMemoryListRepository implements IListRepository {
   }: {
     ctx: TransactionContext;
     uri: AtUri;
-  }): Promise<ListRow | null> {
+  }): Promise<List | null> {
     return this.lists.get(uri.toString()) ?? null;
   }
 
@@ -24,12 +24,7 @@ export class InMemoryListRepository implements IListRepository {
     this.lists.clear();
   }
 
-  async save({
-    list,
-  }: {
-    ctx: TransactionContext;
-    list: ListRow;
-  }): Promise<void> {
+  async save({ list }: { ctx: TransactionContext; list: List }): Promise<void> {
     this.lists.set(list.uri, list);
   }
 }

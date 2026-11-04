@@ -2,11 +2,11 @@ import type { TransactionContext } from "@repo/common/domain";
 import { schema } from "@repo/db";
 
 import type { IRepostRepository } from "../../../application/interfaces/repositories/repost-repository.js";
-import type { RepostRow } from "../../../application/record-parsers.js";
+import type { Repost } from "../../../application/models/repost.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class RepostRepository implements IRepostRepository {
-  async save({ ctx, repost }: { ctx: TransactionContext; repost: RepostRow }) {
+  async save({ ctx, repost }: { ctx: TransactionContext; repost: Repost }) {
     const { uri, indexedAt, ...rest } = repost;
     const data = {
       ...rest,

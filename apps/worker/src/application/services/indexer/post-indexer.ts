@@ -14,14 +14,10 @@ import type {
 } from "../../interfaces/repositories/notification-repository.js";
 import type { IPostRepository } from "../../interfaces/repositories/post-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
-import {
-  getEmbedRecordUri,
-  getSortAt,
-  parsePost,
-  type Post,
-} from "../../models/post.js";
+import { feedItemFromPost } from "../../models/feed-item.js";
+import { getEmbedRecordUri, parsePost, type Post } from "../../models/post.js";
 import type { Record } from "../../models/record.js";
-import { feedItemFromPost } from "../../record-parsers.js";
+import { getSortAt } from "../../models/sort-at.js";
 
 const REPLY_NOTIFICATION_DEPTH = 4;
 

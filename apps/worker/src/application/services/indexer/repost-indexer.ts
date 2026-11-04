@@ -7,12 +7,10 @@ import type { IFeedItemRepository } from "../../interfaces/repositories/feed-ite
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
 import type { IRepostRepository } from "../../interfaces/repositories/repost-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
+import { feedItemFromRepost } from "../../models/feed-item.js";
 import type { Record } from "../../models/record.js";
-import {
-  feedItemFromRepost,
-  parseRepost,
-  sortAt,
-} from "../../record-parsers.js";
+import { parseRepost } from "../../models/repost.js";
+import { getSortAt } from "../../models/sort-at.js";
 
 export class RepostIndexer implements ICollectionIndexer {
   constructor(
@@ -56,7 +54,7 @@ export class RepostIndexer implements ICollectionIndexer {
             authorDid: repost.accountDid,
             reason: "repost",
             reasonSubject: repost.subjectUri,
-            sortAt: sortAt(repost),
+            sortAt: getSortAt(repost),
           },
         ],
       });
