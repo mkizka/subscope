@@ -7,7 +7,7 @@ import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode"
 import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
 import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export interface IAdminCommand {
   banAccount: (did: string, target: DidString) => Promise<void>;

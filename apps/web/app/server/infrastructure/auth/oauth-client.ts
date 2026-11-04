@@ -7,6 +7,7 @@ import {
 } from "@atproto/oauth-client-node";
 import type { ILoggerManager } from "@repo/common/domain";
 
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { env, isProduction } from "@/app/server/env";
 
 const scope = "atproto transition:generic";
@@ -46,14 +47,6 @@ const keyset = isProduction
       ),
     ]
   : undefined;
-
-export interface IOAuthClient {
-  authorize: (identifier: string) => Promise<string>;
-  callback: (params: URLSearchParams) => Promise<Client>;
-  restore: (did: string) => Promise<Client | null>;
-  clientMetadata: object;
-  jwks: NodeOAuthClient["jwks"];
-}
 
 export const oauthClientFactory = ({
   oauthStateStore,

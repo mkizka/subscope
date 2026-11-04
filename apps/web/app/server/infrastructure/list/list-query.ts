@@ -6,7 +6,7 @@ import getLists from "@repo/client/lex/app/bsky/graph/getLists";
 
 import type { ListDto } from "@/app/server/application/dto/list";
 import type { IListQuery } from "@/app/server/application/interfaces/list-query";
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import {
   isShownInFeed,
   toTimelinePost,
