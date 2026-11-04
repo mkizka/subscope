@@ -1,7 +1,7 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 
 import type { ListDto, ListMemberDto } from "@/app/server/application/dto/list";
-import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timeline-query";
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
 
 export interface IListQuery {
   findLists: (did: string, account: AtIdentifierString) => Promise<ListDto[]>;

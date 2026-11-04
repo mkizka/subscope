@@ -1,6 +1,6 @@
 import type { MembersDto } from "@/app/server/application/dto/members-dto";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 
 export interface IGetRegisteredAccountsUseCase {
   execute: (q?: string) => Promise<MembersDto>;

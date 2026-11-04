@@ -2,8 +2,8 @@ import type { AtIdentifierString } from "@atproto/syntax";
 
 import type { FollowListDto } from "@/app/server/application/dto/account";
 import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import type { IFollowQuery } from "@/app/server/application/interfaces/follow-query";
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
 
 export interface IGetFollowListUseCase {
   execute: (

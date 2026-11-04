@@ -1,6 +1,6 @@
 import type { AtUriString } from "@atproto/syntax";
 
-import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timeline-query";
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
 
 export interface IThreadQuery {
   findThread: (

@@ -1,9 +1,9 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 
 import type { ListDto, ListMemberDto } from "@/app/server/application/dto/list";
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
+import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import type { IListQuery } from "@/app/server/application/interfaces/list-query";
-import type { IBackfillQuery } from "@/app/server/infrastructure/backfill/backfill-query";
-import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timeline-query";
 
 export interface IGetListPageUseCase {
   execute: (

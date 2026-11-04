@@ -6,7 +6,7 @@ import type {
   FollowListDto,
   ProfileTab,
 } from "@/app/server/application/dto/account";
-import type { TimelinePostDto } from "@/app/server/infrastructure/timeline/timeline-query";
+import type { TimelinePostDto } from "@/app/server/application/dto/timeline-post-dto";
 
 export interface IAccountQuery {
   findProfile: (
