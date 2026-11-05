@@ -9,8 +9,10 @@ export function Dialog({ title, actions, children, ...props }: Props) {
   return (
     <dialog
       className="
-        m-auto w-lg rounded-xl bg-surface text-ink
+        mx-auto mt-4 mb-auto w-lg max-w-[calc(100%-2rem)] rounded-xl bg-surface
+        text-ink
         backdrop:bg-black/40
+        md:my-auto
       "
       aria-label={title}
       onClick={(e) => {
