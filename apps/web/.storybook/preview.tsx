@@ -132,7 +132,7 @@ queryClient.setQueryData<{
 });
 
 queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
-  ["clientRegisteredAccounts"],
+  ["clientRegisteredAccounts", ""],
   {
     registeredAccounts: [
       { ...alice, isAdmin: true },
@@ -142,7 +142,7 @@ queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
   },
 );
 queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
-  ["trackedAccounts"],
+  ["trackedAccounts", ""],
   {
     total: 3,
     accounts: [
@@ -239,7 +239,7 @@ queryClient.setQueryData<Data<typeof listLoader>>(
 );
 
 queryClient.setQueryData<Data<typeof followListLoader>>(
-  ["follow-list", "alice.bsky.social", "follows"],
+  ["follow-list", "alice.bsky.social", "follows", false],
   {
     subject: {
       did: "did:plc:alice",
