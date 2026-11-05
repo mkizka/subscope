@@ -189,6 +189,25 @@ test.describe("投稿欄", () => {
   });
 });
 
+test.describe("投稿欄(モバイル)", () => {
+  test.use({ viewport: { width: 375, height: 667 } });
+
+  test("post-form-12: モバイルでは、ソフトウェアキーボードで入力欄が隠れないよう、投稿欄を画面の上寄せで開く", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(async () => {
+      await page.getByRole("button", { name: "新規投稿" }).click();
+      await expect(page.getByRole("textbox", { name: "投稿内容" })).toBeVisible(
+        { timeout: 1000 },
+      );
+    }).toPass();
+
+    const box = await page.getByRole("dialog").boundingBox();
+    expect(box?.y).toBeLessThan(50);
+  });
+});
+
 const openComposeFrom = async (page: Page, text: string, button: string) => {
   await createRecord("alice.test", "app.bsky.feed.post", {
     text,
