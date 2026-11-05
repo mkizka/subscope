@@ -12,7 +12,10 @@ import {
   viewRecord,
 } from "@repo/client/app/bsky/embed/record";
 import { view as recordWithMediaView } from "@repo/client/app/bsky/embed/recordWithMedia";
-import type { FeedViewPost } from "@repo/client/app/bsky/feed/defs";
+import {
+  type FeedViewPost,
+  generatorView,
+} from "@repo/client/app/bsky/feed/defs";
 import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/app/bsky/feed/post";
 import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
@@ -161,6 +164,14 @@ export function toTimelinePost({
         : viewDetached.matches(quoted)
           ? "detached"
           : undefined,
+    quotedFeed: generatorView.matches(quoted)
+      ? {
+          avatar: quoted.avatar,
+          displayName: quoted.displayName,
+          creatorHandle: quoted.creator.handle,
+          description: quoted.description,
+        }
+      : undefined,
     createdAt: maybeString(post.record.createdAt),
     reasonRepost:
       reason && "by" in reason
