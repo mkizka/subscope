@@ -384,6 +384,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - grantAdmin-1: 指定した登録アカウントを管理者にする
 - grantAdmin-2: 登録アカウントでないアカウントには400とNotRegisteredを返す
 
+## me.subsco.admin.revokeAdmin
+
+指定した管理者の管理者権限を外す。管理者の認証が必要。
+
+- revokeAdmin-1: 指定した管理者の管理者権限を外す
+- revokeAdmin-2: 自分自身には400とCannotRevokeSelfを返す
+- revokeAdmin-3: 登録アカウントでないアカウントには400とNotRegisteredを返す
+
 ## me.subsco.admin.banAccount
 
 登録アカウントの登録を解除し、BANする。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
