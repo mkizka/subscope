@@ -91,9 +91,11 @@ export function UnavailableQuote({
   reason: NonNullable<PostCardProps["quoteUnavailable"]>;
 }) {
   return (
-    <blockquote className="
-      mt-2 rounded-xl border border-line px-3 py-2 text-label text-muted
-    ">
+    <blockquote
+      className="
+        mt-2 rounded-xl border border-line px-3 py-2 text-label text-muted
+      "
+    >
       {unavailableLabels[reason]}
     </blockquote>
   );
