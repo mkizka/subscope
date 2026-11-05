@@ -17,15 +17,11 @@ test.describe("アカウント", () => {
 
   const items = (page: Page) => page.getByRole("main").getByRole("listitem");
 
-  test("accounts-1: 左カラムの「アカウント」から、中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
+  test("accounts-1: `/accounts` で、中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
     page,
   }) => {
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
-      .click();
+    await page.goto("/accounts");
 
-    await expect(page).toHaveURL("/accounts");
     const alice = items(page).filter({ hasText: "Alice" });
     await expect(async () => {
       await page.reload();

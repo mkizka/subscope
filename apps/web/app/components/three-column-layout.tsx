@@ -4,7 +4,7 @@ import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tab
 import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { SplashContainer } from "@/app/features/navigation/blocks/splash-container";
-import { ServerAbout } from "@/app/features/navigation/parts/server-about";
+import { ServerCardContainer } from "@/app/features/server/blocks/server-card-container";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
@@ -42,14 +42,14 @@ export const ThreeColumnLayout = ({ children }: Props) => {
         <BottomTabsContainer />
       </main>
       <aside
-        aria-label="このサーバーについて"
+        aria-label="サーバー"
         className="
           hidden border-line p-4
           lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
           lg:border-l
         "
       >
-        <ServerAbout />
+        <ServerCardContainer />
       </aside>
     </div>
   );
