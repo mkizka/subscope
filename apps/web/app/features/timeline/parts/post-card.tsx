@@ -41,6 +41,7 @@ export type PostCardProps = {
     images?: PostImage[];
     external?: NonNullable<PostCardProps["external"]>;
   };
+  quoteUnavailable?: "notFound" | "blocked" | "detached";
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
@@ -75,6 +76,26 @@ function CountChip(props: { Icon: LucideIcon; count?: number; label: string }) {
         {props.count}
       </Badge>
     </span>
+  );
+}
+
+const unavailableLabels = {
+  notFound: "引用元の投稿は削除されました",
+  blocked: "ブロックされた投稿のため表示できません",
+  detached: "投稿者により引用が解除されました",
+};
+
+export function UnavailableQuote({
+  reason,
+}: {
+  reason: NonNullable<PostCardProps["quoteUnavailable"]>;
+}) {
+  return (
+    <blockquote className="
+      mt-2 rounded-xl border border-line px-3 py-2 text-label text-muted
+    ">
+      {unavailableLabels[reason]}
+    </blockquote>
   );
 }
 
@@ -151,6 +172,7 @@ export function PostCard({
   images,
   external,
   quote,
+  quoteUnavailable,
   reasonRepost,
   toolbar,
   threadPath,
@@ -235,6 +257,7 @@ export function PostCard({
           {images && <PostImages images={images} />}
           {external && <ExternalCard external={external} />}
           {quote && <QuotedPost quote={quote} />}
+          {quoteUnavailable && <UnavailableQuote reason={quoteUnavailable} />}
           {toolbar ?? (
             <>
               <div

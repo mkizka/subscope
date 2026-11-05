@@ -76,6 +76,16 @@ export const WithQuote: Story = {
   },
 };
 
+export const WithUnavailableQuote: Story = {
+  args: {
+    authorHandle: "erin.bsky.social",
+    authorDisplayName: "Erin",
+    text: "この投稿に同意です。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    quoteUnavailable: "notFound",
+  },
+};
+
 export const WithExternal: Story = {
   args: {
     authorHandle: "frank.bsky.social",

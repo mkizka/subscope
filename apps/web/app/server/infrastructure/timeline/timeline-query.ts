@@ -6,6 +6,9 @@ import {
 import { view as imagesView } from "@repo/client/app/bsky/embed/images";
 import {
   view as recordView,
+  viewBlocked,
+  viewDetached,
+  viewNotFound,
   viewRecord,
 } from "@repo/client/app/bsky/embed/record";
 import { view as recordWithMediaView } from "@repo/client/app/bsky/embed/recordWithMedia";
@@ -147,6 +150,13 @@ export function toTimelinePost({
             : undefined,
         }
       : undefined,
+    quoteUnavailable: viewNotFound.matches(quoted)
+      ? "notFound"
+      : viewBlocked.matches(quoted)
+        ? "blocked"
+        : viewDetached.matches(quoted)
+          ? "detached"
+          : undefined,
     createdAt: maybeString(post.record.createdAt),
     reasonRepost:
       reason && "by" in reason
