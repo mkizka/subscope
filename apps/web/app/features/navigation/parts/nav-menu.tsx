@@ -64,7 +64,11 @@ export function NavMenu({
       <Item to="/notifications" icon={<BellIcon className="size-6" />} {...p}>
         通知
       </Item>
-      <Item to="/server/accounts" icon={<UsersIcon className="size-6" />} {...p}>
+      <Item
+        to="/server/accounts"
+        icon={<UsersIcon className="size-6" />}
+        {...p}
+      >
         アカウント
       </Item>
       {profileId && (
