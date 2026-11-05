@@ -34,6 +34,7 @@ export type TimelinePostDto = {
     authorHandle: string;
     text?: string;
     images?: { thumb: string; fullsize: string; alt: string }[];
+    threadPath?: string;
     external?: {
       uri: string;
       title: string;
