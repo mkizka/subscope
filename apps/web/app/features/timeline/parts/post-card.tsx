@@ -188,9 +188,15 @@ export function PostCard({
       {reasonRepost && (
         <div className="mb-1 flex items-center gap-3 text-caption text-muted">
           <RepeatIcon className="ml-6 size-4 shrink-0" />
-          <span className="truncate">
+          <ProfileLink
+            handle={reasonRepost.byHandle}
+            className="
+              relative truncate
+              hover:underline
+            "
+          >
             {reasonRepost.byDisplayName ?? reasonRepost.byHandle}がリポスト
-          </span>
+          </ProfileLink>
         </div>
       )}
       <div className="flex gap-3">
