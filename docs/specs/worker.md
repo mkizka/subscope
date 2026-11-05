@@ -32,6 +32,9 @@ Tapから受け取ったコミットのレコードをDBに保存・削除する
 - index-13: アカウントを保存するときは、管理者権限を書き換えない
 - index-14: 保存しないレコードのコミットは、revを記録しない
 - index-15: 投稿のgallery埋め込み(引用のmediaにあるものを含む)の画像を、images埋め込みと区別して保存する
+- index-16: 投稿のvideo埋め込み(引用のmediaにあるものを含む)のメタデータ(動画のCID、alt、アスペクト比、presentation)を保存する
+
+動画の本体はBlobとして保存せず、再生に使うplaylistとサムネイルは公式のvideo.bsky.appのURLを使う。そのためメタデータのみ保存する。字幕(captions)は保存しない。
 
 null文字を含む文字列はPostgreSQLに保存できないため除外する。
 

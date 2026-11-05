@@ -331,6 +331,17 @@ export const postEmbedImages = pgTable(
   (table) => [primaryKey({ columns: [table.postUri, table.position] })],
 );
 
+export const postEmbedVideos = pgTable("post_embed_videos", {
+  postUri: varchar({ length: 256 })
+    .primaryKey()
+    .references(() => posts.uri, { onDelete: "cascade" }),
+  cid: varchar({ length: 256 }).notNull(),
+  alt: text(),
+  aspectRatioWidth: integer(),
+  aspectRatioHeight: integer(),
+  presentation: varchar({ length: 16 }),
+});
+
 export const postEmbedExternals = pgTable("post_embed_externals", {
   postUri: varchar({ length: 256 })
     .primaryKey()
@@ -372,6 +383,10 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     references: [accounts.did],
   }),
   embedImages: many(postEmbedImages),
+  embedVideo: one(postEmbedVideos, {
+    fields: [posts.uri],
+    references: [postEmbedVideos.postUri],
+  }),
   embedExternal: one(postEmbedExternals, {
     fields: [posts.uri],
     references: [postEmbedExternals.postUri],
@@ -398,6 +413,16 @@ export const postEmbedImagesRelations = relations(
   ({ one }) => ({
     post: one(posts, {
       fields: [postEmbedImages.postUri],
+      references: [posts.uri],
+    }),
+  }),
+);
+
+export const postEmbedVideosRelations = relations(
+  postEmbedVideos,
+  ({ one }) => ({
+    post: one(posts, {
+      fields: [postEmbedVideos.postUri],
       references: [posts.uri],
     }),
   }),
