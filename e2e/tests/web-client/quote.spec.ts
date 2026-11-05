@@ -163,17 +163,49 @@ test.describe("引用投稿", () => {
     await expect(card).toHaveAttribute("href", "https://example.com/quote-5");
   });
 
-  test("quote-6: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する", async ({
+  test("quote-6: 引用されている投稿をタップすると、その投稿のスレッドを開く", async ({
     page,
   }) => {
-    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
-      did: "did:web:feed.example.com",
-      displayName: "quote-6: フィード名",
-      description: "quote-6: フィードの説明",
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-6: 引用される投稿",
       createdAt: new Date().toISOString(),
     });
     await createRecord("alice.test", "app.bsky.feed.post", {
       text: "quote-6: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const link = page
+      .getByRole("article")
+      .filter({ hasText: "quote-6: 引用した投稿" })
+      .getByRole("link", { name: "引用された投稿のスレッドを開く" });
+    await expect(async () => {
+      await page.reload();
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await link.click();
+
+    await expect(page).toHaveURL(
+      `/alice.test/post/${quoted.uri.split("/").pop()}`,
+    );
+    await expect(page.getByLabel("選んだ投稿")).toContainText(
+      "quote-6: 引用される投稿",
+    );
+  });
+
+  test("quote-7: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する", async ({
+    page,
+  }) => {
+    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
+      did: "did:web:feed.example.com",
+      displayName: "quote-7: フィード名",
+      description: "quote-7: フィードの説明",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-7: 引用した投稿",
       embed: { $type: "app.bsky.embed.record", record: feed },
       createdAt: new Date().toISOString(),
     });
@@ -181,14 +213,14 @@ test.describe("引用投稿", () => {
     await page.goto("/");
     const quote = page
       .getByRole("article")
-      .filter({ hasText: "quote-6: 引用した投稿" })
+      .filter({ hasText: "quote-7: 引用した投稿" })
       .getByRole("blockquote");
     await expect(async () => {
       await page.reload();
       await expect(quote).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await expect(quote).toContainText("quote-6: フィード名");
+    await expect(quote).toContainText("quote-7: フィード名");
     await expect(quote).toContainText("@alice.test");
-    await expect(quote).toContainText("quote-6: フィードの説明");
+    await expect(quote).toContainText("quote-7: フィードの説明");
   });
 });
