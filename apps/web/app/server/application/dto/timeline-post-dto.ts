@@ -42,6 +42,7 @@ export type TimelinePostDto = {
       thumb?: string;
     };
   };
+  quoteUnavailable?: "notFound" | "blocked" | "detached";
   quotedFeed?: {
     avatar?: string;
     displayName: string;

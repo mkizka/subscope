@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, putRecord, uploadImage } from "../../helpers/pds";
+import {
+  createRecord,
+  deleteRecord,
+  putRecord,
+  uploadImage,
+} from "../../helpers/pds";
 
 test.describe("引用投稿", () => {
   test("quote-1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する", async ({
@@ -195,20 +200,19 @@ test.describe("引用投稿", () => {
     );
   });
 
-  test("quote-7: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する", async ({
+  test("quote-7: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する", async ({
     page,
   }) => {
-    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
-      did: "did:web:feed.example.com",
-      displayName: "quote-7: フィード名",
-      description: "quote-7: フィードの説明",
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-7: 引用される投稿",
       createdAt: new Date().toISOString(),
     });
     await createRecord("alice.test", "app.bsky.feed.post", {
       text: "quote-7: 引用した投稿",
-      embed: { $type: "app.bsky.embed.record", record: feed },
+      embed: { $type: "app.bsky.embed.record", record: quoted },
       createdAt: new Date().toISOString(),
     });
+    await deleteRecord("alice.test", quoted.uri);
 
     await page.goto("/");
     const quote = page
@@ -217,10 +221,36 @@ test.describe("引用投稿", () => {
       .getByRole("blockquote");
     await expect(async () => {
       await page.reload();
+      await expect(quote).toContainText("削除されました", { timeout: 1000 });
+    }).toPass();
+  });
+
+  test("quote-8: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する", async ({
+    page,
+  }) => {
+    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
+      did: "did:web:feed.example.com",
+      displayName: "quote-8: フィード名",
+      description: "quote-8: フィードの説明",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-8: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: feed },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-8: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
       await expect(quote).toBeVisible({ timeout: 1000 });
     }).toPass();
-    await expect(quote).toContainText("quote-7: フィード名");
+    await expect(quote).toContainText("quote-8: フィード名");
     await expect(quote).toContainText("@alice.test");
-    await expect(quote).toContainText("quote-7: フィードの説明");
+    await expect(quote).toContainText("quote-8: フィードの説明");
   });
 });
