@@ -148,6 +148,7 @@ export function toTimelinePost({
           external: externalView.matches(quotedMedia)
             ? quotedMedia.external
             : undefined,
+          threadPath: `/${quoted.author.handle}/post/${quoted.uri.split("/").pop()}`,
         }
       : undefined,
     quoteUnavailable: viewNotFound.matches(quoted)
