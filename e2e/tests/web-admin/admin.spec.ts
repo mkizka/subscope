@@ -135,7 +135,7 @@ test.describe("登録アカウント", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("admin-accounts-2: 管理者でない登録アカウントを、行の右端のメニューから確認のうえ「BAN」すると登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("admin-accounts-2: 管理者でない登録アカウントを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -155,10 +155,10 @@ test.describe("登録アカウント", () => {
       .filter({ has: page.getByTitle(daveDid) });
 
     await row.getByRole("button", { name: "操作" }).click();
-    await row.getByRole("button", { name: "BAN" }).click();
+    await row.getByRole("button", { name: "サーバー登録を停止する" }).click();
     await page
       .getByRole("dialog")
-      .getByRole("button", { name: "BANする" })
+      .getByRole("button", { name: "停止する" })
       .click();
 
     await expect(row).toHaveCount(0);
@@ -179,16 +179,16 @@ test.describe("登録アカウント", () => {
     return did;
   };
 
-  test("admin-accounts-5: 「登録アカウント」「BAN済み」のタブで一覧を切り替える", async ({
+  test("admin-accounts-5: 「登録アカウント」「停止中」のタブで一覧を切り替える", async ({
     page,
   }) => {
     await page.goto("/");
     const aliceDid = await resolveHandle("alice.test");
 
     await page.goto("/admin/registered-accounts");
-    await page.getByRole("tab", { name: "BAN済み" }).click();
+    await page.getByRole("tab", { name: "停止中" }).click();
 
-    await expect(page.getByRole("tab", { name: "BAN済み" })).toHaveAttribute(
+    await expect(page.getByRole("tab", { name: "停止中" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
@@ -203,10 +203,10 @@ test.describe("登録アカウント", () => {
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
-    await page.getByRole("tab", { name: "BAN済み" }).click();
+    await page.getByRole("tab", { name: "停止中" }).click();
     await page.reload();
 
-    await expect(page.getByRole("tab", { name: "BAN済み" })).toHaveAttribute(
+    await expect(page.getByRole("tab", { name: "停止中" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
@@ -230,7 +230,7 @@ test.describe("登録アカウント", () => {
     }).toPass();
   });
 
-  test("admin-accounts-6: 「BAN済み」タブには、BANしたアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
+  test("admin-accounts-6: 「停止中」タブには、サーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -242,28 +242,28 @@ test.describe("登録アカウント", () => {
       .getByRole("main")
       .getByRole("listitem")
       .filter({ has: page.getByTitle(graceDid) });
-    await page.getByRole("tab", { name: "BAN済み" }).click();
+    await page.getByRole("tab", { name: "停止中" }).click();
 
     await expect(row.getByTitle(graceDid)).toBeVisible();
   });
 
-  test("admin-accounts-7: BAN済みのアカウントを、行の「解除」から確認のうえ解除すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+  test("admin-accounts-7: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
     page,
   }) => {
     await page.goto("/");
     const frankDid = await banAccount(page, "frank.test");
 
     await page.goto("/admin/registered-accounts");
-    await page.getByRole("tab", { name: "BAN済み" }).click();
+    await page.getByRole("tab", { name: "停止中" }).click();
 
     const row = page
       .getByRole("main")
       .getByRole("listitem")
       .filter({ has: page.getByTitle(frankDid) });
-    await row.getByRole("button", { name: "解除" }).click();
+    await row.getByRole("button", { name: "登録を再開する" }).click();
     await page
       .getByRole("dialog")
-      .getByRole("button", { name: "解除する" })
+      .getByRole("button", { name: "再開する" })
       .click();
 
     await expect(row).toHaveCount(0);

@@ -23,7 +23,7 @@ async function fetchBannedAccounts(
     `/admin/api/banned-accounts?${params.toString()}`,
   );
   if (!response.ok) {
-    throw new Error("BAN済みアカウントの取得に失敗しました");
+    throw new Error("停止中アカウントの取得に失敗しました");
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return response.json() as Promise<BannedAccountsResponse>;
@@ -36,7 +36,7 @@ async function unbanAccount(did: string) {
     body: JSON.stringify({ did }),
   });
   if (!response.ok) {
-    throw new Error("BANの解除に失敗しました");
+    throw new Error("登録の再開に失敗しました");
   }
 }
 

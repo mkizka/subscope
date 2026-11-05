@@ -112,7 +112,7 @@ export function RegisteredAccountList({
             },
             {
               to: "/admin/registered-accounts?tab=banned",
-              label: "BAN済み",
+              label: "停止中",
               selected: tab === "banned",
             },
           ]}
@@ -121,7 +121,7 @@ export function RegisteredAccountList({
       {!isLoading && isEmpty && (
         <p className="py-8 text-center text-label text-muted">
           {tab === "banned"
-            ? "BAN済みのアカウントはありません"
+            ? "停止中のアカウントはありません"
             : "登録アカウントはまだありません"}
         </p>
       )}
@@ -134,9 +134,9 @@ export function RegisteredAccountList({
             <li key={account.did} className={rowClass}>
               <ProfileCell account={account} />
               <ConfirmDialog
-                title={`@${account.handle} のBANを解除しますか？`}
-                description="解除すると、招待コードで再登録できるようになります。"
-                confirmLabel="解除する"
+                title={`@${account.handle} の登録を再開しますか？`}
+                description="再開すると、招待コードで再登録できるようになります。"
+                confirmLabel="再開する"
                 onConfirm={() => onUnban?.(account.did)}
               >
                 {(open) => (
@@ -150,7 +150,7 @@ export function RegisteredAccountList({
                     {unbanningDid !== account.did && (
                       <UndoIcon className="size-4" />
                     )}
-                    解除
+                    登録を再開する
                   </Button>
                 )}
               </ConfirmDialog>
@@ -176,9 +176,9 @@ export function RegisteredAccountList({
                 >
                   {(openGrantAdmin) => (
                     <ConfirmDialog
-                      title={`@${registeredAccount.handle} をBANしますか？`}
-                      description="登録が解除され、招待コードでも再登録できなくなります。"
-                      confirmLabel="BANする"
+                      title={`@${registeredAccount.handle} のサーバー登録を停止しますか？`}
+                      description="サーバー登録が停止され、招待コードでも再登録できなくなります。"
+                      confirmLabel="停止する"
                       danger
                       onConfirm={() => onBan?.(registeredAccount.did)}
                     >
@@ -203,7 +203,7 @@ export function RegisteredAccountList({
                             onClick={openBan}
                           >
                             <BanIcon className="size-4" />
-                            BAN
+                            サーバー登録を停止する
                           </button>
                         </Menu>
                       )}
