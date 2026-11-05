@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader as registeredLoader } from "@/app/routes/api.registered-accounts";
-import type { loader as serverLoader } from "@/app/routes/api.server";
+import type { loader as serverLoader } from "@/app/routes/api.server-info";
 import type { loader as trackedLoader } from "@/app/routes/api.tracked-accounts";
 
 type RegisteredResponse = Awaited<ReturnType<typeof registeredLoader>>["data"];
@@ -22,7 +22,7 @@ export function useServerInfo() {
   }).data;
   const server = useQuery({
     queryKey: ["server"],
-    queryFn: () => fetchJson<ServerResponse>("/api/server"),
+    queryFn: () => fetchJson<ServerResponse>("/api/server-info"),
     throwOnError: true,
   }).data;
 
