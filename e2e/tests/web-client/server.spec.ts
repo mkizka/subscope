@@ -12,7 +12,9 @@ test.describe("サーバー", () => {
     await expect(main.getByRole("heading", { name: "Subscope" })).toBeVisible();
     await expect(main.getByText("招待制", { exact: true })).toBeVisible();
     await expect(
-      main.getByText("登録アカウントとそのフォロー先の投稿だけを保存します"),
+      main
+        .getByText("登録アカウントとそのフォロー先の投稿だけを保存します")
+        .locator("visible=true"),
     ).toBeVisible();
   });
 
