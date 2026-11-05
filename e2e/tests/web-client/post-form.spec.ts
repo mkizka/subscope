@@ -11,6 +11,15 @@ const image = (name: string) => ({
   ),
 });
 
+const wideImage = {
+  name: "wide.png",
+  mimeType: "image/png",
+  buffer: Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAMAAAACCAIAAAASFvFNAAAAC0lEQVR4nGNgwAQAABQAAX3+Hu4AAAAASUVORK5CYII=",
+    "base64",
+  ),
+};
+
 test.describe("投稿欄", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -125,6 +134,44 @@ test.describe("投稿欄", () => {
     );
     const { value }: { value: { text: string } } = await postRecord.json();
     expect(value.text).toBe(text);
+  });
+
+  test("post-form-13: 添付した画像には、公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
+    page,
+    request,
+  }) => {
+    const text = `post-form-13: ${Date.now()}`;
+    await page.getByRole("textbox", { name: "投稿内容" }).fill(text);
+    await page.getByLabel("画像を追加").setInputFiles(wideImage);
+    await page.getByRole("button", { name: "投稿", exact: true }).click();
+    await expect(
+      page.getByRole("textbox", { name: "投稿内容" }),
+    ).not.toBeVisible();
+
+    const did = await resolveHandle("alice.test");
+    const res = await request.get(
+      `${PDS_URL}/xrpc/com.atproto.repo.listRecords`,
+      {
+        params: { repo: did, collection: "app.bsky.feed.post", limit: 1 },
+      },
+    );
+    const {
+      records: [record],
+    }: {
+      records: [
+        {
+          value: {
+            text: string;
+            embed: { images: { aspectRatio: unknown }[] };
+          };
+        },
+      ];
+    } = await res.json();
+    expect(record.value.text).toBe(text);
+    expect(record.value.embed.images[0]?.aspectRatio).toEqual({
+      width: 3,
+      height: 2,
+    });
   });
 
   test("post-form-6: 本文のURLとハッシュタグには、その範囲にfacetsを付ける", async ({
