@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import type { DatabaseClient } from "../../domain/interfaces/transaction.js";
+import type { DatabaseClient } from "../../domain/interface/transaction.js";
 import { InMemoryTransactionManager } from "./transaction.in-memory.js";
 import { TransactionManager } from "./transaction.js";
 

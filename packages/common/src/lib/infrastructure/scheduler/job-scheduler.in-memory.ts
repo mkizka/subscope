@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
+import type { IJobScheduler } from "../../domain/interface/job-scheduler.js";
 
 interface ScheduledFetchRecord {
   uri: AtUri;

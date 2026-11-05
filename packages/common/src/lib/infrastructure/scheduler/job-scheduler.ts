@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 
-import type { IJobQueue } from "../../domain/interfaces/job-queue.js";
-import type { IJobScheduler } from "../../domain/interfaces/job-scheduler.js";
+import type { IJobQueue } from "../../domain/interface/job-queue.js";
+import type { IJobScheduler } from "../../domain/interface/job-scheduler.js";
 
 const AGGREGATE_STATS_DELAY_MS = 10 * 1000;
 

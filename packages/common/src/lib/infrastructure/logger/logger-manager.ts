@@ -3,7 +3,7 @@ import { pino } from "pino";
 import type {
   ILoggerManager,
   LogLevel,
-} from "../../domain/interfaces/logger.js";
+} from "../../domain/interface/logger.js";
 
 export class LoggerManager implements ILoggerManager {
   private readonly rootLogger;

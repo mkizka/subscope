@@ -5,7 +5,7 @@ import type {
   JobData,
   JobOptions,
   QueueName,
-} from "../../domain/interfaces/job-queue.js";
+} from "../../domain/interface/job-queue.js";
 
 interface AddedJob<T extends QueueName = QueueName> {
   queueName: T;
