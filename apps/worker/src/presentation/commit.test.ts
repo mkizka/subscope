@@ -242,4 +242,73 @@ describe("commit", () => {
       },
     ]);
   });
+
+  test("index-16: 投稿のvideo埋め込み(引用のmediaにあるものを含む)のメタデータ(動画のCID、alt、アスペクト比、presentation)を保存する", async () => {
+    // arrange
+    const account = await accountFactory(ctx.db)
+      .use((t) => t.registeredAccount())
+      .create();
+    const videoCid = await randomCid();
+    const videoEmbed = {
+      $type: "app.bsky.embed.video",
+      video: {
+        $type: "blob",
+        ref: { $link: videoCid },
+        mimeType: "video/mp4",
+        size: 1000,
+      },
+      alt: "alt",
+      aspectRatio: { width: 16, height: 9 },
+      presentation: "gif",
+    };
+    const embedPostEvent = (rkey: string, embed: LexValue): RecordEvent => ({
+      ...postEvent(account.did, "create", "3aaaaaaaaaaaa", "video"),
+      rkey,
+      record: {
+        $type: "app.bsky.feed.post",
+        text: "video",
+        embed,
+        createdAt: new Date().toISOString(),
+      },
+    });
+
+    // act
+    await processCommit(embedPostEvent("1", videoEmbed));
+    await processCommit(
+      embedPostEvent("2", {
+        $type: "app.bsky.embed.recordWithMedia",
+        record: {
+          $type: "app.bsky.embed.record",
+          record: {
+            uri: AtUri.make(account.did, "app.bsky.feed.post", "1").toString(),
+            cid: "bafyreie5737gdxlw5i64vzichcalba3z2v5n6icifvx5xytvske7mr3hpm",
+          },
+        },
+        media: videoEmbed,
+      }),
+    );
+
+    // assert
+    const videos = await ctx.db
+      .select()
+      .from(schema.postEmbedVideos)
+      .orderBy(schema.postEmbedVideos.postUri);
+    const expected = {
+      cid: videoCid,
+      alt: "alt",
+      aspectRatioWidth: 16,
+      aspectRatioHeight: 9,
+      presentation: "gif",
+    };
+    expect(videos).toEqual([
+      {
+        ...expected,
+        postUri: AtUri.make(account.did, "app.bsky.feed.post", "1").toString(),
+      },
+      {
+        ...expected,
+        postUri: AtUri.make(account.did, "app.bsky.feed.post", "2").toString(),
+      },
+    ]);
+  });
 });

@@ -6,6 +6,7 @@ import gallery, { image } from "@repo/client/app/bsky/embed/gallery";
 import images from "@repo/client/app/bsky/embed/images";
 import embedRecord from "@repo/client/app/bsky/embed/record";
 import recordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
+import video from "@repo/client/app/bsky/embed/video";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "./record.js";
@@ -25,6 +26,13 @@ export type EmbedImage = {
 
 export type EmbedMedia =
   | { type: "images" | "gallery"; images: EmbedImage[] }
+  | {
+      type: "video";
+      cid: string;
+      alt: string | null;
+      aspectRatio: EmbedImage["aspectRatio"] | null;
+      presentation: string | null;
+    }
   | {
       type: "external";
       uri: string;
@@ -84,7 +92,6 @@ const toEmbedImages = (
     aspectRatio: item.aspectRatio,
   }));
 
-// TODO: app.bsky.embed.videoをサポートする
 const toEmbedMedia = (embed: RawEmbed): EmbedMedia | null => {
   if (images.isTypeOf(embed)) {
     return { type: "images", images: toEmbedImages(embed.images) };
@@ -93,6 +100,15 @@ const toEmbedMedia = (embed: RawEmbed): EmbedMedia | null => {
     return {
       type: "gallery",
       images: toEmbedImages(embed.items.filter((item) => image.isTypeOf(item))),
+    };
+  }
+  if (video.isTypeOf(embed)) {
+    return {
+      type: "video",
+      cid: getBlobCidString(embed.video),
+      alt: embed.alt ?? null,
+      aspectRatio: embed.aspectRatio ?? null,
+      presentation: embed.presentation ?? null,
     };
   }
   if (external.isTypeOf(embed)) {

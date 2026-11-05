@@ -211,6 +211,13 @@
       "when": 1793618314411,
       "tag": "0029_rename-actors-to-accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1793880659500,
+      "tag": "0030_add-post_embed_videos",
+      "breakpoints": true
     }
   ]
 }

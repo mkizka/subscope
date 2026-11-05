@@ -46,6 +46,8 @@ export class PostRepository implements IPostRepository {
     const media = embed.type === "recordWithMedia" ? embed.media : embed;
     if (media.type === "external") {
       await this.upsertEmbedExternal(ctx, postUri, media);
+    } else if (media.type === "video") {
+      await this.upsertEmbedVideo(ctx, postUri, media);
     } else if (media.type === "images" || media.type === "gallery") {
       await this.upsertEmbedImages(ctx, postUri, media.images, media.type);
     }
@@ -75,6 +77,27 @@ export class PostRepository implements IPostRepository {
         })),
       );
     }
+  }
+
+  private async upsertEmbedVideo(
+    ctx: TransactionContext,
+    postUri: string,
+    embedVideo: Extract<EmbedMedia, { type: "video" }>,
+  ) {
+    const data = {
+      cid: embedVideo.cid,
+      alt: embedVideo.alt,
+      aspectRatioWidth: embedVideo.aspectRatio?.width,
+      aspectRatioHeight: embedVideo.aspectRatio?.height,
+      presentation: embedVideo.presentation,
+    };
+    await ctx.db
+      .insert(schema.postEmbedVideos)
+      .values({ postUri, ...data })
+      .onConflictDoUpdate({
+        target: schema.postEmbedVideos.postUri,
+        set: data,
+      });
   }
 
   private async upsertEmbedExternal(
