@@ -83,6 +83,19 @@ export const putRecord = async (
   );
 };
 
+export const deleteRecord = async (handle: string, uri: string) => {
+  const { did, accessJwt } = await xrpc<{ did: string; accessJwt: string }>(
+    "com.atproto.server.createSession",
+    { identifier: handle, password: "password" },
+  );
+  const [, collection, rkey] = uri.replace("at://", "").split("/");
+  await xrpc(
+    "com.atproto.repo.deleteRecord",
+    { repo: did, collection, rkey },
+    accessJwt,
+  );
+};
+
 export const follow = async (handle: string, subjectHandle: string) => {
   const [did, subject] = await Promise.all([
     resolveHandle(handle),

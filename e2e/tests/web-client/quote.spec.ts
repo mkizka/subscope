@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, putRecord, uploadImage } from "../../helpers/pds";
+import {
+  createRecord,
+  deleteRecord,
+  putRecord,
+  uploadImage,
+} from "../../helpers/pds";
 
 test.describe("引用投稿", () => {
   test("quote-1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する", async ({
@@ -193,5 +198,30 @@ test.describe("引用投稿", () => {
     await expect(page.getByLabel("選んだ投稿")).toContainText(
       "quote-6: 引用される投稿",
     );
+  });
+
+  test("quote-7: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する", async ({
+    page,
+  }) => {
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-7: 引用される投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-7: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+    await deleteRecord("alice.test", quoted.uri);
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-7: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
+      await expect(quote).toContainText("削除されました", { timeout: 1000 });
+    }).toPass();
   });
 });
