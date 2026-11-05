@@ -190,9 +190,9 @@ test.describe("検索", () => {
     }).toPass();
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "通知", exact: true })
       .click();
-    await expect(page).toHaveURL("/server/accounts");
+    await expect(page).toHaveURL("/notifications");
     await page.route("**/api/search*", () => {});
 
     await page.goBack();

@@ -373,7 +373,7 @@ test.describe("プロフィール", () => {
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {
       displayName: "Alice",
     });
-    await page.goto("/server/accounts");
+    await page.goto("/accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/profile/*", async (route) => {
       await released;
@@ -470,9 +470,9 @@ test.describe("プロフィール", () => {
     await expect(followers).toBeVisible();
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "通知", exact: true })
       .click();
-    await expect(page).toHaveURL("/server/accounts");
+    await expect(page).toHaveURL("/notifications");
     await page.route("**/api/profile/*", () => {});
 
     await page.goBack();

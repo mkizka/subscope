@@ -48,7 +48,7 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
       >
         <ServerAbout />
         <nav className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
-          <NavMenu profileId={profileId} onNavigate={close} />
+          <NavMenu profileId={profileId} onNavigate={close} showServer />
           {isAdmin && <AdminNavMenu onNavigate={close} />}
           <Form method="post" action="/oauth/logout">
             <button

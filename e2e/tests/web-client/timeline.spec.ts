@@ -137,7 +137,7 @@ test.describe("タイムライン", () => {
   test("timeline-11: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
-    await page.goto("/server/accounts");
+    await page.goto("/accounts");
     const { promise: released, resolve: release } = Promise.withResolvers();
     await page.route("**/api/timeline*", async (route) => {
       await released;
@@ -173,9 +173,9 @@ test.describe("タイムライン", () => {
     }).toPass();
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "通知", exact: true })
       .click();
-    await expect(page).toHaveURL("/server/accounts");
+    await expect(page).toHaveURL("/notifications");
     await page.route("**/api/timeline*", () => {});
 
     await page.goBack();
