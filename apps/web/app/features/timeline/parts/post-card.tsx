@@ -13,6 +13,7 @@ import { Badge } from "@/app/components/ui/badge";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 import { type PostImage, PostImages } from "./post-images";
+import { PostVideo, type PostVideoData } from "./post-video";
 import { ProfileLink } from "./profile-link";
 import { RichText, type TextLink } from "./rich-text";
 
@@ -27,6 +28,7 @@ export type PostCardProps = {
   likeCount?: number;
   createdAt?: string;
   images?: PostImage[];
+  video?: PostVideoData;
   external?: {
     uri: string;
     title: string;
@@ -40,6 +42,7 @@ export type PostCardProps = {
     text?: string;
     links?: TextLink[];
     images?: PostImage[];
+    video?: PostVideoData;
     threadPath?: string;
     external?: NonNullable<PostCardProps["external"]>;
   };
@@ -134,6 +137,7 @@ export function QuotedPost({
         {quote.text && <RichText text={quote.text} links={quote.links} />}
       </p>
       {quote.images && <PostImages images={quote.images} />}
+      {quote.video && <PostVideo video={quote.video} />}
       {quote.external && <ExternalCard external={quote.external} />}
     </blockquote>
   );
@@ -210,6 +214,7 @@ export function PostCard({
   likeCount,
   createdAt,
   images,
+  video,
   external,
   quote,
   quoteUnavailable,
@@ -296,6 +301,7 @@ export function PostCard({
             {text && <RichText text={text} links={links} />}
           </p>
           {images && <PostImages images={images} />}
+          {video && <PostVideo video={video} />}
           {external && <ExternalCard external={external} />}
           {quote && <QuotedPost quote={quote} />}
           {quoteUnavailable && <UnavailableQuote reason={quoteUnavailable} />}

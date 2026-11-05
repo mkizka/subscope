@@ -19,6 +19,7 @@ import {
   UnavailableQuote,
 } from "@/app/features/timeline/parts/post-card";
 import { PostImages } from "@/app/features/timeline/parts/post-images";
+import { PostVideo } from "@/app/features/timeline/parts/post-video";
 import { ProfileLink } from "@/app/features/timeline/parts/profile-link";
 import { RichText } from "@/app/features/timeline/parts/rich-text";
 import { useHydrated } from "@/app/lib/use-hydrated";
@@ -38,6 +39,7 @@ function FocusedPost({
   text,
   links,
   images,
+  video,
   external,
   quote,
   quoteUnavailable,
@@ -77,6 +79,7 @@ function FocusedPost({
         {text && <RichText text={text} links={links} />}
       </p>
       {images && <PostImages images={images} />}
+      {video && <PostVideo video={video} />}
       {external && <ExternalCard external={external} />}
       {quote && <QuotedPost quote={quote} />}
       {quoteUnavailable && <UnavailableQuote reason={quoteUnavailable} />}
