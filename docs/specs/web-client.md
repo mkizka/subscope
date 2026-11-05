@@ -306,9 +306,9 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 
 ## アカウント
 
-中央カラムの `/accounts` に、このサーバーのアカウントを「登録アカウント」「追跡アカウント」のタブで一覧表示する。追跡アカウントのタブは `/accounts?tab=tracked`。旧URLの `/registered-accounts` と `/tracked-accounts` は該当タブへリダイレクトする。
+中央カラムの `/server/accounts` に、このサーバーのアカウントを「登録アカウント」「追跡アカウント」のタブで一覧表示する。追跡アカウントのタブは `/server/accounts?tab=tracked`。旧URLの `/accounts`、`/registered-accounts`、`/tracked-accounts` は該当タブへリダイレクトする。
 
-- accounts-1: `/accounts` で、中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する
+- accounts-1: `/server/accounts` で、中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する
 - accounts-2: 「追跡アカウント」タブを選ぶと、追跡アカウント（名前、ハンドル）を、フォローしている登録アカウントが多い順に一覧表示する
 - accounts-3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する
 - accounts-4: 各タブに、そのタブの人数を表示する
@@ -317,7 +317,8 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 - accounts-7: 追跡アカウントのタブには、フォローしている登録アカウントの数を「n人からフォロー」と表示する
 - accounts-8: 追跡アカウントのタブの「追跡アカウントとは？」を押すと、追跡アカウントの説明をモーダルで表示する
 - accounts-9: 登録アカウントのタブには「追跡アカウントとは？」を表示しない
-- accounts-10: 旧URLの /registered-accounts と /tracked-accounts は、/accounts の該当タブへ移動する
+- accounts-10: 旧URLの /accounts、/registered-accounts、/tracked-accounts は、/server/accounts の該当タブへ移動する
+- accounts-14: 見出しの横に戻る矢印を表示し、押すと /server に移動する
 - accounts-11: アカウントの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する
 - accounts-12: タブの下の検索欄に入力すると、選んでいるタブの全件から表示名・ハンドルの部分一致で絞り込み、検索語を `?q=` に入れる
 - accounts-13: 検索に一致するアカウントがないときは「アカウントが見つかりません」を表示する
