@@ -168,7 +168,7 @@ test.describe("投稿欄", () => {
       ];
     } = await res.json();
     expect(record.value.text).toBe(text);
-    expect(record.value.embed.images[0].aspectRatio).toEqual({
+    expect(record.value.embed.images[0]?.aspectRatio).toEqual({
       width: 3,
       height: 2,
     });
