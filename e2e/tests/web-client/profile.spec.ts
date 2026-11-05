@@ -45,7 +45,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-20: プロフィールの自己紹介の下に、プロフィールに設定されたリンクを表示する。表示名（なければドメイン）を選ぶと、リンク先を新しいタブで開く", async ({
+  test("profile-20: プロフィールの自己紹介の下に、プロフィールに設定されたリンクを、枠付きの丸いボタンとして折り返しながら並べて表示する。表示名（なければドメイン）を選ぶと、リンク先を新しいタブで開く", async ({
     page,
   }) => {
     const link = await createRecord("alice.test", "app.bsky.actor.link", {
@@ -76,6 +76,10 @@ test.describe("プロフィール", () => {
     await expect(
       main.getByRole("link", { name: "example.org" }),
     ).toHaveAttribute("target", "_blank");
+    await expect(main.getByRole("link", { name: "example.org" })).toHaveCSS(
+      "border-radius",
+      /^\d+px$/,
+    );
   });
 
   test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
