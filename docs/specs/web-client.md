@@ -290,3 +290,10 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 
 - error-1: 存在しないページを開くと「ページが見つかりません」とステータスコード404を表示する
 - error-2: 「ホームに戻る」を押すとトップページに移動する
+
+## PWA
+
+ブラウザやOSのホーム画面にアプリとしてインストールできるようにする。Service Workerは使わず、オフライン動作やプッシュ通知には対応しない。
+
+- pwa-1: Web App Manifestで、名前・アイコン・`display: standalone`・`start_url`・DESIGN.mdのsurfaceに合わせたテーマ色を宣言する
+- pwa-2: すべてのページのheadでManifestとapple-touch-iconを参照する
