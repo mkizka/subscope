@@ -38,6 +38,7 @@ export type PostCardProps = {
     authorDisplayName?: string;
     authorHandle: string;
     text?: string;
+    links?: TextLink[];
     images?: PostImage[];
     external?: NonNullable<PostCardProps["external"]>;
   };
@@ -93,7 +94,7 @@ export function QuotedPost({
         <span className="truncate text-muted">@{quote.authorHandle}</span>
       </div>
       <p className="text-label wrap-break-word whitespace-pre-wrap">
-        {quote.text}
+        {quote.text && <RichText text={quote.text} links={quote.links} />}
       </p>
       {quote.images && <PostImages images={quote.images} />}
       {quote.external && <ExternalCard external={quote.external} />}

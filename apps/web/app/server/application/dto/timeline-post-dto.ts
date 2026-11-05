@@ -33,6 +33,7 @@ export type TimelinePostDto = {
     authorDisplayName?: string;
     authorHandle: string;
     text?: string;
+    links?: TextLinkDto[];
     images?: { thumb: string; fullsize: string; alt: string }[];
     external?: {
       uri: string;

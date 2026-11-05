@@ -162,4 +162,50 @@ test.describe("引用投稿", () => {
     }).toPass();
     await expect(card).toHaveAttribute("href", "https://example.com/quote-5");
   });
+
+  test("quote-6: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする", async ({
+    page,
+  }) => {
+    const prefix = "quote-6: 引用される投稿 ";
+    const label = "example.com/quote-6...";
+    const byteStart = new TextEncoder().encode(prefix).length;
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: `${prefix}${label}`,
+      facets: [
+        {
+          index: {
+            byteStart,
+            byteEnd: byteStart + new TextEncoder().encode(label).length,
+          },
+          features: [
+            {
+              $type: "app.bsky.richtext.facet#link",
+              uri: "https://example.com/quote-6/full",
+            },
+          ],
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-6: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const link = page
+      .getByRole("article")
+      .filter({ hasText: "quote-6: 引用した投稿" })
+      .getByRole("blockquote")
+      .getByRole("link", { name: label, exact: true });
+    await expect(async () => {
+      await page.reload();
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(link).toHaveAttribute(
+      "href",
+      "https://example.com/quote-6/full",
+    );
+  });
 });
