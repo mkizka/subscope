@@ -139,6 +139,7 @@ export function toTimelinePost({
           authorHandle: quoted.author.handle,
           text: maybeString(quoted.value.text),
           images: toImages(mediaOf(quoted.embeds?.[0])),
+          threadPath: `/${quoted.author.handle}/post/${quoted.uri.split("/").pop()}`,
         }
       : undefined,
     createdAt: maybeString(post.record.createdAt),
