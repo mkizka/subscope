@@ -19,6 +19,7 @@ import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 import type { loader as followListLoader } from "@/app/routes/api.profile.$handle.$kind";
 import type { loader as registeredAccountsLoader } from "@/app/routes/api.registered-accounts";
 import type { loader as searchLoader } from "@/app/routes/api.search";
+import type { loader as serverInfoLoader } from "@/app/routes/api.server-info";
 import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
@@ -141,6 +142,9 @@ queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
     hasMore: false,
   },
 );
+queryClient.setQueryData<Data<typeof serverInfoLoader>>(["server"], {
+  serviceDid: "did:web:subsco.me",
+});
 queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
   ["trackedAccounts", ""],
   {
