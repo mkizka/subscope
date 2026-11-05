@@ -54,6 +54,27 @@ export const config = [
     },
   },
   {
+    files: ["app/**/*.{ts,tsx}"],
+    ignores: [
+      "app/server/application/**/*.ts",
+      "app/server/infrastructure/db/db.ts",
+      "app/server/infrastructure/auth/oauth-storage.ts",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@repo/db",
+              message: "webは認証以外でDBに触れず、XRPCを経由してください。",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ["**/src/domain/**/*.ts"],
     ignores: ["**/*.test.ts"],
     rules: {
