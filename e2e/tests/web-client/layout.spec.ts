@@ -65,14 +65,14 @@ test.describe("レイアウト", () => {
     await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     let release = () => {};
     const released = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/accounts.data*", async (route) => {
+    await page.route("**/alice.test.data*", async (route) => {
       await released;
       await route.continue();
     });
 
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "プロフィール" })
       .click();
 
     const progress = page.getByRole("progressbar", { name: "読み込み中" });
