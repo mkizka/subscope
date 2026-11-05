@@ -3,8 +3,8 @@
 @import "@fontsource/zen-kaku-gothic-new/700.css";
 @theme static {
   --font-sans: "Zen Kaku Gothic New", sans-serif;
-  --color-surface: color-mix(in srgb, #b8326b 7%, #fff);
-  --color-surface-2: color-mix(in srgb, #b8326b 13%, #fff);
+  --color-surface: #fff;
+  --color-surface-2: color-mix(in srgb, #b8326b 7%, #fff);
   --color-line: color-mix(in srgb, #b8326b 22%, #fff);
   --color-ink: #17191c;
   --color-muted: color-mix(in srgb, #17191c 62%, transparent);
@@ -41,8 +41,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-surface: color-mix(in srgb, #e8709f 9%, #121314);
-    --color-surface-2: color-mix(in srgb, #e8709f 5%, #0c0d0e);
+    --color-surface: #121314;
+    --color-surface-2: color-mix(in srgb, #e8709f 9%, #121314);
     --color-line: color-mix(in srgb, #e8709f 20%, #24262a);
     --color-ink: #eceef0;
     --color-muted: color-mix(in srgb, #eceef0 62%, transparent);
