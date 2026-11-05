@@ -68,6 +68,19 @@ export const timelineQueryFactory = ({
 const maybeString = (value: unknown) =>
   typeof value === "string" ? value : undefined;
 
+function toLinks(record: unknown): TextLinkDto[] | undefined {
+  if (!postRecord.matches(record)) return undefined;
+  return record.facets?.flatMap(({ index: { byteStart, byteEnd }, features }) =>
+    features.flatMap((feature): TextLinkDto[] =>
+      link.matches(feature)
+        ? [{ byteStart, byteEnd, uri: feature.uri }]
+        : mention.matches(feature)
+          ? [{ byteStart, byteEnd, did: feature.did }]
+          : [],
+    ),
+  );
+}
+
 export function isShownInFeed({ post, reason }: FeedViewPost) {
   if (reason || !postRecord.matches(post.record) || !post.record.reply) {
     return true;
@@ -124,18 +137,7 @@ export function toTimelinePost({
     authorDisplayName: post.author.displayName,
     authorHandle: post.author.handle,
     text: maybeString(post.record.text),
-    links: postRecord.matches(post.record)
-      ? post.record.facets?.flatMap(
-          ({ index: { byteStart, byteEnd }, features }) =>
-            features.flatMap((feature): TextLinkDto[] =>
-              link.matches(feature)
-                ? [{ byteStart, byteEnd, uri: feature.uri }]
-                : mention.matches(feature)
-                  ? [{ byteStart, byteEnd, did: feature.did }]
-                  : [],
-            ),
-        )
-      : undefined,
+    links: toLinks(post.record),
     replyCount: post.replyCount,
     repostCount: post.repostCount,
     likeCount: post.likeCount,
@@ -147,6 +149,7 @@ export function toTimelinePost({
           authorDisplayName: quoted.author.displayName,
           authorHandle: quoted.author.handle,
           text: maybeString(quoted.value.text),
+          links: toLinks(quoted.value),
           images: toImages(quotedMedia),
           external: externalView.matches(quotedMedia)
             ? quotedMedia.external
