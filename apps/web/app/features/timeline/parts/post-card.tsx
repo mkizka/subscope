@@ -41,6 +41,12 @@ export type PostCardProps = {
     images?: PostImage[];
     external?: NonNullable<PostCardProps["external"]>;
   };
+  quotedFeed?: {
+    avatar?: string;
+    displayName: string;
+    creatorHandle: string;
+    description?: string;
+  };
   reasonRepost?: {
     byDisplayName?: string;
     byHandle: string;
@@ -101,6 +107,29 @@ export function QuotedPost({
   );
 }
 
+export function QuotedFeed({
+  feed,
+}: {
+  feed: NonNullable<PostCardProps["quotedFeed"]>;
+}) {
+  return (
+    <blockquote className="mt-2 rounded-xl border border-line px-3 py-2">
+      <div className="flex items-center gap-2 text-label">
+        <Avatar src={feed.avatar} size="sm" />
+        <span className="truncate font-bold">{feed.displayName}</span>
+      </div>
+      <div className="text-caption text-muted">
+        フィード by @{feed.creatorHandle}
+      </div>
+      {feed.description && (
+        <p className="text-label wrap-break-word whitespace-pre-wrap">
+          {feed.description}
+        </p>
+      )}
+    </blockquote>
+  );
+}
+
 export function ExternalCard({
   external,
 }: {
@@ -151,6 +180,7 @@ export function PostCard({
   images,
   external,
   quote,
+  quotedFeed,
   reasonRepost,
   toolbar,
   threadPath,
@@ -235,6 +265,7 @@ export function PostCard({
           {images && <PostImages images={images} />}
           {external && <ExternalCard external={external} />}
           {quote && <QuotedPost quote={quote} />}
+          {quotedFeed && <QuotedFeed feed={quotedFeed} />}
           {toolbar ?? (
             <>
               <div

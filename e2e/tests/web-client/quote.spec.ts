@@ -162,4 +162,33 @@ test.describe("引用投稿", () => {
     }).toPass();
     await expect(card).toHaveAttribute("href", "https://example.com/quote-5");
   });
+
+  test("quote-6: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する", async ({
+    page,
+  }) => {
+    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
+      did: "did:web:feed.example.com",
+      displayName: "quote-6: フィード名",
+      description: "quote-6: フィードの説明",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-6: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: feed },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-6: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
+      await expect(quote).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(quote).toContainText("quote-6: フィード名");
+    await expect(quote).toContainText("@alice.test");
+    await expect(quote).toContainText("quote-6: フィードの説明");
+  });
 });

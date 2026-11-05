@@ -41,5 +41,11 @@ export type TimelinePostDto = {
       thumb?: string;
     };
   };
+  quotedFeed?: {
+    avatar?: string;
+    displayName: string;
+    creatorHandle: string;
+    description?: string;
+  };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };
