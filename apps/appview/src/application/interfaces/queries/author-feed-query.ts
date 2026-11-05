@@ -10,6 +10,7 @@ export interface IAuthorFeedQuery {
   findFeedItems: (params: FindParams) => Promise<FeedItemDto[]>;
   findFeedItemsWithoutReplies: (params: FindParams) => Promise<FeedItemDto[]>;
   findFeedItemsWithMedia: (params: FindParams) => Promise<FeedItemDto[]>;
+  findFeedItemsWithVideo: (params: FindParams) => Promise<FeedItemDto[]>;
   findFeedItemsWithAuthorThreads: (
     params: FindParams,
   ) => Promise<FeedItemDto[]>;

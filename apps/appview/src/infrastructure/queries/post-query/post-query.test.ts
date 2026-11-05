@@ -42,6 +42,7 @@ describe("PostQuery", () => {
           accountDid: post.accountDid,
           embedImages: [],
           embedGallery: [],
+          embedVideo: null,
           embedExternal: null,
           embedRecordUri: null,
           replyRootUri: null,

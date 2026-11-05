@@ -83,6 +83,21 @@ export class AuthorFeedQuery implements IAuthorFeedQuery {
     );
   }
 
+  findFeedItemsWithVideo(params: FindParams): Promise<FeedItemDto[]> {
+    return this.findFeedItems(
+      params,
+      and(
+        eq(schema.feedItems.type, "post"),
+        exists(
+          this.db
+            .select()
+            .from(schema.postEmbedVideos)
+            .where(eq(schema.postEmbedVideos.postUri, schema.feedItems.uri)),
+        ),
+      ),
+    );
+  }
+
   findFeedItemsWithAuthorThreads(params: FindParams): Promise<FeedItemDto[]> {
     const authorUri = `at://${params.accountDid}/%`;
     return this.findFeedItems(

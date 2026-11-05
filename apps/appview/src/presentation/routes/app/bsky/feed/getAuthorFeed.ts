@@ -1,10 +1,7 @@
-import { type LexRouter, LexServerError } from "@atproto/lex-server";
+import type { LexRouter } from "@atproto/lex-server";
 import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
 
-import {
-  type GetAuthorFeedUseCase,
-  UnsupportedFilterError,
-} from "../../../../../application/use-cases/feed/get-author-feed-use-case.js";
+import type { GetAuthorFeedUseCase } from "../../../../../application/use-cases/feed/get-author-feed-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
 
@@ -23,25 +20,15 @@ export class GetAuthorFeed {
           params.actor,
         );
 
-        try {
-          const body = await this.getAuthorFeedUseCase.execute({
-            accountDid,
-            limit: params.limit,
-            cursor: params.cursor ? new Date(params.cursor) : undefined,
-            filter: params.filter,
-            includePins: params.includePins,
-            viewerDid: viewerDid ?? undefined,
-          });
-          return { body };
-        } catch (error) {
-          if (error instanceof UnsupportedFilterError) {
-            throw new LexServerError(501, {
-              error: "MethodNotImplemented",
-              message: error.message,
-            });
-          }
-          throw error;
-        }
+        const body = await this.getAuthorFeedUseCase.execute({
+          accountDid,
+          limit: params.limit,
+          cursor: params.cursor ? new Date(params.cursor) : undefined,
+          filter: params.filter,
+          includePins: params.includePins,
+          viewerDid: viewerDid ?? undefined,
+        });
+        return { body };
       },
     });
   }

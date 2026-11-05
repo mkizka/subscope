@@ -10,12 +10,14 @@ import type * as AppBskyEmbedGallery from "@repo/client/app/bsky/embed/gallery";
 import type * as AppBskyEmbedImages from "@repo/client/app/bsky/embed/images";
 import type * as AppBskyEmbedRecord from "@repo/client/app/bsky/embed/record";
 import type * as AppBskyEmbedRecordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
+import type * as AppBskyEmbedVideo from "@repo/client/app/bsky/embed/video";
 import { validateRecord } from "@repo/common/utils";
 
 import type {
   PostDto,
   PostEmbedExternalDto,
   PostEmbedImageDto,
+  PostEmbedVideoDto,
 } from "../dto/post-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
 import { gateUri } from "../utils/gate-uri.js";
@@ -61,6 +63,9 @@ export class EmbedViews {
     }
     if (post.embedGallery.length > 0) {
       return this.galleryView(post.embedGallery, post.accountDid);
+    }
+    if (post.embedVideo) {
+      return this.videoView(post.embedVideo, post.accountDid);
     }
     if (post.embedExternal) {
       return this.externalView(post.embedExternal, post.accountDid);
@@ -166,6 +171,24 @@ export class EmbedViews {
           ? this.assetUrlBuilder.getFeedThumbnailUrl(accountDid, embed.thumbCid)
           : undefined,
       },
+    };
+  }
+
+  private videoView(
+    embed: PostEmbedVideoDto,
+    accountDid: string,
+  ): $Typed<AppBskyEmbedVideo.View> {
+    return {
+      $type: "app.bsky.embed.video#view",
+      cid: embed.cid,
+      playlist: this.assetUrlBuilder.getVideoPlaylistUrl(accountDid, embed.cid),
+      thumbnail: this.assetUrlBuilder.getVideoThumbnailUrl(
+        accountDid,
+        embed.cid,
+      ),
+      alt: embed.alt ?? undefined,
+      aspectRatio: embed.aspectRatio,
+      presentation: embed.presentation ?? undefined,
     };
   }
 

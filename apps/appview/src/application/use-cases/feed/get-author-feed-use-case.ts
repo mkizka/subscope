@@ -18,21 +18,7 @@ type GetAuthorFeedParams = {
   viewerDid?: Did;
 };
 
-export class UnsupportedFilterError extends Error {
-  constructor(filter: string) {
-    super(`filter ${filter} is not supported`);
-    this.name = "UnsupportedFilterError";
-  }
-}
-
 export class GetAuthorFeedUseCase {
-  private supportedFilters: Filter[] = [
-    "posts_with_replies",
-    "posts_no_replies",
-    "posts_with_media",
-    "posts_and_author_threads",
-  ];
-
   constructor(
     private readonly authorFeedQuery: IAuthorFeedQuery,
     private readonly viewContextFactory: ViewContextFactory,
@@ -42,10 +28,6 @@ export class GetAuthorFeedUseCase {
   async execute(
     params: GetAuthorFeedParams,
   ): Promise<AppBskyFeedGetAuthorFeed.$OutputBody> {
-    if (!this.supportedFilters.includes(params.filter)) {
-      throw new UnsupportedFilterError(params.filter);
-    }
-
     const paginator = createCursorPaginator<FeedItemDto>({
       limit: params.limit,
       getCursor: (item) => item.sortAt.toISOString(),
@@ -78,6 +60,8 @@ export class GetAuthorFeedUseCase {
         return this.authorFeedQuery.findFeedItemsWithoutReplies(params);
       case "posts_with_media":
         return this.authorFeedQuery.findFeedItemsWithMedia(params);
+      case "posts_with_video":
+        return this.authorFeedQuery.findFeedItemsWithVideo(params);
       case "posts_and_author_threads":
         return this.authorFeedQuery.findFeedItemsWithAuthorThreads(params);
       default:

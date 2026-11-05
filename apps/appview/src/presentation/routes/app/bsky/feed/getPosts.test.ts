@@ -8,6 +8,7 @@ import {
   listItemFactory,
   postEmbedImageFactory,
   postEmbedRecordFactory,
+  postEmbedVideoFactory,
   postFactory,
   recordFactory,
   repostFactory,
@@ -434,5 +435,37 @@ describe("app.bsky.feed.getPosts", () => {
         media: galleryView,
       },
     ]);
+  });
+
+  test("embed-2: 動画の埋め込みは、再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す", async () => {
+    // arrange
+    const { client } = await setupApiTest();
+    const post = await createPost();
+    const video = await postEmbedVideoFactory(ctx.db)
+      .vars({ post: () => post })
+      .props({
+        alt: () => "alt text",
+        aspectRatioWidth: () => 1920,
+        aspectRatioHeight: () => 1080,
+        presentation: () => "gif",
+      })
+      .create();
+
+    // act
+    const res = await client.call(getPosts, {
+      uris: [asAtUriString(post.uri)],
+    });
+
+    // assert
+    const base = `https://video.bsky.app/watch/${post.accountDid}/${video.cid}`;
+    expect(res.posts[0]?.embed).toEqual({
+      $type: "app.bsky.embed.video#view",
+      cid: video.cid,
+      playlist: `${base}/playlist.m3u8`,
+      thumbnail: `${base}/thumbnail.jpg`,
+      alt: "alt text",
+      aspectRatio: { width: 1920, height: 1080 },
+      presentation: "gif",
+    });
   });
 });
