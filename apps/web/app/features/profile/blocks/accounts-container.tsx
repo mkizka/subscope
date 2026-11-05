@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { InfoIcon } from "lucide-react";
+import { ArrowLeftIcon, InfoIcon } from "lucide-react";
 import { useRef } from "react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { Button } from "@/app/components/ui/button";
@@ -50,16 +50,21 @@ export function AccountsContainer() {
 
   return (
     <>
-      <h1 className="border-b border-line p-4 text-title">アカウント</h1>
+      <header className="flex items-center gap-2 border-b border-line p-4">
+        <Link to="/server" aria-label="戻る" className="text-muted">
+          <ArrowLeftIcon className="size-5" />
+        </Link>
+        <h1 className="text-title">アカウント</h1>
+      </header>
       <Tabs
         tabs={[
           {
-            to: "/accounts",
+            to: "/server/accounts",
             label: `登録アカウント${registered && !q ? ` ${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}` : ""}`,
             selected: !tracked,
           },
           {
-            to: "/accounts?tab=tracked",
+            to: "/server/accounts?tab=tracked",
             label: `追跡アカウント${trackedData ? ` ${trackedData.total}` : ""}`,
             selected: tracked,
           },

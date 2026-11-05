@@ -1,14 +1,6 @@
-import { loginRequiredMiddleware } from "@/app/middlewares/auth";
-import { AccountsPage } from "@/app/pages/client/accounts-page";
+import { redirect } from "react-router";
 
 import type { Route } from "./+types/accounts";
 
-export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
-
-export function meta() {
-  return [{ title: "アカウント - Subscope" }];
-}
-
-export default function Accounts() {
-  return <AccountsPage />;
-}
+export const loader = ({ request }: Route.LoaderArgs) =>
+  redirect(`/server/accounts${new URL(request.url).search}`);

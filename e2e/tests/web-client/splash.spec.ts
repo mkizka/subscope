@@ -56,7 +56,7 @@ test.describe("起動時のスプラッシュ", () => {
       .getByRole("link", { name: "アカウント", exact: true })
       .click();
 
-    await expect(page).toHaveURL("/accounts");
+    await expect(page).toHaveURL("/server/accounts");
     await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
   });
 

@@ -192,7 +192,7 @@ test.describe("検索", () => {
       .getByRole("navigation")
       .getByRole("link", { name: "アカウント", exact: true })
       .click();
-    await expect(page).toHaveURL("/accounts");
+    await expect(page).toHaveURL("/server/accounts");
     await page.route("**/api/search*", () => {});
 
     await page.goBack();

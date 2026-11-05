@@ -17,15 +17,11 @@ test.describe("アカウント", () => {
 
   const items = (page: Page) => page.getByRole("main").getByRole("listitem");
 
-  test("accounts-1: 左カラムの「アカウント」から、中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
+  test("accounts-1: 中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
     page,
   }) => {
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
-      .click();
+    await page.goto("/server/accounts");
 
-    await expect(page).toHaveURL("/accounts");
     const alice = items(page).filter({ hasText: "Alice" });
     await expect(async () => {
       await page.reload();
@@ -39,11 +35,11 @@ test.describe("アカウント", () => {
   test("accounts-2: 「追跡アカウント」タブを選ぶと、追跡アカウント（名前、ハンドル）を、フォローしている登録アカウントが多い順に一覧表示する", async ({
     page,
   }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     await page.getByRole("tab", { name: /^追跡アカウント/ }).click();
 
-    await expect(page).toHaveURL("/accounts?tab=tracked");
+    await expect(page).toHaveURL("/server/accounts?tab=tracked");
     const bob = items(page).filter({ hasText: "Bob" });
     await expect(async () => {
       await page.reload();
@@ -63,7 +59,7 @@ test.describe("アカウント", () => {
   test("accounts-3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     await page
       .getByRole("main")
@@ -79,7 +75,7 @@ test.describe("アカウント", () => {
   });
 
   test("accounts-4: 各タブに、そのタブの人数を表示する", async ({ page }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     await expect(
       page.getByRole("tab", { name: /^登録アカウント \d+/ }),
@@ -92,7 +88,7 @@ test.describe("アカウント", () => {
   test("accounts-5: 管理者の登録アカウントには「管理者」ラベルを表示する", async ({
     page,
   }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     await expect(
       items(page).filter({ hasText: "Alice" }).getByText("管理者"),
@@ -102,7 +98,7 @@ test.describe("アカウント", () => {
   test("accounts-6: 一覧のアカウントには、名前の下の行に過去の投稿の同期状態を表示する", async ({
     page,
   }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     const item = items(page).filter({ hasText: "Alice" });
     await expect(async () => {
@@ -116,7 +112,7 @@ test.describe("アカウント", () => {
   test("accounts-7: 追跡アカウントのタブには、フォローしている登録アカウントの数を「n人からフォロー」と表示する", async ({
     page,
   }) => {
-    await page.goto("/accounts?tab=tracked");
+    await page.goto("/server/accounts?tab=tracked");
 
     await expect(
       items(page)
@@ -128,7 +124,7 @@ test.describe("アカウント", () => {
   test("accounts-8: 追跡アカウントのタブの「追跡アカウントとは？」を押すと、追跡アカウントの説明をモーダルで表示する", async ({
     page,
   }) => {
-    await page.goto("/accounts?tab=tracked");
+    await page.goto("/server/accounts?tab=tracked");
 
     await page.getByRole("button", { name: "追跡アカウントとは？" }).click();
 
@@ -146,21 +142,24 @@ test.describe("アカウント", () => {
   test("accounts-9: 登録アカウントのタブには「追跡アカウントとは？」を表示しない", async ({
     page,
   }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     await expect(
       page.getByRole("button", { name: "追跡アカウントとは？" }),
     ).toBeHidden();
   });
 
-  test("accounts-10: 旧URLの /registered-accounts と /tracked-accounts は、/accounts の該当タブへ移動する", async ({
+  test("accounts-10: 旧URLの /accounts、/registered-accounts、/tracked-accounts は、/server/accounts の該当タブへ移動する", async ({
     page,
   }) => {
+    await page.goto("/accounts?tab=tracked");
+    await expect(page).toHaveURL("/server/accounts?tab=tracked");
+
     await page.goto("/registered-accounts");
-    await expect(page).toHaveURL("/accounts");
+    await expect(page).toHaveURL("/server/accounts");
 
     await page.goto("/tracked-accounts");
-    await expect(page).toHaveURL("/accounts?tab=tracked");
+    await expect(page).toHaveURL("/server/accounts?tab=tracked");
   });
 
   test("accounts-11: アカウントの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
@@ -172,10 +171,7 @@ test.describe("アカウント", () => {
       await route.continue();
     });
 
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
-      .click();
+    await page.goto("/server/accounts");
 
     await expect(
       page.getByRole("heading", { name: "アカウント" }),
@@ -192,12 +188,12 @@ test.describe("アカウント", () => {
   test("accounts-12: タブの下の検索欄に入力すると、選んでいるタブの全件から表示名・ハンドルの部分一致で絞り込み、検索語を `?q=` に入れる", async ({
     page,
   }) => {
-    await page.goto("/accounts?tab=tracked");
+    await page.goto("/server/accounts?tab=tracked");
     await expect(items(page).filter({ hasText: "Alice" })).toBeVisible();
 
     await page.getByPlaceholder("名前・ハンドルで検索").fill("bob");
 
-    await expect(page).toHaveURL("/accounts?tab=tracked&q=bob");
+    await expect(page).toHaveURL("/server/accounts?tab=tracked&q=bob");
     await expect(items(page).filter({ hasText: "Bob" })).toBeVisible();
     await expect(items(page).filter({ hasText: "Alice" })).toBeHidden();
   });
@@ -205,10 +201,20 @@ test.describe("アカウント", () => {
   test("accounts-13: 検索に一致するアカウントがないときは「アカウントが見つかりません」を表示する", async ({
     page,
   }) => {
-    await page.goto("/accounts");
+    await page.goto("/server/accounts");
 
     await page.getByPlaceholder("名前・ハンドルで検索").fill("zzzzzz");
 
     await expect(page.getByText("アカウントが見つかりません")).toBeVisible();
+  });
+
+  test("accounts-14: 見出しの横に戻る矢印を表示し、押すと /server に移動する", async ({
+    page,
+  }) => {
+    await page.goto("/server/accounts");
+
+    await page.getByRole("main").getByRole("link", { name: "戻る" }).click();
+
+    await expect(page).toHaveURL("/server");
   });
 });
