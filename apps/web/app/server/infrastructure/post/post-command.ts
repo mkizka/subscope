@@ -4,6 +4,7 @@ import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
 import postRecord from "@repo/client/app/bsky/feed/post";
 import threadgate from "@repo/client/app/bsky/feed/threadgate";
 import * as facet from "@repo/client/app/bsky/richtext/facet";
+import { imageSize } from "image-size";
 
 import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
 import type { PostRef } from "@/app/server/application/dto/new-post";
@@ -20,6 +21,13 @@ const toStrongRef = ({ uri, cid }: PostRef) => ({
   uri: asAtUriString(uri),
   cid,
 });
+
+const getAspectRatio = (bytes: Uint8Array) => {
+  const { width, height, orientation = 1 } = imageSize(bytes);
+  return orientation >= 5
+    ? { width: height, height: width }
+    : { width, height };
+};
 
 export const postCommandFactory = ({
   oauthClient,
@@ -39,7 +47,10 @@ export const postCommandFactory = ({
       const uploaded = await Promise.all(
         images.map(async ({ file, alt }) => {
           const { body } = await agent.uploadBlob(file);
-          return { image: body.blob, alt };
+          const aspectRatio = getAspectRatio(
+            new Uint8Array(await file.arrayBuffer()),
+          );
+          return { image: body.blob, alt, aspectRatio };
         }),
       );
       const media =
