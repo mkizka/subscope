@@ -40,6 +40,7 @@ export type PostCardProps = {
     text?: string;
     links?: TextLink[];
     images?: PostImage[];
+    threadPath?: string;
     external?: NonNullable<PostCardProps["external"]>;
   };
   reasonRepost?: {
@@ -85,7 +86,14 @@ export function QuotedPost({
   quote: NonNullable<PostCardProps["quote"]>;
 }) {
   return (
-    <blockquote className="mt-2 rounded-xl border border-line px-3 py-2">
+    <blockquote className="relative mt-2 rounded-xl border border-line px-3 py-2">
+      {quote.threadPath && (
+        <Link
+          to={quote.threadPath}
+          aria-label="引用された投稿のスレッドを開く"
+          className="absolute inset-0 rounded-xl"
+        />
+      )}
       <div className="flex items-center gap-2 text-label">
         <Avatar src={quote.authorAvatar} size="sm" />
         <span className="truncate font-bold">

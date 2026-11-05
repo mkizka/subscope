@@ -35,6 +35,7 @@ export type TimelinePostDto = {
     text?: string;
     links?: TextLinkDto[];
     images?: { thumb: string; fullsize: string; alt: string }[];
+    threadPath?: string;
     external?: {
       uri: string;
       title: string;
