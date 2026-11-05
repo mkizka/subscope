@@ -17,7 +17,7 @@ test.describe("アカウント", () => {
 
   const items = (page: Page) => page.getByRole("main").getByRole("listitem");
 
-  test("accounts-1: 中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
+  test("accounts-1: `/server/accounts` で、中央カラムに登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
     page,
   }) => {
     await page.goto("/server/accounts");
