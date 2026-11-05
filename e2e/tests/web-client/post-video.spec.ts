@@ -64,7 +64,7 @@ test.describe("投稿動画", () => {
     page,
   }) => {
     const text = `post-video-3: ${Date.now()}`;
-    const quoted = await postVideo(`${text} quoted`);
+    const quoted = await postVideo(`post-video-3-quoted: ${Date.now()}`);
     await createRecord("alice.test", "app.bsky.feed.post", {
       text,
       embed: { $type: "app.bsky.embed.record", record: quoted },
