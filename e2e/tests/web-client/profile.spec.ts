@@ -78,6 +78,22 @@ test.describe("プロフィール", () => {
     ).toHaveAttribute("target", "_blank");
   });
 
+  test("profile-21: アイコン画像を設定していないアカウントには、人型のシルエットをアイコンの代わりに表示する", async ({
+    page,
+  }) => {
+    await putRecord("alice.test", "app.bsky.actor.profile", "self", {
+      displayName: "Alice",
+    });
+    await page.goto("/alice.test");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page.getByRole("main").getByTestId("avatar-fallback"),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
   test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
     page,
   }) => {
