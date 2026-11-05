@@ -1,6 +1,6 @@
 import { type Did, isDid } from "@atproto/did";
 import { LexServerError } from "@atproto/lex-server";
-import type { ILoggerManager, Logger } from "@repo/common/domain";
+import type { ILoggerManager, Logger } from "@repo/common/interface";
 import { type Handle, isHandle } from "@repo/common/utils";
 
 import {

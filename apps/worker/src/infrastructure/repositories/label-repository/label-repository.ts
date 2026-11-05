@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, eq } from "drizzle-orm";
 

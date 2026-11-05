@@ -1,4 +1,4 @@
-import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/interface";
 
 import { parseFollow } from "../../dto/follow.js";
 import type { Record } from "../../dto/record.js";

@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import {
   type DatabaseClient,
   type TransactionContext,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 

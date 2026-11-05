@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 export interface IPostQuery {
   exists: (ctx: TransactionContext, uri: AtUri) => Promise<boolean>;

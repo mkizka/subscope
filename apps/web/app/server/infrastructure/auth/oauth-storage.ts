@@ -2,7 +2,7 @@ import type {
   NodeSavedSessionStore,
   NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
-import type { DatabaseClient } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 

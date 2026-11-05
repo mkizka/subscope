@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { FeedItem } from "../../../application/dto/feed-item.js";
 import type { IFeedItemRepository } from "../../../application/interfaces/repositories/feed-item-repository.js";

@@ -1,4 +1,4 @@
-import type { DatabaseClient } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, gt, inArray, isNull, or } from "drizzle-orm";
 

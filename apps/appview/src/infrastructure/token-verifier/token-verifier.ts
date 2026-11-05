@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { AuthRequiredError, verifyJwt } from "@atproto/xrpc-server";
-import type { IDidResolver } from "@repo/common/domain";
+import type { IDidResolver } from "@repo/common/interface";
 
 import type { ITokenVerifier } from "../../application/interfaces/token-verifier.js";
 

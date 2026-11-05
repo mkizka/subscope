@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/repositories/account-repository.js";
 import type { Account } from "../../../domain/account.js";

@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { IJobScheduler } from "@repo/common/domain";
+import type { IJobScheduler } from "@repo/common/interface";
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { IFollowQuery } from "../../interfaces/queries/follow-query.js";

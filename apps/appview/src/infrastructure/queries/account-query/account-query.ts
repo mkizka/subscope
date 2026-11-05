@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
-import type { DatabaseClient } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, asc, eq, gt } from "drizzle-orm";
 

@@ -1,4 +1,4 @@
-import type { AfterCommitContext } from "@repo/common/domain";
+import type { AfterCommitContext } from "@repo/common/interface";
 
 import { parseListItem } from "../../dto/list-item.js";
 import type { Record } from "../../dto/record.js";

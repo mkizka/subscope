@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { AccountStats } from "../repositories/account-stats-repository.js";
 

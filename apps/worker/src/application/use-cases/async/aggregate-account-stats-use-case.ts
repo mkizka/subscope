@@ -1,4 +1,4 @@
-import type { ITransactionManager } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 import type { IAccountStatsQuery } from "../../interfaces/queries/account-stats-query.js";

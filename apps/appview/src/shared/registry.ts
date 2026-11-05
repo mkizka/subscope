@@ -1,11 +1,4 @@
 import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
-import type {
-  IDidCache,
-  IDidResolver,
-  IJobQueue,
-  IJobScheduler,
-  ITransactionManager,
-} from "@repo/common/domain";
 import {
   connectionPoolFactory,
   databaseFactory,
@@ -17,6 +10,13 @@ import {
   RedisDidCache,
   TransactionManager,
 } from "@repo/common/infrastructure";
+import type {
+  IDidCache,
+  IDidResolver,
+  IJobQueue,
+  IJobScheduler,
+  ITransactionManager,
+} from "@repo/common/interface";
 
 import type { IAccountRepository } from "../application/interfaces/account-repository.js";
 import type { IAssetUrlBuilder } from "../application/interfaces/asset-url-builder.js";

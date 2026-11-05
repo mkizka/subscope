@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { ListItem } from "../../../application/dto/list-item.js";
 import type { IListItemRepository } from "../../../application/interfaces/repositories/list-item-repository.js";

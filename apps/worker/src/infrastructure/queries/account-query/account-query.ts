@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { union } from "drizzle-orm/pg-core";

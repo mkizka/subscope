@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 

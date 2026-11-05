@@ -1,8 +1,8 @@
-import type { DatabaseClient, ILoggerManager } from "@repo/common/domain";
 import {
   connectionPoolFactory,
   databaseFactory,
 } from "@repo/common/infrastructure";
+import type { DatabaseClient, ILoggerManager } from "@repo/common/interface";
 
 import { env } from "@/app/server/env";
 

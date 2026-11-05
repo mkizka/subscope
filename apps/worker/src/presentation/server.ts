@@ -1,6 +1,6 @@
 import type { Server } from "node:http";
 
-import type { IJobQueue, ILoggerManager, Logger } from "@repo/common/domain";
+import type { IJobQueue, ILoggerManager, Logger } from "@repo/common/interface";
 import { loggingMiddleware } from "@repo/common/utils";
 import express, { type Router } from "express";
 import promBundle from "express-prom-bundle";

@@ -2,7 +2,7 @@ import type { Did } from "@atproto/did";
 import {
   type IJobScheduler,
   type ITransactionManager,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import type { CreateAdminService } from "../../../application/service/admin/create-admin-service.js";
