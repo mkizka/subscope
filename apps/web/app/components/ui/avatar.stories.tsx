@@ -16,6 +16,10 @@ export const Small: Story = {
 
 export const Medium: Story = {};
 
+export const WithImage: Story = {
+  args: { src: "https://placehold.co/80" },
+};
+
 export const Large: Story = {
   args: { size: "lg" },
 };
