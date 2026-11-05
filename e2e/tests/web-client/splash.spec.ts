@@ -53,10 +53,10 @@ test.describe("起動時のスプラッシュ", () => {
 
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "通知", exact: true })
       .click();
 
-    await expect(page).toHaveURL("/accounts");
+    await expect(page).toHaveURL("/notifications");
     await expect(page.getByText("読み込み中", { exact: true })).toBeHidden();
   });
 

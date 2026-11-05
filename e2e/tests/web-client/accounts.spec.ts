@@ -168,10 +168,7 @@ test.describe("アカウント", () => {
       await route.continue();
     });
 
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
-      .click();
+    await page.goto("/accounts");
 
     await expect(
       page.getByRole("heading", { name: "アカウント" }),

@@ -12,10 +12,10 @@ test.describe("レイアウト", () => {
       "page",
     );
 
-    await nav.getByRole("link", { name: "アカウント", exact: true }).click();
+    await nav.getByRole("link", { name: "通知", exact: true }).click();
 
     await expect(
-      nav.getByRole("link", { name: "アカウント", exact: true }),
+      nav.getByRole("link", { name: "通知", exact: true }),
     ).toHaveAttribute("aria-current", "page");
     await expect(nav.getByRole("link", { name: "ホーム" })).not.toHaveAttribute(
       "aria-current",
