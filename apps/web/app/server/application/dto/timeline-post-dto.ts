@@ -43,5 +43,6 @@ export type TimelinePostDto = {
       thumb?: string;
     };
   };
+  quoteUnavailable?: "notFound" | "blocked" | "detached";
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };

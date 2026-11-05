@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, putRecord, uploadImage } from "../../helpers/pds";
+import {
+  createRecord,
+  deleteRecord,
+  putRecord,
+  uploadImage,
+} from "../../helpers/pds";
 
 test.describe("引用投稿", () => {
   test("quote-1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する", async ({
@@ -195,11 +200,36 @@ test.describe("引用投稿", () => {
     );
   });
 
-  test("quote-7: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする", async ({
+  test("quote-7: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する", async ({
     page,
   }) => {
-    const prefix = "quote-7: 引用される投稿 ";
-    const label = "example.com/quote-7...";
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-7: 引用される投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-7: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+    await deleteRecord("alice.test", quoted.uri);
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-7: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
+      await expect(quote).toContainText("削除されました", { timeout: 1000 });
+    }).toPass();
+  });
+
+  test("quote-8: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする", async ({
+    page,
+  }) => {
+    const prefix = "quote-8: 引用される投稿 ";
+    const label = "example.com/quote-8...";
     const byteStart = new TextEncoder().encode(prefix).length;
     const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
       text: `${prefix}${label}`,
@@ -212,7 +242,7 @@ test.describe("引用投稿", () => {
           features: [
             {
               $type: "app.bsky.richtext.facet#link",
-              uri: "https://example.com/quote-7/full",
+              uri: "https://example.com/quote-8/full",
             },
           ],
         },
@@ -220,7 +250,7 @@ test.describe("引用投稿", () => {
       createdAt: new Date().toISOString(),
     });
     await createRecord("alice.test", "app.bsky.feed.post", {
-      text: "quote-7: 引用した投稿",
+      text: "quote-8: 引用した投稿",
       embed: { $type: "app.bsky.embed.record", record: quoted },
       createdAt: new Date().toISOString(),
     });
@@ -228,7 +258,7 @@ test.describe("引用投稿", () => {
     await page.goto("/");
     const link = page
       .getByRole("article")
-      .filter({ hasText: "quote-7: 引用した投稿" })
+      .filter({ hasText: "quote-8: 引用した投稿" })
       .getByRole("blockquote")
       .getByRole("link", { name: label, exact: true });
     await expect(async () => {
@@ -237,7 +267,7 @@ test.describe("引用投稿", () => {
     }).toPass();
     await expect(link).toHaveAttribute(
       "href",
-      "https://example.com/quote-7/full",
+      "https://example.com/quote-8/full",
     );
   });
 });

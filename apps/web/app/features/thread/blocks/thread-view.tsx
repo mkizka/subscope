@@ -16,6 +16,7 @@ import {
   PostCard,
   type PostCardProps,
   QuotedPost,
+  UnavailableQuote,
 } from "@/app/features/timeline/parts/post-card";
 import { PostImages } from "@/app/features/timeline/parts/post-images";
 import { ProfileLink } from "@/app/features/timeline/parts/profile-link";
@@ -39,6 +40,7 @@ function FocusedPost({
   images,
   external,
   quote,
+  quoteUnavailable,
   createdAt,
   replyCount,
   repostCount,
@@ -77,6 +79,7 @@ function FocusedPost({
       {images && <PostImages images={images} />}
       {external && <ExternalCard external={external} />}
       {quote && <QuotedPost quote={quote} />}
+      {quoteUnavailable && <UnavailableQuote reason={quoteUnavailable} />}
       {createdAt && (
         <time
           dateTime={createdAt}
