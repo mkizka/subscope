@@ -14,15 +14,22 @@ type Props = {
 };
 
 export function ThreadViewContainer({ handle, rkey }: Props) {
-  const { data } = useQuery({
+  const { data, isError } = useQuery({
     queryKey: ["thread", handle, rkey],
     queryFn: () =>
       fetchJson<ThreadResponse>(
         `/api/thread?${new URLSearchParams({ handle, rkey })}`,
       ),
-    throwOnError: true,
+    retry: false,
   });
 
+  if (isError) {
+    return (
+      <p className="py-8 text-center text-label text-muted">
+        投稿が見つかりません
+      </p>
+    );
+  }
   if (!data) {
     return <PostsSkeleton />;
   }

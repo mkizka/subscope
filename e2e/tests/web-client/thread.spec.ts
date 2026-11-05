@@ -366,4 +366,20 @@ test.describe("スレッド", () => {
         .getByText("thread-15: 投稿"),
     ).toBeVisible();
   });
+
+  test("thread-16: 存在しない投稿のスレッドを開くと、再試行せずに「投稿が見つかりません」を表示する", async ({
+    page,
+  }) => {
+    let requests = 0;
+    await page.route("**/api/thread*", async (route) => {
+      requests++;
+      await route.continue();
+    });
+
+    await page.goto("/alice.test/post/3zzzzzzzzzzzz");
+
+    await expect(page.getByText("投稿が見つかりません")).toBeVisible();
+    await page.waitForTimeout(3000);
+    expect(requests).toBe(1);
+  });
 });
