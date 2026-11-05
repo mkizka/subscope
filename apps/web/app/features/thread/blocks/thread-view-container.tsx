@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { PostsSkeleton } from "@/app/components/posts-skeleton";
+import { ThreadSkeleton } from "@/app/features/thread/parts/thread-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.thread";
 
@@ -31,7 +31,7 @@ export function ThreadViewContainer({ handle, rkey }: Props) {
     );
   }
   if (!data) {
-    return <PostsSkeleton />;
+    return <ThreadSkeleton />;
   }
   return <ThreadView thread={data} />;
 }
