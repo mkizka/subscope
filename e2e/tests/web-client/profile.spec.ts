@@ -89,7 +89,9 @@ test.describe("プロフィール", () => {
     await expect(async () => {
       await page.reload();
       await expect(
-        page.getByRole("main").getByTestId("avatar-fallback"),
+        page
+          .getByRole("button", { name: "アイコンを拡大" })
+          .getByTestId("avatar-fallback"),
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
   });
