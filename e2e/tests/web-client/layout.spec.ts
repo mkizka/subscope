@@ -12,10 +12,10 @@ test.describe("レイアウト", () => {
       "page",
     );
 
-    await nav.getByRole("link", { name: "アカウント", exact: true }).click();
+    await nav.getByRole("link", { name: "通知", exact: true }).click();
 
     await expect(
-      nav.getByRole("link", { name: "アカウント", exact: true }),
+      nav.getByRole("link", { name: "通知", exact: true }),
     ).toHaveAttribute("aria-current", "page");
     await expect(nav.getByRole("link", { name: "ホーム" })).not.toHaveAttribute(
       "aria-current",
@@ -48,14 +48,20 @@ test.describe("レイアウト", () => {
     }).toPass();
   });
 
-  test("layout-5: 右カラムに、このサーバーが登録アカウントとそのフォロー先の投稿だけを保存することを表示する", async ({
+  test("layout-5: 右カラムに、サーバー名と「登録 N ・ 追跡 N」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
     page,
   }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    await expect(
-      page.getByRole("complementary", { name: "このサーバーについて" }),
-    ).toContainText("登録アカウントとそのフォロー先の投稿だけを保存します");
+    const card = page
+      .getByRole("complementary", { name: "サーバー" })
+      .getByRole("link");
+    await expect(card).toContainText("Subscope");
+    await expect(card).toContainText(/登録 \d+\+? ・ 追跡 \d+/);
+    await card.click();
+
+    await expect(page).toHaveURL("/server");
   });
 
   test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
@@ -122,7 +128,7 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(page).toHaveURL("/login");
   });
 
-  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べる", async ({
+  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目に加えて「サーバー」を並べ、`/server` に移動できる", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -138,6 +144,13 @@ test.describe("レイアウト（モバイル）", () => {
       .getByRole("link")
       .allTextContents();
 
-    expect(drawerItems).toEqual(pcItems);
+    expect(drawerItems.filter((text) => text !== "サーバー")).toEqual(pcItems);
+    expect(drawerItems).toContain("サーバー");
+
+    await page
+      .getByRole("dialog", { name: "メニュー" })
+      .getByRole("link", { name: "サーバー" })
+      .click();
+    await expect(page).toHaveURL("/server");
   });
 });

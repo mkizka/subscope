@@ -353,9 +353,9 @@ test.describe("スレッド", () => {
     await openThread(page, target.uri, "thread-15: 投稿");
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "通知", exact: true })
       .click();
-    await expect(page).toHaveURL("/accounts");
+    await expect(page).toHaveURL("/notifications");
     await page.route("**/api/thread*", () => {});
 
     await page.goBack();

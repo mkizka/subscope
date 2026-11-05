@@ -470,9 +470,9 @@ test.describe("プロフィール", () => {
     await expect(followers).toBeVisible();
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "アカウント", exact: true })
+      .getByRole("link", { name: "通知", exact: true })
       .click();
-    await expect(page).toHaveURL("/accounts");
+    await expect(page).toHaveURL("/notifications");
     await page.route("**/api/profile/*", () => {});
 
     await page.goBack();
