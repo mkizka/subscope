@@ -39,6 +39,7 @@ export type PostCardProps = {
     authorHandle: string;
     text?: string;
     images?: PostImage[];
+    external?: NonNullable<PostCardProps["external"]>;
   };
   reasonRepost?: {
     byDisplayName?: string;
@@ -95,6 +96,7 @@ export function QuotedPost({
         {quote.text}
       </p>
       {quote.images && <PostImages images={quote.images} />}
+      {quote.external && <ExternalCard external={quote.external} />}
     </blockquote>
   );
 }
