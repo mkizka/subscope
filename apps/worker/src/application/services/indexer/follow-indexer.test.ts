@@ -1,4 +1,4 @@
-import type { AfterCommitContext } from "@repo/common/domain";
+import type { AfterCommitContext } from "@repo/common/interface";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { accountFactory } from "../../../domain/account.factory.js";

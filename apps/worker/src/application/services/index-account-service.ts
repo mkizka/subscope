@@ -4,7 +4,7 @@ import {
   type AfterCommitContext,
   type IJobScheduler,
   type TransactionContext,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 import type { Handle } from "@repo/common/utils";
 
 import type { AccountStatus } from "../../domain/account.js";

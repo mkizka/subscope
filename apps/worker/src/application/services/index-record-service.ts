@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
-import type { AfterCommitContext } from "@repo/common/domain";
+import type { AfterCommitContext } from "@repo/common/interface";
 import {
   isSupportedCollection,
   type SupportedCollection,

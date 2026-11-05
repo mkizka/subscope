@@ -1,4 +1,7 @@
-import type { IJobScheduler, ITransactionManager } from "@repo/common/domain";
+import type {
+  IJobScheduler,
+  ITransactionManager,
+} from "@repo/common/interface";
 
 import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 

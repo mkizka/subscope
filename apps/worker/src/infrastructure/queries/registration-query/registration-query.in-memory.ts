@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 

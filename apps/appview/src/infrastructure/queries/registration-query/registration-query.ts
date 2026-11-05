@@ -1,5 +1,5 @@
 import { asDid, type Did } from "@atproto/did";
-import { type DatabaseClient } from "@repo/common/domain";
+import { type DatabaseClient } from "@repo/common/interface";
 import { type BackfillStatus } from "@repo/db";
 import { schema } from "@repo/db";
 import {

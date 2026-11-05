@@ -1,4 +1,4 @@
-import type { JobData } from "@repo/common/domain";
+import type { JobData } from "@repo/common/interface";
 import type { BackoffStrategy, Processor, WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
 

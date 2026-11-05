@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { Generator } from "../../../application/dto/generator.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";

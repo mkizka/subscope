@@ -5,7 +5,7 @@
   "private": true,
   "exports": {
     "./utils": "./src/utils.js",
-    "./domain": "./src/domain.js",
+    "./interface": "./src/interface.js",
     "./infrastructure": "./src/infrastructure.js",
     "./test": "./src/test.js"
   },

@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import { type ITransactionManager } from "@repo/common/domain";
+import { type ITransactionManager } from "@repo/common/interface";
 
 import type { IRegistrationRepository } from "../../../application/interfaces/registration-repository.js";
 import { Registration } from "../../../domain/models/registration.js";

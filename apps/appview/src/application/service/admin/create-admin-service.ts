@@ -3,7 +3,7 @@ import { AtUri } from "@atproto/syntax";
 import {
   type AfterCommitContext,
   type IJobScheduler,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import { Account } from "../../../domain/models/account.js";

@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { Follow } from "../../../application/dto/follow.js";
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";

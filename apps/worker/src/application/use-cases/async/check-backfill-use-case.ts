@@ -2,7 +2,7 @@ import type {
   IJobScheduler,
   ITransactionManager,
   JobData,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 
 import type { BackfillStatus } from "../../../domain/account.js";
 import type { ITapClient } from "../../interfaces/external/tap-client.js";

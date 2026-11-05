@@ -1,5 +1,5 @@
 import { type DatetimeString, toDatetimeString } from "@atproto/syntax";
-import { type ITransactionManager } from "@repo/common/domain";
+import { type ITransactionManager } from "@repo/common/interface";
 
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 import { InviteCode } from "../../../domain/models/invite-code.js";

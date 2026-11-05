@@ -1,4 +1,4 @@
-import type { ILoggerManager } from "@repo/common/domain";
+import type { ILoggerManager } from "@repo/common/interface";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { ISubscopeCommand } from "@/app/server/application/interfaces/subscope-command";

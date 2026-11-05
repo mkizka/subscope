@@ -1,6 +1,6 @@
 import { pinoHttp } from "pino-http";
 
-import type { Logger } from "../domain/interfaces/logger.js";
+import type { Logger } from "../interface/logger.js";
 
 export function loggingMiddleware(logger: Logger) {
   const isDevelopment = process.env.NODE_ENV === "development";

@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 export interface AccountStats {
   accountDid: string;

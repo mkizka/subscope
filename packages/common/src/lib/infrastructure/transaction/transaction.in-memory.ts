@@ -2,7 +2,7 @@ import type {
   AfterCommitContext,
   ITransactionManager,
   TransactionContext,
-} from "../../domain/interfaces/transaction.js";
+} from "../../interface/transaction.js";
 
 export class InMemoryTransactionManager implements ITransactionManager {
   async transaction<T>(

@@ -27,7 +27,7 @@ appsディレクトリ(アプリケーション)
 packagesディレクトリ(共通パッケージ)
 
 - `@repo/db` - Drizzle ORMデータベースの定義
-- `@repo/common/domain` - ドメインモデル
+- `@repo/common/interface` - インターフェース定義
 - `@repo/common/infrastructure` - インフラストラクチャ
 - `@repo/common/utils` - 共有ユーティリティ関数
 - `@repo/client` - `@atproto/lex`で生成したlexiconスキーマ

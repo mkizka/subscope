@@ -1,4 +1,4 @@
-import type { ITransactionManager } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IndexAccountService } from "../../services/index-account-service.js";
 import type { ResolveDidUseCase } from "../async/resolve-did-use-case.js";

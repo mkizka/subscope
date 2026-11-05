@@ -1,4 +1,4 @@
-import type { DatabaseClient } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/interface";
 import type { TableConfig } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 
