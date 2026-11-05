@@ -314,7 +314,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 閲覧者を登録し、Tapに閲覧者のリポジトリを追加する。認証が必要。
 
 - registerAccount-1: 1つの招待コードは同時に使われても1人しか登録せず、他のリクエストには400を返す
-- registerAccount-2: BANされたアカウントは登録せず、400とBannedを返す
+- registerAccount-2: サーバー登録を停止されたアカウントは登録せず、400とBannedを返す
 - registerAccount-3: 管理者以外は、有効期限内の未使用の招待コードがなければ登録せず、400とInvalidInviteCodeを返す
 - registerAccount-4: 登録済みのアカウントは登録せず、400とAlreadyRegisteredを返す
 - registerAccount-5: 管理者は招待コードなしで登録する
@@ -386,24 +386,24 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.banAccount
 
-登録アカウントの登録を解除し、BANする。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
+登録アカウントの登録を解除し、サーバー登録を停止する。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
 
-- banAccount-1: 管理者はBANせず、400とCannotBanAdminを返す
+- banAccount-1: 管理者は登録停止せず、400とCannotBanAdminを返す
 - banAccount-2: 本人とそのフォロー先のsyncTapRepoジョブを積む
 
 ## me.subsco.admin.getBannedAccounts
 
-BANされたアカウントのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
+サーバー登録を停止中のアカウントのプロフィールを返す。管理者の認証が必要。limitとcursorでページングする。
 
-- getBannedAccounts-1: BANされたアカウントのprofileViewを返す
-- getBannedAccounts-2: BANされていないアカウントは含めない
+- getBannedAccounts-1: 停止中のアカウントのprofileViewを返す
+- getBannedAccounts-2: 停止中でないアカウントは含めない
 
 ## me.subsco.admin.unbanAccount
 
-アカウントのBANを解除する。管理者の認証が必要。登録アカウントには戻さず、本人が改めて登録する。
+アカウントのサーバー登録の停止を取り消す(登録を再開する)。管理者の認証が必要。登録アカウントには戻さず、本人が改めて登録する。
 
-- unbanAccount-1: BANを解除したアカウントは招待コードで再登録できる
-- unbanAccount-2: BANされていないアカウントには400とNotBannedを返す
+- unbanAccount-1: 登録を再開したアカウントは招待コードで再登録できる
+- unbanAccount-2: 停止中でないアカウントには400とNotBannedを返す
 
 ## me.subsco.admin.createInviteCode
 
