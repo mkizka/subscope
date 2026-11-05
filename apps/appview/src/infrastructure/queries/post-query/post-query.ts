@@ -9,6 +9,7 @@ import type { IPostQuery } from "../../../application/interfaces/queries/post-qu
 
 type SelectPost = typeof schema.posts.$inferSelect & {
   embedImages: (typeof schema.postEmbedImages.$inferSelect)[];
+  embedVideo: typeof schema.postEmbedVideos.$inferSelect | null;
   embedExternal: typeof schema.postEmbedExternals.$inferSelect | null;
   embedRecord: typeof schema.postEmbedRecords.$inferSelect | null;
 };
@@ -33,6 +34,18 @@ const toPostDto = (post: SelectPost): PostDto => ({
   accountDid: asDid(post.accountDid),
   embedImages: toImageDtos(post.embedImages, "images"),
   embedGallery: toImageDtos(post.embedImages, "gallery"),
+  embedVideo: post.embedVideo && {
+    cid: post.embedVideo.cid,
+    alt: post.embedVideo.alt,
+    aspectRatio:
+      post.embedVideo.aspectRatioWidth && post.embedVideo.aspectRatioHeight
+        ? {
+            width: post.embedVideo.aspectRatioWidth,
+            height: post.embedVideo.aspectRatioHeight,
+          }
+        : undefined,
+    presentation: post.embedVideo.presentation,
+  },
   embedExternal: post.embedExternal && {
     uri: post.embedExternal.uri,
     title: post.embedExternal.title,
@@ -50,6 +63,7 @@ const withEmbeds = {
   embedImages: {
     orderBy: asc(schema.postEmbedImages.position),
   },
+  embedVideo: true,
   embedExternal: true,
   embedRecord: true,
 } as const;

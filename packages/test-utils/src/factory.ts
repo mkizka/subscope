@@ -381,6 +381,28 @@ export const postEmbedImageFactory = (db: Database) =>
       postUri: async ({ vars }) => (await vars.post).uri,
     });
 
+export const postEmbedVideoFactory = (db: Database) =>
+  factory
+    .define(
+      {
+        props: {
+          postUri: later<string>(),
+          cid: () => randomCid(),
+          alt: () => faker.lorem.sentence(),
+          aspectRatioWidth: () => faker.number.int({ min: 100, max: 2000 }),
+          aspectRatioHeight: () => faker.number.int({ min: 100, max: 2000 }),
+          presentation: () => "default",
+        },
+        vars: {
+          post: () => postFactory(db).create(),
+        },
+      },
+      (props) => create(db, schema.postEmbedVideos, props),
+    )
+    .props({
+      postUri: async ({ vars }) => (await vars.post).uri,
+    });
+
 export const postEmbedExternalFactory = (db: Database) =>
   factory
     .define(

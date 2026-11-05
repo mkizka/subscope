@@ -2,6 +2,7 @@ import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
 import {
   accountFactory,
   postEmbedImageFactory,
+  postEmbedVideoFactory,
   postFactory,
   postFeedItemFactory,
   recordFactory,
@@ -176,23 +177,33 @@ describe("app.bsky.feed.getAuthorFeed", () => {
     );
   });
 
-  test("getAuthorFeed-6: filterがposts_with_videoのとき、501とMethodNotImplementedを返す", async () => {
+  test("getAuthorFeed-6: filterがposts_with_videoのとき、動画を添付したアカウント自身の投稿だけを返し、リポストは含めない", async () => {
     // arrange
     const { client } = await setupApiTest();
-    await accountFactory(ctx.db)
+    const author = await accountFactory(ctx.db)
       .props({ handle: () => "alice.test" })
       .create();
+    const videoPost = await createPost(author);
+    await postEmbedVideoFactory(ctx.db)
+      .vars({ post: () => videoPost })
+      .create();
+    const imagePost = await createPost(author);
+    await postEmbedImageFactory(ctx.db)
+      .vars({ post: () => imagePost })
+      .create();
+    const otherVideoPost = await postFactory(ctx.db).create();
+    await postEmbedVideoFactory(ctx.db)
+      .vars({ post: () => otherVideoPost })
+      .create();
+    await createRepost(author, otherVideoPost);
 
     // act
-    const promise = client.call(getAuthorFeed, {
+    const res = await client.call(getAuthorFeed, {
       actor: "alice.test",
       filter: "posts_with_video",
     });
 
     // assert
-    await expect(promise).rejects.toMatchObject({
-      status: 501,
-      error: "MethodNotImplemented",
-    });
+    expect(res.feed).toMatchObject([{ post: { uri: videoPost.uri } }]);
   });
 });

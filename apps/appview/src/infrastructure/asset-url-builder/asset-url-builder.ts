@@ -21,4 +21,12 @@ export class AssetUrlBuilder implements IAssetUrlBuilder {
   getFeedFullsizeUrl(accountDid: string, cid: string): UriString {
     return `${this.blobProxyUrl}/img/feed_fullsize/plain/${accountDid}/${cid}`;
   }
+
+  getVideoPlaylistUrl(accountDid: string, cid: string): UriString {
+    return `https://video.bsky.app/watch/${accountDid}/${cid}/playlist.m3u8`;
+  }
+
+  getVideoThumbnailUrl(accountDid: string, cid: string): UriString {
+    return `https://video.bsky.app/watch/${accountDid}/${cid}/thumbnail.jpg`;
+  }
 }

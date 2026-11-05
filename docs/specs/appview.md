@@ -63,9 +63,10 @@ v1で対応しないXRPCやパラメータには、空の応答で成功を装�
 
 ## 埋め込み
 
-投稿に埋め込まれた画像・リンクカード・引用を、postViewのembedに公式AppViewと同じ形で返す。
+投稿に埋め込まれた画像・動画・リンクカード・引用を、postViewのembedに公式AppViewと同じ形で返す。
 
 - embed-1: gallery埋め込みの画像は、引用のmediaにあるものを含めてapp.bsky.embed.gallery#viewとして返す
+- embed-2: 動画の埋め込みは、再生用のplaylistとサムネイルをvideo.bsky.appのURLにしてapp.bsky.embed.video#viewとして返す
 
 ## フィード
 
@@ -204,9 +205,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getAuthorFeed-3: filterがposts_with_mediaのとき、画像を添付したアカウント自身の投稿だけを返し、リポストは含めない
 - getAuthorFeed-4: filterがposts_no_repliesのとき、リプライを含めない
 - getAuthorFeed-5: filterがposts_and_author_threadsのとき、リプライは親とルートがともにアカウント自身の投稿であるものだけを含める
-- getAuthorFeed-6: filterがposts_with_videoのとき、501とMethodNotImplementedを返す
-
-動画の埋め込みはインデックスしていないため、posts_with_videoには対応しない。
+- getAuthorFeed-6: filterがposts_with_videoのとき、動画を添付したアカウント自身の投稿だけを返し、リポストは含めない
 
 ## app.bsky.notification.listNotifications
 

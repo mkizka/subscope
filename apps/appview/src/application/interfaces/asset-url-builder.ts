@@ -5,4 +5,6 @@ export interface IAssetUrlBuilder {
   getBannerUrl: (accountDid: string, cid: string) => UriString;
   getFeedThumbnailUrl: (accountDid: string, cid: string) => UriString;
   getFeedFullsizeUrl: (accountDid: string, cid: string) => UriString;
+  getVideoPlaylistUrl: (accountDid: string, cid: string) => UriString;
+  getVideoThumbnailUrl: (accountDid: string, cid: string) => UriString;
 }

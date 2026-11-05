@@ -14,11 +14,19 @@ export type PostEmbedExternalDto = {
   thumbCid: string | null;
 };
 
+export type PostEmbedVideoDto = {
+  cid: string;
+  alt: string | null;
+  aspectRatio?: { width: number; height: number };
+  presentation: string | null;
+};
+
 export type PostDto = {
   uri: AtUriString;
   accountDid: Did;
   embedImages: PostEmbedImageDto[];
   embedGallery: PostEmbedImageDto[];
+  embedVideo: PostEmbedVideoDto | null;
   embedExternal: PostEmbedExternalDto | null;
   embedRecordUri: string | null;
   replyRootUri: string | null;
