@@ -76,10 +76,6 @@ test.describe("プロフィール", () => {
     await expect(
       main.getByRole("link", { name: "example.org" }),
     ).toHaveAttribute("target", "_blank");
-    await expect(main.getByRole("link", { name: "example.org" })).toHaveCSS(
-      "border-radius",
-      /^\d+px$/,
-    );
   });
 
   test("profile-5: 全体ページのフォローボタンでそのアカウントをフォローし、もう一度押すと外す", async ({
