@@ -1,15 +1,15 @@
 import type { InferOutput } from "@atproto/lex";
-import link from "@repo/client/lex/app/bsky/actor/link";
-import profile from "@repo/client/lex/app/bsky/actor/profile";
-import generator from "@repo/client/lex/app/bsky/feed/generator";
-import like from "@repo/client/lex/app/bsky/feed/like";
-import post from "@repo/client/lex/app/bsky/feed/post";
-import postgate from "@repo/client/lex/app/bsky/feed/postgate";
-import repost from "@repo/client/lex/app/bsky/feed/repost";
-import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
-import follow from "@repo/client/lex/app/bsky/graph/follow";
-import list from "@repo/client/lex/app/bsky/graph/list";
-import listitem from "@repo/client/lex/app/bsky/graph/listitem";
+import link from "@repo/client/app/bsky/actor/link";
+import profile from "@repo/client/app/bsky/actor/profile";
+import generator from "@repo/client/app/bsky/feed/generator";
+import like from "@repo/client/app/bsky/feed/like";
+import post from "@repo/client/app/bsky/feed/post";
+import postgate from "@repo/client/app/bsky/feed/postgate";
+import repost from "@repo/client/app/bsky/feed/repost";
+import threadgate from "@repo/client/app/bsky/feed/threadgate";
+import follow from "@repo/client/app/bsky/graph/follow";
+import list from "@repo/client/app/bsky/graph/list";
+import listitem from "@repo/client/app/bsky/graph/listitem";
 
 export const SUPPORTED_COLLECTION_SCHEMAS = {
   "app.bsky.actor.link": link,

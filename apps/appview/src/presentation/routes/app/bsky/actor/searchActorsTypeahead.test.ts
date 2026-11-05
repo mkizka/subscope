@@ -1,4 +1,4 @@
-import searchActorsTypeahead from "@repo/client/lex/app/bsky/actor/searchActorsTypeahead";
+import searchActorsTypeahead from "@repo/client/app/bsky/actor/searchActorsTypeahead";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

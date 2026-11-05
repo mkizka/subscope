@@ -1,5 +1,5 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
+import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
 
 import {
   type GetAuthorFeedUseCase,

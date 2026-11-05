@@ -1,5 +1,5 @@
 import { toDatetimeString } from "@atproto/syntax";
-import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/getInviteCodes";
+import type { $OutputBody } from "@repo/client/me/subsco/admin/getInviteCodes";
 
 import type { InviteCodeDto } from "../../../application/dto/invite-code-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

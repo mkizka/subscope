@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type * as AppBskyFeedGetActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
+import type * as AppBskyFeedGetActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

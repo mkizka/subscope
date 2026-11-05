@@ -1,5 +1,5 @@
 import { asAtIdentifierString } from "@atproto/syntax";
-import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
+import getActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
 import {
   accountFactory,
   likeFactory,

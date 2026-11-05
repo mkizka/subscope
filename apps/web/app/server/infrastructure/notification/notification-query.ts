@@ -1,6 +1,6 @@
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
-import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
-import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
+import getPosts from "@repo/client/app/bsky/feed/getPosts";
+import getUnreadCount from "@repo/client/app/bsky/notification/getUnreadCount";
+import listNotifications from "@repo/client/app/bsky/notification/listNotifications";
 
 import type { INotificationQuery } from "@/app/server/application/interfaces/notification-query";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";

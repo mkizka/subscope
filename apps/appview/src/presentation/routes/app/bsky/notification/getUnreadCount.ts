@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
+import getUnreadCount from "@repo/client/app/bsky/notification/getUnreadCount";
 
 import type { GetUnreadCountUseCase } from "../../../../../application/use-cases/notification/get-unread-count-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

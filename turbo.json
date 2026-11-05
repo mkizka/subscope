@@ -3,7 +3,7 @@
   "concurrency": "20",
   "tasks": {
     "generate": {
-      "outputs": ["src/generated/**"]
+      "outputs": ["src/**"]
     },
     "build": {
       "dependsOn": ["^build", "generate"],

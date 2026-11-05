@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getBackfillStatuses from "@repo/client/lex/me/subsco/sync/getBackfillStatuses";
+import getBackfillStatuses from "@repo/client/me/subsco/sync/getBackfillStatuses";
 
 import type { GetBackfillStatusesUseCase } from "../../../../../application/use-cases/sync/get-backfill-statuses-use-case.js";
 

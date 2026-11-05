@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
+import unbanAccount from "@repo/client/me/subsco/admin/unbanAccount";
 
 import {
   NotBannedError,

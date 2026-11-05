@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type * as MeSubscoServerGetTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAccounts";
+import type * as MeSubscoServerGetTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
 
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

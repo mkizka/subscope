@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { $OutputBody } from "@repo/client/lex/me/subsco/graph/getRegisteredFollowers";
+import type { $OutputBody } from "@repo/client/me/subsco/graph/getRegisteredFollowers";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../utils/pagination.js";

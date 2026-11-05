@@ -1,5 +1,5 @@
 import { asAtUriString } from "@atproto/syntax";
-import getList from "@repo/client/lex/app/bsky/graph/getList";
+import getList from "@repo/client/app/bsky/graph/getList";
 import {
   accountFactory,
   listFactory,

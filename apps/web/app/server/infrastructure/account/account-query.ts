@@ -1,14 +1,14 @@
 import { isAtIdentifierString } from "@atproto/syntax";
-import type { ProfileView } from "@repo/client/lex/app/bsky/actor/defs";
-import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
-import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
-import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
-import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
-import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
-import getAuthorFeed from "@repo/client/lex/app/bsky/feed/getAuthorFeed";
-import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
-import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
-import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
+import type { ProfileView } from "@repo/client/app/bsky/actor/defs";
+import getProfile from "@repo/client/app/bsky/actor/getProfile";
+import getProfiles from "@repo/client/app/bsky/actor/getProfiles";
+import searchActors from "@repo/client/app/bsky/actor/searchActors";
+import type { FeedViewPost } from "@repo/client/app/bsky/feed/defs";
+import getActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
+import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
+import getFollowers from "@repo/client/app/bsky/graph/getFollowers";
+import getFollows from "@repo/client/app/bsky/graph/getFollows";
+import verifyAccess from "@repo/client/me/subsco/admin/verifyAccess";
 
 import type { AccountDto } from "@/app/server/application/dto/account";
 import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";

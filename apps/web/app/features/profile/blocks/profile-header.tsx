@@ -1,4 +1,4 @@
-import type { ProfileLinkView } from "@repo/client/lex/app/bsky/actor/defs";
+import type { ProfileLinkView } from "@repo/client/app/bsky/actor/defs";
 import { Link as LinkIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router";

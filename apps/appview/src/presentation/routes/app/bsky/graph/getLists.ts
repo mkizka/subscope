@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getLists from "@repo/client/lex/app/bsky/graph/getLists";
+import getLists from "@repo/client/app/bsky/graph/getLists";
 
 import type { GetListsUseCase } from "../../../../../application/use-cases/graph/get-lists-use-case.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";

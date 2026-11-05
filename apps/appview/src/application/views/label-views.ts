@@ -7,8 +7,8 @@ import {
   normalizeDatetimeAlways,
   toDatetimeString,
 } from "@atproto/syntax";
-import type * as ComAtprotoLabelDefs from "@repo/client/lex/com/atproto/label/defs";
-import { selfLabels } from "@repo/client/lex/com/atproto/label/defs";
+import type * as ComAtprotoLabelDefs from "@repo/client/com/atproto/label/defs";
+import { selfLabels } from "@repo/client/com/atproto/label/defs";
 
 import type { LabelDto } from "../dto/label-dto.js";
 import type { RecordDto } from "../dto/record-dto.js";

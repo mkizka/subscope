@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import createInviteCode from "@repo/client/lex/me/subsco/admin/createInviteCode";
+import createInviteCode from "@repo/client/me/subsco/admin/createInviteCode";
 
 import type { CreateInviteCodeUseCase } from "../../../../../application/use-cases/admin/create-invite-code-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";

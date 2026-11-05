@@ -1,6 +1,6 @@
 import { AtUri, currentDatetimeString } from "@atproto/syntax";
-import list from "@repo/client/lex/app/bsky/graph/list";
-import listitem from "@repo/client/lex/app/bsky/graph/listitem";
+import list from "@repo/client/app/bsky/graph/list";
+import listitem from "@repo/client/app/bsky/graph/listitem";
 
 import type { IListCommand } from "@/app/server/application/interfaces/list-command";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";

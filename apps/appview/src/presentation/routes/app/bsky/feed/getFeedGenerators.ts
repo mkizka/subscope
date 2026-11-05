@@ -1,6 +1,6 @@
 import type { LexRouter } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
-import getFeedGenerators from "@repo/client/lex/app/bsky/feed/getFeedGenerators";
+import getFeedGenerators from "@repo/client/app/bsky/feed/getFeedGenerators";
 
 import type { GetFeedGeneratorsUseCase } from "../../../../../application/use-cases/feed/get-feed-generators-use-case.js";
 

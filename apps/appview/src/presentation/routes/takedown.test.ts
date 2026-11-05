@@ -1,6 +1,6 @@
 import { asAtIdentifierString, asAtUriString } from "@atproto/syntax";
-import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
+import getProfiles from "@repo/client/app/bsky/actor/getProfiles";
+import getPosts from "@repo/client/app/bsky/feed/getPosts";
 import { schema } from "@repo/db";
 import {
   accountFactory,

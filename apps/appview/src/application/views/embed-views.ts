@@ -5,11 +5,11 @@ import {
   toDatetimeString,
   type UriString,
 } from "@atproto/syntax";
-import type * as AppBskyEmbedExternal from "@repo/client/lex/app/bsky/embed/external";
-import type * as AppBskyEmbedGallery from "@repo/client/lex/app/bsky/embed/gallery";
-import type * as AppBskyEmbedImages from "@repo/client/lex/app/bsky/embed/images";
-import type * as AppBskyEmbedRecord from "@repo/client/lex/app/bsky/embed/record";
-import type * as AppBskyEmbedRecordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
+import type * as AppBskyEmbedExternal from "@repo/client/app/bsky/embed/external";
+import type * as AppBskyEmbedGallery from "@repo/client/app/bsky/embed/gallery";
+import type * as AppBskyEmbedImages from "@repo/client/app/bsky/embed/images";
+import type * as AppBskyEmbedRecord from "@repo/client/app/bsky/embed/record";
+import type * as AppBskyEmbedRecordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
 import { validateRecord } from "@repo/common/utils";
 
 import type {

@@ -1,4 +1,4 @@
-import getInviteCodes from "@repo/client/lex/me/subsco/admin/getInviteCodes";
+import getInviteCodes from "@repo/client/me/subsco/admin/getInviteCodes";
 import {
   accountFactory,
   labelFactory,

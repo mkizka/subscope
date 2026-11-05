@@ -1,4 +1,4 @@
-import getGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
+import getGroupedNotifications from "@repo/client/app/bsky/notification/getGroupedNotifications";
 import { schema } from "@repo/db";
 import {
   accountFactory,

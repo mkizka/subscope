@@ -1,5 +1,5 @@
-import type { $OutputBody as BannedAccountsResponse } from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
-import type { $OutputBody } from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
+import type { $OutputBody as BannedAccountsResponse } from "@repo/client/me/subsco/admin/getBannedAccounts";
+import type { $OutputBody } from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 import {
   useInfiniteQuery,
   useMutation,

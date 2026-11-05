@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import banAccount from "@repo/client/lex/me/subsco/admin/banAccount";
+import banAccount from "@repo/client/me/subsco/admin/banAccount";
 import {
   accountFactory,
   followFactory,

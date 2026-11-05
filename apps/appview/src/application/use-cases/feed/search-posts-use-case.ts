@@ -1,4 +1,4 @@
-import type { $OutputBody } from "@repo/client/lex/app/bsky/feed/searchPosts";
+import type { $OutputBody } from "@repo/client/app/bsky/feed/searchPosts";
 
 import type { PostDto } from "../../dto/post-dto.js";
 import type { IPostQuery } from "../../interfaces/queries/post-query.js";

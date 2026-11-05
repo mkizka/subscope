@@ -1,5 +1,5 @@
 import { asAtIdentifierString } from "@atproto/syntax";
-import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
+import getProfile from "@repo/client/app/bsky/actor/getProfile";
 import {
   accountFactory,
   labelFactory,

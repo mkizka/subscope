@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { toDatetimeString } from "@atproto/syntax";
-import type * as MeSubscoAdminListRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
+import type * as MeSubscoAdminListRegisteredAccounts from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";

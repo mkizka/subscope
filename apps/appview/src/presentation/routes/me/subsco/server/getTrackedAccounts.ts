@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAccounts";
+import getTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
 
 import type { GetTrackedAccountsUseCase } from "../../../../../application/use-cases/server/get-tracked-accounts-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

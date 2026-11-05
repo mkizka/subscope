@@ -1,5 +1,5 @@
 import { asAtUriString } from "@atproto/syntax";
-import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
+import getPostThread from "@repo/client/app/bsky/feed/getPostThread";
 import {
   accountFactory,
   postFactory,

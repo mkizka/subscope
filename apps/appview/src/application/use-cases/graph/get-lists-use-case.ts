@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getLists";
+import type { $OutputBody } from "@repo/client/app/bsky/graph/getLists";
 
 import type { ListDto } from "../../../application/dto/list-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

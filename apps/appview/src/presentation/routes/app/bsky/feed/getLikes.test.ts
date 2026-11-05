@@ -1,5 +1,5 @@
 import { asAtUriString } from "@atproto/syntax";
-import getLikes from "@repo/client/lex/app/bsky/feed/getLikes";
+import getLikes from "@repo/client/app/bsky/feed/getLikes";
 import {
   accountFactory,
   likeFactory,

@@ -1,11 +1,11 @@
 import { asDid, type Did } from "@atproto/did";
 import { type BlobRef, getBlobCidString } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import external from "@repo/client/lex/app/bsky/embed/external";
-import gallery, { image } from "@repo/client/lex/app/bsky/embed/gallery";
-import images from "@repo/client/lex/app/bsky/embed/images";
-import embedRecord from "@repo/client/lex/app/bsky/embed/record";
-import recordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
+import external from "@repo/client/app/bsky/embed/external";
+import gallery, { image } from "@repo/client/app/bsky/embed/gallery";
+import images from "@repo/client/app/bsky/embed/images";
+import embedRecord from "@repo/client/app/bsky/embed/record";
+import recordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
 import { validateRecord } from "@repo/common/utils";
 
 import type { Record } from "./record.js";

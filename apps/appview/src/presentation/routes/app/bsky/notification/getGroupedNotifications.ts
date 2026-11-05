@@ -1,5 +1,5 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import getGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
+import getGroupedNotifications from "@repo/client/app/bsky/notification/getGroupedNotifications";
 
 import {
   type GetGroupedNotificationsUseCase,

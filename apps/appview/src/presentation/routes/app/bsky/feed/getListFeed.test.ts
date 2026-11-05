@@ -1,4 +1,4 @@
-import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
+import getListFeed from "@repo/client/app/bsky/feed/getListFeed";
 import { schema } from "@repo/db";
 import {
   accountFactory,

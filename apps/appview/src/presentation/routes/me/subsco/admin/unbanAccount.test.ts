@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
-import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
-import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
+import unbanAccount from "@repo/client/me/subsco/admin/unbanAccount";
+import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

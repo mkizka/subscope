@@ -1,5 +1,5 @@
 import { asAtUriString } from "@atproto/syntax";
-import getFeedGenerators from "@repo/client/lex/app/bsky/feed/getFeedGenerators";
+import getFeedGenerators from "@repo/client/app/bsky/feed/getFeedGenerators";
 import {
   accountFactory,
   generatorFactory,

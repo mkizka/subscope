@@ -1,4 +1,4 @@
-import type { ListView } from "@repo/client/lex/app/bsky/graph/defs";
+import type { ListView } from "@repo/client/app/bsky/graph/defs";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 

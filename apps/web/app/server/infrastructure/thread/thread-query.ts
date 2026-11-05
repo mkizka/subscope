@@ -1,8 +1,8 @@
 import {
   type ThreadViewPost,
   threadViewPost,
-} from "@repo/client/lex/app/bsky/feed/defs";
-import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
+} from "@repo/client/app/bsky/feed/defs";
+import getPostThread from "@repo/client/app/bsky/feed/getPostThread";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { IThreadQuery } from "@/app/server/application/interfaces/thread-query";

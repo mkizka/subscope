@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
+import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
 
 import type { GetSetupStatusUseCase } from "../../../../../application/use-cases/server/get-setup-status-use-case.js";
 

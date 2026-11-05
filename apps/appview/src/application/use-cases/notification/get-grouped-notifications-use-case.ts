@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyNotificationGetGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
+import type * as AppBskyNotificationGetGroupedNotifications from "@repo/client/app/bsky/notification/getGroupedNotifications";
 
 import type {
   NotificationDto,

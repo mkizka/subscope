@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getListFeed from "@repo/client/lex/app/bsky/feed/getListFeed";
+import getListFeed from "@repo/client/app/bsky/feed/getListFeed";
 
 import type { GetListFeedUseCase } from "../../../../../application/use-cases/feed/get-list-feed-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

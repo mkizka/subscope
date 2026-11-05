@@ -1,4 +1,4 @@
-import searchActors from "@repo/client/lex/app/bsky/actor/searchActors";
+import searchActors from "@repo/client/app/bsky/actor/searchActors";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

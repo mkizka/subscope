@@ -1,5 +1,5 @@
 import { type Did } from "@atproto/did";
-import type * as AppBskyActorSearchActors from "@repo/client/lex/app/bsky/actor/searchActors";
+import type * as AppBskyActorSearchActors from "@repo/client/app/bsky/actor/searchActors";
 
 import type { ProfileDto } from "../../dto/profile-dto.js";
 import type { IProfileQuery } from "../../interfaces/queries/profile-query.js";

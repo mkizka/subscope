@@ -1,7 +1,7 @@
 import type { Did } from "@atproto/did";
 import { getBlobCidString, isPlainObject } from "@atproto/lex";
 import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
+import type * as AppBskyActorDefs from "@repo/client/app/bsky/actor/defs";
 import { validateRecord } from "@repo/common/utils";
 
 import type { ProfileDto } from "../dto/profile-dto.js";

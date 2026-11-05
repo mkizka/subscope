@@ -1,4 +1,4 @@
-import createInviteCode from "@repo/client/lex/me/subsco/admin/createInviteCode";
+import createInviteCode from "@repo/client/me/subsco/admin/createInviteCode";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { afterEach, describe, expect, test, vi } from "vitest";
 

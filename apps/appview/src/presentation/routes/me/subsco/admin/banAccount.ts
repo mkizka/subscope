@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import banAccount from "@repo/client/lex/me/subsco/admin/banAccount";
+import banAccount from "@repo/client/me/subsco/admin/banAccount";
 
 import {
   type BanAccountUseCase,

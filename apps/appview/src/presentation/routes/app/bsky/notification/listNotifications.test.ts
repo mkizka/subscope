@@ -1,4 +1,4 @@
-import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
+import listNotifications from "@repo/client/app/bsky/notification/listNotifications";
 import { schema } from "@repo/db";
 import { accountFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";

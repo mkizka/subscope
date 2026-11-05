@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
+import updateSeen from "@repo/client/app/bsky/notification/updateSeen";
 
 import type { UpdateSeenUseCase } from "../../../../../application/use-cases/notification/update-seen-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

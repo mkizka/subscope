@@ -1,4 +1,4 @@
-import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
+import getUnreadCount from "@repo/client/app/bsky/notification/getUnreadCount";
 import { schema } from "@repo/db";
 import { accountFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";

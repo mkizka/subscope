@@ -1,5 +1,5 @@
 import type { AtUriString } from "@atproto/syntax";
-import type { Notification } from "@repo/client/lex/app/bsky/notification/listNotifications";
+import type { Notification } from "@repo/client/app/bsky/notification/listNotifications";
 
 export interface INotificationQuery {
   findMany: (

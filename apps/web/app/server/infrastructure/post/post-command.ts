@@ -1,9 +1,9 @@
 import { RichText } from "@atproto/api";
 import { TID } from "@atproto/common-web";
 import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
-import postRecord from "@repo/client/lex/app/bsky/feed/post";
-import threadgate from "@repo/client/lex/app/bsky/feed/threadgate";
-import * as facet from "@repo/client/lex/app/bsky/richtext/facet";
+import postRecord from "@repo/client/app/bsky/feed/post";
+import threadgate from "@repo/client/app/bsky/feed/threadgate";
+import * as facet from "@repo/client/app/bsky/richtext/facet";
 
 import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
 import type { PostRef } from "@/app/server/application/dto/new-post";

@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
+import type * as AppBskyActorDefs from "@repo/client/app/bsky/actor/defs";
 
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";

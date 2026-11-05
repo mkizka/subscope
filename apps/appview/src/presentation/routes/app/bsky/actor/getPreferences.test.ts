@@ -1,4 +1,4 @@
-import getPreferences from "@repo/client/lex/app/bsky/actor/getPreferences";
+import getPreferences from "@repo/client/app/bsky/actor/getPreferences";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";

@@ -1,6 +1,6 @@
 import { asDatetimeString } from "@atproto/syntax";
-import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
-import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
+import getUnreadCount from "@repo/client/app/bsky/notification/getUnreadCount";
+import updateSeen from "@repo/client/app/bsky/notification/updateSeen";
 import { schema } from "@repo/db";
 import { accountFactory, recordFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";

@@ -1,5 +1,5 @@
 import type { AtIdentifierString } from "@atproto/syntax";
-import type { ProfileViewDetailed } from "@repo/client/lex/app/bsky/actor/defs";
+import type { ProfileViewDetailed } from "@repo/client/app/bsky/actor/defs";
 
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 import type { ProfileTab } from "@/app/server/application/dto/account";

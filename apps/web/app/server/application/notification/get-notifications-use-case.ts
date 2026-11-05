@@ -1,4 +1,4 @@
-import type { Notification } from "@repo/client/lex/app/bsky/notification/listNotifications";
+import type { Notification } from "@repo/client/app/bsky/notification/listNotifications";
 
 import type { INotificationQuery } from "@/app/server/application/interfaces/notification-query";
 

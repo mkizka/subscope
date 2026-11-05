@@ -1,9 +1,9 @@
 import { asDid } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
 import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
-import { listRule } from "@repo/client/lex/app/bsky/feed/threadgate";
-import { mention } from "@repo/client/lex/app/bsky/richtext/facet";
+import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
+import { listRule } from "@repo/client/app/bsky/feed/threadgate";
+import { mention } from "@repo/client/app/bsky/richtext/facet";
 import { validateRecord } from "@repo/common/utils";
 
 import type { RecordDto } from "../dto/record-dto.js";

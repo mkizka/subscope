@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getLikes from "@repo/client/lex/app/bsky/feed/getLikes";
+import getLikes from "@repo/client/app/bsky/feed/getLikes";
 
 import type { GetLikesUseCase } from "../../../../../application/use-cases/feed/get-likes-use-case.js";
 

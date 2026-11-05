@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import searchActorsTypeahead from "@repo/client/lex/app/bsky/actor/searchActorsTypeahead";
+import searchActorsTypeahead from "@repo/client/app/bsky/actor/searchActorsTypeahead";
 
 import type { SearchActorsTypeaheadUseCase } from "../../../../../application/use-cases/actor/search-actors-typeahead-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

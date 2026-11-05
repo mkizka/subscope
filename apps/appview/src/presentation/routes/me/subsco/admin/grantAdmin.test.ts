@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
+import grantAdmin from "@repo/client/me/subsco/admin/grantAdmin";
 import { schema } from "@repo/db";
 import {
   accountFactory,

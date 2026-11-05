@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
+import getRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
 
 import type { GetRegisteredAccountsUseCase } from "../../../../../application/use-cases/server/get-registered-accounts-use-case.js";
 

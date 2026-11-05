@@ -1,4 +1,4 @@
-import unregisterAccount from "@repo/client/lex/me/subsco/sync/unregisterAccount";
+import unregisterAccount from "@repo/client/me/subsco/sync/unregisterAccount";
 import { schema } from "@repo/db";
 import {
   accountFactory,

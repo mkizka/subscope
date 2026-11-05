@@ -1,6 +1,6 @@
 import { asDid, type Did } from "@atproto/did";
 import { asAtUriString, toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyNotificationListNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
+import type * as AppBskyNotificationListNotifications from "@repo/client/app/bsky/notification/listNotifications";
 
 import {
   isNotificationReason,

@@ -1,6 +1,6 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
-import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
+import getPostThread from "@repo/client/app/bsky/feed/getPostThread";
 
 import {
   type GetPostThreadUseCase,

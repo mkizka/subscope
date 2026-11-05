@@ -1,4 +1,4 @@
-import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
+import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 import { schema } from "@repo/db";
 import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";
