@@ -43,5 +43,11 @@ export type TimelinePostDto = {
     };
   };
   quoteUnavailable?: "notFound" | "blocked" | "detached";
+  quotedFeed?: {
+    avatar?: string;
+    displayName: string;
+    creatorHandle: string;
+    description?: string;
+  };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };

@@ -224,4 +224,33 @@ test.describe("引用投稿", () => {
       await expect(quote).toContainText("削除されました", { timeout: 1000 });
     }).toPass();
   });
+
+  test("quote-8: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する", async ({
+    page,
+  }) => {
+    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
+      did: "did:web:feed.example.com",
+      displayName: "quote-8: フィード名",
+      description: "quote-8: フィードの説明",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-8: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: feed },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const quote = page
+      .getByRole("article")
+      .filter({ hasText: "quote-8: 引用した投稿" })
+      .getByRole("blockquote");
+    await expect(async () => {
+      await page.reload();
+      await expect(quote).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(quote).toContainText("quote-8: フィード名");
+    await expect(quote).toContainText("@alice.test");
+    await expect(quote).toContainText("quote-8: フィードの説明");
+  });
 });
