@@ -4,7 +4,6 @@ import type {
   IDidResolver,
   IJobQueue,
   IJobScheduler,
-  ITapClient,
   ITransactionManager,
 } from "@repo/common/domain";
 import {
@@ -16,13 +15,13 @@ import {
   LoggerManager,
   MetricReporter,
   RedisDidCache,
-  TapClient,
   TransactionManager,
 } from "@repo/common/infrastructure";
 
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";
 import type { ILabelFetcher } from "../application/interfaces/external/label-fetcher.js";
+import type { ITapClient } from "../application/interfaces/external/tap-client.js";
 import type { IAccountQuery } from "../application/interfaces/queries/account-query.js";
 import type { IAccountStatsQuery } from "../application/interfaces/queries/account-stats-query.js";
 import type { IPostQuery } from "../application/interfaces/queries/post-query.js";
@@ -51,6 +50,7 @@ import { FollowIndexer } from "../application/services/indexer/follow-indexer.js
 import { GateIndexer } from "../application/services/indexer/gate-indexer.js";
 import { GeneratorIndexer } from "../application/services/indexer/generator-indexer.js";
 import { LikeIndexer } from "../application/services/indexer/like-indexer.js";
+import { LinkIndexer } from "../application/services/indexer/link-indexer.js";
 import { ListIndexer } from "../application/services/indexer/list-indexer.js";
 import { ListItemIndexer } from "../application/services/indexer/list-item-indexer.js";
 import { PostIndexer } from "../application/services/indexer/post-indexer.js";
@@ -92,6 +92,7 @@ import { ProfileRepository } from "../infrastructure/repositories/profile-reposi
 import { RecordRepository } from "../infrastructure/repositories/record-repository/record-repository.js";
 import { RecordRevRepository } from "../infrastructure/repositories/record-rev-repository/record-rev-repository.js";
 import { RepostRepository } from "../infrastructure/repositories/repost-repository/repost-repository.js";
+import { TapClient } from "../infrastructure/tap-client/tap-client.js";
 import { LabelSubscriber } from "../presentation/label-subscriber.js";
 import { healthRouterFactory } from "../presentation/routes/health.js";
 import { WorkerServer } from "../presentation/server.js";
@@ -160,9 +161,10 @@ export const createWorkerRegistry = (env: Env) =>
     .service("listIndexer", ["listRepository"], asClassArgs(ListIndexer))
     .service("listItemIndexer", ["listItemRepository", "indexAccountService"], asClassArgs(ListItemIndexer))
     .service("gateIndexer", asClassArgs(GateIndexer))
+    .service("linkIndexer", asClassArgs(LinkIndexer))
     .service("likeIndexer", ["likeRepository", "jobScheduler", "registrationQuery", "notificationRepository"], asClassArgs(LikeIndexer))
     .service("repostIndexer", ["repostRepository", "feedItemRepository", "postQuery", "jobScheduler", "registrationQuery", "notificationRepository"], asClassArgs(RepostIndexer))
-    .service("indexRecordService", ["recordRepository", "indexAccountService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer"], asClassArgs(IndexRecordService))
+    .service("indexRecordService", ["recordRepository", "indexAccountService", "postIndexer", "profileIndexer", "followIndexer", "generatorIndexer", "likeIndexer", "repostIndexer", "listIndexer", "listItemIndexer", "gateIndexer", "linkIndexer"], asClassArgs(IndexRecordService))
     // application(use-case)
     .service("resolveDidUseCase", ["didResolver", "handleResolver", "accountRepository", "transactionManager"], asClassArgs(ResolveDidUseCase))
     .service("upsertIdentityUseCase", ["transactionManager", "indexAccountService", "resolveDidUseCase"], asClassArgs(UpsertIdentityUseCase))

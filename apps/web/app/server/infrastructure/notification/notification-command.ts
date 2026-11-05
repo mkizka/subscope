@@ -1,11 +1,7 @@
-import type { DatetimeString } from "@atproto/syntax";
 import updateSeen from "@repo/client/app/bsky/notification/updateSeen";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-export interface INotificationCommand {
-  updateSeen: (did: string, seenAt: DatetimeString) => Promise<void>;
-}
+import type { INotificationCommand } from "@/app/server/application/interfaces/notification-command";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export const notificationCommandFactory = ({
   oauthClient,

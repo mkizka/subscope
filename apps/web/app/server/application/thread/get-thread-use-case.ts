@@ -1,6 +1,6 @@
 import type { AtUriString } from "@atproto/syntax";
 
-import type { IThreadQuery } from "@/app/server/infrastructure/thread/thread-query";
+import type { IThreadQuery } from "@/app/server/application/interfaces/thread-query";
 
 export interface IGetThreadUseCase {
   execute: (

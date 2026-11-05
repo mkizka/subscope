@@ -1,6 +1,6 @@
 node_modules/
 dist/
-generated/
+packages/client/src/
 .env
 *.log
 node-compile-cache/

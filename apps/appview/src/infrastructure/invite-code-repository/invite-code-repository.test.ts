@@ -1,7 +1,7 @@
-import { InviteCode } from "@repo/common/domain";
 import { inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
+import { InviteCode } from "../../domain/models/invite-code.js";
 import { InviteCodeRepository } from "./invite-code-repository.js";
 
 describe("InviteCodeRepository", () => {

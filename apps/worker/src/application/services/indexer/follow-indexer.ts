@@ -1,10 +1,8 @@
-import type {
-  AfterCommitContext,
-  IJobScheduler,
-  Record,
-} from "@repo/common/domain";
-import { Follow } from "@repo/common/domain";
+import type { AfterCommitContext, IJobScheduler } from "@repo/common/domain";
 
+import { parseFollow } from "../../dto/follow.js";
+import type { Record } from "../../dto/record.js";
+import { getSortAt } from "../../dto/sort-at.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IFollowRepository } from "../../interfaces/repositories/follow-repository.js";
 import type { INotificationRepository } from "../../interfaces/repositories/notification-repository.js";
@@ -29,7 +27,7 @@ export class FollowIndexer implements ICollectionIndexer {
     record: Record;
     live: boolean;
   }) {
-    const follow = Follow.from(record);
+    const follow = parseFollow(record);
     await this.indexAccountService.upsert({
       ctx,
       did: follow.subjectDid,
@@ -53,12 +51,12 @@ export class FollowIndexer implements ICollectionIndexer {
         ctx,
         notifications: [
           {
-            recordUri: follow.uri.toString(),
+            recordUri: follow.uri,
             recipientDid: follow.subjectDid,
             authorDid: follow.accountDid,
             reason: "follow",
             reasonSubject: null,
-            sortAt: follow.sortAt,
+            sortAt: getSortAt(follow),
           },
         ],
       });
@@ -74,7 +72,7 @@ export class FollowIndexer implements ICollectionIndexer {
     record: Record;
     action: "upsert" | "delete";
   }): Promise<void> {
-    const follow = Follow.from(record);
+    const follow = parseFollow(record);
     ctx.afterCommit(() =>
       this.jobScheduler.scheduleAggregateAccountStats(follow.accountDid),
     );

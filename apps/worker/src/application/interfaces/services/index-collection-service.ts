@@ -1,4 +1,6 @@
-import type { AfterCommitContext, Record } from "@repo/common/domain";
+import type { AfterCommitContext } from "@repo/common/domain";
+
+import type { Record } from "../../dto/record.js";
 
 export interface ICollectionIndexer {
   shouldIndex?: ({

@@ -1,6 +1,7 @@
-import type { Record, TransactionContext } from "@repo/common/domain";
-import { Profile } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
+import { parseProfile } from "../../dto/profile.js";
+import type { Record } from "../../dto/record.js";
 import type { IProfileRepository } from "../../interfaces/repositories/profile-repository.js";
 import type { ICollectionIndexer } from "../../interfaces/services/index-collection-service.js";
 
@@ -8,7 +9,7 @@ export class ProfileIndexer implements ICollectionIndexer {
   constructor(private readonly profileRepository: IProfileRepository) {}
 
   async upsert({ ctx, record }: { ctx: TransactionContext; record: Record }) {
-    const profile = Profile.from(record);
+    const profile = parseProfile(record);
     await this.profileRepository.save({ ctx, profile });
   }
 }

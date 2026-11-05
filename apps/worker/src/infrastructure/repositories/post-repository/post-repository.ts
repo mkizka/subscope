@@ -1,15 +1,14 @@
-import {
-  type Post,
-  PostEmbedExternal,
-  PostEmbedGallery,
-  type PostEmbedImage,
-  PostEmbedRecord,
-  PostEmbedRecordWithMedia,
-  type TransactionContext,
-} from "@repo/common/domain";
+import type { AtUri } from "@atproto/syntax";
+import type { TransactionContext } from "@repo/common/domain";
 import { type PostInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
+import type {
+  EmbedImage,
+  EmbedMedia,
+  Post,
+  PostEmbed,
+} from "../../../application/dto/post.js";
 import type { IPostRepository } from "../../../application/interfaces/repositories/post-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
@@ -39,30 +38,23 @@ export class PostRepository implements IPostRepository {
         set: data,
       });
 
-    if (post.embed) {
-      if (Array.isArray(post.embed)) {
-        await this.upsertEmbedImages(ctx, postUri, post.embed, "images");
-      } else if (post.embed instanceof PostEmbedGallery) {
-        await this.upsertEmbedImages(
-          ctx,
-          postUri,
-          post.embed.images,
-          "gallery",
-        );
-      } else if (post.embed instanceof PostEmbedExternal) {
-        await this.upsertEmbedExternal(ctx, postUri, post.embed);
-      } else if (post.embed instanceof PostEmbedRecord) {
-        await this.upsertEmbedRecord(ctx, postUri, post.embed);
-      } else if (post.embed instanceof PostEmbedRecordWithMedia) {
-        await this.upsertEmbedRecordWithMedia(ctx, postUri, post.embed);
-      }
+    const { embed } = post;
+    if (!embed) return;
+    if (embed.type === "record" || embed.type === "recordWithMedia") {
+      await this.upsertEmbedRecord(ctx, postUri, embed);
+    }
+    const media = embed.type === "recordWithMedia" ? embed.media : embed;
+    if (media.type === "external") {
+      await this.upsertEmbedExternal(ctx, postUri, media);
+    } else if (media.type === "images" || media.type === "gallery") {
+      await this.upsertEmbedImages(ctx, postUri, media.images, media.type);
     }
   }
 
   private async upsertEmbedImages(
     ctx: TransactionContext,
     postUri: string,
-    embedImages: PostEmbedImage[],
+    embedImages: EmbedImage[],
     embedType: "images" | "gallery",
   ) {
     // 添付画像には一意なIDがないので、既存の画像を削除してから新しい画像を挿入
@@ -88,7 +80,7 @@ export class PostRepository implements IPostRepository {
   private async upsertEmbedExternal(
     ctx: TransactionContext,
     postUri: string,
-    embedExternal: PostEmbedExternal,
+    embedExternal: Extract<EmbedMedia, { type: "external" }>,
   ) {
     await ctx.db
       .insert(schema.postEmbedExternals)
@@ -113,7 +105,7 @@ export class PostRepository implements IPostRepository {
   private async upsertEmbedRecord(
     ctx: TransactionContext,
     postUri: string,
-    embedRecord: PostEmbedRecord,
+    embedRecord: Extract<PostEmbed, { uri: AtUri }>,
   ) {
     await ctx.db
       .insert(schema.postEmbedRecords)
@@ -129,46 +121,5 @@ export class PostRepository implements IPostRepository {
           cid: embedRecord.cid,
         },
       });
-  }
-
-  private async upsertEmbedRecordWithMedia(
-    ctx: TransactionContext,
-    postUri: string,
-    embedRecordWithMedia: PostEmbedRecordWithMedia,
-  ) {
-    // record部分を保存
-    await ctx.db
-      .insert(schema.postEmbedRecords)
-      .values({
-        postUri,
-        uri: embedRecordWithMedia.uri.toString(),
-        cid: embedRecordWithMedia.cid,
-      })
-      .onConflictDoUpdate({
-        target: schema.postEmbedRecords.postUri,
-        set: {
-          uri: embedRecordWithMedia.uri.toString(),
-          cid: embedRecordWithMedia.cid,
-        },
-      });
-
-    // media部分を保存
-    if (Array.isArray(embedRecordWithMedia.media)) {
-      await this.upsertEmbedImages(
-        ctx,
-        postUri,
-        embedRecordWithMedia.media,
-        "images",
-      );
-    } else if (embedRecordWithMedia.media instanceof PostEmbedGallery) {
-      await this.upsertEmbedImages(
-        ctx,
-        postUri,
-        embedRecordWithMedia.media.images,
-        "gallery",
-      );
-    } else if (embedRecordWithMedia.media instanceof PostEmbedExternal) {
-      await this.upsertEmbedExternal(ctx, postUri, embedRecordWithMedia.media);
-    }
   }
 }

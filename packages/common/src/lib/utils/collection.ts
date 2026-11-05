@@ -1,4 +1,5 @@
 import type { InferOutput } from "@atproto/lex";
+import link from "@repo/client/app/bsky/actor/link";
 import profile from "@repo/client/app/bsky/actor/profile";
 import generator from "@repo/client/app/bsky/feed/generator";
 import like from "@repo/client/app/bsky/feed/like";
@@ -11,6 +12,7 @@ import list from "@repo/client/app/bsky/graph/list";
 import listitem from "@repo/client/app/bsky/graph/listitem";
 
 export const SUPPORTED_COLLECTION_SCHEMAS = {
+  "app.bsky.actor.link": link,
   "app.bsky.actor.profile": profile,
   "app.bsky.feed.generator": generator,
   "app.bsky.feed.like": like,

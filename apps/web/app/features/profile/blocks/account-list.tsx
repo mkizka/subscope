@@ -1,4 +1,3 @@
-import type { BackfillStatus } from "@repo/common/domain";
 import { ShieldIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
@@ -6,6 +5,7 @@ import { Link } from "react-router";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
 import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 export type Account = {
   did: string;
@@ -35,14 +35,14 @@ export function AccountList<T extends Account>({
         return (
           <li
             key={account.did}
-            className="flex flex-wrap items-center border-b border-line pr-2"
+            className="
+              flex flex-wrap items-center border-b border-line pr-2
+              hover:bg-surface-2
+            "
           >
             <Link
-              to={`/profile/${profileId}`}
-              className="
-                flex min-w-0 flex-1 items-center gap-3 px-4 py-3
-                hover:bg-surface-2
-              "
+              to={`/${profileId}`}
+              className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3"
             >
               <Avatar src={account.avatarUrl} />
               <div className="min-w-0 flex-1">
@@ -72,7 +72,7 @@ export function AccountList<T extends Account>({
                 <BackfillStatusBadge status={account.backfillStatus} />
               )}
               {account.registeredFollowersCount !== undefined && (
-                <Link to={`/profile/${profileId}/followers?filter=registered`}>
+                <Link to={`/${profileId}/followers?filter=registered`}>
                   <Badge>
                     {account.registeredFollowersCount}人からフォロー
                   </Badge>

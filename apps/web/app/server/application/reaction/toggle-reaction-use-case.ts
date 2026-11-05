@@ -1,4 +1,4 @@
-import type { IReactionCommand } from "@/app/server/infrastructure/reaction/reaction-command";
+import type { IReactionCommand } from "@/app/server/application/interfaces/reaction-command";
 
 export interface IToggleReactionUseCase {
   execute: (

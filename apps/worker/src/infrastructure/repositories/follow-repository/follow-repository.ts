@@ -1,27 +1,20 @@
-import type { Follow, TransactionContext } from "@repo/common/domain";
-import { type FollowInsert, schema } from "@repo/db";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
+import type { Follow } from "../../../application/dto/follow.js";
 import type { IFollowRepository } from "../../../application/interfaces/repositories/follow-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class FollowRepository implements IFollowRepository {
   async save({ ctx, follow }: { ctx: TransactionContext; follow: Follow }) {
+    const { uri, indexedAt, ...rest } = follow;
     const data = {
-      cid: follow.cid,
-      accountDid: follow.accountDid,
-      subjectDid: follow.subjectDid,
-      createdAt: sanitizeDate(follow.createdAt),
-    } satisfies FollowInsert;
+      ...rest,
+      createdAt: sanitizeDate(rest.createdAt),
+    };
     await ctx.db
       .insert(schema.follows)
-      .values({
-        uri: follow.uri.toString(),
-        indexedAt: follow.indexedAt,
-        ...data,
-      })
-      .onConflictDoUpdate({
-        target: schema.follows.uri,
-        set: data,
-      });
+      .values({ uri, indexedAt, ...data })
+      .onConflictDoUpdate({ target: schema.follows.uri, set: data });
   }
 }

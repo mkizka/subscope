@@ -15,6 +15,7 @@ export default defineConfig(
   {
     files: ["app/**/*.{ts,tsx}"],
     ignores: [
+      "app/server/application/**/*.ts",
       "app/server/infrastructure/db/db.ts",
       "app/server/infrastructure/auth/oauth-storage.ts",
     ],

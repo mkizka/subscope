@@ -1,18 +1,15 @@
 import { AtUri } from "@atproto/syntax";
-import {
-  accountFactory,
-  postFactory,
-  recordFactory,
-  registrationFactory,
-} from "@repo/common/test";
 import { randomCid } from "@repo/test-utils";
 import { assert, beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
+import { postFactory } from "../../dto/post.factory.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("PostIndexer", () => {
   let postIndexer: TestServices["postIndexer"];
@@ -66,7 +63,7 @@ describe("PostIndexer", () => {
 
       const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         type: "post",
         accountDid: author.did,
         subjectUri: null,
@@ -177,8 +174,8 @@ describe("PostIndexer", () => {
       // arrange
       const quoted = accountFactory();
       const mentioned = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: quoted.did }));
-      registrationQuery.add(registrationFactory({ accountDid: mentioned.did }));
+      registrationQuery.add(quoted.did);
+      registrationQuery.add(mentioned.did);
       const quotedUri = `at://${quoted.did}/app.bsky.feed.post/quoted`;
       const record = recordFactory({
         uri: `at://${accountFactory().did}/app.bsky.feed.post/notify`,
@@ -209,8 +206,8 @@ describe("PostIndexer", () => {
       // arrange
       const mentioned = accountFactory();
       const quoted = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: mentioned.did }));
-      registrationQuery.add(registrationFactory({ accountDid: quoted.did }));
+      registrationQuery.add(mentioned.did);
+      registrationQuery.add(quoted.did);
       const author = accountFactory();
       const cid = await randomCid();
       const postRecord = (rkey: string, did: string, withMention: boolean) => {
@@ -249,7 +246,7 @@ describe("PostIndexer", () => {
       const ancestors = [];
       for (let i = 0; i < 5; i++) {
         const account = accountFactory();
-        registrationQuery.add(registrationFactory({ accountDid: account.did }));
+        registrationQuery.add(account.did);
         const { post } = postFactory({
           accountDid: account.did,
           uri: `at://${account.did}/app.bsky.feed.post/ancestor${i}`,

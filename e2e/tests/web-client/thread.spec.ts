@@ -2,8 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { createRecord } from "../../helpers/pds";
 
-const threadPath = (uri: string) =>
-  `/profile/alice.test/post/${uri.split("/").pop()}`;
+const threadPath = (uri: string) => `/alice.test/post/${uri.split("/").pop()}`;
 
 const post = (text: string, parent?: { uri: string; cid: string }) =>
   createRecord("alice.test", "app.bsky.feed.post", {
@@ -38,7 +37,7 @@ test.describe("スレッド", () => {
     }).toPass();
     await article.getByRole("link", { name: "スレッドを開く" }).click();
 
-    await expect(page).toHaveURL(/\/profile\/alice\.test\/post\/\w+$/);
+    await expect(page).toHaveURL(/\/alice\.test\/post\/\w+$/);
     await expect(
       page.getByRole("region", { name: "スレッド" }).getByText(text),
     ).toBeVisible();
@@ -64,7 +63,7 @@ test.describe("スレッド", () => {
     ]);
   });
 
-  test("thread-3: /profile/ハンドル/post/rkey を開くと、その投稿のスレッドを表示する", async ({
+  test("thread-3: /ハンドル/post/rkey を開くと、その投稿のスレッドを表示する", async ({
     page,
   }) => {
     const text = "thread-3: 投稿";
@@ -319,7 +318,7 @@ test.describe("スレッド", () => {
     }
   });
 
-  test("thread-14: スレッドを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("thread-14: スレッドを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     const target = await post("thread-14: 投稿");
@@ -333,13 +332,13 @@ test.describe("スレッド", () => {
 
     await page.goto(threadPath(target.uri));
 
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
     await expect(
       page
         .getByRole("region", { name: "スレッド" })

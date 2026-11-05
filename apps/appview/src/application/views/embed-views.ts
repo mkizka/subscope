@@ -10,7 +10,7 @@ import type * as AppBskyEmbedGallery from "@repo/client/app/bsky/embed/gallery";
 import type * as AppBskyEmbedImages from "@repo/client/app/bsky/embed/images";
 import type * as AppBskyEmbedRecord from "@repo/client/app/bsky/embed/record";
 import type * as AppBskyEmbedRecordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
-import { Record } from "@repo/common/domain";
+import { validateRecord } from "@repo/common/utils";
 
 import type {
   PostDto,
@@ -100,9 +100,10 @@ export class EmbedViews {
       ]);
       const detached =
         postgate &&
-        Record.create(postgate)
-          .validate("app.bsky.feed.postgate")
-          .detachedEmbeddingUris?.includes(asAtUriString(parentUri));
+        validateRecord(
+          "app.bsky.feed.postgate",
+          postgate,
+        ).detachedEmbeddingUris?.includes(asAtUriString(parentUri));
       if (detached) {
         return {
           $type: "app.bsky.embed.record#viewDetached" as const,

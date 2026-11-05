@@ -1,28 +1,20 @@
-import type { Like, TransactionContext } from "@repo/common/domain";
-import { type LikeInsert, schema } from "@repo/db";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
+import type { Like } from "../../../application/dto/like.js";
 import type { ILikeRepository } from "../../../application/interfaces/repositories/like-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class LikeRepository implements ILikeRepository {
   async save({ ctx, like }: { ctx: TransactionContext; like: Like }) {
+    const { uri, indexedAt, ...rest } = like;
     const data = {
-      cid: like.cid,
-      accountDid: like.accountDid,
-      subjectUri: like.subjectUri.toString(),
-      subjectCid: like.subjectCid,
-      createdAt: sanitizeDate(like.createdAt),
-    } satisfies LikeInsert;
+      ...rest,
+      createdAt: sanitizeDate(rest.createdAt),
+    };
     await ctx.db
       .insert(schema.likes)
-      .values({
-        uri: like.uri.toString(),
-        indexedAt: like.indexedAt,
-        ...data,
-      })
-      .onConflictDoUpdate({
-        target: schema.likes.uri,
-        set: data,
-      });
+      .values({ uri, indexedAt, ...data })
+      .onConflictDoUpdate({ target: schema.likes.uri, set: data });
   }
 }

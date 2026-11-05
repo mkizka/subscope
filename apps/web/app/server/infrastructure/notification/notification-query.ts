@@ -1,22 +1,9 @@
-import type { AtUriString } from "@atproto/syntax";
 import getPosts from "@repo/client/app/bsky/feed/getPosts";
 import getUnreadCount from "@repo/client/app/bsky/notification/getUnreadCount";
-import type { Notification } from "@repo/client/app/bsky/notification/listNotifications";
 import listNotifications from "@repo/client/app/bsky/notification/listNotifications";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-export interface INotificationQuery {
-  findMany: (
-    did: string,
-    cursor?: string,
-  ) => Promise<{ notifications: Notification[]; cursor?: string }>;
-  findPostTexts: (
-    did: string,
-    uris: AtUriString[],
-  ) => Promise<Record<string, unknown>>;
-  countUnread: (did: string) => Promise<{ count: number }>;
-}
+import type { INotificationQuery } from "@/app/server/application/interfaces/notification-query";
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 
 export const notificationQueryFactory = ({
   oauthClient,

@@ -320,7 +320,7 @@ importers:
       '@conform-to/zod':
         specifier: 1.21.2
         version: 1.21.2(zod@4.6.7)
-      '@fontsource/zen-maru-gothic':
+      '@fontsource/zen-kaku-gothic-new':
         specifier: 5.3.1
         version: 5.3.1
       '@gyaku/di':
@@ -599,9 +599,6 @@ importers:
       '@atproto/syntax':
         specifier: 0.7.7
         version: 0.7.7
-      '@atproto/tap':
-        specifier: 0.4.16
-        version: 0.4.16
       '@keyv/redis':
         specifier: 6.1.0
         version: 6.1.0(@opentelemetry/api@1.10.0)(keyv@6.1.0)
@@ -1854,8 +1851,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@fontsource/zen-maru-gothic@5.3.1':
-    resolution: {integrity: sha512-DtDKg44WTu44VuUWIJq8oAdCMHkkKrlpUaYHPbBQQkr8eZUNUjdWtzTJM3QIVlYYqdUPZN0Oy2a20EbxPJnF/g==}
+  '@fontsource/zen-kaku-gothic-new@5.3.1':
+    resolution: {integrity: sha512-L69mE6bkzeVK3UdTenxOmCIWvTwMxohJRNm1dAj+W+UiCULQ91b7M77ENVw+pjGmFL6zKPFYFeH3g8x2ugAJNw==}
 
   '@graphql-typed-document-node/core@3.2.0':
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
@@ -8748,7 +8745,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@fontsource/zen-maru-gothic@5.3.1': {}
+  '@fontsource/zen-kaku-gothic-new@5.3.1': {}
 
   '@graphql-typed-document-node/core@3.2.0(graphql@16.14.2)':
     dependencies:

@@ -4,7 +4,7 @@ import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
 import { listRule } from "@repo/client/app/bsky/feed/threadgate";
 import { mention } from "@repo/client/app/bsky/richtext/facet";
-import { Record } from "@repo/common/domain";
+import { validateRecord } from "@repo/common/utils";
 
 import type { RecordDto } from "../dto/record-dto.js";
 import { gateUri } from "../utils/gate-uri.js";
@@ -77,7 +77,7 @@ export class PostViews {
     gate: RecordDto,
     ctx: ViewContext,
   ): Promise<AppBskyFeedDefs.ThreadgateView> {
-    const { allow } = Record.create(gate).validate("app.bsky.feed.threadgate");
+    const { allow } = validateRecord("app.bsky.feed.threadgate", gate);
     const lists = await Promise.all(
       (allow ?? [])
         .filter((rule) => listRule.isTypeOf(rule))
@@ -100,8 +100,9 @@ export class PostViews {
     if (!viewerDid) {
       return undefined;
     }
-    const { embeddingRules } = Record.create(postgate).validate(
+    const { embeddingRules } = validateRecord(
       "app.bsky.feed.postgate",
+      postgate,
     );
     return (
       viewerDid !== authorDid &&
@@ -121,7 +122,7 @@ export class PostViews {
       return undefined;
     }
     const ownerDid = asDid(new AtUri(rootUri).host);
-    const { allow } = Record.create(gate).validate("app.bsky.feed.threadgate");
+    const { allow } = validateRecord("app.bsky.feed.threadgate", gate);
     if (viewerDid === ownerDid || !allow) {
       return false;
     }
@@ -136,14 +137,11 @@ export class PostViews {
       ),
     ]);
     const mentioned = root
-      ? Record.create(root)
-          .validate("app.bsky.feed.post")
-          .facets?.some((facet) =>
-            facet.features.some(
-              (feature) =>
-                mention.isTypeOf(feature) && feature.did === viewerDid,
-            ),
-          )
+      ? validateRecord("app.bsky.feed.post", root).facets?.some((facet) =>
+          facet.features.some(
+            (feature) => mention.isTypeOf(feature) && feature.did === viewerDid,
+          ),
+        )
       : false;
     if (
       (has("app.bsky.feed.threadgate#mentionRule") && mentioned) ||

@@ -1,6 +1,6 @@
 import type { DidString } from "@atproto/syntax";
 
-import type { IAccountQuery } from "@/app/server/infrastructure/account/account-query";
+import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
 
 export interface IGetMeUseCase {
   execute: (did: DidString) => Promise<{

@@ -1,8 +1,8 @@
 import {
   type ILoggerManager,
   type ITransactionManager,
-  RecordValidationError,
 } from "@repo/common/domain";
+import { RecordValidationError } from "@repo/common/utils";
 
 import type { IRecordRevRepository } from "../../interfaces/repositories/record-rev-repository.js";
 import type { IndexRecordService } from "../../services/index-record-service.js";

@@ -1,6 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Record, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
+import type { Record } from "../../../application/dto/record.js";
 import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
 
 export class InMemoryRecordRepository implements IRecordRepository {

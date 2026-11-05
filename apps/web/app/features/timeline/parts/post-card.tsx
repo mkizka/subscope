@@ -34,6 +34,7 @@ export type PostCardProps = {
     thumb?: string;
   };
   quote?: {
+    authorAvatar?: string;
     authorDisplayName?: string;
     authorHandle: string;
     text?: string;
@@ -83,7 +84,8 @@ export function QuotedPost({
 }) {
   return (
     <blockquote className="mt-2 rounded-xl border border-line px-3 py-2">
-      <div className="flex items-baseline gap-2 text-label">
+      <div className="flex items-center gap-2 text-label">
+        <Avatar src={quote.authorAvatar} size="sm" />
         <span className="truncate font-bold">
           {quote.authorDisplayName ?? quote.authorHandle}
         </span>
@@ -184,8 +186,8 @@ export function PostCard({
         />
       )}
       {reasonRepost && (
-        <div className="mb-1 flex gap-3 text-caption text-muted">
-          <RepeatIcon className="size-4 w-10 shrink-0" />
+        <div className="mb-1 flex items-center gap-3 text-caption text-muted">
+          <RepeatIcon className="ml-6 size-4 shrink-0" />
           <span className="truncate">
             {reasonRepost.byDisplayName ?? reasonRepost.byHandle}がリポスト
           </span>

@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Subscope
-description: 木苺の赤をアクセントにした、線で区切る丸ゴシックのBluesky互換クライアント
+description: 木苺の赤をアクセントにした、線で区切る角ゴシックのBluesky互換クライアント
 colors:
   surface: "color-mix(in srgb, #b8326b 7%, #fff)"
   surface-2: "color-mix(in srgb, #b8326b 13%, #fff)"
@@ -14,32 +14,32 @@ colors:
   danger: "#c62828"
 typography:
   title:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.4
   heading:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 18px
     fontWeight: 700
     lineHeight: 1.4
   body-lg:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.6
   body:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.4
   caption:
-    fontFamily: Zen Maru Gothic
+    fontFamily: Zen Kaku Gothic New
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.4
@@ -178,7 +178,7 @@ Blueskyが使えなくなったときに、同じ会話をそのまま続けら�
 
 ## Typography
 
-フォントは丸ゴシックの Zen Maru Gothic だけを使い、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
+フォントは角ゴシックの Zen Kaku Gothic New だけを使い、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
 
 | 名前      | 大きさ | 太さ | 行の高さ | 使う場所                               |
 | --------- | ------ | ---- | -------- | -------------------------------------- |
@@ -243,20 +243,22 @@ Bluesky公式と同じく、PCは3カラム、スマホは1カラムにする。
 - 無効: `disabled:opacity-50 disabled:cursor-not-allowed`
 - 送信中: ボタンを無効にし、ラベルの前に lucide の `LoaderCircle` を `animate-spin` で出す
 - エラー: 入力欄の枠を `border-danger` にし、下に `text-label text-danger` で理由を出す
+- 読み込み中: 画面や一覧の初回読み込みは `Skeleton` で行の形を先に出し、読み込み後に位置がずれないようにする。スピナーは形のない待ち時間（続きの追加読み込み、ボタンの送信中、バックフィルの進行中）だけに使う。ページ遷移中は画面上部のプログレスバーを使う。例外として、ログイン後の最初の表示だけは、自分の情報（`/api/me`）が届くまで全画面のスプラッシュを出し、準備ができたら300msのフェードで消す（メニューの項目やアバターが後から現れてレイアウトが動くのを防ぐため）。`prefers-reduced-motion` のときはフェードせずに消す
 - 空の一覧: `py-8 text-center text-label text-muted` で1文を出す
-- 動き: スピナーと読み込み中のプログレスバー（`animate-progress`）以外のアニメーションやトランジションは付けない
+- 動き: スピナー、読み込み中のプログレスバー（`animate-progress`）、スプラッシュのフェード以外のアニメーションやトランジションは付けない
 
 ### 一覧
 
-| 部品     | ファイル     | 使い方                                                                                                                                                                |
-| -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button` | `button.tsx` | 種類は `primary`（塗り）、`secondary`（`line` の枠）、`ghost`（枠なし・アイコンだけ）、`danger`。大きさは高さ40pxと32px（`sm`）。`<Link>` には `buttonClass()` を使う |
-| `Input`  | `input.tsx`  | 1行の入力欄。ラベルは上に `text-label` で置く                                                                                                                         |
-| `Dialog` | `dialog.tsx` | `<dialog>` で作る。幅は最大512px、見出しは `text-heading`、ボタンは右寄せで主ボタンを右端に置く。暗幕のクリックで閉じる                                               |
-| `Menu`   | `menu.tsx`   | `popover` 属性で作るメニュー。項目は `px-4 py-2 text-label`                                                                                                           |
-| `Tabs`   | `tabs.tsx`   | URLで切り替えるタブ。均等幅で、選択中は `text-ink font-bold` と下線                                                                                                   |
-| `Avatar` | `avatar.tsx` | 大きさは28px（ナビ・小さい一覧）、40px（投稿・ユーザー一覧）、80px（プロフィール）の3つ                                                                               |
-| `Badge`  | `badge.tsx`  | 件数は `brand` の塗り、状態は `surface-2` の塗り、エラーの状態は `surface-2` の塗りに `danger` の文字                                                                 |
+| 部品       | ファイル       | 使い方                                                                                                                                                                |
+| ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`   | `button.tsx`   | 種類は `primary`（塗り）、`secondary`（`line` の枠）、`ghost`（枠なし・アイコンだけ）、`danger`。大きさは高さ40pxと32px（`sm`）。`<Link>` には `buttonClass()` を使う |
+| `Input`    | `input.tsx`    | 1行の入力欄。ラベルは上に `text-label` で置く                                                                                                                         |
+| `Dialog`   | `dialog.tsx`   | `<dialog>` で作る。幅は最大512px、見出しは `text-heading`、ボタンは右寄せで主ボタンを右端に置く。暗幕のクリックで閉じる                                               |
+| `Menu`     | `menu.tsx`     | `popover` 属性で作るメニュー。項目は `px-4 py-2 text-label`                                                                                                           |
+| `Tabs`     | `tabs.tsx`     | URLで切り替えるタブ。均等幅で、選択中は `text-ink font-bold` と下線                                                                                                   |
+| `Avatar`   | `avatar.tsx`   | 大きさは28px（ナビ・小さい一覧）、40px（投稿・ユーザー一覧）、80px（プロフィール）の3つ                                                                               |
+| `Skeleton` | `skeleton.tsx` | 読み込み前の文字や数字の場所に置く `surface-2` の丸い棒。点滅などの動きは付けず、高さと幅はクラスで指定する                                                           |
+| `Badge`    | `badge.tsx`    | 件数は `brand` の塗り、状態は `surface-2` の塗り、エラーの状態は `surface-2` の塗りに `danger` の文字                                                                 |
 
 - チェックボックス・ラジオ・セレクトはブラウザ標準の要素を使う。色は `app.css` の `accent-color` で `brand` になる
 - アイコンは lucide-react だけを使う。大きさはボタンや補足の中で `size-4`、投稿のアクションで `size-5`、ナビとタブで `size-6`

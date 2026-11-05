@@ -1,7 +1,7 @@
 import type { AtIdentifierString } from "@atproto/syntax";
 import type { ProfileViewDetailed } from "@repo/client/app/bsky/actor/defs";
 
-import type { IAccountQuery } from "@/app/server/infrastructure/account/account-query";
+import type { IAccountQuery } from "@/app/server/application/interfaces/account-query";
 
 export interface IGetProfileUseCase {
   execute: (

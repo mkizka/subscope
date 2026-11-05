@@ -1,12 +1,11 @@
 import type { Did } from "@atproto/did";
 import { asDid } from "@atproto/did";
 import type { TransactionContext } from "@repo/common/domain";
-import type { Account } from "@repo/common/domain";
-import { Account as AccountDomain } from "@repo/common/domain";
 import { type AccountInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
 import type { IAccountRepository } from "../../../application/interfaces/repositories/account-repository.js";
+import { Account } from "../../../domain/account.js";
 
 export class AccountRepository implements IAccountRepository {
   async save({ ctx, account }: { ctx: TransactionContext; account: Account }) {
@@ -37,11 +36,9 @@ export class AccountRepository implements IAccountRepository {
     if (!row) {
       return null;
     }
-    return AccountDomain.reconstruct({
+    return Account.reconstruct({
       did: asDid(row.did),
       handle: row.handle || null,
-      isAdmin: row.isAdmin,
-      isBanned: row.isBanned,
       status: row.status,
       backfillStatus: row.backfillStatus,
       indexedAt: row.indexedAt,

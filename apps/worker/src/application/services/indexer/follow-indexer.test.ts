@@ -1,16 +1,13 @@
 import type { AfterCommitContext } from "@repo/common/domain";
-import {
-  accountFactory,
-  recordFactory,
-  registrationFactory,
-} from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("FollowIndexer", () => {
   let followIndexer: TestServices["followIndexer"];
@@ -55,7 +52,7 @@ describe("FollowIndexer", () => {
       // assert
       const follow = await followRepo.find({ ctx, uri: record.uri });
       expect(follow).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         cid: record.cid,
         accountDid: follower.did,
         subjectDid: followee.did,
@@ -66,7 +63,7 @@ describe("FollowIndexer", () => {
       // arrange
       const follower = accountFactory();
       const followee = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: followee.did }));
+      registrationQuery.add(followee.did);
       const record = recordFactory({
         uri: `at://${follower.did}/app.bsky.graph.follow/followrkey`,
         json: {

@@ -17,3 +17,11 @@
 5. 運用の調査でClaudeなどにジョブキューを読ませる場合は、Webの `ADMIN_API_TOKEN` をダッシュボードで設定する
 6. Grafanaの `GF_SECURITY_ADMIN_PASSWORD` をダッシュボードで設定する(未設定だとGrafanaは起動しない)
 7. `railway.ts` の `domains` に書いたカスタムドメインのDNSレコードを、ダッシュボードの表示どおりに設定する
+8. 運用の調査でClaudeなどにメトリクスを読ませる場合は、GrafanaでViewerロールのサービスアカウントのトークンを作る
+
+## 運用の調査
+
+Claude Codeのクラウド環境からは、ネットワークシークレットに登録したトークンをプロキシが付けるので、次のURLをcurlでGETすれば読める。
+
+- ジョブキュー: `https://alpha.subsco.me/admin/bull-board/api/queues`(Webの `ADMIN_API_TOKEN`)
+- メトリクス: `https://grafana.subsco.me/api/datasources/proxy/uid/prometheus/api/v1/query?query={PromQL}`(GrafanaのViewerトークン)。Tapの `tap_events_delivered_total`・`tap_events_acked_total`・`tap_resyncs_failed_total`、Workerの `worker_events_commit_total`・`worker_events_identity_total` などを読める。推移は `query_range` で読む

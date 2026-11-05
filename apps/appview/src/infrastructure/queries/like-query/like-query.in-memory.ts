@@ -1,6 +1,5 @@
 import type { Did } from "@atproto/did";
-import { asAtUriString, type AtUri } from "@atproto/syntax";
-import type { Like } from "@repo/common/domain";
+import type { AtUri, AtUriString } from "@atproto/syntax";
 
 import type { FeedItemDto } from "../../../application/dto/feed-item-dto.js";
 import type {
@@ -8,6 +7,14 @@ import type {
   SubjectLikeDto,
 } from "../../../application/dto/like-dto.js";
 import type { ILikeQuery } from "../../../application/interfaces/queries/like-query.js";
+
+type Like = {
+  uri: AtUriString;
+  accountDid: Did;
+  subjectUri: AtUriString;
+  createdAt: Date;
+  sortAt: Date;
+};
 
 export class InMemoryLikeQuery implements ILikeQuery {
   private likes: Like[] = [];
@@ -28,12 +35,11 @@ export class InMemoryLikeQuery implements ILikeQuery {
       this.likes
         .filter(
           (like) =>
-            like.accountDid === viewerDid &&
-            uris.includes(like.subjectUri.toString()),
+            like.accountDid === viewerDid && uris.includes(like.subjectUri),
         )
         .map((like) => ({
-          uri: asAtUriString(like.uri.toString()),
-          subjectUri: asAtUriString(like.subjectUri.toString()),
+          uri: like.uri,
+          subjectUri: like.subjectUri,
         })),
     );
   }
@@ -55,8 +61,7 @@ export class InMemoryLikeQuery implements ILikeQuery {
       this.likes
         .filter(
           (like) =>
-            like.subjectUri.toString() === subjectUri &&
-            (!cursor || like.sortAt < cursor),
+            like.subjectUri === subjectUri && (!cursor || like.sortAt < cursor),
         )
         .sort((a, b) => b.sortAt.getTime() - a.sortAt.getTime())
         .slice(0, limit)

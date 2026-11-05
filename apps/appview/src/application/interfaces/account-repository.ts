@@ -1,5 +1,7 @@
 import type { Did } from "@atproto/did";
-import type { Account, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+
+import type { Account } from "../../domain/models/account.js";
 
 export interface IAccountRepository {
   find: (did: Did) => Promise<Account | null>;

@@ -2,7 +2,6 @@ import assert from "node:assert";
 import { once } from "node:events";
 
 import { asDid } from "@atproto/did";
-import { accountFactory } from "@repo/common/test";
 import express from "express";
 import {
   afterAll,
@@ -13,6 +12,7 @@ import {
   test,
 } from "vitest";
 
+import { accountFactory } from "../../domain/models/account.factory.js";
 import { testRegistry, type TestServices } from "../../shared/test-utils.js";
 
 describe("lexRouter", () => {

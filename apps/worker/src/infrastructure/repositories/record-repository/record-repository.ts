@@ -1,9 +1,10 @@
+import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
 import type { TransactionContext } from "@repo/common/domain";
-import { Record } from "@repo/common/domain";
 import { type RecordInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 
+import type { Record } from "../../../application/dto/record.js";
 import type { IRecordRepository } from "../../../application/interfaces/repositories/record-repository.js";
 
 export class RecordRepository implements IRecordRepository {
@@ -24,18 +25,18 @@ export class RecordRepository implements IRecordRepository {
       return null;
     }
 
-    return Record.reconstruct({
+    return {
       uri,
       cid: row.cid,
       json: row.json,
       indexedAt: row.indexedAt,
-    });
+    };
   }
 
   async save({ ctx, record }: { ctx: TransactionContext; record: Record }) {
     const data = {
       cid: record.cid,
-      accountDid: record.accountDid,
+      accountDid: asDid(record.uri.host),
       json: record.json,
     } satisfies RecordInsert;
     await ctx.db

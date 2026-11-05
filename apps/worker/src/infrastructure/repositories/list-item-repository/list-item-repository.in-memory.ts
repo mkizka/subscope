@@ -1,6 +1,7 @@
 import type { AtUri } from "@atproto/syntax";
-import type { ListItem, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
+import type { ListItem } from "../../../application/dto/list-item.js";
 import type { IListItemRepository } from "../../../application/interfaces/repositories/list-item-repository.js";
 
 export class InMemoryListItemRepository implements IListItemRepository {
@@ -21,6 +22,6 @@ export class InMemoryListItemRepository implements IListItemRepository {
     ctx: TransactionContext;
     listItem: ListItem;
   }): Promise<void> {
-    this.listItems.set(listItem.uri.toString(), listItem);
+    this.listItems.set(listItem.uri, listItem);
   }
 }

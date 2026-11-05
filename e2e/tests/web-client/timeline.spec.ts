@@ -134,7 +134,7 @@ test.describe("タイムライン", () => {
     ).toBeAttached();
   });
 
-  test("timeline-11: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスピナーを表示する", async ({
+  test("timeline-11: タイムラインを開くと、投稿の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
     page,
   }) => {
     await page.goto("/accounts");
@@ -152,13 +152,13 @@ test.describe("タイムライン", () => {
     await expect(
       page.getByRole("heading", { name: "フォロー中" }),
     ).toBeVisible();
-    const spinner = page.getByRole("status", {
+    const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(spinner).toBeVisible();
+    await expect(skeleton).toBeVisible();
     release(undefined);
-    await expect(spinner).toBeHidden();
+    await expect(skeleton).toBeHidden();
   });
 
   test("timeline-12: 一度表示したタイムラインに戻ると、読み込み直しを待たずに前回の投稿を表示する", async ({
@@ -456,8 +456,6 @@ test.describe("タイムライン", () => {
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
     await link.click();
-    await expect(page).toHaveURL(
-      `/profile/${await resolveHandle("alice.test")}`,
-    );
+    await expect(page).toHaveURL(`/${await resolveHandle("alice.test")}`);
   });
 });

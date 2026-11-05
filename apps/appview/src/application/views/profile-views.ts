@@ -1,6 +1,8 @@
 import type { Did } from "@atproto/did";
-import { AtUri, toDatetimeString } from "@atproto/syntax";
+import { getBlobCidString, isPlainObject } from "@atproto/lex";
+import { asAtUriString, AtUri, toDatetimeString } from "@atproto/syntax";
 import type * as AppBskyActorDefs from "@repo/client/app/bsky/actor/defs";
+import { validateRecord } from "@repo/common/utils";
 
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
@@ -42,9 +44,10 @@ export class ProfileViews {
     if (!profile) {
       return undefined;
     }
-    const [basic, stats] = await Promise.all([
+    const [basic, stats, links] = await Promise.all([
       this.toBasic(profile, ctx),
       ctx.accountStats(did),
+      this.links(did, ctx),
     ]);
     return {
       ...basic,
@@ -56,11 +59,66 @@ export class ProfileViews {
             profile.bannerCid,
           )
         : undefined,
+      links: links.length > 0 ? links : undefined,
       followersCount: stats?.followersCount ?? 0,
       followsCount: stats?.followsCount ?? 0,
       postsCount: stats?.postsCount ?? 0,
       indexedAt: toDatetimeString(profile.indexedAt),
     };
+  }
+
+  private async links(
+    did: Did,
+    ctx: ViewContext,
+  ): Promise<AppBskyActorDefs.ProfileLinkView[]> {
+    const profileRecord = await ctx.record(
+      AtUri.make(did, "app.bsky.actor.profile", "self").toString(),
+    );
+    const refs: unknown =
+      isPlainObject(profileRecord?.json) && profileRecord.json.links;
+    if (!Array.isArray(refs)) {
+      return [];
+    }
+    const views = await Promise.all(
+      refs.map(
+        async (ref: unknown): Promise<AppBskyActorDefs.ProfileLinkView[]> => {
+          const uri = isPlainObject(ref) && ref.uri;
+          if (typeof uri !== "string") {
+            return [];
+          }
+          const atUri = new AtUri(uri);
+          if (
+            atUri.host !== did ||
+            atUri.collection !== "app.bsky.actor.link"
+          ) {
+            return [];
+          }
+          const [record, labels] = await Promise.all([
+            ctx.visibleRecord(uri),
+            ctx.labelsOf(uri),
+          ]);
+          if (!record) {
+            return [];
+          }
+          const parsed = validateRecord("app.bsky.actor.link", record);
+          const iconCid = getBlobCidString(parsed.icon);
+          return [
+            {
+              $type: "app.bsky.actor.defs#profileLinkView",
+              uri: asAtUriString(record.uri),
+              cid: record.cid,
+              url: parsed.url,
+              title: parsed.title,
+              icon: iconCid
+                ? this.assetUrlBuilder.getAvatarThumbnailUrl(did, iconCid)
+                : undefined,
+              labels: [...toLabelViews(labels), ...toSelfLabelViews(record)],
+            },
+          ];
+        },
+      ),
+    );
+    return views.flat();
   }
 
   private async toBasic(

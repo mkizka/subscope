@@ -1,11 +1,8 @@
 import type { Did } from "@atproto/did";
-import type {
-  IJobScheduler,
-  ITapClient,
-  ITransactionManager,
-} from "@repo/common/domain";
+import type { IJobScheduler, ITransactionManager } from "@repo/common/domain";
 
 import type { ILabelFetcher } from "../../interfaces/external/label-fetcher.js";
+import type { ITapClient } from "../../interfaces/external/tap-client.js";
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import type { IndexLabelUseCase } from "../label/index-label-use-case.js";
 

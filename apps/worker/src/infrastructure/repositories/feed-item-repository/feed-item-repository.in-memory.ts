@@ -1,13 +1,14 @@
 import type { AtUri } from "@atproto/syntax";
-import type { FeedItem, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
+import type { FeedItem } from "../../../application/dto/feed-item.js";
 import type { IFeedItemRepository } from "../../../application/interfaces/repositories/feed-item-repository.js";
 
 export class InMemoryFeedItemRepository implements IFeedItemRepository {
   private feedItems: Map<string, FeedItem> = new Map();
 
   add(feedItem: FeedItem): void {
-    this.feedItems.set(feedItem.uri.toString(), feedItem);
+    this.feedItems.set(feedItem.uri, feedItem);
   }
 
   clear(): void {
@@ -29,6 +30,6 @@ export class InMemoryFeedItemRepository implements IFeedItemRepository {
     ctx: TransactionContext;
     feedItem: FeedItem;
   }): Promise<void> {
-    this.feedItems.set(feedItem.uri.toString(), feedItem);
+    this.feedItems.set(feedItem.uri, feedItem);
   }
 }

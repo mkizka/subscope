@@ -1,28 +1,20 @@
-import type { Repost, TransactionContext } from "@repo/common/domain";
-import { type RepostInsert, schema } from "@repo/db";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
+import type { Repost } from "../../../application/dto/repost.js";
 import type { IRepostRepository } from "../../../application/interfaces/repositories/repost-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
 export class RepostRepository implements IRepostRepository {
   async save({ ctx, repost }: { ctx: TransactionContext; repost: Repost }) {
+    const { uri, indexedAt, ...rest } = repost;
     const data = {
-      cid: repost.cid,
-      accountDid: repost.accountDid,
-      subjectUri: repost.subjectUri.toString(),
-      subjectCid: repost.subjectCid,
-      createdAt: sanitizeDate(repost.createdAt),
-    } satisfies RepostInsert;
+      ...rest,
+      createdAt: sanitizeDate(rest.createdAt),
+    };
     await ctx.db
       .insert(schema.reposts)
-      .values({
-        uri: repost.uri.toString(),
-        indexedAt: repost.indexedAt,
-        ...data,
-      })
-      .onConflictDoUpdate({
-        target: schema.reposts.uri,
-        set: data,
-      });
+      .values({ uri, indexedAt, ...data })
+      .onConflictDoUpdate({ target: schema.reposts.uri, set: data });
   }
 }

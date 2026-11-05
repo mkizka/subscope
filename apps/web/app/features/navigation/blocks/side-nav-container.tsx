@@ -15,11 +15,13 @@ async function fetchMe(): Promise<MeResponse> {
   return response.json() as Promise<MeResponse>;
 }
 
+export const meQueryOptions = {
+  queryKey: ["me"],
+  queryFn: fetchMe,
+};
+
 export function useMe() {
-  const { data } = useQuery({
-    queryKey: ["me"],
-    queryFn: fetchMe,
-  });
+  const { data } = useQuery(meQueryOptions);
   if (!data) return undefined;
   return {
     ...data,

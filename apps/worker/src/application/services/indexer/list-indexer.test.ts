@@ -1,7 +1,8 @@
-import { accountFactory, recordFactory } from "@repo/common/test";
 import { describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import { testRegistry } from "../../../shared/test-utils.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("ListIndexer", () => {
   test("リストレコードを正しく保存する", async () => {

@@ -67,6 +67,8 @@ export const WithQuote: Story = {
     text: "この投稿に同意です。",
     createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
     quote: {
+      authorAvatar:
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E",
       authorHandle: "alice.bsky.social",
       authorDisplayName: "Alice",
       text: "Subscopeは省ストレージを目指した互換AppViewの実装です。",

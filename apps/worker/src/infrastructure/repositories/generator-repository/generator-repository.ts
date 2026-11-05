@@ -1,6 +1,7 @@
-import type { Generator, TransactionContext } from "@repo/common/domain";
-import { type GeneratorInsert, schema } from "@repo/db";
+import type { TransactionContext } from "@repo/common/domain";
+import { schema } from "@repo/db";
 
+import type { Generator } from "../../../application/dto/generator.js";
 import type { IGeneratorRepository } from "../../../application/interfaces/repositories/generator-repository.js";
 import { sanitizeDate } from "../../utils/data-sanitizer.js";
 
@@ -12,25 +13,14 @@ export class GeneratorRepository implements IGeneratorRepository {
     ctx: TransactionContext;
     generator: Generator;
   }) {
+    const { uri, indexedAt, ...rest } = generator;
     const data = {
-      cid: generator.cid,
-      accountDid: generator.accountDid,
-      did: generator.did,
-      displayName: generator.displayName,
-      description: generator.description,
-      avatarCid: generator.avatarCid,
-      createdAt: sanitizeDate(generator.createdAt),
-    } satisfies GeneratorInsert;
+      ...rest,
+      createdAt: sanitizeDate(rest.createdAt),
+    };
     await ctx.db
       .insert(schema.generators)
-      .values({
-        uri: generator.uri.toString(),
-        indexedAt: generator.indexedAt,
-        ...data,
-      })
-      .onConflictDoUpdate({
-        target: schema.generators.uri,
-        set: data,
-      });
+      .values({ uri, indexedAt, ...data })
+      .onConflictDoUpdate({ target: schema.generators.uri, set: data });
   }
 }

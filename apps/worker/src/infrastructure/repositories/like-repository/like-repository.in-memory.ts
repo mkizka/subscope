@@ -1,13 +1,14 @@
 import type { AtUri } from "@atproto/syntax";
-import type { Like, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
 
+import type { Like } from "../../../application/dto/like.js";
 import type { ILikeRepository } from "../../../application/interfaces/repositories/like-repository.js";
 
 export class InMemoryLikeRepository implements ILikeRepository {
   private likes: Map<string, Like> = new Map();
 
   add(like: Like): void {
-    this.likes.set(like.uri.toString(), like);
+    this.likes.set(like.uri, like);
   }
 
   clear(): void {
@@ -28,6 +29,6 @@ export class InMemoryLikeRepository implements ILikeRepository {
   }
 
   async save(params: { ctx: TransactionContext; like: Like }): Promise<void> {
-    this.likes.set(params.like.uri.toString(), params.like);
+    this.likes.set(params.like.uri, params.like);
   }
 }

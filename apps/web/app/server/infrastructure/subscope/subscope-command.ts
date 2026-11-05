@@ -2,14 +2,8 @@ import { XrpcResponseError } from "@atproto/lex";
 import registerAdmin from "@repo/client/me/subsco/admin/registerAdmin";
 import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 
-import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
-
-export type RegisterResult = "registered" | "invalidInviteCode" | "failed";
-
-export interface ISubscopeCommand {
-  registerAdmin: (did: string) => Promise<void>;
-  subscribe: (did: string, inviteCode: string) => Promise<RegisterResult>;
-}
+import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
+import type { ISubscopeCommand } from "@/app/server/application/interfaces/subscope-command";
 
 export const subscopeCommandFactory = ({
   oauthClient,

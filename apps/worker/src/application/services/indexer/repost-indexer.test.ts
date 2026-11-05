@@ -1,18 +1,15 @@
 import { AtUri } from "@atproto/syntax";
-import {
-  accountFactory,
-  fakeCid,
-  postFactory,
-  recordFactory,
-  registrationFactory,
-} from "@repo/common/test";
+import { fakeCid } from "@repo/common/test";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { accountFactory } from "../../../domain/account.factory.js";
 import {
   afterCommit,
   testRegistry,
   type TestServices,
 } from "../../../shared/test-utils.js";
+import { postFactory } from "../../dto/post.factory.js";
+import { recordFactory } from "../../dto/record.factory.js";
 
 describe("RepostIndexer", () => {
   let repostIndexer: TestServices["repostIndexer"];
@@ -66,15 +63,15 @@ describe("RepostIndexer", () => {
       // assert
       const repost = await repostRepo.find({ ctx, uri: record.uri });
       expect(repost).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         cid: record.cid,
         accountDid: reposter.did,
-        subjectUri: new AtUri(subjectUri),
+        subjectUri: subjectUri,
       });
 
       const feedItem = await feedItemRepo.find({ ctx, uri: record.uri });
       expect(feedItem).toMatchObject({
-        uri: record.uri,
+        uri: record.uri.toString(),
         type: "repost",
         accountDid: reposter.did,
         subjectUri: subjectUri,
@@ -93,7 +90,7 @@ describe("RepostIndexer", () => {
       // arrange
       const reposter = accountFactory();
       const author = accountFactory();
-      registrationQuery.add(registrationFactory({ accountDid: author.did }));
+      registrationQuery.add(author.did);
       const subjectUri = `at://${author.did}/app.bsky.feed.post/123`;
       const record = recordFactory({
         uri: `at://${reposter.did}/app.bsky.feed.repost/repostrkey`,

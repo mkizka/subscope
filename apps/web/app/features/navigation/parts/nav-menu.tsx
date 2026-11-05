@@ -69,15 +69,11 @@ export function NavMenu({
       </Item>
       {profileId && (
         <>
-          <Item
-            to={`/profile/${profileId}/lists`}
-            icon={<ListIcon className="size-6" />}
-            {...p}
-          >
+          <Item to="/lists" icon={<ListIcon className="size-6" />} {...p}>
             リスト
           </Item>
           <Item
-            to={`/profile/${profileId}`}
+            to={`/${profileId}`}
             icon={<CircleUserIcon className="size-6" />}
             {...p}
           >

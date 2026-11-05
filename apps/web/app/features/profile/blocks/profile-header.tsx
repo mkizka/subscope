@@ -1,17 +1,22 @@
-import type { BackfillStatus } from "@repo/common/domain";
+import type { ProfileLinkView } from "@repo/client/app/bsky/actor/defs";
+import { Link as LinkIcon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
+import { Skeleton } from "@/app/components/ui/skeleton";
 import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
+import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 type Props = {
+  loading?: boolean;
   displayName?: string;
   handle: string;
   avatarUrl?: string;
   bannerUrl?: string;
   description?: string;
+  links?: ProfileLinkView[];
   followsCount?: number;
   followersCount?: number;
   backfillStatus?: BackfillStatus;
@@ -19,11 +24,13 @@ type Props = {
 };
 
 export function ProfileHeader({
+  loading,
   displayName,
   handle,
   avatarUrl,
   bannerUrl,
   description,
+  links,
   followsCount,
   followersCount,
   backfillStatus,
@@ -61,26 +68,68 @@ export function ProfileHeader({
           {action}
         </div>
         <div className="min-w-0">
-          <h1 className="truncate text-title">{displayName || handle}</h1>
+          <h1 className="truncate text-title">
+            {loading ? (
+              <Skeleton className="h-5 w-40 align-middle" />
+            ) : (
+              displayName || handle
+            )}
+          </h1>
           <div className="flex items-center gap-2">
             <p className="truncate text-label text-muted">@{handle}</p>
             {backfillStatus && <BackfillStatusBadge status={backfillStatus} />}
           </div>
         </div>
+        {loading && (
+          <div className="flex flex-col gap-2 py-1">
+            <Skeleton className="h-3.5 w-full" />
+            <Skeleton className="h-3.5 w-2/3" />
+          </div>
+        )}
         {description && (
           <p className="text-body wrap-break-word whitespace-pre-wrap">
             {description}
           </p>
         )}
+        {links && links.length > 0 && (
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-label">
+            {links.map((link) => (
+              <li key={link.uri} className="min-w-0">
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+                    flex items-center gap-1 text-brand
+                    hover:underline
+                  "
+                >
+                  {link.icon ? (
+                    <img src={link.icon} alt="" className="size-4 rounded-xs" />
+                  ) : (
+                    <LinkIcon className="size-4 shrink-0" />
+                  )}
+                  <span className="truncate">
+                    {link.title || new URL(link.url).hostname}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="flex gap-4 text-label text-muted">
-          <Link to={`/profile/${handle}/follows`} className="hover:underline">
-            {followsCount !== undefined && (
+          <Link to={`/${handle}/follows`} className="hover:underline">
+            {loading ? (
+              <Skeleton className="h-3.5 w-7 align-middle" />
+            ) : (
               <b className="text-ink">{followsCount}</b>
             )}{" "}
             フォロー
           </Link>
-          <Link to={`/profile/${handle}/followers`} className="hover:underline">
-            {followersCount !== undefined && (
+          <Link to={`/${handle}/followers`} className="hover:underline">
+            {loading ? (
+              <Skeleton className="h-3.5 w-7 align-middle" />
+            ) : (
               <b className="text-ink">{followersCount}</b>
             )}{" "}
             フォロワー

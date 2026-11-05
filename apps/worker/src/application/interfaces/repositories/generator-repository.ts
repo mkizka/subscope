@@ -1,4 +1,6 @@
-import type { Generator, TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/domain";
+
+import type { Generator } from "../../dto/generator.js";
 
 export interface IGeneratorRepository {
   save: (params: {

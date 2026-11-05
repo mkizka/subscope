@@ -2,7 +2,7 @@
 import { AtUri } from "@atproto/syntax";
 import { factory, later } from "@factory-js/factory";
 import { faker } from "@faker-js/faker";
-import type { AccountStatus } from "@repo/common/domain";
+import type { AccountStatus } from "@repo/db";
 import { schema } from "@repo/db";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
