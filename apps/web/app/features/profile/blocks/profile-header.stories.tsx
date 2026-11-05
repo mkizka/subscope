@@ -31,6 +31,13 @@ export const WithLinks: StoryObj<typeof meta> = {
         cid: "b",
         url: "https://github.com/alice",
       },
+      {
+        uri: "at://a/app.bsky.actor.link/3",
+        cid: "c",
+        url: "https://example.com/long",
+        title:
+          "とても長いタイトルのリンクがここに入った場合の表示を確認するためのリンク",
+      },
     ],
   },
 };

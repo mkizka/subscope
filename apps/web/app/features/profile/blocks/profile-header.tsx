@@ -92,7 +92,7 @@ export function ProfileHeader({
           </p>
         )}
         {links && links.length > 0 && (
-          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-label">
+          <ul className="flex flex-wrap gap-2 text-label">
             {links.map((link) => (
               <li key={link.uri} className="min-w-0">
                 <a
@@ -100,8 +100,9 @@ export function ProfileHeader({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="
-                    flex items-center gap-1 text-brand
-                    hover:underline
+                    flex h-10 max-w-full items-center gap-2 rounded-full border
+                    border-line px-3
+                    hover:bg-surface-2
                   "
                 >
                   {link.icon ? (
