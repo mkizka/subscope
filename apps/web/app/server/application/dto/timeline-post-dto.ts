@@ -35,6 +35,12 @@ export type TimelinePostDto = {
     text?: string;
     images?: { thumb: string; fullsize: string; alt: string }[];
     threadPath?: string;
+    external?: {
+      uri: string;
+      title: string;
+      description: string;
+      thumb?: string;
+    };
   };
   reasonRepost?: { byDisplayName?: string; byHandle: string };
 };

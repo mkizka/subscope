@@ -100,6 +100,9 @@ export function toTimelinePost({
     : recordView.matches(post.embed)
       ? post.embed.record
       : undefined;
+  const quotedMedia = viewRecord.matches(quoted)
+    ? mediaOf(quoted.embeds?.[0])
+    : undefined;
   return {
     uri: post.uri,
     cid: post.cid,
@@ -138,7 +141,10 @@ export function toTimelinePost({
           authorDisplayName: quoted.author.displayName,
           authorHandle: quoted.author.handle,
           text: maybeString(quoted.value.text),
-          images: toImages(mediaOf(quoted.embeds?.[0])),
+          images: toImages(quotedMedia),
+          external: externalView.matches(quotedMedia)
+            ? quotedMedia.external
+            : undefined,
           threadPath: `/${quoted.author.handle}/post/${quoted.uri.split("/").pop()}`,
         }
       : undefined,

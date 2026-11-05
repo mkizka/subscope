@@ -129,11 +129,19 @@ test.describe("引用投稿", () => {
     }).toPass();
   });
 
-  test("quote-5: 引用されている投稿をタップすると、その投稿のスレッドを開く", async ({
+  test("quote-5: 引用される投稿に付いたリンクカードを、引用した投稿の中に表示する", async ({
     page,
   }) => {
     const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
       text: "quote-5: 引用される投稿",
+      embed: {
+        $type: "app.bsky.embed.external",
+        external: {
+          uri: "https://example.com/quote-5",
+          title: "quote-5: タイトル",
+          description: "quote-5: 説明",
+        },
+      },
       createdAt: new Date().toISOString(),
     });
     await createRecord("alice.test", "app.bsky.feed.post", {
@@ -143,9 +151,35 @@ test.describe("引用投稿", () => {
     });
 
     await page.goto("/");
-    const link = page
+    const card = page
       .getByRole("article")
       .filter({ hasText: "quote-5: 引用した投稿" })
+      .getByRole("blockquote")
+      .getByRole("link", { name: "quote-5: タイトル" });
+    await expect(async () => {
+      await page.reload();
+      await expect(card).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(card).toHaveAttribute("href", "https://example.com/quote-5");
+  });
+
+  test("quote-6: 引用されている投稿をタップすると、その投稿のスレッドを開く", async ({
+    page,
+  }) => {
+    const quoted = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-6: 引用される投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-6: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: quoted },
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const link = page
+      .getByRole("article")
+      .filter({ hasText: "quote-6: 引用した投稿" })
       .getByRole("link", { name: "引用された投稿のスレッドを開く" });
     await expect(async () => {
       await page.reload();
@@ -157,7 +191,7 @@ test.describe("引用投稿", () => {
       `/alice.test/post/${quoted.uri.split("/").pop()}`,
     );
     await expect(page.getByLabel("選んだ投稿")).toContainText(
-      "quote-5: 引用される投稿",
+      "quote-6: 引用される投稿",
     );
   });
 });
