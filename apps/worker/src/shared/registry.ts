@@ -1,11 +1,4 @@
 import { asClassArgs, asFunctionArgs, createRegistry } from "@gyaku/di";
-import type {
-  IDidCache,
-  IDidResolver,
-  IJobQueue,
-  IJobScheduler,
-  ITransactionManager,
-} from "@repo/common/domain";
 import {
   connectionPoolFactory,
   databaseFactory,
@@ -17,6 +10,13 @@ import {
   RedisDidCache,
   TransactionManager,
 } from "@repo/common/infrastructure";
+import type {
+  IDidCache,
+  IDidResolver,
+  IJobQueue,
+  IJobScheduler,
+  ITransactionManager,
+} from "@repo/common/interface";
 
 import type { IHandleResolver } from "../application/interfaces/external/handle-resolver.js";
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";

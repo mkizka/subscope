@@ -2,7 +2,7 @@ import type {
   AfterCommitContext,
   DatabaseClient,
   ITransactionManager,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 
 export class TransactionManager implements ITransactionManager {
   constructor(private readonly db: DatabaseClient) {}

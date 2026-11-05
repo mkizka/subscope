@@ -1,4 +1,4 @@
-import type { IJobQueue, ITransactionManager } from "@repo/common/domain";
+import type { IJobQueue, ITransactionManager } from "@repo/common/interface";
 
 import type { IPostStatsQuery } from "../../interfaces/queries/post-stats-query.js";
 import type { IPostStatsRepository } from "../../interfaces/repositories/post-stats-repository.js";

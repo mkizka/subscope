@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 export type LabelData = {
   src: string;

@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import { parseProfile } from "../../dto/profile.js";
 import type { Record } from "../../dto/record.js";

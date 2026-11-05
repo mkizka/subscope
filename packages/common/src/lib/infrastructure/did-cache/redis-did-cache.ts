@@ -1,5 +1,5 @@
 import type { CacheResult, DidDocument } from "@atproto/identity";
-import type { IDidCache, IMetricReporter } from "@repo/common/domain";
+import type { IDidCache, IMetricReporter } from "@repo/common/interface";
 import Keyv from "keyv";
 
 import { createKeyvRedis } from "../keyv-redis/keyv-redis.js";

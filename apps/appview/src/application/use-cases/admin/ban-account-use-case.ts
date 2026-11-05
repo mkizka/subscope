@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { ITransactionManager } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { UnregisterAccountUseCase } from "../sync/unregister-account-use-case.js";

@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import { type ITransactionManager } from "@repo/common/domain";
+import { type ITransactionManager } from "@repo/common/interface";
 import { RecordValidationError } from "@repo/common/utils";
 
 import type { JobLogger } from "../../../shared/job.js";

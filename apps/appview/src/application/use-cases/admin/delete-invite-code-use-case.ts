@@ -1,4 +1,4 @@
-import type { ITransactionManager } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IInviteCodeRepository } from "../../../application/interfaces/invite-code-repository.js";
 

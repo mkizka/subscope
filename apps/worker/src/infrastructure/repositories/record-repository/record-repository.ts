@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 import { type RecordInsert, schema } from "@repo/db";
 import { eq } from "drizzle-orm";
 

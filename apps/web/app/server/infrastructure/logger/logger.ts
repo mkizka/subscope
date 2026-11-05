@@ -1,5 +1,5 @@
-import type { ILoggerManager } from "@repo/common/domain";
 import { LoggerManager } from "@repo/common/infrastructure";
+import type { ILoggerManager } from "@repo/common/interface";
 
 import { env } from "@/app/server/env";
 

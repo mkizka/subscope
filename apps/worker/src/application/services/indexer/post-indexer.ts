@@ -2,7 +2,7 @@ import type {
   AfterCommitContext,
   IJobScheduler,
   TransactionContext,
-} from "@repo/common/domain";
+} from "@repo/common/interface";
 import { validateRecord } from "@repo/common/utils";
 
 import { feedItemFromPost } from "../../dto/feed-item.js";

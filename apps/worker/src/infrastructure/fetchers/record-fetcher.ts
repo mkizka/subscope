@@ -1,8 +1,8 @@
 import { asDid } from "@atproto/did";
 import { Client, lexToJson, XrpcResponseError } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import type { IDidResolver, IMetricReporter } from "@repo/common/domain";
-import { DidNotFoundError } from "@repo/common/domain";
+import type { IDidResolver, IMetricReporter } from "@repo/common/interface";
+import { DidNotFoundError } from "@repo/common/interface";
 import { required } from "@repo/common/utils";
 
 import type { Record } from "../../application/dto/record.js";

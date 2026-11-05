@@ -8,9 +8,9 @@ import {
   DidNotFoundError,
   DidResolutionError,
   type IDidResolver,
-} from "../../domain/interface/did-resolver.js";
-import type { ILoggerManager, Logger } from "../../domain/interface/logger.js";
-import type { IMetricReporter } from "../../domain/interface/metric.js";
+} from "../../interface/did-resolver.js";
+import type { ILoggerManager, Logger } from "../../interface/logger.js";
+import type { IMetricReporter } from "../../interface/metric.js";
 import { asHandle } from "../../utils/handle.js";
 
 class Resolver extends AtprotoDidResolver {

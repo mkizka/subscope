@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { IPostQuery } from "../../../application/interfaces/queries/post-query.js";
 import type { InMemoryPostRepository } from "../../repositories/post-repository/post-repository.in-memory.js";

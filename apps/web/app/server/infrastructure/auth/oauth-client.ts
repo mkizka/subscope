@@ -5,7 +5,7 @@ import {
   type NodeSavedSessionStore,
   type NodeSavedStateStore,
 } from "@atproto/oauth-client-node";
-import type { ILoggerManager } from "@repo/common/domain";
+import type { ILoggerManager } from "@repo/common/interface";
 
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import { env, isProduction } from "@/app/server/env";

@@ -1,6 +1,6 @@
 import { isDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import type { ITransactionManager } from "@repo/common/domain";
+import type { ITransactionManager } from "@repo/common/interface";
 
 import type { IAccountQuery } from "../../interfaces/queries/account-query.js";
 import type {

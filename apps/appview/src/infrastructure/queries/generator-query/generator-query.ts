@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { asAtUriString, type AtUri } from "@atproto/syntax";
-import type { DatabaseClient } from "@repo/common/domain";
+import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
 import { inArray } from "drizzle-orm";
 

@@ -1,4 +1,4 @@
-import type { ILoggerManager, Logger } from "@repo/common/domain";
+import type { ILoggerManager, Logger } from "@repo/common/interface";
 import { loggingMiddleware } from "@repo/common/utils";
 import type { RequestHandler, Router } from "express";
 import express from "express";

@@ -4,7 +4,7 @@ import type {
   CounterKey,
   IMetricReporter,
   LabelsValue,
-} from "../../domain/interface/metric.js";
+} from "../../interface/metric.js";
 
 type CounterMap = {
   [key in CounterKey]: client.Counter;

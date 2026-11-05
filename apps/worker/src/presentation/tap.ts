@@ -2,7 +2,7 @@ import { lexToJson } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
 import type { RecordEvent, TapEvent } from "@atproto/tap";
 import { Tap } from "@atproto/tap";
-import type { ILoggerManager, IMetricReporter } from "@repo/common/domain";
+import type { ILoggerManager, IMetricReporter } from "@repo/common/interface";
 import { isSupportedCollection } from "@repo/common/utils";
 
 import type { IndexCommitCommand } from "../application/use-cases/commit/index-commit-command.js";

@@ -1,4 +1,4 @@
-import type { TransactionContext } from "@repo/common/domain";
+import type { TransactionContext } from "@repo/common/interface";
 
 import type { IInviteCodeRepository } from "../../application/interfaces/invite-code-repository.js";
 import type { InviteCode } from "../../domain/models/invite-code.js";

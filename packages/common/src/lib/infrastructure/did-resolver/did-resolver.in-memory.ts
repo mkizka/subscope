@@ -3,7 +3,7 @@ import type { Did } from "@atproto/did";
 import {
   DidNotFoundError,
   type IDidResolver,
-} from "../../domain/interface/did-resolver.js";
+} from "../../interface/did-resolver.js";
 import type { Handle } from "../../utils/handle.js";
 
 type ResolveResult = {

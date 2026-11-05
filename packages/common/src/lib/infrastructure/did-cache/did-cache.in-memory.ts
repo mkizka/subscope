@@ -1,5 +1,5 @@
 import type { CacheResult } from "@atproto/identity";
-import type { IDidCache } from "@repo/common/domain";
+import type { IDidCache } from "@repo/common/interface";
 
 export class InMemoryDidCache implements IDidCache {
   async cacheDid(): Promise<void> {}
