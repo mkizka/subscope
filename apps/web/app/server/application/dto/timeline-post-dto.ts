@@ -22,6 +22,12 @@ export type TimelinePostDto = {
   likeCount?: number;
   createdAt?: string;
   images?: { thumb: string; fullsize: string; alt: string }[];
+  video?: {
+    playlist: string;
+    thumbnail?: string;
+    alt?: string;
+    aspectRatio?: { width: number; height: number };
+  };
   external?: {
     uri: string;
     title: string;
@@ -35,6 +41,12 @@ export type TimelinePostDto = {
     text?: string;
     links?: TextLinkDto[];
     images?: { thumb: string; fullsize: string; alt: string }[];
+    video?: {
+      playlist: string;
+      thumbnail?: string;
+      alt?: string;
+      aspectRatio?: { width: number; height: number };
+    };
     threadPath?: string;
     external?: {
       uri: string;

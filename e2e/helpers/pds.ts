@@ -144,6 +144,7 @@ export const registerAccount = async (handle: string, inviteCode: string) => {
 export const uploadBlob = async (
   handle: string,
   body: Uint8Array<ArrayBuffer>,
+  contentType = "image/png",
 ) => {
   const { accessJwt } = await xrpc<{ accessJwt: string }>(
     "com.atproto.server.createSession",
@@ -152,7 +153,7 @@ export const uploadBlob = async (
   const response = await fetch(`${PDS_URL}/xrpc/com.atproto.repo.uploadBlob`, {
     method: "POST",
     headers: {
-      "content-type": "image/png",
+      "content-type": contentType,
       authorization: `Bearer ${accessJwt}`,
     },
     body,

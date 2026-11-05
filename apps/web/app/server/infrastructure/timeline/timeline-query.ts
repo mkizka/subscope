@@ -12,6 +12,7 @@ import {
   viewRecord,
 } from "@repo/client/app/bsky/embed/record";
 import { view as recordWithMediaView } from "@repo/client/app/bsky/embed/recordWithMedia";
+import { view as videoView } from "@repo/client/app/bsky/embed/video";
 import {
   type FeedViewPost,
   generatorView,
@@ -95,6 +96,10 @@ function mediaOf(embed: unknown) {
   return recordWithMediaView.matches(embed) ? embed.media : embed;
 }
 
+function toVideo(media: unknown) {
+  return videoView.matches(media) ? media : undefined;
+}
+
 function toImages(media: unknown) {
   return imagesView.matches(media)
     ? media.images
@@ -142,6 +147,7 @@ export function toTimelinePost({
     repostCount: post.repostCount,
     likeCount: post.likeCount,
     images: toImages(media),
+    video: toVideo(media),
     external: externalView.matches(media) ? media.external : undefined,
     quote: viewRecord.matches(quoted)
       ? {
@@ -151,6 +157,7 @@ export function toTimelinePost({
           text: maybeString(quoted.value.text),
           links: toLinks(quoted.value),
           images: toImages(quotedMedia),
+          video: toVideo(quotedMedia),
           external: externalView.matches(quotedMedia)
             ? quotedMedia.external
             : undefined,
