@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import type * as MeSubscoServerGetRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
+import type * as MeSubscoServerGetRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
 import type { Registration } from "@repo/common/domain";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";

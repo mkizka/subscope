@@ -2,7 +2,7 @@ import "@/app/app.css";
 import "./preview.css";
 
 import { asAtUriString, asDatetimeString } from "@atproto/syntax";
-import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
+import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 import type { Preview } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";

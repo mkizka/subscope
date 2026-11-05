@@ -1,6 +1,6 @@
 import type { $Typed } from "@atproto/lex";
 import { toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
+import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
 
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";
 import type { ProfileViews } from "./profile-views.js";

@@ -1,8 +1,8 @@
 import type { Did } from "@atproto/did";
 import type { $Typed } from "@atproto/lex";
 import { AtUri } from "@atproto/syntax";
-import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
-import type * as AppBskyFeedGetPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
+import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
+import type * as AppBskyFeedGetPostThread from "@repo/client/app/bsky/feed/getPostThread";
 
 import type { PostDto } from "../../../application/dto/post-dto.js";
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";

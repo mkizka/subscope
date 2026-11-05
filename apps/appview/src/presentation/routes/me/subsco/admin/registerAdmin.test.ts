@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
+import registerAdmin from "@repo/client/me/subsco/admin/registerAdmin";
 import { schema } from "@repo/db";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { eq } from "drizzle-orm";

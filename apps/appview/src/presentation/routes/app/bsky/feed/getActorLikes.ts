@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getActorLikes from "@repo/client/lex/app/bsky/feed/getActorLikes";
+import getActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
 
 import type { GetActorLikesUseCase } from "../../../../../application/use-cases/feed/get-actor-likes-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

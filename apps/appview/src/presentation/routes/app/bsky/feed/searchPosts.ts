@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
+import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
 
 import type { SearchPostsUseCase } from "../../../../../application/use-cases/feed/search-posts-use-case.js";
 

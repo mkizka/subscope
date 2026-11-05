@@ -1,5 +1,5 @@
 import { getBlobCidString } from "@atproto/lex";
-import type { Image } from "@repo/client/lex/app/bsky/embed/images";
+import type { Image } from "@repo/client/app/bsky/embed/images";
 
 type AspectRatio = {
   width: number;

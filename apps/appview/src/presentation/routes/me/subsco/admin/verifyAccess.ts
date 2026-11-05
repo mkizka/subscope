@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
+import verifyAccess from "@repo/client/me/subsco/admin/verifyAccess";
 
 import type { VerifyAccessUseCase } from "../../../../../application/use-cases/admin/verify-access-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

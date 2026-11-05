@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getRegistrationStatus from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
+import getRegistrationStatus from "@repo/client/me/subsco/sync/getRegistrationStatus";
 
 import type { GetRegistrationStatusUseCase } from "../../../../../application/use-cases/sync/get-registration-status-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

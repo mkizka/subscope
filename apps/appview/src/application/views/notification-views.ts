@@ -5,7 +5,7 @@ import {
   type AtUriString,
   toDatetimeString,
 } from "@atproto/syntax";
-import type * as AppBskyNotificationGetGroupedNotifications from "@repo/client/lex/app/bsky/notification/getGroupedNotifications";
+import type * as AppBskyNotificationGetGroupedNotifications from "@repo/client/app/bsky/notification/getGroupedNotifications";
 
 import type { NotificationDto } from "../dto/notification-dto.js";
 import type { GeneratorViews } from "./generator-views.js";

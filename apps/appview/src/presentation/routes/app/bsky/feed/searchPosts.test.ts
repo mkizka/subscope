@@ -1,4 +1,4 @@
-import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
+import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
 import {
   accountFactory,
   postFactory,

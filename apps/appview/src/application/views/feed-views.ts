@@ -1,6 +1,6 @@
 import type { $Typed } from "@atproto/lex";
 import { asAtUriString, toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
+import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
 
 import type { FeedItemDto } from "../dto/feed-item-dto.js";
 import type { PostViews } from "./post-views.js";

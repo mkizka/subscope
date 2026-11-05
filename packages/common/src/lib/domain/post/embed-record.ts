@@ -1,5 +1,5 @@
 import { AtUri } from "@atproto/syntax";
-import type { Main as EmbedRecord } from "@repo/client/lex/app/bsky/embed/record";
+import type { Main as EmbedRecord } from "@repo/client/app/bsky/embed/record";
 
 type PostEmbedRecordParams = {
   uri: AtUri | string;

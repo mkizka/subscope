@@ -1,6 +1,6 @@
 import { isDid } from "@atproto/did";
 import type { LexRouter } from "@atproto/lex-server";
-import getProfiles from "@repo/client/lex/app/bsky/actor/getProfiles";
+import getProfiles from "@repo/client/app/bsky/actor/getProfiles";
 import { isHandle } from "@repo/common/utils";
 
 import type { GetProfilesUseCase } from "../../../../../application/use-cases/actor/get-profiles-use-case.js";

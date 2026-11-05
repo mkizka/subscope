@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./lex/*": {
-      "import": "./dist/generated/*.js",
-      "types": "./dist/generated/*.d.ts"
+    "./*": {
+      "import": "./dist/*.js",
+      "types": "./dist/*.d.ts"
     }
   },
   "scripts": {

@@ -1,4 +1,4 @@
-import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
+import deleteInviteCode from "@repo/client/me/subsco/admin/deleteInviteCode";
 import { accountFactory, inviteCodeFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

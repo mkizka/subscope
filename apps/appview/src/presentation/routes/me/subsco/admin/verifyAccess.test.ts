@@ -1,4 +1,4 @@
-import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
+import verifyAccess from "@repo/client/me/subsco/admin/verifyAccess";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

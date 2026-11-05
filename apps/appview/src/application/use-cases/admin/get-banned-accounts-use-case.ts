@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type * as MeSubscoAdminGetBannedAccounts from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
+import type * as MeSubscoAdminGetBannedAccounts from "@repo/client/me/subsco/admin/getBannedAccounts";
 
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { IAccountQuery } from "../../interfaces/queries/account-query.js";

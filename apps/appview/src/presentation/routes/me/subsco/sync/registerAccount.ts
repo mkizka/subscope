@@ -1,6 +1,6 @@
 import { asDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
+import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 
 import {
   AlreadyRegisteredError,

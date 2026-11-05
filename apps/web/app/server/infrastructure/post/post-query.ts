@@ -1,5 +1,5 @@
 import { asAtUriString } from "@atproto/syntax";
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
+import getPosts from "@repo/client/app/bsky/feed/getPosts";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

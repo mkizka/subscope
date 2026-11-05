@@ -40,7 +40,7 @@ AT ProtocolのXRPCエンドポイントを`apps/appview`に追加するための
 
 ```typescript
 import type { LexRouter } from "@atproto/lex-server";
-import getFollows from "@repo/client/lex/app/bsky/graph/getFollows";
+import getFollows from "@repo/client/app/bsky/graph/getFollows";
 
 export class GetFollows {
   constructor(

@@ -1,4 +1,4 @@
-import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
+import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
 import {
   accountFactory,
   followFactory,

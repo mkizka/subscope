@@ -1,4 +1,4 @@
-import getRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
+import getRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

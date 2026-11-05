@@ -1,5 +1,5 @@
 import { asAtIdentifierString } from "@atproto/syntax";
-import getFollowers from "@repo/client/lex/app/bsky/graph/getFollowers";
+import getFollowers from "@repo/client/app/bsky/graph/getFollowers";
 import {
   accountFactory,
   followFactory,

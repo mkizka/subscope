@@ -1,5 +1,5 @@
 import { toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyFeedGetLikes from "@repo/client/lex/app/bsky/feed/getLikes";
+import type * as AppBskyFeedGetLikes from "@repo/client/app/bsky/feed/getLikes";
 
 import type { SubjectLikeDto } from "../../../application/dto/like-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { Client } from "@atproto/lex";
-import * as queryLabels from "@repo/client/lex/com/atproto/label/queryLabels";
+import * as queryLabels from "@repo/client/com/atproto/label/queryLabels";
 
 import type { ILabelFetcher } from "../../application/interfaces/external/label-fetcher.js";
 import type { LabelData } from "../../application/interfaces/repositories/label-repository.js";

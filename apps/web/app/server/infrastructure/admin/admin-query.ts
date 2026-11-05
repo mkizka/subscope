@@ -1,12 +1,12 @@
 import getBannedAccounts, {
   type $OutputBody as GetBannedAccountsOutput,
-} from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
+} from "@repo/client/me/subsco/admin/getBannedAccounts";
 import getInviteCodes, {
   type $OutputBody as GetInviteCodesOutput,
-} from "@repo/client/lex/me/subsco/admin/getInviteCodes";
+} from "@repo/client/me/subsco/admin/getInviteCodes";
 import listRegisteredAccounts, {
   type $OutputBody as ListRegisteredAccountsOutput,
-} from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
+} from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

@@ -1,6 +1,6 @@
 import { Client } from "@atproto/lex";
 import type { AtIdentifierString } from "@atproto/syntax";
-import getRegisteredFollowers from "@repo/client/lex/me/subsco/graph/getRegisteredFollowers";
+import getRegisteredFollowers from "@repo/client/me/subsco/graph/getRegisteredFollowers";
 
 import { env } from "@/app/server/env";
 

@@ -1,4 +1,4 @@
-import type * as AppBskyFeedGetRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
+import type * as AppBskyFeedGetRepostedBy from "@repo/client/app/bsky/feed/getRepostedBy";
 
 import type { RepostDto } from "../../../application/dto/repost-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

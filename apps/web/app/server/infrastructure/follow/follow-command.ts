@@ -1,5 +1,5 @@
 import { AtUri, currentDatetimeString } from "@atproto/syntax";
-import follow from "@repo/client/lex/app/bsky/graph/follow";
+import follow from "@repo/client/app/bsky/graph/follow";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

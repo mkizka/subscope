@@ -1,8 +1,8 @@
 import type { AtUriString } from "@atproto/syntax";
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
-import getUnreadCount from "@repo/client/lex/app/bsky/notification/getUnreadCount";
-import type { Notification } from "@repo/client/lex/app/bsky/notification/listNotifications";
-import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
+import getPosts from "@repo/client/app/bsky/feed/getPosts";
+import getUnreadCount from "@repo/client/app/bsky/notification/getUnreadCount";
+import type { Notification } from "@repo/client/app/bsky/notification/listNotifications";
+import listNotifications from "@repo/client/app/bsky/notification/listNotifications";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

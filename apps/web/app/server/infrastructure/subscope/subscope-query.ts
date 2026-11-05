@@ -1,10 +1,10 @@
 import { Client } from "@atproto/lex";
-import getRegisteredAccounts from "@repo/client/lex/me/subsco/server/getRegisteredAccounts";
-import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
-import getTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAccounts";
+import getRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
+import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
+import getTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
 import getRegistrationStatus, {
   registered,
-} from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
+} from "@repo/client/me/subsco/sync/getRegistrationStatus";
 import type { BackfillStatus } from "@repo/common/domain";
 
 import { env } from "@/app/server/env";

@@ -1,5 +1,5 @@
 import type { AtUri } from "@atproto/syntax";
-import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getList";
+import type { $OutputBody } from "@repo/client/app/bsky/graph/getList";
 
 import type { ListItemDto } from "../../../application/dto/list-dto.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";

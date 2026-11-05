@@ -1,5 +1,5 @@
-import type { Main as Gallery } from "@repo/client/lex/app/bsky/embed/gallery";
-import { image } from "@repo/client/lex/app/bsky/embed/gallery";
+import type { Main as Gallery } from "@repo/client/app/bsky/embed/gallery";
+import { image } from "@repo/client/app/bsky/embed/gallery";
 
 import { PostEmbedImage } from "./embed-images.js";
 

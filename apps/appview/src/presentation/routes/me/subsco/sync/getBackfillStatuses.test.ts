@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import getBackfillStatuses from "@repo/client/lex/me/subsco/sync/getBackfillStatuses";
+import getBackfillStatuses from "@repo/client/me/subsco/sync/getBackfillStatuses";
 import {
   accountFactory,
   followFactory,

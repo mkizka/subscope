@@ -1,6 +1,6 @@
 import { isDid } from "@atproto/did";
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import getProfile from "@repo/client/lex/app/bsky/actor/getProfile";
+import getProfile from "@repo/client/app/bsky/actor/getProfile";
 import { isHandle } from "@repo/common/utils";
 
 import {

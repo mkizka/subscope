@@ -2,8 +2,8 @@ import type { Did } from "@atproto/did";
 import {
   type ThreadViewPost,
   threadViewPost,
-} from "@repo/client/lex/app/bsky/feed/defs";
-import type * as AppBskyUnspeccedGetPostThreadV2 from "@repo/client/lex/app/bsky/unspecced/getPostThreadV2";
+} from "@repo/client/app/bsky/feed/defs";
+import type * as AppBskyUnspeccedGetPostThreadV2 from "@repo/client/app/bsky/unspecced/getPostThreadV2";
 
 import type { ResolvedAtUri } from "../../../domain/models/at-uri.js";
 import {

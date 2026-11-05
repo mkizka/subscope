@@ -1,5 +1,5 @@
 import { getBlobCidString } from "@atproto/lex";
-import type { External } from "@repo/client/lex/app/bsky/embed/external";
+import type { External } from "@repo/client/app/bsky/embed/external";
 
 export class PostEmbedExternal {
   constructor(

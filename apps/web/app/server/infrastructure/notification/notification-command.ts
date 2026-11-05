@@ -1,5 +1,5 @@
 import type { DatetimeString } from "@atproto/syntax";
-import updateSeen from "@repo/client/lex/app/bsky/notification/updateSeen";
+import updateSeen from "@repo/client/app/bsky/notification/updateSeen";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

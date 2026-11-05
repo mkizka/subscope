@@ -1,4 +1,4 @@
-import getTrackedAccounts from "@repo/client/lex/me/subsco/server/getTrackedAccounts";
+import getTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
 import {
   accountFactory,
   followFactory,

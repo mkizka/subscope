@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import listNotifications from "@repo/client/lex/app/bsky/notification/listNotifications";
+import listNotifications from "@repo/client/app/bsky/notification/listNotifications";
 
 import type { ListNotificationsUseCase } from "../../../../../application/use-cases/notification/list-notifications-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

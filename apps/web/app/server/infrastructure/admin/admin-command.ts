@@ -1,11 +1,11 @@
 import type { DidString } from "@atproto/syntax";
-import banAccount from "@repo/client/lex/me/subsco/admin/banAccount";
+import banAccount from "@repo/client/me/subsco/admin/banAccount";
 import createInviteCode, {
   type $OutputBody as CreateInviteCodeOutput,
-} from "@repo/client/lex/me/subsco/admin/createInviteCode";
-import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
-import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
-import unbanAccount from "@repo/client/lex/me/subsco/admin/unbanAccount";
+} from "@repo/client/me/subsco/admin/createInviteCode";
+import deleteInviteCode from "@repo/client/me/subsco/admin/deleteInviteCode";
+import grantAdmin from "@repo/client/me/subsco/admin/grantAdmin";
+import unbanAccount from "@repo/client/me/subsco/admin/unbanAccount";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

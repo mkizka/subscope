@@ -1,22 +1,22 @@
-import { view as externalView } from "@repo/client/lex/app/bsky/embed/external";
+import { view as externalView } from "@repo/client/app/bsky/embed/external";
 import {
   view as galleryView,
   viewImage as galleryViewImage,
-} from "@repo/client/lex/app/bsky/embed/gallery";
-import { view as imagesView } from "@repo/client/lex/app/bsky/embed/images";
+} from "@repo/client/app/bsky/embed/gallery";
+import { view as imagesView } from "@repo/client/app/bsky/embed/images";
 import {
   view as recordView,
   viewRecord,
-} from "@repo/client/lex/app/bsky/embed/record";
-import { view as recordWithMediaView } from "@repo/client/lex/app/bsky/embed/recordWithMedia";
-import type { FeedViewPost } from "@repo/client/lex/app/bsky/feed/defs";
-import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
-import postRecord from "@repo/client/lex/app/bsky/feed/post";
-import searchPosts from "@repo/client/lex/app/bsky/feed/searchPosts";
-import { link, mention } from "@repo/client/lex/app/bsky/richtext/facet";
+} from "@repo/client/app/bsky/embed/record";
+import { view as recordWithMediaView } from "@repo/client/app/bsky/embed/recordWithMedia";
+import type { FeedViewPost } from "@repo/client/app/bsky/feed/defs";
+import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
+import postRecord from "@repo/client/app/bsky/feed/post";
+import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
+import { link, mention } from "@repo/client/app/bsky/richtext/facet";
 import getRegistrationStatus, {
   registered,
-} from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
+} from "@repo/client/me/subsco/sync/getRegistrationStatus";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

@@ -1,6 +1,6 @@
 import { asAtUriString, AtUri, currentDatetimeString } from "@atproto/syntax";
-import like from "@repo/client/lex/app/bsky/feed/like";
-import repost from "@repo/client/lex/app/bsky/feed/repost";
+import like from "@repo/client/app/bsky/feed/like";
+import repost from "@repo/client/app/bsky/feed/repost";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

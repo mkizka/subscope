@@ -1,6 +1,6 @@
 import { XrpcResponseError } from "@atproto/lex";
-import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
-import registerAccount from "@repo/client/lex/me/subsco/sync/registerAccount";
+import registerAdmin from "@repo/client/me/subsco/admin/registerAdmin";
+import registerAccount from "@repo/client/me/subsco/sync/registerAccount";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

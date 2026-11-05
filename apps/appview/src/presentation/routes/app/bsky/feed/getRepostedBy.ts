@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getRepostedBy from "@repo/client/lex/app/bsky/feed/getRepostedBy";
+import getRepostedBy from "@repo/client/app/bsky/feed/getRepostedBy";
 
 import type { GetRepostedByUseCase } from "../../../../../application/use-cases/feed/get-reposted-by-use-case.js";
 

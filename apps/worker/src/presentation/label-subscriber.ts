@@ -1,5 +1,5 @@
 import { Subscription } from "@atproto/xrpc-server";
-import * as subscribeLabels from "@repo/client/lex/com/atproto/label/subscribeLabels";
+import * as subscribeLabels from "@repo/client/com/atproto/label/subscribeLabels";
 import type { IMetricReporter } from "@repo/common/domain";
 
 import type { ILabelCursorStore } from "../application/interfaces/external/label-cursor-store.js";

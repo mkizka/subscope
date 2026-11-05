@@ -1,4 +1,4 @@
-import getBannedAccounts from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
+import getBannedAccounts from "@repo/client/me/subsco/admin/getBannedAccounts";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

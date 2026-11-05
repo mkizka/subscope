@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
-import verifyAccess from "@repo/client/lex/me/subsco/admin/verifyAccess";
+import verifyAccess from "@repo/client/me/subsco/admin/verifyAccess";
 import { data, redirect, type RouterContextProvider } from "react-router";
 
 import { didContext } from "@/app/context/did";

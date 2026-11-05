@@ -1,10 +1,10 @@
 import { asDid, type Did } from "@atproto/did";
 import { AtUri } from "@atproto/syntax";
-import external from "@repo/client/lex/app/bsky/embed/external";
-import gallery from "@repo/client/lex/app/bsky/embed/gallery";
-import images from "@repo/client/lex/app/bsky/embed/images";
-import embedRecord from "@repo/client/lex/app/bsky/embed/record";
-import recordWithMedia from "@repo/client/lex/app/bsky/embed/recordWithMedia";
+import external from "@repo/client/app/bsky/embed/external";
+import gallery from "@repo/client/app/bsky/embed/gallery";
+import images from "@repo/client/app/bsky/embed/images";
+import embedRecord from "@repo/client/app/bsky/embed/record";
+import recordWithMedia from "@repo/client/app/bsky/embed/recordWithMedia";
 
 import type { Record } from "../record/record.js";
 import { PostEmbedExternal } from "./embed-external.js";

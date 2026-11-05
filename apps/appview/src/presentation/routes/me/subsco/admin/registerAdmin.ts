@@ -1,5 +1,5 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import registerAdmin from "@repo/client/lex/me/subsco/admin/registerAdmin";
+import registerAdmin from "@repo/client/me/subsco/admin/registerAdmin";
 
 import {
   AdminAlreadyExistsError,

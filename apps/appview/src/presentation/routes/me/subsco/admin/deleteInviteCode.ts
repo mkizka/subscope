@@ -1,5 +1,5 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import deleteInviteCode from "@repo/client/lex/me/subsco/admin/deleteInviteCode";
+import deleteInviteCode from "@repo/client/me/subsco/admin/deleteInviteCode";
 
 import {
   type DeleteInviteCodeUseCase,

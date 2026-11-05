@@ -1,6 +1,6 @@
 import type { LexRouter } from "@atproto/lex-server";
-import { savedFeedsPrefV2 } from "@repo/client/lex/app/bsky/actor/defs";
-import getPreferences from "@repo/client/lex/app/bsky/actor/getPreferences";
+import { savedFeedsPrefV2 } from "@repo/client/app/bsky/actor/defs";
+import getPreferences from "@repo/client/app/bsky/actor/getPreferences";
 
 export class GetPreferences {
   handle(router: LexRouter) {

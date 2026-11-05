@@ -1,6 +1,6 @@
 import type { Did } from "@atproto/did";
 import { AtUri, toDatetimeString } from "@atproto/syntax";
-import type * as AppBskyActorDefs from "@repo/client/lex/app/bsky/actor/defs";
+import type * as AppBskyActorDefs from "@repo/client/app/bsky/actor/defs";
 
 import type { ProfileDto } from "../dto/profile-dto.js";
 import type { IAssetUrlBuilder } from "../interfaces/asset-url-builder.js";

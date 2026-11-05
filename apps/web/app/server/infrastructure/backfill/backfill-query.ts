@@ -1,6 +1,6 @@
 import { Client } from "@atproto/lex";
 import { isValidDid } from "@atproto/syntax";
-import getBackfillStatuses from "@repo/client/lex/me/subsco/sync/getBackfillStatuses";
+import getBackfillStatuses from "@repo/client/me/subsco/sync/getBackfillStatuses";
 import type { BackfillStatus } from "@repo/common/domain";
 
 import { env } from "@/app/server/env";

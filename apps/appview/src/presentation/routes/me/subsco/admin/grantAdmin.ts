@@ -1,5 +1,5 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
-import grantAdmin from "@repo/client/lex/me/subsco/admin/grantAdmin";
+import grantAdmin from "@repo/client/me/subsco/admin/grantAdmin";
 
 import type { GrantAdminUseCase } from "../../../../../application/use-cases/admin/grant-admin-use-case.js";
 import { NotRegisteredError } from "../../../../../application/use-cases/sync/unregister-account-use-case.js";

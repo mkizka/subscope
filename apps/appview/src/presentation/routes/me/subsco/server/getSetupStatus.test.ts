@@ -1,4 +1,4 @@
-import getSetupStatus from "@repo/client/lex/me/subsco/server/getSetupStatus";
+import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

@@ -1,5 +1,5 @@
 import type { Did } from "@atproto/did";
-import type { $OutputBody } from "@repo/client/lex/app/bsky/graph/getFollows";
+import type { $OutputBody } from "@repo/client/app/bsky/graph/getFollows";
 import { required } from "@repo/common/utils";
 
 import type { FolloweeDto } from "../../../application/dto/follow-dto.js";

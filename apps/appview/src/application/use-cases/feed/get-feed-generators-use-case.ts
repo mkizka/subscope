@@ -1,6 +1,6 @@
 import type { $Typed } from "@atproto/lex";
 import type { AtUri } from "@atproto/syntax";
-import type * as AppBskyFeedDefs from "@repo/client/lex/app/bsky/feed/defs";
+import type * as AppBskyFeedDefs from "@repo/client/app/bsky/feed/defs";
 
 import type { GeneratorViews } from "../../views/generator-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";

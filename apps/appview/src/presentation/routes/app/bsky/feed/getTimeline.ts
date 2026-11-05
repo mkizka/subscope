@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getTimeline from "@repo/client/lex/app/bsky/feed/getTimeline";
+import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
 
 import type { GetTimelineUseCase } from "../../../../../application/use-cases/feed/get-timeline-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";

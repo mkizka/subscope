@@ -1,6 +1,6 @@
 import { type LexRouter, LexServerError } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
-import getList from "@repo/client/lex/app/bsky/graph/getList";
+import getList from "@repo/client/app/bsky/graph/getList";
 
 import type { GetListUseCase } from "../../../../../application/use-cases/graph/get-list-use-case.js";
 import type { AtUriService } from "../../../../../domain/service/at-uri-service.js";

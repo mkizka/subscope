@@ -3,8 +3,8 @@ import {
   type AtUriString,
   currentDatetimeString,
 } from "@atproto/syntax";
-import list from "@repo/client/lex/app/bsky/graph/list";
-import listitem from "@repo/client/lex/app/bsky/graph/listitem";
+import list from "@repo/client/app/bsky/graph/list";
+import listitem from "@repo/client/app/bsky/graph/listitem";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 

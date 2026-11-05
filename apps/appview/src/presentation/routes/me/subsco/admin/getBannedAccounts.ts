@@ -1,5 +1,5 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getBannedAccounts from "@repo/client/lex/me/subsco/admin/getBannedAccounts";
+import getBannedAccounts from "@repo/client/me/subsco/admin/getBannedAccounts";
 
 import type { GetBannedAccountsUseCase } from "../../../../../application/use-cases/admin/get-banned-accounts-use-case.js";
 import type { AdminMiddleware } from "../../../../../presentation/middleware/admin-middleware.js";

@@ -1,4 +1,4 @@
-import listRegisteredAccounts from "@repo/client/lex/me/subsco/admin/listRegisteredAccounts";
+import listRegisteredAccounts from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 import {
   accountFactory,
   followFactory,

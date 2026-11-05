@@ -2,8 +2,8 @@ import type { AtUriString } from "@atproto/syntax";
 import {
   type ThreadViewPost,
   threadViewPost,
-} from "@repo/client/lex/app/bsky/feed/defs";
-import getPostThread from "@repo/client/lex/app/bsky/feed/getPostThread";
+} from "@repo/client/app/bsky/feed/defs";
+import getPostThread from "@repo/client/app/bsky/feed/getPostThread";
 
 import type { IOAuthClient } from "@/app/server/infrastructure/auth/oauth-client";
 import {

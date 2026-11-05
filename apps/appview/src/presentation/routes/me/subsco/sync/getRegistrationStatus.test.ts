@@ -1,4 +1,4 @@
-import getRegistrationStatus from "@repo/client/lex/me/subsco/sync/getRegistrationStatus";
+import getRegistrationStatus from "@repo/client/me/subsco/sync/getRegistrationStatus";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 

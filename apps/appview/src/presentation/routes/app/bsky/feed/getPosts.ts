@@ -1,6 +1,6 @@
 import type { LexRouter } from "@atproto/lex-server";
 import { AtUri } from "@atproto/syntax";
-import getPosts from "@repo/client/lex/app/bsky/feed/getPosts";
+import getPosts from "@repo/client/app/bsky/feed/getPosts";
 
 import type { GetPostsUseCase } from "../../../../../application/use-cases/feed/get-posts-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
