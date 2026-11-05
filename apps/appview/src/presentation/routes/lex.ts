@@ -35,6 +35,7 @@ import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
 import type { ListRegisteredAccounts } from "./me/subsco/admin/listRegisteredAccounts.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
+import type { RevokeAdmin } from "./me/subsco/admin/revokeAdmin.js";
 import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetRegisteredFollowers } from "./me/subsco/graph/getRegisteredFollowers.js";
@@ -71,6 +72,7 @@ export const lexRouterFactory = (
   deleteInviteCode: DeleteInviteCode,
   getInviteCodes: GetInviteCodes,
   grantAdmin: GrantAdmin,
+  revokeAdmin: RevokeAdmin,
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
   getRegisteredAccounts: GetRegisteredAccounts,
@@ -116,6 +118,7 @@ export const lexRouterFactory = (
     deleteInviteCode,
     getInviteCodes,
     grantAdmin,
+    revokeAdmin,
     registerAdmin,
     verifyAccess,
     getRegisteredAccounts,

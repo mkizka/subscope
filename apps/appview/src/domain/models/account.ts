@@ -55,6 +55,10 @@ export class Account {
     this._isAdmin = true;
   }
 
+  demoteFromAdmin(): void {
+    this._isAdmin = false;
+  }
+
   ban(): void {
     this._isBanned = true;
   }

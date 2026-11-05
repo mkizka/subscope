@@ -87,6 +87,7 @@
     "me.subsco.admin.grantAdmin",
     "me.subsco.admin.listRegisteredAccounts",
     "me.subsco.admin.registerAdmin",
+    "me.subsco.admin.revokeAdmin",
     "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
     "me.subsco.graph.getRegisteredFollowers",
@@ -382,6 +383,10 @@
     "me.subsco.admin.registerAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/registerAdmin.json",
       "cid": "bafyreidh653anvtfbwrnl3frr2vcs6ycc4p2dj4ii23rp4ahcdjpruh4a4"
+    },
+    "me.subsco.admin.revokeAdmin": {
+      "uri": "file://./lexicons/me/subsco/admin/revokeAdmin.json",
+      "cid": "bafyreigblxekxqvj5b4f7mew4epsz6hq3ehadiv26ywqsqesxq5ygtckji"
     },
     "me.subsco.admin.unbanAccount": {
       "uri": "file://./lexicons/me/subsco/admin/unbanAccount.json",
