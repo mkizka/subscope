@@ -49,7 +49,9 @@ export function AccountList<T extends Account>({
                 <p className="truncate text-body font-bold">
                   {account.displayName || profileId}
                 </p>
-                <p className="truncate text-label text-muted">@{profileId}</p>
+                {account.handle !== "handle.invalid" && (
+                  <p className="truncate text-label text-muted">@{profileId}</p>
+                )}
                 {account.description && (
                   <p className="truncate text-label">{account.description}</p>
                 )}

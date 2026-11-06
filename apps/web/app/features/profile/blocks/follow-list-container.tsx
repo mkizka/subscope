@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router";
+import { ArrowLeftIcon } from "lucide-react";
+import { Link, useSearchParams } from "react-router";
 
 import { RowsSkeleton } from "@/app/components/rows-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
@@ -33,17 +34,17 @@ export function FollowListContainer({ handle, kind }: Props) {
   const subject = data?.subject;
   return (
     <>
-      <h1 className="sticky top-0 border-b border-line bg-surface p-4 text-title">
-        {titles[kind]}
-        {subject && (
-          <>
-            {" "}
-            <span className="font-normal text-muted">
-              {subject.displayName || subject.handle}
-            </span>
-          </>
-        )}
-      </h1>
+      <header className="
+        sticky top-0 flex items-center gap-2 border-b border-line bg-surface p-4
+      ">
+        <Link to={`/${handle}`} aria-label="戻る" className="text-muted">
+          <ArrowLeftIcon className="size-5" />
+        </Link>
+        <h1 className="text-title">
+          {subject ? `${subject.displayName || subject.handle}の` : ""}
+          {titles[kind]}
+        </h1>
+      </header>
       {kind === "followers" && (
         <Tabs
           tabs={[
