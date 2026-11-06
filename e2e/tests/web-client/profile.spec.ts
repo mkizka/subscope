@@ -45,6 +45,22 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
+  test("profile-22: 自分をフォローしているアカウントのプロフィール全体ページには、ハンドルの横に「フォローされています」を表示する", async ({
+    page,
+  }) => {
+    await follow("bob.test", "alice.test");
+    const bob = await resolveHandle("bob.test");
+    await page.goto(`/${bob}`);
+
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("フォローされています")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
   test("profile-20: プロフィールの自己紹介の下に、プロフィールに設定されたリンクを、枠付きの丸いボタンとして折り返しながら並べて表示する。表示名（なければドメイン）を選ぶと、リンク先を新しいタブで開く", async ({
     page,
   }) => {

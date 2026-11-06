@@ -42,6 +42,10 @@ export const WithLinks: StoryObj<typeof meta> = {
   },
 };
 
+export const FollowedBy: StoryObj<typeof meta> = {
+  args: { followedBy: true },
+};
+
 export const BackfillInProgress: StoryObj<typeof meta> = {
   args: { backfillStatus: "inProgress" },
 };
