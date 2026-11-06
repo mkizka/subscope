@@ -2,14 +2,12 @@ import "@/app/app.css";
 import "./preview.css";
 
 import { asAtUriString, asDatetimeString } from "@atproto/syntax";
-import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 import type { Preview } from "@storybook/react-vite";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { createRoutesStub } from "react-router";
 
 import ListDetailStories from "@/app/features/list/blocks/list-detail.stories";
 import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
-import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-codes";
 import type { loader as listLoader } from "@/app/routes/api.list.$handle.$rkey";
 import type { loader as listsLoader } from "@/app/routes/api.lists.$handle";
 import type { loader as meLoader } from "@/app/routes/api.me";
@@ -24,21 +22,7 @@ import type { loader as threadLoader } from "@/app/routes/api.thread";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
 
-type Data<T extends (...args: never) => unknown> =
-  Awaited<ReturnType<T>> extends {
-    data: infer D;
-  }
-    ? D
-    : never;
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      staleTime: Infinity,
-    },
-  },
-});
+import { type Data, queryClient } from "./query-client";
 
 const infinite = <T extends (...args: never) => unknown>(page: Data<T>) => ({
   pages: [page],
@@ -101,32 +85,6 @@ queryClient.setQueryData<{
   ],
   pageParams: [undefined],
 });
-queryClient.setQueryData<{
-  pages: RegisteredAccountsResponse[];
-  pageParams: unknown[];
-}>(["registeredAccounts"], {
-  pages: [
-    {
-      registeredAccounts: [
-        {
-          profile: alice,
-          isAdmin: true,
-          registeredAt: "2024-01-01T00:00:00.000Z",
-          backfillStatus: "completed",
-        },
-        {
-          profile: bob,
-          isAdmin: false,
-          registeredAt: "2024-01-02T00:00:00.000Z",
-          backfillStatus: "inProgress",
-        },
-      ],
-      total: 2,
-    },
-  ],
-  pageParams: [undefined],
-});
-
 queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
   ["clientRegisteredAccounts", ""],
   {
@@ -180,23 +138,6 @@ searchQuery("accounts", "alice", {
 searchQuery("accounts", "nobody", {});
 searchQuery("posts", "alice", { posts: TimelineFeedStories.args.posts });
 searchQuery("posts", "nobody", {});
-queryClient.setQueryData<{
-  pages: Data<typeof inviteCodesLoader>[];
-  pageParams: unknown[];
-}>(["inviteCodes"], {
-  pages: [
-    {
-      codes: [
-        {
-          code: "abc-123-def",
-          expiresAt: "2099-12-31T23:59:59.000Z",
-          createdAt: "2025-01-01T00:00:00.000Z",
-        },
-      ],
-    },
-  ],
-  pageParams: [undefined],
-});
 queryClient.setQueryData<Data<typeof listsLoader>>(["lists", alice.handle], {
   lists: [
     {
