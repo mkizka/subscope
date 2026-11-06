@@ -64,6 +64,20 @@ test.describe("レイアウト", () => {
     await expect(page).toHaveURL("/server");
   });
 
+  test("layout-9: `/server` では、同じ内容の重複を避けるため右カラムのサーバーカードを表示しない", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/server");
+
+    await expect(
+      page.getByRole("main").getByRole("heading", { name: "Subscope" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("complementary", { name: "サーバー" }),
+    ).toHaveCount(0);
+  });
+
   test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
     page,
   }) => {

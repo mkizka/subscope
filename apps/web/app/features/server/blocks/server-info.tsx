@@ -27,7 +27,7 @@ export function ServerInfo({
   return (
     <>
       <h1 className="border-b border-line p-4 text-title">サーバー</h1>
-      <section className="m-4 rounded-2xl border border-line bg-surface-2 p-4">
+      <section className="border-b border-line p-4">
         <div className="flex items-center gap-3">
           <img src="/favicon.svg" alt="" className="size-12" />
           <div>
@@ -39,7 +39,7 @@ export function ServerInfo({
           Blueskyのアカウントで使える招待制のサーバーです。登録アカウントとそのフォロー先の投稿だけを保存します。
         </p>
       </section>
-      <section>
+      <section className="border-b border-line">
         <h2 className="px-4 pt-4 pb-1.5 text-label text-muted">アカウント</h2>
         <Link to="/server/accounts" className={rowClass}>
           <span>登録アカウント</span>

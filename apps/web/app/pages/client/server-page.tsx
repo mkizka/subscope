@@ -3,7 +3,7 @@ import { ServerInfoContainer } from "@/app/features/server/blocks/server-info-co
 
 export function ServerPage() {
   return (
-    <ThreeColumnLayout>
+    <ThreeColumnLayout hideServerCard>
       <ServerInfoContainer />
     </ThreeColumnLayout>
   );
