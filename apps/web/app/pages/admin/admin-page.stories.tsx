@@ -1,7 +1,7 @@
 import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/me/subsco/admin/listRegisteredAccounts";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { setInfiniteQueryData } from "@/.storybook/query-client";
+import { alice, bob, queryClient } from "@/.storybook/query-client";
 import { RegisteredAccountListContainer } from "@/app/features/admin/blocks/registered-account-list-container";
 
 import { AdminPage } from "./admin-page";
@@ -19,31 +19,28 @@ type Story = StoryObj<typeof meta>;
 
 export const RegisteredAccounts: Story = {
   beforeEach: () => {
-    setInfiniteQueryData(["registeredAccounts"], {
-      registeredAccounts: [
+    queryClient.setQueryData(["registeredAccounts"], {
+      pages: [
         {
-          profile: {
-            did: "did:plc:alice",
-            handle: "alice.bsky.social",
-            displayName: "Alice",
-          },
-          isAdmin: true,
-          registeredAt: "2024-01-01T00:00:00.000Z",
-          backfillStatus: "completed",
-        },
-        {
-          profile: {
-            did: "did:plc:bob",
-            handle: "bob.bsky.social",
-            displayName: "Bob",
-          },
-          isAdmin: false,
-          registeredAt: "2024-01-02T00:00:00.000Z",
-          backfillStatus: "inProgress",
-        },
+          registeredAccounts: [
+            {
+              profile: alice,
+              isAdmin: true,
+              registeredAt: "2024-01-01T00:00:00.000Z",
+              backfillStatus: "completed",
+            },
+            {
+              profile: bob,
+              isAdmin: false,
+              registeredAt: "2024-01-02T00:00:00.000Z",
+              backfillStatus: "inProgress",
+            },
+          ],
+          total: 2,
+        } satisfies RegisteredAccountsResponse,
       ],
-      total: 2,
-    } satisfies RegisteredAccountsResponse);
+      pageParams: [undefined],
+    });
   },
   args: {
     children: <RegisteredAccountListContainer />,

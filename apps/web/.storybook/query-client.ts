@@ -1,3 +1,4 @@
+import { asDatetimeString } from "@atproto/syntax";
 import { QueryClient } from "@tanstack/react-query";
 
 export type Data<T extends (...args: never) => unknown> =
@@ -16,8 +17,21 @@ export const queryClient = new QueryClient({
   },
 });
 
-export const setInfiniteQueryData = (queryKey: unknown[], page: unknown) =>
-  queryClient.setQueryData(queryKey, {
-    pages: [page],
-    pageParams: [undefined],
-  });
+export const infinite = <T extends (...args: never) => unknown>(
+  page: Data<T>,
+) => ({
+  pages: [page],
+  pageParams: [undefined],
+});
+
+export const alice = {
+  did: "did:plc:alice",
+  handle: "alice.bsky.social",
+  displayName: "Alice",
+} as const;
+export const bob = {
+  did: "did:plc:bob",
+  handle: "bob.bsky.social",
+  displayName: "Bob",
+} as const;
+export const indexedAt = asDatetimeString(new Date().toISOString());
