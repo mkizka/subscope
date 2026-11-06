@@ -38,3 +38,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const NoPosts: Story = {
+  beforeEach: () => {
+    queryClient.setQueryData<Data<typeof profileLoader>>(
+      ["profile", alice.handle, ""],
+      {
+        profile: {
+          did: alice.did,
+          handle: alice.handle,
+          displayName: alice.displayName,
+          followsCount: 0,
+          followersCount: 0,
+        },
+        isSelf: false,
+        posts: [],
+        tab: "posts",
+      },
+    );
+  },
+};

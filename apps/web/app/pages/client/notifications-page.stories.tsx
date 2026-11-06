@@ -61,3 +61,16 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Empty: Story = {
+  beforeEach: () => {
+    queryClient.setQueryData(
+      ["notifications"],
+      infinite<typeof notificationsLoader>({
+        notifications: [],
+        cursor: undefined,
+        subjectTexts: {},
+      }),
+    );
+  },
+};
