@@ -25,7 +25,13 @@ export function SearchPage({ q, tab }: Props) {
           selected: tab === value,
         }))}
       />
-      {q && <SearchResultsContainer q={q} tab={tab} />}
+      {q ? (
+        <SearchResultsContainer q={q} tab={tab} />
+      ) : (
+        <p className="p-6 text-center text-label text-muted">
+          名前やハンドル、投稿の言葉で、このサーバーが保存しているアカウントと投稿を探せます
+        </p>
+      )}
     </ThreeColumnLayout>
   );
 }

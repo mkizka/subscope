@@ -26,6 +26,16 @@ test.describe("検索", () => {
     });
   });
 
+  test("search-11: 検索語がないときは、検索欄の下に探せる対象（追跡アカウントと投稿）の説明を出す", async ({
+    page,
+  }) => {
+    await page.goto("/search");
+
+    await expect(
+      page.getByText("このサーバーが保存しているアカウントと投稿を探せます"),
+    ).toBeVisible();
+  });
+
   test("search-1: 左カラムの「検索」から開いた検索欄で検索すると、表示名またはハンドルが検索語に部分一致するアカウント（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
