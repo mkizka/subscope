@@ -20,6 +20,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Single: Story = {};
 
+export const SingleWide: Story = {
+  args: { images: [{ ...image, aspectRatio: { width: 16, height: 9 } }] },
+};
+
 export const Grid: Story = {
   args: {
     images: Array(4)

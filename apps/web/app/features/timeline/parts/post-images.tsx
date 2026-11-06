@@ -3,7 +3,12 @@ import { useState } from "react";
 
 import { ImageViewer } from "@/app/components/ui/image-viewer";
 
-export type PostImage = { thumb: string; fullsize: string; alt: string };
+export type PostImage = {
+  thumb: string;
+  fullsize: string;
+  alt: string;
+  aspectRatio?: { width: number; height: number };
+};
 
 export function PostImages({ images }: { images: PostImage[] }) {
   const [index, setIndex] = useState(-1);
@@ -30,6 +35,13 @@ export function PostImages({ images }: { images: PostImage[] }) {
             <img
               src={image.thumb}
               alt={image.alt}
+              style={
+                images.length === 1 && image.aspectRatio
+                  ? {
+                      aspectRatio: `${image.aspectRatio.width} / ${image.aspectRatio.height}`,
+                    }
+                  : undefined
+              }
               className={clsx(
                 "w-full rounded-xl object-cover",
                 images.length > 1 ? "aspect-square" : "max-h-[80vh]",
