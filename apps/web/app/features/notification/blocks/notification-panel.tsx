@@ -16,6 +16,7 @@ import { Avatar } from "@/app/components/ui/avatar";
 type Notification = {
   uri: string;
   authorName: string;
+  authorHandle: string;
   avatarUrl?: string;
   reason: string;
   text?: string;
@@ -90,10 +91,10 @@ export function NotificationPanel({
                 key={notification.uri}
                 className={clsx(
                   "flex gap-3 border-b border-line px-4 py-3",
-                  !notification.isRead && "bg-brand-soft",
+                  !notification.isRead && "bg-surface-2",
                 )}
               >
-                <div className="flex w-7 shrink-0 justify-center pt-1">
+                <div className="flex w-10 shrink-0 justify-end pt-2">
                   {Icon && (
                     <Icon
                       role="img"
@@ -103,10 +104,13 @@ export function NotificationPanel({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <Avatar src={notification.avatarUrl} size="sm" />
-                  <p className="mt-1">
+                  <Avatar src={notification.avatarUrl} />
+                  <p className="mt-2">
                     <span className="font-bold">{notification.authorName}</span>
                     {reason?.label}
+                  </p>
+                  <p className="text-label text-muted">
+                    @{notification.authorHandle}
                   </p>
                   {notification.text && (
                     <p
