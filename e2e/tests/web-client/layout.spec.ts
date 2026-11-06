@@ -182,6 +182,7 @@ test.describe("レイアウト（モバイル）", () => {
     page,
   }) => {
     await page.goto("/");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     const fab = page.getByRole("button", { name: "新規投稿" });
     await expect(fab).toBeInViewport();
 

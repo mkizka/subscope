@@ -56,7 +56,7 @@ export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
             transition-transform
             hover:opacity-90
             lg:hidden
-            ${scrollingDown ? "pointer-events-none translate-y-32" : ""}
+            ${scrollingDown ? "pointer-events-none translate-y-40" : ""}
           `}
         />
         <BottomTabsContainer />
