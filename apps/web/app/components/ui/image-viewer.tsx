@@ -2,6 +2,7 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 
+import { useEffect, useRef } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import Captions from "yet-another-react-lightbox/plugins/captions";
 import Counter from "yet-another-react-lightbox/plugins/counter";
@@ -26,9 +27,28 @@ type Props = {
 
 export function ImageViewer({ images, index, onIndexChange }: Props) {
   const single = images.length === 1;
+  const open = index >= 0;
+  const onIndexChangeRef = useRef(onIndexChange);
+  onIndexChangeRef.current = onIndexChange;
+
+  useEffect(() => {
+    if (!open) return;
+    let closedByPopState = false;
+    history.pushState("imageViewer", "");
+    const onPopState = () => {
+      closedByPopState = true;
+      onIndexChangeRef.current(-1);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      if (!closedByPopState && history.state === "imageViewer") history.back();
+    };
+  }, [open]);
+
   return (
     <Lightbox
-      open={index >= 0}
+      open={open}
       index={index}
       close={() => onIndexChange(-1)}
       on={{ view: ({ index }) => onIndexChange(index) }}
