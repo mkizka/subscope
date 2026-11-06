@@ -144,8 +144,17 @@ jobs:
         if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
         run: |
           MARKER="<!-- vrt -->"
+          FAILED=$(jq -r '[.. | objects | select(has("specs")) | .specs[] | .title as $t | .tests[] | select(.status == "unexpected") | "- `\($t)` (\(.projectName))"] | unique | .[]' e2e/test-results/vrt.json)
+          if [ -n "$FAILED" ]; then
+            RESULT="⚠️ 差分あり: $(echo "$FAILED" | wc -l)件
+          $FAILED"
+          else
+            RESULT="✅ 差分なし"
+          fi
           BODY="$MARKER
           ## VRT
+          $RESULT
+
           🖼️ [View Diff](${{ vars.S3_BASE_URL }}/vrt/pr${{ github.event.number }}/index.html)"
           COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
             --paginate --jq "[.[] | select(.body | startswith(\"$MARKER\"))][-1].id // empty")
