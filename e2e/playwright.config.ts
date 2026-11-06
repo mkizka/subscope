@@ -6,8 +6,8 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: "http://127.0.0.1:3000",
-    trace: "on",
-    video: "on",
+    trace: "retain-on-failure",
+    video: "retain-on-failure",
   },
   projects: [
     { name: "login", testMatch: "login.spec.ts" },
