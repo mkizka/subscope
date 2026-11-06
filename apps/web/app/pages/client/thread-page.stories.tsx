@@ -5,6 +5,7 @@ import { ThreadPage } from "./thread-page";
 const meta = {
   component: ThreadPage,
   parameters: {
+    path: "/alice.bsky.social/post/selected",
     layout: "fullscreen",
   },
   args: {

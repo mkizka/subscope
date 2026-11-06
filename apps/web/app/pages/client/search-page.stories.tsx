@@ -9,6 +9,7 @@ const meta = {
     tab: "accounts",
   },
   parameters: {
+    path: "/search",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof SearchPage>;
