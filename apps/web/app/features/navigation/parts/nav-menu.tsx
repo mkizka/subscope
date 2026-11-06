@@ -49,11 +49,9 @@ function Item({
 export function NavMenu({
   profileId,
   onNavigate,
-  showServer,
 }: {
   profileId?: string;
   onNavigate?: () => void;
-  showServer?: boolean;
 }) {
   const p = { onNavigate };
   return (
@@ -81,11 +79,9 @@ export function NavMenu({
           </Item>
         </>
       )}
-      {showServer && (
-        <Item to="/server" icon={<ServerIcon className="size-6" />} {...p}>
-          サーバー
-        </Item>
-      )}
+      <Item to="/server" icon={<ServerIcon className="size-6" />} {...p}>
+        サーバー
+      </Item>
     </ul>
   );
 }
