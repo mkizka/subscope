@@ -1,5 +1,7 @@
 import {
+  EllipsisIcon,
   HeartIcon,
+  LinkIcon,
   type LucideIcon,
   MessageCircleIcon,
   QuoteIcon,
@@ -8,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
+import { Menu, menuItemClass } from "@/app/components/ui/menu";
 
 type Props = {
   replyCount?: number;
@@ -22,6 +25,7 @@ type Props = {
   onRepost: () => void;
   onReply: () => void;
   onQuote: () => void;
+  onCopyLink: () => void;
   onDelete?: () => void;
 };
 
@@ -68,6 +72,7 @@ export function PostToolbar({
   onRepost,
   onReply,
   onQuote,
+  onCopyLink,
   onDelete,
 }: Props) {
   return (
@@ -95,24 +100,43 @@ export function PostToolbar({
         busy={likeBusy}
         onClick={onLike}
       />
-      {onDelete && (
-        <ConfirmDialog
-          title="投稿を削除"
-          description="この投稿を削除しますか？"
-          confirmLabel="削除"
-          danger
-          onConfirm={onDelete}
-        >
-          {(open) => (
-            <ToggleButton
-              label="削除"
-              Icon={Trash2Icon}
-              busy={deleteBusy}
-              onClick={() => !deleteBusy && open()}
-            />
-          )}
-        </ConfirmDialog>
-      )}
+      <ConfirmDialog
+        title="投稿を削除"
+        description="この投稿を削除しますか？"
+        confirmLabel="削除"
+        danger
+        onConfirm={() => onDelete?.()}
+      >
+        {(open) => (
+          <Menu
+            label="投稿のメニュー"
+            trigger={<EllipsisIcon className="size-5" />}
+          >
+            <button
+              type="button"
+              className={menuItemClass}
+              onClick={onCopyLink}
+            >
+              <LinkIcon className="size-4" />
+              リンクをコピー
+            </button>
+            {onDelete && (
+              <button
+                type="button"
+                className={`
+                  ${menuItemClass}
+                  text-danger
+                `}
+                disabled={deleteBusy}
+                onClick={open}
+              >
+                <Trash2Icon className="size-4" />
+                削除
+              </button>
+            )}
+          </Menu>
+        )}
+      </ConfirmDialog>
     </div>
   );
 }

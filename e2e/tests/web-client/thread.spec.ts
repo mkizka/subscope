@@ -285,8 +285,9 @@ test.describe("スレッド", () => {
     await openThread(page, target.uri, "thread-12: 投稿");
     await page
       .getByRole("region", { name: "スレッド" })
-      .getByRole("button", { name: "削除" })
+      .getByRole("button", { name: "投稿のメニュー" })
       .click();
+    await page.getByRole("button", { name: "削除" }).click();
     await page
       .getByRole("dialog", { name: "投稿を削除" })
       .getByRole("button", { name: "削除" })
