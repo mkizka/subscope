@@ -109,6 +109,53 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - if: needs.e2e-shard.result != 'success'
         run: exit 1
+  vrt:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: |
+          npm i -g corepack@latest
+          corepack enable pnpm
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm i
+      - run: pnpm --filter @repo/e2e exec playwright install --with-deps chromium
+      - name: Download baseline
+        if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        run: aws s3 sync s3://subscope/vrt/main e2e/baseline
+      - name: Run VRT
+        run: pnpm --filter @repo/e2e vrt ${{ github.ref == 'refs/heads/main' && '--update-snapshots=all' || '' }} || true
+      - name: Upload baseline
+        if: github.ref == 'refs/heads/main'
+        run: aws s3 sync e2e/baseline s3://subscope/vrt/main --delete
+      - name: Upload Report
+        if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        run: aws s3 sync e2e/playwright-report "s3://subscope/vrt/pr${{ github.event.number }}" --delete
+      - name: Comment on PR
+        if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
+        run: |
+          MARKER="<!-- vrt -->"
+          BODY="$MARKER
+          ## VRT
+          🖼️ [View Diff](${{ vars.S3_BASE_URL }}/vrt/pr${{ github.event.number }}/index.html)"
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
+            --paginate --jq "[.[] | select(.body | startswith(\"$MARKER\"))][-1].id // empty")
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -f body="$BODY"
+          else
+            gh pr comment ${{ github.event.number }} --body "$BODY"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   storybook:
     runs-on: ubuntu-latest
     permissions:
