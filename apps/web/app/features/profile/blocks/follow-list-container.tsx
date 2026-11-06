@@ -12,6 +12,10 @@ import { AccountList } from "./account-list";
 type FollowListResponse = Awaited<ReturnType<typeof loader>>["data"];
 
 const titles = { follows: "フォロー", followers: "フォロワー" };
+const emptyMessages = {
+  follows: "フォローしているアカウントはありません",
+  followers: "フォロワーはいません",
+};
 
 type Props = {
   handle: string;
@@ -60,7 +64,15 @@ export function FollowListContainer({ handle, kind }: Props) {
           ]}
         />
       )}
-      {data ? <AccountList accounts={data.accounts} /> : <RowsSkeleton />}
+      {!data ? (
+        <RowsSkeleton />
+      ) : data.accounts.length === 0 ? (
+        <p className="py-8 text-center text-label text-muted">
+          {emptyMessages[kind]}
+        </p>
+      ) : (
+        <AccountList accounts={data.accounts} />
+      )}
     </>
   );
 }
