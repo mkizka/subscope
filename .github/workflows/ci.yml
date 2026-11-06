@@ -83,7 +83,7 @@ jobs:
       - name: Upload Report
         if: always() && (github.ref == 'refs/heads/main' || github.actor == 'mkizka')
         run: |
-          REPORT_S3_PATH="playwright-report/${{ github.ref == 'refs/heads/main' && 'main' || github.sha }}"
+          REPORT_S3_PATH="${{ github.ref == 'refs/heads/main' && 'main/e2e' || format('pr/e2e/{0}', github.sha) }}"
           aws s3 cp e2e/playwright-report "s3://subscope/$REPORT_S3_PATH" --recursive
           echo "REPORT_URL=${{ vars.S3_BASE_URL }}/$REPORT_S3_PATH/index.html" >> $GITHUB_ENV
         env:
@@ -131,15 +131,15 @@ jobs:
       - run: pnpm --filter @repo/e2e exec playwright install --with-deps chromium
       - name: Download baseline
         if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
-        run: aws s3 sync s3://subscope/vrt/main e2e/baseline
+        run: aws s3 sync s3://subscope/main/vrt e2e/baseline
       - name: Run VRT
         run: pnpm --filter @repo/e2e vrt ${{ github.ref == 'refs/heads/main' && '--update-snapshots=all' || '' }} || true
       - name: Upload baseline
         if: github.ref == 'refs/heads/main'
-        run: aws s3 sync e2e/baseline s3://subscope/vrt/main --delete
+        run: aws s3 sync e2e/baseline s3://subscope/main/vrt --delete
       - name: Upload Report
         if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
-        run: aws s3 sync e2e/playwright-report "s3://subscope/vrt/pr${{ github.event.number }}" --delete
+        run: aws s3 sync e2e/playwright-report "s3://subscope/pr/${{ github.event.number }}/vrt" --delete
       - name: Comment on PR
         if: github.ref != 'refs/heads/main' && github.actor == 'mkizka'
         run: |
@@ -155,7 +155,7 @@ jobs:
           ## VRT
           $RESULT
 
-          🖼️ [View Diff](${{ vars.S3_BASE_URL }}/vrt/pr${{ github.event.number }}/index.html)"
+          🖼️ [View Diff](${{ vars.S3_BASE_URL }}/pr/${{ github.event.number }}/vrt/index.html)"
           COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" \
             --paginate --jq "[.[] | select(.body | startswith(\"$MARKER\"))][-1].id // empty")
           if [ -n "$COMMENT_ID" ]; then
@@ -183,7 +183,7 @@ jobs:
       - name: Upload Storybook
         if: github.ref == 'refs/heads/main' || github.actor == 'mkizka'
         run: |
-          STORYBOOK_S3_PATH="storybook/${{ github.ref == 'refs/heads/main' && 'main' || format('pr{0}', github.event.number) }}"
+          STORYBOOK_S3_PATH="${{ github.ref == 'refs/heads/main' && 'main/storybook' || format('pr/{0}/storybook', github.event.number) }}"
           aws s3 cp apps/web/storybook-static "s3://subscope/$STORYBOOK_S3_PATH" --recursive
           echo "STORYBOOK_URL=${{ vars.S3_BASE_URL }}/$STORYBOOK_S3_PATH/index.html" >> $GITHUB_ENV
         env:
