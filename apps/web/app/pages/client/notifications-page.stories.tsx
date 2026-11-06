@@ -5,6 +5,7 @@ import { NotificationsPage } from "./notifications-page";
 const meta = {
   component: NotificationsPage,
   parameters: {
+    path: "/notifications",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof NotificationsPage>;
