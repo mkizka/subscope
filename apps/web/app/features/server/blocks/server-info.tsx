@@ -32,7 +32,7 @@ export function ServerInfo({
           <img src="/favicon.svg" alt="" className="size-12" />
           <div>
             <h2 className="text-title">Subscope</h2>
-            <div className="text-caption text-muted">招待制</div>
+            <div className="text-label text-muted">招待制</div>
           </div>
         </div>
         <p className="mt-3 text-label">
@@ -40,7 +40,7 @@ export function ServerInfo({
         </p>
       </section>
       <section>
-        <h2 className="px-4 pt-4 pb-1.5 text-caption text-muted">アカウント</h2>
+        <h2 className="px-4 pt-4 pb-1.5 text-label text-muted">アカウント</h2>
         <Link to="/server/accounts" className={rowClass}>
           <span>登録アカウント</span>
           <span className="text-muted">{registeredCount ?? "-"} ›</span>
@@ -53,7 +53,7 @@ export function ServerInfo({
           type="button"
           onClick={() => helpRef.current?.showModal()}
           className="
-            flex items-center gap-1 px-4 py-2 text-caption text-brand
+            flex items-center gap-1 px-4 py-2 text-label text-brand
             hover:underline
           "
         >
@@ -79,7 +79,7 @@ export function ServerInfo({
         </Dialog>
       </section>
       <section>
-        <h2 className="px-4 pt-4 pb-1.5 text-caption text-muted">上級者向け</h2>
+        <h2 className="px-4 pt-4 pb-1.5 text-label text-muted">上級者向け</h2>
         <div className="mx-4 mb-4">
           <div className="mb-1 text-label">サーバーDID</div>
           <div
@@ -88,13 +88,12 @@ export function ServerInfo({
               py-2 pr-2 pl-3
             "
           >
-            <code className="min-w-0 flex-1 truncate text-caption">
+            <code className="min-w-0 flex-1 truncate text-label">
               {serviceDid}
             </code>
             <Button
               type="button"
               variant="secondary"
-              size="sm"
               disabled={!serviceDid}
               onClick={() =>
                 void navigator.clipboard
@@ -113,7 +112,7 @@ export function ServerInfo({
               コピー
             </Button>
           </div>
-          <p className="mt-1 text-caption text-muted">
+          <p className="mt-1 text-label text-muted">
             この文字列をコピーして他のBlueskyクライアントで使用できます
           </p>
         </div>
