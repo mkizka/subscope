@@ -9,7 +9,11 @@ const devicesByName = {
 export default defineConfig({
   testDir: "./vrt",
   snapshotPathTemplate: "baseline/{projectName}/{arg}{ext}",
-  reporter: [["list"], ["html", { open: "never" }]],
+  reporter: [
+    ["list"],
+    ["html", { open: "never" }],
+    ["json", { outputFile: "test-results/vrt.json" }],
+  ],
   use: {
     baseURL: "http://127.0.0.1:6006",
     launchOptions: { args: ["--font-render-hinting=none"] },

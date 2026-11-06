@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { AdminNavMenu, NavMenu } from "./nav-menu";
+import { NavMenu } from "./nav-menu";
 
 const meta = {
   component: NavMenu,
@@ -19,8 +19,4 @@ export const WithoutProfile: Story = {
   args: {
     profileId: undefined,
   },
-};
-
-export const Admin: Story = {
-  render: () => <AdminNavMenu />,
 };
