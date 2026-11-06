@@ -52,6 +52,20 @@ export default defineConfig(
   },
   storybook.configs["flat/recommended"],
   {
+    files: ["app/**/*.stories.tsx"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ObjectExpression > Property[key.name='render']",
+          message:
+            "storyでrenderを上書きして別のコンポーネントを描画しないでください。コンポーネントごとにstoriesファイルを分け、argsで状態を表現してください。",
+        },
+      ],
+    },
+  },
+  {
     extends: [eslintPluginBetterTailwindcss.configs.recommended],
     settings: {
       "better-tailwindcss": {
