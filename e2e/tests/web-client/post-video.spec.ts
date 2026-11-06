@@ -65,10 +65,7 @@ test.describe("投稿動画", () => {
       void el.play().catch(() => undefined);
     });
     await requested;
-    await expect(video).toHaveJSProperty(
-      "src",
-      expect.stringMatching(/^blob:/),
-    );
+    await expect(video).toHaveAttribute("src", /^blob:/);
   });
 
   test("post-video-3: 引用された投稿に付いた動画を、引用した投稿の中に表示する", async ({
