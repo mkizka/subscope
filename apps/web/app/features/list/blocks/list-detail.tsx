@@ -1,5 +1,14 @@
+import {
+  ArrowLeftIcon,
+  EllipsisIcon,
+  PencilIcon,
+  TrashIcon,
+} from "lucide-react";
+import { useRef } from "react";
+import { Link } from "react-router";
+
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
-import { Button } from "@/app/components/ui/button";
+import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { Tabs } from "@/app/components/ui/tabs";
 import {
   type Account,
@@ -14,6 +23,7 @@ import { ListForm } from "./list-form";
 import { AddListMemberForm, RemoveListMemberButton } from "./list-member-forms";
 
 type Props = {
+  handle: string;
   uri: string;
   name: string;
   description?: string;
@@ -26,6 +36,7 @@ type Props = {
 };
 
 export function ListDetail({
+  handle,
   uri,
   name,
   description,
@@ -36,22 +47,22 @@ export function ListDetail({
   deleting,
   onDelete,
 }: Props) {
+  const editRef = useRef<HTMLDialogElement>(null);
   return (
     <>
-      <section className="flex flex-col gap-2 border-b border-line p-4">
-        <h1 className="text-title">{name}</h1>
-        {description && (
-          <p className="wrap-break-word whitespace-pre-wrap">{description}</p>
-        )}
-      </section>
-      {isSelf && (
-        <>
-          <ListForm
-            summary="編集する"
-            submitLabel="保存する"
-            name={name}
-            description={description}
-          />
+      <header className="flex items-center gap-2 border-b border-line p-4">
+        <Link
+          to={`/${handle}/lists`}
+          aria-label="戻る"
+          className="shrink-0 text-muted"
+        >
+          <ArrowLeftIcon className="size-5" />
+        </Link>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <h1 className="text-title">{name}</h1>
+          <p className="text-caption text-muted">@{handle} が作成</p>
+        </div>
+        {isSelf && (
           <ConfirmDialog
             title={`「${name}」を削除しますか？`}
             description="リストとそのメンバー登録が削除され、元に戻せません。"
@@ -59,20 +70,53 @@ export function ListDetail({
             danger
             onConfirm={onDelete}
           >
-            {(open) => (
-              <div className="m-4">
-                <Button
-                  variant="danger"
-                  size="sm"
-                  loading={deleting}
-                  onClick={open}
+            {(openDelete) => (
+              <Menu
+                label="操作"
+                loading={deleting}
+                trigger={<EllipsisIcon className="size-4" />}
+              >
+                <button
+                  type="button"
+                  className={menuItemClass}
+                  onClick={() => editRef.current?.showModal()}
                 >
+                  <PencilIcon className="size-4" />
+                  編集する
+                </button>
+                <button
+                  type="button"
+                  className={`
+                    ${menuItemClass}
+                    text-danger
+                  `}
+                  onClick={openDelete}
+                >
+                  <TrashIcon className="size-4" />
                   削除する
-                </Button>
-              </div>
+                </button>
+              </Menu>
             )}
           </ConfirmDialog>
-        </>
+        )}
+      </header>
+      {description && (
+        <p
+          className="
+            border-b border-line p-4 wrap-break-word whitespace-pre-wrap
+          "
+        >
+          {description}
+        </p>
+      )}
+      {isSelf && (
+        <ListForm
+          ref={editRef}
+          title="リストを編集"
+          submitLabel="保存する"
+          name={name}
+          description={description}
+        />
       )}
       <Tabs
         tabs={[

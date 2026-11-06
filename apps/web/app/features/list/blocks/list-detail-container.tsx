@@ -34,6 +34,7 @@ export function ListDetailContainer({ handle, rkey }: Props) {
   const { list, ...rest } = data;
   return (
     <ListDetail
+      handle={handle}
       uri={list.uri}
       name={list.name}
       description={list.description}

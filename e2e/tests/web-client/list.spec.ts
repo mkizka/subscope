@@ -62,7 +62,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-2: 一覧のリストを選ぶと、リストの名前と説明、リストのメンバーの投稿を新しい順に表示する", async ({
+  test("list-2: 一覧のリストを選ぶと、戻るボタンと作成者を含むヘッダー、リストの名前と説明、リストのメンバーの投稿を新しい順に表示する", async ({
     page,
   }) => {
     const name = `list-2のリスト ${Date.now()}`;
@@ -89,6 +89,8 @@ test.describe("リスト", () => {
     await expect(page).toHaveURL(`/alice.test/lists/${rkey}`);
     await expect(main.getByRole("heading", { name })).toBeVisible();
     await expect(main.getByText(`${name}の説明`)).toBeVisible();
+    await expect(main.getByRole("link", { name: "戻る" })).toBeVisible();
+    await expect(main.getByText("@alice.test が作成")).toBeVisible();
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(newer)).toBeVisible({ timeout: 1000 });
@@ -121,20 +123,21 @@ test.describe("リスト", () => {
     await expect(main.getByText("@bob.test")).toBeVisible();
   });
 
-  test("list-4: 「リスト」の管理画面（`/lists`）で、名前と説明を入力してリストを作成する", async ({
+  test("list-4: 「リスト」の管理画面（`/lists`）で、「新しいリスト」ボタンのダイアログに名前と説明を入力してリストを作成する", async ({
     page,
   }) => {
     const name = `list-4のリスト ${Date.now()}`;
     await page.goto("/lists");
     const main = page.getByRole("main");
 
-    await main.getByText("新しいリスト").click();
-    await main.getByLabel("名前").fill(name);
-    await main.getByLabel("説明").fill(`${name}の説明`);
+    await main.getByRole("button", { name: "新しいリスト" }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("名前").fill(name);
+    await dialog.getByLabel("説明").fill(`${name}の説明`);
     const submitted = page.waitForResponse(
       (res) => res.request().method() === "POST",
     );
-    await main.getByRole("button", { name: "作成する" }).click();
+    await dialog.getByRole("button", { name: "作成する" }).click();
     await submitted;
 
     await expect(async () => {
@@ -148,7 +151,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-5: 自分のリスト詳細で、リストの名前と説明を編集する", async ({
+  test("list-5: 自分のリスト詳細のヘッダーにある「…」メニューから編集ダイアログを開き、リストの名前と説明を編集する", async ({
     page,
   }) => {
     const rkey = await createList(`list-5のリスト ${Date.now()}`);
@@ -157,16 +160,20 @@ test.describe("リスト", () => {
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
-      await expect(main.getByText("編集する")).toBeVisible({ timeout: 1000 });
+      await expect(main.getByRole("button", { name: "操作" })).toBeVisible({
+        timeout: 1000,
+      });
     }).toPass();
 
-    await main.getByText("編集する").click();
-    await main.getByLabel("名前").fill(name);
-    await main.getByLabel("説明").fill(`${name}の説明`);
+    await main.getByRole("button", { name: "操作" }).click();
+    await page.getByRole("button", { name: "編集する" }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("名前").fill(name);
+    await dialog.getByLabel("説明").fill(`${name}の説明`);
     const submitted = page.waitForResponse(
       (res) => res.request().method() === "POST",
     );
-    await main.getByRole("button", { name: "保存する" }).click();
+    await dialog.getByRole("button", { name: "保存する" }).click();
     await submitted;
 
     await expect(async () => {
@@ -180,7 +187,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-6: 自分のリスト詳細で、確認のうえリストとそのメンバー登録を削除し、リスト一覧に戻る", async ({
+  test("list-6: 自分のリスト詳細のヘッダーにある「…」メニューから、確認のうえリストとそのメンバー登録を削除し、リスト一覧に戻る", async ({
     page,
   }) => {
     const name = `list-6のリスト ${Date.now()}`;
@@ -190,12 +197,13 @@ test.describe("リスト", () => {
     const main = page.getByRole("main");
     await expect(async () => {
       await page.reload();
-      await expect(main.getByRole("button", { name: "削除する" })).toBeVisible({
+      await expect(main.getByRole("button", { name: "操作" })).toBeVisible({
         timeout: 1000,
       });
     }).toPass();
 
-    await main.getByRole("button", { name: "削除する" }).click();
+    await main.getByRole("button", { name: "操作" }).click();
+    await page.getByRole("button", { name: "削除する" }).click();
     await page
       .getByRole("dialog")
       .getByRole("button", { name: "削除する" })
@@ -276,26 +284,27 @@ test.describe("リスト", () => {
   }) => {
     await page.goto("/lists");
     const main = page.getByRole("main");
-    await main.getByText("新しいリスト").click();
-    await main.getByLabel("名前").fill(`list-9のリスト ${Date.now()}`);
+    await main.getByRole("button", { name: "新しいリスト" }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("名前").fill(`list-9のリスト ${Date.now()}`);
     const release = await holdSubmit(page);
-    const button = main.getByRole("button", { name: "作成する" });
+    const button = dialog.getByRole("button", { name: "作成する" });
 
     await button.click();
 
     await expect(button).toBeDisabled();
     await expect(button.locator(".animate-spin")).toBeVisible();
     release();
-    await expect(button).toBeEnabled();
+    await expect(dialog).toBeHidden();
   });
 
-  test("list-10: リストの削除ボタンは、削除してリスト一覧に戻るまでスピナーを出して押せなくする", async ({
+  test("list-10: リスト詳細の「…」ボタンは、削除してリスト一覧に戻るまでスピナーを出して押せなくする", async ({
     page,
   }) => {
     const rkey = await createList(`list-10のリスト ${Date.now()}`);
     await page.goto(`/alice.test/lists/${rkey}`);
     const main = page.getByRole("main");
-    const button = main.getByRole("button", { name: "削除する" });
+    const button = main.getByRole("button", { name: "操作" });
     await expect(async () => {
       await page.reload();
       await expect(button).toBeVisible({ timeout: 1000 });
@@ -303,6 +312,7 @@ test.describe("リスト", () => {
     const release = await holdSubmit(page);
 
     await button.click();
+    await page.getByRole("button", { name: "削除する" }).click();
     await page
       .getByRole("dialog")
       .getByRole("button", { name: "削除する" })
@@ -460,7 +470,9 @@ test.describe("リスト", () => {
       "aria-selected",
       "true",
     );
-    await expect(main.getByText("新しいリスト")).toBeHidden();
+    await expect(
+      main.getByRole("button", { name: "新しいリスト" }),
+    ).toBeHidden();
 
     await page.goto("/bob.test/lists");
 
