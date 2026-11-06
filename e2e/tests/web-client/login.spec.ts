@@ -43,6 +43,18 @@ test.describe("ログイン", () => {
     await expect(page.getByLabel("招待コード")).toBeVisible();
   });
 
+  test("login-11: 管理者がいるサーバーのログイン画面には、登録していないアカウントはログイン後に招待コードの入力が必要なことを出す", async ({
+    page,
+  }) => {
+    await page.goto("/login");
+
+    await expect(
+      page.getByText(
+        "このサーバーに登録していないアカウントは、ログイン後に招待コードの入力が必要です",
+      ),
+    ).toBeVisible();
+  });
+
   test("login-5: 無効な招待コードを入力すると「招待コードが無効または期限切れです」と出す", async ({
     page,
   }) => {

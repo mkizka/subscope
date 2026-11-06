@@ -5,15 +5,22 @@ type Props = {
 };
 
 export function ErrorIcon({ status }: Props) {
-  const Icon = status === 404 ? FileQuestionIcon : AlertTriangleIcon;
+  const notFound = status === 404;
+  const Icon = notFound ? FileQuestionIcon : AlertTriangleIcon;
 
   return (
     <div
-      className="
-        flex size-12 items-center justify-center rounded-full bg-danger/10
-      "
+      className={`
+        flex size-12 items-center justify-center rounded-full
+        ${notFound ? "bg-surface-2" : "bg-danger/10"}
+      `}
     >
-      <Icon className="size-6 text-danger" />
+      <Icon
+        className={`
+          size-6
+          ${notFound ? "text-muted" : "text-danger"}
+        `}
+      />
     </div>
   );
 }

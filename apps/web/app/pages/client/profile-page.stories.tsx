@@ -8,6 +8,7 @@ const meta = {
     handle: "alice.bsky.social",
   },
   parameters: {
+    path: "/alice.bsky.social",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof ProfilePage>;

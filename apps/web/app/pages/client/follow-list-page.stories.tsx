@@ -6,6 +6,7 @@ const meta = {
   component: FollowListPage,
   args: { handle: "alice.bsky.social", kind: "follows" },
   parameters: {
+    path: "/alice.bsky.social/follows",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof FollowListPage>;

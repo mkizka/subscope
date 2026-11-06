@@ -6,6 +6,7 @@ const meta = {
   component: ListPage,
   args: { handle: "alice.bsky.social", rkey: "1" },
   parameters: {
+    path: "/alice.bsky.social/lists/1",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof ListPage>;

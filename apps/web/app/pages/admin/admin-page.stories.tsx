@@ -7,6 +7,7 @@ import { AdminPage } from "./admin-page";
 const meta = {
   component: AdminPage,
   parameters: {
+    path: "/admin/registered-accounts",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof AdminPage>;

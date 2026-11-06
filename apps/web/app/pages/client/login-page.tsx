@@ -19,9 +19,14 @@ export function LoginPage({ step }: Props) {
           <img src="/favicon.svg" alt="" className="size-8" />
           <h1 className="text-title">Subscope</h1>
         </div>
-        <p className="text-label text-muted">
+        <p className="text-label">
           招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。
         </p>
+        {step === "login" && (
+          <p className="text-label text-muted">
+            このサーバーに登録していないアカウントは、ログイン後に招待コードの入力が必要です
+          </p>
+        )}
         {step === "setup" && (
           <p>最初にログインしたアカウントがこのサーバーの管理者になります</p>
         )}

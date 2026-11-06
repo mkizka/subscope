@@ -4,6 +4,7 @@ import { type ReactNode, useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
+import { Badge } from "@/app/components/ui/badge";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
@@ -20,6 +21,7 @@ type Props = {
   followsCount?: number;
   followersCount?: number;
   backfillStatus?: BackfillStatus;
+  followedBy?: boolean;
   action?: ReactNode;
 };
 
@@ -34,6 +36,7 @@ export function ProfileHeader({
   followsCount,
   followersCount,
   backfillStatus,
+  followedBy,
   action,
 }: Props) {
   const [viewing, setViewing] = useState<string>();
@@ -77,6 +80,7 @@ export function ProfileHeader({
           </h1>
           <div className="flex items-center gap-2">
             <p className="truncate text-label text-muted">@{handle}</p>
+            {followedBy && <Badge>フォローされています</Badge>}
             {backfillStatus && <BackfillStatusBadge status={backfillStatus} />}
           </div>
         </div>

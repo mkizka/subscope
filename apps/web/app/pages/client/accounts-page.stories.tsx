@@ -5,6 +5,7 @@ import { AccountsPage } from "./accounts-page";
 const meta = {
   component: AccountsPage,
   parameters: {
+    path: "/server/accounts",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof AccountsPage>;

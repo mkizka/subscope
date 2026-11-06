@@ -5,6 +5,7 @@ import { MyListsPage } from "./my-lists-page";
 const meta = {
   component: MyListsPage,
   parameters: {
+    path: "/lists",
     layout: "fullscreen",
   },
 } satisfies Meta<typeof MyListsPage>;

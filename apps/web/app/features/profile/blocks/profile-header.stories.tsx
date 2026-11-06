@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { FollowButton } from "@/app/features/profile/parts/follow-button";
+
 import { ProfileHeader } from "./profile-header";
 
 const meta = {
@@ -16,6 +18,29 @@ const meta = {
 export default meta;
 
 export const Default: StoryObj<typeof meta> = {};
+
+export const WithImages: StoryObj<typeof meta> = {
+  args: {
+    avatarUrl: "https://placehold.co/160",
+    bannerUrl: "https://placehold.co/600x200",
+  },
+};
+
+export const NotFollowing: StoryObj<typeof meta> = {
+  args: {
+    avatarUrl: "https://placehold.co/160",
+    bannerUrl: "https://placehold.co/600x200",
+    action: <FollowButton following={false} onClick={() => {}} />,
+  },
+};
+
+export const Following: StoryObj<typeof meta> = {
+  args: {
+    avatarUrl: "https://placehold.co/160",
+    bannerUrl: "https://placehold.co/600x200",
+    action: <FollowButton following onClick={() => {}} />,
+  },
+};
 
 export const WithLinks: StoryObj<typeof meta> = {
   args: {
@@ -40,6 +65,10 @@ export const WithLinks: StoryObj<typeof meta> = {
       },
     ],
   },
+};
+
+export const FollowedBy: StoryObj<typeof meta> = {
+  args: { followedBy: true },
 };
 
 export const BackfillInProgress: StoryObj<typeof meta> = {

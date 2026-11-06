@@ -26,7 +26,7 @@ export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
       </aside>
       <main
         className="
-          w-full max-w-main min-w-0 pb-16
+          w-full max-w-main min-w-0 pb-40
           lg:pb-0
         "
       >
