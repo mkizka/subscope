@@ -21,7 +21,12 @@ export type TimelinePostDto = {
   repostCount?: number;
   likeCount?: number;
   createdAt?: string;
-  images?: { thumb: string; fullsize: string; alt: string }[];
+  images?: {
+    thumb: string;
+    fullsize: string;
+    alt: string;
+    aspectRatio?: { width: number; height: number };
+  }[];
   video?: {
     playlist: string;
     thumbnail?: string;
@@ -40,7 +45,12 @@ export type TimelinePostDto = {
     authorHandle: string;
     text?: string;
     links?: TextLinkDto[];
-    images?: { thumb: string; fullsize: string; alt: string }[];
+    images?: {
+      thumb: string;
+      fullsize: string;
+      alt: string;
+      aspectRatio?: { width: number; height: number };
+    }[];
     video?: {
       playlist: string;
       thumbnail?: string;

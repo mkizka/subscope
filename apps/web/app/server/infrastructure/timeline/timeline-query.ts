@@ -106,10 +106,11 @@ function toImages(media: unknown) {
     : galleryView.matches(media)
       ? media.items
           .filter((item) => galleryViewImage.matches(item))
-          .map(({ thumbnail, fullsize, alt }) => ({
+          .map(({ thumbnail, fullsize, alt, aspectRatio }) => ({
             thumb: thumbnail,
             fullsize,
             alt,
+            aspectRatio,
           }))
       : undefined;
 }
