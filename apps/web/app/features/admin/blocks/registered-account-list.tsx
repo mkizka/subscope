@@ -98,7 +98,7 @@ export function RegisteredAccountList({
     <>
       <div className="sticky top-0 bg-surface">
         <div className="flex items-baseline gap-2 px-4 py-3">
-          <h1 className="text-title">登録アカウント</h1>
+          <h1 className="text-title">アカウント管理</h1>
           {total !== undefined && (
             <span className="text-label text-muted">{total}人</span>
           )}
