@@ -20,6 +20,13 @@ const wideImage = {
   ),
 };
 
+const writeAlt = async (page: Page, n: number, alt: string) => {
+  await page.getByRole("button", { name: `画像${n}のALTを編集` }).click();
+  const dialog = page.getByRole("dialog", { name: "ALTを追加" });
+  await dialog.getByRole("textbox", { name: "ALT" }).fill(alt);
+  await dialog.getByRole("button", { name: "完了" }).click();
+};
+
 test.describe("投稿欄", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -74,7 +81,7 @@ test.describe("投稿欄", () => {
   }) => {
     const alt = `post-form-3: ${Date.now()}`;
     await page.getByLabel("画像を追加").setInputFiles(image("a.png"));
-    await page.getByRole("textbox", { name: "画像1のALT" }).fill(alt);
+    await writeAlt(page, 1, alt);
     await page.getByRole("button", { name: "投稿", exact: true }).click();
 
     await expect(page.getByRole("img", { name: alt })).toBeAttached();
@@ -86,9 +93,12 @@ test.describe("投稿欄", () => {
       ["1", "2", "3", "4"].map((n) => image(`${n}.png`)),
     );
 
-    await expect(page.getByRole("textbox", { name: /のALT$/ })).toHaveCount(4);
+    await expect(
+      page.getByRole("button", { name: /のALTを編集$/ }),
+    ).toHaveCount(4);
     await expect(input).toBeDisabled();
   });
+
   test("post-form-5: 返信できる人の設定は、投稿と同じrkeyのthreadgateに保存する", async ({
     page,
     request,
@@ -134,6 +144,41 @@ test.describe("投稿欄", () => {
     );
     const { value }: { value: { text: string } } = await postRecord.json();
     expect(value.text).toBe(text);
+  });
+
+  test("post-form-14: 添付した画像には、ALTが未入力なら「+ ALT」、入力済みなら「ALT」のバッジを重ね、押すとその画像のALTを入力するダイアログを開く", async ({
+    page,
+  }) => {
+    await page
+      .getByLabel("画像を追加")
+      .setInputFiles([image("1.png"), image("2.png")]);
+    const badge = (n: number) =>
+      page.getByRole("button", { name: `画像${n}のALTを編集` });
+    await expect(badge(1)).toHaveText("+ ALT");
+
+    await writeAlt(page, 1, "post-form-14");
+
+    await expect(badge(1)).toHaveText("ALT");
+    await expect(badge(2)).toHaveText("+ ALT");
+    await badge(1).click();
+    await expect(
+      page
+        .getByRole("dialog", { name: "ALTを追加" })
+        .getByRole("textbox", { name: "ALT" }),
+    ).toHaveValue("post-form-14");
+  });
+
+  test("post-form-15: ALTは2000字を超えると保存できない", async ({ page }) => {
+    await page.getByLabel("画像を追加").setInputFiles(image("a.png"));
+    await page.getByRole("button", { name: "画像1のALTを編集" }).click();
+    const dialog = page.getByRole("dialog", { name: "ALTを追加" });
+    const done = dialog.getByRole("button", { name: "完了" });
+
+    await dialog.getByRole("textbox", { name: "ALT" }).fill("あ".repeat(2001));
+    await expect(done).toBeDisabled();
+
+    await dialog.getByRole("textbox", { name: "ALT" }).fill("あ".repeat(2000));
+    await expect(done).toBeEnabled();
   });
 
   test("post-form-13: 添付した画像には、公式クライアントと同じく実寸の縦横比をaspectRatioに保存する", async ({
