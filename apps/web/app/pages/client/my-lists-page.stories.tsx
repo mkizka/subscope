@@ -40,3 +40,12 @@ const meta = {
 export default meta;
 
 export const Default: StoryObj<typeof meta> = {};
+
+export const Empty: StoryObj<typeof meta> = {
+  beforeEach: () => {
+    queryClient.setQueryData<Data<typeof listsLoader>>(
+      ["lists", alice.handle],
+      { lists: [], isSelf: true },
+    );
+  },
+};

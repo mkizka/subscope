@@ -45,3 +45,26 @@ const meta = {
 export default meta;
 
 export const Default: StoryObj<typeof meta> = {};
+
+export const NoReplies: StoryObj<typeof meta> = {
+  beforeEach: () => {
+    queryClient.setQueryData<Data<typeof threadLoader>>(
+      ["thread", alice.handle, "selected"],
+      {
+        ancestors: [],
+        post: {
+          uri: "at://a/2",
+          cid: "bafyexample",
+          authorDisplayName: alice.displayName,
+          authorHandle: alice.handle,
+          text: "選んだ投稿です",
+          createdAt: new Date().toISOString(),
+          replyCount: 0,
+          repostCount: 0,
+          likeCount: 0,
+        },
+        replies: [],
+      },
+    );
+  },
+};
