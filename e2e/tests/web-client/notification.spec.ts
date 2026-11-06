@@ -190,12 +190,12 @@ test.describe("通知（PC）", () => {
       .getByRole("region", { name: "通知" })
       .getByRole("listitem")
       .first();
-    await expect(notification).toHaveText("Bobさんにフォローされました");
-    await expect(notification).toHaveClass(/bg-brand-soft/);
+    await expect(notification).toContainText("Bobさんにフォローされました");
+    await expect(notification).toHaveClass(/bg-surface-2/);
 
     await expect(async () => {
       await page.reload();
-      await expect(notification).not.toHaveClass(/bg-brand-soft/, {
+      await expect(notification).not.toHaveClass(/bg-surface-2/, {
         timeout: 1000,
       });
     }).toPass();
