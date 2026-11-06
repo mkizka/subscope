@@ -295,7 +295,7 @@ test.describe("リスト", () => {
     await expect(button).toBeDisabled();
     await expect(button.locator(".animate-spin")).toBeVisible();
     release();
-    await expect(button).toBeEnabled();
+    await expect(dialog).toBeHidden();
   });
 
   test("list-10: リスト詳細の「…」ボタンは、削除してリスト一覧に戻るまでスピナーを出して押せなくする", async ({
