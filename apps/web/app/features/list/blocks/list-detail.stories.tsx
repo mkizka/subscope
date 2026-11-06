@@ -6,6 +6,7 @@ import { ListDetail } from "./list-detail";
 const meta = {
   component: ListDetail,
   args: {
+    handle: "alice.bsky.social",
     uri: "at://did:plc:alice/app.bsky.graph.list/1",
     name: "友達",
     description: "よく話す人たち",

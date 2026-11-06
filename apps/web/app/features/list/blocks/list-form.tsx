@@ -1,7 +1,9 @@
+import { type RefObject, useEffect, useId, useRef } from "react";
 import { Form, useNavigation } from "react-router";
 import { z } from "zodV4";
 
 import { Button } from "@/app/components/ui/button";
+import { Dialog } from "@/app/components/ui/dialog";
 import { Input } from "@/app/components/ui/input";
 
 export const listSchema = z.object({
@@ -10,25 +12,49 @@ export const listSchema = z.object({
 });
 
 type Props = {
-  summary: string;
+  ref: RefObject<HTMLDialogElement | null>;
+  title: string;
   submitLabel: string;
   name?: string;
   description?: string;
 };
 
-export function ListForm({ summary, submitLabel, name, description }: Props) {
+export function ListForm({
+  ref,
+  title,
+  submitLabel,
+  name,
+  description,
+}: Props) {
+  const formId = useId();
   const navigation = useNavigation();
+  const submitting = navigation.formData?.has("name") ?? false;
+  const wasSubmittingRef = useRef(false);
+  useEffect(() => {
+    if (wasSubmittingRef.current && !submitting) ref.current?.close();
+    wasSubmittingRef.current = submitting;
+  }, [submitting, ref]);
+
   return (
-    <details className="border-b border-line">
-      <summary
-        className="
-          cursor-pointer p-4 text-heading
-          hover:bg-surface-2
-        "
-      >
-        {summary}
-      </summary>
-      <Form method="post" className="flex flex-col gap-3 px-4 pb-4">
+    <Dialog
+      ref={ref}
+      title={title}
+      actions={
+        <>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => ref.current?.close()}
+          >
+            キャンセル
+          </Button>
+          <Button type="submit" form={formId} loading={submitting}>
+            {submitLabel}
+          </Button>
+        </>
+      }
+    >
+      <Form id={formId} method="post" className="flex flex-col gap-3">
         <Input
           label="名前"
           name="name"
@@ -42,12 +68,7 @@ export function ListForm({ summary, submitLabel, name, description }: Props) {
           maxLength={300}
           defaultValue={description}
         />
-        <div className="self-end">
-          <Button type="submit" loading={navigation.formData?.has("name")}>
-            {submitLabel}
-          </Button>
-        </div>
       </Form>
-    </details>
+    </Dialog>
   );
 }

@@ -1,11 +1,12 @@
 import { type ReactNode, useId } from "react";
 
-import { buttonClass } from "./button";
+import { Button } from "./button";
 
 type Props = {
   label: string;
   trigger: ReactNode;
   placement?: "bottom" | "top";
+  loading?: boolean;
   children: ReactNode;
 };
 
@@ -16,21 +17,24 @@ export function Menu({
   label,
   trigger,
   placement = "bottom",
+  loading,
   children,
 }: Props) {
   const id = useId();
   const anchor = `--${id.replace(/[^\w-]/g, "")}`;
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         popoverTarget={id}
         aria-label={label}
-        className={buttonClass({ variant: "ghost", size: "sm" })}
+        loading={loading}
         style={{ anchorName: anchor }}
       >
-        {trigger}
-      </button>
+        {!loading && trigger}
+      </Button>
       <div
         id={id}
         popover="auto"
