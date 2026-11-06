@@ -46,18 +46,26 @@ test.describe("投稿動画", () => {
     await expect(video).toHaveAttribute("poster", /thumbnail\.jpg$/);
   });
 
-  test("post-video-2: 動画を再生すると、playlistを取得して再生を始める", async ({
+  test("post-video-2: 動画を再生すると、hls.jsでplaylistを取得して再生を始める", async ({
     page,
   }) => {
     const text = `post-video-2: ${Date.now()}`;
     await postVideo(text);
     const post = await open(page, text);
 
+    await page.route(PLAYLIST, (route) =>
+      route.fulfill({
+        contentType: "application/vnd.apple.mpegurl",
+        body: "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:6\n#EXT-X-ENDLIST\n",
+      }),
+    );
     const requested = page.waitForRequest(PLAYLIST);
-    await post.getByLabel(text).evaluate((el: HTMLVideoElement) => {
+    const video = post.getByLabel(text);
+    await video.evaluate((el: HTMLVideoElement) => {
       void el.play().catch(() => undefined);
     });
     await requested;
+    await expect(video).toHaveAttribute("src", /^blob:/);
   });
 
   test("post-video-3: 引用された投稿に付いた動画を、引用した投稿の中に表示する", async ({

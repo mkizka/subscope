@@ -11,12 +11,13 @@ export function PostVideo({ video }: { video: PostVideoData }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const element = ref.current;
-    if (!element || element.canPlayType("application/vnd.apple.mpegurl")) {
-      return;
-    }
+    if (!element) return;
     let destroy: (() => void) | undefined;
     void import("hls.js").then(({ default: Hls }) => {
-      if (!Hls.isSupported()) return;
+      if (!Hls.isSupported()) {
+        element.src = video.playlist;
+        return;
+      }
       const hls = new Hls();
       hls.loadSource(video.playlist);
       hls.attachMedia(element);
@@ -27,7 +28,6 @@ export function PostVideo({ video }: { video: PostVideoData }) {
   return (
     <video
       ref={ref}
-      src={video.playlist}
       poster={video.thumbnail}
       aria-label={video.alt}
       controls
