@@ -159,4 +159,16 @@ test.describe("画像の拡大表示", () => {
       /\/img\/banner\//,
     );
   });
+
+  test("image-viewer-8: ブラウザの戻るで閉じ、元の画面にとどまる", async ({
+    page,
+  }) => {
+    const viewer = await openViewer(page, "image-viewer-8: 投稿", [
+      "image-viewer-8: 画像",
+    ]);
+
+    await page.goBack();
+    await expect(viewer).toBeHidden();
+    await expect(page).toHaveURL(/\/$/);
+  });
 });
