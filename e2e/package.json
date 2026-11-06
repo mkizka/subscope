@@ -9,7 +9,8 @@
     "e2e": "playwright test",
     "format": "pnpm -s run _eslint --fix && pnpm -s run _prettier --ignore-unknown --write",
     "lint": "pnpm -s run _eslint && pnpm -s run _prettier --check",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "vrt": "pnpm --filter @repo/web exec storybook build && playwright test -c playwright.vrt.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
