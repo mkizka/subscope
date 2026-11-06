@@ -54,6 +54,7 @@ export function ProfileContainer({ handle }: Props) {
         followsCount={profile && (profile.followsCount ?? 0)}
         followersCount={profile && (profile.followersCount ?? 0)}
         backfillStatus={data?.backfillStatus}
+        followedBy={!!profile?.viewer?.followedBy}
         action={
           profile &&
           !data?.isSelf && (
