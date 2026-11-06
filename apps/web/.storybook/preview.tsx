@@ -40,6 +40,11 @@ const queryClient = new QueryClient({
   },
 });
 
+const infinite = <T extends (...args: never) => unknown>(page: Data<T>) => ({
+  pages: [page],
+  pageParams: [undefined],
+});
+
 const alice = {
   did: "did:plc:alice",
   handle: "alice.bsky.social",
@@ -52,16 +57,6 @@ const bob = {
 } as const;
 const indexedAt = asDatetimeString(new Date().toISOString());
 
-queryClient.setQueryData<Data<typeof meLoader>>(["me"], {
-  did: alice.did,
-  avatarUrl: undefined,
-  handle: alice.handle,
-  isAdmin: true,
-});
-queryClient.setQueryData<Data<typeof unreadCountLoader>>(
-  ["notifications", "unread-count"],
-  { count: 2 },
-);
 queryClient.setQueryData<{
   pages: Data<typeof notificationsLoader>[];
   pageParams: unknown[];
@@ -142,9 +137,6 @@ queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
     hasMore: false,
   },
 );
-queryClient.setQueryData<Data<typeof serverInfoLoader>>(["server"], {
-  serviceDid: "did:web:subsco.me",
-});
 queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
   ["trackedAccounts", ""],
   {
@@ -161,13 +153,10 @@ queryClient.setQueryData<Data<typeof trackedAccountsLoader>>(
   },
 );
 
-queryClient.setQueryData<{
-  pages: Data<typeof timelineLoader>[];
-  pageParams: unknown[];
-}>(["timeline"], {
-  pages: [{ posts: TimelineFeedStories.args.posts }],
-  pageParams: [undefined],
-});
+queryClient.setQueryData(
+  ["timeline"],
+  infinite<typeof timelineLoader>({ posts: TimelineFeedStories.args.posts }),
+);
 
 const searchQuery = (
   tab: "accounts" | "posts",
@@ -307,7 +296,31 @@ queryClient.setQueryData<Data<typeof profileLoader>>(
   },
 );
 
+const pageData = queryClient
+  .getQueryCache()
+  .getAll()
+  .map(({ queryKey, state }) => [queryKey, state.data] as const);
+
 const preview: Preview = {
+  beforeEach: () => {
+    queryClient.clear();
+    for (const [key, data] of pageData) {
+      queryClient.setQueryData(key, data);
+    }
+    queryClient.setQueryData<Data<typeof meLoader>>(["me"], {
+      did: alice.did,
+      avatarUrl: undefined,
+      handle: alice.handle,
+      isAdmin: true,
+    });
+    queryClient.setQueryData<Data<typeof unreadCountLoader>>(
+      ["notifications", "unread-count"],
+      { count: 2 },
+    );
+    queryClient.setQueryData<Data<typeof serverInfoLoader>>(["server"], {
+      serviceDid: "did:web:subsco.me",
+    });
+  },
   decorators: [
     (Story, { parameters }) => {
       const Stub = createRoutesStub([
