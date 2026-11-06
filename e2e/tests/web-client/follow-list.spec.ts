@@ -183,4 +183,16 @@ test.describe("フォロー・フォロワー", () => {
 
     await expect(page).toHaveURL("/alice.test");
   });
+
+  test("follow-list-11: 読み込みが終わって0件のときは、フォロー一覧には「フォローしているアカウントはありません」、フォロワー一覧には「フォロワーはいません」を表示する", async ({
+    page,
+  }) => {
+    await page.goto("/bob.test/follows");
+    await expect(
+      page.getByText("フォローしているアカウントはありません"),
+    ).toBeVisible();
+
+    await page.goto("/alice.test/followers");
+    await expect(page.getByText("フォロワーはいません")).toBeVisible();
+  });
 });
