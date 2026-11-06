@@ -42,18 +42,16 @@ export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
         />
         <BottomTabsContainer />
       </main>
-      {!hideServerCard && (
-        <aside
-          aria-label="サーバー"
-          className="
-            hidden border-line p-4
-            lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
-            lg:border-l
-          "
-        >
-          <ServerCardContainer />
-        </aside>
-      )}
+      <aside
+        aria-label={hideServerCard ? undefined : "サーバー"}
+        className="
+          hidden border-line p-4
+          lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
+          lg:border-l
+        "
+      >
+        {!hideServerCard && <ServerCardContainer />}
+      </aside>
     </div>
   );
 };
