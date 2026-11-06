@@ -1,11 +1,11 @@
 import { clsx } from "clsx";
-import { Globe } from "lucide-react";
+import { Globe, X } from "lucide-react";
 import { type Ref, useId, useState } from "react";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button, buttonClass } from "@/app/components/ui/button";
 import { Dialog } from "@/app/components/ui/dialog";
-import { Input } from "@/app/components/ui/input";
+import { AltDialog } from "@/app/features/timeline/parts/alt-dialog";
 import {
   formatRelativeTime,
   type PostCardProps,
@@ -85,7 +85,10 @@ export function PostForm({
   const [allow, setAllow] = useState<ReplyRule[]>();
   const [showRules, setShowRules] = useState(false);
   const canSetReplyRules = target?.type !== "reply";
-  const [images, setImages] = useState<{ file: File; url: string }[]>([]);
+  const [images, setImages] = useState<
+    { file: File; url: string; alt: string }[]
+  >([]);
+  const [editingAlt, setEditingAlt] = useState<number>();
   const length = countGraphemes(text);
 
   return (
@@ -119,7 +122,10 @@ export function PostForm({
         onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.currentTarget);
-          images.forEach(({ file }) => formData.append("image", file));
+          images.forEach(({ file, alt }) => {
+            formData.append("image", file);
+            formData.append("alt", alt);
+          });
           if (canSetReplyRules && allow) {
             formData.set("threadgate", "on");
             allow.forEach((rule) => formData.append("allow", rule));
@@ -163,28 +169,46 @@ export function PostForm({
             />
             {images.length > 0 && (
               <div className="grid grid-cols-2 gap-2">
-                {images.map(({ file, url }, i) => (
-                  <div key={url} className="flex flex-col gap-1">
+                {images.map(({ file, url, alt }, i) => (
+                  <div
+                    key={url}
+                    className="relative overflow-hidden rounded-xl"
+                  >
                     <img
                       src={url}
                       alt=""
-                      className="h-24 w-full rounded-xl object-cover"
+                      className="h-28 w-full object-cover"
                     />
-                    <Input
-                      name="alt"
-                      aria-label={`画像${i + 1}のALT`}
-                      placeholder="ALT"
-                    />
-                    <Button
+                    <button
                       type="button"
-                      variant="secondary"
-                      size="sm"
+                      aria-label={`画像${i + 1}のALTを編集`}
+                      className={clsx(
+                        `
+                          absolute bottom-2 left-2 h-6 rounded-full border px-2
+                          text-caption
+                        `,
+                        alt
+                          ? "border-line bg-surface text-ink"
+                          : "border-brand bg-brand font-bold text-on-brand",
+                      )}
+                      onClick={() => setEditingAlt(i)}
+                    >
+                      {alt ? "ALT" : "+ ALT"}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`画像${i + 1}を削除`}
+                      className={`
+                        absolute top-2 right-2 flex size-8 items-center
+                        justify-center rounded-full border border-line
+                        bg-surface text-ink
+                      `}
                       onClick={() =>
                         setImages(images.filter((it) => it.file !== file))
                       }
                     >
-                      削除
-                    </Button>
+                      <X className="size-4" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -215,6 +239,7 @@ export function PostForm({
                 const files = [...(e.target.files ?? [])].map((file) => ({
                   file,
                   url: URL.createObjectURL(file),
+                  alt: "",
                 }));
                 setImages([...images, ...files].slice(0, MAX_IMAGES));
                 e.target.value = "";
@@ -285,6 +310,19 @@ export function PostForm({
           </fieldset>
         )}
       </form>
+      {editingAlt !== undefined && images[editingAlt] && (
+        <AltDialog
+          imageUrl={images[editingAlt].url}
+          defaultValue={images[editingAlt].alt}
+          onClose={() => setEditingAlt(undefined)}
+          onSave={(alt) => {
+            setImages(
+              images.map((it, i) => (i === editingAlt ? { ...it, alt } : it)),
+            );
+            setEditingAlt(undefined);
+          }}
+        />
+      )}
     </Dialog>
   );
 }
