@@ -17,16 +17,18 @@ const meta = {
 
 export default meta;
 
-export const Default: StoryObj<typeof meta> = {};
+type Story = StoryObj<typeof meta>;
 
-export const WithImages: StoryObj<typeof meta> = {
+export const Default: Story = {};
+
+export const WithImages: Story = {
   args: {
     avatarUrl: "https://placehold.co/160",
     bannerUrl: "https://placehold.co/600x200",
   },
 };
 
-export const NotFollowing: StoryObj<typeof meta> = {
+export const NotFollowing: Story = {
   args: {
     avatarUrl: "https://placehold.co/160",
     bannerUrl: "https://placehold.co/600x200",
@@ -34,7 +36,7 @@ export const NotFollowing: StoryObj<typeof meta> = {
   },
 };
 
-export const Following: StoryObj<typeof meta> = {
+export const Following: Story = {
   args: {
     avatarUrl: "https://placehold.co/160",
     bannerUrl: "https://placehold.co/600x200",
@@ -42,7 +44,7 @@ export const Following: StoryObj<typeof meta> = {
   },
 };
 
-export const WithLinks: StoryObj<typeof meta> = {
+export const WithLinks: Story = {
   args: {
     links: [
       {
@@ -67,19 +69,19 @@ export const WithLinks: StoryObj<typeof meta> = {
   },
 };
 
-export const FollowedBy: StoryObj<typeof meta> = {
+export const FollowedBy: Story = {
   args: { followedBy: true },
 };
 
-export const BackfillInProgress: StoryObj<typeof meta> = {
+export const BackfillInProgress: Story = {
   args: { backfillStatus: "inProgress" },
 };
 
-export const BackfillError: StoryObj<typeof meta> = {
+export const BackfillError: Story = {
   args: { backfillStatus: "error" },
 };
 
-export const Loading: StoryObj<typeof meta> = {
+export const Loading: Story = {
   args: {
     loading: true,
     displayName: undefined,

@@ -44,9 +44,11 @@ const meta = {
 
 export default meta;
 
-export const Default: StoryObj<typeof meta> = {};
+type Story = StoryObj<typeof meta>;
 
-export const NoReplies: StoryObj<typeof meta> = {
+export const Default: Story = {};
+
+export const NoReplies: Story = {
   beforeEach: () => {
     queryClient.setQueryData<Data<typeof threadLoader>>(
       ["thread", alice.handle, "selected"],

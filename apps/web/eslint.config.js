@@ -58,6 +58,12 @@ export default defineConfig(
         "error",
         {
           selector:
+            "TSTypeAnnotation > TSTypeReference[typeName.name='StoryObj']",
+          message:
+            "storyの型はStoryObjを直接書かず、type Story = StoryObj<typeof meta>;を定義して使ってください。",
+        },
+        {
+          selector:
             "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ObjectExpression > Property[key.name='render']",
           message:
             "storyでrenderを上書きして別のコンポーネントを描画しないでください。コンポーネントごとにstoriesファイルを分け、argsで状態を表現してください。",
