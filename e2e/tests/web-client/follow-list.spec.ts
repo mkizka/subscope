@@ -170,4 +170,17 @@ test.describe("フォロー・フォロワー", () => {
 
     await expect(page).toHaveURL(/\/followers\?filter=registered$/);
   });
+
+  test("follow-list-10: 見出しを「{名前}のフォロー」「{名前}のフォロワー」とし、戻るボタンでそのアカウントのプロフィール全体ページに移動する", async ({
+    page,
+  }) => {
+    await page.goto("/alice.test/follows");
+
+    await expect(
+      page.getByRole("heading", { name: "Aliceのフォロー" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "戻る" }).click();
+
+    await expect(page).toHaveURL("/alice.test");
+  });
 });
