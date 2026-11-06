@@ -34,9 +34,12 @@ export function FollowListContainer({ handle, kind }: Props) {
   const subject = data?.subject;
   return (
     <>
-      <header className="
-        sticky top-0 flex items-center gap-2 border-b border-line bg-surface p-4
-      ">
+      <header
+        className="
+          sticky top-0 flex items-center gap-2 border-b border-line bg-surface
+          p-4
+        "
+      >
         <Link to={`/${handle}`} aria-label="戻る" className="text-muted">
           <ArrowLeftIcon className="size-5" />
         </Link>
