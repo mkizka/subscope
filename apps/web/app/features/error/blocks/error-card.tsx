@@ -57,7 +57,7 @@ export function ErrorCard({ title, details, status, stack }: Props) {
         <HomeIcon className="size-4" />
         ホームに戻る
       </a>
-      {status && <p className="text-caption text-muted">{status}</p>}
+      {status && <p className="text-heading text-muted">{status}</p>}
     </div>
   );
 }
