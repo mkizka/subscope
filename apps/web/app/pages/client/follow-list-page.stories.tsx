@@ -14,3 +14,11 @@ const meta = {
 export default meta;
 
 export const Default: StoryObj<typeof meta> = {};
+
+export const FollowsEmpty: StoryObj<typeof meta> = {
+  args: { handle: "dave.bsky.social" },
+};
+
+export const FollowersEmpty: StoryObj<typeof meta> = {
+  args: { handle: "dave.bsky.social", kind: "followers" },
+};

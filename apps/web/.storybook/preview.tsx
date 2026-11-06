@@ -261,6 +261,19 @@ queryClient.setQueryData<Data<typeof followListLoader>>(
     ],
   },
 );
+for (const kind of ["follows", "followers"] as const) {
+  queryClient.setQueryData<Data<typeof followListLoader>>(
+    ["follow-list", "dave.bsky.social", kind, false],
+    {
+      subject: {
+        did: "did:plc:dave",
+        handle: "dave.bsky.social",
+        displayName: "Dave",
+      },
+      accounts: [],
+    },
+  );
+}
 
 const threadPost = (uri: string, text: string) => ({
   uri,
