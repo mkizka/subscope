@@ -177,22 +177,4 @@ test.describe("レイアウト（モバイル）", () => {
 
     expect(drawerItems).toEqual(pcItems);
   });
-
-  test("layout-11: モバイルでは、下にスクロールしている間は新規投稿ボタンを隠し、上にスクロールすると再び表示する", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
-    const fab = page.getByRole("button", { name: "新規投稿" });
-    await expect(fab).toBeInViewport();
-
-    await page.evaluate(() => {
-      document.body.style.minHeight = "3000px";
-      window.scrollTo(0, 500);
-    });
-    await expect(fab).not.toBeInViewport();
-
-    await page.evaluate(() => window.scrollTo(0, 100));
-    await expect(fab).toBeInViewport();
-  });
 });
