@@ -58,4 +58,6 @@ const meta = {
 
 export default meta;
 
-export const Default: StoryObj<typeof meta> = {};
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};

@@ -38,22 +38,24 @@ const meta = {
 
 export default meta;
 
-export const Default: StoryObj<typeof meta> = {};
+type Story = StoryObj<typeof meta>;
 
-export const NotFound: StoryObj<typeof meta> = {
+export const Default: Story = {};
+
+export const NotFound: Story = {
   args: { q: "nobody" },
 };
 
-export const Posts: StoryObj<typeof meta> = {
+export const Posts: Story = {
   args: {
     tab: "posts",
   },
 };
 
-export const PostsNotFound: StoryObj<typeof meta> = {
+export const PostsNotFound: Story = {
   args: { q: "nobody", tab: "posts" },
 };
 
-export const Empty: StoryObj<typeof meta> = {
+export const Empty: Story = {
   args: { q: undefined },
 };
