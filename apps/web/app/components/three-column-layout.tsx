@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tabs-container";
 import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
@@ -12,24 +12,7 @@ type Props = {
   hideServerCard?: boolean;
 };
 
-const useScrollingDown = () => {
-  const [down, setDown] = useState(false);
-  useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (Math.abs(y - last) < 8) return;
-      setDown(y > last);
-      last = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return down;
-};
-
 export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
-  const scrollingDown = useScrollingDown();
   return (
     <div className="flex min-h-screen justify-center bg-surface text-ink">
       <SplashContainer />
@@ -50,14 +33,12 @@ export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
         <MobileHeaderContainer />
         {children}
         <ComposeButton
-          className={`
+          className="
             fixed right-4 bottom-20 z-10 flex size-14 items-center
             justify-center rounded-full bg-brand text-on-brand shadow-lg
-            transition-transform
             hover:opacity-90
             lg:hidden
-            ${scrollingDown ? "pointer-events-none translate-y-40" : ""}
-          `}
+          "
         />
         <BottomTabsContainer />
       </main>
