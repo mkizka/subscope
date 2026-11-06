@@ -15,6 +15,7 @@ const meta = {
     onRepost: fn(),
     onReply: fn(),
     onQuote: fn(),
+    onCopyLink: fn(),
   },
 } satisfies Meta<typeof PostToolbar>;
 

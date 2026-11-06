@@ -85,6 +85,11 @@ export function PostToolbarContainer(props: Props) {
               )
           : undefined
       }
+      onCopyLink={() =>
+        void navigator.clipboard.writeText(
+          `${location.origin}/${props.authorHandle}/post/${props.uri.split("/").pop()}`,
+        )
+      }
       onReply={() =>
         openCompose({
           type: "reply",

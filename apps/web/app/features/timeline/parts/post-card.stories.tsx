@@ -99,3 +99,54 @@ export const WithExternal: Story = {
     },
   },
 };
+
+const sampleImage = {
+  thumb:
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E",
+  fullsize:
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E",
+  alt: "サンプル画像",
+};
+
+const externalWithThumb = {
+  uri: "https://github.com/mkizka/subscope",
+  title: "mkizka/subscope",
+  description: "省ストレージを目指したBluesky互換AppView",
+  thumb: sampleImage.thumb,
+};
+
+export const WithImages: Story = {
+  args: {
+    authorHandle: "grace.bsky.social",
+    authorDisplayName: "Grace",
+    text: "写真を載せました。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    images: [sampleImage, sampleImage],
+  },
+};
+
+export const WithExternalThumb: Story = {
+  args: {
+    authorHandle: "frank.bsky.social",
+    authorDisplayName: "Frank",
+    text: "Subscopeのリポジトリです。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    external: externalWithThumb,
+  },
+};
+
+export const WithQuoteImagesAndExternal: Story = {
+  args: {
+    authorHandle: "erin.bsky.social",
+    authorDisplayName: "Erin",
+    text: "この投稿に同意です。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    quote: {
+      authorHandle: "alice.bsky.social",
+      authorDisplayName: "Alice",
+      text: "画像とリンクつきの投稿です。",
+      images: [sampleImage],
+      external: externalWithThumb,
+    },
+  },
+};

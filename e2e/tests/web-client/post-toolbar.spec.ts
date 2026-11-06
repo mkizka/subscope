@@ -206,15 +206,21 @@ test("post-toolbar-6: 削除ボタンは、タイムラインでもスレッド�
     await expect(mine).toBeVisible({ timeout: 1000 });
     await expect(others).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await mine.getByRole("button", { name: "投稿のメニュー" }).click();
   await expect(mine.getByRole("button", { name: "削除" })).toBeVisible();
-  await expect(others.getByRole("button", { name: "削除" })).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await others.getByRole("button", { name: "投稿のメニュー" }).click();
+  await expect(others.getByRole("button", { name: "削除" })).toBeHidden();
+  await page.keyboard.press("Escape");
 
   const thread = page.getByRole("region", { name: "スレッド" });
   await page.goto(`/alice.test/post/${mineRecord.uri.split("/").pop()}`);
+  await thread.getByRole("button", { name: "投稿のメニュー" }).click();
   await expect(thread.getByRole("button", { name: "削除" })).toBeVisible();
   await page.goto(`/bob.test/post/${othersRecord.uri.split("/").pop()}`);
   await expect(thread.getByText("post-toolbar-6: 他人の投稿")).toBeVisible();
-  await expect(thread.getByRole("button", { name: "削除" })).toHaveCount(0);
+  await thread.getByRole("button", { name: "投稿のメニュー" }).click();
+  await expect(thread.getByRole("button", { name: "削除" })).toBeHidden();
 });
 
 test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除すると再読み込みなしでタイムラインから投稿を消す", async ({
@@ -233,6 +239,7 @@ test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除�
     await page.reload();
     await expect(post).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await post.getByRole("button", { name: "投稿のメニュー" }).click();
   await post.getByRole("button", { name: "削除" }).click();
   await page
     .getByRole("dialog", { name: "投稿を削除" })
@@ -271,4 +278,29 @@ test("post-toolbar-8: 返信を投稿すると、再読み込みなしで返信�
     .click();
 
   await expect(post.getByTitle("1件の返信")).toHaveText("1");
+});
+
+test("post-toolbar-9: 投稿のメニューの「リンクをコピー」で、投稿のスレッドのURLをクリップボードにコピーする", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const text = "post-toolbar-9: 投稿";
+  const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  await page.goto("/");
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await post.getByRole("button", { name: "投稿のメニュー" }).click();
+  await post.getByRole("button", { name: "リンクをコピー" }).click();
+
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    `${new URL(page.url()).origin}/alice.test/post/${uri.split("/").pop()}`,
+  );
 });
