@@ -9,9 +9,10 @@ import { ComposeButton } from "@/app/features/timeline/blocks/post-form-containe
 
 type Props = {
   children: ReactNode;
+  hideServerCard?: boolean;
 };
 
-export const ThreeColumnLayout = ({ children }: Props) => {
+export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
   return (
     <div className="flex min-h-screen justify-center bg-surface text-ink">
       <SplashContainer />
@@ -41,16 +42,18 @@ export const ThreeColumnLayout = ({ children }: Props) => {
         />
         <BottomTabsContainer />
       </main>
-      <aside
-        aria-label="サーバー"
-        className="
-          hidden border-line p-4
-          lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
-          lg:border-l
-        "
-      >
-        <ServerCardContainer />
-      </aside>
+      {!hideServerCard && (
+        <aside
+          aria-label="サーバー"
+          className="
+            hidden border-line p-4
+            lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
+            lg:border-l
+          "
+        >
+          <ServerCardContainer />
+        </aside>
+      )}
     </div>
   );
 };
