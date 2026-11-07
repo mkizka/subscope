@@ -495,4 +495,31 @@ test.describe("プロフィール", () => {
 
     await expect(followers).toBeVisible();
   });
+
+  test("profile-23: 全体ページの各タブ（投稿・リプライ・メディア・いいね）は、一番下の2画面分手前までスクロールすると、続きの古い投稿を読み込む", async ({
+    page,
+  }) => {
+    for (let i = 1; i <= 25; i++) {
+      await createRecord("alice.test", "app.bsky.feed.post", {
+        text: `profile-23: 投稿${i}`,
+        createdAt: new Date().toISOString(),
+      });
+    }
+    await page.goto("/alice.test");
+    const main = page.getByRole("main");
+    const oldestPost = main.getByText("profile-23: 投稿1", { exact: true });
+    await expect(async () => {
+      await page.reload();
+      await expect(main.getByText("profile-23: 投稿25")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    await expect(oldestPost).toHaveCount(0);
+
+    await page.evaluate(() =>
+      window.scrollTo(0, document.body.scrollHeight - window.innerHeight * 2.5),
+    );
+
+    await expect(oldestPost).toBeAttached();
+  });
 });

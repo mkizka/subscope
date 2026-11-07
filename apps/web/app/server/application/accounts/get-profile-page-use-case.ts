@@ -12,11 +12,13 @@ export interface IGetProfilePageUseCase {
     did: string,
     account: AtIdentifierString,
     tab: ProfileTab,
+    cursor?: string,
   ) => Promise<{
     profile: ProfileViewDetailed;
     isSelf: boolean;
     backfillStatus?: BackfillStatus;
     posts: TimelinePostDto[];
+    cursor?: string;
     tab: ProfileTab;
   }>;
 }
@@ -28,10 +30,10 @@ export const getProfilePageUseCaseFactory = ({
   accountQuery: IAccountQuery;
   backfillQuery: IBackfillQuery;
 }): IGetProfilePageUseCase => ({
-  async execute(did, account, tab) {
-    const [profile, posts] = await Promise.all([
+  async execute(did, account, tab, cursor) {
+    const [profile, { posts, cursor: next }] = await Promise.all([
       accountQuery.findProfile(did, account),
-      accountQuery.findPosts(did, account, tab),
+      accountQuery.findPosts(did, account, tab, cursor),
     ]);
     const statuses = await backfillQuery.findTrackedStatuses([profile.did]);
     return {
@@ -39,6 +41,7 @@ export const getProfilePageUseCaseFactory = ({
       isSelf: profile.did === did,
       backfillStatus: statuses[profile.did],
       posts,
+      cursor: next,
       tab,
     };
   },

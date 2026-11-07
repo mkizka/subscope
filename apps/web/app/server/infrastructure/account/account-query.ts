@@ -61,20 +61,26 @@ export const accountQueryFactory = ({
       const agent = await restore(did);
       return agent.call(getProfile, { actor: account });
     },
-    async findPosts(did, account, tab) {
+    async findPosts(did, account, tab, cursor) {
       const agent = await restore(did);
-      // ponytail: 最初の20件のみ。古い投稿の読み込みはapi.timelineと同様のAPIルートを足すとき
-      const { feed } =
+      const { feed, cursor: next } =
         tab === "likes"
-          ? await agent.call(getActorLikes, { actor: account, limit: 20 })
+          ? await agent.call(getActorLikes, {
+              actor: account,
+              limit: 20,
+              cursor,
+            })
           : await agent.call(getAuthorFeed, {
               actor: account,
               limit: 20,
+              cursor,
               filter: filters[tab],
             });
-      return tab === "replies"
-        ? withReplyParents(feed)
-        : feed.map(toTimelinePost);
+      return {
+        posts:
+          tab === "replies" ? withReplyParents(feed) : feed.map(toTimelinePost),
+        cursor: next,
+      };
     },
     async findFollowList(did, account, kind) {
       const agent = await restore(did);
