@@ -32,7 +32,7 @@ type Props = {
 
 const reasons: Record<
   string,
-  { label: string; name: string; icon: LucideIcon }
+  { label: string; name: string; icon: LucideIcon; color?: string }
 > = {
   like: {
     label: "さんがいいねしました",
@@ -43,6 +43,7 @@ const reasons: Record<
     label: "さんがリポストしました",
     name: "リポスト",
     icon: Repeat2Icon,
+    color: "text-repost",
   },
   follow: {
     label: "さんにフォローされました",
@@ -99,7 +100,7 @@ export function NotificationPanel({
                     <Icon
                       role="img"
                       aria-label={reason.name}
-                      className="size-6 text-brand"
+                      className={clsx("size-6", reason.color ?? "text-brand")}
                     />
                   )}
                 </div>
