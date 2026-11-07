@@ -15,12 +15,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const WithServer: Story = {
-  args: {
-    showServer: true,
-  },
-};
-
 export const WithoutProfile: Story = {
   args: {
     profileId: undefined,

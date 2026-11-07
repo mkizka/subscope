@@ -217,7 +217,7 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(menuButton).toBeInViewport();
   });
 
-  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目に加えて「サーバー」を並べる", async ({
+  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べ、上に右カラムと同じ「サーバーについて」カードを出す", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -228,16 +228,21 @@ test.describe("レイアウト（モバイル）", () => {
 
     await page.setViewportSize({ width: 375, height: 667 });
     await page.getByRole("button", { name: "メニューを開く" }).click();
-    const drawerItems = await page
-      .getByRole("dialog", { name: "メニュー" })
+    const drawer = page.getByRole("dialog", { name: "メニュー" });
+    await expect(
+      drawer.getByRole("link", { name: /サーバーについて/ }),
+    ).toContainText(
+      "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
+    );
+    const drawerItems = await drawer
+      .getByRole("navigation")
       .getByRole("link")
       .allTextContents();
 
-    expect(drawerItems).toContain("サーバー");
-    expect(drawerItems.filter((item) => item !== "サーバー")).toEqual(pcItems);
+    expect(drawerItems).toEqual(pcItems);
   });
 
-  test("layout-10: モバイルのドロワーの「サーバー」から `/server` に移動できる", async ({
+  test("layout-10: モバイルのドロワーの「サーバーについて」カードから `/server` に移動できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -245,7 +250,7 @@ test.describe("レイアウト（モバイル）", () => {
     await page.getByRole("button", { name: "メニューを開く" }).click();
     await page
       .getByRole("dialog", { name: "メニュー" })
-      .getByRole("link", { name: "サーバー" })
+      .getByRole("link", { name: /サーバーについて/ })
       .click();
 
     await expect(page).toHaveURL("/server");
