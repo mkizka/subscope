@@ -14,32 +14,26 @@ colors:
   danger: "#c62828"
 typography:
   title:
-    fontFamily: BIZ UDPGothic
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.4
   heading:
-    fontFamily: BIZ UDPGothic
     fontSize: 18px
     fontWeight: 700
     lineHeight: 1.4
   body-lg:
-    fontFamily: BIZ UDPGothic
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.6
   body:
-    fontFamily: BIZ UDPGothic
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: BIZ UDPGothic
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.4
   caption:
-    fontFamily: BIZ UDPGothic
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.4
@@ -178,7 +172,7 @@ Blueskyが使えなくなったときに、同じ会話をそのまま続けら�
 
 ## Typography
 
-フォントは角ゴシックの BIZ UDPGothic だけを使い、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
+フォントはTailwindのデフォルト(システムフォント)に任せ、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
 
 | 名前      | 大きさ | 太さ | 行の高さ | 使う場所                               |
 | --------- | ------ | ---- | -------- | -------------------------------------- |
