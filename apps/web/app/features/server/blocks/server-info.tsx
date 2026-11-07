@@ -2,6 +2,8 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 
+import { Skeleton } from "@/app/components/ui/skeleton";
+
 type Operator = { did: string; handle: string; displayName?: string };
 
 type Props = {
@@ -22,6 +24,11 @@ export function ServerInfo({ operators, serviceDid }: Props) {
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">運営者</dt>
           <dd className="flex min-w-0 flex-wrap gap-x-3">
+            {!operators && (
+              <span role="status" aria-label="運営者を読み込み中">
+                <Skeleton className="h-4 w-24" />
+              </span>
+            )}
             {operators?.map((operator) => (
               <Link
                 key={operator.did}
@@ -39,7 +46,13 @@ export function ServerInfo({ operators, serviceDid }: Props) {
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">サーバーDID</dt>
           <dd className="flex min-w-0 flex-1 items-center gap-1">
-            <code className="min-w-0 truncate">{serviceDid}</code>
+            {serviceDid ? (
+              <code className="min-w-0 truncate">{serviceDid}</code>
+            ) : (
+              <span role="status" aria-label="サーバーDIDを読み込み中">
+                <Skeleton className="h-4 w-56 max-w-full" />
+              </span>
+            )}
             <button
               type="button"
               aria-label="コピー"
