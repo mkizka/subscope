@@ -16,6 +16,7 @@ const meta = {
     );
   },
   component: TimelinePage,
+  args: { local: false },
   parameters: {
     layout: "fullscreen",
   },
@@ -54,6 +55,18 @@ export const LongText: Story = {
             createdAt: new Date().toISOString(),
           },
         ],
+      }),
+    );
+  },
+};
+
+export const Local: Story = {
+  args: { local: true },
+  beforeEach: () => {
+    queryClient.setQueryData(
+      ["local-timeline"],
+      infinite<typeof timelineLoader>({
+        posts: TimelineFeedStories.args.posts,
       }),
     );
   },

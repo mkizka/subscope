@@ -21,6 +21,7 @@ import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/app/bsky/feed/post";
 import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
 import { link, mention } from "@repo/client/app/bsky/richtext/facet";
+import getLocalTimeline from "@repo/client/me/subsco/server/getLocalTimeline";
 import getRegistrationStatus, {
   registered,
 } from "@repo/client/me/subsco/sync/getRegistrationStatus";
@@ -57,6 +58,14 @@ export const timelineQueryFactory = ({
         posts: feed.filter(isShownInFeed).map(toTimelinePost),
         cursor: next,
       };
+    },
+    async findLocalPosts(did, cursor) {
+      const agent = await restore(did);
+      const { feed, cursor: next } = await agent.call(getLocalTimeline, {
+        limit: 50,
+        cursor,
+      });
+      return { posts: feed.map(toTimelinePost), cursor: next };
     },
     async searchPosts(did, q) {
       const agent = await restore(did);

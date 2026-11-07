@@ -50,9 +50,7 @@ test.describe("過去の投稿の同期状態", () => {
     await page.goto("/");
     await statusResponse;
 
-    await expect(
-      page.getByRole("heading", { name: "フォロー中" }),
-    ).toBeVisible();
+    await expect(page.getByRole("tab", { name: "フォロー中" })).toBeVisible();
     await expect(page.getByText(IN_PROGRESS)).toHaveCount(0);
     await expect(page.getByText(ERROR)).toHaveCount(0);
     await expect(page.getByText(DONE)).toHaveCount(0);
