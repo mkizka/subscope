@@ -12,18 +12,21 @@ type Props = {
 function Tab({
   to,
   icon,
+  label,
   children,
 }: {
   to: string;
   icon: ReactNode;
-  children: ReactNode;
+  label: string;
+  children?: ReactNode;
 }) {
   return (
     <NavLink
       to={to}
       end
+      aria-label={label}
       className={({ isActive }) =>
-        `relative flex flex-col items-center gap-1 py-2 text-caption ${isActive ? "font-bold text-ink" : "text-muted"}`
+        `relative flex items-center justify-center py-3 ${isActive ? "text-ink" : "text-muted"}`
       }
     >
       {icon}
@@ -42,14 +45,13 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
         lg:hidden
       "
     >
-      <Tab to="/" icon={<HomeIcon className="size-6" />}>
-        ホーム
-      </Tab>
-      <Tab to="/search" icon={<SearchIcon className="size-6" />}>
-        検索
-      </Tab>
-      <Tab to="/notifications" icon={<BellIcon className="size-6" />}>
-        通知
+      <Tab to="/" label="ホーム" icon={<HomeIcon className="size-6" />} />
+      <Tab to="/search" label="検索" icon={<SearchIcon className="size-6" />} />
+      <Tab
+        to="/notifications"
+        label="通知"
+        icon={<BellIcon className="size-6" />}
+      >
         {unreadCount > 0 && (
           <span className="absolute top-1 left-1/2 ml-1">
             <Badge variant="count">{unreadCount}</Badge>
@@ -58,10 +60,9 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
       </Tab>
       <Tab
         to={profileId ? `/${profileId}` : "/"}
+        label="プロフィール"
         icon={<CircleUserIcon className="size-6" />}
-      >
-        プロフィール
-      </Tab>
+      />
     </nav>
   );
 }
