@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
-import { RowsSkeleton } from "@/app/components/rows-skeleton";
+import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
@@ -124,7 +124,7 @@ export function ServerMemberList({
             : "メンバーはまだありません"}
         </p>
       )}
-      {isLoading && <RowsSkeleton />}
+      {isLoading && <AccountsSkeleton />}
       <ul>
         {tab === "banned" &&
           bannedAccounts.map((account) => (
