@@ -320,9 +320,6 @@ importers:
       '@conform-to/zod':
         specifier: 1.21.2
         version: 1.21.2(zod@4.6.7)
-      '@fontsource/biz-udpgothic':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@gyaku/di':
         specifier: 5.0.0
         version: 5.0.0
@@ -1856,9 +1853,6 @@ packages:
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
-
-  '@fontsource/biz-udpgothic@5.3.0':
-    resolution: {integrity: sha512-uBcdaC2/Bg7GEhzWSb2REs8azL1ys+KpI8TmPnJa2xtaD8DVMgsRbtIcEss8xjN5KRtp8E0+LFbG43FhkWZdPw==}
 
   '@graphql-typed-document-node/core@3.2.0':
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
@@ -8758,8 +8752,6 @@ snapshots:
   '@faker-js/faker@10.6.0': {}
 
   '@fastify/busboy@2.1.1': {}
-
-  '@fontsource/biz-udpgothic@5.3.0': {}
 
   '@graphql-typed-document-node/core@3.2.0(graphql@16.14.2)':
     dependencies:
