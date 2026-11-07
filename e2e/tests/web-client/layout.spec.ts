@@ -111,6 +111,29 @@ test.describe("レイアウト", () => {
     ).toHaveCount(0);
   });
 
+  test("layout-13: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す", async ({
+    page,
+  }) => {
+    await page.goto("/search");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/api/timeline*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "ホーム" })
+      .click();
+
+    const skeleton = page
+      .getByRole("status", { name: "読み込み中", exact: true })
+      .locator(".skeleton")
+      .first();
+    await expect(skeleton).toHaveCSS("animation-name", "skeleton-shimmer");
+    release(undefined);
+  });
+
   test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
     page,
   }) => {
