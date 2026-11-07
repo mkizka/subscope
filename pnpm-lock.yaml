@@ -356,9 +356,9 @@ importers:
       express:
         specifier: 5.3.0
         version: 5.3.0(supports-color@7.2.0)
-      hls.js:
-        specifier: 1.7.4
-        version: 1.7.4
+      hls-video-element:
+        specifier: 1.5.12
+        version: 1.5.12
       image-size:
         specifier: 2.0.4
         version: 2.0.4
@@ -368,6 +368,9 @@ importers:
       lucide-react:
         specifier: 1.62.0
         version: 1.62.0(@types/react@19.3.0)(react@19.3.1)
+      media-chrome:
+        specifier: 4.19.4
+        version: 4.19.4(react@19.3.1)
       morgan:
         specifier: 1.12.1
         version: 1.12.1(supports-color@7.2.0)
@@ -4162,6 +4165,11 @@ packages:
     resolution: {integrity: sha512-6/viltD51JklRhq4L7jC3zgy6gryuG5xfZ3kzpE+PravtyeQLeQmCYLREhQH7pWENg5pY4Yu/XCd6a7dKScVlw==}
     hasBin: true
 
+  ce-la-react@0.3.2:
+    resolution: {integrity: sha512-QJ6k4lOD/btI08xG8jBPxRCGXvCnusGGkTsiXk0u3NqUu/W+BXRnFD4PYjwtqh8AWmGa5LDbGk0fLQsqr0nSMA==}
+    peerDependencies:
+      react: '>=17.0.0'
+
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
     engines: {node: '>=18'}
@@ -4331,6 +4339,9 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  custom-media-element@1.4.7:
+    resolution: {integrity: sha512-rNBpnzkTAWPhE3cSajteAvg9qfFTsTd0b6dt33y9Q0Pq8afMvxL7SbvxzbUCqIRk/raIJHbJrHheCPADdK9+Ww==}
 
   data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
@@ -5150,6 +5161,9 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
+  hls-video-element@1.5.12:
+    resolution: {integrity: sha512-VV2F/uP7ntW3WFWtxjTA5kT+4+azfhc4H1GUhPOGHubpcRWuwxddMZ60ujxOTZODmbNdSimySSloJOJjPuw1OQ==}
+
   hls.js@1.7.4:
     resolution: {integrity: sha512-3GlxGdPvT2YHvQYOt+yOzT/DEior/qJVNIylHA77kgeoBTdQQqi70GwefNEUmHQeNGyjC8U62+bruqW/Tpm+tg==}
 
@@ -5648,6 +5662,12 @@ packages:
 
   mdn-data@2.37.2:
     resolution: {integrity: sha512-rz9YOBGItdSbe7HcSArUbhiAv4SB/4DKRYg96CSFS2CcIYMbUvBtZlzA1NCbk2AdgbmYwMqwNblLpR441lLeiQ==}
+
+  media-chrome@4.19.4:
+    resolution: {integrity: sha512-QAL48kT03+InLijPzXN1end9fcsl0/l53j1laCfbt/79vF2iZ45dovv4wQMw2q9zOLEiDwWsB718NJPhtZUBDg==}
+
+  media-tracks@0.3.5:
+    resolution: {integrity: sha512-l54rkKXlLBt3ob3zOLWHcnjvwUmX5bNEZ70igyapOZZC9imzqBmq1oz8p2roiV04KhjblFIi2hetLPF1oYVLRA==}
 
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
@@ -11130,6 +11150,10 @@ snapshots:
 
   cborg@4.5.8: {}
 
+  ce-la-react@0.3.2(react@19.3.1):
+    dependencies:
+      react: 19.3.1
+
   chai@5.3.3:
     dependencies:
       assertion-error: 2.0.1
@@ -11287,6 +11311,8 @@ snapshots:
   css.escape@1.5.1: {}
 
   csstype@3.2.3: {}
+
+  custom-media-element@1.4.7: {}
 
   data-uri-to-buffer@4.0.1: {}
 
@@ -12213,6 +12239,12 @@ snapshots:
 
   help-me@5.0.0: {}
 
+  hls-video-element@1.5.12:
+    dependencies:
+      custom-media-element: 1.4.7
+      hls.js: 1.7.4
+      media-tracks: 0.3.5
+
   hls.js@1.7.4: {}
 
   hono@4.13.14: {}
@@ -12609,6 +12641,14 @@ snapshots:
   math-intrinsics@1.1.0: {}
 
   mdn-data@2.37.2: {}
+
+  media-chrome@4.19.4(react@19.3.1):
+    dependencies:
+      ce-la-react: 0.3.2(react@19.3.1)
+    transitivePeerDependencies:
+      - react
+
+  media-tracks@0.3.5: {}
 
   media-typer@0.3.0: {}
 

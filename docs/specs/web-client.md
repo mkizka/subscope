@@ -169,10 +169,10 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 
 ## 投稿動画
 
-投稿に付いた動画(app.bsky.embed.video)を、本文の下にプレイヤーで表示する。再生用のHLSは、hls.jsが使えるブラウザではhls.jsで再生し、使えないブラウザ(iPhoneのSafariなど)ではvideo要素のネイティブ再生を使う。ChromeはcanPlayTypeが対応を示してもHLSを再生できないため、canPlayTypeでは判定しない。
+投稿に付いた動画(app.bsky.embed.video)を、本文の下にプレイヤーで表示する。プレイヤーはMedia Chromeで作り、コントロールは再生・シーク・ミュート・音量・全画面だけにする(音量はスマホ幅では隠す)。再生用のHLSはhls-video-elementが扱い、hls.jsが使えるブラウザではhls.jsで、使えないブラウザ(iPhoneのSafariなど)ではネイティブ再生で再生する。プレイヤーはSSRを避けるため、クライアントで読み込む。
 
 - post-video-1: 動画はサムネイルを表示し、ALTをプレイヤーのラベルにする
-- post-video-2: 動画を再生すると、hls.jsでplaylistを取得して再生を始める
+- post-video-2: 再生ボタンを押すと、playlistを取得して再生を始める
 - post-video-3: 引用された投稿に付いた動画を、引用した投稿の中に表示する
 
 ## 画像の拡大表示
