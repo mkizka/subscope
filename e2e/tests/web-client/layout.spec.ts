@@ -184,10 +184,10 @@ test.describe("レイアウト（モバイル）", () => {
     });
     const menuButton = page.getByRole("button", { name: "メニューを開く" });
 
-    await page.mouse.wheel(0, 1000);
+    await page.evaluate(() => window.scrollTo(0, 1000));
     await expect(menuButton).not.toBeInViewport();
 
-    await page.mouse.wheel(0, -100);
+    await page.evaluate(() => window.scrollTo(0, 900));
     await expect(menuButton).toBeInViewport();
   });
 
