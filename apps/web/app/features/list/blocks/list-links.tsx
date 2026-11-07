@@ -39,7 +39,7 @@ export function ListLinks({ handle, lists }: Props) {
               icon={<ListIcon className="size-5" />}
             />
             <div className="min-w-0">
-              <p className="truncate text-heading">{list.name}</p>
+              <p className="truncate text-body font-bold">{list.name}</p>
               {list.description && (
                 <p className="truncate text-label text-muted">
                   {list.description}
