@@ -214,6 +214,26 @@ test.describe("サーバー", () => {
     await expect(skeleton).toBeHidden();
   });
 
+  test("server-16: 運営者とサーバーDIDは、読み込み終えるまで値の場所にスケルトンを表示する", async ({
+    page,
+  }) => {
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route(/\/api\/server-info/, async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.goto("/server");
+
+    const skeleton = page.getByRole("status", {
+      name: "サーバーDIDを読み込み中",
+    });
+    await expect(skeleton).toBeVisible();
+    release(undefined);
+    await expect(skeleton).toBeHidden();
+    await expect(page.getByText(/^did:web:.+#bsky_appview$/)).toBeVisible();
+  });
+
   test("server-14: タブの下の検索欄に入力すると、選んでいるタブの全件から表示名・ハンドルの部分一致で絞り込み、検索語を `?q=` に入れる", async ({
     page,
   }) => {

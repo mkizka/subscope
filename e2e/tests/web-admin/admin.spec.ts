@@ -230,6 +230,30 @@ test.describe("メンバー", () => {
     }).toPass();
   });
 
+  test("admin-accounts-10: メンバーの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const { promise: released, resolve: release } = Promise.withResolvers();
+    await page.route("**/admin/api/registered-accounts*", async (route) => {
+      await released;
+      await route.continue();
+    });
+
+    await page.goto("/admin/registered-accounts");
+
+    await expect(
+      page.getByRole("heading", { name: "アカウント管理" }),
+    ).toBeVisible();
+    const skeleton = page.getByRole("status", {
+      name: "読み込み中",
+      exact: true,
+    });
+    await expect(skeleton).toBeVisible();
+    release(undefined);
+    await expect(skeleton).toBeHidden();
+  });
+
   test("admin-accounts-6: 「停止中」タブには、サーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
     page,
   }) => {

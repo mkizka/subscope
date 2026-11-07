@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
+import { Skeleton } from "@/app/components/ui/skeleton";
 
 type Operator = {
   did: string;
@@ -29,6 +30,11 @@ export function ServerInfo({ operator, serviceDid }: Props) {
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">運営者</dt>
           <dd className="flex min-w-0 flex-wrap gap-x-3">
+            {!serviceDid && (
+              <span role="status" aria-label="運営者を読み込み中">
+                <Skeleton className="h-4 w-24" />
+              </span>
+            )}
             {operator && (
               <Link
                 to={`/${operator.handle === "handle.invalid" ? operator.did : operator.handle}`}
@@ -65,7 +71,13 @@ export function ServerInfo({ operator, serviceDid }: Props) {
                   })
               }
             >
-              <code className="min-w-0 truncate">{serviceDid}</code>
+              {serviceDid ? (
+                <code className="min-w-0 truncate">{serviceDid}</code>
+              ) : (
+                <span role="status" aria-label="サーバーDIDを読み込み中">
+                  <Skeleton className="h-4 w-56 max-w-full" />
+                </span>
+              )}
               {copied ? (
                 <CheckIcon className="size-4 shrink-0 text-muted" />
               ) : (
