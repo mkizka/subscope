@@ -5,8 +5,9 @@ import { ServerInfo } from "./server-info";
 const meta = {
   component: ServerInfo,
   args: {
-    registeredCount: "3",
-    trackedCount: 128,
+    operators: [
+      { did: "did:plc:alice", handle: "alice.test", displayName: "Alice" },
+    ],
     serviceDid: "did:web:alpha.subsco.me#bsky_appview",
   },
 } satisfies Meta<typeof ServerInfo>;
@@ -19,8 +20,7 @@ export const Default: Story = {};
 
 export const Loading: Story = {
   args: {
-    registeredCount: undefined,
-    trackedCount: undefined,
+    operators: undefined,
     serviceDid: undefined,
   },
 };
