@@ -51,6 +51,7 @@ for (const name of [
   "erin",
   "frank",
   "grace",
+  "heidi",
 ]) {
   await network.pds.getAgent().createAccount({
     handle: `${name}.test`,
@@ -78,7 +79,7 @@ const blobProxy = createServer((req, res) => {
 }).listen(PORTS.blobProxy);
 
 process.stdout.write(
-  "Test accounts: alice.test, bob.test, carol.test, dave.test, erin.test, frank.test, grace.test / password\n",
+  "Test accounts: alice.test, bob.test, carol.test, dave.test, erin.test, frank.test, grace.test, heidi.test / password\n",
 );
 
 const app = spawn(process.argv.slice(2).join(" "), {

@@ -509,8 +509,8 @@ test.describe("ローカルタイムライン", () => {
     page,
     request,
   }) => {
-    await follow("alice.test", "bob.test");
-    await createRecord("bob.test", "app.bsky.feed.post", {
+    await follow("alice.test", "heidi.test");
+    await createRecord("heidi.test", "app.bsky.feed.post", {
       text: "localTimeline-2: メンバーではない人の投稿",
       createdAt: new Date().toISOString(),
     });
