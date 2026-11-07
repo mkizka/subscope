@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "me.subsco.server.getRegisteredAccounts",
+  "id": "me.subsco.admin.listServerMembers",
   "defs": {
     "main": {
       "type": "query",
@@ -16,10 +16,6 @@
           },
           "cursor": {
             "type": "string"
-          },
-          "q": {
-            "type": "string",
-            "description": "Filter accounts whose display name or handle contains this text."
           }
         }
       },
@@ -27,10 +23,13 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["registeredAccounts"],
+          "required": ["registeredAccounts", "total"],
           "properties": {
             "cursor": {
               "type": "string"
+            },
+            "total": {
+              "type": "integer"
             },
             "registeredAccounts": {
               "type": "array",
@@ -45,7 +44,7 @@
     },
     "registeredAccount": {
       "type": "object",
-      "required": ["profile", "isAdmin"],
+      "required": ["profile", "isAdmin", "registeredAt", "backfillStatus"],
       "properties": {
         "profile": {
           "type": "ref",
@@ -53,6 +52,14 @@
         },
         "isAdmin": {
           "type": "boolean"
+        },
+        "registeredAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "backfillStatus": {
+          "type": "string",
+          "knownValues": ["inProgress", "completed", "error"]
         }
       }
     }

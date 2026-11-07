@@ -1,14 +1,14 @@
 import type {
   GetBannedAccountsOutput,
   GetInviteCodesOutput,
-  ListRegisteredAccountsOutput,
+  ListServerMembersOutput,
 } from "@/app/server/application/dto/admin";
 
 export interface IAdminQuery {
-  listRegisteredAccounts: (
+  listServerMembers: (
     did: string,
     cursor?: string,
-  ) => Promise<ListRegisteredAccountsOutput>;
+  ) => Promise<ListServerMembersOutput>;
   getBannedAccounts: (
     did: string,
     cursor?: string,

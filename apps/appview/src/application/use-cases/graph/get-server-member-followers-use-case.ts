@@ -1,12 +1,12 @@
 import type { Did } from "@atproto/did";
-import type { $OutputBody } from "@repo/client/me/subsco/graph/getRegisteredFollowers";
+import type { $OutputBody } from "@repo/client/me/subsco/graph/getServerMemberFollowers";
 
 import type { IRegistrationQuery } from "../../interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
-export class GetRegisteredFollowersUseCase {
+export class GetServerMemberFollowersUseCase {
   constructor(
     private readonly registrationQuery: IRegistrationQuery,
     private readonly viewContextFactory: ViewContextFactory,

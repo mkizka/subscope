@@ -33,13 +33,13 @@ import type { DeleteInviteCode } from "./me/subsco/admin/deleteInviteCode.js";
 import type { GetBannedAccounts } from "./me/subsco/admin/getBannedAccounts.js";
 import type { GetInviteCodes } from "./me/subsco/admin/getInviteCodes.js";
 import type { GrantAdmin } from "./me/subsco/admin/grantAdmin.js";
-import type { ListRegisteredAccounts } from "./me/subsco/admin/listRegisteredAccounts.js";
+import type { ListServerMembers } from "./me/subsco/admin/listServerMembers.js";
 import type { RegisterAdmin } from "./me/subsco/admin/registerAdmin.js";
 import type { RevokeAdmin } from "./me/subsco/admin/revokeAdmin.js";
 import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
-import type { GetRegisteredFollowers } from "./me/subsco/graph/getRegisteredFollowers.js";
-import type { GetRegisteredAccounts } from "./me/subsco/server/getRegisteredAccounts.js";
+import type { GetServerMemberFollowers } from "./me/subsco/graph/getServerMemberFollowers.js";
+import type { GetServerMembers } from "./me/subsco/server/getServerMembers.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 import type { GetTrackedAccounts } from "./me/subsco/server/getTrackedAccounts.js";
 import type { GetBackfillStatuses } from "./me/subsco/sync/getBackfillStatuses.js";
@@ -75,16 +75,16 @@ export const lexRouterFactory = (
   revokeAdmin: RevokeAdmin,
   registerAdmin: RegisterAdmin,
   verifyAccess: VerifyAccess,
-  getRegisteredAccounts: GetRegisteredAccounts,
+  getServerMembers: GetServerMembers,
   getSetupStatus: GetSetupStatus,
   getTrackedAccounts: GetTrackedAccounts,
-  getRegisteredFollowers: GetRegisteredFollowers,
+  getServerMemberFollowers: GetServerMemberFollowers,
   getPreferences: GetPreferences,
   getProfile: GetProfile,
   getProfiles: GetProfiles,
   searchActors: SearchActors,
   searchActorsTypeahead: SearchActorsTypeahead,
-  listRegisteredAccounts: ListRegisteredAccounts,
+  listServerMembers: ListServerMembers,
   getBannedAccounts: GetBannedAccounts,
   getLikes: GetLikes,
   getRepostedBy: GetRepostedBy,
@@ -121,16 +121,16 @@ export const lexRouterFactory = (
     revokeAdmin,
     registerAdmin,
     verifyAccess,
-    getRegisteredAccounts,
+    getServerMembers,
     getSetupStatus,
     getTrackedAccounts,
-    getRegisteredFollowers,
+    getServerMemberFollowers,
     getPreferences,
     getProfile,
     getProfiles,
     searchActors,
     searchActorsTypeahead,
-    listRegisteredAccounts,
+    listServerMembers,
     getBannedAccounts,
     getLikes,
     getRepostedBy,

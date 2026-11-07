@@ -1,5 +1,5 @@
 import { Client } from "@atproto/lex";
-import getRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
+import getServerMembers from "@repo/client/me/subsco/server/getServerMembers";
 import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
 import getTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
 import getRegistrationStatus, {
@@ -37,7 +37,7 @@ export const subscopeQueryFactory = ({
     async findMembers(q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
       const { registeredAccounts, cursor } = await publicClient.call(
-        getRegisteredAccounts,
+        getServerMembers,
         {
           limit: 100,
           q,

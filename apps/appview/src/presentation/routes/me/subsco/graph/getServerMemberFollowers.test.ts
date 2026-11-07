@@ -1,5 +1,5 @@
 import { asAtIdentifierString } from "@atproto/syntax";
-import getRegisteredFollowers from "@repo/client/me/subsco/graph/getRegisteredFollowers";
+import getServerMemberFollowers from "@repo/client/me/subsco/graph/getServerMemberFollowers";
 import {
   accountFactory,
   followFactory,
@@ -10,7 +10,7 @@ import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
-describe("me.subsco.graph.getRegisteredFollowers", () => {
+describe("me.subsco.graph.getServerMemberFollowers", () => {
   const { ctx } = testSetup;
 
   const createAccount = () => accountFactory(ctx.db).create();
@@ -34,7 +34,7 @@ describe("me.subsco.graph.getRegisteredFollowers", () => {
       .props(date ? { createdAt: () => date, indexedAt: () => date } : {})
       .create();
 
-  test("getRegisteredFollowers-1: 指定したアカウントをフォローしているメンバーだけをfollowersにprofileViewで返す", async () => {
+  test("getServerMemberFollowers-1: 指定したアカウントをフォローしているメンバーだけをfollowersにprofileViewで返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
@@ -44,7 +44,7 @@ describe("me.subsco.graph.getRegisteredFollowers", () => {
     await follow(unregisteredFollower, account);
 
     // act
-    const res = await client.call(getRegisteredFollowers, {
+    const res = await client.call(getServerMemberFollowers, {
       actor: asAtIdentifierString(account.did),
     });
 
@@ -52,7 +52,7 @@ describe("me.subsco.graph.getRegisteredFollowers", () => {
     expect(res.followers.map((a) => a.did)).toEqual([registeredFollower.did]);
   });
 
-  test("getRegisteredFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
+  test("getServerMemberFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
@@ -64,11 +64,11 @@ describe("me.subsco.graph.getRegisteredFollowers", () => {
     await follow(newFollower, account, new Date("2024-01-03"));
 
     // act
-    const firstPage = await client.call(getRegisteredFollowers, {
+    const firstPage = await client.call(getServerMemberFollowers, {
       actor: asAtIdentifierString(account.did),
       limit: 2,
     });
-    const secondPage = await client.call(getRegisteredFollowers, {
+    const secondPage = await client.call(getServerMemberFollowers, {
       actor: asAtIdentifierString(account.did),
       limit: 2,
       cursor: firstPage.cursor,
@@ -82,7 +82,7 @@ describe("me.subsco.graph.getRegisteredFollowers", () => {
     expect(secondPage.followers.map((a) => a.did)).toEqual([oldFollower.did]);
   });
 
-  test("getRegisteredFollowers-3: totalにはページングに関係なくメンバーのフォロワーの総数を入れる", async () => {
+  test("getServerMemberFollowers-3: totalにはページングに関係なくメンバーのフォロワーの総数を入れる", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
@@ -91,7 +91,7 @@ describe("me.subsco.graph.getRegisteredFollowers", () => {
     await follow(await createAccount(), account);
 
     // act
-    const res = await client.call(getRegisteredFollowers, {
+    const res = await client.call(getServerMemberFollowers, {
       actor: asAtIdentifierString(account.did),
       limit: 1,
     });

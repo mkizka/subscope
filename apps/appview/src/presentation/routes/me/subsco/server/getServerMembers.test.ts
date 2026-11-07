@@ -1,13 +1,13 @@
-import getRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
+import getServerMembers from "@repo/client/me/subsco/server/getServerMembers";
 import { accountFactory, testSetup } from "@repo/test-utils";
 import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
-describe("me.subsco.server.getRegisteredAccounts", () => {
+describe("me.subsco.server.getServerMembers", () => {
   const { ctx } = testSetup;
 
-  test("getRegisteredAccounts-1: メンバーごとにprofileViewを返す", async () => {
+  test("getServerMembers-1: メンバーごとにprofileViewを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -16,7 +16,7 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
     await accountFactory(ctx.db).create();
 
     // act
-    const res = await client.call(getRegisteredAccounts);
+    const res = await client.call(getServerMembers);
 
     // assert
     expect(res.registeredAccounts).toMatchObject([
@@ -29,7 +29,7 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
     ]);
   });
 
-  test("getRegisteredAccounts-2: メンバーごとに管理者かどうかを返す", async () => {
+  test("getServerMembers-2: メンバーごとに管理者かどうかを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -41,7 +41,7 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
       .create();
 
     // act
-    const res = await client.call(getRegisteredAccounts);
+    const res = await client.call(getServerMembers);
 
     // assert
     expect(res.registeredAccounts).toEqual(
@@ -58,7 +58,7 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
     );
   });
 
-  test("getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す", async () => {
+  test("getServerMembers-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const byName = await accountFactory(ctx.db)
@@ -75,7 +75,7 @@ describe("me.subsco.server.getRegisteredAccounts", () => {
       .create();
 
     // act
-    const res = await client.call(getRegisteredAccounts, { q: "NEEDLE" });
+    const res = await client.call(getServerMembers, { q: "NEEDLE" });
 
     // assert
     expect(res.registeredAccounts.map((a) => a.profile.did).sort()).toEqual(

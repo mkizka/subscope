@@ -276,21 +276,21 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getLists-1: 指定したアカウントが作成したリストをlistViewで返す
 - getLists-2: purposesを指定すると、その用途のリストだけを返す
 
-## me.subsco.graph.getRegisteredFollowers
+## me.subsco.graph.getServerMemberFollowers
 
 指定したアカウントをフォローしているメンバーをprofileViewで返す。認証は不要。limitとcursorでページングする。
 
-- getRegisteredFollowers-1: 指定したアカウントをフォローしているメンバーだけをfollowersにprofileViewで返す
-- getRegisteredFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
-- getRegisteredFollowers-3: totalにはページングに関係なくメンバーのフォロワーの総数を入れる
+- getServerMemberFollowers-1: 指定したアカウントをフォローしているメンバーだけをfollowersにprofileViewで返す
+- getServerMemberFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
+- getServerMemberFollowers-3: totalにはページングに関係なくメンバーのフォロワーの総数を入れる
 
-## me.subsco.server.getRegisteredAccounts
+## me.subsco.server.getServerMembers
 
 メンバーのプロフィールを返す。メンバーの一覧は公開情報とし、認証は不要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）アカウントだけを返す。
 
-- getRegisteredAccounts-1: メンバーごとにprofileViewを返す
-- getRegisteredAccounts-2: メンバーごとに管理者かどうかを返す
-- getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す
+- getServerMembers-1: メンバーごとにprofileViewを返す
+- getServerMembers-2: メンバーごとに管理者かどうかを返す
+- getServerMembers-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す
 
 ## me.subsco.server.getSetupStatus
 
@@ -361,18 +361,18 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - registerAdmin-4: 閲覧者のプロフィールのfetchRecordジョブを積む
 - registerAdmin-5: 閲覧者のハンドルが未取得ならresolveDidジョブを積む
 
-## me.subsco.admin.listRegisteredAccounts
+## me.subsco.admin.listServerMembers
 
 メンバーのプロフィール、管理者かどうか、登録日時、同期状態と、メンバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
 
-- listRegisteredAccounts-1: 認証がないリクエストには401を返す
-- listRegisteredAccounts-2: 管理者でないアカウントからのリクエストには403を返す
-- listRegisteredAccounts-3: メンバーごとにprofileViewと管理者かどうかを返す
-- listRegisteredAccounts-4: テイクダウンされたメンバーも含める
-- listRegisteredAccounts-5: メンバーごとに登録日時をregisteredAtとして返す
-- listRegisteredAccounts-6: ページングに関係なくメンバーの総数をtotalとして返す
-- listRegisteredAccounts-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す
-- listRegisteredAccounts-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
+- listServerMembers-1: 認証がないリクエストには401を返す
+- listServerMembers-2: 管理者でないアカウントからのリクエストには403を返す
+- listServerMembers-3: メンバーごとにprofileViewと管理者かどうかを返す
+- listServerMembers-4: テイクダウンされたメンバーも含める
+- listServerMembers-5: メンバーごとに登録日時をregisteredAtとして返す
+- listServerMembers-6: ページングに関係なくメンバーの総数をtotalとして返す
+- listServerMembers-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す
+- listServerMembers-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
 
 バックフィルの状態はworkerがaccountsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
 

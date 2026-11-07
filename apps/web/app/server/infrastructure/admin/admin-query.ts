@@ -1,6 +1,6 @@
 import getBannedAccounts from "@repo/client/me/subsco/admin/getBannedAccounts";
 import getInviteCodes from "@repo/client/me/subsco/admin/getInviteCodes";
-import listRegisteredAccounts from "@repo/client/me/subsco/admin/listRegisteredAccounts";
+import listServerMembers from "@repo/client/me/subsco/admin/listServerMembers";
 
 import type { IAdminQuery } from "@/app/server/application/interfaces/admin-query";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
@@ -19,9 +19,9 @@ export const adminQueryFactory = ({
   };
 
   return {
-    async listRegisteredAccounts(did, cursor) {
+    async listServerMembers(did, cursor) {
       const agent = await restore(did);
-      return agent.call(listRegisteredAccounts, { limit: 20, cursor });
+      return agent.call(listServerMembers, { limit: 20, cursor });
     },
     async getBannedAccounts(did, cursor) {
       const agent = await restore(did);

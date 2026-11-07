@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "me.subsco.graph.getRegisteredFollowers",
+  "id": "me.subsco.graph.getServerMemberFollowers",
   "defs": {
     "main": {
       "type": "query",
