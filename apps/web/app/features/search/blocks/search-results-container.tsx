@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
+import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.search";
 
@@ -24,7 +25,7 @@ export function SearchResultsContainer({ q, tab }: Props) {
   });
 
   if (!data) {
-    return <PostsSkeleton />;
+    return tab === "accounts" ? <AccountsSkeleton /> : <PostsSkeleton />;
   }
   return (
     <SearchResults tab={tab} accounts={data.accounts} posts={data.posts} />

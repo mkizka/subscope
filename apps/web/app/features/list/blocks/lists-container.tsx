@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { RowsSkeleton } from "@/app/components/rows-skeleton";
+import { ListsSkeleton } from "@/app/components/rows-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.lists.$handle";
 
@@ -16,7 +16,7 @@ export function ListsContainer({ handle }: { handle: string }) {
   });
 
   if (!data) {
-    return <RowsSkeleton />;
+    return <ListsSkeleton />;
   }
   return <ListLinks handle={handle} lists={data.lists} />;
 }
