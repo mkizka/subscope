@@ -43,8 +43,9 @@ test.describe("検索", () => {
     await page.getByRole("link", { name: "検索", exact: true }).click();
     await expect(page).toHaveURL("/search");
 
-    await page.getByRole("searchbox", { name: "検索語" }).fill("lic");
-    await page.getByRole("button", { name: "検索" }).click();
+    const main = page.getByRole("main");
+    await main.getByRole("searchbox", { name: "検索語" }).fill("lic");
+    await main.getByRole("button", { name: "検索" }).click();
 
     await expect(page).toHaveURL("/search?q=lic");
     const alice = page

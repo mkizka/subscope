@@ -1,11 +1,11 @@
 import { createRegistry } from "@gyaku/di";
 
 import { getFollowListUseCaseFactory } from "./application/accounts/get-follow-list-use-case";
+import { getFollowedAccountsUseCaseFactory } from "./application/accounts/get-followed-accounts-use-case";
 import { getMeUseCaseFactory } from "./application/accounts/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/accounts/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/accounts/get-profile-use-case";
 import { getServerMembersUseCaseFactory } from "./application/accounts/get-server-members-use-case";
-import { getTrackedAccountsUseCaseFactory } from "./application/accounts/get-tracked-accounts-use-case";
 import { banAccountUseCaseFactory } from "./application/admin/ban-account-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
@@ -94,9 +94,9 @@ export const di = await createRegistry()
     getServerMembersUseCaseFactory,
   )
   .service(
-    "getTrackedAccountsUseCase",
+    "getFollowedAccountsUseCase",
     ["subscopeQuery", "backfillQuery"],
-    getTrackedAccountsUseCaseFactory,
+    getFollowedAccountsUseCaseFactory,
   )
   .service(
     "getBackfillStatusUseCase",

@@ -39,9 +39,9 @@ import type { RevokeAdmin } from "./me/subsco/admin/revokeAdmin.js";
 import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetServerMemberFollowers } from "./me/subsco/graph/getServerMemberFollowers.js";
+import type { GetFollowedAccounts } from "./me/subsco/server/getFollowedAccounts.js";
 import type { GetServerMembers } from "./me/subsco/server/getServerMembers.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
-import type { GetTrackedAccounts } from "./me/subsco/server/getTrackedAccounts.js";
 import type { GetBackfillStatuses } from "./me/subsco/sync/getBackfillStatuses.js";
 import type { GetRegistrationStatus } from "./me/subsco/sync/getRegistrationStatus.js";
 import type { RegisterAccount } from "./me/subsco/sync/registerAccount.js";
@@ -77,7 +77,7 @@ export const lexRouterFactory = (
   verifyAccess: VerifyAccess,
   getServerMembers: GetServerMembers,
   getSetupStatus: GetSetupStatus,
-  getTrackedAccounts: GetTrackedAccounts,
+  getFollowedAccounts: GetFollowedAccounts,
   getServerMemberFollowers: GetServerMemberFollowers,
   getPreferences: GetPreferences,
   getProfile: GetProfile,
@@ -123,7 +123,7 @@ export const lexRouterFactory = (
     verifyAccess,
     getServerMembers,
     getSetupStatus,
-    getTrackedAccounts,
+    getFollowedAccounts,
     getServerMemberFollowers,
     getPreferences,
     getProfile,

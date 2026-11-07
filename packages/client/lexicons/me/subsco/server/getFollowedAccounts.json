@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "me.subsco.server.getTrackedAccounts",
+  "id": "me.subsco.server.getFollowedAccounts",
   "defs": {
     "main": {
       "type": "query",
-      "description": "Get tracked accounts ordered by the number of registered accounts following them.",
+      "description": "Get accounts followed by at least one member, ordered by the number of members following them.",
       "parameters": {
         "type": "params",
         "properties": {
@@ -27,7 +27,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["trackedAccounts", "total"],
+          "required": ["followedAccounts", "total"],
           "properties": {
             "cursor": {
               "type": "string"
@@ -35,18 +35,18 @@
             "total": {
               "type": "integer"
             },
-            "trackedAccounts": {
+            "followedAccounts": {
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#trackedAccount"
+                "ref": "#followedAccount"
               }
             }
           }
         }
       }
     },
-    "trackedAccount": {
+    "followedAccount": {
       "type": "object",
       "required": ["profile", "registeredFollowersCount"],
       "properties": {

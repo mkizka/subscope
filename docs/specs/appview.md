@@ -299,14 +299,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getSetupStatus-1: 管理者が未登録ならinitializedをfalseにする
 - getSetupStatus-2: 管理者が登録済みならinitializedをtrueにする
 
-## me.subsco.server.getTrackedAccounts
+## me.subsco.server.getFollowedAccounts
 
-追跡アカウントのprofileViewと、その追跡アカウントをフォローしているメンバーの数、追跡アカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）追跡アカウントだけを返す。
+フォローされているアカウント（メンバーの1人以上にフォローされているアカウント。メンバーも含む）のprofileViewと、そのアカウントをフォローしているメンバーの数、フォローされているアカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）フォローされているアカウントだけを返す。
 
-- getTrackedAccounts-1: メンバーとそのフォロー先を返し、それ以外のアカウントは含めない
-- getTrackedAccounts-2: フォローしているメンバーが多い順に並べる
-- getTrackedAccounts-3: totalにはページングに関係なく追跡アカウントの総数を入れる
-- getTrackedAccounts-4: qを指定すると、表示名またはハンドルにqを含む追跡アカウントだけを返す。totalはqに関係なく総数のままにする
+- getFollowedAccounts-1: メンバーの1人以上にフォローされているアカウントを返し、それ以外のアカウントは含めない
+- getFollowedAccounts-2: フォローしているメンバーが多い順に並べる
+- getFollowedAccounts-3: totalにはページングに関係なくフォローされているアカウントの総数を入れる
+- getFollowedAccounts-4: qを指定すると、表示名またはハンドルにqを含むフォローされているアカウントだけを返す。totalはqに関係なく総数のままにする
 
 ## me.subsco.sync.registerAccount
 
