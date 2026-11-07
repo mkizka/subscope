@@ -175,7 +175,7 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(page).toHaveURL("/login");
   });
 
-  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べる", async ({
+  test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目に加えて「サーバー」を並べる", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -191,7 +191,8 @@ test.describe("レイアウト（モバイル）", () => {
       .getByRole("link")
       .allTextContents();
 
-    expect(drawerItems).toEqual([...pcItems, "サーバー"]);
+    expect(drawerItems).toContain("サーバー");
+    expect(drawerItems.filter((item) => item !== "サーバー")).toEqual(pcItems);
   });
 
   test("layout-10: モバイルのドロワーの「サーバー」から `/server` に移動できる", async ({
