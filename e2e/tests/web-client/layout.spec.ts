@@ -179,6 +179,7 @@ test.describe("レイアウト（モバイル）", () => {
     page,
   }) => {
     await page.goto("/server");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
     await page.evaluate(() => {
       document.body
         .querySelector("main")
