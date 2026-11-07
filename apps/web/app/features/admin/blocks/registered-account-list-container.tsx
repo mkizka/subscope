@@ -49,7 +49,7 @@ async function fetchRegisteredAccounts(cursor?: string): Promise<$OutputBody> {
     `/admin/api/registered-accounts?${params.toString()}`,
   );
   if (!response.ok) {
-    throw new Error("登録アカウントの取得に失敗しました");
+    throw new Error("メンバーの取得に失敗しました");
   }
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return response.json() as Promise<$OutputBody>;
@@ -62,7 +62,7 @@ async function updateRegisteredAccount(method: "POST" | "DELETE", did: string) {
     body: JSON.stringify({ did }),
   });
   if (!response.ok) {
-    throw new Error("登録アカウントの更新に失敗しました");
+    throw new Error("メンバーの更新に失敗しました");
   }
 }
 

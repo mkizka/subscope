@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.server.getServerMembers", () => {
   const { ctx } = testSetup;
 
-  test("getServerMembers-1: 登録アカウントごとにprofileViewを返す", async () => {
+  test("getServerMembers-1: メンバーごとにprofileViewを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -29,7 +29,7 @@ describe("me.subsco.server.getServerMembers", () => {
     ]);
   });
 
-  test("getServerMembers-2: 登録アカウントごとに管理者かどうかを返す", async () => {
+  test("getServerMembers-2: メンバーごとに管理者かどうかを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -58,7 +58,7 @@ describe("me.subsco.server.getServerMembers", () => {
     );
   });
 
-  test("getServerMembers-3: qを指定すると、表示名またはハンドルにqを含む登録アカウントだけを返す", async () => {
+  test("getServerMembers-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const byName = await accountFactory(ctx.db)

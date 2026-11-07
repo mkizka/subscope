@@ -38,7 +38,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     await expect(promise).rejects.toMatchObject({ status: 403 });
   });
 
-  test("listServerMembers-3: 登録アカウントごとにprofileViewと管理者かどうかを返す", async () => {
+  test("listServerMembers-3: メンバーごとにprofileViewと管理者かどうかを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -58,7 +58,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     ]);
   });
 
-  test("listServerMembers-4: テイクダウンされた登録アカウントも含める", async () => {
+  test("listServerMembers-4: テイクダウンされたメンバーも含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -81,7 +81,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     ]);
   });
 
-  test("listServerMembers-5: 登録アカウントごとに登録日時をregisteredAtとして返す", async () => {
+  test("listServerMembers-5: メンバーごとに登録日時をregisteredAtとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -106,7 +106,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     ]);
   });
 
-  test("listServerMembers-6: ページングに関係なく登録アカウントの総数をtotalとして返す", async () => {
+  test("listServerMembers-6: ページングに関係なくメンバーの総数をtotalとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -153,7 +153,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     return client;
   };
 
-  test("listServerMembers-7: フォロー先の状態にかかわらず、登録アカウント本人のバックフィルの状態をbackfillStatusとして返す", async () => {
+  test("listServerMembers-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す", async () => {
     // arrange
     const client = await setupBackfill("completed", "error");
 
@@ -166,7 +166,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     ]);
   });
 
-  test("listServerMembers-8: 登録アカウント本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする", async () => {
+  test("listServerMembers-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする", async () => {
     // arrange
     const client = await setupBackfill(null, "completed");
 

@@ -83,8 +83,8 @@ test.describe("ジョブキュー", () => {
   });
 });
 
-test.describe("登録アカウント", () => {
-  test("admin-accounts-1: 登録アカウントを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
+test.describe("メンバー", () => {
+  test("admin-accounts-1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -100,7 +100,7 @@ test.describe("登録アカウント", () => {
     await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
   });
 
-  test("admin-accounts-4: 見出しの横に登録アカウントの人数を出す", async ({
+  test("admin-accounts-4: 見出しの横にメンバーの人数を出す", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
@@ -108,7 +108,7 @@ test.describe("登録アカウント", () => {
     await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
   });
 
-  test("admin-accounts-3: 管理者でない登録アカウントを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
+  test("admin-accounts-3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -135,7 +135,7 @@ test.describe("登録アカウント", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("admin-accounts-2: 管理者でない登録アカウントを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("admin-accounts-2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -179,7 +179,7 @@ test.describe("登録アカウント", () => {
     return did;
   };
 
-  test("admin-accounts-5: 「登録アカウント」「停止中」のタブで一覧を切り替える", async ({
+  test("admin-accounts-5: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
     page,
   }) => {
     await page.goto("/");
@@ -194,7 +194,7 @@ test.describe("登録アカウント", () => {
     );
     await expect(page.getByTitle(aliceDid)).toHaveCount(0);
 
-    await page.getByRole("tab", { name: "登録アカウント" }).click();
+    await page.getByRole("tab", { name: "メンバー" }).click();
 
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
@@ -212,7 +212,7 @@ test.describe("登録アカウント", () => {
     );
   });
 
-  test("admin-accounts-9: 「登録アカウント」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
+  test("admin-accounts-9: 「メンバー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
     page,
   }) => {
     await page.goto("/");

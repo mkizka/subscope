@@ -107,7 +107,7 @@ export function RegisteredAccountList({
           tabs={[
             {
               to: "/admin/registered-accounts",
-              label: "登録アカウント",
+              label: "メンバー",
               selected: tab === "registeredAccounts",
             },
             {
@@ -122,7 +122,7 @@ export function RegisteredAccountList({
         <p className="py-8 text-center text-label text-muted">
           {tab === "banned"
             ? "停止中のアカウントはありません"
-            : "登録アカウントはまだありません"}
+            : "メンバーはまだありません"}
         </p>
       )}
       {isLoading && (
