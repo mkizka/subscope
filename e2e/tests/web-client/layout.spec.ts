@@ -48,23 +48,24 @@ test.describe("レイアウト", () => {
     }).toPass();
   });
 
-  test("layout-5: 右カラムに、サーバー名と「登録 N ・ 追跡 N」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
+  test("layout-5: 右カラムに、見出し「サーバーについて」と「Subscopeは誰かがフォローしている人の投稿だけが流れる登録制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
     const card = page
-      .getByRole("complementary", { name: "サーバー" })
-      .getByRole("link");
-    await expect(card).toContainText("Subscope");
-    await expect(card).toContainText(/登録 \d+\+? ・ 追跡 \d+/);
+      .getByRole("complementary")
+      .getByRole("link", { name: /サーバーについて/ });
+    await expect(card).toContainText(
+      "Subscopeは誰かがフォローしている人の投稿だけが流れる登録制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。",
+    );
     await card.click();
 
     await expect(page).toHaveURL("/server");
   });
 
-  test("layout-9: `/server` では、同じ内容の重複を避けるため右カラムのサーバーカードを表示しない", async ({
+  test("layout-9: `/server` では、同じ内容の重複を避けるため右カラムのカードを表示せず、中央カラムの位置は他のページと変えない", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -76,23 +77,38 @@ test.describe("レイアウト", () => {
       page.getByRole("main").getByRole("heading", { name: "Subscope" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("complementary", { name: "サーバー" }),
+      page.getByRole("link", { name: /サーバーについて/ }),
     ).toHaveCount(0);
     expect((await page.getByRole("main").boundingBox())?.x).toBe(home?.x);
   });
 
-  test("layout-10: 左カラムのメニューの「サーバー」から `/server` に移動できる", async ({
+  test("layout-11: 右カラムの検索ボックスで検索語を入力してEnterを押すと、`/search?q=検索語` に移動する", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
     await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "サーバー" })
-      .click();
+      .getByRole("complementary")
+      .getByRole("searchbox", { name: "検索語" })
+      .fill("alice");
+    await page.keyboard.press("Enter");
 
-    await expect(page).toHaveURL("/server");
+    await expect(page).toHaveURL("/search?q=alice");
+  });
+
+  test("layout-12: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/search");
+
+    await expect(page.getByRole("searchbox", { name: "検索語" })).toHaveCount(
+      1,
+    );
+    await expect(
+      page.getByRole("complementary").getByRole("searchbox"),
+    ).toHaveCount(0);
   });
 
   test("layout-4: ページの読み込み中は、画面上部に読み込み中のプログレスバーを表示する", async ({
@@ -175,6 +191,20 @@ test.describe("レイアウト（モバイル）", () => {
       .getByRole("link")
       .allTextContents();
 
-    expect(drawerItems).toEqual(pcItems);
+    expect(drawerItems).toEqual([...pcItems, "サーバー"]);
+  });
+
+  test("layout-10: モバイルのドロワーの「サーバー」から `/server` に移動できる", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await page.getByRole("button", { name: "メニューを開く" }).click();
+    await page
+      .getByRole("dialog", { name: "メニュー" })
+      .getByRole("link", { name: "サーバー" })
+      .click();
+
+    await expect(page).toHaveURL("/server");
   });
 });

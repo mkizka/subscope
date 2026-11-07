@@ -1,28 +1,22 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Link } from "react-router";
 
-type Props = {
-  registeredCount?: string;
-  trackedCount?: number;
-};
-
-export function ServerCard({ registeredCount, trackedCount }: Props) {
+export function ServerCard() {
   return (
     <Link
       to="/server"
       className="
-        flex items-center gap-3 rounded-2xl border border-line bg-surface-2 p-3
+        block rounded-2xl border border-line bg-surface-2 p-4
         hover:opacity-90
       "
     >
-      <img src="/favicon.svg" alt="" className="size-9" />
-      <div className="min-w-0 flex-1">
-        <div className="text-heading">Subscope</div>
-        <div className="text-caption text-muted">
-          登録 {registeredCount ?? "-"} ・ 追跡 {trackedCount ?? "-"}
-        </div>
+      <div className="flex items-center justify-between">
+        <span className="text-heading">サーバーについて</span>
+        <ChevronRightIcon className="size-4 text-muted" aria-hidden />
       </div>
-      <ChevronRightIcon className="size-4 text-muted" aria-hidden />
+      <p className="mt-2 text-label text-muted">
+        Subscopeは誰かがフォローしている人の投稿だけが流れる登録制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。
+      </p>
     </Link>
   );
 }

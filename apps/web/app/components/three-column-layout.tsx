@@ -4,15 +4,21 @@ import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tab
 import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { SplashContainer } from "@/app/features/navigation/blocks/splash-container";
-import { ServerCardContainer } from "@/app/features/server/blocks/server-card-container";
+import { SidebarSearch } from "@/app/features/search/parts/sidebar-search";
+import { ServerCard } from "@/app/features/server/parts/server-card";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
   children: ReactNode;
   hideServerCard?: boolean;
+  hideSearch?: boolean;
 };
 
-export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
+export const ThreeColumnLayout = ({
+  children,
+  hideServerCard,
+  hideSearch,
+}: Props) => {
   return (
     <div className="flex min-h-screen justify-center bg-surface text-ink">
       <SplashContainer />
@@ -43,14 +49,13 @@ export const ThreeColumnLayout = ({ children, hideServerCard }: Props) => {
         <BottomTabsContainer />
       </main>
       <aside
-        aria-label={hideServerCard ? undefined : "サーバー"}
         className="
-          hidden border-line p-4
-          lg:sticky lg:top-0 lg:block lg:h-screen lg:w-80 lg:shrink-0
-          lg:border-l
+          hidden flex-col gap-4 border-line p-4
+          lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-80 lg:shrink-0 lg:border-l
         "
       >
-        {!hideServerCard && <ServerCardContainer />}
+        {!hideSearch && <SidebarSearch />}
+        {!hideServerCard && <ServerCard />}
       </aside>
     </div>
   );
