@@ -15,7 +15,7 @@ export function ServerCard() {
         <ChevronRightIcon className="size-4 text-muted" aria-hidden />
       </div>
       <p className="mt-2 text-label text-muted">
-        Subscopeは誰かがフォローしている人の投稿だけが流れる登録制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。
+        Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。
       </p>
     </Link>
   );

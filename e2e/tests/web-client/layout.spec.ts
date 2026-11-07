@@ -48,7 +48,7 @@ test.describe("レイアウト", () => {
     }).toPass();
   });
 
-  test("layout-5: 右カラムに、見出し「サーバーについて」と「Subscopeは誰かがフォローしている人の投稿だけが流れる登録制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
+  test("layout-5: 右カラムに、見出し「サーバーについて」と「Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -58,7 +58,7 @@ test.describe("レイアウト", () => {
       .getByRole("complementary")
       .getByRole("link", { name: /サーバーについて/ });
     await expect(card).toContainText(
-      "Subscopeは誰かがフォローしている人の投稿だけが流れる登録制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。",
+      "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。",
     );
     await card.click();
 
