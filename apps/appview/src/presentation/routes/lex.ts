@@ -40,6 +40,7 @@ import type { UnbanAccount } from "./me/subsco/admin/unbanAccount.js";
 import type { VerifyAccess } from "./me/subsco/admin/verifyAccess.js";
 import type { GetServerMemberFollowers } from "./me/subsco/graph/getServerMemberFollowers.js";
 import type { GetFollowedAccounts } from "./me/subsco/server/getFollowedAccounts.js";
+import type { GetOperator } from "./me/subsco/server/getOperator.js";
 import type { GetServerMembers } from "./me/subsco/server/getServerMembers.js";
 import type { GetSetupStatus } from "./me/subsco/server/getSetupStatus.js";
 import type { GetBackfillStatuses } from "./me/subsco/sync/getBackfillStatuses.js";
@@ -77,6 +78,7 @@ export const lexRouterFactory = (
   verifyAccess: VerifyAccess,
   getServerMembers: GetServerMembers,
   getSetupStatus: GetSetupStatus,
+  getOperator: GetOperator,
   getFollowedAccounts: GetFollowedAccounts,
   getServerMemberFollowers: GetServerMemberFollowers,
   getPreferences: GetPreferences,
@@ -123,6 +125,7 @@ export const lexRouterFactory = (
     verifyAccess,
     getServerMembers,
     getSetupStatus,
+    getOperator,
     getFollowedAccounts,
     getServerMemberFollowers,
     getPreferences,

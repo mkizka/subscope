@@ -1,5 +1,6 @@
 import { Client } from "@atproto/lex";
 import getFollowedAccounts from "@repo/client/me/subsco/server/getFollowedAccounts";
+import getOperator from "@repo/client/me/subsco/server/getOperator";
 import getServerMembers from "@repo/client/me/subsco/server/getServerMembers";
 import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
 import getRegistrationStatus, {
@@ -33,6 +34,17 @@ export const subscopeQueryFactory = ({
     async isRegistered(did) {
       const response = await (await restore(did)).call(getRegistrationStatus);
       return registered.isTypeOf(response);
+    },
+    async findOperator() {
+      const { operator } = await publicClient.call(getOperator);
+      return (
+        operator && {
+          did: operator.did,
+          handle: operator.handle,
+          displayName: operator.displayName,
+          avatarUrl: operator.avatar,
+        }
+      );
     },
     async findMembers(q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
