@@ -383,7 +383,7 @@ test.describe("プロフィール", () => {
     }).toPass();
   });
 
-  test("profile-14: プロフィールを開くと、読み込みを待たずにハンドルとタブを表示し、表示名・自己紹介・フォロー数・フォロワー数・投稿の場所には読み込み終えるまで灰色の骨組み（スケルトン）を表示する", async ({
+  test("profile-14: プロフィールを開くと、読み込みを待たずに画面を表示し、読み込み終えるまでバナー・アイコン・名前・自己紹介2行と投稿の場所のスケルトンを表示する。ハンドル・タブ・フォロー数は読み込み後に表示する", async ({
     page,
   }) => {
     await putRecord("alice.test", "app.bsky.actor.profile", "self", {
@@ -399,17 +399,17 @@ test.describe("プロフィール", () => {
     await page.getByRole("link", { name: "プロフィール" }).click();
 
     const main = page.getByRole("main");
-    const skeleton = main.getByRole("status", {
+    const skeletons = main.getByRole("status", {
       name: "読み込み中",
       exact: true,
     });
-    await expect(skeleton).toBeVisible();
-    await expect(main.getByText(/^@/).first()).toBeVisible();
-    await expect(main.getByRole("tab", { name: "投稿" })).toBeVisible();
-    await expect(main.getByRole("heading", { level: 1 })).not.toHaveText(/\S/);
+    await expect(skeletons).toHaveCount(2);
+    await expect(main.getByText(/^@/)).toBeHidden();
+    await expect(main.getByRole("tab", { name: "投稿" })).toBeHidden();
     await expect(main.getByText(/^\d+ フォロー$/)).toBeHidden();
     release(undefined);
-    await expect(skeleton).toBeHidden();
+    await expect(skeletons).toHaveCount(0);
+    await expect(main.getByRole("tab", { name: "投稿" })).toBeVisible();
     await expect(main.getByRole("heading", { name: "Alice" })).toBeVisible();
     await expect(main.getByText(/^\d+ フォロー$/)).toBeVisible();
   });

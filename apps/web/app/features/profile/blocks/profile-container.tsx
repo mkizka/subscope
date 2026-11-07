@@ -65,23 +65,25 @@ export function ProfileContainer({ handle }: Props) {
           )
         }
       />
-      <Tabs
-        tabs={[
-          ...tabs.map((value) => ({
-            to: value === "posts" ? `/${handle}` : `/${handle}?tab=${value}`,
-            label: tabLabels[value],
-            selected:
-              !listsTab &&
-              ((isPlaceholderData ? undefined : data?.tab) ??
-                (tabParam || "posts")) === value,
-          })),
-          {
-            to: `/${handle}/lists`,
-            label: "リスト",
-            selected: !!listsTab,
-          },
-        ]}
-      />
+      {data && (
+        <Tabs
+          tabs={[
+            ...tabs.map((value) => ({
+              to: value === "posts" ? `/${handle}` : `/${handle}?tab=${value}`,
+              label: tabLabels[value],
+              selected:
+                !listsTab &&
+                ((isPlaceholderData ? undefined : data.tab) ??
+                  (tabParam || "posts")) === value,
+            })),
+            {
+              to: `/${handle}/lists`,
+              label: "リスト",
+              selected: !!listsTab,
+            },
+          ]}
+        />
+      )}
       {listsTab ??
         (data && !isPlaceholderData ? (
           // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ

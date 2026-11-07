@@ -11,10 +11,14 @@ const rows: { body: string[]; media?: Media }[] = [
   { body: ["w-1/2"], media: "image" },
 ];
 
-export function PostsSkeleton() {
+type Props = {
+  count?: number;
+};
+
+export function PostsSkeleton({ count }: Props) {
   return (
     <div role="status" aria-label="読み込み中">
-      {rows.map(({ body, media }) => (
+      {rows.slice(0, count).map(({ body, media }) => (
         <div
           key={`${body.join()}${media}`}
           className="flex gap-3 border-b border-line px-4 py-3"

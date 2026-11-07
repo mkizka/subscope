@@ -40,6 +40,25 @@ export function ProfileHeader({
   action,
 }: Props) {
   const [viewing, setViewing] = useState<string>();
+  if (loading) {
+    return (
+      <section
+        role="status"
+        aria-label="読み込み中"
+        className="border-b border-line"
+      >
+        <div className="h-32 skeleton" />
+        <div className="flex flex-col gap-2 px-4 pb-4">
+          <Skeleton className="-mt-10 size-20 border-4 border-surface" />
+          <Skeleton className="h-5 w-40" />
+          <div className="flex flex-col gap-2 py-1">
+            <Skeleton className="h-3.5 w-full" />
+            <Skeleton className="h-3.5 w-2/3" />
+          </div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="border-b border-line">
       {bannerUrl ? (
@@ -71,25 +90,13 @@ export function ProfileHeader({
           {action}
         </div>
         <div className="min-w-0">
-          <h1 className="truncate text-title">
-            {loading ? (
-              <Skeleton className="h-5 w-40 align-middle" />
-            ) : (
-              displayName || handle
-            )}
-          </h1>
+          <h1 className="truncate text-title">{displayName || handle}</h1>
           <div className="flex items-center gap-2">
             <p className="truncate text-label text-muted">@{handle}</p>
             {followedBy && <Badge>フォローされています</Badge>}
             {backfillStatus && <BackfillStatusBadge status={backfillStatus} />}
           </div>
         </div>
-        {loading && (
-          <div className="flex flex-col gap-2 py-1">
-            <Skeleton className="h-3.5 w-full" />
-            <Skeleton className="h-3.5 w-2/3" />
-          </div>
-        )}
         {description && (
           <p className="text-body wrap-break-word whitespace-pre-wrap">
             {description}
@@ -124,20 +131,10 @@ export function ProfileHeader({
         )}
         <div className="flex gap-4 text-label text-muted">
           <Link to={`/${handle}/follows`} className="hover:underline">
-            {loading ? (
-              <Skeleton className="h-3.5 w-7 align-middle" />
-            ) : (
-              <b className="text-ink">{followsCount}</b>
-            )}{" "}
-            フォロー
+            <b className="text-ink">{followsCount}</b> フォロー
           </Link>
           <Link to={`/${handle}/followers`} className="hover:underline">
-            {loading ? (
-              <Skeleton className="h-3.5 w-7 align-middle" />
-            ) : (
-              <b className="text-ink">{followersCount}</b>
-            )}{" "}
-            フォロワー
+            <b className="text-ink">{followersCount}</b> フォロワー
           </Link>
         </div>
       </div>
