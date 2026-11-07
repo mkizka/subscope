@@ -50,7 +50,7 @@ describe("me.subsco.admin.revokeAdmin", () => {
     });
   });
 
-  test("revokeAdmin-3: 登録アカウントでないアカウントには400とNotRegisteredを返す", async () => {
+  test("revokeAdmin-3: メンバーでないアカウントには400とNotRegisteredを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

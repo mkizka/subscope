@@ -31,7 +31,7 @@ test.describe("サーバー", () => {
     ).toBeVisible();
   });
 
-  test("server-2: 項目「運営者」に、管理者権限を持つ登録アカウントを表示し、選ぶとそのアカウントのプロフィール全体ページに移動する", async ({
+  test("server-2: 項目「運営者」に、管理者権限を持つメンバーを表示し、選ぶとそのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -71,7 +71,7 @@ test.describe("サーバー", () => {
       .toBe(did);
   });
 
-  test("server-6: 「登録アカウント」タブでは、登録アカウントの一覧（名前、ハンドル、自己紹介）を表示する", async ({
+  test("server-6: 「メンバー」タブでは、メンバーの一覧（名前、ハンドル、自己紹介）を表示する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -125,22 +125,20 @@ test.describe("サーバー", () => {
     ).toBeVisible();
   });
 
-  test("server-5: 「登録アカウント」「誰かがフォロー」のタブを表示し、タブ見出しに各タブの人数を出す", async ({
+  test("server-5: 「メンバー」「誰かがフォロー」のタブを表示し、タブ見出しに各タブの人数を出す", async ({
     page,
   }) => {
     await page.goto("/server");
 
     await expect(
-      page.getByRole("tab", { name: /^登録アカウント \d+/ }),
+      page.getByRole("tab", { name: /^メンバー \d+/ }),
     ).toBeVisible();
     await expect(
       page.getByRole("tab", { name: /^誰かがフォロー \d+/ }),
     ).toBeVisible();
   });
 
-  test("server-9: 管理者の登録アカウントには「運営者」ラベルを表示する", async ({
-    page,
-  }) => {
+  test("server-9: 管理者には「運営者」ラベルを表示する", async ({ page }) => {
     await page.goto("/server");
 
     await expect(

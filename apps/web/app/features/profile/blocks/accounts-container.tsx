@@ -49,7 +49,7 @@ export function AccountsContainer() {
         tabs={[
           {
             to: "/server",
-            label: `登録アカウント${registered && !q ? ` ${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}` : ""}`,
+            label: `メンバー${registered && !q ? ` ${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}` : ""}`,
             selected: !tracked,
           },
           {

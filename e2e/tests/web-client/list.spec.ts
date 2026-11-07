@@ -187,7 +187,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-6: 自分のリスト詳細のヘッダーにある「…」メニューから、確認のうえリストとそのメンバー登録を削除し、リスト一覧に戻る", async ({
+  test("list-6: 自分のリスト詳細のヘッダーにある「…」メニューから、確認のうえリストとリストのメンバーを削除し、リスト一覧に戻る", async ({
     page,
   }) => {
     const name = `list-6のリスト ${Date.now()}`;
@@ -256,7 +256,7 @@ test.describe("リスト", () => {
     }).toPass();
   });
 
-  test("list-8: 自分のリストの「メンバー」タブで、メンバーをリストから削除する", async ({
+  test("list-8: 自分のリストの「メンバー」タブで、リストのメンバーをリストから削除する", async ({
     page,
   }) => {
     const rkey = await createList(`list-8のリスト ${Date.now()}`);
@@ -324,7 +324,7 @@ test.describe("リスト", () => {
     await expect(page).toHaveURL("/alice.test/lists");
   });
 
-  test("list-11: メンバーの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
+  test("list-11: リストのメンバーの追加・削除ボタンは、送信が終わるまでスピナーを出して押せなくする", async ({
     page,
   }) => {
     const rkey = await createList(`list-11のリスト ${Date.now()}`);
