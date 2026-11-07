@@ -6,5 +6,9 @@ export interface ITimelineQuery {
     did: string,
     cursor?: string,
   ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
+  findLocalPosts: (
+    did: string,
+    cursor?: string,
+  ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
   searchPosts: (did: string, q: string) => Promise<TimelinePostDto[]>;
 }

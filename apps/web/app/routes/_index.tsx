@@ -1,5 +1,5 @@
 import { parseWithZod } from "@conform-to/zod/v4";
-import { data } from "react-router";
+import { data, useSearchParams } from "react-router";
 
 import { didContext } from "@/app/context/did";
 import { postSchema } from "@/app/features/timeline/blocks/post-form-container";
@@ -54,5 +54,6 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
 };
 
 export default function Home() {
-  return <TimelinePage />;
+  const [params] = useSearchParams();
+  return <TimelinePage local={params.get("tab") === "local"} />;
 }
