@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
-import { RowsSkeleton } from "@/app/components/rows-skeleton";
+import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Input } from "@/app/components/ui/input";
 import { Tabs } from "@/app/components/ui/tabs";
 import { fetchJson } from "@/app/lib/fetch-json";
@@ -87,7 +87,7 @@ export function AccountsContainer() {
           </p>
         )
       ) : (
-        <RowsSkeleton />
+        <AccountsSkeleton />
       )}
     </>
   );

@@ -11,6 +11,17 @@ export interface IGetTimelineUseCase {
   } | null>;
 }
 
+export const getLocalTimelineUseCaseFactory = ({
+  timelineQuery,
+}: {
+  timelineQuery: ITimelineQuery;
+}): IGetTimelineUseCase => ({
+  async execute(did, cursor) {
+    if (!(await timelineQuery.isRegistered(did))) return null;
+    return timelineQuery.findLocalPosts(did, cursor);
+  },
+});
+
 export const getTimelineUseCaseFactory = ({
   timelineQuery,
 }: {

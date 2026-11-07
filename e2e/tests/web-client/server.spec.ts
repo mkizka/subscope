@@ -58,7 +58,7 @@ test.describe("サーバー", () => {
     await expect(page.getByText(/^did:web:.+#bsky_appview$/)).toBeVisible();
   });
 
-  test("server-4: サーバーDIDの横のコピーボタンで、サーバーDIDをクリップボードにコピーできる", async ({
+  test("server-4: サーバーDIDの文字列とコピーアイコンをひとつのボタンにし、押すとサーバーDIDをクリップボードにコピーできる", async ({
     page,
     context,
   }) => {
@@ -66,7 +66,7 @@ test.describe("サーバー", () => {
     await page.goto("/server");
     const did = await page.getByText(/^did:web:.+#bsky_appview$/).textContent();
 
-    await page.getByRole("button", { name: "コピー" }).click();
+    await page.getByRole("button", { name: "サーバーDIDをコピー" }).click();
 
     await expect
       .poll(() => page.evaluate(() => navigator.clipboard.readText()))

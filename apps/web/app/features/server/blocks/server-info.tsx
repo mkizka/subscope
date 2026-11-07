@@ -53,20 +53,13 @@ export function ServerInfo({ operator, serviceDid }: Props) {
         </div>
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">サーバーDID</dt>
-          <dd className="flex min-w-0 flex-1 items-center gap-1">
-            {serviceDid ? (
-              <code className="min-w-0 truncate">{serviceDid}</code>
-            ) : (
-              <span role="status" aria-label="サーバーDIDを読み込み中">
-                <Skeleton className="h-4 w-56 max-w-full" />
-              </span>
-            )}
+          <dd className="min-w-0 flex-1">
             <button
               type="button"
-              aria-label="コピー"
+              aria-label="サーバーDIDをコピー"
               disabled={!serviceDid}
               className="
-                shrink-0 rounded-md p-1 text-muted
+                flex w-full min-w-0 items-center gap-1 rounded-md py-1 text-left
                 hover:bg-surface-2
               "
               onClick={() =>
@@ -78,10 +71,17 @@ export function ServerInfo({ operator, serviceDid }: Props) {
                   })
               }
             >
-              {copied ? (
-                <CheckIcon className="size-4" />
+              {serviceDid ? (
+                <code className="min-w-0 truncate">{serviceDid}</code>
               ) : (
-                <CopyIcon className="size-4" />
+                <span role="status" aria-label="サーバーDIDを読み込み中">
+                  <Skeleton className="h-4 w-56 max-w-full" />
+                </span>
+              )}
+              {copied ? (
+                <CheckIcon className="size-4 shrink-0 text-muted" />
+              ) : (
+                <CopyIcon className="size-4 shrink-0 text-muted" />
               )}
             </button>
           </dd>

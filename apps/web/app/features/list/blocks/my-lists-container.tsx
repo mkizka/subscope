@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import { RowsSkeleton } from "@/app/components/rows-skeleton";
+import { ListsSkeleton } from "@/app/components/rows-skeleton";
 import { Button } from "@/app/components/ui/button";
 import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
 
@@ -23,7 +23,7 @@ export function MyListsContainer() {
       {me?.profileId ? (
         <ListsContainer handle={me.profileId} />
       ) : (
-        <RowsSkeleton />
+        <ListsSkeleton />
       )}
     </>
   );
