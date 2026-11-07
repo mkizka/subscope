@@ -14,26 +14,32 @@ colors:
   danger: "#c62828"
 typography:
   title:
+    fontFamily: Noto Sans JP
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.4
   heading:
+    fontFamily: Noto Sans JP
     fontSize: 18px
     fontWeight: 700
     lineHeight: 1.4
   body-lg:
+    fontFamily: Noto Sans JP
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.6
   body:
+    fontFamily: Noto Sans JP
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
   label:
+    fontFamily: Noto Sans JP
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.4
   caption:
+    fontFamily: Noto Sans JP
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.4
@@ -172,7 +178,7 @@ Blueskyが使えなくなったときに、同じ会話をそのまま続けら�
 
 ## Typography
 
-フォントはTailwindのデフォルト(システムフォント)に任せ、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
+フォントはNoto Sans JPだけを使い(`@fontsource/noto-sans-jp` をunicode-rangeの分割済みで配信し、使う文字のぶんだけ読み込む)、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
 
 | 名前      | 大きさ | 太さ | 行の高さ | 使う場所                               |
 | --------- | ------ | ---- | -------- | -------------------------------------- |
