@@ -63,6 +63,7 @@ import { GetAuthorFeedUseCase } from "../application/use-cases/feed/get-author-f
 import { GetFeedGeneratorsUseCase } from "../application/use-cases/feed/get-feed-generators-use-case.js";
 import { GetLikesUseCase } from "../application/use-cases/feed/get-likes-use-case.js";
 import { GetListFeedUseCase } from "../application/use-cases/feed/get-list-feed-use-case.js";
+import { GetLocalTimelineUseCase } from "../application/use-cases/feed/get-local-timeline-use-case.js";
 import { GetPostThreadUseCase } from "../application/use-cases/feed/get-post-thread-use-case.js";
 import { GetPostThreadV2UseCase } from "../application/use-cases/feed/get-post-thread-v2-use-case.js";
 import { GetPostsUseCase } from "../application/use-cases/feed/get-posts-use-case.js";
@@ -162,6 +163,7 @@ import { UnbanAccount } from "../presentation/routes/me/subsco/admin/unbanAccoun
 import { VerifyAccess } from "../presentation/routes/me/subsco/admin/verifyAccess.js";
 import { GetServerMemberFollowers } from "../presentation/routes/me/subsco/graph/getServerMemberFollowers.js";
 import { GetFollowedAccounts } from "../presentation/routes/me/subsco/server/getFollowedAccounts.js";
+import { GetLocalTimeline } from "../presentation/routes/me/subsco/server/getLocalTimeline.js";
 import { GetOperator } from "../presentation/routes/me/subsco/server/getOperator.js";
 import { GetServerMembers } from "../presentation/routes/me/subsco/server/getServerMembers.js";
 import { GetSetupStatus } from "../presentation/routes/me/subsco/server/getSetupStatus.js";
@@ -249,6 +251,7 @@ export const createAppRegistry = (env: Env) =>
     .service("getAuthorFeedUseCase", ["authorFeedQuery", "viewContextFactory", "feedViews"], asClassArgs(GetAuthorFeedUseCase))
     .service("getFeedGeneratorsUseCase", ["viewContextFactory", "generatorViews"], asClassArgs(GetFeedGeneratorsUseCase))
     .service("getLikesUseCase", ["likeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetLikesUseCase))
+    .service("getLocalTimelineUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetLocalTimelineUseCase))
     .service("getListFeedUseCase", ["timelineQuery", "viewContextFactory", "feedViews"], asClassArgs(GetListFeedUseCase))
     .service("getRepostedByUseCase", ["repostQuery", "viewContextFactory", "profileViews"], asClassArgs(GetRepostedByUseCase))
     .service("getFollowsUseCase", ["followQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowsUseCase))
@@ -312,6 +315,7 @@ export const createAppRegistry = (env: Env) =>
     .service("revokeAdmin", ["revokeAdminUseCase", "adminMiddleware"], asClassArgs(RevokeAdmin))
     .service("registerAdmin", ["registerAdminUseCase", "authVerifierMiddleware"], asClassArgs(RegisterAdmin))
     .service("verifyAccess", ["verifyAccessUseCase", "authVerifierMiddleware"], asClassArgs(VerifyAccess))
+    .service("getLocalTimeline", ["authVerifierMiddleware", "getLocalTimelineUseCase"], asClassArgs(GetLocalTimeline))
     .service("getServerMembers", ["getServerMembersUseCase"], asClassArgs(GetServerMembers))
     .service("getSetupStatus", ["getSetupStatusUseCase"], asClassArgs(GetSetupStatus))
     .service("getOperator", ["getOperatorUseCase"], asClassArgs(GetOperator))
@@ -324,7 +328,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unbanAccount", ["unbanAccountUseCase", "adminMiddleware"], asClassArgs(UnbanAccount))
     .service("banAccount", ["banAccountUseCase", "adminMiddleware"], asClassArgs(BanAccount))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getLocalTimeline", "getServerMembers", "getSetupStatus", "getOperator", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap

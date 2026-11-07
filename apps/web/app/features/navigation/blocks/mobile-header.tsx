@@ -1,5 +1,5 @@
 import { LogOutIcon } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -16,15 +16,34 @@ type Props = {
   isAdmin?: boolean;
 };
 
+function useScrollingUp() {
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - last) < 8) return;
+      setVisible(y < last || y < 56);
+      last = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return visible;
+}
+
 export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const close = () => ref.current?.close();
+  const visible = useScrollingUp();
 
   return (
     <header
+      data-visible={visible}
       className="
         sticky top-0 z-10 grid h-14 grid-cols-3 items-center border-b
-        border-line bg-surface px-4
+        border-line bg-surface px-4 transition-transform
+        data-[visible=false]:-translate-y-full
         lg:hidden
       "
     >
