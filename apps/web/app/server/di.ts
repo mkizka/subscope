@@ -5,14 +5,14 @@ import { getFollowedAccountsUseCaseFactory } from "./application/accounts/get-fo
 import { getMeUseCaseFactory } from "./application/accounts/get-me-use-case";
 import { getProfilePageUseCaseFactory } from "./application/accounts/get-profile-page-use-case";
 import { getProfileUseCaseFactory } from "./application/accounts/get-profile-use-case";
-import { getRegisteredAccountsUseCaseFactory } from "./application/accounts/get-registered-accounts-use-case";
+import { getServerMembersUseCaseFactory } from "./application/accounts/get-server-members-use-case";
 import { banAccountUseCaseFactory } from "./application/admin/ban-account-use-case";
 import { createInviteCodeUseCaseFactory } from "./application/admin/create-invite-code-use-case";
 import { deleteInviteCodeUseCaseFactory } from "./application/admin/delete-invite-code-use-case";
 import { getBannedAccountsUseCaseFactory } from "./application/admin/get-banned-accounts-use-case";
 import { getInviteCodesUseCaseFactory } from "./application/admin/get-invite-codes-use-case";
 import { grantAdminUseCaseFactory } from "./application/admin/grant-admin-use-case";
-import { listRegisteredAccountsUseCaseFactory } from "./application/admin/list-registered-accounts-use-case";
+import { listServerMembersUseCaseFactory } from "./application/admin/list-server-members-use-case";
 import { unbanAccountUseCaseFactory } from "./application/admin/unban-account-use-case";
 import { toggleFollowUseCaseFactory } from "./application/follow/toggle-follow-use-case";
 import { addListMemberUseCaseFactory } from "./application/list/add-list-member-use-case";
@@ -89,9 +89,9 @@ export const di = await createRegistry()
   )
   .service("backfillQuery", backfillQueryFactory)
   .service(
-    "getRegisteredAccountsUseCase",
+    "getServerMembersUseCase",
     ["subscopeQuery", "backfillQuery"],
-    getRegisteredAccountsUseCaseFactory,
+    getServerMembersUseCaseFactory,
   )
   .service(
     "getFollowedAccountsUseCase",
@@ -137,9 +137,9 @@ export const di = await createRegistry()
   .service("adminQuery", ["oauthClient"], adminQueryFactory)
   .service("adminCommand", ["oauthClient"], adminCommandFactory)
   .service(
-    "listRegisteredAccountsUseCase",
+    "listServerMembersUseCase",
     ["adminQuery"],
-    listRegisteredAccountsUseCaseFactory,
+    listServerMembersUseCaseFactory,
   )
   .service("banAccountUseCase", ["adminCommand"], banAccountUseCaseFactory)
   .service("grantAdminUseCase", ["adminCommand"], grantAdminUseCaseFactory)

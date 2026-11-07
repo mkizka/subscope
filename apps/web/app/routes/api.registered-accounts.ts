@@ -9,5 +9,5 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const q = new URL(request.url).searchParams.get("q") || undefined;
-  return data(await di.getRegisteredAccountsUseCase.execute(q));
+  return data(await di.getServerMembersUseCase.execute(q));
 };

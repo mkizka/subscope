@@ -53,7 +53,7 @@ import { DeleteInviteCodeUseCase } from "../application/use-cases/admin/delete-i
 import { GetBannedAccountsUseCase } from "../application/use-cases/admin/get-banned-accounts-use-case.js";
 import { GetInviteCodesUseCase } from "../application/use-cases/admin/get-invite-codes-use-case.js";
 import { GrantAdminUseCase } from "../application/use-cases/admin/grant-admin-use-case.js";
-import { ListRegisteredAccountsUseCase } from "../application/use-cases/admin/list-registered-accounts-use-case.js";
+import { ListServerMembersUseCase } from "../application/use-cases/admin/list-server-members-use-case.js";
 import { RegisterAdminUseCase } from "../application/use-cases/admin/register-admin-use-case.js";
 import { RevokeAdminUseCase } from "../application/use-cases/admin/revoke-admin-use-case.js";
 import { UnbanAccountUseCase } from "../application/use-cases/admin/unban-account-use-case.js";
@@ -73,13 +73,13 @@ import { GetFollowersUseCase } from "../application/use-cases/graph/get-follower
 import { GetFollowsUseCase } from "../application/use-cases/graph/get-follows-use-case.js";
 import { GetListUseCase } from "../application/use-cases/graph/get-list-use-case.js";
 import { GetListsUseCase } from "../application/use-cases/graph/get-lists-use-case.js";
-import { GetRegisteredFollowersUseCase } from "../application/use-cases/graph/get-registered-followers-use-case.js";
+import { GetServerMemberFollowersUseCase } from "../application/use-cases/graph/get-server-member-followers-use-case.js";
 import { GetGroupedNotificationsUseCase } from "../application/use-cases/notification/get-grouped-notifications-use-case.js";
 import { GetUnreadCountUseCase } from "../application/use-cases/notification/get-unread-count-use-case.js";
 import { ListNotificationsUseCase } from "../application/use-cases/notification/list-notifications-use-case.js";
 import { UpdateSeenUseCase } from "../application/use-cases/notification/update-seen-use-case.js";
 import { GetFollowedAccountsUseCase } from "../application/use-cases/server/get-followed-accounts-use-case.js";
-import { GetRegisteredAccountsUseCase } from "../application/use-cases/server/get-registered-accounts-use-case.js";
+import { GetServerMembersUseCase } from "../application/use-cases/server/get-server-members-use-case.js";
 import { GetSetupStatusUseCase } from "../application/use-cases/server/get-setup-status-use-case.js";
 import { GetBackfillStatusesUseCase } from "../application/use-cases/sync/get-backfill-statuses-use-case.js";
 import { GetRegistrationStatusUseCase } from "../application/use-cases/sync/get-registration-status-use-case.js";
@@ -154,14 +154,14 @@ import { DeleteInviteCode } from "../presentation/routes/me/subsco/admin/deleteI
 import { GetBannedAccounts } from "../presentation/routes/me/subsco/admin/getBannedAccounts.js";
 import { GetInviteCodes } from "../presentation/routes/me/subsco/admin/getInviteCodes.js";
 import { GrantAdmin } from "../presentation/routes/me/subsco/admin/grantAdmin.js";
-import { ListRegisteredAccounts } from "../presentation/routes/me/subsco/admin/listRegisteredAccounts.js";
+import { ListServerMembers } from "../presentation/routes/me/subsco/admin/listServerMembers.js";
 import { RegisterAdmin } from "../presentation/routes/me/subsco/admin/registerAdmin.js";
 import { RevokeAdmin } from "../presentation/routes/me/subsco/admin/revokeAdmin.js";
 import { UnbanAccount } from "../presentation/routes/me/subsco/admin/unbanAccount.js";
 import { VerifyAccess } from "../presentation/routes/me/subsco/admin/verifyAccess.js";
-import { GetRegisteredFollowers } from "../presentation/routes/me/subsco/graph/getRegisteredFollowers.js";
+import { GetServerMemberFollowers } from "../presentation/routes/me/subsco/graph/getServerMemberFollowers.js";
 import { GetFollowedAccounts } from "../presentation/routes/me/subsco/server/getFollowedAccounts.js";
-import { GetRegisteredAccounts } from "../presentation/routes/me/subsco/server/getRegisteredAccounts.js";
+import { GetServerMembers } from "../presentation/routes/me/subsco/server/getServerMembers.js";
 import { GetSetupStatus } from "../presentation/routes/me/subsco/server/getSetupStatus.js";
 import { GetBackfillStatuses } from "../presentation/routes/me/subsco/sync/getBackfillStatuses.js";
 import { GetRegistrationStatus } from "../presentation/routes/me/subsco/sync/getRegistrationStatus.js";
@@ -257,14 +257,14 @@ export const createAppRegistry = (env: Env) =>
     .service("deleteInviteCodeUseCase", ["transactionManager", "inviteCodeRepository"], asClassArgs(DeleteInviteCodeUseCase))
     .service("getBannedAccountsUseCase", ["accountQuery", "viewContextFactory", "profileViews"], asClassArgs(GetBannedAccountsUseCase))
     .service("getInviteCodesUseCase", ["inviteCodeQuery", "viewContextFactory", "profileViews"], asClassArgs(GetInviteCodesUseCase))
-    .service("listRegisteredAccountsUseCase", ["viewContextFactory", "profileViews", "accountRepository", "registrationQuery"], asClassArgs(ListRegisteredAccountsUseCase))
+    .service("listServerMembersUseCase", ["viewContextFactory", "profileViews", "accountRepository", "registrationQuery"], asClassArgs(ListServerMembersUseCase))
     .service("grantAdminUseCase", ["transactionManager", "accountRepository", "registrationRepository"], asClassArgs(GrantAdminUseCase))
     .service("revokeAdminUseCase", ["transactionManager", "accountRepository"], asClassArgs(RevokeAdminUseCase))
     .service("registerAdminUseCase", ["transactionManager", "accountQuery", "registrationRepository", "createAdminService", "jobScheduler"], asClassArgs(RegisterAdminUseCase))
     .service("verifyAccessUseCase", ["accountRepository"], asClassArgs(VerifyAccessUseCase))
-    .service("getRegisteredAccountsUseCase", ["registrationQuery", "accountRepository", "viewContextFactory", "profileViews"], asClassArgs(GetRegisteredAccountsUseCase))
+    .service("getServerMembersUseCase", ["registrationQuery", "accountRepository", "viewContextFactory", "profileViews"], asClassArgs(GetServerMembersUseCase))
     .service("getSetupStatusUseCase", ["accountQuery"], asClassArgs(GetSetupStatusUseCase))
-    .service("getRegisteredFollowersUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetRegisteredFollowersUseCase))
+    .service("getServerMemberFollowersUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetServerMemberFollowersUseCase))
     .service("getFollowedAccountsUseCase", ["registrationQuery", "viewContextFactory", "profileViews"], asClassArgs(GetFollowedAccountsUseCase))
     .service("getBackfillStatusesUseCase", ["registrationQuery"], asClassArgs(GetBackfillStatusesUseCase))
     .service("getRegistrationStatusUseCase", ["registrationRepository"], asClassArgs(GetRegistrationStatusUseCase))
@@ -304,14 +304,14 @@ export const createAppRegistry = (env: Env) =>
     .service("deleteInviteCode", ["deleteInviteCodeUseCase", "adminMiddleware"], asClassArgs(DeleteInviteCode))
     .service("getInviteCodes", ["getInviteCodesUseCase", "adminMiddleware"], asClassArgs(GetInviteCodes))
     .service("getBannedAccounts", ["getBannedAccountsUseCase", "adminMiddleware"], asClassArgs(GetBannedAccounts))
-    .service("listRegisteredAccounts", ["listRegisteredAccountsUseCase", "adminMiddleware"], asClassArgs(ListRegisteredAccounts))
+    .service("listServerMembers", ["listServerMembersUseCase", "adminMiddleware"], asClassArgs(ListServerMembers))
     .service("grantAdmin", ["grantAdminUseCase", "adminMiddleware"], asClassArgs(GrantAdmin))
     .service("revokeAdmin", ["revokeAdminUseCase", "adminMiddleware"], asClassArgs(RevokeAdmin))
     .service("registerAdmin", ["registerAdminUseCase", "authVerifierMiddleware"], asClassArgs(RegisterAdmin))
     .service("verifyAccess", ["verifyAccessUseCase", "authVerifierMiddleware"], asClassArgs(VerifyAccess))
-    .service("getRegisteredAccounts", ["getRegisteredAccountsUseCase"], asClassArgs(GetRegisteredAccounts))
+    .service("getServerMembers", ["getServerMembersUseCase"], asClassArgs(GetServerMembers))
     .service("getSetupStatus", ["getSetupStatusUseCase"], asClassArgs(GetSetupStatus))
-    .service("getRegisteredFollowers", ["getRegisteredFollowersUseCase", "handleMiddleware"], asClassArgs(GetRegisteredFollowers))
+    .service("getServerMemberFollowers", ["getServerMemberFollowersUseCase", "handleMiddleware"], asClassArgs(GetServerMemberFollowers))
     .service("getFollowedAccounts", ["getFollowedAccountsUseCase", "authVerifierMiddleware"], asClassArgs(GetFollowedAccounts))
     .service("getBackfillStatuses", ["getBackfillStatusesUseCase"], asClassArgs(GetBackfillStatuses))
     .service("getRegistrationStatus", ["getRegistrationStatusUseCase", "authVerifierMiddleware"], asClassArgs(GetRegistrationStatus))
@@ -320,7 +320,7 @@ export const createAppRegistry = (env: Env) =>
     .service("unbanAccount", ["unbanAccountUseCase", "adminMiddleware"], asClassArgs(UnbanAccount))
     .service("banAccount", ["banAccountUseCase", "adminMiddleware"], asClassArgs(BanAccount))
     .service("updateSeen", ["updateSeenUseCase", "authVerifierMiddleware"], asClassArgs(UpdateSeen))
-    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getRegisteredAccounts", "getSetupStatus", "getFollowedAccounts", "getRegisteredFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listRegisteredAccounts", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
+    .service("lexRouter", ["getPostThread", "searchPosts", "getActorLikes", "getAuthorFeed", "getTimeline", "getListFeed", "getFollows", "getFollowers", "getList", "getLists", "getUnreadCount", "listNotifications", "getGroupedNotifications", "updateSeen", "getRegistrationStatus", "getBackfillStatuses", "registerAccount", "unregisterAccount", "banAccount", "unbanAccount", "createInviteCode", "deleteInviteCode", "getInviteCodes", "grantAdmin", "revokeAdmin", "registerAdmin", "verifyAccess", "getServerMembers", "getSetupStatus", "getFollowedAccounts", "getServerMemberFollowers", "getPreferences", "getProfile", "getProfiles", "searchActors", "searchActorsTypeahead", "listServerMembers", "getBannedAccounts", "getLikes", "getRepostedBy", "getFeedGenerators", "getPosts", "getPostThreadV2", "searchPostsV2"], asFunctionArgs(lexRouterFactory))
     .service("healthRouter", ["nodeEnv", "logLevel", "port", "publicUrl"], healthRouterFactory)
     .service("wellKnownRouter", ["serviceDid", "publicUrl"], asFunctionArgs(wellKnownRouterFactory))
     // bootstrap

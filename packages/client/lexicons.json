@@ -85,14 +85,14 @@
     "me.subsco.admin.getBannedAccounts",
     "me.subsco.admin.getInviteCodes",
     "me.subsco.admin.grantAdmin",
-    "me.subsco.admin.listRegisteredAccounts",
+    "me.subsco.admin.listServerMembers",
     "me.subsco.admin.registerAdmin",
     "me.subsco.admin.revokeAdmin",
     "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
-    "me.subsco.graph.getRegisteredFollowers",
+    "me.subsco.graph.getServerMemberFollowers",
     "me.subsco.server.getFollowedAccounts",
-    "me.subsco.server.getRegisteredAccounts",
+    "me.subsco.server.getServerMembers",
     "me.subsco.server.getSetupStatus",
     "me.subsco.sync.getBackfillStatuses",
     "me.subsco.sync.getRegistrationStatus",
@@ -376,9 +376,9 @@
       "uri": "file://./lexicons/me/subsco/admin/grantAdmin.json",
       "cid": "bafyreifslkhaelc2garrsbjufp6lw53ay2t3peyawmz37pcpk5uhe6muta"
     },
-    "me.subsco.admin.listRegisteredAccounts": {
-      "uri": "file://./lexicons/me/subsco/admin/listRegisteredAccounts.json",
-      "cid": "bafyreidmnquz2wimqxmd4cw4mul62glgtlw2wbylbdjv3vv7ztxddzgqa4"
+    "me.subsco.admin.listServerMembers": {
+      "uri": "file://./lexicons/me/subsco/admin/listServerMembers.json",
+      "cid": "bafyreidy2ezoppksjc35himzc3hv7ftg3tehpvjt23tzbhigqz4il4lpnq"
     },
     "me.subsco.admin.registerAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/registerAdmin.json",
@@ -396,17 +396,17 @@
       "uri": "file://./lexicons/me/subsco/admin/verifyAccess.json",
       "cid": "bafyreicu3ybnraw6kdfjegxa3drcttkltqxt3saeh2sc7lrnb37iuzwbs4"
     },
-    "me.subsco.graph.getRegisteredFollowers": {
-      "uri": "file://./lexicons/me/subsco/graph/getRegisteredFollowers.json",
-      "cid": "bafyreifw5b5s22p5fbpjyxsp34o2ffmyt6qobue3gyjhilq4tc5ajbnwdi"
+    "me.subsco.graph.getServerMemberFollowers": {
+      "uri": "file://./lexicons/me/subsco/graph/getServerMemberFollowers.json",
+      "cid": "bafyreieel56xpsztdvkqhqy3uq7e5ixmqiuil3xuxhpzt5zfdrpsr6u6a4"
     },
     "me.subsco.server.getFollowedAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getFollowedAccounts.json",
       "cid": "bafyreigeqysnvxhwa5uea3th54yscp7cioqntqspnll3a5obsfjaha2gdi"
     },
-    "me.subsco.server.getRegisteredAccounts": {
-      "uri": "file://./lexicons/me/subsco/server/getRegisteredAccounts.json",
-      "cid": "bafyreic3x64hor5t6wz4f4pi3c5nj2yz3ptcqlqulg5lnv2jqgiwnosfue"
+    "me.subsco.server.getServerMembers": {
+      "uri": "file://./lexicons/me/subsco/server/getServerMembers.json",
+      "cid": "bafyreiapfv5zezn3p2dxsyc4w64cbjcwzlrmfwsrbvgxo7vi4yf4ldwzou"
     },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
