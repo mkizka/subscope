@@ -1,6 +1,6 @@
 import type { IAdminQuery } from "@/app/server/application/interfaces/admin-query";
 
-export const listRegisteredAccountsUseCaseFactory =
+export const listServerMembersUseCaseFactory =
   ({ adminQuery }: { adminQuery: IAdminQuery }) =>
   (did: string, cursor?: string) =>
-    adminQuery.listRegisteredAccounts(did, cursor);
+    adminQuery.listServerMembers(did, cursor);

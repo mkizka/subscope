@@ -1,5 +1,5 @@
 import { asDid } from "@atproto/did";
-import type * as MeSubscoServerGetRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
+import type * as MeSubscoServerGetServerMembers from "@repo/client/me/subsco/server/getServerMembers";
 
 import type { IAccountRepository } from "../../../application/interfaces/account-repository.js";
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
@@ -8,13 +8,13 @@ import type { Registration } from "../../../domain/models/registration.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
-type GetRegisteredAccountsParams = {
+type GetServerMembersParams = {
   limit: number;
   cursor?: string;
   q?: string;
 };
 
-export class GetRegisteredAccountsUseCase {
+export class GetServerMembersUseCase {
   constructor(
     private readonly registrationQuery: IRegistrationQuery,
     private readonly accountRepository: IAccountRepository,
@@ -23,8 +23,8 @@ export class GetRegisteredAccountsUseCase {
   ) {}
 
   async execute(
-    params: GetRegisteredAccountsParams,
-  ): Promise<MeSubscoServerGetRegisteredAccounts.$OutputBody> {
+    params: GetServerMembersParams,
+  ): Promise<MeSubscoServerGetServerMembers.$OutputBody> {
     const paginator = createCursorPaginator<Registration>({
       limit: params.limit,
       getCursor: (sub) => sub.createdAt.toISOString(),

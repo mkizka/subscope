@@ -1,4 +1,4 @@
-import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/me/subsco/admin/listRegisteredAccounts";
+import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/me/subsco/admin/listServerMembers";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { alice, bob, queryClient } from "@/.storybook/query-client";
