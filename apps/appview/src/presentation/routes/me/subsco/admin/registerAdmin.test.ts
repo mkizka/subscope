@@ -12,7 +12,7 @@ describe("me.subsco.admin.registerAdmin", () => {
   const { ctx } = testSetup;
   const requesterDid = asDid("did:plc:requester");
 
-  test("registerAdmin-1: 閲覧者を管理者にし、登録アカウントにする", async () => {
+  test("registerAdmin-1: 閲覧者を管理者にし、メンバーにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     loginAs(requesterDid);

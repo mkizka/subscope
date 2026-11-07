@@ -36,7 +36,7 @@ describe("me.subsco.server.getTrackedAccounts", () => {
       })
       .create();
 
-  test("getTrackedAccounts-1: 登録アカウントとそのフォロー先を返し、それ以外のアカウントは含めない", async () => {
+  test("getTrackedAccounts-1: メンバーとそのフォロー先を返し、それ以外のアカウントは含めない", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const registeredAccount = await createRegisteredAccount();
@@ -56,7 +56,7 @@ describe("me.subsco.server.getTrackedAccounts", () => {
     );
   });
 
-  test("getTrackedAccounts-2: フォローしている登録アカウントが多い順に並べる", async () => {
+  test("getTrackedAccounts-2: フォローしているメンバーが多い順に並べる", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const registeredAccount1 = await createRegisteredAccount();

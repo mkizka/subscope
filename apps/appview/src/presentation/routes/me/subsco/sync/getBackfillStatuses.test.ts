@@ -36,7 +36,7 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
       })
       .create();
 
-  test("getBackfillStatuses-1: 登録アカウントとそのフォロー先のbackfillStatusを返し、それ以外のアカウントは含めない", async () => {
+  test("getBackfillStatuses-1: メンバーとそのフォロー先のbackfillStatusを返し、それ以外のアカウントは含めない", async () => {
     // arrange
     const { client } = await setupApiTest();
     const registeredAccount = await createRegisteredAccount();

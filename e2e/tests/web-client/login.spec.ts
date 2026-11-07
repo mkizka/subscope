@@ -35,7 +35,7 @@ test.describe("ログイン", () => {
     ).toBeVisible();
   });
 
-  test("login-4: 登録アカウントでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
+  test("login-4: メンバーでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
     page,
   }) => {
     await login(page, "bob.test", "/login");
@@ -98,7 +98,7 @@ test.describe("ログイン", () => {
     await expect(page.getByRole("button", { name: "登録する" })).toBeDisabled();
   });
 
-  test("login-6: 有効な招待コードを入力すると、登録アカウントとして登録してタイムラインに移動する", async ({
+  test("login-6: 有効な招待コードを入力すると、メンバーとして登録してタイムラインに移動する", async ({
     page,
     browser,
   }) => {

@@ -14,7 +14,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.admin.grantAdmin", () => {
   const { ctx } = testSetup;
 
-  test("grantAdmin-1: 指定した登録アカウントを管理者にする", async () => {
+  test("grantAdmin-1: 指定したメンバーを管理者にする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -34,7 +34,7 @@ describe("me.subsco.admin.grantAdmin", () => {
     expect(account?.isAdmin).toBe(true);
   });
 
-  test("grantAdmin-2: 登録アカウントでないアカウントには400とNotRegisteredを返す", async () => {
+  test("grantAdmin-2: メンバーでないアカウントには400とNotRegisteredを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)

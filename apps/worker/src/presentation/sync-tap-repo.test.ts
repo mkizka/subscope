@@ -49,7 +49,7 @@ const unfollowEvent = (
 describe("Tapへの登録", () => {
   const { ctx } = testSetup;
 
-  test("tap-1: 登録アカウントがフォローしたアカウントをTapに追加する", async () => {
+  test("tap-1: メンバーがフォローしたアカウントをTapに追加する", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -65,7 +65,7 @@ describe("Tapへの登録", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("tap-2: 登録アカウント以外のフォローではTapに追加しない", async () => {
+  test("tap-2: メンバー以外のフォローではTapに追加しない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const nonRegisteredAccount = await accountFactory(ctx.db).create();
@@ -81,7 +81,7 @@ describe("Tapへの登録", () => {
     expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
   });
 
-  test("tap-3: 登録アカウントがフォローを外したアカウントは、追跡アカウントでなくなればTapから外す", async () => {
+  test("tap-3: メンバーがフォローを外したアカウントは、追跡アカウントでなくなればTapから外す", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -99,7 +99,7 @@ describe("Tapへの登録", () => {
     expect(tapClient.getRegisteredDids()).not.toContain(followee.did);
   });
 
-  test("tap-4: 他の登録アカウントがフォローしているアカウントはTapから外さない", async () => {
+  test("tap-4: 他のメンバーがフォローしているアカウントはTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -123,7 +123,7 @@ describe("Tapへの登録", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("tap-5: 登録アカウント以外がフォローを外してもTapから外さない", async () => {
+  test("tap-5: メンバー以外がフォローを外してもTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -145,7 +145,7 @@ describe("Tapへの登録", () => {
     expect(tapClient.getRegisteredDids()).toContain(followee.did);
   });
 
-  test("tap-6: 登録アカウントは、フォローを外されてもTapから外さない", async () => {
+  test("tap-6: メンバーは、フォローを外されてもTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
     const registeredAccount = await accountFactory(ctx.db)

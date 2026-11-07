@@ -278,19 +278,19 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.graph.getRegisteredFollowers
 
-指定したアカウントをフォローしている登録アカウントをprofileViewで返す。認証は不要。limitとcursorでページングする。
+指定したアカウントをフォローしているメンバーをprofileViewで返す。認証は不要。limitとcursorでページングする。
 
-- getRegisteredFollowers-1: 指定したアカウントをフォローしている登録アカウントだけをfollowersにprofileViewで返す
+- getRegisteredFollowers-1: 指定したアカウントをフォローしているメンバーだけをfollowersにprofileViewで返す
 - getRegisteredFollowers-2: 新しい順に並べ、cursorを指定するとそれより古いものだけを返す
-- getRegisteredFollowers-3: totalにはページングに関係なく登録アカウントのフォロワーの総数を入れる
+- getRegisteredFollowers-3: totalにはページングに関係なくメンバーのフォロワーの総数を入れる
 
 ## me.subsco.server.getRegisteredAccounts
 
-登録アカウントのプロフィールを返す。登録アカウントの一覧は公開情報とし、認証は不要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）アカウントだけを返す。
+メンバーのプロフィールを返す。メンバーの一覧は公開情報とし、認証は不要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）アカウントだけを返す。
 
-- getRegisteredAccounts-1: 登録アカウントごとにprofileViewを返す
-- getRegisteredAccounts-2: 登録アカウントごとに管理者かどうかを返す
-- getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含む登録アカウントだけを返す
+- getRegisteredAccounts-1: メンバーごとにprofileViewを返す
+- getRegisteredAccounts-2: メンバーごとに管理者かどうかを返す
+- getRegisteredAccounts-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す
 
 ## me.subsco.server.getSetupStatus
 
@@ -301,10 +301,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.server.getTrackedAccounts
 
-追跡アカウントのprofileViewと、その追跡アカウントをフォローしている登録アカウントの数、追跡アカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）追跡アカウントだけを返す。
+追跡アカウントのprofileViewと、その追跡アカウントをフォローしているメンバーの数、追跡アカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）追跡アカウントだけを返す。
 
-- getTrackedAccounts-1: 登録アカウントとそのフォロー先を返し、それ以外のアカウントは含めない
-- getTrackedAccounts-2: フォローしている登録アカウントが多い順に並べる
+- getTrackedAccounts-1: メンバーとそのフォロー先を返し、それ以外のアカウントは含めない
+- getTrackedAccounts-2: フォローしているメンバーが多い順に並べる
 - getTrackedAccounts-3: totalにはページングに関係なく追跡アカウントの総数を入れる
 - getTrackedAccounts-4: qを指定すると、表示名またはハンドルにqを含む追跡アカウントだけを返す。totalはqに関係なく総数のままにする
 
@@ -331,7 +331,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.sync.getBackfillStatuses
 
-指定したdidのうち、追跡アカウント（登録アカウントとそのフォロー先）のbackfillStatusを返す。認証は不要。didsは最大100件まで指定できる。
+指定したdidのうち、追跡アカウント（メンバーとそのフォロー先）のbackfillStatusを返す。認証は不要。didsは最大100件まで指定できる。
 
 - getBackfillStatuses-1: 追跡アカウントのbackfillStatusを返し、追跡アカウント以外は含めない
 - getBackfillStatuses-2: backfillStatusが未設定のアカウントはinProgressとして返す
@@ -339,10 +339,10 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.sync.getRegistrationStatus
 
-閲覧者が登録アカウントかどうかを返す。認証が必要。
+閲覧者がメンバーかどうかを返す。認証が必要。
 
-- getRegistrationStatus-1: 閲覧者が登録アカウントならisRegisteredをtrueにする
-- getRegistrationStatus-2: 閲覧者が登録アカウントでなければisRegisteredをfalseにする
+- getRegistrationStatus-1: 閲覧者がメンバーならisRegisteredをtrueにする
+- getRegistrationStatus-2: 閲覧者がメンバーでなければisRegisteredをfalseにする
 
 ## me.subsco.admin.verifyAccess
 
@@ -355,7 +355,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 管理者が未登録のとき、閲覧者を最初の管理者として登録する。認証が必要。
 
-- registerAdmin-1: 閲覧者を管理者にし、登録アカウントにする
+- registerAdmin-1: 閲覧者を管理者にし、メンバーにする
 - registerAdmin-2: 既に管理者がいれば、400とAdminAlreadyExistsを返す
 - registerAdmin-3: 閲覧者のsyncTapRepoジョブを積む
 - registerAdmin-4: 閲覧者のプロフィールのfetchRecordジョブを積む
@@ -363,25 +363,25 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.listRegisteredAccounts
 
-登録アカウントのプロフィール、管理者かどうか、登録日時、同期状態と、登録アカウントの総数を返す。管理者の認証が必要。limitとcursorでページングする。
+メンバーのプロフィール、管理者かどうか、登録日時、同期状態と、メンバーの総数を返す。管理者の認証が必要。limitとcursorでページングする。
 
 - listRegisteredAccounts-1: 認証がないリクエストには401を返す
 - listRegisteredAccounts-2: 管理者でないアカウントからのリクエストには403を返す
-- listRegisteredAccounts-3: 登録アカウントごとにprofileViewと管理者かどうかを返す
-- listRegisteredAccounts-4: テイクダウンされた登録アカウントも含める
-- listRegisteredAccounts-5: 登録アカウントごとに登録日時をregisteredAtとして返す
-- listRegisteredAccounts-6: ページングに関係なく登録アカウントの総数をtotalとして返す
-- listRegisteredAccounts-7: フォロー先の状態にかかわらず、登録アカウント本人のバックフィルの状態をbackfillStatusとして返す
-- listRegisteredAccounts-8: 登録アカウント本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
+- listRegisteredAccounts-3: メンバーごとにprofileViewと管理者かどうかを返す
+- listRegisteredAccounts-4: テイクダウンされたメンバーも含める
+- listRegisteredAccounts-5: メンバーごとに登録日時をregisteredAtとして返す
+- listRegisteredAccounts-6: ページングに関係なくメンバーの総数をtotalとして返す
+- listRegisteredAccounts-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す
+- listRegisteredAccounts-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする
 
 バックフィルの状態はworkerがaccountsに保存したもの（[backfill-1](./worker.md#バックフィルの状態の確認)）を読む。
 
 ## me.subsco.admin.grantAdmin
 
-指定した登録アカウントを管理者にする。管理者の認証が必要。
+指定したメンバーを管理者にする。管理者の認証が必要。
 
-- grantAdmin-1: 指定した登録アカウントを管理者にする
-- grantAdmin-2: 登録アカウントでないアカウントには400とNotRegisteredを返す
+- grantAdmin-1: 指定したメンバーを管理者にする
+- grantAdmin-2: メンバーでないアカウントには400とNotRegisteredを返す
 
 ## me.subsco.admin.revokeAdmin
 
@@ -389,11 +389,11 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 - revokeAdmin-1: 指定した管理者の管理者権限を外す
 - revokeAdmin-2: 自分自身には400とCannotRevokeSelfを返す
-- revokeAdmin-3: 登録アカウントでないアカウントには400とNotRegisteredを返す
+- revokeAdmin-3: メンバーでないアカウントには400とNotRegisteredを返す
 
 ## me.subsco.admin.banAccount
 
-登録アカウントの登録を解除し、サーバー登録を停止する。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
+メンバーの登録を解除し、サーバー登録を停止する。管理者の認証が必要。登録していなければ400とNotRegisteredを返す。
 
 - banAccount-1: 管理者は登録停止せず、400とCannotBanAdminを返す
 - banAccount-2: 本人とそのフォロー先のsyncTapRepoジョブを積む
@@ -407,7 +407,7 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 
 ## me.subsco.admin.unbanAccount
 
-アカウントのサーバー登録の停止を取り消す(登録を再開する)。管理者の認証が必要。登録アカウントには戻さず、本人が改めて登録する。
+アカウントのサーバー登録の停止を取り消す(登録を再開する)。管理者の認証が必要。メンバーには戻さず、本人が改めて登録する。
 
 - unbanAccount-1: 登録を再開したアカウントは招待コードで再登録できる
 - unbanAccount-2: 停止中でないアカウントには400とNotBannedを返す

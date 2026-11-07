@@ -143,11 +143,11 @@ describe("IndexCommitUseCase", () => {
     });
 
     test.each([
-      { name: "いいねした人が登録アカウント", liker: true, author: false },
-      { name: "投稿の作者が登録アカウント", liker: false, author: true },
-      { name: "どちらも登録アカウントでない", liker: false, author: false },
+      { name: "いいねした人がメンバー", liker: true, author: false },
+      { name: "投稿の作者がメンバー", liker: false, author: true },
+      { name: "どちらもメンバーでない", liker: false, author: false },
     ])(
-      "index-11: いいねは、いいねした人かいいねされた投稿の作者が登録アカウントのものだけ保存する($name)",
+      "index-11: いいねは、いいねした人かいいねされた投稿の作者がメンバーのものだけ保存する($name)",
       async ({ liker, author }) => {
         // arrange
         const likerAccount = accountFactory();
