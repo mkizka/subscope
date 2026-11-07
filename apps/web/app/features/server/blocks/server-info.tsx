@@ -2,38 +2,47 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 
-type Operator = { did: string; handle: string; displayName?: string };
+import { Avatar } from "@/app/components/ui/avatar";
+
+type Operator = {
+  did: string;
+  handle: string;
+  displayName?: string;
+  avatarUrl?: string;
+};
 
 type Props = {
-  operators?: Operator[];
+  operator?: Operator;
   serviceDid?: string;
 };
 
-export function ServerInfo({ operators, serviceDid }: Props) {
+export function ServerInfo({ operator, serviceDid }: Props) {
   const [copied, setCopied] = useState(false);
 
   return (
     <>
-      <h1 className="p-4 pb-2 text-title">サーバー</h1>
+      <h1 className="p-4 pb-2 text-title">サーバーについて</h1>
       <p className="px-4 pb-4 text-label">
-        Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。
+        Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです
       </p>
       <dl className="border-t border-line text-label">
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">運営者</dt>
           <dd className="flex min-w-0 flex-wrap gap-x-3">
-            {operators?.map((operator) => (
+            {operator && (
               <Link
-                key={operator.did}
                 to={`/${operator.handle === "handle.invalid" ? operator.did : operator.handle}`}
                 className="
-                  truncate text-brand
+                  flex min-w-0 items-center gap-2 text-brand
                   hover:underline
                 "
               >
-                {operator.displayName || operator.handle}
+                <Avatar src={operator.avatarUrl} size="sm" />
+                <span className="truncate">
+                  {operator.displayName || operator.handle}
+                </span>
               </Link>
-            ))}
+            )}
           </dd>
         </div>
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">

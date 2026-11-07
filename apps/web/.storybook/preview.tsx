@@ -53,6 +53,7 @@ const preview: Preview = {
     );
     queryClient.setQueryData<Data<typeof serverInfoLoader>>(["server"], {
       serviceDid: "did:web:subsco.me",
+      operator: undefined,
     });
   },
   decorators: [

@@ -5,9 +5,11 @@ import { ServerInfo } from "./server-info";
 const meta = {
   component: ServerInfo,
   args: {
-    operators: [
-      { did: "did:plc:alice", handle: "alice.test", displayName: "Alice" },
-    ],
+    operator: {
+      did: "did:plc:alice",
+      handle: "alice.test",
+      displayName: "Alice",
+    },
     serviceDid: "did:web:alpha.subsco.me#bsky_appview",
   },
 } satisfies Meta<typeof ServerInfo>;
@@ -20,7 +22,7 @@ export const Default: Story = {};
 
 export const Loading: Story = {
   args: {
-    operators: undefined,
+    operator: undefined,
     serviceDid: undefined,
   },
 };

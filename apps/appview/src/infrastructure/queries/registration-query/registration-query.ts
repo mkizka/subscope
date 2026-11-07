@@ -52,6 +52,18 @@ export class RegistrationQuery implements IRegistrationQuery {
     );
   }
 
+  async findFirstAdminDid(): Promise<Did | undefined> {
+    const { accounts, registrations } = schema;
+    const [row] = await this.db
+      .select({ did: accounts.did })
+      .from(registrations)
+      .innerJoin(accounts, eq(accounts.did, registrations.accountDid))
+      .where(eq(accounts.isAdmin, true))
+      .orderBy(asc(registrations.createdAt))
+      .limit(1);
+    return row ? asDid(row.did) : undefined;
+  }
+
   async count(): Promise<number> {
     const [row] = await this.db
       .select({ count: count() })

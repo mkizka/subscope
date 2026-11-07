@@ -17,21 +17,23 @@ test.describe("サーバー", () => {
 
   const items = (page: Page) => page.getByRole("main").getByRole("listitem");
 
-  test("server-1: 見出し「サーバー」の下に、誰かがフォローしている人の投稿だけが流れる招待制サーバーで、Blueskyではないことを1文で説明する", async ({
+  test("server-1: 見出し「サーバーについて」の下に、「Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです」と説明する", async ({
     page,
   }) => {
     await page.goto("/server");
 
     const main = page.getByRole("main");
-    await expect(main.getByRole("heading", { name: "サーバー" })).toBeVisible();
+    await expect(
+      main.getByRole("heading", { name: "サーバーについて" }),
+    ).toBeVisible();
     await expect(
       main.getByText(
-        "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです。Blueskyへの投稿の一部が表示されていますが、Blueskyではありません。",
+        "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
       ),
     ).toBeVisible();
   });
 
-  test("server-2: 項目「運営者」に、管理者権限を持つメンバーを表示し、選ぶとそのアカウントのプロフィール全体ページに移動する", async ({
+  test("server-2: 項目「運営者」に、最初に管理者になった1人のアイコンと名前を表示し、選ぶとそのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -199,7 +201,9 @@ test.describe("サーバー", () => {
 
     await page.goto("/server");
 
-    await expect(page.getByRole("heading", { name: "サーバー" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "サーバーについて" }),
+    ).toBeVisible();
     const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,

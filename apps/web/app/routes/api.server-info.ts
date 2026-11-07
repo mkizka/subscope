@@ -1,12 +1,16 @@
 import { data } from "react-router";
 
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
+import { di } from "@/app/server/di";
 import { env } from "@/app/server/env";
 
 import type { Route } from "./+types/api.server-info";
 
 export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 
-export const loader = () => {
-  return data({ serviceDid: `${env.APPVIEW_DID}#bsky_appview` });
+export const loader = async () => {
+  return data({
+    serviceDid: `${env.APPVIEW_DID}#bsky_appview`,
+    operator: await di.subscopeQuery.findOperator(),
+  });
 };
