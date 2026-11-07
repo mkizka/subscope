@@ -175,6 +175,22 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(page).toHaveURL("/login");
   });
 
+  test("layout-13: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
+    page,
+  }) => {
+    await page.goto("/server");
+    await page.evaluate(() => {
+      document.body.style.minHeight = "3000px";
+    });
+    const menuButton = page.getByRole("button", { name: "メニューを開く" });
+
+    await page.mouse.wheel(0, 1000);
+    await expect(menuButton).not.toBeInViewport();
+
+    await page.mouse.wheel(0, -100);
+    await expect(menuButton).toBeInViewport();
+  });
+
   test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目に加えて「サーバー」を並べる", async ({
     page,
   }) => {
