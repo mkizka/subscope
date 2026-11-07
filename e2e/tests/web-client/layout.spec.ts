@@ -183,6 +183,17 @@ test.describe("レイアウト（モバイル）", () => {
     ).not.toHaveAttribute("aria-current");
   });
 
+  test("layout-15: モバイルでは、下のタブにラベル文字を出さず、アイコンだけを表示する", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const tabs = page.getByRole("navigation", { name: "タブバー" });
+    await expect(tabs.getByRole("link", { name: "ホーム" })).toBeVisible();
+    await expect(tabs.getByText("ホーム")).toHaveCount(0);
+    await expect(tabs.getByText("プロフィール")).toHaveCount(0);
+  });
+
   test("layout-7: モバイルでは、ヘッダーの自分のアイコンから開くドロワーの「ログアウト」で、ログイン画面に移動する", async ({
     page,
   }) => {
