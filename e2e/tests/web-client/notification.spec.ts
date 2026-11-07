@@ -300,4 +300,15 @@ test.describe("通知（PC）", () => {
 
     await expect(region.getByText("通知はまだありません")).toBeVisible();
   });
+
+  test("notification-9: 通知の読み込み中は、左にアイコン列、右にアバター・文・ハンドル・本文を持つ通知の形のスケルトンを6行表示する", async ({
+    page,
+  }) => {
+    await page.route("**/api/notifications?*", () => {});
+
+    await page.goto("/notifications");
+
+    const rows = page.getByRole("region", { name: "通知" }).getByRole("status");
+    await expect(rows.locator("> div")).toHaveCount(6);
+  });
 });

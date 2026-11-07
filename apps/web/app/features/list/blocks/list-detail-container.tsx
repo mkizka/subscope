@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigation, useSearchParams, useSubmit } from "react-router";
 
-import { RowsSkeleton } from "@/app/components/rows-skeleton";
+import { PostsSkeleton } from "@/app/components/posts-skeleton";
+import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.list.$handle.$rkey";
 
@@ -29,7 +30,7 @@ export function ListDetailContainer({ handle, rkey }: Props) {
   });
 
   if (!data) {
-    return <RowsSkeleton />;
+    return tab === "members" ? <AccountsSkeleton /> : <PostsSkeleton />;
   }
   const { list, ...rest } = data;
   return (

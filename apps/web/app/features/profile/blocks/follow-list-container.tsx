@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeftIcon } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
 
-import { RowsSkeleton } from "@/app/components/rows-skeleton";
+import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle.$kind";
@@ -65,7 +65,7 @@ export function FollowListContainer({ handle, kind }: Props) {
         />
       )}
       {!data ? (
-        <RowsSkeleton />
+        <AccountsSkeleton />
       ) : data.accounts.length === 0 ? (
         <p className="py-8 text-center text-label text-muted">
           {emptyMessages[kind]}
