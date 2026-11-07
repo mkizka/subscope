@@ -42,11 +42,11 @@ test.describe("投稿動画", () => {
     const post = await open(page, text);
 
     const video = post.getByLabel(text);
-    await expect(video).toHaveJSProperty("tagName", "VIDEO");
+    await expect(video).toHaveJSProperty("tagName", "HLS-VIDEO");
     await expect(video).toHaveAttribute("poster", /thumbnail\.jpg$/);
   });
 
-  test("post-video-2: 動画を再生すると、hls.jsでplaylistを取得して再生を始める", async ({
+  test("post-video-2: 再生ボタンを押すとplaylistを取得して再生を始める", async ({
     page,
   }) => {
     const text = `post-video-2: ${Date.now()}`;
@@ -60,12 +60,8 @@ test.describe("投稿動画", () => {
       }),
     );
     const requested = page.waitForRequest(PLAYLIST);
-    const video = post.getByLabel(text);
-    await video.evaluate((el: HTMLVideoElement) => {
-      void el.play().catch(() => undefined);
-    });
+    await post.getByRole("button", { name: /play/i }).click();
     await requested;
-    await expect(video).toHaveAttribute("src", /^blob:/);
   });
 
   test("post-video-3: 引用された投稿に付いた動画を、引用した投稿の中に表示する", async ({
