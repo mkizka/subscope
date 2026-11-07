@@ -17,7 +17,8 @@ export interface IAccountQuery {
     did: string,
     account: AtIdentifierString,
     tab: ProfileTab,
-  ) => Promise<TimelinePostDto[]>;
+    cursor?: string,
+  ) => Promise<{ posts: TimelinePostDto[]; cursor?: string }>;
   findFollowList: (
     did: string,
     account: AtIdentifierString,

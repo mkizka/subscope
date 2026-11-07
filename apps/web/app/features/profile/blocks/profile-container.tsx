@@ -1,6 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useOutlet, useSearchParams } from "react-router";
 
+import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger";
+import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
 import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
@@ -26,17 +28,27 @@ type Props = {
 export function ProfileContainer({ handle }: Props) {
   const listsTab = useOutlet();
   const tabParam = useSearchParams()[0].get("tab") ?? "";
-  const { data, isPlaceholderData } = useQuery({
+  const {
+    data: pages,
+    isPlaceholderData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["profile", handle, tabParam],
-    queryFn: () =>
+    queryFn: ({ pageParam }) =>
       fetchJson<ProfileResponse>(
-        `/api/profile/${handle}?${new URLSearchParams({ tab: tabParam })}`,
+        `/api/profile/${handle}?${new URLSearchParams({ tab: tabParam, ...(pageParam && { cursor: pageParam }) })}`,
       ),
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
     placeholderData: (previous, previousQuery) =>
       previousQuery?.queryKey[1] === handle ? previous : undefined,
     throwOnError: true,
   });
 
+  const data = pages?.pages[0];
   const tabs = data?.isSelf
     ? (["posts", "replies", "media", "likes"] as const)
     : (["posts", "replies", "media"] as const);
@@ -83,9 +95,19 @@ export function ProfileContainer({ handle }: Props) {
         ]}
       />
       {listsTab ??
-        (data && !isPlaceholderData ? (
+        (pages && data && !isPlaceholderData ? (
           // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ
-          <TimelineFeed posts={data.posts} />
+          <>
+            <TimelineFeed posts={pages.pages.flatMap((page) => page.posts)} />
+            {hasNextPage && (
+              <LoadingSpinner label="続きを読み込み中">
+                <InfiniteScrollTrigger
+                  onIntersect={() => void fetchNextPage()}
+                  enabled={!isFetchingNextPage}
+                />
+              </LoadingSpinner>
+            )}
+          </>
         ) : (
           <PostsSkeleton />
         ))}

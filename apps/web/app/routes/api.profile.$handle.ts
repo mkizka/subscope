@@ -23,11 +23,13 @@ export const loader = async ({
   if (!isAtIdentifierString(params.handle)) {
     throw data("ユーザーが見つかりません", { status: 404 });
   }
+  const searchParams = new URL(request.url).searchParams;
   return data(
     await di.getProfilePageUseCase.execute(
       context.get(didContext),
       params.handle,
-      toTab(new URL(request.url).searchParams.get("tab")),
+      toTab(searchParams.get("tab")),
+      searchParams.get("cursor") ?? undefined,
     ),
   );
 };
