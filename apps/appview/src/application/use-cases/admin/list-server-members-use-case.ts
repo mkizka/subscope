@@ -39,7 +39,7 @@ export class ListServerMembersUseCase {
     const paginationResult = paginator.extractPage(registrations);
 
     const ctx = this.viewContextFactory.create({ includeTakedowns: true });
-    const registeredAccounts = await Promise.all(
+    const serverMembers = await Promise.all(
       paginationResult.items.map(async (sub) => {
         const did = asDid(sub.accountDid);
         const [profile, account] = await Promise.all([
@@ -60,7 +60,7 @@ export class ListServerMembersUseCase {
     return {
       cursor: paginationResult.cursor,
       total,
-      registeredAccounts: registeredAccounts.filter((sub) => sub !== undefined),
+      serverMembers: serverMembers.filter((sub) => sub !== undefined),
     };
   }
 }

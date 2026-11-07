@@ -52,13 +52,13 @@ describe("Tapへの登録", () => {
   test("tap-1: メンバーがフォローしたアカウントをTapに追加する", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
 
     // act
-    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    await indexCommit(await followEvent(serverMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
@@ -68,13 +68,11 @@ describe("Tapへの登録", () => {
   test("tap-2: メンバー以外のフォローではTapに追加しない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const nonRegisteredAccount = await accountFactory(ctx.db).create();
+    const nonServerMember = await accountFactory(ctx.db).create();
     const followee = await accountFactory(ctx.db).create();
 
     // act
-    await indexCommit(
-      await followEvent(nonRegisteredAccount.did, followee.did),
-    );
+    await indexCommit(await followEvent(nonServerMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
@@ -84,15 +82,15 @@ describe("Tapへの登録", () => {
   test("tap-3: メンバーがフォローを外したアカウントは、追跡アカウントでなくなればTapから外す", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
-    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    await indexCommit(await followEvent(serverMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // act
-    await indexCommit(unfollowEvent(registeredAccount.did, followee.did));
+    await indexCommit(unfollowEvent(serverMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
@@ -102,21 +100,19 @@ describe("Tapへの登録", () => {
   test("tap-4: 他のメンバーがフォローしているアカウントはTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
-    const otherRegisteredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const otherServerMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
-    await indexCommit(await followEvent(registeredAccount.did, followee.did));
-    await indexCommit(
-      await followEvent(otherRegisteredAccount.did, followee.did),
-    );
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    await indexCommit(await followEvent(otherServerMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // act
-    await indexCommit(unfollowEvent(registeredAccount.did, followee.did));
+    await indexCommit(unfollowEvent(serverMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
@@ -126,19 +122,17 @@ describe("Tapへの登録", () => {
   test("tap-5: メンバー以外がフォローを外してもTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
-    const nonRegisteredAccount = await accountFactory(ctx.db).create();
+    const nonServerMember = await accountFactory(ctx.db).create();
     const followee = await accountFactory(ctx.db).create();
-    await indexCommit(await followEvent(registeredAccount.did, followee.did));
-    await indexCommit(
-      await followEvent(nonRegisteredAccount.did, followee.did),
-    );
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    await indexCommit(await followEvent(nonServerMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // act
-    await indexCommit(unfollowEvent(nonRegisteredAccount.did, followee.did));
+    await indexCommit(unfollowEvent(nonServerMember.did, followee.did));
     await runSyncTapRepoJobs();
 
     // assert
@@ -148,27 +142,25 @@ describe("Tapへの登録", () => {
   test("tap-6: メンバーは、フォローを外されてもTapから外さない", async () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, tapClient } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
-    const followedRegisteredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const followedServerMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     await indexCommit(
-      await followEvent(registeredAccount.did, followedRegisteredAccount.did),
+      await followEvent(serverMember.did, followedServerMember.did),
     );
     await runSyncTapRepoJobs();
 
     // act
     await indexCommit(
-      unfollowEvent(registeredAccount.did, followedRegisteredAccount.did),
+      unfollowEvent(serverMember.did, followedServerMember.did),
     );
     await runSyncTapRepoJobs();
 
     // assert
-    expect(tapClient.getRegisteredDids()).toContain(
-      followedRegisteredAccount.did,
-    );
+    expect(tapClient.getRegisteredDids()).toContain(followedServerMember.did);
   });
 });
 
@@ -187,13 +179,13 @@ describe("バックフィルの状態の確認", () => {
     // arrange
     const { indexCommit, runSyncTapRepoJobs, runCheckBackfillJobs } =
       await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
 
     // act
-    await indexCommit(await followEvent(registeredAccount.did, followee.did));
+    await indexCommit(await followEvent(serverMember.did, followee.did));
     await runSyncTapRepoJobs();
     await runCheckBackfillJobs();
 
@@ -218,12 +210,12 @@ describe("バックフィルの状態の確認", () => {
 
     // act
     for (const state of Object.keys(expected)) {
-      const registeredAccount = await accountFactory(ctx.db)
-        .use((t) => t.registeredAccount())
+      const serverMember = await accountFactory(ctx.db)
+        .use((t) => t.serverMember())
         .create();
-      tapClient.setRepoState(asDid(registeredAccount.did), state);
-      await checkBackfill(asDid(registeredAccount.did));
-      actual[state] = await findBackfillStatus(registeredAccount.did);
+      tapClient.setRepoState(asDid(serverMember.did), state);
+      await checkBackfill(asDid(serverMember.did));
+      actual[state] = await findBackfillStatus(serverMember.did);
     }
 
     // assert
@@ -233,10 +225,10 @@ describe("バックフィルの状態の確認", () => {
   test("backfill-3: 完了でなければ、間隔を伸ばしながら確認を続ける", async () => {
     // arrange
     const { checkBackfill, tapClient, jobScheduler } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
-    const did = asDid(registeredAccount.did);
+    const did = asDid(serverMember.did);
 
     // act
     tapClient.setRepoState(did, "pending");
@@ -268,13 +260,13 @@ describe("バックフィルの状態の確認", () => {
     // arrange
     const { indexCommit, scheduleBackfillChecks, jobScheduler } =
       await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
-    await indexCommit(await followEvent(registeredAccount.did, followee.did));
-    const checkedRegisteredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    await indexCommit(await followEvent(serverMember.did, followee.did));
+    const checkedServerMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .props({ backfillStatus: () => "completed" })
       .create();
     const untracked = await accountFactory(ctx.db).create();
@@ -286,9 +278,9 @@ describe("バックフィルの状態の確認", () => {
     // assert
     const dids = jobScheduler.getCheckBackfillJobs().map((job) => job.did);
     expect(dids).toEqual(
-      expect.arrayContaining([registeredAccount.did, followee.did]),
+      expect.arrayContaining([serverMember.did, followee.did]),
     );
-    expect(dids).not.toContain(checkedRegisteredAccount.did);
+    expect(dids).not.toContain(checkedServerMember.did);
     expect(dids).not.toContain(untracked.did);
   });
 });

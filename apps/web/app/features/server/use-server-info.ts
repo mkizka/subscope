@@ -11,7 +11,7 @@ type ServerResponse = Awaited<ReturnType<typeof serverLoader>>["data"];
 
 export function useServerInfo() {
   const registered = useQuery({
-    queryKey: ["clientRegisteredAccounts", ""],
+    queryKey: ["clientServerMembers", ""],
     queryFn: () => fetchJson<RegisteredResponse>(`/api/registered-accounts?q=`),
     throwOnError: true,
   }).data;
@@ -28,12 +28,10 @@ export function useServerInfo() {
 
   return {
     registeredCount: registered
-      ? `${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}`
+      ? `${registered.serverMembers.length}${registered.hasMore ? "+" : ""}`
       : undefined,
     trackedCount: tracked?.total,
-    operators: registered?.registeredAccounts.filter(
-      (account) => account.isAdmin,
-    ),
+    operators: registered?.serverMembers.filter((account) => account.isAdmin),
     serviceDid: server?.serviceDid,
   };
 }

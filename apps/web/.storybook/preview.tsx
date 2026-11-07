@@ -7,7 +7,7 @@ import { createRoutesStub } from "react-router";
 
 import type { loader as meLoader } from "@/app/routes/api.me";
 import type { loader as unreadCountLoader } from "@/app/routes/api.notifications.unread-count";
-import type { loader as registeredAccountsLoader } from "@/app/routes/api.registered-accounts";
+import type { loader as serverMembersLoader } from "@/app/routes/api.registered-accounts";
 import type { loader as serverInfoLoader } from "@/app/routes/api.server-info";
 import type { loader as trackedAccountsLoader } from "@/app/routes/api.tracked-accounts";
 
@@ -26,10 +26,10 @@ const preview: Preview = {
       ["notifications", "unread-count"],
       { count: 2 },
     );
-    queryClient.setQueryData<Data<typeof registeredAccountsLoader>>(
-      ["clientRegisteredAccounts", ""],
+    queryClient.setQueryData<Data<typeof serverMembersLoader>>(
+      ["clientServerMembers", ""],
       {
-        registeredAccounts: [
+        serverMembers: [
           { ...alice, isAdmin: true },
           { did: "did:plc:carol", handle: "handle.invalid", isAdmin: false },
         ],

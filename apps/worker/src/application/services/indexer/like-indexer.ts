@@ -37,11 +37,13 @@ export class LikeIndexer implements ICollectionIndexer {
   async upsert({ ctx, record }: { ctx: AfterCommitContext; record: Record }) {
     const like = parseLike(record);
     const recipientDid = new AtUri(like.subjectUri).host;
-    const isRecipientRegisteredAccount =
-      await this.registrationQuery.isRegistered(ctx, recipientDid);
+    const isRecipientServerMember = await this.registrationQuery.isRegistered(
+      ctx,
+      recipientDid,
+    );
     await this.likeRepository.save({ ctx, like });
 
-    if (recipientDid !== like.accountDid && isRecipientRegisteredAccount) {
+    if (recipientDid !== like.accountDid && isRecipientServerMember) {
       await this.notificationRepository.save({
         ctx,
         notifications: [

@@ -15,7 +15,7 @@ describe("NotificationQuery", () => {
     test("受信者の通知をcursorより古いものから新しい順に返し、seenAt以前のものを既読にする", async () => {
       // arrange
       const recipient = await accountFactory(ctx.db)
-        .use((t) => t.registeredAccount())
+        .use((t) => t.serverMember())
         .create();
       const author = await accountFactory(ctx.db).create();
       const notify = async (sortAt: string) => {
@@ -58,7 +58,7 @@ describe("NotificationQuery", () => {
     test("受信者の通知のうちseenAtより新しいものの数を返す", async () => {
       // arrange
       const recipient = await accountFactory(ctx.db)
-        .use((t) => t.registeredAccount())
+        .use((t) => t.serverMember())
         .create();
       const author = await accountFactory(ctx.db).create();
       for (const sortAt of ["2024-01-01", "2024-01-03", "2024-01-05"]) {

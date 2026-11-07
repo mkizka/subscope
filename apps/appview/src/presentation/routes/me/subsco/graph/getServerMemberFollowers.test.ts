@@ -15,9 +15,9 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
 
   const createAccount = () => accountFactory(ctx.db).create();
 
-  const createRegisteredAccount = () =>
+  const createServerMember = () =>
     accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
 
   type Account = Awaited<ReturnType<typeof createAccount>>;
@@ -38,7 +38,7 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
-    const registeredFollower = await createRegisteredAccount();
+    const registeredFollower = await createServerMember();
     const unregisteredFollower = await createAccount();
     await follow(registeredFollower, account);
     await follow(unregisteredFollower, account);
@@ -56,9 +56,9 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
-    const oldFollower = await createRegisteredAccount();
-    const middleFollower = await createRegisteredAccount();
-    const newFollower = await createRegisteredAccount();
+    const oldFollower = await createServerMember();
+    const middleFollower = await createServerMember();
+    const newFollower = await createServerMember();
     await follow(oldFollower, account, new Date("2024-01-01"));
     await follow(middleFollower, account, new Date("2024-01-02"));
     await follow(newFollower, account, new Date("2024-01-03"));
@@ -86,8 +86,8 @@ describe("me.subsco.graph.getServerMemberFollowers", () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await createAccount();
-    await follow(await createRegisteredAccount(), account);
-    await follow(await createRegisteredAccount(), account);
+    await follow(await createServerMember(), account);
+    await follow(await createServerMember(), account);
     await follow(await createAccount(), account);
 
     // act

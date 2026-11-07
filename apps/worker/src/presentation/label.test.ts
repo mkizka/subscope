@@ -77,25 +77,25 @@ describe("ラベルの保存", () => {
   test("label-4: Tapに追加したアカウントに付いているラベルをモデレーションサービスの queryLabels で取り寄せて保存する", async () => {
     // arrange
     const { syncTapRepo, labelFetcher } = await setupJobTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const cts = "2026-01-01T00:00:00.000Z";
     labelFetcher.add({
       src,
-      uri: registeredAccount.did,
+      uri: serverMember.did,
       val: "!takedown",
       cts,
     });
     labelFetcher.add({ src, uri: "did:plc:other", val: "!takedown", cts });
 
     // act
-    await syncTapRepo(asDid(registeredAccount.did));
+    await syncTapRepo(asDid(serverMember.did));
 
     // assert
     const labels = await ctx.db.select().from(schema.labels);
     expect(labels).toEqual([
-      expect.objectContaining({ uri: registeredAccount.did }),
+      expect.objectContaining({ uri: serverMember.did }),
     ]);
   });
 });

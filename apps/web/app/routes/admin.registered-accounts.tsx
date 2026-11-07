@@ -1,5 +1,5 @@
-import { RegisteredAccountListContainer } from "@/app/features/admin/blocks/registered-account-list-container";
+import { ServerMemberListContainer } from "@/app/features/admin/blocks/server-member-list-container";
 
-export default function AdminRegisteredAccounts() {
-  return <RegisteredAccountListContainer />;
+export default function AdminServerMembers() {
+  return <ServerMemberListContainer />;
 }

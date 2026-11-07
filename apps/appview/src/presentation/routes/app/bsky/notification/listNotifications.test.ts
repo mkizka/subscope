@@ -24,7 +24,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
@@ -64,7 +64,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
@@ -104,7 +104,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const author = await accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
@@ -139,7 +139,7 @@ describe("app.bsky.notification.listNotifications", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     await ctx.db
       .update(schema.registrations)

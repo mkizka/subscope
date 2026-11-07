@@ -18,7 +18,7 @@ describe("me.subsco.admin.banAccount", () => {
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     loginAs(admin.did);
 
@@ -38,15 +38,15 @@ describe("me.subsco.admin.banAccount", () => {
     const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
     await followFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ account: () => registeredAccount })
+            .vars({ account: () => serverMember })
             .create(),
         followee: () => followee,
       })
@@ -54,11 +54,11 @@ describe("me.subsco.admin.banAccount", () => {
     loginAs(admin.did);
 
     // act
-    await client.call(banAccount, { did: asDid(registeredAccount.did) });
+    await client.call(banAccount, { did: asDid(serverMember.did) });
 
     // assert
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
-      { did: asDid(registeredAccount.did) },
+      { did: asDid(serverMember.did) },
       { did: followee.did },
     ]);
   });
