@@ -86,7 +86,7 @@ test.describe("サーバー", () => {
     await expect(alice.getByText(/^@/)).toBeVisible();
   });
 
-  test("server-7: 「誰かがフォロー」タブでは、追跡アカウント（名前、ハンドル）を、フォローしている登録アカウントが多い順に一覧表示する", async ({
+  test("server-7: 「誰かがフォロー」タブでは、フォローされているアカウント（名前、ハンドル）を、フォローしているメンバーが多い順に一覧表示する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -97,9 +97,7 @@ test.describe("サーバー", () => {
     const bob = items(page).filter({ hasText: "Bob" });
     await expect(async () => {
       await page.reload();
-      await expect(items(page).filter({ hasText: "Alice" })).toBeVisible({
-        timeout: 1000,
-      });
+      await expect(bob).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(bob.getByText(/^@/)).toBeVisible();
     const counts = (
@@ -164,7 +162,7 @@ test.describe("サーバー", () => {
     }).toPass();
   });
 
-  test("server-11: 「誰かがフォロー」タブには、フォローしている登録アカウントの数を「n人からフォロー」と表示する", async ({
+  test("server-11: 「誰かがフォロー」タブには、フォローしているメンバーの数を「n人からフォロー」と表示する", async ({
     page,
   }) => {
     await page.goto("/server?tab=tracked");
@@ -217,13 +215,17 @@ test.describe("サーバー", () => {
     page,
   }) => {
     await page.goto("/server?tab=tracked");
-    await expect(items(page).filter({ hasText: "Alice" })).toBeVisible();
+    await expect(items(page).filter({ hasText: "Bob" })).toBeVisible();
 
     await page.getByPlaceholder("名前・ハンドルで検索").fill("bob");
 
     await expect(page).toHaveURL("/server?tab=tracked&q=bob");
     await expect(items(page).filter({ hasText: "Bob" })).toBeVisible();
-    await expect(items(page).filter({ hasText: "Alice" })).toBeHidden();
+
+    await page.getByPlaceholder("名前・ハンドルで検索").fill("alice");
+
+    await expect(page).toHaveURL("/server?tab=tracked&q=alice");
+    await expect(items(page).filter({ hasText: "Bob" })).toBeHidden();
   });
 
   test("server-15: 検索に一致するアカウントがないときは「アカウントが見つかりません」を表示する", async ({

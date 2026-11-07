@@ -10,12 +10,12 @@ export interface IRegistrationQuery {
     q?: string;
   }) => Promise<Registration[]>;
   count: () => Promise<number>;
-  findTrackedAccounts: (params: {
+  findFollowedAccounts: (params: {
     limit: number;
     cursor?: string;
     q?: string;
   }) => Promise<{ did: Did; registeredFollowersCount: number }[]>;
-  countTrackedAccounts: () => Promise<number>;
+  countFollowedAccounts: () => Promise<number>;
   findRegisteredFollowers: (params: {
     subjectDid: Did;
     limit: number;

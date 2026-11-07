@@ -91,9 +91,9 @@
     "me.subsco.admin.unbanAccount",
     "me.subsco.admin.verifyAccess",
     "me.subsco.graph.getRegisteredFollowers",
+    "me.subsco.server.getFollowedAccounts",
     "me.subsco.server.getRegisteredAccounts",
     "me.subsco.server.getSetupStatus",
-    "me.subsco.server.getTrackedAccounts",
     "me.subsco.sync.getBackfillStatuses",
     "me.subsco.sync.getRegistrationStatus",
     "me.subsco.sync.registerAccount",
@@ -400,6 +400,10 @@
       "uri": "file://./lexicons/me/subsco/graph/getRegisteredFollowers.json",
       "cid": "bafyreifw5b5s22p5fbpjyxsp34o2ffmyt6qobue3gyjhilq4tc5ajbnwdi"
     },
+    "me.subsco.server.getFollowedAccounts": {
+      "uri": "file://./lexicons/me/subsco/server/getFollowedAccounts.json",
+      "cid": "bafyreigeqysnvxhwa5uea3th54yscp7cioqntqspnll3a5obsfjaha2gdi"
+    },
     "me.subsco.server.getRegisteredAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getRegisteredAccounts.json",
       "cid": "bafyreic3x64hor5t6wz4f4pi3c5nj2yz3ptcqlqulg5lnv2jqgiwnosfue"
@@ -407,10 +411,6 @@
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",
       "cid": "bafyreiaml7lvp3tih3gcbfaxmpuc4eelqgpxy23ld7gzrejeqtu5ytqb2q"
-    },
-    "me.subsco.server.getTrackedAccounts": {
-      "uri": "file://./lexicons/me/subsco/server/getTrackedAccounts.json",
-      "cid": "bafyreidgtkjkiacn25c2bsk74tcgdlagc7x5qzmofoohmvud2pj2ewhbse"
     },
     "me.subsco.sync.getBackfillStatuses": {
       "uri": "file://./lexicons/me/subsco/sync/getBackfillStatuses.json",

@@ -1,7 +1,7 @@
 import { Client } from "@atproto/lex";
+import getFollowedAccounts from "@repo/client/me/subsco/server/getFollowedAccounts";
 import getRegisteredAccounts from "@repo/client/me/subsco/server/getRegisteredAccounts";
 import getSetupStatus from "@repo/client/me/subsco/server/getSetupStatus";
-import getTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
 import getRegistrationStatus, {
   registered,
 } from "@repo/client/me/subsco/sync/getRegistrationStatus";
@@ -55,14 +55,14 @@ export const subscopeQueryFactory = ({
         hasMore: cursor !== undefined,
       };
     },
-    async findTrackedAccounts(did, q) {
+    async findFollowedAccounts(did, q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-      const { trackedAccounts, total } = await (
+      const { followedAccounts, total } = await (
         await restore(did)
-      ).call(getTrackedAccounts, { limit: 100, q });
+      ).call(getFollowedAccounts, { limit: 100, q });
       return {
         total,
-        accounts: trackedAccounts.map(
+        accounts: followedAccounts.map(
           ({ profile, registeredFollowersCount }) => ({
             did: profile.did,
             handle: profile.handle,

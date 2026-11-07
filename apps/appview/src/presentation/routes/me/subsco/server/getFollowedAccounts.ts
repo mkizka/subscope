@@ -1,20 +1,20 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
+import getFollowedAccounts from "@repo/client/me/subsco/server/getFollowedAccounts";
 
-import type { GetTrackedAccountsUseCase } from "../../../../../application/use-cases/server/get-tracked-accounts-use-case.js";
+import type { GetFollowedAccountsUseCase } from "../../../../../application/use-cases/server/get-followed-accounts-use-case.js";
 import type { AuthVerifierMiddleware } from "../../../../../presentation/middleware/auth-verifier-middleware.js";
 
-export class GetTrackedAccounts {
+export class GetFollowedAccounts {
   constructor(
-    private getTrackedAccountsUseCase: GetTrackedAccountsUseCase,
+    private getFollowedAccountsUseCase: GetFollowedAccountsUseCase,
     private authVerifierMiddleware: AuthVerifierMiddleware,
   ) {}
 
   handle(router: LexRouter) {
-    router.add(getTrackedAccounts, {
+    router.add(getFollowedAccounts, {
       auth: (ctx) => this.authVerifierMiddleware.loginRequired(ctx),
       handler: async ({ params }) => {
-        const result = await this.getTrackedAccountsUseCase.execute({
+        const result = await this.getFollowedAccountsUseCase.execute({
           limit: params.limit,
           cursor: params.cursor,
           q: params.q,

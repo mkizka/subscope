@@ -12,7 +12,6 @@ import {
   gt,
   ilike,
   inArray,
-  isNotNull,
   lt,
   or,
 } from "drizzle-orm";
@@ -60,7 +59,7 @@ export class RegistrationQuery implements IRegistrationQuery {
     return row?.count ?? 0;
   }
 
-  async findTrackedAccounts(params: {
+  async findFollowedAccounts(params: {
     limit: number;
     cursor?: string;
     q?: string;
@@ -72,13 +71,13 @@ export class RegistrationQuery implements IRegistrationQuery {
     const rows = await this.db
       .select({ did: accounts.did, registeredFollowersCount })
       .from(accounts)
-      .leftJoin(follows, eq(follows.subjectDid, accounts.did))
-      .leftJoin(registrations, eq(registrations.accountDid, follows.accountDid))
+      .innerJoin(follows, eq(follows.subjectDid, accounts.did))
+      .innerJoin(
+        registrations,
+        eq(registrations.accountDid, follows.accountDid),
+      )
       .where(
-        and(
-          this.isTrackedAccount(),
-          params.q ? inArray(accounts.did, this.matching(params.q)) : undefined,
-        ),
+        params.q ? inArray(accounts.did, this.matching(params.q)) : undefined,
       )
       .groupBy(accounts.did)
       .having(
@@ -98,14 +97,16 @@ export class RegistrationQuery implements IRegistrationQuery {
     return rows.map((row) => ({ ...row, did: asDid(row.did) }));
   }
 
-  async countTrackedAccounts(): Promise<number> {
+  async countFollowedAccounts(): Promise<number> {
     const { accounts, follows, registrations } = schema;
     const [row] = await this.db
       .select({ total: countDistinct(accounts.did) })
       .from(accounts)
-      .leftJoin(follows, eq(follows.subjectDid, accounts.did))
-      .leftJoin(registrations, eq(registrations.accountDid, follows.accountDid))
-      .where(this.isTrackedAccount());
+      .innerJoin(follows, eq(follows.subjectDid, accounts.did))
+      .innerJoin(
+        registrations,
+        eq(registrations.accountDid, follows.accountDid),
+      );
     return row?.total ?? 0;
   }
 
@@ -190,16 +191,5 @@ export class RegistrationQuery implements IRegistrationQuery {
           ilike(accounts.handle, pattern),
         ),
       );
-  }
-
-  private isTrackedAccount() {
-    const { accounts, registrations } = schema;
-    return or(
-      isNotNull(registrations.accountDid),
-      inArray(
-        accounts.did,
-        this.db.select({ did: registrations.accountDid }).from(registrations),
-      ),
-    );
   }
 }
