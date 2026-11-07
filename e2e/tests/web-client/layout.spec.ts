@@ -180,7 +180,9 @@ test.describe("レイアウト（モバイル）", () => {
   }) => {
     await page.goto("/server");
     await page.evaluate(() => {
-      document.body.style.minHeight = "3000px";
+      document.body
+        .querySelector("main")
+        ?.style.setProperty("min-height", "3000px");
     });
     const menuButton = page.getByRole("button", { name: "メニューを開く" });
 
