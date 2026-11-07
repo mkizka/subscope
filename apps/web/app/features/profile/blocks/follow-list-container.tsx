@@ -58,7 +58,7 @@ export function FollowListContainer({ handle, kind }: Props) {
             { to: ".", label: "すべて", selected: !registered },
             {
               to: "?filter=registered",
-              label: `登録アカウント${data?.registeredCount === undefined ? "" : ` ${data.registeredCount}`}`,
+              label: `メンバー${data?.registeredCount === undefined ? "" : ` ${data.registeredCount}`}`,
               selected: registered,
             },
           ]}

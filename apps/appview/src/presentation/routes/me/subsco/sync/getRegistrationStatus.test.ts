@@ -7,7 +7,7 @@ import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 describe("me.subsco.sync.getRegistrationStatus", () => {
   const { ctx } = testSetup;
 
-  test("getRegistrationStatus-1: 閲覧者が登録アカウントならisRegisteredをtrueにする", async () => {
+  test("getRegistrationStatus-1: 閲覧者がメンバーならisRegisteredをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const registeredAccount = await accountFactory(ctx.db)
@@ -25,7 +25,7 @@ describe("me.subsco.sync.getRegistrationStatus", () => {
     });
   });
 
-  test("getRegistrationStatus-2: 閲覧者が登録アカウントでなければisRegisteredをfalseにする", async () => {
+  test("getRegistrationStatus-2: 閲覧者がメンバーでなければisRegisteredをfalseにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const account = await accountFactory(ctx.db).create();

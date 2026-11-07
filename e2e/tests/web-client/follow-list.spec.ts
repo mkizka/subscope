@@ -124,23 +124,23 @@ test.describe("フォロー・フォロワー", () => {
     await expect(bob).toBeVisible();
   });
 
-  test("follow-list-7: フォロワー一覧に「すべて」と「登録アカウント」のタブを表示し、「登録アカウント」には人数を添える", async ({
+  test("follow-list-7: フォロワー一覧に「すべて」と「メンバー」のタブを表示し、「メンバー」には人数を添える", async ({
     page,
   }) => {
     await page.goto("/bob.test/followers");
 
     await expect(page.getByRole("tab", { name: "すべて" })).toBeVisible();
     await expect(
-      page.getByRole("tab", { name: /^登録アカウント \d+$/ }),
+      page.getByRole("tab", { name: /^メンバー \d+$/ }),
     ).toBeVisible();
   });
 
-  test("follow-list-8: 「登録アカウント」タブ（`?filter=registered`）には、そのアカウントをフォローしている登録アカウントだけを一覧表示する", async ({
+  test("follow-list-8: 「メンバー」タブ（`?filter=registered`）には、そのアカウントをフォローしているメンバーだけを一覧表示する", async ({
     page,
   }) => {
     await page.goto("/bob.test/followers");
 
-    await page.getByRole("tab", { name: /^登録アカウント/ }).click();
+    await page.getByRole("tab", { name: /^メンバー/ }).click();
 
     await expect(page).toHaveURL("/bob.test/followers?filter=registered");
     const alice = page
@@ -153,7 +153,7 @@ test.describe("フォロー・フォロワー", () => {
     }).toPass();
   });
 
-  test("follow-list-9: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「登録アカウント」タブに移動する", async ({
+  test("follow-list-9: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「メンバー」タブに移動する", async ({
     page,
   }) => {
     const link = page
