@@ -14,7 +14,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   try {
     const url = new URL(request.url);
     const cursor = url.searchParams.get("cursor") ?? undefined;
-    return data(await di.listRegisteredAccountsUseCase(did, cursor));
+    return data(await di.listServerMembersUseCase(did, cursor));
   } catch (e) {
     if (
       e instanceof XrpcResponseError &&

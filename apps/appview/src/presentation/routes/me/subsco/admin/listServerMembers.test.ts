@@ -1,4 +1,4 @@
-import listRegisteredAccounts from "@repo/client/me/subsco/admin/listRegisteredAccounts";
+import listServerMembers from "@repo/client/me/subsco/admin/listServerMembers";
 import {
   accountFactory,
   followFactory,
@@ -11,34 +11,34 @@ import { describe, expect, test } from "vitest";
 
 import { setupApiTest } from "../../../../../shared/api-test-utils.js";
 
-describe("me.subsco.admin.listRegisteredAccounts", () => {
+describe("me.subsco.admin.listServerMembers", () => {
   const { ctx } = testSetup;
 
-  test("listRegisteredAccounts-1: 認証がないリクエストには401を返す", async () => {
+  test("listServerMembers-1: 認証がないリクエストには401を返す", async () => {
     // arrange
     const { client } = await setupApiTest();
 
     // act
-    const promise = client.call(listRegisteredAccounts);
+    const promise = client.call(listServerMembers);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 401 });
   });
 
-  test("listRegisteredAccounts-2: 管理者でないアカウントからのリクエストには403を返す", async () => {
+  test("listServerMembers-2: 管理者でないアカウントからのリクエストには403を返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const viewer = await accountFactory(ctx.db).create();
     loginAs(viewer.did);
 
     // act
-    const promise = client.call(listRegisteredAccounts);
+    const promise = client.call(listServerMembers);
 
     // assert
     await expect(promise).rejects.toMatchObject({ status: 403 });
   });
 
-  test("listRegisteredAccounts-3: メンバーごとにprofileViewと管理者かどうかを返す", async () => {
+  test("listServerMembers-3: メンバーごとにprofileViewと管理者かどうかを返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -50,7 +50,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     loginAs(admin.did);
 
     // act
-    const res = await client.call(listRegisteredAccounts);
+    const res = await client.call(listServerMembers);
 
     // assert
     expect(res.registeredAccounts).toMatchObject([
@@ -58,7 +58,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     ]);
   });
 
-  test("listRegisteredAccounts-4: テイクダウンされたメンバーも含める", async () => {
+  test("listServerMembers-4: テイクダウンされたメンバーも含める", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -73,7 +73,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     loginAs(admin.did);
 
     // act
-    const res = await client.call(listRegisteredAccounts);
+    const res = await client.call(listServerMembers);
 
     // assert
     expect(res.registeredAccounts).toMatchObject([
@@ -81,7 +81,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     ]);
   });
 
-  test("listRegisteredAccounts-5: メンバーごとに登録日時をregisteredAtとして返す", async () => {
+  test("listServerMembers-5: メンバーごとに登録日時をregisteredAtとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -95,7 +95,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     loginAs(admin.did);
 
     // act
-    const res = await client.call(listRegisteredAccounts);
+    const res = await client.call(listServerMembers);
 
     // assert
     expect(res.registeredAccounts).toMatchObject([
@@ -106,7 +106,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     ]);
   });
 
-  test("listRegisteredAccounts-6: ページングに関係なくメンバーの総数をtotalとして返す", async () => {
+  test("listServerMembers-6: ページングに関係なくメンバーの総数をtotalとして返す", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
@@ -118,7 +118,7 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     loginAs(admin.did);
 
     // act
-    const res = await client.call(listRegisteredAccounts, { limit: 1 });
+    const res = await client.call(listServerMembers, { limit: 1 });
 
     // assert
     expect(res.registeredAccounts).toHaveLength(1);
@@ -153,12 +153,12 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     return client;
   };
 
-  test("listRegisteredAccounts-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す", async () => {
+  test("listServerMembers-7: フォロー先の状態にかかわらず、メンバー本人のバックフィルの状態をbackfillStatusとして返す", async () => {
     // arrange
     const client = await setupBackfill("completed", "error");
 
     // act
-    const res = await client.call(listRegisteredAccounts);
+    const res = await client.call(listServerMembers);
 
     // assert
     expect(res.registeredAccounts).toMatchObject([
@@ -166,12 +166,12 @@ describe("me.subsco.admin.listRegisteredAccounts", () => {
     ]);
   });
 
-  test("listRegisteredAccounts-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする", async () => {
+  test("listServerMembers-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする", async () => {
     // arrange
     const client = await setupBackfill(null, "completed");
 
     // act
-    const res = await client.call(listRegisteredAccounts);
+    const res = await client.call(listServerMembers);
 
     // assert
     expect(res.registeredAccounts).toMatchObject([

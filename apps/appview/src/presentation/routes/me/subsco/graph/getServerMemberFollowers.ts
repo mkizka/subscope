@@ -1,22 +1,22 @@
 import type { LexRouter } from "@atproto/lex-server";
-import getRegisteredFollowers from "@repo/client/me/subsco/graph/getRegisteredFollowers";
+import getServerMemberFollowers from "@repo/client/me/subsco/graph/getServerMemberFollowers";
 
-import type { GetRegisteredFollowersUseCase } from "../../../../../application/use-cases/graph/get-registered-followers-use-case.js";
+import type { GetServerMemberFollowersUseCase } from "../../../../../application/use-cases/graph/get-server-member-followers-use-case.js";
 import type { HandleMiddleware } from "../../../../../presentation/middleware/handle-middleware.js";
 
-export class GetRegisteredFollowers {
+export class GetServerMemberFollowers {
   constructor(
-    private getRegisteredFollowersUseCase: GetRegisteredFollowersUseCase,
+    private getServerMemberFollowersUseCase: GetServerMemberFollowersUseCase,
     private handleMiddleware: HandleMiddleware,
   ) {}
 
   handle(router: LexRouter) {
-    router.add(getRegisteredFollowers, async ({ params }) => {
+    router.add(getServerMemberFollowers, async ({ params }) => {
       const accountDid = await this.handleMiddleware.resolveHandleOrDid(
         params.actor,
       );
 
-      const result = await this.getRegisteredFollowersUseCase.execute({
+      const result = await this.getServerMemberFollowersUseCase.execute({
         accountDid,
         limit: params.limit,
         cursor: params.cursor,

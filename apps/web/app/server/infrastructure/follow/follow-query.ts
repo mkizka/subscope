@@ -1,5 +1,5 @@
 import { Client } from "@atproto/lex";
-import getRegisteredFollowers from "@repo/client/me/subsco/graph/getRegisteredFollowers";
+import getServerMemberFollowers from "@repo/client/me/subsco/graph/getServerMemberFollowers";
 
 import type { IFollowQuery } from "@/app/server/application/interfaces/follow-query";
 import { env } from "@/app/server/env";
@@ -9,7 +9,7 @@ export const followQueryFactory = (): IFollowQuery => {
   return {
     async findRegisteredFollowers(subject, limit) {
       const { total, followers } = await publicClient.call(
-        getRegisteredFollowers,
+        getServerMemberFollowers,
         { actor: subject, limit },
       );
       return { total, dids: followers.map((follower) => follower.did) };
