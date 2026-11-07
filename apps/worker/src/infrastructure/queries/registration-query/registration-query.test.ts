@@ -14,18 +14,18 @@ describe("RegistrationQuery", () => {
 
   const registrationQuery = new RegistrationQuery();
 
-  describe("isFollowedByAnyRegisteredAccount", () => {
+  describe("isFollowedByAnyServerMember", () => {
     test("サブスクライバーからフォローされている場合、trueを返す", async () => {
       // arrange
-      const registeredAccount = await accountFactory(ctx.db).create();
+      const serverMember = await accountFactory(ctx.db).create();
       const followee = await accountFactory(ctx.db).create();
 
       await registrationFactory(ctx.db)
-        .vars({ account: () => registeredAccount })
+        .vars({ account: () => serverMember })
         .create();
 
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ account: () => registeredAccount })
+        .vars({ account: () => serverMember })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -35,7 +35,7 @@ describe("RegistrationQuery", () => {
         .create();
 
       // act
-      const result = await registrationQuery.isFollowedByAnyRegisteredAccount(
+      const result = await registrationQuery.isFollowedByAnyServerMember(
         ctx,
         followee.did,
       );
@@ -46,11 +46,11 @@ describe("RegistrationQuery", () => {
 
     test("サブスクライバー以外からのみフォローされている場合、falseを返す", async () => {
       // arrange
-      const nonRegisteredAccount = await accountFactory(ctx.db).create();
+      const nonServerMember = await accountFactory(ctx.db).create();
       const followee = await accountFactory(ctx.db).create();
 
       const record = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ account: () => nonRegisteredAccount })
+        .vars({ account: () => nonServerMember })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -60,7 +60,7 @@ describe("RegistrationQuery", () => {
         .create();
 
       // act
-      const result = await registrationQuery.isFollowedByAnyRegisteredAccount(
+      const result = await registrationQuery.isFollowedByAnyServerMember(
         ctx,
         followee.did,
       );
@@ -74,7 +74,7 @@ describe("RegistrationQuery", () => {
       const followee = await accountFactory(ctx.db).create();
 
       // act
-      const result = await registrationQuery.isFollowedByAnyRegisteredAccount(
+      const result = await registrationQuery.isFollowedByAnyServerMember(
         ctx,
         followee.did,
       );
@@ -85,16 +85,16 @@ describe("RegistrationQuery", () => {
 
     test("複数のフォロワーがいて、一人がサブスクライバーの場合、trueを返す", async () => {
       // arrange
-      const registeredAccount = await accountFactory(ctx.db).create();
-      const nonRegisteredAccount = await accountFactory(ctx.db).create();
+      const serverMember = await accountFactory(ctx.db).create();
+      const nonServerMember = await accountFactory(ctx.db).create();
       const followee = await accountFactory(ctx.db).create();
 
       await registrationFactory(ctx.db)
-        .vars({ account: () => registeredAccount })
+        .vars({ account: () => serverMember })
         .create();
 
       const record1 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ account: () => registeredAccount })
+        .vars({ account: () => serverMember })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -104,7 +104,7 @@ describe("RegistrationQuery", () => {
         .create();
 
       const record2 = await recordFactory(ctx.db, "app.bsky.graph.follow")
-        .vars({ account: () => nonRegisteredAccount })
+        .vars({ account: () => nonServerMember })
         .create();
       await followFactory(ctx.db)
         .vars({
@@ -114,7 +114,7 @@ describe("RegistrationQuery", () => {
         .create();
 
       // act
-      const result = await registrationQuery.isFollowedByAnyRegisteredAccount(
+      const result = await registrationQuery.isFollowedByAnyServerMember(
         ctx,
         followee.did,
       );

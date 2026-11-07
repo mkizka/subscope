@@ -16,18 +16,14 @@ export const getServerMembersUseCaseFactory = ({
   async execute(q) {
     const result = await subscopeQuery.findMembers(q);
     const statuses = await backfillQuery.findTrackedStatuses(
-      result.registeredAccounts.map(
-        (registeredAccount) => registeredAccount.did,
-      ),
+      result.serverMembers.map((serverMember) => serverMember.did),
     );
     return {
       ...result,
-      registeredAccounts: result.registeredAccounts.map(
-        (registeredAccount) => ({
-          ...registeredAccount,
-          backfillStatus: statuses[registeredAccount.did],
-        }),
-      ),
+      serverMembers: result.serverMembers.map((serverMember) => ({
+        ...serverMember,
+        backfillStatus: statuses[serverMember.did],
+      })),
     };
   },
 });

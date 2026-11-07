@@ -17,10 +17,10 @@ describe("me.subsco.server.getFollowedAccounts", () => {
       .use((t) => t.withProfile({}))
       .create();
 
-  const createRegisteredAccount = () =>
+  const createServerMember = () =>
     accountFactory(ctx.db)
       .use((t) => t.withProfile({}))
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
 
   type Account = Awaited<ReturnType<typeof createAccount>>;
@@ -39,8 +39,8 @@ describe("me.subsco.server.getFollowedAccounts", () => {
   test("getFollowedAccounts-1: メンバーの1人以上にフォローされているアカウントを返し、それ以外のアカウントは含めない", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const member = await createRegisteredAccount();
-    const followedMember = await createRegisteredAccount();
+    const member = await createServerMember();
+    const followedMember = await createServerMember();
     const followee = await createAccount();
     const other = await createAccount();
     const otherFollowee = await createAccount();
@@ -61,14 +61,14 @@ describe("me.subsco.server.getFollowedAccounts", () => {
   test("getFollowedAccounts-2: フォローしているメンバーが多い順に並べる", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const registeredAccount1 = await createRegisteredAccount();
-    const registeredAccount2 = await createRegisteredAccount();
+    const serverMember1 = await createServerMember();
+    const serverMember2 = await createServerMember();
     const followedByOne = await createAccount();
     const followedByTwo = await createAccount();
-    await follow(registeredAccount1, followedByOne);
-    await follow(registeredAccount1, followedByTwo);
-    await follow(registeredAccount2, followedByTwo);
-    loginAs(registeredAccount1.did);
+    await follow(serverMember1, followedByOne);
+    await follow(serverMember1, followedByTwo);
+    await follow(serverMember2, followedByTwo);
+    loginAs(serverMember1.did);
 
     // act
     const page1 = await client.call(getFollowedAccounts, { limit: 1 });
@@ -90,10 +90,10 @@ describe("me.subsco.server.getFollowedAccounts", () => {
   test("getFollowedAccounts-3: totalにはページングに関係なくフォローされているアカウントの総数を入れる", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const registeredAccount = await createRegisteredAccount();
-    await follow(registeredAccount, await createAccount());
-    await follow(registeredAccount, await createAccount());
-    loginAs(registeredAccount.did);
+    const serverMember = await createServerMember();
+    await follow(serverMember, await createAccount());
+    await follow(serverMember, await createAccount());
+    loginAs(serverMember.did);
 
     // act
     const res = await client.call(getFollowedAccounts, { limit: 1 });
@@ -106,13 +106,13 @@ describe("me.subsco.server.getFollowedAccounts", () => {
   test("getFollowedAccounts-4: qを指定すると、表示名またはハンドルにqを含むフォローされているアカウントだけを返す。totalはqに関係なく総数のままにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const registeredAccount = await createRegisteredAccount();
+    const serverMember = await createServerMember();
     const match = await accountFactory(ctx.db)
       .use((t) => t.withProfile({ displayName: "Needle Name" }))
       .create();
-    await follow(registeredAccount, match);
-    await follow(registeredAccount, await createAccount());
-    loginAs(registeredAccount.did);
+    await follow(serverMember, match);
+    await follow(serverMember, await createAccount());
+    loginAs(serverMember.did);
 
     // act
     const res = await client.call(getFollowedAccounts, { q: "needle" });

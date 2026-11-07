@@ -7,10 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useSearchParams } from "react-router";
 
-import {
-  RegisteredAccountList,
-  type RegisteredAccountTab,
-} from "./registered-account-list";
+import { ServerMemberList, type ServerMemberTab } from "./server-member-list";
 
 async function fetchBannedAccounts(
   cursor?: string,
@@ -40,7 +37,7 @@ async function unbanAccount(did: string) {
   }
 }
 
-async function fetchRegisteredAccounts(cursor?: string): Promise<$OutputBody> {
+async function fetchServerMembers(cursor?: string): Promise<$OutputBody> {
   const params = new URLSearchParams();
   if (cursor) {
     params.set("cursor", cursor);
@@ -55,7 +52,7 @@ async function fetchRegisteredAccounts(cursor?: string): Promise<$OutputBody> {
   return response.json() as Promise<$OutputBody>;
 }
 
-async function updateRegisteredAccount(method: "POST" | "DELETE", did: string) {
+async function updateServerMember(method: "POST" | "DELETE", did: string) {
   const response = await fetch("/admin/api/registered-accounts", {
     method,
     headers: { "content-type": "application/json" },
@@ -66,22 +63,22 @@ async function updateRegisteredAccount(method: "POST" | "DELETE", did: string) {
   }
 }
 
-export function RegisteredAccountListContainer() {
+export function ServerMemberListContainer() {
   const [searchParams] = useSearchParams();
-  const tab: RegisteredAccountTab =
-    searchParams.get("tab") === "banned" ? "banned" : "registeredAccounts";
+  const tab: ServerMemberTab =
+    searchParams.get("tab") === "banned" ? "banned" : "serverMembers";
   const queryClient = useQueryClient();
   const onSuccess = () =>
     Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["registeredAccounts"] }),
+      queryClient.invalidateQueries({ queryKey: ["serverMembers"] }),
       queryClient.invalidateQueries({ queryKey: ["bannedAccounts"] }),
     ]);
   const grantAdminMutation = useMutation({
-    mutationFn: (did: string) => updateRegisteredAccount("POST", did),
+    mutationFn: (did: string) => updateServerMember("POST", did),
     onSuccess,
   });
   const banMutation = useMutation({
-    mutationFn: (did: string) => updateRegisteredAccount("DELETE", did),
+    mutationFn: (did: string) => updateServerMember("DELETE", did),
     onSuccess,
   });
   const unbanMutation = useMutation({ mutationFn: unbanAccount, onSuccess });
@@ -94,34 +91,32 @@ export function RegisteredAccountListContainer() {
     select: (data) => data.pages.flatMap((page) => page.actors),
     enabled: tab === "banned",
   });
-  const registeredAccountsQuery = useInfiniteQuery({
-    queryKey: ["registeredAccounts"],
-    queryFn: ({ pageParam }) => fetchRegisteredAccounts(pageParam),
+  const serverMembersQuery = useInfiniteQuery({
+    queryKey: ["serverMembers"],
+    queryFn: ({ pageParam }) => fetchServerMembers(pageParam),
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
     select: (data) => ({
       total: data.pages[0]?.total,
-      registeredAccounts: data.pages.flatMap((page) =>
-        page.registeredAccounts.map(({ profile, ...registeredAccount }) => ({
+      serverMembers: data.pages.flatMap((page) =>
+        page.serverMembers.map(({ profile, ...serverMember }) => ({
           ...profile,
-          ...registeredAccount,
+          ...serverMember,
         })),
       ),
     }),
   });
 
   const { fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    tab === "banned" ? bannedQuery : registeredAccountsQuery;
+    tab === "banned" ? bannedQuery : serverMembersQuery;
 
   return (
-    <RegisteredAccountList
+    <ServerMemberList
       tab={tab}
-      registeredAccounts={
-        registeredAccountsQuery.data?.registeredAccounts ?? []
-      }
+      serverMembers={serverMembersQuery.data?.serverMembers ?? []}
       bannedAccounts={bannedQuery.data ?? []}
-      total={registeredAccountsQuery.data?.total}
+      total={serverMembersQuery.data?.total}
       isLoading={isLoading}
       isFetchingNextPage={isFetchingNextPage}
       onLoadMore={fetchNextPage}

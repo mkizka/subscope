@@ -18,9 +18,9 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
       .props({ backfillStatus: () => backfillStatus ?? null })
       .create();
 
-  const createRegisteredAccount = () =>
+  const createServerMember = () =>
     accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
 
   type Account = Awaited<ReturnType<typeof createAccount>>;
@@ -39,16 +39,16 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
   test("getBackfillStatuses-1: メンバーとそのフォロー先のbackfillStatusを返し、それ以外のアカウントは含めない", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const registeredAccount = await createRegisteredAccount();
+    const serverMember = await createServerMember();
     const followee = await createAccount("completed");
     const other = await createAccount("completed");
     const otherFollowee = await createAccount("completed");
-    await follow(registeredAccount, followee);
+    await follow(serverMember, followee);
     await follow(other, otherFollowee);
 
     // act
     const res = await client.call(getBackfillStatuses, {
-      dids: [registeredAccount, followee, other, otherFollowee].map((a) =>
+      dids: [serverMember, followee, other, otherFollowee].map((a) =>
         asDid(a.did),
       ),
     });
@@ -56,7 +56,7 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
     // assert
     expect(res.statuses.sort((a, b) => a.did.localeCompare(b.did))).toEqual(
       [
-        { did: registeredAccount.did, status: "inProgress" },
+        { did: serverMember.did, status: "inProgress" },
         { did: followee.did, status: "completed" },
       ].sort((a, b) => a.did.localeCompare(b.did)),
     );
@@ -65,27 +65,27 @@ describe("me.subsco.sync.getBackfillStatuses", () => {
   test("getBackfillStatuses-2: backfillStatusが未設定のアカウントはinProgressとして返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const registeredAccount = await createRegisteredAccount();
+    const serverMember = await createServerMember();
 
     // act
     const res = await client.call(getBackfillStatuses, {
-      dids: [asDid(registeredAccount.did)],
+      dids: [asDid(serverMember.did)],
     });
 
     // assert
     expect(res.statuses).toEqual([
-      { did: registeredAccount.did, status: "inProgress" },
+      { did: serverMember.did, status: "inProgress" },
     ]);
   });
 
   test("getBackfillStatuses-3: 認証なしで呼び出せる", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const registeredAccount = await createRegisteredAccount();
+    const serverMember = await createServerMember();
 
     // act
     const res = await client.call(getBackfillStatuses, {
-      dids: [asDid(registeredAccount.did)],
+      dids: [asDid(serverMember.did)],
     });
 
     // assert

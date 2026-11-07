@@ -6,6 +6,7 @@ type Props = {
   label: string;
   trigger: ReactNode;
   placement?: "bottom" | "top";
+  size?: "md" | "sm";
   loading?: boolean;
   children: ReactNode;
 };
@@ -17,6 +18,7 @@ export function Menu({
   label,
   trigger,
   placement = "bottom",
+  size = "sm",
   loading,
   children,
 }: Props) {
@@ -27,7 +29,7 @@ export function Menu({
       <Button
         type="button"
         variant="ghost"
-        size="sm"
+        size={size}
         popoverTarget={id}
         aria-label={label}
         loading={loading}

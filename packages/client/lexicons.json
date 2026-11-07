@@ -379,7 +379,7 @@
     },
     "me.subsco.admin.listServerMembers": {
       "uri": "file://./lexicons/me/subsco/admin/listServerMembers.json",
-      "cid": "bafyreidy2ezoppksjc35himzc3hv7ftg3tehpvjt23tzbhigqz4il4lpnq"
+      "cid": "bafyreih353li273p6djdtanilhxupglykucll6egjszqiu2klkaozkxmqm"
     },
     "me.subsco.admin.registerAdmin": {
       "uri": "file://./lexicons/me/subsco/admin/registerAdmin.json",
@@ -411,7 +411,7 @@
     },
     "me.subsco.server.getServerMembers": {
       "uri": "file://./lexicons/me/subsco/server/getServerMembers.json",
-      "cid": "bafyreiapfv5zezn3p2dxsyc4w64cbjcwzlrmfwsrbvgxo7vi4yf4ldwzou"
+      "cid": "bafyreihid666r5nibk6lwdl3xxjjikzyev7hmxrfquyzzounmjoneeh2bq"
     },
     "me.subsco.server.getSetupStatus": {
       "uri": "file://./lexicons/me/subsco/server/getSetupStatus.json",

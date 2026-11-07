@@ -50,7 +50,7 @@ export class GetServerMembersUseCase {
 
     return {
       cursor: page.cursor,
-      registeredAccounts: profiles
+      serverMembers: profiles
         .filter((profile) => profile !== undefined)
         .map((profile) => ({
           profile,

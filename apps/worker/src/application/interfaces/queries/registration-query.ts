@@ -5,7 +5,7 @@ export interface IRegistrationQuery {
     ctx: TransactionContext,
     accountDid: string,
   ) => Promise<boolean>;
-  isFollowedByAnyRegisteredAccount: (
+  isFollowedByAnyServerMember: (
     ctx: TransactionContext,
     subjectDid: string,
   ) => Promise<boolean>;

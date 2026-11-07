@@ -18,7 +18,7 @@ export class RegistrationQuery implements IRegistrationQuery {
     return result.length > 0;
   }
 
-  async isFollowedByAnyRegisteredAccount(
+  async isFollowedByAnyServerMember(
     ctx: TransactionContext,
     subjectDid: string,
   ): Promise<boolean> {

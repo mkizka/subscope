@@ -106,7 +106,7 @@ describe("Tapからのイベント受信", () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
 
     // act
@@ -135,7 +135,7 @@ describe("Tapからのイベント受信", () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
 
     // act
@@ -150,7 +150,7 @@ describe("Tapからのイベント受信", () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     vi.spyOn(services.transactionManager, "transaction").mockRejectedValueOnce(
       new Error("db down"),
@@ -167,7 +167,7 @@ describe("Tapからのイベント受信", () => {
     // arrange
     await connect();
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
 
     // act
@@ -186,7 +186,7 @@ describe("Tapからのイベント受信", () => {
     // arrange
     await connect(1);
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const blocker = Promise.withResolvers<never>();
     const transaction = vi

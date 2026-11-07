@@ -20,7 +20,7 @@ describe("app.bsky.notification.getGroupedNotifications", () => {
   const setup = async () => {
     const api = await setupApiTest();
     const viewer = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const createAuthor = () =>
       accountFactory(ctx.db)

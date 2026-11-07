@@ -1,8 +1,8 @@
-import type { $OutputBody as RegisteredAccountsResponse } from "@repo/client/me/subsco/admin/listServerMembers";
+import type { $OutputBody as ServerMembersResponse } from "@repo/client/me/subsco/admin/listServerMembers";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { alice, bob, queryClient } from "@/.storybook/query-client";
-import { RegisteredAccountListContainer } from "@/app/features/admin/blocks/registered-account-list-container";
+import { ServerMemberListContainer } from "@/app/features/admin/blocks/server-member-list-container";
 
 import { AdminPage } from "./admin-page";
 
@@ -17,12 +17,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const RegisteredAccounts: Story = {
+export const ServerMembers: Story = {
   beforeEach: () => {
-    queryClient.setQueryData(["registeredAccounts"], {
+    queryClient.setQueryData(["serverMembers"], {
       pages: [
         {
-          registeredAccounts: [
+          serverMembers: [
             {
               profile: alice,
               isAdmin: true,
@@ -37,12 +37,12 @@ export const RegisteredAccounts: Story = {
             },
           ],
           total: 2,
-        } satisfies RegisteredAccountsResponse,
+        } satisfies ServerMembersResponse,
       ],
       pageParams: [undefined],
     });
   },
   args: {
-    children: <RegisteredAccountListContainer />,
+    children: <ServerMemberListContainer />,
   },
 };
