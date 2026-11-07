@@ -10,6 +10,7 @@ export interface IRegistrationQuery {
     q?: string;
   }) => Promise<Registration[]>;
   count: () => Promise<number>;
+  findFirstAdminDid: () => Promise<Did | undefined>;
   findFollowedAccounts: (params: {
     limit: number;
     cursor?: string;

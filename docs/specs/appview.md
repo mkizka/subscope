@@ -307,6 +307,13 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getSetupStatus-1: 管理者が未登録ならinitializedをfalseにする
 - getSetupStatus-2: 管理者が登録済みならinitializedをtrueにする
 
+## me.subsco.server.getOperator
+
+サーバーの運営者のprofileViewを返す。運営者は、管理者のうち最初にサーバーに登録した1人。認証は不要。
+
+- getOperator-1: 管理者のうち最初に登録したメンバー1人だけをoperatorにprofileViewで返す
+- getOperator-2: 管理者がいなければoperatorを含めない
+
 ## me.subsco.server.getFollowedAccounts
 
 フォローされているアカウント（メンバーの1人以上にフォローされているアカウント。メンバーも含む）のprofileViewと、そのアカウントをフォローしているメンバーの数、フォローされているアカウントの総数を返す。認証が必要。limitとcursorでページングする。qを指定すると、表示名またはハンドルにqを含む（大文字小文字を区別しない）フォローされているアカウントだけを返す。

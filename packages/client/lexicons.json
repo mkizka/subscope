@@ -93,6 +93,7 @@
     "me.subsco.graph.getServerMemberFollowers",
     "me.subsco.server.getFollowedAccounts",
     "me.subsco.server.getLocalTimeline",
+    "me.subsco.server.getOperator",
     "me.subsco.server.getServerMembers",
     "me.subsco.server.getSetupStatus",
     "me.subsco.sync.getBackfillStatuses",
@@ -408,6 +409,10 @@
     "me.subsco.server.getLocalTimeline": {
       "uri": "file://./lexicons/me/subsco/server/getLocalTimeline.json",
       "cid": "bafyreibdcgs5b5d4dze6bir5wiz53k75achrahrikrcbichvmerh5eyluy"
+    },
+    "me.subsco.server.getOperator": {
+      "uri": "file://./lexicons/me/subsco/server/getOperator.json",
+      "cid": "bafyreiekdeugnm752ma577fk4xe7b66zrs5jd4wymsw2fa2zqiprulxcha"
     },
     "me.subsco.server.getServerMembers": {
       "uri": "file://./lexicons/me/subsco/server/getServerMembers.json",

@@ -1,0 +1,22 @@
+{
+  "lexicon": 1,
+  "id": "me.subsco.server.getOperator",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the operator of the server: the first account that became an admin.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "operator": {
+              "type": "ref",
+              "ref": "app.bsky.actor.defs#profileView"
+            }
+          }
+        }
+      }
+    }
+  }
+}
