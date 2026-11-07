@@ -8,7 +8,7 @@ export function Skeleton({ className }: Props) {
   return (
     <span
       aria-hidden
-      className={clsx("inline-block rounded-full bg-surface-2", className)}
+      className={clsx("inline-block skeleton rounded-full", className)}
     />
   );
 }
