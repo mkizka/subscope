@@ -16,9 +16,6 @@ generated/
 # serena mcp
 .serena/
 
-# repomix
-*.xml
-
 # vitest
 coverage/
 
