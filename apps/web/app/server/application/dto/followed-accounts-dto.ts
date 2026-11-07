@@ -1,6 +1,6 @@
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 
-export type TrackedAccountsDto = {
+export type FollowedAccountsDto = {
   total: number;
   accounts: {
     did: string;

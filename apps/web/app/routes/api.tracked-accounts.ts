@@ -11,6 +11,6 @@ export const middleware: Route.MiddlewareFunction[] = [loginRequiredMiddleware];
 export const loader = async ({ context, request }: Route.LoaderArgs) => {
   const q = new URL(request.url).searchParams.get("q") || undefined;
   return data(
-    await di.getTrackedAccountsUseCase.execute(context.get(didContext), q),
+    await di.getFollowedAccountsUseCase.execute(context.get(didContext), q),
   );
 };

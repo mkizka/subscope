@@ -1,20 +1,20 @@
-import type { TrackedAccountsDto } from "@/app/server/application/dto/tracked-accounts-dto";
+import type { FollowedAccountsDto } from "@/app/server/application/dto/followed-accounts-dto";
 import type { IBackfillQuery } from "@/app/server/application/interfaces/backfill-query";
 import type { ISubscopeQuery } from "@/app/server/application/interfaces/subscope-query";
 
-export interface IGetTrackedAccountsUseCase {
-  execute: (did: string, q?: string) => Promise<TrackedAccountsDto>;
+export interface IGetFollowedAccountsUseCase {
+  execute: (did: string, q?: string) => Promise<FollowedAccountsDto>;
 }
 
-export const getTrackedAccountsUseCaseFactory = ({
+export const getFollowedAccountsUseCaseFactory = ({
   subscopeQuery,
   backfillQuery,
 }: {
   subscopeQuery: ISubscopeQuery;
   backfillQuery: IBackfillQuery;
-}): IGetTrackedAccountsUseCase => ({
+}): IGetFollowedAccountsUseCase => ({
   async execute(did, q) {
-    const result = await subscopeQuery.findTrackedAccounts(did, q);
+    const result = await subscopeQuery.findFollowedAccounts(did, q);
     const statuses = await backfillQuery.findTrackedStatuses(
       result.accounts.map((account) => account.did),
     );

@@ -1,12 +1,12 @@
 import type { Did } from "@atproto/did";
-import type * as MeSubscoServerGetTrackedAccounts from "@repo/client/me/subsco/server/getTrackedAccounts";
+import type * as MeSubscoServerGetFollowedAccounts from "@repo/client/me/subsco/server/getFollowedAccounts";
 
 import type { IRegistrationQuery } from "../../../application/interfaces/queries/registration-query.js";
 import { createCursorPaginator } from "../../../application/utils/pagination.js";
 import type { ProfileViews } from "../../views/profile-views.js";
 import type { ViewContextFactory } from "../../views/view-context.js";
 
-export class GetTrackedAccountsUseCase {
+export class GetFollowedAccountsUseCase {
   constructor(
     private readonly registrationQuery: IRegistrationQuery,
     private readonly viewContextFactory: ViewContextFactory,
@@ -17,7 +17,7 @@ export class GetTrackedAccountsUseCase {
     limit: number;
     cursor?: string;
     q?: string;
-  }): Promise<MeSubscoServerGetTrackedAccounts.$OutputBody> {
+  }): Promise<MeSubscoServerGetFollowedAccounts.$OutputBody> {
     const paginator = createCursorPaginator<{
       did: Did;
       registeredFollowersCount: number;
@@ -26,12 +26,12 @@ export class GetTrackedAccountsUseCase {
       getCursor: (item) => `${item.registeredFollowersCount}::${item.did}`,
     });
     const [items, total] = await Promise.all([
-      this.registrationQuery.findTrackedAccounts({
+      this.registrationQuery.findFollowedAccounts({
         limit: paginator.queryLimit,
         cursor: params.cursor,
         q: params.q,
       }),
-      this.registrationQuery.countTrackedAccounts(),
+      this.registrationQuery.countFollowedAccounts(),
     ]);
     const page = paginator.extractPage(items);
 
@@ -43,7 +43,7 @@ export class GetTrackedAccountsUseCase {
     return {
       cursor: page.cursor,
       total,
-      trackedAccounts: page.items.flatMap((item, i) => {
+      followedAccounts: page.items.flatMap((item, i) => {
         const profile = profiles[i];
         return profile
           ? [
