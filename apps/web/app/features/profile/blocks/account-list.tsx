@@ -67,7 +67,7 @@ export function AccountList<T extends Account>({
               {account.isAdmin && (
                 <Badge>
                   <ShieldIcon className="mr-1 size-3" />
-                  管理者
+                  運営者
                 </Badge>
               )}
               {account.backfillStatus && (

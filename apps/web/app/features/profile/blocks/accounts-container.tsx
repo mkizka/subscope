@@ -1,11 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ArrowLeftIcon, InfoIcon } from "lucide-react";
-import { useRef } from "react";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 import { RowsSkeleton } from "@/app/components/rows-skeleton";
-import { Button } from "@/app/components/ui/button";
-import { Dialog } from "@/app/components/ui/dialog";
 import { Input } from "@/app/components/ui/input";
 import { Tabs } from "@/app/components/ui/tabs";
 import { fetchJson } from "@/app/lib/fetch-json";
@@ -21,7 +17,6 @@ export function AccountsContainer() {
   const [params, setParams] = useSearchParams();
   const q = params.get("q") ?? "";
   const tracked = params.get("tab") === "tracked";
-  const helpRef = useRef<HTMLDialogElement>(null);
 
   const registeredQuery = useQuery({
     queryKey: ["clientRegisteredAccounts", q],
@@ -50,22 +45,16 @@ export function AccountsContainer() {
 
   return (
     <>
-      <header className="flex items-center gap-2 border-b border-line p-4">
-        <Link to="/server" aria-label="戻る" className="text-muted">
-          <ArrowLeftIcon className="size-5" />
-        </Link>
-        <h1 className="text-title">アカウント</h1>
-      </header>
       <Tabs
         tabs={[
           {
-            to: "/server/accounts",
+            to: "/server",
             label: `登録アカウント${registered && !q ? ` ${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}` : ""}`,
             selected: !tracked,
           },
           {
-            to: "/server/accounts?tab=tracked",
-            label: `追跡アカウント${trackedData ? ` ${trackedData.total}` : ""}`,
+            to: "/server?tab=tracked",
+            label: `誰かがフォロー${trackedData ? ` ${trackedData.total}` : ""}`,
             selected: tracked,
           },
         ]}
@@ -89,38 +78,6 @@ export function AccountsContainer() {
           }
         />
       </div>
-      {tracked && (
-        <>
-          <button
-            type="button"
-            onClick={() => helpRef.current?.showModal()}
-            className="
-              flex items-center gap-1 px-4 py-2 text-label text-muted
-              hover:underline
-            "
-          >
-            <InfoIcon className="size-4" aria-hidden />
-            追跡アカウントとは？
-          </button>
-          <Dialog
-            ref={helpRef}
-            title="追跡アカウント"
-            actions={
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => helpRef.current?.close()}
-              >
-                閉じる
-              </Button>
-            }
-          >
-            <p>
-              登録アカウントと、登録アカウント1人以上からフォローされているアカウントです。これらのアカウントの投稿がサーバーに保存されます。
-            </p>
-          </Dialog>
-        </>
-      )}
       {accounts ? (
         accounts.length > 0 ? (
           <AccountList accounts={accounts} />

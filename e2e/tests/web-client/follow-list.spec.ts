@@ -162,7 +162,7 @@ test.describe("フォロー・フォロワー", () => {
       .filter({ hasText: "Bob" })
       .getByRole("link", { name: /^[1-9]\d*人からフォロー$/ });
     await expect(async () => {
-      await page.goto("/server/accounts?tab=tracked");
+      await page.goto("/server?tab=tracked");
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
 

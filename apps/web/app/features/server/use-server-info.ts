@@ -31,6 +31,9 @@ export function useServerInfo() {
       ? `${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}`
       : undefined,
     trackedCount: tracked?.total,
+    operators: registered?.registeredAccounts.filter(
+      (account) => account.isAdmin,
+    ),
     serviceDid: server?.serviceDid,
   };
 }
