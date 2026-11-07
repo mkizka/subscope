@@ -44,8 +44,8 @@ describe("me.subsco.admin.listServerMembers", () => {
     const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     loginAs(admin.did);
 
@@ -53,8 +53,8 @@ describe("me.subsco.admin.listServerMembers", () => {
     const res = await client.call(listServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toMatchObject([
-      { profile: { did: registeredAccount.did }, isAdmin: false },
+    expect(res.serverMembers).toMatchObject([
+      { profile: { did: serverMember.did }, isAdmin: false },
     ]);
   });
 
@@ -64,11 +64,11 @@ describe("me.subsco.admin.listServerMembers", () => {
     const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     await labelFactory(ctx.db)
-      .vars({ account: () => registeredAccount })
+      .vars({ account: () => serverMember })
       .create();
     loginAs(admin.did);
 
@@ -76,8 +76,8 @@ describe("me.subsco.admin.listServerMembers", () => {
     const res = await client.call(listServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toMatchObject([
-      { profile: { did: registeredAccount.did } },
+    expect(res.serverMembers).toMatchObject([
+      { profile: { did: serverMember.did } },
     ]);
   });
 
@@ -87,9 +87,9 @@ describe("me.subsco.admin.listServerMembers", () => {
     const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await accountFactory(ctx.db).create();
+    const serverMember = await accountFactory(ctx.db).create();
     await registrationFactory(ctx.db)
-      .vars({ account: () => registeredAccount })
+      .vars({ account: () => serverMember })
       .props({ createdAt: () => new Date("2024-01-01T00:00:00.000Z") })
       .create();
     loginAs(admin.did);
@@ -98,9 +98,9 @@ describe("me.subsco.admin.listServerMembers", () => {
     const res = await client.call(listServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toMatchObject([
+    expect(res.serverMembers).toMatchObject([
       {
-        profile: { did: registeredAccount.did },
+        profile: { did: serverMember.did },
         registeredAt: "2024-01-01T00:00:00.000Z",
       },
     ]);
@@ -113,7 +113,7 @@ describe("me.subsco.admin.listServerMembers", () => {
       .props({ isAdmin: () => true })
       .create();
     await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .createList(3);
     loginAs(admin.did);
 
@@ -121,27 +121,27 @@ describe("me.subsco.admin.listServerMembers", () => {
     const res = await client.call(listServerMembers, { limit: 1 });
 
     // assert
-    expect(res.registeredAccounts).toHaveLength(1);
+    expect(res.serverMembers).toHaveLength(1);
     expect(res.total).toBe(3);
   });
 
   const setupBackfill = async (
-    registeredAccountStatus: "inProgress" | "completed" | "error" | null,
+    serverMemberStatus: "inProgress" | "completed" | "error" | null,
     followeeStatus: "inProgress" | "completed" | "error" | null,
   ) => {
     const { client, loginAs } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
-      .props({ backfillStatus: () => registeredAccountStatus })
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
+      .props({ backfillStatus: () => serverMemberStatus })
       .create();
     await followFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ account: () => registeredAccount })
+            .vars({ account: () => serverMember })
             .create(),
         followee: () =>
           accountFactory(ctx.db)
@@ -161,9 +161,7 @@ describe("me.subsco.admin.listServerMembers", () => {
     const res = await client.call(listServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toMatchObject([
-      { backfillStatus: "completed" },
-    ]);
+    expect(res.serverMembers).toMatchObject([{ backfillStatus: "completed" }]);
   });
 
   test("listServerMembers-8: メンバー本人のバックフィルの状態をまだ確認していなければ、backfillStatusをinProgressにする", async () => {
@@ -174,8 +172,6 @@ describe("me.subsco.admin.listServerMembers", () => {
     const res = await client.call(listServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toMatchObject([
-      { backfillStatus: "inProgress" },
-    ]);
+    expect(res.serverMembers).toMatchObject([{ backfillStatus: "inProgress" }]);
   });
 });

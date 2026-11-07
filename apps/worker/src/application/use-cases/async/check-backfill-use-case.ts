@@ -30,10 +30,7 @@ export class CheckBackfillUseCase {
     const account = await this.transactionManager.transaction(async (ctx) => {
       const isTrackedAccount =
         (await this.registrationQuery.isRegistered(ctx, did)) ||
-        (await this.registrationQuery.isFollowedByAnyRegisteredAccount(
-          ctx,
-          did,
-        ));
+        (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did));
       return isTrackedAccount
         ? this.accountRepository.find({ ctx, did })
         : null;

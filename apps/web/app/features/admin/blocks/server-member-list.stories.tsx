@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { RegisteredAccountList } from "./registered-account-list";
+import { ServerMemberList } from "./server-member-list";
 
 const meta = {
-  component: RegisteredAccountList,
-} satisfies Meta<typeof RegisteredAccountList>;
+  component: ServerMemberList,
+} satisfies Meta<typeof ServerMemberList>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    registeredAccounts: [
+    serverMembers: [
       {
         did: "did:plc:example123",
         handle: "alice.bsky.social",
@@ -43,20 +43,20 @@ export const Default: Story = {
 
 export const Empty: Story = {
   args: {
-    registeredAccounts: [],
+    serverMembers: [],
   },
 };
 
 export const Loading: Story = {
   args: {
-    registeredAccounts: [],
+    serverMembers: [],
     isLoading: true,
   },
 };
 
 export const LoadingMore: Story = {
   args: {
-    registeredAccounts: [
+    serverMembers: [
       {
         did: "did:plc:example123",
         handle: "alice.bsky.social",
@@ -73,7 +73,7 @@ export const LoadingMore: Story = {
 export const Banned: Story = {
   args: {
     tab: "banned",
-    registeredAccounts: [],
+    serverMembers: [],
     bannedAccounts: [
       {
         did: "did:plc:example999",

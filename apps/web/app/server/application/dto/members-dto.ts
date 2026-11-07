@@ -1,7 +1,7 @@
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 export type MembersDto = {
-  registeredAccounts: {
+  serverMembers: {
     did: string;
     handle: string;
     displayName?: string;

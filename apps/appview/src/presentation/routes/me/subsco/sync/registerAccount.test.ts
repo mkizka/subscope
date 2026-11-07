@@ -109,7 +109,7 @@ describe("me.subsco.sync.registerAccount", () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const inviteCode = await inviteCodeFactory(ctx.db).create();
     loginAs(account.did);

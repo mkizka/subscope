@@ -19,27 +19,27 @@ describe("me.subsco.sync.unregisterAccount", () => {
   test("unregisterAccount-1: 本人とそのフォロー先のsyncTapRepoジョブを積む", async () => {
     // arrange
     const { client, loginAs, jobScheduler } = await setupApiTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     const followee = await accountFactory(ctx.db).create();
     await followFactory(ctx.db)
       .vars({
         record: () =>
           recordFactory(ctx.db, "app.bsky.graph.follow")
-            .vars({ account: () => registeredAccount })
+            .vars({ account: () => serverMember })
             .create(),
         followee: () => followee,
       })
       .create();
-    loginAs(registeredAccount.did);
+    loginAs(serverMember.did);
 
     // act
     await client.call(unregisterAccount);
 
     // assert
     expect(jobScheduler.getSyncTapRepoJobs()).toEqual([
-      { did: registeredAccount.did },
+      { did: serverMember.did },
       { did: followee.did },
     ]);
   });

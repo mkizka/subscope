@@ -20,7 +20,7 @@ export class InMemoryRegistrationQuery implements IRegistrationQuery {
     return this.registrations.has(accountDid);
   }
 
-  async isFollowedByAnyRegisteredAccount(
+  async isFollowedByAnyServerMember(
     _ctx: TransactionContext,
     _subjectDid: string,
   ): Promise<boolean> {
