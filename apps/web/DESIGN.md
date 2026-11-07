@@ -14,26 +14,32 @@ colors:
   danger: "#c62828"
 typography:
   title:
+    fontFamily: Noto Sans JP
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.4
   heading:
+    fontFamily: Noto Sans JP
     fontSize: 18px
     fontWeight: 700
     lineHeight: 1.4
   body-lg:
+    fontFamily: Noto Sans JP
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.6
   body:
+    fontFamily: Noto Sans JP
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.6
   label:
+    fontFamily: Noto Sans JP
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.4
   caption:
+    fontFamily: Noto Sans JP
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.4
@@ -172,16 +178,16 @@ Blueskyが使えなくなったときに、同じ会話をそのまま続けら�
 
 ## Typography
 
-フォントはTailwindのデフォルト(システムフォント)に任せ、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
+フォントはNoto Sans JPだけを使い(`@fontsource/noto-sans-jp` をunicode-rangeの分割済みで配信し、使う文字のぶんだけ読み込む)、太さは400と700の2つだけにする。文字の大きさは下の6段階を `text-{名前}` のクラスで指定する。大きさ・行の高さ・太さが一度に決まるので、`font-bold` や `leading-*` を重ねない。
 
-| 名前      | 大きさ | 太さ | 行の高さ | 使う場所                               |
-| --------- | ------ | ---- | -------- | -------------------------------------- |
-| `title`   | 20px   | 700  | 1.4      | ページの見出し、プロフィールの表示名   |
-| `heading` | 18px   | 700  | 1.4      | セクション・ダイアログの見出し         |
-| `body-lg` | 18px   | 400  | 1.6      | スレッドで選んだ投稿の本文             |
-| `body`    | 16px   | 400  | 1.6      | 投稿本文、入力欄、ナビ                 |
-| `label`   | 14px   | 400  | 1.4      | ボタン、タブ、メニュー、ハンドルや日時 |
-| `caption` | 12px   | 400  | 1.4      | バッジ、注記                           |
+| 名前      | 大きさ | 太さ | 行の高さ | 使う場所                                                       |
+| --------- | ------ | ---- | -------- | -------------------------------------------------------------- |
+| `title`   | 20px   | 700  | 1.4      | ページの見出し、プロフィールの表示名                           |
+| `heading` | 18px   | 700  | 1.4      | セクション・ダイアログの見出し                                 |
+| `body-lg` | 18px   | 400  | 1.6      | スレッドで選んだ投稿の本文                                     |
+| `body`    | 16px   | 400  | 1.6      | プロフィールの自己紹介、入力欄、ナビ                           |
+| `label`   | 14px   | 400  | 1.4      | タイムラインの投稿本文、ボタン、タブ、メニュー、ハンドルや日時 |
+| `caption` | 12px   | 400  | 1.4      | バッジ、注記                                                   |
 
 - 例外として、投稿者の名前、主ボタン、選択中のタブとナビだけは `font-bold` を足してよい
 - 入力欄はiOSで拡大されないよう `body` 以上にする

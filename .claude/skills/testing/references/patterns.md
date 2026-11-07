@@ -100,11 +100,11 @@ const record = recordFactory({
     text: "reply to registered account",
     reply: {
       parent: {
-        uri: `at://${registeredAccountDid}/app.bsky.feed.post/original123`,
+        uri: `at://${serverMemberDid}/app.bsky.feed.post/original123`,
         cid: fakeCid(),
       },
       root: {
-        uri: `at://${registeredAccountDid}/app.bsky.feed.post/original123`,
+        uri: `at://${serverMemberDid}/app.bsky.feed.post/original123`,
         cid: fakeCid(),
       },
     },

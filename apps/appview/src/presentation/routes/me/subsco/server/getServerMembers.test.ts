@@ -10,8 +10,8 @@ describe("me.subsco.server.getServerMembers", () => {
   test("getServerMembers-1: メンバーごとにprofileViewを返す", async () => {
     // arrange
     const { client } = await setupApiTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
     await accountFactory(ctx.db).create();
 
@@ -19,11 +19,11 @@ describe("me.subsco.server.getServerMembers", () => {
     const res = await client.call(getServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toMatchObject([
+    expect(res.serverMembers).toMatchObject([
       {
         profile: {
-          did: registeredAccount.did,
-          handle: registeredAccount.handle,
+          did: serverMember.did,
+          handle: serverMember.handle,
         },
       },
     ]);
@@ -33,25 +33,25 @@ describe("me.subsco.server.getServerMembers", () => {
     // arrange
     const { client } = await setupApiTest();
     const admin = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .props({ isAdmin: () => true })
       .create();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
 
     // act
     const res = await client.call(getServerMembers);
 
     // assert
-    expect(res.registeredAccounts).toEqual(
+    expect(res.serverMembers).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           profile: expect.objectContaining({ did: admin.did }),
           isAdmin: true,
         }),
         expect.objectContaining({
-          profile: expect.objectContaining({ did: registeredAccount.did }),
+          profile: expect.objectContaining({ did: serverMember.did }),
           isAdmin: false,
         }),
       ]),
@@ -62,15 +62,15 @@ describe("me.subsco.server.getServerMembers", () => {
     // arrange
     const { client } = await setupApiTest();
     const byName = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .use((t) => t.withProfile({ displayName: "Needle Name" }))
       .create();
     const byHandle = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .props({ handle: () => "needle.test" })
       .create();
     await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .use((t) => t.withProfile({ displayName: "Other" }))
       .create();
 
@@ -78,7 +78,7 @@ describe("me.subsco.server.getServerMembers", () => {
     const res = await client.call(getServerMembers, { q: "NEEDLE" });
 
     // assert
-    expect(res.registeredAccounts.map((a) => a.profile.did).sort()).toEqual(
+    expect(res.serverMembers.map((a) => a.profile.did).sort()).toEqual(
       [byName.did, byHandle.did].sort(),
     );
   });

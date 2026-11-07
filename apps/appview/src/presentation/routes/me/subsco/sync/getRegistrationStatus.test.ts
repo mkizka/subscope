@@ -10,10 +10,10 @@ describe("me.subsco.sync.getRegistrationStatus", () => {
   test("getRegistrationStatus-1: 閲覧者がメンバーならisRegisteredをtrueにする", async () => {
     // arrange
     const { client, loginAs } = await setupApiTest();
-    const registeredAccount = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+    const serverMember = await accountFactory(ctx.db)
+      .use((t) => t.serverMember())
       .create();
-    loginAs(registeredAccount.did);
+    loginAs(serverMember.did);
 
     // act
     const result = await client.call(getRegistrationStatus);

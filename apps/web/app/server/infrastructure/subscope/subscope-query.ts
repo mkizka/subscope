@@ -36,7 +36,7 @@ export const subscopeQueryFactory = ({
     },
     async findMembers(q) {
       // ponytail: 最初の100件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
-      const { registeredAccounts, cursor } = await publicClient.call(
+      const { serverMembers, cursor } = await publicClient.call(
         getServerMembers,
         {
           limit: 100,
@@ -44,7 +44,7 @@ export const subscopeQueryFactory = ({
         },
       );
       return {
-        registeredAccounts: registeredAccounts.map(({ profile, isAdmin }) => ({
+        serverMembers: serverMembers.map(({ profile, isAdmin }) => ({
           did: profile.did,
           handle: profile.handle,
           displayName: profile.displayName,

@@ -86,7 +86,7 @@ describe("commit", () => {
   test("index-5: 削除したレコードは、削除より古いrevのコミットで復活させない", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     await processCommit(deleteEvent(account.did, "3bbbbbbbbbbbb"));
 
@@ -102,7 +102,7 @@ describe("commit", () => {
   test("index-6: 更新したレコードは、更新より古いrevのコミットで古い内容に戻さない", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     await processCommit(
       postEvent(account.did, "update", "3bbbbbbbbbbbb", "new"),
@@ -120,7 +120,7 @@ describe("commit", () => {
   test("index-8: 処理済みのrevと同じrevのコミットは、もう一度処理する", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     await processCommit(
       postEvent(account.did, "create", "3aaaaaaaaaaaa", "old"),
@@ -172,7 +172,7 @@ describe("commit", () => {
   test("index-15: 投稿のgallery埋め込み(引用のmediaにあるものを含む)の画像を、images埋め込みと区別して保存する", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const imageCid = await randomCid();
     const galleryEmbed = {
@@ -246,7 +246,7 @@ describe("commit", () => {
   test("index-16: 投稿のvideo埋め込み(引用のmediaにあるものを含む)のメタデータ(動画のCID、alt、アスペクト比、presentation)を保存する", async () => {
     // arrange
     const account = await accountFactory(ctx.db)
-      .use((t) => t.registeredAccount())
+      .use((t) => t.serverMember())
       .create();
     const videoCid = await randomCid();
     const videoEmbed = {

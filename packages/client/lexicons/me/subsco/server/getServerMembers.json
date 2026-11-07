@@ -27,23 +27,23 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["registeredAccounts"],
+          "required": ["serverMembers"],
           "properties": {
             "cursor": {
               "type": "string"
             },
-            "registeredAccounts": {
+            "serverMembers": {
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#registeredAccount"
+                "ref": "#serverMember"
               }
             }
           }
         }
       }
     },
-    "registeredAccount": {
+    "serverMember": {
       "type": "object",
       "required": ["profile", "isAdmin"],
       "properties": {

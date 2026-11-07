@@ -35,9 +35,11 @@ export class FollowIndexer implements ICollectionIndexer {
     });
     await this.followRepository.save({ ctx, follow });
 
-    const isFollowerRegisteredAccount =
-      await this.registrationQuery.isRegistered(ctx, follow.accountDid);
-    if (isFollowerRegisteredAccount) {
+    const isFollowerServerMember = await this.registrationQuery.isRegistered(
+      ctx,
+      follow.accountDid,
+    );
+    if (isFollowerServerMember) {
       ctx.afterCommit(() =>
         this.jobScheduler.scheduleSyncTapRepo(follow.subjectDid),
       );

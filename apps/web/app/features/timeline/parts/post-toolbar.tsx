@@ -44,8 +44,8 @@ function ToggleButton(props: {
       aria-pressed={props.pressed}
       aria-disabled={props.busy}
       className={`
-        inline-flex h-10 min-w-10 flex-1 items-center justify-center gap-1
-        rounded-full px-2 text-label
+        inline-flex h-10 min-w-10 items-center justify-center gap-1 rounded-full
+        px-2 text-label
         hover:bg-surface-2
         aria-disabled:cursor-not-allowed
         ${props.pressed ? "text-brand" : "text-muted"}
@@ -77,7 +77,7 @@ export function PostToolbar({
   onDelete,
 }: Props) {
   return (
-    <div className="relative mt-1 flex">
+    <div className="relative mt-1 -ml-2 flex justify-between">
       <ToggleButton
         label="返信"
         Icon={MessageCircleIcon}
@@ -111,6 +111,7 @@ export function PostToolbar({
         {(open) => (
           <Menu
             label="投稿のメニュー"
+            size="md"
             trigger={<EllipsisIcon className="size-5" />}
           >
             <button

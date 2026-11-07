@@ -23,7 +23,7 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": ["registeredAccounts", "total"],
+          "required": ["serverMembers", "total"],
           "properties": {
             "cursor": {
               "type": "string"
@@ -31,18 +31,18 @@
             "total": {
               "type": "integer"
             },
-            "registeredAccounts": {
+            "serverMembers": {
               "type": "array",
               "items": {
                 "type": "ref",
-                "ref": "#registeredAccount"
+                "ref": "#serverMember"
               }
             }
           }
         }
       }
     },
-    "registeredAccount": {
+    "serverMember": {
       "type": "object",
       "required": ["profile", "isAdmin", "registeredAt", "backfillStatus"],
       "properties": {

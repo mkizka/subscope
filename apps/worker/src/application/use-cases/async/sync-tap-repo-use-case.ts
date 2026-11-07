@@ -23,10 +23,7 @@ export class SyncTapRepoUseCase {
     const isTrackedAccount = await this.transactionManager.transaction(
       async (ctx) =>
         (await this.registrationQuery.isRegistered(ctx, did)) ||
-        (await this.registrationQuery.isFollowedByAnyRegisteredAccount(
-          ctx,
-          did,
-        )),
+        (await this.registrationQuery.isFollowedByAnyServerMember(ctx, did)),
     );
     if (isTrackedAccount) {
       await this.tapClient.addRepo(did);

@@ -111,7 +111,7 @@ test.describe("レイアウト", () => {
     ).toHaveCount(0);
   });
 
-  test("layout-13: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す", async ({
+  test("layout-14: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す", async ({
     page,
   }) => {
     await page.goto("/search");
@@ -196,6 +196,25 @@ test.describe("レイアウト（モバイル）", () => {
       .click();
 
     await expect(page).toHaveURL("/login");
+  });
+
+  test("layout-13: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
+    page,
+  }) => {
+    await page.goto("/server");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
+    await page.evaluate(() => {
+      document.body
+        .querySelector("main")
+        ?.style.setProperty("min-height", "3000px");
+    });
+    const menuButton = page.getByRole("button", { name: "メニューを開く" });
+
+    await page.evaluate(() => window.scrollTo(0, 1000));
+    await expect(menuButton).not.toBeInViewport();
+
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await expect(menuButton).toBeInViewport();
   });
 
   test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目に加えて「サーバー」を並べる", async ({

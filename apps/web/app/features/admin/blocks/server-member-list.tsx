@@ -18,7 +18,7 @@ export type BannedAccount = {
   avatar?: string;
 };
 
-export type RegisteredAccount = BannedAccount & {
+export type ServerMember = BannedAccount & {
   isAdmin: boolean;
   registeredAt: string;
   backfillStatus: string;
@@ -32,7 +32,7 @@ function BackfillBadge({ status }: { status: string }) {
 
 const rowClass = "flex items-center gap-3 border-b border-line px-4 py-3";
 
-export type RegisteredAccountTab = "registeredAccounts" | "banned";
+export type ServerMemberTab = "serverMembers" | "banned";
 
 function ProfileCell({
   account,
@@ -58,8 +58,8 @@ function ProfileCell({
 }
 
 type Props = {
-  tab?: RegisteredAccountTab;
-  registeredAccounts: RegisteredAccount[];
+  tab?: ServerMemberTab;
+  serverMembers: ServerMember[];
   bannedAccounts?: BannedAccount[];
   total?: number;
   isLoading?: boolean;
@@ -74,9 +74,9 @@ type Props = {
   unbanningDid?: string | null;
 };
 
-export function RegisteredAccountList({
-  tab = "registeredAccounts",
-  registeredAccounts,
+export function ServerMemberList({
+  tab = "serverMembers",
+  serverMembers,
   bannedAccounts = [],
   total,
   isLoading,
@@ -91,9 +91,7 @@ export function RegisteredAccountList({
   unbanningDid,
 }: Props) {
   const isEmpty =
-    tab === "banned"
-      ? bannedAccounts.length === 0
-      : registeredAccounts.length === 0;
+    tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
   return (
     <>
       <div className="sticky top-0 bg-surface">
@@ -108,7 +106,7 @@ export function RegisteredAccountList({
             {
               to: "/admin/registered-accounts",
               label: "メンバー",
-              selected: tab === "registeredAccounts",
+              selected: tab === "serverMembers",
             },
             {
               to: "/admin/registered-accounts?tab=banned",
@@ -156,31 +154,31 @@ export function RegisteredAccountList({
               </ConfirmDialog>
             </li>
           ))}
-        {tab === "registeredAccounts" &&
-          registeredAccounts.map((registeredAccount) => (
-            <li key={registeredAccount.did} className={rowClass}>
-              <ProfileCell account={registeredAccount}>
+        {tab === "serverMembers" &&
+          serverMembers.map((serverMember) => (
+            <li key={serverMember.did} className={rowClass}>
+              <ProfileCell account={serverMember}>
                 <div className="flex items-center gap-2 text-caption text-muted">
-                  <BackfillBadge status={registeredAccount.backfillStatus} />
-                  {formatDate(registeredAccount.registeredAt)} 登録
+                  <BackfillBadge status={serverMember.backfillStatus} />
+                  {formatDate(serverMember.registeredAt)} 登録
                 </div>
               </ProfileCell>
-              {registeredAccount.isAdmin ? (
+              {serverMember.isAdmin ? (
                 <Badge>管理者</Badge>
               ) : (
                 <ConfirmDialog
-                  title={`@${registeredAccount.handle} を管理者にしますか？`}
+                  title={`@${serverMember.handle} を管理者にしますか？`}
                   description="管理画面のすべての操作ができるようになります。"
                   confirmLabel="管理者にする"
-                  onConfirm={() => onGrantAdmin?.(registeredAccount.did)}
+                  onConfirm={() => onGrantAdmin?.(serverMember.did)}
                 >
                   {(openGrantAdmin) => (
                     <ConfirmDialog
-                      title={`@${registeredAccount.handle} のサーバー登録を停止しますか？`}
+                      title={`@${serverMember.handle} のサーバー登録を停止しますか？`}
                       description="サーバー登録が停止され、招待コードでも再登録できなくなります。"
                       confirmLabel="停止する"
                       danger
-                      onConfirm={() => onBan?.(registeredAccount.did)}
+                      onConfirm={() => onBan?.(serverMember.did)}
                     >
                       {(openBan) => (
                         <Menu
@@ -190,7 +188,7 @@ export function RegisteredAccountList({
                           <button
                             type="button"
                             className={menuItemClass}
-                            disabled={grantingDid === registeredAccount.did}
+                            disabled={grantingDid === serverMember.did}
                             onClick={openGrantAdmin}
                           >
                             <ShieldIcon className="size-4" />
@@ -199,7 +197,7 @@ export function RegisteredAccountList({
                           <button
                             type="button"
                             className={clsx(menuItemClass, "text-danger")}
-                            disabled={banningDid === registeredAccount.did}
+                            disabled={banningDid === serverMember.did}
                             onClick={openBan}
                           >
                             <BanIcon className="size-4" />

@@ -55,7 +55,7 @@ export const accountFactory = (db: Database) =>
             .create();
         },
       }),
-      registeredAccount: () => ({
+      serverMember: () => ({
         after: async (account) => {
           await registrationFactory(db)
             .vars({ account: () => account })

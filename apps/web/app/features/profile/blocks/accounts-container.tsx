@@ -19,7 +19,7 @@ export function AccountsContainer() {
   const tracked = params.get("tab") === "tracked";
 
   const registeredQuery = useQuery({
-    queryKey: ["clientRegisteredAccounts", q],
+    queryKey: ["clientServerMembers", q],
     queryFn: () =>
       fetchJson<RegisteredResponse>(
         `/api/registered-accounts?${new URLSearchParams({ q })}`,
@@ -41,7 +41,7 @@ export function AccountsContainer() {
 
   const accounts: Account[] | undefined = tracked
     ? trackedData?.accounts
-    : registered?.registeredAccounts;
+    : registered?.serverMembers;
 
   return (
     <>
@@ -49,7 +49,7 @@ export function AccountsContainer() {
         tabs={[
           {
             to: "/server",
-            label: `メンバー${registered && !q ? ` ${registered.registeredAccounts.length}${registered.hasMore ? "+" : ""}` : ""}`,
+            label: `メンバー${registered && !q ? ` ${registered.serverMembers.length}${registered.hasMore ? "+" : ""}` : ""}`,
             selected: !tracked,
           },
           {
