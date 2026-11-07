@@ -7,7 +7,6 @@ import {
   ListTodoIcon,
   MailIcon,
   SearchIcon,
-  ServerIcon,
   UsersIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -48,11 +47,9 @@ function Item({
 
 export function NavMenu({
   profileId,
-  showServer,
   onNavigate,
 }: {
   profileId?: string;
-  showServer?: boolean;
   onNavigate?: () => void;
 }) {
   const p = { onNavigate };
@@ -80,11 +77,6 @@ export function NavMenu({
             プロフィール
           </Item>
         </>
-      )}
-      {showServer && (
-        <Item to="/server" icon={<ServerIcon className="size-6" />} {...p}>
-          サーバー
-        </Item>
       )}
     </ul>
   );

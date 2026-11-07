@@ -1,10 +1,11 @@
 import { ChevronRightIcon } from "lucide-react";
 import { Link } from "react-router";
 
-export function ServerCard() {
+export function ServerCard({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Link
       to="/server"
+      onClick={onNavigate}
       className="
         block rounded-2xl border border-line bg-surface-2 p-4
         hover:opacity-90
