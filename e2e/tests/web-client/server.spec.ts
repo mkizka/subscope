@@ -27,9 +27,10 @@ test.describe("サーバー", () => {
       main.getByRole("heading", { name: "サーバーについて" }),
     ).toBeVisible();
     await expect(
-      main.getByText(
-        "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
-      ),
+      main.getByRole("paragraph").filter({
+        hasText:
+          "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
+      }),
     ).toBeVisible();
   });
 
