@@ -12,6 +12,7 @@
   --color-on-brand: #fff;
   --color-brand-soft: color-mix(in srgb, #b8326b 12%, transparent);
   --color-danger: #c62828;
+  --color-repost: #1b8a5a;
   --text-title: 1.25rem;
   --text-title--line-height: 1.4;
   --text-title--font-weight: 700;
@@ -70,6 +71,7 @@
     --color-on-brand: #17191c;
     --color-brand-soft: color-mix(in srgb, #e8709f 16%, transparent);
     --color-danger: #ef6b6b;
+    --color-repost: #4cc38a;
   }
 }
 

@@ -12,6 +12,7 @@ colors:
   on-brand: "#ffffff"
   brand-soft: "color-mix(in srgb, #b8326b 12%, transparent)"
   danger: "#c62828"
+  repost: "#1b8a5a"
 typography:
   title:
     fontFamily: Noto Sans JP
@@ -172,6 +173,7 @@ Blueskyが使えなくなったときに、同じ会話をそのまま続けら�
 | `on-brand`   | `brand` と `danger` の上の文字                             | `#FFFFFF`          | `#17191C`                 |
 | `brand-soft` | 未読の通知など、目立たせたい行の背景                       | `brand` の12%      | `brand` の16%             |
 | `danger`     | 削除・サーバー登録の停止など取り消せない操作、エラーの文字 | `#C62828`          | `#EF6B6B`                 |
+| `repost`     | 通知のリポストのアイコン（いいねの `brand` と見分ける）    | `#1B8A5A`          | `#4CC38A`                 |
 
 - `brand` は1つの領域で一番大事な操作1つにだけ使う。並んだボタンをすべて `brand` にしない
 - 文字色は `ink`・`muted`・`brand`・`danger` の4つだけ
