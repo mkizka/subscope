@@ -292,6 +292,14 @@ query以外の絞り込みパラメータ(authors、sortなど)は今は無視�
 - getServerMembers-2: メンバーごとに管理者かどうかを返す
 - getServerMembers-3: qを指定すると、表示名またはハンドルにqを含むメンバーだけを返す
 
+## me.subsco.server.getLocalTimeline
+
+メンバーの投稿とリポストを、新しいものほど上にfeedViewPostで返す。ローカルタイムラインとして、メンバーのフォロー先ではないアカウントの投稿は含めない。認証は任意で、認証した場合は閲覧者のviewerを含める。limitとcursorでページングする。
+
+- getLocalTimeline-1: メンバーの投稿とリポストを、新しいものほど上に返す
+- getLocalTimeline-2: メンバー以外のアカウントの投稿は含めない
+- getLocalTimeline-3: メンバーのリプライは含めない
+
 ## me.subsco.server.getSetupStatus
 
 サーバーの初期設定が済んでいるかを返す。認証は不要。

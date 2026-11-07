@@ -92,6 +92,7 @@
     "me.subsco.admin.verifyAccess",
     "me.subsco.graph.getServerMemberFollowers",
     "me.subsco.server.getFollowedAccounts",
+    "me.subsco.server.getLocalTimeline",
     "me.subsco.server.getServerMembers",
     "me.subsco.server.getSetupStatus",
     "me.subsco.sync.getBackfillStatuses",
@@ -403,6 +404,10 @@
     "me.subsco.server.getFollowedAccounts": {
       "uri": "file://./lexicons/me/subsco/server/getFollowedAccounts.json",
       "cid": "bafyreigeqysnvxhwa5uea3th54yscp7cioqntqspnll3a5obsfjaha2gdi"
+    },
+    "me.subsco.server.getLocalTimeline": {
+      "uri": "file://./lexicons/me/subsco/server/getLocalTimeline.json",
+      "cid": "bafyreibdcgs5b5d4dze6bir5wiz53k75achrahrikrcbichvmerh5eyluy"
     },
     "me.subsco.server.getServerMembers": {
       "uri": "file://./lexicons/me/subsco/server/getServerMembers.json",

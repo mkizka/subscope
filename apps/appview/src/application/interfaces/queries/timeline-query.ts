@@ -9,6 +9,11 @@ export interface ITimelineQuery {
     cursor?: Date;
   }) => Promise<FeedItemDto[]>;
 
+  findLocalFeedItems: (params: {
+    limit: number;
+    cursor?: Date;
+  }) => Promise<FeedItemDto[]>;
+
   findListFeedItems: (params: {
     listUri: string;
     limit: number;
