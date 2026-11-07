@@ -34,7 +34,10 @@ import { toggleReactionUseCaseFactory } from "./application/reaction/toggle-reac
 import { searchUseCaseFactory } from "./application/search/search-use-case";
 import { getThreadUseCaseFactory } from "./application/thread/get-thread-use-case";
 import { getBackfillStatusUseCaseFactory } from "./application/timeline/get-backfill-status-use-case";
-import { getTimelineUseCaseFactory } from "./application/timeline/get-timeline-use-case";
+import {
+  getLocalTimelineUseCaseFactory,
+  getTimelineUseCaseFactory,
+} from "./application/timeline/get-timeline-use-case";
 import { accountQueryFactory } from "./infrastructure/account/account-query";
 import { adminCommandFactory } from "./infrastructure/admin/admin-command";
 import { adminQueryFactory } from "./infrastructure/admin/admin-query";
@@ -124,6 +127,11 @@ export const di = await createRegistry()
   .service("postCommand", ["oauthClient"], postCommandFactory)
   .service("postQuery", ["oauthClient"], postQueryFactory)
   .service("getTimelineUseCase", ["timelineQuery"], getTimelineUseCaseFactory)
+  .service(
+    "getLocalTimelineUseCase",
+    ["timelineQuery"],
+    getLocalTimelineUseCaseFactory,
+  )
   .service(
     "createPostUseCase",
     ["postCommand", "postQuery"],

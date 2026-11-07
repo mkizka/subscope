@@ -10,13 +10,14 @@ import { TimelineFeed } from "./timeline-feed";
 
 type TimelineResponse = Awaited<ReturnType<typeof loader>>["data"];
 
-export function TimelineFeedContainer() {
+export function TimelineFeedContainer({ local }: { local: boolean }) {
+  const name = local ? "local-timeline" : "timeline";
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ["timeline"],
+      queryKey: [name],
       queryFn: ({ pageParam }) =>
         fetchJson<TimelineResponse>(
-          `/api/timeline?${new URLSearchParams(pageParam ? { cursor: pageParam } : {})}`,
+          `/api/${name}?${new URLSearchParams(pageParam ? { cursor: pageParam } : {})}`,
         ),
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       initialPageParam: undefined as string | undefined,

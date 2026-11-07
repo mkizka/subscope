@@ -149,9 +149,7 @@ test.describe("タイムライン", () => {
       .getByRole("link", { name: "ホーム" })
       .click();
 
-    await expect(
-      page.getByRole("heading", { name: "フォロー中" }),
-    ).toBeVisible();
+    await expect(page.getByRole("tab", { name: "フォロー中" })).toBeVisible();
     const skeleton = page.getByRole("status", {
       name: "読み込み中",
       exact: true,
@@ -484,5 +482,66 @@ test.describe("タイムライン", () => {
     }).toPass();
     await link.click();
     await expect(page).toHaveURL(`/${await resolveHandle("alice.test")}`);
+  });
+});
+
+test.describe("ローカルタイムライン", () => {
+  test("localTimeline-1: 「ローカル」タブを選ぶと、このサーバーのメンバーの投稿を新しいものほど上に表示する", async ({
+    page,
+    request,
+  }) => {
+    const texts = ["localTimeline-1: 古い投稿", "localTimeline-1: 新しい投稿"];
+    await createPosts(request, texts);
+    texts.reverse();
+
+    await page.goto("/");
+    await page.getByRole("tab", { name: "ローカル" }).click();
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByText(/^localTimeline-1: /)).toHaveText(texts, {
+        timeout: 1000,
+      });
+    }).toPass();
+  });
+
+  test("localTimeline-2: 「ローカル」タブには、メンバーのフォロー先であってもメンバーではないアカウントの投稿は表示しない", async ({
+    page,
+    request,
+  }) => {
+    await follow("alice.test", "bob.test");
+    await createRecord("bob.test", "app.bsky.feed.post", {
+      text: "localTimeline-2: メンバーではない人の投稿",
+      createdAt: new Date().toISOString(),
+    });
+    await createPosts(request, ["localTimeline-2: メンバーの投稿"]);
+
+    await page.goto("/?tab=local");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page.getByText("localTimeline-2: メンバーの投稿"),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(
+      page.getByText("localTimeline-2: メンバーではない人の投稿"),
+    ).toBeHidden();
+  });
+
+  test("localTimeline-3: 「フォロー中」タブを選ぶと、フォロー中のタイムラインに戻る", async ({
+    page,
+    request,
+  }) => {
+    await createPosts(request, ["localTimeline-3: 投稿"]);
+
+    await page.goto("/?tab=local");
+    await page.getByRole("tab", { name: "フォロー中" }).click();
+
+    await expect(page).toHaveURL("/");
+    await expect(page.getByRole("tab", { name: "フォロー中" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 });
