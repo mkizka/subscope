@@ -115,8 +115,7 @@ test.describe("サーバー", () => {
   }) => {
     await page.goto("/server");
 
-    await page
-      .getByRole("main")
+    await items(page)
       .getByRole("link", { name: /^Alice/ })
       .click();
 
