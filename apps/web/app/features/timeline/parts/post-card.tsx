@@ -230,7 +230,7 @@ export function PostCard({
     <article
       className={clsx(
         `
-          relative border-line px-4 py-3
+          relative border-line px-4 pt-3 pb-2
           hover:bg-surface-2
         `,
         !connectedBelow && "border-b",
