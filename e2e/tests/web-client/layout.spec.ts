@@ -340,14 +340,14 @@ test.describe("レイアウト（モバイル）", () => {
     expect(drawerItems).toEqual(pcItems);
   });
 
-  test("layout-10: 左カラムとモバイルのドロワーのメニューの「サーバーについて」から `/server` に移動できる", async ({
+  test("layout-10: 左カラムとモバイルのドロワーのメニューの「サーバー」から `/server` に移動できる", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
     await page
       .getByRole("navigation")
-      .getByRole("link", { name: "サーバーについて" })
+      .getByRole("link", { name: "サーバー", exact: true })
       .click();
     await expect(page).toHaveURL("/server");
 
@@ -356,7 +356,7 @@ test.describe("レイアウト（モバイル）", () => {
     await page.getByRole("button", { name: "メニューを開く" }).click();
     await page
       .getByRole("dialog", { name: "メニュー" })
-      .getByRole("link", { name: "サーバーについて" })
+      .getByRole("link", { name: "サーバー", exact: true })
       .click();
     await expect(page).toHaveURL("/server");
   });
