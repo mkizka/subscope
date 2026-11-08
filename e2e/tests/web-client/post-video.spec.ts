@@ -60,7 +60,7 @@ test.describe("投稿動画", () => {
       }),
     );
     const requested = page.waitForRequest(PLAYLIST);
-    await post.getByRole("button", { name: /play/i }).click();
+    await post.locator('[slot="centered-chrome"]').click();
     await requested;
   });
 
@@ -77,5 +77,25 @@ test.describe("投稿動画", () => {
     const post = await open(page, text);
 
     await expect(post.locator("blockquote").getByLabel(/quoted/)).toBeVisible();
+  });
+
+  test("post-video-4: 停止中は、動画の中央に再生ボタンを表示する", async ({
+    page,
+  }) => {
+    const text = `post-video-4: ${Date.now()}`;
+    await postVideo(text);
+    const post = await open(page, text);
+
+    await expect(post.locator('[slot="centered-chrome"]')).toBeVisible();
+  });
+
+  test("post-video-5: 再生ボタンの横に、経過時間と動画の長さを表示する", async ({
+    page,
+  }) => {
+    const text = `post-video-5: ${Date.now()}`;
+    await postVideo(text);
+    const post = await open(page, text);
+
+    await expect(post.locator("media-time-display")).toBeVisible();
   });
 });

@@ -19,3 +19,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Vertical: Story = {
+  args: {
+    video: { ...meta.args.video, aspectRatio: { width: 9, height: 16 } },
+  },
+};
