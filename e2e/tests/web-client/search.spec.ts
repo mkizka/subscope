@@ -253,7 +253,9 @@ test.describe("検索履歴", () => {
     ).toHaveCount(0);
   });
 
-  test("search-13: 履歴の語を選ぶと、その語で検索する", async ({ page }) => {
+  test("search-13: 履歴の語を選ぶと、検索欄にその語を入れて検索する", async ({
+    page,
+  }) => {
     await seedHistory(page, ["bar", "foo"]);
     await page.goto("/search");
 
@@ -261,6 +263,7 @@ test.describe("検索履歴", () => {
     await history(page).getByRole("link", { name: "foo" }).click();
 
     await expect(page).toHaveURL("/search?q=foo");
+    await expect(searchbox(page)).toHaveValue("foo");
   });
 
   test("search-14: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる", async ({
