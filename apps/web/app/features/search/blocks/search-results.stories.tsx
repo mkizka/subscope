@@ -5,7 +5,7 @@ import { SearchResults } from "./search-results";
 const meta = {
   component: SearchResults,
   args: {
-    tab: "accounts",
+    tab: "posts",
     accounts: [
       {
         did: "did:plc:alice",
@@ -36,16 +36,16 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Accounts: Story = {};
+export const Posts: Story = {};
 
-export const Posts: Story = {
-  args: { tab: "posts" },
+export const Accounts: Story = {
+  args: { tab: "accounts" },
 };
 
 export const NoAccounts: Story = {
-  args: { accounts: [] },
+  args: { tab: "accounts", accounts: [] },
 };
 
 export const NoPosts: Story = {
-  args: { tab: "posts", posts: [] },
+  args: { posts: [] },
 };

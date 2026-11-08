@@ -19,13 +19,13 @@ export function SearchResultsContainer({ q, tab }: Props) {
     queryKey: ["search", tab, q],
     queryFn: () =>
       fetchJson<SearchResponse>(
-        `/api/search?${new URLSearchParams({ q, ...(tab === "posts" && { tab }) })}`,
+        `/api/search?${new URLSearchParams({ q, ...(tab === "accounts" && { tab }) })}`,
       ),
     throwOnError: true,
   });
 
   if (!data) {
-    return tab === "accounts" ? <AccountsSkeleton /> : <PostsSkeleton />;
+    return tab === "posts" ? <PostsSkeleton /> : <AccountsSkeleton />;
   }
   return (
     <SearchResults tab={tab} accounts={data.accounts} posts={data.posts} />

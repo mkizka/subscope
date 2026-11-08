@@ -548,7 +548,7 @@ test.describe("タイムライン", () => {
     await expect(page).toHaveURL(`/${await resolveHandle("alice.test")}`);
   });
 
-  test("timeline-17: 本文のうちfacetsでハッシュタグが付いた範囲は、そのハッシュタグを投稿タブで検索する検索ページ（`/search?q=%23タグ&tab=posts`）へのリンクにする", async ({
+  test("timeline-17: 本文のうちfacetsでハッシュタグが付いた範囲は、そのハッシュタグを投稿タブで検索する検索ページ（`/search?q=%23タグ`）へのリンクにする", async ({
     page,
   }) => {
     const prefix = "timeline-17: こんにちは ";
@@ -575,7 +575,7 @@ test.describe("タイムライン", () => {
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
     await link.click();
-    await expect(page).toHaveURL(/\/search\?q=%23.+&tab=posts$/);
+    await expect(page).toHaveURL(/\/search\?q=%23[^&]+$/);
   });
 });
 

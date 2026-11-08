@@ -16,8 +16,8 @@ export function SearchPage({ q, tab }: Props) {
       <Tabs
         tabs={(
           [
-            ["accounts", "ユーザー", {}],
-            ["posts", "投稿", { tab: "posts" }],
+            ["posts", "投稿", {}],
+            ["accounts", "ユーザー", { tab: "accounts" }],
           ] as const
         ).map(([value, label, params]) => ({
           to: `?${new URLSearchParams({ ...(q && { q }), ...params })}`,

@@ -77,7 +77,7 @@ test.describe("スレッド", () => {
   }) => {
     const text = "thread-4: 投稿";
     await post(text);
-    const search = `/search?${new URLSearchParams({ q: text, tab: "posts" })}`;
+    const search = `/search?${new URLSearchParams({ q: text })}`;
     const article = page.getByRole("article").filter({ hasText: text });
     await expect(async () => {
       await page.goto(search);

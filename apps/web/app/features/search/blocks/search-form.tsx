@@ -47,7 +47,7 @@ export function SearchForm({
           <SearchHistory
             history={history}
             hrefFor={(word) =>
-              `?${new URLSearchParams({ q: word, ...(tab === "posts" && { tab }) })}`
+              `?${new URLSearchParams({ q: word, ...(tab === "accounts" && { tab }) })}`
             }
             onSelect={() => setFocused(false)}
             onRemove={onRemoveHistory}
@@ -55,7 +55,9 @@ export function SearchForm({
           />
         )}
       </div>
-      {tab === "posts" && <input type="hidden" name="tab" value="posts" />}
+      {tab === "accounts" && (
+        <input type="hidden" name="tab" value="accounts" />
+      )}
       <Button type="submit" loading={loading}>
         検索
       </Button>
