@@ -49,9 +49,7 @@ export function ProfileContainer({ handle }: Props) {
   });
 
   const data = pages?.pages[0];
-  const tabs = data?.isSelf
-    ? (["posts", "replies", "media", "likes"] as const)
-    : (["posts", "replies", "media"] as const);
+  const tabs = ["posts", "replies", "media", "likes"] as const;
   const { profile } = data ?? {};
   return (
     <>
