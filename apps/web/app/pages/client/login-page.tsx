@@ -16,7 +16,11 @@ export function LoginPage({ step }: Props) {
         "
       >
         <div className="flex items-center gap-2">
-          <img src="/favicon.svg" alt="" className="size-8" />
+          <img
+            src={`${import.meta.env.BASE_URL}favicon.svg`}
+            alt=""
+            className="size-8"
+          />
           <h1 className="text-title">Subscope</h1>
         </div>
         <p className="text-label">

@@ -22,7 +22,11 @@ export function SideNav({ profileId, avatarUrl, handle, isAdmin }: Props) {
   return (
     <nav className="flex h-full flex-col p-4">
       <div className="mb-2 flex items-center gap-2 px-3 text-title">
-        <img src="/favicon.svg" alt="" className="size-8" />
+        <img
+          src={`${import.meta.env.BASE_URL}favicon.svg`}
+          alt=""
+          className="size-8"
+        />
         Subscope
       </div>
       <div className="flex flex-1 flex-col gap-3">
