@@ -29,7 +29,7 @@ export function SearchPage({ q, tab }: Props) {
         <SearchResultsContainer q={q} tab={tab} />
       ) : (
         <p className="p-6 text-center text-label text-muted">
-          名前やハンドル、投稿の言葉で、このサーバーが保存しているアカウントと投稿を探せます
+          名前・ハンドル・投稿の本文から、このサーバーに保存されているアカウントと投稿を検索できます
         </p>
       )}
     </ThreeColumnLayout>
