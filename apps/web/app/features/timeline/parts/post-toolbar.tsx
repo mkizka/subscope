@@ -83,7 +83,7 @@ export function PostToolbar({
   onDelete,
 }: Props) {
   return (
-    <div className="relative -ml-2 flex justify-between">
+    <div className="relative mt-1 -ml-2 flex justify-between">
       <ToggleButton
         label="返信"
         Icon={MessageCircleIcon}
