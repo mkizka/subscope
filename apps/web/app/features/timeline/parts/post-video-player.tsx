@@ -48,8 +48,8 @@ export default function PostVideoPlayer({ video }: { video: PostVideoData }) {
       />
       <MediaControlBar
         className="
-          absolute inset-x-0 bottom-0 items-center bg-linear-to-t from-black/65
-          to-transparent px-2 pt-8 pb-2
+          absolute inset-x-0 bottom-0 items-center gap-2 bg-linear-to-t
+          from-black/65 to-transparent px-2 pt-8 pb-2
         "
       >
         <MediaPlayButton />
