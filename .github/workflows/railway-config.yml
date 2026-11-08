@@ -18,14 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: |
-          npm i -g corepack@latest
-          corepack enable pnpm
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .node-version
-          cache: pnpm
-      - uses: railwayapp/config@9e17d413dbe219f19d62538d9c06b5dbb5e9abf8 # v1.2.0
+      - uses: railwayapp/config@f1f0c715716fe035319b0a716b95c6e83e0f6595 # main (v1.2.0以降、pnpm対応)
         with:
           command: plan
           railway-token: ${{ secrets.RAILWAY_TOKEN }}
@@ -37,7 +30,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
-      - uses: railwayapp/config@9e17d413dbe219f19d62538d9c06b5dbb5e9abf8 # v1.2.0
+      - uses: railwayapp/config@f1f0c715716fe035319b0a716b95c6e83e0f6595 # main (v1.2.0以降、pnpm対応)
         with:
           command: apply
           railway-token: ${{ secrets.RAILWAY_TOKEN }}
