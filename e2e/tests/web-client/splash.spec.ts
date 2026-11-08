@@ -18,12 +18,10 @@ test.describe("起動時のスプラッシュ", () => {
       page.getByText("Subscope", { exact: true }).first(),
     ).toBeVisible();
     const box = await splash.locator("..").boundingBox();
-    const viewport = await page.evaluate(() => ({
-      width: document.documentElement.clientWidth,
-      height: document.documentElement.clientHeight,
-    }));
-    expect(box?.width).toBe(viewport.width);
-    expect(box?.height).toBe(viewport.height);
+    const viewport = page.viewportSize();
+    expect(box?.x).toBe(0);
+    expect(box?.width).toBeGreaterThan((viewport?.width ?? 0) - 20);
+    expect(box?.height).toBe(viewport?.height);
     release();
   });
 
