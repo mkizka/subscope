@@ -36,7 +36,7 @@ export function ServerInfo({ operator, serviceDid }: Props) {
         <section className="space-y-1">
           <h2 className="text-body font-bold">Subscopeが目指すもの</h2>
           <p>
-            これまで、Blueskyと連携する分散SNSを作るには、Blueskyと同等に強力なサーバーが必要でした。Subscopeは上の仕組みでサーバーに保存するデータを大幅に減らし、誰でも個人でBlueskyの仕組みを使った分散SNSを運営できることを目指しています。
+            これまでBlueskyと連携する分散SNSを作るには、Blueskyと同等に強力なサーバーが必要でした。Subscopeは上の仕組みでサーバーに保存するデータを大幅に減らし、誰でも個人でBlueskyの仕組みを使った分散SNSを運営できることを目指しています。
           </p>
         </section>
       </div>
