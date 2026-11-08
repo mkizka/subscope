@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 
 import { Badge } from "@/app/components/ui/badge";
+import { useReloadTimeline } from "@/app/lib/use-reload-timeline";
 
 type Props = {
   profileId?: string;
@@ -14,16 +15,19 @@ function Tab({
   icon,
   label,
   children,
+  onClick,
 }: {
   to: string;
   icon: ReactNode;
   label: string;
   children?: ReactNode;
+  onClick?: () => void;
 }) {
   return (
     <NavLink
       to={to}
       end
+      onClick={onClick}
       aria-label={label}
       className={({ isActive }) =>
         `relative flex items-center justify-center py-3 ${isActive ? "text-ink" : "text-muted"}`
@@ -36,6 +40,7 @@ function Tab({
 }
 
 export function BottomTabs({ profileId, unreadCount }: Props) {
+  const reloadTimeline = useReloadTimeline();
   return (
     <nav
       aria-label="タブバー"
@@ -45,7 +50,12 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
         lg:hidden
       "
     >
-      <Tab to="/" label="ホーム" icon={<HomeIcon className="size-6" />} />
+      <Tab
+        to="/"
+        label="ホーム"
+        icon={<HomeIcon className="size-6" />}
+        onClick={() => reloadTimeline("/")}
+      />
       <Tab to="/search" label="検索" icon={<SearchIcon className="size-6" />} />
       <Tab
         to="/notifications"

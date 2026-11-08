@@ -13,6 +13,8 @@ import {
 import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 
+import { useReloadTimeline } from "@/app/lib/use-reload-timeline";
+
 export const navItemClass = `
   flex items-center gap-3 rounded-xl px-3 py-2 text-body
   hover:bg-surface-2
@@ -54,9 +56,18 @@ export function NavMenu({
   onNavigate?: () => void;
 }) {
   const p = { onNavigate };
+  const reloadTimeline = useReloadTimeline();
   return (
     <ul className="flex flex-col gap-1">
-      <Item to="/" icon={<HomeIcon className="size-6" />} {...p}>
+      <Item
+        to="/"
+        icon={<HomeIcon className="size-6" />}
+        {...p}
+        onNavigate={() => {
+          onNavigate?.();
+          reloadTimeline("/");
+        }}
+      >
         ホーム
       </Item>
       <Item to="/search" icon={<SearchIcon className="size-6" />} {...p}>

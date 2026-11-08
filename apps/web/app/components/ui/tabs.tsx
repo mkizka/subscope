@@ -3,15 +3,17 @@ import { Link } from "react-router";
 
 type Props = {
   tabs: { to: string; label: string; selected: boolean }[];
+  onSelect?: (to: string) => void;
 };
 
-export function Tabs({ tabs }: Props) {
+export function Tabs({ tabs, onSelect }: Props) {
   return (
     <div role="tablist" className="flex border-b border-line">
       {tabs.map(({ to, label, selected }) => (
         <Link
           key={to}
           to={to}
+          onClick={() => onSelect?.(to)}
           role="tab"
           aria-selected={selected}
           className={clsx(
