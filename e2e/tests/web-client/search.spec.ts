@@ -277,4 +277,16 @@ test.describe("検索履歴", () => {
     await page.getByRole("button", { name: "履歴を全て削除" }).click();
     await expect(history(page)).toBeHidden();
   });
+
+  test("search-15: 検索を実行すると、履歴を閉じる", async ({ page }) => {
+    await seedHistory(page, ["bar", "foo"]);
+    await page.goto("/search");
+
+    await openHistory(page);
+    await searchbox(page).fill("baz");
+    await searchbox(page).press("Enter");
+
+    await expect(page).toHaveURL(/q=baz/);
+    await expect(history(page)).toBeHidden();
+  });
 });

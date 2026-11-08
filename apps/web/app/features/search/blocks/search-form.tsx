@@ -26,7 +26,14 @@ export function SearchForm({
   const [focused, setFocused] = useState(false);
 
   return (
-    <Form className="flex gap-2 p-4" {...formProps}>
+    <Form
+      className="flex gap-2 p-4"
+      {...formProps}
+      onSubmit={(e) => {
+        formProps.onSubmit?.(e);
+        e.currentTarget.querySelector("input")?.blur();
+      }}
+    >
       <div
         className="relative flex-1"
         onFocus={() => setFocused(true)}
