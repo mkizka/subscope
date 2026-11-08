@@ -31,7 +31,7 @@ export function SearchForm({
       {...formProps}
       onSubmit={(e) => {
         formProps.onSubmit?.(e);
-        (document.activeElement as HTMLElement | null)?.blur();
+        e.currentTarget.querySelector("input")?.blur();
       }}
     >
       <div
