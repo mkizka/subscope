@@ -56,3 +56,9 @@ export const Empty: Story = {
     posts: [],
   },
 };
+
+export const Refreshing: Story = {
+  args: {
+    refreshing: true,
+  },
+};

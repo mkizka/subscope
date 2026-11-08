@@ -31,14 +31,10 @@ export function TimelineFeedContainer({ local }: { local: boolean }) {
   }
   return (
     <>
-      {isRefetching && !isFetchingNextPage && (
-        <div className="relative h-0">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10">
-            <LoadingSpinner label="タイムラインを更新中" />
-          </div>
-        </div>
-      )}
-      <TimelineFeed posts={data.pages.flatMap((page) => page.posts)} />
+      <TimelineFeed
+        posts={data.pages.flatMap((page) => page.posts)}
+        refreshing={isRefetching && !isFetchingNextPage}
+      />
       {hasNextPage && (
         <LoadingSpinner label="続きを読み込み中">
           <InfiniteScrollTrigger
