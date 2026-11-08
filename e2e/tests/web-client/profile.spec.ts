@@ -247,40 +247,29 @@ test.describe("プロフィール", () => {
     ).toHaveCount(2);
   });
 
-  test("profile-8: 自分のプロフィールの「いいね」タブに、自分がいいねした投稿を表示する", async ({
+  test("profile-8: 全てのアカウントのプロフィールの「いいね」タブに、そのアカウントがいいねした投稿を表示する", async ({
     page,
   }) => {
     await follow("alice.test", "bob.test");
     const text = `profile-8の投稿 ${Date.now()}`;
-    const subject = await createRecord("bob.test", "app.bsky.feed.post", {
+    const subject = await createRecord("alice.test", "app.bsky.feed.post", {
       text,
       createdAt: new Date().toISOString(),
     });
-    await createRecord("alice.test", "app.bsky.feed.like", {
+    await createRecord("bob.test", "app.bsky.feed.like", {
       subject,
       createdAt: new Date().toISOString(),
     });
-    await page.goto("/alice.test");
+    await page.goto("/bob.test");
     const main = page.getByRole("main");
 
     await main.getByRole("tab", { name: "いいね" }).click();
 
-    await expect(page).toHaveURL("/alice.test?tab=likes");
+    await expect(page).toHaveURL("/bob.test?tab=likes");
     await expect(async () => {
       await page.reload();
       await expect(main.getByText(text)).toBeVisible({ timeout: 1000 });
     }).toPass();
-  });
-
-  test("profile-9: 他のアカウントのプロフィールには「いいね」タブを出さない", async ({
-    page,
-  }) => {
-    await follow("alice.test", "bob.test");
-    await page.goto("/bob.test");
-
-    const main = page.getByRole("main");
-    await expect(main.getByRole("tab", { name: "リプライ" })).toBeVisible();
-    await expect(main.getByRole("tab", { name: "いいね" })).toHaveCount(0);
   });
 
   test("profile-10: 全体ページの「メディア」タブには、画像付きの投稿だけを表示する", async ({
