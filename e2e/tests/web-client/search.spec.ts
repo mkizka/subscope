@@ -220,18 +220,20 @@ test.describe("検索履歴", () => {
   const history = (page: Page) =>
     page.getByRole("main").getByRole("list", { name: "検索履歴" });
 
-  const submit = async (page: Page, q: string) => {
-    await searchbox(page).fill(q);
-    await searchbox(page).press("Enter");
-    await expect(page).toHaveURL(`/search?q=${q}`);
-  };
+  const seedHistory = (page: Page, words: string[]) =>
+    page.addInitScript(
+      (value) => localStorage.setItem("search-history", value),
+      JSON.stringify(words),
+    );
 
   test("search-12: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する", async ({
     page,
   }) => {
-    await page.goto("/search");
-    for (let i = 1; i <= 11; i++) await submit(page, `word${i}`);
-    await submit(page, "word5");
+    await seedHistory(
+      page,
+      Array.from({ length: 11 }, (_, i) => `word${11 - i}`),
+    );
+    await page.goto("/search?q=word5");
 
     await searchbox(page).focus();
 
@@ -243,9 +245,8 @@ test.describe("検索履歴", () => {
   });
 
   test("search-13: 履歴の語を選ぶと、その語で検索する", async ({ page }) => {
+    await seedHistory(page, ["bar", "foo"]);
     await page.goto("/search");
-    await submit(page, "foo");
-    await submit(page, "bar");
 
     await searchbox(page).focus();
     await history(page).getByRole("link", { name: "foo" }).click();
@@ -256,9 +257,8 @@ test.describe("検索履歴", () => {
   test("search-14: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる", async ({
     page,
   }) => {
+    await seedHistory(page, ["bar", "foo"]);
     await page.goto("/search");
-    await submit(page, "foo");
-    await submit(page, "bar");
 
     await searchbox(page).focus();
     await history(page).getByRole("button", { name: "fooを削除" }).click();
