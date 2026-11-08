@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { type ComponentProps, useState } from "react";
 import { Form, Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -24,8 +24,16 @@ export function SidebarSearch({
   onRemoveHistory,
   onClearHistory,
 }: Props) {
+  const [focused, setFocused] = useState(false);
+
   return (
-    <div className="group relative">
+    <div
+      className="group relative"
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      }}
+    >
       <Form action="/search">
         <Input
           type="search"
@@ -36,21 +44,14 @@ export function SidebarSearch({
           {...inputProps}
         />
       </Form>
-      {history.length > 0 && (
-        <div
-          className="
-            hidden
-            group-focus-within:block
-          "
-        >
-          <SearchHistory
-            history={history}
-            hrefFor={(word) => `/search?${new URLSearchParams({ q: word })}`}
-            onSelect={onSelect}
-            onRemove={onRemoveHistory}
-            onClear={onClearHistory}
-          />
-        </div>
+      {focused && history.length > 0 && (
+        <SearchHistory
+          history={history}
+          hrefFor={(word) => `/search?${new URLSearchParams({ q: word })}`}
+          onSelect={onSelect}
+          onRemove={onRemoveHistory}
+          onClear={onClearHistory}
+        />
       )}
       {suggestions.length > 0 && (
         <ul
