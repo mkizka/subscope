@@ -4,8 +4,8 @@
 
 ## 反映の流れ
 
-- `.railway/**` を変更したPRでは、GitHub Actions(`railway-config.yml`)が `railway config plan` の結果をPRにコメントする
-- PRをマージすると、そのplanが `railway config apply` で本番に適用される
+- `.railway/**` を変更したPRでは、GitHub Actions(`railway-config.yml`、[railwayapp/config](https://github.com/railwayapp/config))が `railway config plan` の結果をPRにコメントする
+- PRをマージすると、そのPRで固定されたplanが `railway config apply` で本番に適用される。planの後に環境が変わっていた場合はapplyが失敗するので、PRを更新してplanをやり直す
 - `railway.ts` に書いていないリソースはapplyで削除される
 
 ## 初回セットアップ
