@@ -12,7 +12,7 @@ export function SearchPage({ q, tab }: Props) {
   return (
     <ThreeColumnLayout hideSearch>
       <h1 className="border-b border-line p-4 text-title">検索</h1>
-      <SearchFormContainer q={q} tab={tab} />
+      <SearchFormContainer key={q} q={q} tab={tab} />
       <Tabs
         tabs={(
           [
