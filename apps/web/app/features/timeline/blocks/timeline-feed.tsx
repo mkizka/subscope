@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import {
   PostCard,
   type PostCardProps,
@@ -49,6 +51,9 @@ function groupThreads(posts: TimelinePost[]) {
   return groups.sort((a, b) => a.index - b.index).map((g) => g.posts);
 }
 
+const postKey = (post: TimelinePost) =>
+  `${post.uri}-${post.reasonRepost?.byHandle ?? ""}`;
+
 export function TimelineFeed({ posts }: Props) {
   return (
     <section>
@@ -57,18 +62,20 @@ export function TimelineFeed({ posts }: Props) {
           タイムラインに投稿がありません
         </p>
       )}
-      {groupThreads(posts).map((group) =>
-        group.map((post, i) => (
-          <PostCard
-            key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
-            {...post}
-            connectedAbove={i > 0}
-            connectedBelow={i < group.length - 1}
-            threadPath={threadPath(post)}
-            toolbar={<PostToolbarContainer {...post} />}
-          />
-        )),
-      )}
+      {groupThreads(posts).map((group) => (
+        <Fragment key={group.map(postKey).join("|")}>
+          {group.map((post, i) => (
+            <PostCard
+              key={postKey(post)}
+              {...post}
+              connectedAbove={i > 0}
+              connectedBelow={i < group.length - 1}
+              threadPath={threadPath(post)}
+              toolbar={<PostToolbarContainer {...post} />}
+            />
+          ))}
+        </Fragment>
+      ))}
     </section>
   );
 }
