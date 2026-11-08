@@ -248,7 +248,9 @@ test.describe("検索履歴", () => {
     await expect(items).toHaveCount(10);
     await expect(items.first()).toContainText("word5");
     await expect(items.nth(1)).toContainText("word11");
-    await expect(history(page)).not.toContainText("word1 ");
+    await expect(
+      history(page).getByRole("link", { name: "word1", exact: true }),
+    ).toHaveCount(0);
   });
 
   test("search-13: 履歴の語を選ぶと、その語で検索する", async ({ page }) => {
