@@ -45,7 +45,7 @@ function ToggleButton(props: {
       aria-pressed={props.pressed}
       aria-disabled={props.busy}
       className={`
-        inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full
+        inline-flex h-7 min-w-8 items-center justify-center gap-1 rounded-full
         px-2 text-label
         hover:bg-surface-2
         aria-disabled:cursor-not-allowed
@@ -55,7 +55,7 @@ function ToggleButton(props: {
     >
       <props.Icon
         className={`
-          size-5
+          size-4
           ${props.pressed && props.fillWhenPressed ? "fill-current" : ""}
         `}
       />
@@ -118,7 +118,7 @@ export function PostToolbar({
         {(open) => (
           <Menu
             label="投稿のメニュー"
-            trigger={<EllipsisIcon className="size-5" />}
+            trigger={<EllipsisIcon className="size-4" />}
           >
             <button
               type="button"
