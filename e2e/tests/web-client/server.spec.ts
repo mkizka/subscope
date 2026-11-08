@@ -17,7 +17,7 @@ test.describe("サーバー", () => {
 
   const items = (page: Page) => page.getByRole("main").getByRole("listitem");
 
-  test("server-1: 見出し「サーバーについて」の下に、「Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです」と説明する", async ({
+  test("server-1: 見出し「サーバーについて」の下に、Subscopeの概要と、見出し「仕組み」「Subscopeが目指すもの」の説明を表示する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -27,10 +27,13 @@ test.describe("サーバー", () => {
       main.getByRole("heading", { name: "サーバーについて" }),
     ).toBeVisible();
     await expect(
-      main.getByRole("paragraph").filter({
-        hasText:
-          "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
-      }),
+      main.getByText(
+        "SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。",
+      ),
+    ).toBeVisible();
+    await expect(main.getByRole("heading", { name: "仕組み" })).toBeVisible();
+    await expect(
+      main.getByRole("heading", { name: "Subscopeが目指すもの" }),
     ).toBeVisible();
   });
 
