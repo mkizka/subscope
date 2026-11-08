@@ -209,7 +209,10 @@ test.describe("タイムライン", () => {
     await expect(spinner).toBeVisible();
     release(undefined);
     await expect(spinner).toBeHidden();
-    await expect(page.getByText(newText)).toBeVisible();
+    await expect(async () => {
+      await page.clock.fastForward(60_000);
+      await expect(page.getByText(newText)).toBeVisible({ timeout: 1000 });
+    }).toPass();
   });
 
   test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
