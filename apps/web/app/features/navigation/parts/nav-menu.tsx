@@ -3,11 +3,11 @@ import {
   CircleUserIcon,
   ExternalLinkIcon,
   HomeIcon,
-  InfoIcon,
   ListIcon,
   ListTodoIcon,
   MailIcon,
   SearchIcon,
+  ServerIcon,
   UsersIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -79,8 +79,8 @@ export function NavMenu({
           </Item>
         </>
       )}
-      <Item to="/server" icon={<InfoIcon className="size-6" />} {...p}>
-        サーバーについて
+      <Item to="/server" icon={<ServerIcon className="size-6" />} {...p}>
+        サーバー
       </Item>
     </ul>
   );
