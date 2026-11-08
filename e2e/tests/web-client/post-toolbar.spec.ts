@@ -304,3 +304,25 @@ test("post-toolbar-9: 投稿のメニューの「リンクをコピー」で、�
     `${new URL(page.url()).origin}/alice.test/post/${uri.split("/").pop()}`,
   );
 });
+
+test("post-toolbar-10: いいね済みの投稿のいいねボタンは、ハートを塗りつぶして表示する", async ({
+  page,
+}) => {
+  const text = "post-toolbar-10: 投稿";
+  await createRecord("alice.test", "app.bsky.feed.post", {
+    text,
+    createdAt: new Date().toISOString(),
+  });
+
+  await page.goto("/");
+  const post = page.getByRole("article").filter({ hasText: text });
+  await expect(async () => {
+    await page.reload();
+    await expect(post).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  const heart = post.getByRole("button", { name: "いいね" }).locator("svg");
+
+  await expect(heart).toHaveCSS("fill", "none");
+  await post.getByRole("button", { name: "いいね" }).click();
+  await expect(heart).not.toHaveCSS("fill", "none");
+});
