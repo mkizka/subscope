@@ -17,6 +17,7 @@ type Props = {
 
 function useScrollingUp() {
   const [visible, setVisible] = useState(true);
+
   useEffect(() => {
     let last = window.scrollY;
     const onScroll = () => {
@@ -28,6 +29,7 @@ function useScrollingUp() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
   return visible;
 }
 

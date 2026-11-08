@@ -30,6 +30,7 @@ export function ListForm({
   const navigation = useNavigation();
   const submitting = navigation.formData?.has("name") ?? false;
   const wasSubmittingRef = useRef(false);
+
   useEffect(() => {
     if (wasSubmittingRef.current && !submitting) ref.current?.close();
     wasSubmittingRef.current = submitting;

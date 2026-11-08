@@ -11,6 +11,7 @@ export function SidebarSearchContainer() {
   const { history, remove, clear } = useSearchHistory();
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
+
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQ(q.trim()), 200);
     return () => clearTimeout(timer);

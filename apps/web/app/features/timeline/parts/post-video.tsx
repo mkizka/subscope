@@ -11,9 +11,11 @@ export function PostVideo({ video }: { video: PostVideoData }) {
   const [Player, setPlayer] = useState<ComponentType<{
     video: PostVideoData;
   }> | null>(null);
+
   useEffect(() => {
     void import("./post-video-player").then((m) => setPlayer(() => m.default));
   }, []);
+
   if (!Player) {
     return (
       <div
