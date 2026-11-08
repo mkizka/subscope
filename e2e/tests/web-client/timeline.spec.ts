@@ -215,6 +215,40 @@ test.describe("タイムライン", () => {
     }).toPass();
   });
 
+  test("timeline-20: 表示中のタイムラインと同じものを指すメニューのホーム、またはフォロー中・ローカルのタブをタップすると、先頭へスクロールして投稿を読み込み直し、読み込み中は timeline-18 と同じ「更新中」のスピナーを表示する", async ({
+    page,
+    request,
+  }) => {
+    await createPosts(request, [`timeline-20: ${Date.now()}`]);
+    await expect(async () => {
+      await page.goto("/");
+      await expect(page.getByText("timeline-20:")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    const spinner = page.getByRole("status", { name: "タイムラインを更新中" });
+    await expect(spinner).toBeHidden();
+    let release: (v: unknown) => void = () => {};
+    const gate = new Promise((resolve) => (release = resolve));
+    await page.route("**/api/timeline*", async (route) => {
+      await gate;
+      await route.continue();
+    });
+
+    await page
+      .getByRole("navigation")
+      .getByRole("link", { name: "ホーム" })
+      .click();
+
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+
+    await page.unroute("**/api/timeline*");
+    await page.getByRole("tab", { name: "フォロー中" }).click();
+    await expect(page).toHaveURL("/");
+  });
+
   test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
     page,
     request,
