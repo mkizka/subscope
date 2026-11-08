@@ -299,4 +299,29 @@ test.describe("引用投稿", () => {
       "https://example.com/quote-9/full",
     );
   });
+
+  test("quote-10: スレッドで選んだ投稿がフィードジェネレーターを引用している場合も、quote-8と同じ枠を表示する", async ({
+    page,
+  }) => {
+    const feed = await createRecord("alice.test", "app.bsky.feed.generator", {
+      did: "did:web:feed.example.com",
+      displayName: "quote-10: フィード名",
+      description: "quote-10: フィードの説明",
+      createdAt: new Date().toISOString(),
+    });
+    const post = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "quote-10: 引用した投稿",
+      embed: { $type: "app.bsky.embed.record", record: feed },
+      createdAt: new Date().toISOString(),
+    });
+
+    const quote = page.getByLabel("選んだ投稿").getByRole("blockquote");
+    await expect(async () => {
+      await page.goto(`/alice.test/post/${post.uri.split("/").pop()}`);
+      await expect(quote).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await expect(quote).toContainText("quote-10: フィード名");
+    await expect(quote).toContainText("@alice.test");
+    await expect(quote).toContainText("quote-10: フィードの説明");
+  });
 });

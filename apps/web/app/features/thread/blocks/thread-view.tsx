@@ -15,6 +15,7 @@ import {
   ExternalCard,
   PostCard,
   type PostCardProps,
+  QuotedFeed,
   QuotedPost,
   UnavailableQuote,
 } from "@/app/features/timeline/parts/post-card";
@@ -43,6 +44,7 @@ function FocusedPost({
   external,
   quote,
   quoteUnavailable,
+  quotedFeed,
   createdAt,
   replyCount,
   repostCount,
@@ -83,6 +85,7 @@ function FocusedPost({
       {external && <ExternalCard external={external} />}
       {quote && <QuotedPost quote={quote} />}
       {quoteUnavailable && <UnavailableQuote reason={quoteUnavailable} />}
+      {quotedFeed && <QuotedFeed feed={quotedFeed} />}
       {createdAt && (
         <time
           dateTime={createdAt}
