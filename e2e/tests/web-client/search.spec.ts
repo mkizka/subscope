@@ -223,7 +223,7 @@ test.describe("検索履歴", () => {
   const openHistory = (page: Page) =>
     expect(async () => {
       await searchbox(page).blur();
-      await openHistory(page);
+      await searchbox(page).focus();
       await expect(history(page)).toBeVisible({ timeout: 500 });
     }).toPass();
 
