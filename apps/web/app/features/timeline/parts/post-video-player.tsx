@@ -23,7 +23,7 @@ export default function PostVideoPlayer({ video }: { video: PostVideoData }) {
         mt-2 block max-h-[80vh] w-full overflow-hidden rounded-xl bg-black
         [--media-control-background:transparent]
         [--media-control-hover-background:transparent]
-        [--media-primary-color:var(--color-brand)]
+        [--media-primary-color:white]
         [--media-range-bar-color:var(--color-brand)]
         [--media-range-thumb-background:var(--color-brand)]
         [--media-secondary-color:transparent]
@@ -49,7 +49,7 @@ export default function PostVideoPlayer({ video }: { video: PostVideoData }) {
       <MediaControlBar
         className="
           absolute inset-x-0 bottom-0 items-center bg-linear-to-t from-black/65
-          to-transparent pt-8
+          to-transparent px-2 pt-8 pb-2
         "
       >
         <MediaPlayButton />
