@@ -402,7 +402,7 @@ test.describe("タイムライン", () => {
     ).toHaveCount(2);
   });
 
-  test("timeline-19: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した件数を点線つきで表示する。この表示は、最後の投稿のスレッドページへのリンクにする", async ({
+  test("timeline-19: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した投稿の件数を、リンクと分かる見た目で点線つきで表示する。この表示は、最後の投稿のスレッドページへのリンクにする", async ({
     page,
   }) => {
     const root = await createRecord("alice.test", "app.bsky.feed.post", {
@@ -427,9 +427,7 @@ test.describe("タイムライン", () => {
         { timeout: 1000 },
       );
     }).toPass();
-    await expect(page.getByTestId("omitted-posts")).toHaveText(
-      "2件の投稿を省略",
-    );
+    await expect(page.getByTestId("omitted-posts")).toHaveText("2件の投稿");
     await page.getByTestId("omitted-posts").click();
     await expect(page).toHaveURL(/\/alice\.test\/post\//);
     await expect(page.getByText("timeline-19: 2")).toBeVisible();
