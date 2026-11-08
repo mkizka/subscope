@@ -108,14 +108,13 @@ test.describe("レイアウト", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    await page
-      .getByRole("complementary")
-      .getByRole("searchbox", { name: "検索語" })
-      .fill("alice");
-    await page
-      .getByRole("complementary")
-      .getByRole("link", { name: /alice\.test/ })
-      .click();
+    const sidebar = page.getByRole("complementary");
+    const link = sidebar.getByRole("link", { name: /alice\.test/ });
+    await expect(async () => {
+      await sidebar.getByRole("searchbox", { name: "検索語" }).fill("alice");
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await link.click();
 
     await expect(page).toHaveURL("/alice.test");
   });
@@ -129,6 +128,16 @@ test.describe("レイアウト", () => {
   const sidebarHistory = (page: Page) =>
     page.getByRole("complementary").getByRole("list", { name: "検索履歴" });
 
+  const openSidebarHistory = (page: Page) =>
+    expect(async () => {
+      const searchbox = page
+        .getByRole("complementary")
+        .getByRole("searchbox", { name: "検索語" });
+      await searchbox.blur();
+      await searchbox.focus();
+      await expect(sidebarHistory(page)).toBeVisible({ timeout: 500 });
+    }).toPass();
+
   test("layout-17: 右カラムの検索ボックスにフォーカスして何も入力していないとき、過去に検索した語を新しい順に最大10件、検索ボックスの下に表示する", async ({
     page,
   }) => {
@@ -139,10 +148,7 @@ test.describe("レイアウト", () => {
     );
     await page.goto("/");
 
-    await page
-      .getByRole("complementary")
-      .getByRole("searchbox", { name: "検索語" })
-      .focus();
+    await openSidebarHistory(page);
 
     const items = sidebarHistory(page).getByRole("listitem");
     await expect(items).toHaveCount(10);
@@ -156,10 +162,7 @@ test.describe("レイアウト", () => {
     await seedHistory(page, ["bar", "foo"]);
     await page.goto("/");
 
-    await page
-      .getByRole("complementary")
-      .getByRole("searchbox", { name: "検索語" })
-      .focus();
+    await openSidebarHistory(page);
     await sidebarHistory(page).getByRole("link", { name: "foo" }).click();
 
     await expect(page).toHaveURL("/search?q=foo");
@@ -172,10 +175,7 @@ test.describe("レイアウト", () => {
     await seedHistory(page, ["bar", "foo"]);
     await page.goto("/");
 
-    await page
-      .getByRole("complementary")
-      .getByRole("searchbox", { name: "検索語" })
-      .focus();
+    await openSidebarHistory(page);
     await sidebarHistory(page)
       .getByRole("button", { name: "fooを削除" })
       .click();
