@@ -57,6 +57,18 @@ function groupThreads(posts: TimelinePost[]) {
   return groups.sort((a, b) => a.index - b.index);
 }
 
+function OmittedPosts({ count }: { count: number }) {
+  return (
+    <div
+      data-testid="omitted-posts"
+      className="flex items-center gap-3 px-4 py-2 text-caption text-muted"
+    >
+      <span className="ml-[19px] h-6 w-0 border-l-2 border-dotted border-line" />
+      {count}件の投稿を省略
+    </div>
+  );
+}
+
 export function TimelineFeed({ posts, refreshing = false }: Props) {
   return (
     <section>
@@ -72,20 +84,30 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
           タイムラインに投稿がありません
         </p>
       )}
-      {groupThreads(posts).map(({ key, posts: group }) => (
-        <Fragment key={key}>
-          {group.map((post, i) => (
-            <PostCard
-              key={postKey(post)}
-              {...post}
-              connectedAbove={i > 0}
-              connectedBelow={i < group.length - 1}
-              threadPath={threadPath(post)}
-              toolbar={<PostToolbarContainer {...post} />}
-            />
-          ))}
-        </Fragment>
-      ))}
+      {groupThreads(posts).map(({ key, posts: group }) => {
+        const omitted = Math.max(group.length - 3, 0);
+        return (
+          <Fragment key={key}>
+            {group.map((post, i) => {
+              if (omitted > 0 && i > 0 && i < group.length - 2) return null;
+              return (
+                <Fragment key={postKey(post)}>
+                  {omitted > 0 && i === group.length - 2 && (
+                    <OmittedPosts count={omitted} />
+                  )}
+                  <PostCard
+                    {...post}
+                    connectedAbove={i > 0}
+                    connectedBelow={i < group.length - 1}
+                    threadPath={threadPath(post)}
+                    toolbar={<PostToolbarContainer {...post} />}
+                  />
+                </Fragment>
+              );
+            })}
+          </Fragment>
+        );
+      })}
     </section>
   );
 }
