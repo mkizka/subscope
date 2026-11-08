@@ -62,6 +62,9 @@ Reactコンポーネントは以下の方針で実装しています。
     - /blocks ... partsを使用したUIのまとまり。単体で意味を持つ
 - ページはpages/admin(管理画面)かpages/client(クライアント)に{name}-page.tsxとして配置し、storyを書く
   - routesはloader/actionを持ち、表示はpagesのページコンポーネントに任せる
+- 見た目が変わるUI変更や新規UIでは、同じPRで該当コンポーネントのstoryを追加・更新する
+  - 読み込み中・エラー・空など、状態ごとの見た目もstoryにする
+  - pages配下のstoryはVRT(e2e/vrt)の対象なので、スナップショットも更新する
 
 ### 仕様書・資料など
 
