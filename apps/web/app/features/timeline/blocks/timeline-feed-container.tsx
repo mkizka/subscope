@@ -12,7 +12,7 @@ type TimelineResponse = Awaited<ReturnType<typeof loader>>["data"];
 
 export function TimelineFeedContainer({ local }: { local: boolean }) {
   const name = local ? "local-timeline" : "timeline";
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } =
     useInfiniteQuery({
       queryKey: [name],
       queryFn: ({ pageParam }) =>
@@ -22,6 +22,7 @@ export function TimelineFeedContainer({ local }: { local: boolean }) {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage.cursor,
+      refetchInterval: 60_000,
       throwOnError: true,
     });
 
@@ -30,7 +31,10 @@ export function TimelineFeedContainer({ local }: { local: boolean }) {
   }
   return (
     <>
-      <TimelineFeed posts={data.pages.flatMap((page) => page.posts)} />
+      <TimelineFeed
+        posts={data.pages.flatMap((page) => page.posts)}
+        refreshing={isRefetching && !isFetchingNextPage}
+      />
       {hasNextPage && (
         <LoadingSpinner label="続きを読み込み中">
           <InfiniteScrollTrigger

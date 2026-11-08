@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 
+import { LoadingSpinner } from "@/app/components/loading-spinner";
 import {
   PostCard,
   type PostCardProps,
@@ -18,6 +19,7 @@ export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
 
 type Props = {
   posts: TimelinePost[];
+  refreshing?: boolean;
 };
 
 export const threadPath = (post: TimelinePost) =>
@@ -55,9 +57,16 @@ function groupThreads(posts: TimelinePost[]) {
   return groups.sort((a, b) => a.index - b.index);
 }
 
-export function TimelineFeed({ posts }: Props) {
+export function TimelineFeed({ posts, refreshing = false }: Props) {
   return (
     <section>
+      {refreshing && (
+        <div className="relative h-0">
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10">
+            <LoadingSpinner label="タイムラインを更新中" />
+          </div>
+        </div>
+      )}
       {posts.length === 0 && (
         <p className="py-8 text-center text-label text-muted">
           タイムラインに投稿がありません
