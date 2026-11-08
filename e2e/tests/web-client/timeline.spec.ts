@@ -368,6 +368,36 @@ test.describe("タイムライン", () => {
     ).toHaveCount(2);
   });
 
+  test("timeline-19: 線で繋げた投稿が4件以上ある場合は、起点・最後の投稿の返信先・最後の投稿の3件だけを表示し、起点と返信先の間に省略した件数を点線つきで表示する", async ({
+    page,
+  }) => {
+    const root = await createRecord("alice.test", "app.bsky.feed.post", {
+      text: "timeline-19: 1",
+      createdAt: new Date().toISOString(),
+    });
+    let parent = root;
+    for (const n of [2, 3, 4, 5]) {
+      parent = await createRecord("alice.test", "app.bsky.feed.post", {
+        text: `timeline-19: ${n}`,
+        reply: { root, parent },
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    await page.goto("/");
+
+    await expect(async () => {
+      await page.reload();
+      await expect(page.getByText(/^timeline-19: /)).toHaveText(
+        ["timeline-19: 1", "timeline-19: 4", "timeline-19: 5"],
+        { timeout: 1000 },
+      );
+    }).toPass();
+    await expect(page.getByTestId("omitted-posts")).toHaveText(
+      "2件の投稿を省略",
+    );
+  });
+
   test("timeline-15: 投稿には、投稿者の名前の隣にハンドルを表示する", async ({
     page,
   }) => {

@@ -62,3 +62,31 @@ export const Refreshing: Story = {
     refreshing: true,
   },
 };
+
+const threadPost = (n: number, parent?: number) => ({
+  uri: `at://did:plc:example1/app.bsky.feed.post/t${n}`,
+  cid: `bafythread${n}`,
+  authorHandle: "alice.bsky.social",
+  authorDisplayName: "Alice",
+  text: `連投${n}件目`,
+  replyCount: 0,
+  repostCount: 0,
+  likeCount: 0,
+  createdAt: new Date(Date.now() - 1000 * 60 * (10 - n)).toISOString(),
+  replyParentUri:
+    parent === undefined
+      ? undefined
+      : `at://did:plc:example1/app.bsky.feed.post/t${parent}`,
+});
+
+export const OmittedThread: Story = {
+  args: {
+    posts: [
+      threadPost(5, 4),
+      threadPost(4, 3),
+      threadPost(3, 2),
+      threadPost(2, 1),
+      threadPost(1),
+    ],
+  },
+};
