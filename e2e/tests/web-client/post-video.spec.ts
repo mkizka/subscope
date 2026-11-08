@@ -60,7 +60,7 @@ test.describe("投稿動画", () => {
       }),
     );
     const requested = page.waitForRequest(PLAYLIST);
-    await post.getByRole("button", { name: /play/i }).click();
+    await post.getByRole("button", { name: /play/i }).last().click();
     await requested;
   });
 
@@ -77,5 +77,24 @@ test.describe("投稿動画", () => {
     const post = await open(page, text);
 
     await expect(post.locator("blockquote").getByLabel(/quoted/)).toBeVisible();
+  });
+
+  test("post-video-4: 停止中は動画の中央に再生ボタンを表示し、再生が始まると隠す", async ({
+    page,
+  }) => {
+    const text = `post-video-4: ${Date.now()}`;
+    await postVideo(text);
+    const post = await open(page, text);
+
+    await page.route(PLAYLIST, (route) =>
+      route.fulfill({
+        contentType: "application/vnd.apple.mpegurl",
+        body: "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:6\n#EXT-X-ENDLIST\n",
+      }),
+    );
+    const center = post.getByRole("button", { name: /play/i }).first();
+    await expect(center).toBeVisible();
+    await center.click();
+    await expect(center).toBeHidden();
   });
 });

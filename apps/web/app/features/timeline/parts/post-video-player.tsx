@@ -5,8 +5,8 @@ import {
   MediaFullscreenButton,
   MediaMuteButton,
   MediaPlayButton,
+  MediaTimeDisplay,
   MediaTimeRange,
-  MediaVolumeRange,
 } from "media-chrome/react";
 
 import type { PostVideoData } from "./post-video";
@@ -23,7 +23,7 @@ export default function PostVideoPlayer({ video }: { video: PostVideoData }) {
         mt-2 block max-h-[80vh] w-full overflow-hidden rounded-xl bg-black
         [--media-control-background:transparent]
         [--media-control-hover-background:transparent]
-        [--media-primary-color:var(--color-brand)]
+        [--media-primary-color:white]
         [--media-range-bar-color:var(--color-brand)]
         [--media-range-thumb-background:var(--color-brand)]
       "
@@ -37,16 +37,26 @@ export default function PostVideoPlayer({ video }: { video: PostVideoData }) {
         playsInline
         className="size-full"
       />
-      <MediaControlBar className="absolute inset-x-0 bottom-0 items-center">
+      <MediaPlayButton
+        className="
+          absolute top-1/2 left-1/2 w-16 -translate-1/2 rounded-full
+          [--media-button-icon-width:30px]
+          [--media-control-background:rgb(0_0_0/0.55)]
+          [--media-control-height:64px]
+          [--media-control-hover-background:rgb(0_0_0/0.7)]
+          not-[[mediapaused]]:hidden
+        "
+      />
+      <MediaControlBar
+        className="
+          absolute inset-x-0 bottom-0 items-center bg-linear-to-t from-black/65
+          to-transparent pt-8
+        "
+      >
         <MediaPlayButton />
+        <MediaTimeDisplay showDuration />
         <MediaTimeRange className="min-w-0 flex-1" />
         <MediaMuteButton />
-        <MediaVolumeRange
-          className="
-            hidden
-            sm:inline-flex
-          "
-        />
         <MediaFullscreenButton />
       </MediaControlBar>
     </MediaController>
