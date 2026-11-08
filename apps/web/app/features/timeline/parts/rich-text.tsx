@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 import { ProfileLink } from "./profile-link";
 
 export type TextLink = {
@@ -5,6 +7,7 @@ export type TextLink = {
   byteEnd: number;
   uri?: string;
   did?: string;
+  tag?: string;
 };
 
 const encoder = new TextEncoder();
@@ -35,6 +38,7 @@ function splitByLinks(text: string, links: TextLink[] = []) {
       start: link.byteStart,
       uri: link.uri,
       did: link.did,
+      tag: link.tag,
     });
     cursor = link.byteEnd;
   }
@@ -63,6 +67,17 @@ export function RichText({
       >
         {segment.text}
       </ProfileLink>
+    ) : segment.tag ? (
+      <Link
+        key={segment.start}
+        to={`/search?${new URLSearchParams({ q: `#${segment.tag}`, tab: "posts" })}`}
+        className="
+          relative text-brand
+          hover:underline
+        "
+      >
+        {segment.text}
+      </Link>
     ) : segment.uri && /^https?:\/\//.test(segment.uri) ? (
       <a
         key={segment.start}

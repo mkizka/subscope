@@ -20,7 +20,7 @@ import {
 import getTimeline from "@repo/client/app/bsky/feed/getTimeline";
 import postRecord from "@repo/client/app/bsky/feed/post";
 import searchPosts from "@repo/client/app/bsky/feed/searchPosts";
-import { link, mention } from "@repo/client/app/bsky/richtext/facet";
+import { link, mention, tag } from "@repo/client/app/bsky/richtext/facet";
 import getLocalTimeline from "@repo/client/me/subsco/server/getLocalTimeline";
 import getRegistrationStatus, {
   registered,
@@ -86,7 +86,9 @@ function toLinks(record: unknown): TextLinkDto[] | undefined {
         ? [{ byteStart, byteEnd, uri: feature.uri }]
         : mention.matches(feature)
           ? [{ byteStart, byteEnd, did: feature.did }]
-          : [],
+          : tag.matches(feature)
+            ? [{ byteStart, byteEnd, tag: feature.tag }]
+            : [],
     ),
   );
 }
