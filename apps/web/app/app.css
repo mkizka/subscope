@@ -76,6 +76,10 @@
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-surface text-ink h-svh accent-brand;
   }

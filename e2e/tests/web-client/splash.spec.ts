@@ -19,7 +19,8 @@ test.describe("起動時のスプラッシュ", () => {
     ).toBeVisible();
     const box = await splash.locator("..").boundingBox();
     const viewport = page.viewportSize();
-    expect(box?.width).toBe(viewport?.width);
+    expect(box?.x).toBe(0);
+    expect(box?.width).toBeGreaterThan((viewport?.width ?? 0) - 20);
     expect(box?.height).toBe(viewport?.height);
     release();
   });
