@@ -1,4 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
+const rightColumn = (page: Page) =>
+  page.getByRole("complementary").filter({
+    hasNot: page.getByRole("navigation"),
+  });
 
 test.describe("レイアウト", () => {
   test("layout-1: 左カラムのメニューで、今いるページの項目を強調する", async ({
@@ -54,9 +59,9 @@ test.describe("レイアウト", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    const card = page
-      .getByRole("complementary")
-      .getByRole("link", { name: /サーバーについて/ });
+    const card = rightColumn(page).getByRole("link", {
+      name: /サーバーについて/,
+    });
     await expect(card).toContainText(
       "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
     );
@@ -77,9 +82,7 @@ test.describe("レイアウト", () => {
       page.getByRole("main").getByRole("heading", { name: "サーバーについて" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("complementary").getByRole("link", {
-        name: /サーバーについて/,
-      }),
+      rightColumn(page).getByRole("link", { name: /サーバーについて/ }),
     ).toHaveCount(0);
     expect((await page.getByRole("main").boundingBox())?.x).toBe(home?.x);
   });
