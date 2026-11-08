@@ -9,7 +9,7 @@ import { SearchForm } from "./search-form";
 
 export const searchSchema = z.object({
   q: z.string().optional(),
-  tab: z.literal("posts").optional(),
+  tab: z.literal("accounts").optional(),
 });
 
 type Props = {

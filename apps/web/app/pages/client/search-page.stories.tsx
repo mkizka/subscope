@@ -28,7 +28,7 @@ const meta = {
   component: SearchPage,
   args: {
     q: "alice",
-    tab: "accounts",
+    tab: "posts",
   },
   parameters: {
     path: "/search",
@@ -46,14 +46,14 @@ export const NotFound: Story = {
   args: { q: "nobody" },
 };
 
-export const Posts: Story = {
+export const Accounts: Story = {
   args: {
-    tab: "posts",
+    tab: "accounts",
   },
 };
 
-export const PostsNotFound: Story = {
-  args: { q: "nobody", tab: "posts" },
+export const AccountsNotFound: Story = {
+  args: { q: "nobody", tab: "accounts" },
 };
 
 export const Empty: Story = {

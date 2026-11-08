@@ -7,7 +7,7 @@ const meta = {
   args: {
     formProps: {},
     inputProps: { name: "q" },
-    tab: "accounts",
+    tab: "posts",
     loading: false,
     history: [],
     onRemoveHistory: () => {},

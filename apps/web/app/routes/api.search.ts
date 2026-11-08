@@ -14,7 +14,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const submission = parseWithZod(new URL(request.url).searchParams, {
     schema: searchSchema,
   });
-  const { q, tab = "accounts" as const } =
+  const { q, tab = "posts" as const } =
     submission.status === "success" ? submission.value : {};
   return data(
     q

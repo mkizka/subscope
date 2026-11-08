@@ -70,7 +70,7 @@ export function RichText({
     ) : segment.tag ? (
       <Link
         key={segment.start}
-        to={`/search?${new URLSearchParams({ q: `#${segment.tag}`, tab: "posts" })}`}
+        to={`/search?${new URLSearchParams({ q: `#${segment.tag}` })}`}
         className="
           relative text-brand
           hover:underline

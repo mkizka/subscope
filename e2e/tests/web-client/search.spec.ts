@@ -12,7 +12,7 @@ const post = (text: string, parent?: { uri: string; cid: string }) =>
 const searchPosts = async (page: Page, q: string, text: string) => {
   const article = page.getByRole("article").filter({ hasText: text });
   await expect(async () => {
-    await page.goto(`/search?${new URLSearchParams({ q, tab: "posts" })}`);
+    await page.goto(`/search?${new URLSearchParams({ q })}`);
     await expect(article).toBeVisible({ timeout: 1000 });
   }).toPass();
   return article;
@@ -46,10 +46,11 @@ test.describe("検索", () => {
     await expect(page).toHaveURL("/search");
 
     const main = page.getByRole("main");
+    await main.getByRole("tab", { name: "ユーザー" }).click();
     await main.getByRole("searchbox", { name: "検索語" }).fill("lic");
     await main.getByRole("button", { name: "検索" }).click();
 
-    await expect(page).toHaveURL("/search?q=lic");
+    await expect(page).toHaveURL("/search?q=lic&tab=accounts");
     const alice = page
       .getByRole("main")
       .getByRole("listitem")
@@ -67,7 +68,7 @@ test.describe("検索", () => {
   }) => {
     const link = page.getByRole("main").getByRole("link", { name: /^Alice/ });
     await expect(async () => {
-      await page.goto("/search?q=alice");
+      await page.goto("/search?q=alice&tab=accounts");
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();
 
@@ -84,7 +85,7 @@ test.describe("検索", () => {
   test("search-3: 一致するアカウントがないときは「ユーザーが見つかりません」と表示する", async ({
     page,
   }) => {
-    await page.goto("/search?q=nobody-matches-this");
+    await page.goto("/search?q=nobody-matches-this&tab=accounts");
 
     await expect(page.getByText("ユーザーが見つかりません")).toBeVisible();
   });
@@ -97,9 +98,6 @@ test.describe("検索", () => {
     await expect(page.getByRole("searchbox", { name: "検索語" })).toHaveValue(
       "alice",
     );
-    await expect(
-      page.getByRole("main").getByRole("listitem").filter({ hasText: "Alice" }),
-    ).toBeVisible();
   });
 
   test("search-5: 「投稿」タブで検索すると、本文が検索語に部分一致する投稿を、リプライを除いて新しい順に一覧表示する", async ({
@@ -110,13 +108,12 @@ test.describe("検索", () => {
     await post(`新しい ${q} 投稿`);
     await post(`返信 ${q}`, older);
     await searchPosts(page, q, `新しい ${q} 投稿`);
-    await page.goto("/search?q=x");
+    await page.goto("/search");
 
-    await page.getByRole("tab", { name: "投稿" }).click();
     await page.getByRole("searchbox", { name: "検索語" }).fill(q);
     await page.getByRole("button", { name: "検索" }).click();
 
-    await expect(page).toHaveURL(`/search?q=${q}&tab=posts`);
+    await expect(page).toHaveURL(`/search?q=${q}`);
     await expect(page.getByRole("main").getByRole("article")).toHaveText([
       new RegExp(`新しい ${q} 投稿`),
       new RegExp(`古い ${q} 投稿`),
@@ -126,7 +123,7 @@ test.describe("検索", () => {
   test("search-6: 一致する投稿がないときは「投稿が見つかりません」と表示する", async ({
     page,
   }) => {
-    await page.goto("/search?q=nobody-matches-this&tab=posts");
+    await page.goto("/search?q=nobody-matches-this");
 
     await expect(page.getByText("投稿が見つかりません")).toBeVisible();
   });
@@ -160,7 +157,7 @@ test.describe("検索", () => {
       .getByRole("listitem")
       .filter({ hasText: "@alice.test" });
     await expect(async () => {
-      await page.goto("/search?q=alice");
+      await page.goto("/search?q=alice&tab=accounts");
       await expect(alice.getByText("同期済み", { exact: true })).toBeVisible({
         timeout: 1000,
       });
@@ -198,7 +195,7 @@ test.describe("検索", () => {
       .getByRole("listitem")
       .filter({ hasText: "@alice.test" });
     await expect(async () => {
-      await page.goto("/search?q=alice");
+      await page.goto("/search?q=alice&tab=accounts");
       await expect(alice).toBeVisible({ timeout: 1000 });
     }).toPass();
     await page

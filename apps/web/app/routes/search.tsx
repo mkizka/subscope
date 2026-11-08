@@ -16,7 +16,7 @@ export function meta() {
 export default function Search() {
   const [searchParams] = useSearchParams();
   const submission = parseWithZod(searchParams, { schema: searchSchema });
-  const { q, tab = "accounts" as const } =
+  const { q, tab = "posts" as const } =
     submission.status === "success" ? submission.value : {};
   return <SearchPage q={q} tab={tab} />;
 }
