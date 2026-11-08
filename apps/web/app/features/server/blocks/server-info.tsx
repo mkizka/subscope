@@ -23,9 +23,23 @@ export function ServerInfo({ operator, serviceDid }: Props) {
   return (
     <>
       <h1 className="p-4 pb-2 text-title">サーバーについて</h1>
-      <p className="px-4 pb-4 text-label">
-        Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです
-      </p>
+      <div className="space-y-4 px-4 pb-4 text-label">
+        <p>
+          SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。
+        </p>
+        <section className="space-y-1">
+          <h2 className="text-heading">仕組み</h2>
+          <p>
+            Subscopeにログインするとあなたのアカウントが登録され、アカウントの情報を読み込みます。このとき、あなたがフォローしている全てのアカウントの情報も読み込みます。これにより、サーバーに登録した人と、その誰かがフォローした人の投稿が表示されます。
+          </p>
+        </section>
+        <section className="space-y-1">
+          <h2 className="text-heading">Subscopeが目指すもの</h2>
+          <p>
+            これまで、Blueskyと連携する分散SNSを作るには、Blueskyと同等に強力なサーバーが必要でした。Subscopeは上の仕組みでサーバーに保存するデータを大幅に減らし、誰でも個人でBlueskyの仕組みを使った分散SNSを運営できることを目指しています。
+          </p>
+        </section>
+      </div>
       <dl className="border-t border-line text-label">
         <div className="flex items-center gap-4 border-b border-line px-4 py-3">
           <dt className="w-20 shrink-0 text-muted">運営者</dt>
