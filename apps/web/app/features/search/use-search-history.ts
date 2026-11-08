@@ -7,7 +7,9 @@ const MAX = 10;
 
 const load = (): string[] => {
   try {
-    return schema.parse(JSON.parse(localStorage.getItem(KEY) ?? "[]"));
+    return schema
+      .parse(JSON.parse(localStorage.getItem(KEY) ?? "[]"))
+      .slice(0, MAX);
   } catch {
     return [];
   }

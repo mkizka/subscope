@@ -11,7 +11,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: { inputProps: {}, suggestions: [], onSelect: () => {} },
+  args: {
+    inputProps: {},
+    suggestions: [],
+    onSelect: () => {},
+    history: [],
+    onRemoveHistory: () => {},
+    onClearHistory: () => {},
+  },
 };
 
 export const WithSuggestions: Story = {
@@ -22,5 +29,8 @@ export const WithSuggestions: Story = {
       { did: "did:plc:alina", handle: "alina.test" },
     ],
     onSelect: () => {},
+    history: [],
+    onRemoveHistory: () => {},
+    onClearHistory: () => {},
   },
 };

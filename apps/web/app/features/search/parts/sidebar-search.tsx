@@ -1,19 +1,39 @@
-import type { ComponentProps } from "react";
+import { type ComponentProps, useState } from "react";
 import { Form, Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Input } from "@/app/components/ui/input";
 import type { AccountDto } from "@/app/server/application/dto/account";
 
+import { SearchHistory } from "./search-history";
+
 type Props = {
   inputProps: ComponentProps<"input">;
   suggestions: AccountDto[];
   onSelect: () => void;
+  history: string[];
+  onRemoveHistory: (word: string) => void;
+  onClearHistory: () => void;
 };
 
-export function SidebarSearch({ inputProps, suggestions, onSelect }: Props) {
+export function SidebarSearch({
+  inputProps,
+  suggestions,
+  onSelect,
+  history,
+  onRemoveHistory,
+  onClearHistory,
+}: Props) {
+  const [focused, setFocused] = useState(false);
+
   return (
-    <div className="group relative">
+    <div
+      className="group relative"
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      }}
+    >
       <Form action="/search">
         <Input
           type="search"
@@ -24,6 +44,15 @@ export function SidebarSearch({ inputProps, suggestions, onSelect }: Props) {
           {...inputProps}
         />
       </Form>
+      {focused && history.length > 0 && (
+        <SearchHistory
+          history={history}
+          hrefFor={(word) => `/search?${new URLSearchParams({ q: word })}`}
+          onSelect={onSelect}
+          onRemove={onRemoveHistory}
+          onClear={onClearHistory}
+        />
+      )}
       {suggestions.length > 0 && (
         <ul
           className="

@@ -108,16 +108,85 @@ test.describe("レイアウト", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/");
 
-    await page
-      .getByRole("complementary")
-      .getByRole("searchbox", { name: "検索語" })
-      .fill("alice");
-    await page
-      .getByRole("complementary")
-      .getByRole("link", { name: /alice\.test/ })
-      .click();
+    const sidebar = page.getByRole("complementary");
+    const link = sidebar.getByRole("link", { name: /alice\.test/ });
+    await expect(async () => {
+      await sidebar.getByRole("searchbox", { name: "検索語" }).fill("alice");
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await link.click();
 
     await expect(page).toHaveURL("/alice.test");
+  });
+
+  const seedHistory = (page: Page, words: string[]) =>
+    page.addInitScript(
+      (value) => localStorage.setItem("search-history", value),
+      JSON.stringify(words),
+    );
+
+  const sidebarHistory = (page: Page) =>
+    page.getByRole("complementary").getByRole("list", { name: "検索履歴" });
+
+  const openSidebarHistory = (page: Page) =>
+    expect(async () => {
+      const searchbox = page
+        .getByRole("complementary")
+        .getByRole("searchbox", { name: "検索語" });
+      await searchbox.blur();
+      await searchbox.focus();
+      await expect(sidebarHistory(page)).toBeVisible({ timeout: 500 });
+    }).toPass();
+
+  test("layout-17: 右カラムの検索ボックスにフォーカスして何も入力していないとき、過去に検索した語を新しい順に最大10件、検索ボックスの下に表示する", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await seedHistory(
+      page,
+      Array.from({ length: 11 }, (_, i) => `word${11 - i}`),
+    );
+    await page.goto("/");
+
+    await openSidebarHistory(page);
+
+    const items = sidebarHistory(page).getByRole("listitem");
+    await expect(items).toHaveCount(10);
+    await expect(items.first()).toContainText("word11");
+  });
+
+  test("layout-18: 右カラムの履歴の語を選ぶと、その語で検索する", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await seedHistory(page, ["bar", "foo"]);
+    await page.goto("/");
+
+    await openSidebarHistory(page);
+    await sidebarHistory(page).getByRole("link", { name: "foo" }).click();
+
+    await expect(page).toHaveURL("/search?q=foo");
+  });
+
+  test("layout-19: 右カラムの履歴の語は個別に、または「履歴を全て削除」で全て削除できる", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await seedHistory(page, ["bar", "foo"]);
+    await page.goto("/");
+
+    await openSidebarHistory(page);
+    await sidebarHistory(page)
+      .getByRole("button", { name: "fooを削除" })
+      .click();
+    await expect(sidebarHistory(page)).not.toContainText("foo");
+    await expect(sidebarHistory(page)).toContainText("bar");
+
+    await page
+      .getByRole("complementary")
+      .getByRole("button", { name: "履歴を全て削除" })
+      .click();
+    await expect(sidebarHistory(page)).toBeHidden();
   });
 
   test("layout-12: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない", async ({
