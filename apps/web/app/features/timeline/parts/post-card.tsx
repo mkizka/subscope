@@ -297,7 +297,7 @@ export function PostCard({
                 : "日時不明"}
             </span>
           </div>
-          <p className="wrap-break-word whitespace-pre-wrap">
+          <p className="mt-1 wrap-break-word whitespace-pre-wrap">
             {text && <RichText text={text} links={links} />}
           </p>
           {images && <PostImages images={images} />}
