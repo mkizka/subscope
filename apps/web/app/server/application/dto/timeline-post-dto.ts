@@ -3,6 +3,7 @@ export type TextLinkDto = {
   byteEnd: number;
   uri?: string;
   did?: string;
+  tag?: string;
 };
 
 export type TimelinePostDto = {

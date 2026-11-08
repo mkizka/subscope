@@ -483,6 +483,36 @@ test.describe("タイムライン", () => {
     await link.click();
     await expect(page).toHaveURL(`/${await resolveHandle("alice.test")}`);
   });
+
+  test("timeline-17: 本文のうちfacetsでハッシュタグが付いた範囲は、そのハッシュタグを投稿タブで検索する検索ページ（`/search?q=%23タグ&tab=posts`）へのリンクにする", async ({
+    page,
+  }) => {
+    const prefix = "timeline-17: こんにちは ";
+    const label = "#タグ17";
+    const byteStart = new TextEncoder().encode(prefix).length;
+    await createRecord("alice.test", "app.bsky.feed.post", {
+      text: `${prefix}${label} です`,
+      facets: [
+        {
+          index: {
+            byteStart,
+            byteEnd: byteStart + new TextEncoder().encode(label).length,
+          },
+          features: [{ $type: "app.bsky.richtext.facet#tag", tag: "タグ17" }],
+        },
+      ],
+      createdAt: new Date().toISOString(),
+    });
+
+    await page.goto("/");
+    const link = page.getByRole("link", { name: label, exact: true });
+    await expect(async () => {
+      await page.reload();
+      await expect(link).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await link.click();
+    await expect(page).toHaveURL(/\/search\?q=%23.+&tab=posts$/);
+  });
 });
 
 test.describe("ローカルタイムライン", () => {
