@@ -9,6 +9,9 @@ const meta = {
     inputProps: { name: "q" },
     tab: "accounts",
     loading: false,
+    history: [],
+    onRemoveHistory: () => {},
+    onClearHistory: () => {},
   },
 } satisfies Meta<typeof SearchForm>;
 
@@ -20,4 +23,11 @@ export const Default: Story = {};
 
 export const Loading: Story = {
   args: { loading: true },
+};
+
+export const WithHistory: Story = {
+  args: { history: ["Bluesky", "#atproto", "alice"] },
+  play: ({ canvasElement }) => {
+    canvasElement.querySelector("input")?.focus();
+  },
 };

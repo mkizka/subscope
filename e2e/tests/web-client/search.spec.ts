@@ -213,3 +213,59 @@ test.describe("検索", () => {
     await expect(alice).toBeVisible();
   });
 });
+
+test.describe("検索履歴", () => {
+  const searchbox = (page: Page) =>
+    page.getByRole("main").getByRole("searchbox", { name: "検索語" });
+  const history = (page: Page) =>
+    page.getByRole("main").getByRole("list", { name: "検索履歴" });
+
+  const submit = async (page: Page, q: string) => {
+    await searchbox(page).fill(q);
+    await searchbox(page).press("Enter");
+    await expect(page).toHaveURL(`/search?q=${q}`);
+  };
+
+  test("search-12: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する", async ({
+    page,
+  }) => {
+    await page.goto("/search");
+    for (let i = 1; i <= 11; i++) await submit(page, `word${i}`);
+    await submit(page, "word5");
+
+    await searchbox(page).focus();
+
+    const items = history(page).getByRole("listitem");
+    await expect(items).toHaveCount(10);
+    await expect(items.first()).toContainText("word5");
+    await expect(items.nth(1)).toContainText("word11");
+    await expect(history(page)).not.toContainText("word1 ");
+  });
+
+  test("search-13: 履歴の語を選ぶと、その語で検索する", async ({ page }) => {
+    await page.goto("/search");
+    await submit(page, "foo");
+    await submit(page, "bar");
+
+    await searchbox(page).focus();
+    await history(page).getByRole("link", { name: "foo" }).click();
+
+    await expect(page).toHaveURL("/search?q=foo");
+  });
+
+  test("search-14: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる", async ({
+    page,
+  }) => {
+    await page.goto("/search");
+    await submit(page, "foo");
+    await submit(page, "bar");
+
+    await searchbox(page).focus();
+    await history(page).getByRole("button", { name: "fooを削除" }).click();
+    await expect(history(page)).not.toContainText("foo");
+    await expect(history(page)).toContainText("bar");
+
+    await page.getByRole("button", { name: "履歴を全て削除" }).click();
+    await expect(history(page)).toBeHidden();
+  });
+});
