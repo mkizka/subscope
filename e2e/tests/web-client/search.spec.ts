@@ -220,6 +220,13 @@ test.describe("検索履歴", () => {
   const history = (page: Page) =>
     page.getByRole("main").getByRole("list", { name: "検索履歴" });
 
+  const openHistory = (page: Page) =>
+    expect(async () => {
+      await searchbox(page).blur();
+      await openHistory(page);
+      await expect(history(page)).toBeVisible({ timeout: 500 });
+    }).toPass();
+
   const seedHistory = (page: Page, words: string[]) =>
     page.addInitScript(
       (value) => localStorage.setItem("search-history", value),
@@ -235,7 +242,7 @@ test.describe("検索履歴", () => {
     );
     await page.goto("/search?q=word5");
 
-    await searchbox(page).focus();
+    await openHistory(page);
 
     const items = history(page).getByRole("listitem");
     await expect(items).toHaveCount(10);
@@ -248,7 +255,7 @@ test.describe("検索履歴", () => {
     await seedHistory(page, ["bar", "foo"]);
     await page.goto("/search");
 
-    await searchbox(page).focus();
+    await openHistory(page);
     await history(page).getByRole("link", { name: "foo" }).click();
 
     await expect(page).toHaveURL("/search?q=foo");
@@ -260,7 +267,7 @@ test.describe("検索履歴", () => {
     await seedHistory(page, ["bar", "foo"]);
     await page.goto("/search");
 
-    await searchbox(page).focus();
+    await openHistory(page);
     await history(page).getByRole("button", { name: "fooを削除" }).click();
     await expect(history(page)).not.toContainText("foo");
     await expect(history(page)).toContainText("bar");
