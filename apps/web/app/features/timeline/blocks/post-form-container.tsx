@@ -69,6 +69,7 @@ function PostFormDialogContainer({
     fetcher.data && "uri" in fetcher.data ? fetcher.data.uri : undefined;
 
   useEffect(() => ref.current?.showModal(), []);
+
   useEffect(() => {
     if (!uri) return;
     target?.onPosted?.();

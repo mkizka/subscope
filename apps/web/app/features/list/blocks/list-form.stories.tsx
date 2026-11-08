@@ -5,7 +5,9 @@ import { ListForm } from "./list-form";
 
 function OpenListForm(args: ComponentProps<typeof ListForm>) {
   const ref = useRef<HTMLDialogElement>(null);
+
   useEffect(() => ref.current?.show(), []);
+
   return <ListForm {...args} ref={ref} />;
 }
 
