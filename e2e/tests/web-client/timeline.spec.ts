@@ -181,6 +181,37 @@ test.describe("タイムライン", () => {
     await expect(page.getByText(text)).toBeVisible();
   });
 
+  test("timeline-18: 表示中は60秒ごとに投稿を自動で読み込み直し、読み込み中は一覧の上部に「更新中」のスピナーを表示する", async ({
+    page,
+    request,
+  }) => {
+    await createPosts(request, [`timeline-18: ${Date.now()}`]);
+    await page.clock.install();
+    await expect(async () => {
+      await page.goto("/");
+      await expect(page.getByText("timeline-18:")).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+    const spinner = page.getByRole("status", { name: "タイムラインを更新中" });
+    await expect(spinner).toBeHidden();
+    let release: (v: unknown) => void = () => {};
+    const gate = new Promise((resolve) => (release = resolve));
+    await page.route("**/api/timeline*", async (route) => {
+      await gate;
+      await route.continue();
+    });
+    const newText = `timeline-18-new: ${Date.now()}`;
+    await createPosts(request, [newText]);
+
+    await page.clock.fastForward(60_000);
+
+    await expect(spinner).toBeVisible();
+    release(undefined);
+    await expect(spinner).toBeHidden();
+    await expect(page.getByText(newText)).toBeVisible();
+  });
+
   test("timeline-5: 投稿の時刻は、ブラウザの現在時刻からの経過時間で表示する", async ({
     page,
     request,
