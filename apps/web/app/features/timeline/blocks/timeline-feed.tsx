@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import {
   PostCard,
   type PostCardProps,
@@ -21,6 +23,9 @@ type Props = {
 export const threadPath = (post: TimelinePost) =>
   `/${post.authorHandle}/post/${post.uri.split("/").pop()}`;
 
+const postKey = (post: TimelinePost) =>
+  `${post.uri}-${post.reasonRepost?.byHandle ?? ""}`;
+
 function groupThreads(posts: TimelinePost[]) {
   const byUri = new Map<string, number>();
   posts.forEach((post, i) => {
@@ -34,7 +39,7 @@ function groupThreads(posts: TimelinePost[]) {
     childOf.set(parent, i);
     isChild.add(i);
   });
-  const groups: { index: number; posts: TimelinePost[] }[] = [];
+  const groups: { index: number; key: string; posts: TimelinePost[] }[] = [];
   posts.forEach((post, i) => {
     if (isChild.has(i)) return;
     const chain = [i];
@@ -43,10 +48,11 @@ function groupThreads(posts: TimelinePost[]) {
     }
     groups.push({
       index: Math.min(...chain),
+      key: postKey(post),
       posts: chain.flatMap((j) => posts[j] ?? []),
     });
   });
-  return groups.sort((a, b) => a.index - b.index).map((g) => g.posts);
+  return groups.sort((a, b) => a.index - b.index);
 }
 
 export function TimelineFeed({ posts }: Props) {
@@ -57,18 +63,20 @@ export function TimelineFeed({ posts }: Props) {
           タイムラインに投稿がありません
         </p>
       )}
-      {groupThreads(posts).map((group) =>
-        group.map((post, i) => (
-          <PostCard
-            key={`${post.uri}-${post.reasonRepost?.byHandle ?? ""}`}
-            {...post}
-            connectedAbove={i > 0}
-            connectedBelow={i < group.length - 1}
-            threadPath={threadPath(post)}
-            toolbar={<PostToolbarContainer {...post} />}
-          />
-        )),
-      )}
+      {groupThreads(posts).map(({ key, posts: group }) => (
+        <Fragment key={key}>
+          {group.map((post, i) => (
+            <PostCard
+              key={postKey(post)}
+              {...post}
+              connectedAbove={i > 0}
+              connectedBelow={i < group.length - 1}
+              threadPath={threadPath(post)}
+              toolbar={<PostToolbarContainer {...post} />}
+            />
+          ))}
+        </Fragment>
+      ))}
     </section>
   );
 }
