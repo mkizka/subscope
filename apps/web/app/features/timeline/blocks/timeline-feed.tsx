@@ -1,6 +1,6 @@
+import { LoaderCircle } from "lucide-react";
 import { Fragment } from "react";
 
-import { LoadingSpinner } from "@/app/components/loading-spinner";
 import {
   PostCard,
   type PostCardProps,
@@ -74,8 +74,23 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
     <section>
       {refreshing && (
         <div className="relative h-0">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10">
-            <LoadingSpinner label="タイムラインを更新中" />
+          <div
+            className="
+              pointer-events-none absolute inset-x-0 top-2 z-10 flex
+              justify-center
+            "
+          >
+            <div
+              role="status"
+              aria-label="タイムラインを更新中"
+              className="
+                flex items-center gap-2 rounded-full border border-line
+                bg-surface py-1.5 pr-3.5 pl-2.5 text-caption shadow-lg
+              "
+            >
+              <LoaderCircle className="size-4 animate-spin text-brand" />
+              更新中
+            </div>
           </div>
         </div>
       )}
