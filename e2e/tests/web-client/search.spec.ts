@@ -32,7 +32,9 @@ test.describe("検索", () => {
     await page.goto("/search");
 
     await expect(
-      page.getByText("このサーバーが保存しているアカウントと投稿を探せます"),
+      page.getByText(
+        "このサーバーに保存されているアカウントと投稿を検索できます",
+      ),
     ).toBeVisible();
   });
 
