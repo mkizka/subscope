@@ -1,5 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 import { Fragment } from "react";
+import { Link } from "react-router";
 
 import {
   PostCard,
@@ -57,15 +58,19 @@ function groupThreads(posts: TimelinePost[]) {
   return groups.sort((a, b) => a.index - b.index);
 }
 
-function OmittedPosts({ count }: { count: number }) {
+function OmittedPosts({ count, to }: { count: number; to: string }) {
   return (
-    <div
+    <Link
+      to={to}
       data-testid="omitted-posts"
-      className="flex items-center gap-3 px-4 py-2 text-caption text-muted"
+      className="
+        flex items-center gap-3 px-4 py-2 text-caption text-muted
+        hover:bg-surface-2
+      "
     >
       <span className="ml-[19px] h-6 w-0 border-l-2 border-dotted border-line" />
       {count}件の投稿を省略
-    </div>
+    </Link>
   );
 }
 
@@ -108,7 +113,10 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
               return (
                 <Fragment key={postKey(post)}>
                   {omitted > 0 && i === group.length - 2 && (
-                    <OmittedPosts count={omitted} />
+                    <OmittedPosts
+                      count={omitted}
+                      to={threadPath(group.at(-1) ?? post)}
+                    />
                   )}
                   <PostCard
                     {...post}
