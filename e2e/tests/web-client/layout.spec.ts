@@ -53,7 +53,7 @@ test.describe("レイアウト", () => {
     }).toPass();
   });
 
-  test("layout-5: 右カラムに、見出し「サーバーについて」と「Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
+  test("layout-5: 右カラムに、見出し「サーバーについて」と「SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。」を出したカードを表示し、カード全体を `/server` へのリンクにする", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -63,7 +63,7 @@ test.describe("レイアウト", () => {
       name: /サーバーについて/,
     });
     await expect(card).toContainText(
-      "Subscopeは誰かがフォローしている人の投稿だけが流れる招待制サーバーです",
+      "SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。",
     );
     await card.click();
 
