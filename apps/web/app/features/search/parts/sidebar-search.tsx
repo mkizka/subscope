@@ -5,13 +5,25 @@ import { Avatar } from "@/app/components/ui/avatar";
 import { Input } from "@/app/components/ui/input";
 import type { AccountDto } from "@/app/server/application/dto/account";
 
+import { SearchHistory } from "./search-history";
+
 type Props = {
   inputProps: ComponentProps<"input">;
   suggestions: AccountDto[];
   onSelect: () => void;
+  history: string[];
+  onRemoveHistory: (word: string) => void;
+  onClearHistory: () => void;
 };
 
-export function SidebarSearch({ inputProps, suggestions, onSelect }: Props) {
+export function SidebarSearch({
+  inputProps,
+  suggestions,
+  onSelect,
+  history,
+  onRemoveHistory,
+  onClearHistory,
+}: Props) {
   return (
     <div className="group relative">
       <Form action="/search">
@@ -24,6 +36,22 @@ export function SidebarSearch({ inputProps, suggestions, onSelect }: Props) {
           {...inputProps}
         />
       </Form>
+      {history.length > 0 && (
+        <div
+          className="
+            hidden
+            group-focus-within:block
+          "
+        >
+          <SearchHistory
+            history={history}
+            hrefFor={(word) => `/search?${new URLSearchParams({ q: word })}`}
+            onSelect={onSelect}
+            onRemove={onRemoveHistory}
+            onClear={onClearHistory}
+          />
+        </div>
+      )}
       {suggestions.length > 0 && (
         <ul
           className="
