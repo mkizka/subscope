@@ -64,12 +64,12 @@ function OmittedPosts({ count, to }: { count: number; to: string }) {
       to={to}
       data-testid="omitted-posts"
       className="
-        flex items-center gap-3 px-4 py-2 text-caption text-muted
+        flex items-center gap-3 px-4 py-2 text-caption text-brand
         hover:bg-surface-2
       "
     >
       <span className="ml-[19px] h-6 w-0 border-l-2 border-dotted border-line" />
-      {count}件の投稿を省略
+      <span className="underline">{count}件の投稿</span>
     </Link>
   );
 }
