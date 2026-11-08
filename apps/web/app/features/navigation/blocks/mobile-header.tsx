@@ -8,7 +8,6 @@ import {
   navItemClass,
   NavMenu,
 } from "@/app/features/navigation/parts/nav-menu";
-import { ServerCard } from "@/app/features/server/parts/server-card";
 
 type Props = {
   avatarUrl?: string;
@@ -65,8 +64,7 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
         "
         onClick={(e) => e.target === e.currentTarget && close()}
       >
-        <ServerCard onNavigate={close} />
-        <nav className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
+        <nav className="flex flex-col gap-3">
           <NavMenu profileId={profileId} onNavigate={close} />
           {isAdmin && <AdminNavMenu onNavigate={close} />}
           <Form method="post" action="/oauth/logout">

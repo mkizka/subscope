@@ -3,6 +3,7 @@ import {
   CircleUserIcon,
   ExternalLinkIcon,
   HomeIcon,
+  InfoIcon,
   ListIcon,
   ListTodoIcon,
   MailIcon,
@@ -78,6 +79,9 @@ export function NavMenu({
           </Item>
         </>
       )}
+      <Item to="/server" icon={<InfoIcon className="size-6" />} {...p}>
+        サーバーについて
+      </Item>
     </ul>
   );
 }
