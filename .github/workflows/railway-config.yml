@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     paths:
       - ".railway/**"
+      - ".github/workflows/railway-config.yml"
 
 permissions:
   contents: read
