@@ -34,6 +34,7 @@ function ToggleButton(props: {
   Icon: LucideIcon;
   count?: number;
   pressed?: boolean;
+  fillWhenPressed?: boolean;
   busy?: boolean;
   onClick: () => void;
 }) {
@@ -52,7 +53,12 @@ function ToggleButton(props: {
       `}
       onClick={props.onClick}
     >
-      <props.Icon className="size-5" />
+      <props.Icon
+        className={`
+          size-5
+          ${props.pressed && props.fillWhenPressed ? "fill-current" : ""}
+        `}
+      />
       {!!props.count && (
         <span title={`${props.count}件の${props.label}`}>{props.count}</span>
       )}
@@ -98,6 +104,7 @@ export function PostToolbar({
         Icon={HeartIcon}
         count={likeCount}
         pressed={liked}
+        fillWhenPressed
         busy={likeBusy}
         onClick={onLike}
       />
