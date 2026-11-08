@@ -56,7 +56,11 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
       >
         <Avatar src={avatarUrl} size="sm" />
       </button>
-      <img src="/favicon.svg" alt="Subscope" className="mx-auto size-8" />
+      <img
+        src={`${import.meta.env.BASE_URL}favicon.svg`}
+        alt="Subscope"
+        className="mx-auto size-8"
+      />
       <dialog
         ref={ref}
         aria-label="メニュー"

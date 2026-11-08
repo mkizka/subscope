@@ -13,7 +13,11 @@ export function Splash({ leaving }: { leaving: boolean }) {
       >
         <div className="h-full w-1/3 animate-progress bg-brand" />
       </div>
-      <img src="/favicon.svg" alt="" className="size-20" />
+      <img
+        src={`${import.meta.env.BASE_URL}favicon.svg`}
+        alt=""
+        className="size-20"
+      />
       <div className="text-title">Subscope</div>
       <div role="status" className="text-label text-muted">
         読み込み中
