@@ -10,4 +10,17 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: { inputProps: {}, suggestions: [], onSelect: () => {} },
+};
+
+export const WithSuggestions: Story = {
+  args: {
+    inputProps: { value: "ali" },
+    suggestions: [
+      { did: "did:plc:alice", handle: "alice.test", displayName: "Alice" },
+      { did: "did:plc:alina", handle: "alina.test" },
+    ],
+    onSelect: () => {},
+  },
+};

@@ -3,6 +3,7 @@ import type { ProfileView } from "@repo/client/app/bsky/actor/defs";
 import getProfile from "@repo/client/app/bsky/actor/getProfile";
 import getProfiles from "@repo/client/app/bsky/actor/getProfiles";
 import searchActors from "@repo/client/app/bsky/actor/searchActors";
+import searchActorsTypeahead from "@repo/client/app/bsky/actor/searchActorsTypeahead";
 import type { FeedViewPost } from "@repo/client/app/bsky/feed/defs";
 import getActorLikes from "@repo/client/app/bsky/feed/getActorLikes";
 import getAuthorFeed from "@repo/client/app/bsky/feed/getAuthorFeed";
@@ -121,6 +122,14 @@ export const accountQueryFactory = ({
       // ponytail: 最初の25件のみ。続きの読み込みはcursorを使うAPIルートを足すとき
       const { actors: accounts } = await agent.call(searchActors, { q });
       return accounts.map(toAccount);
+    },
+    async searchActorsTypeahead(did, q) {
+      const agent = await restore(did);
+      const { actors } = await agent.call(searchActorsTypeahead, {
+        q,
+        limit: 8,
+      });
+      return actors.map(toAccount);
     },
   };
 };

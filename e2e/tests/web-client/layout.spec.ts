@@ -97,6 +97,24 @@ test.describe("レイアウト", () => {
     await expect(page).toHaveURL("/search?q=alice");
   });
 
+  test("layout-16: 右カラムの検索ボックスに入力すると、入力に合うアカウントの候補（アイコン、表示名、ハンドル）を下に表示し、候補を選ぶとそのアカウントのプロフィールに移動する", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/");
+
+    await page
+      .getByRole("complementary")
+      .getByRole("searchbox", { name: "検索語" })
+      .fill("alice");
+    await page
+      .getByRole("complementary")
+      .getByRole("link", { name: /alice\.test/ })
+      .click();
+
+    await expect(page).toHaveURL("/alice.test");
+  });
+
   test("layout-12: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない", async ({
     page,
   }) => {

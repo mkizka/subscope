@@ -27,4 +27,5 @@ export interface IAccountQuery {
   findProfiles: (did: string, dids: string[]) => Promise<AccountDto[]>;
   isAdmin: (did: string) => Promise<boolean>;
   searchActors: (did: string, q: string) => Promise<AccountDto[]>;
+  searchActorsTypeahead: (did: string, q: string) => Promise<AccountDto[]>;
 }

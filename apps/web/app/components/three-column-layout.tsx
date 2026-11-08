@@ -4,7 +4,7 @@ import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tab
 import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { SplashContainer } from "@/app/features/navigation/blocks/splash-container";
-import { SidebarSearch } from "@/app/features/search/parts/sidebar-search";
+import { SidebarSearchContainer } from "@/app/features/search/parts/sidebar-search-container";
 import { ServerCard } from "@/app/features/server/parts/server-card";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
@@ -54,7 +54,7 @@ export const ThreeColumnLayout = ({
           lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-80 lg:shrink-0 lg:border-l
         "
       >
-        {!hideSearch && <SidebarSearch />}
+        {!hideSearch && <SidebarSearchContainer />}
         {!hideServerCard && <ServerCard />}
       </aside>
     </div>
