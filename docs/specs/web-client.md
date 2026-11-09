@@ -185,7 +185,7 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 - link-card-1: リンクカードのサムネイル・タイトル・説明を投稿の中に表示し、選ぶとリンク先を新しいタブで開く
 - link-card-2: リンク先がx.com・twitter.comのツイートの場合は、リンクカードの代わりにツイートを埋め込んで表示する
 
-ツイートの埋め込みは、widgets.jsを読み込まず、ツイートごとのiframe(platform.twitter.com/embed/Tweet.html)で表示する。リンクカードを表示した時点でTwitterへ接続するが、dnt=trueを付け、Referrerは送らない。
+ツイートの埋め込みはTwitter公式のwidgets.js(platform.twitter.com)で表示する。リンクカードを表示した時点でTwitterへ接続するが、data-dnt="true"を付けてトラッキングを避ける。
 
 ## 投稿画像
 
