@@ -320,6 +320,33 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(menuButton).toBeInViewport();
   });
 
+  test("layout-20: モバイルでは、タイムラインの「フォロー中」「ローカル」タブをヘッダーと同時に、同じ動きで隠し・再表示する", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
+    await page.evaluate(() => {
+      document.body
+        .querySelector("main")
+        ?.style.setProperty("min-height", "3000px");
+    });
+    const tab = page.getByRole("link", { name: "フォロー中" });
+    const menuButton = page.getByRole("button", { name: "メニューを開く" });
+
+    await page.evaluate(() => window.scrollTo(0, 1000));
+    await expect(menuButton).not.toBeInViewport();
+    await expect(tab).toBeInViewport();
+    await expect
+      .poll(async () => (await tab.boundingBox())?.y)
+      .toBeLessThan(56);
+
+    await page.evaluate(() => window.scrollTo(0, 900));
+    await expect(menuButton).toBeInViewport();
+    await expect
+      .poll(async () => (await tab.boundingBox())?.y)
+      .toBeGreaterThanOrEqual(56);
+  });
+
   test("layout-8: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べる", async ({
     page,
   }) => {

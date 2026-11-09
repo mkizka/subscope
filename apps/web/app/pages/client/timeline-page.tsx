@@ -10,9 +10,9 @@ export function TimelinePage({ local }: { local: boolean }) {
     <ThreeColumnLayout>
       <div
         className="
-          sticky top-0 z-10 bg-surface transition-[top]
-          [header[data-visible=true]~&]:top-14
-          lg:[header[data-visible=true]~&]:top-0
+          sticky top-14 z-10 bg-surface transition-transform
+          lg:top-0
+          max-lg:[header[data-visible=false]~&]:-translate-y-14
         "
       >
         <Tabs
