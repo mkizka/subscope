@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@atproto/dev-env": "0.6.24",
-    "@opentelemetry/api": "1.10.0",
     "@testcontainers/postgresql": "12.2.1",
     "@vitest/coverage-v8": "5.0.5",
     "husky": "9.1.7",

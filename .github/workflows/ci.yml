@@ -34,7 +34,7 @@ jobs:
           cache: pnpm
       - run: pnpm i
       - run: pnpm build
-      - run: pnpm test --coverage --project '*:unit' --project '*:integration'
+      - run: pnpm test --coverage
   e2e-shard:
     runs-on: ubuntu-latest
     strategy:
@@ -179,8 +179,6 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm i
-      - run: pnpm --filter @repo/web exec playwright install --with-deps chromium
-      - run: pnpm test run --project 'web:storybook'
       - run: pnpm --filter @repo/web exec storybook build
       - name: Upload Storybook
         if: github.ref == 'refs/heads/main' || github.actor == 'mkizka'
