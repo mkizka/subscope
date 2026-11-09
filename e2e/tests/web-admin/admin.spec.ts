@@ -25,15 +25,10 @@ test.describe("管理画面へのアクセス", () => {
   });
 
   test("admin-2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
-    page,
     browser,
   }) => {
-    const response = await page.request.post("/admin/api/invite-codes");
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const { code } = (await response.json()) as { code: string };
-    await registerAccount("bob.test", code);
     const memberPage = await browser.newPage();
-    await login(memberPage, "bob.test");
+    await login(memberPage, "heidi.test", "/login");
 
     await memberPage.goto("/admin/registered-accounts");
 
