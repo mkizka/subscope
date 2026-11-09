@@ -33,16 +33,16 @@ test.describe("管理画面へのアクセス", () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { code } = (await response.json()) as { code: string };
     await registerAccount("heidi.test", code);
-    const memberPage = await browser.newPage();
+    const context = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const memberPage = await context.newPage();
     await login(memberPage, "heidi.test");
 
-    const res = await memberPage.goto("/admin/registered-accounts");
+    await memberPage.goto("/admin/registered-accounts");
 
-    await memberPage.waitForTimeout(3000);
-    throw new Error(
-      `DEBUG ${res?.status()} ${memberPage.url()} ${(await memberPage.content()).replace(/<script[\s\S]*?<\/script>/g, "").slice(0, 1500)}`,
-    );
-    await memberPage.close();
+    await expect(memberPage.getByText("403")).toBeVisible();
+    await context.close();
   });
 });
 
