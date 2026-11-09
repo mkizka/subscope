@@ -172,8 +172,8 @@ export function ThreadView({ thread }: Props) {
     <section aria-label="スレッド" className="flex flex-col">
       <header
         className="
-          sticky top-0 flex items-center gap-2 border-b border-line bg-surface
-          px-4 py-3
+          sticky top-0 z-10 flex items-center gap-2 border-b border-line
+          bg-surface px-4 py-3
         "
       >
         <BackButton />

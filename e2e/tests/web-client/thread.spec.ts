@@ -383,4 +383,24 @@ test.describe("スレッド", () => {
     await page.waitForTimeout(3000);
     expect(requests).toBe(1);
   });
+
+  test("thread-17: スクロールしても見出しは画面上部に残り、投稿やツイートの埋め込みより手前に表示する", async ({
+    page,
+  }) => {
+    const root = await post("thread-17: 起点");
+    for (let i = 0; i < 12; i++) {
+      await post(`thread-17: 返信${i}`, root);
+    }
+    await openThread(page, root.uri, "thread-17: 返信11");
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+
+    const header = page.getByRole("heading", { name: "スレッド" });
+    await expect(header).toBeInViewport();
+    const topmost = await header.evaluate((el) => {
+      const { x, y } = el.getBoundingClientRect();
+      return document.elementFromPoint(x + 1, y + 1)?.tagName;
+    });
+    expect(topmost).toBe("H1");
+  });
 });
