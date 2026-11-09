@@ -7,9 +7,10 @@ import { Avatar } from "@/app/components/ui/avatar";
 import { Badge } from "@/app/components/ui/badge";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
 import { Skeleton } from "@/app/components/ui/skeleton";
-import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
-import { UntrackedBadge } from "@/app/features/profile/parts/untracked-badge";
 import type { BackfillStatus } from "@/app/lib/backfill-status";
+
+import { BackfillStatusBadge } from "./backfill-status-badge";
+import { UntrackedBadge } from "./untracked-badge";
 
 type Props = {
   loading?: boolean;

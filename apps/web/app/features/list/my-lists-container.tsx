@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import { ListsSkeleton } from "@/app/components/rows-skeleton";
 import { Button } from "@/app/components/ui/button";
-import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
+import { useMe } from "@/app/features/navigation/side-nav-container";
 
 import { ListForm } from "./list-form";
 import { ListsContainer } from "./lists-container";

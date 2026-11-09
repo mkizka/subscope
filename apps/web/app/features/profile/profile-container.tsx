@@ -5,13 +5,13 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
-import { UntrackedNotice } from "@/app/features/profile/parts/untracked-notice";
 import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
 
 import { FollowButtonContainer } from "./follow-button-container";
 import { ProfileHeader } from "./profile-header";
+import { UntrackedNotice } from "./untracked-notice";
 
 type ProfileResponse = Awaited<ReturnType<typeof loader>>["data"];
 

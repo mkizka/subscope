@@ -10,7 +10,7 @@ import {
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
-import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
+import { useMe } from "@/app/features/navigation/side-nav-container";
 import type { action } from "@/app/routes/_index";
 
 import {

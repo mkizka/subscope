@@ -18,8 +18,8 @@ export function SearchHistory({
   return (
     <div
       className="
-        absolute inset-x-0 top-full z-dropdown mt-1 rounded-lg border border-line
-        bg-surface
+        absolute inset-x-0 top-full z-dropdown mt-1 rounded-lg border
+        border-line bg-surface
       "
     >
       <ul aria-label="検索履歴">

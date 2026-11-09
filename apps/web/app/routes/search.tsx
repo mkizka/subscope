@@ -1,7 +1,7 @@
 import { parseWithZod } from "@conform-to/zod/v4";
 import { useSearchParams } from "react-router";
 
-import { searchSchema } from "@/app/features/search/blocks/search-form-container";
+import { searchSchema } from "@/app/features/search/search-form-container";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { SearchPage } from "@/app/pages/client/search-page";
 

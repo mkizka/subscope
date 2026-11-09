@@ -3,11 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Form } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
-import {
-  AdminNavMenu,
-  navItemClass,
-  NavMenu,
-} from "@/app/features/navigation/parts/nav-menu";
+
+import { AdminNavMenu, navItemClass, NavMenu } from "./nav-menu";
 
 type Props = {
   avatarUrl?: string;

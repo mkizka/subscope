@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
-import { searchSchema } from "@/app/features/search/blocks/search-form-container";
+import { searchSchema } from "@/app/features/search/search-form-container";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
 

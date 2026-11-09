@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
-import { BottomTabsContainer } from "@/app/features/navigation/blocks/bottom-tabs-container";
-import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-header-container";
-import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
-import { SplashContainer } from "@/app/features/navigation/blocks/splash-container";
-import { SidebarSearchContainer } from "@/app/features/search/parts/sidebar-search-container";
+import { BottomTabsContainer } from "@/app/features/navigation/bottom-tabs-container";
+import { MobileHeaderContainer } from "@/app/features/navigation/mobile-header-container";
+import { SideNavContainer } from "@/app/features/navigation/side-nav-container";
+import { SplashContainer } from "@/app/features/navigation/splash-container";
+import { SidebarSearchContainer } from "@/app/features/search/sidebar-search-container";
 import { ServerCard } from "@/app/features/server/server-card";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 

@@ -2,8 +2,9 @@ import { isValidDid } from "@atproto/syntax";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
-import { FollowButton } from "@/app/features/profile/parts/follow-button";
 import type { action } from "@/app/routes/api.follows";
+
+import { FollowButton } from "./follow-button";
 
 export const followSchema = z.object({
   did: z.string().refine(isValidDid),
