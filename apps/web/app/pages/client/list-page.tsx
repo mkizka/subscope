@@ -1,5 +1,5 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { ListDetailContainer } from "@/app/features/list/blocks/list-detail-container";
+import { ListDetailContainer } from "@/app/features/list/list-detail-container";
 
 type Props = {
   handle: string;

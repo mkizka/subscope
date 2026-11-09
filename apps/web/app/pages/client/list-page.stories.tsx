@@ -2,7 +2,7 @@ import { asAtUriString } from "@atproto/syntax";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { alice, type Data, queryClient } from "@/.storybook/query-client";
-import ListDetailStories from "@/app/features/list/blocks/list-detail.stories";
+import ListDetailStories from "@/app/features/list/list-detail.stories";
 import type { loader as listLoader } from "@/app/routes/api.list.$handle.$rkey";
 
 import { ListPage } from "./list-page";

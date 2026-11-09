@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
-import { listSchema } from "@/app/features/list/blocks/list-form";
+import { listSchema } from "@/app/features/list/list-form";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { MyListsPage } from "@/app/pages/client/my-lists-page";
 import { di } from "@/app/server/di";

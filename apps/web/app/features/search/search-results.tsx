@@ -1,7 +1,4 @@
-import {
-  type Account,
-  AccountList,
-} from "@/app/features/profile/blocks/account-list";
+import { type Account, AccountList } from "@/app/features/profile/account-list";
 import {
   TimelineFeed,
   type TimelinePost,

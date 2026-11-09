@@ -1,4 +1,4 @@
-import { ListsContainer } from "@/app/features/list/blocks/lists-container";
+import { ListsContainer } from "@/app/features/list/lists-container";
 
 import type { Route } from "./+types/$handle.lists";
 

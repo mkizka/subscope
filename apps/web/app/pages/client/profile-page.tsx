@@ -1,5 +1,5 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { ProfileContainer } from "@/app/features/profile/blocks/profile-container";
+import { ProfileContainer } from "@/app/features/profile/profile-container";
 
 type Props = {
   handle: string;

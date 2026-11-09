@@ -1,5 +1,5 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { FollowListContainer } from "@/app/features/profile/blocks/follow-list-container";
+import { FollowListContainer } from "@/app/features/profile/follow-list-container";
 
 type Props = {
   handle: string;

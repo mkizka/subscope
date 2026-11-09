@@ -3,9 +3,8 @@ import { getZodConstraint, parseWithZod } from "@conform-to/zod/v4";
 import { useIsFetching } from "@tanstack/react-query";
 import { z } from "zodV4";
 
-import { useSearchHistory } from "@/app/features/search/use-search-history";
-
 import { SearchForm } from "./search-form";
+import { useSearchHistory } from "./use-search-history";
 
 export const searchSchema = z.object({
   q: z.string().optional(),

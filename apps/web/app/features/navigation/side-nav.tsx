@@ -5,11 +5,9 @@ import { Form } from "react-router";
 import { Avatar } from "@/app/components/ui/avatar";
 import { buttonClass } from "@/app/components/ui/button";
 import { Menu, menuItemClass } from "@/app/components/ui/menu";
-import {
-  AdminNavMenu,
-  NavMenu,
-} from "@/app/features/navigation/parts/nav-menu";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
+
+import { AdminNavMenu, NavMenu } from "./nav-menu";
 
 type Props = {
   profileId?: string;

@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import { Splash } from "@/app/features/navigation/parts/splash";
-
 import { meQueryOptions } from "./side-nav-container";
+import { Splash } from "./splash";
 
 const FADE_MS = 300;
 

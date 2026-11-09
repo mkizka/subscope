@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { FollowButton } from "@/app/features/profile/parts/follow-button";
-
+import { FollowButton } from "./follow-button";
 import { ProfileHeader } from "./profile-header";
 
 const meta = {
