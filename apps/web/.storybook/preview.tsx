@@ -59,7 +59,11 @@ const preview: Preview = {
   decorators: [
     (Story, { parameters }) => {
       const Stub = createRoutesStub([
-        { path: "*", Component: Story, action: () => null },
+        {
+          path: "*",
+          Component: Story,
+          action: () => (parameters.pending ? new Promise(() => {}) : null),
+        },
       ]);
       return (
         <QueryClientProvider client={queryClient}>
