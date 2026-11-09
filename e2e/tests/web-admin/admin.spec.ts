@@ -36,11 +36,11 @@ test.describe("管理画面へのアクセス", () => {
     const memberPage = await browser.newPage();
     await login(memberPage, "heidi.test");
 
-    await memberPage.goto("/admin/registered-accounts");
+    const res = await memberPage.goto("/admin/registered-accounts");
 
     await memberPage.waitForTimeout(3000);
     throw new Error(
-      `DEBUG ${memberPage.url()} ${(await memberPage.locator("body").innerText()).slice(0, 500)}`,
+      `DEBUG ${res?.status()} ${memberPage.url()} ${(await memberPage.content()).replace(/<script[\s\S]*?<\/script>/g, "").slice(0, 1500)}`,
     );
     await memberPage.close();
   });
