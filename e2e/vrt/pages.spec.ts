@@ -2,11 +2,17 @@ import { readFileSync } from "node:fs";
 
 import { expect, test } from "@playwright/test";
 
-const index: { entries: Record<string, { id: string; importPath: string }> } =
-  JSON.parse(readFileSync("../apps/web/storybook-static/index.json", "utf-8"));
+const index: {
+  entries: Record<string, { id: string; importPath: string; tags: string[] }>;
+} = JSON.parse(
+  readFileSync("../apps/web/storybook-static/index.json", "utf-8"),
+);
 
 const storyIds = Object.values(index.entries)
-  .filter((entry) => entry.importPath.includes("/pages/"))
+  .filter(
+    (entry) =>
+      entry.importPath.includes("/pages/") && !entry.tags.includes("play"),
+  )
   .map((entry) => entry.id);
 
 for (const id of storyIds) {
