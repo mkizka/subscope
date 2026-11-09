@@ -1,7 +1,7 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { Tabs } from "@/app/components/ui/tabs";
-import { BackfillBannerContainer } from "@/app/features/timeline/blocks/backfill-banner-container";
-import { TimelineFeedContainer } from "@/app/features/timeline/blocks/timeline-feed-container";
+import { BackfillBannerContainer } from "@/app/features/timeline/backfill-banner-container";
+import { TimelineFeedContainer } from "@/app/features/timeline/timeline-feed-container";
 import { useReloadTimeline } from "@/app/lib/use-reload-timeline";
 
 export function TimelinePage({ local }: { local: boolean }) {

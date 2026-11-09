@@ -5,11 +5,11 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
-import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
+import { FollowButtonContainer } from "@/app/features/account/follow-button-container";
+import { TimelineFeed } from "@/app/features/timeline/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
 
-import { FollowButtonContainer } from "./follow-button-container";
 import { ProfileHeader } from "./profile-header";
 import { UntrackedNotice } from "./untracked-notice";
 

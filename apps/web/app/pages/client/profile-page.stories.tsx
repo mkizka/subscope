@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { alice, infinite, queryClient } from "@/.storybook/query-client";
-import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
+import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 
 import { ProfilePage } from "./profile-page";

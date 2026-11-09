@@ -6,7 +6,7 @@ import threadgate from "@repo/client/app/bsky/feed/threadgate";
 import * as facet from "@repo/client/app/bsky/richtext/facet";
 import { imageSize } from "image-size";
 
-import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
+import type { ReplyRule } from "@/app/features/post/post-form";
 import type { PostRef } from "@/app/server/application/dto/new-post";
 import type { IOAuthClient } from "@/app/server/application/interfaces/oauth-client";
 import type { IPostCommand } from "@/app/server/application/interfaces/post-command";
