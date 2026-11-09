@@ -29,12 +29,11 @@ describe("app.bsky.actor.searchActorsTypeahead", () => {
     ]);
   });
 
-  test("searchActorsTypeahead-2: ハンドルが検索語に部分一致するアカウントも返す", async () => {
+  test("searchActorsTypeahead-2: ハンドルが検索語に部分一致するアカウントは、プロフィールレコードがなくても返す", async () => {
     // arrange
     const { client } = await setupApiTest();
     const account = await accountFactory(ctx.db)
       .props({ handle: () => "zqx-carol.test" })
-      .use((t) => t.withProfile({ displayName: "Carol" }))
       .create();
 
     // act
