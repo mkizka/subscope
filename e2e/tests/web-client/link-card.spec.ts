@@ -58,14 +58,15 @@ test.describe("リンクカード", () => {
     const embed = page
       .getByRole("article")
       .filter({ hasText: "link-card-2: ツイート付きの投稿" })
-      .locator("iframe");
+      .locator("[data-tweet-id]");
     await expect(async () => {
       await page.reload();
-      await expect(embed).toBeVisible({ timeout: 1000 });
+      await expect(embed).toBeAttached({ timeout: 1000 });
     }).toPass();
-    await expect(embed).toHaveAttribute(
+    await expect(embed).toHaveAttribute("data-tweet-id", "20");
+    await expect(embed.locator("script")).toHaveAttribute(
       "src",
-      /^https:\/\/platform\.twitter\.com\/embed\/Tweet\.html\?id=20&/,
+      "https://platform.twitter.com/widgets.js",
     );
   });
 });

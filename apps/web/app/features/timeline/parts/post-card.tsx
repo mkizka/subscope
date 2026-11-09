@@ -5,7 +5,7 @@ import {
   MessageCircleIcon,
   RepeatIcon,
 } from "lucide-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -177,45 +177,26 @@ function getTweetId(uri: string) {
   return url.pathname.match(/^\/[^/]+\/status\/(\d+)/)?.[1];
 }
 
-function getResizeHeight(data: unknown): number | undefined {
-  if (typeof data !== "object" || data === null) return undefined;
-  const message: unknown = Reflect.get(data, "twttr.embed");
-  if (typeof message !== "object" || message === null) return undefined;
-  if (Reflect.get(message, "method") !== "twttr.private.resize") {
-    return undefined;
-  }
-  const params: unknown = Reflect.get(message, "params");
-  const height: unknown = Array.isArray(params)
-    ? Reflect.get(Object(params[0]), "height")
-    : undefined;
-  return typeof height === "number" ? height : undefined;
-}
-
-function TweetEmbed({ id, title }: { id: string; title: string }) {
-  const ref = useRef<HTMLIFrameElement>(null);
-  const [height, setHeight] = useState(250);
+function TweetEmbed({ id }: { id: string }) {
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onMessage = (event: MessageEvent) => {
-      if (event.source !== ref.current?.contentWindow) return;
-      const resized = getResizeHeight(event.data);
-      if (resized) setHeight(resized);
-    };
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, []);
+    const container = ref.current;
+    if (!container) return;
+    const blockquote = document.createElement("blockquote");
+    blockquote.className = "twitter-tweet";
+    blockquote.dataset.dnt = "true";
+    const link = document.createElement("a");
+    link.href = `https://twitter.com/i/status/${id}`;
+    blockquote.append(link);
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://platform.twitter.com/widgets.js";
+    container.append(blockquote, script);
+    return () => container.replaceChildren();
+  }, [id]);
 
-  return (
-    <iframe
-      ref={ref}
-      src={`https://platform.twitter.com/embed/Tweet.html?id=${id}&dnt=true`}
-      title={title}
-      loading="lazy"
-      referrerPolicy="no-referrer"
-      style={{ height }}
-      className="mt-2 w-full"
-    />
-  );
+  return <div ref={ref} data-tweet-id={id} className="mt-2" />;
 }
 
 export function ExternalCard({
@@ -225,7 +206,7 @@ export function ExternalCard({
 }) {
   const tweetId = getTweetId(external.uri);
   if (tweetId) {
-    return <TweetEmbed id={tweetId} title={external.title} />;
+    return <TweetEmbed id={tweetId} />;
   }
   return (
     <a
