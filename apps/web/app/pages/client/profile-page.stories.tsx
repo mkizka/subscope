@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { alice, infinite, queryClient } from "@/.storybook/query-client";
+import { ListsContainer } from "@/app/features/list/lists-container";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
 import type { loader as profileLoader } from "@/app/routes/api.profile.$handle";
 
@@ -77,5 +79,35 @@ export const Untracked: Story = {
         tab: "posts",
       }),
     );
+  },
+};
+
+const ListsTab = () => <ListsContainer handle={alice.handle} />;
+
+export const ListsLoading: Story = {
+  name: "list-s5: リスト一覧を開くと、リストの読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する",
+  tags: ["play"],
+  parameters: {
+    path: "/alice.bsky.social/lists",
+    route: {
+      path: "/:handle",
+      children: [{ path: "lists", Component: ListsTab }],
+    },
+  },
+  beforeEach: () => {
+    void queryClient.query({
+      queryKey: ["lists", alice.handle],
+      queryFn: () => new Promise<never>(() => {}),
+    });
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("tab", { name: "リスト" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(
+      canvas.getByRole("status", { name: "読み込み中" }),
+    ).toBeVisible();
   },
 };
