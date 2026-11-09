@@ -1,5 +1,6 @@
 import { expect, type Page, request, test } from "@playwright/test";
 
+import { login } from "../../helpers/login";
 import {
   putRecord,
   registerAccount,
@@ -21,6 +22,23 @@ test.describe("管理画面へのアクセス", () => {
     ).toBeVisible();
     await expect(nav.getByRole("link", { name: "招待コード" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
+  });
+
+  test("admin-2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
+    page,
+    browser,
+  }) => {
+    const response = await page.request.post("/admin/api/invite-codes");
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const { code } = (await response.json()) as { code: string };
+    await registerAccount("bob.test", code);
+    const memberPage = await browser.newPage();
+    await login(memberPage, "bob.test");
+
+    await memberPage.goto("/admin/registered-accounts");
+
+    await expect(memberPage.getByText("403")).toBeVisible();
+    await memberPage.close();
   });
 });
 

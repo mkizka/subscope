@@ -1,8 +1,5 @@
 import { globSync, readFileSync } from "node:fs";
 
-// 仕様書にあるがテストが未実装の既存ID。実装したら削除する
-const KNOWN_MISSING = new Set(["admin-2"]);
-
 const ID = String.raw`["'\`]([A-Za-z][A-Za-z0-9]*-[es]?\d+):`;
 const SPEC_ID = /^- ([A-Za-z][A-Za-z0-9]*-[es]?\d+):/gm;
 const TEST_ID = new RegExp(
@@ -36,7 +33,6 @@ const errors: string[] = [];
 for (const [id, files] of specs) {
   if (files.length > 1) errors.push(`${id}: 仕様書内でIDが重複しています`);
   const found = tests.get(id) ?? [];
-  if (KNOWN_MISSING.has(id) && found.length === 0) continue;
   if (found.length !== 1) {
     errors.push(`${id}: テストが${found.length}件あります(1件にしてください)`);
     continue;
