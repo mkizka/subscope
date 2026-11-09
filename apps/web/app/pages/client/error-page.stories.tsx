@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { ErrorPage } from "./error-page";
 
@@ -14,6 +15,24 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const NotFound: Story = {
+  args: {
+    error: {
+      status: 404,
+      statusText: "Not Found",
+      data: null,
+      internal: false,
+    },
+  },
+};
+
+export const HomeLink: Story = {
+  name: "error-s1: 「ホームに戻る」を押すとトップページに移動する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByRole("link", { name: "ホームに戻る" }),
+    ).toHaveAttribute("href", "/");
+  },
   args: {
     error: {
       status: 404,
