@@ -38,7 +38,10 @@ test.describe("管理画面へのアクセス", () => {
 
     await memberPage.goto("/admin/registered-accounts");
 
-    await expect(memberPage.getByText("403")).toBeVisible();
+    await memberPage.waitForTimeout(3000);
+    throw new Error(
+      `DEBUG ${memberPage.url()} ${(await memberPage.locator("body").innerText()).slice(0, 500)}`,
+    );
     await memberPage.close();
   });
 });
