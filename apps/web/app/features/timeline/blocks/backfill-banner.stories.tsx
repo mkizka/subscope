@@ -12,7 +12,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const InProgress: Story = {
-  name: "s1: 自分の同期中は、「過去の投稿を同期しています」の帯を出す",
+  name: "backfillBanner-s1: 自分の同期中は、「過去の投稿を同期しています」の帯を出す",
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByText(/過去の投稿を同期しています/),
