@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 import {
   createRecord,
@@ -370,6 +370,54 @@ test.describe("プロフィール", () => {
         page.getByRole("main").getByText("同期済み", { exact: true }),
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
+  });
+
+  const unfollowHeidi = async (page: Page) => {
+    await follow("alice.test", "heidi.test");
+    await page.goto("/heidi.test");
+    const main = page.getByRole("main");
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        main.getByRole("button", { name: "フォロー中" }),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await main.getByRole("button", { name: "フォロー中" }).click();
+    await expect(
+      main.getByRole("button", { name: "フォロー", exact: true }),
+    ).toBeVisible();
+  };
+
+  test("profile-24: 追跡アカウントでない全体ページには、ハンドルの横に「同期対象外」を表示する", async ({
+    page,
+  }) => {
+    await unfollowHeidi(page);
+
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page.getByRole("main").getByText("同期対象外", { exact: true }),
+      ).toBeVisible({ timeout: 1000 });
+    }).toPass();
+  });
+
+  test("profile-25: 追跡アカウントでない全体ページには、タブの下に「このアカウントのデータはサーバーに同期されていません。フォローすると同期を開始します。」を全てのタブで表示する", async ({
+    page,
+  }) => {
+    await unfollowHeidi(page);
+    const notice = page
+      .getByRole("main")
+      .getByText(
+        "このアカウントのデータはサーバーに同期されていません。フォローすると同期を開始します。",
+      );
+
+    await expect(async () => {
+      await page.reload();
+      await expect(notice).toBeVisible({ timeout: 1000 });
+    }).toPass();
+    await page.getByRole("tab", { name: "いいね" }).click();
+    await expect(page).toHaveURL("/heidi.test?tab=likes");
+    await expect(notice).toBeVisible();
   });
 
   test("profile-14: プロフィールを開くと、読み込みを待たずに画面を表示し、読み込み終えるまでバナー・アイコン・名前・自己紹介2行と投稿の場所のスケルトンを表示する。ハンドル・タブ・フォロー数は読み込み後に表示する", async ({
