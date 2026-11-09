@@ -48,7 +48,7 @@ const hasSpinner = (button: HTMLElement) =>
 export const Deleting: Story = {
   name: "list-s2: リスト詳細の「…」ボタンは、削除してリスト一覧に戻るまでスピナーを出して押せなくする",
   tags: ["play"],
-  parameters: { action: () => new Promise(() => {}) },
+  parameters: { pending: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole("button", { name: "操作" });
@@ -71,7 +71,7 @@ export const MemberSubmitting: Story = {
   tags: ["play"],
   parameters: {
     path: "/alice.bsky.social/lists/1?tab=members",
-    action: () => new Promise(() => {}),
+    pending: true,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

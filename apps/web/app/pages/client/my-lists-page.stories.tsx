@@ -56,7 +56,7 @@ export const Empty: Story = {
 export const Submitting: Story = {
   name: "list-s1: リストの作成・保存ボタンは、送信が終わるまでスピナーを出して押せなくする",
   tags: ["play"],
-  parameters: { action: () => new Promise(() => {}) },
+  parameters: { pending: true },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: "新しいリスト" }));

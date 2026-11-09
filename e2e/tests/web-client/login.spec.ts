@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { login } from "../../helpers/login";
 
 test.describe("ログイン", () => {
-  test("login-2: ログインしていないときにトップページを開くと、ログイン画面に移動する", async ({
+  test("login-e2: ログインしていないときにトップページを開くと、ログイン画面に移動する", async ({
     page,
   }) => {
     await page.goto("/");
@@ -11,19 +11,7 @@ test.describe("ログイン", () => {
     await expect(page).toHaveURL("/login");
   });
 
-  test("login-3: 管理者がまだいないサーバーでは、最初にログインしたアカウントが管理者になることをログイン画面に出す", async ({
-    page,
-  }) => {
-    await page.goto("/login");
-
-    await expect(
-      page.getByText(
-        "最初にログインしたアカウントがこのサーバーの管理者になります",
-      ),
-    ).toBeVisible();
-  });
-
-  test("login-1: 最初にログインしたアカウントを管理者として登録する", async ({
+  test("login-e1: 最初にログインしたアカウントを管理者として登録する", async ({
     page,
   }) => {
     await login(page);
@@ -35,7 +23,7 @@ test.describe("ログイン", () => {
     ).toBeVisible();
   });
 
-  test("login-4: メンバーでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
+  test("login-e3: メンバーでないアカウントでログインすると、ログイン画面で招待コードの入力を求める", async ({
     page,
   }) => {
     await login(page, "bob.test", "/login");
@@ -43,19 +31,7 @@ test.describe("ログイン", () => {
     await expect(page.getByLabel("招待コード")).toBeVisible();
   });
 
-  test("login-11: 管理者がいるサーバーのログイン画面には、登録していないアカウントはログイン後に招待コードの入力が必要なことを出す", async ({
-    page,
-  }) => {
-    await page.goto("/login");
-
-    await expect(
-      page.getByText(
-        "このサーバーに登録していないアカウントは、ログイン後に招待コードの入力が必要です",
-      ),
-    ).toBeVisible();
-  });
-
-  test("login-5: 無効な招待コードを入力すると「招待コードが無効または期限切れです」と出す", async ({
+  test("login-e4: 無効な招待コードを入力すると「招待コードが無効または期限切れです」と出す", async ({
     page,
   }) => {
     await login(page, "bob.test", "/login");
@@ -68,37 +44,7 @@ test.describe("ログイン", () => {
     );
   });
 
-  test("login-8: 招待コードの入力を求めるときは「ログイン」「招待コード」の2段階の手順を出し、今が「招待コード」の段階であることを示す", async ({
-    page,
-  }) => {
-    await login(page, "bob.test", "/login");
-
-    const steps = page.getByRole("list", { name: "手順" });
-    await expect(steps.getByRole("listitem")).toHaveText([
-      "ログイン",
-      "招待コード",
-    ]);
-    await expect(steps.locator('[aria-current="step"]')).toHaveText(
-      "招待コード",
-    );
-  });
-
-  test("login-10: 「登録する」を押してから結果が出るまで、登録ボタンを無効にしてスピナーを出す", async ({
-    page,
-  }) => {
-    await login(page, "bob.test", "/login");
-    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
-    await page.route("**/login.data", async (route) => {
-      if (route.request().method() !== "POST") await route.continue();
-    });
-
-    await page.getByLabel("招待コード").fill("invalid-code");
-    await page.getByRole("button", { name: "登録する" }).click();
-
-    await expect(page.getByRole("button", { name: "登録する" })).toBeDisabled();
-  });
-
-  test("login-6: 有効な招待コードを入力すると、メンバーとして登録してタイムラインに移動する", async ({
+  test("login-e5: 有効な招待コードを入力すると、メンバーとして登録してタイムラインに移動する", async ({
     page,
     browser,
   }) => {
@@ -115,29 +61,5 @@ test.describe("ログイン", () => {
 
     await page.waitForURL("/");
     await expect(page.getByRole("navigation")).toBeVisible();
-  });
-
-  test("login-7: ログイン画面には、Blueskyのアカウントでログインする招待制のサーバーであることを出す", async ({
-    page,
-  }) => {
-    await page.goto("/login");
-
-    await expect(
-      page.getByText(
-        "招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。",
-      ),
-    ).toBeVisible();
-  });
-
-  test("login-9: 「ログイン」を押してから認証画面に移動するまで、ログインボタンを無効にしてスピナーを出す", async ({
-    page,
-  }) => {
-    await page.route("**/oauth/login.data", () => {});
-    await page.goto("/login");
-    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
-    await page.getByLabel("ハンドル").fill("alice.test");
-    await page.getByRole("button", { name: "ログイン" }).click();
-
-    await expect(page.getByRole("button", { name: "ログイン" })).toBeDisabled();
   });
 });

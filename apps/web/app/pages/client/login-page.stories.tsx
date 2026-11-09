@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, userEvent, within } from "storybook/test";
 
 import { LoginPage } from "./login-page";
 
@@ -27,5 +28,99 @@ export const Setup: Story = {
 export const InviteCode: Story = {
   args: {
     step: "inviteCode",
+  },
+};
+
+export const SetupNotice: Story = {
+  name: "login-s1: 管理者がまだいないサーバーでは、最初にログインしたアカウントが管理者になることをログイン画面に出す",
+  tags: ["play"],
+  args: {
+    step: "setup",
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByText(
+        "最初にログインしたアカウントがこのサーバーの管理者になります",
+      ),
+    ).toBeVisible();
+  },
+};
+
+export const Description: Story = {
+  name: "login-s2: ログイン画面には、Blueskyのアカウントでログインする招待制のサーバーであることを出す",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByText(
+        "招待制のBluesky互換サーバーです。Blueskyのアカウントでログインします。",
+      ),
+    ).toBeVisible();
+  },
+};
+
+export const InviteCodeSteps: Story = {
+  name: "login-s3: 招待コードの入力を求めるときは「ログイン」「招待コード」の2段階の手順を出し、今が「招待コード」の段階であることを示す",
+  tags: ["play"],
+  args: {
+    step: "inviteCode",
+  },
+  play: async ({ canvasElement }) => {
+    const steps = within(canvasElement).getByRole("list", { name: "手順" });
+    const items = within(steps).getAllByRole("listitem");
+    await expect(items.map((item) => item.textContent)).toEqual([
+      "ログイン",
+      "招待コード",
+    ]);
+    await expect(
+      steps.querySelector('[aria-current="step"]'),
+    ).toHaveTextContent("招待コード");
+  },
+};
+
+export const LoginSubmitting: Story = {
+  name: "login-s4: 「ログイン」を押してから認証画面に移動するまで、ログインボタンを無効にしてスピナーを出す",
+  tags: ["play"],
+  parameters: {
+    pending: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.type(canvas.getByLabelText("ハンドル"), "alice.test");
+    await userEvent.click(canvas.getByRole("button", { name: "ログイン" }));
+    await expect(
+      canvas.getByRole("button", { name: "ログイン" }),
+    ).toBeDisabled();
+  },
+};
+
+export const MemberNotice: Story = {
+  name: "login-s5: 管理者がいるサーバーのログイン画面には、登録していないアカウントはログイン後に招待コードの入力が必要なことを出す",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(canvasElement).getByText(
+        "このサーバーに登録していないアカウントは、ログイン後に招待コードの入力が必要です",
+      ),
+    ).toBeVisible();
+  },
+};
+
+export const InviteCodeSubmitting: Story = {
+  name: "login-s6: 「登録する」を押してから結果が出るまで、登録ボタンを無効にしてスピナーを出す",
+  tags: ["play"],
+  args: {
+    step: "inviteCode",
+  },
+  parameters: {
+    path: "/login",
+    pending: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.type(canvas.getByLabelText("招待コード"), "invalid-code");
+    await userEvent.click(canvas.getByRole("button", { name: "登録する" }));
+    await expect(
+      canvas.getByRole("button", { name: "登録する" }),
+    ).toBeDisabled();
   },
 };
