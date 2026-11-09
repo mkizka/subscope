@@ -64,9 +64,6 @@ test.describe("リンクカード", () => {
       await expect(embed).toBeAttached({ timeout: 1000 });
     }).toPass();
     await expect(embed).toHaveAttribute("data-tweet-id", "20");
-    await expect(embed.locator("script")).toHaveAttribute(
-      "src",
-      "https://platform.twitter.com/widgets.js",
-    );
+    await expect(page.locator("script[src$='/widgets.js']")).toHaveCount(1);
   });
 });
