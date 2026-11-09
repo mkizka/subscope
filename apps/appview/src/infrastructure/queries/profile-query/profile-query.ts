@@ -2,7 +2,7 @@ import { asDid, type Did } from "@atproto/did";
 import { isValidHandle } from "@atproto/syntax";
 import type { DatabaseClient } from "@repo/common/interface";
 import { schema } from "@repo/db";
-import { and, desc, eq, ilike, inArray, lt, or } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lt, or, sql } from "drizzle-orm";
 
 import type { ProfileDto } from "../../../application/dto/profile-dto.js";
 import type { IProfileQuery } from "../../../application/interfaces/queries/profile-query.js";
@@ -45,13 +45,14 @@ export class ProfileQuery implements IProfileQuery {
     limit: number;
     cursor?: Date;
   }): Promise<ProfileDto[]> {
+    const indexedAt = sql<Date>`coalesce(${schema.profiles.indexedAt}, ${schema.accounts.indexedAt})`;
     const pattern = `%${params.query.replace(/[%_]/g, "\\$&")}%`;
     const rows = await this.db
       .select({ account: schema.accounts, profile: schema.profiles })
-      .from(schema.profiles)
-      .innerJoin(
-        schema.accounts,
-        eq(schema.profiles.accountDid, schema.accounts.did),
+      .from(schema.accounts)
+      .leftJoin(
+        schema.profiles,
+        eq(schema.accounts.did, schema.profiles.accountDid),
       )
       .where(
         and(
@@ -59,10 +60,10 @@ export class ProfileQuery implements IProfileQuery {
             ilike(schema.profiles.displayName, pattern),
             ilike(schema.accounts.handle, pattern),
           ),
-          params.cursor && lt(schema.profiles.indexedAt, params.cursor),
+          params.cursor && lt(indexedAt, params.cursor),
         ),
       )
-      .orderBy(desc(schema.profiles.indexedAt))
+      .orderBy(desc(indexedAt))
       .limit(params.limit);
     return rows.map(toDto);
   }
