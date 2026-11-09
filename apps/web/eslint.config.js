@@ -79,5 +79,19 @@ export default defineConfig(
         strictness: "loose",
       },
     },
+    rules: {
+      "better-tailwindcss/no-restricted-classes": [
+        "error",
+        {
+          restrict: [
+            {
+              pattern: "(^|:)-?z-(\\d+|\\[.+\\]|\\(.+\\))$",
+              message:
+                "z-indexの数字は直接書かず、DESIGN.mdの重なり順にある名前付きのz-raised・z-sticky・z-nav・z-dropdown・z-overlayを使ってください。",
+            },
+          ],
+        },
+      ],
+    },
   },
 );
