@@ -10,11 +10,11 @@ import { Link } from "react-router";
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { Menu, menuItemClass } from "@/app/components/ui/menu";
 import { Tabs } from "@/app/components/ui/tabs";
-import { type Account, AccountList } from "@/app/features/profile/account-list";
+import { type Account, AccountList } from "@/app/features/account/account-list";
 import {
   TimelineFeed,
   type TimelinePost,
-} from "@/app/features/timeline/blocks/timeline-feed";
+} from "@/app/features/timeline/timeline-feed";
 
 import { ListForm } from "./list-form";
 import { AddListMemberForm, RemoveListMemberButton } from "./list-member-forms";

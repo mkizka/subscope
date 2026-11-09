@@ -59,6 +59,7 @@ Reactコンポーネントは以下の方針で実装しています。
 - UIはfeaturesディレクトリ以下に配置して次の構成にする
   - features/{feature}
     - 種別ごとのサブディレクトリは作らず、feature直下に `xxx.tsx` / `xxx-container.tsx` / `xxx.stories.tsx` を並べる
+    - 複数のfeatureから使う投稿の部品は `features/post`、アカウントの部品は `features/account` に置く
 - ページはpages/admin(管理画面)かpages/client(クライアント)に{name}-page.tsxとして配置し、storyを書く
   - routesはloader/actionを持ち、表示はpagesのページコンポーネントに任せる
 - 見た目が変わるUI変更や新規UIでは、同じPRで該当コンポーネントのstoryを追加・更新する

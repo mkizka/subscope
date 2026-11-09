@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
-import { reactionSchema } from "@/app/features/timeline/blocks/post-toolbar-container";
+import { reactionSchema } from "@/app/features/post/post-toolbar-container";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
 

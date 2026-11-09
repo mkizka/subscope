@@ -4,10 +4,9 @@ import { Link, useSearchParams } from "react-router";
 
 import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
+import { AccountList } from "@/app/features/account/account-list";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle.$kind";
-
-import { AccountList } from "./account-list";
 
 type FollowListResponse = Awaited<ReturnType<typeof loader>>["data"];
 

@@ -5,7 +5,7 @@ import { Form } from "react-router";
 import { Avatar } from "@/app/components/ui/avatar";
 import { buttonClass } from "@/app/components/ui/button";
 import { Menu, menuItemClass } from "@/app/components/ui/menu";
-import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
+import { ComposeButton } from "@/app/features/post/post-form-container";
 
 import { AdminNavMenu, NavMenu } from "./nav-menu";
 

@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data } from "react-router";
 
 import { didContext } from "@/app/context/did";
-import { followSchema } from "@/app/features/profile/follow-button-container";
+import { followSchema } from "@/app/features/account/follow-button-container";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
 

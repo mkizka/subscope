@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { alice, type Data, queryClient } from "@/.storybook/query-client";
-import TimelineFeedStories from "@/app/features/timeline/blocks/timeline-feed.stories";
+import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
 import type { loader as searchLoader } from "@/app/routes/api.search";
 
 import { SearchPage } from "./search-page";

@@ -4,9 +4,9 @@ import { BottomTabsContainer } from "@/app/features/navigation/bottom-tabs-conta
 import { MobileHeaderContainer } from "@/app/features/navigation/mobile-header-container";
 import { SideNavContainer } from "@/app/features/navigation/side-nav-container";
 import { SplashContainer } from "@/app/features/navigation/splash-container";
+import { ComposeButton } from "@/app/features/post/post-form-container";
 import { SidebarSearchContainer } from "@/app/features/search/sidebar-search-container";
 import { ServerCard } from "@/app/features/server/server-card";
-import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {
   children: ReactNode;

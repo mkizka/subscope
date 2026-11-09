@@ -2,7 +2,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data, useSearchParams } from "react-router";
 
 import { didContext } from "@/app/context/did";
-import { postSchema } from "@/app/features/timeline/blocks/post-form-container";
+import { postSchema } from "@/app/features/post/post-form-container";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { TimelinePage } from "@/app/pages/client/timeline-page";
 import { di } from "@/app/server/di";
