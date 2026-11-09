@@ -136,7 +136,7 @@ export function InviteCodeList({
     <div>
       <div
         className="
-          sticky top-0 flex items-center justify-between border-b border-line
+          sticky top-0 z-sticky flex items-center justify-between border-b border-line
           bg-surface px-4 py-3
         "
       >

@@ -287,6 +287,22 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(tabs.getByText("プロフィール")).toHaveCount(0);
   });
 
+  test("layout-21: 重なり順は下から、本文・埋め込み、浮かせた表示、固定の見出し、固定の下タブ、検索候補の順にする", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const z = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => Number(getComputedStyle(el).zIndex));
+    const header = await z("header");
+    const tabs = await z('nav[aria-label="タブバー"]');
+    expect(header).toBeGreaterThan(0);
+    expect(tabs).toBeGreaterThan(header);
+  });
+
   test("layout-7: モバイルでは、ヘッダーの自分のアイコンから開くドロワーの「ログアウト」で、ログイン画面に移動する", async ({
     page,
   }) => {

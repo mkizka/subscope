@@ -45,7 +45,7 @@ export function BottomTabs({ profileId, unreadCount }: Props) {
     <nav
       aria-label="タブバー"
       className="
-        fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-line
+        fixed inset-x-0 bottom-0 z-nav grid grid-cols-4 border-t border-line
         bg-surface
         lg:hidden
       "

@@ -81,7 +81,7 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
         <div className="relative h-0">
           <div
             className="
-              pointer-events-none absolute inset-x-0 top-2 z-0 flex
+              pointer-events-none absolute inset-x-0 top-2 z-raised flex
               justify-center
             "
           >

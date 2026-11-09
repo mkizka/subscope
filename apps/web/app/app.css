@@ -40,6 +40,26 @@
   }
 }
 
+@utility z-raised {
+  z-index: 10;
+}
+
+@utility z-sticky {
+  z-index: 20;
+}
+
+@utility z-nav {
+  z-index: 30;
+}
+
+@utility z-dropdown {
+  z-index: 40;
+}
+
+@utility z-overlay {
+  z-index: 50;
+}
+
 @keyframes skeleton-shimmer {
   to {
     background-position: -300% 0;

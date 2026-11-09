@@ -2,7 +2,7 @@ export function Splash({ leaving }: { leaving: boolean }) {
   return (
     <div
       className={`
-        fixed inset-0 z-50 flex flex-col items-center justify-center gap-4
+        fixed inset-0 z-overlay flex flex-col items-center justify-center gap-4
         bg-surface text-ink transition-opacity duration-300
         ${leaving ? "pointer-events-none opacity-0" : ""}
       `}
