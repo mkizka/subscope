@@ -196,7 +196,7 @@ function TweetEmbed({ id }: { id: string }) {
     return () => container.replaceChildren();
   }, [id]);
 
-  return <div ref={ref} data-tweet-id={id} className="mt-2" />;
+  return <div ref={ref} data-tweet-id={id} className="relative mt-2" />;
 }
 
 export function ExternalCard({
