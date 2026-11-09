@@ -166,11 +166,35 @@ export function QuotedFeed({
   );
 }
 
+const tweetHosts = ["x.com", "twitter.com", "mobile.twitter.com"];
+
+function getTweetId(uri: string) {
+  if (!URL.canParse(uri)) return undefined;
+  const url = new URL(uri);
+  if (!tweetHosts.includes(url.hostname.replace(/^www\./, ""))) {
+    return undefined;
+  }
+  return url.pathname.match(/^\/[^/]+\/status\/(\d+)/)?.[1];
+}
+
 export function ExternalCard({
   external,
 }: {
   external: NonNullable<PostCardProps["external"]>;
 }) {
+  const tweetId = getTweetId(external.uri);
+  if (tweetId) {
+    return (
+      <iframe
+        src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&dnt=true`}
+        title={external.title}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        sandbox="allow-scripts allow-same-origin allow-popups"
+        className="mt-2 h-[480px] w-full rounded-xl border border-line"
+      />
+    );
+  }
   return (
     <a
       href={external.uri}

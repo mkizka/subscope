@@ -150,3 +150,17 @@ export const WithQuoteImagesAndExternal: Story = {
     },
   },
 };
+
+export const WithTweet: Story = {
+  args: {
+    authorHandle: "frank.bsky.social",
+    authorDisplayName: "Frank",
+    text: "最初のツイートです。",
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    external: {
+      uri: "https://x.com/jack/status/20",
+      title: "just setting up my twttr",
+      description: "",
+    },
+  },
+};
