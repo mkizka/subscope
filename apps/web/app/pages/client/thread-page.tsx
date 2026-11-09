@@ -1,5 +1,5 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { ThreadViewContainer } from "@/app/features/thread/blocks/thread-view-container";
+import { ThreadViewContainer } from "@/app/features/thread/thread-view-container";
 
 type Props = {
   handle: string;

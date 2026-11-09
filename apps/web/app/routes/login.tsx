@@ -1,7 +1,7 @@
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, redirect } from "react-router";
 
-import { inviteCodeSchema } from "@/app/features/login/blocks/invite-code-form-container";
+import { inviteCodeSchema } from "@/app/features/login/invite-code-form-container";
 import { getAgent } from "@/app/middlewares/auth";
 import { LoginPage } from "@/app/pages/client/login-page";
 import { di } from "@/app/server/di";

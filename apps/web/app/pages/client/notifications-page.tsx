@@ -1,5 +1,5 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
-import { NotificationPanelContainer } from "@/app/features/notification/blocks/notification-panel-container";
+import { NotificationPanelContainer } from "@/app/features/notification/notification-panel-container";
 
 export function NotificationsPage() {
   return (

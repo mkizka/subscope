@@ -5,7 +5,7 @@ import { MobileHeaderContainer } from "@/app/features/navigation/blocks/mobile-h
 import { SideNavContainer } from "@/app/features/navigation/blocks/side-nav-container";
 import { SplashContainer } from "@/app/features/navigation/blocks/splash-container";
 import { SidebarSearchContainer } from "@/app/features/search/parts/sidebar-search-container";
-import { ServerCard } from "@/app/features/server/parts/server-card";
+import { ServerCard } from "@/app/features/server/server-card";
 import { ComposeButton } from "@/app/features/timeline/blocks/post-form-container";
 
 type Props = {

@@ -1,7 +1,7 @@
 import { CheckIcon } from "lucide-react";
 
-import { InviteCodeFormContainer } from "@/app/features/login/blocks/invite-code-form-container";
-import { LoginFormContainer } from "@/app/features/login/blocks/login-form-container";
+import { InviteCodeFormContainer } from "@/app/features/login/invite-code-form-container";
+import { LoginFormContainer } from "@/app/features/login/login-form-container";
 
 type Props = {
   step: "setup" | "login" | "inviteCode";

@@ -1,7 +1,7 @@
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, redirect } from "react-router";
 
-import { loginSchema } from "@/app/features/login/blocks/login-form-container";
+import { loginSchema } from "@/app/features/login/login-form-container";
 import { di } from "@/app/server/di";
 
 import type { Route } from "./+types/oauth.login";

@@ -4,8 +4,9 @@ import { type ReactNode, useState } from "react";
 import { ConfirmDialog } from "@/app/components/confirm-dialog";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
-import { StatusBadge } from "@/app/features/admin/parts/status-badge";
 import { formatDate } from "@/app/lib/format-date";
+
+import { StatusBadge } from "./status-badge";
 
 export type InviteCode = {
   code: string;
