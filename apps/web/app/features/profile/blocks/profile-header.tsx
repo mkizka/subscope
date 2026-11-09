@@ -8,6 +8,7 @@ import { Badge } from "@/app/components/ui/badge";
 import { ImageViewer } from "@/app/components/ui/image-viewer";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { BackfillStatusBadge } from "@/app/features/profile/parts/backfill-status-badge";
+import { UntrackedBadge } from "@/app/features/profile/parts/untracked-badge";
 import type { BackfillStatus } from "@/app/lib/backfill-status";
 
 type Props = {
@@ -21,6 +22,7 @@ type Props = {
   followsCount?: number;
   followersCount?: number;
   backfillStatus?: BackfillStatus;
+  untracked?: boolean;
   followedBy?: boolean;
   action?: ReactNode;
 };
@@ -36,6 +38,7 @@ export function ProfileHeader({
   followsCount,
   followersCount,
   backfillStatus,
+  untracked,
   followedBy,
   action,
 }: Props) {
@@ -95,6 +98,7 @@ export function ProfileHeader({
             <p className="truncate text-label text-muted">@{handle}</p>
             {followedBy && <Badge>フォローされています</Badge>}
             {backfillStatus && <BackfillStatusBadge status={backfillStatus} />}
+            {untracked && <UntrackedBadge />}
           </div>
         </div>
         {description && (

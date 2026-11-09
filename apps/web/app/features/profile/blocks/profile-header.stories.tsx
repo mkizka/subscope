@@ -21,6 +21,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const Untracked: Story = { args: { untracked: true } };
+
 export const WithImages: Story = {
   args: {
     avatarUrl: "https://placehold.co/160",
