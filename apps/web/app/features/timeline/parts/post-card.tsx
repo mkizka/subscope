@@ -5,7 +5,7 @@ import {
   MessageCircleIcon,
   RepeatIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
@@ -177,6 +177,47 @@ function getTweetId(uri: string) {
   return url.pathname.match(/^\/[^/]+\/status\/(\d+)/)?.[1];
 }
 
+function getResizeHeight(data: unknown): number | undefined {
+  if (typeof data !== "object" || data === null) return undefined;
+  const message: unknown = Reflect.get(data, "twttr.embed");
+  if (typeof message !== "object" || message === null) return undefined;
+  if (Reflect.get(message, "method") !== "twttr.private.resize") {
+    return undefined;
+  }
+  const params: unknown = Reflect.get(message, "params");
+  const height: unknown = Array.isArray(params)
+    ? Reflect.get(Object(params[0]), "height")
+    : undefined;
+  return typeof height === "number" ? height : undefined;
+}
+
+function TweetEmbed({ id, title }: { id: string; title: string }) {
+  const ref = useRef<HTMLIFrameElement>(null);
+  const [height, setHeight] = useState(250);
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.source !== ref.current?.contentWindow) return;
+      const resized = getResizeHeight(event.data);
+      if (resized) setHeight(resized);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
+  return (
+    <iframe
+      ref={ref}
+      src={`https://platform.twitter.com/embed/Tweet.html?id=${id}&dnt=true`}
+      title={title}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      style={{ height }}
+      className="mt-2 w-full"
+    />
+  );
+}
+
 export function ExternalCard({
   external,
 }: {
@@ -184,16 +225,7 @@ export function ExternalCard({
 }) {
   const tweetId = getTweetId(external.uri);
   if (tweetId) {
-    return (
-      <iframe
-        src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&dnt=true`}
-        title={external.title}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        sandbox="allow-scripts allow-same-origin allow-popups"
-        className="mt-2 h-[480px] w-full rounded-xl border border-line"
-      />
-    );
+    return <TweetEmbed id={tweetId} title={external.title} />;
   }
   return (
     <a
