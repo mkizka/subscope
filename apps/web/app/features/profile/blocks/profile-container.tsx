@@ -5,6 +5,7 @@ import { InfiniteScrollTrigger } from "@/app/components/infinite-scroll-trigger"
 import { LoadingSpinner } from "@/app/components/loading-spinner";
 import { PostsSkeleton } from "@/app/components/posts-skeleton";
 import { Tabs } from "@/app/components/ui/tabs";
+import { UntrackedNotice } from "@/app/features/profile/parts/untracked-notice";
 import { TimelineFeed } from "@/app/features/timeline/blocks/timeline-feed";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.profile.$handle";
@@ -64,6 +65,7 @@ export function ProfileContainer({ handle }: Props) {
         followsCount={profile && (profile.followsCount ?? 0)}
         followersCount={profile && (profile.followersCount ?? 0)}
         backfillStatus={data?.backfillStatus}
+        untracked={!!data && !data.backfillStatus}
         followedBy={!!profile?.viewer?.followedBy}
         action={
           profile &&
@@ -94,6 +96,7 @@ export function ProfileContainer({ handle }: Props) {
           ]}
         />
       )}
+      {data && !data.backfillStatus && <UntrackedNotice />}
       {listsTab ??
         (pages && data && !isPlaceholderData ? (
           // ponytail: 返信・引用は投稿欄のあるタイムラインでだけ動く。全体ページに投稿欄を置くときにつなぐ

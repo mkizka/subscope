@@ -18,6 +18,7 @@ const meta = {
           followersCount: 345,
         },
         isSelf: false,
+        backfillStatus: "completed",
         posts: TimelineFeedStories.args.posts,
         tab: "posts",
       }),
@@ -52,7 +53,27 @@ export const NoPosts: Story = {
           followersCount: 0,
         },
         isSelf: false,
+        backfillStatus: "completed",
         posts: [],
+        tab: "posts",
+      }),
+    );
+  },
+};
+
+export const Untracked: Story = {
+  beforeEach: () => {
+    queryClient.setQueryData(
+      ["profile", alice.handle, ""],
+      infinite<typeof profileLoader>({
+        profile: {
+          ...alice,
+          description: "Blueskyを使っています。",
+          followsCount: 120,
+          followersCount: 345,
+        },
+        isSelf: false,
+        posts: TimelineFeedStories.args.posts,
         tab: "posts",
       }),
     );
