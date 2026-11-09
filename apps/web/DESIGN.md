@@ -234,7 +234,7 @@ Bluesky公式と同じく、PCは3カラム、スマホは1カラムにする。
 
 ## Components
 
-繰り返し使う部品は `app/components/ui/` にReactコンポーネントとして置き、画面ではそれを使う。同じ見た目をその場のクラスで作り直さない。2つ以上のfeatureで使うものだけを `components/ui/` に置き、1つのfeatureでしか使わないものは `features/{feature}/parts/` に置く。部品を足したら下の一覧に追記する。
+繰り返し使う部品は `app/components/ui/` にReactコンポーネントとして置き、画面ではそれを使う。同じ見た目をその場のクラスで作り直さない。2つ以上のfeatureで使うものだけを `components/ui/` に置き、1つのfeatureでしか使わないものは `features/{feature}/` に置く。部品を足したら下の一覧に追記する。
 
 ### 状態
 

@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { ThreadSkeleton } from "@/app/features/thread/parts/thread-skeleton";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader } from "@/app/routes/api.thread";
 
+import { ThreadSkeleton } from "./thread-skeleton";
 import { ThreadView } from "./thread-view";
 
 type ThreadResponse = Awaited<ReturnType<typeof loader>>["data"];

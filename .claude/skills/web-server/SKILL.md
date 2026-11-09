@@ -56,5 +56,5 @@ export const timelineQueryFactory = ({
 ## routes(presentation)
 
 - ログインが必要なルートは `loginRequiredMiddleware`/`adminRequiredMiddleware` を `middleware` に並べる
-- フォームの入力は必ず conform-to(`parseWithZod`)で検証する。スキーマはフォームのコンポーネント(`features/**/blocks/*-container.tsx`)と共有する
+- フォームの入力は必ず conform-to(`parseWithZod`)で検証する。スキーマはフォームのコンポーネント(`features/**/*-container.tsx`)と共有する
 - `app/server` は loader/action/middleware からだけ参照する。コンポーネントから参照するとクライアントバンドルにサーバーの処理が入る

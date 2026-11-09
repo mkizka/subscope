@@ -2,7 +2,8 @@ import { CheckIcon, CopyIcon, HomeIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Button, buttonClass } from "@/app/components/ui/button";
-import { ErrorIcon } from "@/app/features/error/parts/error-icon";
+
+import { ErrorIcon } from "./error-icon";
 
 type Props = {
   title: string;

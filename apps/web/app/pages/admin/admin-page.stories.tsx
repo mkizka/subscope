@@ -2,7 +2,7 @@ import type { $OutputBody as ServerMembersResponse } from "@repo/client/me/subsc
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { alice, bob, queryClient } from "@/.storybook/query-client";
-import { ServerMemberListContainer } from "@/app/features/admin/blocks/server-member-list-container";
+import { ServerMemberListContainer } from "@/app/features/admin/server-member-list-container";
 
 import { AdminPage } from "./admin-page";
 

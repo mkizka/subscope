@@ -1,4 +1,4 @@
-import { ServerMemberListContainer } from "@/app/features/admin/blocks/server-member-list-container";
+import { ServerMemberListContainer } from "@/app/features/admin/server-member-list-container";
 
 export default function AdminServerMembers() {
   return <ServerMemberListContainer />;

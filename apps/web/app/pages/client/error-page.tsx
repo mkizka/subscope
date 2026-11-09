@@ -1,6 +1,6 @@
 import { isRouteErrorResponse } from "react-router";
 
-import { ErrorCard } from "@/app/features/error/blocks/error-card";
+import { ErrorCard } from "@/app/features/error/error-card";
 
 type Props = {
   error: unknown;
