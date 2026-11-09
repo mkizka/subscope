@@ -330,7 +330,7 @@ test.describe("レイアウト（モバイル）", () => {
         .querySelector("main")
         ?.style.setProperty("min-height", "3000px");
     });
-    const tab = page.getByRole("link", { name: "フォロー中" });
+    const tab = page.getByRole("tab", { name: "フォロー中" });
     const menuButton = page.getByRole("button", { name: "メニューを開く" });
 
     await page.evaluate(() => window.scrollTo(0, 1000));
