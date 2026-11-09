@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 
 import { useSearchHistory } from "@/app/features/search/use-search-history";
 import { fetchJson } from "@/app/lib/fetch-json";
+import { useHydrated } from "@/app/lib/use-hydrated";
 import type { AccountDto } from "@/app/server/application/dto/account";
 
 import { SidebarSearch } from "./sidebar-search";
 
 export function SidebarSearchContainer() {
   const { history, remove, clear } = useSearchHistory();
+  const hydrated = useHydrated();
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
 
@@ -28,7 +30,11 @@ export function SidebarSearchContainer() {
 
   return (
     <SidebarSearch
-      inputProps={{ value: q, onChange: (e) => setQ(e.target.value) }}
+      inputProps={{
+        value: q,
+        onChange: (e) => setQ(e.target.value),
+        readOnly: !hydrated,
+      }}
       suggestions={q.trim() === "" ? [] : (data ?? [])}
       onSelect={() => setQ("")}
       history={q.trim() === "" ? history : []}

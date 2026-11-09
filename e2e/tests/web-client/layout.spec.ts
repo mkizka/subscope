@@ -96,11 +96,10 @@ test.describe("レイアウト", () => {
     const searchbox = page
       .getByRole("complementary")
       .getByRole("searchbox", { name: "検索語" });
-    await expect(async () => {
-      await searchbox.fill("alice");
-      await searchbox.press("Enter");
-      await expect(page).toHaveURL("/search?q=alice", { timeout: 1000 });
-    }).toPass();
+    await searchbox.fill("alice");
+    await searchbox.press("Enter");
+
+    await expect(page).toHaveURL("/search?q=alice");
   });
 
   test("layout-16: 右カラムの検索ボックスに入力すると、入力に合うアカウントの候補（アイコン、表示名、ハンドル）を下に表示し、候補を選ぶとそのアカウントのプロフィールに移動する", async ({
