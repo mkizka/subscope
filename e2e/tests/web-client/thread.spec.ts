@@ -383,4 +383,29 @@ test.describe("スレッド", () => {
     await page.waitForTimeout(3000);
     expect(requests).toBe(1);
   });
+
+  test("thread-17: 見出しはスクロールしても投稿や埋め込みより手前の不透明な背景で上に固定する", async ({
+    page,
+  }) => {
+    let parent = await post("thread-17: 投稿0");
+    for (let i = 1; i <= 8; i++) {
+      parent = await post(`thread-17: 投稿${i}`, parent);
+    }
+    await openThread(page, parent.uri, "thread-17: 投稿8");
+
+    await page.evaluate(() => window.scrollTo(0, 400));
+
+    const header = page
+      .getByRole("region", { name: "スレッド" })
+      .locator("header");
+    const isTopmost = await header.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top > 0) return false;
+      const x = rect.left + rect.width / 2;
+      return [rect.top + 4, rect.top + rect.height - 4].every((y) =>
+        el.contains(document.elementFromPoint(x, y)),
+      );
+    });
+    expect(isTopmost).toBe(true);
+  });
 });

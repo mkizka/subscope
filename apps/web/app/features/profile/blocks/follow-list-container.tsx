@@ -40,8 +40,8 @@ export function FollowListContainer({ handle, kind }: Props) {
     <>
       <header
         className="
-          sticky top-0 flex items-center gap-2 border-b border-line bg-surface
-          p-4
+          sticky top-0 z-10 flex items-center gap-2 border-b border-line
+          bg-surface p-4
         "
       >
         <Link to={`/${handle}`} aria-label="戻る" className="text-muted">
