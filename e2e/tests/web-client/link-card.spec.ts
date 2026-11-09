@@ -64,10 +64,7 @@ test.describe("リンクカード", () => {
       await expect(embed).toBeAttached({ timeout: 1000 });
     }).toPass();
     await expect(embed).toHaveAttribute("data-tweet-id", "20");
-    await expect(embed.locator("script")).toHaveAttribute(
-      "src",
-      "https://platform.twitter.com/widgets.js",
-    );
+    await expect(page.locator("script[src$='/widgets.js']")).toHaveCount(1);
   });
 
   test("link-card-3: 埋め込んだツイートの中を選んだ場合は、投稿の詳細へ遷移せずツイート側の操作を優先する", async ({

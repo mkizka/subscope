@@ -177,6 +177,31 @@ function getTweetId(uri: string) {
   return url.pathname.match(/^\/[^/]+\/status\/(\d+)/)?.[1];
 }
 
+type TwitterWidgets = { widgets: { load: (element: HTMLElement) => void } };
+
+declare global {
+  interface Window {
+    twttr?: TwitterWidgets;
+  }
+}
+
+let widgetsReady: Promise<TwitterWidgets> | undefined;
+
+function loadWidgets() {
+  widgetsReady ??= new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://platform.twitter.com/widgets.js";
+    script.onload = () => {
+      if (window.twttr) resolve(window.twttr);
+      else reject(new Error("twttr is not defined"));
+    };
+    script.onerror = reject;
+    document.head.append(script);
+  });
+  return widgetsReady;
+}
+
 function TweetEmbed({ id }: { id: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -189,10 +214,8 @@ function TweetEmbed({ id }: { id: string }) {
     const link = document.createElement("a");
     link.href = `https://twitter.com/i/status/${id}`;
     blockquote.append(link);
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = "https://platform.twitter.com/widgets.js";
-    container.append(blockquote, script);
+    container.append(blockquote);
+    void loadWidgets().then((twttr) => twttr.widgets.load(container));
     return () => container.replaceChildren();
   }, [id]);
 
