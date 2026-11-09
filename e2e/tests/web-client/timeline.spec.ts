@@ -181,7 +181,7 @@ test.describe("タイムライン", () => {
     await expect(page.getByText(text)).toBeVisible();
   });
 
-  test("timeline-18: 表示中は60秒ごとに投稿を自動で読み込み直し、読み込み中は一覧の上部に、スピナー付きの「更新中」の表示を投稿の上に重ねて浮かせる", async ({
+  test("timeline-18: 表示中は60秒ごとに投稿を自動で読み込み直し、読み込み中は一覧の上部に、スピナー付きの「更新中」の表示を投稿の上、上部のタブの下に重ねて浮かせる", async ({
     page,
     request,
   }) => {
@@ -207,6 +207,17 @@ test.describe("タイムライン", () => {
     await page.clock.fastForward(60_000);
 
     await expect(spinner).toBeVisible();
+    const z = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => {
+          const target = el.closest("[class*=z-]") ?? el;
+          return Number(getComputedStyle(target).zIndex) || 0;
+        });
+    expect(await z('[role="status"]')).toBeLessThan(
+      await z('[role="tablist"]'),
+    );
     release(undefined);
     await expect(spinner).toBeHidden();
     await expect(async () => {
