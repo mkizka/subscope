@@ -58,9 +58,16 @@ const preview: Preview = {
   },
   decorators: [
     (Story, { parameters }) => {
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
       const Stub = createRoutesStub([
-        { path: "*", Component: Story, action: () => null },
+        {
+          path: "*",
+          ...parameters.route,
+          Component: Story,
+          action: parameters.action ?? (() => null),
+        },
       ]);
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
       return (
         <QueryClientProvider client={queryClient}>
           <Stub initialEntries={[parameters.path ?? "/"]} />
