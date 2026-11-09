@@ -56,7 +56,7 @@ export function SidebarSearch({
       {suggestions.length > 0 && (
         <ul
           className="
-            absolute inset-x-0 top-full z-10 mt-1 hidden overflow-hidden
+            absolute inset-x-0 top-full z-dropdown mt-1 hidden overflow-hidden
             rounded-lg border border-line bg-surface shadow-lg
             group-focus-within:block
           "

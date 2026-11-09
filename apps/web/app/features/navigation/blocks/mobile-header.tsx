@@ -42,7 +42,7 @@ export function MobileHeader({ avatarUrl, profileId, isAdmin }: Props) {
     <header
       data-visible={visible}
       className="
-        sticky top-0 z-10 grid h-14 grid-cols-3 items-center border-b
+        sticky top-0 z-sticky grid h-14 grid-cols-3 items-center border-b
         border-line bg-surface px-4 transition-transform
         data-[visible=false]:-translate-y-full
         lg:hidden

@@ -40,7 +40,7 @@ export const ThreeColumnLayout = ({
         {children}
         <ComposeButton
           className="
-            fixed right-4 bottom-20 z-10 flex size-14 items-center
+            fixed right-4 bottom-20 z-nav flex size-14 items-center
             justify-center rounded-full bg-brand text-on-brand shadow-lg
             hover:opacity-90
             lg:hidden
