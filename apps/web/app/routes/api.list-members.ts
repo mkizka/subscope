@@ -5,7 +5,7 @@ import { didContext } from "@/app/context/did";
 import {
   addListMemberSchema,
   removeListMemberSchema,
-} from "@/app/features/list/blocks/list-member-forms";
+} from "@/app/features/list/list-member-forms";
 import { loginRequiredMiddleware } from "@/app/middlewares/auth";
 import { di } from "@/app/server/di";
 

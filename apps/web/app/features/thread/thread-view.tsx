@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
-import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
+import { useMe } from "@/app/features/navigation/side-nav-container";
 import { useCompose } from "@/app/features/timeline/blocks/post-form-container";
 import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
 import {

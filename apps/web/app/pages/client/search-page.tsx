@@ -1,7 +1,7 @@
 import { ThreeColumnLayout } from "@/app/components/three-column-layout";
 import { Tabs } from "@/app/components/ui/tabs";
-import { SearchFormContainer } from "@/app/features/search/blocks/search-form-container";
-import { SearchResultsContainer } from "@/app/features/search/blocks/search-results-container";
+import { SearchFormContainer } from "@/app/features/search/search-form-container";
+import { SearchResultsContainer } from "@/app/features/search/search-results-container";
 
 type Props = {
   q?: string;

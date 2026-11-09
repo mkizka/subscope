@@ -137,8 +137,8 @@ export function InviteCodeList({
     <div>
       <div
         className="
-          sticky top-0 z-sticky flex items-center justify-between border-b border-line
-          bg-surface px-4 py-3
+          sticky top-0 z-sticky flex items-center justify-between border-b
+          border-line bg-surface px-4 py-3
         "
       >
         <h1 className="text-title">招待コード</h1>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
-import { useMe } from "@/app/features/navigation/blocks/side-nav-container";
+import { useMe } from "@/app/features/navigation/side-nav-container";
 import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
 import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";

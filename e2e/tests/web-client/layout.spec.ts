@@ -111,6 +111,7 @@ test.describe("レイアウト", () => {
     const sidebar = page.getByRole("complementary");
     const link = sidebar.getByRole("link", { name: /alice\.test/ });
     await expect(async () => {
+      await page.reload();
       await sidebar.getByRole("searchbox", { name: "検索語" }).fill("alice");
       await expect(link).toBeVisible({ timeout: 1000 });
     }).toPass();

@@ -3,7 +3,8 @@ import { Form } from "react-router";
 
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { SearchHistory } from "@/app/features/search/parts/search-history";
+
+import { SearchHistory } from "./search-history";
 
 type Props = {
   formProps: ComponentProps<typeof Form>;

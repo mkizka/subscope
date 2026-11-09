@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-import { useSearchHistory } from "@/app/features/search/use-search-history";
 import { fetchJson } from "@/app/lib/fetch-json";
 import { useHydrated } from "@/app/lib/use-hydrated";
 import type { AccountDto } from "@/app/server/application/dto/account";
 
 import { SidebarSearch } from "./sidebar-search";
+import { useSearchHistory } from "./use-search-history";
 
 export function SidebarSearchContainer() {
   const { history, remove, clear } = useSearchHistory();
