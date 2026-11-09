@@ -4,11 +4,10 @@ import { useSearchParams } from "react-router";
 import { AccountsSkeleton } from "@/app/components/rows-skeleton";
 import { Input } from "@/app/components/ui/input";
 import { Tabs } from "@/app/components/ui/tabs";
+import { type Account, AccountList } from "@/app/features/account/account-list";
 import { fetchJson } from "@/app/lib/fetch-json";
 import type { loader as registeredLoader } from "@/app/routes/api.registered-accounts";
 import type { loader as trackedLoader } from "@/app/routes/api.tracked-accounts";
-
-import { type Account, AccountList } from "./account-list";
 
 type RegisteredResponse = Awaited<ReturnType<typeof registeredLoader>>["data"];
 type TrackedResponse = Awaited<ReturnType<typeof trackedLoader>>["data"];

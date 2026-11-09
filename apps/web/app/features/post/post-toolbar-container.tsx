@@ -3,12 +3,12 @@ import { useFetcher } from "react-router";
 import { z } from "zodV4";
 
 import { useMe } from "@/app/features/navigation/side-nav-container";
-import { PostToolbar } from "@/app/features/timeline/parts/post-toolbar";
+import type { TimelinePost } from "@/app/features/timeline/timeline-feed";
 import type { action as deletePostAction } from "@/app/routes/api.posts";
 import type { action } from "@/app/routes/api.reactions";
 
 import { useCompose } from "./post-form-container";
-import type { TimelinePost } from "./timeline-feed";
+import { PostToolbar } from "./post-toolbar";
 
 export const reactionSchema = z.object({
   type: z.enum(["like", "repost"]),

@@ -13,7 +13,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { ComposeProvider } from "./features/timeline/blocks/post-form-container";
+import { ComposeProvider } from "./features/post/post-form-container";
 import { ErrorPage } from "./pages/client/error-page";
 
 export const links: Route.LinksFunction = () => [

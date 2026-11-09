@@ -2,12 +2,8 @@ import { LoaderCircle } from "lucide-react";
 import { Fragment } from "react";
 import { Link } from "react-router";
 
-import {
-  PostCard,
-  type PostCardProps,
-} from "@/app/features/timeline/parts/post-card";
-
-import { PostToolbarContainer } from "./post-toolbar-container";
+import { PostCard, type PostCardProps } from "@/app/features/post/post-card";
+import { PostToolbarContainer } from "@/app/features/post/post-toolbar-container";
 
 export type TimelinePost = Omit<PostCardProps, "toolbar"> & {
   uri: string;

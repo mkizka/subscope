@@ -1,8 +1,8 @@
-import { type Account, AccountList } from "@/app/features/profile/account-list";
+import { type Account, AccountList } from "@/app/features/account/account-list";
 import {
   TimelineFeed,
   type TimelinePost,
-} from "@/app/features/timeline/blocks/timeline-feed";
+} from "@/app/features/timeline/timeline-feed";
 
 type Props = {
   tab: "accounts" | "posts";

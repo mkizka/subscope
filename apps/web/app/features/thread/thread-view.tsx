@@ -5,12 +5,6 @@ import { useNavigate } from "react-router";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
 import { useMe } from "@/app/features/navigation/side-nav-container";
-import { useCompose } from "@/app/features/timeline/blocks/post-form-container";
-import { PostToolbarContainer } from "@/app/features/timeline/blocks/post-toolbar-container";
-import {
-  threadPath,
-  type TimelinePost,
-} from "@/app/features/timeline/blocks/timeline-feed";
 import {
   ExternalCard,
   PostCard,
@@ -18,11 +12,17 @@ import {
   QuotedFeed,
   QuotedPost,
   UnavailableQuote,
-} from "@/app/features/timeline/parts/post-card";
-import { PostImages } from "@/app/features/timeline/parts/post-images";
-import { PostVideo } from "@/app/features/timeline/parts/post-video";
-import { ProfileLink } from "@/app/features/timeline/parts/profile-link";
-import { RichText } from "@/app/features/timeline/parts/rich-text";
+} from "@/app/features/post/post-card";
+import { useCompose } from "@/app/features/post/post-form-container";
+import { PostImages } from "@/app/features/post/post-images";
+import { PostToolbarContainer } from "@/app/features/post/post-toolbar-container";
+import { PostVideo } from "@/app/features/post/post-video";
+import { ProfileLink } from "@/app/features/post/profile-link";
+import { RichText } from "@/app/features/post/rich-text";
+import {
+  threadPath,
+  type TimelinePost,
+} from "@/app/features/timeline/timeline-feed";
 import { useHydrated } from "@/app/lib/use-hydrated";
 
 type Props = {

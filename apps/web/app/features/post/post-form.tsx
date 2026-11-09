@@ -5,13 +5,14 @@ import { type Ref, useId, useState } from "react";
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button, buttonClass } from "@/app/components/ui/button";
 import { Dialog } from "@/app/components/ui/dialog";
-import { AltDialog } from "@/app/features/timeline/parts/alt-dialog";
+import { useHydrated } from "@/app/lib/use-hydrated";
+
+import { AltDialog } from "./alt-dialog";
 import {
   formatRelativeTime,
   type PostCardProps,
   QuotedPost,
-} from "@/app/features/timeline/parts/post-card";
-import { useHydrated } from "@/app/lib/use-hydrated";
+} from "./post-card";
 
 export const MAX_POST_LENGTH = 300;
 export const MAX_IMAGES = 4;

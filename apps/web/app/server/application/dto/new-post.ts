@@ -1,4 +1,4 @@
-import type { ReplyRule } from "@/app/features/timeline/blocks/post-form";
+import type { ReplyRule } from "@/app/features/post/post-form";
 
 export type PostRef = { uri: string; cid: string };
 
