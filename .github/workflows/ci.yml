@@ -21,6 +21,7 @@ jobs:
       - run: pnpm i
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm check:specs
   test:
     runs-on: ubuntu-latest
     steps:

@@ -14,6 +14,7 @@
     "db:migrate": "pnpm --filter @repo/db db:migrate",
     "dev": "node --import tsx ./dev-env/server.mts pnpm turbo run dev --ui tui",
     "format": "pnpm -s run _prettier . --write && turbo run format",
+    "check:specs": "node scripts/check-spec-tests.mts",
     "lint": "pnpm -s run _prettier . --check && turbo run lint",
     "prepare": "husky",
     "storybook": "pnpm --filter @repo/web storybook",
