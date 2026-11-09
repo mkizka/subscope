@@ -95,7 +95,7 @@ export function ServerMemberList({
     tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
   return (
     <>
-      <div className="sticky top-0 bg-surface">
+      <div className="sticky top-0 z-sticky bg-surface">
         <div className="flex items-baseline gap-2 px-4 py-3">
           <h1 className="text-title">アカウント管理</h1>
           {total !== undefined && (

@@ -68,7 +68,7 @@ export default function App() {
           role="progressbar"
           aria-label="読み込み中"
           className="
-            fixed inset-x-0 top-0 z-50 h-1 overflow-hidden bg-brand-soft
+            fixed inset-x-0 top-0 z-overlay h-1 overflow-hidden bg-brand-soft
           "
         >
           <div className="h-full w-1/3 animate-progress bg-brand" />

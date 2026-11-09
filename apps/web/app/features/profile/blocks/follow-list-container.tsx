@@ -40,7 +40,7 @@ export function FollowListContainer({ handle, kind }: Props) {
     <>
       <header
         className="
-          sticky top-0 flex items-center gap-2 border-b border-line bg-surface
+          sticky top-0 z-sticky flex items-center gap-2 border-b border-line bg-surface
           p-4
         "
       >
