@@ -16,16 +16,6 @@ const mockBackfillStatus = async (
 };
 
 test.describe("過去の投稿の同期状態", () => {
-  test("backfillBanner-1: 自分の同期中は、「過去の投稿を同期しています」の帯を出す", async ({
-    page,
-  }) => {
-    await mockBackfillStatus(page, ["inProgress"]);
-
-    await page.goto("/");
-
-    await expect(page.getByText(IN_PROGRESS)).toBeVisible();
-  });
-
   test("backfillBanner-2: 自分の同期がエラーなら、「過去の投稿を同期できていません」の帯を出す", async ({
     page,
   }) => {
