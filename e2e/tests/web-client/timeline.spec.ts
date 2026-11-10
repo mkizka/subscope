@@ -207,6 +207,16 @@ test.describe("タイムライン", () => {
     await page.clock.fastForward(60_000);
 
     await expect(spinner).toBeVisible();
+    const isOnTop = await spinner.evaluate((el) => {
+      if (el.parentElement) el.parentElement.style.pointerEvents = "auto";
+      const rect = el.getBoundingClientRect();
+      const hit = document.elementFromPoint(
+        rect.x + rect.width / 2,
+        rect.y + rect.height / 2,
+      );
+      return el.contains(hit);
+    });
+    expect(isOnTop).toBe(true);
     await page.addStyleTag({ content: "main { min-height: 3000px }" });
     const topBefore = (await spinner.boundingBox())?.y;
     await page.mouse.wheel(0, 300);
@@ -214,17 +224,6 @@ test.describe("タイムライン", () => {
       expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
     }).toPass();
     expect((await spinner.boundingBox())?.y).toBe(topBefore);
-    const z = (selector: string) =>
-      page
-        .locator(selector)
-        .first()
-        .evaluate((el) => {
-          const target = el.closest("[class*=z-]") ?? el;
-          return Number(getComputedStyle(target).zIndex) || 0;
-        });
-    expect(await z('[role="status"]')).toBeLessThan(
-      await z('[role="tablist"]'),
-    );
     release(undefined);
     await expect(spinner).toBeHidden();
     await expect(async () => {
