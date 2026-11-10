@@ -76,14 +76,13 @@ export function TimelineFeed({ posts, refreshing = false }: Props) {
       {refreshing && (
         <div
           className="
-            sticky top-25.25 h-0
+            sticky top-25.25 z-raised h-0
             lg:top-11.25
           "
         >
           <div
             className="
-              pointer-events-none absolute inset-x-0 top-2 z-raised flex
-              justify-center
+              pointer-events-none absolute inset-x-0 top-2 flex justify-center
             "
           >
             <div
