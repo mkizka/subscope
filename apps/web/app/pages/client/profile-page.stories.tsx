@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, screen, userEvent, waitFor, within } from "storybook/test";
 
 import {
   alice,
@@ -295,6 +295,47 @@ export const UntrackedNotice: Story = {
     await userEvent.click(page.getByRole("tab", { name: "いいね" }));
 
     await expect(notice).toBeVisible();
+  },
+};
+
+const svg = (color: string): `data:${string}` =>
+  `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23${color}'/%3E%3C/svg%3E`;
+
+export const ImageViewerProfile: Story = {
+  name: "image-viewer-s7: プロフィール全体ページのアイコンかバナーを選ぶと、その画像を拡大して表示する",
+  tags: ["play"],
+  beforeEach: () => {
+    queryClient.setQueryData(
+      ["profile", alice.handle, ""],
+      infinite<typeof profileLoader>({
+        profile: {
+          ...alice,
+          avatar: svg("d97750"),
+          banner: svg("d97751"),
+          followsCount: 0,
+          followersCount: 0,
+        },
+        isSelf: false,
+        backfillStatus: "completed",
+        posts: [],
+        tab: "posts",
+      }),
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = () =>
+      screen.queryByRole("dialog", { name: "画像の拡大表示" });
+    const viewerSrc = () => dialog()?.querySelector("img")?.getAttribute("src");
+
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "アイコンを拡大" }),
+    );
+    await waitFor(() => expect(viewerSrc()).toBe(svg("d97750")));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
+    await userEvent.click(canvas.getByRole("button", { name: "バナーを拡大" }));
+    await waitFor(() => expect(viewerSrc()).toBe(svg("d97751")));
   },
 };
 
