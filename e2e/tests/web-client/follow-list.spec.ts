@@ -15,7 +15,7 @@ test.describe("フォロー・フォロワー", () => {
     await page.goto("/");
   });
 
-  test("follow-list-1: プロフィール全体ページのフォロー数から、中央カラムにそのアカウントのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("follow-list-e1: プロフィール全体ページのフォロー数から、中央カラムにそのアカウントのフォロー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.goto("/alice.test");
@@ -34,7 +34,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(bob.getByText("@bob.test")).toBeVisible();
   });
 
-  test("follow-list-2: プロフィール全体ページのフォロワー数から、中央カラムにそのアカウントのフォロワー（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("follow-list-e2: プロフィール全体ページのフォロワー数から、中央カラムにそのアカウントのフォロワー（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.goto("/bob.test");
@@ -55,7 +55,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(alice.getByText("@alice.test")).toBeVisible();
   });
 
-  test("follow-list-3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
+  test("follow-list-e3: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/alice.test/follows");
@@ -68,43 +68,7 @@ test.describe("フォロー・フォロワー", () => {
     ).toBeVisible();
   });
 
-  test("follow-list-4: 一覧の追跡アカウントには、過去の投稿の同期状態を表示する", async ({
-    page,
-  }) => {
-    await page.goto("/alice.test/follows");
-
-    const item = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ hasText: "Bob" });
-    await expect(async () => {
-      await page.reload();
-      await expect(item.getByText("同期済み", { exact: true })).toBeVisible({
-        timeout: 1000,
-      });
-    }).toPass();
-  });
-
-  test("follow-list-5: 一覧を開くと、読み込みを待たずに見出しを表示し、読み込み終えるまでスケルトンを表示する", async ({
-    page,
-  }) => {
-    await page.goto("/alice.test");
-    const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/api/profile/*/follows", async (route) => {
-      await released;
-      await route.continue();
-    });
-
-    await page.getByRole("link", { name: /^\d+ フォロー$/ }).click();
-
-    await expect(page.getByRole("heading", { name: "フォロー" })).toBeVisible();
-    const skeleton = page.getByRole("status", { name: "読み込み中" });
-    await expect(skeleton).toBeVisible();
-    release(undefined);
-    await expect(skeleton).toBeHidden();
-  });
-
-  test("follow-list-6: 一度表示した一覧に戻ると、読み込み直しを待たずに前回の一覧を表示する", async ({
+  test("follow-list-e4: 一度表示した一覧に戻ると、読み込み直しを待たずに前回の一覧を表示する", async ({
     page,
   }) => {
     const bob = page
@@ -124,18 +88,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(bob).toBeVisible();
   });
 
-  test("follow-list-7: フォロワー一覧に「すべて」と「メンバー」のタブを表示し、「メンバー」には人数を添える", async ({
-    page,
-  }) => {
-    await page.goto("/bob.test/followers");
-
-    await expect(page.getByRole("tab", { name: "すべて" })).toBeVisible();
-    await expect(
-      page.getByRole("tab", { name: /^メンバー \d+$/ }),
-    ).toBeVisible();
-  });
-
-  test("follow-list-8: 「メンバー」タブ（`?filter=registered`）には、そのアカウントをフォローしているメンバーだけを一覧表示する", async ({
+  test("follow-list-e5: 「メンバー」タブ（`?filter=registered`）には、そのアカウントをフォローしているメンバーだけを一覧表示する", async ({
     page,
   }) => {
     await page.goto("/bob.test/followers");
@@ -153,7 +106,7 @@ test.describe("フォロー・フォロワー", () => {
     }).toPass();
   });
 
-  test("follow-list-9: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「メンバー」タブに移動する", async ({
+  test("follow-list-e6: アカウント一覧の追跡アカウントの「n人からフォロー」を押すと、そのアカウントのフォロワー一覧の「メンバー」タブに移動する", async ({
     page,
   }) => {
     const link = page
@@ -171,7 +124,7 @@ test.describe("フォロー・フォロワー", () => {
     await expect(page).toHaveURL(/\/followers\?filter=registered$/);
   });
 
-  test("follow-list-10: 見出しを「{名前}のフォロー」「{名前}のフォロワー」とし、戻るボタンでそのアカウントのプロフィール全体ページに移動する", async ({
+  test("follow-list-e7: 見出しを「{名前}のフォロー」「{名前}のフォロワー」とし、戻るボタンでそのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     await page.goto("/alice.test/follows");
@@ -182,17 +135,5 @@ test.describe("フォロー・フォロワー", () => {
     await page.getByRole("link", { name: "戻る" }).click();
 
     await expect(page).toHaveURL("/alice.test");
-  });
-
-  test("follow-list-11: 読み込みが終わって0件のときは、フォロー一覧には「フォローしているアカウントはありません」、フォロワー一覧には「フォロワーはいません」を表示する", async ({
-    page,
-  }) => {
-    await page.goto("/bob.test/follows");
-    await expect(
-      page.getByText("フォローしているアカウントはありません"),
-    ).toBeVisible();
-
-    await page.goto("/alice.test/followers");
-    await expect(page.getByText("フォロワーはいません")).toBeVisible();
   });
 });
