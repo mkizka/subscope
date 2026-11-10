@@ -214,7 +214,7 @@ export const HistoryRemove: Story = {
 };
 
 export const Skeleton: Story = {
-  name: "layout-s11: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す",
+  name: "layout-s12: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す",
   tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["timeline"] });
@@ -238,7 +238,7 @@ export const Skeleton: Story = {
 };
 
 export const TabBarIconOnly: Story = {
-  name: "layout-s12: モバイルでは、下のタブにラベル文字を出さず、アイコンだけを表示する",
+  name: "layout-s13: モバイルでは、下のタブにラベル文字を出さず、アイコンだけを表示する",
   tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
@@ -251,7 +251,7 @@ export const TabBarIconOnly: Story = {
 };
 
 export const StackingOrder: Story = {
-  name: "layout-s13: 重なり順は下から、本文・埋め込み、浮かせた表示、固定の見出し、固定の下タブ、検索候補の順にする",
+  name: "layout-s14: 重なり順は下から、本文・埋め込み、浮かせた表示、固定の見出し、固定の下タブ、検索候補の順にする",
   tags: ["play"],
   globals: mobile,
   play: async ({ canvasElement }) => {
@@ -264,5 +264,29 @@ export const StackingOrder: Story = {
 
     await expect(header).toBeGreaterThan(0);
     await expect(tabs).toBeGreaterThan(header);
+  },
+};
+
+export const TabsPinnedOnScroll: Story = {
+  name: "layout-s10: モバイルでは、タブのあるページ（タイムライン・プロフィール・サーバーなど）は、ヘッダーを隠すとタブだけを画面上端に残し、ヘッダーの再表示と同時にタブをその下へ戻す",
+  tags: ["play"],
+  globals: mobile,
+  play: async ({ canvasElement }) => {
+    const main = canvasElement.querySelector("main");
+    main?.style.setProperty("min-height", "3000px");
+    const tab = within(canvasElement).getByRole("tab", { name: "フォロー中" });
+    const menu = within(canvasElement).getByRole("button", {
+      name: "メニューを開く",
+    });
+    window.scrollTo(0, 1000);
+    await waitFor(() =>
+      expect(menu.closest("header")?.dataset.visible).toBe("false"),
+    );
+    await waitFor(() => expect(tab.getBoundingClientRect().y).toBeLessThan(56));
+    await expect(tab.getBoundingClientRect().bottom).toBeGreaterThan(0);
+    window.scrollTo(0, 900);
+    await waitFor(() =>
+      expect(tab.getBoundingClientRect().y).toBeGreaterThanOrEqual(56),
+    );
   },
 };

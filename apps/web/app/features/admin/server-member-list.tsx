@@ -95,28 +95,26 @@ export function ServerMemberList({
     tab === "banned" ? bannedAccounts.length === 0 : serverMembers.length === 0;
   return (
     <>
-      <div className="sticky top-0 z-sticky bg-surface">
-        <div className="flex items-baseline gap-2 px-4 py-3">
-          <h1 className="text-title">アカウント管理</h1>
-          {total !== undefined && (
-            <span className="text-label text-muted">{total}人</span>
-          )}
-        </div>
-        <Tabs
-          tabs={[
-            {
-              to: "/admin/registered-accounts",
-              label: "メンバー",
-              selected: tab === "serverMembers",
-            },
-            {
-              to: "/admin/registered-accounts?tab=banned",
-              label: "停止中",
-              selected: tab === "banned",
-            },
-          ]}
-        />
+      <div className="flex items-baseline gap-2 px-4 py-3">
+        <h1 className="text-title">アカウント管理</h1>
+        {total !== undefined && (
+          <span className="text-label text-muted">{total}人</span>
+        )}
       </div>
+      <Tabs
+        tabs={[
+          {
+            to: "/admin/registered-accounts",
+            label: "メンバー",
+            selected: tab === "serverMembers",
+          },
+          {
+            to: "/admin/registered-accounts?tab=banned",
+            label: "停止中",
+            selected: tab === "banned",
+          },
+        ]}
+      />
       {!isLoading && isEmpty && (
         <p className="py-8 text-center text-label text-muted">
           {tab === "banned"

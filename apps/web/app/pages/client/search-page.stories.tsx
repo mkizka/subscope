@@ -233,7 +233,7 @@ export const HistoryClosesOnSearch: Story = {
 };
 
 export const NoSidebarSearch: Story = {
-  name: "layout-s10: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない",
+  name: "layout-s11: `/search` では、中央に検索欄があるため右カラムの検索ボックスを表示しない",
   tags: ["play"],
   globals: { viewport: { value: "desktop" } },
   play: async ({ canvasElement }) => {

@@ -8,21 +8,13 @@ export function TimelinePage({ local }: { local: boolean }) {
   const reloadTimeline = useReloadTimeline();
   return (
     <ThreeColumnLayout>
-      <div
-        className="
-          sticky top-14 z-sticky bg-surface transition-transform
-          lg:top-0
-          max-lg:[header[data-visible=false]~&]:-translate-y-14
-        "
-      >
-        <Tabs
-          onSelect={reloadTimeline}
-          tabs={[
-            { to: "/", label: "フォロー中", selected: !local },
-            { to: "/?tab=local", label: "ローカル", selected: local },
-          ]}
-        />
-      </div>
+      <Tabs
+        onSelect={reloadTimeline}
+        tabs={[
+          { to: "/", label: "フォロー中", selected: !local },
+          { to: "/?tab=local", label: "ローカル", selected: local },
+        ]}
+      />
       {!local && <BackfillBannerContainer />}
       <TimelineFeedContainer local={local} />
     </ThreeColumnLayout>
