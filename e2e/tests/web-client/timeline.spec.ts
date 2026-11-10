@@ -121,7 +121,7 @@ test.describe("タイムライン", () => {
     await expect(page.getByText(text)).toBeVisible();
   });
 
-  test("timeline-e8: 表示中は60秒ごとに投稿を自動で読み込み直し、読み込み中は一覧の上部に、スピナー付きの「更新中」の表示を投稿の上、上部のタブの下に重ねて浮かせる", async ({
+  test("timeline-e8: 表示中は60秒ごとに投稿を自動で読み込み直し、読み込み中は一覧の上部に、スピナー付きの「更新中」の表示を投稿の上、上部のタブの下に重ねて浮かせ、スクロールしても画面上の位置を変えない", async ({
     page,
     request,
   }) => {
@@ -147,6 +147,13 @@ test.describe("タイムライン", () => {
     await page.clock.fastForward(60_000);
 
     await expect(spinner).toBeVisible();
+    await page.addStyleTag({ content: "main { min-height: 3000px }" });
+    const topBefore = (await spinner.boundingBox())?.y;
+    await page.mouse.wheel(0, 300);
+    await expect(async () => {
+      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+    }).toPass();
+    expect((await spinner.boundingBox())?.y).toBe(topBefore);
     const z = (selector: string) =>
       page
         .locator(selector)
