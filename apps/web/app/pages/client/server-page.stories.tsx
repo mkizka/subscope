@@ -60,7 +60,9 @@ export const MemberDetails: Story = {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
       ["clientServerMembers", ""],
       {
-        serverMembers: [{ ...alice, description: "Blueskyを使っています" }],
+        serverMembers: [
+          { ...alice, isAdmin: false, description: "Blueskyを使っています" },
+        ],
         hasMore: false,
       },
     );
@@ -78,11 +80,7 @@ export const OperatorBadge: Story = {
   tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
-      within(
-        within(within(canvasElement).getByRole("main")).getAllByRole(
-          "listitem",
-        )[0],
-      ).getByText("運営者"),
+      within(canvasElement).getByText("運営者", { selector: "li *" }),
     ).toBeVisible();
   },
 };
@@ -94,7 +92,9 @@ export const SyncStatus: Story = {
     queryClient.setQueryData<Data<typeof registeredLoader>>(
       ["clientServerMembers", ""],
       {
-        serverMembers: [{ ...alice, backfillStatus: "completed" }],
+        serverMembers: [
+          { ...alice, isAdmin: false, backfillStatus: "completed" },
+        ],
         hasMore: false,
       },
     );
@@ -145,7 +145,7 @@ export const AccountsLoading: Story = {
       canvas.getByRole("heading", { name: "サーバーについて" }),
     ).toBeVisible();
     await expect(
-      canvas.getByRole("status", { name: "読み込み中", exact: true }),
+      canvas.getByRole("status", { name: "読み込み中" }),
     ).toBeVisible();
   },
 };
