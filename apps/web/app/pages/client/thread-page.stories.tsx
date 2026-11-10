@@ -118,10 +118,12 @@ export const Loading: Story = {
   tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["thread", alice.handle] });
-    void queryClient.query({
-      queryKey: ["thread", alice.handle, "selected"],
-      queryFn: () => new Promise<never>(() => {}),
-    });
+    queryClient
+      .query({
+        queryKey: ["thread", alice.handle, "selected"],
+        queryFn: () => new Promise<never>(() => {}),
+      })
+      .catch(() => {});
   },
   play: async ({ canvasElement }) => {
     await expect(
@@ -129,5 +131,38 @@ export const Loading: Story = {
         name: "読み込み中",
       }),
     ).toBeVisible();
+  },
+};
+
+export const QuotedFeed: Story = {
+  name: "quote-s9: スレッドで選んだ投稿がフィードジェネレーターを引用している場合も、quote-s7と同じ枠を表示する",
+  tags: ["play"],
+  beforeEach: () => {
+    queryClient.setQueryData<Data<typeof threadLoader>>(
+      ["thread", alice.handle, "selected"],
+      {
+        ancestors: [],
+        post: {
+          uri: "at://a/2",
+          cid: "bafyexample",
+          authorDisplayName: alice.displayName,
+          authorHandle: alice.handle,
+          text: "選んだ投稿です",
+          createdAt: new Date().toISOString(),
+          quotedFeed: {
+            displayName: "フィード名",
+            creatorHandle: alice.handle,
+            description: "フィードの説明",
+          },
+        },
+        replies: [],
+      },
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const quote = within(canvasElement).getByRole("blockquote");
+    await expect(quote).toHaveTextContent("フィード名");
+    await expect(quote).toHaveTextContent("@alice.bsky.social");
+    await expect(quote).toHaveTextContent("フィードの説明");
   },
 };

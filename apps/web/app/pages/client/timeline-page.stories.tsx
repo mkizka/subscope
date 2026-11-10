@@ -77,6 +77,165 @@ export const LongText: Story = {
   },
 };
 
+const svg = (color: string) =>
+  `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23${color}'/%3E%3C/svg%3E`;
+
+const viewerPost = (alts: string[]) => ({
+  uri: "at://did:plc:alice/app.bsky.feed.post/images",
+  cid: "bafyimages",
+  authorHandle: "alice.bsky.social",
+  authorDisplayName: "Alice",
+  text: "画像つきの投稿",
+  replyCount: 0,
+  repostCount: 0,
+  likeCount: 0,
+  createdAt: new Date().toISOString(),
+  images: alts.map((alt, i) => ({
+    thumb: svg(`d9775${i}`),
+    fullsize: svg(`d9775${i}`),
+    alt,
+  })),
+});
+
+const withImages =
+  (alts: string[]): Story["beforeEach"] =>
+  () => {
+    queryClient.setQueryData(
+      ["timeline"],
+      infinite<typeof timelineLoader>({ posts: [viewerPost(alts)] }),
+    );
+  };
+
+const openViewer = async (canvasElement: HTMLElement, alt: string) => {
+  await userEvent.click(
+    await within(canvasElement).findByRole("button", { name: alt }),
+  );
+  return within(await screen.findByRole("dialog", { name: "画像の拡大表示" }));
+};
+
+export const ImageViewerOpen: Story = {
+  name: "image-viewer-s1: 投稿画像を選ぶと、スレッドは開かずに元サイズの画像を拡大して表示する",
+  tags: ["play"],
+  beforeEach: withImages(["画像"]),
+  play: async ({ canvasElement }) => {
+    const viewer = await openViewer(canvasElement, "画像");
+
+    await expect(viewer.getByRole("img")).toHaveAttribute("src", svg("d97750"));
+  },
+};
+
+export const ImageViewerNavigate: Story = {
+  name: "image-viewer-s2: 画像が複数あるときは、前後の画像に切り替えられる",
+  tags: ["play"],
+  beforeEach: withImages(["画像1", "画像2"]),
+  play: async ({ canvasElement }) => {
+    const viewer = await openViewer(canvasElement, "画像1");
+
+    await userEvent.click(viewer.getByRole("button", { name: "次の画像" }));
+    await waitFor(() =>
+      expect(viewer.getByRole("img", { name: "画像2" })).toBeInTheDocument(),
+    );
+    await userEvent.click(viewer.getByRole("button", { name: "前の画像" }));
+    await waitFor(() =>
+      expect(viewer.getByRole("img", { name: "画像1" })).toBeInTheDocument(),
+    );
+  },
+};
+
+export const ImageViewerAlt: Story = {
+  name: "image-viewer-s3: 拡大した画像の下にALTを表示する",
+  tags: ["play"],
+  beforeEach: withImages(["ALTの文章"]),
+  play: async ({ canvasElement }) => {
+    const viewer = await openViewer(canvasElement, "ALTの文章");
+
+    await waitFor(() => expect(viewer.getByText("ALTの文章")).toBeVisible());
+  },
+};
+
+export const ImageViewerClose: Story = {
+  name: "image-viewer-s4: 閉じるボタンかEscキーで閉じる",
+  tags: ["play"],
+  beforeEach: withImages(["画像"]),
+  play: async ({ canvasElement }) => {
+    const viewer = await openViewer(canvasElement, "画像");
+    const dialog = () =>
+      screen.queryByRole("dialog", { name: "画像の拡大表示" });
+
+    await userEvent.click(viewer.getByRole("button", { name: "画像を閉じる" }));
+    await waitFor(() => expect(dialog()).toBeNull());
+    await openViewer(canvasElement, "画像");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog()).toBeNull());
+  },
+};
+
+export const ImageViewerSwipe: Story = {
+  name: "image-viewer-s5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる",
+  tags: ["play"],
+  beforeEach: withImages(["画像1", "画像2"]),
+  play: async ({ canvasElement }) => {
+    const viewer = await openViewer(canvasElement, "画像1");
+    const target = viewer.getByRole("img", { name: "画像1" });
+    const swipe = async (dx: number) => {
+      const init = {
+        pointerId: 1,
+        pointerType: "touch",
+        isPrimary: true,
+        bubbles: true,
+      };
+      await fireEvent.pointerDown(target, {
+        ...init,
+        clientX: 300,
+        clientY: 200,
+        buttons: 1,
+      });
+      await fireEvent.pointerMove(target, {
+        ...init,
+        clientX: 300 + dx / 2,
+        clientY: 200,
+        buttons: 1,
+      });
+      await fireEvent.pointerMove(target, {
+        ...init,
+        clientX: 300 + dx,
+        clientY: 200,
+        buttons: 1,
+      });
+      await fireEvent.pointerUp(target, {
+        ...init,
+        clientX: 300 + dx,
+        clientY: 200,
+      });
+    };
+
+    await swipe(-200);
+    await waitFor(() =>
+      expect(viewer.getByRole("img", { name: "画像2" })).toBeInTheDocument(),
+    );
+    await swipe(200);
+    await waitFor(() =>
+      expect(viewer.getByRole("img", { name: "画像1" })).toBeInTheDocument(),
+    );
+  },
+};
+
+export const ImageViewerZoom: Story = {
+  name: "image-viewer-s6: 拡大表示した画像は、ピンチ操作か拡大ボタンでさらにズームできる",
+  tags: ["play"],
+  beforeEach: withImages(["画像"]),
+  play: async ({ canvasElement }) => {
+    const viewer = await openViewer(canvasElement, "画像");
+    const image = viewer.getByRole("img");
+    const before = image.getBoundingClientRect().width;
+
+    await userEvent.click(viewer.getByRole("button", { name: "拡大" }));
+    await waitFor(() =>
+      expect(image.getBoundingClientRect().width).toBeGreaterThan(before),
+    );
+  },
+};
+
 export const Local: Story = {
   args: { local: true },
   beforeEach: () => {
@@ -488,161 +647,171 @@ export const PostFormAltLimit: Story = {
   },
 };
 
-const svg = (color: string) =>
-  `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23${color}'/%3E%3C/svg%3E`;
+type TimelinePost = Data<typeof timelineLoader>["posts"][number];
 
-const viewerPost = (alts: string[]) => ({
-  uri: "at://did:plc:alice/app.bsky.feed.post/images",
-  cid: "bafyimages",
-  authorHandle: "alice.bsky.social",
-  authorDisplayName: "Alice",
-  text: "画像つきの投稿",
-  replyCount: 0,
-  repostCount: 0,
-  likeCount: 0,
-  createdAt: new Date().toISOString(),
-  images: alts.map((alt, i) => ({
-    thumb: svg(`d9775${i}`),
-    fullsize: svg(`d9775${i}`),
-    alt,
-  })),
-});
+const dot =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E";
+const image = { thumb: dot, fullsize: dot, alt: "画像" };
+const external = {
+  uri: "https://example.com/quote",
+  title: "リンクカードのタイトル",
+  description: "リンクカードの説明",
+};
 
-const withImages =
-  (alts: string[]): Story["beforeEach"] =>
-  () => {
+const quoting = (post: Partial<TimelinePost>): Story => ({
+  beforeEach: () => {
     queryClient.setQueryData(
       ["timeline"],
-      infinite<typeof timelineLoader>({ posts: [viewerPost(alts)] }),
+      infinite<typeof timelineLoader>({
+        posts: [
+          {
+            uri: "at://did:plc:erin/app.bsky.feed.post/1",
+            cid: "bafyquote",
+            authorHandle: "erin.bsky.social",
+            text: "引用した投稿",
+            createdAt: new Date().toISOString(),
+            ...post,
+          },
+        ],
+      }),
     );
-  };
+  },
+});
 
-const openViewer = async (canvasElement: HTMLElement, alt: string) => {
-  await userEvent.click(
-    await within(canvasElement).findByRole("button", { name: alt }),
-  );
-  return within(await screen.findByRole("dialog", { name: "画像の拡大表示" }));
-};
+const quote = (canvasElement: HTMLElement) =>
+  within(canvasElement).getByRole("blockquote");
 
-export const ImageViewerOpen: Story = {
-  name: "image-viewer-s1: 投稿画像を選ぶと、スレッドは開かずに元サイズの画像を拡大して表示する",
+export const QuoteText: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      authorDisplayName: "Alice",
+      text: "引用される投稿",
+    },
+  }),
+  name: "quote-s1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する",
   tags: ["play"],
-  beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
-    const viewer = await openViewer(canvasElement, "画像");
-
-    await expect(viewer.getByRole("img")).toHaveAttribute("src", svg("d97750"));
+    const q = quote(canvasElement);
+    await expect(q).toHaveTextContent("Alice");
+    await expect(q).toHaveTextContent("@alice.bsky.social");
+    await expect(q).toHaveTextContent("引用される投稿");
   },
 };
 
-export const ImageViewerNavigate: Story = {
-  name: "image-viewer-s2: 画像が複数あるときは、前後の画像に切り替えられる",
+export const QuoteWithMedia: Story = {
+  ...quoting({
+    images: [{ ...image, alt: "引用した投稿の画像" }],
+    quote: { authorHandle: "alice.bsky.social", text: "引用される投稿" },
+  }),
+  name: "quote-s2: 画像付きで引用した投稿は、画像と引用している投稿の両方を表示する",
   tags: ["play"],
-  beforeEach: withImages(["画像1", "画像2"]),
   play: async ({ canvasElement }) => {
-    const viewer = await openViewer(canvasElement, "画像1");
-
-    await userEvent.click(viewer.getByRole("button", { name: "次の画像" }));
-    await waitFor(() =>
-      expect(viewer.getByRole("img", { name: "画像2" })).toBeInTheDocument(),
-    );
-    await userEvent.click(viewer.getByRole("button", { name: "前の画像" }));
-    await waitFor(() =>
-      expect(viewer.getByRole("img", { name: "画像1" })).toBeInTheDocument(),
-    );
+    await expect(
+      within(canvasElement).getByRole("img", { name: "引用した投稿の画像" }),
+    ).toBeVisible();
+    await expect(quote(canvasElement)).toHaveTextContent("引用される投稿");
   },
 };
 
-export const ImageViewerAlt: Story = {
-  name: "image-viewer-s3: 拡大した画像の下にALTを表示する",
+export const QuoteImages: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      text: "引用される投稿",
+      images: [{ ...image, alt: "引用される投稿の画像" }],
+    },
+  }),
+  name: "quote-s3: 引用される投稿に付いた画像を、引用した投稿の中に表示する",
   tags: ["play"],
-  beforeEach: withImages(["ALTの文章"]),
   play: async ({ canvasElement }) => {
-    const viewer = await openViewer(canvasElement, "ALTの文章");
-
-    await waitFor(() => expect(viewer.getByText("ALTの文章")).toBeVisible());
+    await expect(
+      within(quote(canvasElement)).getByRole("img", {
+        name: "引用される投稿の画像",
+      }),
+    ).toBeVisible();
   },
 };
 
-export const ImageViewerClose: Story = {
-  name: "image-viewer-s4: 閉じるボタンかEscキーで閉じる",
+export const QuoteAvatar: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      authorAvatar: dot,
+      text: "引用される投稿",
+    },
+  }),
+  name: "quote-s4: 引用されている投稿の投稿者のアバターを、引用した投稿の中に表示する",
   tags: ["play"],
-  beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
-    const viewer = await openViewer(canvasElement, "画像");
-    const dialog = () =>
-      screen.queryByRole("dialog", { name: "画像の拡大表示" });
-
-    await userEvent.click(viewer.getByRole("button", { name: "画像を閉じる" }));
-    await waitFor(() => expect(dialog()).toBeNull());
-    await openViewer(canvasElement, "画像");
-    await userEvent.keyboard("{Escape}");
-    await waitFor(() => expect(dialog()).toBeNull());
-  },
-};
-
-export const ImageViewerSwipe: Story = {
-  name: "image-viewer-s5: 画像が複数あるときは、横スワイプで前後の画像に切り替えられる",
-  tags: ["play"],
-  beforeEach: withImages(["画像1", "画像2"]),
-  play: async ({ canvasElement }) => {
-    const viewer = await openViewer(canvasElement, "画像1");
-    const target = viewer.getByRole("img", { name: "画像1" });
-    const swipe = async (dx: number) => {
-      const init = {
-        pointerId: 1,
-        pointerType: "touch",
-        isPrimary: true,
-        bubbles: true,
-      };
-      await fireEvent.pointerDown(target, {
-        ...init,
-        clientX: 300,
-        clientY: 200,
-        buttons: 1,
-      });
-      await fireEvent.pointerMove(target, {
-        ...init,
-        clientX: 300 + dx / 2,
-        clientY: 200,
-        buttons: 1,
-      });
-      await fireEvent.pointerMove(target, {
-        ...init,
-        clientX: 300 + dx,
-        clientY: 200,
-        buttons: 1,
-      });
-      await fireEvent.pointerUp(target, {
-        ...init,
-        clientX: 300 + dx,
-        clientY: 200,
-      });
-    };
-
-    await swipe(-200);
-    await waitFor(() =>
-      expect(viewer.getByRole("img", { name: "画像2" })).toBeInTheDocument(),
-    );
-    await swipe(200);
-    await waitFor(() =>
-      expect(viewer.getByRole("img", { name: "画像1" })).toBeInTheDocument(),
+    await expect(quote(canvasElement).querySelector("img")).toHaveAttribute(
+      "src",
+      dot,
     );
   },
 };
 
-export const ImageViewerZoom: Story = {
-  name: "image-viewer-s6: 拡大表示した画像は、ピンチ操作か拡大ボタンでさらにズームできる",
+export const QuoteExternal: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      text: "引用される投稿",
+      external,
+    },
+  }),
+  name: "quote-s5: 引用される投稿に付いたリンクカードを、引用した投稿の中に表示する",
   tags: ["play"],
-  beforeEach: withImages(["画像"]),
   play: async ({ canvasElement }) => {
-    const viewer = await openViewer(canvasElement, "画像");
-    const image = viewer.getByRole("img");
-    const before = image.getBoundingClientRect().width;
+    await expect(
+      within(quote(canvasElement)).getByRole("link", {
+        name: /リンクカードのタイトル/,
+      }),
+    ).toHaveAttribute("href", external.uri);
+  },
+};
 
-    await userEvent.click(viewer.getByRole("button", { name: "拡大" }));
-    await waitFor(() =>
-      expect(image.getBoundingClientRect().width).toBeGreaterThan(before),
-    );
+export const QuoteDeleted: Story = {
+  ...quoting({ quoteUnavailable: "notFound" }),
+  name: "quote-s6: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(quote(canvasElement)).toHaveTextContent("削除されました");
+  },
+};
+
+export const QuoteFeed: Story = {
+  ...quoting({
+    quotedFeed: {
+      displayName: "フィード名",
+      creatorHandle: "alice.bsky.social",
+      description: "フィードの説明",
+    },
+  }),
+  name: "quote-s7: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const q = quote(canvasElement);
+    await expect(q).toHaveTextContent("フィード名");
+    await expect(q).toHaveTextContent("@alice.bsky.social");
+    await expect(q).toHaveTextContent("フィードの説明");
+  },
+};
+
+export const QuoteLink: Story = {
+  ...quoting({
+    quote: {
+      authorHandle: "alice.bsky.social",
+      text: "引用される投稿 example.com/quote...",
+      links: [{ byteStart: 22, byteEnd: 42, uri: "https://example.com/full" }],
+    },
+  }),
+  name: "quote-s8: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    await expect(
+      within(quote(canvasElement)).getByRole("link", {
+        name: "example.com/quote...",
+      }),
+    ).toHaveAttribute("href", "https://example.com/full");
   },
 };
