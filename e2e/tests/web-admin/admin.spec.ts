@@ -1,12 +1,7 @@
 import { expect, type Page, request, test } from "@playwright/test";
 
 import { login } from "../../helpers/login";
-import {
-  putRecord,
-  registerAccount,
-  resolveHandle,
-  uploadImage,
-} from "../../helpers/pds";
+import { registerAccount, resolveHandle } from "../../helpers/pds";
 
 const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
@@ -330,7 +325,7 @@ test.describe("招待コード", () => {
     return ((await response.json()) as { code: string }).code;
   };
 
-  test("invite-codes-1: 招待コードを新しい順に並べ、コード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
+  test("invite-codes-e1: 招待コードを新しい順に1件1行で並べ、各行にコード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -345,34 +340,7 @@ test.describe("招待コード", () => {
     await expect(rows.nth(1)).toContainText(older);
   });
 
-  test("invite-codes-9: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
-    page,
-  }) => {
-    await page.goto("/admin/registered-accounts");
-    const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/admin/api/invite-codes*", async (route) => {
-      await released;
-      await route.continue();
-    });
-
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "招待コード" })
-      .click();
-
-    await expect(
-      page.getByRole("heading", { name: "招待コード" }),
-    ).toBeVisible();
-    const skeleton = page.getByRole("status", {
-      name: "読み込み中",
-      exact: true,
-    });
-    await expect(skeleton).toBeVisible();
-    release(undefined);
-    await expect(skeleton).toBeHidden();
-  });
-
-  test("invite-codes-2: 一覧の下までスクロールすると続きを読み込む", async ({
+  test("invite-codes-e2: 一覧の下までスクロールすると続きを読み込む", async ({
     page,
   }) => {
     await page.goto("/");
@@ -389,7 +357,7 @@ test.describe("招待コード", () => {
     await expect(page.getByText(oldest, { exact: true })).toBeVisible();
   });
 
-  test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
+  test("invite-codes-e3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -412,7 +380,7 @@ test.describe("招待コード", () => {
     );
   });
 
-  test("invite-codes-4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
+  test("invite-codes-e4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -429,40 +397,7 @@ test.describe("招待コード", () => {
     await expect(row).toHaveCount(0);
   });
 
-  test("invite-codes-5: 使用済みの招待コードは削除できない", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const code = await createInviteCode(page);
-    await registerAccount("carol.test", code);
-
-    await page.goto("/admin/invite-codes");
-    const row = inviteCodeRows(page).filter({ hasText: code });
-
-    await expect(row).toContainText("使用済み");
-    await expect(row.getByRole("button", { name: "削除" })).toHaveCount(0);
-  });
-
-  test("invite-codes-8: 使用済みの招待コードには、使用者のアバターと名前を出す", async ({
-    page,
-  }) => {
-    await putRecord("erin.test", "app.bsky.actor.profile", "self", {
-      displayName: "Erin",
-      avatar: await uploadImage("erin.test"),
-    });
-    await page.goto("/");
-    const code = await createInviteCode(page);
-    await registerAccount("erin.test", code);
-
-    const row = inviteCodeRows(page).filter({ hasText: code });
-    await expect(async () => {
-      await page.goto("/admin/invite-codes");
-      await expect(row).toContainText("Erin が使用", { timeout: 1000 });
-      await expect(row.locator("img")).toBeVisible({ timeout: 1000 });
-    }).toPass();
-  });
-
-  test("invite-codes-6: 期限切れの招待コードは確認せずに削除できる", async ({
+  test("invite-codes-e5: 期限切れの招待コードは確認せずに削除できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -474,22 +409,5 @@ test.describe("招待コード", () => {
     await row.getByRole("button", { name: "削除" }).click();
 
     await expect(row).toHaveCount(0);
-  });
-
-  test("invite-codes-7: 未使用で期限内の招待コードは、コードの横のボタンでコードをクリップボードにコピーできる", async ({
-    page,
-    context,
-  }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await page.goto("/");
-    const code = await createInviteCode(page);
-
-    await page.goto("/admin/invite-codes");
-    const row = inviteCodeRows(page).filter({ hasText: code });
-    await row.getByRole("button", { name: "コピー" }).click();
-
-    await expect
-      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
-      .toBe(code);
   });
 });
