@@ -11,7 +11,7 @@ import {
 const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-e1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -24,7 +24,7 @@ test.describe("管理画面へのアクセス", () => {
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
   });
 
-  test("admin-2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
+  test("admin-e2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
     page,
     browser,
   }) => {
