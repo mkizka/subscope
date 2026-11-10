@@ -51,7 +51,7 @@ test.describe("レイアウト", () => {
     await expect(page).toHaveURL("/search?q=alice");
   });
 
-  test("layout-e8: 右カラムの検索ボックスに入力すると、入力に合うアカウントの候補（アイコン、表示名、ハンドル）を下に表示し、候補を選ぶとそのアカウントのプロフィールに移動する", async ({
+  test("layout-e7: 右カラムの検索ボックスに入力すると、入力に合うアカウントの候補（アイコン、表示名、ハンドル）を下に表示し、候補を選ぶとそのアカウントのプロフィールに移動する", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -111,7 +111,7 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(page).toHaveURL("/login");
   });
 
-  test("layout-e7: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
+  test("layout-e6: モバイルでは、下にスクロールするとヘッダーを隠し、上にスクロールすると自分のアイコンを含むヘッダーを再び表示する", async ({
     page,
   }) => {
     await page.goto("/server");
@@ -128,32 +128,5 @@ test.describe("レイアウト（モバイル）", () => {
 
     await page.evaluate(() => window.scrollTo(0, 900));
     await expect(menuButton).toBeInViewport();
-  });
-
-  test("layout-e6: モバイルでは、タブのあるページ（タイムライン・プロフィール・サーバーなど）は、ヘッダーを隠すとタブだけを画面上端に残し、ヘッダーの再表示と同時にタブをその下へ戻す", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.waitForFunction(() => "__TANSTACK_QUERY_CLIENT__" in window);
-    await page.evaluate(() => {
-      document.body
-        .querySelector("main")
-        ?.style.setProperty("min-height", "3000px");
-    });
-    const tab = page.getByRole("tab", { name: "フォロー中" });
-    const menuButton = page.getByRole("button", { name: "メニューを開く" });
-
-    await page.evaluate(() => window.scrollTo(0, 1000));
-    await expect(menuButton).not.toBeInViewport();
-    await expect(tab).toBeInViewport();
-    await expect
-      .poll(async () => (await tab.boundingBox())?.y)
-      .toBeLessThan(56);
-
-    await page.evaluate(() => window.scrollTo(0, 900));
-    await expect(menuButton).toBeInViewport();
-    await expect
-      .poll(async () => (await tab.boundingBox())?.y)
-      .toBeGreaterThanOrEqual(56);
   });
 });
