@@ -47,7 +47,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("ジョブキュー", () => {
-  test("bull-board-1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
+  test("bull-board-e1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
     page,
   }) => {
     await page.goto("/");
@@ -62,7 +62,7 @@ test.describe("ジョブキュー", () => {
     await expect(popup).toHaveURL(/\/admin\/bull-board/);
   });
 
-  test("bull-board-2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
+  test("bull-board-e2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -86,7 +86,7 @@ test.describe("ジョブキュー", () => {
     });
   });
 
-  test("bull-board-3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
+  test("bull-board-e3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
