@@ -127,7 +127,6 @@ export const Loading: Story = {
     await expect(
       within(canvasElement).getByRole("status", {
         name: "読み込み中",
-        exact: true,
       }),
     ).toBeVisible();
   },
