@@ -371,8 +371,8 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 
 ブラウザやOSのホーム画面にアプリとしてインストールできるようにする。Service Workerは使わず、オフライン動作やプッシュ通知には対応しない。
 
-- pwa-1: Web App Manifestで、名前・アイコン・`display: standalone`・`start_url`・DESIGN.mdのsurfaceに合わせたテーマ色を宣言する
-- pwa-2: すべてのページのheadでManifestとapple-touch-iconを参照する
+- pwa-e1: Web App Manifestで、名前・アイコン・`display: standalone`・`start_url`・DESIGN.mdのsurfaceに合わせたテーマ色を宣言する
+- pwa-e2: すべてのページのheadでManifestとapple-touch-iconを参照する
 
 ## サーバー
 
