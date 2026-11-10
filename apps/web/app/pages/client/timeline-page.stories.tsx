@@ -85,7 +85,6 @@ const external = {
 };
 
 const quoting = (post: Partial<TimelinePost>): Story => ({
-  tags: ["play"],
   beforeEach: () => {
     queryClient.setQueryData(
       ["timeline"],
@@ -117,6 +116,7 @@ export const QuoteText: Story = {
     },
   }),
   name: "quote-s1: 引用している投稿の投稿者名と本文を、引用した投稿の中に表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     const q = quote(canvasElement);
     await expect(q).toHaveTextContent("Alice");
@@ -131,6 +131,7 @@ export const QuoteWithMedia: Story = {
     quote: { authorHandle: "alice.bsky.social", text: "引用される投稿" },
   }),
   name: "quote-s2: 画像付きで引用した投稿は、画像と引用している投稿の両方を表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(canvasElement).getByRole("img", { name: "引用した投稿の画像" }),
@@ -148,6 +149,7 @@ export const QuoteImages: Story = {
     },
   }),
   name: "quote-s3: 引用される投稿に付いた画像を、引用した投稿の中に表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(quote(canvasElement)).getByRole("img", {
@@ -166,6 +168,7 @@ export const QuoteAvatar: Story = {
     },
   }),
   name: "quote-s4: 引用されている投稿の投稿者のアバターを、引用した投稿の中に表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(quote(canvasElement).querySelector("img")).toHaveAttribute(
       "src",
@@ -183,6 +186,7 @@ export const QuoteExternal: Story = {
     },
   }),
   name: "quote-s5: 引用される投稿に付いたリンクカードを、引用した投稿の中に表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(quote(canvasElement)).getByRole("link", {
@@ -195,6 +199,7 @@ export const QuoteExternal: Story = {
 export const QuoteDeleted: Story = {
   ...quoting({ quoteUnavailable: "notFound" }),
   name: "quote-s6: 引用される投稿が削除されている場合は、削除されたことを示す枠を引用した投稿の中に表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(quote(canvasElement)).toHaveTextContent("削除されました");
   },
@@ -209,6 +214,7 @@ export const QuoteFeed: Story = {
     },
   }),
   name: "quote-s7: フィードジェネレーターを引用した投稿は、フィード名・作成者・説明を枠で囲んで表示する",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     const q = quote(canvasElement);
     await expect(q).toHaveTextContent("フィード名");
@@ -226,6 +232,7 @@ export const QuoteLink: Story = {
     },
   }),
   name: "quote-s8: 引用される投稿の本文は、通常の投稿と同じくfacetsでリンクが付いた範囲をリンクにする",
+  tags: ["play"],
   play: async ({ canvasElement }) => {
     await expect(
       within(quote(canvasElement)).getByRole("link", {
