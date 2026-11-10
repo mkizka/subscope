@@ -132,10 +132,12 @@ export const AccountsLoading: Story = {
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["clientServerMembers"] });
     queryClient.removeQueries({ queryKey: ["trackedAccounts"] });
-    void queryClient.query({
-      queryKey: ["clientServerMembers", ""],
-      queryFn: () => new Promise<never>(() => {}),
-    });
+    void queryClient
+      .query({
+        queryKey: ["clientServerMembers", ""],
+        queryFn: () => new Promise<never>(() => {}),
+      })
+      .catch(() => {});
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -170,10 +172,12 @@ export const ServerInfoLoading: Story = {
   tags: ["play"],
   beforeEach: () => {
     queryClient.removeQueries({ queryKey: ["server"] });
-    void queryClient.query({
-      queryKey: ["server"],
-      queryFn: () => new Promise<never>(() => {}),
-    });
+    void queryClient
+      .query({
+        queryKey: ["server"],
+        queryFn: () => new Promise<never>(() => {}),
+      })
+      .catch(() => {});
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
