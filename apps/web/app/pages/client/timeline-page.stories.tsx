@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import {
-  alice,
-  type Data,
-  infinite,
-  queryClient,
-} from "@/.storybook/query-client";
+import { type Data, infinite, queryClient } from "@/.storybook/query-client";
+import { ComposeProvider } from "@/app/features/post/post-form-container";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
 import type { loader as backfillStatusLoader } from "@/app/routes/api.backfill-status";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
@@ -23,6 +19,13 @@ const meta = {
     );
   },
   component: TimelinePage,
+  decorators: [
+    (Story) => (
+      <ComposeProvider>
+        <Story />
+      </ComposeProvider>
+    ),
+  ],
   args: { local: false },
   parameters: {
     layout: "fullscreen",
@@ -261,242 +264,219 @@ export const QuotedVideo: Story = {
   },
 };
 
-const desktop = { viewport: { value: "desktop" } };
-const mobile = { viewport: { value: "mobile1" } };
+const png = (name: string) =>
+  new File(
+    [
+      Uint8Array.from(
+        atob(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        ),
+        (c) => c.charCodeAt(0),
+      ),
+    ],
+    name,
+    { type: "image/png" },
+  );
 
-const sideNav = (canvasElement: HTMLElement) =>
-  within(within(canvasElement).getByRole("navigation"));
-
-const tabBar = (canvasElement: HTMLElement) =>
-  within(within(canvasElement).getByRole("navigation", { name: "タブバー" }));
-
-const rightColumn = (canvasElement: HTMLElement) => {
-  const aside = within(canvasElement).getAllByRole("complementary").at(-1);
-  if (!aside) throw new Error("右カラムがありません");
-  return within(aside);
+const openCompose = async (canvasElement: HTMLElement) => {
+  const [button] = within(canvasElement).getAllByRole("button", {
+    name: "新規投稿",
+  });
+  if (!button) throw new Error("no button");
+  await userEvent.click(button);
+  return within(canvasElement).findByRole("dialog");
 };
 
-export const SideNavCurrent: Story = {
-  name: "layout-s1: 左カラムのメニューで、今いるページの項目を強調する",
-  tags: ["play"],
-  globals: desktop,
-  play: async ({ canvasElement }) => {
-    const nav = sideNav(canvasElement);
+const openComposeFromPost = async (
+  canvasElement: HTMLElement,
+  button: string,
+) => {
+  const canvas = within(canvasElement);
+  const [post] = await canvas.findAllByRole("article");
+  if (!post) throw new Error("no post");
+  await userEvent.click(within(post).getByRole("button", { name: button }));
+  return canvas.findByRole("dialog");
+};
 
-    await expect(nav.getByRole("link", { name: "ホーム" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-    await expect(nav.getByRole("link", { name: "通知" })).not.toHaveAttribute(
-      "aria-current",
-    );
+const addImages = async (dialogElement: HTMLElement, count: number) => {
+  const dialog = within(dialogElement);
+  await userEvent.upload(
+    dialog.getByLabelText("画像を追加"),
+    Array.from({ length: count }, (_, i) => png(`${i + 1}.png`)),
+  );
+};
+
+const writeAlt = async (dialogElement: HTMLElement, n: number, alt: string) => {
+  const dialog = within(dialogElement);
+  await userEvent.click(
+    dialog.getByRole("button", { name: `画像${n}のALTを編集` }),
+  );
+  const altDialog = within(
+    await dialog.findByRole("dialog", { name: "ALTを追加" }),
+  );
+  await userEvent.type(altDialog.getByRole("textbox", { name: "ALT" }), alt);
+  await userEvent.click(altDialog.getByRole("button", { name: "完了" }));
+};
+
+export const PostFormTextLimit: Story = {
+  name: "post-form-s1: 300字を超えると投稿できない",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const dialog = within(await openCompose(canvasElement));
+    const textbox = dialog.getByRole("textbox", { name: "投稿内容" });
+    const submit = dialog.getByRole("button", { name: /^投稿$/ });
+
+    await userEvent.click(textbox);
+    await userEvent.paste("あ".repeat(300));
+    await expect(submit).toBeEnabled();
+    await userEvent.type(textbox, "あ");
+    await expect(submit).toBeDisabled();
   },
 };
 
-export const SideNavHandle: Story = {
-  name: "layout-s2: 左カラムのアカウント欄に、自分のハンドルを表示する",
+export const PostFormImageLimit: Story = {
+  name: "post-form-s2: 画像は4枚まで添付できる",
   tags: ["play"],
-  globals: desktop,
   play: async ({ canvasElement }) => {
+    const dialogElement = await openCompose(canvasElement);
+    const dialog = within(dialogElement);
+
+    await addImages(dialogElement, 4);
+
     await expect(
-      sideNav(canvasElement).getByText(`@${alice.handle}`),
+      dialog.getAllByRole("button", { name: /のALTを編集$/ }),
+    ).toHaveLength(4);
+    await expect(dialog.getByLabelText("画像を追加")).toBeDisabled();
+  },
+};
+
+export const PostFormAuthor: Story = {
+  name: "post-form-s3: 入力欄に添えて、自分のアイコン・名前・ハンドルを表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const dialog = within(await openCompose(canvasElement));
+
+    await expect(dialog.getByText("@alice.bsky.social")).toBeVisible();
+  },
+};
+
+export const PostFormReply: Story = {
+  name: "post-form-s4: 返信するときは、自分の名前の上に返信先の投稿の投稿者名・ハンドル・本文を表示し、投稿ボタンを「返信」にする",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const dialog = within(await openComposeFromPost(canvasElement, "返信"));
+    const target = dialog.getByRole("article", { name: "返信先" });
+
+    await expect(target).toHaveTextContent("Alice");
+    await expect(target).toHaveTextContent("@alice.bsky.social");
+    await expect(target).toHaveTextContent(
+      "こんにちは！今日はいい天気ですね。",
+    );
+    await expect(dialog.getByRole("button", { name: /^返信$/ })).toBeVisible();
+  },
+};
+
+export const PostFormQuote: Story = {
+  name: "post-form-s5: 引用するときは、入力欄の下に引用先の投稿の投稿者名と本文を枠で囲んで表示する",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const dialog = within(await openComposeFromPost(canvasElement, "引用"));
+    const quote = dialog.getByRole("blockquote");
+
+    await expect(quote).toHaveTextContent("Alice");
+    await expect(quote).toHaveTextContent("こんにちは！今日はいい天気ですね。");
+  },
+};
+
+export const PostFormReplyRules: Story = {
+  name: "post-form-s6: 返信できる人の設定は、入力欄の下にある今の設定を示すボタン(「誰でも返信できます」など)を押して選ぶ",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const dialog = within(await openCompose(canvasElement));
+
+    await expect(dialog.queryByRole("radio", { name: "返信不可" })).toBeNull();
+    await userEvent.click(
+      dialog.getByRole("button", { name: "誰でも返信できます" }),
+    );
+    await userEvent.click(dialog.getByRole("radio", { name: "返信不可" }));
+    await expect(
+      dialog.getByRole("button", { name: "返信不可" }),
     ).toBeVisible();
   },
 };
 
-export const ServerCard: Story = {
-  name: "layout-s3: 右カラムに、見出し「サーバーについて」と「SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。」を出したカードを表示し、カード全体を `/server` へのリンクにする",
+export const PostFormReplyHidesRules: Story = {
+  name: "post-form-s7: 返信するときは、返信できる人の設定を表示しない",
   tags: ["play"],
-  globals: desktop,
   play: async ({ canvasElement }) => {
-    const card = rightColumn(canvasElement).getByRole("link", {
-      name: /サーバーについて/,
-    });
+    const dialog = within(await openComposeFromPost(canvasElement, "返信"));
 
-    await expect(card).toHaveTextContent(
-      "SubscopeはBlueskyでフォローしている人の投稿だけが流れる分散SNSです。",
-    );
-    await expect(card).toHaveAttribute("href", "/server");
+    await expect(dialog.getByRole("button", { name: /^返信$/ })).toBeVisible();
+    await expect(
+      dialog.queryByRole("button", { name: "誰でも返信できます" }),
+    ).toBeNull();
   },
 };
 
-export const TabBarCurrent: Story = {
-  name: "layout-s4: モバイルでは、下のタブで今いるページの項目を強調する",
+export const PostFormMobile: Story = {
+  name: "post-form-s8: モバイルでは、ソフトウェアキーボードで入力欄が隠れないよう、投稿欄を画面の上寄せで開く",
   tags: ["play"],
-  globals: mobile,
+  globals: { viewport: { value: "mobile1" } },
   play: async ({ canvasElement }) => {
-    const tabs = tabBar(canvasElement);
-
-    await expect(tabs.getByRole("link", { name: "ホーム" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-    await expect(tabs.getByRole("link", { name: "検索" })).not.toHaveAttribute(
-      "aria-current",
-    );
-  },
-};
-
-const openDrawer = async (canvasElement: HTMLElement) => {
-  await userEvent.click(
-    within(canvasElement).getByRole("button", { name: "メニューを開く" }),
-  );
-  return within(
-    within(canvasElement).getByRole("dialog", { name: "メニュー" }),
-  );
-};
-
-export const DrawerItems: Story = {
-  name: "layout-s5: モバイルのドロワーには、PCの左カラムと同じメニュー項目を並べる",
-  tags: ["play"],
-  globals: mobile,
-  play: async ({ canvasElement }) => {
-    const pcItems = [...canvasElement.querySelectorAll("aside nav a")].map(
-      (a) => a.textContent,
-    );
-
-    const drawer = await openDrawer(canvasElement);
-
-    await expect(drawer.getAllByRole("link").map((a) => a.textContent)).toEqual(
-      pcItems,
-    );
-  },
-};
-
-export const ServerMenu: Story = {
-  name: "layout-s6: 左カラムとモバイルのドロワーのメニューの「サーバー」から `/server` に移動できる",
-  tags: ["play"],
-  globals: mobile,
-  play: async ({ canvasElement }) => {
-    const drawer = await openDrawer(canvasElement);
+    await openCompose(canvasElement);
 
     await expect(
-      drawer.getByRole("link", { name: "サーバー" }),
-    ).toHaveAttribute("href", "/server");
+      within(canvasElement)
+        .getByRole("dialog", { name: "新規投稿" })
+        .getBoundingClientRect().y,
+    ).toBeLessThan(50);
+  },
+};
+
+export const PostFormAltBadge: Story = {
+  name: "post-form-s9: 添付した画像には、ALTが未入力なら「+ ALT」、入力済みなら「ALT」のバッジを重ね、押すとその画像のALTを入力するダイアログを開く",
+  tags: ["play"],
+  play: async ({ canvasElement }) => {
+    const dialogElement = await openCompose(canvasElement);
+    const dialog = within(dialogElement);
+    await addImages(dialogElement, 2);
+    const badge = (n: number) =>
+      dialog.getByRole("button", { name: `画像${n}のALTを編集` });
+    await expect(badge(1)).toHaveTextContent("+ ALT");
+
+    await writeAlt(dialogElement, 1, "post-form-s9");
+
+    await expect(badge(1)).toHaveTextContent(/^ALT$/);
+    await expect(badge(2)).toHaveTextContent("+ ALT");
+    await userEvent.click(badge(1));
     await expect(
-      canvasElement.querySelector('aside nav a[href="/server"]'),
-    ).not.toBeNull();
+      dialog
+        .getByRole("dialog", { name: "ALTを追加" })
+        .querySelector("textarea, input"),
+    ).toHaveValue("post-form-s9");
   },
 };
 
-const seedHistory = (words: string[]): (() => void) => {
-  localStorage.setItem("search-history", JSON.stringify(words));
-  return () => localStorage.removeItem("search-history");
-};
-
-const openHistory = async (canvasElement: HTMLElement) => {
-  await userEvent.click(
-    rightColumn(canvasElement).getByRole("searchbox", { name: "検索語" }),
-  );
-  return rightColumn(canvasElement).findByRole("list", { name: "検索履歴" });
-};
-
-export const HistoryList: Story = {
-  name: "layout-s7: 右カラムの検索ボックスにフォーカスして何も入力していないとき、過去に検索した語を新しい順に最大10件、検索ボックスの下に表示する",
+export const PostFormAltLimit: Story = {
+  name: "post-form-s10: ALTは2000字を超えると保存できない",
   tags: ["play"],
-  globals: desktop,
-  beforeEach: () =>
-    seedHistory(Array.from({ length: 11 }, (_, i) => `word${11 - i}`)),
   play: async ({ canvasElement }) => {
-    const items = within(await openHistory(canvasElement)).getAllByRole(
-      "listitem",
-    );
-
-    await expect(items).toHaveLength(10);
-    await expect(items[0]).toHaveTextContent("word11");
-  },
-};
-
-export const HistorySelect: Story = {
-  name: "layout-s8: 右カラムの履歴の語を選ぶと、その語で検索する",
-  tags: ["play"],
-  globals: desktop,
-  beforeEach: () => seedHistory(["bar", "foo"]),
-  play: async ({ canvasElement }) => {
-    const history = within(await openHistory(canvasElement));
-
-    await expect(history.getByRole("link", { name: "foo" })).toHaveAttribute(
-      "href",
-      "/search?q=foo",
-    );
-  },
-};
-
-export const HistoryRemove: Story = {
-  name: "layout-s9: 右カラムの履歴の語は個別に、または「履歴を全て削除」で全て削除できる",
-  tags: ["play"],
-  globals: desktop,
-  beforeEach: () => seedHistory(["bar", "foo"]),
-  play: async ({ canvasElement }) => {
-    const history = within(await openHistory(canvasElement));
-
-    await userEvent.click(history.getByRole("button", { name: "fooを削除" }));
-    await expect(history.queryByText("foo")).toBeNull();
-    await expect(history.getByText("bar")).toBeVisible();
-
+    const dialogElement = await openCompose(canvasElement);
+    const dialog = within(dialogElement);
+    await addImages(dialogElement, 1);
     await userEvent.click(
-      rightColumn(canvasElement).getByRole("button", {
-        name: "履歴を全て削除",
-      }),
+      dialog.getByRole("button", { name: "画像1のALTを編集" }),
     );
-    await waitFor(() =>
-      expect(
-        rightColumn(canvasElement).queryByRole("list", { name: "検索履歴" }),
-      ).toBeNull(),
+    const altDialog = within(
+      await dialog.findByRole("dialog", { name: "ALTを追加" }),
     );
-  },
-};
+    const textbox = altDialog.getByRole("textbox", { name: "ALT" });
+    const done = altDialog.getByRole("button", { name: "完了" });
 
-export const Skeleton: Story = {
-  name: "layout-s11: スケルトンは、左から右へ光が流れるアニメーションで読み込み中であることを示す",
-  tags: ["play"],
-  beforeEach: () => {
-    queryClient.removeQueries({ queryKey: ["timeline"] });
-    queryClient
-      .query({
-        queryKey: ["timeline"],
-        queryFn: () => new Promise<never>(() => {}),
-      })
-      .catch(() => {});
-  },
-  play: async ({ canvasElement }) => {
-    const skeleton = within(canvasElement)
-      .getByRole("status", { name: "読み込み中" })
-      .querySelector(".skeleton");
-
-    await expect(skeleton).not.toBeNull();
-    await expect(skeleton && getComputedStyle(skeleton).animationName).toBe(
-      "skeleton-shimmer",
-    );
-  },
-};
-
-export const TabBarIconOnly: Story = {
-  name: "layout-s12: モバイルでは、下のタブにラベル文字を出さず、アイコンだけを表示する",
-  tags: ["play"],
-  globals: mobile,
-  play: async ({ canvasElement }) => {
-    const tabs = tabBar(canvasElement);
-
-    await expect(tabs.getByRole("link", { name: "ホーム" })).toBeVisible();
-    await expect(tabs.queryByText("ホーム")).toBeNull();
-    await expect(tabs.queryByText("プロフィール")).toBeNull();
-  },
-};
-
-export const StackingOrder: Story = {
-  name: "layout-s13: 重なり順は下から、本文・埋め込み、浮かせた表示、固定の見出し、固定の下タブ、検索候補の順にする",
-  tags: ["play"],
-  globals: mobile,
-  play: async ({ canvasElement }) => {
-    const z = (el: Element) => Number(getComputedStyle(el).zIndex);
-    const tabsEl = within(canvasElement).getByRole("navigation", {
-      name: "タブバー",
-    });
-    const header = z(within(canvasElement).getByRole("banner"));
-    const tabs = z(tabsEl);
-
-    await expect(header).toBeGreaterThan(0);
-    await expect(tabs).toBeGreaterThan(header);
+    await userEvent.click(textbox);
+    await userEvent.paste("あ".repeat(2000));
+    await expect(done).toBeEnabled();
+    await userEvent.type(textbox, "あ");
+    await expect(done).toBeDisabled();
   },
 };
