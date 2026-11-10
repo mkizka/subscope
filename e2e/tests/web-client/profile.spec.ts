@@ -217,7 +217,7 @@ test.describe("プロフィール", () => {
     );
   });
 
-  test("profile-16: 全体ページの「投稿」タブでは、自分の投稿への自分のリプライ(スレッド)を含め、timeline-13と同じく線で繋げる", async ({
+  test("profile-16: 全体ページの「投稿」タブでは、自分の投稿への自分のリプライ(スレッド)を含め、timeline-s6と同じく線で繋げる", async ({
     page,
   }) => {
     const root = await createRecord("alice.test", "app.bsky.feed.post", {
