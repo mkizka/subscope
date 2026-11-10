@@ -9,7 +9,6 @@ import {
   queryClient,
 } from "@/.storybook/query-client";
 import { ComposeProvider } from "@/app/features/post/post-form-container";
-import type { TimelinePost } from "@/app/features/timeline/timeline-feed";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
 import type { loader as backfillStatusLoader } from "@/app/routes/api.backfill-status";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
@@ -41,6 +40,8 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+type TimelinePost = Data<typeof timelineLoader>["posts"][number];
 
 const setPost = (external: NonNullable<TimelinePost["external"]>) =>
   queryClient.setQueryData(
@@ -651,8 +652,6 @@ export const PostFormAltLimit: Story = {
     await expect(done).toBeDisabled();
   },
 };
-
-type TimelinePost = Data<typeof timelineLoader>["posts"][number];
 
 const dot =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Crect width='1' height='1' fill='%23d97757'/%3E%3C/svg%3E";
