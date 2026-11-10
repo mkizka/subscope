@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 
 import { infinite, queryClient } from "@/.storybook/query-client";
-import type { InviteCode } from "@/app/features/admin/invite-code-list";
 import type { loader as inviteCodesLoader } from "@/app/routes/admin.api.invite-codes";
 
 import { AdminPage } from "./admin-page";
