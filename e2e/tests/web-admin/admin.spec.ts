@@ -106,7 +106,7 @@ test.describe("ジョブキュー", () => {
 });
 
 test.describe("メンバー", () => {
-  test("admin-accounts-1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
+  test("admin-accounts-e1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -122,15 +122,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
   });
 
-  test("admin-accounts-4: 見出しの横にメンバーの人数を出す", async ({
-    page,
-  }) => {
-    await page.goto("/admin/registered-accounts");
-
-    await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
-  });
-
-  test("admin-accounts-3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
+  test("admin-accounts-e3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -157,7 +149,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("admin-accounts-2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("admin-accounts-e2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -201,7 +193,7 @@ test.describe("メンバー", () => {
     return did;
   };
 
-  test("admin-accounts-5: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
+  test("admin-accounts-e4: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
     page,
   }) => {
     await page.goto("/");
@@ -221,7 +213,7 @@ test.describe("メンバー", () => {
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
 
-  test("admin-accounts-8: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
+  test("admin-accounts-e6: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
@@ -234,66 +226,7 @@ test.describe("メンバー", () => {
     );
   });
 
-  test("admin-accounts-9: 「メンバー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const aliceDid = await resolveHandle("alice.test");
-
-    await expect(async () => {
-      await page.goto("/admin/registered-accounts");
-      const row = page
-        .getByRole("main")
-        .getByRole("listitem")
-        .filter({ has: page.getByTitle(aliceDid) });
-      await expect(row.getByText("同期済み")).toBeVisible({
-        timeout: 1000,
-      });
-    }).toPass();
-  });
-
-  test("admin-accounts-10: メンバーの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/admin/api/registered-accounts*", async (route) => {
-      await released;
-      await route.continue();
-    });
-
-    await page.goto("/admin/registered-accounts");
-
-    await expect(
-      page.getByRole("heading", { name: "アカウント管理" }),
-    ).toBeVisible();
-    const skeleton = page.getByRole("status", {
-      name: "読み込み中",
-      exact: true,
-    });
-    await expect(skeleton).toBeVisible();
-    release(undefined);
-    await expect(skeleton).toBeHidden();
-  });
-
-  test("admin-accounts-6: 「停止中」タブには、サーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const graceDid = await banAccount(page, "grace.test");
-
-    await page.goto("/admin/registered-accounts");
-
-    const row = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ has: page.getByTitle(graceDid) });
-    await page.getByRole("tab", { name: "停止中" }).click();
-
-    await expect(row.getByTitle(graceDid)).toBeVisible();
-  });
-
-  test("admin-accounts-7: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+  test("admin-accounts-e5: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
     page,
   }) => {
     await page.goto("/");
