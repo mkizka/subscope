@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
-import { infinite, queryClient } from "@/.storybook/query-client";
+import { type Data, infinite, queryClient } from "@/.storybook/query-client";
 import TimelineFeedStories from "@/app/features/timeline/timeline-feed.stories";
+import type { loader as backfillStatusLoader } from "@/app/routes/api.backfill-status";
 import type { loader as timelineLoader } from "@/app/routes/api.timeline";
 
 import { TimelinePage } from "./timeline-page";
@@ -69,5 +71,53 @@ export const Local: Story = {
         posts: TimelineFeedStories.args.posts,
       }),
     );
+  },
+};
+
+const setBackfillStatus = (
+  status: Data<typeof backfillStatusLoader>["status"],
+) => {
+  queryClient.setQueryData<Data<typeof backfillStatusLoader>>(
+    ["backfill-status"],
+    {
+      status,
+    },
+  );
+};
+
+export const BackfillInProgress: Story = {
+  name: "backfillBanner-s1: 自分の同期中は、「過去の投稿を同期しています」の帯を出す",
+  tags: ["play"],
+  beforeEach: () => setBackfillStatus("inProgress"),
+  play: async ({ canvasElement }) => {
+    await expect(
+      await within(canvasElement).findByText(/過去の投稿を同期しています/),
+    ).toBeVisible();
+  },
+};
+
+export const BackfillError: Story = {
+  name: "backfillBanner-s2: 自分の同期がエラーなら、「過去の投稿を同期できていません」の帯を出す",
+  tags: ["play"],
+  beforeEach: () => setBackfillStatus("error"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByText(/過去の投稿を同期できていません/),
+    ).toBeVisible();
+    await expect(canvas.queryByText(/過去の投稿を同期しています/)).toBeNull();
+  },
+};
+
+export const BackfillCompleted: Story = {
+  name: "backfillBanner-s3: 自分の同期が終わっていれば、帯を出さない",
+  tags: ["play"],
+  beforeEach: () => setBackfillStatus("completed"),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      await canvas.findByRole("tab", { name: "フォロー中" }),
+    ).toBeVisible();
+    await expect(canvas.queryByText(/過去の投稿を/)).toBeNull();
   },
 };
