@@ -171,7 +171,7 @@ export const HistoryList: Story = {
     await expect(items[0]).toHaveTextContent("word5");
     await expect(items[1]).toHaveTextContent("word11");
     await expect(
-      within(history).queryByRole("link", { name: "word1", exact: true }),
+      within(history).queryByRole("link", { name: "word1" }),
     ).toBeNull();
   },
 };
