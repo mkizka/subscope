@@ -194,9 +194,9 @@ URLとハッシュタグは公式クライアントと同じ `@atproto/api` のR
 
 投稿に付いた画像を、本文の下に並べて表示する。
 
-- post-images-1: 画像が1枚のときは、投稿の幅いっぱいに表示する
-- post-images-2: gallery埋め込み(app.bsky.embed.gallery)の画像も、すべて並べて表示する
-- post-images-3: 画像が5枚以上のときは、横スクロールで表示する
+- post-images-s1: 画像が1枚のときは、投稿の幅いっぱいに表示する
+- post-images-e1: gallery埋め込み(app.bsky.embed.gallery)の画像も、すべて並べて表示する
+- post-images-s2: 画像が5枚以上のときは、横スクロールで表示する
 
 ## 投稿動画
 
