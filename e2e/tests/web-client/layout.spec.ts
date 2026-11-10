@@ -337,7 +337,7 @@ test.describe("レイアウト（モバイル）", () => {
     await expect(menuButton).toBeInViewport();
   });
 
-  test("layout-20: モバイルでは、タイムラインの「フォロー中」「ローカル」タブをヘッダーと同時に、同じ動きで隠し・再表示する", async ({
+  test("layout-20: モバイルでは、タブのあるページ（タイムライン・プロフィール・サーバーなど）は、ヘッダーを隠すとタブだけを画面上端に残し、ヘッダーの再表示と同時にタブをその下へ戻す", async ({
     page,
   }) => {
     await page.goto("/");

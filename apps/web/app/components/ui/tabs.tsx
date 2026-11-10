@@ -8,7 +8,15 @@ type Props = {
 
 export function Tabs({ tabs, onSelect }: Props) {
   return (
-    <div role="tablist" className="flex border-b border-line">
+    <div
+      role="tablist"
+      className="
+        sticky top-14 z-sticky flex border-b border-line bg-surface
+        transition-transform
+        lg:top-0
+        max-lg:[main:has(>header[data-visible=false])_&]:-translate-y-14
+      "
+    >
       {tabs.map(({ to, label, selected }) => (
         <Link
           key={to}
