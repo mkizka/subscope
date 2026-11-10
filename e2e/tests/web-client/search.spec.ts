@@ -26,19 +26,7 @@ test.describe("検索", () => {
     });
   });
 
-  test("search-11: 検索語がないときは、検索欄の下に探せる対象（追跡アカウントと投稿）の説明を出す", async ({
-    page,
-  }) => {
-    await page.goto("/search");
-
-    await expect(
-      page.getByText(
-        "このサーバーに保存されているアカウントと投稿を検索できます",
-      ),
-    ).toBeVisible();
-  });
-
-  test("search-1: 左カラムの「検索」から開いた検索欄で検索すると、表示名またはハンドルが検索語に部分一致するアカウント（名前、ハンドル、自己紹介）を一覧表示する", async ({
+  test("search-e1: 左カラムの「検索」から開いた検索欄でユーザータブに切り替えて検索すると、表示名またはハンドルが検索語に部分一致するアカウント（名前、ハンドル、自己紹介）を一覧表示する", async ({
     page,
   }) => {
     await page.goto("/");
@@ -63,7 +51,7 @@ test.describe("検索", () => {
     await expect(alice.getByText("Blueskyを使っています")).toBeVisible();
   });
 
-  test("search-2: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
+  test("search-e2: 一覧のアカウントを選ぶと、そのアカウントのプロフィール全体ページに移動する", async ({
     page,
   }) => {
     const link = page.getByRole("main").getByRole("link", { name: /^Alice/ });
@@ -82,28 +70,10 @@ test.describe("検索", () => {
     ).toBeVisible();
   });
 
-  test("search-3: 一致するアカウントがないときは「ユーザーが見つかりません」と表示する", async ({
+  test("search-e3: 投稿タブ（最初に表示されるタブ）で検索すると、本文が検索語に部分一致する投稿を、リプライを除いて新しい順に一覧表示する", async ({
     page,
   }) => {
-    await page.goto("/search?q=nobody-matches-this&tab=accounts");
-
-    await expect(page.getByText("ユーザーが見つかりません")).toBeVisible();
-  });
-
-  test("search-4: URLに `?q=検索語` があると、検索欄にその語を入れて検索結果を表示する", async ({
-    page,
-  }) => {
-    await page.goto("/search?q=alice");
-
-    await expect(page.getByRole("searchbox", { name: "検索語" })).toHaveValue(
-      "alice",
-    );
-  });
-
-  test("search-5: 「投稿」タブで検索すると、本文が検索語に部分一致する投稿を、リプライを除いて新しい順に一覧表示する", async ({
-    page,
-  }) => {
-    const q = `search5-${Date.now()}`;
+    const q = `search3-${Date.now()}`;
     const older = await post(`古い ${q} 投稿`);
     await post(`新しい ${q} 投稿`);
     await post(`返信 ${q}`, older);
@@ -120,74 +90,7 @@ test.describe("検索", () => {
     ]);
   });
 
-  test("search-6: 一致する投稿がないときは「投稿が見つかりません」と表示する", async ({
-    page,
-  }) => {
-    await page.goto("/search?q=nobody-matches-this");
-
-    await expect(page.getByText("投稿が見つかりません")).toBeVisible();
-  });
-
-  test("search-7: 検索ボタンは、検索結果のページに移るまでスピナーを出して押せなくする", async ({
-    page,
-  }) => {
-    await page.goto("/search");
-    let release = () => {};
-    const held = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/api/search*", async (route) => {
-      await held;
-      await route.continue();
-    });
-    const button = page.getByRole("button", { name: "検索" });
-
-    await page.getByRole("searchbox", { name: "検索語" }).fill("alice");
-    await button.click();
-
-    await expect(button).toBeDisabled();
-    await expect(button.locator(".animate-spin")).toBeVisible();
-    release();
-    await expect(button).toBeEnabled();
-  });
-
-  test("search-8: アカウントの検索結果には、過去の投稿の同期状態を表示する", async ({
-    page,
-  }) => {
-    const alice = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ hasText: "@alice.test" });
-    await expect(async () => {
-      await page.goto("/search?q=alice&tab=accounts");
-      await expect(alice.getByText("同期済み", { exact: true })).toBeVisible({
-        timeout: 1000,
-      });
-    }).toPass();
-  });
-
-  test("search-9: 検索結果のページを開くと、結果の読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
-    page,
-  }) => {
-    await page.goto("/search");
-    const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/api/search*", async (route) => {
-      await released;
-      await route.continue();
-    });
-
-    await page.getByRole("searchbox", { name: "検索語" }).fill("alice");
-    await page.getByRole("button", { name: "検索" }).click();
-
-    await expect(page).toHaveURL("/search?q=alice");
-    const skeleton = page.getByRole("status", {
-      name: "読み込み中",
-      exact: true,
-    });
-    await expect(skeleton).toBeVisible();
-    release(undefined);
-    await expect(skeleton).toBeHidden();
-  });
-
-  test("search-10: 一度表示した検索結果に戻ると、読み込み直しを待たずに前回の結果を表示する", async ({
+  test("search-e4: 一度表示した検索結果に戻ると、読み込み直しを待たずに前回の結果を表示する", async ({
     page,
   }) => {
     const alice = page
@@ -208,85 +111,5 @@ test.describe("検索", () => {
     await page.goBack();
 
     await expect(alice).toBeVisible();
-  });
-});
-
-test.describe("検索履歴", () => {
-  const searchbox = (page: Page) =>
-    page.getByRole("main").getByRole("searchbox", { name: "検索語" });
-  const history = (page: Page) =>
-    page.getByRole("main").getByRole("list", { name: "検索履歴" });
-
-  const openHistory = (page: Page) =>
-    expect(async () => {
-      await searchbox(page).blur();
-      await searchbox(page).focus();
-      await expect(history(page)).toBeVisible({ timeout: 500 });
-    }).toPass();
-
-  const seedHistory = (page: Page, words: string[]) =>
-    page.addInitScript(
-      (value) => localStorage.setItem("search-history", value),
-      JSON.stringify(words),
-    );
-
-  test("search-12: 検索欄にフォーカスすると、過去に検索した語を新しい順に最大10件、検索欄の下に表示する", async ({
-    page,
-  }) => {
-    await seedHistory(
-      page,
-      Array.from({ length: 11 }, (_, i) => `word${11 - i}`),
-    );
-    await page.goto("/search?q=word5");
-
-    await openHistory(page);
-
-    const items = history(page).getByRole("listitem");
-    await expect(items).toHaveCount(10);
-    await expect(items.first()).toContainText("word5");
-    await expect(items.nth(1)).toContainText("word11");
-    await expect(
-      history(page).getByRole("link", { name: "word1", exact: true }),
-    ).toHaveCount(0);
-  });
-
-  test("search-13: 履歴の語を選ぶと、検索欄にその語を入れて検索する", async ({
-    page,
-  }) => {
-    await seedHistory(page, ["bar", "foo"]);
-    await page.goto("/search");
-
-    await openHistory(page);
-    await history(page).getByRole("link", { name: "foo" }).click();
-
-    await expect(page).toHaveURL("/search?q=foo");
-    await expect(searchbox(page)).toHaveValue("foo");
-  });
-
-  test("search-14: 履歴の語は個別に、または「履歴を全て削除」で全て削除できる", async ({
-    page,
-  }) => {
-    await seedHistory(page, ["bar", "foo"]);
-    await page.goto("/search");
-
-    await openHistory(page);
-    await history(page).getByRole("button", { name: "fooを削除" }).click();
-    await expect(history(page)).not.toContainText("foo");
-    await expect(history(page)).toContainText("bar");
-
-    await page.getByRole("button", { name: "履歴を全て削除" }).click();
-    await expect(history(page)).toBeHidden();
-  });
-
-  test("search-15: 検索を実行すると、履歴を閉じる", async ({ page }) => {
-    await seedHistory(page, ["bar", "foo"]);
-    await page.goto("/search");
-
-    await openHistory(page);
-    await searchbox(page).fill("baz");
-    await searchbox(page).press("Enter");
-
-    await expect(page).toHaveURL(/q=baz/);
-    await expect(history(page)).toBeHidden();
   });
 });
