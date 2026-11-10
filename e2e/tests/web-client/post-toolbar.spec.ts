@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { createRecord, follow, PDS_URL } from "../../helpers/pds";
+import { createRecord, PDS_URL } from "../../helpers/pds";
 
 const cases = [
-  { id: "post-toolbar-1", name: "いいね", collection: "app.bsky.feed.like" },
+  { id: "post-toolbar-e1", name: "いいね", collection: "app.bsky.feed.like" },
   {
-    id: "post-toolbar-2",
+    id: "post-toolbar-e2",
     name: "リポスト",
     collection: "app.bsky.feed.repost",
   },
@@ -77,14 +77,14 @@ type PostRecord = {
 
 const composeCases = [
   {
-    id: "post-toolbar-3",
+    id: "post-toolbar-e3",
     name: "返信",
     submit: "返信",
     title: "返信ボタンで投稿欄が開き、投稿するとその投稿への返信になる",
     subjectOf: (record: PostRecord) => record.reply?.parent.uri,
   },
   {
-    id: "post-toolbar-4",
+    id: "post-toolbar-e4",
     name: "引用",
     submit: "投稿",
     title: "引用ボタンで投稿欄が開き、投稿するとその投稿を引用した投稿になる",
@@ -130,11 +130,11 @@ for (const { id, name, submit, title, subjectOf } of composeCases) {
   });
 }
 
-test("post-toolbar-5: いいね・リポストのボタンは、押した結果を画面に反映し終えるまで押せない", async ({
+test("post-toolbar-e5: いいね・リポストのボタンは、押した結果を画面に反映し終えるまで押せない", async ({
   page,
   request,
 }) => {
-  const text = "post-toolbar-5: 投稿";
+  const text = "post-toolbar-e5: 投稿";
   const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
     text,
     createdAt: new Date().toISOString(),
@@ -180,54 +180,11 @@ test("post-toolbar-5: いいね・リポストのボタンは、押した結果�
   }
 });
 
-test("post-toolbar-6: 削除ボタンは、タイムラインでもスレッドでも自分の投稿にだけ表示する", async ({
-  page,
-}) => {
-  await follow("alice.test", "bob.test");
-  const createdAt = new Date().toISOString();
-  const mineRecord = await createRecord("alice.test", "app.bsky.feed.post", {
-    text: "post-toolbar-6: 自分の投稿",
-    createdAt,
-  });
-  const othersRecord = await createRecord("bob.test", "app.bsky.feed.post", {
-    text: "post-toolbar-6: 他人の投稿",
-    createdAt,
-  });
-
-  await page.goto("/");
-  const mine = page
-    .getByRole("article")
-    .filter({ hasText: "post-toolbar-6: 自分の投稿" });
-  const others = page
-    .getByRole("article")
-    .filter({ hasText: "post-toolbar-6: 他人の投稿" });
-  await expect(async () => {
-    await page.reload();
-    await expect(mine).toBeVisible({ timeout: 1000 });
-    await expect(others).toBeVisible({ timeout: 1000 });
-  }).toPass();
-  await mine.getByRole("button", { name: "投稿のメニュー" }).click();
-  await expect(mine.getByRole("button", { name: "削除" })).toBeVisible();
-  await page.keyboard.press("Escape");
-  await others.getByRole("button", { name: "投稿のメニュー" }).click();
-  await expect(others.getByRole("button", { name: "削除" })).toBeHidden();
-  await page.keyboard.press("Escape");
-
-  const thread = page.getByRole("region", { name: "スレッド" });
-  await page.goto(`/alice.test/post/${mineRecord.uri.split("/").pop()}`);
-  await thread.getByRole("button", { name: "投稿のメニュー" }).click();
-  await expect(thread.getByRole("button", { name: "削除" })).toBeVisible();
-  await page.goto(`/bob.test/post/${othersRecord.uri.split("/").pop()}`);
-  await expect(thread.getByText("post-toolbar-6: 他人の投稿")).toBeVisible();
-  await thread.getByRole("button", { name: "投稿のメニュー" }).click();
-  await expect(thread.getByRole("button", { name: "削除" })).toBeHidden();
-});
-
-test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除すると再読み込みなしでタイムラインから投稿を消す", async ({
+test("post-toolbar-e6: 削除ボタンで確認ダイアログを開き、削除すると再読み込みなしでタイムラインから投稿を消す", async ({
   page,
   request,
 }) => {
-  const text = "post-toolbar-7: 投稿";
+  const text = "post-toolbar-e6: 投稿";
   const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
     text,
     createdAt: new Date().toISOString(),
@@ -253,10 +210,10 @@ test("post-toolbar-7: 削除ボタンで確認ダイアログを開き、削除�
   expect(await res.text()).not.toContain(uri);
 });
 
-test("post-toolbar-8: 返信を投稿すると、再読み込みなしで返信先の投稿の返信の件数を増やす", async ({
+test("post-toolbar-e7: 返信を投稿すると、再読み込みなしで返信先の投稿の返信の件数を増やす", async ({
   page,
 }) => {
-  const text = "post-toolbar-8: 投稿";
+  const text = "post-toolbar-e7: 投稿";
   await createRecord("alice.test", "app.bsky.feed.post", {
     text,
     createdAt: new Date().toISOString(),
@@ -271,7 +228,7 @@ test("post-toolbar-8: 返信を投稿すると、再読み込みなしで返信�
   await post.getByRole("button", { name: "返信" }).click();
   await page
     .getByRole("textbox", { name: "投稿内容" })
-    .fill("post-toolbar-8: 返信");
+    .fill("post-toolbar-e7: 返信");
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "返信", exact: true })
@@ -280,12 +237,12 @@ test("post-toolbar-8: 返信を投稿すると、再読み込みなしで返信�
   await expect(post.getByTitle("1件の返信")).toHaveText("1");
 });
 
-test("post-toolbar-9: 投稿のメニューの「リンクをコピー」で、投稿のスレッドのURLをクリップボードにコピーする", async ({
+test("post-toolbar-e8: 投稿のメニューの「リンクをコピー」で、投稿のスレッドのURLをクリップボードにコピーする", async ({
   page,
   context,
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-  const text = "post-toolbar-9: 投稿";
+  const text = "post-toolbar-e8: 投稿";
   const { uri } = await createRecord("alice.test", "app.bsky.feed.post", {
     text,
     createdAt: new Date().toISOString(),
@@ -303,26 +260,4 @@ test("post-toolbar-9: 投稿のメニューの「リンクをコピー」で、�
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
     `${new URL(page.url()).origin}/alice.test/post/${uri.split("/").pop()}`,
   );
-});
-
-test("post-toolbar-10: いいね済みの投稿のいいねボタンは、ハートを塗りつぶして表示する", async ({
-  page,
-}) => {
-  const text = "post-toolbar-10: 投稿";
-  await createRecord("alice.test", "app.bsky.feed.post", {
-    text,
-    createdAt: new Date().toISOString(),
-  });
-
-  await page.goto("/");
-  const post = page.getByRole("article").filter({ hasText: text });
-  await expect(async () => {
-    await page.reload();
-    await expect(post).toBeVisible({ timeout: 1000 });
-  }).toPass();
-  const heart = post.getByRole("button", { name: "いいね" }).locator("svg");
-
-  await expect(heart).toHaveCSS("fill", "none");
-  await post.getByRole("button", { name: "いいね" }).click();
-  await expect(heart).not.toHaveCSS("fill", "none");
 });
