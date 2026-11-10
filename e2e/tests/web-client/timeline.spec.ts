@@ -281,11 +281,14 @@ test.describe("タイムライン", () => {
 });
 
 test.describe("ローカルタイムライン", () => {
-  test("localTimeline-1: 「ローカル」タブを選ぶと、このサーバーのメンバーの投稿を新しいものほど上に表示する", async ({
+  test("localTimeline-e1: 「ローカル」タブを選ぶと、このサーバーのメンバーの投稿を新しいものほど上に表示する", async ({
     page,
     request,
   }) => {
-    const texts = ["localTimeline-1: 古い投稿", "localTimeline-1: 新しい投稿"];
+    const texts = [
+      "localTimeline-e1: 古い投稿",
+      "localTimeline-e1: 新しい投稿",
+    ];
     await createPosts(request, texts);
     texts.reverse();
 
@@ -294,41 +297,41 @@ test.describe("ローカルタイムライン", () => {
 
     await expect(async () => {
       await page.reload();
-      await expect(page.getByText(/^localTimeline-1: /)).toHaveText(texts, {
+      await expect(page.getByText(/^localTimeline-e1: /)).toHaveText(texts, {
         timeout: 1000,
       });
     }).toPass();
   });
 
-  test("localTimeline-2: 「ローカル」タブには、メンバーのフォロー先であってもメンバーではないアカウントの投稿は表示しない", async ({
+  test("localTimeline-e2: 「ローカル」タブには、メンバーのフォロー先であってもメンバーではないアカウントの投稿は表示しない", async ({
     page,
     request,
   }) => {
     await follow("alice.test", "heidi.test");
     await createRecord("heidi.test", "app.bsky.feed.post", {
-      text: "localTimeline-2: メンバーではない人の投稿",
+      text: "localTimeline-e2: メンバーではない人の投稿",
       createdAt: new Date().toISOString(),
     });
-    await createPosts(request, ["localTimeline-2: メンバーの投稿"]);
+    await createPosts(request, ["localTimeline-e2: メンバーの投稿"]);
 
     await page.goto("/?tab=local");
 
     await expect(async () => {
       await page.reload();
       await expect(
-        page.getByText("localTimeline-2: メンバーの投稿"),
+        page.getByText("localTimeline-e2: メンバーの投稿"),
       ).toBeVisible({ timeout: 1000 });
     }).toPass();
     await expect(
-      page.getByText("localTimeline-2: メンバーではない人の投稿"),
+      page.getByText("localTimeline-e2: メンバーではない人の投稿"),
     ).toBeHidden();
   });
 
-  test("localTimeline-3: 「フォロー中」タブを選ぶと、フォロー中のタイムラインに戻る", async ({
+  test("localTimeline-e3: 「フォロー中」タブを選ぶと、フォロー中のタイムラインに戻る", async ({
     page,
     request,
   }) => {
-    await createPosts(request, ["localTimeline-3: 投稿"]);
+    await createPosts(request, ["localTimeline-e3: 投稿"]);
 
     await page.goto("/?tab=local");
     await page.getByRole("tab", { name: "フォロー中" }).click();
