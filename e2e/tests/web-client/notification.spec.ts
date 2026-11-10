@@ -5,34 +5,10 @@ import {
   follow,
   putRecord,
   resolveHandle,
-  uploadBlob,
 } from "../../helpers/pds";
 
 test.describe("通知", () => {
-  test.use({ viewport: { width: 375, height: 667 } });
-
-  test("notification-6: モバイルでは、未読があるとき下のタブの通知に未読数を表示する", async ({
-    page,
-  }) => {
-    await follow("alice.test", "bob.test");
-    await follow("bob.test", "alice.test");
-
-    await page.goto("/");
-
-    await expect(async () => {
-      await page.reload();
-      await expect(
-        page
-          .getByRole("navigation", { name: "タブバー" })
-          .getByRole("link", { name: "通知" })
-          .getByText(/^\d+$/),
-      ).toBeVisible({ timeout: 1000 });
-    }).toPass();
-  });
-});
-
-test.describe("通知（PC）", () => {
-  test("notification-2: フォローの通知には、相手の名前を表示する", async ({
+  test("notification-e2: フォローの通知には、相手の名前を表示する", async ({
     page,
   }) => {
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -54,11 +30,11 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-1: いいね・リポストの通知には、相手の名前と対象の投稿の本文を表示する", async ({
+  test("notification-e1: いいね・リポストの通知には、相手の名前と対象の投稿の本文を表示する", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();
-    const text = `notification-1: ${createdAt}`;
+    const text = `notification-e1: ${createdAt}`;
     const post = await createRecord("alice.test", "app.bsky.feed.post", {
       text,
       createdAt,
@@ -99,13 +75,13 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-3: リプライ・引用・メンションの通知には、相手の名前とその投稿を表示する", async ({
+  test("notification-e3: リプライ・引用・メンションの通知には、相手の名前とその投稿を表示する", async ({
     page,
   }) => {
     const createdAt = new Date().toISOString();
     const aliceDid = await resolveHandle("alice.test");
     const post = await createRecord("alice.test", "app.bsky.feed.post", {
-      text: "notification-3: 元の投稿",
+      text: "notification-e3: 元の投稿",
       createdAt,
     });
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -114,10 +90,10 @@ test.describe("通知（PC）", () => {
     await follow("alice.test", "bob.test");
     const ref = { uri: post.uri, cid: post.cid };
     const mention = "@alice.test";
-    const mentionText = `notification-3: メンション ${mention}`;
+    const mentionText = `notification-e3: メンション ${mention}`;
     const texts = [
-      "notification-3: リプライ",
-      "notification-3: 引用",
+      "notification-e3: リプライ",
+      "notification-e3: 引用",
       mentionText,
     ];
     await createRecord("bob.test", "app.bsky.feed.post", {
@@ -164,7 +140,7 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-5: 未読の通知は背景色で区別し、通知を開いた後に再表示すると既読にする", async ({
+  test("notification-e5: 未読の通知は背景色で区別し、通知を開いた後に再表示すると既読にする", async ({
     page,
   }) => {
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -201,11 +177,11 @@ test.describe("通知（PC）", () => {
     }).toPass();
   });
 
-  test("notification-4: 通知を新しい順に並べ、下までスクロールすると古い通知を読み込む", async ({
+  test("notification-e4: 通知を新しい順に並べ、下までスクロールすると古い通知を読み込む", async ({
     page,
   }) => {
     const post = await createRecord("alice.test", "app.bsky.feed.post", {
-      text: "notification-4: 元の投稿",
+      text: "notification-e4: 元の投稿",
       createdAt: new Date().toISOString(),
     });
     await putRecord("bob.test", "app.bsky.actor.profile", "self", {
@@ -215,7 +191,7 @@ test.describe("通知（PC）", () => {
     const ref = { uri: post.uri, cid: post.cid };
     const texts = Array.from(
       { length: 31 },
-      (_, i) => `notification-4: リプライ${i}`,
+      (_, i) => `notification-e4: リプライ${i}`,
     );
     for (const text of texts) {
       await createRecord("bob.test", "app.bsky.feed.post", {
@@ -229,86 +205,12 @@ test.describe("通知（PC）", () => {
 
     const replies = page
       .getByRole("region", { name: "通知" })
-      .getByText(/^notification-4: リプライ/);
+      .getByText(/^notification-e4: リプライ/);
     await expect(async () => {
       await page.reload();
       await expect(replies.first()).toBeVisible({ timeout: 1000 });
       await replies.last().scrollIntoViewIfNeeded();
       await expect(replies).toHaveText([...texts].reverse(), { timeout: 1000 });
     }).toPass();
-  });
-
-  test("notification-7: 通知には、種類を表す色付きのアイコンと相手のアバターを表示する", async ({
-    page,
-  }) => {
-    const avatar = await uploadBlob(
-      "bob.test",
-      Uint8Array.from(
-        Buffer.from(
-          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-          "base64",
-        ),
-      ),
-    );
-    await putRecord("bob.test", "app.bsky.actor.profile", "self", {
-      displayName: "Bob",
-      avatar,
-    });
-    await follow("alice.test", "bob.test");
-    await createRecord("bob.test", "app.bsky.graph.follow", {
-      subject: await resolveHandle("alice.test"),
-      createdAt: new Date().toISOString(),
-    });
-
-    await page.goto("/notifications");
-
-    const notification = page
-      .getByRole("region", { name: "通知" })
-      .getByRole("listitem")
-      .filter({ hasText: "Bobさんにフォローされました" })
-      .first();
-    await expect(async () => {
-      await page.reload();
-      await expect(
-        notification.getByRole("img", { name: "フォロー" }),
-      ).toBeVisible({ timeout: 1000 });
-      await expect(
-        notification.locator(`img[src*="${avatar.ref.$link}"]`),
-      ).toBeVisible({ timeout: 1000 });
-    }).toPass();
-  });
-
-  test("notification-8: 通知の読み込み中は「通知はまだありません」を表示せず、読み込みが終わって0件のときだけ表示する", async ({
-    page,
-  }) => {
-    let release: () => void = () => {};
-    const gate = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/api/notifications?*", async (route) => {
-      await gate;
-      await route.fulfill({
-        json: { notifications: [], subjectTexts: {} },
-      });
-    });
-
-    await page.goto("/notifications");
-
-    const region = page.getByRole("region", { name: "通知" });
-    await expect(region.getByRole("status")).toBeVisible();
-    await expect(region.getByText("通知はまだありません")).toBeHidden();
-
-    release();
-
-    await expect(region.getByText("通知はまだありません")).toBeVisible();
-  });
-
-  test("notification-9: 通知の読み込み中は、左にアイコン列、右にアバター・文・ハンドル・本文を持つ通知の形のスケルトンを6行表示する", async ({
-    page,
-  }) => {
-    await page.route("**/api/notifications?*", () => {});
-
-    await page.goto("/notifications");
-
-    const rows = page.getByRole("region", { name: "通知" }).getByRole("status");
-    await expect(rows.locator("> div")).toHaveCount(6);
   });
 });

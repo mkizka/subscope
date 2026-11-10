@@ -34,22 +34,10 @@ async function open(page: Page, text: string) {
 }
 
 test.describe("投稿動画", () => {
-  test("post-video-1: 動画はサムネイルを表示し、ALTをプレイヤーのラベルにする", async ({
+  test("post-video-e1: 再生ボタンを押すとplaylistを取得して再生を始める", async ({
     page,
   }) => {
-    const text = `post-video-1: ${Date.now()}`;
-    await postVideo(text);
-    const post = await open(page, text);
-
-    const video = post.getByLabel(text);
-    await expect(video).toHaveJSProperty("tagName", "HLS-VIDEO");
-    await expect(video).toHaveAttribute("poster", /thumbnail\.jpg$/);
-  });
-
-  test("post-video-2: 再生ボタンを押すとplaylistを取得して再生を始める", async ({
-    page,
-  }) => {
-    const text = `post-video-2: ${Date.now()}`;
+    const text = `post-video-e1: ${Date.now()}`;
     await postVideo(text);
     const post = await open(page, text);
 
@@ -62,40 +50,5 @@ test.describe("投稿動画", () => {
     const requested = page.waitForRequest(PLAYLIST);
     await post.locator('[slot="centered-chrome"]').click();
     await requested;
-  });
-
-  test("post-video-3: 引用された投稿に付いた動画を、引用した投稿の中に表示する", async ({
-    page,
-  }) => {
-    const text = `post-video-3: ${Date.now()}`;
-    const quoted = await postVideo(`post-video-3-quoted: ${Date.now()}`);
-    await createRecord("alice.test", "app.bsky.feed.post", {
-      text,
-      embed: { $type: "app.bsky.embed.record", record: quoted },
-      createdAt: new Date().toISOString(),
-    });
-    const post = await open(page, text);
-
-    await expect(post.locator("blockquote").getByLabel(/quoted/)).toBeVisible();
-  });
-
-  test("post-video-4: 停止中は、動画の中央に再生ボタンを表示する", async ({
-    page,
-  }) => {
-    const text = `post-video-4: ${Date.now()}`;
-    await postVideo(text);
-    const post = await open(page, text);
-
-    await expect(post.locator('[slot="centered-chrome"]')).toBeVisible();
-  });
-
-  test("post-video-5: 再生ボタンの横に、経過時間と動画の長さを表示する", async ({
-    page,
-  }) => {
-    const text = `post-video-5: ${Date.now()}`;
-    await postVideo(text);
-    const post = await open(page, text);
-
-    await expect(post.locator("media-time-display")).toBeVisible();
   });
 });
