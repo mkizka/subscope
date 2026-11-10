@@ -41,7 +41,9 @@ export const Default: Story = {
   },
 };
 
-const setCodes = (codes: InviteCode[]) =>
+const setCodes = (
+  codes: Parameters<typeof infinite<typeof inviteCodesLoader>>[0]["codes"],
+) =>
   queryClient.setQueryData(
     ["inviteCodes"],
     infinite<typeof inviteCodesLoader>({ codes }),
