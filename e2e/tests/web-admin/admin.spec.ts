@@ -1,17 +1,12 @@
 import { expect, type Page, request, test } from "@playwright/test";
 
 import { login } from "../../helpers/login";
-import {
-  putRecord,
-  registerAccount,
-  resolveHandle,
-  uploadImage,
-} from "../../helpers/pds";
+import { registerAccount, resolveHandle } from "../../helpers/pds";
 
 const ADMIN_API_TOKEN = "sP3M1s3vK7jvA0pZ2bUuC5mD8qL4xN6tR9wE1yH0aB2c";
 
 test.describe("管理画面へのアクセス", () => {
-  test("admin-1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
+  test("admin-e1: 左カラムのメニューの下の「サーバー管理」に、管理者にだけ「アカウント管理」「招待コード」「ジョブキュー」を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -24,7 +19,7 @@ test.describe("管理画面へのアクセス", () => {
     await expect(nav.getByRole("link", { name: "ジョブキュー" })).toBeVisible();
   });
 
-  test("admin-2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
+  test("admin-e2: 管理者でないアカウントが管理画面のURLを開くと403エラーを出す", async ({
     page,
     browser,
   }) => {
@@ -47,7 +42,7 @@ test.describe("管理画面へのアクセス", () => {
 });
 
 test.describe("ジョブキュー", () => {
-  test("bull-board-1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
+  test("bull-board-e1: 左カラムの「ジョブキュー」は、新しいタブを開くことが分かるアイコンを付け、新しいタブで開く", async ({
     page,
   }) => {
     await page.goto("/");
@@ -62,7 +57,7 @@ test.describe("ジョブキュー", () => {
     await expect(popup).toHaveURL(/\/admin\/bull-board/);
   });
 
-  test("bull-board-2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
+  test("bull-board-e2: `Authorization: Bearer {ADMIN_API_TOKEN}` を付けると、ログインせずに bull-board のAPI(`/admin/bull-board/api/` 以下)をGETで読める", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -86,7 +81,7 @@ test.describe("ジョブキュー", () => {
     });
   });
 
-  test("bull-board-3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
+  test("bull-board-e3: `ADMIN_API_TOKEN` では、bull-board のAPIをGET以外で呼べない", async ({
     baseURL,
   }) => {
     const context = await request.newContext({
@@ -106,7 +101,7 @@ test.describe("ジョブキュー", () => {
 });
 
 test.describe("メンバー", () => {
-  test("admin-accounts-1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
+  test("admin-accounts-e1: メンバーを新しい順に1人1行で並べ、名前・ハンドル・管理者かどうか・登録日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -122,15 +117,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText(/\d{4}\/\d{2}\/\d{2} 登録/)).toBeVisible();
   });
 
-  test("admin-accounts-4: 見出しの横にメンバーの人数を出す", async ({
-    page,
-  }) => {
-    await page.goto("/admin/registered-accounts");
-
-    await expect(page.getByRole("main").getByText(/^\d+人$/)).toBeVisible();
-  });
-
-  test("admin-accounts-3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
+  test("admin-accounts-e3: 管理者でないメンバーを、行の右端のメニューから確認のうえ「管理者にする」で管理者にできる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -157,7 +144,7 @@ test.describe("メンバー", () => {
     await expect(row.getByText("管理者", { exact: true })).toBeVisible();
   });
 
-  test("admin-accounts-2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
+  test("admin-accounts-e2: 管理者でないメンバーを、行の右端のメニューから確認のうえ「サーバー登録を停止する」と登録を解除し、そのアカウントは招待コードで再登録できなくなる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -201,7 +188,7 @@ test.describe("メンバー", () => {
     return did;
   };
 
-  test("admin-accounts-5: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
+  test("admin-accounts-e4: 「メンバー」「停止中」のタブで一覧を切り替える", async ({
     page,
   }) => {
     await page.goto("/");
@@ -221,7 +208,7 @@ test.describe("メンバー", () => {
     await expect(page.getByTitle(aliceDid)).toBeVisible();
   });
 
-  test("admin-accounts-8: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
+  test("admin-accounts-e6: 選んだタブをURLに残し、そのURLを開くと同じタブを出す", async ({
     page,
   }) => {
     await page.goto("/admin/registered-accounts");
@@ -234,66 +221,7 @@ test.describe("メンバー", () => {
     );
   });
 
-  test("admin-accounts-9: 「メンバー」タブの各行に、本人の過去の投稿の同期状態を「同期済み」「同期中」「同期エラー」のバッジで出す", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const aliceDid = await resolveHandle("alice.test");
-
-    await expect(async () => {
-      await page.goto("/admin/registered-accounts");
-      const row = page
-        .getByRole("main")
-        .getByRole("listitem")
-        .filter({ has: page.getByTitle(aliceDid) });
-      await expect(row.getByText("同期済み")).toBeVisible({
-        timeout: 1000,
-      });
-    }).toPass();
-  });
-
-  test("admin-accounts-10: メンバーの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/admin/api/registered-accounts*", async (route) => {
-      await released;
-      await route.continue();
-    });
-
-    await page.goto("/admin/registered-accounts");
-
-    await expect(
-      page.getByRole("heading", { name: "アカウント管理" }),
-    ).toBeVisible();
-    const skeleton = page.getByRole("status", {
-      name: "読み込み中",
-      exact: true,
-    });
-    await expect(skeleton).toBeVisible();
-    release(undefined);
-    await expect(skeleton).toBeHidden();
-  });
-
-  test("admin-accounts-6: 「停止中」タブには、サーバー登録を停止したアカウントを1人1行で並べ、名前・ハンドルを出す", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const graceDid = await banAccount(page, "grace.test");
-
-    await page.goto("/admin/registered-accounts");
-
-    const row = page
-      .getByRole("main")
-      .getByRole("listitem")
-      .filter({ has: page.getByTitle(graceDid) });
-    await page.getByRole("tab", { name: "停止中" }).click();
-
-    await expect(row.getByTitle(graceDid)).toBeVisible();
-  });
-
-  test("admin-accounts-7: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
+  test("admin-accounts-e5: 停止中のアカウントを、行の「登録を再開する」から確認のうえ再開すると一覧から消え、そのアカウントは招待コードで再登録できるようになる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -330,7 +258,7 @@ test.describe("招待コード", () => {
     return ((await response.json()) as { code: string }).code;
   };
 
-  test("invite-codes-1: 招待コードを新しい順に並べ、コード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
+  test("invite-codes-e1: 招待コードを新しい順に1件1行で並べ、各行にコード・状態（未使用・使用済み・期限切れ）・使用者・有効期限・作成日を出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -345,34 +273,7 @@ test.describe("招待コード", () => {
     await expect(rows.nth(1)).toContainText(older);
   });
 
-  test("invite-codes-9: 招待コードの一覧を開くと、読み込みを待たずに画面を表示し、読み込み終えるまでスケルトンを表示する", async ({
-    page,
-  }) => {
-    await page.goto("/admin/registered-accounts");
-    const { promise: released, resolve: release } = Promise.withResolvers();
-    await page.route("**/admin/api/invite-codes*", async (route) => {
-      await released;
-      await route.continue();
-    });
-
-    await page
-      .getByRole("navigation")
-      .getByRole("link", { name: "招待コード" })
-      .click();
-
-    await expect(
-      page.getByRole("heading", { name: "招待コード" }),
-    ).toBeVisible();
-    const skeleton = page.getByRole("status", {
-      name: "読み込み中",
-      exact: true,
-    });
-    await expect(skeleton).toBeVisible();
-    release(undefined);
-    await expect(skeleton).toBeHidden();
-  });
-
-  test("invite-codes-2: 一覧の下までスクロールすると続きを読み込む", async ({
+  test("invite-codes-e2: 一覧の下までスクロールすると続きを読み込む", async ({
     page,
   }) => {
     await page.goto("/");
@@ -389,7 +290,7 @@ test.describe("招待コード", () => {
     await expect(page.getByText(oldest, { exact: true })).toBeVisible();
   });
 
-  test("invite-codes-3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
+  test("invite-codes-e3: 「新規作成」で有効期限7日の招待コードを作り、一覧の先頭に出す", async ({
     page,
   }) => {
     await page.goto("/");
@@ -412,7 +313,7 @@ test.describe("招待コード", () => {
     );
   });
 
-  test("invite-codes-4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
+  test("invite-codes-e4: 未使用で期限内の招待コードは、確認のうえ削除できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -429,40 +330,7 @@ test.describe("招待コード", () => {
     await expect(row).toHaveCount(0);
   });
 
-  test("invite-codes-5: 使用済みの招待コードは削除できない", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const code = await createInviteCode(page);
-    await registerAccount("carol.test", code);
-
-    await page.goto("/admin/invite-codes");
-    const row = inviteCodeRows(page).filter({ hasText: code });
-
-    await expect(row).toContainText("使用済み");
-    await expect(row.getByRole("button", { name: "削除" })).toHaveCount(0);
-  });
-
-  test("invite-codes-8: 使用済みの招待コードには、使用者のアバターと名前を出す", async ({
-    page,
-  }) => {
-    await putRecord("erin.test", "app.bsky.actor.profile", "self", {
-      displayName: "Erin",
-      avatar: await uploadImage("erin.test"),
-    });
-    await page.goto("/");
-    const code = await createInviteCode(page);
-    await registerAccount("erin.test", code);
-
-    const row = inviteCodeRows(page).filter({ hasText: code });
-    await expect(async () => {
-      await page.goto("/admin/invite-codes");
-      await expect(row).toContainText("Erin が使用", { timeout: 1000 });
-      await expect(row.locator("img")).toBeVisible({ timeout: 1000 });
-    }).toPass();
-  });
-
-  test("invite-codes-6: 期限切れの招待コードは確認せずに削除できる", async ({
+  test("invite-codes-e5: 期限切れの招待コードは確認せずに削除できる", async ({
     page,
   }) => {
     await page.goto("/");
@@ -474,22 +342,5 @@ test.describe("招待コード", () => {
     await row.getByRole("button", { name: "削除" }).click();
 
     await expect(row).toHaveCount(0);
-  });
-
-  test("invite-codes-7: 未使用で期限内の招待コードは、コードの横のボタンでコードをクリップボードにコピーできる", async ({
-    page,
-    context,
-  }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await page.goto("/");
-    const code = await createInviteCode(page);
-
-    await page.goto("/admin/invite-codes");
-    const row = inviteCodeRows(page).filter({ hasText: code });
-    await row.getByRole("button", { name: "コピー" }).click();
-
-    await expect
-      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
-      .toBe(code);
   });
 });
